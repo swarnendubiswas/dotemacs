@@ -165,7 +165,7 @@
                                         ; First ensure that a required set of packages are always installed
 (require 'ensure-packages)
 (setq ensure-packages
-      '(ac-math anaconda-mode auto-auto-indent auto-complete-auctex auto-complete auto-complete-config auto-indent-mode bash-completion color-theme company-auctex company dired-x display-theme es-lib esh-help eshell-fringe-status eshell-manual f fill-column-indicator flex-autopair flx-ido flx flymake-shell flymake-easy highlight-indentation ido-at-point indent-guide jgraph-mode json-rpc latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme mic-paren mode-icons nav obsidian-theme popup rainbow-delimiters readline-complete recentf s sentence-highlight simple-mode-line smart-mode-line smart-tab smart-tabs-mode smartparens dash smex starter-kit-eshell tramp uniquify yasnippet)
+      '(ac-math anaconda-mode auto-auto-indent auto-complete-auctex auto-complete auto-indent-mode bash-completion color-theme company-auctex company display-theme es-lib esh-help eshell-fringe-status eshell-manual f fill-column-indicator flex-autopair flx-ido flx flymake-shell flymake-easy highlight-indentation ido-at-point indent-guide jgraph-mode json-rpc latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme mic-paren mode-icons nav obsidian-theme popup rainbow-delimiters readline-complete recentf s sentence-highlight simple-mode-line smart-mode-line smart-tab smart-tabs-mode smartparens dash smex starter-kit-eshell tramp yasnippet)
       )
 (ensure-packages-install-missing)
 
