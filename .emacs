@@ -1,5 +1,10 @@
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 
+;; Citations (inspired from http://www.mygooglest.com/fni/dot-emacs.html)
+;;
+;;   "Show me your ~/.emacs and I will tell you who you are."  - Bogdan Maryniuk
+;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen - the editor should get used to us." - Vivek Haldar
+
 ;; Customizing packages
 (add-to-list 'load-path "~/.emacs.d/")
 (require 'package)
@@ -11,10 +16,12 @@
 (package-initialize)
 
 
-;; Customizing common functionality
+;; customizing common functionality
 
-(setq backup-inhibited t) ; disable backup
-(setq make-backup-files nil)
+;; backup
+(setq make-backup-files nil) ; stop making backup ~ files
+(setq backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
+
 (setq require-final-newline t) ; always end a file with a newline
 (setq inhibit-default-init t) ; disable loading of "default.el" at startup
 (setq inhibit-startup-screen t)
@@ -45,7 +52,7 @@
 ;;(transient-mark-mode 1) ;; No region when it is not highlighted
 
 
-;; Customize appearance
+;; customize appearance
 
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
@@ -66,22 +73,16 @@
 (display-time)
 (setq frame-title-format (concat  "%b - emacs@" (system-name))) ;; default to better frame titles
 
-(load-theme 'leuven t) ; set default theme on start up
+;; These are two nice themes, leuven and professional
+;;(load-theme 'leuven t) ; set default theme on start up
+(load-theme 'professional t)
 (set-face-background 'fringe "white") ; Hide the fringe mark on the left
 (setq-default indicate-empty-lines t)
 (setq-default highlight-changes-mode 1)
 (delete-selection-mode t) ; typing with the mark active will overwrite the marked region
 
 
-;; show the name of the function in the modeline
-(which-function-mode)
-(add-to-list 'which-func-modes 'java-mode)
-(add-to-list 'which-func-modes 'c-mode)
-(add-to-list 'which-func-modes 'c++-mode)
-(add-to-list 'which-func-modes 'python-mode)
-
-
-;; scroll one line at a time (less "jumpy" than defaults)    
+;; scroll one line at a time (less "jumpy" than defaults)
 (setq mouse-wheel-scroll-amount '(10 ((shift) . 10))) ;; one line at a time
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
@@ -89,22 +90,25 @@
 
 
 ;; Keyboard shortcuts
-(global-set-key "\C-l" 'goto-line) 
+(global-set-key "\C-l" 'goto-line)
 (global-set-key [f1] 'shell)
 (global-set-key [f2] 'split-window-vertically)
 (global-set-key [f3] 'split-window-horizontally)
 (global-set-key [f4] 'delete-other-windows)
-(global-set-key [f7] 'other-window) ; switch to the other buffer 
+(global-set-key [f7] 'other-window) ; switch to the other buffer
 (global-set-key "\C-x z" 'repeat)
 (global-set-key (kbd "M-/") 'hippie-expand)
-(global-set-key (kbd "C-f") 'isearch-forward)
+(global-set-key (kbd "C-f") 'isearch-forward-regexp)
 (define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (global-set-key "\C-s" 'save-buffer)
 (global-set-key (kbd "C-z") 'undo)
+(global-set-key (kbd "C-c n") 'comment-region)
+(global-set-key (kbd "C-c m") 'uncomment-region)
 
 ;; define a keyboard shortcut for duplicating lines
 (defun duplicate-line()
+  "Duplicate current line."
   (interactive)
   (move-beginning-of-line 1)
   (kill-line)
@@ -139,12 +143,18 @@
 (setq ibuffer-use-header-line t)
 
 
-;; Search
+;; fontification
+(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+(setq jit-lock-defer-time 0.10) ; improve scrolling speed with jit fontification
+
+
+;; search
 (setq search-highlight t) ; highlight incremental search
 (setq query-replace-highlight t) ; highlight during query
 
 
-;; Tramp
+;; tramp
 (setq tramp-default-method "ssh") ; faster than the default scp
 (setq tramp-default-user "biswass"
       tramp-default-host "sunshine.cse.ohio-state.edu")
@@ -162,10 +172,16 @@
 ;;(toggle-fullscreen)
 ;;(global-set-key [f11] 'toggle-fullscreen)
 
+;; full screen
+(defun fullscreen ()
+  (interactive)
+  (set-frame-parameter nil 'fullscreen
+                       (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
+;;(fullscreen)
+;;(global-set-key [f11] 'fullscreen)
+
 
 (setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
-
-
 
 
 ;; Package specific
@@ -174,24 +190,26 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-c-headers ac-ispell ac-math auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode autopair bash-completion better-defaults bibtex-utils color-theme company-auctex company-c-headers company dired+ display-theme emacs-setup es-lib f fill-column-indicator fish-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy highlight-indentation hl-line+ hlinum hungry-delete idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme mic-paren mode-icons nav pkg-info epl popup rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete s sentence-highlight smart-mode-line rich-minority smartparens dash smex yasnippet)
+      '(ac-ispell ac-math auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion better-defaults bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme readline-complete s sentence-highlight smart-mode-line rich-minority dash smex yasnippet)
       )
 (ensure-packages-install-missing)
 
 
-(autopair-global-mode 1) ; auto pair parentheses seems better than smartparens
-(electric-indent-mode) ; intelligent indentation
-
-;;(electric-pair-mode 1) ; autocomplete brackets/parentheses
+;; related to pairing of parentheses, brackets, etc.
+;;(autopair-global-mode 1) ; auto pair parentheses seems better than smartparens
 ;;(smartparens-global-mode 1) ; show paired parentheses
+(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
 ;;(paren-activate) ; mic-paren - parentheses matching
+(electric-indent-mode) ; intelligent indentation
+;;(electric-pair-mode 1) ; autocomplete brackets/parentheses
 
 ;; recentf stuff
-(recentf-mode 1)
+(require 'recentf)
 ;;(setq recentf-max-menu-items 15) ; show 15 in recent menu, but currently menu bar is disabled
-(setq recentf-max-saved-items 100) ; keep track of last 100 files 
+(setq recentf-max-saved-items 100) ; keep track of last 100 files
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 (setq recentf-auto-cleanup 'never)
+(recentf-mode 1)
 
 ;; if you want to use ido with recentf
 (defun recentf-ido-find-file ()
@@ -220,28 +238,24 @@
 ;;(ido-vertical-mode 1) ; display ido completions in a vertical list
 
 
-;; autocomplete
-(require 'auto-complete)
-(require 'auto-complete-config)
-(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
-(ac-config-default)
-(global-auto-complete-mode t)
-(ac-flyspell-workaround) ; seems auto-complete stops working with flymake
-
-(add-hook 'c-mode-hook
-          (lambda ()
-            (add-to-list 'ac-sources 'ac-source-c-headers)
-            (add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
-
-
-(hlinum-activate) ; highlight current line number
+;; autocomplete ; currently disabled in favor of company
+;;(require 'auto-complete)
+;;(require 'auto-complete-config)
+;;(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
+;;(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
+;;(ac-config-default)
+;;(global-auto-complete-mode t)
+;;(ac-flyspell-workaround) ; seems auto-complete stops working with flymake
+;;(add-hook 'c-mode-hook
+;;(lambda ()
+;;(add-to-list 'ac-sources 'ac-source-c-headers)
+;;(add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
 
 
-;;(flex-autopair-mode 1)
+;;(hlinum-activate) ; extension to linum-mode to highlight current line number
 
 (auto-indent-global-mode) ; auto-indentation minor mode
-;;(indent-guide-global-mode t)
+;;(indent-guide-global-mode t) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
 
 
 ;; whitespace
@@ -256,10 +270,6 @@
 ;;                    :weight 'bold)
 ;;(global-whitespace-mode t)
 
-;;(add-hook 'java-mode-hook
-;;          (lambda ()
-;;            (setq c-basic-offset 2)))
-
 
 ;; fci
 (define-globalized-minor-mode
@@ -272,12 +282,9 @@
   (if (> (frame-width) 120)
       (fci-mode 1)
     (fci-mode 0))
-)
+  )
 ;;(add-hook 'after-change-major-mode-hook 'auto-fci-mode)
 ;;(add-hook 'window-size-change-functions 'auto-fci-mode)
-
-
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
 
 ;; uniquify
@@ -290,43 +297,19 @@
 ;;(turn-on-flyspell 1)
 ;;(turn-on-auto-fill t)
 ;;(flyspell-issue-message-flag nil)
-(add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
-;;(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'find-file-hooks 'turn-on-flyspell) ; Otherwise flyspell isn't enabled as I want it
 (setq-default ispell-program-name "/usr/bin/aspell")
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
 
 
-;; Text mode  hooks
-(setq-default major-mode 'text-mode)
-;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-(setq comment-auto-fill-only-comments t)
-
-
 ;; rainbow mode
-;; To enable it in all programming-related emacs modes (Emacs 24+)
-;;(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable only in programming related-modes
-(global-rainbow-delimiters-mode) ; use Emacs-wide
-
-
-(global-font-lock-mode t)
-(setq font-lock-maximum-decoration t)
-(setq jit-lock-defer-time 0.05) ; improve scrolling speed with jit fontification
+;;(global-rainbow-delimiters-mode) ; use Emacs-wide
 
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
 (require 'dired-x)
-
-
-;; full screen
-(defun fullscreen ()
-  (interactive)
-  (set-frame-parameter nil 'fullscreen
-		       (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
-;;(fullscreen)
-;;(global-set-key [f11] 'fullscreen)
 
 
 ;;(global-smart-tab-mode 1)
@@ -345,6 +328,88 @@
 (global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
 
 
+;; helm
+;(helm-mode t)
+;(global-set-key (kbd "C-x C-f") 'helm-find-files)
+
+
+;; company
+(autoload 'company-mode "company" nil t)
+(add-hook 'after-init-hook 'global-company-mode)
+(require 'company-auctex)
+(company-auctex-init)
+
+
+;; smex
+(smex-initialize)
+(setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
+ '(custom-safe-themes (quote ("15990253bbcfb708ad6ee158d9969cf74be46e3fea2b35f1a0afbac7d4682fbf" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "e31eb7a32815c953e9f311987689e500524075dd8f5641f9140c5dbd4564ff25" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
+ '(display-time-mode t)
+ '(menu-bar-mode nil)
+ '(show-paren-mode t)
+ '(size-indication-mode t)
+ '(tool-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+
+;; mode-line
+;;(setq sml/theme 'automatic)
+(sml/setup)
+
+
+(global-hungry-delete-mode) ; erase 'all' consecutive white space characters in a given direction
+
+
+;; org mode
+(add-hook 'org-mode-hook 'turn-on-font-lock)
+
+
+(setq-default idle-highlight-mode t) ; idle highlight modes
+
+
+(iswitchb-mode t) ;; auto completion in minibuffer
+(icomplete-mode t) ;;minibuffer compeltion/suggestions
+
+(setq require-final-newline 'query)
+
+
+;; save history--------------------------------
+;;Save mode-line history between sessions. Very good!
+(setq savehist-additional-variables    ;; Also save ...
+      '(search-ring regexp-search-ring)    ;; ... searches
+      savehist-file "~/.emacs.d/savehist") ;; keep home clean
+(savehist-mode t)                      ;; do this before evaluation
+;;--------------------------------------------
+
+
+;; discover
+;;(global-discover-mode 1)
+
+
+;; Text mode  hooks
+(setq-default major-mode 'text-mode)
+;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(setq comment-auto-fill-only-comments t)
+(add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
+
+
+;; latex mode hooks
+
 ;; preview-latex
 (autoload 'LaTeX-preview-setup "preview")
 (add-hook 'LaTeX-mode-hook #'LaTeX-preview-setup)
@@ -352,19 +417,8 @@
 (add-hook 'latex-mode-hook 'magic-latex-buffer)
 
 
-;; helm
-;(helm-mode t)
-;(global-set-key (kbd "C-x C-f") 'helm-find-files)
-
-
-;; company 
-(autoload 'company-mode "company" nil t)
-(add-hook 'after-init-hook 'global-company-mode)
-(require 'company-auctex)
-(company-auctex-init)
-
-
-;;(require 'readline-complete) ; set up auto-complete in shell mode with company
+;; shell mode hooks
+(require 'readline-complete) ; set up auto-complete in shell mode with company
 
 
 ;; set up shell (not eshell) mode
@@ -375,67 +429,30 @@
 (push 'company-readline company-backends)
 (add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
 
+(add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
-;; smex
-(smex-initialize)
-(setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+;; programming mode hooks
 
-
-;; flymake syntax-check for shell scripts
-(add-hook 'sh-set-shell-hook 'flymake-shell-load)
+;;(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+;;(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable only in programming related-modes (Emacs 24+)
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(column-number-mode t)
- ;;'(cua-mode t nil (cua-base))
- '(custom-safe-themes (quote ("3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
- '(display-time-mode t)
- '(size-indication-mode t)
- '(tool-bar-mode nil)
- '(menu-bar-mode nil)
- )
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; show the name of the function in the modeline
+(which-function-mode)
+(add-to-list 'which-func-modes 'java-mode)
+(add-to-list 'which-func-modes 'c-mode)
+(add-to-list 'which-func-modes 'c++-mode)
+(add-to-list 'which-func-modes 'python-mode)
+
+;; c/c++ hooks
+
+;; java hooks
+(add-hook 'java-mode-hook
+          (lambda ()
+            (setq c-basic-offset 2)))
 
 
-;; mode-line
-(setq sml/theme 'automatic)
-(sml/setup)
+;; python hooks
 
-
-(global-hungry-delete-mode) ; erase 'all' consecutive white space characters in a given direction
-
-
-;; Org mode
-(add-hook 'org-mode-hook 'turn-on-font-lock)
-
-
-(setq-default idle-highlight-mode t) ; idle highlight modes
-
-
-(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
-
-
-(iswitchb-mode t) ;; auto completion in minibuffer
-(icomplete-mode t) ;;minibuffer compeltion/suggestions
-
-(setq require-final-newline 'query)
-
-
-;;Save History--------------------------------
-;;Save mode-line history between sessions. Very good!
-(setq savehist-additional-variables    ;; Also save ...
-      '(search-ring regexp-search-ring)    ;; ... searches
-      savehist-file "~/.emacs.d/savehist") ;; keep home clean
-(savehist-mode t)                      ;; do this before evaluation
-;;--------------------------------------------
