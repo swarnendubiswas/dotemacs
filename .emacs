@@ -190,7 +190,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-ispell ac-math auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion better-defaults bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme readline-complete s sentence-highlight smart-mode-line rich-minority dash smex yasnippet)
+      '(ac-ispell ac-math auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion better-defaults bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer malabar-mode mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme readline-complete s sentence-highlight smart-mode-line smart-tabs-mode rich-minority dash smex yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -198,10 +198,11 @@
 ;; related to pairing of parentheses, brackets, etc.
 ;;(autopair-global-mode 1) ; auto pair parentheses seems better than smartparens
 ;;(smartparens-global-mode 1) ; show paired parentheses
-(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
+;;(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
 ;;(paren-activate) ; mic-paren - parentheses matching
-(electric-indent-mode) ; intelligent indentation
+;;(electric-indent-mode) ; intelligent indentation
 ;;(electric-pair-mode 1) ; autocomplete brackets/parentheses
+(setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
 ;; recentf stuff
 (require 'recentf)
@@ -258,6 +259,9 @@
 ;;(indent-guide-global-mode t) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
 
 
+;; smooth scroll
+;;(smooth-scroll-mode t)
+
 ;; whitespace
 ;; (setq-default indicate-empty-lines t)
 ;; (show-trailing-whitespace t)
@@ -312,7 +316,15 @@
 (require 'dired-x)
 
 
+;; smart tabs (indent with tabs, align with spaces)
 ;;(global-smart-tab-mode 1)
+(autoload 'smart-tabs-mode "smart-tabs-mode"
+  "Intelligently indent with tabs, align with spaces!")
+(autoload 'smart-tabs-mode-enable "smart-tabs-mode")
+(autoload 'smart-tabs-advice "smart-tabs-mode")
+(autoload 'smart-tabs-insinuate "smart-tabs-mode")
+(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python
+                      'ruby 'nxml)
 
 
 ;; ergoemacs
@@ -329,8 +341,9 @@
 
 
 ;; helm
-;(helm-mode t)
-;(global-set-key (kbd "C-x C-f") 'helm-find-files)
+;;(require 'helm-config)
+;;(helm-mode t)
+;;(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 
 ;; company
@@ -356,6 +369,7 @@
  '(custom-safe-themes (quote ("15990253bbcfb708ad6ee158d9969cf74be46e3fea2b35f1a0afbac7d4682fbf" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "e31eb7a32815c953e9f311987689e500524075dd8f5641f9140c5dbd4564ff25" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
  '(display-time-mode t)
  '(menu-bar-mode nil)
+ '(scroll-bar-mode t)
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil))
@@ -375,33 +389,27 @@
 (global-hungry-delete-mode) ; erase 'all' consecutive white space characters in a given direction
 
 
-;; org mode
-(add-hook 'org-mode-hook 'turn-on-font-lock)
-
-
 (setq-default idle-highlight-mode t) ; idle highlight modes
 
 
 (iswitchb-mode t) ;; auto completion in minibuffer
-(icomplete-mode t) ;;minibuffer compeltion/suggestions
-
-(setq require-final-newline 'query)
+(icomplete-mode t) ;; minibuffer completion/suggestions
 
 
-;; save history--------------------------------
-;;Save mode-line history between sessions. Very good!
+;; save history
+;; save mode-line history between sessions. Very good!
 (setq savehist-additional-variables    ;; Also save ...
       '(search-ring regexp-search-ring)    ;; ... searches
       savehist-file "~/.emacs.d/savehist") ;; keep home clean
 (savehist-mode t)                      ;; do this before evaluation
-;;--------------------------------------------
 
 
 ;; discover
 ;;(global-discover-mode 1)
 
 
-;; Text mode  hooks
+;; text mode  hooks
+
 (setq-default major-mode 'text-mode)
 ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
 (setq comment-auto-fill-only-comments t)
@@ -432,6 +440,7 @@
 (add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
+
 ;; programming mode hooks
 
 ;;(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
@@ -452,7 +461,32 @@
 (add-hook 'java-mode-hook
           (lambda ()
             (setq c-basic-offset 2)))
-
+;;(add-to-list 'load-path "~/.emacs.d/jdee-2.4.1/lisp")
+;;(load "jde")
+(require 'cedet)
+(require 'semantic)
+;;(require 'semantic/db-javap)
+(load "semantic/loaddefs.el")
+(semantic-mode 1)
+(require 'malabar-mode)
+(add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+;; compile on save
+(add-hook 'malabar-mode-hook
+          (lambda () 
+            (add-hook 'after-save-hook 'malabar-compile-file-silently
+                      nil t)))
+;;(load-file "~/cedet-1.0pre6/common/cedet.el")
+(global-ede-mode 1)                      ; Enable the Project management system
+;;(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
+(global-semantic-decoration-mode)
+(global-semantic-highlight-edits-mode)
+(global-semantic-highlight-func-mode)
+(global-semantic-idle-completions-mode)
+(global-semantic-idle-breadcrumbs-mode)
 
 ;; python hooks
+
+
+;; org mode hooks
+(add-hook 'org-mode-hook 'turn-on-font-lock)
 
