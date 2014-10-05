@@ -1,9 +1,13 @@
+;; Swarnendu Biswas
+;; Mon Sep 29 17:43:44 EDT 2014
+
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 
 ;; Citations (inspired from http://www.mygooglest.com/fni/dot-emacs.html)
 ;;
 ;;   "Show me your ~/.emacs and I will tell you who you are."  - Bogdan Maryniuk
 ;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen - the editor should get used to us." - Vivek Haldar
+;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean McGrath
 
 ;; Customizing packages
 (add-to-list 'load-path "~/.emacs.d/")
@@ -22,22 +26,31 @@
 (setq make-backup-files nil) ; stop making backup ~ files
 (setq backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
 
-(setq require-final-newline t) ; always end a file with a newline
+;; startup
 (setq inhibit-default-init t) ; disable loading of "default.el" at startup
 (setq inhibit-startup-screen t)
 (setq inhibit-splash-screen t
       initial-scratch-message nil)
 (set initial-major-mode 'text-mode) ; *scratch* is in Lisp interaction mode by default
-(fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-;;(setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and applications ; already set by better-defaults
-(set-face-attribute 'default nil :height 109) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 
+;; defaults
+(setq require-final-newline t) ; always end a file with a newline
+(set default-major-mode 'text-mode)
+(fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
+(setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and applications
+(set-face-attribute 'default nil :height 109) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+(setq column-number-mode t)
+(setq-default fill-column 120)
+(setq standard-indent 2) ; Set standard indent to 2 rather that 4
+(setq-default tab-width 2)
+(setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
 
 ;; auto revert
 (global-auto-revert-mode t) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 30) ; default is 5 s
 ;;(auto-revert-tail-mode t) ; auto-revert if file grows at the end, also works for remote files
-
+;; All the "Reverting buffer foo" messages are _really_ distracting.
+(setq-default auto-revert-verbose nil) ;; quit this message
 
 ;; cua mode
 ;; cua-mode interferes with \C-x which can be useful in LaTeX. There are ways to get around it,
@@ -57,12 +70,9 @@
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
 ;;(setq linum-format " %d ")
-(setq column-number-mode t)
-(setq-default fill-column 120)
-;;(show-paren-mode t) ; (setq show-paren-mode t) ; also set by better-defaults
-(setq standard-indent 2) ; Set standard indent to 2 rather that 4
-(setq-default tab-width 2)
-;;(setq-default indent-tabs-mode nil) ; spaces instead of tabs by default, already set by better-defaults
+(show-paren-mode t) ; (setq show-paren-mode t) 
+(setq show-paren-style 'parenthesis) ; highlight just brackets
+;;(setq show-paren-style 'expression) ; highlight entire bracket expression
 
 (tool-bar-mode nil) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
@@ -79,8 +89,9 @@
 (set-face-background 'fringe "white") ; Hide the fringe mark on the left
 (setq-default indicate-empty-lines t)
 (setq-default highlight-changes-mode 1)
-(delete-selection-mode t) ; typing with the mark active will overwrite the marked region
+(setq-default indicate-buffer-boundaries 'right)
 
+(delete-selection-mode t) ; typing with the mark active will overwrite the marked region
 
 ;; scroll one line at a time (less "jumpy" than defaults)
 (setq mouse-wheel-scroll-amount '(10 ((shift) . 10))) ;; one line at a time
@@ -98,6 +109,7 @@
 (global-set-key [f7] 'other-window) ; switch to the other buffer
 (global-set-key "\C-x z" 'repeat)
 (global-set-key (kbd "M-/") 'hippie-expand)
+(global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (global-set-key (kbd "C-f") 'isearch-forward-regexp)
 (define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
@@ -160,6 +172,13 @@
       tramp-default-host "sunshine.cse.ohio-state.edu")
 
 
+;; ignore case when reading a file name completion
+(setq read-file-name-completion-ignore-case t)
+
+;; dim the ignored part of the file name
+(file-name-shadow-mode 1)
+
+
 ;; This doesn't work on all Gnome versions
 ;; make emacs start fullscreen, there is also the -fs option, but that covers the desktop panels
 ;;(defun toggle-fullscreen ()
@@ -190,7 +209,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-ispell ac-math auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion better-defaults bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer malabar-mode mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme readline-complete s sentence-highlight smart-mode-line smart-tabs-mode rich-minority dash smex yasnippet)
+      '(ac-ispell ac-math auctex-latexmk auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode rich-minority dash smex writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -210,6 +229,8 @@
 (setq recentf-max-saved-items 100) ; keep track of last 100 files
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 (setq recentf-auto-cleanup 'never)
+;; save file names relative to my current home directory
+(setq recentf-filename-handlers '(abbreviate-file-name))
 (recentf-mode 1)
 
 ;; if you want to use ido with recentf
@@ -222,8 +243,8 @@
 
 
 ;; enable ido mode
-;;(ido-mode 1) ; already set by better-defaults
-;;(setq ido-enable-flex-matching t) ; already set by better-defaults
+(ido-mode 1)
+(setq ido-enable-flex-matching t)
 (setq ido-everywhere t) ;;(ido-everywhere 1)
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 (setq ido-use-filename-at-point 'guess)
@@ -253,7 +274,7 @@
 ;;(add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
 
 
-;;(hlinum-activate) ; extension to linum-mode to highlight current line number
+(hlinum-activate) ; extension to linum-mode to highlight current line number
 
 (auto-indent-global-mode) ; auto-indentation minor mode
 ;;(indent-guide-global-mode t) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
@@ -292,8 +313,9 @@
 
 
 ;; uniquify
-;;(setq uniquify-buffer-name-style 'post-forward uniquify-separator ":") ; already set by better-defaults
-;;(setq uniquify-buffer-name-style 'reverse) ; another choice
+;;(setq uniquify-buffer-name-style 'post-forward uniquify-separator ":")
+(setq uniquify-buffer-name-style 'reverse)
+;;(setq uniquify-buffer-name-style 'forward)
 
 
 ;; Spell check
@@ -307,13 +329,19 @@
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
 
 
+;; minibuffer completion
+(require 'icicles)
+(icy-mode 1)
+
 ;; rainbow mode
 ;;(global-rainbow-delimiters-mode) ; use Emacs-wide
-
+(rainbow-mode)
+(rainbow-identifiers-mode)
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
 (require 'dired-x)
+(setq dired-auto-revert-buffer t) ;; revert each dired buffer automatically when you visit it
 
 
 ;; smart tabs (indent with tabs, align with spaces)
@@ -323,8 +351,7 @@
 (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
 (autoload 'smart-tabs-advice "smart-tabs-mode")
 (autoload 'smart-tabs-insinuate "smart-tabs-mode")
-(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python
-                      'ruby 'nxml)
+(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
 
 
 ;; ergoemacs
@@ -351,6 +378,8 @@
 (add-hook 'after-init-hook 'global-company-mode)
 (require 'company-auctex)
 (company-auctex-init)
+;; turn off auto downcasing of things
+(setq company-dabbrev-downcase nil)
 
 
 ;; smex
@@ -366,7 +395,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
- '(custom-safe-themes (quote ("15990253bbcfb708ad6ee158d9969cf74be46e3fea2b35f1a0afbac7d4682fbf" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" "e31eb7a32815c953e9f311987689e500524075dd8f5641f9140c5dbd4564ff25" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
  '(display-time-mode t)
  '(menu-bar-mode nil)
  '(scroll-bar-mode t)
@@ -384,6 +412,10 @@
 ;; mode-line
 ;;(setq sml/theme 'automatic)
 (sml/setup)
+;; flat-looking mode-line
+(set-face-attribute 'mode-line nil :box nil)
+(set-face-attribute 'mode-line-inactive nil :box nil)
+(set-face-attribute 'mode-line-highlight nil :box nil)
 
 
 (global-hungry-delete-mode) ; erase 'all' consecutive white space characters in a given direction
@@ -396,12 +428,16 @@
 (icomplete-mode t) ;; minibuffer completion/suggestions
 
 
-;; save history
-;; save mode-line history between sessions. Very good!
-(setq savehist-additional-variables    ;; Also save ...
-      '(search-ring regexp-search-ring)    ;; ... searches
-      savehist-file "~/.emacs.d/savehist") ;; keep home clean
-(savehist-mode t)                      ;; do this before evaluation
+;; save minibuffer histories across emacs sessions
+(setq savehist-additional-variables    
+      '(search-ring regexp-search-ring)    
+      savehist-file "~/.emacs.d/savehist") 
+(savehist-mode t)
+
+
+;; Setting up writegood-mode, identify weasel words, passive voice, and duplicate words
+(require 'writegood-mode)
+(global-set-key "\C-cg" 'writegood-mode)
 
 
 ;; discover
@@ -414,20 +450,35 @@
 ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
 (setq comment-auto-fill-only-comments t)
 (add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
-
+(add-hook 'text-mode-hook 'writegood-mode)
 
 ;; latex mode hooks
+
+;; auctex suggestions
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+(setq reftex-plug-into-AUCTeX t)
+(setq TeX-PDF-mode t) ; compile files to pdf by default
+
+(require 'auctex-latexmk)
+(auctex-latexmk-setup)
 
 ;; preview-latex
 (autoload 'LaTeX-preview-setup "preview")
 (add-hook 'LaTeX-mode-hook #'LaTeX-preview-setup)
 (latex-preview-pane-enable) ; latex-preview-pane
 (add-hook 'latex-mode-hook 'magic-latex-buffer)
+(add-hook 'latex-mode-hook 'writegood-mode)
 
 
 ;; shell mode hooks
 (require 'readline-complete) ; set up auto-complete in shell mode with company
-
 
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "bash")
@@ -445,7 +496,7 @@
 
 ;;(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-;;(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable only in programming related-modes (Emacs 24+)
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable only in programming related-modes (Emacs 24+)
 
 
 ;; show the name of the function in the modeline
@@ -468,13 +519,13 @@
 ;;(require 'semantic/db-javap)
 (load "semantic/loaddefs.el")
 (semantic-mode 1)
-(require 'malabar-mode)
-(add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
-;; compile on save
-(add-hook 'malabar-mode-hook
-          (lambda () 
-            (add-hook 'after-save-hook 'malabar-compile-file-silently
-                      nil t)))
+;; (require 'malabar-mode)
+;; (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+;; ;; compile on save
+;; (add-hook 'malabar-mode-hook
+;;           (lambda () 
+;;             (add-hook 'after-save-hook 'malabar-compile-file-silently
+;;                       nil t)))
 ;;(load-file "~/cedet-1.0pre6/common/cedet.el")
 (global-ede-mode 1)                      ; Enable the Project management system
 ;;(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
