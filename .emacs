@@ -93,12 +93,6 @@
 
 (delete-selection-mode t) ; typing with the mark active will overwrite the marked region
 
-;; scroll one line at a time (less "jumpy" than defaults)
-(setq mouse-wheel-scroll-amount '(10 ((shift) . 10))) ;; one line at a time
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
-(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-(setq scroll-step 10) ;; keyboard scroll one line at a time
-
 
 ;; Keyboard shortcuts
 (global-set-key "\C-l" 'goto-line)
@@ -156,7 +150,7 @@
 
 
 ;; fontification
-(global-font-lock-mode t)
+(global-font-lock-mode t) ; turn on syntax coloring, on by default since Emacs 22
 (setq font-lock-maximum-decoration t)
 (setq jit-lock-defer-time 0.10) ; improve scrolling speed with jit fontification
 
@@ -209,7 +203,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-ispell ac-math auctex-latexmk auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode rich-minority dash smex writegood-mode yasnippet)
+      '(ac-ispell ac-math auctex-latexmk auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode smooth-scroll rich-minority dash smex writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -281,7 +275,15 @@
 
 
 ;; smooth scroll
-;;(smooth-scroll-mode t)
+(require 'smooth-scroll)
+(smooth-scroll-mode t)
+
+;; scroll one line at a time (less "jumpy" than defaults)
+;;(setq mouse-wheel-scroll-amount '(10 ((shift) . 10))) ;; one line at a time
+;;(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+;;(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+;;(setq scroll-step 10) ;; keyboard scroll one line at a time
+
 
 ;; whitespace
 ;; (setq-default indicate-empty-lines t)
@@ -514,7 +516,7 @@
             (setq c-basic-offset 2)))
 ;;(add-to-list 'load-path "~/.emacs.d/jdee-2.4.1/lisp")
 ;;(load "jde")
-(require 'cedet)
+;;(require 'cedet)
 (require 'semantic)
 ;;(require 'semantic/db-javap)
 (load "semantic/loaddefs.el")
@@ -527,8 +529,8 @@
 ;;             (add-hook 'after-save-hook 'malabar-compile-file-silently
 ;;                       nil t)))
 ;;(load-file "~/cedet-1.0pre6/common/cedet.el")
-(global-ede-mode 1)                      ; Enable the Project management system
-;;(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
+;;(global-ede-mode 1)                      ; Enable the Project management system
+(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
 (global-semantic-decoration-mode)
 (global-semantic-highlight-edits-mode)
 (global-semantic-highlight-func-mode)
