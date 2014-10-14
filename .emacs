@@ -1,5 +1,5 @@
 ;; Swarnendu Biswas
-;; Mon Sep 29 17:43:44 EDT 2014
+;; Mon Oct 13 11:22:15 EDT 2014
 
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 
@@ -35,22 +35,24 @@
 
 ;; defaults
 (setq require-final-newline t) ; always end a file with a newline
-(set default-major-mode 'text-mode)
+(set major-mode 'text-mode)
+;;(set default-major-mode 'text-mode) ; obsolete variable from Emacs 23.2
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
 (setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and applications
 (set-face-attribute 'default nil :height 109) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq column-number-mode t)
 (setq-default fill-column 120)
-(setq standard-indent 2) ; Set standard indent to 2 rather that 4
+(setq-default standard-indent 2) ; Set standard indent to 2 rather that 4
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
 
 ;; auto revert
-(global-auto-revert-mode t) ; auto-refresh all buffers, does not work for remote files
+(global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 30) ; default is 5 s
 ;;(auto-revert-tail-mode t) ; auto-revert if file grows at the end, also works for remote files
 ;; All the "Reverting buffer foo" messages are _really_ distracting.
 (setq-default auto-revert-verbose nil) ;; quit this message
+
 
 ;; cua mode
 ;; cua-mode interferes with \C-x which can be useful in LaTeX. There are ways to get around it,
@@ -70,13 +72,13 @@
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
 ;;(setq linum-format " %d ")
-(show-paren-mode t) ; (setq show-paren-mode t) 
+(show-paren-mode 1) ; (setq show-paren-mode t) 
 (setq show-paren-style 'parenthesis) ; highlight just brackets
 ;;(setq show-paren-style 'expression) ; highlight entire bracket expression
 
-(tool-bar-mode nil) ; no toolbar with icons
+(tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
-(menu-bar-mode nil) ; disable menu bar
+(menu-bar-mode -1) ; disable menu bar
 ;; displays the time and date in the mode line
 (setq display-time-day-and-date t
       display-time-24hr-format nil)
@@ -91,7 +93,7 @@
 (setq-default highlight-changes-mode 1)
 (setq-default indicate-buffer-boundaries 'right)
 
-(delete-selection-mode t) ; typing with the mark active will overwrite the marked region
+(delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 
 
 ;; Keyboard shortcuts
@@ -150,7 +152,7 @@
 
 
 ;; fontification
-(global-font-lock-mode t) ; turn on syntax coloring, on by default since Emacs 22
+(global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
 (setq font-lock-maximum-decoration t)
 (setq jit-lock-defer-time 0.10) ; improve scrolling speed with jit fontification
 
@@ -162,8 +164,8 @@
 
 ;; tramp
 (setq tramp-default-method "ssh") ; faster than the default scp
-(setq tramp-default-user "biswass"
-      tramp-default-host "sunshine.cse.ohio-state.edu")
+(setq tramp-default-user "xxx"
+      tramp-default-host "xxx")
 
 
 ;; ignore case when reading a file name completion
@@ -213,7 +215,7 @@
 ;;(smartparens-global-mode 1) ; show paired parentheses
 ;;(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
 ;;(paren-activate) ; mic-paren - parentheses matching
-;;(electric-indent-mode) ; intelligent indentation
+(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
 ;;(electric-pair-mode 1) ; autocomplete brackets/parentheses
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
@@ -243,14 +245,14 @@
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 (setq ido-use-filename-at-point 'guess)
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
-(ido-at-point-mode)
+(ido-at-point-mode 1)
 
 ;;(add-hook 'ido-setup-hook
 ;;          (lambda ()
 ;;            (define-key ido-completion-map [up] 'previous-history-element)))
 (flx-ido-mode 1)
 (setq ido-use-faces nil) ; disable ido faces to see flx highlights
-(ido-ubiquitous-mode) ; allow ido-style completion in more places
+(ido-ubiquitous-mode 1) ; allow ido-style completion in more places
 ;;(ido-vertical-mode 1) ; display ido completions in a vertical list
 
 
@@ -260,7 +262,7 @@
 ;;(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
 ;;(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
 ;;(ac-config-default)
-;;(global-auto-complete-mode t)
+;;(global-auto-complete-mode 1)
 ;;(ac-flyspell-workaround) ; seems auto-complete stops working with flymake
 ;;(add-hook 'c-mode-hook
 ;;(lambda ()
@@ -270,13 +272,17 @@
 
 (hlinum-activate) ; extension to linum-mode to highlight current line number
 
-(auto-indent-global-mode) ; auto-indentation minor mode
+
+;; indentation
+(auto-indent-global-mode 1) ; auto-indentation minor mode
 ;;(indent-guide-global-mode t) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
+(indent-guide-mode 1)
+(highlight-indentation-mode 1)
 
 
 ;; smooth scroll
 (require 'smooth-scroll)
-(smooth-scroll-mode t)
+(smooth-scroll-mode 1)
 
 ;; scroll one line at a time (less "jumpy" than defaults)
 ;;(setq mouse-wheel-scroll-amount '(10 ((shift) . 10))) ;; one line at a time
@@ -301,7 +307,7 @@
 ;; fci
 (define-globalized-minor-mode
   global-fci-mode fci-mode (lambda () (fci-mode 1)))
-;;(global-fci-mode t)
+;;(global-fci-mode 1)
 ;;(setq fci-rule-width 1)
 ;;(setq-default fci-rule-column 120)
 ;;(setq fci-handle-truncate-lines nil)
@@ -315,9 +321,11 @@
 
 
 ;; uniquify
+(require 'uniquify) ; default from Emacs 24.4
 ;;(setq uniquify-buffer-name-style 'post-forward uniquify-separator ":")
-(setq uniquify-buffer-name-style 'reverse)
+;;(setq uniquify-buffer-name-style 'reverse)
 ;;(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; emacs 24.4 style ⁖ cat.png<dirName>
 
 
 ;; Spell check
@@ -337,13 +345,16 @@
 
 ;; rainbow mode
 ;;(global-rainbow-delimiters-mode) ; use Emacs-wide
-(rainbow-mode)
-(rainbow-identifiers-mode)
+(rainbow-mode 1)
+(rainbow-identifiers-mode 1)
+(rainbow-delimiters-mode 1)
+
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
 (require 'dired-x)
 (setq dired-auto-revert-buffer t) ;; revert each dired buffer automatically when you visit it
+(setq dired-recursive-deletes 'always) ; single prompt for all n directories
 
 
 ;; smart tabs (indent with tabs, align with spaces)
@@ -382,6 +393,7 @@
 (company-auctex-init)
 ;; turn off auto downcasing of things
 (setq company-dabbrev-downcase nil)
+(global-company-mode 1)
 
 
 ;; smex
@@ -397,10 +409,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
- '(display-time-mode t)
+ '(display-time-mode 1)
  '(menu-bar-mode nil)
- '(scroll-bar-mode t)
- '(show-paren-mode t)
+ '(scroll-bar-mode 1)
+ '(show-paren-mode 1)
  '(size-indication-mode t)
  '(tool-bar-mode nil))
 (custom-set-faces
@@ -420,21 +432,21 @@
 (set-face-attribute 'mode-line-highlight nil :box nil)
 
 
-(global-hungry-delete-mode) ; erase 'all' consecutive white space characters in a given direction
+(global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
 
 
 (setq-default idle-highlight-mode t) ; idle highlight modes
 
 
-(iswitchb-mode t) ;; auto completion in minibuffer
-(icomplete-mode t) ;; minibuffer completion/suggestions
+(iswitchb-mode 1) ;; auto completion in minibuffer
+(icomplete-mode 1) ;; minibuffer completion/suggestions
 
 
 ;; save minibuffer histories across emacs sessions
 (setq savehist-additional-variables    
       '(search-ring regexp-search-ring)    
       savehist-file "~/.emacs.d/savehist") 
-(savehist-mode t)
+(savehist-mode 1)
 
 
 ;; Setting up writegood-mode, identify weasel words, passive voice, and duplicate words
@@ -457,9 +469,10 @@
 ;; latex mode hooks
 
 ;; auctex suggestions
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
+(setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
+(setq TeX-parse-self t) ; enable parse on load
+(setq-default TeX-master nil) ; query for master file
+
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
@@ -498,7 +511,7 @@
 
 ;;(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable only in programming related-modes (Emacs 24+)
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 
 
 ;; show the name of the function in the modeline
@@ -521,6 +534,7 @@
 ;;(require 'semantic/db-javap)
 (load "semantic/loaddefs.el")
 (semantic-mode 1)
+
 ;; (require 'malabar-mode)
 ;; (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
 ;; ;; compile on save
@@ -528,9 +542,11 @@
 ;;           (lambda () 
 ;;             (add-hook 'after-save-hook 'malabar-compile-file-silently
 ;;                       nil t)))
+
 ;;(load-file "~/cedet-1.0pre6/common/cedet.el")
 ;;(global-ede-mode 1)                      ; Enable the Project management system
-(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
+
+;;(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
 (global-semantic-decoration-mode)
 (global-semantic-highlight-edits-mode)
 (global-semantic-highlight-func-mode)
@@ -542,4 +558,7 @@
 
 ;; org mode hooks
 (add-hook 'org-mode-hook 'turn-on-font-lock)
-
+(add-hook 'org-mode-hook 'visual-line-mode)
+;; turn on soft wrapping mode for org mode
+(add-hook 'org-mode-hook 
+          (lambda () (setq truncate-lines nil)))
