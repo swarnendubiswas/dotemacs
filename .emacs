@@ -31,7 +31,8 @@
 (setq inhibit-startup-screen t)
 (setq inhibit-splash-screen t
       initial-scratch-message nil)
-(set initial-major-mode 'text-mode) ; *scratch* is in Lisp interaction mode by default
+;; *scratch* is in Lisp interaction mode by default, make it use text mode by default
+(set initial-major-mode 'text-mode) 
 
 ;; defaults
 (setq require-final-newline t) ; always end a file with a newline
@@ -52,6 +53,14 @@
 ;;(auto-revert-tail-mode t) ; auto-revert if file grows at the end, also works for remote files
 ;; All the "Reverting buffer foo" messages are _really_ distracting.
 (setq-default auto-revert-verbose nil) ;; quit this message
+
+
+;; automatically load abbreviations table
+;; Note that emacs chooses, by default, the filename "~/.abbrev_defs", so don't try to be too clever
+;; by changing its name
+(setq-default abbrev-mode t)
+(read-abbrev-file "~/.abbrev_defs")
+(setq save-abbrevs t)
 
 
 ;; cua mode
@@ -205,7 +214,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-ispell ac-math auctex-latexmk auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode smooth-scroll rich-minority dash smex writegood-mode yasnippet)
+      '(ac-ispell ac-math anzu auctex-latexmk auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode smooth-scroll rich-minority dash smex writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -432,6 +441,11 @@
 (set-face-attribute 'mode-line-highlight nil :box nil)
 
 
+;; anzu mode - show number of searches in the mode line
+(require 'anzu)
+(global-anzu-mode 1)
+
+
 (global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
 
 
@@ -444,7 +458,7 @@
 
 ;; save minibuffer histories across emacs sessions
 (setq savehist-additional-variables    
-      '(search-ring regexp-search-ring)    
+      '(kill-ring search-ring regexp-search-ring)    
       savehist-file "~/.emacs.d/savehist") 
 (savehist-mode 1)
 
@@ -522,6 +536,9 @@
 (add-to-list 'which-func-modes 'python-mode)
 
 ;; c/c++ hooks
+(setq c-default-style "cc-mode"
+      c-basic-offset 2)
+
 
 ;; java hooks
 (add-hook 'java-mode-hook
@@ -553,6 +570,7 @@
 (global-semantic-idle-completions-mode)
 (global-semantic-idle-breadcrumbs-mode)
 
+
 ;; python hooks
 
 
@@ -562,3 +580,22 @@
 ;; turn on soft wrapping mode for org mode
 (add-hook 'org-mode-hook 
           (lambda () (setq truncate-lines nil)))
+
+
+
+;; automatically byte compile any emacs-lisp after every change (a save)
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda ()
+             (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t))
+          )
+
+;; automatically byte compile .emacs after every change (a save)
+(defun auto-recompile-emacs-file ()
+  (interactive)
+  (when (and buffer-file-name (string-match "\\.emacs" buffer-file-name))
+    (let ((byte-file (concat buffer-file-name "\\.elc")))
+      (if (or (not (file-exists-p byte-file))
+              (file-newer-than-file-p buffer-file-name byte-file))
+          (byte-compile-file buffer-file-name)))))
+
+(add-hook 'after-save-hook 'auto-recompile-emacs-file)
