@@ -6,11 +6,14 @@
 ;; Citations (inspired from http://www.mygooglest.com/fni/dot-emacs.html)
 ;;
 ;;   "Show me your ~/.emacs and I will tell you who you are."  - Bogdan Maryniuk
-;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen - the editor should get used to us." - Vivek Haldar
+;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
+;;    the editor should get used to us." - Vivek Haldar
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean McGrath
 
 ;; Customizing packages
-(add-to-list 'load-path "~/.emacs.d/")
+(add-to-list 'load-path "~/.emacs.d/lisp")
+;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+
 (require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
@@ -112,7 +115,7 @@
 (global-set-key [f3] 'split-window-horizontally)
 (global-set-key [f4] 'delete-other-windows)
 (global-set-key [f7] 'other-window) ; switch to the other buffer
-(global-set-key "\C-x z" 'repeat)
+(global-set-key "\C-c z" 'repeat)
 (global-set-key (kbd "M-/") 'hippie-expand)
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (global-set-key (kbd "C-f") 'isearch-forward-regexp)
@@ -208,13 +211,18 @@
 (setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
 
 
+;; goto-last-change
+(require 'goto-last-change)
+(global-set-key "\C-x\C-\\" 'goto-last-change)
+
+
 ;; Package specific
 
 ;; First ensure that a required set of packages are always installed
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-ispell ac-math anzu auctex-latexmk auto-auto-indent auto-complete-auctex auto-complete-c-headers auto-complete auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode smooth-scroll rich-minority dash smex writegood-mode yasnippet)
+      '(ac-ispell ac-math aggressive-indent anzu async auctex auctex-latexmk auto-auto-indent auto-complete auto-complete-auctex auto-complete-c-headers auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company company-auctex dash dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flycheck-color-mode-line flycheck-tip flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons names nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode smooth-scroll rich-minority dash smex writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -227,32 +235,17 @@
 (electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
 ;;(electric-pair-mode 1) ; autocomplete brackets/parentheses
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
-
-;; recentf stuff
-(require 'recentf)
-;;(setq recentf-max-menu-items 15) ; show 15 in recent menu, but currently menu bar is disabled
-(setq recentf-max-saved-items 100) ; keep track of last 100 files
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
-(setq recentf-auto-cleanup 'never)
-;; save file names relative to my current home directory
-(setq recentf-filename-handlers '(abbreviate-file-name))
-(recentf-mode 1)
-
-;; if you want to use ido with recentf
-(defun recentf-ido-find-file ()
-  "Find a recent file using ido."
-  (interactive)
-  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
-    (when file
-      (find-file file))))
+(require 'aggressive-indent)
+(global-aggressive-indent-mode 1)
+(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
 
 
 ;; enable ido mode
 (ido-mode 1)
+(setq ido-everywhere t)
 (setq ido-enable-flex-matching t)
-(setq ido-everywhere t) ;;(ido-everywhere 1)
-(setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 (setq ido-use-filename-at-point 'guess)
+(setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
 (ido-at-point-mode 1)
 
@@ -263,12 +256,33 @@
 (setq ido-use-faces nil) ; disable ido faces to see flx highlights
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
 ;;(ido-vertical-mode 1) ; display ido completions in a vertical list
+(setq ido-use-virtual-buffers t)
+
+
+;; recentf stuff
+(require 'recentf)
+;;(setq recentf-max-menu-items 15) ; show 15 in recent menu, but currently menu bar is disabled
+(setq recentf-max-saved-items 100) ; keep track of last 100 files
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+(setq recentf-auto-cleanup 'never)
+;; save file names relative to my current home directory
+(setq recentf-filename-handlers '(abbreviate-file-name))
+(recentf-mode 1)
+(setq recentf-exclude '("/tmp/" "/ssh:"))
+
+;; if you want to use ido with recentf
+(defun recentf-ido-find-file ()
+  "Find a recent file using ido."
+  (interactive)
+  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+    (when file
+      (find-file file))))
 
 
 ;; autocomplete ; currently disabled in favor of company
 ;;(require 'auto-complete)
 ;;(require 'auto-complete-config)
-;;(add-to-list 'load-path "~/.emacs.d/auto-complete-1.3.1")
+;;(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-1.3.1")
 ;;(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
 ;;(ac-config-default)
 ;;(global-auto-complete-mode 1)
@@ -284,9 +298,20 @@
 
 ;; indentation
 (auto-indent-global-mode 1) ; auto-indentation minor mode
-;;(indent-guide-global-mode t) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
-(indent-guide-mode 1)
+(indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
+;;(indent-guide-mode 1)
 (highlight-indentation-mode 1)
+
+
+;; highlight-symbol at point
+(require 'highlight-symbol)
+(highlight-symbol-mode 1)
+
+
+;; guide-key
+(require 'guide-key)
+(setq guide-key/guide-key-sequence '("C-x r" "C-x 4"))
+(guide-key-mode 1)  ; Enable guide-key-mode
 
 
 ;; smooth scroll
@@ -335,6 +360,7 @@
 ;;(setq uniquify-buffer-name-style 'reverse)
 ;;(setq uniquify-buffer-name-style 'forward)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; emacs 24.4 style ⁖ cat.png<dirName>
+(setq uniquify-after-kill-buffer-p t)
 
 
 ;; Spell check
@@ -348,9 +374,18 @@
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
 
 
+;; flycheck
+(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
+;;(add-hook 'after-init-hook #'global-flycheck-mode)
+(global-flycheck-mode 1)
+;; disable Checkdoc warnings for .emacs
+(eval-after-load 'flycheck (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+
+
 ;; minibuffer completion
-(require 'icicles)
-(icy-mode 1)
+;;(require 'icicles)
+;;(icy-mode -1)
+
 
 ;; rainbow mode
 ;;(global-rainbow-delimiters-mode) ; use Emacs-wide
@@ -361,9 +396,11 @@
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
+(require 'dired+)
 (require 'dired-x)
 (setq dired-auto-revert-buffer t) ;; revert each dired buffer automatically when you visit it
 (setq dired-recursive-deletes 'always) ; single prompt for all n directories
+(setq-default diredp-hide-details-initially-flag nil)
 
 
 ;; smart tabs (indent with tabs, align with spaces)
@@ -383,7 +420,7 @@
 
 
 ;; directory navigation
-(add-to-list 'load-path "~/.emacs.d/emacs-nav-49/")
+(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
 (global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
@@ -400,8 +437,8 @@
 (add-hook 'after-init-hook 'global-company-mode)
 (require 'company-auctex)
 (company-auctex-init)
-;; turn off auto downcasing of things
-(setq company-dabbrev-downcase nil)
+(setq company-dabbrev-downcase nil) ;; turn off auto downcasing of things
+(setq company-show-numbers t)
 (global-company-mode 1)
 
 
@@ -452,8 +489,8 @@
 (setq-default idle-highlight-mode t) ; idle highlight modes
 
 
-(iswitchb-mode 1) ;; auto completion in minibuffer
-(icomplete-mode 1) ;; minibuffer completion/suggestions
+;;(iswitchb-mode 1) ;; auto completion in minibuffer, obsolete since Emacs 24.4
+(icomplete-mode 1) ;; incremental minibuffer completion/suggestions
 
 
 ;; save minibuffer histories across emacs sessions
@@ -580,7 +617,12 @@
 ;; turn on soft wrapping mode for org mode
 (add-hook 'org-mode-hook 
           (lambda () (setq truncate-lines nil)))
-
+(setq org-completion-use-ido t)
+(setq org-src-fontify-natively t)
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-indent-mode t))
+          t)
 
 
 ;; automatically byte compile any emacs-lisp after every change (a save)
