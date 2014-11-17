@@ -1,33 +1,38 @@
 ;; Swarnendu Biswas
-;; Mon Oct 13 11:22:15 EDT 2014
+;; Wed Nov 12 23:44:13 EST 2014
+
 
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
+;; Init file shouldn't ideally contain calls to load or require, since they cause eager loading and are expensive, a
+;; cheaper alternative is to use autoload
 
 ;; Citations (inspired from http://www.mygooglest.com/fni/dot-emacs.html)
 ;;
-;;   "Show me your ~/.emacs and I will tell you who you are."  - Bogdan Maryniuk
+;;   "Show me your ~/.emacs and I will tell you who you are." - Bogdan Maryniuk
 ;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
 ;;    the editor should get used to us." - Vivek Haldar
-;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean McGrath
+;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean
+;;    McGrath
+
+
+;; time your .emacs initialization
+;;(require 'cl) ; a rare necessary use of REQUIRE
+;;(defvar *emacs-load-start* (current-time))
 
 ;; Customizing packages
 (add-to-list 'load-path "~/.emacs.d/lisp")
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
-(require 'package)
+;;(require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
-                        ))
+                         ;;("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
+                         ))
 (package-initialize)
 
 
-;; customizing common functionality
-
-;; backup
-(setq make-backup-files nil) ; stop making backup ~ files
-(setq backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
+;; start customizing functionality
 
 ;; startup
 (setq inhibit-default-init t) ; disable loading of "default.el" at startup
@@ -35,58 +40,56 @@
 (setq inhibit-splash-screen t
       initial-scratch-message nil)
 ;; *scratch* is in Lisp interaction mode by default, make it use text mode by default
-(set initial-major-mode 'text-mode) 
+(setq initial-major-mode 'text-mode) 
+(setq-default major-mode 'text-mode)
 
-;; defaults
+
+;; customize defaults
 (setq require-final-newline t) ; always end a file with a newline
-(set major-mode 'text-mode)
-;;(set default-major-mode 'text-mode) ; obsolete variable from Emacs 23.2
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
 (setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and applications
 (set-face-attribute 'default nil :height 109) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq column-number-mode t)
 (setq-default fill-column 120)
-(setq-default standard-indent 2) ; Set standard indent to 2 rather that 4
+(setq-default standard-indent 2) ; set standard indent to 2 rather that 4
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
+
+
+;; backup
+(setq make-backup-files nil) ; stop making backup ~ files
+(setq backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
+
 
 ;; auto revert
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 30) ; default is 5 s
 ;;(auto-revert-tail-mode t) ; auto-revert if file grows at the end, also works for remote files
-;; All the "Reverting buffer foo" messages are _really_ distracting.
-(setq-default auto-revert-verbose nil) ;; quit this message
+(setq-default auto-revert-verbose nil) 
 
 
 ;; automatically load abbreviations table
-;; Note that emacs chooses, by default, the filename "~/.abbrev_defs", so don't try to be too clever
-;; by changing its name
 (setq-default abbrev-mode t)
-(read-abbrev-file "~/.abbrev_defs")
+(setq-default abbrev-file-name "~/.emacs/abbrev_defs")
 (setq save-abbrevs t)
 
 
-;; cua mode
-;; cua-mode interferes with \C-x which can be useful in LaTeX. There are ways to get around it,
-;; for example, press the prefix key twice very quickly, or instead use \C-\S-x
-;;(cua-mode t) ; normal cut, copy, paste mode
-;;(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
-;;(setq cua-keep-region-after-copy t) ;; Standard Windows behavior
+;; tooltips
+(tooltip-mode -1)
+;;(setq tooltip-use-echo-area t) ; obsolete since 24.1
 
 
-;; This is already turned on by default since Emacs v23
-(setq transient-mark-mode t) ; enable visual feedback on selections
-;;(transient-mark-mode 1) ;; No region when it is not highlighted
+;; enable tabbar minor mode
+(setq tabbar-use-images nil) ; speed up by not using images
+(tabbar-mode 1)
 
 
 ;; customize appearance
 
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
+;;(hlinum-activate 1) ; extension to linum-mode to highlight current line number
 ;;(setq linum-format " %d ")
-(show-paren-mode 1) ; (setq show-paren-mode t) 
-(setq show-paren-style 'parenthesis) ; highlight just brackets
-;;(setq show-paren-style 'expression) ; highlight entire bracket expression
 
 (tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
@@ -97,6 +100,7 @@
 (display-time)
 (setq frame-title-format (concat  "%b - emacs@" (system-name))) ;; default to better frame titles
 
+
 ;; These are two nice themes, leuven and professional
 ;;(load-theme 'leuven t) ; set default theme on start up
 (load-theme 'professional t)
@@ -105,26 +109,20 @@
 (setq-default highlight-changes-mode 1)
 (setq-default indicate-buffer-boundaries 'right)
 
+
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
+(transient-mark-mode 1) ; enable visual feedback on selections, default since v23
+(global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
+(idle-highlight-mode 1) ; idle highlight mode
 
 
-;; Keyboard shortcuts
-(global-set-key "\C-l" 'goto-line)
-(global-set-key [f1] 'shell)
-(global-set-key [f2] 'split-window-vertically)
-(global-set-key [f3] 'split-window-horizontally)
-(global-set-key [f4] 'delete-other-windows)
-(global-set-key [f7] 'other-window) ; switch to the other buffer
-(global-set-key "\C-c z" 'repeat)
-(global-set-key (kbd "M-/") 'hippie-expand)
-(global-unset-key (kbd "C-s")) ; isearch-forward-regexp
-(global-set-key (kbd "C-f") 'isearch-forward-regexp)
-(define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
-(global-unset-key (kbd "C-x C-s")) ; save-buffer
-(global-set-key "\C-s" 'save-buffer)
-(global-set-key (kbd "C-z") 'undo)
-(global-set-key (kbd "C-c n") 'comment-region)
-(global-set-key (kbd "C-c m") 'uncomment-region)
+;; cua mode
+;; cua-mode interferes with \C-x which can be useful in LaTeX. There are ways to get around it,
+;; for example, press the prefix key twice very quickly, or instead use \C-\S-x
+;;(cua-mode t) ; normal cut, copy, paste mode
+;;(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+;;(setq cua-keep-region-after-copy t) ;; Standard Windows behavior
+
 
 ;; define a keyboard shortcut for duplicating lines
 (defun duplicate-line()
@@ -137,7 +135,6 @@
   (next-line 1)
   (yank)
   )
-(global-set-key "\C-c\C-d" 'duplicate-line)
 
 ;; kill all non-special buffers but the current one
 (defun kill-other-buffers ()
@@ -146,12 +143,10 @@
   (dolist (buffer (buffer-list))
     (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
       (kill-buffer buffer))))
-(global-set-key (kbd "\C-c k") 'kill-other-buffers)
 
 
 ;; ibuffer
-(global-set-key (kbd "C-x C-b") 'ibuffer) ; Use IBuffer for buffer list
-;;(ibuffer-auto-mode) ; automatically keeps the buffer list up to date
+;;(ibuffer-auto-mode 1) ; automatically keeps the buffer list up to date
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
              (ibuffer-auto-mode 1)))
@@ -186,16 +181,17 @@
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
 
+;; start emacs/emacsclient in fullscreen mode
 
-;; This doesn't work on all Gnome versions
+;; this doesn't work on all Gnome versions
 ;; make emacs start fullscreen, there is also the -fs option, but that covers the desktop panels
 ;;(defun toggle-fullscreen ()
 ;;(interactive)
-;(x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-;'(2 "_NET_WM_STATE_MAXIMIZED_VERT" 0))
-;(x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-;'(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0))
-;)
+;;(x-send-client-message nil 0 nil "_NET_WM_STATE" 32
+;;'(2 "_NET_WM_STATE_MAXIMIZED_VERT" 0))
+;;(x-send-client-message nil 0 nil "_NET_WM_STATE" 32
+;;'(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0))
+;;)
 ;;(toggle-fullscreen)
 ;;(global-set-key [f11] 'toggle-fullscreen)
 
@@ -207,13 +203,15 @@
 ;;(fullscreen)
 ;;(global-set-key [f11] 'fullscreen)
 
+;; for emacs, just pass -mm or --maximized
+;; for emacsclient, use /usr/local/bin/emacsclient -a "" -c -F "((fullscreen . maximized))"
+(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; use fullboth for fullscreen
+
+;; fully redraw the display before queued input events are processed
+(setq redisplay-dont-pause t)
+
 
 (setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
-
-
-;; goto-last-change
-(require 'goto-last-change)
-(global-set-key "\C-x\C-\\" 'goto-last-change)
 
 
 ;; Package specific
@@ -222,32 +220,70 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ac-ispell ac-math aggressive-indent anzu async auctex auctex-latexmk auto-auto-indent auto-complete auto-complete-auctex auto-complete-c-headers auto-indent-mode bash-completion bibtex-utils color-theme company-auctex company company-auctex dash dired+ display-theme es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flycheck-color-mode-line flycheck-tip flymake flymake-shell flymake-easy flyparens highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons names nav parent-mode pkg-info epl popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete s sentence-highlight smart-mode-line smart-tabs-mode smooth-scroll rich-minority dash smex writegood-mode yasnippet)
+      '(ace-jump-buffer aggressive-indent anzu async auctex auctex-latexmk auto-auto-indent autodisass-java-bytecode auto-indent-mode bash-completion bibtex-utils color-theme company company-auctex company-math dash dired+ display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flycheck-color-mode-line flycheck-tip flymake flymake-shell flymake-easy flyparens goto-last-change guide-key guide-key-tip highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons names nav parent-mode pkg-info popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete rich-minority s sentence-highlight smart-tabs-mode smooth-scroll smex tabbar writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
 
 ;; related to pairing of parentheses, brackets, etc.
+(show-paren-mode 1) 
+(setq show-paren-style 'parenthesis) ; highlight just brackets, 'expression
 ;;(autopair-global-mode 1) ; auto pair parentheses seems better than smartparens
 ;;(smartparens-global-mode 1) ; show paired parentheses
 ;;(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
 ;;(paren-activate) ; mic-paren - parentheses matching
 (electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
-;;(electric-pair-mode 1) ; autocomplete brackets/parentheses
+(electric-pair-mode 1) ; autocomplete brackets/parentheses, seems to be more improved than autopair
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
-(require 'aggressive-indent)
 (global-aggressive-indent-mode 1)
 (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+
+
+;; ace-jump-buffer
+;; leave out certain buffer based on file name patterns
+;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
+(defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
+  "*Buffer regexps to always show when buffer switching.")
+(defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$")
+  "*Buffer regexps to never show when buffer switching.")
+(defvar my-ido-ignore-dired-buffers nil
+  "*If non-nil, buffer switching should ignore dired buffers.")
+(defun my-bs-str-in-regexp-list (str regexp-list)
+  "Return non-nil if str matches anything in regexp-list."
+  (let ((case-fold-search nil))
+    (catch 'done
+      (dolist (regexp regexp-list)
+        (when (string-match regexp str)
+          (throw 'done t))))))
+(defun my-bs-ignore-buffer (name)
+  "Return non-nil if the named buffer should be ignored."
+  (or (and (not (my-bs-str-in-regexp-list name my-bs-always-show-regexps))
+           (my-bs-str-in-regexp-list name my-bs-never-show-regexps))
+      (and my-ido-ignore-dired-buffers
+           (save-excursion
+             (set-buffer name)
+             (equal major-mode 'dired-mode)))))
+(setq bs-configurations
+      '(("all" nil nil nil nil nil)
+        ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
+(setq bs-cycle-configuration-name "files")
+(setq-default ajb-bs-configuration "files")
 
 
 ;; enable ido mode
 (ido-mode 1)
 (setq ido-everywhere t)
 (setq ido-enable-flex-matching t)
-(setq ido-use-filename-at-point 'guess)
+(setq ido-use-filename-at-point 'guess) ; 'ffap-guesser
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
 (ido-at-point-mode 1)
+(setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
+                           "*Messages*" "Async Shell Command"))
+(setq ido-enable-last-directory-history t)
+(setq ido-max-work-directory-list 30)
+(setq ido-max-work-file-list 50)
+(setq confirm-nonexistent-file-or-buffer nil)
 
 ;;(add-hook 'ido-setup-hook
 ;;          (lambda ()
@@ -255,15 +291,12 @@
 (flx-ido-mode 1)
 (setq ido-use-faces nil) ; disable ido faces to see flx highlights
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
-;;(ido-vertical-mode 1) ; display ido completions in a vertical list
 (setq ido-use-virtual-buffers t)
 
 
 ;; recentf stuff
-(require 'recentf)
-;;(setq recentf-max-menu-items 15) ; show 15 in recent menu, but currently menu bar is disabled
+(setq recentf-max-menu-items 15) ; show 15 in recent menu, but currently menu bar is disabled
 (setq recentf-max-saved-items 100) ; keep track of last 100 files
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
 (setq recentf-auto-cleanup 'never)
 ;; save file names relative to my current home directory
 (setq recentf-filename-handlers '(abbreviate-file-name))
@@ -293,8 +326,6 @@
 ;;(add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
 
 
-(hlinum-activate) ; extension to linum-mode to highlight current line number
-
 
 ;; indentation
 (auto-indent-global-mode 1) ; auto-indentation minor mode
@@ -304,12 +335,10 @@
 
 
 ;; highlight-symbol at point
-(require 'highlight-symbol)
 (highlight-symbol-mode 1)
 
 
 ;; guide-key
-(require 'guide-key)
 (setq guide-key/guide-key-sequence '("C-x r" "C-x 4"))
 (guide-key-mode 1)  ; Enable guide-key-mode
 
@@ -355,7 +384,6 @@
 
 
 ;; uniquify
-(require 'uniquify) ; default from Emacs 24.4
 ;;(setq uniquify-buffer-name-style 'post-forward uniquify-separator ":")
 ;;(setq uniquify-buffer-name-style 'reverse)
 ;;(setq uniquify-buffer-name-style 'forward)
@@ -364,14 +392,12 @@
 
 
 ;; Spell check
-;;(setq flyspell-mode 1) ; this is slow and doesn't work perfectly
+;;(flyspell-mode) ; this is slow and doesn't work perfectly
 ;;(turn-on-flyspell 1)
 ;;(turn-on-auto-fill t)
 ;;(flyspell-issue-message-flag nil)
 (add-hook 'find-file-hooks 'turn-on-flyspell) ; Otherwise flyspell isn't enabled as I want it
 (setq-default ispell-program-name "/usr/bin/aspell")
-(global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
-(global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
 
 
 ;; flycheck
@@ -379,7 +405,7 @@
 ;;(add-hook 'after-init-hook #'global-flycheck-mode)
 (global-flycheck-mode 1)
 ;; disable Checkdoc warnings for .emacs
-(eval-after-load 'flycheck (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+;;(eval-after-load 'flycheck (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 
 ;; minibuffer completion
@@ -388,7 +414,6 @@
 
 
 ;; rainbow mode
-;;(global-rainbow-delimiters-mode) ; use Emacs-wide
 (rainbow-mode 1)
 (rainbow-identifiers-mode 1)
 (rainbow-delimiters-mode 1)
@@ -396,8 +421,11 @@
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
-(require 'dired+)
-(require 'dired-x)
+;;(require 'dired+)
+;;(require 'dired-x)
+(add-hook 'dired-load-hook
+          (lambda ()
+            (load "dired-x")))
 (setq dired-auto-revert-buffer t) ;; revert each dired buffer automatically when you visit it
 (setq dired-recursive-deletes 'always) ; single prompt for all n directories
 (setq-default diredp-hide-details-initially-flag nil)
@@ -423,7 +451,6 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
-(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
 
 
 ;; helm
@@ -435,7 +462,7 @@
 ;; company
 (autoload 'company-mode "company" nil t)
 (add-hook 'after-init-hook 'global-company-mode)
-(require 'company-auctex)
+;;(require 'company-auctex)
 (company-auctex-init)
 (setq company-dabbrev-downcase nil) ;; turn off auto downcasing of things
 (setq company-show-numbers t)
@@ -443,10 +470,9 @@
 
 
 ;; smex
-(smex-initialize)
+;;(smex-initialize) ; this is slow
+(autoload 'smex "smex")
 (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 
 (custom-set-variables
@@ -454,7 +480,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ajb-bs-configuration "files" t)
  '(column-number-mode t)
+ '(custom-safe-themes (quote ( default)))
+ '(diredp-hide-details-initially-flag nil t)
  '(display-time-mode 1)
  '(menu-bar-mode nil)
  '(scroll-bar-mode 1)
@@ -470,23 +499,73 @@
 
 
 ;; mode-line
-;;(setq sml/theme 'automatic)
-(sml/setup)
-;; flat-looking mode-line
-(set-face-attribute 'mode-line nil :box nil)
-(set-face-attribute 'mode-line-inactive nil :box nil)
-(set-face-attribute 'mode-line-highlight nil :box nil)
+;; powerline
+;; (set-face-attribute ;; 'mode-line nil
+;;  :foreground "Black"
+;;  :background "DarkOrange"
+;;  :box nil
+;;  )
+;;(require 'powerline)
+;;(setq powerline-arrow-shape 'curve) ; options: arrow, curve, arrow14
+;;(setq powerline-default-separator-dir '(right . left))
+;;(setq powerline-color1 "grey22")
+;;(setq powerline-active1 "grey40")
 
+;; smart mode line
+;;(setq sml/theme 'powerline) ; options: dark, light, respectful, automatic, powerline
+;;(setq sml/name-width 20)
+;;(setq sml/modes ((t :foreground "White"))))
+;;(setq sml/no-confirm-load-theme t)
+;;(sml/setup)
+;; flat-looking mode-line
+;;(set-face-attribute 'mode-line nil :box nil)
+;;(set-face-attribute 'mode-line-inactive nil :box nil)
+;;(set-face-attribute 'mode-line-highlight nil :box nil)
+
+;; (setq-default mode-line-format `(
+;;                                  "%e" mode-line-front-space
+;;                                  ;; Standard info about the current buffer
+;;                                  mode-line-mule-info
+;;                                  mode-line-client
+;;                                  mode-line-modified
+;;                                  mode-line-remote
+;;                                  mode-line-frame-identification
+;;                                  mode-line-buffer-identification mode-line-position
+;;                                  (vc-mode vc-mode-line) ; VC information
+;;                                  (flycheck-mode flycheck-mode-line) ; Flycheck status
+;;                                  ;; Misc information, notably battery state and function name
+;;                                  " " mode-line-modes mode-line-end-spaces
+;;                                  ))
+
+;;(set-face-attribute 'mode-line nil :foreground "White" :background "grey22" :box nil)
+;;(set-face-attribute 'mode-line-highlight nil :foreground "red" )
+;; (set-face-background 'modeline "grey40" (current-buffer))
+;;(set-face-attribute 'minor-mode-alist "red" )
+
+;; (setq-default mode-line-format
+;;               (list
+;;                "%e:"
+;;                mode-line-front-space
+;;                mode-line-mule-info
+;;                mode-line-client
+;;                mode-line-modified
+;;                mode-line-remote
+;;                mode-line-frame-identification
+;;                mode-line-buffer-identification
+;;                ;; " --user: " (getenv "USER")
+;;                ;;mode-line-position
+;;                "%m"  ;; value of `mode-name'
+;;                ;; value of current buffer name
+;;                ;;"buffer %b, "
+;;                ;; value of current line number
+;;                ;;"line %l "
+;;                ;;(vc-mode vc-mode-line)
+;;                minor-mode-alist
+;;                mode-line-end-spaces
+;;                ))
 
 ;; anzu mode - show number of searches in the mode line
-(require 'anzu)
 (global-anzu-mode 1)
-
-
-(global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
-
-
-(setq-default idle-highlight-mode t) ; idle highlight modes
 
 
 ;;(iswitchb-mode 1) ;; auto completion in minibuffer, obsolete since Emacs 24.4
@@ -500,13 +579,8 @@
 (savehist-mode 1)
 
 
-;; Setting up writegood-mode, identify weasel words, passive voice, and duplicate words
-(require 'writegood-mode)
-(global-set-key "\C-cg" 'writegood-mode)
-
-
-;; discover
-;;(global-discover-mode 1)
+;; yasnippet
+(yas-global-mode 1)
 
 
 ;; text mode  hooks
@@ -518,33 +592,48 @@
 (add-hook 'text-mode-hook 'writegood-mode)
 
 ;; latex mode hooks
-
-;; auctex suggestions
-(setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
-(setq TeX-parse-self t) ; enable parse on load
-(setq-default TeX-master nil) ; query for master file
-
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook #'reftex-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-(setq reftex-plug-into-AUCTeX t)
+(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
+(add-hook 'LaTeX-mode-hook 'writegood-mode)
+
+(setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
+(setq TeX-parse-self t) ; enable parse on load
+(setq-default TeX-master nil) ; query for master file
 (setq TeX-PDF-mode t) ; compile files to pdf by default
 
-(require 'auctex-latexmk)
-(auctex-latexmk-setup)
+(autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
+(autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
+(setq reftex-plug-into-AUCTeX t)
+;;(TeX-source-correlate-mode 1)
+;;(TeX-source-correlate-determine-method 'synctex)
+;;(TeX-source-correlate-method-active)
+
+(auctex-latexmk-setup) ; add support for latexmk
+
+(setq TeX-electric-sub-and-superscript t) ; automatically insert braces in math mode
 
 ;; preview-latex
 (autoload 'LaTeX-preview-setup "preview")
 (add-hook 'LaTeX-mode-hook #'LaTeX-preview-setup)
 (latex-preview-pane-enable) ; latex-preview-pane
-(add-hook 'latex-mode-hook 'magic-latex-buffer)
-(add-hook 'latex-mode-hook 'writegood-mode)
+
+;; custom hook
+(defun compile-candidacy-proposal()
+  "Compile my candidacy proposal"
+  (message "banana"))
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (add-hook 'after-save-hook 'compile-candidacy-proposal nil 'make-it-local)))
 
 
 ;; shell mode hooks
-(require 'readline-complete) ; set up auto-complete in shell mode with company
+;;(require 'readline-complete) ; set up auto-complete in shell mode with company
 
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "bash")
@@ -560,13 +649,12 @@
 
 ;; programming mode hooks
 
-;;(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
+(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
-
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 
 ;; show the name of the function in the modeline
-(which-function-mode)
+(which-function-mode 1)
 (add-to-list 'which-func-modes 'java-mode)
 (add-to-list 'which-func-modes 'c-mode)
 (add-to-list 'which-func-modes 'c++-mode)
@@ -581,13 +669,14 @@
 (add-hook 'java-mode-hook
           (lambda ()
             (setq c-basic-offset 2)))
+
 ;;(add-to-list 'load-path "~/.emacs.d/jdee-2.4.1/lisp")
 ;;(load "jde")
 ;;(require 'cedet)
-(require 'semantic)
+;;(require 'semantic)
 ;;(require 'semantic/db-javap)
-(load "semantic/loaddefs.el")
-(semantic-mode 1)
+;;(load "semantic/loaddefs.el")
+;;(semantic-mode 1)
 
 ;; (require 'malabar-mode)
 ;; (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
@@ -601,11 +690,11 @@
 ;;(global-ede-mode 1)                      ; Enable the Project management system
 
 ;;(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
-(global-semantic-decoration-mode)
-(global-semantic-highlight-edits-mode)
-(global-semantic-highlight-func-mode)
-(global-semantic-idle-completions-mode)
-(global-semantic-idle-breadcrumbs-mode)
+;;(global-semantic-decoration-mode)
+;;(global-semantic-highlight-edits-mode)
+;;(global-semantic-highlight-func-mode)
+;;(global-semantic-idle-completions-mode)
+;;(global-semantic-idle-breadcrumbs-mode)
 
 
 ;; python hooks
@@ -621,15 +710,14 @@
 (setq org-src-fontify-natively t)
 (add-hook 'org-mode-hook
           (lambda ()
-            (org-indent-mode t))
-          t)
+            (org-indent-mode t)) t)
 
 
 ;; automatically byte compile any emacs-lisp after every change (a save)
-(add-hook 'emacs-lisp-mode-hook
-          '(lambda ()
-             (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t))
-          )
+;; (add-hook 'emacs-lisp-mode-hook
+;;           '(lambda ()
+;;              (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t))
+;;           )
 
 ;; automatically byte compile .emacs after every change (a save)
 (defun auto-recompile-emacs-file ()
@@ -640,4 +728,53 @@
               (file-newer-than-file-p buffer-file-name byte-file))
           (byte-compile-file buffer-file-name)))))
 
-(add-hook 'after-save-hook 'auto-recompile-emacs-file)
+;;(add-hook 'after-save-hook 'auto-recompile-emacs-file)
+
+
+;; keyboard shortcuts
+(global-set-key "\C-l" 'goto-line)
+(global-set-key [f1] 'shell)
+(global-set-key [f2] 'split-window-vertically)
+(global-set-key [f3] 'split-window-horizontally)
+(global-set-key [f4] 'delete-other-windows)
+(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
+(global-set-key [f7] 'other-window) ; switch to the other buffer
+(global-set-key "\C-c z" 'repeat)
+(global-set-key (kbd "M-/") 'hippie-expand)
+(global-unset-key (kbd "C-s")) ; isearch-forward-regexp
+(global-set-key (kbd "C-f") 'isearch-forward-regexp)
+(define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
+(global-unset-key (kbd "C-x C-s")) ; save-buffer
+(global-set-key "\C-s" 'save-buffer)
+(global-set-key (kbd "C-z") 'undo)
+(global-set-key (kbd "C-c n") 'comment-region)
+(global-set-key (kbd "C-c m") 'uncomment-region)
+;; setting up writegood-mode, identify weasel words, passive voice, and duplicate words
+(global-set-key "\C-cg" 'writegood-mode)
+;; define a keyboard shortcut for duplicating lines
+;;(global-set-key "\C-c\C-d" 'duplicate-line)
+(global-set-key (kbd "C-c C-d") 'duplicate-thing)
+;; kill all non-special buffers
+(global-set-key (kbd "\C-c k") 'kill-other-buffers)
+(global-set-key (kbd "C-x C-b") 'ibuffer) ; use IBuffer for buffer list
+(global-set-key "\C-x\C-\\" 'goto-last-change) ; goto-last-change
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+(global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
+(global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
+(global-set-key [M-left] 'tabbar-backward-tab)
+(global-set-key [M-right] 'tabbar-forward-tab)
+;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
+(global-set-key (kbd "M-b") 'ace-jump-buffer)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+
+;; start emacs server
+;;(server-start)
+
+
+;; compute total running time
+;; (message "My .emacs loaded in %ds" (destructuring-bind (hi lo ms) (current-time)
+;;                                      (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
+
+
