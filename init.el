@@ -1,5 +1,6 @@
 ;; Swarnendu Biswas
-;; Wed Nov 19 22:03:03 EST 2014
+;; Mon Nov 24 23:32:48 EST 2014
+
 
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to load or require, since they cause eager loading and are expensive, a
@@ -20,9 +21,7 @@
 
 ;;(require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ;;("melpa-stable" . "http://melpa-stable.milkbox.net/packages/")
                          ))
 (package-initialize)
 
@@ -59,20 +58,17 @@
 
 ;; auto revert
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
-(setq-default auto-revert-interval 30) ; default is 5 s
-;;(auto-revert-tail-mode t) ; auto-revert if file grows at the end, also works for remote files
+(setq-default auto-revert-interval 5) ; default is 5 s
 (setq-default auto-revert-verbose nil) 
 
 
 ;; automatically load abbreviations table
-;;(setq-default abbrev-mode t) ; only enable for certain major modes
 (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
 (setq save-abbrevs t)
 
 
 ;; tooltips
 (tooltip-mode -1)
-;;(setq tooltip-use-echo-area t) ; obsolete since 24.1
 
 
 ;; enable tabbar minor mode
@@ -82,10 +78,11 @@
 
 ;; customize appearance
 
+;;  line numbers
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
 (hlinum-activate) ; extension to linum-mode to highlight current line number
-;;(setq linum-format " %d ")
+(column-number-mode 1)
 
 (tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
@@ -93,12 +90,11 @@
 ;; displays the time and date in the mode line
 (setq display-time-day-and-date t
       display-time-24hr-format nil)
-(display-time)
+;;(display-time)
 (setq frame-title-format (concat  "%b - emacs@" (system-name))) ;; default to better frame titles
 
 
 ;; these are two nice themes: leuven and professional
-;;(load-theme 'leuven t) ; set default theme on start up
 (load-theme 'professional t)
 ;;(set-face-background 'fringe "white") ; Hide the fringe mark on the left
 (setq-default indicate-empty-lines t)
@@ -109,28 +105,7 @@
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 (transient-mark-mode 1) ; enable visual feedback on selections, default since v23
 (global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
-;;(idle-highlight-mode 1) ; idle highlight mode
 
-
-;; cua mode
-;; cua-mode interferes with \C-x which can be useful in LaTeX. There are ways to get around it,
-;; for example, press the prefix key twice very quickly, or instead use \C-\S-x
-;;(cua-mode t) ; normal cut, copy, paste mode
-;;(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
-;;(setq cua-keep-region-after-copy t) ;; Standard Windows behavior
-
-
-;; define a keyboard shortcut for duplicating lines
-(defun duplicate-line()
-  "Duplicate current line."
-  (interactive)
-  (move-beginning-of-line 1)
-  (kill-line)
-  (yank)
-  (open-line 1)
-  (next-line 1)
-  (yank)
-  )
 
 ;; kill all non-special buffers but the current one
 (defun kill-other-buffers ()
@@ -162,55 +137,41 @@
 ;; search
 (setq search-highlight t) ; highlight incremental search
 (setq query-replace-highlight t) ; highlight during query
+(setq case-fold-search t) ; make search ignore case
 
 
 ;; tramp
 (setq tramp-default-method "ssh") ; faster than the default scp
-(setq tramp-default-user "xxx"
-      tramp-default-host "xxx")
+(setq tramp-default-user "biswass"
+      tramp-default-host "sunshine.cse.ohio-state.edu")
+;; disable version control
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
 
 
 ;; ignore case when reading a file name completion
 (setq read-file-name-completion-ignore-case t)
 
+
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
 
 
-(desktop-save-mode 1) ;; use desktop save mode
+;; use desktop save mode
+(desktop-save-mode 0) 
+(setq-default desktop-restore-frames nil) ; no need to restore frames
+(setq-default desktop-load-locked-desktop nil)
 
-
-;; start emacs/emacsclient in fullscreen mode
-
-;; this doesn't work on all Gnome versions
-;; make emacs start fullscreen, there is also the -fs option, but that covers the desktop panels
-;;(defun toggle-fullscreen ()
-;;(interactive)
-;;(x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-;;'(2 "_NET_WM_STATE_MAXIMIZED_VERT" 0))
-;;(x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-;;'(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0))
-;;)
-;;(toggle-fullscreen)
-;;(global-set-key [f11] 'toggle-fullscreen)
-
-;; full screen
-(defun fullscreen ()
-  (interactive)
-  (set-frame-parameter nil 'fullscreen
-                       (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
-;;(fullscreen)
-;;(global-set-key [f11] 'fullscreen)
-
-;; for emacs, just pass -mm or --maximized
-;; for emacsclient, use /usr/local/bin/emacsclient -a "" -c -F "((fullscreen . maximized))"
-(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; use fullboth for fullscreen
 
 ;; fully redraw the display before queued input events are processed
 (setq redisplay-dont-pause t)
 
 
+;; speed up emacs for large files
 (setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
+(require 'vlf-integrate)
 
 
 ;; Package specific
@@ -219,7 +180,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer malabar-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -227,11 +188,6 @@
 ;; related to pairing of parentheses, brackets, etc.
 (show-paren-mode 1) 
 (setq show-paren-style 'parenthesis) ; highlight just brackets, 'expression
-;;(autopair-global-mode 1) ; auto pair parentheses seems better than smartparens
-;;(smartparens-global-mode 1) ; show paired parentheses
-;;(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
-;;(paren-activate) ; mic-paren - parentheses matching
-;;(electric-pair-mode 1) ; autocomplete brackets/parentheses, seems to be more improved than autopair
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
 ;; smart pairing for all, from prelude
@@ -240,23 +196,20 @@
 (setq sp-autoskip-closing-pair 'always)
 (setq sp-hybrid-kill-entire-symbol nil)
 (sp-use-paredit-bindings)
-
-(show-smartparens-global-mode +1)
+(show-smartparens-global-mode 1)
 
 
 ;; indentation
-;;(global-aggressive-indent-mode 1) ; manual spacing won't work for aligning in text modes
-;;(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
 (electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
 (auto-indent-global-mode 1) ; auto-indentation minor mode
 (indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
-;;(indent-guide-mode 1)
 (highlight-indentation-mode 1)
 
 
 ;; highlight-symbol at point
 (global-auto-highlight-symbol-mode 1)
 ;;(highlight-symbol-mode 1)
+;;(idle-highlight-mode 1) ; idle highlight mode
 
 
 ;; ace-jump-buffer
@@ -304,10 +257,6 @@
 (setq ido-max-work-directory-list 30)
 (setq ido-max-work-file-list 50)
 (setq confirm-nonexistent-file-or-buffer nil)
-
-;;(add-hook 'ido-setup-hook
-;;          (lambda ()
-;;            (define-key ido-completion-map [up] 'previous-history-element)))
 (flx-ido-mode 1)
 (setq ido-use-faces nil) ; disable ido faces to see flx highlights
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
@@ -324,43 +273,10 @@
 (recentf-mode 1)
 (setq recentf-exclude '("/tmp/" "/ssh:"))
 
-;; if you want to use ido with recentf
-(defun recentf-ido-find-file ()
-  "Find a recent file using ido."
-  (interactive)
-  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
-    (when file
-      (find-file file))))
-
-
-;; autocomplete ; currently disabled in favor of company
-;;(require 'auto-complete)
-;;(require 'auto-complete-config)
-;;(add-to-list 'load-path "~/.emacs.d/lisp/auto-complete-1.3.1")
-;;(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
-;;(ac-config-default)
-;;(global-auto-complete-mode 1)
-;;(ac-flyspell-workaround) ; seems auto-complete stops working with flymake
-;;(add-hook 'c-mode-hook
-;;(lambda ()
-;;(add-to-list 'ac-sources 'ac-source-c-headers)
-;;(add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
-
-
-;; guide-key
-;;(setq guide-key/guide-key-sequence '("C-x r" "C-x 4"))
-;;(guide-key-mode 1)  ; Enable guide-key-mode
-
 
 ;; smooth scroll
 (require 'smooth-scroll)
 (smooth-scroll-mode 1)
-
-;; scroll one line at a time (less "jumpy" than defaults)
-;;(setq mouse-wheel-scroll-amount '(10 ((shift) . 10))) ;; one line at a time
-;;(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
-;;(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-;;(setq scroll-step 10) ;; keyboard scroll one line at a time
 
 
 ;; whitespace
@@ -393,33 +309,22 @@
 
 
 ;; uniquify
-;;(setq uniquify-buffer-name-style 'post-forward uniquify-separator ":")
-;;(setq uniquify-buffer-name-style 'reverse)
-;;(setq uniquify-buffer-name-style 'forward)
+;;(setq uniquify-separator ":")
+;; options: post-forward, reverse, forward
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; emacs 24.4 style ⁖ cat.png<dirName>
 (setq uniquify-after-kill-buffer-p t)
 
 
 ;; Spell check
-;;(flyspell-mode) ; this is slow and doesn't work perfectly
-;;(turn-on-flyspell 1)
-;;(turn-on-auto-fill t)
-;;(flyspell-issue-message-flag nil)
 (add-hook 'find-file-hooks 'turn-on-flyspell) ; Otherwise flyspell isn't enabled as I want it
 (setq-default ispell-program-name "/usr/bin/aspell")
-
+;; Speed up aspell: ultra | fast | normal
+(setq ispell-extra-args '("--sug-mode=normal"))
 
 ;; flycheck
 (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
-;;(add-hook 'after-init-hook #'global-flycheck-mode)
 (global-flycheck-mode 1)
-;; disable Checkdoc warnings for .emacs
-;;(eval-after-load 'flycheck (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
-
-;; minibuffer completion
-;;(require 'icicles)
-;;(icy-mode -1)
 
 
 ;; rainbow mode
@@ -430,8 +335,6 @@
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
-;;(require 'dired+)
-;;(require 'dired-x)
 ;; (add-hook 'emacs-startup-hook ; dired-load-hook
 ;;           (lambda ()
 ;;             (load "dired-x")))
@@ -444,6 +347,7 @@
   'interactive)
 (setq dired-bind-jump t)
 
+
 ;; smart tabs (indent with tabs, align with spaces)
 ;;(global-smart-tab-mode 1)
 (autoload 'smart-tabs-mode "smart-tabs-mode"
@@ -454,22 +358,10 @@
 (smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
 
 
-;; ergoemacs
-;;(setq ergoemacs-theme nil) ;; Uses Standard Ergoemacs keyboard theme
-;;(setq ergoemacs-keyboard-layout "us") ;; Assumes QWERTY keyboard layout
-;;(ergoemacs-mode 1)
-
-
 ;; directory navigation
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
-
-
-;; helm
-;;(require 'helm-config)
-;;(helm-mode t)
-;;(global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 
 ;; company
@@ -479,7 +371,6 @@
 (setq company-dabbrev-downcase nil) ;; turn off auto downcasing of things
 (setq company-show-numbers t)
 (setq company-minimum-prefix-length 2)
-;;(add-hook 'after-init-hook 'global-company-mode)
 (global-company-mode 1)
 
 
@@ -498,11 +389,12 @@
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
- '(display-time-mode t)
+ ;;'(display-time-mode t)
  '(scroll-bar-mode 1)
  '(show-paren-mode t)
  '(size-indication-mode t)
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(vlf-application 'dont-ask))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -512,23 +404,9 @@
  '(sml/modes ((t (:inherit sml/global :background "#006666" :foreground "white smoke")))))
 
 
-;; mode-line
-;; powerline
-;; (set-face-attribute ;; 'mode-line nil
-;;  :foreground "Black"
-;;  :background "DarkOrange"
-;;  :box nil
-;;  )
-;;(require 'powerline)
-;;(setq powerline-arrow-shape 'curve) ; options: arrow, curve, arrow14
-;;(setq powerline-default-separator-dir '(right . left))
-;;(setq powerline-color1 "grey22")
-;;(setq powerline-active1 "grey40")
-
 ;; smart mode line
 (setq sml/theme 'powerline) ; options: dark, light, respectful, automatic, powerline
 ;;(setq sml/name-width 20)
-;;(setq sml/modes ((t :foreground "White"))))
 (setq sml/no-confirm-load-theme t)
 (sml/setup)
 ;; flat-looking mode-line
@@ -536,54 +414,11 @@
 ;;(set-face-attribute 'mode-line-inactive nil :box nil)
 ;;(set-face-attribute 'mode-line-highlight nil :box nil)
 
-;; (setq-default mode-line-format `(
-;;                                  "%e" mode-line-front-space
-;;                                  ;; Standard info about the current buffer
-;;                                  mode-line-mule-info
-;;                                  mode-line-client
-;;                                  mode-line-modified
-;;                                  mode-line-remote
-;;                                  mode-line-frame-identification
-;;                                  mode-line-buffer-identification mode-line-position
-;;                                  (vc-mode vc-mode-line) ; VC information
-;;                                  (flycheck-mode flycheck-mode-line) ; Flycheck status
-;;                                  ;; Misc information, notably battery state and function name
-;;                                  " " mode-line-modes mode-line-end-spaces
-;;                                  ))
-
-;;(set-face-attribute 'mode-line nil :foreground "White" :background "grey22" :box nil)
-;;(set-face-attribute 'mode-line-highlight nil :foreground "red" )
-;; (set-face-background 'modeline "grey40" (current-buffer))
-;;(set-face-attribute 'minor-mode-alist "red" )
-
-;; (setq-default mode-line-format
-;;               (list
-;;                "%e:"
-;;                mode-line-front-space
-;;                mode-line-mule-info
-;;                mode-line-client
-;;                mode-line-modified
-;;                mode-line-remote
-;;                mode-line-frame-identification
-;;                mode-line-buffer-identification
-;;                ;; " --user: " (getenv "USER")
-;;                ;;mode-line-position
-;;                "%m"  ;; value of `mode-name'
-;;                ;; value of current buffer name
-;;                ;;"buffer %b, "
-;;                ;; value of current line number
-;;                ;;"line %l "
-;;                ;;(vc-mode vc-mode-line)
-;;                minor-mode-alist
-;;                mode-line-end-spaces
-;;                ))
-
 
 ;; anzu mode - show number of searches in the mode line
 (global-anzu-mode 1)
 
 
-;;(iswitchb-mode 1) ;; auto completion in minibuffer, obsolete since Emacs 24.4
 (icomplete-mode 1) ;; incremental minibuffer completion/suggestions
 
 
@@ -595,7 +430,8 @@
 
 
 ;; yasnippet
-(yas-global-mode 1)
+;;(yas-global-mode 1)
+(yas-reload-all 1)
 
 
 ;; text mode  hooks
@@ -618,6 +454,7 @@
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook 'writegood-mode)
 (add-hook 'LaTeX-mode-hook 'abbrev-mode)
+(add-hook 'LaTeX-mode-hook 'yas-minor-mode)
 
 (setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
 (setq TeX-parse-self t) ; enable parse on load
@@ -630,31 +467,13 @@
 (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
 (setq reftex-plug-into-AUCTeX t)
-;;(TeX-source-correlate-mode 1)
-;;(TeX-source-correlate-determine-method 'synctex)
-;;(TeX-source-correlate-method-active)
 
 (auctex-latexmk-setup) ; add support for latexmk
 
 (setq TeX-electric-sub-and-superscript t) ; automatically insert braces in math mode
 
-;; preview-latex
-;;(autoload 'LaTeX-preview-setup "preview")
-;;(add-hook 'LaTeX-mode-hook #'LaTeX-preview-setup)
-;;(latex-preview-pane-enable) ; latex-preview-pane
-;;(preview-cache-preamble 1) 
-
-;; custom hook
-(defun compile-candidacy-proposal()
-  "Compile my candidacy proposal"
-  (message "banana"))
-(add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (add-hook 'after-save-hook 'compile-candidacy-proposal nil 'make-it-local)))
-
 
 ;; shell mode hooks
-;;(require 'readline-complete) ; set up auto-complete in shell mode with company
 
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "bash")
@@ -675,6 +494,7 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
 (add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
+(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 
 ;; show the name of the function in the modeline
 (which-function-mode 1)
@@ -693,32 +513,6 @@
           (lambda ()
             (setq c-basic-offset 2)))
 
-;;(add-to-list 'load-path "~/.emacs.d/jdee-2.4.1/lisp")
-;;(load "jde")
-;;(require 'cedet)
-;;(require 'semantic)
-;;(require 'semantic/db-javap)
-;;(load "semantic/loaddefs.el")
-;;(semantic-mode 1)
-
-;; (require 'malabar-mode)
-;; (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
-;; ;; compile on save
-;; (add-hook 'malabar-mode-hook
-;;           (lambda () 
-;;             (add-hook 'after-save-hook 'malabar-compile-file-silently
-;;                       nil t)))
-
-;;(load-file "~/cedet-1.0pre6/common/cedet.el")
-;;(global-ede-mode 1)                      ; Enable the Project management system
-
-;;(semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion 
-;;(global-semantic-decoration-mode)
-;;(global-semantic-highlight-edits-mode)
-;;(global-semantic-highlight-func-mode)
-;;(global-semantic-idle-completions-mode)
-;;(global-semantic-idle-breadcrumbs-mode)
-
 
 ;; python hooks
 
@@ -734,24 +528,6 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (org-indent-mode t)) t)
-
-
-;; automatically byte compile any emacs-lisp after every change (a save)
-;; (add-hook 'emacs-lisp-mode-hook
-;;           '(lambda ()
-;;              (add-hook 'after-save-hook 'emacs-lisp-byte-compile t t))
-;;           )
-
-;; automatically byte compile .emacs after every change (a save)
-(defun auto-recompile-emacs-file ()
-  (interactive)
-  (when (and buffer-file-name (string-match "\\.emacs" buffer-file-name))
-    (let ((byte-file (concat buffer-file-name "\\.elc")))
-      (if (or (not (file-exists-p byte-file))
-              (file-newer-than-file-p buffer-file-name byte-file))
-          (byte-compile-file buffer-file-name)))))
-
-;;(add-hook 'after-save-hook 'auto-recompile-emacs-file)
 
 
 ;; keyboard shortcuts
@@ -784,14 +560,13 @@
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
-(global-set-key [M-left] 'tabbar-backward-tab)
-(global-set-key [M-right] 'tabbar-forward-tab)
 ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
 (global-set-key (kbd "M-b") 'ace-jump-buffer)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 (global-set-key (kbd "C-x C-j") #'dired-jump)
 
-;; start emacs server
-;;(server-start)
+;;(global-set-key [M-left] 'tabbar-backward-tab) ; overwritten by 'ahs-backward
+;;(global-set-key [M-right] 'tabbar-forward-tab) ; overwritten by 'ahs-forward
+
 
