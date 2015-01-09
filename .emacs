@@ -1,6 +1,5 @@
 ;; Swarnendu Biswas
-;; Wed Nov 12 23:44:13 EST 2014
-
+;; Wed Nov 19 22:03:03 EST 2014
 
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to load or require, since they cause eager loading and are expensive, a
@@ -14,10 +13,6 @@
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean
 ;;    McGrath
 
-
-;; time your .emacs initialization
-;;(require 'cl) ; a rare necessary use of REQUIRE
-;;(defvar *emacs-load-start* (current-time))
 
 ;; Customizing packages
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -54,6 +49,7 @@
 (setq-default standard-indent 2) ; set standard indent to 2 rather that 4
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
+(blink-cursor-mode 1) ;; enable/disable blinking cursor
 
 
 ;; backup
@@ -69,8 +65,8 @@
 
 
 ;; automatically load abbreviations table
-(setq-default abbrev-mode t)
-(setq-default abbrev-file-name "~/.emacs/abbrev_defs")
+;;(setq-default abbrev-mode t) ; only enable for certain major modes
+(setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
 (setq save-abbrevs t)
 
 
@@ -88,12 +84,12 @@
 
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
-;;(hlinum-activate 1) ; extension to linum-mode to highlight current line number
+(hlinum-activate) ; extension to linum-mode to highlight current line number
 ;;(setq linum-format " %d ")
 
 (tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
-(menu-bar-mode -1) ; disable menu bar
+(menu-bar-mode 1) ; keep menu bar enabled
 ;; displays the time and date in the mode line
 (setq display-time-day-and-date t
       display-time-24hr-format nil)
@@ -101,19 +97,19 @@
 (setq frame-title-format (concat  "%b - emacs@" (system-name))) ;; default to better frame titles
 
 
-;; These are two nice themes, leuven and professional
+;; these are two nice themes: leuven and professional
 ;;(load-theme 'leuven t) ; set default theme on start up
 (load-theme 'professional t)
-(set-face-background 'fringe "white") ; Hide the fringe mark on the left
+;;(set-face-background 'fringe "white") ; Hide the fringe mark on the left
 (setq-default indicate-empty-lines t)
-(setq-default highlight-changes-mode 1)
+(highlight-changes-mode 1)
 (setq-default indicate-buffer-boundaries 'right)
 
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 (transient-mark-mode 1) ; enable visual feedback on selections, default since v23
 (global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
-(idle-highlight-mode 1) ; idle highlight mode
+;;(idle-highlight-mode 1) ; idle highlight mode
 
 
 ;; cua mode
@@ -146,7 +142,6 @@
 
 
 ;; ibuffer
-;;(ibuffer-auto-mode 1) ; automatically keeps the buffer list up to date
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
              (ibuffer-auto-mode 1)))
@@ -180,6 +175,10 @@
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
+
+
+(desktop-save-mode 1) ;; use desktop save mode
+
 
 ;; start emacs/emacsclient in fullscreen mode
 
@@ -220,7 +219,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer aggressive-indent anzu async auctex auctex-latexmk auto-auto-indent autodisass-java-bytecode auto-indent-mode bash-completion bibtex-utils color-theme company company-auctex company-math dash dired+ display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck flycheck-color-mode-line flycheck-tip flymake flymake-shell flymake-easy flyparens goto-last-change guide-key guide-key-tip highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icicles idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra auctex latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer mic-paren mode-icons names nav parent-mode pkg-info popup professional-theme rainbow-mode rainbow-delimiters rainbow-identifiers readline-complete rich-minority s sentence-highlight smart-tabs-mode smooth-scroll smex tabbar writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer malabar-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -232,11 +231,32 @@
 ;;(smartparens-global-mode 1) ; show paired parentheses
 ;;(flex-autopair-mode 1) ; this seems to work best, it autocompletes over existing words
 ;;(paren-activate) ; mic-paren - parentheses matching
-(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
-(electric-pair-mode 1) ; autocomplete brackets/parentheses, seems to be more improved than autopair
+;;(electric-pair-mode 1) ; autocomplete brackets/parentheses, seems to be more improved than autopair
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
-(global-aggressive-indent-mode 1)
-(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+
+;; smart pairing for all, from prelude
+(require 'smartparens-config)
+(setq sp-base-key-bindings 'paredit)
+(setq sp-autoskip-closing-pair 'always)
+(setq sp-hybrid-kill-entire-symbol nil)
+(sp-use-paredit-bindings)
+
+(show-smartparens-global-mode +1)
+
+
+;; indentation
+;;(global-aggressive-indent-mode 1) ; manual spacing won't work for aligning in text modes
+;;(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
+(auto-indent-global-mode 1) ; auto-indentation minor mode
+(indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
+;;(indent-guide-mode 1)
+(highlight-indentation-mode 1)
+
+
+;; highlight-symbol at point
+(global-auto-highlight-symbol-mode 1)
+;;(highlight-symbol-mode 1)
 
 
 ;; ace-jump-buffer
@@ -274,7 +294,7 @@
 (ido-mode 1)
 (setq ido-everywhere t)
 (setq ido-enable-flex-matching t)
-(setq ido-use-filename-at-point 'guess) ; 'ffap-guesser
+;;(setq ido-use-filename-at-point 'guess) ; other options: 'ffap-guesser
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
 (ido-at-point-mode 1)
@@ -292,6 +312,7 @@
 (setq ido-use-faces nil) ; disable ido faces to see flx highlights
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
 (setq ido-use-virtual-buffers t)
+(ido-better-flex/enable)
 
 
 ;; recentf stuff
@@ -326,21 +347,9 @@
 ;;(add-to-list 'ac-sources 'ac-source-c-header-symbols t)))
 
 
-
-;; indentation
-(auto-indent-global-mode 1) ; auto-indentation minor mode
-(indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
-;;(indent-guide-mode 1)
-(highlight-indentation-mode 1)
-
-
-;; highlight-symbol at point
-(highlight-symbol-mode 1)
-
-
 ;; guide-key
-(setq guide-key/guide-key-sequence '("C-x r" "C-x 4"))
-(guide-key-mode 1)  ; Enable guide-key-mode
+;;(setq guide-key/guide-key-sequence '("C-x r" "C-x 4"))
+;;(guide-key-mode 1)  ; Enable guide-key-mode
 
 
 ;; smooth scroll
@@ -355,7 +364,7 @@
 
 
 ;; whitespace
-;; (setq-default indicate-empty-lines t)
+(setq-default indicate-empty-lines t)
 ;; (show-trailing-whitespace t)
 ;; (add-hook 'before-save-hook 'whitespace-cleanup)
 ;;(setq whitespace-style '(face empty tabs lines-tail trailing))
@@ -414,22 +423,26 @@
 
 
 ;; rainbow mode
-(rainbow-mode 1)
-(rainbow-identifiers-mode 1)
-(rainbow-delimiters-mode 1)
+;;(rainbow-mode 1)
+;;(rainbow-identifiers-mode 1)
+;;(rainbow-delimiters-mode 1)
 
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
 ;;(require 'dired+)
 ;;(require 'dired-x)
-(add-hook 'dired-load-hook
-          (lambda ()
-            (load "dired-x")))
+;; (add-hook 'emacs-startup-hook ; dired-load-hook
+;;           (lambda ()
+;;             (load "dired-x")))
 (setq dired-auto-revert-buffer t) ;; revert each dired buffer automatically when you visit it
 (setq dired-recursive-deletes 'always) ; single prompt for all n directories
+(setq dired-recursive-copies 'always)
 (setq-default diredp-hide-details-initially-flag nil)
-
+(autoload 'dired-jump "dired-x"
+  "Jump to dired buffer corresponding to current buffer."
+  'interactive)
+(setq dired-bind-jump t)
 
 ;; smart tabs (indent with tabs, align with spaces)
 ;;(global-smart-tab-mode 1)
@@ -461,11 +474,12 @@
 
 ;; company
 (autoload 'company-mode "company" nil t)
-(add-hook 'after-init-hook 'global-company-mode)
 ;;(require 'company-auctex)
 (company-auctex-init)
 (setq company-dabbrev-downcase nil) ;; turn off auto downcasing of things
 (setq company-show-numbers t)
+(setq company-minimum-prefix-length 2)
+;;(add-hook 'after-init-hook 'global-company-mode)
 (global-company-mode 1)
 
 
@@ -482,12 +496,11 @@
  ;; If there is more than one, they won't work right.
  '(ajb-bs-configuration "files" t)
  '(column-number-mode t)
- '(custom-safe-themes (quote ( default)))
+ '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
- '(display-time-mode 1)
- '(menu-bar-mode nil)
+ '(display-time-mode t)
  '(scroll-bar-mode 1)
- '(show-paren-mode 1)
+ '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil))
 (custom-set-faces
@@ -495,7 +508,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(sml/folder ((t (:inherit sml/global :background "#000000" :foreground "white smoke" :weight normal))))
+ '(sml/modes ((t (:inherit sml/global :background "#006666" :foreground "white smoke")))))
 
 
 ;; mode-line
@@ -512,11 +526,11 @@
 ;;(setq powerline-active1 "grey40")
 
 ;; smart mode line
-;;(setq sml/theme 'powerline) ; options: dark, light, respectful, automatic, powerline
+(setq sml/theme 'powerline) ; options: dark, light, respectful, automatic, powerline
 ;;(setq sml/name-width 20)
 ;;(setq sml/modes ((t :foreground "White"))))
-;;(setq sml/no-confirm-load-theme t)
-;;(sml/setup)
+(setq sml/no-confirm-load-theme t)
+(sml/setup)
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)
 ;;(set-face-attribute 'mode-line-inactive nil :box nil)
@@ -564,6 +578,7 @@
 ;;                mode-line-end-spaces
 ;;                ))
 
+
 ;; anzu mode - show number of searches in the mode line
 (global-anzu-mode 1)
 
@@ -590,6 +605,7 @@
 (setq comment-auto-fill-only-comments t)
 (add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
 (add-hook 'text-mode-hook 'writegood-mode)
+(add-hook 'text-mode-hook 'abbrev-mode)
 
 ;; latex mode hooks
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
@@ -599,13 +615,17 @@
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 (add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
+;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook 'writegood-mode)
+(add-hook 'LaTeX-mode-hook 'abbrev-mode)
 
 (setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
 (setq TeX-parse-self t) ; enable parse on load
 (setq-default TeX-master nil) ; query for master file
 (setq TeX-PDF-mode t) ; compile files to pdf by default
+
+;; always use `TeX-default-mode', which defaults to `latex-mode'
+(setq TeX-force-default-mode t)
 
 (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
@@ -619,9 +639,10 @@
 (setq TeX-electric-sub-and-superscript t) ; automatically insert braces in math mode
 
 ;; preview-latex
-(autoload 'LaTeX-preview-setup "preview")
-(add-hook 'LaTeX-mode-hook #'LaTeX-preview-setup)
-(latex-preview-pane-enable) ; latex-preview-pane
+;;(autoload 'LaTeX-preview-setup "preview")
+;;(add-hook 'LaTeX-mode-hook #'LaTeX-preview-setup)
+;;(latex-preview-pane-enable) ; latex-preview-pane
+;;(preview-cache-preamble 1) 
 
 ;; custom hook
 (defun compile-candidacy-proposal()
@@ -652,6 +673,8 @@
 (add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
+(add-hook 'prog-mode-hook #'aggressive-indent-mode)
+(add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
 
 ;; show the name of the function in the modeline
 (which-function-mode 1)
@@ -767,14 +790,8 @@
 (global-set-key (kbd "M-b") 'ace-jump-buffer)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-
+(global-set-key (kbd "C-x C-j") #'dired-jump)
 
 ;; start emacs server
 ;;(server-start)
-
-
-;; compute total running time
-;; (message "My .emacs loaded in %ds" (destructuring-bind (hi lo ms) (current-time)
-;;                                      (- (+ hi lo) (+ (first *emacs-load-start*) (second *emacs-load-start*)))))
-
 

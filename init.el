@@ -1,6 +1,5 @@
 ;; Swarnendu Biswas
-;; Mon Nov 24 23:32:48 EST 2014
-
+;; Wed Dec 10 15:43:01 EST 2014
 
 ;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to load or require, since they cause eager loading and are expensive, a
@@ -142,8 +141,8 @@
 
 ;; tramp
 (setq tramp-default-method "ssh") ; faster than the default scp
-(setq tramp-default-user "biswass"
-      tramp-default-host "sunshine.cse.ohio-state.edu")
+(setq tramp-default-user "XXX"
+      tramp-default-host "XXX")
 ;; disable version control
 (setq vc-ignore-dir-regexp
       (format "\\(%s\\)\\|\\(%s\\)"
@@ -169,11 +168,6 @@
 (setq redisplay-dont-pause t)
 
 
-;; speed up emacs for large files
-(setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
-(require 'vlf-integrate)
-
-
 ;; Package specific
 
 ;; First ensure that a required set of packages are always installed
@@ -183,6 +177,11 @@
       '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
+
+
+;; speed up emacs for large files
+(setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
+(require 'vlf-setup)
 
 
 ;; related to pairing of parentheses, brackets, etc.
@@ -203,7 +202,7 @@
 (electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
 (auto-indent-global-mode 1) ; auto-indentation minor mode
 (indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
-(highlight-indentation-mode 1)
+;;(highlight-indentation-mode 1) ; there seems to be an error with derived-mode
 
 
 ;; highlight-symbol at point
@@ -430,8 +429,8 @@
 
 
 ;; yasnippet
-;;(yas-global-mode 1)
-(yas-reload-all 1)
+(yas-global-mode 1)
+;;(yas-reload-all 1)
 
 
 ;; text mode  hooks
