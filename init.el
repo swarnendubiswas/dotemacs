@@ -1,7 +1,7 @@
 ;; Swarnendu Biswas
-;; Wed Dec 10 15:43:01 EST 2014
+;; Wed Jan 14 09:55:00 EST 2015
 
-;; SB: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
+;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to load or require, since they cause eager loading and are expensive, a
 ;; cheaper alternative is to use autoload
 
@@ -174,7 +174,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens ggtags goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -202,7 +202,7 @@
 (electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
 (auto-indent-global-mode 1) ; auto-indentation minor mode
 (indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
-;;(highlight-indentation-mode 1) ; there seems to be an error with derived-mode
+(highlight-indentation-mode 1) ; there seems to be an error with derived-mode
 
 
 ;; highlight-symbol at point
@@ -511,6 +511,8 @@
 (add-hook 'java-mode-hook
           (lambda ()
             (setq c-basic-offset 2)))
+(autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
+(add-hook 'java-mode-hook 'jtags-mode)
 
 
 ;; python hooks
@@ -565,7 +567,9 @@
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 (global-set-key (kbd "C-x C-j") #'dired-jump)
 
-;;(global-set-key [M-left] 'tabbar-backward-tab) ; overwritten by 'ahs-backward
-;;(global-set-key [M-right] 'tabbar-forward-tab) ; overwritten by 'ahs-forward
-
+;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
+(define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
+(define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
+(global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
+(global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
 
