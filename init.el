@@ -1,3 +1,4 @@
+;;; init.el starts here
 ;; Swarnendu Biswas
 ;; Wed Jan 14 09:55:00 EST 2015
 
@@ -12,6 +13,15 @@
 ;;    the editor should get used to us." - Vivek Haldar
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean
 ;;    McGrath
+;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
+;;    is not just bigger and brighter; it simply makes everything else vanish." - Neal Stephenson, "In the Beginning was
+;;    the Command Line"
+;;   "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
+;;    and they're probably right..." - Jerry Coffin (on indentation)
+;;   "The only real difficulties in programming are cache invalidation and naming things." - Phil Karlton
+;;   "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
+;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." - Steve
+;;    McConnell
 
 
 ;; Customizing packages
@@ -345,6 +355,11 @@
   "Jump to dired buffer corresponding to current buffer."
   'interactive)
 (setq dired-bind-jump t)
+;; jump to home directory
+(global-set-key (kbd "S-<f1>")
+                (lambda ()
+                  (interactive)
+                  (dired "~/")))
 
 
 ;; smart tabs (indent with tabs, align with spaces)
@@ -573,3 +588,4 @@
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
 
+;;; init.el ends here
