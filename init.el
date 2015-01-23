@@ -1,28 +1,30 @@
 ;;; init.el starts here
 ;; Swarnendu Biswas
-;; Wed Jan 14 09:55:00 EST 2015
+;; Thu Jan 22 12:09:59 EST 2015
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
-;; Init file shouldn't ideally contain calls to load or require, since they cause eager loading and are expensive, a
-;; cheaper alternative is to use autoload
+;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
+;; cheaper alternative is to use "autoload"
 
-;; Citations (inspired from http://www.mygooglest.com/fni/dot-emacs.html)
+;; Interesting quotes (inspired from http://www.mygooglest.com/fni/dot-emacs.html):
 ;;
-;;   "Show me your ~/.emacs and I will tell you who you are." - Bogdan Maryniuk
+;;   "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk
 ;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
-;;    the editor should get used to us." - Vivek Haldar
-;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." - Sean
+;;    the editor should get used to us." -- Vivek Haldar
+;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
 ;;    McGrath
 ;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
-;;    is not just bigger and brighter; it simply makes everything else vanish." - Neal Stephenson, "In the Beginning was
+;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning was
 ;;    the Command Line"
 ;;   "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
-;;    and they're probably right..." - Jerry Coffin (on indentation)
-;;   "The only real difficulties in programming are cache invalidation and naming things." - Phil Karlton
+;;    and they're probably right..." -- Jerry Coffin (on indentation)
+;;   "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton
 ;;   "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
-;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." - Steve
+;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." -- Steve
 ;;    McConnell
 
+
+;;; Code:
 
 ;; Customizing packages
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -38,9 +40,9 @@
 ;; start customizing functionality
 
 ;; startup
-(setq inhibit-default-init t) ; disable loading of "default.el" at startup
-(setq inhibit-startup-screen t)
-(setq inhibit-splash-screen t
+(setq inhibit-default-init t ; disable loading of "default.el" at startup
+      inhibit-startup-screen t
+      inhibit-splash-screen t
       initial-scratch-message nil)
 ;; *scratch* is in Lisp interaction mode by default, make it use text mode by default
 (setq initial-major-mode 'text-mode) 
@@ -50,15 +52,23 @@
 ;; customize defaults
 (setq require-final-newline t) ; always end a file with a newline
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and applications
-(set-face-attribute 'default nil :height 109) ; set font size, value is in 1/10pt, so 100 will give you 10pt
-(setq column-number-mode t)
+(set-face-attribute 'default nil :height 120) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq-default fill-column 120)
 (setq-default standard-indent 2) ; set standard indent to 2 rather that 4
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
-(blink-cursor-mode 1) ;; enable/disable blinking cursor
 
+;;(setq-default truncate-lines t)
+(toggle-truncate-lines 1)
+(setq word-wrap t)
+(setq visual-line-mode nil)
+
+;; we need to paste something from another program, but sometimes we
+;; do real paste after some kill action, that will erase the
+;; clipboard,so we need to save it to kill ring, here is the setting
+;; used to control that
+(setq save-interprogram-paste-before-kill t)
+(setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and other applications
 
 ;; backup
 (setq make-backup-files nil) ; stop making backup ~ files
@@ -76,10 +86,6 @@
 (setq save-abbrevs t)
 
 
-;; tooltips
-(tooltip-mode -1)
-
-
 ;; enable tabbar minor mode
 (setq tabbar-use-images nil) ; speed up by not using images
 (tabbar-mode 1)
@@ -87,34 +93,49 @@
 
 ;; customize appearance
 
+;; better frame titles
+;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
+(setq frame-title-format
+      (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
+
 ;;  line numbers
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
 (hlinum-activate) ; extension to linum-mode to highlight current line number
 (column-number-mode 1)
 
+(tooltip-mode -1) ;; tooltips
 (tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
 (menu-bar-mode 1) ; keep menu bar enabled
+(blink-cursor-mode 1) ;; enable/disable blinking cursor
+
 ;; displays the time and date in the mode line
 (setq display-time-day-and-date t
       display-time-24hr-format nil)
-;;(display-time)
-(setq frame-title-format (concat  "%b - emacs@" (system-name))) ;; default to better frame titles
+(display-time)
 
 
 ;; these are two nice themes: leuven and professional
 (load-theme 'professional t)
-;;(set-face-background 'fringe "white") ; Hide the fringe mark on the left
+(set-face-background 'fringe "white") ; Hide the fringe mark on the left
 (setq-default indicate-empty-lines t)
-(highlight-changes-mode 1)
 (setq-default indicate-buffer-boundaries 'right)
 
 
+;;(highlight-changes-mode 1) ; not very useful usually
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 (transient-mark-mode 1) ; enable visual feedback on selections, default since v23
 (global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
 
+
+;; fontification
+(global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
+(setq font-lock-maximum-decoration t)
+(setq jit-lock-defer-time 0.10) ; improve scrolling speed with jit fontification
+
+
+;; custom functions
 
 ;; kill all non-special buffers but the current one
 (defun kill-other-buffers ()
@@ -135,12 +156,6 @@
 (setq ibuffer-always-show-last-buffer nil)
 (setq ibuffer-sorting-mode 'recency)
 (setq ibuffer-use-header-line t)
-
-
-;; fontification
-(global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
-(setq font-lock-maximum-decoration t)
-(setq jit-lock-defer-time 0.10) ; improve scrolling speed with jit fontification
 
 
 ;; search
@@ -168,8 +183,8 @@
 (file-name-shadow-mode 1)
 
 
-;; use desktop save mode
-(desktop-save-mode 0) 
+;; desktop save mode
+(desktop-save-mode -1) 
 (setq-default desktop-restore-frames nil) ; no need to restore frames
 (setq-default desktop-load-locked-desktop nil)
 
@@ -184,7 +199,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-auto-indent auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip  flycheck epl flymake flymake-shell flymake-easy flyparens ggtags goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane leuven-theme magic-latex-buffer fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -209,16 +224,21 @@
 
 
 ;; indentation
-(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
-(auto-indent-global-mode 1) ; auto-indentation minor mode
-(indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
+;;(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
+;;(auto-indent-global-mode 1) ; auto-indentation minor mode
+;;(indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
 (highlight-indentation-mode 1) ; there seems to be an error with derived-mode
+(global-aggressive-indent-mode 1)
 
 
 ;; highlight-symbol at point
 (global-auto-highlight-symbol-mode 1)
 ;;(highlight-symbol-mode 1)
 ;;(idle-highlight-mode 1) ; idle highlight mode
+
+
+;; ace jump mode major function
+(autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
 
 
 ;; ace-jump-buffer
@@ -252,7 +272,7 @@
 (setq-default ajb-bs-configuration "files")
 
 
-;; enable ido mode
+;; ido mode
 (ido-mode 1)
 (setq ido-everywhere t)
 (setq ido-enable-flex-matching t)
@@ -263,7 +283,7 @@
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command"))
 (setq ido-enable-last-directory-history t)
-(setq ido-max-work-directory-list 30)
+(setq ido-max-work-directory-list 20)
 (setq ido-max-work-file-list 50)
 (setq confirm-nonexistent-file-or-buffer nil)
 (flx-ido-mode 1)
@@ -302,17 +322,17 @@
 
 
 ;; fci
-(define-globalized-minor-mode
-  global-fci-mode fci-mode (lambda () (fci-mode 1)))
+;;(define-globalized-minor-mode
+;;  global-fci-mode fci-mode (lambda () (fci-mode 1)))
 ;;(global-fci-mode 1)
 ;;(setq fci-rule-width 1)
-;;(setq-default fci-rule-column 120)
+(setq-default fci-rule-column 120)
 ;;(setq fci-handle-truncate-lines nil)
-(defun auto-fci-mode (&optional unused)
-  (if (> (frame-width) 120)
-      (fci-mode 1)
-    (fci-mode 0))
-  )
+;; (defun auto-fci-mode (&optional unused)
+;;   (if (> (frame-width) 120)
+;;       (fci-mode 1)
+;;     (fci-mode 0))
+;;   )
 ;;(add-hook 'after-change-major-mode-hook 'auto-fci-mode)
 ;;(add-hook 'window-size-change-functions 'auto-fci-mode)
 
@@ -324,16 +344,16 @@
 (setq uniquify-after-kill-buffer-p t)
 
 
-;; Spell check
+;; spell check
 (add-hook 'find-file-hooks 'turn-on-flyspell) ; Otherwise flyspell isn't enabled as I want it
 (setq-default ispell-program-name "/usr/bin/aspell")
 ;; Speed up aspell: ultra | fast | normal
 (setq ispell-extra-args '("--sug-mode=normal"))
 
+
 ;; flycheck
 (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
 (global-flycheck-mode 1)
-
 
 
 ;; rainbow mode
@@ -355,11 +375,6 @@
   "Jump to dired buffer corresponding to current buffer."
   'interactive)
 (setq dired-bind-jump t)
-;; jump to home directory
-(global-set-key (kbd "S-<f1>")
-                (lambda ()
-                  (interactive)
-                  (dired "~/")))
 
 
 ;; smart tabs (indent with tabs, align with spaces)
@@ -399,16 +414,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ajb-bs-configuration "files" t)
+ '(ajb-bs-configuration "files")
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
- ;;'(display-time-mode t)
+ '(display-time-mode t)
  '(scroll-bar-mode 1)
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
- '(vlf-application 'dont-ask))
+ '(vlf-application (quote dont-ask)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -419,7 +434,7 @@
 
 
 ;; smart mode line
-(setq sml/theme 'powerline) ; options: dark, light, respectful, automatic, powerline
+(setq sml/theme 'automatic) ; options: dark, light, respectful, automatic, powerline
 ;;(setq sml/name-width 20)
 (setq sml/no-confirm-load-theme t)
 (sml/setup)
@@ -456,6 +471,8 @@
 (add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
 (add-hook 'text-mode-hook 'writegood-mode)
 (add-hook 'text-mode-hook 'abbrev-mode)
+(add-hook 'text-mode-hook 'fci-mode)
+
 
 ;; latex mode hooks
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
@@ -469,6 +486,7 @@
 (add-hook 'LaTeX-mode-hook 'writegood-mode)
 (add-hook 'LaTeX-mode-hook 'abbrev-mode)
 (add-hook 'LaTeX-mode-hook 'yas-minor-mode)
+(add-hook 'LaTeX-mode-hook 'fci-mode)
 
 (setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
 (setq TeX-parse-self t) ; enable parse on load
@@ -509,6 +527,7 @@
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
 (add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
+(add-hook 'prog-mode-hook 'fci-mode)
 
 ;; show the name of the function in the modeline
 (which-function-mode 1)
@@ -541,51 +560,70 @@
           (lambda () (setq truncate-lines nil)))
 (setq org-completion-use-ido t)
 (setq org-src-fontify-natively t)
-(add-hook 'org-mode-hook
-          (lambda ()
-            (org-indent-mode t)) t)
 
 
 ;; keyboard shortcuts
 (global-set-key "\C-l" 'goto-line)
+(global-set-key "\C-c z" 'repeat)
+(global-set-key (kbd "C-z") 'undo)
+(global-set-key "\C-x\C-\\" 'goto-last-change) ; goto-last-change
+
 (global-set-key [f1] 'shell)
+
 (global-set-key [f2] 'split-window-vertically)
 (global-set-key [f3] 'split-window-horizontally)
 (global-set-key [f4] 'delete-other-windows)
-(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
 (global-set-key [f7] 'other-window) ; switch to the other buffer
-(global-set-key "\C-c z" 'repeat)
+
+(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
+
+
 (global-set-key (kbd "M-/") 'hippie-expand)
+
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (global-set-key (kbd "C-f") 'isearch-forward-regexp)
 (define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (global-set-key "\C-s" 'save-buffer)
-(global-set-key (kbd "C-z") 'undo)
+
 (global-set-key (kbd "C-c n") 'comment-region)
 (global-set-key (kbd "C-c m") 'uncomment-region)
+
 ;; setting up writegood-mode, identify weasel words, passive voice, and duplicate words
 (global-set-key "\C-cg" 'writegood-mode)
+
 ;; define a keyboard shortcut for duplicating lines
 ;;(global-set-key "\C-c\C-d" 'duplicate-line)
 (global-set-key (kbd "C-c C-d") 'duplicate-thing)
+
 ;; kill all non-special buffers
 (global-set-key (kbd "\C-c k") 'kill-other-buffers)
 (global-set-key (kbd "C-x C-b") 'ibuffer) ; use IBuffer for buffer list
-(global-set-key "\C-x\C-\\" 'goto-last-change) ; goto-last-change
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
+
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
+
+(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
 (global-set-key (kbd "M-b") 'ace-jump-buffer)
+
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
 (global-set-key (kbd "C-x C-j") #'dired-jump)
+;; jump to home directory
+(global-set-key (kbd "M-<f1>")
+                (lambda () 
+                  (interactive)
+                  (dired "~/")))
+
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
 (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
+
 
 ;;; init.el ends here
