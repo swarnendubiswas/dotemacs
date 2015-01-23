@@ -1,6 +1,6 @@
 ;;; init.el starts here
 ;; Swarnendu Biswas
-;; Thu Jan 22 12:09:59 EST 2015
+;; Fri Jan 23 13:50:39 EST 2015
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
@@ -52,16 +52,12 @@
 ;; customize defaults
 (setq require-final-newline t) ; always end a file with a newline
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(set-face-attribute 'default nil :height 120) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+(set-face-attribute 'default nil :height 110) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq-default fill-column 120)
 (setq-default standard-indent 2) ; set standard indent to 2 rather that 4
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
 
-;;(setq-default truncate-lines t)
-(toggle-truncate-lines 1)
-(setq word-wrap t)
-(setq visual-line-mode nil)
 
 ;; we need to paste something from another program, but sometimes we
 ;; do real paste after some kill action, that will erase the
@@ -81,9 +77,19 @@
 (setq-default auto-revert-verbose nil) 
 
 
+;;; FIXME: Are these important?
 ;; automatically load abbreviations table
 (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
 (setq save-abbrevs t)
+
+
+;; First ensure that a required set of packages are always installed
+(require 'ensure-packages)
+;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
+(setq ensure-packages
+      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      )
+(ensure-packages-install-missing)
 
 
 ;; enable tabbar minor mode
@@ -194,14 +200,6 @@
 
 
 ;; Package specific
-
-;; First ensure that a required set of packages are always installed
-(require 'ensure-packages)
-;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
-(setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
-      )
-(ensure-packages-install-missing)
 
 
 ;; speed up emacs for large files
@@ -327,7 +325,7 @@
 ;;(global-fci-mode 1)
 ;;(setq fci-rule-width 1)
 (setq-default fci-rule-column 120)
-;;(setq fci-handle-truncate-lines nil)
+(setq fci-handle-truncate-lines nil)
 ;; (defun auto-fci-mode (&optional unused)
 ;;   (if (> (frame-width) 120)
 ;;       (fci-mode 1)
@@ -379,12 +377,12 @@
 
 ;; smart tabs (indent with tabs, align with spaces)
 ;;(global-smart-tab-mode 1)
-(autoload 'smart-tabs-mode "smart-tabs-mode"
-  "Intelligently indent with tabs, align with spaces!")
-(autoload 'smart-tabs-mode-enable "smart-tabs-mode")
-(autoload 'smart-tabs-advice "smart-tabs-mode")
-(autoload 'smart-tabs-insinuate "smart-tabs-mode")
-(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
+;;(autoload 'smart-tabs-mode "smart-tabs-mode"
+;;  "Intelligently indent with tabs, align with spaces!")
+;;(autoload 'smart-tabs-mode-enable "smart-tabs-mode")
+;;(autoload 'smart-tabs-advice "smart-tabs-mode")
+;;(autoload 'smart-tabs-insinuate "smart-tabs-mode")
+;;(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
 
 
 ;; directory navigation
@@ -407,30 +405,6 @@
 ;;(smex-initialize) ; this is slow
 (autoload 'smex "smex")
 (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ajb-bs-configuration "files")
- '(column-number-mode t)
- '(custom-safe-themes (quote (default)))
- '(diredp-hide-details-initially-flag nil t)
- '(display-time-mode t)
- '(scroll-bar-mode 1)
- '(show-paren-mode t)
- '(size-indication-mode t)
- '(tool-bar-mode nil)
- '(vlf-application (quote dont-ask)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(sml/folder ((t (:inherit sml/global :background "#000000" :foreground "white smoke" :weight normal))))
- '(sml/modes ((t (:inherit sml/global :background "#006666" :foreground "white smoke")))))
 
 
 ;; smart mode line
@@ -624,6 +598,31 @@
 (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ajb-bs-configuration "files")
+ '(column-number-mode t)
+ '(custom-safe-themes (quote (default)))
+ '(diredp-hide-details-initially-flag nil t)
+ '(display-time-mode t)
+ '(scroll-bar-mode 1)
+ '(show-paren-mode t)
+ '(size-indication-mode t)
+ '(tool-bar-mode nil)
+ '(vlf-application (quote dont-ask)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ ;;'(sml/folder ((t (:inherit sml/global :background "#000000" :foreground "white smoke" :weight normal))))
+ ;;'(sml/modes ((t (:inherit sml/global :background "#006666" :foreground "white smoke"))))
+ )
 
 
 ;;; init.el ends here
