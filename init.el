@@ -77,17 +77,18 @@
 (setq-default auto-revert-verbose nil) 
 
 
-;;; FIXME: Are these important?
 ;; automatically load abbreviations table
 (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
-(setq save-abbrevs t)
+(setq save-abbrevs nil) ;; do not ask to save new abbrevs when quitting
+(setq-default abbrev-mode t)
+(quietly-read-abbrev-file) 
 
 
 ;; First ensure that a required set of packages are always installed
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -123,7 +124,7 @@
 
 
 ;; these are two nice themes: leuven and professional
-(load-theme 'professional t)
+(load-theme 'leuven t)
 (set-face-background 'fringe "white") ; Hide the fringe mark on the left
 (setq-default indicate-empty-lines t)
 (setq-default indicate-buffer-boundaries 'right)
@@ -160,9 +161,13 @@
 (defalias 'list-buffers 'ibuffer)
 (setq ibuffer-shrink-to-minimum-size t)
 (setq ibuffer-always-show-last-buffer nil)
+(setq ibuffer-default-sorting-mode 'major-mode)
 (setq ibuffer-sorting-mode 'recency)
 (setq ibuffer-use-header-line t)
-
+(add-hook 'ibuffer-mode-hook
+          '(lambda ()
+             (ibuffer-auto-mode 1)
+             ))
 
 ;; search
 (setq search-highlight t) ; highlight incremental search
@@ -212,13 +217,13 @@
 (setq show-paren-style 'parenthesis) ; highlight just brackets, 'expression
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
-;; smart pairing for all, from prelude
-(require 'smartparens-config)
-(setq sp-base-key-bindings 'paredit)
-(setq sp-autoskip-closing-pair 'always)
-(setq sp-hybrid-kill-entire-symbol nil)
-(sp-use-paredit-bindings)
-(show-smartparens-global-mode 1)
+;; ;; smart pairing for all, from prelude
+;; (require 'smartparens-config)
+;; (setq sp-base-key-bindings 'paredit)
+;; (setq sp-autoskip-closing-pair 'always)
+;; (setq sp-hybrid-kill-entire-symbol nil)
+;; (sp-use-paredit-bindings)
+;; (show-smartparens-global-mode 1)
 
 
 ;; indentation
@@ -277,6 +282,7 @@
 ;;(setq ido-use-filename-at-point 'guess) ; other options: 'ffap-guesser
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
+(setq ido-create-new-buffer 'always) ; other options: prompt, never
 (ido-at-point-mode 1)
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command"))
@@ -284,11 +290,14 @@
 (setq ido-max-work-directory-list 20)
 (setq ido-max-work-file-list 50)
 (setq confirm-nonexistent-file-or-buffer nil)
+
 (flx-ido-mode 1)
 (setq ido-use-faces nil) ; disable ido faces to see flx highlights
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
 (setq ido-use-virtual-buffers t)
 (ido-better-flex/enable)
+
+(ido-vertical-mode 1)
 
 
 ;; recentf stuff
@@ -408,7 +417,7 @@
 
 
 ;; smart mode line
-(setq sml/theme 'automatic) ; options: dark, light, respectful, automatic, powerline
+(setq sml/theme 'light) ; options: dark, light, respectful, automatic, powerline
 ;;(setq sml/name-width 20)
 (setq sml/no-confirm-load-theme t)
 (sml/setup)
@@ -435,6 +444,9 @@
 ;; yasnippet
 (yas-global-mode 1)
 ;;(yas-reload-all 1)
+
+
+;; specific major mode hooks
 
 
 ;; text mode  hooks
@@ -510,6 +522,7 @@
 (add-to-list 'which-func-modes 'c++-mode)
 (add-to-list 'which-func-modes 'python-mode)
 
+
 ;; c/c++ hooks
 (setq c-default-style "cc-mode"
       c-basic-offset 2)
@@ -537,10 +550,11 @@
 
 
 ;; keyboard shortcuts
-(global-set-key "\C-l" 'goto-line)
-(global-set-key "\C-c z" 'repeat)
+
+(global-set-key (kbd "C-l") 'goto-line)
+(global-set-key (kbd "C-c z") 'repeat)
 (global-set-key (kbd "C-z") 'undo)
-(global-set-key "\C-x\C-\\" 'goto-last-change) ; goto-last-change
+(global-set-key (kbd "C-x C-\\") 'goto-last-change) ; goto-last-change
 
 (global-set-key [f1] 'shell)
 
@@ -551,29 +565,28 @@
 
 (global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
 
-
 (global-set-key (kbd "M-/") 'hippie-expand)
 
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (global-set-key (kbd "C-f") 'isearch-forward-regexp)
 (define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
-(global-set-key "\C-s" 'save-buffer)
+(global-set-key (kbd "C-s") 'save-buffer)
 
 (global-set-key (kbd "C-c n") 'comment-region)
 (global-set-key (kbd "C-c m") 'uncomment-region)
 
 ;; setting up writegood-mode, identify weasel words, passive voice, and duplicate words
-(global-set-key "\C-cg" 'writegood-mode)
+(global-set-key (kbd "C-c g") 'writegood-mode)
 
 ;; define a keyboard shortcut for duplicating lines
-;;(global-set-key "\C-c\C-d" 'duplicate-line)
+;;(global-set-key (kbd "C-c C-d") 'duplicate-line)
 (global-set-key (kbd "C-c C-d") 'duplicate-thing)
 
-;; kill all non-special buffers
-(global-set-key (kbd "\C-c k") 'kill-other-buffers)
+;; buffers
+(global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
 (global-set-key (kbd "C-x C-b") 'ibuffer) ; use IBuffer for buffer list
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+(global-set-key (kbd "C-x C-r") 'recentf-open-files)
 
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
@@ -605,7 +618,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ajb-bs-configuration "files")
+ '(ajb-bs-configuration "files" t)
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
