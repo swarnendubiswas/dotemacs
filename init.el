@@ -4,7 +4,7 @@
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
-;; cheaper alternative is to use "autoload"
+;; cheaper alternative is to use "autoload".
 
 ;; Interesting quotes (inspired from http://www.mygooglest.com/fni/dot-emacs.html):
 ;;
@@ -88,7 +88,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -126,7 +126,7 @@
 ;; these are two nice themes: leuven and professional
 (load-theme 'leuven t)
 (set-face-background 'fringe "white") ; Hide the fringe mark on the left
-(setq-default indicate-empty-lines t)
+(setq-default indicate-empty-lines t) ; show empty lines after buffer end
 (setq-default indicate-buffer-boundaries 'right)
 
 
@@ -153,6 +153,10 @@
       (kill-buffer buffer))))
 
 
+;; achievements
+(achievements-mode 1)
+
+
 ;; ibuffer
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
@@ -164,10 +168,6 @@
 (setq ibuffer-default-sorting-mode 'major-mode)
 (setq ibuffer-sorting-mode 'recency)
 (setq ibuffer-use-header-line t)
-(add-hook 'ibuffer-mode-hook
-          '(lambda ()
-             (ibuffer-auto-mode 1)
-             ))
 
 ;; search
 (setq search-highlight t) ; highlight incremental search
@@ -201,7 +201,7 @@
 
 
 ;; fully redraw the display before queued input events are processed
-(setq redisplay-dont-pause t)
+(setq redisplay-dont-pause t) ; don't defer screen updates when performing operations
 
 
 ;; Package specific
@@ -213,17 +213,18 @@
 
 
 ;; related to pairing of parentheses, brackets, etc.
-(show-paren-mode 1) 
+(show-paren-mode 1) ; highlight matching parentheses when the point is on them
 (setq show-paren-style 'parenthesis) ; highlight just brackets, 'expression
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
 ;; ;; smart pairing for all, from prelude
-;; (require 'smartparens-config)
+(require 'smartparens-config)
 ;; (setq sp-base-key-bindings 'paredit)
 ;; (setq sp-autoskip-closing-pair 'always)
 ;; (setq sp-hybrid-kill-entire-symbol nil)
 ;; (sp-use-paredit-bindings)
-;; (show-smartparens-global-mode 1)
+(smartparens-global-mode 1)
+(show-smartparens-global-mode 1)
 
 
 ;; indentation
@@ -276,27 +277,28 @@
 
 
 ;; ido mode
-(ido-mode 1)
-(setq ido-everywhere t)
-(setq ido-enable-flex-matching t)
+(setq ido-everywhere t
+      ido-enable-flex-matching t
+      ido-enable-prefix nil
+      ido-max-prospects 10)
 ;;(setq ido-use-filename-at-point 'guess) ; other options: 'ffap-guesser
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
 (setq ido-create-new-buffer 'always) ; other options: prompt, never
-(ido-at-point-mode 1)
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command"))
 (setq ido-enable-last-directory-history t)
-(setq ido-max-work-directory-list 20)
-(setq ido-max-work-file-list 50)
+(setq ido-max-work-directory-list 20
+      ido-max-work-file-list 50)
 (setq confirm-nonexistent-file-or-buffer nil)
+(setq ido-use-faces nil ; disable ido faces to see flx highlights
+      ido-use-virtual-buffers t)
 
-(flx-ido-mode 1)
-(setq ido-use-faces nil) ; disable ido faces to see flx highlights
+(ido-mode 1)
+(ido-at-point-mode 1)
+(flx-ido-mode 1) ; smarter fuzzy matching for ido
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
-(setq ido-use-virtual-buffers t)
 (ido-better-flex/enable)
-
 (ido-vertical-mode 1)
 
 
@@ -407,6 +409,8 @@
 (setq company-dabbrev-downcase nil) ;; turn off auto downcasing of things
 (setq company-show-numbers t)
 (setq company-minimum-prefix-length 2)
+;; invert the navigation direction if the completion popup is displayed on top (happens near the bottom of windows)
+(setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
 
 
@@ -431,10 +435,10 @@
 (global-anzu-mode 1)
 
 
-(icomplete-mode 1) ;; incremental minibuffer completion/suggestions
+(icomplete-mode 1) ; incremental minibuffer completion/suggestions
 
 
-;; save minibuffer histories across emacs sessions
+;; save minibuffer histories across sessions
 (setq savehist-additional-variables    
       '(kill-ring search-ring regexp-search-ring)    
       savehist-file "~/.emacs.d/savehist") 
@@ -479,8 +483,7 @@
 (setq-default TeX-master nil) ; query for master file
 (setq TeX-PDF-mode t) ; compile files to pdf by default
 
-;; always use `TeX-default-mode', which defaults to `latex-mode'
-(setq TeX-force-default-mode t)
+(setq TeX-force-default-mode t) ; always use `TeX-default-mode', which defaults to `latex-mode'
 
 (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
@@ -494,7 +497,7 @@
 ;; shell mode hooks
 
 ;; set up shell (not eshell) mode
-(setq explicit-shell-file-name "bash")
+(setq explicit-shell-file-name "fish")
 (setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
 (setq comint-process-echoes t)
 ;; setup auto-completion framework
@@ -604,13 +607,25 @@
                 (lambda () 
                   (interactive)
                   (dired "~/")))
-
+;; M-up is nicer in dired if it moves to the fourth line - the first file
+(defun dired-back-to-top ()
+  (interactive)
+  (beginning-of-buffer)
+  (dired-next-line 4))
+;; M-down is nicer in dired if it moves to the last file
+(defun dired-jump-to-bottom ()
+  (interactive)
+  (end-of-buffer)
+  (dired-next-line -1))
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
 (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
+
+;; up and down keys to navigate options, left and right to move through history/directories
+(setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 
 
 (custom-set-variables
