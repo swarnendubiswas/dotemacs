@@ -1,6 +1,6 @@
 ;;; init.el starts here
 ;; Swarnendu Biswas
-;; Fri Jan 23 13:50:39 EST 2015
+;; Tue Jan 27 13:07:55 EST 2015
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
@@ -53,28 +53,28 @@
 (setq require-final-newline t) ; always end a file with a newline
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
 (set-face-attribute 'default nil :height 110) ; set font size, value is in 1/10pt, so 100 will give you 10pt
-(setq-default fill-column 120)
-(setq-default standard-indent 2) ; set standard indent to 2 rather that 4
-(setq-default tab-width 2)
-(setq-default indent-tabs-mode nil) ; spaces instead of tabs by default
+(setq-default fill-column 120
+              standard-indent 2 ; set standard indent to 2 rather that 4
+              tab-width 2
+              indent-tabs-mode nil ; spaces instead of tabs by default
+              )
 
 
-;; we need to paste something from another program, but sometimes we
-;; do real paste after some kill action, that will erase the
-;; clipboard,so we need to save it to kill ring, here is the setting
-;; used to control that
+;; we need to paste something from another program, but sometimes we do real paste after some kill
+;; action, that will erase the clipboard, so we need to save it to kill ring.
 (setq save-interprogram-paste-before-kill t)
 (setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and other applications
 
+
 ;; backup
-(setq make-backup-files nil) ; stop making backup ~ files
-(setq backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
+(setq make-backup-files nil ; stop making backup ~ files
+      backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
 
 
 ;; auto revert
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
-(setq-default auto-revert-interval 5) ; default is 5 s
-(setq-default auto-revert-verbose nil) 
+(setq-default auto-revert-interval 5 ; default is 5 s
+              auto-revert-verbose nil) 
 
 
 ;; automatically load abbreviations table
@@ -88,7 +88,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -126,8 +126,8 @@
 ;; these are two nice themes: leuven and professional
 (load-theme 'leuven t)
 (set-face-background 'fringe "white") ; Hide the fringe mark on the left
-(setq-default indicate-empty-lines t) ; show empty lines after buffer end
-(setq-default indicate-buffer-boundaries 'right)
+(setq-default indicate-empty-lines t ; show empty lines after buffer end
+              indicate-buffer-boundaries 'right)
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
@@ -138,9 +138,13 @@
 
 ;; fontification
 (global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
-(setq font-lock-maximum-decoration t)
-(setq jit-lock-defer-time 0.10) ; improve scrolling speed with jit fontification
-
+(setq font-lock-maximum-decoration t ; maximum fontification possible
+      jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
+      font-lock-support-mode 'jit-lock-mode ; jit locking is better than fast-lock and lazy-lock
+      jit-lock-stealth-time 10
+      jit-lock-defer-contextually t
+      jit-lock-stealth-nice 0.5
+      )
 
 ;; custom functions
 
@@ -230,9 +234,13 @@
 ;; indentation
 ;;(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
 ;;(auto-indent-global-mode 1) ; auto-indentation minor mode
-;;(indent-guide-global-mode 1) ; doesn't seem to work well with transient-mark-mode and auto-complete-mode
-(highlight-indentation-mode 1) ; there seems to be an error with derived-mode
 (global-aggressive-indent-mode 1)
+
+;; indentation guides
+;;(indent-guide-global-mode 1) ; doesn't seem to work well with company-mode and auto-complete-mode
+;;(setq indent-guide-delay 0.1) ; show guide lines only in idle-time
+(highlight-indentation-mode 1) 
+
 
 
 ;; highlight-symbol at point
@@ -436,6 +444,8 @@
 
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
+(eval-after-load "icomplete" '(progn (require 'icomplete+)))
+(icy-mode 1)
 
 
 ;; save minibuffer histories across sessions
@@ -549,7 +559,7 @@
 (add-hook 'org-mode-hook 
           (lambda () (setq truncate-lines nil)))
 (setq org-completion-use-ido t)
-(setq org-src-fontify-natively t)
+(setq org-src-fontify-natively t) ; code block fontification using the major-mode of the code
 
 
 ;; keyboard shortcuts
@@ -583,12 +593,11 @@
 (global-set-key (kbd "C-c g") 'writegood-mode)
 
 ;; define a keyboard shortcut for duplicating lines
-;;(global-set-key (kbd "C-c C-d") 'duplicate-line)
 (global-set-key (kbd "C-c C-d") 'duplicate-thing)
 
 ;; buffers
 (global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
-(global-set-key (kbd "C-x C-b") 'ibuffer) ; use IBuffer for buffer list
+(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
 (global-set-key (kbd "C-x C-r") 'recentf-open-files)
 
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
@@ -603,7 +612,7 @@
 
 (global-set-key (kbd "C-x C-j") #'dired-jump)
 ;; jump to home directory
-(global-set-key (kbd "M-<f1>")
+(global-set-key (kbd "M-<home>")
                 (lambda () 
                   (interactive)
                   (dired "~/")))
