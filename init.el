@@ -1,6 +1,6 @@
 ;;; init.el starts here
 ;; Swarnendu Biswas
-;; Tue Jan 27 13:07:55 EST 2015
+;; Fri Jan 30 12:32:56 EST 2015
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
@@ -10,23 +10,27 @@
 ;;
 ;;   "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk
 ;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
-;;    the editor should get used to us." -- Vivek Haldar
+;;    the editor should get used to us." -- Vivek Haldar in "New frontiers in text editing".
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
 ;;    McGrath
 ;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
-;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning was
-;;    the Command Line"
+;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning 
+;;    was the Command Line"
 ;;   "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
 ;;    and they're probably right..." -- Jerry Coffin (on indentation)
 ;;   "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton
 ;;   "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
 ;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." -- Steve
 ;;    McConnell
-
+;;   "What I don't understand is: why should you ever care how your editor looks, unless you're trying to win a
+;;    screenshot competition? The primary factor in looking good should be the choice of a good font at a comfortable
+;;    size, and a syntax coloring theme that you like. And that is not something specific to an editor. Editors like
+;;    Emacs and vi have almost no UI! If Emacs is configured right, the only UI it has is the modeline and the
+;;    minibuffer." -- Vivek Haldar in "New frontiers in text editing".
 
 ;;; Code:
 
-;; Customizing packages
+;; customizing packages
 (add-to-list 'load-path "~/.emacs.d/lisp")
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
@@ -35,6 +39,11 @@
                          ("melpa" . "http://melpa.milkbox.net/packages/")
                          ))
 (package-initialize)
+
+
+;; user details
+(setq user-full-name "Swarnendu Biswas"
+      user-mail-address "XXX")
 
 
 ;; start customizing functionality
@@ -88,7 +97,7 @@
 (require 'ensure-packages)
 ;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll sublime-themes tabbar vlf writegood-mode yasnippet)
       )
 (ensure-packages-install-missing)
 
@@ -158,6 +167,7 @@
 
 
 ;; achievements
+(setq achievements-idle-time 600) ; seconds
 (achievements-mode 1)
 
 
@@ -420,6 +430,7 @@
 ;; invert the navigation direction if the completion popup is displayed on top (happens near the bottom of windows)
 (setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
+(company-statistics-mode 1)
 
 
 ;; smex
@@ -445,7 +456,7 @@
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
 (eval-after-load "icomplete" '(progn (require 'icomplete+)))
-(icy-mode 1)
+;;(icy-mode 1) ; icicles
 
 
 ;; save minibuffer histories across sessions
@@ -560,10 +571,14 @@
           (lambda () (setq truncate-lines nil)))
 (setq org-completion-use-ido t)
 (setq org-src-fontify-natively t) ; code block fontification using the major-mode of the code
+(add-hook 'org-mode-hook
+          (lambda ()
+            (writegood-mode 1)))
 
 
 ;; keyboard shortcuts
 
+(global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-l") 'goto-line)
 (global-set-key (kbd "C-c z") 'repeat)
 (global-set-key (kbd "C-z") 'undo)
