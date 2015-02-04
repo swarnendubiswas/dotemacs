@@ -89,15 +89,16 @@
 ;; automatically load abbreviations table
 (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
 (setq save-abbrevs nil) ;; do not ask to save new abbrevs when quitting
+;;(quietly-read-abbrev-file)
+(setq dabbrev-case-replace nil) ; preserve case when expanding
 (setq-default abbrev-mode t)
-(quietly-read-abbrev-file) 
 
 
-;; First ensure that a required set of packages are always installed
+;; ensure that a required set of packages are always installed
 (require 'ensure-packages)
-;; Get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
+;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key-tip pos-tip guide-key popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icicles icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer magit fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line powerline smart-tab smart-tabs-mode smartparens smex smooth-scroll sublime-themes tabbar vlf writegood-mode yasnippet)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change pos-tip popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols light-soap-theme latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll sublime-themes tabbar undo-tree vlf writegood-mode yasnippet org-beautify-theme direx autopair ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
@@ -171,27 +172,31 @@
 (achievements-mode 1)
 
 
+(global-undo-tree-mode 1)
+
+
 ;; ibuffer
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
              (ibuffer-auto-mode 1)))
-(setq ibuffer-expert t)
-(defalias 'list-buffers 'ibuffer)
-(setq ibuffer-shrink-to-minimum-size t)
-(setq ibuffer-always-show-last-buffer nil)
-(setq ibuffer-default-sorting-mode 'major-mode)
-(setq ibuffer-sorting-mode 'recency)
-(setq ibuffer-use-header-line t)
+(defalias 'list-buffers 'ibuffer) ;; FIXME: Why is this required?
+(setq ibuffer-expert t
+      ibuffer-shrink-to-minimum-size t
+      ibuffer-always-show-last-buffer nil
+      ibuffer-default-sorting-mode 'major-mode
+      ibuffer-sorting-mode 'recency
+      ibuffer-use-header-line t)
+
 
 ;; search
-(setq search-highlight t) ; highlight incremental search
-(setq query-replace-highlight t) ; highlight during query
-(setq case-fold-search t) ; make search ignore case
+(setq search-highlight t ; highlight incremental search
+      query-replace-highlight t ; highlight during query
+      case-fold-search t) ; make search ignore case
 
 
 ;; tramp
-(setq tramp-default-method "ssh") ; faster than the default scp
-(setq tramp-default-user "XXX"
+(setq tramp-default-method "ssh" ; faster than the default scp
+      tramp-default-user "XXX"
       tramp-default-host "XXX")
 ;; disable version control
 (setq vc-ignore-dir-regexp
@@ -210,8 +215,8 @@
 
 ;; desktop save mode
 (desktop-save-mode -1) 
-(setq-default desktop-restore-frames nil) ; no need to restore frames
-(setq-default desktop-load-locked-desktop nil)
+(setq-default desktop-restore-frames nil ; no need to restore frames
+              desktop-load-locked-desktop nil)
 
 
 ;; fully redraw the display before queued input events are processed
@@ -305,8 +310,8 @@
 (setq ido-create-new-buffer 'always) ; other options: prompt, never
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command"))
-(setq ido-enable-last-directory-history t)
-(setq ido-max-work-directory-list 20
+(setq ido-enable-last-directory-history t
+      ido-max-work-directory-list 20
       ido-max-work-file-list 50)
 (setq confirm-nonexistent-file-or-buffer nil)
 (setq ido-use-faces nil ; disable ido faces to see flx highlights
@@ -321,13 +326,13 @@
 
 
 ;; recentf stuff
-(setq recentf-max-menu-items 15) ; show 15 in recent menu, but currently menu bar is disabled
-(setq recentf-max-saved-items 100) ; keep track of last 100 files
-(setq recentf-auto-cleanup 'never)
-;; save file names relative to my current home directory
-(setq recentf-filename-handlers '(abbreviate-file-name))
+(setq recentf-max-menu-items 15 ; show 15 in recent menu, but currently menu bar is disabled
+      recentf-max-saved-items 100 ; keep track of last 100 files
+      recentf-auto-cleanup 'never
+      recentf-exclude '("/tmp/" "/ssh:")
+      recentf-filename-handlers '(abbreviate-file-name) ; save file names relative to my current home directory
+      ) 
 (recentf-mode 1)
-(setq recentf-exclude '("/tmp/" "/ssh:"))
 
 
 ;; smooth scroll
@@ -367,14 +372,14 @@
 ;; uniquify
 ;;(setq uniquify-separator ":")
 ;; options: post-forward, reverse, forward
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; emacs 24.4 style ⁖ cat.png<dirName>
-(setq uniquify-after-kill-buffer-p t)
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
+      uniquify-after-kill-buffer-p t)
 
 
 ;; spell check
 (add-hook 'find-file-hooks 'turn-on-flyspell) ; Otherwise flyspell isn't enabled as I want it
 (setq-default ispell-program-name "/usr/bin/aspell")
-;; Speed up aspell: ultra | fast | normal
+;; speed up aspell: ultra | fast | normal
 (setq ispell-extra-args '("--sug-mode=normal"))
 
 
@@ -394,9 +399,9 @@
 ;; (add-hook 'emacs-startup-hook ; dired-load-hook
 ;;           (lambda ()
 ;;             (load "dired-x")))
-(setq dired-auto-revert-buffer t) ;; revert each dired buffer automatically when you visit it
-(setq dired-recursive-deletes 'always) ; single prompt for all n directories
-(setq dired-recursive-copies 'always)
+(setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
+      dired-recursive-deletes 'always ; single prompt for all n directories
+      dired-recursive-copies 'always)
 (setq-default diredp-hide-details-initially-flag nil)
 (autoload 'dired-jump "dired-x"
   "Jump to dired buffer corresponding to current buffer."
@@ -423,13 +428,13 @@
 ;; company
 (autoload 'company-mode "company" nil t)
 ;;(require 'company-auctex)
-(company-auctex-init)
-(setq company-dabbrev-downcase nil) ;; turn off auto downcasing of things
-(setq company-show-numbers t)
-(setq company-minimum-prefix-length 2)
+(setq company-dabbrev-downcase nil ;; turn off auto downcasing of things
+      company-show-numbers t
+      company-minimum-prefix-length 2)
 ;; invert the navigation direction if the completion popup is displayed on top (happens near the bottom of windows)
 (setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
+(company-auctex-init)
 (company-statistics-mode 1)
 
 
@@ -499,8 +504,8 @@
 (add-hook 'LaTeX-mode-hook 'yas-minor-mode)
 (add-hook 'LaTeX-mode-hook 'fci-mode)
 
-(setq TeX-auto-save t) ; enable parse on save, stores parsed information in an "auto" directory
-(setq TeX-parse-self t) ; enable parse on load
+(setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
+      TeX-parse-self t) ; enable parse on load
 (setq-default TeX-master nil) ; query for master file
 (setq TeX-PDF-mode t) ; compile files to pdf by default
 
@@ -651,6 +656,7 @@
 ;; up and down keys to navigate options, left and right to move through history/directories
 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 
+(global-set-key (kbd "C-h C-m") 'discover-my-major)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
