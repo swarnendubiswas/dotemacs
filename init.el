@@ -83,7 +83,9 @@
 ;; auto revert
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 5 ; default is 5 s
-              auto-revert-verbose nil) 
+              auto-revert-verbose nil
+              global-auto-revert-non-file-buffers t ; auto-refresh dired buffers
+              ) 
 
 
 ;; automatically load abbreviations table
@@ -98,7 +100,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change pos-tip popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols light-soap-theme latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll sublime-themes tabbar undo-tree vlf writegood-mode yasnippet org-beautify-theme direx autopair ibuffer-tramp json-mode)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols light-soap-theme latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll sublime-themes tabbar undo-tree vlf writegood-mode yasnippet org-beautify-theme direx autopair ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
@@ -135,7 +137,7 @@
 
 ;; these are two nice themes: leuven and professional
 (load-theme 'leuven t)
-(set-face-background 'fringe "white") ; Hide the fringe mark on the left
+(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-empty-lines t ; show empty lines after buffer end
               indicate-buffer-boundaries 'right)
 
@@ -156,6 +158,7 @@
       jit-lock-stealth-nice 0.5
       )
 
+
 ;; custom functions
 
 ;; kill all non-special buffers but the current one
@@ -172,6 +175,8 @@
 (achievements-mode 1)
 
 
+;; undo-tree (visualize with C-x u)
+(setq undo-tree-mode-lighter "")
 (global-undo-tree-mode 1)
 
 
@@ -303,7 +308,9 @@
 (setq ido-everywhere t
       ido-enable-flex-matching t
       ido-enable-prefix nil
-      ido-max-prospects 10)
+      ido-max-prospects 10
+      ido-case-fold t ; ignore case
+      ) 
 ;;(setq ido-use-filename-at-point 'guess) ; other options: 'ffap-guesser
 (setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
 ;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
@@ -318,7 +325,7 @@
       ido-use-virtual-buffers t)
 
 (ido-mode 1)
-(ido-at-point-mode 1)
+(ido-at-point-mode 1) ;; M-tab to start completion
 (flx-ido-mode 1) ; smarter fuzzy matching for ido
 (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
 (ido-better-flex/enable)
@@ -326,8 +333,8 @@
 
 
 ;; recentf stuff
-(setq recentf-max-menu-items 15 ; show 15 in recent menu, but currently menu bar is disabled
-      recentf-max-saved-items 100 ; keep track of last 100 files
+(setq recentf-max-menu-items 15 ; show in recent menu
+      recentf-max-saved-items 50 ; keep track of last xx files
       recentf-auto-cleanup 'never
       recentf-exclude '("/tmp/" "/ssh:")
       recentf-filename-handlers '(abbreviate-file-name) ; save file names relative to my current home directory
@@ -435,7 +442,7 @@
 (setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
 (company-auctex-init)
-(company-statistics-mode 1)
+;;(company-statistics-mode 1) ; this seems to disable the completion popup, which is inconvenient
 
 
 ;; smex
@@ -474,6 +481,14 @@
 ;; yasnippet
 (yas-global-mode 1)
 ;;(yas-reload-all 1)
+
+
+;; guide-key
+(setq guide-key/guide-key-sequence t)
+(setq guide-key/recursive-key-sequence-flag t
+      guide-key/popup-window-position 'bottom)
+(guide-key-mode 1)
+(setq guide-key-tip/enabled t)
 
 
 ;; specific major mode hooks
@@ -630,22 +645,26 @@
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
+;; dired
 (global-set-key (kbd "C-x C-j") #'dired-jump)
 ;; jump to home directory
 (global-set-key (kbd "M-<home>")
                 (lambda () 
                   (interactive)
                   (dired "~/")))
-;; M-up is nicer in dired if it moves to the fourth line - the first file
+;; M-<up> is nicer in dired if it moves to the fourth line - the first file
 (defun dired-back-to-top ()
   (interactive)
   (beginning-of-buffer)
   (dired-next-line 4))
-;; M-down is nicer in dired if it moves to the last file
+(define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top)
+
+;; M-<down> is nicer in dired if it moves to the last file
 (defun dired-jump-to-bottom ()
   (interactive)
   (end-of-buffer)
   (dired-next-line -1))
+(define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom)
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
