@@ -403,6 +403,7 @@
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
+(require 'dired) ; needed for dired-mode-map
 ;; (add-hook 'emacs-startup-hook ; dired-load-hook
 ;;           (lambda ()
 ;;             (load "dired-x")))
@@ -442,7 +443,7 @@
 (setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
 (company-auctex-init)
-;;(company-statistics-mode 1) ; this seems to disable the completion popup, which is inconvenient
+(company-statistics-mode 1) 
 
 
 ;; smex
@@ -617,7 +618,7 @@
 
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (global-set-key (kbd "C-f") 'isearch-forward-regexp)
-(define-key isearch-mode-map "\C-f" 'isearch-repeat-forward)
+(define-key isearch-mode-map (kbd "C-f") 'isearch-repeat-forward)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (global-set-key (kbd "C-s") 'save-buffer)
 
@@ -647,6 +648,7 @@
 
 ;; dired
 (global-set-key (kbd "C-x C-j") #'dired-jump)
+(define-key dired-mode-map (kbd "i") 'ido-find-file)
 ;; jump to home directory
 (global-set-key (kbd "M-<home>")
                 (lambda () 
