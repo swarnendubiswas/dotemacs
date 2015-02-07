@@ -126,7 +126,7 @@
 (tooltip-mode -1) ;; tooltips
 (tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
-(menu-bar-mode 1) ; keep menu bar enabled
+(menu-bar-mode -1) ; no menu bar
 (blink-cursor-mode 1) ;; enable/disable blinking cursor
 
 ;; displays the time and date in the mode line
@@ -336,7 +336,7 @@
 (setq recentf-max-menu-items 15 ; show in recent menu
       recentf-max-saved-items 50 ; keep track of last xx files
       recentf-auto-cleanup 'never
-      recentf-exclude '("/tmp/" "/ssh:")
+      recentf-exclude '("/tmp/") ; "/ssh:"
       recentf-filename-handlers '(abbreviate-file-name) ; save file names relative to my current home directory
       ) 
 (recentf-mode 1)
@@ -480,7 +480,7 @@
 
 
 ;; yasnippet
-(yas-global-mode 1)
+;;(yas-global-mode 1)
 ;;(yas-reload-all 1)
 
 
@@ -517,13 +517,14 @@
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook 'writegood-mode)
 (add-hook 'LaTeX-mode-hook 'abbrev-mode)
+(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'LaTeX-mode-hook 'yas-minor-mode)
 (add-hook 'LaTeX-mode-hook 'fci-mode)
+(add-hook 'LaTeX-mode-hook 'TeX-PDF-mode) ; compile files to pdf by default
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
       TeX-parse-self t) ; enable parse on load
 (setq-default TeX-master nil) ; query for master file
-(setq TeX-PDF-mode t) ; compile files to pdf by default
 
 (setq TeX-force-default-mode t) ; always use `TeX-default-mode', which defaults to `latex-mode'
 
@@ -557,16 +558,18 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
 (add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
+(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
 
 ;; show the name of the function in the modeline
-(which-function-mode 1)
-(add-to-list 'which-func-modes 'java-mode)
-(add-to-list 'which-func-modes 'c-mode)
-(add-to-list 'which-func-modes 'c++-mode)
-(add-to-list 'which-func-modes 'python-mode)
-
+(add-hook 'prog-mode-hook 'which-function-mode)
+;; (add-to-list 'which-func-modes 'java-mode)
+;; (add-to-list 'which-func-modes 'c-mode)
+;; (add-to-list 'which-func-modes 'c++-mode)
+;; (add-to-list 'which-func-modes 'python-mode)
+(eval-after-load "which-func"
+  '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
 
 ;; c/c++ hooks
 (setq c-default-style "cc-mode"
