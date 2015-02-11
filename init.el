@@ -1,6 +1,6 @@
 ;;; init.el starts here
 ;; Swarnendu Biswas
-;; Fri Jan 30 12:32:56 EST 2015
+;; Mon Feb  9 12:35:49 EST 2015
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
@@ -52,9 +52,9 @@
 (setq inhibit-default-init t ; disable loading of "default.el" at startup
       inhibit-startup-screen t
       inhibit-splash-screen t
-      initial-scratch-message nil)
-;; *scratch* is in Lisp interaction mode by default, make it use text mode by default
-(setq initial-major-mode 'text-mode) 
+      initial-scratch-message nil
+      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
+      ) 
 (setq-default major-mode 'text-mode)
 
 
@@ -90,7 +90,7 @@
 
 ;; automatically load abbreviations table
 (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
-(setq save-abbrevs nil) ;; do not ask to save new abbrevs when quitting
+(setq save-abbrevs nil) ; do not ask to save new abbrevs when quitting
 ;;(quietly-read-abbrev-file)
 (setq dabbrev-case-replace nil) ; preserve case when expanding
 (setq-default abbrev-mode t)
@@ -100,7 +100,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers highlight-symbol hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols light-soap-theme latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll sublime-themes tabbar undo-tree vlf writegood-mode yasnippet org-beautify-theme direx autopair ibuffer-tramp json-mode)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
@@ -117,10 +117,10 @@
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
 
-;;  line numbers
+;;  line and column numbers
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
-(hlinum-activate) ; extension to linum-mode to highlight current line number
+(hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
 (column-number-mode 1)
 
 (tooltip-mode -1) ;; tooltips
@@ -184,11 +184,11 @@
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
              (ibuffer-auto-mode 1)))
-(defalias 'list-buffers 'ibuffer) ;; FIXME: Why is this required?
+(defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
 (setq ibuffer-expert t
       ibuffer-shrink-to-minimum-size t
       ibuffer-always-show-last-buffer nil
-      ibuffer-default-sorting-mode 'major-mode
+      ibuffer-default-sorting-mode 'recency ; 'major-mode
       ibuffer-sorting-mode 'recency
       ibuffer-use-header-line t)
 
@@ -196,7 +196,8 @@
 ;; search
 (setq search-highlight t ; highlight incremental search
       query-replace-highlight t ; highlight during query
-      case-fold-search t) ; make search ignore case
+      case-fold-search t ; make search ignore case
+      )
 
 
 ;; tramp
@@ -225,7 +226,8 @@
 
 
 ;; fully redraw the display before queued input events are processed
-(setq redisplay-dont-pause t) ; don't defer screen updates when performing operations
+;; don't defer screen updates when performing operations
+(setq redisplay-dont-pause t) 
 
 
 ;; Package specific
@@ -237,24 +239,27 @@
 
 
 ;; related to pairing of parentheses, brackets, etc.
+(setq show-paren-delay 0
+      show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
+      )
 (show-paren-mode 1) ; highlight matching parentheses when the point is on them
-(setq show-paren-style 'parenthesis) ; highlight just brackets, 'expression
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
-;; ;; smart pairing for all, from prelude
+;; smart pairing
 (require 'smartparens-config)
 ;; (setq sp-base-key-bindings 'paredit)
 ;; (setq sp-autoskip-closing-pair 'always)
 ;; (setq sp-hybrid-kill-entire-symbol nil)
 ;; (sp-use-paredit-bindings)
 (smartparens-global-mode 1)
-(show-smartparens-global-mode 1)
+(show-smartparens-global-mode 1) ; highlight matching pairs
 
 
 ;; indentation
-;;(electric-indent-mode 1) ; intelligent indentation, on by default from Emacs 24.4
+(electric-indent-mode -1) ; intelligent indentation, on by default from Emacs 24.4
 ;;(auto-indent-global-mode 1) ; auto-indentation minor mode
 (global-aggressive-indent-mode 1)
+
 
 ;; indentation guides
 ;;(indent-guide-global-mode 1) ; doesn't seem to work well with company-mode and auto-complete-mode
@@ -262,11 +267,8 @@
 (highlight-indentation-mode 1) 
 
 
-
-;; highlight-symbol at point
+;; highlight symbol at point
 (global-auto-highlight-symbol-mode 1)
-;;(highlight-symbol-mode 1)
-;;(idle-highlight-mode 1) ; idle highlight mode
 
 
 ;; ace jump mode major function
@@ -310,19 +312,19 @@
       ido-enable-prefix nil
       ido-max-prospects 10
       ido-case-fold t ; ignore case
+      ;;ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
+      ;;ido-show-dot-for-dired t ; don't show current directory as the first choice
+      ido-create-new-buffer 'always ; other options: prompt, never
+      ido-save-directory-list-file "~/.emacs.d/.ido.last"
+      ido-enable-last-directory-history t
+      ido-max-work-directory-list 20
+      ido-max-work-file-list 50
+      confirm-nonexistent-file-or-buffer nil
+      ido-use-faces nil ; disable ido faces to see flx highlights
+      ido-use-virtual-buffers t
       ) 
-;;(setq ido-use-filename-at-point 'guess) ; other options: 'ffap-guesser
-(setq ido-save-directory-list-file "~/.emacs.d/.ido.last")
-;;(setq ido-show-dot-for-dired t) ; don't show current directory as the first choice
-(setq ido-create-new-buffer 'always) ; other options: prompt, never
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command"))
-(setq ido-enable-last-directory-history t
-      ido-max-work-directory-list 20
-      ido-max-work-file-list 50)
-(setq confirm-nonexistent-file-or-buffer nil)
-(setq ido-use-faces nil ; disable ido faces to see flx highlights
-      ido-use-virtual-buffers t)
 
 (ido-mode 1)
 (ido-at-point-mode 1) ;; M-tab to start completion
@@ -348,8 +350,8 @@
 
 
 ;; whitespace
-(setq-default indicate-empty-lines t)
-;; (show-trailing-whitespace t)
+(setq-default indicate-empty-lines t
+              show-trailing-whitespace t)
 ;; (add-hook 'before-save-hook 'whitespace-cleanup)
 ;;(setq whitespace-style '(face empty tabs lines-tail trailing))
 ;;(setq whitespace-style '(face empty tabs lines-tail))
@@ -384,7 +386,7 @@
 
 
 ;; spell check
-(add-hook 'find-file-hooks 'turn-on-flyspell) ; Otherwise flyspell isn't enabled as I want it
+(add-hook 'find-file-hooks 'turn-on-flyspell) 
 (setq-default ispell-program-name "/usr/bin/aspell")
 ;; speed up aspell: ultra | fast | normal
 (setq ispell-extra-args '("--sug-mode=normal"))
@@ -417,6 +419,12 @@
 (setq dired-bind-jump t)
 
 
+;; directory navigation
+(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
+;;(nav-mode) ; always start in navigation mode
+;;(nav-disable-overeager-window-splitting)
+
+
 ;; smart tabs (indent with tabs, align with spaces)
 ;;(global-smart-tab-mode 1)
 ;;(autoload 'smart-tabs-mode "smart-tabs-mode"
@@ -425,12 +433,6 @@
 ;;(autoload 'smart-tabs-advice "smart-tabs-mode")
 ;;(autoload 'smart-tabs-insinuate "smart-tabs-mode")
 ;;(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
-
-
-;; directory navigation
-(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
-;;(nav-mode) ; always start in navigation mode
-;;(nav-disable-overeager-window-splitting)
 
 
 ;; company
@@ -455,7 +457,9 @@
 ;; smart mode line
 (setq sml/theme 'light) ; options: dark, light, respectful, automatic, powerline
 ;;(setq sml/name-width 20)
-(setq sml/no-confirm-load-theme t)
+(setq sml/no-confirm-load-theme t
+      sml/shorten-modes t
+      sml/shorten-directory t)
 (sml/setup)
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)
@@ -481,13 +485,14 @@
 
 ;; yasnippet
 ;;(yas-global-mode 1)
-;;(yas-reload-all 1)
+;;(yas-reload-all 1) ; this slows startup
 
 
 ;; guide-key
-(setq guide-key/guide-key-sequence t)
-(setq guide-key/recursive-key-sequence-flag t
-      guide-key/popup-window-position 'bottom)
+(setq guide-key/guide-key-sequence t
+      guide-key/recursive-key-sequence-flag t
+      guide-key/popup-window-position 'bottom
+      )
 (guide-key-mode 1)
 (setq guide-key-tip/enabled t)
 
@@ -507,6 +512,10 @@
 
 
 ;; latex mode hooks
+(autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
+(autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
+(autoload 'reftex-citation "reftex-cite" "Make citation" nil)
+
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
@@ -523,30 +532,26 @@
 (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode) ; compile files to pdf by default
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
-      TeX-parse-self t) ; enable parse on load
+      TeX-parse-self t ; enable parse on load
+      TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
+      TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
+      reftex-plug-into-AUCTeX t
+      )
 (setq-default TeX-master nil) ; query for master file
 
-(setq TeX-force-default-mode t) ; always use `TeX-default-mode', which defaults to `latex-mode'
-
-(autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
-(autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
-(setq reftex-plug-into-AUCTeX t)
-
 (auctex-latexmk-setup) ; add support for latexmk
-
-(setq TeX-electric-sub-and-superscript t) ; automatically insert braces in math mode
 
 
 ;; shell mode hooks
 
 ;; set up shell (not eshell) mode
-(setq explicit-shell-file-name "fish")
-(setq explicit-bash-args '("-c" "export EMACS=; stty echo; bash"))
+(setq explicit-shell-file-name "fish"
+      explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+      )
 (setq comint-process-echoes t)
 ;; setup auto-completion framework
 (push 'company-readline company-backends)
 (add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
-
 (add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
@@ -558,9 +563,10 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
 (add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
-(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
+(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
+(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
 
 ;; show the name of the function in the modeline
 (add-hook 'prog-mode-hook 'which-function-mode)
@@ -570,6 +576,7 @@
 ;; (add-to-list 'which-func-modes 'python-mode)
 (eval-after-load "which-func"
   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
+
 
 ;; c/c++ hooks
 (setq c-default-style "cc-mode"
@@ -593,11 +600,12 @@
 ;; turn on soft wrapping mode for org mode
 (add-hook 'org-mode-hook 
           (lambda () (setq truncate-lines nil)))
-(setq org-completion-use-ido t)
-(setq org-src-fontify-natively t) ; code block fontification using the major-mode of the code
 (add-hook 'org-mode-hook
           (lambda ()
             (writegood-mode 1)))
+(setq org-completion-use-ido t
+      org-src-fontify-natively t ; code block fontification using the major-mode of the code
+      )
 
 
 ;; keyboard shortcuts
@@ -682,12 +690,13 @@
 
 (global-set-key (kbd "C-h C-m") 'discover-my-major)
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ajb-bs-configuration "files" t)
+ '(ajb-bs-configuration "files")
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
