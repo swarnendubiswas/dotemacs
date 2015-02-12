@@ -159,17 +159,6 @@
       )
 
 
-;; custom functions
-
-;; kill all non-special buffers but the current one
-(defun kill-other-buffers ()
-  "Kill all buffers but the current one. Don't mess with special buffers."
-  (interactive)
-  (dolist (buffer (buffer-list))
-    (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
-      (kill-buffer buffer))))
-
-
 ;; achievements
 (setq achievements-idle-time 600) ; seconds
 (achievements-mode 1)
@@ -243,7 +232,7 @@
       show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
       )
 (when (fboundp 'show-paren-mode)
-  (show-paren-mode 1)
+  (show-paren-mode 1) ; highlight matching parentheses when the point is on them
   (make-variable-buffer-local 'show-paren-mode))
 ;;(show-paren-mode 1) ; highlight matching parentheses when the point is on them
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
@@ -611,6 +600,36 @@
       )
 
 
+;; custom functions
+
+;; kill all non-special buffers but the current one
+(defun kill-other-buffers ()
+  "Kill all buffers but the current one. Don't mess with special buffers."
+  (interactive)
+  (dolist (buffer (buffer-list))
+    (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
+      (kill-buffer buffer))))
+
+;; http://endlessparentheses.com/new-in-emacs-25-1-comment-line.html
+(defun comment-line (n)
+  "Comment or uncomment current line and leave point after it.
+With positive prefix, apply to N lines including current one.
+With negative prefix, apply to -N lines above.
+If region is active, apply to active region instead."
+  (interactive "p")
+  (if (use-region-p)
+      (comment-or-uncomment-region
+       (region-beginning) (region-end))
+    (let ((range
+           (list (line-beginning-position)
+                 (goto-char (line-end-position n)))))
+      (comment-or-uncomment-region
+       (apply #'min range)
+       (apply #'max range)))
+    (forward-line 1)
+    (back-to-indentation)))
+
+
 ;; keyboard shortcuts
 
 (global-set-key (kbd "RET") 'newline-and-indent)
@@ -638,6 +657,7 @@
 
 (global-set-key (kbd "C-c n") 'comment-region)
 (global-set-key (kbd "C-c m") 'uncomment-region)
+(global-set-key (kbd "C-c ;") #'comment-line)
 
 ;; setting up writegood-mode, identify weasel words, passive voice, and duplicate words
 (global-set-key (kbd "C-c g") 'writegood-mode)
