@@ -242,17 +242,20 @@
 (setq show-paren-delay 0
       show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
       )
-(show-paren-mode 1) ; highlight matching parentheses when the point is on them
+(when (fboundp 'show-paren-mode)
+  (show-paren-mode 1)
+  (make-variable-buffer-local 'show-paren-mode))
+;;(show-paren-mode 1) ; highlight matching parentheses when the point is on them
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
 ;; smart pairing
-(require 'smartparens-config)
+;; (require 'smartparens-config)
 ;; (setq sp-base-key-bindings 'paredit)
 ;; (setq sp-autoskip-closing-pair 'always)
 ;; (setq sp-hybrid-kill-entire-symbol nil)
 ;; (sp-use-paredit-bindings)
-(smartparens-global-mode 1)
-(show-smartparens-global-mode 1) ; highlight matching pairs
+;; (smartparens-global-mode 1)
+;; (show-smartparens-global-mode 1) ; highlight matching pairs
 
 
 ;; indentation
