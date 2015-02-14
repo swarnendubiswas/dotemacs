@@ -259,10 +259,6 @@
 (highlight-indentation-mode 1) 
 
 
-;; highlight symbol at point
-(global-auto-highlight-symbol-mode 1)
-
-
 ;; ace jump mode major function
 (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
 
@@ -516,12 +512,13 @@
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 (add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
-(add-hook 'LaTeX-mode-hook 'writegood-mode)
-(add-hook 'LaTeX-mode-hook 'abbrev-mode)
+(add-hook 'LaTeX-mode-hook #'writegood-mode)
+(add-hook 'LaTeX-mode-hook #'abbrev-mode)
 (add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
-(add-hook 'LaTeX-mode-hook 'yas-minor-mode)
-(add-hook 'LaTeX-mode-hook 'fci-mode)
-(add-hook 'LaTeX-mode-hook 'TeX-PDF-mode) ; compile files to pdf by default
+(add-hook 'LaTeX-mode-hook #'yas-minor-mode)
+(add-hook 'LaTeX-mode-hook #'fci-mode)
+(add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; compile files to pdf by default
+(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
       TeX-parse-self t ; enable parse on load
@@ -559,6 +556,7 @@
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
 (add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
+(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 ;; show the name of the function in the modeline
 (add-hook 'prog-mode-hook 'which-function-mode)
@@ -703,8 +701,10 @@ If region is active, apply to active region instead."
 (define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom)
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
+(when (auto-highlight-symbol-mode)
 (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
 (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
+  )
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
 
