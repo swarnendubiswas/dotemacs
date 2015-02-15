@@ -702,9 +702,14 @@ If region is active, apply to active region instead."
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (when (auto-highlight-symbol-mode)
-(define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-(define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
+  (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
+  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
   )
+(add-hook 'org-mode-hook 
+          (lambda ()
+            (define-key org-mode-map (kbd "M-<left>") nil)
+            (define-key org-mode-map (kbd "M-<right>") nil)
+            ))
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
 
