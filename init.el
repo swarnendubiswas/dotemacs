@@ -707,8 +707,8 @@ If region is active, apply to active region instead."
   )
 (add-hook 'org-mode-hook 
           (lambda ()
-            (define-key org-mode-map (kbd "M-<left>") nil)
-            (define-key org-mode-map (kbd "M-<right>") nil)
+            (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
+            (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)
             ))
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
