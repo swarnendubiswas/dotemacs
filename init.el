@@ -31,13 +31,13 @@
 ;;; Code:
 
 ;; customizing packages
-(add-to-list 'load-path "~/.emacs.d/lisp")
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
 ;;(require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
                          ))
+(setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
 (package-initialize)
 
 
@@ -80,6 +80,10 @@
       backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
 
 
+;; saveplace: remember cursor position in files
+(setq-default save-place t)
+
+
 ;; auto revert
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 5 ; default is 5 s
@@ -89,11 +93,12 @@
 
 
 ;; automatically load abbreviations table
-(setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
-(setq save-abbrevs nil) ; do not ask to save new abbrevs when quitting
+(setq-default abbrev-file-name "~/.emacs.d/abbrev_defs"
+              abbrev-mode t)
+(setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
+      dabbrev-case-replace nil ; preserve case when expanding
+      )
 ;;(quietly-read-abbrev-file)
-(setq dabbrev-case-replace nil) ; preserve case when expanding
-(setq-default abbrev-mode t)
 
 
 ;; ensure that a required set of packages are always installed
@@ -200,12 +205,14 @@
               tramp-file-name-regexp))
 
 
-;; ignore case when reading a file name completion
-(setq read-file-name-completion-ignore-case t)
+(setq completion-ignore-case t ; ignore case when completing
+      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
+      )
 
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
+(setq use-file-dialog nil)
 
 
 ;; desktop save mode
@@ -394,9 +401,9 @@
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
 (require 'dired) ; needed for dired-mode-map
-;; (add-hook 'emacs-startup-hook ; dired-load-hook
-;;           (lambda ()
-;;             (load "dired-x")))
+(add-hook 'dired-load-hook ; dired-load-hook
+          (lambda ()
+            (load "dired-x")))
 (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
       dired-recursive-deletes 'always ; single prompt for all n directories
       dired-recursive-copies 'always)
@@ -461,6 +468,9 @@
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
 (eval-after-load "icomplete" '(progn (require 'icomplete+)))
+(setq icomplete-prospects-height 2
+      icomplete-compute-delay 0
+      )
 ;;(icy-mode 1) ; icicles
 
 
