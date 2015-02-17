@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+
 ;; customizing packages
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
@@ -39,6 +40,20 @@
                          ))
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
 (package-initialize)
+
+
+;; set up use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+
+;; (setq load-prefer-newer t)
+(require 'auto-compile)
+(auto-compile-on-load-mode 1)
+(auto-compile-on-save-mode 1)
+(setq auto-compile-display-buffer nil
+      auto-compile-mode-line-counter t)
 
 
 ;; user details
@@ -59,7 +74,8 @@
 
 
 ;; customize defaults
-(setq require-final-newline t) ; always end a file with a newline
+(setq require-final-newline t ; always end a file with a newline
+      sentence-end-double-space nil)
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
 (set-face-attribute 'default nil :height 110) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq-default fill-column 120
@@ -105,7 +121,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp json-mode)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
@@ -170,7 +186,10 @@
 
 
 ;; undo-tree (visualize with C-x u)
-(setq undo-tree-mode-lighter "")
+(setq undo-tree-mode-lighter ""
+      undo-tree-visualizer-timestamps t
+      undo-tree-visualizer-diff t
+      )
 (global-undo-tree-mode 1)
 
 
@@ -524,8 +543,9 @@
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook #'writegood-mode)
 (add-hook 'LaTeX-mode-hook #'abbrev-mode)
-(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
-(add-hook 'LaTeX-mode-hook #'yas-minor-mode)
+;;(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
+(add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
+;;(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'LaTeX-mode-hook #'fci-mode)
 (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; compile files to pdf by default
 (add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
@@ -562,7 +582,7 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
 (add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
-(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
+;;(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
 (add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
@@ -605,8 +625,19 @@
             (writegood-mode 1)))
 (setq org-completion-use-ido t
       org-src-fontify-natively t ; code block fontification using the major-mode of the code
+      org-src-preserve-indentation t
       )
+;; requite org-latex so that the following variables are defined
+(require 'ox-latex)
 
+;; tell org to use listings
+(setq org-latex-listings t)
+
+;; you must include the listings package
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+
+;; if you want colored source code then you need to include the color package
+(add-to-list 'org-latex-packages-alist '("" "color"))
 
 ;; custom functions
 
@@ -734,7 +765,7 @@ If region is active, apply to active region instead."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ajb-bs-configuration "files")
+ '(ajb-bs-configuration "files" t)
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
