@@ -47,68 +47,10 @@
   (package-install 'use-package))
 
 
-(use-package auto-compile
-             :ensure t
-             :init ((auto-compile-on-load-mode 1)
-                    (auto-compile-on-save-mode 1)
-                    )
-             :config (setq auto-compile-display-buffer nil
-                           auto-compile-mode-line-counter t
-                           )
-             )
-(setq load-prefer-newer t)
-
-
-;; user details
-(setq user-full-name "Swarnendu Biswas"
-      user-mail-address "biswass@cse.ohio-state.edu")
-
-
 ;; start customizing functionality
-
-;; startup
-(setq inhibit-default-init t ; disable loading of "default.el" at startup
-      inhibit-startup-screen t
-      inhibit-splash-screen t
-      initial-scratch-message nil
-      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
-      ) 
-(setq-default major-mode 'text-mode)
-
-
-;; customize defaults
-(setq require-final-newline t ; always end a file with a newline
-      sentence-end-double-space nil)
-(fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(set-face-attribute 'default nil :height 110) ; set font size, value is in 1/10pt, so 100 will give you 10pt
-(setq-default fill-column 120
-              standard-indent 2 ; set standard indent to 2 rather that 4
-              tab-width 2
-              indent-tabs-mode nil ; spaces instead of tabs by default
-              )
-
-
-;; we need to paste something from another program, but sometimes we do real paste after some kill
-;; action, that will erase the clipboard, so we need to save it to kill ring.
-(setq save-interprogram-paste-before-kill t)
-(setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and other applications
-
-
-;; backup
-(setq make-backup-files nil ; stop making backup ~ files
-      backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
-
 
 ;; saveplace: remember cursor position in files
 (setq-default save-place t)
-
-
-;; auto revert
-(global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
-(setq-default auto-revert-interval 5 ; default is 5 s
-              auto-revert-verbose nil
-              global-auto-revert-non-file-buffers t ; auto-refresh dired buffers
-              ) 
 
 
 ;; automatically load abbreviations table
@@ -124,7 +66,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smartparens smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp json-mode)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils color-theme  ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-tab smart-tabs-mode smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
@@ -136,34 +78,6 @@
 
 ;; customize appearance
 
-;; better frame titles
-;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
-(setq frame-title-format
-      (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
-
-;;  line and column numbers
-(global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
-(global-linum-mode 1) ; display line numbers in margin
-(hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
-(column-number-mode 1)
-
-(tooltip-mode -1) ;; tooltips
-(tool-bar-mode -1) ; no toolbar with icons
-(scroll-bar-mode -1) ; no scroll bars
-(menu-bar-mode -1) ; no menu bar
-(blink-cursor-mode 1) ;; enable/disable blinking cursor
-
-;; displays the time and date in the mode line
-(setq display-time-day-and-date t
-      display-time-24hr-format nil)
-(display-time)
-
-
-;; these are two nice themes: leuven and professional
-(load-theme 'leuven t)
-(set-face-background 'fringe "white") ; hide the fringe mark on the left
-(setq-default indicate-empty-lines t ; show empty lines after buffer end
-              indicate-buffer-boundaries 'right)
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
@@ -321,34 +235,6 @@
 (setq-default ajb-bs-configuration "files")
 
 
-;; ido mode
-(setq ido-everywhere t
-      ido-enable-flex-matching t
-      ido-enable-prefix nil
-      ido-max-prospects 10
-      ido-case-fold t ; ignore case
-      ;;ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
-      ;;ido-show-dot-for-dired t ; don't show current directory as the first choice
-      ido-create-new-buffer 'always ; other options: prompt, never
-      ido-save-directory-list-file "~/.emacs.d/.ido.last"
-      ido-enable-last-directory-history t
-      ido-max-work-directory-list 20
-      ido-max-work-file-list 50
-      confirm-nonexistent-file-or-buffer nil
-      ido-use-faces nil ; disable ido faces to see flx highlights
-      ido-use-virtual-buffers t
-      )
-(setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
-                           "*Messages*" "Async Shell Command"))
-
-(ido-mode 1)
-(ido-at-point-mode 1) ;; M-tab to start completion
-(flx-ido-mode 1) ; smarter fuzzy matching for ido
-(ido-ubiquitous-mode 1) ; allow ido-style completion in more places
-(ido-better-flex/enable)
-(ido-vertical-mode 1)
-
-
 ;; recentf stuff
 (setq recentf-max-menu-items 15 ; show in recent menu
       recentf-max-saved-items 50 ; keep track of last xx files
@@ -357,11 +243,6 @@
       recentf-filename-handlers '(abbreviate-file-name) ; save file names relative to my current home directory
       ) 
 (recentf-mode 1)
-
-
-;; smooth scroll
-(require 'smooth-scroll)
-(smooth-scroll-mode 1)
 
 
 ;; whitespace
@@ -375,22 +256,6 @@
 ;;                    :foreground "yellow"
 ;;                    :weight 'bold)
 ;;(global-whitespace-mode t)
-
-
-;; fci
-;;(define-globalized-minor-mode
-;;  global-fci-mode fci-mode (lambda () (fci-mode 1)))
-;;(global-fci-mode 1)
-;;(setq fci-rule-width 1)
-(setq-default fci-rule-column 120)
-(setq fci-handle-truncate-lines nil)
-;; (defun auto-fci-mode (&optional unused)
-;;   (if (> (frame-width) 120)
-;;       (fci-mode 1)
-;;     (fci-mode 0))
-;;   )
-;;(add-hook 'after-change-major-mode-hook 'auto-fci-mode)
-;;(add-hook 'window-size-change-functions 'auto-fci-mode)
 
 
 ;; uniquify
@@ -424,10 +289,6 @@
 (add-hook 'dired-load-hook ; dired-load-hook
           (lambda ()
             (load "dired-x")))
-(setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
-      dired-recursive-deletes 'always ; single prompt for all n directories
-      dired-recursive-copies 'always)
-(setq-default diredp-hide-details-initially-flag nil)
 (autoload 'dired-jump "dired-x"
   "Jump to dired buffer corresponding to current buffer."
   'interactive)
@@ -450,65 +311,10 @@
 ;;(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
 
 
-;; company
-(use-package company
-             :ensure t
-             :defer t
-             :config (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
-                           company-show-numbers t
-                           company-minimum-prefix-length 2
-                                        ; invert the navigation direction if the completion popup is displayed on top (happens near the bottom of windows)
-                           company-tooltip-flip-when-above t  
-                           )
-             :idle (global-company-mode 1)
-             )
-(use-package company-auctex
-             :ensure t
-             :defer t
-             :idle (company-auctex-init)
-             )
-(use-package company-statistics
-             :ensure t
-             :defer t
-             :idle (company-statistics-mode 1)
-             )
-
-
 ;; smex
 ;;(smex-initialize) ; this is slow
 (autoload 'smex "smex")
 (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
-
-
-;; smart mode line
-(use-package smart-mode-line
-             :ensure t
-             :defer t
-             :idle
-             (progn
-               (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
-                     ;; sml/name-width 20
-                     sml/no-confirm-load-theme t
-                     sml/shorten-modes t
-                     sml/shorten-directory t
-                     )
-               (sml/setup)
-               )
-             )
-;; flat-looking mode-line
-;;(set-face-attribute 'mode-line nil :box nil)
-;;(set-face-attribute 'mode-line-inactive nil :box nil)
-;;(set-face-attribute 'mode-line-highlight nil :box nil)
-
-
-;; anzu mode - show number of searches in the mode line
-(use-package anzu-mode
-             :ensure t
-             :defer t
-             :idle (global-anzu-mode 1)
-             )
-(global-anzu-mode 1)
-
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
 (eval-after-load "icomplete" '(progn (require 'icomplete+)))
@@ -528,23 +334,6 @@
 ;; yasnippet
 ;;(yas-global-mode 1)
 ;;(yas-reload-all 1) ; this slows startup
-
-
-;; guide-key
-(use-package guide-key
-             :ensure t
-             :defer t
-             :config (setq guide-key/guide-key-sequence t
-                           guide-key/recursive-key-sequence-flag t
-                           guide-key/popup-window-position 'bottom
-                           )
-             :idle (guide-key-mode 1)
-             )
-(use-package guide-key-tip
-             :ensure t
-             :defer t
-             :config (setq guide-key-tip/enabled t)
-             )
 
 
 ;; specific major mode hooks
