@@ -1,6 +1,6 @@
 ;;; init.el starts here
 ;; Swarnendu Biswas
-;; Mon Feb  9 12:35:49 EST 2015
+;; Wed Feb 18 18:23:30 EST 2015
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
@@ -117,11 +117,30 @@
 ;;(quietly-read-abbrev-file)
 
 
+;; tags
+;; create tags for a latex project, no need to setup a keybinding
+;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
+(defun create-latex-etags ()
+  "Create etags for the current latex project"
+  (interactive)
+  (compile "find . -name \"*.tex\" -print | etags -")
+  )
+(defun create-latex-ctags () ; (dir-name))
+  "Create ctags for the current latex project"
+  ;;(interactive "DDirectory: ")
+  ;; (shell-command
+  ;;  (format "ctags -o TAGS -R *.tex %s" (directory-file-name dir-name)))
+  (interactive)
+  ;;(compile "find . -name \"*.tex\" -print | ctags -a -u -o TAGS -")
+  (compile "find . -name \"*.tex\" -print | xargs ctags -o TAGS")
+  )
+
+
 ;; ensure that a required set of packages are always installed
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils color-theme company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line-powerline-theme smart-mode-line smart-tab smart-tabs-mode smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp json-mode)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smart-tab smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
@@ -144,11 +163,15 @@
 (hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
 (column-number-mode 1)
 
-(tooltip-mode -1) ;; tooltips
+(tooltip-mode -1) ; tooltips
 (tool-bar-mode -1) ; no toolbar with icons
 (scroll-bar-mode -1) ; no scroll bars
 (menu-bar-mode -1) ; no menu bar
-(blink-cursor-mode 1) ;; enable/disable blinking cursor
+(blink-cursor-mode 1) ; enable/disable blinking cursor
+(mode-icons-mode 1)
+(display-theme-mode 1)
+(fixme-mode 1)
+
 
 ;; displays the time and date in the mode line
 (setq display-time-day-and-date t
@@ -271,6 +294,8 @@
 ;; (sp-use-paredit-bindings)
 ;; (smartparens-global-mode 1)
 ;; (show-smartparens-global-mode 1) ; highlight matching pairs
+
+(flex-autopair-mode 1)
 
 
 ;; indentation
@@ -460,6 +485,7 @@
 (global-company-mode 1)
 (company-auctex-init)
 (company-statistics-mode 1) 
+(company-quickhelp-mode 1)
 
 
 ;; smex
@@ -543,9 +569,8 @@
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook #'writegood-mode)
 (add-hook 'LaTeX-mode-hook #'abbrev-mode)
-;;(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
+(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
-;;(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'LaTeX-mode-hook #'fci-mode)
 (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; compile files to pdf by default
 (add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
@@ -582,7 +607,7 @@
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
 (add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
-;;(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
+(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
 (add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
