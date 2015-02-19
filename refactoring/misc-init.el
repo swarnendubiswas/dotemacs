@@ -24,6 +24,22 @@
                     )
              )
 
+(use-package achievements-mode
+             :ensure t
+             :defer t
+             :init (achievements-mode 1)
+             :config (setq achievements-idle-time 600) ; seconds
+             )
+
+;; speed up emacs for large files
+(use-package vlf
+             :ensure t
+             :defer t
+             :config (setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
+             )
+(require 'vlf-setup)
+
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

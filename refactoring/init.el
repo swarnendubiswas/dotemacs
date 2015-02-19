@@ -53,15 +53,6 @@
 (setq-default save-place t)
 
 
-;; automatically load abbreviations table
-(setq-default abbrev-file-name "~/.emacs.d/abbrev_defs"
-              abbrev-mode t)
-(setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
-      dabbrev-case-replace nil ; preserve case when expanding
-      )
-;;(quietly-read-abbrev-file)
-
-
 ;; ensure that a required set of packages are always installed
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
@@ -81,9 +72,6 @@
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
-(delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
-(transient-mark-mode 1) ; enable visual feedback on selections, default since v23
-(global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
 
 
 ;; fontification
@@ -97,30 +85,12 @@
       )
 
 
-;; achievements
-(setq achievements-idle-time 600) ; seconds
-(achievements-mode 1)
-
-
 ;; undo-tree (visualize with C-x u)
 (setq undo-tree-mode-lighter ""
       undo-tree-visualizer-timestamps t
       undo-tree-visualizer-diff t
       )
 (global-undo-tree-mode 1)
-
-
-;; ibuffer
-(add-hook 'ibuffer-mode-hook
-          '(lambda ()
-             (ibuffer-auto-mode 1)))
-(defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
-(setq ibuffer-expert t
-      ibuffer-shrink-to-minimum-size t
-      ibuffer-always-show-last-buffer nil
-      ibuffer-default-sorting-mode 'recency ; 'major-mode
-      ibuffer-sorting-mode 'recency
-      ibuffer-use-header-line t)
 
 
 ;; search
@@ -163,15 +133,6 @@
 
 
 ;; Package specific
-
-
-;; speed up emacs for large files
-(use-package vlf
-             :ensure t
-             :defer t
-             :config (setq large-file-warning-threshold 50000000) ; warn when opening files bigger than 50MB
-             )
-(require 'vlf-setup)
 
 
 ;; related to pairing of parentheses, brackets, etc.
@@ -235,14 +196,6 @@
 (setq-default ajb-bs-configuration "files")
 
 
-;; recentf stuff
-(setq recentf-max-menu-items 15 ; show in recent menu
-      recentf-max-saved-items 50 ; keep track of last xx files
-      recentf-auto-cleanup 'never
-      recentf-exclude '("/tmp/") ; "/ssh:"
-      recentf-filename-handlers '(abbreviate-file-name) ; save file names relative to my current home directory
-      ) 
-(recentf-mode 1)
 
 
 ;; whitespace
@@ -282,33 +235,11 @@
 ;;(rainbow-identifiers-mode 1)
 ;;(rainbow-delimiters-mode 1)
 
-
-;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
-;; you can use C-x d, or 'M-x dired'
-(require 'dired) ; needed for dired-mode-map
-(add-hook 'dired-load-hook ; dired-load-hook
-          (lambda ()
-            (load "dired-x")))
-(autoload 'dired-jump "dired-x"
-  "Jump to dired buffer corresponding to current buffer."
-  'interactive)
-(setq dired-bind-jump t)
-
-
 ;; directory navigation
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
 
-
-;; smart tabs (indent with tabs, align with spaces)
-;;(global-smart-tab-mode 1)
-;;(autoload 'smart-tabs-mode "smart-tabs-mode"
-;;  "Intelligently indent with tabs, align with spaces!")
-;;(autoload 'smart-tabs-mode-enable "smart-tabs-mode")
-;;(autoload 'smart-tabs-advice "smart-tabs-mode")
-;;(autoload 'smart-tabs-insinuate "smart-tabs-mode")
-;;(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
 
 
 ;; smex
@@ -337,240 +268,6 @@
 
 
 ;; specific major mode hooks
-
-
-;; text mode  hooks
-
-(setq-default major-mode 'text-mode)
-;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-(setq comment-auto-fill-only-comments t)
-(add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
-(add-hook 'text-mode-hook 'writegood-mode)
-(add-hook 'text-mode-hook 'abbrev-mode)
-(add-hook 'text-mode-hook 'fci-mode)
-
-
-;; latex mode hooks
-(autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
-(autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
-(autoload 'reftex-citation "reftex-cite" "Make citation" nil)
-
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook #'reftex-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
-;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
-(add-hook 'LaTeX-mode-hook #'writegood-mode)
-(add-hook 'LaTeX-mode-hook #'abbrev-mode)
-;;(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
-(add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
-;;(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
-(add-hook 'LaTeX-mode-hook #'fci-mode)
-(add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; compile files to pdf by default
-(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
-
-(setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
-      TeX-parse-self t ; enable parse on load
-      TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
-      TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
-      reftex-plug-into-AUCTeX t
-      )
-(setq-default TeX-master nil) ; query for master file
-
-(auctex-latexmk-setup) ; add support for latexmk
-
-
-;; shell mode hooks
-
-;; set up shell (not eshell) mode
-(setq explicit-shell-file-name "fish"
-      explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-      )
-(setq comint-process-echoes t)
-;; setup auto-completion framework
-(push 'company-readline company-backends)
-(add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
-(add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-
-
-;; programming mode hooks
-
-(add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
-(add-hook 'prog-mode-hook #'aggressive-indent-mode)
-(add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
-;;(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
-(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
-(add-hook 'prog-mode-hook 'fci-mode)
-(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
-(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
-
-;; show the name of the function in the modeline
-(add-hook 'prog-mode-hook 'which-function-mode)
-;; (add-to-list 'which-func-modes 'java-mode)
-;; (add-to-list 'which-func-modes 'c-mode)
-;; (add-to-list 'which-func-modes 'c++-mode)
-;; (add-to-list 'which-func-modes 'python-mode)
-(eval-after-load "which-func"
-  '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
-
-
-;; c/c++ hooks
-(setq c-default-style "cc-mode"
-      c-basic-offset 2)
-
-
-;; java hooks
-(add-hook 'java-mode-hook
-          (lambda ()
-            (setq c-basic-offset 2)))
-(autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
-(add-hook 'java-mode-hook 'jtags-mode)
-
-
-;; python hooks
-
-
-;; org mode hooks
-(add-hook 'org-mode-hook 'turn-on-font-lock)
-(add-hook 'org-mode-hook 'visual-line-mode)
-;; turn on soft wrapping mode for org mode
-(add-hook 'org-mode-hook 
-          (lambda () (setq truncate-lines nil)))
-(add-hook 'org-mode-hook
-          (lambda ()
-            (writegood-mode 1)))
-(setq org-completion-use-ido t
-      org-src-fontify-natively t ; code block fontification using the major-mode of the code
-      org-src-preserve-indentation t
-      )
-
-
-;; custom functions
-
-;; kill all non-special buffers but the current one
-(defun kill-other-buffers ()
-  "Kill all buffers but the current one. Don't mess with special buffers."
-  (interactive)
-  (dolist (buffer (buffer-list))
-    (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
-      (kill-buffer buffer))))
-
-;; http://endlessparentheses.com/new-in-emacs-25-1-comment-line.html
-(defun comment-line (n)
-  "Comment or uncomment current line and leave point after it.
-With positive prefix, apply to N lines including current one.
-With negative prefix, apply to -N lines above.
-If region is active, apply to active region instead."
-  (interactive "p")
-  (if (use-region-p)
-      (comment-or-uncomment-region
-       (region-beginning) (region-end))
-    (let ((range
-           (list (line-beginning-position)
-                 (goto-char (line-end-position n)))))
-      (comment-or-uncomment-region
-       (apply #'min range)
-       (apply #'max range)))
-    (forward-line 1)
-    (back-to-indentation)))
-
-
-;; keyboard shortcuts
-
-(global-set-key (kbd "RET") 'newline-and-indent)
-(global-set-key (kbd "C-l") 'goto-line)
-(global-set-key (kbd "C-c z") 'repeat)
-(global-set-key (kbd "C-z") 'undo)
-(global-set-key (kbd "C-x C-\\") 'goto-last-change) ; goto-last-change
-
-(global-set-key [f1] 'shell)
-
-(global-set-key [f2] 'split-window-vertically)
-(global-set-key [f3] 'split-window-horizontally)
-(global-set-key [f4] 'delete-other-windows)
-(global-set-key [f7] 'other-window) ; switch to the other buffer
-
-(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
-
-(global-set-key (kbd "M-/") 'hippie-expand)
-
-(global-unset-key (kbd "C-s")) ; isearch-forward-regexp
-(global-set-key (kbd "C-f") 'isearch-forward-regexp)
-(define-key isearch-mode-map (kbd "C-f") 'isearch-repeat-forward)
-(global-unset-key (kbd "C-x C-s")) ; save-buffer
-(global-set-key (kbd "C-s") 'save-buffer)
-
-(global-set-key (kbd "C-c n") 'comment-region)
-(global-set-key (kbd "C-c m") 'uncomment-region)
-(global-set-key (kbd "C-c ;") #'comment-line)
-
-;; setting up writegood-mode, identify weasel words, passive voice, and duplicate words
-(global-set-key (kbd "C-c g") 'writegood-mode)
-
-;; define a keyboard shortcut for duplicating lines
-(global-set-key (kbd "C-c C-d") 'duplicate-thing)
-
-;; buffers
-(global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
-(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
-(global-set-key (kbd "C-x C-r") 'recentf-open-files)
-
-(global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
-(global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
-
-(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
-;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
-(global-set-key (kbd "M-b") 'ace-jump-buffer)
-
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-
-;; dired
-(global-set-key (kbd "C-x C-j") #'dired-jump)
-(define-key dired-mode-map (kbd "i") 'ido-find-file)
-;; jump to home directory
-(global-set-key (kbd "M-<home>")
-                (lambda () 
-                  (interactive)
-                  (dired "~/")))
-;; M-<up> is nicer in dired if it moves to the fourth line - the first file
-(defun dired-back-to-top ()
-  (interactive)
-  (beginning-of-buffer)
-  (dired-next-line 4))
-(define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top)
-
-;; M-<down> is nicer in dired if it moves to the last file
-(defun dired-jump-to-bottom ()
-  (interactive)
-  (end-of-buffer)
-  (dired-next-line -1))
-(define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom)
-
-;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
-(when (auto-highlight-symbol-mode)
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
-  )
-(add-hook 'org-mode-hook 
-          (lambda ()
-            (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
-            (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)
-            ))
-(global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
-(global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
-
-;; up and down keys to navigate options, left and right to move through history/directories
-(setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-
-(global-set-key (kbd "C-h C-m") 'discover-my-major)
-
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

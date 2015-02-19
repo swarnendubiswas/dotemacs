@@ -46,4 +46,11 @@
               global-auto-revert-non-file-buffers t ; auto-refresh dired buffers
               ) 
 
+
+(delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
+(transient-mark-mode 1) ; enable visual feedback on selections, default since v23
+(global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
+
+(provide 'defaults-init)
+
 ;;; defaults-init.el ends here
