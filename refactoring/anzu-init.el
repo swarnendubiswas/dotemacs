@@ -10,6 +10,5 @@
              :defer t
              :idle (global-anzu-mode 1)
              )
-(global-anzu-mode 1)
 
-;;; misc-init.el ends here
+;;; anzu-init.el ends here

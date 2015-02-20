@@ -57,19 +57,12 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils color-theme  ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-autopair flex-isearch flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup powerline professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-tab smart-tabs-mode smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme ibuffer-tramp json-mode)
+      '(aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode autodisass-java-bytecode bash-completion bibtex-utils color-theme  ctags ctags-update dash discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist  magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup readline-complete rich-minority s sentence-highlight smart-tab smart-tabs-mode use-package undo-tree writegood-mode yasnippet org-beautify-theme ibuffer-tramp json-mode)
       )
 (ensure-packages-install-missing)
 
 
-;; enable tabbar minor mode
-(setq tabbar-use-images nil) ; speed up by not using images
-(tabbar-mode 1)
-
-
 ;; customize appearance
-
-
 
 ;;(highlight-changes-mode 1) ; not very useful usually
 
@@ -83,53 +76,6 @@
       jit-lock-defer-contextually t
       jit-lock-stealth-nice 0.5
       )
-
-
-;; undo-tree (visualize with C-x u)
-(setq undo-tree-mode-lighter ""
-      undo-tree-visualizer-timestamps t
-      undo-tree-visualizer-diff t
-      )
-(global-undo-tree-mode 1)
-
-
-;; search
-(setq search-highlight t ; highlight incremental search
-      query-replace-highlight t ; highlight during query
-      case-fold-search t ; make search ignore case
-      )
-
-
-;; tramp
-(setq tramp-default-method "ssh" ; faster than the default scp
-      tramp-default-user "biswass"
-      tramp-default-host "sunshine.cse.ohio-state.edu")
-;; disable version control
-(setq vc-ignore-dir-regexp
-      (format "\\(%s\\)\\|\\(%s\\)"
-              vc-ignore-dir-regexp
-              tramp-file-name-regexp))
-
-
-(setq completion-ignore-case t ; ignore case when completing
-      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
-      )
-
-
-;; dim the ignored part of the file name
-(file-name-shadow-mode 1)
-(setq use-file-dialog nil)
-
-
-;; desktop save mode
-(desktop-save-mode -1) 
-(setq-default desktop-restore-frames nil ; no need to restore frames
-              desktop-load-locked-desktop nil)
-
-
-;; fully redraw the display before queued input events are processed
-;; don't defer screen updates when performing operations
-(setq redisplay-dont-pause t) 
 
 
 ;; Package specific
@@ -159,10 +105,6 @@
 ;;(indent-guide-global-mode 1) ; doesn't seem to work well with company-mode and auto-complete-mode
 ;;(setq indent-guide-delay 0.1) ; show guide lines only in idle-time
 (highlight-indentation-mode 1) 
-
-
-;; ace jump mode major function
-(autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
 
 
 ;; ace-jump-buffer
@@ -241,11 +183,6 @@
 ;;(nav-disable-overeager-window-splitting)
 
 
-
-;; smex
-;;(smex-initialize) ; this is slow
-(autoload 'smex "smex")
-(setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
 (eval-after-load "icomplete" '(progn (require 'icomplete+)))

@@ -1,7 +1,13 @@
+;;; appearance-init.el --- Part of emacs initialization
+
+;;; Commentary:
+;; Tweak emacs appearance.
+
+;;; Code:
+
 ;;  line and column numbers
 (global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
 (global-linum-mode 1) ; display line numbers in margin
-(hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
 (column-number-mode 1)
 
 (tooltip-mode -1) ;; tooltips
@@ -15,12 +21,28 @@
       display-time-24hr-format nil)
 (display-time)
 
+(usepackage hlinum
+            :ensure t
+            :init (hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
+            )
 
 ;; these are two nice themes: leuven and professional
-(load-theme 'leuven t)
+(use-package leuven-theme
+             :ensure t
+             :init (load-theme 'leuven t)
+             )
+
+(use-package professional-theme
+             :ensure t
+             :disabled t
+             )
+
 (set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-empty-lines t ; show empty lines after buffer end
               indicate-buffer-boundaries 'right)
 
 
+(provide 'appearance-init)
+
+;;; appearance-init.el ends here
 

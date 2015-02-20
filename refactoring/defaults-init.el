@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(provide 'defaults-init)
-
 ;; startup
 (setq inhibit-default-init t ; disable loading of "default.el" at startup
       inhibit-startup-screen t
@@ -50,6 +48,43 @@
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 (transient-mark-mode 1) ; enable visual feedback on selections, default since v23
 (global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
+
+;; search
+(setq search-highlight t ; highlight incremental search
+      query-replace-highlight t ; highlight during query
+      case-fold-search t ; make search ignore case
+      )
+
+
+;; tramp
+(setq tramp-default-method "ssh" ; faster than the default scp
+      tramp-default-user "biswass"
+      tramp-default-host "sunshine.cse.ohio-state.edu")
+;; disable version control
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+
+
+(setq completion-ignore-case t ; ignore case when completing
+      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
+      )
+
+;; dim the ignored part of the file name
+(file-name-shadow-mode 1)
+(setq use-file-dialog nil)
+
+
+;; desktop save mode
+(desktop-save-mode -1) 
+(setq-default desktop-restore-frames nil ; no need to restore frames
+              desktop-load-locked-desktop nil)
+
+
+;; fully redraw the display before queued input events are processed
+;; don't defer screen updates when performing operations
+(setq redisplay-dont-pause t) 
 
 (provide 'defaults-init)
 

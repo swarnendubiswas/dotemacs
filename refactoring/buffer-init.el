@@ -27,7 +27,31 @@
   'interactive)
 (setq dired-bind-jump t)
 
+(use-package dired+
+             :ensure t
+             :defer t
+             )
+
+(use-package dired-details
+             :ensure t
+             :defer t
+             )
+
+(use-package dired-details+
+             :ensure t
+             :defer t
+             )
+
+(use-package dired-rainbow
+             :ensure t
+             :defer t
+             )
+
+(use-package dired-hacks-utils
+             :ensure t
+             :defer t
+             )
 
 (provide 'buffer-init)
 
-;;; misc-init.el ends here
+;;; buffer-init.el ends here

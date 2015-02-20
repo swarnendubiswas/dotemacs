@@ -24,7 +24,7 @@
                     )
              )
 
-(use-package achievements-mode
+(use-package achievements
              :ensure t
              :defer t
              :init (achievements-mode 1)
@@ -39,6 +39,11 @@
              )
 (require 'vlf-setup)
 
+(use-package tabbar
+             :ensure t
+             :init (tabbar-mode 1)
+             :config (setq tabbar-use-images nil) ; speed up by not using images
+             )
 
 (provide 'misc-init)
 
