@@ -86,6 +86,8 @@
 ;; don't defer screen updates when performing operations
 (setq redisplay-dont-pause t) 
 
+(setq-default major-mode 'text-mode)
+
 (provide 'defaults-init)
 
 ;;; defaults-init.el ends here

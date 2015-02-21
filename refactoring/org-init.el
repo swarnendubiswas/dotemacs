@@ -1,7 +1,7 @@
-;;; undo-tree-init.el --- Part of emacs initialization
+;;; org-init.el --- Part of emacs initialization
 
 ;;; Commentary:
-;; Setup undo-tree
+;; Setup org mode.
 
 ;;; Code:
 

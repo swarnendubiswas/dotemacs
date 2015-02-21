@@ -1,3 +1,10 @@
+;;; prog-init.el --- Part of emacs initialization
+
+;;; Commentary:
+;; Programming mode specific.
+
+;;; Code:
+
 (add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
@@ -15,3 +22,7 @@
 ;; (add-to-list 'which-func-modes 'python-mode)
 (eval-after-load "which-func"
   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
+
+(provide 'prog-init)
+
+;;; prog-init.el ends here

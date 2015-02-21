@@ -1,8 +1,15 @@
+;;; mode-line-init.el --- Part of emacs initialization
+
+;;; Commentary:
+;; Tweak mode line.
+
+;;; Code:
+
 ;; smart mode line
 
 (use-package smart-mode-line-powerline-theme
              :ensure t
-             :defer t
+             :disable t
              )
 
 (use-package smart-mode-line
@@ -19,8 +26,12 @@
                (sml/setup)
                )
              )
+
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)
 ;;(set-face-attribute 'mode-line-inactive nil :box nil)
 ;;(set-face-attribute 'mode-line-highlight nil :box nil)
 
+(provide 'mode-line-init)
+
+;;; mode-line-init.el ends here

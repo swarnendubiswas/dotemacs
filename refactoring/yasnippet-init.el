@@ -18,4 +18,4 @@
 
 (provide 'yasnippet-init)
 
-;;; company-init.el ends here
+;;; yasnippet-init.el ends here

@@ -21,4 +21,3 @@
 (provide 'smex-init)
 
 ;;; smex-init.el ends here
-
