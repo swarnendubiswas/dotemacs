@@ -7,6 +7,7 @@
 
 (use-package ace-jump-mode
              :ensure t
+             :disabled t
              :init (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
              )
 
@@ -20,6 +21,7 @@
 (use-package ace-isearch
              :ensure t
              :defer t
+             :disabled t
              :init (global-ace-isearch-mode 1)
              )
 

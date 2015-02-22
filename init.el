@@ -651,6 +651,7 @@
 (setq org-completion-use-ido t
       org-src-fontify-natively t ; code block fontification using the major-mode of the code
       org-src-preserve-indentation t
+      org-src-window-setup 'current-window 
       )
 ;; requite org-latex so that the following variables are defined
 (require 'ox-latex)

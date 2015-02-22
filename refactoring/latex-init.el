@@ -15,10 +15,29 @@
              :defer t
              )
 
+(use-package latex-pretty-symbols
+             :ensure t
+             :defer t
+             )
+(use-package latex-preview-pane
+             :ensure t
+             :disabled t
+             )
+(use-package magic-latex-buffer
+             :ensure t
+             :disabled t
+             )
+
+(use-package bibtex-utils
+             :ensure t
+             :defer t
+             )
+
 (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
 (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
 
+(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
