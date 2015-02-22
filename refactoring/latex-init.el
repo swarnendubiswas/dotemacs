@@ -10,6 +10,11 @@
              :defer t
              )
 
+(use-package auctex-latexmk
+             :ensure t
+             :defer t
+             )
+
 (use-package latex-extra
              :ensure t
              :defer t

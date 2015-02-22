@@ -1,3 +1,10 @@
+;;; fci-init.el --- Part of emacs initialization
+
+;;; Commentary:
+;; Setup fci.
+
+;;; Code:
+
 (use-package fill-column-indicator
              :ensure t
              :defer t
@@ -21,3 +28,7 @@
 ;;   )
 ;;(add-hook 'after-change-major-mode-hook 'auto-fci-mode)
 ;;(add-hook 'window-size-change-functions 'auto-fci-mode)
+
+(provide 'fci-init)
+
+;;; fci-init.el ends here

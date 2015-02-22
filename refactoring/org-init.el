@@ -28,6 +28,11 @@
           (lambda ()
             (writegood-mode 1)))
 
+(use-package org-beautify-theme
+             :ensure t
+             :defer t
+             )
+
 (provide 'org-init)
 
 ;;; org-init.el ends here

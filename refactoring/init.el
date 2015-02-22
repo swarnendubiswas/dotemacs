@@ -34,77 +34,10 @@
 ;; customizing packages
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
-;;(require 'package)
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ))
-(setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
-(package-initialize)
-
-;; set up use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-
-;; start customizing functionality
-
-;; saveplace: remember cursor position in files
-(setq-default save-place t)
-
-
-;; ensure that a required set of packages are always installed
-(require 'ensure-packages)
-;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
-(setq ensure-packages
-      '(aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode bash-completion color-theme  ctags ctags-update dash discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx flycheck-color-mode-line flycheck-tip flycheck flymake flymake-shell flymake-easy flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hl-line+ hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode indent-guide jgraph-mode jtags let-alist  manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup readline-complete rich-minority s sentence-highlight use-package writegood-mode  org-beautify-theme ibuffer-tramp json-mode)
-      )
-(ensure-packages-install-missing)
-
 
 ;; customize appearance
 
-;;(highlight-changes-mode 1) ; not very useful usually
-
-
-;; fontification
-(global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
-(setq font-lock-maximum-decoration t ; maximum fontification possible
-      jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
-      font-lock-support-mode 'jit-lock-mode ; jit locking is better than fast-lock and lazy-lock
-      jit-lock-stealth-time 10
-      jit-lock-defer-contextually t
-      jit-lock-stealth-nice 0.5
-      )
-
-
 ;; Package specific
-
-
-;; related to pairing of parentheses, brackets, etc.
-(setq show-paren-delay 0
-      show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
-      )
-(when (fboundp 'show-paren-mode)
-  (show-paren-mode 1) ; highlight matching parentheses when the point is on them
-  (make-variable-buffer-local 'show-paren-mode))
-;;(show-paren-mode 1) ; highlight matching parentheses when the point is on them
-(setq-default flyparens-mode t) ; highlight/track mismatched parentheses
-
-;; indentation
-(electric-indent-mode -1) ; intelligent indentation, on by default from Emacs 24.4
-;;(auto-indent-global-mode 1) ; auto-indentation minor mode
-(use-package aggressive-indent
-             :ensure t
-             :defer t
-             :idle (global-aggressive-indent-mode 1)
-             )
-
-
-;; indentation guides
-;;(indent-guide-global-mode 1) ; doesn't seem to work well with company-mode and auto-complete-mode
-;;(setq indent-guide-delay 0.1) ; show guide lines only in idle-time
-(highlight-indentation-mode 1) 
 
 
 ;; ace-jump-buffer
@@ -160,28 +93,10 @@
       uniquify-after-kill-buffer-p t)
 
 
-;; spell check
-(add-hook 'find-file-hooks 'turn-on-flyspell) 
-(setq-default ispell-program-name "/usr/bin/aspell")
-;; speed up aspell: ultra | fast | normal
-(setq ispell-extra-args '("--sug-mode=normal"))
-
-
-;; flycheck
-(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
-(global-flycheck-mode 1)
-
-
-;; rainbow mode
-;;(rainbow-mode 1)
-;;(rainbow-identifiers-mode 1)
-;;(rainbow-delimiters-mode 1)
-
 ;; directory navigation
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
-
 
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
@@ -189,7 +104,6 @@
 (setq icomplete-prospects-height 2
       icomplete-compute-delay 0
       )
-;;(icy-mode 1) ; icicles
 
 
 ;; save minibuffer histories across sessions

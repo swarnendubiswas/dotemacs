@@ -88,6 +88,21 @@
 
 (setq-default major-mode 'text-mode)
 
+;; fontification
+(global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
+(setq font-lock-maximum-decoration t ; maximum fontification possible
+      jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
+      font-lock-support-mode 'jit-lock-mode ; jit locking is better than fast-lock and lazy-lock
+      jit-lock-stealth-time 10
+      jit-lock-defer-contextually t
+      jit-lock-stealth-nice 0.5
+      )
+
+;;(highlight-changes-mode 1) ; not very useful usually
+
+;; saveplace: remember cursor position in files
+(setq-default save-place t)
+
 (provide 'defaults-init)
 
 ;;; defaults-init.el ends here

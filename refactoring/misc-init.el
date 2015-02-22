@@ -45,6 +45,28 @@
              :config (setq tabbar-use-images nil) ; speed up by not using images
              )
 
+(use-package jgraph-mode
+             :ensure
+             :defer t
+             )
+
+(use-package hungry-delete
+             :ensure t
+             :defer t
+             :init (global-hungry-delete-mode 1)
+             )
+
+(use-package fixme-mode
+             :ensure t
+             :defer t
+             :config (fixme-mode 1)
+             )
+
+(use-package fish-mode
+             :ensure t
+             :disabled t
+             )
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
