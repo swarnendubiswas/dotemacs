@@ -8,6 +8,7 @@
 (use-package anzu-mode
              :ensure t
              :defer t
+             :diminish anzu-mode
              :idle (global-anzu-mode 1)
              )
 

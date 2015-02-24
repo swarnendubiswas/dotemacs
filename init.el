@@ -123,12 +123,12 @@
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun create-latex-etags ()
-  "Create etags for the current latex project"
+  "Create etags for the current latex project."
   (interactive)
   (compile "find . -name \"*.tex\" -print | etags -")
   )
 (defun create-latex-ctags () ; (dir-name))
-  "Create ctags for the current latex project"
+  "Create ctags for the current latex project."
   ;;(interactive "DDirectory: ")
   ;; (shell-command
   ;;  (format "ctags -o TAGS -R *.tex %s" (directory-file-name dir-name)))
@@ -142,7 +142,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap)
       )
 (ensure-packages-install-missing)
 
@@ -306,6 +306,7 @@
 
 ;; indentation
 (electric-indent-mode -1) ; intelligent indentation, on by default from Emacs 24.4
+(add-hook 'after-change-major-mode-hook (lambda() (electric-indent-mode -1)))
 ;;(auto-indent-global-mode 1) ; auto-indentation minor mode
 (global-aggressive-indent-mode 1)
 
@@ -456,7 +457,9 @@
             (load "dired-x")))
 (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
       dired-recursive-deletes 'always ; single prompt for all n directories
-      dired-recursive-copies 'always)
+      dired-recursive-copies 'always
+      dired-listing-switches "-aBhl --si --group-directories-first"
+      )
 (setq-default diredp-hide-details-initially-flag nil)
 (autoload 'dired-jump "dired-x"
   "Jump to dired buffer corresponding to current buffer."
@@ -500,19 +503,6 @@
 (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
 
 
-;; smart mode line
-(setq sml/theme 'light) ; options: dark, light, respectful, automatic, powerline
-;;(setq sml/name-width 20)
-(setq sml/no-confirm-load-theme t
-      sml/shorten-modes t
-      sml/shorten-directory t)
-(sml/setup)
-;; flat-looking mode-line
-;;(set-face-attribute 'mode-line nil :box nil)
-;;(set-face-attribute 'mode-line-inactive nil :box nil)
-;;(set-face-attribute 'mode-line-highlight nil :box nil)
-
-
 ;; anzu mode - show number of searches in the mode line
 (global-anzu-mode 1)
 
@@ -546,6 +536,46 @@
 (setq guide-key-tip/enabled t)
 
 
+;; diminish minor modes
+(eval-after-load "company"
+  '(diminish 'company-mode))
+(eval-after-load "abbrev"
+  '(diminish 'abbrev-mode))
+(eval-after-load "yasnippet"
+  '(diminish 'yas-minor-mode))
+(eval-after-load "anzu"
+  '(diminish 'anzu-mode))
+(eval-after-load "smooth-scroll"
+  '(diminish 'smooth-scroll-mode))
+(eval-after-load "achievements"
+  '(diminish 'achievements-mode))
+(eval-after-load "flyspell"
+  '(diminish 'flyspell-mode))
+(eval-after-load "guide-key"
+  '(diminish 'guide-key-mode))
+(eval-after-load "auto-highlight-symbol"
+  '(diminish 'auto-highlight-symbol-mode))
+(eval-after-load "highlight-indentation"
+  '(diminish 'highlight-indentation-mode))
+(eval-after-load "aggressive-indent"
+  '(diminish 'aggressive-indent-mode))
+(eval-after-load "writegood-mode"
+  '(diminish 'writegood-mode))
+
+
+;; smart mode line
+(setq sml/theme 'biswass) ; options: dark, light, respectful, automatic, powerline, biswass
+;;(setq sml/name-width 20)
+(setq sml/no-confirm-load-theme t
+      sml/shorten-modes t
+      sml/shorten-directory t)
+(sml/setup)
+;; flat-looking mode-line
+;;(set-face-attribute 'mode-line nil :box nil)
+;;(set-face-attribute 'mode-line-inactive nil :box nil)
+;;(set-face-attribute 'mode-line-highlight nil :box nil)
+
+
 ;; specific major mode hooks
 
 
@@ -565,8 +595,8 @@
 (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
 (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
 
-(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
+;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 (add-hook 'LaTeX-mode-hook #'reftex-mode)
@@ -707,8 +737,10 @@ If region is active, apply to active region instead."
 
 ;; keyboard shortcuts
 
-(global-set-key (kbd "RET") 'newline-and-indent)
-(global-set-key (kbd "C-l") 'goto-line)
+;;(global-set-key (kbd "RET") 'newline-and-indent)
+(define-key global-map (kbd "RET") 'newline-and-indent)
+;;(global-set-key (kbd "C-l") 'goto-line)
+(define-key global-map (kbd "C-l") 'goto-line)
 (global-set-key (kbd "C-c z") 'repeat)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-x C-\\") 'goto-last-change) ; goto-last-change

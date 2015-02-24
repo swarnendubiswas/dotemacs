@@ -20,3 +20,8 @@
              :commands dired-jump
              :config (setq dired-bind-jump t)
              )
+
+(use-package dired-efap
+             :ensure t
+             :defer t
+             )
