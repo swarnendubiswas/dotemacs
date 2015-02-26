@@ -1,6 +1,5 @@
 ;;; init.el --- Emacs customization
 ;; Swarnendu Biswas
-;; Wed Feb 18 18:23:30 EST 2015
 
 ;;; Commentary:
 
@@ -34,7 +33,9 @@
 
 
 ;; customizing packages
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+;; FIXME: Why does this not work?
+;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(add-to-list 'load-path "~/.emacs.d/lisp/")
 
 ;;(require 'package)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -142,7 +143,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap flycheck-package)
       )
 (ensure-packages-install-missing)
 
@@ -441,6 +442,7 @@
 ;; flycheck
 (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
 (global-flycheck-mode 1)
+(eval-after-load 'flycheck '(flycheck-package-setup))
 
 
 ;; rainbow mode
@@ -561,15 +563,19 @@
   '(diminish 'aggressive-indent-mode))
 (eval-after-load "writegood-mode"
   '(diminish 'writegood-mode))
+(eval-after-load "reftex"
+  '(diminish 'reftex-mode))
 
 
 ;; smart mode line
-(setq sml/theme 'biswass) ; options: dark, light, respectful, automatic, powerline, biswass
-;;(setq sml/name-width 20)
+(setq sml/theme 'light) ; options: dark, light, respectful, automatic, powerline
 (setq sml/no-confirm-load-theme t
       sml/shorten-modes t
-      sml/shorten-directory t)
+      sml/shorten-directory t
+      ;;sml/name-width 20
+      )
 (sml/setup)
+
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)
 ;;(set-face-attribute 'mode-line-inactive nil :box nil)
@@ -671,7 +677,8 @@
 ;; java hooks
 (add-hook 'java-mode-hook
           (lambda ()
-            (setq c-basic-offset 2)))
+            (setq c-basic-offset 2
+                  c-set-style "java")))
 (autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
 (add-hook 'java-mode-hook 'jtags-mode)
 
@@ -775,7 +782,8 @@ If region is active, apply to active region instead."
 ;; buffers
 (global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
 (global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
-(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+;;(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+(global-set-key [f8] 'recentf-open-files)
 
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
