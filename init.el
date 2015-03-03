@@ -143,7 +143,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap flycheck-package)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap flycheck-package latex-math-preview)
       )
 (ensure-packages-install-missing)
 
@@ -175,8 +175,8 @@
 (scroll-bar-mode -1) ; no scroll bars
 (menu-bar-mode -1) ; no menu bar
 (blink-cursor-mode 1) ; enable/disable blinking cursor
-(mode-icons-mode 1)
-(display-theme-mode 1)
+;;(mode-icons-mode 1)
+;;(display-theme-mode 1)
 (fixme-mode 1)
 
 
@@ -190,7 +190,8 @@
 (load-theme 'leuven t)
 (set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-empty-lines t ; show empty lines after buffer end
-              indicate-buffer-boundaries 'right)
+              indicate-buffer-boundaries 'right
+              )
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
@@ -495,7 +496,7 @@
 (setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
 (company-auctex-init)
-(company-statistics-mode 1) 
+;;(company-statistics-mode 1) 
 (company-quickhelp-mode 1)
 
 
@@ -615,21 +616,31 @@
 (add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'LaTeX-mode-hook #'fci-mode)
-(add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; compile files to pdf by default
+(add-hook 'LaTeX-mode-hook (lambda () (TeX-PDF-mode 1))) ; compile files to pdf by default
 (add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
       TeX-parse-self t ; enable parse on load
       TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
       TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
+      TeX-auto-untabify t 
       )
+
 (setq reftex-plug-into-AUCTeX t
       reftex-cite-format 'abbrv
       reftex-save-parse-info t
       )
 (setq-default TeX-master nil) ; query for master file
 
+(setq latex-run-command "latexmk")
+(setq-default TeX-command-default "LatexMk")
+
 (auctex-latexmk-setup) ; add support for latexmk
+
+;;(latex-preview-pane-enable) ; current does not support multi-file parsing
+
+(setq TeX-source-correlate-method 'synctex)
+(add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
 
 
 ;; shell mode hooks
@@ -803,15 +814,15 @@ If region is active, apply to active region instead."
                 (lambda () 
                   (interactive)
                   (dired "~/")))
-;; M-<up> is nicer in dired if it moves to the fourth line - the first file
 (defun dired-back-to-top ()
+  "M-<up> is nicer in dired if it moves to the fourth line - the first file."
   (interactive)
   (beginning-of-buffer)
   (dired-next-line 4))
 (define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top)
 
-;; M-<down> is nicer in dired if it moves to the last file
 (defun dired-jump-to-bottom ()
+  "M-<down> is nicer in dired if it moves to the last file."
   (interactive)
   (end-of-buffer)
   (dired-next-line -1))
