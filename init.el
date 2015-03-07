@@ -80,7 +80,7 @@
 (setq require-final-newline t ; always end a file with a newline
       sentence-end-double-space nil)
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(set-face-attribute 'default nil :height 110) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+(set-face-attribute 'default nil :height 120) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq-default fill-column 120
               standard-indent 2 ; set standard indent to 2 rather that 4
               tab-width 2
@@ -143,7 +143,7 @@
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
 (setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap flycheck-package latex-math-preview)
+      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap flycheck-package latex-math-preview move-text whitespace-cleanup-mode powerline smart-mode-line-powerline-theme)
       )
 (ensure-packages-install-missing)
 
@@ -165,10 +165,13 @@
       (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
 
 ;;  line and column numbers
-(global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
+;;(global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
+;;(set-face-background 'hl-line "#e5e4e2") ;; platinum
+;;(set-face-foreground 'highlight nil)
 (global-linum-mode 1) ; display line numbers in margin
 (hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
 (column-number-mode 1)
+
 
 (tooltip-mode -1) ; tooltips
 (tool-bar-mode -1) ; no toolbar with icons
@@ -187,11 +190,10 @@
 
 
 ;; these are two nice themes: leuven and professional
-(load-theme 'leuven t)
-(set-face-background 'fringe "white") ; hide the fringe mark on the left
-(setq-default indicate-empty-lines t ; show empty lines after buffer end
-              indicate-buffer-boundaries 'right
-              )
+;;(require 'eclipse-theme)
+;;(load-theme 'professional t)
+;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
+(setq-default indicate-buffer-boundaries 'right)
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
@@ -213,7 +215,7 @@
 
 ;; achievements
 (setq achievements-idle-time 600) ; seconds
-(achievements-mode 1)
+;;(achievements-mode 1)
 
 
 ;; undo-tree (visualize with C-x u)
@@ -286,12 +288,11 @@
 
 ;; related to pairing of parentheses, brackets, etc.
 (setq show-paren-delay 0
-      show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
+      show-paren-style 'parenthesis ; 'expression, 'parenthesis, 'mixed
       )
 (when (fboundp 'show-paren-mode)
   (show-paren-mode 1) ; highlight matching parentheses when the point is on them
   (make-variable-buffer-local 'show-paren-mode))
-;;(show-paren-mode 1) ; highlight matching parentheses when the point is on them
 (setq-default flyparens-mode t) ; highlight/track mismatched parentheses
 
 ;; smart pairing
@@ -316,7 +317,7 @@
 ;; indentation guides
 ;;(indent-guide-global-mode 1) ; doesn't seem to work well with company-mode and auto-complete-mode
 ;;(setq indent-guide-delay 0.1) ; show guide lines only in idle-time
-(highlight-indentation-mode 1) 
+;;(highlight-indentation-mode 1) 
 
 
 ;; ace jump mode major function
@@ -370,9 +371,9 @@
       confirm-nonexistent-file-or-buffer nil
       ido-use-faces nil ; disable ido faces to see flx highlights
       ido-use-virtual-buffers t
+      ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
+                           "*Messages*" "Async Shell Command")
       ) 
-(setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
-                           "*Messages*" "Async Shell Command"))
 
 (ido-mode 1)
 (ido-at-point-mode 1) ;; M-tab to start completion
@@ -398,16 +399,19 @@
 
 
 ;; whitespace
-(setq-default indicate-empty-lines t
-              show-trailing-whitespace t)
-;; (add-hook 'before-save-hook 'whitespace-cleanup)
-;;(setq whitespace-style '(face empty tabs lines-tail trailing))
-;;(setq whitespace-style '(face empty tabs lines-tail))
+(setq-default indicate-empty-lines t ; show empty lines after buffer end
+              ;;show-trailing-whitespace t
+              whitespace-style '(spaces tabs newline space-mark tab-mark newline-mark)
+              )
+
+;; (add-hook 'before-save-hook 'whitespace-cleanup-mode)
+;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
+
 ;;(set-face-attribute 'whitespace-line nil
 ;;                    :background "red1"
 ;;                    :foreground "yellow"
 ;;                    :weight 'bold)
-;;(global-whitespace-mode t)
+;; (global-whitespace-mode 1)
 
 
 ;; fci
@@ -460,6 +464,7 @@
             (load "dired-x")))
 (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
       dired-recursive-deletes 'always ; single prompt for all n directories
+      delete-by-moving-to-trash t
       dired-recursive-copies 'always
       dired-listing-switches "-aBhl --si --group-directories-first"
       )
@@ -491,7 +496,7 @@
 ;;(require 'company-auctex)
 (setq company-dabbrev-downcase nil ;; turn off auto downcasing of things
       company-show-numbers t
-      company-minimum-prefix-length 2)
+      company-minimum-prefix-length 3)
 ;; invert the navigation direction if the completion popup is displayed on top (happens near the bottom of windows)
 (setq company-tooltip-flip-when-above t) 
 (global-company-mode 1)
@@ -567,15 +572,28 @@
 (eval-after-load "reftex"
   '(diminish 'reftex-mode))
 
+;; mode-line customizations
+
+;; setup powerline
+;;(powerline-default-theme)
+;;(powerline-vim-theme)
+;;(powerline-center-theme)
+;;(powerline-center-evil-theme)
 
 ;; smart mode line
-(setq sml/theme 'light) ; options: dark, light, respectful, automatic, powerline
-(setq sml/no-confirm-load-theme t
-      sml/shorten-modes t
-      sml/shorten-directory t
-      ;;sml/name-width 20
-      )
-(sml/setup)
+;;(setq sml/theme 'powerline) ; options: dark, light, respectful, automatic, powerline, biswass
+;; (setq sml/no-confirm-load-theme t
+;;       sml/shorten-modes t
+;;       sml/shorten-directory t
+;;       ;;sml/name-width 20
+;;       )
+;;(sml/setup)
+
+;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
+(add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline")
+(setq powerline-color1 "grey22")
+(setq powerline-color2 "grey40")
+(require 'powerline)
 
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)
@@ -609,7 +627,7 @@
 (add-hook 'LaTeX-mode-hook #'reftex-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
+;;(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook #'writegood-mode)
 (add-hook 'LaTeX-mode-hook #'abbrev-mode)
@@ -617,7 +635,7 @@
 (add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'LaTeX-mode-hook #'fci-mode)
 (add-hook 'LaTeX-mode-hook (lambda () (TeX-PDF-mode 1))) ; compile files to pdf by default
-(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
+;;(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
       TeX-parse-self t ; enable parse on load
@@ -661,14 +679,14 @@
 
 (add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
+;;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
 (add-hook 'prog-mode-hook #'aggressive-indent-mode)
-(add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
+;;(add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
 (add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
 (add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
-(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
-(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
+;;(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
+;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 ;; show the name of the function in the modeline
 (add-hook 'prog-mode-hook 'which-function-mode)
@@ -698,8 +716,8 @@
 
 
 ;; org mode hooks
-(add-hook 'org-mode-hook 'turn-on-font-lock)
-(add-hook 'org-mode-hook 'visual-line-mode)
+(add-hook 'org-mode-hook #'turn-on-font-lock)
+(add-hook 'org-mode-hook #'visual-line-mode)
 ;; turn on soft wrapping mode for org mode
 (add-hook 'org-mode-hook 
           (lambda () (setq truncate-lines nil)))
@@ -710,6 +728,7 @@
       org-src-fontify-natively t ; code block fontification using the major-mode of the code
       org-src-preserve-indentation t
       org-src-window-setup 'current-window 
+      org-fontify-whole-heading-line t
       )
 ;; requite org-latex so that the following variables are defined
 (require 'ox-latex)
@@ -722,6 +741,7 @@
 
 ;; if you want colored source code then you need to include the color package
 (add-to-list 'org-latex-packages-alist '("" "color"))
+
 
 ;; custom functions
 
@@ -790,6 +810,9 @@ If region is active, apply to active region instead."
 ;; define a keyboard shortcut for duplicating lines
 (global-set-key (kbd "C-c C-d") 'duplicate-thing)
 
+;; move text with M-up and M-down like eclipse
+(move-text-default-bindings)
+
 ;; buffers
 (global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
 (global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
@@ -853,22 +876,25 @@ If region is active, apply to active region instead."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ajb-bs-configuration "files" t)
+ '(blink-cursor-mode t)
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
  '(display-time-mode t)
+ '(paradox-github-token nil)
  '(scroll-bar-mode 1)
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
  '(vlf-application (quote dont-ask)))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;;'(sml/folder ((t (:inherit sml/global :background "#000000" :foreground "white smoke" :weight normal))))
- ;;'(sml/modes ((t (:inherit sml/global :background "#006666" :foreground "white smoke"))))
+ '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
+ '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil))))
  )
 
 
