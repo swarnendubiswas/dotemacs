@@ -411,7 +411,7 @@
 ;;                    :background "red1"
 ;;                    :foreground "yellow"
 ;;                    :weight 'bold)
-;; (global-whitespace-mode 1)
+;;(global-whitespace-mode 1)
 
 
 ;; fci
@@ -464,7 +464,7 @@
             (load "dired-x")))
 (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
       dired-recursive-deletes 'always ; single prompt for all n directories
-      delete-by-moving-to-trash t
+      ;;delete-by-moving-to-trash t
       dired-recursive-copies 'always
       dired-listing-switches "-aBhl --si --group-directories-first"
       )
@@ -591,12 +591,11 @@
 
 ;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline")
-(setq powerline-color1 "grey22")
-(setq powerline-color2 "grey40")
+(setq powerline-arrow-shape 'arrow) ; curve, arrow, half
 (require 'powerline)
 
 ;; flat-looking mode-line
-;;(set-face-attribute 'mode-line nil :box nil)
+;;(set-face-attribute 'mode-line nil :background "grey40" :foreground "white" :box nil)
 ;;(set-face-attribute 'mode-line-inactive nil :box nil)
 ;;(set-face-attribute 'mode-line-highlight nil :box nil)
 
@@ -747,7 +746,7 @@
 
 ;; kill all non-special buffers but the current one
 (defun kill-other-buffers ()
-  "Kill all buffers but the current one. Don't mess with special buffers."
+  "Kill all buffers but the current one.  Don't mess with special buffers."
   (interactive)
   (dolist (buffer (buffer-list))
     (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
@@ -888,14 +887,14 @@ If region is active, apply to active region instead."
  '(tool-bar-mode nil)
  '(vlf-application (quote dont-ask)))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
- '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil))))
- )
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
+;;  '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil))))
+;;  )
 
 
 ;;; init.el ends here
