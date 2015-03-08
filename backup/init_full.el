@@ -166,8 +166,8 @@
 
 ;; tramp
 (setq tramp-default-method "ssh") ; faster than the default scp
-(setq tramp-default-user "biswass"
-      tramp-default-host "sunshine.cse.ohio-state.edu")
+(setq tramp-default-user "XXX"
+      tramp-default-host "XXX")
 
 
 ;; ignore case when reading a file name completion
