@@ -52,7 +52,7 @@
 
 
 ;; (setq load-prefer-newer t)
-(require 'auto-compile)
+(paradox-require 'auto-compile)
 (auto-compile-on-load-mode 1)
 (auto-compile-on-save-mode 1)
 (setq auto-compile-display-buffer nil
@@ -149,7 +149,9 @@
 
 
 ;; paradox
-(setq paradox-execute-asynchronously t)
+(setq paradox-execute-asynchronously t
+      paradox-github-token t)
+(paradox-upgrade-packages)
 
 
 ;; enable tabbar minor mode
@@ -190,7 +192,7 @@
 
 
 ;; these are two nice themes: leuven and professional
-;;(require 'eclipse-theme)
+(paradox-require 'eclipse-theme)
 ;;(load-theme 'professional t)
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-buffer-boundaries 'right)
@@ -394,12 +396,12 @@
 
 
 ;; smooth scroll
-(require 'smooth-scroll)
+(paradox-require 'smooth-scroll)
 (smooth-scroll-mode 1)
 
 
 ;; whitespace
-(setq-default indicate-empty-lines t ; show empty lines after buffer end
+(setq-default indicate-empty-lines nil ; show empty lines after buffer end
               ;;show-trailing-whitespace t
               whitespace-style '(spaces tabs newline space-mark tab-mark newline-mark)
               )
@@ -458,7 +460,7 @@
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
-(require 'dired) ; needed for dired-mode-map
+(paradox-require 'dired) ; needed for dired-mode-map
 (add-hook 'dired-load-hook ; dired-load-hook
           (lambda ()
             (load "dired-x")))
@@ -513,10 +515,12 @@
 
 ;; anzu mode - show number of searches in the mode line
 (global-anzu-mode 1)
+(set-face-attribute 'anzu-mode-line nil
+                    :foreground "yellow" :weight 'bold)
 
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
-(eval-after-load "icomplete" '(progn (require 'icomplete+)))
+(eval-after-load "icomplete" '(progn (paradox-require 'icomplete+)))
 (setq icomplete-prospects-height 2
       icomplete-compute-delay 0
       )
@@ -531,7 +535,7 @@
 
 
 ;; yasnippet
-;;(yas-global-mode 1)
+(yas-global-mode 1) ; it is okay if you use daemon
 ;;(yas-reload-all 1) ; this slows startup
 
 
@@ -592,7 +596,7 @@
 ;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline")
 (setq powerline-arrow-shape 'arrow) ; curve, arrow, half
-(require 'powerline)
+(paradox-require 'powerline)
 
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :background "grey40" :foreground "white" :box nil)
@@ -608,7 +612,7 @@
 (setq-default major-mode 'text-mode)
 ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
 (setq comment-auto-fill-only-comments t)
-(add-hook 'text-mode-hook 'flyspell-mode) ; possibly won't work for extensionless .ascii files
+(add-hook 'text-mode-hook 'turn-on-flyspell) ; possibly won't work for extensionless .ascii files
 (add-hook 'text-mode-hook 'writegood-mode)
 (add-hook 'text-mode-hook 'abbrev-mode)
 (add-hook 'text-mode-hook 'fci-mode)
@@ -621,17 +625,17 @@
 
 ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-flyspell)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 (add-hook 'LaTeX-mode-hook #'reftex-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
 ;;(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 (add-hook 'LaTeX-mode-hook #'writegood-mode)
 (add-hook 'LaTeX-mode-hook #'abbrev-mode)
-(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
-(add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
+;;(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
+;;(add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'LaTeX-mode-hook #'fci-mode)
 (add-hook 'LaTeX-mode-hook (lambda () (TeX-PDF-mode 1))) ; compile files to pdf by default
 ;;(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
@@ -664,7 +668,7 @@
 
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "fish"
-      explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+      ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
       )
 (setq comint-process-echoes t)
 ;; setup auto-completion framework
@@ -679,10 +683,10 @@
 (add-hook 'prog-mode-hook 'highlight-numbers-mode) ; minor mode to highlight numeric literals
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 ;;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode) ; enable in programming related-modes (Emacs 24+)
-(add-hook 'prog-mode-hook #'aggressive-indent-mode)
+;;(add-hook 'prog-mode-hook #'aggressive-indent-mode)
 ;;(add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
-(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
-(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
+;;(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
+;;(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'prog-mode-hook 'fci-mode)
 ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
 ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
@@ -730,7 +734,7 @@
       org-fontify-whole-heading-line t
       )
 ;; requite org-latex so that the following variables are defined
-(require 'ox-latex)
+(paradox-require 'ox-latex)
 
 ;; tell org to use listings
 (setq org-latex-listings t)
@@ -819,7 +823,7 @@ If region is active, apply to active region instead."
 (global-set-key [f8] 'recentf-open-files)
 
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
-(global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
+(global-set-key (kbd "C-M-<f8>") 'flyspell-buffer) ; FIXME: shortcut might not work on certain GNU/Linux systems
 
 (define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
@@ -875,17 +879,16 @@ If region is active, apply to active region instead."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ajb-bs-configuration "files" t)
- '(blink-cursor-mode t)
  '(column-number-mode t)
  '(custom-safe-themes (quote (default)))
  '(diredp-hide-details-initially-flag nil t)
  '(display-time-mode t)
- '(paradox-github-token nil)
  '(scroll-bar-mode 1)
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
  '(vlf-application (quote dont-ask)))
+
 
 ;; (custom-set-faces
 ;;  ;; custom-set-faces was added by Custom.
