@@ -1,9 +1,9 @@
-;;; init.el --- Emacs customization
+;;; init.el --- Emacs customization ;;; -*- lexical-binding: t; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:
 
-;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
+;; Notes: To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
 ;; cheaper alternative is to use "autoload".
 
@@ -28,6 +28,7 @@
 ;;    size, and a syntax coloring theme that you like. And that is not something specific to an editor. Editors like
 ;;    Emacs and vi have almost no UI! If Emacs is configured right, the only UI it has is the modeline and the
 ;;    minibuffer." -- Vivek Haldar in "New frontiers in text editing".
+;;  "Good code is like a good joke - it needs no explanation." -- Russ Olsen
 
 ;;; Code:
 
@@ -37,9 +38,10 @@
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
-;;(require 'package)
+
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
                          ))
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
 (package-initialize)
@@ -51,7 +53,7 @@
   (package-install 'use-package))
 
 
-;; (setq load-prefer-newer t)
+(setq load-prefer-newer t)
 (paradox-require 'auto-compile)
 (auto-compile-on-load-mode 1)
 (auto-compile-on-save-mode 1)
@@ -73,7 +75,7 @@
       initial-scratch-message nil
       initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
       ) 
-(setq-default major-mode 'text-mode)
+(setq-default major-mode 'text-mode) ; default is fundamental mode for files that do not specify a major mode
 
 
 ;; customize defaults
@@ -151,7 +153,7 @@
 ;; paradox
 (setq paradox-execute-asynchronously t
       paradox-github-token t)
-(paradox-upgrade-packages)
+;;(paradox-upgrade-packages)
 
 
 ;; enable tabbar minor mode
@@ -165,6 +167,16 @@
 ;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
+
+
+;; these are two nice themes: leuven and professional
+(paradox-require 'eclipse-theme)
+;;(load-theme 'professional t)
+;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
+;;(set-face-attribute 'region nil :background "RoyalBlue4" :foreground "white")
+(set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+(setq-default indicate-buffer-boundaries 'right)
+
 
 ;;  line and column numbers
 ;;(global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
@@ -189,13 +201,6 @@
 (setq display-time-day-and-date t
       display-time-24hr-format nil)
 (display-time)
-
-
-;; these are two nice themes: leuven and professional
-(paradox-require 'eclipse-theme)
-;;(load-theme 'professional t)
-;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
-(setq-default indicate-buffer-boundaries 'right)
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
@@ -375,6 +380,7 @@
       ido-use-virtual-buffers t
       ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command")
+      ido-enable-tramp-completion t
       ) 
 
 (ido-mode 1)
@@ -448,7 +454,7 @@
 
 ;; flycheck
 (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
-(global-flycheck-mode 1)
+(add-hook 'after-init-hook #'global-flycheck-mode)
 (eval-after-load 'flycheck '(flycheck-package-setup))
 
 
@@ -650,7 +656,8 @@
 (setq reftex-plug-into-AUCTeX t
       reftex-cite-format 'abbrv
       reftex-save-parse-info t
-      )
+      reftex-use-multiple-selection-buffers t
+      reftex-enable-partial-scans t)
 (setq-default TeX-master nil) ; query for master file
 
 (setq latex-run-command "latexmk")
@@ -669,6 +676,8 @@
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "fish"
       ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+      sh-basic-offset 4
+      sh-indent-comment t
       )
 (setq comint-process-echoes t)
 ;; setup auto-completion framework
