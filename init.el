@@ -10,25 +10,33 @@
 ;; Interesting quotes (inspired from http://www.mygooglest.com/fni/dot-emacs.html):
 ;;
 ;;   "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk
+;;
 ;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
 ;;    the editor should get used to us." -- Vivek Haldar in "New frontiers in text editing".
+;;
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
 ;;    McGrath
+;;
 ;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
-;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning 
+;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning
 ;;    was the Command Line"
+;;
 ;;   "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
 ;;    and they're probably right..." -- Jerry Coffin (on indentation)
+;;
 ;;   "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton
+;;
 ;;   "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
 ;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." -- Steve
 ;;    McConnell
+;;
 ;;   "What I don't understand is: why should you ever care how your editor looks, unless you're trying to win a
 ;;    screenshot competition? The primary factor in looking good should be the choice of a good font at a comfortable
 ;;    size, and a syntax coloring theme that you like. And that is not something specific to an editor. Editors like
 ;;    Emacs and vi have almost no UI! If Emacs is configured right, the only UI it has is the modeline and the
 ;;    minibuffer." -- Vivek Haldar in "New frontiers in text editing".
-;;  "Good code is like a good joke - it needs no explanation." -- Russ Olsen
+;;
+;;   "Good code is like a good joke - it needs no explanation." -- Russ Olsen
 
 ;;; Code:
 
@@ -41,8 +49,7 @@
 
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ))
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
 (package-initialize)
 
@@ -73,8 +80,7 @@
       inhibit-startup-screen t
       inhibit-splash-screen t
       initial-scratch-message nil
-      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
-      ) 
+      initial-major-mode 'text-mode) ; *scratch* is in Lisp interaction mode by default, use text mode instead
 (setq-default major-mode 'text-mode) ; default is fundamental mode for files that do not specify a major mode
 
 
@@ -82,12 +88,11 @@
 (setq require-final-newline t ; always end a file with a newline
       sentence-end-double-space nil)
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(set-face-attribute 'default nil :height 120) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+(set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 (setq-default fill-column 120
               standard-indent 2 ; set standard indent to 2 rather that 4
               tab-width 2
-              indent-tabs-mode nil ; spaces instead of tabs by default
-              )
+              indent-tabs-mode nil) ; spaces instead of tabs by default
 
 
 ;; we need to paste something from another program, but sometimes we do real paste after some kill
@@ -109,16 +114,14 @@
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 5 ; default is 5 s
               auto-revert-verbose nil
-              global-auto-revert-non-file-buffers t ; auto-refresh dired buffers
-              ) 
+              global-auto-revert-non-file-buffers t) ; auto-refresh dired buffers
 
 
 ;; automatically load abbreviations table
 (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs"
               abbrev-mode t)
 (setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
-      dabbrev-case-replace nil ; preserve case when expanding
-      )
+      dabbrev-case-replace nil) ; preserve case when expanding
 ;;(quietly-read-abbrev-file)
 
 
@@ -144,9 +147,107 @@
 ;; ensure that a required set of packages are always installed
 (require 'ensure-packages)
 ;; get a list of currently installed packages (excluding built in packages) with '\C-h v package-activated-list'
-(setq ensure-packages
-      '(ace-jump-buffer ace-jump-mode achievements aggressive-indent anzu async auctex-latexmk auctex auto-highlight-symbol auto-indent-mode auto-compile autodisass-java-bytecode bash-completion bibtex-utils company-auctex company company-math company-quickhelp company-statistics ctags ctags-update dash dired+ dired-details dired-details+ dired-rainbow dired-hacks-utils discover-my-major display-theme duplicate-thing epl es-lib f fill-column-indicator fish-mode fixme-mode flex-isearch flx-ido flx flycheck-color-mode-line flycheck-tip flycheck flyparens ggtags git-rebase-mode git-commit-mode goto-last-change guide-key guide-key-tip pos-tip popwin highlight-indentation highlight-numbers hlinum hungry-delete icomplete+ idle-highlight idle-highlight-mode ido-at-point ido-better-flex ido-hacks ido-ubiquitous ido-vertical-mode ido-yes-or-no indent-guide javap-mode jgraph-mode jtags latex-extra latex-pretty-symbols latex-preview-pane let-alist leuven-theme magic-latex-buffer manage-minor-mode fringe-helper math-symbol-lists mic-paren mode-icons names nav org parent-mode pkg-info popup professional-theme rainbow-delimiters rainbow-identifiers rainbow-mode readline-complete rich-minority s sentence-highlight smart-mode-line smex smooth-scroll tabbar use-package undo-tree vlf writegood-mode yasnippet org-beautify-theme direx ibuffer-tramp paradox diminish dired-efap flycheck-package latex-math-preview move-text whitespace-cleanup-mode powerline smart-mode-line-powerline-theme)
-      )
+(setq ensure-packages '(ace-jump-buffer
+                        ace-jump-mode
+                        achievements
+                        aggressive-indent
+                        anzu
+                        auctex-latexmk
+                        auctex
+                        auto-highlight-symbol
+                        auto-indent-mode
+                        auto-compile
+                        autodisass-java-bytecode
+                        bash-completion
+                        bibtex-utils
+                        company-auctex
+                        company
+                        company-math
+                        company-quickhelp
+                        company-statistics
+                        ctags
+                        ctags-update
+                        dash dired+
+                        dired-details
+                        dired-details+
+                        dired-rainbow
+                        dired-hacks-utils
+                        discover-my-major
+                        display-theme
+                        duplicate-thing
+                        fill-column-indicator
+                        fish-mode
+                        fixme-mode
+                        flex-isearch
+                        flx-ido
+                        flx
+                        flycheck-color-mode-line
+                        flycheck-tip
+                        flycheck
+                        flyparens
+                        ggtags
+                        goto-last-change
+                        guide-key
+                        guide-key-tip
+                        highlight-indentation
+                        highlight-numbers
+                        hlinum
+                        hungry-delete
+                        icomplete+
+                        idle-highlight
+                        idle-highlight-mode
+                        ido-at-point
+                        ido-better-flex
+                        ido-hacks
+                        ido-ubiquitous
+                        ido-vertical-mode
+                        ido-yes-or-no
+                        indent-guide
+                        javap-mode
+                        jgraph-mode
+                        jtags
+                        latex-extra
+                        latex-pretty-symbols
+                        latex-preview-pane
+                        leuven-theme
+                        magic-latex-buffer
+                        manage-minor-mode
+                        fringe-helper
+                        math-symbol-lists
+                        mic-paren
+                        mode-icons
+                        names
+                        nav
+                        org
+                        parent-mode
+                        professional-theme
+                        rainbow-delimiters
+                        rainbow-identifiers
+                        rainbow-mode
+                        readline-complete
+                        rich-minority
+                        sentence-highlight
+                        smart-mode-line
+                        smex
+                        smooth-scroll
+                        tabbar
+                        use-package
+                        undo-tree
+                        vlf
+                        writegood-mode
+                        yasnippet
+                        org-beautify-theme
+                        direx
+                        ibuffer-tramp
+                        paradox
+                        diminish
+                        dired-efap
+                        flycheck-package
+                        latex-math-preview
+                        move-text
+                        whitespace-cleanup-mode
+                        powerline
+                        smart-mode-line-powerline-theme))
 (ensure-packages-install-missing)
 
 
@@ -201,6 +302,7 @@
 (setq display-time-day-and-date t
       display-time-24hr-format nil)
 (display-time)
+(size-indication-mode 1)
 
 
 ;;(highlight-changes-mode 1) ; not very useful usually
@@ -216,8 +318,7 @@
       font-lock-support-mode 'jit-lock-mode ; jit locking is better than fast-lock and lazy-lock
       jit-lock-stealth-time 10
       jit-lock-defer-contextually t
-      jit-lock-stealth-nice 0.5
-      )
+      jit-lock-stealth-nice 0.5)
 
 
 ;; achievements
@@ -228,8 +329,7 @@
 ;; undo-tree (visualize with C-x u)
 (setq undo-tree-mode-lighter ""
       undo-tree-visualizer-timestamps t
-      undo-tree-visualizer-diff t
-      )
+      undo-tree-visualizer-diff t)
 (global-undo-tree-mode 1)
 
 
@@ -265,8 +365,7 @@
 
 
 (setq completion-ignore-case t ; ignore case when completing
-      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
-      )
+      read-file-name-completion-ignore-case t) ; ignore case when reading a file name completion
 
 
 ;; dim the ignored part of the file name
@@ -380,8 +479,7 @@
       ido-use-virtual-buffers t
       ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                            "*Messages*" "Async Shell Command")
-      ido-enable-tramp-completion t
-      ) 
+      ido-enable-tramp-completion t)
 
 (ido-mode 1)
 (ido-at-point-mode 1) ;; M-tab to start completion
@@ -396,8 +494,7 @@
       recentf-max-saved-items 50 ; keep track of last xx files
       recentf-auto-cleanup 'never
       recentf-exclude '("/tmp/") ; "/ssh:"
-      recentf-filename-handlers '(abbreviate-file-name) ; save file names relative to my current home directory
-      ) 
+      recentf-filename-handlers '(abbreviate-file-name)) ; save file names relative to my current home directory
 (recentf-mode 1)
 
 
@@ -409,8 +506,7 @@
 ;; whitespace
 (setq-default indicate-empty-lines nil ; show empty lines after buffer end
               ;;show-trailing-whitespace t
-              whitespace-style '(spaces tabs newline space-mark tab-mark newline-mark)
-              )
+              whitespace-style '(spaces tabs newline space-mark tab-mark newline-mark))
 
 ;; (add-hook 'before-save-hook 'whitespace-cleanup-mode)
 ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
@@ -474,8 +570,7 @@
       dired-recursive-deletes 'always ; single prompt for all n directories
       ;;delete-by-moving-to-trash t
       dired-recursive-copies 'always
-      dired-listing-switches "-aBhl --si --group-directories-first"
-      )
+      dired-listing-switches "-aBhl --si --group-directories-first")
 (setq-default diredp-hide-details-initially-flag nil)
 (autoload 'dired-jump "dired-x"
   "Jump to dired buffer corresponding to current buffer."
@@ -528,8 +623,7 @@
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
 (eval-after-load "icomplete" '(progn (paradox-require 'icomplete+)))
 (setq icomplete-prospects-height 2
-      icomplete-compute-delay 0
-      )
+      icomplete-compute-delay 0)
 ;;(icy-mode 1) ; icicles
 
 
@@ -601,7 +695,7 @@
 
 ;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline")
-(setq powerline-arrow-shape 'arrow) ; curve, arrow, half
+(setq powerline-arrow-shape 'arrow14) ; curve, arrow, half, arrow14
 (paradox-require 'powerline)
 
 ;; flat-looking mode-line
@@ -650,8 +744,7 @@
       TeX-parse-self t ; enable parse on load
       TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
       TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
-      TeX-auto-untabify t 
-      )
+      TeX-auto-untabify t)
 
 (setq reftex-plug-into-AUCTeX t
       reftex-cite-format 'abbrv
@@ -677,8 +770,7 @@
 (setq explicit-shell-file-name "fish"
       ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
       sh-basic-offset 4
-      sh-indent-comment t
-      )
+      sh-indent-comment t)
 (setq comint-process-echoes t)
 ;; setup auto-completion framework
 (push 'company-readline company-backends)
@@ -740,8 +832,7 @@
       org-src-fontify-natively t ; code block fontification using the major-mode of the code
       org-src-preserve-indentation t
       org-src-window-setup 'current-window 
-      org-fontify-whole-heading-line t
-      )
+      org-fontify-whole-heading-line t)
 ;; requite org-latex so that the following variables are defined
 (paradox-require 'ox-latex)
 
@@ -894,7 +985,7 @@ If region is active, apply to active region instead."
  '(display-time-mode t)
  '(scroll-bar-mode 1)
  '(show-paren-mode t)
- '(size-indication-mode t)
+ ;; '(size-indication-mode t)
  '(tool-bar-mode nil)
  '(vlf-application (quote dont-ask)))
 
@@ -904,8 +995,9 @@ If region is active, apply to active region instead."
 ;;  ;; If you edit it by hand, you could mess it up, so be careful.
 ;;  ;; Your init file should contain only one such instance.
 ;;  ;; If there is more than one, they won't work right.
-;;  '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
-;;  '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil))))
+;;  ;; '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
+;;  ;; '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil))))
+;;  ;; '(region ((t (:inherit nil :background "RoyalBlue4"))))
 ;;  )
 
 
