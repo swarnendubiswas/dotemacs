@@ -1,183 +1,92 @@
-;;; init.el starts here
+;;; init.el --- Emacs customization ;;; -*- lexical-binding: t; -*-
 ;; Swarnendu Biswas
-;; Mon Feb  9 12:35:49 EST 2015
 
-;; Notes: To evaluate an Sexp, just go to the end of the sexp and type \C-x \C-e, instead of evaluating the whole buffer
+;;; Commentary:
+
+;; Notes: To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the whole buffer
 ;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
 ;; cheaper alternative is to use "autoload".
 
 ;; Interesting quotes (inspired from http://www.mygooglest.com/fni/dot-emacs.html):
 ;;
-;;  "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk
-;;  "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
+;;   "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk
+;;
+;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
 ;;    the editor should get used to us." -- Vivek Haldar in "New frontiers in text editing".
-;;  "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
+;;
+;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
 ;;    McGrath
-;;  "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
-;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning 
+;;
+;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
+;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning
 ;;    was the Command Line"
-;;  "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
+;;
+;;   "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
 ;;    and they're probably right..." -- Jerry Coffin (on indentation)
-;;  "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton
-;;  "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
+;;
+;;   "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton
+;;
+;;   "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
 ;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." -- Steve
 ;;    McConnell
-;;  "What I don't understand is: why should you ever care how your editor looks, unless you're trying to win a
+;;
+;;   "What I don't understand is: why should you ever care how your editor looks, unless you're trying to win a
 ;;    screenshot competition? The primary factor in looking good should be the choice of a good font at a comfortable
 ;;    size, and a syntax coloring theme that you like. And that is not something specific to an editor. Editors like
 ;;    Emacs and vi have almost no UI! If Emacs is configured right, the only UI it has is the modeline and the
 ;;    minibuffer." -- Vivek Haldar in "New frontiers in text editing".
+;;
+;;   "Good code is like a good joke - it needs no explanation." -- Russ Olsen
 
 ;;; Code:
 
 
 ;; customizing packages
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+;; FIXME: Why does this not work?
+;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(add-to-list 'load-path "~/.emacs.d/lisp/")
 
+(require 'packages-init)
+
+
+
+(require 'ido-init)
+(require 'anzu-init)
+(require 'abbrev-init)
+(require 'ace-jump-init)
+(require 'anzu-init)
+(require 'appearance-init)
+(require 'buffer-init)
+(require 'c-init)
+(require 'company-init)
+(require 'custom-init)
+(require 'defaults-init)
+(require 'dired-init)
+(require 'fci-init)
+(require 'flycheck-init)
+(require 'guide-key-init)
+(require 'indent-init)
+(require 'java-init)
+(require 'keybindings-init)
+(require 'latex-init)
+(require 'misc-init)
+(require 'mode-line-init)
+(require 'org-init)
+(require 'parens-init)
+(require 'prog-init)
+(require 'rainbow-init)
+(require 'recent-init)
+(require 'shell-init)
+(require 'smex-init)
+(require 'spell-init)
+(require 'text-init)
+(require 'undo-tree-init)
+(require 'user-init)
+(require 'yasnippet-init)
 
 ;; customize appearance
 
 ;; Package specific
-
-
-;; ace-jump-buffer
-;; leave out certain buffer based on file name patterns
-;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
-(defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
-  "*Buffer regexps to always show when buffer switching.")
-(defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$")
-  "*Buffer regexps to never show when buffer switching.")
-(defvar my-ido-ignore-dired-buffers nil
-  "*If non-nil, buffer switching should ignore dired buffers.")
-(defun my-bs-str-in-regexp-list (str regexp-list)
-  "Return non-nil if str matches anything in regexp-list."
-  (let ((case-fold-search nil))
-    (catch 'done
-      (dolist (regexp regexp-list)
-        (when (string-match regexp str)
-          (throw 'done t))))))
-(defun my-bs-ignore-buffer (name)
-  "Return non-nil if the named buffer should be ignored."
-  (or (and (not (my-bs-str-in-regexp-list name my-bs-always-show-regexps))
-           (my-bs-str-in-regexp-list name my-bs-never-show-regexps))
-      (and my-ido-ignore-dired-buffers
-           (save-excursion
-             (set-buffer name)
-             (equal major-mode 'dired-mode)))))
-(setq bs-configurations
-      '(("all" nil nil nil nil nil)
-        ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
-(setq bs-cycle-configuration-name "files")
-(setq-default ajb-bs-configuration "files")
-
-
-
-
-;; whitespace
-(setq-default indicate-empty-lines t
-              show-trailing-whitespace t)
-;; (add-hook 'before-save-hook 'whitespace-cleanup)
-;;(setq whitespace-style '(face empty tabs lines-tail trailing))
-;;(setq whitespace-style '(face empty tabs lines-tail))
-;;(set-face-attribute 'whitespace-line nil
-;;                    :background "red1"
-;;                    :foreground "yellow"
-;;                    :weight 'bold)
-;;(global-whitespace-mode t)
-
-
-;; uniquify
-;;(setq uniquify-separator ":")
-;; options: post-forward, reverse, forward
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
-      uniquify-after-kill-buffer-p t)
-
-
-;; directory navigation
-(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
-;;(nav-mode) ; always start in navigation mode
-;;(nav-disable-overeager-window-splitting)
-
-
-(icomplete-mode 1) ; incremental minibuffer completion/suggestions
-(eval-after-load "icomplete" '(progn (require 'icomplete+)))
-(setq icomplete-prospects-height 2
-      icomplete-compute-delay 0
-      )
-
-
-;; save minibuffer histories across sessions
-(setq savehist-additional-variables    
-      '(kill-ring search-ring regexp-search-ring)    
-      savehist-file "~/.emacs.d/savehist") 
-(savehist-mode 1)
-
-
-;; yasnippet
-;;(yas-global-mode 1)
-;;(yas-reload-all 1) ; this slows startup
-
-
-;; specific major mode hooks
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ajb-bs-configuration "files")
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
- '(column-number-mode t)
- '(custom-safe-themes
-   (quote
-    ("b98666d27e294e536e61320317c1736e6614317c4bffcd542556b8c6826d45c3" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "9dae95cdbed1505d45322ef8b5aa90ccb6cb59e0ff26fef0b8f411dfc416c552" "87755ed88c91cd87ee37b666b82edeb382b3a3a6191078a56bec558ebf8a58d9" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "987b709680284a5858d5fe7e4e428463a20dfabe0a6f2a6146b3b8c7c529f08b" "e35ef4f72931a774769da2b0c863e11d94e60a9ad97fb9734e8b28c7ee40f49b" "930a202ae41cb4417a89bc3a6f969ebb7fcea5ffa9df6e7313df4f7a2a631434" "acb039d6f2c41b3bd852b448351b2979f44ef488026c95dd5228d2f6da57f574" default)))
- '(diredp-hide-details-initially-flag nil t)
- '(display-time-mode t)
- '(scroll-bar-mode 1)
- '(show-paren-mode t)
- '(size-indication-mode t)
- '(tool-bar-mode nil)
- '(vlf-application (quote dont-ask)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:background nil)))))
-
-;; temporary stuff
-
-;; (add-to-list 'file-name-handler-alist '("\\.class$" . javap-handler))
-
-;; (defun javap-handler (op &rest args)
-;;   "Handle .class files by putting the output of javap in the buffer."
-;;   (cond
-;;    ((eq op 'get-file-buffer)
-;;     (let ((file (car args)))
-;;       (with-current-buffer (create-file-buffer file)
-;;         (call-process "javap" nil (current-buffer) nil "-c -private"
-;;                       "-classpath" (file-name-directory file)
-;;                       (file-name-sans-extension
-;;                        (file-name-nondirectory file)))
-;;         (setq buffer-file-name file)
-;;         (setq buffer-read-only t)
-;;         (set-buffer-modified-p nil)
-;;         (goto-char (point-min))
-;;         (java-mode)
-;;         (current-buffer))))
-;;    ((javap-handler-real op args))))
-
-;; (defun javap-handler-real (operation args)
-;;   "Run the real handler without the javap handler installed."
-;;   (let ((inhibit-file-name-handlers
-;;          (cons 'javap-handler
-;;                (and (eq inhibit-file-name-operation operation)
-;;                     inhibit-file-name-handlers)))
-;;         (inhibit-file-name-operation operation))
-;;     (apply operation args)))
 
 
 ;;; init.el ends here
