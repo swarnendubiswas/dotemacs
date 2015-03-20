@@ -5,17 +5,20 @@
 
 ;;; Code:
 
-(use-package flycheck-color-mode-line-cookie
+(use-package flycheck-color-mode-line
              :ensure t
              :defer t
-             :idle (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
-             )
+  :config (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
 (use-package flycheck
              :ensure t
              :defer t
-             :idle (global-flycheck-mode 1)
-             )
+  :init (global-flycheck-mode 1)
+  :config (use-package flycheck-package))
+
+(use-package flycheck-tip
+  :ensure t
+  :disabled t)
 
 (provide 'flycheck-init)
 

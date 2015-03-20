@@ -771,8 +771,8 @@
 (setq explicit-shell-file-name "fish"
       ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
       sh-basic-offset 4
-      sh-indent-comment t)
-(setq comint-process-echoes t)
+      sh-indent-comment t
+	    comint-process-echoes t)
 ;; setup auto-completion framework
 (push 'company-readline company-backends)
 (add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
@@ -833,14 +833,12 @@
       org-src-fontify-natively t ; code block fontification using the major-mode of the code
       org-src-preserve-indentation t
       org-src-window-setup 'current-window 
-      org-fontify-whole-heading-line t)
+      org-fontify-whole-heading-line t
+	    org-latex-listings t) ;; tell org to use listings
 ;; requite org-latex so that the following variables are defined
 (paradox-require 'ox-latex)
 
-;; tell org to use listings
-(setq org-latex-listings t)
-
-;; you must include the listings package
+;; include the listings package
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 
 ;; if you want colored source code then you need to include the color package

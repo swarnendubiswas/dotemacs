@@ -12,10 +12,8 @@
              (progn
                (setq-default fci-rule-column 120)
                (setq fci-handle-truncate-lines nil
-                     ;; fci-rule-width 1
-                     )
-               )
-             )
+                     fci-rule-width 1
+		     fci-rule-color "grey40")))
 
 ;; fci
 ;;(define-globalized-minor-mode

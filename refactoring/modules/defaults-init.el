@@ -10,8 +10,7 @@
       inhibit-startup-screen t
       inhibit-splash-screen t
       initial-scratch-message nil
-      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
-      ) 
+      initial-major-mode 'text-mode) ; *scratch* is in Lisp interaction mode by default, use text mode instead
 (setq-default major-mode 'text-mode)
 
 
@@ -24,7 +23,7 @@
 (setq require-final-newline t ; always end a file with a newline
       sentence-end-double-space nil)
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(set-face-attribute 'default nil :height 110) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+(set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 
 ;; we need to paste something from another program, but sometimes we do real paste after some kill
 ;; action, that will erase the clipboard, so we need to save it to kill ring.
@@ -41,8 +40,7 @@
 (global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
 (setq-default auto-revert-interval 5 ; default is 5 s
               auto-revert-verbose nil
-              global-auto-revert-non-file-buffers t ; auto-refresh dired buffers
-              ) 
+              global-auto-revert-non-file-buffers t) ; auto-refresh dired buffers
 
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
@@ -52,8 +50,7 @@
 ;; search
 (setq search-highlight t ; highlight incremental search
       query-replace-highlight t ; highlight during query
-      case-fold-search t ; make search ignore case
-      )
+      case-fold-search t) ; make search ignore case
 
 
 ;; tramp
@@ -68,8 +65,8 @@
 
 
 (setq completion-ignore-case t ; ignore case when completing
-      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
-      )
+      read-file-name-completion-ignore-case t) ; ignore case when reading a file name completion
+
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
@@ -86,7 +83,6 @@
 ;; don't defer screen updates when performing operations
 (setq redisplay-dont-pause t) 
 
-(setq-default major-mode 'text-mode)
 
 ;; fontification
 (global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
@@ -95,10 +91,11 @@
       font-lock-support-mode 'jit-lock-mode ; jit locking is better than fast-lock and lazy-lock
       jit-lock-stealth-time 10
       jit-lock-defer-contextually t
-      jit-lock-stealth-nice 0.5
-      )
+      jit-lock-stealth-nice 0.5)
+
 
 ;;(highlight-changes-mode 1) ; not very useful usually
+
 
 ;; saveplace: remember cursor position in files
 (setq-default save-place t)

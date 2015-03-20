@@ -5,11 +5,12 @@
 
 ;;; Code:
 
-(use-package anzu-mode
+(use-package anzu
              :ensure t
              :defer t
              :diminish anzu-mode
-             :idle (global-anzu-mode 1)
-             )
+             :config (global-anzu-mode 1))
+
+(provide 'anzu-init)
 
 ;;; anzu-init.el ends here

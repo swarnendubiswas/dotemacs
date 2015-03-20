@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;;  line and column numbers
-(global-hl-line-mode 1) ; highlight current line, turn it on for all modes by default
+;;(global-hl-line-mode 1) ; highlight current line
 (global-linum-mode 1) ; display line numbers in margin
 (column-number-mode 1)
 
@@ -21,21 +21,24 @@
       display-time-24hr-format nil)
 (display-time)
 
-(usepackage hlinum
+(use-package hlinum
             :ensure t
-            :init (hlinum-activate) ; extension to linum-mode to highlight current line number in the margin
-            )
+            :init (hlinum-activate)) ; extension to linum-mode to highlight current line number in the margin
+
 
 ;; these are two nice themes: leuven and professional
 (use-package leuven-theme
              :ensure t
-             :init (load-theme 'leuven t)
-             )
+             ;;:init (load-theme 'leuven t)
+	     :disabled t)
 
 (use-package professional-theme
              :ensure t
-             :disabled t
-             )
+             :disabled t)
+
+(use-package eclipse-theme
+	     :ensure t
+	     :init (require 'eclipse-theme))
 
 (set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-empty-lines t ; show empty lines after buffer end

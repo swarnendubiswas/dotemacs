@@ -6,19 +6,14 @@
 ;;; Code:
 
 ;; visualize with C-x u
-
 (use-package undo-tree
              :ensure t
              :defer t
-             :idle (global-undo-tree-mode 1)
+  :init (global-undo-tree-mode 1)
              :config
-             (progn
                (setq undo-tree-mode-lighter ""
                      undo-tree-visualizer-timestamps t
-                     undo-tree-visualizer-diff t
-                     )
-               )
-             )
+        undo-tree-visualizer-diff t))
 
 (provide 'undo-tree-init)
 

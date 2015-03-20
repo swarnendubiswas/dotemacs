@@ -1,3 +1,10 @@
+;;; custom-init.el --- Part of emacs initialization
+
+;;; Commentary:
+;; Contains custom or temporary defintions.
+
+;;; Code:
+
 ;; custom functions
 
 ;; kill all non-special buffers but the current one
@@ -26,3 +33,7 @@ If region is active, apply to active region instead."
        (apply #'max range)))
     (forward-line 1)
     (back-to-indentation)))
+
+(provide 'custom-init)
+
+;;; custom-init.el ends here

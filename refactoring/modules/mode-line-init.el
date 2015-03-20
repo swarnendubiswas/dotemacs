@@ -7,15 +7,22 @@
 
 ;; smart mode line
 
+
+(use-package powerline
+  :ensure t
+  :disabled t
+  :config (powerline-default-theme))
+
 (use-package smart-mode-line-powerline-theme
              :ensure t
-             :disable t
-             )
+  :disabled t)
+
 
 (use-package smart-mode-line
              :ensure t
              :defer t
-             :idle
+  :disabled t
+  :config
              (progn
                (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
                      ;; sml/name-width 20
@@ -26,6 +33,12 @@
                (sml/setup)
                )
              )
+
+;; use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
+(add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline/")
+(setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
+(paradox-require 'powerline)
+(set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)
 
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)

@@ -1,7 +1,13 @@
+;;; ido-init.el --- Part of emacs initialization
+
+;;; Commentary:
+;; Configure ido
+
+;;; Code:
+
 (use-package ido
              :ensure t
-             :config
-             (progn
+             :init
                (setq ido-everywhere t
                      ido-enable-flex-matching t
                      ido-enable-prefix nil
@@ -18,46 +24,45 @@
                      ido-use-faces nil ; disable ido faces to see flx highlights
                      ido-use-virtual-buffers t
                      ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
-                                          "*Messages*" "Async Shell Command")
-                     )
-               )
-             :init (ido-mode 1)
-             )
+			     "*Messages*" "Async Shell Command"))
+  :config (ido-mode 1))
 
 (use-package ido-vertical-mode
              :ensure t
-             :init (ido-vertical-mode 1)
-             )
+  :config (ido-vertical-mode 1))
 
 (use-package ido-yes-or-no
              :ensure t
-             )
+  :defer t)
 
 (use-package ido-hacks
              :ensure t
-             )
+  :defer t)
 
 (use-package ido-ubiquitous
              :ensure t
-             :init (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
-             )
+  :config (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
+  :defer t)
 
 (use-package ido-better-flex
              :ensure t
-             :init (ido-better-flex/enable)
-             )
+  :defer t
+  :config (ido-better-flex/enable))
 
 (use-package ido-better-flex
              :ensure t
-             )
+  :defer t)
 
 (use-package ido-at-point
              :ensure t
-             :init (ido-at-point-mode 1)
-             )
+  :defer t
+  :config (ido-at-point-mode 1))
 
 (use-package flx-ido
              :ensure t
              :init (flx-ido-mode 1) ; smarter fuzzy matching for ido
-             )
+  :defer t)
 
+(provide 'ido-init)
+
+;;; ido-init.el ends here

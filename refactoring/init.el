@@ -44,48 +44,61 @@
 ;; customizing packages
 ;; FIXME: Why does this not work?
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'load-path "~/.emacs.d/lisp/") ; hird-party packages
+(add-to-list 'load-path "~/.emacs.d/modules/") ; personal modules for customizing emacs initialization
 
 ;; setup the packaging system
 (require 'packages-init)
 
 ;; now setup other modules in certain order
 
+;; user and appearance defaults
 (require 'user-init)
 (require 'defaults-init)
 (require 'appearance-init)
+(require 'mode-line-init)
+
+
+;; configure power packages
 (require 'buffer-init)
 (require 'dired-init)
 (require 'company-init)
 (require 'ido-init)
 
+;; configure the more useful extensions
 (require 'anzu-init)
-(require 'abbrev-init)
+(require 'smex-init)
 (require 'ace-jump-init)
 
-(require 'shell-init)
+;; setup helper packages
+(require 'abbrev-init)
+(require 'fci-init)
+(require 'indent-init)
+(require 'parens-init)
+(require 'recentf-init)
+
+(require 'spell-init)
+(require 'flycheck-init)
+
+(require 'misc-init)
+
+(require 'guide-key-init)
+(require 'rainbow-init)
+(require 'undo-tree-init)
+(require 'yasnippet-init)
+
+;; configure individual programming or major modes
+(require 'text-init)
+(require 'latex-init)
+(require 'org-init)
 (require 'prog-init)
 (require 'c-init)
 (require 'java-init)
-(require 'org-init)
-(require 'latex-init)
+(require 'shell-init)
 
-(require 'custom-init)
-
-(require 'fci-init)
-(require 'flycheck-init)
-(require 'guide-key-init)
-(require 'indent-init)
 (require 'keybindings-init)
-(require 'misc-init)
-(require 'mode-line-init)
-(require 'parens-init)
-(require 'rainbow-init)
-(require 'recent-init)
-(require 'smex-init)
-(require 'spell-init)
-(require 'text-init)
-(require 'undo-tree-init)
-(require 'yasnippet-init)
+
+;; custom definitions
+(require 'custom-init)
 
 ;;; init.el ends here

@@ -9,11 +9,9 @@
              :ensure t
              :defer t
              :diminish yas-minor-mode
-             :commands yas-global-mode
-             :idle
-             (progn
+  :init
                (yas-global-mode 1)
-               )
+  ;;(yas-reload-all 1) ; this slows startup
              )
 
 (provide 'yasnippet-init)
