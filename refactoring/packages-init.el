@@ -5,13 +5,14 @@
 
 ;;; Code:
 
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")))
-(setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
+(setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
+      package-enable-at-startup nil)
+(add-to-list 'package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                                 ("melpa" . "http://melpa.milkbox.net/packages/")
+                                 ("marmalade" . "http://marmalade-repo.org/packages/")))
 (package-initialize)
 
-;; set up use-package
+;; setup use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))

@@ -65,7 +65,7 @@
 (auto-compile-on-load-mode 1)
 (auto-compile-on-save-mode 1)
 (setq auto-compile-display-buffer nil
-      auto-compile-mode-line-counter t)
+      auto-compile-mode-line-counter nil)
 
 
 ;; user details
@@ -254,7 +254,6 @@
 ;; paradox
 (setq paradox-execute-asynchronously t
       paradox-github-token t)
-;;(paradox-upgrade-packages)
 
 
 ;; enable tabbar minor mode
@@ -274,7 +273,6 @@
 (paradox-require 'eclipse-theme)
 ;;(load-theme 'professional t)
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
-;;(set-face-attribute 'region nil :background "RoyalBlue4" :foreground "white")
 (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
 (setq-default indicate-buffer-boundaries 'right)
 
@@ -519,19 +517,21 @@
 
 
 ;; fci
+;;(setq fci-rule-width 1)
+(setq-default fci-rule-column 120)
+(setq fci-handle-truncate-lines nil
+      fci-rule-color "grey40")
 ;;(define-globalized-minor-mode
 ;;  global-fci-mode fci-mode (lambda () (fci-mode 1)))
 ;;(global-fci-mode 1)
-;;(setq fci-rule-width 1)
-(setq-default fci-rule-column 120)
-(setq fci-handle-truncate-lines nil)
 ;; (defun auto-fci-mode (&optional unused)
 ;;   (if (> (frame-width) 120)
 ;;       (fci-mode 1)
 ;;     (fci-mode 0))
 ;;   )
-;;(add-hook 'after-change-major-mode-hook 'auto-fci-mode)
-;;(add-hook 'window-size-change-functions 'auto-fci-mode)
+;; FIXME: This also shows up in the minibuffer
+;;(add-hook 'after-change-major-mode-hook 'fci-mode)
+;;(add-hook 'window-size-change-functions 'fci-mode)
 
 
 ;; uniquify
@@ -549,7 +549,7 @@
 
 
 ;; flycheck
-(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
+;;(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode) ; FIXME: This causes a color bug on mode-line-active
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (eval-after-load 'flycheck '(flycheck-package-setup))
 
@@ -579,7 +579,7 @@
 
 
 ;; directory navigation
-(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
+;;(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
 
@@ -617,7 +617,7 @@
 ;; anzu mode - show number of searches in the mode line
 (global-anzu-mode 1)
 (set-face-attribute 'anzu-mode-line nil
-                    :foreground "yellow" :weight 'bold)
+                    :foreground "darkblue" :weight 'bold)
 
 
 (icomplete-mode 1) ; incremental minibuffer completion/suggestions
@@ -695,8 +695,9 @@
 
 ;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline")
-(setq powerline-arrow-shape 'arrow14) ; curve, arrow, half, arrow14
+(setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
 (paradox-require 'powerline)
+(set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)
 
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :background "grey40" :foreground "white" :box nil)
@@ -715,7 +716,7 @@
 (add-hook 'text-mode-hook 'turn-on-flyspell) ; possibly won't work for extensionless .ascii files
 (add-hook 'text-mode-hook 'writegood-mode)
 (add-hook 'text-mode-hook 'abbrev-mode)
-(add-hook 'text-mode-hook 'fci-mode)
+(add-hook 'text-mode-hook #'fci-mode)
 
 
 ;; latex mode hooks
@@ -788,7 +789,7 @@
 ;;(add-hook 'prog-mode-hook #'rainbow-identifiers-mode)
 ;;(add-hook 'prog-mode-hook (lambda () (yas-reload-all)))
 ;;(add-hook 'prog-mode-hook '(lambda () (yas-minor-mode)))
-(add-hook 'prog-mode-hook 'fci-mode)
+(add-hook 'prog-mode-hook #'fci-mode)
 ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
 ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 

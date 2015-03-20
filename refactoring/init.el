@@ -46,47 +46,46 @@
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
+;; setup the packaging system
 (require 'packages-init)
 
+;; now setup other modules in certain order
 
-
+(require 'user-init)
+(require 'defaults-init)
+(require 'appearance-init)
+(require 'buffer-init)
+(require 'dired-init)
+(require 'company-init)
 (require 'ido-init)
+
 (require 'anzu-init)
 (require 'abbrev-init)
 (require 'ace-jump-init)
-(require 'anzu-init)
-(require 'appearance-init)
-(require 'buffer-init)
+
+(require 'shell-init)
+(require 'prog-init)
 (require 'c-init)
-(require 'company-init)
+(require 'java-init)
+(require 'org-init)
+(require 'latex-init)
+
 (require 'custom-init)
-(require 'defaults-init)
-(require 'dired-init)
+
 (require 'fci-init)
 (require 'flycheck-init)
 (require 'guide-key-init)
 (require 'indent-init)
-(require 'java-init)
 (require 'keybindings-init)
-(require 'latex-init)
 (require 'misc-init)
 (require 'mode-line-init)
-(require 'org-init)
 (require 'parens-init)
-(require 'prog-init)
 (require 'rainbow-init)
 (require 'recent-init)
-(require 'shell-init)
 (require 'smex-init)
 (require 'spell-init)
 (require 'text-init)
 (require 'undo-tree-init)
-(require 'user-init)
 (require 'yasnippet-init)
-
-;; customize appearance
-
-;; Package specific
-
 
 ;;; init.el ends here
