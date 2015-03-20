@@ -63,12 +63,24 @@
 
 (use-package duplicate-thing
   :ensure t
-  :defer t)
+  :defer t
+  :bind ("C-c C-d" . duplicate-thing))
 
+;; setup writegood-mode, identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :ensure t
   :defer t
+  :bind ("C-c g" . writegood-mode)
   :diminish writegood-mode)
+
+(use-package discover-my-major
+  :ensure t
+  :defer t
+  :bind ("C-h C-m" . discover-my-major))
+
+(use-package manage-minor-mode
+  :ensure t
+  :defer t)
 
 (provide 'misc-init)
 

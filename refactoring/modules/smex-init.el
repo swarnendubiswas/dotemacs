@@ -7,14 +7,13 @@
 
 (use-package smex
              :ensure t
-  :commands (smex-initialize)
-  ;; :init
-  ;;            ((smex-initialize) ; this is slow
-  ;;             ;;(autoload 'smex "smex")
-  ;; 	      )
-             ;;:config
-             ;;((setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory)))
-             )
+  ;;:commands (smex-initialize) ; this is slow
+  :init
+  (autoload 'smex "smex")
+  :config
+  (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
+  :bind (("M-x" . smex)
+         ("M-X" . smex-major-mode-commands)))
 
 (provide 'smex-init)
 

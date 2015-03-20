@@ -5,8 +5,10 @@
 
 ;;; Code:
 
-(global-set-key (kbd "RET") 'newline-and-indent)
-(global-set-key (kbd "C-l") 'goto-line)
+;;(global-set-key (kbd "RET") 'newline-and-indent)
+(define-key global-map (kbd "RET") 'newline-and-indent)
+;;(global-set-key (kbd "C-l") 'goto-line)
+(define-key global-map (kbd "C-l") 'goto-line)
 (global-set-key (kbd "C-c z") 'repeat)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "C-x C-\\") 'goto-last-change) ; goto-last-change
@@ -32,16 +34,14 @@
 (global-set-key (kbd "C-c m") 'uncomment-region)
 (global-set-key (kbd "C-c ;") #'comment-line)
 
-;; setting up writegood-mode, identify weasel words, passive voice, and duplicate words
-(global-set-key (kbd "C-c g") 'writegood-mode)
-
-;; define a keyboard shortcut for duplicating lines
-(global-set-key (kbd "C-c C-d") 'duplicate-thing)
+;; move text with M-up and M-down like eclipse
+(move-text-default-bindings)
 
 ;; buffers
 (global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
 (global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
-(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+;;(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+(global-set-key [f8] 'recentf-open-files)
 
 (global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
 (global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
@@ -49,9 +49,6 @@
 (define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
 (global-set-key (kbd "M-b") 'ace-jump-buffer)
-
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 ;; dired
 (global-set-key (kbd "C-x C-j") #'dired-jump)
@@ -78,21 +75,16 @@
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (when (auto-highlight-symbol-mode)
   (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
-  )
+  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil))
 (add-hook 'org-mode-hook 
           (lambda ()
             (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
-            (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)
-            ))
+            (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)))
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
 
 ;; up and down keys to navigate options, left and right to move through history/directories
 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-
-(global-set-key (kbd "C-h C-m") 'discover-my-major)
-
 
 (provide 'keybindings-init)
 
