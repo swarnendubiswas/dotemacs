@@ -16,6 +16,9 @@
       ibuffer-sorting-mode 'recency
       ibuffer-use-header-line t)
 
+(use-package ibuffer-tramp
+  :ensure t
+  :defer t)
 
 (provide 'buffer-init)
 

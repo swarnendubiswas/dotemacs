@@ -14,10 +14,7 @@
 (setq-default major-mode 'text-mode)
 
 
-;; better frame titles
-;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
-(setq frame-title-format
-      (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
+(setq load-prefer-newer t)
 
 
 (setq require-final-newline t ; always end a file with a newline

@@ -42,15 +42,17 @@
 
 
 ;; customizing packages
+
+(setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
+      package-enable-at-startup nil)
+
 ;; FIXME: Why does this not work?
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
-
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")))
-(setq package-user-dir (expand-file-name "~/.emacs.d/elpa"))
+;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
 
 
@@ -230,6 +232,7 @@
                         smart-mode-line
                         smex
                         smooth-scroll
+                        smooth-scrolling
                         tabbar
                         use-package
                         undo-tree

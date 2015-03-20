@@ -4,22 +4,24 @@
 ;; Miscellaneous configurations
 
 ;;; Code:
-;; (use-package smooth-scroll
-;;   :ensure t
-;;   :init (smooth-scroll-mode 1))
 
-;; (use-package auto-compile
-;;   :ensure t
-;;   :init ((auto-compile-on-load-mode 1)
-;;          (auto-compile-on-save-mode 1))
-;;   :config
-;;   (setq auto-compile-display-buffer nil
-;;         auto-compile-mode-line-counter nil
-;;         setq load-prefer-newer t))
+(use-package smooth-scrolling
+  :ensure t
+  :init (require 'smooth-scrolling))
+
+(use-package auto-compile
+  :ensure t
+  :config
+  (progn 
+    (setq auto-compile-display-buffer nil
+          auto-compile-mode-line-counter nil)
+    (auto-compile-on-load-mode 1)
+    (auto-compile-on-save-mode 1)))
 
 (use-package achievements
              :ensure t
   :disabled t
+  :diminish achievements-mode
              :init (achievements-mode 1)
   :config (setq achievements-idle-time 600)) ; seconds
 
@@ -54,6 +56,19 @@
 (use-package fish-mode
              :ensure t
   :disabled t)
+
+(use-package move-text
+  :ensure t
+  :defer t)
+
+(use-package duplicate-thing
+  :ensure t
+  :defer t)
+
+(use-package writegood-mode
+  :ensure t
+  :defer t
+  :diminish writegood-mode)
 
 (provide 'misc-init)
 

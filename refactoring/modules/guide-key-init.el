@@ -8,6 +8,7 @@
 (use-package guide-key
              :ensure t
              :defer t
+  :diminish guide-key-mode
              :config (setq guide-key/guide-key-sequence t
                            guide-key/recursive-key-sequence-flag t
                 guide-key/popup-window-position 'bottom)

@@ -13,6 +13,7 @@
 (use-package aggressive-indent
              :ensure t
              :defer t
+  :diminish aggressive-indent-mode
              :init (global-aggressive-indent-mode 1))
 
 (use-package auto-indent-mode

@@ -5,6 +5,11 @@
 
 ;;; Code:
 
+;; better frame titles
+;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
+(setq frame-title-format
+      (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
+
 ;;  line and column numbers
 ;;(global-hl-line-mode 1) ; highlight current line
 (global-linum-mode 1) ; display line numbers in margin
@@ -40,10 +45,9 @@
 	     :ensure t
 	     :init (require 'eclipse-theme))
 
-(set-face-background 'fringe "white") ; hide the fringe mark on the left
-(setq-default indicate-empty-lines t ; show empty lines after buffer end
-              indicate-buffer-boundaries 'right)
-
+;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
+(set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+(setq-default indicate-buffer-boundaries 'right)
 
 (provide 'appearance-init)
 

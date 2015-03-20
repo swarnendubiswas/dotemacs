@@ -12,6 +12,9 @@
 ;;(quietly-read-abbrev-file)
 (add-hook 'text-mode-hook 'abbrev-mode)
 
+(eval-after-load "abbrev"
+  '(diminish 'abbrev-mode))
+
 (provide 'abbrev-init)
 
 ;;; abbrev-init.el ends here

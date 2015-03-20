@@ -10,6 +10,9 @@
 ;; speed up aspell: ultra | fast | normal
 (setq ispell-extra-args '("--sug-mode=normal"))
 
+(eval-after-load "flyspell"
+  '(diminish 'flyspell-mode))
+
 (provide 'spell-init)
 
 ;;; spell-init.el ends here

@@ -58,20 +58,21 @@
       TeX-parse-self t ; enable parse on load
       TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
       TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
-      TeX-auto-untabify t)
+      TeX-auto-untabify t
+      latex-run-command "latexmk")
+(setq-default TeX-master nil ; query for master file
+              TeX-command-default "LatexMk")
 
+(auctex-latexmk-setup) ; add support for latexmk
 
 (setq reftex-plug-into-AUCTeX t
       reftex-cite-format 'abbrv
       reftex-save-parse-info t
       reftex-use-multiple-selection-buffers t
       reftex-enable-partial-scans t)
-(setq-default TeX-master nil) ; query for master file
 
-(setq latex-run-command "latexmk")
-(setq-default TeX-command-default "LatexMk")
-
-(auctex-latexmk-setup) ; add support for latexmk
+(eval-after-load "reftex"
+  '(diminish 'reftex-mode))
 
 ;;(latex-preview-pane-enable) ; current does not support multi-file parsing
 
