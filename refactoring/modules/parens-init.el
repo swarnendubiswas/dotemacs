@@ -11,7 +11,13 @@
 (when (fboundp 'show-paren-mode)
   (show-paren-mode 1) ; highlight matching parentheses when the point is on them
   (make-variable-buffer-local 'show-paren-mode))
-(setq-default flyparens-mode t) ; highlight/track mismatched parentheses
+
+; highlight/track mismatched parentheses
+(use-package flyparens
+  :ensure t
+  :defer t
+  :config
+  (flyparens-mode))
 
 (use-package smartparens
              :ensure t

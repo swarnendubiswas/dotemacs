@@ -17,7 +17,6 @@
              :ensure t
   :disabled t)
 
-
 (use-package smart-mode-line
              :ensure t
              :defer t
@@ -30,9 +29,7 @@
                      sml/shorten-modes t
                      sml/shorten-directory t
                      )
-               (sml/setup)
-               )
-             )
+    (sml/setup)))
 
 ;; use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
 (add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline/")

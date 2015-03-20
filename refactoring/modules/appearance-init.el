@@ -45,6 +45,10 @@
 	     :ensure t
 	     :init (require 'eclipse-theme))
 
+(use-package fringe-helper
+  :ensure t
+  :disabled t)
+
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
 (setq-default indicate-buffer-boundaries 'right)

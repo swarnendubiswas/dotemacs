@@ -10,7 +10,9 @@
 (require 'dired) ; needed for dired-mode-map
                (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
                      dired-recursive-deletes 'always ; single prompt for all n directories
-      dired-recursive-copies 'always)
+      dired-recursive-copies 'always
+      ;;delete-by-moving-to-trash t
+      dired-listing-switches "-aBhl --si --group-directories-first")
                (setq-default diredp-hide-details-initially-flag nil)
 
   ;; ((add-hook 'dired-load-hook ; dired-load-hook
@@ -55,6 +57,11 @@
 (use-package dired-hacks-utils
              :ensure t
              :defer t)
+
+;; directory navigation
+;;(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
+;;(nav-mode) ; always start in navigation mode
+;;(nav-disable-overeager-window-splitting)
 
 (provide 'dired-init)
 

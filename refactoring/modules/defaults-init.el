@@ -42,7 +42,6 @@
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 (transient-mark-mode 1) ; enable visual feedback on selections, default since v23
-(global-hungry-delete-mode 1) ; erase 'all' consecutive white space characters in a given direction
 
 ;; search
 (setq search-highlight t ; highlight incremental search
@@ -96,6 +95,21 @@
 
 ;; saveplace: remember cursor position in files
 (setq-default save-place t)
+
+; incremental minibuffer completion/suggestions
+(icomplete-mode 1)
+(use-package icomplete+
+  :ensure t
+  :defer t)
+(setq icomplete-prospects-height 2
+      icomplete-compute-delay 0)
+;;(icy-mode 1) ; icicles
+
+;; save minibuffer histories across sessions
+(setq savehist-additional-variables    
+      '(kill-ring search-ring regexp-search-ring)    
+      savehist-file "~/.emacs.d/savehist") 
+(savehist-mode 1)
 
 (provide 'defaults-init)
 

@@ -35,6 +35,15 @@ If region is active, apply to active region instead."
     (back-to-indentation)))
 
 ;; tags
+
+(use-package ctags
+  :ensure t
+  :defer t)
+
+(use-package ctags-update
+  :ensure t
+  :defer t)
+
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun create-latex-etags ()

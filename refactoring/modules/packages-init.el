@@ -8,11 +8,11 @@
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
       package-enable-at-startup nil)
+
 ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
-
 
 ;; setup use-package
 (unless (package-installed-p 'use-package)

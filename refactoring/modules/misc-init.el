@@ -43,6 +43,7 @@
              :ensure
   :defer t)
 
+;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
              :ensure t
              :defer t
@@ -79,6 +80,10 @@
   :bind ("C-h C-m" . discover-my-major))
 
 (use-package manage-minor-mode
+  :ensure t
+  :defer t)
+
+(use-package jgraph-mode
   :ensure t
   :defer t)
 

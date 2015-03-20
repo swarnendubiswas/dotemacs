@@ -25,9 +25,17 @@
              :ensure t
   :disabled t)
 
+(use-package latex-math-preview
+  :ensure t
+  :disabled t)
+
 (use-package magic-latex-buffer
              :ensure t
   :disabled t)
+
+(use-package math-symbol-lists
+  :ensure t
+  :defer t)
 
 (use-package bibtex-utils
              :ensure t

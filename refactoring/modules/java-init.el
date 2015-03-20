@@ -17,8 +17,13 @@
           (lambda ()
             (setq c-basic-offset 2
                   c-set-style "java")))
-(autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
-(add-hook 'java-mode-hook 'jtags-mode)
+
+;;(autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
+(use-package jtags
+  :ensure t
+  :defer t
+  :config
+  (add-hook 'java-mode-hook 'jtags-mode))
 
 (provide 'java-init)
 
