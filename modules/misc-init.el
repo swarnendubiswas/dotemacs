@@ -1,7 +1,7 @@
 ;;; misc-init.el --- Part of emacs initialization
 
 ;;; Commentary:
-;; Miscellaneous configurations
+;; Miscellaneous package configurations
 
 ;;; Code:
 
@@ -49,6 +49,7 @@
              :defer t
   :init (global-hungry-delete-mode 1))
 
+;; highlight certain words
 (use-package fixme-mode
              :ensure t
              :defer t
@@ -58,6 +59,7 @@
              :ensure t
   :disabled t)
 
+;; similar to eclipse ide
 (use-package move-text
   :ensure t
   :defer t)
@@ -67,7 +69,7 @@
   :defer t
   :bind ("C-c C-d" . duplicate-thing))
 
-;; setup writegood-mode, identify weasel words, passive voice, and duplicate words
+;; writegood-mode: identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :ensure t
   :defer t
@@ -87,8 +89,14 @@
   :ensure t
   :defer t)
 
+(use-package graphviz-dot-mode
+  :ensure t
+  :defer t)
+
 (use-package goto-last-change
-  :load-path "lisp/"
+  :ensure t
+  :pin melpa
+  ;;:load-path "lisp/" ; prefer melpa
   :defer t
   :bind ("C-x C-\\" . goto-last-change))
 

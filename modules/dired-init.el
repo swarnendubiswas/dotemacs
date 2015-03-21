@@ -22,7 +22,6 @@
   ;;         (lambda ()
   ;;           (load "dired-x"))))
 
-
 ;; (autoload 'dired-jump "dired-x"
 ;;   "Jump to dired buffer corresponding to current buffer."
 ;;   'interactive)

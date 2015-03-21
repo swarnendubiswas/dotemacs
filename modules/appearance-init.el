@@ -53,6 +53,11 @@
 (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
 (setq-default indicate-buffer-boundaries 'right)
 
+(use-package display-theme
+  :ensure t
+  :disabled t
+  :config (display-theme-mode))
+
 (provide 'appearance-init)
 
 ;;; appearance-init.el ends here

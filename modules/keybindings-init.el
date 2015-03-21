@@ -17,9 +17,9 @@
 (global-set-key [f2] 'split-window-vertically)
 (global-set-key [f3] 'split-window-horizontally)
 (global-set-key [f4] 'delete-other-windows)
-(global-set-key [f7] 'other-window) ; switch to the other buffer
+(global-set-key [f5] 'other-window) ; switch to the other buffer
 
-(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
+;;(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
 
 (global-set-key (kbd "M-/") 'hippie-expand)
 
@@ -29,8 +29,8 @@
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (global-set-key (kbd "C-s") 'save-buffer)
 
-(global-set-key (kbd "C-c n") 'comment-region)
-(global-set-key (kbd "C-c m") 'uncomment-region)
+(global-set-key (kbd "C-c n") #'comment-region)
+(global-set-key (kbd "C-c m") #'uncomment-region)
 (global-set-key (kbd "C-c ;") #'comment-line)
 
 ;; move text with M-up and M-down like eclipse

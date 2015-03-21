@@ -6,7 +6,6 @@
 ;;; Code:
 
 (use-package recentf
-  :defer 10
   :commands (recentf-mode)
   :config
 (setq recentf-max-menu-items 15 ; show in recent menu
