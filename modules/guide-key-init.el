@@ -7,12 +7,14 @@
 
 (use-package guide-key
              :ensure t
-             :defer t
+  :commands guide-key-mode
+  :defer 10
   :diminish guide-key-mode
-             :config (setq guide-key/guide-key-sequence t
+  :config
+  (setq guide-key/guide-key-sequence t
                            guide-key/recursive-key-sequence-flag t
                 guide-key/popup-window-position 'bottom)
-  :init (guide-key-mode 1))
+  (guide-key-mode 1))
 
 (use-package guide-key-tip
              :ensure t

@@ -1,7 +1,7 @@
 ;;; packages-init.el --- Part of emacs initialization
 
 ;;; Commentary:
-;; Setup packages.
+;; Setup packages. Inspired from http://www.lunaryorn.com/2015/01/06/my-emacs-configuration-with-use-package.html
 
 ;;; Code:
 

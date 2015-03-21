@@ -7,13 +7,16 @@
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing, otherwise
 ;; you can use C-x d, or 'M-x dired'
-(require 'dired) ; needed for dired-mode-map
+;;(require 'dired) ; needed for dired-mode-map
+
+(use-package dired
+  :config
                (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
                      dired-recursive-deletes 'always ; single prompt for all n directories
       dired-recursive-copies 'always
       ;;delete-by-moving-to-trash t
       dired-listing-switches "-aBhl --si --group-directories-first")
-               (setq-default diredp-hide-details-initially-flag nil)
+  (setq-default diredp-hide-details-initially-flag nil))
 
   ;; ((add-hook 'dired-load-hook ; dired-load-hook
   ;;         (lambda ()
@@ -27,7 +30,8 @@
 
 (use-package dired-x
              :commands (dired-jump)
-             :config (setq dired-bind-jump t))
+  :config (setq dired-bind-jump t)
+  :bind ("C-x C-j" . dired-jump))
 
 
 (use-package direx

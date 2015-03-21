@@ -32,10 +32,13 @@
     (sml/setup)))
 
 ;; use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
-(add-to-list 'load-path "~/.emacs.d/lisp/emacs-powerline/")
+(use-package powerline
+  :ensure t
+  :load-path "lisp/emacs-powerline/"
+  :config
 (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
-(paradox-require 'powerline)
 (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)
+  )
 
 ;; flat-looking mode-line
 ;;(set-face-attribute 'mode-line nil :box nil)

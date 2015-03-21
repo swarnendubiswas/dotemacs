@@ -87,6 +87,11 @@
   :ensure t
   :defer t)
 
+(use-package goto-last-change
+  :load-path "lisp/"
+  :defer t
+  :bind ("C-x C-\\" . goto-last-change))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

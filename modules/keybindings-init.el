@@ -11,7 +11,6 @@
 (define-key global-map (kbd "C-l") 'goto-line)
 (global-set-key (kbd "C-c z") 'repeat)
 (global-set-key (kbd "C-z") 'undo)
-(global-set-key (kbd "C-x C-\\") 'goto-last-change) ; goto-last-change
 
 (global-set-key [f1] 'shell)
 
@@ -51,7 +50,6 @@
 (global-set-key (kbd "M-b") 'ace-jump-buffer)
 
 ;; dired
-(global-set-key (kbd "C-x C-j") #'dired-jump)
 (define-key dired-mode-map (kbd "i") 'ido-find-file)
 ;; jump to home directory
 (global-set-key (kbd "M-<home>")

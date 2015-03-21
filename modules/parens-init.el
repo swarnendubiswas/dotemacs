@@ -23,14 +23,15 @@
              :ensure t
   :disabled t
              :diminish smartparens
-  :init
-  (smartparens-global-mode 1)
-  (show-smartparens-global-mode 1)
+  :commands (smartparens-global-mode show-smartparens-global-mode)
              :config
-             (progn
-    (use-package 'smartparens-config)
-               (add-hook 'emacs-lisp-mode-hook 'smartparens-mode)
-    (add-hook 'emacs-lisp-mode-hook 'show-smartparens-mode)))
+  (use-package 'smartparens-config))
+
+(use-package mic-paren
+  :ensure t
+  :defer 5
+  :config
+  (paren-activate))
 
 ;; (flex-autopair-mode 1)
 

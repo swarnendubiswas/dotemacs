@@ -9,6 +9,8 @@
 (use-package undo-tree
              :ensure t
              :defer t
+  :disabled t
+  ;;:commands global-undo-tree-mode
   :init (global-undo-tree-mode 1)
              :config
                (setq undo-tree-mode-lighter ""

@@ -44,6 +44,9 @@ If region is active, apply to active region instead."
   :ensure t
   :defer t)
 
+(use-package etags
+  :bind ("M-T" . tags-search))
+
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun create-latex-etags ()
