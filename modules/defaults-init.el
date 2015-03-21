@@ -51,8 +51,8 @@
 
 ;; tramp
 (setq tramp-default-method "ssh" ; faster than the default scp
-      tramp-default-user "biswass"
-      tramp-default-host "sunshine.cse.ohio-state.edu")
+      tramp-default-user "XXX"
+      tramp-default-host "XXX")
 ;; disable version control
 (setq vc-ignore-dir-regexp
       (format "\\(%s\\)\\|\\(%s\\)"
