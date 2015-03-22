@@ -17,7 +17,11 @@
                           "/tmp/")) ; "/ssh:"
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name) ; save file names relative to my current home directory
   (use-package recentf-ext
-    :ensure t))
+    :ensure t)
+  :bind ("<f8>" . recentf-open-files))
+
+;;(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+;;(global-set-key [f8] 'recentf-open-files)
 
 (provide 'recentf-init)
 

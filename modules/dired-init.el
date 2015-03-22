@@ -64,6 +64,7 @@
 ;;(add-to-list 'load-path "~/.emacs.d/lisp/emacs-nav-49/")
 ;;(nav-mode) ; always start in navigation mode
 ;;(nav-disable-overeager-window-splitting)
+;;(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
 
 (provide 'dired-init)
 

@@ -11,6 +11,7 @@
 
 (use-package auto-compile
   :ensure t
+  :demand t
   :config
   (progn 
     (setq auto-compile-display-buffer nil
@@ -59,10 +60,11 @@
   :ensure t
   :disabled t)
 
-;; similar to eclipse ide
+;; move text with M-up and M-down like eclipse
 (use-package move-text
   :ensure t
-  :defer t)
+  :defer t
+  :init (move-text-default-bindings))
 
 (use-package duplicate-thing
   :ensure t

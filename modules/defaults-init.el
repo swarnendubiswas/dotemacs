@@ -81,10 +81,11 @@
 ;;(highlight-changes-mode 1) ; not very useful usually
 
 ;; saveplace: remember cursor position in files
-(setq-default save-place t)
+(use-package saveplace
+  :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions
-(icomplete-mode 1)
+;;(icomplete-mode 1)
 (use-package icomplete
   :init (icomplete-mode 1)
   :demand t
@@ -103,6 +104,15 @@
       '(kill-ring search-ring regexp-search-ring)    
       savehist-file "~/.emacs.d/savehist") 
 (savehist-mode 1)
+
+
+;; uniquify
+(use-package uniquify
+  :config
+  ;;(setq uniquify-separator ":")
+  ;; options: post-forward, reverse, forward
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
+        uniquify-after-kill-buffer-p t))
 
 (provide 'defaults-init)
 

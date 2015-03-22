@@ -6,13 +6,16 @@
 ;;; Code:
 
 (use-package ace-jump-mode
-             :ensure t
-             :defer t
-             :init (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
+  :ensure t
+  :defer t
+  :init (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
+  :bind ("C-c C-SPC" . ace-jump-mode))
+
+;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 
 (use-package ace-jump-buffer
-             :ensure t
-             :defer t)
+  :ensure t
+  :defer t)
 
 ;; ace-jump-buffer
 ;; leave out certain buffer based on file name patterns
@@ -43,6 +46,9 @@
         ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
 (setq bs-cycle-configuration-name "files")
 (setq-default ajb-bs-configuration "files")
+
+;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
+(global-set-key (kbd "M-b") 'ace-jump-buffer)
 
 (use-package ace-isearch
              :ensure t

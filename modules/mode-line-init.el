@@ -5,13 +5,13 @@
 
 ;;; Code:
 
-;; smart mode line
-
-
 (use-package powerline
   :ensure t
   ;;:disabled t
-  :config (powerline-default-theme))
+  :config
+  (progn
+    (powerline-default-theme)
+    (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)))
 
 (use-package smart-mode-line
   :ensure t

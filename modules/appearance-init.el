@@ -11,7 +11,6 @@
       (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
 
 ;;  line and column numbers
-(global-hl-line-mode 1) ; highlight current line
 (global-linum-mode 1) ; display line numbers in margin
 (column-number-mode 1)
 
@@ -44,10 +43,13 @@
 
 (use-package eclipse-theme
   :ensure t
-  :init (require 'eclipse-theme)
+  :init (require 'eclipse-theme))
+
+;; highlight current line
+(use-package hl-line
+  :init (global-hl-line-mode 1)
   :config
-  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black"))
 
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-buffer-boundaries 'right)

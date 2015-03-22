@@ -8,9 +8,12 @@
 (use-package ido
   :ensure t
   :demand t
+  :init
+  (progn
+    (ido-mode 1)
+    (ido-everywhere 1))
   :config
-  (setq ido-everywhere t
-        ido-enable-flex-matching t
+  (setq ido-enable-flex-matching t
         ido-enable-prefix nil
         ido-max-prospects 10
         ido-case-fold t
@@ -26,13 +29,15 @@
         ido-use-virtual-buffers t
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              "*Messages*" "Async Shell Command")
-        ido-enable-tramp-completion t)
-  (ido-mode 1))
+        ido-enable-tramp-completion t))
 
 (use-package ido-vertical-mode
   :ensure t
-  :defer t
-  :config (ido-vertical-mode 1))
+  :demand t
+  :config
+  (ido-vertical-mode 1)
+  ;; up and down keys to navigate options, left and right to move through history/directories
+  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right))
 
 (use-package ido-yes-or-no
   :ensure t
@@ -42,9 +47,10 @@
   :ensure t
   :defer t)
 
+;; allow ido-style completion in more places
 (use-package ido-ubiquitous
   :ensure t
-  :config (ido-ubiquitous-mode 1) ; allow ido-style completion in more places
+  :config (ido-ubiquitous-mode 1) 
   :defer t)
 
 (use-package ido-better-flex
@@ -65,7 +71,7 @@
 (use-package flx-ido
   :ensure t
   :disabled t
-  :config (flx-ido-mode 1) 
+  :init (flx-ido-mode 1) 
   :defer t)
 
 (provide 'ido-init)

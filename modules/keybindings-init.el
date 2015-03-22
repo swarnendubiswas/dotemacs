@@ -19,8 +19,6 @@
 (global-set-key [f4] 'delete-other-windows)
 (global-set-key [f5] 'other-window) ; switch to the other buffer
 
-;;(global-set-key [f6] 'nav-toggle) ; set up a quick key to toggle nav
-
 (global-set-key (kbd "M-/") 'hippie-expand)
 
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
@@ -33,21 +31,8 @@
 (global-set-key (kbd "C-c m") #'uncomment-region)
 (global-set-key (kbd "C-c ;") #'comment-line)
 
-;; move text with M-up and M-down like eclipse
-(move-text-default-bindings)
-
 ;; buffers
 (global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
-(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
-;;(global-set-key (kbd "C-x C-r") 'recentf-open-files)
-(global-set-key [f8] 'recentf-open-files)
-
-(global-set-key (kbd "C-S-<f8>") 'flyspell-mode)
-(global-set-key (kbd "C-M-<f8>") 'flyspell-buffer)
-
-(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
-;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
-(global-set-key (kbd "M-b") 'ace-jump-buffer)
 
 ;; dired
 (define-key dired-mode-map (kbd "i") 'ido-find-file)
@@ -80,9 +65,6 @@
             (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)))
 (global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
-
-;; up and down keys to navigate options, left and right to move through history/directories
-(setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
 
 (provide 'keybindings-init)
 
