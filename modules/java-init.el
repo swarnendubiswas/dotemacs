@@ -6,11 +6,11 @@
 ;;; Code:
 
 (use-package javap-mode
-             :ensure t
+  :ensure t
   :defer t)
 
 (use-package autodisass-java-bytecode
-             :ensure t
+  :ensure t
   :defer t)
 
 (add-hook 'java-mode-hook

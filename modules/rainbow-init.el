@@ -6,17 +6,17 @@
 ;;; Code:
 
 (use-package rainbow-mode
-             :ensure t
-  :defer t
+  :ensure t
+  :disabled t
   :config (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package rainbow-identifiers
-             :ensure t
+  :ensure t
   :defer t
   :config (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-delimiters
-             :ensure t
+  :ensure t
   :defer t
   :config (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 

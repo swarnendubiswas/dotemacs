@@ -6,14 +6,14 @@
 ;;; Code:
 
 (use-package fill-column-indicator
-             :ensure t
-             :defer t
-             :config
-             (progn
-               (setq-default fci-rule-column 120)
-               (setq fci-handle-truncate-lines nil
-                     fci-rule-width 1
-		     fci-rule-color "grey40")))
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (setq-default fci-rule-column 120)
+    (setq fci-handle-truncate-lines nil
+          fci-rule-width 1
+          fci-rule-color "grey40")))
 
 ;; fci
 ;;(define-globalized-minor-mode

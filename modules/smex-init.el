@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package smex
-             :ensure t
+  :ensure t
   ;;:commands (smex-initialize) ; this is slow
   :init
   (autoload 'smex "smex")

@@ -19,44 +19,44 @@
     (auto-compile-on-save-mode 1)))
 
 (use-package achievements
-             :ensure t
+  :ensure t
   :disabled t
   :diminish achievements-mode
-             :init (achievements-mode 1)
+  :init (achievements-mode 1)
   :config (setq achievements-idle-time 600)) ; seconds
 
 ;; speed up emacs for large files
 (use-package vlf
-             :ensure t
-             :defer t
+  :ensure t
+  :defer t
   :config
   (progn
     (setq large-file-warning-threshold 50000000)
     (use-package vlf-setup))) ; warn when opening files bigger than 50MB
 
 (use-package tabbar
-             :ensure t
-             :init (tabbar-mode 1)
+  :ensure t
+  :init (tabbar-mode 1)
   :config (setq tabbar-use-images nil)) ; speed up by not using images
 
 (use-package jgraph-mode
-             :ensure
+  :ensure
   :defer t)
 
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
-             :ensure t
-             :defer t
+  :ensure t
+  :defer t
   :init (global-hungry-delete-mode 1))
 
 ;; highlight certain words
 (use-package fixme-mode
-             :ensure t
-             :defer t
+  :ensure t
+  :defer t
   :config (fixme-mode 1))
 
 (use-package fish-mode
-             :ensure t
+  :ensure t
   :disabled t)
 
 ;; similar to eclipse ide

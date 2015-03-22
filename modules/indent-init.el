@@ -11,22 +11,22 @@
               indent-tabs-mode nil) ; spaces instead of tabs by default
 
 (use-package aggressive-indent
-             :ensure t
-             :defer t
+  :ensure t
+  :defer t
   :diminish aggressive-indent-mode
-             :init (global-aggressive-indent-mode 1))
+  :init (global-aggressive-indent-mode 1))
 
 (use-package auto-indent-mode
-             :ensure t
+  :ensure t
   :disabled t)
 
 (use-package highlight-indentation
-             :ensure t
+  :ensure t
   :disabled t)
 
 (use-package indent-guide
-             :ensure t
-             :disabled t)
+  :ensure t
+  :disabled t)
 
 ;; indentation
 (electric-indent-mode -1) ; intelligent indentation, on by default from Emacs 24.4

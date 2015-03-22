@@ -6,13 +6,13 @@
 ;;; Code:
 
 (use-package org
-             :ensure t
-             :defer t
-             :config
-               (setq org-completion-use-ido t
-                     org-src-fontify-natively t ; code block fontification using the major-mode of the code
-                     org-src-preserve-indentation t
-                     org-src-window-setup 'current-window
+  :ensure t
+  :defer t
+  :config
+  (setq org-completion-use-ido t
+        org-src-fontify-natively t ; code block fontification using the major-mode of the code
+        org-src-preserve-indentation t
+        org-src-window-setup 'current-window
         org-fontify-whole-heading-line t
         org-latex-listings t)) ;; tell org to use listings
 ;; requite org-latex so that the following variables are defined
@@ -35,7 +35,7 @@
 (add-to-list 'org-latex-packages-alist '("" "color"))
 
 (use-package org-beautify-theme
-             :ensure t
+  :ensure t
   :defer t)
 
 (provide 'org-init)

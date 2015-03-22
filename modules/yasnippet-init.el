@@ -6,14 +6,14 @@
 ;;; Code:
 
 (use-package yasnippet
-             :ensure t
-             :defer t
-             :diminish yas-minor-mode
+  :ensure t
+  :defer t
+  :diminish yas-minor-mode
   :commands yas-minor-mode
   :init
-               (yas-global-mode 1)
+  (yas-global-mode 1)
   ;;(yas-reload-all 1) ; this slows startup
-             )
+  )
 
 (provide 'yasnippet-init)
 

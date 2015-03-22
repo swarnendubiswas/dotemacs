@@ -20,11 +20,11 @@
   (flyparens-mode))
 
 (use-package smartparens
-             :ensure t
+  :ensure t
   :disabled t
-             :diminish smartparens
+  :diminish smartparens
   :commands (smartparens-global-mode show-smartparens-global-mode)
-             :config
+  :config
   (use-package 'smartparens-config))
 
 (use-package mic-paren

@@ -11,16 +11,16 @@
 
 (use-package dired
   :config
-               (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
-                     dired-recursive-deletes 'always ; single prompt for all n directories
-      dired-recursive-copies 'always
-      ;;delete-by-moving-to-trash t
-      dired-listing-switches "-aBhl --si --group-directories-first")
+  (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
+        dired-recursive-deletes 'always ; single prompt for all n directories
+        dired-recursive-copies 'always
+        ;;delete-by-moving-to-trash t
+        dired-listing-switches "-aBhl --si --group-directories-first")
   (setq-default diredp-hide-details-initially-flag nil))
 
-  ;; ((add-hook 'dired-load-hook ; dired-load-hook
-  ;;         (lambda ()
-  ;;           (load "dired-x"))))
+;; ((add-hook 'dired-load-hook ; dired-load-hook
+;;         (lambda ()
+;;           (load "dired-x"))))
 
 ;; (autoload 'dired-jump "dired-x"
 ;;   "Jump to dired buffer corresponding to current buffer."
@@ -28,26 +28,25 @@
 ;; (setq dired-bind-jump t)
 
 (use-package dired-x
-             :commands (dired-jump)
+  :commands (dired-jump)
   :config (setq dired-bind-jump t)
   :bind ("C-x C-j" . dired-jump))
 
-
 (use-package direx
-             :ensure t
-             :defer t)
+  :ensure t
+  :defer t)
 
 (use-package dired-efap
-             :ensure t
-             :defer t)
+  :ensure t
+  :defer t)
 
 (use-package dired+
              :ensure t
              :defer t)
 
 (use-package dired-details
-             :ensure t
-             :defer t)
+  :ensure t
+  :defer t)
 
 (use-package dired-details+
              :ensure t

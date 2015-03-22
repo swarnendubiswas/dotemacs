@@ -28,7 +28,7 @@
   :ensure t
   :init
   (setq paradox-execute-asynchronously t
-	paradox-github-token t))
+        paradox-github-token t))
 
 (provide 'packages-init)
 

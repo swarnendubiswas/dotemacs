@@ -6,19 +6,19 @@
 ;;; Code:
 
 (use-package guide-key
-             :ensure t
+  :ensure t
   :commands guide-key-mode
   :defer 10
   :diminish guide-key-mode
   :config
   (setq guide-key/guide-key-sequence t
-                           guide-key/recursive-key-sequence-flag t
-                guide-key/popup-window-position 'bottom)
+        guide-key/recursive-key-sequence-flag t
+        guide-key/popup-window-position 'bottom)
   (guide-key-mode 1))
 
 (use-package guide-key-tip
-             :ensure t
-             :defer t
+  :ensure t
+  :defer t
   :config (setq guide-key-tip/enabled t))
 
 (provide 'guide-key-init)

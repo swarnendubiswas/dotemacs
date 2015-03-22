@@ -11,7 +11,7 @@
       (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
 
 ;;  line and column numbers
-;;(global-hl-line-mode 1) ; highlight current line
+(global-hl-line-mode 1) ; highlight current line
 (global-linum-mode 1) ; display line numbers in margin
 (column-number-mode 1)
 
@@ -26,31 +26,30 @@
       display-time-24hr-format nil)
 (display-time)
 
+;; extension to linum-mode to highlight current line number in the margin
 (use-package hlinum
-            :ensure t
-            :init (hlinum-activate)) ; extension to linum-mode to highlight current line number in the margin
-
-
-;; these are two nice themes: leuven and professional
-(use-package leuven-theme
-             :ensure t
-             ;;:init (load-theme 'leuven t)
-	     :disabled t)
-
-(use-package professional-theme
-             :ensure t
-             :disabled t)
-
-(use-package eclipse-theme
-	     :ensure t
-	     :init (require 'eclipse-theme))
-
-(use-package fringe-helper
   :ensure t
+  :config (hlinum-activate)) 
+
+;; these are nice themes
+(use-package leuven-theme
+  :ensure t
+  :init (load-theme 'leuven t)
   :disabled t)
 
+(use-package professional-theme
+  :ensure t
+  :init (load-theme 'professional t)
+  :disabled t)
+
+(use-package eclipse-theme
+  :ensure t
+  :init (require 'eclipse-theme)
+  :config
+  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
-(set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package display-theme
@@ -61,4 +60,3 @@
 (provide 'appearance-init)
 
 ;;; appearance-init.el ends here
-

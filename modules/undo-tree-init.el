@@ -7,14 +7,14 @@
 
 ;; visualize with C-x u
 (use-package undo-tree
-             :ensure t
-             :defer t
+  :ensure t
+  :defer t
   :disabled t
   ;;:commands global-undo-tree-mode
   :init (global-undo-tree-mode 1)
-             :config
-               (setq undo-tree-mode-lighter ""
-                     undo-tree-visualizer-timestamps t
+  :config
+  (setq undo-tree-mode-lighter ""
+        undo-tree-visualizer-timestamps t
         undo-tree-visualizer-diff t))
 
 (provide 'undo-tree-init)

@@ -6,23 +6,25 @@
 ;;; Code:
 
 (use-package auctex
-             :ensure t
+  :ensure t
   :defer t)
 
 (use-package auctex-latexmk
-             :ensure t
+  :ensure t
   :defer t)
 
 (use-package latex-extra
-             :ensure t
-  :defer t)
+  :ensure t
+  :disabled t
+  :config
+  (latex/setup-keybinds))
 
 (use-package latex-pretty-symbols
-             :ensure t
-  :defer t)
+  :ensure t
+  :disabled t)
 
 (use-package latex-preview-pane
-             :ensure t
+  :ensure t
   :disabled t)
 
 (use-package latex-math-preview
@@ -30,7 +32,7 @@
   :disabled t)
 
 (use-package magic-latex-buffer
-             :ensure t
+  :ensure t
   :disabled t)
 
 (use-package math-symbol-lists
@@ -38,7 +40,7 @@
   :defer t)
 
 (use-package bibtex-utils
-             :ensure t
+  :ensure t
   :defer t)
 
 (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
