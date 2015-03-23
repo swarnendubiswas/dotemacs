@@ -90,12 +90,9 @@
   :init (icomplete-mode 1)
   :demand t
   :config
+  (use-package icomplete+)
   (setq icomplete-prospects-height 2
         icomplete-compute-delay 0))
-
-(use-package icomplete+
-  :ensure t
-  :defer t)
 
 ;;(icy-mode 1) ; icicles
 
