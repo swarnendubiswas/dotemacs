@@ -7,7 +7,8 @@
 
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
-      package-enable-at-startup nil)
+      package-enable-at-startup nil
+      use-package-verbose t)
 
 ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
@@ -19,13 +20,26 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(eval-when-compile 
-	(require 'use-package))
+(require 'use-package)
 (require 'diminish)
 (require 'bind-key)
+	     
+;; prefer newer files
+(setq load-prefer-newer t)
+
+(use-package auto-compile
+  :ensure t
+  :demand t
+  :config
+  (progn 
+    (setq auto-compile-display-buffer nil
+          auto-compile-mode-line-counter nil)
+    (auto-compile-on-load-mode 1)
+    (auto-compile-on-save-mode 1)))
 
 (use-package paradox
   :ensure t
+  :defer t
   :init
   (setq paradox-execute-asynchronously t
         paradox-github-token t))

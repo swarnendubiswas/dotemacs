@@ -42,10 +42,9 @@
 
 
 ;; customizing packages
-;; FIXME: Why does this not work?
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
-(add-to-list 'load-path "~/.emacs.d/lisp/") ; hird-party packages
-(add-to-list 'load-path "~/.emacs.d/modules/") ; personal modules for customizing emacs initialization
+;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp")) ; third-party packages
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/")) ; personal modules for customizing emacs initialization
 
 ;; setup the packaging system
 (require 'packages-init)
@@ -58,7 +57,6 @@
 (require 'appearance-init)
 (require 'mode-line-init)
 
-
 ;; configure power packages
 (require 'buffer-init)
 (require 'dired-init)
@@ -68,6 +66,7 @@
 ;; configure the more useful extensions
 (require 'anzu-init)
 (require 'smex-init)
+(require 'recentf-init)
 (require 'ace-jump-init)
 
 ;; setup helper packages
@@ -75,13 +74,9 @@
 (require 'fci-init)
 (require 'indent-init)
 (require 'parens-init)
-(require 'recentf-init)
-
 (require 'spell-init)
 (require 'flycheck-init)
-
 (require 'misc-init)
-
 (require 'guide-key-init)
 (require 'rainbow-init)
 (require 'undo-tree-init)

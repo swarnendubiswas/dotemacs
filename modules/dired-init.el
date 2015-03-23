@@ -14,7 +14,8 @@
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
         ;;delete-by-moving-to-trash t
-        dired-listing-switches "-aBhl --si --group-directories-first")
+        ;;dired-listing-switches "-aBhl --si --group-directories-first")
+        dired-listing-switches "-ABhltc --si --group-directories-first")
   (setq-default diredp-hide-details-initially-flag nil))
 
 ;; Jump to dired buffer corresponding to current buffer.
@@ -29,7 +30,7 @@
 
 (use-package dired-efap
   :ensure t
-  :defer t)
+  :disabled t)
 
 (use-package dired+
   :ensure t
@@ -51,7 +52,6 @@
   :ensure t
   :defer t)
 
-;; directory navigation
 (use-package nav
   :disabled t
   :load-path "~/.emacs.d/lisp/emacs-nav-49/"

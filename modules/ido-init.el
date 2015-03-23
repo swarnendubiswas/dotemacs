@@ -50,8 +50,7 @@
 ;; allow ido-style completion in more places
 (use-package ido-ubiquitous
   :ensure t
-  :config (ido-ubiquitous-mode 1) 
-  :defer t)
+  :config (ido-ubiquitous-mode 1))
 
 (use-package ido-better-flex
   :ensure t
@@ -70,7 +69,6 @@
 ;; smarter fuzzy matching for ido
 (use-package flx-ido
   :ensure t
-  :disabled t
   :init (flx-ido-mode 1) 
   :defer t)
 

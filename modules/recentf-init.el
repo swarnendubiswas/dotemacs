@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package recentf
-  ;;:commands (recentf-mode recentf-add-file recentf-apply-filename-handlers)
+  :commands (recentf-mode) ;recentf-add-file recentf-apply-filename-handlers recentf-open-files)
   :init
   (recentf-mode 1)
   :config
@@ -20,7 +20,6 @@
     :ensure t)
   :bind ("<f8>" . recentf-open-files))
 
-;;(global-set-key (kbd "C-x C-r") 'recentf-open-files)
 ;;(global-set-key [f8] 'recentf-open-files)
 
 (provide 'recentf-init)

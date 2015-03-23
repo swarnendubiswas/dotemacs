@@ -13,8 +13,6 @@
       initial-major-mode 'text-mode) ; *scratch* is in Lisp interaction mode by default, use text mode instead
 (setq-default major-mode 'text-mode)
 
-(setq load-prefer-newer t)
-
 (setq require-final-newline t ; always end a file with a newline
       sentence-end-double-space nil)
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
@@ -82,13 +80,14 @@
 
 ;; saveplace: remember cursor position in files
 (use-package saveplace
+  :defer t
   :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
   :disabled t
-  :init (icomplete-mode 1)
   :config
+  (icomplete-mode 1)
   (use-package icomplete+)
   (setq icomplete-prospects-height 2
         icomplete-compute-delay 0))
@@ -99,6 +98,7 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
+  :defer t
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)    
         savehist-file "~/.emacs.d/savehist") 
@@ -106,6 +106,7 @@
 
 ;; uniquify
 (use-package uniquify
+  :defer t
   :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>

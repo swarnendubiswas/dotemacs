@@ -7,17 +7,8 @@
 
 (use-package smooth-scrolling
   :ensure t
-  :init (require 'smooth-scrolling))
-
-(use-package auto-compile
-  :ensure t
-  :demand t
-  :config
-  (progn 
-    (setq auto-compile-display-buffer nil
-          auto-compile-mode-line-counter nil)
-    (auto-compile-on-load-mode 1)
-    (auto-compile-on-save-mode 1)))
+  :defer t
+  :config (require 'smooth-scrolling))
 
 (use-package achievements
   :ensure t
@@ -53,7 +44,6 @@
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
-  :defer t
   :config (fixme-mode 1))
 
 (use-package fish-mode

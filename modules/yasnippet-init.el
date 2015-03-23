@@ -10,9 +10,12 @@
   :defer t
   :diminish yas-minor-mode
   :commands (yas-global-mode yas-minor-mode)
-  :init
-  ;;(yas-reload-all 1) ; this slows startup
-  (yas-global-mode 1))
+  :config
+  (yas-reload-all 1) ; this slows startup
+  ;;(yas-global-mode 1) ; mostly useful with LaTeX
+  (add-hook 'LaTeX-mode-hook
+            '(lambda ()
+               (yas-minor-mode))))
 
 (provide 'yasnippet-init)
 

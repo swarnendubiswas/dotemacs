@@ -7,14 +7,15 @@
 
 (use-package flycheck-color-mode-line
   :ensure t
-  :defer t
+  :disabled t
   :config (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
 (use-package flycheck
   :ensure t
   :defer t
-  :init (global-flycheck-mode 1)
-  :config (use-package flycheck-package))
+  :config
+  (use-package flycheck-package)
+  (global-flycheck-mode 1))
 
 (use-package flycheck-tip
   :ensure t

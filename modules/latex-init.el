@@ -75,6 +75,7 @@
 
 (use-package reftex
   :diminish reftex-mode
+  :defer t
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-cite-format 'abbrv

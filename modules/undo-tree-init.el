@@ -8,7 +8,6 @@
 ;; visualize with C-x u
 (use-package undo-tree
   :ensure t
-  :defer t
   :disabled t
   ;;:commands global-undo-tree-mode
   :init (global-undo-tree-mode 1)

@@ -12,20 +12,15 @@
   (show-paren-mode 1) ; highlight matching parentheses when the point is on them
   (make-variable-buffer-local 'show-paren-mode))
 
-; highlight/track mismatched parentheses
-(use-package flyparens
-  :ensure t
-  :defer t
-  :config
-  (flyparens-mode))
+;; highlight/track mismatched parentheses
 
 (use-package smartparens
   :ensure t
-  :disabled t
+  :commands (smartparens-mode show-smartparens-mode)
   :diminish smartparens
-  :commands (smartparens-global-mode show-smartparens-global-mode)
   :config
-  (use-package 'smartparens-config))
+  (use-package smartparens-config)
+  (smartparens-global-mode))
 
 (use-package mic-paren
   :ensure t
