@@ -85,30 +85,31 @@
   :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions
-;;(icomplete-mode 1)
 (use-package icomplete
+  :disabled t
   :init (icomplete-mode 1)
-  :demand t
   :config
   (use-package icomplete+)
   (setq icomplete-prospects-height 2
         icomplete-compute-delay 0))
 
-;;(icy-mode 1) ; icicles
+(use-package icicles
+  :disabled t
+  :config (icy-mode 1))
 
 ;; save minibuffer histories across sessions
-(setq savehist-additional-variables    
-      '(kill-ring search-ring regexp-search-ring)    
-      savehist-file "~/.emacs.d/savehist") 
-(savehist-mode 1)
-
+(use-package savehist
+  :config
+  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)    
+        savehist-file "~/.emacs.d/savehist") 
+  (savehist-mode 1))
 
 ;; uniquify
 (use-package uniquify
   :config
-  ;;(setq uniquify-separator ":")
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
+        ;;uniquify-separator ":"
         uniquify-after-kill-buffer-p t))
 
 (provide 'defaults-init)

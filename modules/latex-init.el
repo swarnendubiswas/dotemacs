@@ -49,10 +49,8 @@
 
 ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-flyspell) 
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook #'reftex-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 ;;(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
@@ -75,14 +73,18 @@
 
 (auctex-latexmk-setup) ; add support for latexmk
 
-(setq reftex-plug-into-AUCTeX t
-      reftex-cite-format 'abbrv
-      reftex-save-parse-info t
-      reftex-use-multiple-selection-buffers t
-      reftex-enable-partial-scans t)
+(use-package reftex
+  :diminish reftex-mode
+  :config
+  (setq reftex-plug-into-AUCTeX t
+        reftex-cite-format 'abbrv
+        reftex-save-parse-info t
+        reftex-use-multiple-selection-buffers t
+        reftex-enable-partial-scans t)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
 
-(eval-after-load "reftex"
-  '(diminish 'reftex-mode))
+;; (eval-after-load "reftex"
+;;   '(diminish 'reftex-mode))
 
 ;;(latex-preview-pane-enable) ; current does not support multi-file parsing
 

@@ -12,7 +12,6 @@
 
 (use-package aggressive-indent
   :ensure t
-  :defer t
   :diminish aggressive-indent-mode
   :init (global-aggressive-indent-mode 1))
 
@@ -22,22 +21,24 @@
 
 (use-package highlight-indentation
   :ensure t
-  :disabled t)
+  :disabled t
+  :config (highlight-indentation-mode 1))
 
+;; indentation guide: doesn't seem to work well with company-mode and auto-complete-mode
 (use-package indent-guide
   :ensure t
-  :disabled t)
+  :disabled t
+  :config
+  (setq indent-guide-delay 0.1) ; show guide lines only in idle-time
+  (indent-guide-global-mode 1))
 
-;; indentation
-(electric-indent-mode -1) ; intelligent indentation, on by default from Emacs 24.4
-(add-hook 'after-change-major-mode-hook (lambda() (electric-indent-mode -1)))
+;; intelligent indentation, on by default from Emacs 24.4
+(use-package electric
+  :disabled t
+  :init (electric-indent-mode -1)
+  :config (add-hook 'after-change-major-mode-hook (lambda() (electric-indent-mode -1))))
 
 ;;(auto-indent-global-mode 1) ; auto-indentation minor mode
-
-;; indentation guides
-;;(indent-guide-global-mode 1) ; doesn't seem to work well with company-mode and auto-complete-mode
-;;(setq indent-guide-delay 0.1) ; show guide lines only in idle-time
-;;(highlight-indentation-mode 1) 
 
 ;; smart tabs (indent with tabs, align with spaces)
 (use-package smart-tabs

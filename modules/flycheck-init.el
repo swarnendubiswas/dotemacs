@@ -18,7 +18,7 @@
 
 (use-package flycheck-tip
   :ensure t
-  :disabled t)
+  :defer t)
 
 (provide 'flycheck-init)
 
