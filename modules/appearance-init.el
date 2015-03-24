@@ -34,16 +34,24 @@
 (use-package leuven-theme
   :ensure t
   :init (load-theme 'leuven t)
-  :disabled t)
-
+  :disabled t
+  :config
+  (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
+  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+  
 (use-package professional-theme
   :ensure t
   :init (load-theme 'professional t)
-  :disabled t)
+  :disabled t
+  :config
+  (set-face-attribute 'default nil :height 115)) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
 
 (use-package eclipse-theme
   :ensure t
-  :init (require 'eclipse-theme))
+  :init (require 'eclipse-theme)
+  :config
+  (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
 
 ;; highlight current line
 (use-package hl-line

@@ -76,13 +76,15 @@
 (use-package reftex
   :diminish reftex-mode
   :defer t
+  :init
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-cite-format 'abbrv
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
-        reftex-enable-partial-scans t)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
+        reftex-enable-partial-scans t))
+
 
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))

@@ -9,9 +9,7 @@
   :ensure t
   ;;:disabled t
   :config
-  (progn
-    (powerline-default-theme)
-    (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)))
+  (powerline-default-theme))
 
 (use-package smart-mode-line
   :ensure t

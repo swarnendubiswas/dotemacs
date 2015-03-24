@@ -16,7 +16,6 @@
 (setq require-final-newline t ; always end a file with a newline
       sentence-end-double-space nil)
 (fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
-(set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
 
 ;; we need to paste something from another program, but sometimes we do real paste after some kill
 ;; action, that will erase the clipboard, so we need to save it to kill ring.
@@ -52,11 +51,15 @@
               tramp-file-name-regexp))
 
 (setq completion-ignore-case t ; ignore case when completing
-      read-file-name-completion-ignore-case t) ; ignore case when reading a file name completion
+      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
+      read-buffer-completion-ignore-case t) 
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
-(setq use-file-dialog nil)
+
+;; do not use dialog boxes
+(setq use-dialog-box nil
+      use-file-dialog nil)
 
 ;; desktop save mode
 (desktop-save-mode -1) 
@@ -78,7 +81,7 @@
 
 ;;(highlight-changes-mode 1) ; not very useful usually
 
-;; saveplace: remember cursor position in files
+;; remember cursor position in files
 (use-package saveplace
   :defer t
   :config (setq-default save-place t))
@@ -104,7 +107,6 @@
         savehist-file "~/.emacs.d/savehist") 
   (savehist-mode 1))
 
-;; uniquify
 (use-package uniquify
   :defer t
   :config
