@@ -44,6 +44,7 @@
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
+  :defer t
   :config (fixme-mode 1))
 
 (use-package fish-mode

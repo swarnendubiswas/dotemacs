@@ -51,7 +51,7 @@
   :init (require 'eclipse-theme)
   :config
   (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+  (set-face-attribute 'mode-line nil :background "grey90" :foreground "black" :box nil))
 
 ;; highlight current line
 (use-package hl-line

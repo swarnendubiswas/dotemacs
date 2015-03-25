@@ -74,13 +74,13 @@
 (require 'fci-init)
 (require 'indent-init)
 (require 'parens-init)
+(require 'misc-init)
+(require 'yasnippet-init)
 (require 'spell-init)
 (require 'flycheck-init)
-(require 'misc-init)
 (require 'guide-key-init)
 (require 'rainbow-init)
 (require 'undo-tree-init)
-(require 'yasnippet-init)
 
 ;; configure individual programming or major modes
 (require 'text-init)

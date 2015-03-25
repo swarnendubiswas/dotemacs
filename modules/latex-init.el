@@ -51,13 +51,9 @@
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-flyspell) 
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 ;;(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
-(add-hook 'LaTeX-mode-hook #'writegood-mode)
-(add-hook 'LaTeX-mode-hook #'abbrev-mode)
-;;(add-hook 'LaTeX-mode-hook (lambda () (yas-reload-all)))
-;;(add-hook 'LaTeX-mode-hook '(lambda () (yas-minor-mode)))
 (add-hook 'LaTeX-mode-hook #'fci-mode)
 (add-hook 'LaTeX-mode-hook (lambda () (TeX-PDF-mode 1))) ; compile files to pdf by default
 ;;(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
@@ -75,7 +71,6 @@
 
 (use-package reftex
   :diminish reftex-mode
-  :defer t
   :init
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
   :config
