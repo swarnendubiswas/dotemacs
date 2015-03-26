@@ -8,15 +8,14 @@
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  ;;:commands (yas-global-mode yas-minor-mode)
-  :init (yas-global-mode 1)
-  :config
-  ;; (yas-reload-all 1) ; this slows startup
+  :commands (yas-global-mode yas-minor-mode)
+  :init
+  ;;(yas-reload-all 1) ; this slows startup
   ;; mostly useful with LaTeX
   ;; (add-hook 'LaTeX-mode-hook
   ;;           '(lambda ()
   ;;              (yas-minor-mode)))
-  )
+  (yas-global-mode 1))
 
 (provide 'yasnippet-init)
 

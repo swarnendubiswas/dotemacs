@@ -5,37 +5,44 @@
 
 ;;; Code:
 
-;; startup
-(setq inhibit-default-init t ; disable loading of "default.el" at startup
+(setq inhibit-default-init t ; Disable loading of "default.el" at startup.
       inhibit-startup-screen t
-      inhibit-splash-screen t
+      ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen.
       initial-scratch-message nil
-      initial-major-mode 'text-mode) ; *scratch* is in Lisp interaction mode by default, use text mode instead
+      ;; *scratch* is in Lisp interaction mode by default, use text mode instead.
+      initial-major-mode 'text-mode)
+
 (setq-default major-mode 'text-mode)
 
-(setq require-final-newline t ; always end a file with a newline
-      sentence-end-double-space nil)
-(fset 'yes-or-no-p 'y-or-n-p) ; type "y"/"n" instead of "yes"/"no"
+(use-package files
+  :config
+  (setq require-final-newline t ; Always end a file with a newline.
+        make-backup-files nil ; Stop making backup ~ files
+        ;; Disable backup for a per-file basis, not to be used by major modes.
+        backup-inhibited t)) 
 
-;; we need to paste something from another program, but sometimes we do real paste after some kill
-;; action, that will erase the clipboard, so we need to save it to kill ring.
-(setq save-interprogram-paste-before-kill t)
-(setq x-select-enable-clipboard t) ; enable use of system clipboard across emacs and other applications
+(setq sentence-end-double-space nil)
+(setq x-select-enable-clipboard t) ; Enable use of system clipboard across emacs and other applications.
+(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 
-;; backup
-(setq make-backup-files nil ; stop making backup ~ files
-      backup-inhibited t) ; disable backup for a per-file basis, not to be used by major modes
+(use-package simple
+  :config
+  ;; We need to paste something from another program, but sometimes we do real paste after some kill
+  ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
+  (setq save-interprogram-paste-before-kill t)
+  ;; Enable visual feedback on selections, default since v23 
+  (transient-mark-mode 1)) 
 
-;; auto revert
-(global-auto-revert-mode 1) ; auto-refresh all buffers, does not work for remote files
-(setq-default auto-revert-interval 5 ; default is 5 s
-              auto-revert-verbose nil
-              global-auto-revert-non-file-buffers t) ; auto-refresh dired buffers
+(use-package autorevert
+  :config
+  (setq-default auto-revert-interval 5 ; Default is 5 s.
+                auto-revert-verbose nil
+                global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
+  ;; Auto-refresh all buffers, does not work for remote files.
+  (global-auto-revert-mode 1)) 
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
-(transient-mark-mode 1) ; enable visual feedback on selections, default since v23
 
-;; search
 (setq search-highlight t ; highlight incremental search
       query-replace-highlight t ; highlight during query
       case-fold-search t) ; make search ignore case
@@ -72,12 +79,18 @@
 
 ;; fontification
 (global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
-(setq font-lock-maximum-decoration t ; maximum fontification possible
-      jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
-      font-lock-support-mode 'jit-lock-mode ; jit locking is better than fast-lock and lazy-lock
-      jit-lock-stealth-time 10
-      jit-lock-defer-contextually t
-      jit-lock-stealth-nice 0.5)
+
+(use-package font-lock
+  :config
+  (setq font-lock-maximum-decoration t ; maximum fontification possible
+        font-lock-support-mode 'jit-lock-mode)) ; jit locking is better than fast-lock and lazy-lock       
+
+(use-package jit-lock
+  :config
+  (setq jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
+        jit-lock-stealth-time 10
+        jit-lock-defer-contextually t
+        jit-lock-stealth-nice 0.5))
 
 ;;(highlight-changes-mode 1) ; not very useful usually
 
