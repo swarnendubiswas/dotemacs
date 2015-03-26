@@ -48,16 +48,16 @@
 
 (use-package eclipse-theme
   :ensure t
-  :init (require 'eclipse-theme)
+  :init (load-theme 'eclipse t)
   :config
   (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
-  (set-face-attribute 'mode-line nil :background "grey90" :foreground "black" :box nil))
+  (set-face-attribute 'mode-line nil :background "grey90" :foreground "black" :box nil)
+  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black"))
 
 ;; highlight current line
 (use-package hl-line
-  :init (global-hl-line-mode 1)
   :config
-  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black"))
+  (global-hl-line-mode 1))
 
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-buffer-boundaries 'right)
