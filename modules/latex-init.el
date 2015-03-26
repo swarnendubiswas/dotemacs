@@ -89,6 +89,9 @@
 (setq TeX-source-correlate-method 'synctex)
 (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
 
+(define-key LaTeX-mode-map (kbd "C-c C-d") nil)
+(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing)
+
 (provide 'latex-init)
 
 ;;; latex-init.el ends here
