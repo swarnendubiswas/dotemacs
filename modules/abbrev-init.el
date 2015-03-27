@@ -9,8 +9,7 @@
   :disabled t
   :commands abbrev-mode
   :diminish abbrev-mode
-  :init
-  (add-hook 'text-mode-hook 'abbrev-mode)
+  :init (add-hook 'text-mode-hook 'abbrev-mode)
   :config
   (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs") 
   (setq save-abbrevs nil ; do not ask to save new abbrevs when quitting

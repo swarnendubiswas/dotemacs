@@ -18,10 +18,7 @@
           ibuffer-always-show-last-buffer nil
           ibuffer-default-sorting-mode 'recency ; 'major-mode
           ibuffer-sorting-mode 'recency
-          ibuffer-use-header-line t)
-    (use-package ibuffer-tramp
-      :ensure t
-      :defer t))
+          ibuffer-use-header-line t))
   :bind ("C-x C-b" . ibuffer))
 
 ;;(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list

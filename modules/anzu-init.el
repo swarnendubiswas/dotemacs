@@ -6,10 +6,10 @@
 ;;; Code:
 
 (use-package anzu
-             :ensure t
-             :defer t
-             :diminish anzu-mode
-             :config (global-anzu-mode 1))
+  :ensure t
+  :defer t
+  :diminish anzu-mode
+  :init (global-anzu-mode 1))
 
 (provide 'anzu-init)
 

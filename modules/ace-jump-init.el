@@ -51,10 +51,9 @@
 (global-set-key (kbd "M-b") 'ace-jump-buffer)
 
 (use-package ace-isearch
-             :ensure t
-             :defer t
-             :disabled t
-             :init (global-ace-isearch-mode 1))
+  :ensure t
+  :disabled t
+  :init (global-ace-isearch-mode 1))
 
 (provide 'ace-jump-init)
 

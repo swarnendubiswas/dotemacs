@@ -10,14 +10,16 @@
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
 
-;;  line and column numbers
-(global-linum-mode 1) ; display line numbers in margin
-(column-number-mode 1)
+(use-package linum
+  :init (global-linum-mode 1)) ; display line numbers in margin
 
-(tooltip-mode -1) ;; tooltips
-(tool-bar-mode -1) ; no toolbar with icons
-(scroll-bar-mode -1) ; no scroll bars
-(menu-bar-mode -1) ; no menu bar
+(use-package simple
+  :config (column-number-mode 1))
+
+(tooltip-mode -1) 
+(tool-bar-mode -1) 
+(scroll-bar-mode 1) 
+(menu-bar-mode -1)
 (blink-cursor-mode 1) ;; enable/disable blinking cursor
 
 ;; displays the time and date in the mode line
@@ -30,14 +32,13 @@
   :ensure t
   :config (hlinum-activate)) 
 
-;; these are nice themes
 (use-package leuven-theme
   :ensure t
   :init (load-theme 'leuven t)
   :disabled t
   :config
   (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+  (set-face-attribute 'mode-line nil :background "grey90" :foreground "black" :box nil))
   
 (use-package professional-theme
   :ensure t
@@ -64,7 +65,7 @@
 (use-package display-theme
   :ensure t
   :disabled t
-  :config (display-theme-mode))
+  :init (display-theme-mode))
 
 (provide 'appearance-init)
 

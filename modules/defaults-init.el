@@ -31,7 +31,7 @@
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
   (setq save-interprogram-paste-before-kill t)
   ;; Enable visual feedback on selections, default since v23 
-  (transient-mark-mode 1)) 
+  (transient-mark-mode 1))
 
 (use-package autorevert
   :init (global-auto-revert-mode 1) ;; Auto-refresh all buffers, does not work for remote files.

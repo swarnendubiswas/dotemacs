@@ -18,7 +18,6 @@
         company-tooltip-flip-when-above t
         company-tooltip-align-annotations t))
   
-
 (use-package company-auctex
   :ensure t
   :defer t
