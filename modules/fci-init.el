@@ -1,4 +1,4 @@
-;;; fci-init.el --- Part of emacs initialization
+;;; fci-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup fci.

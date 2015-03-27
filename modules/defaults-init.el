@@ -1,4 +1,4 @@
-;;; defaults-init.el --- Part of emacs initialization
+;;; defaults-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup and tweak emacs defaults.
@@ -24,6 +24,7 @@
 (setq sentence-end-double-space nil)
 (setq x-select-enable-clipboard t) ; Enable use of system clipboard across emacs and other applications.
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
+(fset 'display-startup-echo-area-message #'ignore)
 
 (use-package simple
   :config
@@ -72,9 +73,12 @@
       use-file-dialog nil)
 
 ;; desktop save mode
-(desktop-save-mode -1) 
-(setq-default desktop-restore-frames nil ; no need to restore frames
-              desktop-load-locked-desktop nil)
+(use-package desktop
+  :disabled t
+  :init (desktop-save-mode -1)
+  :config 
+  (setq-default desktop-restore-frames nil ; no need to restore frames
+                desktop-load-locked-desktop nil))
 
 ;; fully redraw the display before queued input events are processed
 ;; don't defer screen updates when performing operations

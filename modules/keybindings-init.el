@@ -1,4 +1,4 @@
-;;; keybindings-init.el --- Part of emacs initialization
+;;; keybindings-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Keybindings

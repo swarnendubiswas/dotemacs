@@ -1,4 +1,4 @@
-;;; prog-init.el --- Part of emacs initialization
+;;; prog-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Programming mode specific.

@@ -1,4 +1,4 @@
-;;; undo-tree-init.el --- Part of emacs initialization
+;;; undo-tree-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup undo-tree

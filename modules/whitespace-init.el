@@ -1,4 +1,4 @@
-;;; whitespace-init.el --- Part of emacs initialization
+;;; whitespace-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Configure whitespace

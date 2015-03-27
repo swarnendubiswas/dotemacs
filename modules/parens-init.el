@@ -1,4 +1,4 @@
-;;; parens-init.el --- Part of emacs initialization
+;;; parens-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup parentheses.

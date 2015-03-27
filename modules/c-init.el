@@ -1,4 +1,4 @@
-;;; c-init.el --- Part of emacs initialization
+;;; c-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.

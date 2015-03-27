@@ -1,4 +1,4 @@
-;;; company-init.el --- Part of emacs initialization
+;;; company-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Initialize company mode for auto completion.

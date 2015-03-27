@@ -1,4 +1,4 @@
-;;; abbrev-init.el --- Part of emacs initialization
+;;; abbrev-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup abbrev

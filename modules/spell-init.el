@@ -1,4 +1,4 @@
-;;; spell-init.el --- Part of emacs initialization
+;;; spell-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup spell check.

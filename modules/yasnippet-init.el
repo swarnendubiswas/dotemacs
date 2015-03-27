@@ -1,4 +1,4 @@
-;;; yasnippet-init.el --- Part of emacs initialization
+;;; yasnippet-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Initialize yasnippet 

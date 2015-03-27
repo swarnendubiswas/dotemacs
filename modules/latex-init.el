@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of emacs initialization
+;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.

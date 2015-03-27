@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization ;;; -*- lexical-binding: t; -*-
+;;; init.el --- Emacs customization   -*- lexical-binding: t; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:

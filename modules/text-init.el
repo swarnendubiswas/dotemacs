@@ -1,4 +1,4 @@
-;;; text-init.el --- Part of emacs initialization
+;;; text-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup text mode.

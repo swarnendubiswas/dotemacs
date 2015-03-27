@@ -1,4 +1,4 @@
-;;; anzu-init.el --- Part of emacs initialization
+;;; anzu-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Anzu: show number of searches in the mode line

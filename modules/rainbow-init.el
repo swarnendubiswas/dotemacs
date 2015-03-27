@@ -1,4 +1,4 @@
-;;; rainbow-init.el --- Part of emacs initialization
+;;; rainbow-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Make emacs more colorful.

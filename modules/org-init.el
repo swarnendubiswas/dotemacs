@@ -1,4 +1,4 @@
-;;; org-init.el --- Part of emacs initialization
+;;; org-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup org mode.

@@ -1,4 +1,4 @@
-;;; custom-init.el --- Part of emacs initialization
+;;; custom-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Contains custom or temporary defintions.

@@ -1,4 +1,4 @@
-;;; user-init.el --- Part of emacs initialization
+;;; user-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup personal details.

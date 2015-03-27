@@ -1,4 +1,4 @@
-;;; flycheck-init.el --- Part of emacs initialization
+;;; flycheck-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Configure flycheck.

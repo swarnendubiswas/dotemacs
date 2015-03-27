@@ -1,4 +1,4 @@
-;;; appearance-init.el --- Part of emacs initialization
+;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Tweak emacs appearance.
@@ -16,10 +16,12 @@
 (use-package simple
   :config (column-number-mode 1))
 
-(tooltip-mode -1) 
-(tool-bar-mode -1) 
+(tooltip-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1)) 
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
 (scroll-bar-mode 1) 
-(menu-bar-mode -1)
 (blink-cursor-mode 1) ;; enable/disable blinking cursor
 
 ;; displays the time and date in the mode line

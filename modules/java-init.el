@@ -1,4 +1,4 @@
-;;; java-init.el --- Part of emacs initialization
+;;; java-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Configure Java programming mode.

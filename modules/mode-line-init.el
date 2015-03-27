@@ -1,4 +1,4 @@
-;;; mode-line-init.el --- Part of emacs initialization
+;;; mode-line-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Tweak mode line.

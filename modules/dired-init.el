@@ -1,4 +1,4 @@
-;;; dired-init.el --- Part of emacs initialization
+;;; dired-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Dired configurations

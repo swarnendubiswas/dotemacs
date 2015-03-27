@@ -1,4 +1,4 @@
-;;; guide-key-init.el --- Part of emacs initialization
+;;; guide-key-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup guide key

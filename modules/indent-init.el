@@ -1,4 +1,4 @@
-;;; indent-init.el --- Part of emacs initialization
+;;; indent-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup indentation in emacs.

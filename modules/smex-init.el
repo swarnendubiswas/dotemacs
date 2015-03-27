@@ -1,4 +1,4 @@
-;;; smex-init.el --- Part of emacs initialization
+;;; smex-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;; Setup smex.
@@ -8,8 +8,7 @@
 (use-package smex
   :ensure t
   ;;:commands (smex-initialize) ; this is slow
-  :init
-  (autoload 'smex "smex")
+  :init (autoload 'smex "smex")
   :config
   (setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
   :bind (("M-x" . smex)
