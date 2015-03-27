@@ -7,8 +7,7 @@
 
 (use-package recentf
   :commands (recentf-mode) ;recentf-add-file recentf-apply-filename-handlers recentf-open-files)
-  :init
-  (recentf-mode 1)
+  :init (recentf-mode 1)
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files

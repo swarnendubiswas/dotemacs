@@ -35,7 +35,6 @@
 (global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
 
 ;; dired
-(define-key dired-mode-map (kbd "i") 'ido-find-file)
 ;; jump to home directory
 (global-set-key (kbd "M-<home>")
                 (lambda () 
@@ -46,14 +45,19 @@
   (interactive)
   (beginning-of-buffer)
   (dired-next-line 4))
-(define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top)
 
 ;; M-<down> is nicer in dired if it moves to the last file
 (defun dired-jump-to-bottom ()
   (interactive)
   (end-of-buffer)
   (dired-next-line -1))
-(define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom)
+
+(eval-after-load 'dired
+  '(define-key dired-mode-map (kbd "i") 'ido-find-file))
+(eval-after-load 'dired
+  '(define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top))
+(eval-after-load 'dired
+  '(define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom))
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (when (auto-highlight-symbol-mode)

@@ -9,6 +9,7 @@
 
 ;; use "C-x d", or "M-x dired"
 (use-package dired
+  :defer t
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories

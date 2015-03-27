@@ -96,5 +96,8 @@
 ;; custom definitions
 (require 'custom-init)
 
+;; start the daemon/server
+(server-start)
+
 
 ;;; init.el ends here

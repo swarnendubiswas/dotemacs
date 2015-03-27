@@ -13,13 +13,25 @@
 (use-package flycheck
   :ensure t
   :defer t
-  :config
-  (use-package flycheck-package)
-  (global-flycheck-mode 1))
+  :init (global-flycheck-mode 1)
+  :diminish flycheck-mode)
+
+;; Check package conventions with Flycheck
+(use-package flycheck-package
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
 (use-package flycheck-tip
   :ensure t
   :defer t)
+
+;; Show Flycheck messages in popups
+(use-package flycheck-pos-tip           
+  :ensure t
+  :defer t
+  :init (with-eval-after-load 'flycheck
+          (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
 (provide 'flycheck-init)
 

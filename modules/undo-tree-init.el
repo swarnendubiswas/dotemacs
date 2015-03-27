@@ -9,12 +9,12 @@
 (use-package undo-tree
   :ensure t
   :disabled t
-  ;;:commands global-undo-tree-mode
   :init (global-undo-tree-mode 1)
   :config
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t
-        undo-tree-visualizer-diff t))
+        undo-tree-visualizer-diff t)
+  :diminish undo-tree-mode)
 
 (provide 'undo-tree-init)
 

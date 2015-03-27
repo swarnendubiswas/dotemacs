@@ -11,7 +11,9 @@
 
 (use-package auctex-latexmk
   :ensure t
-  :defer t)
+  :defer t
+  :init (with-eval-after-load 'latex
+          (auctex-latexmk-setup)))
 
 (use-package latex-extra
   :ensure t
@@ -23,9 +25,12 @@
   :ensure t
   :disabled t)
 
+;; currently does not support multi-file parsing
 (use-package latex-preview-pane
   :ensure t
-  :disabled t)
+  :disabled t
+  :config
+  (latex-preview-pane-enable))
 
 (use-package latex-math-preview
   :ensure t
@@ -49,7 +54,7 @@
 
 ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-flyspell) 
+(add-hook 'LaTeX-mode-hook 'turn-on-flyspell)
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 ;;(add-hook 'LaTeX-mode-hook #'rainbow-delimiters-mode)
@@ -59,38 +64,38 @@
 ;;(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
-      TeX-parse-self t ; enable parse on load
+      TeX-parse-self t ; Parse documents
       TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
       TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
       TeX-auto-untabify t
       latex-run-command "latexmk")
+
 (setq-default TeX-master nil ; query for master file
               TeX-command-default "LatexMk")
 
-(auctex-latexmk-setup) ; add support for latexmk
-
 (use-package reftex
   :diminish reftex-mode
-  :init
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  :init (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   :config
   (setq reftex-plug-into-AUCTeX t
+        reftex-insert-label-flags '(t t)
         reftex-cite-format 'abbrv
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t))
 
-
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))
 
-;;(latex-preview-pane-enable) ; current does not support multi-file parsing
-
-(setq TeX-source-correlate-method 'synctex)
+;; Provide forward and inverse search with SyncTeX
+(setq TeX-source-correlate-method 'synctex
+      TeX-source-correlate-mode t)
 (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
 
-(define-key LaTeX-mode-map (kbd "C-c C-d") nil)
-(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing)
+(eval-after-load 'LaTeX
+  '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
+(eval-after-load 'LaTeX
+  '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
 
 (provide 'latex-init)
 

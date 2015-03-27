@@ -34,12 +34,11 @@
   (transient-mark-mode 1)) 
 
 (use-package autorevert
+  :init (global-auto-revert-mode 1) ;; Auto-refresh all buffers, does not work for remote files.
   :config
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
-                global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
-  ;; Auto-refresh all buffers, does not work for remote files.
-  (global-auto-revert-mode 1)) 
+                global-auto-revert-non-file-buffers t)) ; Auto-refresh dired buffers.
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 
@@ -47,10 +46,14 @@
       query-replace-highlight t ; highlight during query
       case-fold-search t) ; make search ignore case
 
-;; tramp
-(setq tramp-default-method "ssh" ; faster than the default scp
-      tramp-default-user "XXX"
-      tramp-default-host "XXX")
+(use-package tramp
+  :defer t
+  :config
+  (setq tramp-default-method "ssh" ; faster than the default scp
+        tramp-default-user "XXX"
+        tramp-default-host "XXX"
+        tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")))
+
 ;; disable version control
 (setq vc-ignore-dir-regexp
       (format "\\(%s\\)\\|\\(%s\\)"
@@ -116,7 +119,8 @@
 (use-package savehist
   :defer t
   :config
-  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)    
+  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
+        savehist-save-minibuffer-history t
         savehist-file "~/.emacs.d/savehist") 
   (savehist-mode 1))
 

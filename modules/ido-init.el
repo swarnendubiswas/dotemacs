@@ -17,9 +17,10 @@
         ido-enable-prefix nil
         ido-max-prospects 10
         ido-case-fold t
-        ;;ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
+        ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
         ;;ido-show-dot-for-dired t ; don't show current directory as the first choice
         ido-create-new-buffer 'always ; other options: prompt, never
+        ido-default-file-method 'selected-window
         ido-save-directory-list-file "~/.emacs.d/.ido.last"
         ido-enable-last-directory-history t
         ido-max-work-directory-list 20
@@ -34,8 +35,8 @@
 (use-package ido-vertical-mode
   :ensure t
   :demand t
+  :init (ido-vertical-mode 1)
   :config
-  (ido-vertical-mode 1)
   ;; up and down keys to navigate options, left and right to move through history/directories
   (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right))
 
@@ -50,7 +51,7 @@
 ;; allow ido-style completion in more places
 (use-package ido-ubiquitous
   :ensure t
-  :config (ido-ubiquitous-mode 1))
+  :init (ido-ubiquitous-mode 1))
 
 (use-package ido-better-flex
   :ensure t
@@ -64,13 +65,12 @@
 (use-package ido-at-point
   :ensure t
   :defer t
-  :config (ido-at-point-mode 1))
+  :init (ido-at-point-mode 1))
 
 ;; smarter fuzzy matching for ido
 (use-package flx-ido
   :ensure t
-  :init (flx-ido-mode 1) 
-  :defer t)
+  :init (flx-ido-mode 1))
 
 (provide 'ido-init)
 

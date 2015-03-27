@@ -56,8 +56,7 @@
 
 ;; highlight current line
 (use-package hl-line
-  :config
-  (global-hl-line-mode 1))
+  :init (global-hl-line-mode 1))
 
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-buffer-boundaries 'right)

@@ -11,7 +11,6 @@
   (setq c-default-style "cc-mode"
         c-basic-offset 2))
 
-
 (use-package flycheck-google-cpplint
   :defer t
   :config
