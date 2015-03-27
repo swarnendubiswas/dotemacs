@@ -1,4 +1,4 @@
-;;; defaults-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; defaults-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup and tweak emacs defaults.
@@ -35,6 +35,7 @@
   (transient-mark-mode 1))
 
 (use-package autorevert
+  :defer 10
   :init (global-auto-revert-mode 1) ;; Auto-refresh all buffers, does not work for remote files.
   :config
   (setq-default auto-revert-interval 5 ; Default is 5 s.

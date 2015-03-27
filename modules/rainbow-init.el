@@ -1,4 +1,4 @@
-;;; rainbow-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; rainbow-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Make emacs more colorful.
@@ -17,6 +17,7 @@
 
 (use-package rainbow-delimiters
   :ensure t
+  :defer t
   :config (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (provide 'rainbow-init)

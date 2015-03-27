@@ -1,4 +1,4 @@
-;;; indent-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; indent-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup indentation in emacs.
@@ -12,8 +12,8 @@
 
 (use-package aggressive-indent
   :ensure t
-  :diminish aggressive-indent-mode
-  :init (global-aggressive-indent-mode 1))
+  :init (global-aggressive-indent-mode 1)
+  :diminish aggressive-indent-mode)
 
 ;; intelligent indentation, on by default from Emacs 24.4
 (use-package electric
@@ -27,15 +27,15 @@
 (use-package highlight-indentation
   :ensure t
   :disabled t
-  :config (highlight-indentation-mode 1))
+  :init (highlight-indentation-mode 1))
 
 ;; indentation guide: doesn't seem to work well with company-mode and auto-complete-mode
 (use-package indent-guide
   :ensure t
   :disabled t
+  :init (indent-guide-global-mode 1)
   :config
-  (setq indent-guide-delay 0.1) ; show guide lines only in idle-time
-  (indent-guide-global-mode 1))
+  (setq indent-guide-delay 0.1)) ; show guide lines only in idle-time
 
 ;;(auto-indent-global-mode 1) ; auto-indentation minor mode
 

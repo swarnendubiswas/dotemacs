@@ -1,4 +1,4 @@
-;;; org-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; org-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup org mode.
@@ -15,9 +15,9 @@
         org-src-window-setup 'current-window
         org-fontify-whole-heading-line t
         org-latex-listings t)) ;; tell org to use listings
-;; requite org-latex so that the following variables are defined
-(paradox-require 'ox-latex)
 
+;; require org-latex so that the following variables are defined
+(require 'ox-latex)
 
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook 'visual-line-mode)

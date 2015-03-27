@@ -1,4 +1,4 @@
-;;; shell-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; shell-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup shell (not eshell) mode.

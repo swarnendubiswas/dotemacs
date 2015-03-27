@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -96,6 +96,10 @@
   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
 (eval-after-load 'LaTeX
   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
+
+(use-package ebib
+  :ensure t
+  :bind ("C-c e" . ebib))
 
 (provide 'latex-init)
 

@@ -1,4 +1,4 @@
-;;; ace-jump-init.el --- Part of emacs initialization   -*- lexical-binding: t; -*-
+;;; ace-jump-init.el --- Part of emacs initialization   -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup ace jump modes.

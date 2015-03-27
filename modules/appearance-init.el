@@ -1,4 +1,4 @@
-;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Tweak emacs appearance.

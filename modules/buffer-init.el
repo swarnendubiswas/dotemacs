@@ -1,4 +1,4 @@
-;;; buffer-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*-
+;;; buffer-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Buffer configurations

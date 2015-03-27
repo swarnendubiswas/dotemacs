@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization   -*- lexical-binding: t; -*-
+;;; init.el --- Emacs customization  -*- lexical-binding: t; -*-  -*-no-byte-compile: t; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:
@@ -96,8 +96,13 @@
 ;; custom definitions
 (require 'custom-init)
 
-;; start the daemon/server
-(server-start)
+;; ;; start the daemon/server
+;; (use-package server
+;;   :defer t
+;;   :init
+;;   (progn
+;;     (server-force-delete)
+;;     (server-start)))
 
 
 ;;; init.el ends here
