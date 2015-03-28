@@ -58,10 +58,6 @@
   :defer t
   :config (ido-better-flex/enable))
 
-(use-package ido-better-flex
-  :ensure t
-  :defer t)
-
 (use-package ido-at-point
   :ensure t
   :defer t
