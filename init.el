@@ -91,6 +91,8 @@
 (require 'java-init)
 (require 'shell-init)
 
+(require 'svn-init)
+
 (require 'keybindings-init)
 
 ;; custom definitions
