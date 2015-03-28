@@ -19,10 +19,10 @@
   (setq require-final-newline t ; Always end a file with a newline.
         make-backup-files nil ; Stop making backup ~ files
         ;; Disable backup for a per-file basis, not to be used by major modes.
-        backup-inhibited t)) 
+        backup-inhibited t))
 
-(setq sentence-end-double-space nil)
-(setq x-select-enable-clipboard t) ; Enable use of system clipboard across emacs and other applications.
+(setq sentence-end-double-space nil
+      x-select-enable-clipboard t) ; Enable use of system clipboard across emacs and other applications.
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
@@ -31,7 +31,7 @@
   ;; We need to paste something from another program, but sometimes we do real paste after some kill
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
   (setq save-interprogram-paste-before-kill t)
-  ;; Enable visual feedback on selections, default since v23 
+  ;; Enable visual feedback on selections, default since v23
   (transient-mark-mode 1))
 
 (use-package autorevert

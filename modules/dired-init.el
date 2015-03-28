@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-;;(require 'dired) ; needed for dired-mode-map
-
 ;; use "C-x d", or "M-x dired"
 (use-package dired
   :defer t
@@ -15,8 +13,8 @@
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
         ;;delete-by-moving-to-trash t
+        ;;dired-listing-switches "-ABhltc --si --group-directories-first"
         dired-listing-switches "-ABhl --si --group-directories-first")
-        ;;dired-listing-switches "-ABhltc --si --group-directories-first")
   (setq-default diredp-hide-details-initially-flag nil))
 
 ;; Jump to dired buffer corresponding to current buffer.

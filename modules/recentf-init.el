@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package recentf
-  :commands (recentf-mode) ;recentf-add-file recentf-apply-filename-handlers recentf-open-files)
+  :commands (recentf-mode) ;recentf-add-file recentf-apply-filename-handlers recentf-open-files
   :init (recentf-mode 1)
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu

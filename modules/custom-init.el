@@ -45,6 +45,7 @@ If region is active, apply to active region instead."
   :defer t)
 
 (use-package etags
+  :defer t
   :bind ("M-T" . tags-search))
 
 ;; create tags for a latex project, no need to setup a keybinding
@@ -52,8 +53,7 @@ If region is active, apply to active region instead."
 (defun create-latex-etags ()
   "Create etags for the current latex project."
   (interactive)
-  (compile "find . -name \"*.tex\" -print | etags -")
-  )
+  (compile "find . -name \"*.tex\" -print | etags -"))
 (defun create-latex-ctags () ; (dir-name))
   "Create ctags for the current latex project."
   ;;(interactive "DDirectory: ")
@@ -61,8 +61,7 @@ If region is active, apply to active region instead."
   ;;  (format "ctags -o TAGS -R *.tex %s" (directory-file-name dir-name)))
   (interactive)
   ;;(compile "find . -name \"*.tex\" -print | ctags -a -u -o TAGS -")
-  (compile "find . -name \"*.tex\" -print | xargs ctags -o TAGS")
-  )
+  (compile "find . -name \"*.tex\" -print | xargs ctags -o TAGS"))
 
 (provide 'custom-init)
 
