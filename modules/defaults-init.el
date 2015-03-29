@@ -48,6 +48,7 @@
       query-replace-highlight t ; highlight during query
       case-fold-search t) ; make search ignore case
 
+;; /method:user@host#port:filename
 (use-package tramp
   :defer t
   :config

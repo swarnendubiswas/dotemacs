@@ -39,7 +39,9 @@
 (use-package company-quickhelp
   :ensure t
   :defer t
-  :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode))
+  :init
+  ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
+  (company-quickhelp-mode 1))
 
 (provide 'company-init)
 
