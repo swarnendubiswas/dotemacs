@@ -7,13 +7,15 @@
 
 (use-package ace-jump-mode
   :ensure t
+  :defer t
   ;;:init (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind ("C-c C-SPC" . ace-jump-mode))
 
 ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 
 (use-package ace-jump-buffer
-  :ensure t)
+  :ensure t
+  :defer t)
 
 ;; ace-jump-buffer
 ;; leave out certain buffer based on file name patterns

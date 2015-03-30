@@ -37,10 +37,12 @@ If region is active, apply to active region instead."
 ;; tags
 
 (use-package ctags
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package ctags-update
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package etags
   :bind ("M-T" . tags-search))

@@ -41,10 +41,12 @@
   :disabled t)
 
 (use-package math-symbol-lists
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package bibtex-utils
-  :ensure t)
+  :ensure t
+  :defer t)
 
 ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
@@ -74,6 +76,7 @@
 
 (use-package reftex
   :diminish reftex-mode
+  :defer t
   :init
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)

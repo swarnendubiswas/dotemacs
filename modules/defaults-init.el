@@ -40,7 +40,7 @@
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
                 global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
-  :init (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
+  :config (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 

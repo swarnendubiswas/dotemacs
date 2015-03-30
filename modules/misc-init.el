@@ -30,16 +30,19 @@
   :config (tabbar-mode 1))
 
 (use-package jgraph-mode
-  :ensure)
+  :ensure
+  :defer t)
 
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
   :ensure t
+  :defer t
   :config (global-hungry-delete-mode 1))
 
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
+  :defer t
   :config (fixme-mode 1))
 
 (use-package fish-mode
@@ -49,6 +52,7 @@
 ;; move text with M-up and M-down like eclipse
 (use-package move-text
   :ensure t
+  :defer t
   :config (move-text-default-bindings))
 
 (use-package duplicate-thing
@@ -66,19 +70,26 @@
   :bind ("C-h C-m" . discover-my-major))
 
 (use-package manage-minor-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package jgraph-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package graphviz-dot-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package goto-last-change
   :ensure t
   :pin melpa
   ;;:load-path "lisp/" ; prefer melpa
   :bind ("C-x C-\\" . goto-last-change))
+
+(use-package bug-hunter
+  :ensure t
+  :defer t)
 
 (provide 'misc-init)
 

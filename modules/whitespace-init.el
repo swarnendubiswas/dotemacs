@@ -7,6 +7,7 @@
 
 (use-package whitespace
   :diminish global-whitespace-mode
+  :defer t
   :init
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
                 show-trailing-whitespace t
