@@ -7,7 +7,7 @@
 
 (use-package psvn
   :ensure t
-  :defer t
+  :defer 10
   :init
   (setq svn-status-verbose nil
         svn-status-display-full-path t

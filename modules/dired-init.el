@@ -7,7 +7,7 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
-  :defer t
+  :defer 5
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
@@ -23,6 +23,7 @@
   :config (setq dired-bind-jump t)
   :bind ("C-x C-j" . dired-jump)) ;; C-x C-j opens dired with the cursor right on the file you're editing
 
+;; direx:jump-to-directory is a good explorer
 (use-package direx
   :ensure t
   :defer t)
@@ -33,23 +34,23 @@
 
 (use-package dired+
   :ensure t
-  :defer t)
+  :defer 5)
 
 (use-package dired-details
   :ensure t
-  :defer t)
+  :defer 5)
 
 (use-package dired-details+
   :ensure t
-  :defer t)
+  :defer 5)
 
 (use-package dired-rainbow
   :ensure t
-  :defer t)
+  :defer 5)
 
 (use-package dired-hacks-utils
   :ensure t
-  :defer t)
+  :defer 5)
 
 (use-package nav
   :disabled t

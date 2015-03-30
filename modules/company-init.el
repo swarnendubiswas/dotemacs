@@ -25,7 +25,7 @@
 
 (use-package company-statistics
   :ensure t
-  :defer t
+  :defer 10
   :config (company-statistics-mode 1))
 
 (use-package company-math
@@ -38,7 +38,7 @@
 
 (use-package company-quickhelp
   :ensure t
-  :defer t
+  :defer 5
   :config
   ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
   (company-quickhelp-mode 1))

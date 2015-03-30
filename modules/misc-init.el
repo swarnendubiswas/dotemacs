@@ -18,7 +18,7 @@
 ;; speed up emacs for large files
 (use-package vlf
   :ensure t
-  :defer t
+  :defer 10
   :config
   (progn
     (setq large-file-warning-threshold 50000000)
@@ -36,7 +36,7 @@
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
   :ensure t
-  :defer t
+  :defer 5
   :config (global-hungry-delete-mode 1))
 
 ;; highlight certain words
@@ -52,7 +52,7 @@
 ;; move text with M-up and M-down like eclipse
 (use-package move-text
   :ensure t
-  :defer t
+  :defer 5
   :config (move-text-default-bindings))
 
 (use-package duplicate-thing

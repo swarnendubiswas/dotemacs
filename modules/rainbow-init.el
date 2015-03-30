@@ -17,8 +17,10 @@
 
 (use-package rainbow-delimiters
   :ensure t
-  :defer t
-  :config (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  :defer 5
+  :config
+  ;;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  (rainbow-delimiters-mode 1))
 
 (provide 'rainbow-init)
 

@@ -20,7 +20,7 @@
 ;;   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
 
 (use-package which-func
-  :defer t
+  :defer 10
   :config
   (add-hook 'prog-mode-hook 'which-func-mode))
   

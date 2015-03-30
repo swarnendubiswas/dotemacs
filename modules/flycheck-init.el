@@ -19,7 +19,7 @@
 (use-package flycheck-package
   :ensure t
   :defer t
-  :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
+  :config (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
 (use-package flycheck-tip
   :ensure t
@@ -29,8 +29,8 @@
 (use-package flycheck-pos-tip           
   :ensure t
   :defer t
-  :init (with-eval-after-load 'flycheck
-          (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+  :config (with-eval-after-load 'flycheck
+            (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
 (provide 'flycheck-init)
 

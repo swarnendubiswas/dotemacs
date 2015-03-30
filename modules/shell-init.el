@@ -11,8 +11,8 @@
 
 (use-package bash-completion
   :ensure t
-  :defer t
-  :init (bash-completion-setup))
+  :defer 5
+  :config (bash-completion-setup))
 
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "fish"

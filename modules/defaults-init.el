@@ -105,7 +105,7 @@
 
 ;; remember cursor position in files
 (use-package saveplace
-  :defer t
+  :defer 10
   :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions
@@ -123,7 +123,7 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
-  :defer t
+  :defer 10
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
@@ -131,7 +131,7 @@
   (savehist-mode 1))
 
 (use-package uniquify
-  :defer t
+  :defer 10
   :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>

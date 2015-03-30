@@ -7,15 +7,13 @@
 
 (use-package highlight-numbers
   :ensure t
-  :defer t
-  :init
-  ;;(add-hook 'prog-mode-hook #'highlight-numbers-mode)
-  (highlight-numbers-mode 1))
+  :defer 5
+  :config (highlight-numbers-mode 1))
 
 (use-package highlight-symbol
   :ensure t
   :disabled t
-  :init (highlight-symbol-mode 1)
+  :config (highlight-symbol-mode 1)
   :diminish highlight-symbol-mode)
 
 (use-package idle-highlight
@@ -29,7 +27,7 @@
 (use-package auto-highlight-symbol
   :ensure t
   :disabled t
-  :init (global-auto-highlight-symbol-mode 1))
+  :config (global-auto-highlight-symbol-mode 1))
   
 (provide 'highlight-init)
 
