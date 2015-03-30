@@ -8,10 +8,10 @@
 ;; related to pairing of parentheses, brackets, etc.
 
 (use-package paren
-  :config
+  :init
   (setq show-paren-delay 0
         show-paren-style 'parenthesis) ; 'expression, 'parenthesis, 'mixed
-  :init 
+  :config
   (when (fboundp 'show-paren-mode)
     (show-paren-mode 1) ; highlight matching parentheses when the point is on them
     (make-variable-buffer-local 'show-paren-mode)))

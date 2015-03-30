@@ -36,11 +36,11 @@
 
 (use-package autorevert
   :defer 10
-  :init (global-auto-revert-mode 1) ;; Auto-refresh all buffers, does not work for remote files.
-  :config
+  :init
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
-                global-auto-revert-non-file-buffers t)) ; Auto-refresh dired buffers.
+                global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
+  :init (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
 
 (delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
 
@@ -77,10 +77,10 @@
 ;; desktop save mode
 (use-package desktop
   :disabled t
-  :init (desktop-save-mode -1)
-  :config 
+  :init
   (setq-default desktop-restore-frames nil ; no need to restore frames
-                desktop-load-locked-desktop nil))
+                desktop-load-locked-desktop nil)
+  :config (desktop-save-mode -1))
 
 ;; fully redraw the display before queued input events are processed
 ;; don't defer screen updates when performing operations

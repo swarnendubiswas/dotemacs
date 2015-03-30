@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-;; minor mode to highlight numeric literals
 (use-package highlight-numbers
   :ensure t
   :defer t
@@ -16,7 +15,8 @@
 (use-package highlight-symbol
   :ensure t
   :disabled t
-  :init (highlight-symbol-mode 1))
+  :init (highlight-symbol-mode 1)
+  :diminish highlight-symbol-mode)
 
 (use-package idle-highlight
   :ensure t

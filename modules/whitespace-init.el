@@ -7,12 +7,12 @@
 
 (use-package whitespace
   :diminish global-whitespace-mode
-  :init (global-whitespace-mode 1)
-  :config
+  :init
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
                 show-trailing-whitespace t
                 ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
-                whitespace-style '(spaces tabs newline space-mark tab-mark newline-mark)))
+                whitespace-style '(spaces tabs newline space-mark tab-mark newline-mark))
+  :config (global-whitespace-mode 1))
 
 ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
 
@@ -25,8 +25,10 @@
 (use-package whitespace-cleanup-mode
   :ensure t
   :defer t
-  ;; :config
+  :config
   ;; (add-hook 'before-save-hook 'whitespace-cleanup-mode)
-  :init (global-whitespace-cleanup-mode 1))
+  (global-whitespace-cleanup-mode 1))
+
+(provide 'whitespace-init)
 
 ;;; whitespace-init.el ends here

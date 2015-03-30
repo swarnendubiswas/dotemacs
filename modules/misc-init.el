@@ -6,16 +6,14 @@
 ;;; Code:
 
 (use-package smooth-scrolling
-  :ensure t
-  :defer t
-  :config (require 'smooth-scrolling))
+  :ensure t)
 
 (use-package achievements
   :ensure t
   :disabled t
   :diminish achievements-mode
-  :init (achievements-mode 1)
-  :config (setq achievements-idle-time 600)) ; seconds
+  :init (setq achievements-idle-time 600) ; seconds
+  :config (achievements-mode 1))
 
 ;; speed up emacs for large files
 (use-package vlf
@@ -28,23 +26,20 @@
 
 (use-package tabbar
   :ensure t
-  :init (tabbar-mode 1)
-  :config (setq tabbar-use-images nil)) ; speed up by not using images
+  :init (setq tabbar-use-images nil) ; speed up by not using images
+  :config (tabbar-mode 1))
 
 (use-package jgraph-mode
-  :ensure
-  :defer t)
+  :ensure)
 
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
   :ensure t
-  :defer t
-  :init (global-hungry-delete-mode 1))
+  :config (global-hungry-delete-mode 1))
 
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
-  :defer t
   :config (fixme-mode 1))
 
 (use-package fish-mode
@@ -54,43 +49,35 @@
 ;; move text with M-up and M-down like eclipse
 (use-package move-text
   :ensure t
-  :defer t
-  :init (move-text-default-bindings))
+  :config (move-text-default-bindings))
 
 (use-package duplicate-thing
   :ensure t
-  :defer t
   :bind ("C-c C-d" . duplicate-thing))
 
-;; writegood-mode: identify weasel words, passive voice, and duplicate words
+;; identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :ensure t
-  :defer t
   :bind ("C-c g" . writegood-mode)
   :diminish writegood-mode)
 
 (use-package discover-my-major
   :ensure t
-  :defer t
   :bind ("C-h C-m" . discover-my-major))
 
 (use-package manage-minor-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package jgraph-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package graphviz-dot-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package goto-last-change
   :ensure t
   :pin melpa
   ;;:load-path "lisp/" ; prefer melpa
-  :defer t
   :bind ("C-x C-\\" . goto-last-change))
 
 (provide 'misc-init)

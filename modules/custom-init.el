@@ -37,15 +37,12 @@ If region is active, apply to active region instead."
 ;; tags
 
 (use-package ctags
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package ctags-update
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package etags
-  :defer t
   :bind ("M-T" . tags-search))
 
 ;; create tags for a latex project, no need to setup a keybinding

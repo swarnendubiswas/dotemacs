@@ -6,13 +6,15 @@
 ;;; Code:
 
 (use-package psvn
+  :ensure t
   :defer t
-  :init (add-hook 'LaTeX-mode-hook #'svn-status)
-  :config
+  :init
   (setq svn-status-verbose nil
         svn-status-display-full-path t
         svn-status-auto-revert-buffers t
-        svn-status-use-ido-completion t))
+        svn-status-use-ido-completion t)
+  :config
+  (add-hook 'LaTeX-mode-hook #'svn-status))
 
 (provide 'svn-init)
 

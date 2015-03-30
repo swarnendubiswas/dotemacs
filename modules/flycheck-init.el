@@ -12,9 +12,8 @@
 
 (use-package flycheck
   :ensure t
-  :defer t
-  :init (global-flycheck-mode 1)
-  :diminish flycheck-mode)
+  :diminish flycheck-mode
+  :config (global-flycheck-mode 1))
 
 ;; Check package conventions with Flycheck
 (use-package flycheck-package

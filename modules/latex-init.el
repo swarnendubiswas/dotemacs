@@ -41,12 +41,10 @@
   :disabled t)
 
 (use-package math-symbol-lists
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package bibtex-utils
-  :ensure t
-  :defer t)
+  :ensure t)
 
 ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
@@ -55,13 +53,14 @@
 (add-hook 'LaTeX-mode-hook 'turn-on-flyspell)
 (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
 (add-hook 'LaTeX-mode-hook #'fci-mode)
-(add-hook 'LaTeX-mode-hook (lambda () (TeX-PDF-mode 1))) ; compile files to pdf by default
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (TeX-PDF-mode 1))) ; compile files to pdf by default
 
 ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
 ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 ;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
-;;(add-hook 'LaTeX-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
       TeX-parse-self t ; Parse documents
@@ -75,14 +74,14 @@
 
 (use-package reftex
   :diminish reftex-mode
-  :init (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
-  :config
+  :init
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)
         reftex-cite-format 'abbrv
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
-        reftex-enable-partial-scans t))
+        reftex-enable-partial-scans t)
+  :config (add-hook 'LaTeX-mode-hook #'turn-on-reftex))
 
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))

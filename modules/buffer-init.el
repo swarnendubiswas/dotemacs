@@ -7,10 +7,6 @@
 
 (use-package ibuffer
   :init
-  (add-hook 'ibuffer-mode-hook
-            '(lambda ()
-               (ibuffer-auto-mode 1)))
-  :config
   (progn
     (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
     (setq ibuffer-expert t
@@ -19,6 +15,10 @@
           ibuffer-default-sorting-mode 'recency ; 'major-mode
           ibuffer-sorting-mode 'recency
           ibuffer-use-header-line t))
+  :config
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+               (ibuffer-auto-mode 1)))
   :bind ("C-x C-b" . ibuffer))
 
 ;;(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list

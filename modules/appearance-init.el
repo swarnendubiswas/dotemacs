@@ -24,7 +24,7 @@
 (display-time)
 
 (use-package linum
-  :init (global-linum-mode 1)) ; display line numbers in margin
+  :config (global-linum-mode 1)) ; display line numbers in margin
 
 (use-package simple
   :config (column-number-mode 1))
@@ -36,30 +36,30 @@
 
 (use-package leuven-theme
   :ensure t
-  :init (load-theme 'leuven t)
   :disabled t
   :config
+  (load-theme 'leuven t)
   (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
   (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
   
 (use-package professional-theme
   :ensure t
-  :init (load-theme 'professional t)
   :disabled t
   :config
+  (load-theme 'professional t)
   (set-face-attribute 'default nil :height 115)) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
 
 (use-package eclipse-theme
   :ensure t
-  :init (load-theme 'eclipse t)
   :config
+  (load-theme 'eclipse t)
   (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
   (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)
   (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black"))
 
 ;; highlight current line
 (use-package hl-line
-  :init (global-hl-line-mode 1))
+  :config (global-hl-line-mode 1))
 
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
 (setq-default indicate-buffer-boundaries 'right)
@@ -67,7 +67,7 @@
 (use-package display-theme
   :ensure t
   :disabled t
-  :init (display-theme-mode))
+  :config (display-theme-mode))
 
 (provide 'appearance-init)
 

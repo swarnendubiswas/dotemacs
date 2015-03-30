@@ -9,7 +9,7 @@
   :ensure t
   :diminish yas-minor-mode
   :commands (yas-global-mode yas-minor-mode)
-  :init
+  :config
   ;;(yas-reload-all 1) ; this slows startup
   ;; mostly useful with LaTeX
   ;; (add-hook 'LaTeX-mode-hook
