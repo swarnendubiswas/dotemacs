@@ -5,6 +5,19 @@
 
 ;;; Code:
 
+;; (defun setup-shell-mode ()
+;;   "Personal preferences for shell mode."
+;;   (interactive)
+;;   (setq sh-basic-offset 4
+;;         sh-indentation 4))
+;; (add-hook 'sh-mode-hook 'setup-shell-mode)
+
+(use-package sh-script
+  :defer t
+  :config
+  (setq sh-basic-offset 4
+        sh-indentation 4))
+
 (use-package readline-complete
   :ensure t
   :defer t)
@@ -23,7 +36,9 @@
 
 ;; setup auto-completion framework
 (push 'company-readline company-backends)
-(add-hook 'rlc-no-readline-hook (lambda () (company-mode -1)))
+(add-hook 'rlc-no-readline-hook
+          (lambda ()
+            (company-mode -1)))
 ;;(add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 

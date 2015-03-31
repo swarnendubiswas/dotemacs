@@ -20,6 +20,11 @@
 (use-package ox-latex
   :config
   (setq org-latex-listings t)) ;; tell org to use listings
+;; include the listings package
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+;; if you want colored source code then you need to include the color package
+(add-to-list 'org-latex-packages-alist '("" "color"))
+
 
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook 'visual-line-mode)
@@ -30,12 +35,6 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (writegood-mode 1)))
-
-;; include the listings package
-(add-to-list 'org-latex-packages-alist '("" "listings"))
-
-;; if you want colored source code then you need to include the color package
-(add-to-list 'org-latex-packages-alist '("" "color"))
 
 (use-package org-beautify-theme
   :ensure t

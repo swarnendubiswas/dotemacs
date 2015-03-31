@@ -36,9 +36,14 @@
   :ensure t
   :defer t)
 
+;; (when (dired-mode)
+;;   (define-key dired-mode-map (kbd "<f2>") nil))
+
 (use-package dired-efap
   :ensure t
-  :disabled t)
+  ;;:commands dired-efap
+  ;;:bind ("<f2>" . dired-efap)
+  :config (define-key dired-mode-map [f2] 'dired-efap))
 
 ;; Not required starting from Emacs 24.4
 ;; (use-package dired-details
