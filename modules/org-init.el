@@ -13,16 +13,20 @@
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-src-preserve-indentation t
         org-src-window-setup 'current-window
-        org-fontify-whole-heading-line t
-        org-latex-listings t) ;; tell org to use listings
-  ;; require org-latex so that the following variables are defined
-  (require 'ox-latex))
+        org-fontify-whole-heading-line t))
+
+;; require org-latex so that the following variables are defined
+(require 'ox-latex)
+(use-package ox-latex
+  :config
+  (setq org-latex-listings t)) ;; tell org to use listings
 
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook 'visual-line-mode)
 ;; turn on soft wrapping mode for org mode
 (add-hook 'org-mode-hook 
-          (lambda () (setq truncate-lines nil)))
+          (lambda ()
+            (setq truncate-lines nil)))
 (add-hook 'org-mode-hook
           (lambda ()
             (writegood-mode 1)))

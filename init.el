@@ -40,7 +40,6 @@
 
 ;;; Code:
 
-
 ;; customizing packages
 ;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp")) ; third-party packages
@@ -81,6 +80,7 @@
 (require 'guide-key-init)
 (require 'rainbow-init)
 (require 'undo-tree-init)
+(require 'whitespace-init)
 
 ;; configure individual programming or major modes
 (require 'text-init)
