@@ -38,7 +38,7 @@
 
 (use-package company-quickhelp
   :ensure t
-  :defer 5
+  :defer 10
   :config
   ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
   (company-quickhelp-mode 1))

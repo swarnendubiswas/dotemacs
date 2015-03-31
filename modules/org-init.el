@@ -14,10 +14,9 @@
         org-src-preserve-indentation t
         org-src-window-setup 'current-window
         org-fontify-whole-heading-line t
-        org-latex-listings t)) ;; tell org to use listings
-
-;; require org-latex so that the following variables are defined
-(require 'ox-latex)
+        org-latex-listings t) ;; tell org to use listings
+  ;; require org-latex so that the following variables are defined
+  (require 'ox-latex))
 
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook 'visual-line-mode)

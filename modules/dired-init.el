@@ -7,15 +7,18 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
-  :defer 5
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
         ;;delete-by-moving-to-trash t
         ;;dired-listing-switches "-ABhltc --si --group-directories-first"
-        dired-listing-switches "-ABhl --si --group-directories-first")
-  (setq-default diredp-hide-details-initially-flag nil))
+        dired-listing-switches "-ABhl --si --group-directories-first"))
+
+;; (use-package dired+
+;;   :ensure t
+;;   :config
+;;   (setq-default diredp-hide-details-initially-flag nil))
 
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
@@ -31,10 +34,6 @@
 (use-package dired-efap
   :ensure t
   :disabled t)
-
-(use-package dired+
-  :ensure t
-  :defer 5)
 
 (use-package dired-details
   :ensure t

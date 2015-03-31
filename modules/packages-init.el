@@ -29,7 +29,7 @@
 
 (use-package auto-compile
   :ensure t
-  :demand t
+  :disabled t
   :init
   (setq auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)
@@ -39,6 +39,7 @@
 
 (use-package paradox
   :ensure t
+  :defer t
   :init
   (setq paradox-execute-asynchronously t
         paradox-github-token t))

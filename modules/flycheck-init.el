@@ -18,12 +18,12 @@
 ;; Check package conventions with Flycheck
 (use-package flycheck-package
   :ensure t
-  :defer t
+  :disabled t
   :config (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
 (use-package flycheck-tip
   :ensure t
-  :defer t)
+  :defer 10)
 
 ;; Show Flycheck messages in popups
 (use-package flycheck-pos-tip           

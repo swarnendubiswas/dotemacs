@@ -10,7 +10,11 @@
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal
   (setq ispell-extra-args '("--sug-mode=normal"))
-  :config (add-hook 'find-file-hooks 'turn-on-flyspell)
+  :config
+  (add-hook 'find-file-hooks 'turn-on-flyspell)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-flyspell)
+  (add-hook 'text-mode-hook 'turn-on-flyspell)
   :diminish flyspell-mode
   :bind
   ("C-c i f" . flyspell-mode)

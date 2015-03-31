@@ -18,16 +18,22 @@
 
 (use-package idle-highlight
   :ensure t
-  :disabled t)
+  :disabled t
+  :config (idle-highlight))
 
 (use-package idle-highlight-mode
   :ensure t
-  :disabled t)
+  :disabled t
+  :config 
+  ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point)
+  (idle-highlight-mode 1))
 
 (use-package auto-highlight-symbol
   :ensure t
   :disabled t
-  :config (global-auto-highlight-symbol-mode 1))
+  :config
+  ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
+  (global-auto-highlight-symbol-mode 1))
   
 (provide 'highlight-init)
 

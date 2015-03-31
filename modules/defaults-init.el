@@ -105,7 +105,7 @@
 
 ;; remember cursor position in files
 (use-package saveplace
-  :defer 10
+  :defer 15
   :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions
@@ -123,7 +123,7 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
-  :defer 10
+  :defer 15
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t

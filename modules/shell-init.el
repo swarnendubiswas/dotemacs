@@ -11,7 +11,7 @@
 
 (use-package bash-completion
   :ensure t
-  :defer 5
+  :defer t
   :config (bash-completion-setup))
 
 ;; set up shell (not eshell) mode

@@ -32,6 +32,7 @@
 ;; extension to linum-mode to highlight current line number in the margin
 (use-package hlinum
   :ensure t
+  :defer 5
   :config (hlinum-activate))
 
 (use-package leuven-theme
@@ -59,6 +60,8 @@
 
 ;; highlight current line
 (use-package hl-line
+  :ensure t
+  :defer 5
   :config (global-hl-line-mode 1))
 
 ;;(set-face-background 'fringe "white") ; hide the fringe mark on the left

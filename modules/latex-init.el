@@ -52,9 +52,7 @@
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
 
-(add-hook 'LaTeX-mode-hook 'turn-on-flyspell)
 (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook #'fci-mode)
 (add-hook 'LaTeX-mode-hook
           (lambda ()
             (TeX-PDF-mode 1))) ; compile files to pdf by default
