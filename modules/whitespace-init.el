@@ -26,8 +26,9 @@
 
 (use-package whitespace-cleanup-mode
   :ensure t
-  :disabled t
+  ;;:disabled t
   :defer 10
+  :diminish whitespace-cleanup-mode
   :config
   ;; (add-hook 'before-save-hook 'whitespace-cleanup-mode)
   (global-whitespace-cleanup-mode 1))

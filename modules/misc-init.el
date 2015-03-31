@@ -6,7 +6,8 @@
 ;;; Code:
 
 (use-package smooth-scrolling
-  :ensure t)
+  :ensure t
+  :defer 5)
 
 (use-package achievements
   :ensure t
@@ -18,7 +19,7 @@
 ;; speed up emacs for large files
 (use-package vlf
   :ensure t
-  :defer 10
+  :defer 5
   :config
   (progn
     (setq large-file-warning-threshold 50000000)
@@ -42,7 +43,7 @@
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
-  :defer t
+  :defer 5
   :config (fixme-mode 1))
 
 (use-package fish-mode

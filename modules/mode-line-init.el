@@ -7,13 +7,11 @@
 
 (use-package powerline
   :ensure t
-  ;;:disabled t
   :config
   (powerline-default-theme))
 
 (use-package smart-mode-line
   :ensure t
-  :defer t
   :disabled t
   :config
   (progn

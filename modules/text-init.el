@@ -6,7 +6,6 @@
 ;;; Code:
 
 ;;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-(setq comment-auto-fill-only-comments t)
 
 (provide 'text-init)
 

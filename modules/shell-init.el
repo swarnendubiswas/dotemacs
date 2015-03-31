@@ -16,6 +16,7 @@
   :defer t
   :config
   (setq sh-basic-offset 4
+        sh-indent-comment t
         sh-indentation 4))
 
 (use-package readline-complete
@@ -30,8 +31,6 @@
 ;; set up shell (not eshell) mode
 (setq explicit-shell-file-name "fish"
       ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-      sh-basic-offset 4
-      sh-indent-comment t
       comint-process-echoes t)
 
 ;; setup auto-completion framework

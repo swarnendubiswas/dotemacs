@@ -15,15 +15,17 @@
         org-src-window-setup 'current-window
         org-fontify-whole-heading-line t))
 
-;; require org-latex so that the following variables are defined
-(require 'ox-latex)
+;; require ox-latex so that the following variables are defined
+;;(require 'ox-latex)
+
 (use-package ox-latex
+  ;;:demand t
   :config
-  (setq org-latex-listings t)) ;; tell org to use listings
-;; include the listings package
-(add-to-list 'org-latex-packages-alist '("" "listings"))
-;; if you want colored source code then you need to include the color package
-(add-to-list 'org-latex-packages-alist '("" "color"))
+  (setq org-latex-listings t) ;; tell org to use listings
+  ;; include the listings package
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
+  ;; if you want colored source code then you need to include the color package
+  (add-to-list 'org-latex-packages-alist '("" "color")))
 
 
 (add-hook 'org-mode-hook 'turn-on-font-lock)

@@ -12,8 +12,8 @@
 (use-package auctex-latexmk
   :ensure t
   :defer t
-  :init (with-eval-after-load 'latex
-          (auctex-latexmk-setup)))
+  :config (with-eval-after-load 'latex
+            (auctex-latexmk-setup)))
 
 (use-package latex-extra
   :ensure t
@@ -38,7 +38,9 @@
 
 (use-package magic-latex-buffer
   :ensure t
-  :disabled t)
+  :disabled t
+  :config
+  (add-hook 'LaTeX-mode-hook 'magic-latex-buffer))
 
 (use-package math-symbol-lists
   :ensure t
@@ -48,10 +50,6 @@
   :ensure t
   :defer t)
 
-;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
-;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
-;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
-
 (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
 (add-hook 'LaTeX-mode-hook
           (lambda ()
@@ -60,7 +58,6 @@
 ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
 ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-;;(add-hook 'LaTeX-mode-hook 'magic-latex-buffer)
 
 (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
       TeX-parse-self t ; Parse documents
@@ -71,6 +68,10 @@
 
 (setq-default TeX-master nil ; query for master file
               TeX-command-default "LatexMk")
+
+;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
+;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
+;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
 
 (use-package reftex
   :diminish reftex-mode

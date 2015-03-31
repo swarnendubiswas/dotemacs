@@ -21,6 +21,7 @@
 
 (use-package smartparens
   :ensure t
+  :disabled t
   :defer 5
   :commands (smartparens-mode show-smartparens-mode)
   :diminish smartparens-mode

@@ -44,8 +44,7 @@
 (defun dired-back-to-top ()
   (interactive)
   (beginning-of-buffer)
-  (dired-next-line 4))
-
+  (dired-next-line 2))
 ;; M-<down> is nicer in dired if it moves to the last file
 (defun dired-jump-to-bottom ()
   (interactive)

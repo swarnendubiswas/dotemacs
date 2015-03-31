@@ -8,7 +8,7 @@
 (use-package flyspell
   :init
   (setq-default ispell-program-name "/usr/bin/aspell")
-  ;; speed up aspell: ultra | fast | normal
+  ;; speed up aspell: ultra | fast | normal | bad-spellers
   (setq ispell-extra-args '("--sug-mode=normal"))
   :config
   (add-hook 'find-file-hooks 'turn-on-flyspell)
