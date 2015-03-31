@@ -13,18 +13,23 @@
         dired-recursive-copies 'always
         ;;delete-by-moving-to-trash t
         ;;dired-listing-switches "-ABhltc --si --group-directories-first"
-        dired-listing-switches "-ABhl --si --group-directories-first"))
-
-;; (use-package dired+
-;;   :ensure t
-;;   :config
-;;   (setq-default diredp-hide-details-initially-flag nil))
+        dired-listing-switches "-ABhl --si --group-directories-first"
+        dired-dwim-target t))
 
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
   :commands (dired-jump)
-  :config (setq dired-bind-jump t)
+  :config
+  (setq dired-bind-jump t)
+  (setq-default dired-omit-mode t)
   :bind ("C-x C-j" . dired-jump)) ;; C-x C-j opens dired with the cursor right on the file you're editing
+
+(use-package dired+
+  :ensure t
+  ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
+  :init (setq-default diredp-hide-details-initially-flag nil)
+  ;;:config (global-dired-hide-details-mode -1)
+  )
 
 ;; direx:jump-to-directory is a good explorer
 (use-package direx
@@ -35,13 +40,14 @@
   :ensure t
   :disabled t)
 
-(use-package dired-details
-  :ensure t
-  :defer 5)
+;; Not required starting from Emacs 24.4
+;; (use-package dired-details
+;;   :ensure t
+;;   :config (setq dired-details-hide-link-targets nil))
 
-(use-package dired-details+
-  :ensure t
-  :defer 5)
+;; (use-package dired-details+
+;;   :ensure t
+;;   :defer 5)
 
 (use-package dired-rainbow
   :ensure t
