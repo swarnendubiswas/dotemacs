@@ -104,7 +104,9 @@
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
 
-(highlight-changes-mode 1) ; not very useful usually
+(use-package hilit-chg
+  :config (highlight-changes-mode 1) ; not very useful usually
+  :bind ("M-o C" . highlight-changes-mode))
 
 ;; remember cursor position in files
 (use-package saveplace

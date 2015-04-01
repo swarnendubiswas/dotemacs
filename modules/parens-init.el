@@ -8,7 +8,7 @@
 ;; related to pairing of parentheses, brackets, etc.
 
 (use-package paren
-  :defer 5
+  :disabled t
   :init
   (setq show-paren-delay 0
         show-paren-style 'parenthesis) ; 'expression, 'parenthesis, 'mixed
@@ -26,8 +26,8 @@
   :commands (smartparens-mode show-smartparens-mode)
   :diminish smartparens-mode
   :config
-  (use-package smartparens-config)
-  (smartparens-global-mode))
+  ;;(smartparens-global-mode)
+  (use-package smartparens-config))
 
 (use-package mic-paren
   :ensure t
