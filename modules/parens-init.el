@@ -35,7 +35,10 @@
   :config
   (paren-activate))
 
-;; (flex-autopair-mode 1)
+(use-package flex-autopair
+  :ensure t
+  :disabled t
+  :config (flex-autopair-mode 1))
 
 (provide 'parens-init)
 

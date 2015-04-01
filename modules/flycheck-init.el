@@ -5,28 +5,29 @@
 
 ;;; Code:
 
-(use-package flycheck-color-mode-line
-  :ensure t
-  :disabled t
-  :config (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
-
 (use-package flycheck
   :ensure t
   :diminish flycheck-mode
   :config (global-flycheck-mode 1))
 
+(use-package flycheck-color-mode-line
+  :ensure t
+  :disabled t
+  :config (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
+
 ;; Check package conventions with Flycheck
 (use-package flycheck-package
   :ensure t
   :disabled t
-  :config (with-eval-after-load 'flycheck (flycheck-package-setup)))
+  :config (with-eval-after-load 'flycheck
+            (flycheck-package-setup)))
 
 (use-package flycheck-tip
   :ensure t
   :defer 10)
 
 ;; Show Flycheck messages in popups
-(use-package flycheck-pos-tip           
+(use-package flycheck-pos-tip
   :ensure t
   :defer t
   :config (with-eval-after-load 'flycheck

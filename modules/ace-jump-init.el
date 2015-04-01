@@ -7,7 +7,6 @@
 
 (use-package ace-jump-mode
   :ensure t
-  :defer t
   ;;:init (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind ("C-c C-SPC" . ace-jump-mode))
 

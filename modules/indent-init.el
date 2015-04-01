@@ -24,7 +24,7 @@
 
 (use-package auto-indent-mode
   :ensure t
-  :disabled t
+  :defer 5
   :config (auto-indent-global-mode 1))
 
 (use-package highlight-indentation
@@ -41,9 +41,10 @@
 
 ;; smart tabs (indent with tabs, align with spaces)
 (use-package smart-tabs
-  :disabled t)
+  :ensure t
+  :disabled t
+  :config (global-smart-tab-mode 1))
 
-;;(global-smart-tab-mode 1)
 ;;(autoload 'smart-tabs-mode "smart-tabs-mode"
 ;;  "Intelligently indent with tabs, align with spaces!")
 ;;(autoload 'smart-tabs-mode-enable "smart-tabs-mode")

@@ -31,12 +31,9 @@
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook 'visual-line-mode)
 ;; turn on soft wrapping mode for org mode
-(add-hook 'org-mode-hook 
-          (lambda ()
-            (setq truncate-lines nil)))
 (add-hook 'org-mode-hook
           (lambda ()
-            (writegood-mode 1)))
+            (setq truncate-lines nil)))
 
 (use-package org-beautify-theme
   :ensure t

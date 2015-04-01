@@ -1,7 +1,7 @@
 ;;; misc-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Miscellaneous package configurations
+;; Miscellaneous package configurations.
 
 ;;; Code:
 
@@ -31,7 +31,7 @@
   :config (tabbar-mode 1))
 
 (use-package jgraph-mode
-  :ensure
+  :ensure t
   :defer t)
 
 ;; erase 'all' consecutive white space characters in a given direction

@@ -1,7 +1,7 @@
 ;;; git-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup git
+;; Setup git.
 
 ;;; Code:
 

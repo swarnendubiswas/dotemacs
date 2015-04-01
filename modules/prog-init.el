@@ -18,7 +18,6 @@
   :defer 10
   :config
   (add-hook 'prog-mode-hook 'which-func-mode))
-  
 
 (provide 'prog-init)
 

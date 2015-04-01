@@ -8,20 +8,22 @@
 ;; better frame titles
 ;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
 (setq frame-title-format
-      (list '(buffer-file-name "%f" "%b") " -- " "GNU Emacs " emacs-version "@" system-name))
+      (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 
-(tooltip-mode -1)
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode)
   (menu-bar-mode -1))
+(tooltip-mode -1)
 (scroll-bar-mode 1)
-(blink-cursor-mode 1) ;; enable/disable blinking cursor
+(blink-cursor-mode 1) ; enable/disable blinking cursor
 
 ;; displays the time and date in the mode line
-(setq display-time-day-and-date t
-      display-time-24hr-format nil)
-(display-time)
+(use-package time
+  :config
+  (setq display-time-day-and-date t
+        display-time-24hr-format nil)
+  (display-time))
 
 (use-package linum
   :config (global-linum-mode 1)) ; display line numbers in margin
@@ -55,7 +57,7 @@
   :config
   (load-theme 'eclipse t)
   (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil)
+  (set-face-attribute 'mode-line nil :background "grey80" :foreground "black" :box nil)
   (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black"))
 
 ;; highlight current line

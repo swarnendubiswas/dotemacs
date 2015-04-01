@@ -21,7 +21,10 @@
 (use-package company-auctex
   :ensure t
   :defer t
-  :config (company-auctex-init))
+  :config
+  (add-hook 'LaTeX-mode-hook
+            '(lambda ()
+               (company-auctex-init))))
 
 (use-package company-statistics
   :ensure t
@@ -30,7 +33,7 @@
 
 (use-package company-math
   :ensure t
-  :defer t
+  :defer 10
   :config (with-eval-after-load 'company
             ;; Add backends for math characters
             (add-to-list 'company-backends 'company-math-symbols-unicode)

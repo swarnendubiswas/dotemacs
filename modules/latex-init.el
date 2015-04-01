@@ -29,8 +29,7 @@
 (use-package latex-preview-pane
   :ensure t
   :disabled t
-  :config
-  (latex-preview-pane-enable))
+  :config (latex-preview-pane-enable))
 
 (use-package latex-math-preview
   :ensure t
@@ -39,8 +38,7 @@
 (use-package magic-latex-buffer
   :ensure t
   :disabled t
-  :config
-  (add-hook 'LaTeX-mode-hook 'magic-latex-buffer))
+  :config (add-hook 'LaTeX-mode-hook 'magic-latex-buffer))
 
 (use-package math-symbol-lists
   :ensure t
@@ -59,15 +57,22 @@
 ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
 ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
 
-(setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
-      TeX-parse-self t ; Parse documents
-      TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
-      TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
-      TeX-auto-untabify t
-      latex-run-command "latexmk")
+(use-package tex
+  :defer t
+  :config
+  (progn
+    ((setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
+           TeX-parse-self t ; Parse documents
+           TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
+           TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
+           TeX-auto-untabify t
+           TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
+           TeX-source-correlate-mode t)
+     (setq-default TeX-master nil ; query for master file
+                   TeX-command-default "LatexMk")
+     (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))))
 
-(setq-default TeX-master nil ; query for master file
-              TeX-command-default "LatexMk")
+(setq latex-run-command "latexmk")
 
 ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
@@ -87,11 +92,6 @@
 
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))
-
-;; Provide forward and inverse search with SyncTeX
-(setq TeX-source-correlate-method 'synctex
-      TeX-source-correlate-mode t)
-(add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
 
 (eval-after-load 'LaTeX
   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))

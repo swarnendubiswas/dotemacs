@@ -1,7 +1,7 @@
 ;;; whitespace-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Configure whitespace
+;; Configure whitespace.
 
 ;;; Code:
 
@@ -12,17 +12,11 @@
   :init
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
                 show-trailing-whitespace t
-                ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
                 whitespace-style '(tabs newline space-mark tab-mark newline-mark))
   :config (global-whitespace-mode 1))
 
 ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
-
-;;(set-face-attribute 'whitespace-line nil
-;;                    :background "red1"
-;;                    :foreground "yellow"
-;;                    :weight 'bold)
-;;(global-whitespace-mode 1)
+;;(set-face-attribute 'whitespace-line nil :background "red1" :foreground "yellow" :weight 'bold)
 
 (use-package whitespace-cleanup-mode
   :ensure t
@@ -30,7 +24,7 @@
   :defer 10
   :diminish whitespace-cleanup-mode
   :config
-  ;; (add-hook 'before-save-hook 'whitespace-cleanup-mode)
+  (add-hook 'before-save-hook 'whitespace-cleanup-mode)
   (global-whitespace-cleanup-mode 1))
 
 (provide 'whitespace-init)

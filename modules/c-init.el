@@ -7,7 +7,7 @@
 
 (use-package cc-mode
   :defer t
-  :config 
+  :config
   (setq c-default-style "cc-mode"
         c-basic-offset 2))
 

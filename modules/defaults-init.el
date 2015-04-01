@@ -65,7 +65,7 @@
 
 (setq completion-ignore-case t ; ignore case when completing
       read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
-      read-buffer-completion-ignore-case t) 
+      read-buffer-completion-ignore-case t)
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
@@ -84,7 +84,7 @@
 
 ;; fully redraw the display before queued input events are processed
 ;; don't defer screen updates when performing operations
-(setq redisplay-dont-pause t) 
+(setq redisplay-dont-pause t)
 
 ;; fontification
 (global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
@@ -92,7 +92,7 @@
 (use-package font-lock
   :config
   (setq font-lock-maximum-decoration t ; maximum fontification possible
-        font-lock-support-mode 'jit-lock-mode)) ; jit locking is better than fast-lock and lazy-lock       
+        font-lock-support-mode 'jit-lock-mode)) ; jit locking is better than fast-lock and lazy-lock
 
 (use-package jit-lock
   :config
@@ -101,11 +101,11 @@
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
 
-;;(highlight-changes-mode 1) ; not very useful usually
+(highlight-changes-mode 1) ; not very useful usually
 
 ;; remember cursor position in files
 (use-package saveplace
-  :defer 15
+  :defer 10
   :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions
@@ -113,7 +113,8 @@
   :disabled t
   :config
   (icomplete-mode 1)
-  (use-package icomplete+)
+  (use-package icomplete+
+    :ensure t)
   (setq icomplete-prospects-height 2
         icomplete-compute-delay 0))
 
@@ -127,7 +128,7 @@
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
-        savehist-file "~/.emacs.d/savehist") 
+        savehist-file "~/.emacs.d/savehist")
   (savehist-mode 1))
 
 (use-package uniquify

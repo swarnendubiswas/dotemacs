@@ -21,7 +21,12 @@
 
 (use-package readline-complete
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (push 'company-readline company-backends)
+  (add-hook 'rlc-no-readline-hook
+            (lambda ()
+              (company-mode -1))))
 
 (use-package bash-completion
   :ensure t
@@ -33,11 +38,6 @@
       ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
       comint-process-echoes t)
 
-;; setup auto-completion framework
-(push 'company-readline company-backends)
-(add-hook 'rlc-no-readline-hook
-          (lambda ()
-            (company-mode -1)))
 ;;(add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
