@@ -5,6 +5,45 @@
 
 ;;; Code:
 
+(use-package tex
+  :ensure auctex
+  :defer t
+  :config
+  (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
+        TeX-parse-self t ; Parse documents
+        TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
+        TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
+        TeX-auto-untabify t
+        TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
+        TeX-source-correlate-mode t)
+  (setq-default TeX-master nil ; query for master file
+                TeX-command-default "LatexMk")
+  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
+
+(use-package tex-mode
+  :ensure auctex
+  :defer t
+  :config
+  (setq latex-run-command "latexmk"))
+
+(use-package latex
+  :ensure auctex
+  :defer t
+  :config 
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (TeX-PDF-mode 1))) ; compile files to pdf by default
+  ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
+  ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+  )
+
+(eval-after-load 'LaTeX
+  '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
+(eval-after-load 'LaTeX
+  '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
+
 (use-package auctex
   :ensure t
   :defer t)
@@ -48,39 +87,13 @@
   :ensure t
   :defer t)
 
-(add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (TeX-PDF-mode 1))) ; compile files to pdf by default
-
-;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
-;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-
-(use-package tex
-  :defer t
-  :config
-  (progn
-    ((setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
-           TeX-parse-self t ; Parse documents
-           TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
-           TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
-           TeX-auto-untabify t
-           TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
-           TeX-source-correlate-mode t)
-     (setq-default TeX-master nil ; query for master file
-                   TeX-command-default "LatexMk")
-     (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))))
-
-(setq latex-run-command "latexmk")
-
 ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
 
 (use-package reftex
-  :diminish reftex-mode
   :defer t
+  :diminish reftex-mode
   :init
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)
@@ -92,11 +105,6 @@
 
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))
-
-(eval-after-load 'LaTeX
-  '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
-(eval-after-load 'LaTeX
-  '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
 
 (use-package ebib
   :ensure t

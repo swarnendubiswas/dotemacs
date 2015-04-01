@@ -42,7 +42,10 @@
                 global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
   :config (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
 
-(delete-selection-mode 1) ; typing with the mark active will overwrite the marked region
+(use-package delsel
+  :defer t
+  :config
+  (delete-selection-mode 1)) ; typing with the mark active will overwrite the marked region
 
 (setq search-highlight t ; highlight incremental search
       query-replace-highlight t ; highlight during query

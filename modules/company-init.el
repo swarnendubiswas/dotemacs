@@ -8,12 +8,13 @@
 (use-package company
   :ensure t
   :diminish company-mode
+  :defer 5
   :init
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
-        company-show-numbers t
+        company-show-numbers t ; show quick-access numbers for the first ten candidates
         company-minimum-prefix-length 2
         ;; Invert the navigation direction if the completion popup is displayed on top (happens near the bottom of
-        ;; windows).
+        ;; windows). 
         company-tooltip-flip-when-above t
         company-tooltip-align-annotations t)
   :config (global-company-mode 1))

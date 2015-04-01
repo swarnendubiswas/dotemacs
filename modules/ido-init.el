@@ -40,10 +40,12 @@
   :config (ido-vertical-mode 1))
 
 (use-package ido-yes-or-no
-  :ensure t)
+  :ensure t
+  :defer 5)
 
 (use-package ido-hacks
-  :ensure t)
+  :ensure t
+  :defer 5)
 
 ;; allow ido-style completion in more places
 (use-package ido-ubiquitous

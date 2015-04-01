@@ -25,6 +25,7 @@
 (use-package auto-indent-mode
   :ensure t
   :defer 5
+  :diminish auto-indent-mode
   :config (auto-indent-global-mode 1))
 
 (use-package highlight-indentation

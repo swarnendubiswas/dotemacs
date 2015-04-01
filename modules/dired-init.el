@@ -14,6 +14,7 @@
         ;;delete-by-moving-to-trash t
         ;;dired-listing-switches "-ABhltc --si --group-directories-first"
         dired-listing-switches "-ABhl --si --group-directories-first"
+        dired-ls-F-marks-symlinks t
         dired-dwim-target t))
 
 ;; Jump to dired buffer corresponding to current buffer.

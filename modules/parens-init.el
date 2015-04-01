@@ -35,6 +35,10 @@
   :config
   (paren-activate))
 
+(use-package elec-pair
+  :disabled t
+  :config (electric-pair-mode 1))
+
 (use-package flex-autopair
   :ensure t
   :disabled t
