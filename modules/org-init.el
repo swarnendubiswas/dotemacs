@@ -17,15 +17,15 @@
 
 ;; require ox-latex so that the following variables are defined
 ;;(require 'ox-latex)
-
 (use-package ox-latex
+  :defer t
   ;;:demand t
-  :config
-  (setq org-latex-listings t) ;; tell org to use listings
-  ;; include the listings package
-  (add-to-list 'org-latex-packages-alist '("" "listings"))
-  ;; if you want colored source code then you need to include the color package
-  (add-to-list 'org-latex-packages-alist '("" "color")))
+  :config (with-eval-after-load 'org
+            (setq org-latex-listings t) ;; tell org to use listings
+            ;; include the listings package
+            (add-to-list 'org-latex-packages-alist '("" "listings"))
+            ;; if you want colored source code then you need to include the color package
+            (add-to-list 'org-latex-packages-alist '("" "color"))))
 
 
 (add-hook 'org-mode-hook 'turn-on-font-lock)

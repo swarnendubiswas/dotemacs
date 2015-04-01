@@ -9,14 +9,13 @@
   :ensure t
   :defer 5
   :config
-  (progn
-    (setq-default fci-rule-column 120)
-    (setq fci-handle-truncate-lines nil
-          fci-rule-width 1
-          fci-rule-color "grey40")
-    (add-hook 'text-mode-hook #'fci-mode)
-    (add-hook 'LaTeX-mode-hook #'fci-mode)
-    (add-hook 'prog-mode-hook #'fci-mode)))
+  (setq-default fci-rule-column 120)
+  (setq fci-handle-truncate-lines nil
+        fci-rule-width 1
+        fci-rule-color "grey40")
+  (add-hook 'text-mode-hook #'fci-mode)
+  (add-hook 'LaTeX-mode-hook #'fci-mode)
+  (add-hook 'prog-mode-hook #'fci-mode))
 
 ;; fci
 ;;(define-globalized-minor-mode

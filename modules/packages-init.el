@@ -12,7 +12,7 @@
 
 ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+;;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
 
 ;; setup use-package
@@ -20,7 +20,8 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 (require 'diminish)
 (require 'bind-key)
 	     
