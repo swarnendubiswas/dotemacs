@@ -7,7 +7,10 @@
 
 (use-package magit
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  (setq magit-auto-revert-mode nil
+        magit-last-seen-setup-instructions "1.4.0"))
 
 (use-package git-commit-mode            ; Git commit message mode
   :ensure t

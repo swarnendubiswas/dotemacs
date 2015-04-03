@@ -8,13 +8,12 @@
 (use-package psvn
   :ensure t
   :defer 10
-  :init
+  :config
   (setq svn-status-verbose nil
         svn-status-display-full-path t
         svn-status-auto-revert-buffers t
         svn-status-use-ido-completion t)
-  :config
-  ;; Am using svn and emacs mostly for LaTeX files.
+  ;; I use svn and emacs mostly for LaTeX files.
   (add-hook 'LaTeX-mode-hook #'svn-status))
 
 (provide 'svn-init)

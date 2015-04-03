@@ -31,17 +31,16 @@
 (use-package auto-compile
   :ensure t
   :disabled t
-  :init
+  :config
   (setq auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)
-  :config
   (auto-compile-on-load-mode 1)
   (auto-compile-on-save-mode 1))
 
 (use-package paradox
   :ensure t
   :defer t
-  :init
+  :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t))
 

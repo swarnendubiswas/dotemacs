@@ -13,8 +13,9 @@
   :ensure t
   :disabled t
   :diminish achievements-mode
-  :init (setq achievements-idle-time 600) ; seconds
-  :config (achievements-mode 1))
+  :config
+  (setq achievements-idle-time 600) ; seconds
+  (achievements-mode 1))
 
 ;; speed up emacs for large files
 (use-package vlf

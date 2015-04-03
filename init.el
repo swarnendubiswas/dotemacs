@@ -9,26 +9,26 @@
 
 ;; Interesting quotes (inspired from http://www.mygooglest.com/fni/dot-emacs.html):
 ;;
-;;   "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk
+;;   "Show me your ~/.emacs and I will tell you who you are." -- Bogdan Maryniuk.
 ;;
 ;;   "People talk about getting used to a new editor, but over time, it is precisely the opposite that should happen -
 ;;    the editor should get used to us." -- Vivek Haldar in "New frontiers in text editing".
 ;;
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
-;;    McGrath
+;;    McGrath.
 ;;
 ;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
 ;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning
-;;    was the Command Line"
+;;    was the Command Line".
 ;;
 ;;   "Nearly everybody is convinced that every style but their own is ugly and unreadable. Leave out the "but their own"
-;;    and they're probably right..." -- Jerry Coffin (on indentation)
+;;    and they're probably right..." -- Jerry Coffin (on indentation).
 ;;
-;;   "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton
+;;   "The only real difficulties in programming are cache invalidation and naming things." -- Phil Karlton.
 ;;
 ;;   "Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the
 ;;    code so that this comment isn't needed?" Improve the code and then document it to make it even clearer." -- Steve
-;;    McConnell
+;;    McConnell.
 ;;
 ;;   "What I don't understand is: why should you ever care how your editor looks, unless you're trying to win a
 ;;    screenshot competition? The primary factor in looking good should be the choice of a good font at a comfortable
@@ -36,7 +36,7 @@
 ;;    Emacs and vi have almost no UI! If Emacs is configured right, the only UI it has is the modeline and the
 ;;    minibuffer." -- Vivek Haldar in "New frontiers in text editing".
 ;;
-;;   "Good code is like a good joke - it needs no explanation." -- Russ Olsen
+;;   "Good code is like a good joke - it needs no explanation." -- Russ Olsen.
 
 ;;; Code:
 
@@ -92,6 +92,7 @@
 (require 'shell-init)
 
 (require 'svn-init)
+(require 'git-init)
 
 (require 'keybindings-init)
 

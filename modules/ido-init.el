@@ -8,7 +8,7 @@
 (use-package ido
   :ensure t
   :demand t
-  :init
+  :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
         ido-max-prospects 10
@@ -27,17 +27,16 @@
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              "*Messages*" "Async Shell Command")
         ido-enable-tramp-completion t)
-  :config
   (ido-mode 1)
   (ido-everywhere 1))
 
 (use-package ido-vertical-mode
   :ensure t
   :demand t
-  :init
+  :config
   ;; up and down keys to navigate options, left and right to move through history/directories
   (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-  :config (ido-vertical-mode 1))
+  (ido-vertical-mode 1))
 
 (use-package ido-yes-or-no
   :ensure t

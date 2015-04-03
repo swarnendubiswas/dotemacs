@@ -37,8 +37,9 @@
 (use-package indent-guide
   :ensure t
   :disabled t
-  :init (setq indent-guide-delay 0.1) ; show guide lines only in idle-time
-  :config (indent-guide-global-mode 1))
+  :config
+  (setq indent-guide-delay 0.1) ; show guide lines only in idle-time
+  (indent-guide-global-mode 1))
 
 ;; smart tabs (indent with tabs, align with spaces)
 (use-package smart-tabs

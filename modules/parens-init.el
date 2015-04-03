@@ -9,10 +9,9 @@
 
 (use-package paren
   :disabled t
-  :init
+  :config
   (setq show-paren-delay 0
         show-paren-style 'parenthesis) ; 'expression, 'parenthesis, 'mixed
-  :config
   (when (fboundp 'show-paren-mode)
     (show-paren-mode 1) ; highlight matching parentheses when the point is on them
     (make-variable-buffer-local 'show-paren-mode)))

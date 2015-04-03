@@ -9,11 +9,11 @@
   :diminish global-whitespace-mode
   :disabled t
   :defer 5
-  :init
+  :config
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
                 show-trailing-whitespace t
                 whitespace-style '(tabs newline space-mark tab-mark newline-mark))
-  :config (global-whitespace-mode 1))
+  (global-whitespace-mode 1))
 
 ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
 ;;(set-face-attribute 'whitespace-line nil :background "red1" :foreground "yellow" :weight 'bold)

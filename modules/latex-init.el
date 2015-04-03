@@ -94,14 +94,14 @@
 (use-package reftex
   :defer t
   :diminish reftex-mode
-  :init
+  :config
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)
         reftex-cite-format 'abbrv
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t)
-  :config (add-hook 'LaTeX-mode-hook #'turn-on-reftex))
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex))
 
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))
