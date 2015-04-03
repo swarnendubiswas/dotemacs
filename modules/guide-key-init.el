@@ -17,7 +17,7 @@
 
 (use-package guide-key-tip
   :ensure t
-  :defer 10
+  :disabled t
   :config (setq guide-key-tip/enabled t))
 
 (provide 'guide-key-init)
