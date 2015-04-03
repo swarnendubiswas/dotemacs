@@ -24,7 +24,7 @@
   (require 'use-package))
 (require 'diminish)
 (require 'bind-key)
-	     
+
 ;; prefer newer files
 (setq load-prefer-newer t)
 

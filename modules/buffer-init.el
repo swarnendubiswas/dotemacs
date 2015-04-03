@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package ibuffer
+  :defer 2
   :init
   (progn
     (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default

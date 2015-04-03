@@ -16,7 +16,7 @@
   :defer t
   :config
   ;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
-  (flycheck-add-next-checker 'c/c++-clang 
+  (flycheck-add-next-checker 'c/c++-clang
                              'c/c++-googlelint 'append))
 
 (provide 'c-init)

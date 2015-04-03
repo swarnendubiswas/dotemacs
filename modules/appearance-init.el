@@ -20,6 +20,7 @@
 
 ;; displays the time and date in the mode line
 (use-package time
+  :defer 5
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil)
