@@ -27,8 +27,9 @@
 
 (use-package tabbar
   :ensure t
-  :init (setq tabbar-use-images nil) ; speed up by not using images
-  :config (tabbar-mode 1))
+  :config
+  (setq tabbar-use-images nil) ; speed up by not using images
+  (tabbar-mode 1))
 
 (use-package jgraph-mode
   :ensure t

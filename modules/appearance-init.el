@@ -10,13 +10,29 @@
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(when (fboundp 'menu-bar-mode)
-  (menu-bar-mode -1))
-(tooltip-mode -1)
-(scroll-bar-mode 1)
-(blink-cursor-mode 1) ; enable/disable blinking cursor
+(use-package tool-bar
+  :config
+  (when (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1)))
+
+(use-package menu-bar
+  :config
+  (when (fboundp 'menu-bar-mode)
+    (menu-bar-mode -1)))
+
+(use-package tooltip
+  :defer 5
+  :config
+  (tooltip-mode -1))
+
+(use-package scroll-bar
+  :defer 5
+  :config
+  (scroll-bar-mode 1))
+
+(use-package frame
+  :defer 5
+  :config (blink-cursor-mode 1)) ; enable/disable blinking cursor
 
 ;; displays the time and date in the mode line
 (use-package time

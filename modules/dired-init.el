@@ -7,6 +7,7 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
+  :defer 2
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
@@ -30,6 +31,7 @@
 
 (use-package dired+
   :ensure t
+  :defer 2
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
   :init (setq-default diredp-hide-details-initially-flag nil)
   ;;:config (global-dired-hide-details-mode -1)
