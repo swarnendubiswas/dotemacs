@@ -7,7 +7,7 @@
 
 (use-package ibuffer
   :defer 2
-  :init
+  :config
   (progn
     (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
     (setq ibuffer-expert t
@@ -16,7 +16,6 @@
           ibuffer-default-sorting-mode 'recency ; 'major-mode
           ibuffer-sorting-mode 'recency
           ibuffer-use-header-line t))
-  :config
   (add-hook 'ibuffer-mode-hook
             '(lambda ()
                (ibuffer-auto-mode 1)))

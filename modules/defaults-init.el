@@ -27,6 +27,7 @@
 (fset 'display-startup-echo-area-message #'ignore)
 
 (use-package simple
+  :defer 5
   :config
   ;; We need to paste something from another program, but sometimes we do real paste after some kill
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
@@ -36,20 +37,28 @@
 
 (use-package autorevert
   :defer 10
-  :init
+  :config
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
                 global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
-  :config (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
+  (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
 
 (use-package delsel
   :defer t
   :config
   (delete-selection-mode 1)) ; typing with the mark active will overwrite the marked region
 
-(setq search-highlight t ; highlight incremental search
-      query-replace-highlight t ; highlight during query
-      case-fold-search t) ; make search ignore case
+(use-package isearch
+  :defer t
+  :config
+  (setq search-highlight t)) ; highlight incremental search
+
+(use-package replace
+  :defer t
+  :config
+  (setq query-replace-highlight t)) ; highlight during query
+
+(setq case-fold-search t) ; make search ignore case
 
 ;; /method:user@host#port:filename
 (use-package tramp
@@ -80,10 +89,10 @@
 ;; desktop save mode
 (use-package desktop
   :disabled t
-  :init
+  :config
   (setq-default desktop-restore-frames nil ; no need to restore frames
                 desktop-load-locked-desktop nil)
-  :config (desktop-save-mode -1))
+  (desktop-save-mode -1))
 
 ;; fully redraw the display before queued input events are processed
 ;; don't defer screen updates when performing operations

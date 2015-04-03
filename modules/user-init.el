@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-;; user details
 (setq user-full-name "Swarnendu Biswas"
       user-mail-address "XXX")
 

@@ -7,6 +7,7 @@
 
 (use-package powerline
   :ensure t
+  :defer 2
   :config
   (powerline-default-theme))
 
