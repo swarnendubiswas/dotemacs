@@ -61,12 +61,14 @@
 (require 'dired-init)
 (require 'company-init)
 (require 'ido-init)
+(require 'search-init)
 
 ;; configure the more useful extensions
 (require 'anzu-init)
 (require 'smex-init)
 (require 'recentf-init)
 (require 'ace-jump-init)
+(require 'spell-init)
 
 ;; setup helper packages
 (require 'abbrev-init)
@@ -75,7 +77,6 @@
 (require 'parens-init)
 (require 'misc-init)
 (require 'yasnippet-init)
-(require 'spell-init)
 (require 'flycheck-init)
 (require 'guide-key-init)
 (require 'rainbow-init)

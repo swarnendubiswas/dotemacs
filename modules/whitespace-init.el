@@ -24,7 +24,7 @@
   :defer 10
   :diminish whitespace-cleanup-mode
   :config
-  (add-hook 'before-save-hook 'whitespace-cleanup-mode)
+  ;;(add-hook 'before-save-hook #'whitespace-cleanup-mode)
   (global-whitespace-cleanup-mode 1))
 
 (provide 'whitespace-init)

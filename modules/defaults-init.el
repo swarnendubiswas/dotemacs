@@ -48,18 +48,6 @@
   :config
   (delete-selection-mode 1)) ; typing with the mark active will overwrite the marked region
 
-(use-package isearch
-  :defer t
-  :config
-  (setq search-highlight t)) ; highlight incremental search
-
-(use-package replace
-  :defer t
-  :config
-  (setq query-replace-highlight t)) ; highlight during query
-
-(setq case-fold-search t) ; make search ignore case
-
 ;; /method:user@host#port:filename
 (use-package tramp
   :defer t
