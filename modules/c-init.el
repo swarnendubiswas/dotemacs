@@ -11,11 +11,11 @@
   (setq c-default-style "cc-mode"
         c-basic-offset 2))
 
+;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
 (use-package flycheck-google-cpplint
   :ensure t
   :defer t
   :config
-  ;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
   (flycheck-add-next-checker 'c/c++-clang
                              'c/c++-googlelint 'append))
 

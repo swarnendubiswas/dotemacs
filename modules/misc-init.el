@@ -7,7 +7,7 @@
 
 (use-package smooth-scrolling
   :ensure t
-  :defer 5)
+  :defer 10)
 
 (use-package achievements
   :ensure t

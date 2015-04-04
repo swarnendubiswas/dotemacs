@@ -1,7 +1,7 @@
 ;;; dired-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Dired configurations
+;; Dired configurations.
 
 ;;; Code:
 
@@ -24,9 +24,9 @@
   :config
   (setq dired-bind-jump t)
   ;;(setq-default dired-omit-mode t)
-  (add-hook 'dired-mode-hook
-            (lambda ()
-              (dired-omit-mode 1)))
+  ;; (add-hook 'dired-mode-hook
+  ;;           (lambda ()
+  ;;             (dired-omit-mode 1)))
   :bind ("C-x C-j" . dired-jump)) ;; C-x C-j opens dired with the cursor right on the file you're editing
 
 (use-package dired+

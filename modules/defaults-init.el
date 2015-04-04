@@ -69,11 +69,11 @@
         tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")))
 
-;; disable version control
-(setq vc-ignore-dir-regexp
-      (format "\\(%s\\)\\|\\(%s\\)"
-              vc-ignore-dir-regexp
-              tramp-file-name-regexp))
+;; ;; disable version control
+;; (setq vc-ignore-dir-regexp
+;;       (format "\\(%s\\)\\|\\(%s\\)"
+;;               vc-ignore-dir-regexp
+;;               tramp-file-name-regexp))
 
 (setq completion-ignore-case t ; ignore case when completing
       read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
@@ -99,14 +99,19 @@
 (setq redisplay-dont-pause t)
 
 ;; fontification
-(global-font-lock-mode 1) ; turn on syntax coloring, on by default since Emacs 22
+(use-package font-core
+  :defer 2
+  :config
+  (global-font-lock-mode 1)) ; turn on syntax coloring, on by default since Emacs 22
 
 (use-package font-lock
+  :defer 2
   :config
   (setq font-lock-maximum-decoration t ; maximum fontification possible
         font-lock-support-mode 'jit-lock-mode)) ; jit locking is better than fast-lock and lazy-lock
 
 (use-package jit-lock
+  :defer 2
   :config
   (setq jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
         jit-lock-stealth-time 10
@@ -114,6 +119,7 @@
         jit-lock-stealth-nice 0.5))
 
 (use-package hilit-chg
+  :disabled t
   :config (highlight-changes-mode 1) ; not very useful usually
   :bind ("M-o C" . highlight-changes-mode))
 
@@ -124,7 +130,7 @@
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
-  :disabled t
+  :defer 5
   :config
   (icomplete-mode 1)
   (use-package icomplete+
@@ -138,7 +144,7 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
-  :defer 15
+  :defer 10
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
@@ -146,7 +152,7 @@
   (savehist-mode 1))
 
 (use-package uniquify
-  :defer 10
+  :defer 5
   :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
