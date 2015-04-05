@@ -11,6 +11,11 @@
   (setq c-default-style "cc-mode"
         c-basic-offset 2))
 
+(use-package cwarn
+  :defer t
+  :config
+  (global-cwarn-mode 1))
+
 ;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
 (use-package flycheck-google-cpplint
   :ensure t

@@ -25,7 +25,8 @@
   :ensure t
   :disabled t
   :config 
-  ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point)
+  ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) ; highlight all occurrences of word under the point
+  ;; (add-hook 'find-file-hook 'idle-highlight-mode)
   (idle-highlight-mode 1))
 
 (use-package auto-highlight-symbol

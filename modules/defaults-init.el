@@ -10,7 +10,8 @@
       ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen.
       initial-scratch-message nil
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead.
-      initial-major-mode 'text-mode)
+      initial-major-mode 'text-mode
+      inhibit-startup-echo-area-message t)
 
 (setq-default major-mode 'text-mode)
 
@@ -31,7 +32,9 @@
   :config
   ;; We need to paste something from another program, but sometimes we do real paste after some kill
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
-  (setq save-interprogram-paste-before-kill t)
+  (setq save-interprogram-paste-before-kill t
+        kill-whole-line t
+        suggest-key-bindings t)
   ;; Enable visual feedback on selections, default since v23
   (transient-mark-mode 1))
 
@@ -46,7 +49,8 @@
 (use-package delsel
   :defer t
   :config
-  (delete-selection-mode 1)) ; typing with the mark active will overwrite the marked region
+  ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
+  (delete-selection-mode 1))
 
 ;; /method:user@host#port:filename
 (use-package tramp
@@ -66,6 +70,9 @@
 (setq completion-ignore-case t ; ignore case when completing
       read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
       read-buffer-completion-ignore-case t)
+
+;; increase gc threshold
+(setq gc-cons-threshold 20000000)
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)

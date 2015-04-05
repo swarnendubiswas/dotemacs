@@ -7,7 +7,6 @@
 
 (use-package tex
   :ensure auctex
-  :defer t
   :config
   (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -22,13 +21,11 @@
 
 (use-package tex-mode
   :ensure auctex
-  :defer t
   :config
   (setq latex-run-command "latexmk"))
 
 (use-package latex
   :ensure auctex
-  :defer t
   :config 
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
   (add-hook 'LaTeX-mode-hook
@@ -44,13 +41,8 @@
 (eval-after-load 'LaTeX
   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
 
-(use-package auctex
-  :ensure t
-  :defer t)
-
 (use-package auctex-latexmk
   :ensure t
-  :defer t
   :config (with-eval-after-load 'latex
             (auctex-latexmk-setup)))
 
@@ -80,8 +72,7 @@
   :config (add-hook 'LaTeX-mode-hook 'magic-latex-buffer))
 
 (use-package math-symbol-lists
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package bibtex-utils
   :ensure t
@@ -92,7 +83,6 @@
 ;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
 
 (use-package reftex
-  :defer t
   :diminish reftex-mode
   :config
   (setq reftex-plug-into-AUCTeX t
