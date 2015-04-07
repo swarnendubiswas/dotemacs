@@ -45,8 +45,14 @@
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
-  :defer 5
+  :disabled t
   :config (fixme-mode 1))
+
+(use-package fic-mode
+  :ensure t
+  :defer 5
+  :config (fic-mode 1)
+  :diminish fic-mode)
 
 (use-package fish-mode
   :ensure t

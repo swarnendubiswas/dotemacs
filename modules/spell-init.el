@@ -11,10 +11,11 @@
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
   (setq ispell-extra-args '("--sug-mode=normal"))
+  ;;(bound-and-true-p 'flyspell-mode)
   (add-hook 'find-file-hooks 'turn-on-flyspell)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   (add-hook 'LaTeX-mode-hook 'turn-on-flyspell)
   (add-hook 'text-mode-hook 'turn-on-flyspell)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   :diminish flyspell-mode
   :bind
   ("C-c i f" . flyspell-mode)

@@ -76,7 +76,7 @@
 
 (use-package bibtex-utils
   :ensure t
-  :defer t)
+  :defer 10)
 
 ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
@@ -91,6 +91,8 @@
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t)
+  ;;(add-hook 'LaTeX-mode-hook #'reftex-mode)
+  (bound-and-true-p reftex-mode)
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex))
 
 ;; (eval-after-load "reftex"

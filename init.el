@@ -100,6 +100,9 @@
 ;; custom definitions
 (require 'custom-init)
 
+;; temporary
+(require 'cedet-init)
+
 ;; ;; start the daemon/server
 ;; (use-package server
 ;;   :defer t

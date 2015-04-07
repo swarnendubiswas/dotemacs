@@ -20,7 +20,8 @@
   (setq require-final-newline t ; Always end a file with a newline.
         make-backup-files nil ; Stop making backup ~ files
         ;; Disable backup for a per-file basis, not to be used by major modes.
-        backup-inhibited t))
+        backup-inhibited t
+        auto-save-default t))
 
 (setq sentence-end-double-space nil
       x-select-enable-clipboard t) ; Enable use of system clipboard across emacs and other applications.

@@ -21,6 +21,12 @@
   ;;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
   (rainbow-delimiters-mode 1))
 
+(use-package rainbow-blocks
+  :ensure t
+  :defer 10
+  :config (rainbow-blocks-mode 1)
+  :diminish rainbow-blocks-mode)
+
 (provide 'rainbow-init)
 
 ;;; rainbow-init.el ends here

@@ -30,7 +30,7 @@
 ;; Show Flycheck messages in popups
 (use-package flycheck-pos-tip
   :ensure t
-  :defer t
+  :defer 10
   :config (with-eval-after-load 'flycheck
             (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
