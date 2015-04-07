@@ -5,6 +5,10 @@
 
 ;;; Code:
 
+;; (use-package simple
+;;   :config
+;;   (add-hook 'before-save-hook 'delete-trailing-whitespace))
+
 (use-package whitespace
   :diminish global-whitespace-mode
   :disabled t
@@ -20,12 +24,10 @@
 
 (use-package whitespace-cleanup-mode
   :ensure t
-  ;;:disabled t
-  :defer 10
+  :defer 5
   :diminish whitespace-cleanup-mode
   :config
-  ;;(add-hook 'before-save-hook #'whitespace-cleanup-mode)
-  (global-whitespace-cleanup-mode 1))
+  (add-hook 'before-save-hook #'whitespace-cleanup-mode))
 
 (provide 'whitespace-init)
 

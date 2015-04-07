@@ -17,7 +17,10 @@
         TeX-source-correlate-mode t)
   (setq-default TeX-master nil ; query for master file
                 TeX-command-default "LatexMk")
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode))
+  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (TeX-PDF-mode 1)))) ; compile files to pdf by default
 
 (use-package tex-mode
   :ensure auctex
@@ -26,15 +29,12 @@
 
 (use-package latex
   :ensure auctex
-  :config 
-  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (TeX-PDF-mode 1))) ; compile files to pdf by default
+  :config
+  (latex-electric-env-pair-mode 1)
   ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
   ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-  )
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode))
 
 (eval-after-load 'LaTeX
   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))

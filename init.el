@@ -100,7 +100,7 @@
 ;; custom definitions
 (require 'custom-init)
 
-;; temporary
+;; temporary modules
 (require 'cedet-init)
 
 ;; ;; start the daemon/server

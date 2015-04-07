@@ -56,24 +56,43 @@
 
 (use-package leuven-theme
   :ensure t
-  :disabled t
   :config
   (load-theme 'leuven t)
-  (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+  (use-package smart-mode-line
+    :ensure t
+    :config
+    (progn
+      (use-package smart-mode-line-powerline-theme
+        :ensure t
+        :defer t)
+      (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
+            ;; sml/name-width 20
+            sml/no-confirm-load-theme t
+            sml/shorten-modes t
+            sml/shorten-directory t)
+      (sml/setup)))
+  ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+  (set-face-attribute 'default nil :height 110))
 
 (use-package professional-theme
   :ensure t
   :disabled t
   :config
   (load-theme 'professional t)
-  (set-face-attribute 'default nil :height 115)) ; set font size, value is in 1/10pt, so 100 will give you 10pt)
+  ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
+  (set-face-attribute 'default nil :height 115))
 
 (use-package eclipse-theme
   :ensure t
+  :disabled t
   :config
   (load-theme 'eclipse t)
-  (set-face-attribute 'default nil :height 115) ; set font size, value is in 1/10pt, so 100 will give you 10pt
+  (use-package powerline
+    :ensure t
+    :config
+    (powerline-default-theme))
+  ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+  (set-face-attribute 'default nil :height 115)
   (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
   (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
   (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD"))

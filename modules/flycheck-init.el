@@ -9,7 +9,9 @@
   :ensure t
   :defer 5
   :diminish flycheck-mode
-  :config (global-flycheck-mode 1))
+  :config
+  ;;(global-flycheck-mode 1)
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package flycheck-color-mode-line
   :ensure t

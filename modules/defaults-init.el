@@ -60,7 +60,9 @@
   (setq tramp-default-method "ssh" ; faster than the default scp
         tramp-default-user "XXX"
         tramp-default-host "XXX"
-        tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")))
+        tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save"))
+  (use-package password-cache
+    :config (setq password-cache-expiry nil)))
 
 ;; ;; disable version control
 ;; (setq vc-ignore-dir-regexp

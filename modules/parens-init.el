@@ -30,7 +30,7 @@
 
 (use-package mic-paren
   :ensure t
-  :defer 5
+  :defer 2
   :config
   (paren-activate))
 

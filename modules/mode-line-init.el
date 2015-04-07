@@ -7,7 +7,7 @@
 
 (use-package powerline
   :ensure t
-  :defer 2
+  :disabled t
   :config
   (powerline-default-theme))
 
@@ -16,13 +16,14 @@
   :disabled t
   :config
   (progn
-    (use-package smart-mode-line-powerline-theme)
+    (use-package smart-mode-line-powerline-theme
+      :ensure t
+      :defer t)
     (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
           ;; sml/name-width 20
           sml/no-confirm-load-theme t
           sml/shorten-modes t
-          sml/shorten-directory t
-          )
+          sml/shorten-directory t)
     (sml/setup)))
 
 ;; use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
