@@ -16,14 +16,13 @@
 
 (use-package rainbow-delimiters
   :ensure t
-  :defer 10
   :config
   ;;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
   (rainbow-delimiters-mode 1))
 
 (use-package rainbow-blocks
   :ensure t
-  :defer 10
+  :defer 5
   :config (rainbow-blocks-mode 1)
   :diminish rainbow-blocks-mode)
 

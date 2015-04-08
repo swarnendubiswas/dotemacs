@@ -13,10 +13,11 @@
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-src-preserve-indentation t
         org-src-window-setup 'current-window
-        org-fontify-whole-heading-line t))
+        org-fontify-whole-heading-line t)
+  (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
 
-(eval-after-load 'org
-  '(bind-key "C-c C-d" 'duplicate-thing org-mode-map))
+;; (eval-after-load 'org
+;;   '(bind-key "C-c C-d" 'duplicate-thing org-mode-map))
 
 ;; (eval-after-load 'org
 ;;   '(define-key org-mode-map (kbd "C-c C-d") nil))

@@ -7,7 +7,6 @@
 
 (use-package anzu
   :ensure t
-  :defer 10
   :diminish anzu-mode
   :config (global-anzu-mode 1))
 

@@ -15,13 +15,12 @@
 ;;   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
 
 (use-package which-func
-  :defer 10
+  :defer 5
   :config
   (setq which-func-modes '(java-mode c++-mode c-mode python-mode))
   (add-hook 'prog-mode-hook 'which-func-mode))
 
 (use-package electric
-  :defer 5
   :config (electric-layout-mode 1))
 
 (provide 'prog-init)

@@ -8,7 +8,7 @@
 (use-package company
   :ensure t
   :diminish company-mode
-  :defer 5
+  :defer 2
   :config
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
         company-show-numbers t ; show quick-access numbers for the first ten candidates
@@ -21,20 +21,17 @@
 
 (use-package company-auctex
   :ensure t
-  :defer t
   :config
   (add-hook 'LaTeX-mode-hook
-            '(lambda ()
-               (company-auctex-init))))
+            (lambda ()
+              (company-auctex-init))))
 
 (use-package company-statistics
   :ensure t
-  :defer 10
   :config (company-statistics-mode 1))
 
 (use-package company-math
   :ensure t
-  :defer 10
   :config (with-eval-after-load 'company
             ;; Add backends for math characters
             (add-to-list 'company-backends 'company-math-symbols-unicode)
@@ -42,7 +39,6 @@
 
 (use-package company-quickhelp
   :ensure t
-  :defer 10
   :config
   ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
   (company-quickhelp-mode 1))

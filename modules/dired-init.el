@@ -7,7 +7,6 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
-  :defer 2
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
@@ -31,25 +30,21 @@
 
 (use-package dired+
   :ensure t
-  :defer 2
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-  :init (setq-default diredp-hide-details-initially-flag nil)
-  ;;:config (global-dired-hide-details-mode -1)
-  )
+  :init (setq-default diredp-hide-details-initially-flag nil))
 
 ;; direx:jump-to-directory is a good explorer
 (use-package direx
-  :ensure t
-  :defer t)
+  :ensure t)
 
 ;; (when (dired-mode)
 ;;   (define-key dired-mode-map (kbd "<f2>") nil))
 
 (use-package dired-efap
   :ensure t
-  ;;:commands dired-efap
-  ;;:bind ("<f2>" . dired-efap)
-  :config (define-key dired-mode-map [f2] 'dired-efap))
+  :config
+  ;;(define-key dired-mode-map [f2] 'dired-efap)
+  (bind-key "<f2>" 'dired-efap dired-mode-map))
 
 ;; Not required starting from Emacs 24.4
 ;; (use-package dired-details
@@ -61,12 +56,10 @@
 ;;   :defer 5)
 
 (use-package dired-rainbow
-  :ensure t
-  :defer 5)
+  :ensure t)
 
 (use-package dired-hacks-utils
-  :ensure t
-  :defer 5)
+  :ensure t)
 
 (use-package nav
   :disabled t

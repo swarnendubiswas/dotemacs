@@ -29,7 +29,6 @@
 (fset 'display-startup-echo-area-message #'ignore)
 
 (use-package simple
-  :defer 5
   :config
   ;; We need to paste something from another program, but sometimes we do real paste after some kill
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
@@ -40,7 +39,7 @@
   (transient-mark-mode 1))
 
 (use-package autorevert
-  :defer 10
+  :defer 5
   :config
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
@@ -123,7 +122,7 @@
 
 ;; remember cursor position in files
 (use-package saveplace
-  :defer 10
+  :defer 5
   :config (setq-default save-place t))
 
 ;; incremental minibuffer completion/suggestions

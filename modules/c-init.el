@@ -14,15 +14,17 @@
 (use-package cwarn
   :defer t
   :config
-  (global-cwarn-mode 1))
+  (eval-after-load 'cc-mode
+    '(global-cwarn-mode 1)))
 
 ;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
 (use-package flycheck-google-cpplint
   :ensure t
   :defer t
   :config
-  (flycheck-add-next-checker 'c/c++-clang
-                             'c/c++-googlelint 'append))
+  (eval-after-load 'cc-mode
+    '(flycheck-add-next-checker 'c/c++-clang
+                                'c/c++-googlelint 'append)))
 
 (provide 'c-init)
 

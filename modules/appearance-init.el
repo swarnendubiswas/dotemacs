@@ -21,17 +21,14 @@
     (menu-bar-mode -1)))
 
 (use-package tooltip
-  :defer 5
   :config
   (tooltip-mode -1))
 
 (use-package scroll-bar
-  :defer 5
   :config
   (scroll-bar-mode 1))
 
 (use-package frame
-  :defer 5
   :config (blink-cursor-mode 1)) ; enable/disable blinking cursor
 
 ;; displays the time and date in the mode line
@@ -54,48 +51,48 @@
   :defer 5
   :config (hlinum-activate))
 
-(use-package leuven-theme
-  :ensure t
-  :config
-  (load-theme 'leuven t)
-  (use-package smart-mode-line
-    :ensure t
-    :config
-    (progn
-      (use-package smart-mode-line-powerline-theme
+(or (use-package leuven-theme
+      :ensure t
+      :config
+      (load-theme 'leuven t)
+      (use-package smart-mode-line
         :ensure t
-        :defer t)
-      (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
-            ;; sml/name-width 20
-            sml/no-confirm-load-theme t
-            sml/shorten-modes t
-            sml/shorten-directory t)
-      (sml/setup)))
-  ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-  (set-face-attribute 'default nil :height 110))
+        :config
+        (progn
+          (use-package smart-mode-line-powerline-theme
+            :ensure t
+            :defer t)
+          (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
+                ;; sml/name-width 20
+                sml/no-confirm-load-theme t
+                sml/shorten-modes t
+                sml/shorten-directory t)
+          (sml/setup)))
+      ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+      (set-face-attribute 'default nil :height 110))
 
-(use-package professional-theme
-  :ensure t
-  :disabled t
-  :config
-  (load-theme 'professional t)
-  ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
-  (set-face-attribute 'default nil :height 115))
+    (use-package professional-theme
+      :ensure t
+      :disabled t
+      :config
+      (load-theme 'professional t)
+      ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
+      (set-face-attribute 'default nil :height 115))
 
-(use-package eclipse-theme
-  :ensure t
-  :disabled t
-  :config
-  (load-theme 'eclipse t)
-  (use-package powerline
-    :ensure t
-    :config
-    (powerline-default-theme))
-  ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-  (set-face-attribute 'default nil :height 115)
-  (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
-  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-  (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD"))
+    (use-package eclipse-theme
+      :ensure t
+      :disabled t
+      :config
+      (load-theme 'eclipse t)
+      (use-package powerline
+        :ensure t
+        :config
+        (powerline-default-theme))
+      ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+      (set-face-attribute 'default nil :height 115)
+      (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
+      (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+      (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")))
 
 ;; highlight current line
 (use-package hl-line

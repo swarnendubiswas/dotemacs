@@ -91,9 +91,9 @@
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t)
-  ;;(add-hook 'LaTeX-mode-hook #'reftex-mode)
-  (bound-and-true-p reftex-mode)
-  (add-hook 'LaTeX-mode-hook #'turn-on-reftex))
+  ;;(bound-and-true-p reftex-mode)
+  ;;(add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook #'reftex-mode))
 
 ;; (eval-after-load "reftex"
 ;;   '(diminish 'reftex-mode))

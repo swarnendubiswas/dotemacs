@@ -13,8 +13,13 @@
         recentf-auto-cleanup 'never
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads\\.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "/tmp/")) ; "/ssh:"
-  ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name) ; save file names relative to my current home directory
+  ;; save file names relative to my current home directory
+  ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
   (recentf-mode 1)
+  ;; Periodically (10 s) save recently opened files, in case emacs crashes
+  (eval-after-load 'recentf
+    '(run-with-timer 0 (* 10 60) 'recentf-save-list))
+  ;; Add buffers to recent list.
   (use-package recentf-ext
     :ensure t)
   :bind ("<f8>" . recentf-open-files))

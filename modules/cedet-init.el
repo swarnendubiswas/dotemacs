@@ -6,32 +6,9 @@
 ;;; Code:
 
 (use-package cedet
+  :load-path "lisp/cedet-1.1/common/"
   :config
   (require 'cedet-files))
-
-(use-package semantic
-  :config
-  (semantic-mode 1)
-  (require 'semantic/ia))
-
-(use-package ede
-  :config
-  (global-ede-mode 1)
-  (ede-enable-generic-projects))
-
-;;(require 'semanticdb)
-;;(require 'semantic/db-javap)
-(load "semantic/loaddefs.el")
-
-(global-semanticdb-minor-mode 1)
-(global-semantic-decoration-mode 1)
-(global-semantic-highlight-func-mode 1)
-
-(use-package idle
-  :config
-  (global-semantic-idle-scheduler-mode 1)
-  (global-semantic-idle-completions-mode 1)
-  (global-semantic-idle-breadcrumbs-mode 1))
 
 ;; Enabling Semantic (code-parsing, smart completion) features
 ;; Select one of the following:
@@ -59,13 +36,35 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 ;;(semantic-load-enable-semantic-debugging-helpers)
 
+;; Copied from http://stackoverflow.com/questions/10326001/updating-cedet-1-0-to-1-1
+(semantic-load-enable-excessive-code-helpers)
+
+(use-package semantic
+  :load-path "lisp/cedet-1.1/semantic/"
+  :config
+  (require 'semantic-ia)
+  (require 'semantic-loaddefs)
+  (require 'semanticdb))
+
+(use-package ede
+  :config
+  (global-ede-mode 1)
+  (ede-enable-generic-projects))
+
+(global-semanticdb-minor-mode 1)
+(global-semantic-highlight-func-mode 1)
+
+(use-package idle
+  :config
+  (global-semantic-idle-scheduler-mode 1)
+  (global-semantic-idle-completions-mode 1)
+  (global-semantic-idle-breadcrumbs-mode 1))
+
 (use-package mode
-:config 
-;; Enable SRecode (Template management) minor-mode.
-(global-srecode-minor-mode 1))
-
-
-;;(require 'semantic/db-javap)
+  :config
+  (global-semantic-decoration-mode 1)
+  ;; Enable SRecode (Template management) minor-mode.
+  (global-srecode-minor-mode 1))
 
 (provide 'cedet-init)
 
