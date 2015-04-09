@@ -10,6 +10,11 @@
   :config
   (require 'cedet-files))
 
+(use-package ede
+  :config
+  (global-ede-mode 1)
+  (ede-enable-generic-projects))
+
 ;; Enabling Semantic (code-parsing, smart completion) features
 ;; Select one of the following:
 
@@ -22,7 +27,7 @@
 
 ;; * This enables even more coding tools such as intellisense mode,
 ;;   decoration mode, and stickyfunc mode (plus regular code helpers)
-;;(semantic-load-enable-gaudy-code-helpers)
+(semantic-load-enable-gaudy-code-helpers)
 
 ;; * This enables the use of Exuberant ctags if you have it installed.
 ;;   If you use C++ templates or boost, you should NOT enable it.
@@ -37,19 +42,14 @@
 ;;(semantic-load-enable-semantic-debugging-helpers)
 
 ;; Copied from http://stackoverflow.com/questions/10326001/updating-cedet-1-0-to-1-1
-(semantic-load-enable-excessive-code-helpers)
+;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
-  :load-path "lisp/cedet-1.1/semantic/"
+  ;;:load-path "lisp/cedet-1.1/semantic/"
   :config
   (require 'semantic-ia)
   (require 'semantic-loaddefs)
   (require 'semanticdb))
-
-(use-package ede
-  :config
-  (global-ede-mode 1)
-  (ede-enable-generic-projects))
 
 (global-semanticdb-minor-mode 1)
 (global-semantic-highlight-func-mode 1)
@@ -65,6 +65,11 @@
   (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
+
+;; (use-package ecb
+;;   :ensure t
+;;   :config
+;;   (add-hook 'prog-mode-hook 'ecb-auto-activate))
 
 (provide 'cedet-init)
 
