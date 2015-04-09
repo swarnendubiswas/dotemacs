@@ -11,16 +11,16 @@
   (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
         TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
-        TeX-force-default-mode t ; always use `TeX-default-mode', which defaults to `latex-mode'
+        TeX-default-mode 'latex-mode
+        TeX-force-default-mode t 
         TeX-auto-untabify t
         TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
         TeX-source-correlate-mode t)
   (setq-default TeX-master nil ; query for master file
                 TeX-command-default "LatexMk")
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (TeX-PDF-mode 1)))) ; compile files to pdf by default
+  ;; compile files to pdf by default
+  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)) 
 
 (use-package tex-mode
   :ensure auctex

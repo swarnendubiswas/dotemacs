@@ -66,10 +66,11 @@
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
 
-;; (use-package ecb
-;;   :ensure t
-;;   :config
-;;   (add-hook 'prog-mode-hook 'ecb-auto-activate))
+(use-package ecb
+  :ensure t
+  :config
+  (setq-default ecb-tip-of-the-day nil)
+  (add-hook 'prog-mode-hook 'ecb-auto-activate))
 
 (provide 'cedet-init)
 

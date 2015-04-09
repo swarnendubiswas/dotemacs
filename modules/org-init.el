@@ -13,7 +13,12 @@
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-src-preserve-indentation t
         org-src-window-setup 'current-window
-        org-fontify-whole-heading-line t)
+        org-fontify-done-headline t
+        org-fontify-whole-heading-line t
+        org-startup-folded nil
+        org-hide-leading-stars t
+        org-hide-leading-stars-before-indent-mode t
+        org-completion-use-ido t)
   (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
 
 ;; (eval-after-load 'org

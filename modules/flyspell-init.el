@@ -1,4 +1,4 @@
-;;; spell-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; flyspell-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup spell check.
@@ -13,6 +13,7 @@
   (setq ispell-extra-args '("--sug-mode=normal" "--lang=en_US"))
   ;;(bound-and-true-p 'flyspell-mode)
   (add-hook 'find-file-hooks 'flyspell-mode)
+  (add-hook 'before-save-hook 'flyspell-buffer)
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode)
@@ -27,6 +28,6 @@
 ;; (eval-after-load "flyspell"
 ;;   '(diminish 'flyspell-mode))
 
-(provide 'spell-init)
+(provide 'flyspell-init)
 
-;;; spell-init.el ends here
+;;; flyspell-init.el ends here

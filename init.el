@@ -68,7 +68,7 @@
 (require 'smex-init)
 (require 'recentf-init)
 (require 'ace-jump-init)
-(require 'spell-init)
+(require 'flyspell-init)
 
 ;; setup helper packages
 (require 'abbrev-init)
@@ -101,15 +101,13 @@
 (require 'custom-init)
 
 ;; temporary modules
-(require 'cedet-init)
+;;(require 'cedet-init)
+;;(require 'jdee-init)
 
-;; ;; start the daemon/server
-;; (use-package server
-;;   :defer t
-;;   :init
-;;   (progn
-;;     (server-force-delete)
-;;     (server-start)))
+;; start the daemon/server
+;;(require 'server-init)
 
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(fullscreen . fullheight))
 
 ;;; init.el ends here

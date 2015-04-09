@@ -7,9 +7,10 @@
 
 (or (use-package mic-paren
       :ensure t
-      :defer 2
       :config
-      (paren-activate))
+      (setq paren-highlight-at-point t)
+      (paren-activate)
+      (make-variable-buffer-local 'show-paren-mode))
 
     (use-package paren
       :disabled t

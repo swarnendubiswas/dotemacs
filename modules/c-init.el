@@ -8,7 +8,7 @@
 (use-package cc-mode
   :defer t
   :config
-  (setq c-default-style "cc-mode"
+  (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2))
 
 (use-package cwarn

@@ -39,18 +39,15 @@
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
   :ensure t
-  :defer 5
   :config (global-hungry-delete-mode 1))
 
 ;; highlight certain words
 (use-package fixme-mode
   :ensure t
-  :defer 5
   :config (fixme-mode 1))
 
 (use-package fic-mode
   :ensure t
-  :defer 5
   :config (fic-mode 1)
   :diminish fic-mode)
 
@@ -61,7 +58,6 @@
 ;; move text with M-up and M-down like eclipse
 (use-package move-text
   :ensure t
-  :defer 5
   :config (move-text-default-bindings))
 
 (use-package duplicate-thing
