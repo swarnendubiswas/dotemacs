@@ -18,7 +18,7 @@
   :disabled t
   :config (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
-;; Check package conventions with Flycheck
+;; Check package conventions with flycheck
 (use-package flycheck-package
   :ensure t
   :disabled t
@@ -29,7 +29,7 @@
   :ensure t
   :defer 10)
 
-;; Show Flycheck messages in popups
+;; Show flycheck messages in popups
 (use-package flycheck-pos-tip
   :ensure t
   :defer 10

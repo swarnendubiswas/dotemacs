@@ -35,7 +35,7 @@
   :config
   ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
   (global-auto-highlight-symbol-mode 1))
-  
+
 (provide 'highlight-init)
 
 ;;; highlight-init.el ends here

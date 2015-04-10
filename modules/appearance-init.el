@@ -9,6 +9,7 @@
 ;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
+(setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
   :config
@@ -33,7 +34,7 @@
 
 ;; displays the time and date in the mode line
 (use-package time
-  :defer 5
+  :defer 2
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil)
@@ -69,8 +70,10 @@
                 sml/shorten-directory t)
           (sml/setup)))
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-      (set-face-attribute 'default nil :height 110))
-
+      (set-face-attribute 'default nil :height 118)
+      ;; hide the fringe mark on the left
+      (set-face-background 'fringe "linen"))
+    
     (use-package professional-theme
       :ensure t
       :disabled t
@@ -100,12 +103,9 @@
   :defer 5
   :config (global-hl-line-mode 1))
 
-;;(set-face-background 'fringe "white") ; hide the fringe mark on the left
-(setq-default indicate-buffer-boundaries 'right)
-
 (use-package display-theme
   :ensure t
-  :disabled t
+  ;;:disabled t
   :config (display-theme-mode))
 
 (provide 'appearance-init)

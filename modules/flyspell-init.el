@@ -11,15 +11,16 @@
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
   (setq ispell-extra-args '("--sug-mode=normal" "--lang=en_US"))
-  ;;(bound-and-true-p 'flyspell-mode)
-  (add-hook 'find-file-hooks 'flyspell-mode)
-  (add-hook 'before-save-hook 'flyspell-buffer)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'text-mode-hook 'flyspell-mode)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
+  ;;(bound-and-true-p 'flyspell-mode)
+  (add-hook 'find-file-hooks 'flyspell-mode)
+  ;;(add-hook 'before-save-hook 'flyspell-buffer)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'org-mode-hook 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   :diminish flyspell-mode
   :bind
   ("C-c i f" . flyspell-mode)

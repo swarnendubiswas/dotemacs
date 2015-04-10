@@ -21,6 +21,7 @@
 
 (use-package company-auctex
   :ensure t
+  :defer t
   :config
   (add-hook 'LaTeX-mode-hook
             (lambda ()
@@ -28,7 +29,9 @@
 
 (use-package company-statistics
   :ensure t
-  :config (company-statistics-mode 1))
+  :config
+  (eval-after-load 'company
+    (company-statistics-mode 1)))
 
 (use-package company-math
   :ensure t
@@ -41,7 +44,8 @@
   :ensure t
   :config
   ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
-  (company-quickhelp-mode 1))
+  (eval-after-load 'company
+    (company-quickhelp-mode 1)))
 
 (provide 'company-init)
 

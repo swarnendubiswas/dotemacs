@@ -53,6 +53,7 @@ If region is active, apply to active region instead."
   "Create etags for the current latex project."
   (interactive)
   (compile "find . -name \"*.tex\" -print | etags -"))
+
 (defun create-latex-ctags () ; (dir-name))
   "Create ctags for the current latex project."
   ;;(interactive "DDirectory: ")

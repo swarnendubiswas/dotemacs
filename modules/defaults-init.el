@@ -39,12 +39,12 @@
   (transient-mark-mode 1))
 
 (use-package autorevert
-  :defer 5
   :config
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
                 global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
-  (global-auto-revert-mode 1)) ;; Auto-refresh all buffers, does not work for remote files.
+  ;; Auto-refresh all buffers, does not work for remote files.
+  (global-auto-revert-mode 1))
 
 (use-package delsel
   :defer t
@@ -141,7 +141,7 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
-  :defer 10
+  :defer 5
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t

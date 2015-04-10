@@ -1,7 +1,7 @@
 ;;; ace-jump-init.el --- Part of emacs initialization   -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup ace jump modes.
+;; Setup ace-xxx (jump/buffer) modes.
 
 ;;; Code:
 
@@ -11,8 +11,7 @@
   :ensure t
   :bind ("C-c C-SPC" . ace-jump-mode))
 
-;; ace-jump-buffer
-;; leave out certain buffer based on file name patterns
+;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
 (use-package ace-jump-buffer
   :ensure t

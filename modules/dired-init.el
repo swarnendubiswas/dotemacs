@@ -67,12 +67,11 @@
 (use-package direx
   :ensure t)
 
-;; (when (dired-mode)
-;;   (define-key dired-mode-map (kbd "<f2>") nil))
-
 (use-package dired-efap
   :ensure t
   :config
+  ;; (when (dired-mode)
+  ;;   (define-key dired-mode-map (kbd "<f2>") nil))
   ;;(define-key dired-mode-map [f2] 'dired-efap)
   (bind-key "<f2>" 'dired-efap dired-mode-map))
 

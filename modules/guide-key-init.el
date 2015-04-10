@@ -8,7 +8,7 @@
 (use-package guide-key
   :ensure t
   :diminish guide-key-mode
-  :defer 10
+  :defer 5
   :config
   (setq guide-key/guide-key-sequence t
         guide-key/recursive-key-sequence-flag t
