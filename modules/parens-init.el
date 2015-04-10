@@ -32,9 +32,13 @@
   (use-package smartparens-config))
 
 (or (use-package elec-pair
-      :disabled t
       :config (electric-pair-mode 1))
 
+    (use-package autopair
+      :ensure t
+      :disabled t
+      :config (autopair-global-mode 1))
+    
     (use-package flex-autopair
       :ensure t
       :disabled t

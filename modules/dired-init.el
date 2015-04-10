@@ -92,7 +92,7 @@
 
 (use-package nav
   :disabled t
-  :load-path "~/.emacs.d/lisp/emacs-nav-49/"
+  :load-path "lisp/emacs-nav-49/"
   :config
   (nav-mode)
   ;;(nav-disable-overeager-window-splitting)

@@ -70,7 +70,9 @@
                 sml/shorten-directory t)
           (sml/setup)))
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-      (set-face-attribute 'default nil :height 118)
+      (if (string-equal system-name "rain.cse.ohio-state.edu")
+          (set-face-attribute 'default nil :height 110)
+        (set-face-attribute 'default nil :height 118) )
       ;; hide the fringe mark on the left
       (set-face-background 'fringe "linen"))
     
@@ -106,7 +108,7 @@
 (use-package display-theme
   :ensure t
   ;;:disabled t
-  :config (display-theme-mode))
+  :config (global-display-theme-mode))
 
 (provide 'appearance-init)
 

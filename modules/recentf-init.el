@@ -22,6 +22,8 @@
   ;; Add buffers to recent list.
   (use-package recentf-ext
     :ensure t)
+  (use-package sync-recentf
+    :load-path "lisp/")
   :bind ("<f8>" . recentf-open-files))
 
 ;;(global-set-key [f8] 'recentf-open-files)

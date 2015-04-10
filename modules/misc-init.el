@@ -71,7 +71,8 @@
   :diminish writegood-mode
   :config
   (add-hook 'text-mode-hook #'writegood-mode)
-  (add-hook 'LaTeX-mode-hook #'writegood-mode))
+  (add-hook 'LaTeX-mode-hook #'writegood-mode)
+  (add-hook 'org-mode-hook #'writegood-mode))
 
 (use-package discover-my-major
   :ensure t

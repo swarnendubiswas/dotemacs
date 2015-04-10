@@ -148,6 +148,11 @@
         savehist-file "~/.emacs.d/savehist")
   (savehist-mode 1))
 
+(setq enable-recursive-minibuffers t)
+
+(use-package mb-depth
+  :config (minibuffer-depth-indicate-mode 1))
+
 (use-package uniquify
   :defer 5
   :config

@@ -28,7 +28,6 @@
 
     ;; use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
     (use-package powerline
-      :ensure t
       :disabled t
       :load-path "lisp/emacs-powerline/"
       :config

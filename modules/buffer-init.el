@@ -6,9 +6,10 @@
 ;;; Code:
 
 (use-package ibuffer
+  :defer t
+  :init (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   :config
   (progn
-    (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
     (setq ibuffer-expert t
           ;;ibuffer-shrink-to-minimum-size t
           ibuffer-always-show-last-buffer nil
@@ -21,9 +22,9 @@
   (add-hook 'ibuffer-mode-hook
             (lambda ()
               (ibuffer-do-sort-by-recency)))
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-recompile-formats -1)))
+  ;; (add-hook 'ibuffer-mode-hook
+  ;;           (lambda ()
+  ;;             (ibuffer-recompile-formats -1)))
   :bind ("C-x C-b" . ibuffer))
 
 ;;(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
