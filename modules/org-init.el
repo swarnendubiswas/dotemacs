@@ -19,6 +19,7 @@
         org-hide-leading-stars t
         org-hide-leading-stars-before-indent-mode t
         org-completion-use-ido t)
+  (add-hook 'org-mode-hook 'turn-on-font-lock)
   (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
 
 ;; (eval-after-load 'org
@@ -40,8 +41,6 @@
             (add-to-list 'org-latex-packages-alist '("" "listings"))
             ;; if you want colored source code then you need to include the color package
             (add-to-list 'org-latex-packages-alist '("" "color"))))
-
-(add-hook 'org-mode-hook 'turn-on-font-lock)
 
 (use-package simple
   :diminish visual-line-mode

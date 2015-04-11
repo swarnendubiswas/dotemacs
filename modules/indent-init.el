@@ -8,7 +8,8 @@
 (setq-default fill-column 120
               standard-indent 2 ; set standard indent to 2 rather that 4
               tab-width 2
-              indent-tabs-mode nil) ; spaces instead of tabs by default
+              ;; spaces instead of tabs by default
+              indent-tabs-mode nil) 
 
 (use-package aggressive-indent
   :ensure t
@@ -19,7 +20,7 @@
 (use-package electric
   :disabled t
   :config
-  ;;(add-hook 'after-change-major-mode-hook (lambda() (electric-indent-mode -1)))
+  ;;(add-hook 'after-change-major-mode-hook (lambda () (electric-indent-mode -1)))
   (electric-indent-mode -1))
 
 (use-package auto-indent-mode

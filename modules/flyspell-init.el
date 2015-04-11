@@ -21,13 +21,12 @@
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'org-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  ;; (eval-after-load "flyspell"
+  ;;   '(diminish 'flyspell-mode))
   :diminish flyspell-mode
   :bind
   ("C-c i f" . flyspell-mode)
   ("C-c i b" . flyspell-buffer))
-
-;; (eval-after-load "flyspell"
-;;   '(diminish 'flyspell-mode))
 
 (provide 'flyspell-init)
 

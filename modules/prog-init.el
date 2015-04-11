@@ -21,6 +21,7 @@
   (add-hook 'prog-mode-hook 'which-func-mode))
 
 (use-package electric
+  :defer 5
   :config (electric-layout-mode 1))
 
 (provide 'prog-init)

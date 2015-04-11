@@ -11,7 +11,7 @@
   (defun dired-go-home ()
     (interactive)
     (dired "~/"))
-  ;; M-<up> is nicer in dired if it moves to the fourth line - the first file
+  ;; M-<up> is nicer in dired if it moves to the first file
   (defun dired-back-to-top ()
     (interactive)
     (beginning-of-buffer)
@@ -46,7 +46,6 @@
   ;;   '(define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom))
   (bind-key "M-<down>" 'dired-jump-to-bottom dired-mode-map))
 
-
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
   :commands (dired-jump)
@@ -56,7 +55,8 @@
   ;; (add-hook 'dired-mode-hook
   ;;           (lambda ()
   ;;             (dired-omit-mode 1)))
-  :bind ("C-x C-j" . dired-jump)) ;; C-x C-j opens dired with the cursor right on the file you're editing
+  ;; C-x C-j opens dired with the cursor right on the file you're editing
+  :bind ("C-x C-j" . dired-jump)) 
 
 (use-package dired+
   :ensure t

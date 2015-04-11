@@ -15,18 +15,18 @@
         fci-rule-color "grey40")
   (add-hook 'text-mode-hook #'fci-mode)
   (add-hook 'LaTeX-mode-hook #'fci-mode)
+  (add-hook 'org-mode-hook #'fci-mode)
   (add-hook 'prog-mode-hook #'fci-mode)
   (defun auto-fci-mode (&optional unused)
     (if (> (frame-width) 120)
         (fci-mode 1)
       (fci-mode 0)))
   (add-hook 'after-change-major-mode-hook 'auto-fci-mode)
-  (add-hook 'window-size-change-functions 'auto-fci-mode))
-
-;; fci
-;;(define-globalized-minor-mode
-;;  global-fci-mode fci-mode (lambda () (fci-mode 1)))
-;;(global-fci-mode 1)
+  (add-hook 'window-size-change-functions 'auto-fci-mode)
+  ;;(define-globalized-minor-mode
+  ;;  global-fci-mode fci-mode (lambda () (fci-mode 1)))
+  ;;(global-fci-mode 1)
+  )
 
 (provide 'fci-init)
 

@@ -24,7 +24,8 @@
         auto-save-default t))
 
 (setq sentence-end-double-space nil
-      x-select-enable-clipboard t) ; Enable use of system clipboard across emacs and other applications.
+      ;; Enable use of system clipboard across emacs and other applications.
+      x-select-enable-clipboard t) 
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
@@ -42,7 +43,8 @@
   :config
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
-                global-auto-revert-non-file-buffers t) ; Auto-refresh dired buffers.
+                ;; Auto-refresh dired buffers.
+                global-auto-revert-non-file-buffers t) 
   ;; Auto-refresh all buffers, does not work for remote files.
   (global-auto-revert-mode 1))
 
@@ -95,17 +97,18 @@
 ;; don't defer screen updates when performing operations
 (setq redisplay-dont-pause t)
 
-;; fontification
+;; fontification: turn on syntax coloring, on by default since Emacs 22
 (use-package font-core
   :defer 2
   :config
-  (global-font-lock-mode 1)) ; turn on syntax coloring, on by default since Emacs 22
+  (global-font-lock-mode 1)) 
 
 (use-package font-lock
   :defer 2
   :config
   (setq font-lock-maximum-decoration t ; maximum fontification possible
-        font-lock-support-mode 'jit-lock-mode)) ; jit locking is better than fast-lock and lazy-lock
+        ;; jit locking is better than fast-lock and lazy-lock
+        font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock
   :defer 2
@@ -117,7 +120,7 @@
 
 (use-package hilit-chg
   :disabled t
-  :config (highlight-changes-mode 1) ; not very useful usually
+  :config (highlight-changes-mode 1) 
   :bind ("M-o C" . highlight-changes-mode))
 
 ;; remember cursor position in files
@@ -159,7 +162,7 @@
   :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
-        ;;uniquify-separator ":"
+        uniquify-separator ":"
         uniquify-after-kill-buffer-p t))
 
 (provide 'defaults-init)

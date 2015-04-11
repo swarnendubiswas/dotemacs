@@ -23,8 +23,9 @@
   :defer 5
   :config
   (progn
+    ;; warn when opening files bigger than 50MB
     (setq large-file-warning-threshold 50000000)
-    (use-package vlf-setup))) ; warn when opening files bigger than 50MB
+    (use-package vlf-setup))) 
 
 (use-package tabbar
   :ensure t
