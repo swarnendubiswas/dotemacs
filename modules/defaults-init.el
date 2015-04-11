@@ -123,7 +123,8 @@
 ;; remember cursor position in files
 (use-package saveplace
   :defer 5
-  :config (setq-default save-place t))
+  :config (setq-default save-place t
+                        save-place-file (concat user-emacs-directory "places")))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
