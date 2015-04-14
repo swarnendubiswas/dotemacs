@@ -17,7 +17,7 @@
         ;;ido-show-dot-for-dired t ; don't show current directory as the first choice
         ido-create-new-buffer 'always ; other options: prompt, never
         ido-default-file-method 'selected-window
-        ido-save-directory-list-file "~/.emacs.d/.ido.last"
+        ido-save-directory-list-file (concat emacs-temp-directory ".ido.last")
         ido-enable-last-directory-history t
         ido-max-work-directory-list 20
         ido-max-work-file-list 50
@@ -62,6 +62,9 @@
 (use-package flx-ido
   :ensure t
   :config (flx-ido-mode 1))
+
+(use-package ido-completing-read+
+  :ensure t)
 
 (provide 'ido-init)
 

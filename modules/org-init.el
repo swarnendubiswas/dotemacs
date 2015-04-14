@@ -12,6 +12,7 @@
   (setq org-completion-use-ido t
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-src-preserve-indentation t
+        org-src-tabs-acts-natively t
         org-src-window-setup 'current-window
         org-fontify-done-headline t
         org-fontify-whole-heading-line t
@@ -43,9 +44,10 @@
             (add-to-list 'org-latex-packages-alist '("" "color"))))
 
 (use-package simple
-  :diminish visual-line-mode
+  :diminish visual-line-mode auto-fill-function
   :config
-  (add-hook 'org-mode-hook 'visual-line-mode))
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'turn-on-auto-fill))
 
 ;; turn on soft wrapping mode for org mode
 (add-hook 'org-mode-hook

@@ -61,7 +61,9 @@
 (use-package dired+
   :ensure t
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-  :init (setq-default diredp-hide-details-initially-flag nil))
+  :init (setq-default diredp-hide-details-initially-flag nil)
+  :config
+  (diredp-toggle-find-file-reuse-dir 1))
 
 ;; direx:jump-to-directory is a good explorer
 (use-package direx

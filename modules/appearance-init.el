@@ -66,14 +66,15 @@
           (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
                 ;; sml/name-width 20
                 sml/no-confirm-load-theme t
+                sml/mode-width 'full
                 sml/shorten-modes t
                 sml/shorten-directory t)
           (sml/setup)))
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-      (if (string-equal system-name "rain.cse.ohio-state.edu")
-          (set-face-attribute 'default nil :height 110)
-        (set-face-attribute 'default nil :height 118) )
-      ;; hide the fringe mark on the left
+      (if (string-equal system-name "XXX")
+          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
+        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 118) )
+      ;; customize the fringe mark on the left
       (set-face-background 'fringe "linen"))
     
     (use-package professional-theme

@@ -9,7 +9,7 @@
   :disabled t
   :diminish abbrev-mode
   :config
-  (setq-default abbrev-file-name "~/.emacs.d/abbrev_defs")
+  (setq-default abbrev-file-name (concat emacs-tmp-directory "abbrev_defs"))
   (setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
         dabbrev-case-replace nil) ; preserve case when expanding
   ;;(quietly-read-abbrev-file)

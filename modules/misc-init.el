@@ -42,16 +42,6 @@
   :ensure t
   :config (global-hungry-delete-mode 1))
 
-;; highlight certain words
-(use-package fixme-mode
-  :ensure t
-  :config (fixme-mode 1))
-
-(use-package fic-mode
-  :ensure t
-  :config (fic-mode 1)
-  :diminish fic-mode)
-
 (use-package fish-mode
   :ensure t
   :disabled t)
@@ -100,6 +90,12 @@
 (use-package bug-hunter
   :ensure t
   :defer t)
+
+(use-package popwin
+  :ensure t
+  :config
+  (setq popwin:popup-window-height 35)
+  (popwin-mode 1))
 
 (provide 'misc-init)
 

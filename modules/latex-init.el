@@ -20,7 +20,7 @@
                 TeX-command-default "LatexMk")
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   ;; compile files to pdf by default
-  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)) 
+  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode))
 
 (use-package tex-mode
   :ensure auctex
@@ -33,7 +33,7 @@
   (latex-electric-env-pair-mode 1)
   ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  ;;(add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode))
 
 (eval-after-load 'LaTeX
@@ -92,7 +92,7 @@
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t)
   ;;(bound-and-true-p reftex-mode)
-  ;;(add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook #'reftex-mode))
 
 ;; (eval-after-load "reftex"

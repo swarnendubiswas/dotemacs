@@ -49,7 +49,9 @@
   :config
   (require 'semantic-ia)
   (require 'semantic-loaddefs)
-  (require 'semanticdb))
+  (require 'semanticdb)
+  ;;SemanticDB files
+  (setq semanticdb-default-save-directory (concat emacs-temp-directory "semanticdb")))
 
 (global-semanticdb-minor-mode 1)
 (global-semantic-highlight-func-mode 1)

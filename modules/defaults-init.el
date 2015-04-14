@@ -15,6 +15,18 @@
 
 (setq-default major-mode 'text-mode)
 
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment 'utf-8)
+(prefer-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-input-method nil)
+
+(unless (file-exists-p "~/.emacs.d/tmp")
+  (make-directory "~/.emacs.d/tmp"))
+(defvar emacs-temp-directory (concat user-emacs-directory "tmp/"))
+  
 (use-package files
   :config
   (setq require-final-newline t ; Always end a file with a newline.
@@ -61,7 +73,9 @@
   (setq tramp-default-method "ssh" ; faster than the default scp
         tramp-default-user "XXX"
         tramp-default-host "XXX"
-        tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save"))
+        tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
+        ;; tramp history
+        tramp-persistency-file-name (concat emacs-temp-directory "tramp"))
   (use-package password-cache
     :config (setq password-cache-expiry nil)))
 
@@ -127,7 +141,7 @@
 (use-package saveplace
   :defer 5
   :config (setq-default save-place t
-                        save-place-file (concat user-emacs-directory "places")))
+                        save-place-file (concat emacs-temp-directory "places")))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
@@ -149,7 +163,11 @@
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
-        savehist-file "~/.emacs.d/savehist")
+        savehist-file (concat emacs-temp-directory "savehist")
+        savehist-additional-variables '(kill-ring
+                                        search-ring
+                                        regexp-search-ring))
+  (setq-default history-length 500)
   (savehist-mode 1))
 
 (setq enable-recursive-minibuffers t)

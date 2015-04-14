@@ -37,6 +37,16 @@
   ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
   (global-auto-highlight-symbol-mode 1))
 
+;; highlight certain words
+(or (use-package fic-mode
+      :ensure t
+      :config (fic-mode 1)
+      :diminish fic-mode)
+    
+    (use-package fixme-mode
+      :ensure t
+      :config (fixme-mode 1)))
+
 (provide 'highlight-init)
 
 ;;; highlight-init.el ends here
