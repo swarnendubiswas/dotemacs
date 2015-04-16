@@ -30,6 +30,23 @@
 (use-package tabbar
   :ensure t
   :config
+  ;; Add a buffer modification state indicator in the tab label, and place a
+  ;; space around the label to make it looks less crowd.
+  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+    (setq ad-return-value
+          (if (and (buffer-modified-p (tabbar-tab-value tab))
+                   (buffer-file-name (tabbar-tab-value tab)))
+              (concat " + " (concat ad-return-value " "))
+            (concat " " (concat ad-return-value " ")))))
+  ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
+  ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
+  (set-face-attribute 'tabbar-default nil :background "gray60")
+  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil)
+  (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t)
+  (set-face-attribute 'tabbar-highlight nil :underline t)
+  (set-face-attribute 'tabbar-button nil :box '(:line-width 1 :color "gray72" :style released-button))
+  ;;(set-face-attribute 'tabbar-button-highlight ((t (:inherit tabbar-default))))
+  (set-face-attribute 'tabbar-separator nil :height 0.7)
   (setq tabbar-use-images nil) ; speed up by not using images
   (tabbar-mode 1))
 

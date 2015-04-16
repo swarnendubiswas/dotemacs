@@ -10,19 +10,21 @@
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
-        recentf-auto-cleanup 'never
+        ;;recentf-auto-cleanup 'never
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads\\.el\\'"
-                          "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "/tmp/*"
-                          "" "*/recentf\\'") ; "/ssh:"
+                          "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "/tmp/.*"
+                          ".*/recentf\\'") ; "/ssh:"
         recentf-save-file (concat emacs-temp-directory "recentf"))
-  (add-to-list 'recentf-exclude "recentf\\'")
+  ;;(add-to-list 'recentf-exclude ".*/recentf\\'")
   (add-to-list 'recentf-exclude "/tmp/recentf-marker")
   ;; save file names relative to my current home directory
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
   (recentf-mode 1)
-  ;; Periodically (10 s) save recently opened files, in case emacs crashes
+  ;; clean up recent files on startup, since otherwise the exclude list is not always respected
+  (recentf-auto-cleanup)
+  ;; Periodically (300 s) save recently opened files, in case emacs crashes
   (eval-after-load 'recentf
-    '(run-with-timer 0 (* 10 60) 'recentf-save-list))
+    '(run-with-timer 0 (* 300 60) 'recentf-save-list))
   ;;(global-set-key [f8] 'recentf-open-files)
   ;; Add buffers to recent list.
   (use-package recentf-ext

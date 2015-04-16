@@ -20,8 +20,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(eval-when-compile
-  (require 'use-package))
+(require 'use-package)
 (require 'diminish)
 (require 'bind-key)
 
@@ -30,7 +29,6 @@
 
 (use-package auto-compile
   :ensure t
-  :disabled t
   :config
   (setq auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)

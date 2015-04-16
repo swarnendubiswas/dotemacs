@@ -40,6 +40,7 @@
       x-select-enable-clipboard t) 
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
+(toggle-indicate-empty-lines 1)
 
 (use-package simple
   :config

@@ -16,17 +16,20 @@
         flyspell-issue-message-flag nil)
   ;;(bound-and-true-p 'flyspell-mode)
   (add-hook 'find-file-hooks 'flyspell-mode)
-  ;;(add-hook 'before-save-hook 'flyspell-buffer)
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'org-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  ;; this is useful but slow
+  ;;(add-hook 'before-save-hook 'flyspell-buffer)
   ;; (eval-after-load "flyspell"
   ;;   '(diminish 'flyspell-mode))
   :diminish flyspell-mode
   :bind
   ("C-c i f" . flyspell-mode)
-  ("C-c i b" . flyspell-buffer))
+  ("C-c i b" . flyspell-buffer)
+  ;; another alternative is M-$
+  ("C-c i w" . ispell-word))
 
 (provide 'flyspell-init)
 

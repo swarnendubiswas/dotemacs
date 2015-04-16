@@ -54,6 +54,7 @@
 
 (or (use-package leuven-theme
       :ensure t
+      :disabled t
       :config
       (load-theme 'leuven t)
       (use-package smart-mode-line
@@ -73,8 +74,8 @@
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
       (if (string-equal system-name "XXX")
           (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
-        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 118) )
-      ;; customize the fringe mark on the left
+        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110) )
+      ;; customize the fringe marks on the sides
       (set-face-background 'fringe "linen"))
     
     (use-package professional-theme
@@ -87,7 +88,6 @@
 
     (use-package eclipse-theme
       :ensure t
-      :disabled t
       :config
       (load-theme 'eclipse t)
       (use-package powerline
@@ -95,10 +95,17 @@
         :config
         (powerline-default-theme))
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-      (set-face-attribute 'default nil :height 115)
+      (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
       (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
       (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-      (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")))
+      (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")
+      ;; org-mode customizations inspired from leuven theme
+      (with-eval-after-load "org"
+        (set-face-attribute 'org-level-1 nil :height 1.2 ;;:weight bold :overline "#A7A7A7"
+                            :foreground "#3C3C3C" :background "#F0F0F0")
+        (set-face-attribute 'org-level-2 nil :height 1.0 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
+      ;; customize the fringe marks on the sides
+      (set-face-background 'fringe "wheat")))
 
 ;; highlight current line
 (use-package hl-line

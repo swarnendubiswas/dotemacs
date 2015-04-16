@@ -56,7 +56,7 @@
 
 (use-package org-beautify-theme
   :ensure t
-  :defer t)
+  :disabled t)
 
 (use-package org-indent
   :defer t

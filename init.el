@@ -67,7 +67,7 @@
 (require 'anzu-init)
 (require 'smex-init)
 (require 'recentf-init)
-(require 'ace-jump-init)
+(require 'ace-init)
 (require 'flyspell-init)
 
 ;; setup helper packages
