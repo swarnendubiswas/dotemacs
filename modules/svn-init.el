@@ -5,9 +5,10 @@
 
 ;;; Code:
 
+;; SB: It seems we cannot use psvn to commit multiple files at once.
 (use-package psvn
   :ensure t
-  :defer 5
+  :disabled t
   :config
   (setq svn-status-verbose nil
         svn-status-display-full-path t

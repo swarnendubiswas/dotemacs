@@ -90,7 +90,8 @@
         reftex-cite-format 'abbrv
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
-        reftex-enable-partial-scans t)
+        reftex-enable-partial-scans t
+        reftex-default-bibliography '("~/workspace/bib/plass.bib"))
   ;;(bound-and-true-p reftex-mode)
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook #'reftex-mode))

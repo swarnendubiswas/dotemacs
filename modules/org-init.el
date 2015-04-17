@@ -65,6 +65,11 @@
   :config (with-eval-after-load 'org
             (org-indent-mode 1)))
 
+(use-package org-ref
+  :load-path "lisp/org-ref"
+  :config
+  (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
+
 (provide 'org-init)
 
 ;;; org-init.el ends here
