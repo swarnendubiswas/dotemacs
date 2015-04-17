@@ -67,11 +67,11 @@
 (require 'anzu-init)
 (require 'smex-init)
 (require 'recentf-init)
-(require 'ace-init)
 (require 'flyspell-init)
 
 ;; setup helper packages
 (require 'abbrev-init)
+(require 'ace-modes-init)
 (require 'fci-init)
 (require 'indent-init)
 (require 'parens-init)
