@@ -21,6 +21,7 @@
         org-hide-leading-stars-before-indent-mode t
         org-completion-use-ido t)
   (add-hook 'org-mode-hook 'turn-on-font-lock)
+  (require 'org-inlinetask)
   (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
 
 ;; (eval-after-load 'org

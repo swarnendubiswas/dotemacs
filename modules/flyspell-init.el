@@ -15,11 +15,11 @@
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
   ;;(bound-and-true-p 'flyspell-mode)
-  (add-hook 'find-file-hooks 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'text-mode-hook 'flyspell-mode)
-  (add-hook 'org-mode-hook 'flyspell-mode)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'find-file-hooks #'turn-on-flyspell)
+  ;; (add-hook 'LaTeX-mode-hook #'turn-on-flyspell)
+  ;; (add-hook 'text-mode-hook #'turn-on-flyspell)
+  ;; (add-hook 'org-mode-hook #'turn-on-flyspell)
+  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)
   ;; (eval-after-load "flyspell"
