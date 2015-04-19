@@ -103,9 +103,9 @@
       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")
       ;; org-mode customizations inspired from leuven theme
       (with-eval-after-load "org"
-        (set-face-attribute 'org-level-1 nil :height 1.2 ;;:weight bold :overline "#A7A7A7"
-                            :foreground "#3C3C3C" :background "#F0F0F0")
-        (set-face-attribute 'org-level-2 nil :height 1.0 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
+        (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold 
+                            :foreground "#3C3C3C" :background "#F5F5F5")
+        (set-face-attribute 'org-level-2 nil :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
       ;; customize the fringe marks on the sides
       (set-face-background 'fringe "wheat")))
 

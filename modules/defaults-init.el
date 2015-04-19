@@ -133,6 +133,11 @@
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
 
+(use-package hi-lock
+  :defer 2
+  :config (global-hi-lock-mode 1)
+  :diminish hi-lock-mode)
+
 (use-package hilit-chg
   :disabled t
   :config (highlight-changes-mode 1) 
