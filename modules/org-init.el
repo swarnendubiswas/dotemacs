@@ -60,8 +60,8 @@
             (setq truncate-lines nil)))
 
 (use-package org-beautify-theme
-  :ensure t
-  :disabled t)
+  :disabled t
+  :ensure t)
 
 (use-package org-indent
   :defer t
@@ -71,8 +71,7 @@
 
 (use-package org-ref
   :load-path "lisp/org-ref"
-  :config
-  (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
+  :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
 
 (provide 'org-init)
 

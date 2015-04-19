@@ -6,8 +6,8 @@
 ;;; Code:
 
 (use-package fill-column-indicator
-  :ensure t
   :disabled t
+  :ensure t
   :defer 5
   :config
   (setq-default fci-rule-column 120)

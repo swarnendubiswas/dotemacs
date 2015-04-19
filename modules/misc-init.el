@@ -10,8 +10,8 @@
   :defer 10)
 
 (use-package achievements
-  :ensure t
   :disabled t
+  :ensure t
   :diminish achievements-mode
   :config
   (setq achievements-idle-time 600) ; seconds
@@ -60,8 +60,8 @@
   :config (global-hungry-delete-mode 1))
 
 (use-package fish-mode
-  :ensure t
-  :disabled t)
+  :disabled t
+  :ensure t)
 
 ;; move text with M-up and M-down like eclipse
 (use-package move-text

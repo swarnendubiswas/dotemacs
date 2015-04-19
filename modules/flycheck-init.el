@@ -14,14 +14,14 @@
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package flycheck-color-mode-line
-  :ensure t
   :disabled t
+  :ensure t
   :config (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
 ;; Check package conventions with flycheck
 (use-package flycheck-package
-  :ensure t
   :disabled t
+  :ensure t
   :config (with-eval-after-load 'flycheck
             (flycheck-package-setup)))
 

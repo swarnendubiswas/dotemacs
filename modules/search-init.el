@@ -18,10 +18,6 @@
 
 (setq case-fold-search t) ; make search ignore case
 
-(use-package swiper
-  :ensure t
-  :disabled t)
-
 (provide 'search-init)
 
 ;;; search-init.el ends here

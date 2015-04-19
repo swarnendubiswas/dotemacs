@@ -11,28 +11,28 @@
   :config (highlight-numbers-mode 1))
 
 (use-package highlight-symbol
-  :ensure t
   :disabled t
+  :ensure t
   :config (highlight-symbol-mode 1)
   :diminish highlight-symbol-mode)
 
 (use-package idle-highlight
-  :ensure t
   :disabled t
+  :ensure t
   :config (idle-highlight))
 
 ;; highlight all occurrences of word under the point
 (use-package idle-highlight-mode
-  :ensure t
   :disabled t
+  :ensure t
   :config 
   ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) 
   ;; (add-hook 'find-file-hook 'idle-highlight-mode)
   (idle-highlight-mode 1))
 
 (use-package auto-highlight-symbol
-  :ensure t
   :disabled t
+  :ensure t
   :config
   ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
   (global-auto-highlight-symbol-mode 1))

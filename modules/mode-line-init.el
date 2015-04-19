@@ -6,14 +6,14 @@
 ;;; Code:
 
 (or (use-package powerline
-      :ensure t
       :disabled t
+      :ensure t
       :config
       (powerline-default-theme))
 
     (use-package smart-mode-line
-      :ensure t
       :disabled t
+      :ensure t
       :config
       (progn
         (use-package smart-mode-line-powerline-theme

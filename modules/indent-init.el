@@ -30,22 +30,22 @@
   :config (auto-indent-global-mode 1))
 
 (use-package highlight-indentation
-  :ensure t
   :disabled t
+  :ensure t
   :config (highlight-indentation-mode 1))
 
 ;; indentation guide: doesn't seem to work well with company-mode and auto-complete-mode
 (use-package indent-guide
-  :ensure t
   :disabled t
+  :ensure t
   :config
   (setq indent-guide-delay 0.1) ; show guide lines only in idle-time
   (indent-guide-global-mode 1))
 
 ;; smart tabs (indent with tabs, align with spaces)
 (use-package smart-tabs
-  :ensure t
   :disabled t
+  :ensure t
   :config (global-smart-tab-mode 1))
 
 ;;(autoload 'smart-tabs-mode "smart-tabs-mode"

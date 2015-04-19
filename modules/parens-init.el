@@ -22,8 +22,8 @@
         (make-variable-buffer-local 'show-paren-mode))))
 
 (use-package smartparens
-  :ensure t
   :disabled t
+  :ensure t
   :defer 5
   :commands (smartparens-mode show-smartparens-mode)
   :diminish smartparens-mode
@@ -35,13 +35,13 @@
       :config (electric-pair-mode 1))
 
     (use-package autopair
-      :ensure t
       :disabled t
+      :ensure t
       :config (autopair-global-mode 1))
     
     (use-package flex-autopair
-      :ensure t
       :disabled t
+      :ensure t
       :config (flex-autopair-mode 1)))
 
 (provide 'parens-init)

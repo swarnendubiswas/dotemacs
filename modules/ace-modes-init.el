@@ -47,8 +47,8 @@
   :bind ("M-b" . ace-jump-buffer))
 
 (use-package ace-isearch
-  :ensure t
   :disabled t
+  :ensure t
   :config (global-ace-isearch-mode 1))
 
 (provide 'ace-modes-init)

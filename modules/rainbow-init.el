@@ -6,8 +6,8 @@
 ;;; Code:
 
 (use-package rainbow-mode
-  :ensure t
   :disabled t
+  :ensure t
   :config (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package rainbow-identifiers
@@ -21,8 +21,8 @@
   (rainbow-delimiters-mode 1))
 
 (use-package rainbow-blocks
-  :ensure t
   :disabled t
+  :ensure t
   :defer 5
   :config (rainbow-blocks-mode 1)
   :diminish rainbow-blocks-mode)

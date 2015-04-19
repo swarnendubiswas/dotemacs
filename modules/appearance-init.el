@@ -53,8 +53,8 @@
   :config (hlinum-activate))
 
 (or (use-package leuven-theme
-      :ensure t
       :disabled t
+      :ensure t
       :config
       (load-theme 'leuven t)
       (use-package smart-mode-line
@@ -79,8 +79,8 @@
       (set-face-background 'fringe "linen"))
     
     (use-package professional-theme
-      :ensure t
       :disabled t
+      :ensure t
       :config
       (load-theme 'professional t)
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
@@ -116,8 +116,8 @@
   :config (global-hl-line-mode 1))
 
 (use-package display-theme
-  :ensure t
   ;;:disabled t
+  :ensure t
   :config (global-display-theme-mode))
 
 (provide 'appearance-init)

@@ -24,8 +24,7 @@
 
 (use-package tex-mode
   :ensure auctex
-  :config
-  (setq latex-run-command "latexmk"))
+  :config (setq latex-run-command "latexmk"))
 
 (use-package latex
   :ensure auctex
@@ -47,28 +46,27 @@
             (auctex-latexmk-setup)))
 
 (use-package latex-extra
-  :ensure t
   :disabled t
-  :config
-  (latex/setup-keybinds))
+  :ensure t
+  :config (latex/setup-keybinds))
 
 (use-package latex-pretty-symbols
-  :ensure t
-  :disabled t)
+  :disabled t
+  :ensure t)
 
 ;; currently does not support multi-file parsing
 (use-package latex-preview-pane
-  :ensure t
   :disabled t
+  :ensure t
   :config (latex-preview-pane-enable))
 
 (use-package latex-math-preview
-  :ensure t
-  :disabled t)
+  :disabled t
+  :ensure t)
 
 (use-package magic-latex-buffer
-  :ensure t
   :disabled t
+  :ensure t
   :config (add-hook 'LaTeX-mode-hook 'magic-latex-buffer))
 
 (use-package math-symbol-lists
