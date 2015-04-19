@@ -74,7 +74,7 @@
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
       (if (string-equal system-name "XXX")
           (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
-        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110) )
+        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
       ;; customize the fringe marks on the sides
       (set-face-background 'fringe "linen"))
     
@@ -95,7 +95,9 @@
         :config
         (powerline-default-theme))
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-      (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
+      (if (string-equal system-name "XXX")
+          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
+        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
       (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
       (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")

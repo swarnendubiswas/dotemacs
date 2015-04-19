@@ -100,6 +100,9 @@
   ;;(nav-disable-overeager-window-splitting)
   :bind ("<f6>" . nav-toggle))
 
+(use-package dired-nav-enhance
+  :ensure t)
+
 (provide 'dired-init)
 
 ;;; dired-init ends here

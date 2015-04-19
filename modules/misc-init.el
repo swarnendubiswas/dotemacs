@@ -111,7 +111,9 @@
 (use-package popwin
   :ensure t
   :config
-  (setq popwin:popup-window-height 35)
+  (if (string-equal system-name "XXX")
+      (setq popwin:popup-window-height 25)
+    (setq popwin:popup-window-height 15))
   (popwin-mode 1))
 
 (provide 'misc-init)

@@ -22,13 +22,14 @@
   (recentf-mode 1)
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   (recentf-auto-cleanup)
-  ;; Periodically (300 s) save recently opened files, in case emacs crashes
+  ;; Periodically (600 s) save recently opened files, in case emacs crashes
   (eval-after-load 'recentf
-    '(run-with-timer 0 (* 300 60) 'recentf-save-list))
+    '(run-with-timer 0 (* 600 60) 'recentf-save-list))
   ;;(global-set-key [f8] 'recentf-open-files)
   ;; Add buffers to recent list.
   (use-package recentf-ext
     :ensure t)
+  ;; Useful for synchronizing updates in case more than one emacs window is open.
   (use-package sync-recentf
     :load-path "lisp/")
   :bind ("<f8>" . recentf-open-files))
