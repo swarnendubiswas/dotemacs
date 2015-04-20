@@ -36,6 +36,7 @@
   (auto-compile-on-save-mode 1))
 
 (use-package paradox
+  :disabled t
   :ensure t
   :defer t
   :config

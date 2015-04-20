@@ -59,7 +59,9 @@
 ;; configure power packages
 (require 'buffer-init)
 (require 'dired-init)
-(require 'company-init)
+;; use either auto-complete or company for auto completion support
+(or (require 'auto-complete-init)
+    (require 'company-init))
 (require 'ido-init)
 (require 'search-init)
 

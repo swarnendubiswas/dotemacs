@@ -101,6 +101,7 @@
       (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
       (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")
+      (set-face-attribute 'hl-line nil :background "lavender")
       ;; org-mode customizations inspired from leuven theme
       (with-eval-after-load "org"
         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold 

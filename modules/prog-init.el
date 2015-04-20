@@ -5,18 +5,17 @@
 
 ;;; Code:
 
-;; ;; show the name of the function in the modeline
-;; (add-hook 'prog-mode-hook 'which-function-mode)
-;; ;; (add-to-list 'which-func-modes 'java-mode)
-;; ;; (add-to-list 'which-func-modes 'c-mode)
-;; ;; (add-to-list 'which-func-modes 'c++-mode)
-;; ;; (add-to-list 'which-func-modes 'python-mode)
-;; (eval-after-load "which-func"
-;;   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
-
+;; show the name of the function in the modeline
 (use-package which-func
   :defer 5
   :config
+  ;; (add-hook 'prog-mode-hook 'which-function-mode)
+  ;; ;; (add-to-list 'which-func-modes 'java-mode)
+  ;; ;; (add-to-list 'which-func-modes 'c-mode)
+  ;; ;; (add-to-list 'which-func-modes 'c++-mode)
+  ;; ;; (add-to-list 'which-func-modes 'python-mode)
+  ;; (eval-after-load "which-func"
+  ;;   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
   (setq which-func-modes '(java-mode c++-mode c-mode python-mode))
   (add-hook 'prog-mode-hook 'which-func-mode))
 

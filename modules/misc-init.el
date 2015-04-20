@@ -38,11 +38,12 @@
                    (buffer-file-name (tabbar-tab-value tab)))
               (concat " + " (concat ad-return-value " "))
             (concat " " (concat ad-return-value " ")))))
+  ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
   (set-face-attribute 'tabbar-default nil :background "gray60")
-  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil)
-  (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t)
+  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil :height 1.1)
+  (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t :height 1.2 :bold t)
   (set-face-attribute 'tabbar-highlight nil :underline t)
   (set-face-attribute 'tabbar-button nil :box '(:line-width 1 :color "gray72" :style released-button))
   ;;(set-face-attribute 'tabbar-button-highlight ((t (:inherit tabbar-default))))
@@ -112,7 +113,7 @@
   :ensure t
   :config
   (if (string-equal system-name "XXX")
-      (setq popwin:popup-window-height 25)
+      (setq popwin:popup-window-height 15)
     (setq popwin:popup-window-height 15))
   (popwin-mode 1))
 
