@@ -46,6 +46,11 @@
 (use-package simple
   :config (column-number-mode 1))
 
+;; highlight current line
+(use-package hl-line
+  :ensure t
+  :config (global-hl-line-mode 1))
+
 ;; extension to linum-mode to highlight current line number in the margin
 (use-package hlinum
   :ensure t
@@ -109,12 +114,6 @@
         (set-face-attribute 'org-level-2 nil :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
       ;; customize the fringe marks on the sides
       (set-face-background 'fringe "wheat")))
-
-;; highlight current line
-(use-package hl-line
-  :ensure t
-  :defer 5
-  :config (global-hl-line-mode 1))
 
 (use-package display-theme
   ;;:disabled t

@@ -36,7 +36,7 @@
     (setq ad-return-value
           (if (and (buffer-modified-p (tabbar-tab-value tab))
                    (buffer-file-name (tabbar-tab-value tab)))
-              (concat " + " (concat ad-return-value " "))
+              (concat " * " (concat ad-return-value " "))
             (concat " " (concat ad-return-value " ")))))
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html

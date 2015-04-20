@@ -94,21 +94,22 @@
 (require 'java-init)
 (require 'shell-init)
 
-(require 'svn-init)
-(require 'git-init)
-
 (require 'keybindings-init)
 
 ;; custom definitions
 (require 'custom-init)
 
 ;; temporary modules
+;;(require 'svn-init)
+;;(require 'git-init)
+
 ;;(require 'cedet-init)
 ;;(require 'jdee-init)
 
 ;; start the daemon/server
 ;;(require 'server-init)
 
+;; start with the emacs window maximized
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 (add-to-list 'default-frame-alist '(fullscreen . fullheight))
 
