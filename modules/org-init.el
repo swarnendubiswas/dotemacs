@@ -16,10 +16,12 @@
         org-src-window-setup 'current-window
         org-fontify-done-headline t
         org-fontify-whole-heading-line t
-        org-startup-folded nil
+        org-startup-folded 'showeverything ; options: nil
         org-hide-leading-stars t
         org-hide-leading-stars-before-indent-mode t
-        org-completion-use-ido t)
+        org-completion-use-ido t
+        ;; use shift-select 
+        org-support-shift-select t)
   ;; Allow syntax highlighting for parts of a word
   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode
   (setcar org-emphasis-regexp-components " \t('\"{[:alpha:]")

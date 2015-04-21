@@ -26,10 +26,28 @@
     ;;           (lambda ()
     ;;             (ibuffer-recompile-formats -1)))
     ;;(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
-    (use-package ibuffer-vc
-      :ensure t
-      :defer t))
+
+    ;; Group ibuffer list by tramp connection
+    (use-package ibuffer-tramp
+      :load-path "lisp/"
+      :config
+      (eval-after-load 'ibuffer
+        '(add-hook 'ibuffer-hook
+                   (lambda ()
+                     (ibuffer-tramp-set-filter-groups-by-tramp-connection)
+                     (ibuffer-do-sort-by-alphabetic))))))
   :bind ("C-x C-b" . ibuffer))
+
+;; use ibuffer-vc to sort buffers by VC status
+(use-package ibuffer-vc
+  :ensure t
+  :config
+  (eval-after-load 'ibuffer
+    '(add-hook 'ibuffer-hook
+               (lambda ()
+                 (ibuffer-vc-set-filter-groups-by-vc-root)
+                 (unless (eq ibuffer-sorting-mode 'alphabetic)
+                   (ibuffer-do-sort-by-alphabetic))))))
 
 (provide 'buffer-init)
 

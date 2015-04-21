@@ -19,24 +19,30 @@
         sh-indent-comment t
         sh-indentation 4))
 
+;; The following setup is from readline-complete package at
+;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
+;; set up shell (not eshell) mode
+(setq explicit-shell-file-name "fish"
+      explicit-bash-args '("-c" "export EMACS=; stty echo; fish")
+      comint-process-echoes t)
+
 (use-package readline-complete
   :ensure t
   :defer t
   :config
-  (push 'company-readline company-backends)
-  (add-hook 'rlc-no-readline-hook
-            (lambda ()
-              (company-mode -1))))
+  (when (fboundp 'company-mode)
+    (push 'company-readline company-backends)
+    (add-hook 'rlc-no-readline-hook
+              (lambda ()
+                (company-mode -1))))
+  (when (fboundp 'auto-complete-mode)
+    (add-to-list 'ac-modes 'shell-mode)
+    (add-hook 'shell-mode-hook 'ac-rlc-setup-sources)))
 
 (use-package bash-completion
   :ensure t
   :defer t
   :config (bash-completion-setup))
-
-;; set up shell (not eshell) mode
-(setq explicit-shell-file-name "fish"
-      ;;explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-      comint-process-echoes t)
 
 ;;(add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)

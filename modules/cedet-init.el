@@ -49,9 +49,24 @@
   :config
   (require 'semantic-ia)
   (require 'semantic-loaddefs)
+  ;; Copied from https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
+  ;; (add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
+  ;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
+  ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
+  ;; (semantic-mode 1)
   (require 'semanticdb)
   ;;SemanticDB files
-  (setq semanticdb-default-save-directory (concat emacs-temp-directory "semanticdb")))
+  (setq semanticdb-default-save-directory (concat emacs-temp-directory "semanticdb"))
+  ;; Ensure semantic can get info from gnu global
+  ;; (require 'semantic/db-global)
+  ;; (semanticdb-enable-gnu-global-databases 'c-mode)
+  ;; (semanticdb-enable-gnu-global-databases 'c++-mode))
 
 (global-semanticdb-minor-mode 1)
 (global-semantic-highlight-func-mode 1)

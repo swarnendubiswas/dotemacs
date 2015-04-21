@@ -48,7 +48,9 @@
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
   (setq save-interprogram-paste-before-kill t
         kill-whole-line t
-        suggest-key-bindings t)
+        suggest-key-bindings t
+        ;; use shift-select for marking
+        shift-select-mode t)
   ;; Enable visual feedback on selections, default since v23
   (transient-mark-mode 1))
 

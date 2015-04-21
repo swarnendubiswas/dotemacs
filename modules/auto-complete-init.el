@@ -13,9 +13,14 @@
         ac-comphist-file (concat emacs-temp-directory "ac-comphist.dat"))
   (require 'auto-complete-config)
   (global-auto-complete-mode)
-  (use-package ac-c-headers
-    :ensure t)
-  (use-package ac-clang
+  (use-package auto-complete-c-headers
+    :ensure t
+    :config
+  (add-hook 'c-mode-hook
+            (lambda ()
+              (add-to-list 'ac-sources 'ac-sources-c-headers)
+              (add-to-list 'ac-sources 'ac-sources-c-headers-symbols t))))
+  (use-package auto-complete-clang
     :ensure t)
   (use-package ac-ispell
     :ensure t)
@@ -25,7 +30,15 @@
     :ensure t)
   (use-package ac-dabbrev
     :ensure t)
-  (use-package ac-etags
+  (use-package auto-complete-etags
+    :ensure t)
+  (use-package auto-complete-exuberant-ctags
+    :ensure t)
+  (use-package ac-html
+    :ensure t)
+  (use-package auto-complete-nxml
+    :ensure t)
+  (use-package auto-complete-auctex
     :ensure t)
   (add-to-list 'ac-sources 'ac-source-abbrev)
   (add-to-list 'ac-sources 'ac-source-dictionary)
@@ -36,10 +49,6 @@
   (add-to-list 'ac-sources 'ac-source-words-in-buffer)
   (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
   (add-to-list 'ac-sources 'ac-source-yasnippet)
-  (add-hook 'c-mode-hook
-            (lambda ()
-              (add-to-list 'ac-sources 'ac-sources-c-headers)
-              (add-to-list 'ac-sources 'ac-sources-c-headers-symbols t)))
   (ac-flyspell-workaround)
   (ac-config-default)
   :diminish auto-complete-mode)
