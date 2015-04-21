@@ -16,7 +16,7 @@
                           ".*/recentf\\'") ; "/ssh:"
         recentf-save-file (concat emacs-temp-directory "recentf"))
   ;;(add-to-list 'recentf-exclude ".*/recentf\\'")
-  (add-to-list 'recentf-exclude "/tmp/recentf-marker")
+  (add-to-list 'recentf-exclude ".*/recentf-marker\\'")
   ;; save file names relative to my current home directory
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
   (recentf-mode 1)
@@ -25,13 +25,13 @@
   ;; Periodically (600 s) save recently opened files, in case emacs crashes
   (eval-after-load 'recentf
     '(run-with-timer 0 (* 600 60) 'recentf-save-list))
-  ;;(global-set-key [f8] 'recentf-open-files)
   ;; Add buffers to recent list.
   (use-package recentf-ext
     :ensure t)
   ;; Useful for synchronizing updates in case more than one emacs window is open.
   (use-package sync-recentf
     :load-path "lisp/")
+  ;;(global-set-key [f8] 'recentf-open-files)
   :bind ("<f8>" . recentf-open-files))
 
 (provide 'recentf-init)

@@ -7,7 +7,6 @@
 
 (use-package ido
   :ensure t
-  ;;:demand t
   :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
@@ -32,7 +31,6 @@
 
 (use-package ido-vertical-mode
   :ensure t
-  ;;:demand t
   :config
   ;; up and down keys to navigate options, left and right to move through history/directories
   (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)

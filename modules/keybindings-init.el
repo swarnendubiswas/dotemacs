@@ -32,7 +32,7 @@
 (global-set-key (kbd "C-c ;") #'comment-line)
 
 ;; buffers
-(global-set-key (kbd "C-c k") 'kill-other-buffers) ; kill all non-special buffers
+(global-set-key (kbd "C-c k") #'kill-other-buffers) ; kill all non-special buffers
 
 ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 (when (auto-highlight-symbol-mode)

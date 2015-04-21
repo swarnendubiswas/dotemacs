@@ -7,9 +7,10 @@
 
 (use-package smex
   :ensure t
-  ;;:commands (smex-initialize) ; this is slow
   ;;:init (autoload 'smex "smex")
-  :config (setq smex-save-file (expand-file-name ".smex-items" emacs-temp-directory))
+  :config
+  ;;(smex-initialize)
+  (setq smex-save-file (expand-file-name ".smex-items" emacs-temp-directory))
   :bind (("M-x" . smex)
          ("M-X" . smex-major-mode-commands)))
 

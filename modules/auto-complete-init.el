@@ -23,6 +23,10 @@
     :ensure t)
   (use-package ac-python
     :ensure t)
+  (use-package ac-dabbrev
+    :ensure t)
+  (use-package ac-etags
+    :ensure t)
   (add-to-list 'ac-sources 'ac-source-abbrev)
   (add-to-list 'ac-sources 'ac-source-dictionary)
   (add-to-list 'ac-sources 'ac-source-filename)

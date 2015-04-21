@@ -7,7 +7,7 @@
 
 (use-package smooth-scrolling
   :ensure t
-  :defer 10)
+  :defer 5)
 
 (use-package achievements
   :disabled t
@@ -64,7 +64,7 @@
   :disabled t
   :ensure t)
 
-;; move text with M-up and M-down like eclipse
+;; move text with M-<up> and M-<down> like eclipse
 (use-package move-text
   :ensure t
   :config (move-text-default-bindings))

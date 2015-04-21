@@ -14,7 +14,6 @@
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
-  ;;(bound-and-true-p 'flyspell-mode)
   (add-hook 'find-file-hooks #'turn-on-flyspell)
   ;; (add-hook 'LaTeX-mode-hook #'turn-on-flyspell)
   ;; (add-hook 'text-mode-hook #'turn-on-flyspell)

@@ -26,15 +26,15 @@
   :disabled t
   :ensure t
   :config 
-  ;;(add-hook 'prog-mode-hook 'idle-highlight-mode) 
-  ;; (add-hook 'find-file-hook 'idle-highlight-mode)
+  ;; (add-hook 'prog-mode-hook #'idle-highlight-mode) 
+  ;; (add-hook 'find-file-hook #'idle-highlight-mode)
   (idle-highlight-mode 1))
 
 (use-package auto-highlight-symbol
   :disabled t
   :ensure t
   :config
-  ;;(add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
+  ;; (add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
   (global-auto-highlight-symbol-mode 1))
 
 ;; highlight certain words

@@ -116,7 +116,6 @@
       (set-face-background 'fringe "wheat")))
 
 (use-package display-theme
-  ;;:disabled t
   :ensure t
   :config (global-display-theme-mode))
 

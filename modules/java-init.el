@@ -22,8 +22,7 @@
 (use-package jtags
   :ensure t
   :defer t
-  :config
-  (add-hook 'java-mode-hook 'jtags-mode))
+  :config (add-hook 'java-mode-hook 'jtags-mode))
 
 (use-package javap-mode
   :ensure t

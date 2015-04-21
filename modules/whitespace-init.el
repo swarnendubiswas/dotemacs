@@ -6,17 +6,17 @@
 ;;; Code:
 
 ;; (use-package simple
-;;   :config (add-hook 'before-save-hook 'delete-trailing-whitespace))
+;;   :config (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package whitespace
   :disabled t
-  :diminish global-whitespace-mode
   :defer 5
+  :diminish global-whitespace-mode
   :config
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
                 show-trailing-whitespace t
+                ;;whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing)
                 whitespace-style '(tabs newline space-mark tab-mark newline-mark))
-  ;;(setq whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing))
   ;;(set-face-attribute 'whitespace-line nil :background "red1" :foreground "yellow" :weight 'bold)
   (global-whitespace-mode 1))
 

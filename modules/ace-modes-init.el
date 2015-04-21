@@ -46,11 +46,6 @@
   ;;(global-set-key (kbd "M-b") 'ace-jump-buffer)
   :bind ("M-b" . ace-jump-buffer))
 
-(use-package ace-isearch
-  :disabled t
-  :ensure t
-  :config (global-ace-isearch-mode 1))
-
 (provide 'ace-modes-init)
 
 ;;; ace-modes-init.el ends here

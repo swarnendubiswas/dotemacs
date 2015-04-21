@@ -51,7 +51,7 @@
   :commands (dired-jump)
   :config
   (setq dired-bind-jump t)
-  ;;(setq-default dired-omit-mode t)
+  ;; (setq-default dired-omit-mode t)
   ;; (add-hook 'dired-mode-hook
   ;;           (lambda ()
   ;;             (dired-omit-mode 1)))

@@ -32,13 +32,14 @@
   (latex-electric-env-pair-mode 1)
   ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode))
+  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map))
 
-(eval-after-load 'LaTeX
-  '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
-(eval-after-load 'LaTeX
-  '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
+;; (eval-after-load 'LaTeX
+;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
+;; (eval-after-load 'LaTeX
+;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
 
 (use-package auctex-latexmk
   :ensure t
@@ -90,12 +91,10 @@
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t
         reftex-default-bibliography '("~/workspace/bib/plass.bib"))
-  ;;(bound-and-true-p reftex-mode)
+  ;; (eval-after-load "reftex"
+  ;;   '(diminish 'reftex-mode))
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook #'reftex-mode))
-
-;; (eval-after-load "reftex"
-;;   '(diminish 'reftex-mode))
 
 (use-package ebib
   :ensure t

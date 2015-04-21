@@ -20,7 +20,9 @@
 (use-package electric
   :disabled t
   :config
-  ;;(add-hook 'after-change-major-mode-hook (lambda () (electric-indent-mode -1)))
+  ;; (add-hook 'after-change-major-mode-hook
+  ;;           (lambda ()
+  ;;             (electric-indent-mode -1)))
   (electric-indent-mode -1))
 
 (use-package auto-indent-mode

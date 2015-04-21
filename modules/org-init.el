@@ -40,7 +40,6 @@
 ;;(require 'ox-latex)
 (use-package ox-latex
   :defer t
-  ;;:demand t
   :config (with-eval-after-load 'org
             (setq org-latex-listings t) ;; tell org to use listings
             ;; include the listings package

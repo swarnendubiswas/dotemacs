@@ -28,6 +28,7 @@
 (setq load-prefer-newer t)
 
 (use-package auto-compile
+  :disabled t
   :ensure t
   :config
   (setq auto-compile-display-buffer nil
