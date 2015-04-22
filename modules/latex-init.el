@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -20,7 +20,8 @@
                 TeX-command-default "LatexMk")
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   ;; compile files to pdf by default
-  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode))
+  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-buffer))
 
 (use-package tex-mode
   :ensure auctex
@@ -40,6 +41,9 @@
 ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
 ;; (eval-after-load 'LaTeX
 ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
+
+;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
+(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
 
 (use-package auctex-latexmk
   :ensure t

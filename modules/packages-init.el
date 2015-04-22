@@ -1,4 +1,4 @@
-;;; packages-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; packages-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup packages. Inspired from http://www.lunaryorn.com/2015/01/06/my-emacs-configuration-with-use-package.html

@@ -1,4 +1,4 @@
-;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Tweak emacs appearance.
@@ -103,17 +103,18 @@
       (if (string-equal system-name "XXX")
           (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+      (set-background-color "white")
       (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
       (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD")
-      (set-face-attribute 'hl-line nil :background "lavender")
+      (set-face-attribute 'hl-line nil :background "linen")
       ;; org-mode customizations inspired from leuven theme
       (with-eval-after-load "org"
         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold 
                             :foreground "#3C3C3C" :background "#F5F5F5")
         (set-face-attribute 'org-level-2 nil :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
       ;; customize the fringe marks on the sides
-      (set-face-background 'fringe "wheat")))
+      (set-face-background 'fringe "lavender")))
 
 (use-package display-theme
   :ensure t

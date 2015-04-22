@@ -1,4 +1,4 @@
-;;; recentf-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; recentf-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Track recently-accessed files.

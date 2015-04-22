@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization  -*- lexical-binding: t; -*-  -*-no-byte-compile: t; -*-
+;;; init.el --- Emacs customization  -*- lexical-binding: t; no-byte-compile: t; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:
@@ -57,11 +57,11 @@
 (require 'mode-line-init)
 
 ;; configure power packages
-(require 'buffer-init)
+(require 'ibuffer-init)
 (require 'dired-init)
 ;; use either auto-complete or company for auto completion support
-(or (require 'auto-complete-init)
-    (require 'company-init))
+(or (require 'company-init)
+    (require 'auto-complete-init))
 (require 'ido-init)
 (require 'search-init)
 
@@ -90,7 +90,7 @@
 (require 'latex-init)
 (require 'org-init)
 (require 'prog-init)
-(require 'c-init)
+(require 'cc-init)
 (require 'java-init)
 (require 'shell-init)
 

@@ -1,4 +1,4 @@
-;;; keybindings-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; keybindings-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Custom keybindings.
@@ -19,7 +19,7 @@
 (global-set-key [f4] 'delete-other-windows)
 (global-set-key [f5] 'other-window) ; switch to the other buffer
 
-(global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "M-/") 'hippie-expand) ;; replace dabbrev-expand
 
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (global-set-key (kbd "C-f") 'isearch-forward-regexp)

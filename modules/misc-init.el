@@ -1,4 +1,4 @@
-;;; misc-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; misc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Miscellaneous package configurations.
@@ -41,7 +41,7 @@
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
-  (set-face-attribute 'tabbar-default nil :background "gray60")
+  (set-face-attribute 'tabbar-default nil :background "gray80")
   (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil :height 1.1)
   (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t :height 1.2 :bold t)
   (set-face-attribute 'tabbar-highlight nil :underline t)
@@ -80,8 +80,20 @@
   :diminish writegood-mode
   :config
   (add-hook 'text-mode-hook #'writegood-mode)
+  ;;(add-hook 'tex-mode-hook #'writegood-mode)
+  ;;(add-hook 'latex-mode-hook #'writegood-mode)
   (add-hook 'LaTeX-mode-hook #'writegood-mode)
   (add-hook 'org-mode-hook #'writegood-mode))
+
+(use-package artbollocks-mode
+  :ensure t
+  :diminish artbollocks-mode
+  :config
+  (add-hook 'text-mode-hook #'artbollocks-mode)
+  ;;(add-hook 'tex-mode-hook #'artbollocks-mode)
+  ;;(add-hook 'latex-mode-hook #'artbollocks-mode)
+  (add-hook 'LaTeX-mode-hook #'artbollocks-mode)
+  (add-hook 'org-mode-hook #'artbollocks-mode))
 
 (use-package discover-my-major
   :ensure t

@@ -1,4 +1,4 @@
-;;; ace-modes-init.el --- Part of emacs initialization   -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; ace-modes-init.el --- Part of emacs initialization   -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup ace-xxx (jump/buffer/isearch) modes.
@@ -9,7 +9,7 @@
 ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 (use-package ace-jump-mode
   :ensure t
-  :bind ("C-c C-SPC" . ace-jump-mode))
+  :bind ("C-c SPC" . ace-jump-mode))
 
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
@@ -37,9 +37,10 @@
              (save-excursion
                (set-buffer name)
                (equal major-mode 'dired-mode)))))
-  :config (setq bs-configurations
-                '(("all" nil nil nil nil nil)
-                  ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
+  :config
+  (setq bs-configurations
+        '(("all" nil nil nil nil nil)
+          ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
   (setq bs-cycle-configuration-name "files")
   (setq-default ajb-bs-configuration "files")
   ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)

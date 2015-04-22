@@ -1,4 +1,4 @@
-;;; dired-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; dired-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Dired configurations.
@@ -87,8 +87,8 @@
 ;;   :defer 5)
 
 (use-package dired-rainbow
-  :ensure t
-  :defer t)
+  :disabled t
+  :ensure t)
 
 (use-package dired-hacks-utils
   :ensure t

@@ -1,4 +1,4 @@
-;;; flyspell-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; flyspell-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup spell check.
@@ -6,11 +6,14 @@
 ;;; Code:
 
 (use-package flyspell
-  :defer 5
   :config
+  (use-package flyspell-lazy
+    :ensure t
+    :config
+    (flyspell-lazy-mode 1))
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
-  (setq ispell-extra-args '("--sug-mode=normal" "--lang=en_US"))
+  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)

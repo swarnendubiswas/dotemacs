@@ -1,4 +1,4 @@
-;;; c-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; cc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.
@@ -26,6 +26,6 @@
     '(flycheck-add-next-checker 'c/c++-clang
                                 'c/c++-googlelint 'append)))
 
-(provide 'c-init)
+(provide 'cc-init)
 
-;;; c-init.el ends here
+;;; cc-init.el ends here
