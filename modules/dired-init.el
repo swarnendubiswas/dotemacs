@@ -66,7 +66,8 @@
 
 ;; direx:jump-to-directory is a good explorer
 (use-package direx
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package dired-efap
   :ensure t
@@ -86,10 +87,12 @@
 ;;   :defer 5)
 
 (use-package dired-rainbow
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package dired-hacks-utils
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package nav
   :disabled t
@@ -100,7 +103,8 @@
   :bind ("<f6>" . nav-toggle))
 
 (use-package dired-nav-enhance
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (provide 'dired-init)
 

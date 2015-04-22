@@ -1,7 +1,7 @@
-;;; buffer-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
+;;; ibuffer-init.el --- Part of emacs initialization  -*- lexical-binding: t; -*- -*- no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Buffer configurations.
+;; IBuffer configurations.
 
 ;;; Code:
 
@@ -49,6 +49,6 @@
                  (unless (eq ibuffer-sorting-mode 'alphabetic)
                    (ibuffer-do-sort-by-alphabetic))))))
 
-(provide 'buffer-init)
+(provide 'ibuffer-init)
 
-;;; buffer-init.el ends here
+;;; ibuffer-init.el ends here
