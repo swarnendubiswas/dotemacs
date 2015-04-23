@@ -7,7 +7,6 @@
 
 (use-package flycheck
   :ensure t
-  :defer 5
   :diminish flycheck-mode
   :config
   ;;(global-flycheck-mode 1)
@@ -22,19 +21,19 @@
 (use-package flycheck-package
   :disabled t
   :ensure t
-  :config (with-eval-after-load 'flycheck
-            (flycheck-package-setup)))
+  :config
+  (with-eval-after-load 'flycheck
+    (flycheck-package-setup)))
 
 (use-package flycheck-tip
-  :ensure t
-  :defer 10)
+  :ensure t)
 
 ;; Show flycheck messages in popups
 (use-package flycheck-pos-tip
   :ensure t
-  :defer 10
-  :config (with-eval-after-load 'flycheck
-            (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+  :config
+  (with-eval-after-load 'flycheck
+    (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
 (provide 'flycheck-init)
 

@@ -116,19 +116,15 @@
 
 ;; fontification: turn on syntax coloring, on by default since Emacs 22
 (use-package font-core
-  :defer 2
-  :config
-  (global-font-lock-mode 1)) 
+  :config (global-font-lock-mode 1)) 
 
 (use-package font-lock
-  :defer 2
   :config
   (setq font-lock-maximum-decoration t ; maximum fontification possible
         ;; jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock
-  :defer 2
   :config
   (setq jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
         jit-lock-stealth-time 10
@@ -136,7 +132,6 @@
         jit-lock-stealth-nice 0.5))
 
 (use-package hi-lock
-  :defer 2
   :config (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
@@ -147,13 +142,12 @@
 
 ;; remember cursor position in files
 (use-package saveplace
-  :defer 5
-  :config (setq-default save-place t
-                        save-place-file (concat emacs-temp-directory "places")))
+  :config
+  (setq-default save-place t
+                save-place-file (concat emacs-temp-directory "places")))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
-  :defer 5
   :config
   (icomplete-mode 1)
   (use-package icomplete+
@@ -167,7 +161,6 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
-  :defer 5
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
@@ -184,7 +177,6 @@
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
-  :defer 5
   :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>

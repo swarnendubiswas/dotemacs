@@ -6,8 +6,7 @@
 ;;; Code:
 
 (use-package smooth-scrolling
-  :ensure t
-  :defer 5)
+  :ensure t)
 
 (use-package achievements
   :disabled t
@@ -20,7 +19,6 @@
 ;; speed up emacs for large files
 (use-package vlf
   :ensure t
-  :defer 5
   :config
   (progn
     ;; warn when opening files bigger than 50MB

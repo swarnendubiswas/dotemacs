@@ -37,8 +37,7 @@
   (ido-vertical-mode 1))
 
 (use-package ido-yes-or-no
-  :ensure t
-  :defer 5)
+  :ensure t)
 
 (use-package ido-hacks
   :ensure t)

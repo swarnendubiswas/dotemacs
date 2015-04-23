@@ -34,7 +34,6 @@
 
 ;; displays the time and date in the mode line
 (use-package time
-  :defer 2
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil)
@@ -54,7 +53,6 @@
 ;; extension to linum-mode to highlight current line number in the margin
 (use-package hlinum
   :ensure t
-  :defer 5
   :config (hlinum-activate))
 
 (or (use-package leuven-theme

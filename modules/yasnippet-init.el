@@ -7,7 +7,6 @@
 
 (use-package yasnippet
   :ensure t
-  :defer 5
   :diminish yas-minor-mode
   :commands (yas-global-mode yas-minor-mode)
   :config

@@ -83,8 +83,7 @@
 ;;   :config (setq dired-details-hide-link-targets nil))
 
 ;; (use-package dired-details+
-;;   :ensure t
-;;   :defer 5)
+;;   :ensure t)
 
 (use-package dired-rainbow
   :disabled t

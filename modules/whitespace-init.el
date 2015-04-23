@@ -10,7 +10,6 @@
 
 (use-package whitespace
   :disabled t
-  :defer 5
   :diminish global-whitespace-mode
   :config
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
@@ -22,7 +21,6 @@
 
 (use-package whitespace-cleanup-mode
   :ensure t
-  :defer 5
   :diminish whitespace-cleanup-mode
   :config (add-hook 'before-save-hook #'whitespace-cleanup-mode))
 

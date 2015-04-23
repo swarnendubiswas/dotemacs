@@ -8,7 +8,6 @@
 (use-package company
   :ensure t
   :diminish company-mode
-  :defer 2
   :config
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
         company-show-numbers t ; show quick-access numbers for the first ten candidates

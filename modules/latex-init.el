@@ -78,8 +78,7 @@
   :ensure t)
 
 (use-package bibtex-utils
-  :ensure t
-  :defer 10)
+  :ensure t)
 
 ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
 ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)

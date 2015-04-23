@@ -23,7 +23,6 @@
 (use-package rainbow-blocks
   :disabled t
   :ensure t
-  :defer 5
   :config (rainbow-blocks-mode 1)
   :diminish rainbow-blocks-mode)
 

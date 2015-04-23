@@ -7,7 +7,6 @@
 
 (use-package highlight-numbers
   :ensure t
-  :defer 5
   :config (highlight-numbers-mode 1))
 
 (use-package highlight-symbol
