@@ -8,6 +8,7 @@
 (use-package magit
   :ensure t
   :defer t
+  :diminish magit-auto-revert-mode
   :config
   (setq magit-auto-revert-mode nil
         magit-last-seen-setup-instructions "1.4.0"))

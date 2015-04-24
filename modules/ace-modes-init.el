@@ -9,7 +9,8 @@
 ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 (use-package ace-jump-mode
   :ensure t
-  :bind ("C-c SPC" . ace-jump-mode))
+  :bind ("C-c SPC" . ace-jump-mode)
+  :config (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html

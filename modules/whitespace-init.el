@@ -22,7 +22,10 @@
 (use-package whitespace-cleanup-mode
   :ensure t
   :diminish whitespace-cleanup-mode
-  :config (add-hook 'before-save-hook #'whitespace-cleanup-mode))
+  :config
+  ;; (dolist (hook '(prog-mode-hook))
+  ;;   (add-hook hook #'whitespace-cleanup-mode))
+  (add-hook 'before-save-hook #'whitespace-cleanup-mode))
 
 (provide 'whitespace-init)
 

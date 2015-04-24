@@ -50,8 +50,10 @@
 (use-package dired-x
   :commands (dired-jump)
   :config
-  (setq dired-bind-jump t)
-  ;; (setq-default dired-omit-mode t)
+  (setq dired-bind-jump t
+        ;; do not show messages when omitting files
+        dired-omit-verbose nil)
+  (setq-default dired-omit-mode t)
   ;; (add-hook 'dired-mode-hook
   ;;           (lambda ()
   ;;             (dired-omit-mode 1)))

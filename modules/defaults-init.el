@@ -37,7 +37,7 @@
 
 (setq sentence-end-double-space nil
       ;; Enable use of system clipboard across emacs and other applications.
-      x-select-enable-clipboard t) 
+      x-select-enable-clipboard t)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 (toggle-indicate-empty-lines 1)

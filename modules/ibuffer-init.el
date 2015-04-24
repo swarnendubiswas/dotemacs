@@ -41,6 +41,7 @@
 ;; use ibuffer-vc to sort buffers by VC status
 (use-package ibuffer-vc
   :ensure t
+  :defer t
   :config
   (eval-after-load 'ibuffer
     '(add-hook 'ibuffer-hook

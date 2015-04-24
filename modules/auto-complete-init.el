@@ -16,11 +16,11 @@
   (use-package auto-complete-c-headers
     :ensure t
     :config
-  (add-hook 'c-mode-hook
-            (lambda ()
-              (add-to-list 'ac-sources 'ac-sources-c-headers)
-              (add-to-list 'ac-sources 'ac-sources-c-headers-symbols t))))
-  (use-package auto-complete-clang
+    (add-hook 'c-mode-hook
+              (lambda ()
+                (add-to-list 'ac-sources 'ac-sources-c-headers)
+                (add-to-list 'ac-sources 'ac-sources-c-headers-symbols t))))
+  (use-package ac-capf
     :ensure t)
   (use-package ac-ispell
     :ensure t)
@@ -29,6 +29,8 @@
   (use-package ac-python
     :ensure t)
   (use-package ac-dabbrev
+    :ensure t)
+  (use-package auto-complete-clang
     :ensure t)
   (use-package auto-complete-etags
     :ensure t)
