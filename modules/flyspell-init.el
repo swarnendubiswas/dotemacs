@@ -6,8 +6,25 @@
 ;;; Code:
 
 (use-package flyspell
-  :config
+  :preface
+  (defun activate-flyspell ()
+    "Turn on flyspell-mode and call flyspell-buffer."
+    (interactive)
+    ;; This next line REALLY slows buffer switching.
+    (flyspell-mode)
+    (flyspell-buffer))
+
+  (defvar customised-hooks-alist
+    '(text-mode-hook org-mode-hook LaTeX-mode-hook)
+    "An alist of hooks that require customisations.")
+
+  ;; (unless noninteractive
+  ;;   ;; Activate flyspell for various major modes.
+  ;;   (add-hook-list customised-hooks-alist 'activate-flyspell))
+
+  :init
   (use-package flyspell-lazy
+    :disabled t
     :ensure t
     :config
     (flyspell-lazy-mode 1))
@@ -18,10 +35,6 @@
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
   (add-hook 'find-file-hooks #'turn-on-flyspell)
-  ;; (add-hook 'LaTeX-mode-hook #'turn-on-flyspell)
-  ;; (add-hook 'text-mode-hook #'turn-on-flyspell)
-  ;; (add-hook 'org-mode-hook #'turn-on-flyspell)
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)
   ;; (eval-after-load "flyspell"

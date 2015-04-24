@@ -19,7 +19,10 @@
   (add-hook 'prog-mode-hook 'which-func-mode))
 
 (use-package electric
-  :config (electric-layout-mode 1))
+  :config
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (electric-layout-mode 1))))
 
 (provide 'prog-init)
 

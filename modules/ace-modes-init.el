@@ -45,7 +45,9 @@
   (setq-default ajb-bs-configuration "files")
   ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
   ;;(global-set-key (kbd "M-b") 'ace-jump-buffer)
-  :bind ("M-b" . ace-jump-buffer))
+  :bind
+  ;;("M-b" . ace-jump-buffer)
+  ("<f6>" . ace-jump-buffer))
 
 (provide 'ace-modes-init)
 

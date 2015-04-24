@@ -9,8 +9,9 @@
   :ensure t
   :diminish flycheck-mode
   :config
-  ;;(global-flycheck-mode 1)
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+  (use-package flycheck-tip
+    :ensure t)
+  (add-hook 'prog-mode-hook #'global-flycheck-mode))
 
 (use-package flycheck-color-mode-line
   :disabled t
@@ -24,9 +25,6 @@
   :config
   (with-eval-after-load 'flycheck
     (flycheck-package-setup)))
-
-(use-package flycheck-tip
-  :ensure t)
 
 ;; Show flycheck messages in popups
 (use-package flycheck-pos-tip
