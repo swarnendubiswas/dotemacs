@@ -15,16 +15,18 @@
   :config
   (setq helm-ff-transformer-show-only-basename nil
         helm-yank-symbol-first t
-        helm-quick-update t
+        helm-quick-update t ; do not display invisible candidates
         helm-buffers-fuzzy-matching t
         helm-M-x-fuzzy-match t
-        helm-ff-file-name-history-use-recentf nil
+        helm-ff-file-name-history-use-recentf t
         helm-ff-auto-update-initial-value t
         helm-recentf-fuzzy-match t
         helm-locate-fuzzy-match t
+        ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
         ido-use-virtual-buffers t
         helm-completion-in-region-fuzzy-match t
+        ;; move to end or beginning of source when reaching top or bottom of source.
         helm-move-to-line-cycle-in-source t
         helm-org-headings-fontify t
         helm-display-header-line t
@@ -45,7 +47,10 @@
     :ensure t
     :config (helm-descbinds-mode 1))
   (use-package helm-flyspell
-    :ensure t)
+    :ensure t
+    :config
+    (eval-after-load 'flyspell
+      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
   (use-package helm-flycheck
     :ensure t)
   (use-package helm-words
@@ -56,9 +61,6 @@
     :ensure t)
   (use-package helm-c-yasnippet
     :ensure t)
-  (use-package helm-j-cheatsheet
-    :ensure t
-    :commands helm-j-cheatsheet)
   :bind
   ("M-x" . helm-M-x)
   ("C-x b" . helm-mini)
@@ -68,6 +70,7 @@
   ("<f8>" . helm-recentf)
   ("C-x C-l" . helm-locate)
   ("M-y" . helm-show-kill-ring)
+  ("<tab>" . helm-execute-persistent-action)
   :diminish helm-mode)
 
 (provide 'helm-init)

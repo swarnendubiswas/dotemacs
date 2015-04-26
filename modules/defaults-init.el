@@ -71,7 +71,7 @@
   ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
   (delete-selection-mode 1))
 
-;; /method:user@host#port:filename
+;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
 (use-package tramp
   :defer t
   :config

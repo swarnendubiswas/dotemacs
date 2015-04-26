@@ -32,7 +32,7 @@
         dired-dwim-target t)
   ;; jump to home directory
   ;; (global-set-key (kbd "M-<home>")
-  ;;                 (lambda () 
+  ;;                 (lambda ()
   ;;                   (interactive)
   ;;                   (dired "~/")))
   (bind-key "M-<home>" 'dired-go-home dired-mode-map)
@@ -49,7 +49,6 @@
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
   :commands (dired-jump)
-  :diminish dired-omit-mode
   :config
   (setq dired-bind-jump t
         ;; do not show messages when omitting files
@@ -59,7 +58,7 @@
   ;;           (lambda ()
   ;;             (dired-omit-mode 1)))
   ;; C-x C-j opens dired with the cursor right on the file you're editing
-  :bind ("C-x C-j" . dired-jump)) 
+  :bind ("C-x C-j" . dired-jump))
 
 (use-package dired+
   :ensure t

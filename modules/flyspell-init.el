@@ -16,7 +16,7 @@
 
   (defvar customised-hooks-alist
     '(text-mode-hook org-mode-hook LaTeX-mode-hook)
-    "An alist of hooks that require customisations.")
+    "An alist of hooks that require customizations.")
 
   ;; (unless noninteractive
   ;;   ;; Activate flyspell for various major modes.
