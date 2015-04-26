@@ -4,8 +4,11 @@
 ;;; Commentary:
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the whole buffer
-;; Init file shouldn't ideally contain calls to "load" or "require", since they cause eager loading and are expensive, a
-;; cheaper alternative is to use "autoload".
+;; Use C-M-x to evaluate the current top-level s-expression. Use M-: to evaluate any Emacs Lisp expression and print the
+;; result.
+
+;; Init file should not ideally contain calls to "load" or "require", since they cause eager loading and are expensive,
+;; a cheaper alternative is to use "autoload".
 
 ;; Interesting quotes (inspired from http://www.mygooglest.com/fni/dot-emacs.html):
 ;;
@@ -41,16 +44,16 @@
 ;;; Code:
 
 ;; customizing packages
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/"))
+;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/")) ; already added by default
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp")) ; third-party packages
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/")) ; personal modules for customizing emacs initialization
 
 ;; setup the packaging system
 (require 'packages-init)
 
-;; now setup other modules in certain order
+;; now setup other modules
 
-;; user and appearance defaults
+;; user, defaults, and appearance
 (require 'user-init)
 (require 'defaults-init)
 (require 'appearance-init)
@@ -59,16 +62,25 @@
 ;; configure power packages
 (require 'ibuffer-init)
 (require 'dired-init)
-;; use either auto-complete or company for auto completion support
-(or (require 'company-init)
-    (require 'auto-complete-init))
-(require 'ido-init)
 (require 'search-init)
+
+;; use either auto-complete or company for auto completion support
+(defconst use-company t "Choose company over auto-complete for completion.")
+(if (bound-and-true-p use-company)
+    (require 'company-init)
+  (require 'auto-complete-init))
+
+;; use either helm or other packages that provide similar functionality
+(defconst use-helm t "Prefer helm instead of ido, smex, and recentf.  Helm provides similar functionalities.")
+(if (bound-and-true-p use-helm)
+    (require 'helm-init)
+  (progn
+    (require 'ido-init)
+    (require 'smex-init)
+    (require 'recentf-init)))
 
 ;; configure the more useful extensions
 (require 'anzu-init)
-(require 'smex-init)
-(require 'recentf-init)
 (require 'flyspell-init)
 
 ;; setup helper packages
@@ -94,6 +106,7 @@
 (require 'java-init)
 (require 'shell-init)
 
+;; generic keybindings, package-specific are usually in their own modules
 (require 'keybindings-init)
 
 ;; custom definitions
@@ -103,8 +116,7 @@
 ;; (require 'svn-init)
 ;; (require 'git-init)
 
-;; does not work perfectly
-;; (require 'cedet-init)
+;; (require 'cedet-init) ;; does not work perfectly
 ;; (require 'jdee-init)
 
 ;; start the daemon/server

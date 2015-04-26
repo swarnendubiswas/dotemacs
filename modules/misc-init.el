@@ -127,6 +127,10 @@
     (setq popwin:popup-window-height 15))
   (popwin-mode 1))
 
+;; this package now provides ivy-mode
+(use-package swiper
+  :ensure t)
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

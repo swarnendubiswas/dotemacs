@@ -20,7 +20,7 @@
         org-hide-leading-stars t
         org-hide-leading-stars-before-indent-mode t
         org-completion-use-ido t
-        ;; use shift-select 
+        ;; use shift-select
         org-support-shift-select t)
   ;; Allow syntax highlighting for parts of a word
   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode

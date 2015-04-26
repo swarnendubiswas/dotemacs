@@ -22,6 +22,8 @@
                 (add-to-list 'ac-sources 'ac-sources-c-headers-symbols t))))
   (use-package ac-capf
     :ensure t)
+  (use-package ac-helm
+    :ensure t)
   (use-package ac-ispell
     :ensure t)
   (use-package ac-math

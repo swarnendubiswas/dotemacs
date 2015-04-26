@@ -96,6 +96,9 @@
       (use-package powerline
         :ensure t
         :config
+        (setq powerline-display-mule-info nil
+              powerline-display-buffer-size t
+              powerline-display-hud nil)
         (powerline-default-theme))
       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
       (if (string-equal system-name "XXX")
@@ -108,7 +111,7 @@
       (set-face-attribute 'hl-line nil :background "linen")
       ;; org-mode customizations inspired from leuven theme
       (with-eval-after-load "org"
-        (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold 
+        (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
                             :foreground "#3C3C3C" :background "#F5F5F5")
         (set-face-attribute 'org-level-2 nil :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
       ;; customize the fringe marks on the sides

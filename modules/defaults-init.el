@@ -33,7 +33,9 @@
         make-backup-files nil ; Stop making backup ~ files
         ;; Disable backup for a per-file basis, not to be used by major modes.
         backup-inhibited t
-        auto-save-default t))
+        auto-save-default t
+        ;; 'y-or-n-p
+        confirm-kill-emacs nil))
 
 (setq sentence-end-double-space nil
       ;; Enable use of system clipboard across emacs and other applications.
@@ -93,7 +95,7 @@
       read-buffer-completion-ignore-case t)
 
 ;; increase gc threshold
-(setq gc-cons-threshold 20000000)
+(setq gc-cons-threshold (* 10 1024 1024))
 
 ;; dim the ignored part of the file name
 (file-name-shadow-mode 1)
@@ -101,6 +103,9 @@
 ;; do not use dialog boxes
 (setq use-dialog-box nil
       use-file-dialog nil)
+
+(use-package advice
+  :config (setq ad-redefinition-action 'accept))
 
 ;; desktop save mode
 (use-package desktop
@@ -148,6 +153,7 @@
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
+  :disabled t
   :config
   (icomplete-mode 1)
   (use-package icomplete+
@@ -168,7 +174,7 @@
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring))
-  (setq-default history-length 500)
+  (setq-default history-length 50)
   (savehist-mode 1))
 
 (setq enable-recursive-minibuffers t)

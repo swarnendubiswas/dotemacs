@@ -9,6 +9,9 @@
       :disabled t
       :ensure t
       :config
+      (setq powerline-display-mule-info nil
+            powerline-display-buffer-size t
+            powerline-display-hud nil)
       (powerline-default-theme))
 
     (use-package smart-mode-line

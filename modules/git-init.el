@@ -11,6 +11,7 @@
   :diminish magit-auto-revert-mode
   :config
   (setq magit-auto-revert-mode nil
+        magit-item-highlight-face 'bold
         magit-last-seen-setup-instructions "1.4.0"))
 
 (use-package git-commit-mode            ; Git commit message mode

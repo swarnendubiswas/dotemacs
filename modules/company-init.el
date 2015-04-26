@@ -19,8 +19,8 @@
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
   (add-to-list 'company-backends 'company-files)
   (add-to-list 'company-backends 'company-capf)
-  (add-to-list 'company-backends 'company-dabbrev)
-  (add-to-list 'company-backends 'company-dabbrev-code)
+  ;; (add-to-list 'company-backends 'company-dabbrev)
+  ;; (add-to-list 'company-backends 'company-dabbrev-code)
   (global-company-mode 1))
 
 (use-package company-auctex

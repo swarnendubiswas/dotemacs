@@ -24,8 +24,8 @@
 (use-package idle-highlight-mode
   :disabled t
   :ensure t
-  :config 
-  ;; (add-hook 'prog-mode-hook #'idle-highlight-mode) 
+  :config
+  ;; (add-hook 'prog-mode-hook #'idle-highlight-mode)
   ;; (add-hook 'find-file-hook #'idle-highlight-mode)
   (idle-highlight-mode 1))
 

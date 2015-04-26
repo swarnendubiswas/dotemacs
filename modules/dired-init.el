@@ -49,6 +49,7 @@
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
   :commands (dired-jump)
+  :diminish dired-omit-mode
   :config
   (setq dired-bind-jump t
         ;; do not show messages when omitting files
@@ -68,6 +69,10 @@
 
 ;; direx:jump-to-directory is a good explorer
 (use-package direx
+  :ensure t
+  :defer t)
+
+(use-package direx-grep
   :ensure t
   :defer t)
 
