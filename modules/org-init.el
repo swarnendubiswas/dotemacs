@@ -22,13 +22,20 @@
         org-completion-use-ido t
         ;; use shift-select
         org-support-shift-select t)
+
   ;; Allow syntax highlighting for parts of a word
   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode
   (setcar org-emphasis-regexp-components " \t('\"{[:alpha:]")
   (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}\\")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+  
   (require 'org-inlinetask)
-  (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
+  (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
+  (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
+  ;; turn on soft wrapping mode for org mode
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (setq truncate-lines nil))))
 
 ;; (eval-after-load 'org
 ;;   '(bind-key "C-c C-d" 'duplicate-thing org-mode-map))
@@ -42,23 +49,19 @@
 ;;(require 'ox-latex)
 (use-package ox-latex
   :defer t
-  :config (with-eval-after-load 'org
-            (setq org-latex-listings t) ;; tell org to use listings
-            ;; include the listings package
-            (add-to-list 'org-latex-packages-alist '("" "listings"))
-            ;; if you want colored source code then you need to include the color package
-            (add-to-list 'org-latex-packages-alist '("" "color"))))
+  :config
+  (with-eval-after-load 'org
+    (setq org-latex-listings t) ;; tell org to use listings
+    ;; include the listings package
+    (add-to-list 'org-latex-packages-alist '("" "listings"))
+    ;; if you want colored source code then you need to include the color package
+    (add-to-list 'org-latex-packages-alist '("" "color"))))
 
 (use-package simple
   :diminish visual-line-mode auto-fill-function
   :config
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'turn-on-auto-fill))
-
-;; turn on soft wrapping mode for org mode
-(add-hook 'org-mode-hook
-          (lambda ()
-            (setq truncate-lines nil)))
 
 (use-package org-beautify-theme
   :disabled t
@@ -67,12 +70,20 @@
 (use-package org-indent
   :defer t
   :diminish org-indent-mode
-  :config (with-eval-after-load 'org
-            (org-indent-mode 1)))
+  :config
+  (with-eval-after-load 'org
+    (org-indent-mode 1)))
 
 (use-package org-ref
+  :disabled t
   :load-path "lisp/org-ref"
   :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
+
+(use-package org-bullets
+  :ensure t)
+
+(use-package org-autolist
+  :ensure t)
 
 (provide 'org-init)
 

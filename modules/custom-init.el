@@ -9,7 +9,7 @@
 
 ;; kill all non-special buffers but the current one
 (defun kill-other-buffers ()
-  "Kill all buffers but the current one. Don't mess with special buffers."
+  "Kill all buffers but the current one.  Don't mess with special buffers."
   (interactive)
   (dolist (buffer (buffer-list))
     (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
@@ -62,6 +62,17 @@ If region is active, apply to active region instead."
   (interactive)
   ;;(compile "find . -name \"*.tex\" -print | ctags -a -u -o TAGS -")
   (compile "find . -name \"*.tex\" -print | xargs ctags -o TAGS"))
+
+;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
+(defun toggle-line-spacing ()
+  "Toggle line spacing.  Increase the line spacing to help readability.
+
+Increase line spacing by two line height."
+  (interactive)
+  (if (eq line-spacing nil)
+      (setq line-spacing 2)
+    (setq line-spacing nil))
+  (redraw-frame (selected-frame)))
 
 (provide 'custom-init)
 

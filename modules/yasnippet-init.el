@@ -12,8 +12,11 @@
   :config
   ;;(yas-global-mode 1)
   ;; I mostly use yasnippet with LaTeX
-  (yas-reload-all) 
-  (add-hook 'LaTeX-mode-hook #'yas-minor-mode))
+  (yas-reload-all)
+  (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
+  (when (bound-and-true-p use-helm)
+    (use-package helm-c-yasnippet
+      :ensure t)))
 
 (provide 'yasnippet-init)
 

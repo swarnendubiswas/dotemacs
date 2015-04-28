@@ -30,19 +30,22 @@
         helm-move-to-line-cycle-in-source t
         helm-org-headings-fontify t
         helm-display-header-line t
-        helm-dabbrev-cycle-threshold 3)
-  (setq helm-mini-default-sources '(helm-source-buffers-list
-                                    helm-source-recentf
-                                    helm-source-bookmarks
-                                    helm-source-buffer-not-found))
+        helm-dabbrev-cycle-threshold 2
+        helm-idle-delay 0.1
+        helm-input-idle-delay 0.1)
+  (use-package helm-dired-recent-dirs
+    :ensure t)
   (use-package helm-adaptive
     :config
     (setq helm-adaptive-history-file (concat emacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
   (use-package helm-company
     :ensure t)
-  (use-package helm-dired-recent-dirs
-    :ensure t)
+  (setq helm-mini-default-sources '(helm-source-buffers-list
+                                    helm-source-recentf
+                                    helm-source-dired-recent-dirs
+                                    ;;helm-source-bookmarks
+                                    helm-source-buffer-not-found))
   (use-package helm-descbinds
     :ensure t
     :config (helm-descbinds-mode 1))
@@ -59,7 +62,19 @@
     :ensure t)
   (use-package helm-orgcard
     :ensure t)
-  (use-package helm-c-yasnippet
+  (use-package helm-gtags
+    :ensure t
+    :defer t
+    :config (add-hook 'prog-mode-hook 'helm-gtags-mode))
+  (use-package helm-mode-manager
+    :ensure t)
+  (use-package helm-projectile
+    :ensure t)
+  (use-package helm-themes
+    :ensure t)
+  (use-package swiper-helm
+    :ensure t)
+  (use-package helm-helm-commands
     :ensure t)
   :bind
   ("M-x" . helm-M-x)
@@ -67,7 +82,7 @@
   ("C-x C-b" . helm-buffers-list)
   ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
   ("C-x C-f" . helm-find-files)
-  ("<f8>" . helm-recentf)
+  ("<f8>" . helm-recentf) ;; not really required, can instead use 'helm-mini
   ("C-x C-l" . helm-locate)
   ("M-y" . helm-show-kill-ring)
   ("<tab>" . helm-execute-persistent-action)

@@ -84,6 +84,7 @@
   (add-hook 'org-mode-hook #'writegood-mode))
 
 (use-package artbollocks-mode
+  :disabled t
   :ensure t
   :diminish artbollocks-mode
   :config
@@ -129,7 +130,27 @@
 
 ;; this package now provides ivy-mode
 (use-package swiper
-  :ensure t)
+  :ensure t
+  :defer t)
+
+(use-package tramp-term
+  :ensure t
+  :defer t)
+
+(use-package pabbrev
+  :disabled t
+  :ensure t
+  :diminish pabbrev-mode
+  :config (global-pabbrev-mode 1))
+
+(use-package markdown-mode
+  :ensure t
+  :defer t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (use-package markdown-mode+
+    :ensure t))
 
 (provide 'misc-init)
 

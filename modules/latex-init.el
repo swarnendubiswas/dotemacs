@@ -12,7 +12,7 @@
         TeX-parse-self t ; Parse documents
         TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
         TeX-default-mode 'latex-mode
-        TeX-force-default-mode t 
+        TeX-force-default-mode t
         TeX-auto-untabify t
         TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
         TeX-source-correlate-mode t)
@@ -102,6 +102,9 @@
 (use-package ebib
   :ensure t
   :bind ("C-c e" . ebib))
+
+(use-package tex-smart-umlauts
+  :ensure t)
 
 (provide 'latex-init)
 

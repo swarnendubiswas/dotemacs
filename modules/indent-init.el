@@ -9,7 +9,7 @@
               standard-indent 2 ; set standard indent to 2 rather that 4
               tab-width 2
               ;; spaces instead of tabs by default
-              indent-tabs-mode nil) 
+              indent-tabs-mode nil)
 
 (use-package aggressive-indent
   :ensure t

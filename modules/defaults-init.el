@@ -61,7 +61,7 @@
   (setq-default auto-revert-interval 5 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
-                global-auto-revert-non-file-buffers t) 
+                global-auto-revert-non-file-buffers t)
   ;; Auto-refresh all buffers, does not work for remote files.
   (global-auto-revert-mode 1))
 
