@@ -22,6 +22,7 @@
         helm-ff-auto-update-initial-value t
         helm-recentf-fuzzy-match t
         helm-locate-fuzzy-match t
+        ;;helm-split-window-default-side 'other ;; open helm buffer in another window
         ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
         ido-use-virtual-buffers t
@@ -31,7 +32,8 @@
         helm-org-headings-fontify t
         helm-display-header-line t
         helm-dabbrev-cycle-threshold 2
-        helm-idle-delay 0.1
+        helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
+        ;; be idle for this many seconds, before updating candidate buffer
         helm-input-idle-delay 0.1)
   (use-package helm-dired-recent-dirs
     :ensure t)
@@ -40,6 +42,7 @@
     (setq helm-adaptive-history-file (concat emacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
   (use-package helm-company
+    :if use-company
     :ensure t)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
@@ -49,13 +52,6 @@
   (use-package helm-descbinds
     :ensure t
     :config (helm-descbinds-mode 1))
-  (use-package helm-flyspell
-    :ensure t
-    :config
-    (eval-after-load 'flyspell
-      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
-  (use-package helm-flycheck
-    :ensure t)
   (use-package helm-words
     :ensure t)
   (use-package helm-bibtex
@@ -67,8 +63,6 @@
     :defer t
     :config (add-hook 'prog-mode-hook 'helm-gtags-mode))
   (use-package helm-mode-manager
-    :ensure t)
-  (use-package helm-projectile
     :ensure t)
   (use-package helm-themes
     :ensure t)
@@ -86,6 +80,7 @@
   ("C-x C-l" . helm-locate)
   ("M-y" . helm-show-kill-ring)
   ("<tab>" . helm-execute-persistent-action)
+  ("C-z" . helm-select-action)
   :diminish helm-mode)
 
 (provide 'helm-init)

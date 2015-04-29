@@ -33,6 +33,10 @@
   (with-eval-after-load 'flycheck
     (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
+(use-package helm-flycheck
+  :ensure t
+  :if use-helm)
+
 (provide 'flycheck-init)
 
 ;;; flycheck-init.el ends here

@@ -44,7 +44,14 @@
   ("C-c i f" . flyspell-mode)
   ("C-c i b" . flyspell-buffer)
   ;; another alternative is M-$
-  ("C-c i w" . ispell-word))
+  ("C-c i w" . ispell-word)
+  :config
+  (use-package helm-flyspell
+    :ensure t
+    :if use-helm
+    :config
+    (eval-after-load 'flyspell
+      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))))
 
 (provide 'flyspell-init)
 

@@ -65,19 +65,22 @@
 (require 'search-init)
 
 ;; use either auto-complete or company for auto completion support
-(defconst use-company t "Choose company over auto-complete for completion.")
+(defconst use-company nil
+  "Choose company over auto-complete for completion.")
+
 (if (bound-and-true-p use-company)
     (require 'company-init)
   (require 'auto-complete-init))
 
 ;; use either helm or other packages that provide similar functionality
-(defconst use-helm t "Prefer helm instead of ido, smex, and recentf.  Helm provides similar functionalities.")
+(defconst use-helm t
+  "Prefer helm instead of ido, smex, and recentf.  Helm provides similar functionalities.")
+
 (if (bound-and-true-p use-helm)
     (require 'helm-init)
-  (progn
-    (require 'ido-init)
-    (require 'smex-init)
-    (require 'recentf-init)))
+  (require 'ido-init)
+  (require 'smex-init)
+  (require 'recentf-init))
 
 ;; configure the more useful extensions
 (require 'anzu-init)

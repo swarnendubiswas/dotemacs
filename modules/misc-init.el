@@ -152,6 +152,21 @@
   (use-package markdown-mode+
     :ensure t))
 
+(use-package projectile
+  :ensure t
+  :config
+  (setq projectile-enable-caching t
+        projectile-require-project-root nil)
+  (use-package helm-projectile
+    :ensure t
+    :if use-helm
+    :config
+    (setq helm-projectile-fuzzy-match t
+          projectile-completion-system 'helm)
+    (helm-projectile-on))
+  (projectile-global-mode 1)
+  :diminish projectile-mode)
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

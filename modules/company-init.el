@@ -40,11 +40,12 @@
 
 (use-package company-math
   :ensure t
-  :config (with-eval-after-load 'company
-            ;; Add backends globally
-            (add-to-list 'company-backends 'company-math-symbols-unicode)
-            (add-to-list 'company-backends 'company-math-symbols-latex)
-            (add-to-list 'company-backends 'company-latex-commands)))
+  :config
+  (with-eval-after-load 'company
+    ;; Add backends globally
+    (add-to-list 'company-backends 'company-math-symbols-unicode)
+    (add-to-list 'company-backends 'company-math-symbols-latex)
+    (add-to-list 'company-backends 'company-latex-commands)))
 
 (use-package company-quickhelp
   :ensure t
@@ -55,8 +56,9 @@
 
 (use-package company-c-headers
   :ensure t
-  :config (with-eval-after-load 'company
-            (add-to-list 'company-backends 'company-c-headers)))
+  :config
+  (with-eval-after-load 'company
+    (add-to-list 'company-backends 'company-c-headers)))
 
 (provide 'company-init)
 
