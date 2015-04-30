@@ -20,10 +20,9 @@
 (use-package vlf
   :ensure t
   :config
-  (progn
-    ;; warn when opening files bigger than 50MB
-    (setq large-file-warning-threshold 50000000)
-    (use-package vlf-setup)))
+  ;; warn when opening files bigger than 50MB
+  (setq large-file-warning-threshold 50000000)
+  (use-package vlf-setup))
 
 (use-package tabbar
   :ensure t
@@ -36,6 +35,7 @@
                    (buffer-file-name (tabbar-tab-value tab)))
               (concat " * " (concat ad-return-value " "))
             (concat " " (concat ad-return-value " ")))))
+  
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
@@ -46,6 +46,7 @@
   (set-face-attribute 'tabbar-button nil :box '(:line-width 1 :color "gray72" :style released-button))
   ;;(set-face-attribute 'tabbar-button-highlight ((t (:inherit tabbar-default))))
   (set-face-attribute 'tabbar-separator nil :height 0.7)
+  
   (setq tabbar-use-images nil) ; speed up by not using images
   (tabbar-mode 1))
 
@@ -131,11 +132,11 @@
 ;; this package now provides ivy-mode
 (use-package swiper
   :ensure t
-  :defer t)
-
-(use-package tramp-term
-  :ensure t
-  :defer t)
+  :defer t
+  :config
+  (use-package swiper-helm
+    :ensure t
+    :if use-helm))
 
 (use-package pabbrev
   :disabled t

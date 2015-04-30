@@ -112,7 +112,8 @@
                                               (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                             (set-background-color "white")
                                             (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
-                                            (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+                                            ;; (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+                                            (set-face-attribute 'region nil :background "#164040" :foreground "white")
                                             (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
                                             (set-face-attribute 'hl-line nil :background "linen")
                                             ;; org-mode customizations inspired from leuven theme

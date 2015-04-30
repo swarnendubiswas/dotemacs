@@ -9,7 +9,9 @@
 ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 (use-package ace-jump-mode
   :ensure t
-  :bind ("C-c SPC" . ace-jump-mode)
+  :bind
+  ;;("C-c SPC" . ace-jump-mode)
+  ("C-'" . ace-jump-mode)
   :config (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
@@ -49,6 +51,14 @@
   :bind
   ;;("M-b" . ace-jump-buffer)
   ("<f6>" . ace-jump-buffer))
+
+(use-package ace-jump-helm-line
+  :ensure t
+  :if use-helm
+  :config
+  ;; style: avy-jump and ace-jump-mode-style
+  (setq ace-jump-helm-line-use-avy-style nil)
+  (bind-key "C-'" 'ace-jump-helm-line helm-map))
 
 (provide 'ace-modes-init)
 

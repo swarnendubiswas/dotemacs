@@ -7,7 +7,6 @@
 
 (use-package helm
   :ensure t
-  :demand t
   :init
   (require 'helm-config)
   (helm-mode 1)
@@ -16,12 +15,15 @@
   (setq helm-ff-transformer-show-only-basename nil
         helm-yank-symbol-first t
         helm-quick-update t ; do not display invisible candidates
-        helm-buffers-fuzzy-matching t
         helm-M-x-fuzzy-match t
         helm-ff-file-name-history-use-recentf t
         helm-ff-auto-update-initial-value t
+        helm-buffers-fuzzy-matching t
         helm-recentf-fuzzy-match t
+        helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
+        helm-lisp-fuzzy-completion t
+        ;; helm-split-window-default-side 'other ;; open helm buffer in another window
         ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
         ido-use-virtual-buffers t
@@ -31,51 +33,39 @@
         helm-org-headings-fontify t
         helm-display-header-line t
         helm-dabbrev-cycle-threshold 2
-        helm-idle-delay 0.1
-        helm-input-idle-delay 0.1)
-  (use-package helm-dired-recent-dirs
-    :ensure t)
-  (use-package helm-adaptive
-    :config
-    (setq helm-adaptive-history-file (concat emacs-temp-directory "helm-adaptive-history"))
-    (helm-adaptive-mode 1))
-  (use-package helm-company
-    :ensure t)
+        helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
+        ;; be idle for this many seconds, before updating candidate buffer
+        helm-input-idle-delay 0.1
+        helm-file-cache-fuzzy-match t)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
                                     helm-source-dired-recent-dirs
                                     ;;helm-source-bookmarks
                                     helm-source-buffer-not-found))
+  (use-package helm-dired-recent-dirs
+    :ensure t
+    :config (setq helm-dired-recent-dirs-max 50))
+  (use-package helm-adaptive
+    :config
+    (setq helm-adaptive-history-file (concat emacs-temp-directory "helm-adaptive-history"))
+    (helm-adaptive-mode 1))
   (use-package helm-descbinds
     :ensure t
     :config (helm-descbinds-mode 1))
-  (use-package helm-flyspell
-    :ensure t
-    :config
-    (eval-after-load 'flyspell
-      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
-  (use-package helm-flycheck
-    :ensure t)
   (use-package helm-words
+    :disabled t
     :ensure t)
   (use-package helm-bibtex
     :ensure t)
   (use-package helm-orgcard
     :ensure t)
-  (use-package helm-gtags
-    :ensure t
-    :defer t
-    :config (add-hook 'prog-mode-hook 'helm-gtags-mode))
   (use-package helm-mode-manager
-    :ensure t)
-  (use-package helm-projectile
     :ensure t)
   (use-package helm-themes
     :ensure t)
-  (use-package swiper-helm
-    :ensure t)
   (use-package helm-helm-commands
     :ensure t)
+  (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   :bind
   ("M-x" . helm-M-x)
   ("C-x b" . helm-mini)
@@ -85,7 +75,8 @@
   ("<f8>" . helm-recentf) ;; not really required, can instead use 'helm-mini
   ("C-x C-l" . helm-locate)
   ("M-y" . helm-show-kill-ring)
-  ("<tab>" . helm-execute-persistent-action)
+  ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
+  ("C-z" . helm-select-action)
   :diminish helm-mode)
 
 (provide 'helm-init)

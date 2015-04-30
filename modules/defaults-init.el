@@ -65,11 +65,9 @@
   ;; Auto-refresh all buffers, does not work for remote files.
   (global-auto-revert-mode 1))
 
-(use-package delsel
-  :defer t
-  :config
   ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
-  (delete-selection-mode 1))
+(use-package delsel
+  :config (delete-selection-mode 1))
 
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
 (use-package tramp
@@ -82,7 +80,10 @@
         ;; tramp history
         tramp-persistency-file-name (concat emacs-temp-directory "tramp"))
   (use-package password-cache
-    :config (setq password-cache-expiry nil)))
+    :config (setq password-cache-expiry nil))
+  (use-package tramp-term
+    :ensure t
+    :defer t))
 
 ;; ;; disable version control
 ;; (setq vc-ignore-dir-regexp
