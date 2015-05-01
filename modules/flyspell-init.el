@@ -48,10 +48,12 @@
   :config
   (use-package helm-flyspell
     :ensure t
-    :if use-helm
+    :if (eq dotemacs-helm-or-ido 'helm)
     :config
     (eval-after-load 'flyspell
-      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))))
+      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
+  (use-package ace-flyspell
+    :ensure t))
 
 (provide 'flyspell-init)
 

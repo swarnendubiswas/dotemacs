@@ -5,6 +5,12 @@
 
 ;;; Code:
 
+(setq c-default-style '((java-mode . "java")
+                        (awk-mode . "awk")
+                        (c-mode . "k&r")
+                        (c++-mode . "stroustrup")
+                        (other . "linux")))
+
 (use-package cc-mode
   :defer t
   :config

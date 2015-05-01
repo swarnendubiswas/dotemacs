@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
+(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
+
 (use-package tex
   :ensure auctex
   :config
@@ -13,7 +16,7 @@
         TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
         TeX-default-mode 'latex-mode
         TeX-force-default-mode t
-        TeX-auto-untabify t
+        TeX-auto-untabify t ; remove all tabs before saving
         TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
         TeX-source-correlate-mode t)
   (setq-default TeX-master nil ; query for master file
@@ -21,7 +24,12 @@
   (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   ;; compile files to pdf by default
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-buffer))
+  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
+  ;; unset "C-c ;" since we want to bind it to 'comment-line
+  (define-key LaTeX-mode-map (kbd "C-c ;") nil))
+
+(use-package tex-site
+  :ensure auctex)
 
 (use-package tex-mode
   :ensure auctex
@@ -30,25 +38,22 @@
 (use-package latex
   :ensure auctex
   :config
+  (setq LaTeX-syntactic-comments t)
   (latex-electric-env-pair-mode 1)
   ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  ;; (eval-after-load 'LaTeX
+  ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
+  ;; (eval-after-load 'LaTeX
+  ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
   (bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map))
-
-;; (eval-after-load 'LaTeX
-;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
-;; (eval-after-load 'LaTeX
-;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
-
-;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
-(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
 
 (use-package auctex-latexmk
   :ensure t
-  :config (with-eval-after-load 'latex
-            (auctex-latexmk-setup)))
+  :config
+  (with-eval-after-load 'latex
+    (auctex-latexmk-setup)))
 
 (use-package latex-extra
   :disabled t
@@ -100,6 +105,7 @@
   (add-hook 'LaTeX-mode-hook #'reftex-mode))
 
 (use-package ebib
+  :disabled t
   :ensure t
   :bind ("C-c e" . ebib))
 

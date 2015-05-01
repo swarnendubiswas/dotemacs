@@ -21,7 +21,7 @@
   :ensure t
   :config
   ;; warn when opening files bigger than 50MB
-  (setq large-file-warning-threshold 50000000)
+  (setq large-file-warning-threshold (* 50 1024 1024))
   (use-package vlf-setup))
 
 (use-package tabbar
@@ -72,29 +72,6 @@
   :ensure t
   :bind ("C-c C-d" . duplicate-thing))
 
-;; identify weasel words, passive voice, and duplicate words
-(use-package writegood-mode
-  :ensure t
-  :bind ("C-c g" . writegood-mode)
-  :diminish writegood-mode
-  :config
-  (add-hook 'text-mode-hook #'writegood-mode)
-  ;;(add-hook 'tex-mode-hook #'writegood-mode)
-  ;;(add-hook 'latex-mode-hook #'writegood-mode)
-  (add-hook 'LaTeX-mode-hook #'writegood-mode)
-  (add-hook 'org-mode-hook #'writegood-mode))
-
-(use-package artbollocks-mode
-  :disabled t
-  :ensure t
-  :diminish artbollocks-mode
-  :config
-  (add-hook 'text-mode-hook #'artbollocks-mode)
-  ;;(add-hook 'tex-mode-hook #'artbollocks-mode)
-  ;;(add-hook 'latex-mode-hook #'artbollocks-mode)
-  (add-hook 'LaTeX-mode-hook #'artbollocks-mode)
-  (add-hook 'org-mode-hook #'artbollocks-mode))
-
 (use-package discover-my-major
   :ensure t
   :bind ("C-h C-m" . discover-my-major))
@@ -136,7 +113,7 @@
   :config
   (use-package swiper-helm
     :ensure t
-    :if use-helm))
+    :if (eq dotemacs-helm-or-ido 'helm)))
 
 (use-package pabbrev
   :disabled t
@@ -158,15 +135,16 @@
   :config
   (setq projectile-enable-caching t
         projectile-require-project-root nil)
+  (projectile-global-mode 1)
   (use-package helm-projectile
     :ensure t
-    :if use-helm
+    :if (eq dotemacs-helm-or-ido 'helm)
     :config
     (setq helm-projectile-fuzzy-match t
           projectile-completion-system 'helm)
     (helm-projectile-on))
-  (projectile-global-mode 1)
-  :diminish projectile-mode)
+  :diminish projectile-mode
+  :bind ("C-c p h" . helm-projectile))
 
 (provide 'misc-init)
 

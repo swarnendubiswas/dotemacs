@@ -6,6 +6,7 @@
 ;;; Code:
 
 (or (use-package mic-paren
+      :disabled t
       :ensure t
       :config
       (setq paren-highlight-at-point t)
@@ -21,16 +22,25 @@
         (show-paren-mode 1) ; highlight matching parentheses when the point is on them
         (make-variable-buffer-local 'show-paren-mode))))
 
+;; from https://github.com/xiaohanyu/oh-my-emacs/blob/master/core/ome-miscs.org
 (use-package smartparens
-  :disabled t
   :ensure t
   :commands (smartparens-mode show-smartparens-mode)
   :diminish smartparens-mode
   :config
-  ;;(smartparens-global-mode)
-  (use-package smartparens-config))
+  (require 'smartparens-config)
+  (setq sp-autoskip-closing-pair 'always
+        sp-navigate-close-if-unbalanced t)
+  (smartparens-global-mode 1)
+  (show-smartparens-global-mode 1)
+  ;; pair management
+  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+  ;; tex-mode latex-mode
+  (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
+    (sp-local-tag "i" "\"<" "\">")))
 
 (or (use-package elec-pair
+      :disabled t
       :config (electric-pair-mode 1))
 
     (use-package autopair

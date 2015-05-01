@@ -19,6 +19,12 @@
         sh-indent-comment t
         sh-indentation 4))
 
+(use-package comint
+  :config
+  (setq comint-scroll-to-bottom-on-input t   ;; always insert at the bottom
+        ;; no duplicates in command history
+        comint-input-ignoredups t))
+
 ;; The following setup is from readline-complete package at
 ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
 ;; set up shell (not eshell) mode

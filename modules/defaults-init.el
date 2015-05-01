@@ -23,10 +23,6 @@
 (set-selection-coding-system 'utf-8)
 (set-input-method nil)
 
-(unless (file-exists-p "~/.emacs.d/tmp")
-  (make-directory "~/.emacs.d/tmp"))
-(defvar emacs-temp-directory (concat user-emacs-directory "tmp/"))
-  
 (use-package files
   :config
   (setq require-final-newline t ; Always end a file with a newline.
@@ -78,7 +74,7 @@
         tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
-        tramp-persistency-file-name (concat emacs-temp-directory "tramp"))
+        tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
   (use-package password-cache
     :config (setq password-cache-expiry nil))
   (use-package tramp-term
@@ -150,7 +146,7 @@
 (use-package saveplace
   :config
   (setq-default save-place t
-                save-place-file (concat emacs-temp-directory "places")))
+                save-place-file (concat dotemacs-temp-directory "places")))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
@@ -171,7 +167,7 @@
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
-        savehist-file (concat emacs-temp-directory "savehist")
+        savehist-file (concat dotemacs-temp-directory "savehist")
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring))
@@ -189,6 +185,22 @@
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"
         uniquify-after-kill-buffer-p t))
+
+;; hippie expand is dabbrev expand on steroids
+(use-package hippie-exp
+  :config
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                           try-expand-dabbrev-all-buffers
+                                           try-expand-dabbrev-from-kill
+                                           try-complete-file-name-partially
+                                           try-complete-file-name
+                                           try-expand-all-abbrevs
+                                           try-expand-list
+                                           try-expand-line
+                                           try-complete-lisp-symbol-partially
+                                           try-complete-lisp-symbol))
+  (use-package hippie-exp-ext
+    :ensure t))
 
 (provide 'defaults-init)
 

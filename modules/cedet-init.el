@@ -62,7 +62,7 @@
   ;; (semantic-mode 1)
   (require 'semanticdb)
   ;;SemanticDB files
-  (setq semanticdb-default-save-directory (concat emacs-temp-directory "semanticdb"))
+  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
   ;; (require 'semantic/db-global)
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)

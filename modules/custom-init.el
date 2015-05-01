@@ -49,7 +49,7 @@ If region is active, apply to active region instead."
 
 (use-package helm-gtags
   :ensure t
-  :if use-helm
+  :if (eq dotemacs-helm-or-ido 'helm)
   :defer t
   :config (add-hook 'prog-mode-hook 'helm-gtags-mode))
 

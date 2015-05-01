@@ -14,7 +14,7 @@
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads\\.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "/tmp/.*"
                           ".*/recentf\\'") ; "/ssh:"
-        recentf-save-file (concat emacs-temp-directory "recentf"))
+        recentf-save-file (concat dotemacs-temp-directory "recentf"))
   ;;(add-to-list 'recentf-exclude ".*/recentf\\'")
   (add-to-list 'recentf-exclude ".*/recentf-marker\\'")
   ;; save file names relative to my current home directory

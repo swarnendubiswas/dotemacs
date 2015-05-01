@@ -10,14 +10,14 @@
   :diminish company-mode
   :config
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
-        company-dabbrev-ignore-case t
+        company-dabbrev-ignore-case nil
         company-show-numbers t ; show quick-access numbers for the first ten candidates
-        company-minimum-prefix-length 2
+        company-minimum-prefix-length 3
         ;; Invert the navigation direction if the completion popup is displayed on top (happens near the bottom of
         ;; windows).
         company-tooltip-flip-when-above t
         company-tooltip-align-annotations t
-        company-dabbrev-code-ignore-case t
+        company-dabbrev-code-ignore-case nil
         company-dabbrev-code-everywhere t)
   
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
@@ -26,9 +26,11 @@
   ;; (add-to-list 'company-backends 'company-dabbrev)
   ;; (add-to-list 'company-backends 'company-dabbrev-code)
 
+  (setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
+  
   (global-company-mode 1)
   (use-package helm-company
-    :if use-helm
+    :if (eq dotemacs-helm-or-ido 'helm)
     :ensure t))
 
 (use-package company-auctex

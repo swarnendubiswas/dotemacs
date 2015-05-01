@@ -35,7 +35,7 @@
 
 (use-package helm-flycheck
   :ensure t
-  :if use-helm)
+  :if (eq dotemacs-helm-or-ido 'helm))
 
 (provide 'flycheck-init)
 

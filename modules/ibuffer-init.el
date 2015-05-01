@@ -15,7 +15,8 @@
           ibuffer-always-show-last-buffer nil
           ;;ibuffer-default-sorting-mode 'recency ; 'major-mode
           ;;ibuffer-sorting-mode 'recency
-          ibuffer-use-header-line t)
+          ibuffer-use-header-line t
+          ibuffer-show-empty-filter-groups nil)
     (add-hook 'ibuffer-mode-hook
               (lambda ()
                 (ibuffer-auto-mode 1)))

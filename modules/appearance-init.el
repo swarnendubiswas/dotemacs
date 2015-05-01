@@ -22,15 +22,15 @@
     (menu-bar-mode -1)))
 
 (use-package tooltip
-  :config
-  (tooltip-mode -1))
+  :config (tooltip-mode -1))
 
 (use-package scroll-bar
-  :config
-  (scroll-bar-mode 1))
+  :config (scroll-bar-mode 1))
 
 (use-package frame
-  :config (blink-cursor-mode 1)) ; enable/disable blinking cursor
+  :config
+  ;; enable/disable blinking cursor
+  (blink-cursor-mode 1))
 
 ;; displays the time and date in the mode line
 (use-package time
@@ -39,8 +39,9 @@
         display-time-24hr-format nil)
   (display-time))
 
+;; display line numbers in margin
 (use-package linum
-  :config (global-linum-mode 1)) ; display line numbers in margin
+  :config (global-linum-mode 1))
 
 (use-package simple
   :config (column-number-mode 1))
@@ -60,69 +61,70 @@
   :ensure t
   :config (hlinum-activate))
 
-;; choices: "leuven", "professional", "eclipse", otherwise default.
-(defcustom use-theme "eclipse"
-  "Specify which Emacs theme to use.")
-
-(cond ((string-equal use-theme "leuven") (use-package leuven-theme
+(cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
+                                     :ensure t
+                                     :config
+                                     (load-theme 'leuven t)
+                                     (use-package smart-mode-line
+                                       :ensure t
+                                       :config
+                                       (progn
+                                         (use-package smart-mode-line-powerline-theme
+                                           :ensure t
+                                           :defer t)
+                                         (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
+                                               ;; sml/name-width 20
+                                               sml/no-confirm-load-theme t
+                                               sml/mode-width 'full
+                                               sml/shorten-modes t
+                                               sml/shorten-directory t)
+                                         (sml/setup)))
+                                     ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+                                     (if (string-equal system-name "XXX")
+                                         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
+                                       (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+                                     ;; customize the fringe marks on the sides
+                                     (set-face-background 'fringe "lavender")
+                                     (set-face-attribute 'hl-line nil :background "linen")))
+      
+      ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
                                            :config
-                                           (load-theme 'leuven t)
-                                           (use-package smart-mode-line
-                                             :ensure t
-                                             :config
-                                             (progn
-                                               (use-package smart-mode-line-powerline-theme
-                                                 :ensure t
-                                                 :defer t)
-                                               (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
-                                                     ;; sml/name-width 20
-                                                     sml/no-confirm-load-theme t
-                                                     sml/mode-width 'full
-                                                     sml/shorten-modes t
-                                                     sml/shorten-directory t)
-                                               (sml/setup)))
-                                           ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                           (if (string-equal system-name "XXX")
-                                               (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
-                                             (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
-                                           ;; customize the fringe marks on the sides
-                                           (set-face-background 'fringe "lavender")
-                                           (set-face-attribute 'hl-line nil :background "linen")))
-      ((string-equal use-theme "professional") (use-package professional-theme
-                                                 :ensure t
-                                                 :config
-                                                 (load-theme 'professional t)
-                                                 ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
-                                                 (set-face-attribute 'default nil :height 115)))
-      ((string-equal use-theme "eclipse") (use-package eclipse-theme
-                                            :ensure t
-                                            :config
-                                            (load-theme 'eclipse t)
-                                            (use-package powerline
-                                              :ensure t
-                                              :config
-                                              (setq powerline-display-mule-info nil
-                                                    powerline-display-buffer-size t
-                                                    powerline-display-hud nil)
-                                              (powerline-default-theme))
-                                            ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                            (if (string-equal system-name "XXX")
-                                                (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
-                                              (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
-                                            (set-background-color "white")
-                                            (set-face-attribute 'mode-line nil :background "grey87" :foreground "black" :box nil)
-                                            ;; (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-                                            (set-face-attribute 'region nil :background "#164040" :foreground "white")
-                                            (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
-                                            (set-face-attribute 'hl-line nil :background "linen")
-                                            ;; org-mode customizations inspired from leuven theme
-                                            (with-eval-after-load "org"
-                                              (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
-                                                                  :foreground "#3C3C3C" :background "#F5F5F5")
-                                              (set-face-attribute 'org-level-2 nil :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
-                                            ;; customize the fringe marks on the sides
-                                            (set-face-background 'fringe "lavender")))
+                                           (load-theme 'professional t)
+                                           ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
+                                           (set-face-attribute 'default nil :height 115)))
+      
+      ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
+                                      :ensure t
+                                      :config
+                                      (load-theme 'eclipse t)
+                                      (use-package powerline
+                                        :ensure t
+                                        :config
+                                        (setq powerline-display-mule-info nil
+                                              powerline-display-buffer-size t
+                                              powerline-display-hud nil)
+                                        (powerline-default-theme))
+                                      ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+                                      (if (string-equal system-name "rain.cse.ohio-state.edu")
+                                          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
+                                        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+                                      (set-background-color "white")
+                                      (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil :bold nil)
+                                      (set-face-attribute 'mode-line-inactive nil :box nil)
+                                      ;; (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+                                      (set-face-attribute 'region nil :background "#164040" :foreground "white")
+                                      (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
+                                      (set-face-attribute 'hl-line nil :background "linen")
+                                      ;; org-mode customizations inspired from leuven theme
+                                      (with-eval-after-load "org"
+                                        (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
+                                                            :foreground "#3C3C3C" :background "#F5F5F5")
+                                        (set-face-attribute 'org-level-2 nil
+                                                            :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
+                                      ;; customize the fringe marks on the sides
+                                      (set-face-background 'fringe "lavender")))
+      
       ;; default
       (t t))
 

@@ -13,7 +13,7 @@
   ;; I mostly use yasnippet with LaTeX
   (yas-reload-all)
   (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
-  (when (bound-and-true-p use-helm)
+  (when (eq dotemacs-helm-or-ido 'helm)
     (use-package helm-c-yasnippet
       :disabled t ;; I do not use yasnippet for programming modes currently
       :ensure t)))

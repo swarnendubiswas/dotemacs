@@ -40,6 +40,14 @@
 ;;    minibuffer." -- Vivek Haldar in "New frontiers in text editing".
 ;;
 ;;   "Good code is like a good joke - it needs no explanation." -- Russ Olsen.
+;;
+;;   "As a poke at Emacs’ creeping featurism, vi advocates have been known to describe Emacs as “a great operating
+;;    system, lacking only a decent editor”." -- Editor war (https://en.wikipedia.org/wiki/Editor_war).
+;;
+;;   "Emacs was a really great idea in the seventies and one of the frightening things about Emacs today is if you skip
+;;    the last 20 years it is much the same." -- Don't use Emacs, says Java's father
+;;    (http://www.computerworld.com.au/article/207799/don_t_use_emacs_says_java_father/).
+
 
 ;;; Code:
 
@@ -50,6 +58,9 @@
 
 ;; setup the packaging system
 (require 'packages-init)
+
+;; setup configuration variables
+(require 'config-init)
 
 ;; now setup other modules
 
@@ -64,19 +75,13 @@
 (require 'dired-init)
 (require 'search-init)
 
-;; use either auto-complete or company for auto completion support
-(defconst use-company nil
-  "Choose company over auto-complete for completion.")
-
-(if (bound-and-true-p use-company)
+;;(if (bound-and-true-p use-company)
+(if (eq dotemacs-completion 'company)
     (require 'company-init)
   (require 'auto-complete-init))
 
-;; use either helm or other packages that provide similar functionality
-(defconst use-helm t
-  "Prefer helm instead of ido, smex, and recentf.  Helm provides similar functionalities.")
-
-(if (bound-and-true-p use-helm)
+;;(if (bound-and-true-p use-helm)
+(if (eq dotemacs-helm-or-ido 'helm)
     (require 'helm-init)
   (require 'ido-init)
   (require 'smex-init)

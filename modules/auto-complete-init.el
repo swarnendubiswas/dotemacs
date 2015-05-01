@@ -12,13 +12,14 @@
         ac-auto-show-menu t
         ac-expand-on-auto-complete t
         ac-show-menu-immediately-on-auto-complete t
+        ac-disable-inline nil
         ac-ignore-case 'smart
         ac-use-comphist t
         ac-use-quickhelp t
         ac-use-fuzzy t
         tab-always-indent 'complete
         ac-dwim t
-        ac-comphist-file (concat emacs-temp-directory "ac-comphist.dat"))
+        ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat"))
   (require 'auto-complete-config)
   (global-auto-complete-mode)
   (ac-linum-workaround)

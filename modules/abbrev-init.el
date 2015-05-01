@@ -11,8 +11,10 @@
   :config
   (setq-default abbrev-file-name (concat emacs-tmp-directory "abbrev_defs"))
   (setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
-        dabbrev-case-replace nil) ; preserve case when expanding
-  ;;(quietly-read-abbrev-file)
+        ;; preserve case when expanding
+        dabbrev-case-replace nil)
+  (if (file-exists-p abbrev-file-name)
+      (quietly-read-abbrev-file))
   (add-hook 'text-mode-hook #'abbrev-mode)
   (add-hook 'LaTeX-mode-hook #'abbrev-mode))
 

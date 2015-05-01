@@ -6,13 +6,14 @@
 ;;; Code:
 
 ;; (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
-;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 (use-package ace-jump-mode
   :ensure t
   :bind
-  ;;("C-c SPC" . ace-jump-mode)
+  ("C-c SPC" . ace-jump-mode)
   ("C-'" . ace-jump-mode)
-  :config (ace-jump-mode-enable-mark-sync))
+  :config
+  ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
+  (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
@@ -54,7 +55,7 @@
 
 (use-package ace-jump-helm-line
   :ensure t
-  :if use-helm
+  :if (eq dotemacs-helm-or-ido 'helm)
   :config
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)

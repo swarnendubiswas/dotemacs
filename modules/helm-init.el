@@ -18,6 +18,7 @@
         helm-M-x-fuzzy-match t
         helm-ff-file-name-history-use-recentf t
         helm-ff-auto-update-initial-value t
+        ;; fuzzy matching buffer names when non--nil
         helm-buffers-fuzzy-matching t
         helm-recentf-fuzzy-match t
         helm-apropos-fuzzy-match t
@@ -28,7 +29,7 @@
         helm-split-window-in-side-p t
         ido-use-virtual-buffers t
         helm-completion-in-region-fuzzy-match t
-        ;; move to end or beginning of source when reaching top or bottom of source.
+        ;; move to end or beginning of source when reaching top or bottom of source
         helm-move-to-line-cycle-in-source t
         helm-org-headings-fontify t
         helm-display-header-line t
@@ -36,7 +37,9 @@
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
         ;; be idle for this many seconds, before updating candidate buffer
         helm-input-idle-delay 0.1
-        helm-file-cache-fuzzy-match t)
+        helm-file-cache-fuzzy-match t
+        helm-follow-mode-persistent t
+        helm-always-two-windows nil)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
                                     helm-source-dired-recent-dirs
@@ -47,7 +50,7 @@
     :config (setq helm-dired-recent-dirs-max 50))
   (use-package helm-adaptive
     :config
-    (setq helm-adaptive-history-file (concat emacs-temp-directory "helm-adaptive-history"))
+    (setq helm-adaptive-history-file (concat dotemacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
   (use-package helm-descbinds
     :ensure t

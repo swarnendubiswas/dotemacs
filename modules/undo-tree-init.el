@@ -1,7 +1,7 @@
 ;;; undo-tree-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup undo-tree
+;; Setup undo-tree.
 
 ;;; Code:
 
@@ -11,6 +11,7 @@
   :config
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t
+        undo-tree-visualizer-relative-timestamps t
         undo-tree-auto-save-history nil
         undo-tree-visualizer-diff t)
   (global-undo-tree-mode 1)
