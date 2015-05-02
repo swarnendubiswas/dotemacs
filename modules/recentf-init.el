@@ -17,6 +17,7 @@
         recentf-save-file (concat dotemacs-temp-directory "recentf"))
   ;;(add-to-list 'recentf-exclude ".*/recentf\\'")
   (add-to-list 'recentf-exclude ".*/recentf-marker\\'")
+  (add-to-list 'recentf-exclude "/tmp/recentf-marker\\'")
   ;; save file names relative to my current home directory
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
   (recentf-mode 1)

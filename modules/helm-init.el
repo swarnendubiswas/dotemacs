@@ -12,15 +12,8 @@
   (helm-mode 1)
   (helm-autoresize-mode 1)
   :config
-  (setq helm-ff-transformer-show-only-basename nil
-        helm-yank-symbol-first t
-        helm-quick-update t ; do not display invisible candidates
+  (setq helm-quick-update t ; do not display invisible candidates
         helm-M-x-fuzzy-match t
-        helm-ff-file-name-history-use-recentf t
-        helm-ff-auto-update-initial-value t
-        ;; fuzzy matching buffer names when non--nil
-        helm-buffers-fuzzy-matching t
-        helm-recentf-fuzzy-match t
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
@@ -31,13 +24,10 @@
         helm-completion-in-region-fuzzy-match t
         ;; move to end or beginning of source when reaching top or bottom of source
         helm-move-to-line-cycle-in-source t
-        helm-org-headings-fontify t
         helm-display-header-line t
-        helm-dabbrev-cycle-threshold 2
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
         ;; be idle for this many seconds, before updating candidate buffer
         helm-input-idle-delay 0.1
-        helm-file-cache-fuzzy-match t
         helm-follow-mode-persistent t
         helm-always-two-windows nil)
   (setq helm-mini-default-sources '(helm-source-buffers-list
@@ -45,6 +35,23 @@
                                     helm-source-dired-recent-dirs
                                     ;;helm-source-bookmarks
                                     helm-source-buffer-not-found))
+  (use-package helm-buffers
+    :config
+    ;; fuzzy matching buffer names when non--nil
+    (setq helm-buffers-fuzzy-matching t))
+  (use-package helm-utils
+    :config (setq helm-highlight-number-lines-around-point 10
+                  helm-yank-symbol-first t))
+  (use-package helm-files
+    :config (setq helm-file-cache-fuzzy-match t
+                  helm-ff-transformer-show-only-basename nil
+                  helm-ff-file-name-history-use-recentf t
+                  helm-ff-auto-update-initial-value t
+                  helm-recentf-fuzzy-match t))
+  (use-package helm-dabbrev
+    :config (setq helm-dabbrev-cycle-threshold 2))
+  (use-package helm-org
+    :config (setq helm-org-headings-fontify t))
   (use-package helm-dired-recent-dirs
     :ensure t
     :config (setq helm-dired-recent-dirs-max 50))
@@ -68,6 +75,14 @@
     :ensure t)
   (use-package helm-helm-commands
     :ensure t)
+  (use-package helm-swoop
+    :ensure t
+    :config
+    (setq helm-multi-swoop-edit-save t
+          helm-swoop-speed-or-color t
+          helm-swoop-split-direction #'split-window-vertically
+          helm-swoop-split-with-multiple-windows nil
+          helm-swoop-use-line-number-face t))
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   :bind
   ("M-x" . helm-M-x)
@@ -80,6 +95,7 @@
   ("M-y" . helm-show-kill-ring)
   ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
   ("C-z" . helm-select-action)
+  ("M-i" . helm-swoop)
   :diminish helm-mode)
 
 (provide 'helm-init)
