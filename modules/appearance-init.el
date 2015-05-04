@@ -116,6 +116,8 @@
                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
                                       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
                                       (set-face-attribute 'hl-line nil :background "linen")
+                                      ;; (with-eval-after-load "helm"
+                                      ;; (set-face-attribute 'helm-selection nil :background "dark khaki"))
                                       ;; org-mode customizations inspired from leuven theme
                                       (with-eval-after-load "org"
                                         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold

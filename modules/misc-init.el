@@ -141,7 +141,9 @@
     :if (eq dotemacs-helm-or-ido 'helm)
     :config
     (setq helm-projectile-fuzzy-match t
-          projectile-completion-system 'helm)
+          projectile-completion-system 'helm
+          ;; other options: 'helm-projectile-find-file
+          projectile-switch-project-action 'helm-projectile)
     (helm-projectile-on))
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))

@@ -35,7 +35,7 @@
         sp-show-pair-from-inside t)
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
-  (sp-use-smartparens-bindings)
+  ;;(sp-use-smartparens-bindings)
   
   ;; pair management
   (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)

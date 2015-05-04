@@ -25,6 +25,7 @@
 
 ;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
 (use-package flycheck-google-cpplint
+  :disabled t
   :ensure t
   :defer t
   :config

@@ -17,6 +17,7 @@
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
+        helm-apropos-fuzzy-match t
         ;; helm-split-window-default-side 'other ;; open helm buffer in another window
         ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
@@ -29,11 +30,11 @@
         ;; be idle for this many seconds, before updating candidate buffer
         helm-input-idle-delay 0.1
         helm-follow-mode-persistent t
-        helm-always-two-windows nil)
+        helm-always-two-windows nil
+        helm-autoresize-max-height 35)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
                                     helm-source-dired-recent-dirs
-                                    ;;helm-source-bookmarks
                                     helm-source-buffer-not-found))
   (use-package helm-buffers
     :config
@@ -84,6 +85,7 @@
           helm-swoop-split-with-multiple-windows nil
           helm-swoop-use-line-number-face t))
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
+  (bind-key "C-z" 'helm-select-action helm-map)
   :bind
   ("M-x" . helm-M-x)
   ("C-x b" . helm-mini)
@@ -94,7 +96,6 @@
   ("C-x C-l" . helm-locate)
   ("M-y" . helm-show-kill-ring)
   ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
-  ("C-z" . helm-select-action)
   ("M-i" . helm-swoop)
   :diminish helm-mode)
 
