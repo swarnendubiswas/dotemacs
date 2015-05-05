@@ -9,7 +9,7 @@
 (use-package ace-jump-mode
   :ensure t
   :bind
-  ("C-c SPC" . ace-jump-mode)
+  ;;("C-c SPC" . ace-jump-mode)
   ("C-'" . ace-jump-mode)
   :config
   ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)

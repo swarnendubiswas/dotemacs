@@ -47,7 +47,7 @@ If region is active, apply to active region instead."
 (use-package etags
   :bind ("M-T" . tags-search))
 
-(use-package helm-gtags
+(use-package gtags
   :ensure t
   :if (eq dotemacs-helm-or-ido 'helm)
   :defer t

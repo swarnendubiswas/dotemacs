@@ -24,6 +24,12 @@
             (lambda ()
               (electric-layout-mode 1))))
 
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (abbrev-mode -1)))
+
+(add-hook 'prog-mode-hook #'semantic-mode)
+
 (provide 'prog-init)
 
 ;;; prog-init.el ends here

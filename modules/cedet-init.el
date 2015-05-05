@@ -67,9 +67,9 @@
   ;; (require 'semantic/db-global)
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)
   ;; (semanticdb-enable-gnu-global-databases 'c++-mode))
-
-(global-semanticdb-minor-mode 1)
-(global-semantic-highlight-func-mode 1)
+  
+  (global-semanticdb-minor-mode 1)
+  (global-semantic-highlight-func-mode 1))
 
 (use-package idle
   :config

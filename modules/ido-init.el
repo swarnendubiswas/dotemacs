@@ -22,7 +22,7 @@
         ido-max-work-file-list 50
         confirm-nonexistent-file-or-buffer nil
         ido-use-faces nil ; disable ido faces to see flx highlights
-        ido-use-virtual-buffers t
+        ido-use-virtual-buffers 'auto
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              "*Messages*" "Async Shell Command")
         ido-enable-tramp-completion t)

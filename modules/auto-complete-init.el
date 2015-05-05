@@ -78,6 +78,14 @@
     :ensure t)
   (use-package ac-tex-ref
     :load-path "lisp")
+  (use-package ac-html-bootstrap
+    :ensure t)
+  (use-package ac-html-csswatcher
+    :ensure t
+    :config
+    (if (eq dotemacs-completion 'company)
+        (company-web-csswatcher-setup)
+      (ac-html-csswatcher-setup)))
   :diminish auto-complete-mode)
 
 (provide 'auto-complete-init)

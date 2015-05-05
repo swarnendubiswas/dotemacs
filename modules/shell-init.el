@@ -17,7 +17,8 @@
   :config
   (setq sh-basic-offset 4
         sh-indent-comment t
-        sh-indentation 4))
+        sh-indentation 4)
+  (bind-key "C-c C-d" 'duplicate-thing shell-mode-map))
 
 (use-package comint
   :config

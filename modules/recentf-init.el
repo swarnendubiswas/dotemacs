@@ -6,24 +6,23 @@
 ;;; Code:
 
 (use-package recentf
-  :commands (recentf-mode) ;recentf-add-file recentf-apply-filename-handlers recentf-open-files
+  :init (recentf-mode 1)
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
         recentf-auto-cleanup 300 ;'never
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads\\.el\\'"
-                          "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "/tmp/*" "/tmp/.*"
-                          ".*/recentf\\'") ; "/ssh:"
+                          "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
+                          ".*/recentf\\'" "~$" "/.autosaves/") ; "/ssh:"
         recentf-save-file (concat dotemacs-temp-directory "recentf"))
-  ;;(add-to-list 'recentf-exclude ".*/recentf\\'")
-  (add-to-list 'recentf-exclude ".*/recentf-marker\\'")
-  (add-to-list 'recentf-exclude "/tmp/recentf-marker\\'")
-  ;; save file names relative to my current home directory
-  ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
-  (recentf-mode 1)
+  (add-to-list 'recentf-exclude "[/\\]tmp/recentf-marker\\'")
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   (recentf-auto-cleanup)
-  
+
+  ;; save file names relative to my current home directory
+  ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
+  ;;(global-set-key [f8] 'recentf-open-files)
+
   ;; ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (eval-after-load 'recentf
   ;;   '(run-with-timer 0 (* 600 60) 'recentf-save-list))
@@ -34,9 +33,9 @@
   
   ;; Useful for synchronizing updates in case more than one emacs window is open.
   (use-package sync-recentf
-    :load-path "lisp/")
+    :load-path "lisp/"
+    :config (recentf-auto-cleanup))
   
-  ;;(global-set-key [f8] 'recentf-open-files)
   :bind ("<f8>" . recentf-open-files))
 
 (provide 'recentf-init)

@@ -15,23 +15,36 @@
   :defer t
   :config
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
-        c-basic-offset 2))
+        c-basic-offset 2)
+  
+  (use-package cwarn
+    :defer t
+    :config
+    (eval-after-load 'cc-mode
+      '(global-cwarn-mode 1))))
 
-(use-package cwarn
-  :defer t
+(use-package semantic
   :config
-  (eval-after-load 'cc-mode
-    '(global-cwarn-mode 1)))
+  ;; (require 'semantic-ia)
+  ;; (require 'semantic-loaddefs)
+  ;;(require 'semanticdb)
+  ;;SemanticDB files
+  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
+  (global-semanticdb-minor-mode 1)
+  (global-semantic-highlight-func-mode 1)
+  (semantic-mode 1))
 
-;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
-(use-package flycheck-google-cpplint
-  :disabled t
-  :ensure t
-  :defer t
+(use-package idle
   :config
-  (eval-after-load 'cc-mode
-    '(flycheck-add-next-checker 'c/c++-clang
-                                'c/c++-googlelint 'append)))
+  (global-semantic-idle-scheduler-mode 1)
+  (global-semantic-idle-completions-mode 1)
+  (global-semantic-idle-breadcrumbs-mode 1))
+
+(use-package mode
+  :config
+  (global-semantic-decoration-mode 1)
+  ;; Enable SRecode (Template management) minor-mode.
+  (global-srecode-minor-mode 1))
 
 (provide 'cc-init)
 

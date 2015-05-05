@@ -21,7 +21,7 @@
         ;; helm-split-window-default-side 'other ;; open helm buffer in another window
         ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
-        ido-use-virtual-buffers t
+        ido-use-virtual-buffers 'auto
         helm-completion-in-region-fuzzy-match t
         ;; move to end or beginning of source when reaching top or bottom of source
         helm-move-to-line-cycle-in-source t
@@ -31,11 +31,18 @@
         helm-input-idle-delay 0.1
         helm-follow-mode-persistent t
         helm-always-two-windows nil
-        helm-autoresize-max-height 35)
+        ;; both the min and max height are set to be equal on purpose
+        helm-autoresize-max-height 60
+        helm-autoresize-min-height 60)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
                                     helm-source-dired-recent-dirs
                                     helm-source-buffer-not-found))
+  (use-package helm-plugin
+    :config
+    ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
+    (defadvice helm-display-mode-line (after undisplay-header activate)
+      (setq header-line-format nil)))
   (use-package helm-buffers
     :config
     ;; fuzzy matching buffer names when non--nil
@@ -48,7 +55,8 @@
                   helm-ff-transformer-show-only-basename nil
                   helm-ff-file-name-history-use-recentf t
                   helm-ff-auto-update-initial-value t
-                  helm-recentf-fuzzy-match t))
+                  helm-recentf-fuzzy-match t
+                  helm-ff-skip-boring-files t))
   (use-package helm-dabbrev
     :config (setq helm-dabbrev-cycle-threshold 2))
   (use-package helm-org
@@ -67,7 +75,8 @@
     :disabled t
     :ensure t)
   (use-package helm-bibtex
-    :ensure t)
+    :ensure t
+    :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
   (use-package helm-orgcard
     :ensure t)
   (use-package helm-mode-manager
@@ -84,6 +93,22 @@
           helm-swoop-split-direction #'split-window-vertically
           helm-swoop-split-with-multiple-windows nil
           helm-swoop-use-line-number-face t))
+  ;; http://tuhdo.github.io/c-ide.html
+  (use-package helm-gtags
+    :ensure t
+    :if (eq dotemacs-helm-or-ido 'helm)
+    :defer t
+    :init
+    (setq helm-gtags-ignore-case t
+          helm-gtags-auto-update t
+          helm-gtags-use-input-at-cursor t
+          helm-gtags-pulse-at-cursor t
+          helm-gtags-prefix-key "\C-cg"
+          helm-gtags-suggested-key-mapping t)
+    :config
+    (add-hook 'dired-mode-hook 'helm-gtags-mode)
+    (add-hook 'prog-mode-hook 'helm-gtags-mode))
+
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   (bind-key "C-z" 'helm-select-action helm-map)
   :bind

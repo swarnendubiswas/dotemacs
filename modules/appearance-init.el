@@ -68,17 +68,12 @@
                                      (use-package smart-mode-line
                                        :ensure t
                                        :config
-                                       (progn
-                                         (use-package smart-mode-line-powerline-theme
-                                           :ensure t
-                                           :defer t)
-                                         (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
-                                               ;; sml/name-width 20
-                                               sml/no-confirm-load-theme t
-                                               sml/mode-width 'full
-                                               sml/shorten-modes t
-                                               sml/shorten-directory t)
-                                         (sml/setup)))
+                                       (setq sml/theme 'light 
+                                             sml/no-confirm-load-theme t
+                                             sml/mode-width 'full
+                                             sml/shorten-modes t
+                                             sml/shorten-directory t)
+                                       (sml/setup))
                                      ;; set font size, value is in 1/10pt, so 100 will give you 10pt
                                      (if (string-equal system-name "XXX")
                                          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
@@ -92,7 +87,7 @@
                                            :config
                                            (load-theme 'professional t)
                                            ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
-                                           (set-face-attribute 'default nil :height 115)))
+                                           (set-face-attribute 'default nil :height 110)))
       
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
