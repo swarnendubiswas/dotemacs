@@ -16,18 +16,27 @@
         ;; Invert the navigation direction if the completion popup is displayed on top (happens near the bottom of
         ;; windows).
         company-tooltip-flip-when-above t
-        company-tooltip-align-annotations t
-        company-dabbrev-code-ignore-case nil
-        company-dabbrev-code-everywhere t)
-  
+        company-tooltip-align-annotations t)
+
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
   (add-to-list 'company-backends 'company-files)
   (add-to-list 'company-backends 'company-capf)
-  ;; (add-to-list 'company-backends 'company-dabbrev)
-  ;; (add-to-list 'company-backends 'company-dabbrev-code)
+  
   (setq company-backends (delete 'company-semantic company-backends))
   (setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (global-company-mode 1)
+
+  (use-package company-dabbrev
+    :config 
+    ;; (add-to-list 'company-backends 'company-dabbrev)
+    )
+  
+  (use-package company-dabbrev-code
+    :config
+    (setq company-dabbrev-code-ignore-case nil
+          company-dabbrev-code-everywhere t)
+    ;; (add-to-list 'company-backends 'company-dabbrev-code)
+    )
   
   (use-package helm-company
     :if (eq dotemacs-helm-or-ido 'helm)

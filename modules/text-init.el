@@ -8,14 +8,15 @@
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also get run for all modes
 ;; derived from a basic mode such as text-mode.
 (use-package simple
-  :config (add-hook 'text-mode-hook #'turn-on-auto-fill))
+  :config (add-hook 'text-mode-hook #'turn-off-auto-fill))
 
 ;; identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :ensure t
   :bind ("C-c g" . writegood-mode)
   :diminish writegood-mode
-  :init (add-hook 'text-mode-hook #'writegood-mode))
+  :init (add-hook 'text-mode-hook #'writegood-mode)
+  :config (writegood-passive-voice-turn-off))
 
 (use-package artbollocks-mode
   :disabled t

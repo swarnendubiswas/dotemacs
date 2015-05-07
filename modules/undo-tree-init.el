@@ -7,6 +7,7 @@
 
 ;; visualize with C-x u
 (use-package undo-tree
+  :disabled t
   :ensure t
   :config
   (setq undo-tree-mode-lighter ""

@@ -74,6 +74,8 @@
 (require 'ibuffer-init)
 (require 'dired-init)
 (require 'search-init)
+;; helm is configured to make use of recentf
+(require 'recentf-init)
 
 ;;(if (bound-and-true-p use-company)
 (if (eq dotemacs-completion 'company)
@@ -84,8 +86,7 @@
 (if (eq dotemacs-helm-or-ido 'helm)
     (require 'helm-init)
   (require 'ido-init)
-  (require 'smex-init)
-  (require 'recentf-init))
+  (require 'smex-init))
 
 ;; configure the more useful extensions
 (require 'anzu-init)

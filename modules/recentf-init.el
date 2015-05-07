@@ -10,10 +10,10 @@
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
-        recentf-auto-cleanup 300 ;'never
-        recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads\\.el\\'"
+        recentf-auto-cleanup 60 ;'never
+        recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
-                          ".*/recentf\\'" "~$" "/.autosaves/") ; "/ssh:"
+                          ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el") ; "/ssh:"
         recentf-save-file (concat dotemacs-temp-directory "recentf"))
   (add-to-list 'recentf-exclude "[/\\]tmp/recentf-marker\\'")
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected

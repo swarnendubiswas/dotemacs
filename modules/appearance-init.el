@@ -111,8 +111,8 @@
                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
                                       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
                                       (set-face-attribute 'hl-line nil :background "linen")
-                                      ;; (with-eval-after-load "helm"
-                                      ;; (set-face-attribute 'helm-selection nil :background "dark khaki"))
+                                      (with-eval-after-load 'helm
+                                        (set-face-attribute 'helm-selection nil :underline t))
                                       ;; org-mode customizations inspired from leuven theme
                                       (with-eval-after-load "org"
                                         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
@@ -121,9 +121,9 @@
                                                             :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
                                       ;; customize the fringe marks on the sides
                                       (set-face-background 'fringe "lavender")))
-      
+
       ;; default
-      (t t))
+      ((eq dotemacs-theme 'default) (set-face-attribute 'default nil :height 110)))
 
 (use-package display-theme
   :ensure t

@@ -26,6 +26,9 @@
         ;; no duplicates in command history
         comint-input-ignoredups t))
 
+(use-package shell-command
+  :config (shell-command-completion-mode 1))
+
 ;; The following setup is from readline-complete package at
 ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
 ;; set up shell (not eshell) mode

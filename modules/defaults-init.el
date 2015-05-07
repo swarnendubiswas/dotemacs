@@ -52,18 +52,20 @@
   ;; Enable visual feedback on selections, default since v23
   (transient-mark-mode 1))
 
+;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
   :config
-  (setq-default auto-revert-interval 5 ; Default is 5 s.
+  (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
                 global-auto-revert-non-file-buffers t)
-  ;; Auto-refresh all buffers, does not work for remote files.
   (global-auto-revert-mode 1))
 
   ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
   :config (delete-selection-mode 1))
+
+(setq delete-by-moving-to-trash t)
 
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
 (use-package tramp
@@ -201,6 +203,10 @@
                                            try-complete-lisp-symbol))
   (use-package hippie-exp-ext
     :ensure t))
+
+(use-package subword
+  :diminish subword-mode
+  :config (global-subword-mode 1))
 
 (provide 'defaults-init)
 

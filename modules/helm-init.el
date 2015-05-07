@@ -33,7 +33,8 @@
         helm-always-two-windows nil
         ;; both the min and max height are set to be equal on purpose
         helm-autoresize-max-height 60
-        helm-autoresize-min-height 60)
+        helm-autoresize-min-height 60
+        helm-case-fold-search 'smart)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
                                     helm-source-dired-recent-dirs
@@ -48,15 +49,23 @@
     ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t))
   (use-package helm-utils
-    :config (setq helm-highlight-number-lines-around-point 10
-                  helm-yank-symbol-first t))
+    :config
+    (setq helm-highlight-number-lines-around-point 10
+          helm-yank-symbol-first t))
   (use-package helm-files
-    :config (setq helm-file-cache-fuzzy-match t
-                  helm-ff-transformer-show-only-basename nil
-                  helm-ff-file-name-history-use-recentf t
-                  helm-ff-auto-update-initial-value t
-                  helm-recentf-fuzzy-match t
-                  helm-ff-skip-boring-files t))
+    :config
+    (setq helm-file-cache-fuzzy-match t
+          helm-ff-transformer-show-only-basename nil
+          helm-ff-file-name-history-use-recentf t
+          helm-ff-auto-update-initial-value t
+          helm-recentf-fuzzy-match t
+          helm-ff-skip-boring-files t
+          helm-boring-file-regexp-list (append helm-boring-file-regexp-list
+                                               '(
+                                                 "\\.undo$"
+                                                 "\\.elc$"
+                                                 "\\#$"
+                                                 "\\~$"))))
   (use-package helm-dabbrev
     :config (setq helm-dabbrev-cycle-threshold 2))
   (use-package helm-org
@@ -111,6 +120,8 @@
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   (bind-key "C-z" 'helm-select-action helm-map)
+  (define-key global-map [remap list-buffers] 'helm-buffers-list)
+  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
   :bind
   ("M-x" . helm-M-x)
   ("C-x b" . helm-mini)
@@ -122,6 +133,7 @@
   ("M-y" . helm-show-kill-ring)
   ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
   ("M-i" . helm-swoop)
+  ("C-h C-f" . helm-apropos)
   :diminish helm-mode)
 
 (provide 'helm-init)

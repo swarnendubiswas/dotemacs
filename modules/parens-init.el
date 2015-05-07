@@ -32,7 +32,8 @@
   (require 'smartparens-config)
   (setq sp-autoskip-closing-pair 'always
         sp-navigate-close-if-unbalanced t
-        sp-show-pair-from-inside t)
+        sp-show-pair-from-inside t
+        sp-autoescape-string-quote nil)
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
   ;;(sp-use-smartparens-bindings)

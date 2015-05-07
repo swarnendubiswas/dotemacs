@@ -11,6 +11,7 @@
   :config (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package rainbow-identifiers
+  :disabled t
   :ensure t
   :config (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 

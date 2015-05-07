@@ -25,7 +25,6 @@
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
-        ;;delete-by-moving-to-trash t
         ;;dired-listing-switches "-ABhltc --si --group-directories-first"
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t
