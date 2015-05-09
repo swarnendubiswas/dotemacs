@@ -49,6 +49,7 @@
 ;; highlight current line
 (use-package hl-line
   :ensure t
+  ;;:if (not (eq dotemacs-theme 'default))
   :config
   ;;(global-hl-line-mode 1)
   ;; highlight only when idle
@@ -123,7 +124,12 @@
                                       (set-face-background 'fringe "lavender")))
 
       ;; default
-      ((eq dotemacs-theme 'default) (set-face-attribute 'default nil :height 110)))
+      ((eq dotemacs-theme 'default)
+       (if (string= system-name "XXX")
+           (set-face-attribute 'default nil  :height 110)
+         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+       (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+       (set-face-attribute 'hl-line nil :background "linen")))
 
 (use-package display-theme
   :ensure t

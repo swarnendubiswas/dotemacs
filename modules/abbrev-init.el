@@ -15,8 +15,8 @@
         dabbrev-case-replace nil)
   (if (file-exists-p abbrev-file-name)
       (quietly-read-abbrev-file))
-  (add-hook 'text-mode-hook #'abbrev-mode)
-  (add-hook 'LaTeX-mode-hook #'abbrev-mode))
+  ;; enable in all modes derived from text-mode
+  (add-hook 'text-mode-hook #'abbrev-mode))
 
 (provide 'abbrev-init)
 

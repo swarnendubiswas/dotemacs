@@ -7,12 +7,13 @@
 
 ;; (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
 (use-package ace-jump-mode
+  :disabled t
   :ensure t
   :bind
-  ;;("C-c SPC" . ace-jump-mode)
-  ("C-'" . ace-jump-mode)
+  ;; ("C-c SPC" . ace-jump-mode)
+  ;; ("C-'" . ace-jump-mode)
   :config
-  ;;(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
+  ;; (define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
   (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
@@ -60,6 +61,11 @@
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)
   (bind-key "C-'" 'ace-jump-helm-line helm-map))
+
+(use-package ace-window
+  :ensure t
+  :config (setq avy-background t)
+  :bind ("M-b" . avi-goto-word-1))
 
 (provide 'ace-modes-init)
 

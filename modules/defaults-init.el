@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+;; SB: Should we use use-package for managing built-in modules?
+
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup.
       inhibit-startup-screen t
       ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen.
@@ -13,14 +15,19 @@
       initial-major-mode 'text-mode
       inhibit-startup-echo-area-message t)
 
+;; major mode to use for files that do no specify a major mode, default value is fundamental-mode
 (setq-default major-mode 'text-mode)
 
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+
+(use-package mule
+  :config 
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8))
+
 (set-language-environment 'utf-8)
 (prefer-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
 (set-input-method nil)
 
 (use-package files
@@ -138,11 +145,6 @@
 (use-package hi-lock
   :config (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
-
-(use-package hilit-chg
-  :disabled t
-  :config (highlight-changes-mode 1) 
-  :bind ("M-o C" . highlight-changes-mode))
 
 ;; remember cursor position in files
 (use-package saveplace

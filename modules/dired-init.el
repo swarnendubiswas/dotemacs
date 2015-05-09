@@ -27,7 +27,7 @@
         dired-recursive-copies 'always
         ;;dired-listing-switches "-ABhltc --si --group-directories-first"
         dired-listing-switches "-ABhl --si --group-directories-first"
-        dired-ls-F-marks-symlinks t
+        dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
   ;; jump to home directory
   ;; (global-set-key (kbd "M-<home>")
@@ -47,22 +47,22 @@
 
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
-  :commands (dired-jump)
+  :commands dired-jump
   :config
   (setq dired-bind-jump t
         ;; do not show messages when omitting files
         dired-omit-verbose nil)
-  (setq-default dired-omit-mode t)
-  ;; (add-hook 'dired-mode-hook
-  ;;           (lambda ()
-  ;;             (dired-omit-mode 1)))
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (dired-omit-mode)))
   ;; C-x C-j opens dired with the cursor right on the file you're editing
   :bind ("C-x C-j" . dired-jump))
 
 (use-package dired+
   :ensure t
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-  :init (setq-default diredp-hide-details-initially-flag nil)
+  :init (setq-default diredp-hide-details-initially-flag nil
+                      diredp-hide-details-propagate-flag nil)
   :config (diredp-toggle-find-file-reuse-dir 1))
 
 ;; direx:jump-to-directory is a good explorer

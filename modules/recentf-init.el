@@ -10,14 +10,14 @@
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
-        recentf-auto-cleanup 60 ;'never
+        recentf-auto-cleanup 'mode
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el") ; "/ssh:"
         recentf-save-file (concat dotemacs-temp-directory "recentf"))
   (add-to-list 'recentf-exclude "[/\\]tmp/recentf-marker\\'")
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
-  (recentf-auto-cleanup)
+  ;;(recentf-auto-cleanup)
 
   ;; save file names relative to my current home directory
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
@@ -33,6 +33,7 @@
   
   ;; Useful for synchronizing updates in case more than one emacs window is open.
   (use-package sync-recentf
+    :disabled t
     :load-path "lisp/"
     :config (recentf-auto-cleanup))
   

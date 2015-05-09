@@ -148,6 +148,13 @@
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))
 
+(use-package golden-ratio
+  :ensure t
+  :diminish golden-ratio-mode
+  :config
+  (golden-ratio-mode 1)
+  (setq golden-ratio-auto-scale t))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
