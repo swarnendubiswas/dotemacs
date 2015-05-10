@@ -13,7 +13,7 @@
     (setq ibuffer-expert t
           ;;ibuffer-shrink-to-minimum-size t
           ibuffer-always-show-last-buffer nil
-          ;;ibuffer-default-sorting-mode 'recency ; 'major-mode
+          ibuffer-default-sorting-mode 'recency ; 'major-mode
           ;;ibuffer-sorting-mode 'recency
           ibuffer-use-header-line t
           ibuffer-show-empty-filter-groups nil)

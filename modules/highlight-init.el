@@ -48,6 +48,7 @@
   :init (fixme-mode 1))
 
 (use-package fic-mode
+  :disabled t
   :ensure t
   :diminish fic-mode
   :init
@@ -55,6 +56,7 @@
   (add-hook 'prog-mode-hook #'turn-on-fic-mode))
 
 (use-package fic-ext-mode
+  :disabled t
   :ensure t
   :preface
   (defun add-something-to-mode-hooks (mode-list something)

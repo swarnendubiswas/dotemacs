@@ -26,6 +26,8 @@
   ;; ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (eval-after-load 'recentf
   ;;   '(run-with-timer 0 (* 600 60) 'recentf-save-list))
+
+  (add-hook 'kill-emacs-hook #'recentf-save-list)
   
   ;; Add buffers to recent list.
   (use-package recentf-ext

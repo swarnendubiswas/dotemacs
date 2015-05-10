@@ -45,7 +45,7 @@
   (set-face-attribute 'tabbar-highlight nil :underline t)
   (set-face-attribute 'tabbar-button nil :box '(:line-width 1 :color "gray72" :style released-button))
   ;;(set-face-attribute 'tabbar-button-highlight ((t (:inherit tabbar-default))))
-  (set-face-attribute 'tabbar-separator nil :height 0.7)
+  (set-face-attribute 'tabbar-separator nil :height 1.0)
   
   (setq tabbar-use-images nil) ; speed up by not using images
   (tabbar-mode 1))

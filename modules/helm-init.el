@@ -13,12 +13,13 @@
   (helm-autoresize-mode 1)
   :config
   (setq helm-quick-update t ; do not display invisible candidates
+        helm-candidate-number-limit 80
         helm-M-x-fuzzy-match t
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-apropos-fuzzy-match t
-        ;; helm-split-window-default-side 'other ;; open helm buffer in another window
+        helm-split-window-default-side 'right
         ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
         ido-use-virtual-buffers 'auto
@@ -117,6 +118,8 @@
     :config
     (add-hook 'dired-mode-hook 'helm-gtags-mode)
     (add-hook 'prog-mode-hook 'helm-gtags-mode))
+  (use-package helm-make
+    :ensure t)
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   (bind-key "C-z" 'helm-select-action helm-map)

@@ -51,6 +51,14 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
+(defcustom dotemacs-window-split
+  'horizontal
+  "Specify the direction in which the windows should be split."
+  :type '(radio
+          (const :tag "vertical" vertical)
+          (const :tag "horizontal" horizontal))
+  :group 'dotemacs)
+
 (provide 'config-init)
 
 ;;; config-init.el ends here
