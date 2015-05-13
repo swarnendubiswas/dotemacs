@@ -39,8 +39,8 @@
   ;;   '(define-key org-mode-map (kbd "C-c C-d") nil))
   ;; (eval-after-load 'org
   ;;   '(define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
-  (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
-  (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
+  ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
+  ;; (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
   
   ;; turn on soft wrapping mode for org mode
   (add-hook 'org-mode-hook

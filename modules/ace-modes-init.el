@@ -7,11 +7,10 @@
 
 ;; (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
 (use-package ace-jump-mode
-  :disabled t
   :ensure t
-  :bind
+  :bind*
   ;; ("C-c SPC" . ace-jump-mode)
-  ;; ("C-'" . ace-jump-mode)
+  ("C-'" . ace-jump-mode)
   :config
   ;; (define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
   (ace-jump-mode-enable-mark-sync))
@@ -55,6 +54,7 @@
   ("<f6>" . ace-jump-buffer))
 
 (use-package ace-jump-helm-line
+  :disabled t
   :ensure t
   :if (eq dotemacs-helm-or-ido 'helm)
   :config
@@ -64,7 +64,7 @@
 
 (use-package ace-window
   :ensure t
-  :config (setq avy-background t)
+  :config (setq avy-background nil)
   :bind ("M-b" . avi-goto-word-1))
 
 (provide 'ace-modes-init)

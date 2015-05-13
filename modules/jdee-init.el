@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package jde
+  :disabled t
   :load-path "lisp/jdee-2.4.1/lisp")
 
 (provide 'jdee-init)

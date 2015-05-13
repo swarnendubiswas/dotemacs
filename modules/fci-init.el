@@ -14,8 +14,6 @@
         fci-rule-width 1
         fci-rule-color "grey40")
   (add-hook 'text-mode-hook #'fci-mode)
-  (add-hook 'LaTeX-mode-hook #'fci-mode)
-  (add-hook 'org-mode-hook #'fci-mode)
   (add-hook 'prog-mode-hook #'fci-mode)
   (defun auto-fci-mode (&optional unused)
     (if (> (frame-width) 120)

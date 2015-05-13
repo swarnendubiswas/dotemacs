@@ -6,10 +6,9 @@
 ;;; Code:
 
 (use-package abbrev
-  :disabled t
   :diminish abbrev-mode
   :config
-  (setq-default abbrev-file-name (concat emacs-tmp-directory "abbrev_defs"))
+  (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))
   (setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
         ;; preserve case when expanding
         dabbrev-case-replace nil)

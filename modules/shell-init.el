@@ -12,14 +12,6 @@
 ;;         sh-indentation 4))
 ;; (add-hook 'sh-mode-hook 'setup-shell-mode)
 
-(use-package sh-script
-  :defer t
-  :config
-  (setq sh-basic-offset 4
-        sh-indent-comment t
-        sh-indentation 4)
-  (bind-key "C-c C-d" 'duplicate-thing shell-mode-map))
-
 (use-package comint
   :config
   (setq comint-scroll-to-bottom-on-input t   ;; always insert at the bottom

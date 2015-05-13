@@ -70,11 +70,15 @@
 
 (use-package duplicate-thing
   :ensure t
-  :bind ("C-c C-d" . duplicate-thing))
+  :bind*
+  ;; bind key and override all minor mode bindings
+  ("C-c C-d" . duplicate-thing))
 
 (use-package discover-my-major
   :ensure t
-  :bind ("C-h C-m" . discover-my-major))
+  :bind*
+  ;; bind key and override all minor mode bindings
+  ("C-h C-m" . discover-my-major))
 
 (use-package manage-minor-mode
   :ensure t
@@ -92,7 +96,7 @@
   :ensure t
   :pin melpa
   ;;:load-path "lisp/" ; prefer melpa
-  :bind ("C-x C-\\" . goto-last-change))
+  :bind* ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
   :ensure t

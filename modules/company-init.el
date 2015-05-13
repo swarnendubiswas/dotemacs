@@ -30,7 +30,7 @@
     :config 
     ;; (add-to-list 'company-backends 'company-dabbrev)
     )
-  
+
   (use-package company-dabbrev-code
     :config
     (setq company-dabbrev-code-ignore-case nil
@@ -79,9 +79,9 @@
     :ensure t
     :config
     (add-to-list 'company-backends 'company-c-headers)
-    (cond ((string-equal system-name "rain.cse.ohio-state.edu")
+    (cond ((string-equal system-name "XXX")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/"))
-          ((string-equal system-name "biswass-Dell-System-XPS-L502X")
+          ((string-equal system-name "YYY")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9")))))
 
 (provide 'company-init)

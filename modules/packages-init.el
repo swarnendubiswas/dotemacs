@@ -40,7 +40,6 @@
 (use-package paradox
   :disabled t
   :ensure t
-  :defer t
   :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t))

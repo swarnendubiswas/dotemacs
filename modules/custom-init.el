@@ -34,25 +34,6 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
-;; tags
-
-(use-package ctags
-  :ensure t
-  :defer t)
-
-(use-package ctags-update
-  :ensure t
-  :defer t)
-
-(use-package etags
-  :bind ("M-T" . tags-search))
-
-(use-package gtags
-  :ensure t
-  :if (eq dotemacs-helm-or-ido 'helm)
-  :defer t
-  :config (add-hook 'prog-mode-hook 'helm-gtags-mode))
-
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun create-latex-etags ()

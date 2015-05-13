@@ -17,9 +17,7 @@
 
 (use-package rainbow-delimiters
   :ensure t
-  :config
-  ;;(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-  (rainbow-delimiters-mode 1))
+  :config (rainbow-delimiters-mode 1))
 
 (use-package rainbow-blocks
   :disabled t

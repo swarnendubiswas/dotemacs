@@ -56,7 +56,7 @@
             (lambda ()
               (dired-omit-mode)))
   ;; C-x C-j opens dired with the cursor right on the file you're editing
-  :bind ("C-x C-j" . dired-jump))
+  :bind* ("C-x C-j" . dired-jump))
 
 (use-package dired+
   :ensure t

@@ -60,7 +60,8 @@
   (eval-after-load "latex"
     '(require 'smartparens-latex))
   (eval-after-load "tex-mode"
-    '(require 'smartparens-latex)))
+    '(require 'smartparens-latex))
+  :config (make-variable-buffer-local 'show-paren-mode))
 
 (or (use-package elec-pair
       :disabled t

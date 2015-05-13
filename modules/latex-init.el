@@ -47,7 +47,8 @@
   ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
   ;; (eval-after-load 'LaTeX
   ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
-  (bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map))
+  ;;(bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
+  )
 
 (use-package auctex-latexmk
   :ensure t
@@ -85,11 +86,11 @@
 (use-package bibtex-utils
   :ensure t)
 
-;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
-;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
-;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
-
 (use-package reftex
+  ;; :init
+  ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
+  ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
+  ;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
   :diminish reftex-mode
   :config
   (setq reftex-plug-into-AUCTeX t

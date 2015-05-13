@@ -80,8 +80,8 @@
                                          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
                                        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                      ;; customize the fringe marks on the sides
-                                     (set-face-background 'fringe "lavender")
-                                     (set-face-attribute 'hl-line nil :background "linen")))
+                                     (set-face-background 'fringe "wheat")
+                                     (set-face-attribute 'hl-line nil :background "lavender")))
       
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
@@ -102,7 +102,7 @@
                                               powerline-display-hud nil)
                                         (powerline-default-theme))
                                       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                      (if (string-equal system-name "rain.cse.ohio-state.edu")
+                                      (if (string-equal system-name "XXX")
                                           (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
                                         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                       (set-background-color "white")

@@ -31,7 +31,7 @@
 ;; (defconst use-helm t
 ;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities.")
 (defcustom dotemacs-helm-or-ido
-  'helm
+  'ido
   "Prefer helm instead of ido and smex.  Helm provides similar functionalities."
   :type '(radio
           (const :tag "helm" helm)
@@ -42,7 +42,7 @@
 ;; (defcustom use-theme "eclipse"
 ;;   "Specify which Emacs theme to use.")
 (defcustom dotemacs-theme
-  'default
+  'eclipse
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -52,7 +52,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-window-split
-  'horizontal
+  'vertical
   "Specify the direction in which the windows should be split."
   :type '(radio
           (const :tag "vertical" vertical)

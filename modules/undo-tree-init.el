@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; visualize with C-x u
+;; Visualize with C-x u
 (use-package undo-tree
   :disabled t
   :ensure t

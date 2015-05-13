@@ -6,11 +6,13 @@
 ;;; Code:
 
 (use-package cedet
+  :disabled t
   :load-path "lisp/cedet-1.1/common/"
   :config
   (require 'cedet-files))
 
 (use-package ede
+  :disabled t
   :config
   (global-ede-mode 1)
   (ede-enable-generic-projects))
@@ -27,7 +29,7 @@
 
 ;; * This enables even more coding tools such as intellisense mode,
 ;;   decoration mode, and stickyfunc mode (plus regular code helpers)
-(semantic-load-enable-gaudy-code-helpers)
+;; (semantic-load-enable-gaudy-code-helpers)
 
 ;; * This enables the use of Exuberant ctags if you have it installed.
 ;;   If you use C++ templates or boost, you should NOT enable it.
@@ -45,6 +47,7 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
+  :disabled t
   ;;:load-path "lisp/cedet-1.1/semantic/"
   :config
   (require 'semantic-ia)

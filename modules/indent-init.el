@@ -47,14 +47,15 @@
 (use-package smart-tabs
   :disabled t
   :ensure t
-  :config (global-smart-tab-mode 1))
+  ;; :init
+  ;; (autoload 'smart-tabs-mode "smart-tabs-mode"
+  ;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
+  ;; (autoload 'smart-tabs-advice "smart-tabs-mode")
+  ;; (autoload 'smart-tabs-insinuate "smart-tabs-mode")
+  :config
+  ;; (smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
+  (global-smart-tab-mode 1))
 
-;;(autoload 'smart-tabs-mode "smart-tabs-mode"
-;;  "Intelligently indent with tabs, align with spaces!")
-;;(autoload 'smart-tabs-mode-enable "smart-tabs-mode")
-;;(autoload 'smart-tabs-advice "smart-tabs-mode")
-;;(autoload 'smart-tabs-insinuate "smart-tabs-mode")
-;;(smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
 
 (provide 'indent-init)
 

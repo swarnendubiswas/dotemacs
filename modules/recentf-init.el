@@ -10,12 +10,13 @@
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
-        recentf-auto-cleanup 'mode
+        recentf-auto-cleanup 'never
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el") ; "/ssh:"
         recentf-save-file (concat dotemacs-temp-directory "recentf"))
   (add-to-list 'recentf-exclude "[/\\]tmp/recentf-marker\\'")
+  
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   ;;(recentf-auto-cleanup)
 
@@ -27,7 +28,7 @@
   ;; (eval-after-load 'recentf
   ;;   '(run-with-timer 0 (* 600 60) 'recentf-save-list))
 
-  (add-hook 'kill-emacs-hook #'recentf-save-list)
+  ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
   
   ;; Add buffers to recent list.
   (use-package recentf-ext
