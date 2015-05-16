@@ -14,23 +14,28 @@
         magit-item-highlight-face 'bold
         magit-last-seen-setup-instructions "1.4.0"))
 
-(use-package git-commit-mode            ; Git commit message mode
+;; Git commit message mode
+(use-package git-commit-mode            
   :ensure t
   :defer t)
 
-(use-package gitconfig-mode             ; Git configuration mode
+;; Git configuration mode
+(use-package gitconfig-mode             
   :ensure t
   :defer t)
 
-(use-package gitignore-mode             ; .gitignore mode
+;; .gitignore mode
+(use-package gitignore-mode             
   :ensure t
   :defer t)
 
-(use-package gitattributes-mode         ; Git attributes mode
+;; Git attributes mode
+(use-package gitattributes-mode         
   :ensure t
   :defer t)
 
-(use-package git-rebase-mode            ; Mode for git rebase -i
+;; Mode for git rebase -i
+(use-package git-rebase-mode            
   :ensure t
   :defer t)
 

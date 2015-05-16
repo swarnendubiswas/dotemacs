@@ -28,6 +28,7 @@
     :ensure t
     :config
     (flyspell-lazy-mode 1))
+  
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
   (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
@@ -37,23 +38,31 @@
   (add-hook 'find-file-hooks #'turn-on-flyspell)
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)
+  
   ;; (eval-after-load "flyspell"
   ;;   '(diminish 'flyspell-mode))
   :diminish flyspell-mode
   :bind
-  ("C-c i f" . flyspell-mode)
-  ("C-c i b" . flyspell-buffer)
-  ;; another alternative is M-$
-  ("C-c i w" . ispell-word)
+  (("C-c i f" . flyspell-mode)
+   ("C-c i b" . flyspell-buffer)
+   ;; another alternative is M-$
+   ("C-c i w" . ispell-word))
+
   :config
   (use-package helm-flyspell
     :ensure t
-    :if (eq dotemacs-helm-or-ido 'helm)
     :config
     (eval-after-load 'flyspell
       '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
   (use-package ace-flyspell
     :ensure t))
+
+(defhydra hydra-flyspell (:color blue)
+  "flyspell mode"
+  ("f" flyspell-mode "flyspell-mode")
+  ("b" flyspell-buffer "flyspell-buffer")
+  ("w" ispell-word "ispell-word"))
+(bind-key "C-c i" 'hydra-flyspell/body)
 
 (provide 'flyspell-init)
 

@@ -18,10 +18,10 @@
   :ensure t
   :defer t)
 
-;;(autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
 (use-package jtags
   :ensure t
   :defer t
+  ;;:init (autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
   :config (add-hook 'java-mode-hook 'jtags-mode))
 
 (use-package javap-mode

@@ -11,16 +11,19 @@
   (defun dired-go-home ()
     (interactive)
     (dired "~/"))
+  
   ;; M-<up> is nicer in dired if it moves to the first file
   (defun dired-back-to-top ()
     (interactive)
     (beginning-of-buffer)
     (dired-next-line 2))
+  
   ;; M-<down> is nicer in dired if it moves to the last file
   (defun dired-jump-to-bottom ()
     (interactive)
     (end-of-buffer)
     (dired-next-line -1))
+  
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
@@ -29,6 +32,7 @@
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
+  
   ;; jump to home directory
   ;; (global-set-key (kbd "M-<home>")
   ;;                 (lambda ()
@@ -91,7 +95,6 @@
 ;;   :ensure t)
 
 (use-package dired-rainbow
-  :disabled t
   :ensure t)
 
 (use-package dired-hacks-utils

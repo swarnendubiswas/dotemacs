@@ -48,16 +48,16 @@
   :init (fixme-mode 1))
 
 (use-package fic-mode
-  :disabled t
   :ensure t
   :diminish fic-mode
-  :init
+  :config
   (add-hook 'text-mode-hook #'turn-on-fic-mode)
   (add-hook 'prog-mode-hook #'turn-on-fic-mode))
 
 (use-package fic-ext-mode
   :disabled t
   :ensure t
+  :diminish fic-ext-mode
   :preface
   (defun add-something-to-mode-hooks (mode-list something)
     "helper function to add a callback to multiple hooks"

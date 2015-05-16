@@ -19,11 +19,7 @@
 ;; intelligent indentation, on by default from Emacs 24.4
 (use-package electric
   :disabled t
-  :config
-  ;; (add-hook 'after-change-major-mode-hook
-  ;;           (lambda ()
-  ;;             (electric-indent-mode -1)))
-  (electric-indent-mode -1))
+  :config (electric-indent-mode -1))
 
 (use-package auto-indent-mode
   :ensure t
@@ -55,7 +51,6 @@
   :config
   ;; (smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
   (global-smart-tab-mode 1))
-
 
 (provide 'indent-init)
 

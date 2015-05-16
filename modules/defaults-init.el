@@ -212,11 +212,11 @@
   :config (global-subword-mode 1))
 
 ;; Set Emacs split to horizontal or vertical
-(if (eq dotemacs-window-split 'horizontal)
-    (setq split-height-threshold 0
-          split-width-threshold nil)
-  (setq split-height-threshold nil
-        split-width-threshold 0))
+;; (if (eq dotemacs-window-split 'horizontal)
+;;     (setq split-height-threshold 0
+;;           split-width-threshold nil)
+;;   (setq split-height-threshold nil
+;;         split-width-threshold 0))
 
 (provide 'defaults-init)
 

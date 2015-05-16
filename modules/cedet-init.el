@@ -6,13 +6,11 @@
 ;;; Code:
 
 (use-package cedet
-  :disabled t
   :load-path "lisp/cedet-1.1/common/"
   :config
   (require 'cedet-files))
 
 (use-package ede
-  :disabled t
   :config
   (global-ede-mode 1)
   (ede-enable-generic-projects))
@@ -47,8 +45,7 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
-  :disabled t
-  ;;:load-path "lisp/cedet-1.1/semantic/"
+  :load-path "lisp/cedet-1.1/semantic/"
   :config
   (require 'semantic-ia)
   (require 'semantic-loaddefs)

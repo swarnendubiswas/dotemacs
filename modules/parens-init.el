@@ -22,6 +22,20 @@
         (show-paren-mode 1) ; highlight matching parentheses when the point is on them
         (make-variable-buffer-local 'show-paren-mode))))
 
+(or (use-package elec-pair
+      :disabled t
+      :config (electric-pair-mode 1))
+    
+    (use-package autopair
+      :disabled t
+      :ensure t
+      :config (autopair-global-mode 1))
+    
+    (use-package flex-autopair
+      :disabled t
+      :ensure t
+      :config (flex-autopair-mode 1)))
+
 ;; https://github.com/xiaohanyu/oh-my-emacs/blob/master/core/ome-miscs.org
 ;; https://github.com/Fuco1/smartparens/blob/master/smartparens-config.el
 ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
@@ -62,20 +76,6 @@
   (eval-after-load "tex-mode"
     '(require 'smartparens-latex))
   :config (make-variable-buffer-local 'show-paren-mode))
-
-(or (use-package elec-pair
-      :disabled t
-      :config (electric-pair-mode 1))
-
-    (use-package autopair
-      :disabled t
-      :ensure t
-      :config (autopair-global-mode 1))
-    
-    (use-package flex-autopair
-      :disabled t
-      :ensure t
-      :config (flex-autopair-mode 1)))
 
 (provide 'parens-init)
 

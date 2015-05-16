@@ -9,47 +9,63 @@
   :defer t
   :init (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   :config
-  (progn
-    (setq ibuffer-expert t
-          ;;ibuffer-shrink-to-minimum-size t
-          ibuffer-always-show-last-buffer nil
-          ibuffer-default-sorting-mode 'recency ; 'major-mode
-          ;;ibuffer-sorting-mode 'recency
-          ibuffer-use-header-line t
-          ibuffer-show-empty-filter-groups nil)
-    (add-hook 'ibuffer-mode-hook
+  (setq ibuffer-expert t
+        ;;ibuffer-shrink-to-minimum-size t
+        ibuffer-always-show-last-buffer nil
+        ibuffer-default-sorting-mode 'recency ; 'major-mode
+        ;;ibuffer-sorting-mode 'recency
+        ibuffer-use-header-line t
+        ibuffer-show-empty-filter-groups nil)
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-auto-mode 1)))
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-do-sort-by-recency)))
+  
+  ;; Group ibuffer list by tramp connection
+  (use-package ibuffer-tramp
+    :load-path "lisp/"
+    :config
+    (add-hook 'ibuffer-hook
               (lambda ()
-                (ibuffer-auto-mode 1)))
-    (add-hook 'ibuffer-mode-hook
-              (lambda ()
-                (ibuffer-do-sort-by-recency)))
-    ;; (add-hook 'ibuffer-mode-hook
-    ;;           (lambda ()
-    ;;             (ibuffer-recompile-formats -1)))
-    ;;(global-set-key (kbd "C-x C-b") 'ibuffer) ; use ibuffer for buffer list
+                (ibuffer-tramp-set-filter-groups-by-tramp-connection)
+                (ibuffer-do-sort-by-alphabetic))))
 
-    ;; Group ibuffer list by tramp connection
-    (use-package ibuffer-tramp
-      :load-path "lisp/"
-      :config
-      (eval-after-load 'ibuffer
-        '(add-hook 'ibuffer-hook
-                   (lambda ()
-                     (ibuffer-tramp-set-filter-groups-by-tramp-connection)
-                     (ibuffer-do-sort-by-alphabetic))))))
+  ;; use ibuffer-vc to sort buffers by VC status
+  (use-package ibuffer-vc
+    :ensure t
+    :defer t
+    :config
+    (add-hook 'ibuffer-hook
+              (lambda ()
+                (ibuffer-vc-set-filter-groups-by-vc-root)
+                (unless (eq ibuffer-sorting-mode 'alphabetic)
+                  (ibuffer-do-sort-by-alphabetic)))))
+  
   :bind ("C-x C-b" . ibuffer))
 
-;; use ibuffer-vc to sort buffers by VC status
-(use-package ibuffer-vc
-  :ensure t
-  :defer t
-  :config
-  (eval-after-load 'ibuffer
-    '(add-hook 'ibuffer-hook
-               (lambda ()
-                 (ibuffer-vc-set-filter-groups-by-vc-root)
-                 (unless (eq ibuffer-sorting-mode 'alphabetic)
-                   (ibuffer-do-sort-by-alphabetic))))))
+;; FIXME: How to activate this?
+(defhydra hydra-buffer-menu (:color pink)
+  "Buffer menu commands"
+  ("m" Buffer-menu-mark "mark")
+  ("u" Buffer-menu-unmark "unmark")
+  ("U" Buffer-menu-backup-unmark "backup-unmark")
+  ("d" Buffer-menu-delete "delete")
+  ("D" Buffer-menu-delete-backwards "delete-backwards")
+  ("s" Buffer-menu-save "save")
+  ("~" Buffer-menu-not-modified "not modified")
+  ("x" Buffer-menu-execute "execute")
+  ("b" Buffer-menu-bury "bury")
+  ("g" revert-buffer "revert")
+  ("T" Buffer-menu-toggle-files-only "toggle files only")
+  ("O" Buffer-menu-multi-occur "multi occur" :color blue)
+  ("I" Buffer-menu-isearch-buffers "isearch buffers" :color blue)
+  ("R" Buffer-menu-isearch-buffers-regexp "isearch buffers regexp" :color blue)
+  ("c" nil "cancel")
+  ("v" Buffer-menu-select "select" :color blue)
+  ("o" Buffer-menu-other-window "other-window" :color blue)
+  ("q" quit-window "quit" :color blue))
 
 (provide 'ibuffer-init)
 

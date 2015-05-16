@@ -6,10 +6,10 @@
 ;;; Code:
 
 (setq c-default-style '((java-mode . "java")
-                        (awk-mode . "awk")
                         (c-mode . "k&r")
                         (c++-mode . "stroustrup")
-                        (other . "linux")))
+                        (other . "gnu/linux")
+                        (awk-mode . "awk")))
 
 (use-package cc-mode
   :defer t
@@ -27,8 +27,8 @@
   :config
   ;; (require 'semantic-ia)
   ;; (require 'semantic-loaddefs)
-  ;;(require 'semanticdb)
-  ;;SemanticDB files
+  ;; (require 'semanticdb)
+  ;; SemanticDB files
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   (global-semanticdb-minor-mode 1)
   (global-semantic-highlight-func-mode 1)
@@ -45,6 +45,24 @@
   (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
+
+;; http://tuhdo.github.io/c-ide.html
+(with-eval-after-load 'company 
+  (setq company-backends (delete 'company-semantic company-backends))
+
+  (with-eval-after-load 'cc-mode
+    (define-key c-mode-map  [(tab)] 'company-complete)
+    (define-key c++-mode-map  [(tab)] 'company-complete))
+  
+  (use-package company-c-headers
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-c-headers)
+    (cond ((string-equal system-name "rain.cse.ohio-state.edu")
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/"))
+          ((string-equal system-name "biswass-Dell-System-XPS-L502X")
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))
+  (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include"))
 
 (provide 'cc-init)
 

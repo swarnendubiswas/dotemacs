@@ -24,6 +24,18 @@
   :diminish artbollocks-mode
   :config (add-hook 'text-mode-hook #'artbollocks-mode))
 
+(use-package markdown-mode
+  :ensure t
+  :defer t
+  :mode
+  (("\\.markdown\\'" . markdown-mode)
+   ("\\.md\\'" . markdown-mode))
+  :config
+  ;;(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  ;;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (use-package markdown-mode+
+    :ensure t))
+
 (provide 'text-init)
 
 ;;; text-init.el ends here

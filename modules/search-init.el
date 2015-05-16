@@ -25,7 +25,9 @@
   (use-package replace+
     :ensure t))
 
-(setq case-fold-search t) ; make search ignore case
+(setq case-fold-search t ; make search ignore case
+      grep-highlight-matches t
+      grep-scroll-output t) 
 
 (provide 'search-init)
 

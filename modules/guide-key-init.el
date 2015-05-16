@@ -13,12 +13,12 @@
         guide-key/recursive-key-sequence-flag t
         guide-key/popup-window-position 'bottom
         guide-key/idle-delay 0.5)
-  (guide-key-mode 1))
-
-(use-package guide-key-tip
-  :disabled t
-  :ensure t
-  :config (setq guide-key-tip/enabled t))
+  (guide-key-mode 1)
+  
+  (use-package guide-key-tip
+    :disabled t
+    :ensure t
+    :config (setq guide-key-tip/enabled t)))
 
 (provide 'guide-key-init)
 

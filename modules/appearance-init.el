@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;; better frame titles
-;;(setq frame-title-format (concat  "%b - emacs@" (system-name)))
+;; (setq frame-title-format (concat  "%b - emacs@" (system-name)))
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 (setq-default indicate-buffer-boundaries 'right)
@@ -51,7 +51,7 @@
   :ensure t
   ;;:if (not (eq dotemacs-theme 'default))
   :config
-  ;;(global-hl-line-mode 1)
+  ;; (global-hl-line-mode 1)
   ;; highlight only when idle
   (use-package hl-line+
     :ensure t
@@ -115,7 +115,7 @@
                                       (with-eval-after-load 'helm
                                         (set-face-attribute 'helm-selection nil :underline t))
                                       ;; org-mode customizations inspired from leuven theme
-                                      (with-eval-after-load "org"
+                                      (with-eval-after-load 'org
                                         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
                                                             :foreground "#3C3C3C" :background "#F5F5F5")
                                         (set-face-attribute 'org-level-2 nil

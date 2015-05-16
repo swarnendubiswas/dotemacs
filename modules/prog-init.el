@@ -8,13 +8,7 @@
 ;; show the name of the function in the modeline
 (use-package which-func
   :config
-  ;; (add-to-list 'which-func-modes 'java-mode)
-  ;; (add-to-list 'which-func-modes 'c-mode)
-  ;; (add-to-list 'which-func-modes 'c++-mode)
-  ;; (add-to-list 'which-func-modes 'python-mode)
-  ;; (eval-after-load "which-func"
-  ;;   '(setq which-func-modes '(java-mode c++-mode c-mode python-mode)))
-  (setq which-func-modes '(java-mode c++-mode c-mode python-mode))
+  (add-to-list 'which-func-modes '(java-mode c++-mode c-mode python-mode))
   (add-hook 'prog-mode-hook 'which-func-mode))
 
 (use-package electric
@@ -44,16 +38,15 @@
 
 (use-package gtags
   :ensure t
-  :defer t
-  :config
-  (use-package helm-gtags
-    :ensure t
-    :if (eq dotemacs-helm-or-ido 'helm)
-    :config (add-hook 'prog-mode-hook #'helm-gtags-mode)))
+  :defer t)
+
+(use-package helm-gtags
+  :ensure t
+  :diminish helm-gtags-mode
+  :config (add-hook 'prog-mode-hook #'helm-gtags-mode))
 
 (use-package ggtags
   :ensure t
-  :defer t
   :diminish ggtags-mode
   :config (add-hook 'prog-mode-hook #'ggtags-mode))
 
@@ -67,6 +60,25 @@
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4))
+
+;; enable speed bar
+(use-package speedbar
+  :config
+  (setq speedbar-use-images nil
+        speedbar-show-unknown-files t)
+  (use-package sr-speedbar
+    :ensure t
+    :config
+    (setq sr-speedbar-right-side nil
+          sr-speedbar-max-width 40
+          sr-speedbar-width 30
+          sr-speedbar-default-width 30
+          sr-speedbar-skip-other-window-p t))
+  ;; (add-hook 'prog-mode-hook
+  ;;           '(lambda ()
+  ;;              (when (window-system)
+  ;;                (sr-speedbar-open))))
+  )
 
 (provide 'prog-init)
 

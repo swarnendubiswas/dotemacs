@@ -20,9 +20,7 @@
   ;; Show flycheck messages in popups
   (use-package flycheck-pos-tip
     :ensure t
-    :config
-    (with-eval-after-load 'flycheck
-      (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+    :config (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
   (use-package flycheck-color-mode-line
     :disabled t
@@ -31,16 +29,12 @@
 
   ;; Check package conventions with flycheck
   (use-package flycheck-package
-    :disabled t
     :ensure t
-    :config
-    (with-eval-after-load 'flycheck
-      (flycheck-package-setup)))
-
+    :init (flycheck-package-setup))
+  
   (use-package helm-flycheck
-    :ensure t
-    :if (eq dotemacs-helm-or-ido 'helm))
-
+    :ensure t)
+  
   ;; Add Google C++ Style checker. In default, syntax checked by Clang and Cppcheck.
   (use-package flycheck-google-cpplint
     :ensure t

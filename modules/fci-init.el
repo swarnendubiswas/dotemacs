@@ -7,6 +7,16 @@
 
 (use-package fill-column-indicator
   :disabled t
+  :preface
+  (defun auto-fci-mode (&optional unused)
+    (if (> (frame-width) 120)
+        (fci-mode 1)
+      (fci-mode 0)))
+
+  (define-globalized-minor-mode global-fci-mode fci-mode
+    (lambda ()
+      (fci-mode 1)))
+  
   :ensure t
   :config
   (setq-default fci-rule-column 120)
@@ -15,15 +25,9 @@
         fci-rule-color "grey40")
   (add-hook 'text-mode-hook #'fci-mode)
   (add-hook 'prog-mode-hook #'fci-mode)
-  (defun auto-fci-mode (&optional unused)
-    (if (> (frame-width) 120)
-        (fci-mode 1)
-      (fci-mode 0)))
   (add-hook 'after-change-major-mode-hook #'auto-fci-mode)
   (add-hook 'window-size-change-functions #'auto-fci-mode)
-  ;; (define-globalized-minor-mode global-fci-mode fci-mode
-  ;;   (lambda ()
-  ;;     (fci-mode 1)))
+  
   ;; (global-fci-mode 1)
   )
 

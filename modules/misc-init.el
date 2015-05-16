@@ -40,7 +40,7 @@
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
   (set-face-attribute 'tabbar-default nil :background "gray80")
-  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil :height 1.1)
+  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil :height 1.0)
   (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t :height 1.2 :bold t)
   (set-face-attribute 'tabbar-highlight nil :underline t)
   (set-face-attribute 'tabbar-button nil :box '(:line-width 1 :color "gray72" :style released-button))
@@ -70,15 +70,11 @@
 
 (use-package duplicate-thing
   :ensure t
-  :bind*
-  ;; bind key and override all minor mode bindings
-  ("C-c C-d" . duplicate-thing))
+  :bind* ("C-c C-d" . duplicate-thing))
 
 (use-package discover-my-major
   :ensure t
-  :bind*
-  ;; bind key and override all minor mode bindings
-  ("C-h C-m" . discover-my-major))
+  :bind* ("C-h C-m" . discover-my-major))
 
 (use-package manage-minor-mode
   :ensure t
@@ -116,23 +112,13 @@
   :defer t
   :config
   (use-package swiper-helm
-    :ensure t
-    :if (eq dotemacs-helm-or-ido 'helm)))
+    :ensure t))
 
 (use-package pabbrev
   :disabled t
   :ensure t
   :diminish pabbrev-mode
   :config (global-pabbrev-mode 1))
-
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-  (use-package markdown-mode+
-    :ensure t))
 
 (use-package projectile
   :ensure t
@@ -142,7 +128,7 @@
   (projectile-global-mode 1)
   (use-package helm-projectile
     :ensure t
-    :if (eq dotemacs-helm-or-ido 'helm)
+    ;;:if (eq dotemacs-helm-or-ido 'helm)
     :config
     (setq helm-projectile-fuzzy-match t
           projectile-completion-system 'helm
@@ -151,6 +137,14 @@
     (helm-projectile-on))
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))
+
+(defhydra hydra-projectile (:color blue)
+  "projectile"
+  ("h" helm-projectile "helm-projectile")
+  ("f" helm-projectile-find-file-dwim "find file dwim")
+  ("g" helm-projectile-find-other-file "find other file"))
+(global-unset-key (kbd "C-c p"))
+(bind-key "C-c p" 'hydra-projectile/body)
 
 (use-package golden-ratio
   :ensure t

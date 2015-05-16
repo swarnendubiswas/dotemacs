@@ -15,7 +15,7 @@
   (setq-default indicate-empty-lines nil ; show empty lines after buffer end
                 show-trailing-whitespace t
                 ;;whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing)
-                whitespace-style '(tabs newline space-mark tab-mark newline-mark))
+                whitespace-style '(tabs newline tab-mark newline-mark))
   ;;(set-face-attribute 'whitespace-line nil :background "red1" :foreground "yellow" :weight 'bold)
   (global-whitespace-mode 1))
 

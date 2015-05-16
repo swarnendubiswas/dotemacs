@@ -5,13 +5,6 @@
 
 ;;; Code:
 
-;; (defun setup-shell-mode ()
-;;   "Personal preferences for shell mode."
-;;   (interactive)
-;;   (setq sh-basic-offset 4
-;;         sh-indentation 4))
-;; (add-hook 'sh-mode-hook 'setup-shell-mode)
-
 (use-package comint
   :config
   (setq comint-scroll-to-bottom-on-input t   ;; always insert at the bottom
@@ -46,7 +39,6 @@
   :defer t
   :config (bash-completion-setup))
 
-;;(add-hook 'sh-set-shell-hook 'flymake-shell-load) ;; flymake syntax-check for shell scripts
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)
 

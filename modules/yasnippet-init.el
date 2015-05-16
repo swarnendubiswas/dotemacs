@@ -9,8 +9,10 @@
   :ensure t
   :diminish yas-minor-mode
   :config
-  ;;(yas-global-mode 1)
+  ;; this is already the default
+  ;;(add-to-list yas-snippet-dirs (concat user-emacs-directory "snippets"))
   ;; SB: I mostly use yasnippet with LaTeX
+  ;;(yas-global-mode 1)
   (yas-reload-all)
   (add-hook 'LaTeX-mode-hook #'yas-minor-mode)
   (use-package helm-c-yasnippet

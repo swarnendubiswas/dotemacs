@@ -12,7 +12,7 @@
   ;;(smex-initialize)
   (setq smex-save-file (expand-file-name ".smex-items" dotemacs-temp-directory)
         smex-completion-method 'ivy)
-  :bind* (("M-x" . smex)
+  :bind* (;;("M-x" . smex)
           ("M-X" . smex-major-mode-commands)))
 
 (provide 'smex-init)

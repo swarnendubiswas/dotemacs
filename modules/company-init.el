@@ -27,8 +27,7 @@
   (global-company-mode 1)
 
   (use-package company-dabbrev
-    :config 
-    ;; (add-to-list 'company-backends 'company-dabbrev)
+    :config ;; (add-to-list 'company-backends 'company-dabbrev)
     )
 
   (use-package company-dabbrev-code
@@ -51,11 +50,7 @@
   
   (use-package company-auctex
     :ensure t
-    :config
-    ;; (add-hook 'LaTeX-mode-hook
-    ;;           (lambda ()
-    ;;             (company-auctex-init)))
-    (company-auctex-init))
+    :config (company-auctex-init))
   
   (use-package company-statistics
     :ensure t
@@ -73,16 +68,7 @@
     :ensure t
     :config
     ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
-    (company-quickhelp-mode 1))
-  
-  (use-package company-c-headers
-    :ensure t
-    :config
-    (add-to-list 'company-backends 'company-c-headers)
-    (cond ((string-equal system-name "XXX")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/"))
-          ((string-equal system-name "YYY")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9")))))
+    (company-quickhelp-mode 1)))
 
 (provide 'company-init)
 

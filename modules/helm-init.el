@@ -62,8 +62,7 @@
           helm-recentf-fuzzy-match t
           helm-ff-skip-boring-files t
           helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                               '(
-                                                 "\\.undo$"
+                                               '("\\.undo$"
                                                  "\\.elc$"
                                                  "\\#$"
                                                  "\\~$"))))
@@ -80,7 +79,7 @@
     (helm-adaptive-mode 1))
   (use-package helm-descbinds
     :ensure t
-    :config (helm-descbinds-mode 1))
+    :init (helm-descbinds-mode 1))
   (use-package helm-words
     :disabled t
     :ensure t)
@@ -106,7 +105,7 @@
   ;; http://tuhdo.github.io/c-ide.html
   (use-package helm-gtags
     :ensure t
-    :if (eq dotemacs-helm-or-ido 'helm)
+    ;;:if (eq dotemacs-helm-or-ido 'helm)
     :defer t
     :init
     (setq helm-gtags-ignore-case t
@@ -123,21 +122,43 @@
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   (bind-key "C-z" 'helm-select-action helm-map)
-  (define-key global-map [remap list-buffers] 'helm-buffers-list)
-  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
+  (when (eq dotemacs-helm-or-ido 'helm)
+    (define-key global-map [remap list-buffers] 'helm-buffers-list)
+    (define-key global-map [remap dabbrev-expand] 'helm-dabbrev))
+
   :bind
-  ("M-x" . helm-M-x)
-  ("C-x b" . helm-mini)
-  ("C-x C-b" . helm-buffers-list)
-  ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
-  ("C-x C-f" . helm-find-files)
-  ("<f8>" . helm-recentf) ;; not really required, can instead use 'helm-mini
-  ("C-x C-l" . helm-locate)
-  ("M-y" . helm-show-kill-ring)
-  ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
-  ("M-i" . helm-swoop)
-  ("C-h C-f" . helm-apropos)
+  (("M-x" . helm-M-x)
+   ("C-c h f" . helm-find-files)
+   ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
+   ("<f1>" . helm-find-files)
+   ("<f6>" . helm-mini)
+   ("<f7>" . helm-buffers-list)
+   ;;  ("C-c h r" . helm-recentf) ;; not really required, can instead use 'helm-mini
+   ;;  ("C-c h l" . helm-locate)
+   ;;  ("C-c h y" . helm-show-kill-ring)
+   ;;  ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
+   ;;  ("C-c h s" . helm-swoop)
+   ;;  ("C-c h a" . helm-apropos)
+   ;;  ("C-c h g" . helm-do-grep)
+   )
+
   :diminish helm-mode)
+
+;; http://ericjmritz.name/2015/04/06/organizing-key-bindings-in-gnu-emacs-using-hydra/
+(defhydra hydra-helm (:color blue)
+  "helm commands"
+  ("x" helm-M-x "helm-M-x")
+  ("b" helm-mini "helm-mini")
+  ("i" helm-buffers-list "helm-buffers-list")
+  ("f" helm-find-files "helm-find-files")
+  ("r" helm-recentf "helm-recentf")
+  ("l" helm-locate "helm-locate")
+  ("y" helm-show-kill-ring "helm-show-kill-ring")
+  ("s" helm-swoop "helm-swoop")
+  ("a" helm-apropos "helm-apropos")
+  ("g" helm-do-grep "helm-do-grep"))
+(global-unset-key (kbd "C-b"))
+(bind-key "C-b" 'hydra-helm/body)
 
 (provide 'helm-init)
 
