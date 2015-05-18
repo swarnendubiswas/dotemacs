@@ -56,5 +56,13 @@ documentation for the current major mode, including a list of its key bindings.
 * `C-c )` - Look up a reference.
 * `C-c [` - Look up a bibliography reference.
 
+#### Programming
+
+* `C-M-h` - Mark function body (`c-mark-function`).
+
+#### Use case
+
+###### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+
 Suggestions are welcome.
 
