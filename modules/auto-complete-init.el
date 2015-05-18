@@ -17,6 +17,7 @@
         ac-use-comphist t
         ac-use-quickhelp t
         ac-use-fuzzy t
+        ac-trigger-key "TAB"
         tab-always-indent 'complete
         ac-dwim t
         ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat"))

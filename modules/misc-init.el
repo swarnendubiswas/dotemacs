@@ -124,7 +124,7 @@
   :ensure t
   :config
   (setq projectile-enable-caching t
-        projectile-require-project-root nil)
+        projectile-require-project-root t)
   (projectile-global-mode 1)
   (use-package helm-projectile
     :ensure t
@@ -134,15 +134,21 @@
           projectile-completion-system 'helm
           ;; other options: 'helm-projectile-find-file
           projectile-switch-project-action 'helm-projectile)
+    (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
+      (add-to-list 'projectile-globally-ignored-files item))
     (helm-projectile-on))
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))
 
-(defhydra hydra-projectile (:color blue)
+(defhydra hydra-projectile (:color teal)
   "projectile"
   ("h" helm-projectile "helm-projectile")
   ("f" helm-projectile-find-file-dwim "find file dwim")
-  ("g" helm-projectile-find-other-file "find other file"))
+  ("d" helm-projectile-find-dir "find dir")
+  ("i" projectile-ibuffer "ibuffer")
+  ("r" projectile-recentf "recentf")
+  ("K" projectile-kill-buffers "kill buffers")
+  ("g" ggtags-update-tags "ggtags update tags"))
 (global-unset-key (kbd "C-c p"))
 (bind-key "C-c p" 'hydra-projectile/body)
 
@@ -152,6 +158,11 @@
   :config
   (golden-ratio-mode 1)
   (setq golden-ratio-auto-scale t))
+
+;; Edit file with sudo
+(use-package sudo-edit
+  :ensure t
+  :bind ("M-s e" . sudo-edit))
 
 (provide 'misc-init)
 

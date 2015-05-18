@@ -9,7 +9,7 @@
   :diminish abbrev-mode
   :config
   (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))
-  (setq save-abbrevs nil ; do not ask to save new abbrevs when quitting
+  (setq save-abbrevs 'silently ; do not ask to save new abbrevs when quitting
         ;; preserve case when expanding
         dabbrev-case-replace nil)
   (if (file-exists-p abbrev-file-name)

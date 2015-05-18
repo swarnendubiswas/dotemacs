@@ -70,9 +70,6 @@
 (bind-key "C-+" 'text-scale-increase)
 (bind-key "C--" 'text-scale-decrease)
 
-;; Edit file with sudo
-(bind-key "M-s e" 'sudo-edit)
-
 (provide 'keybindings-init)
 
 ;;; keybindings-init.el ends here

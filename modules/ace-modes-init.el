@@ -69,9 +69,10 @@
 
 (use-package ace-window
   :ensure t
-  :bind ("M-b" . avi-goto-word-1)
+  :bind ("M-b" . avy-goto-word-1)
   :config
   (setq avy-background nil)
+  (ace-window-display-mode 1)
   (use-package avy-jump
     :config (avy-setup-default)))
 

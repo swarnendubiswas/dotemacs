@@ -34,12 +34,10 @@
   ;; (add-hook 'find-file-hook #'idle-highlight-mode)
   (idle-highlight-mode 1))
 
+;; highlight symbol at point
 (use-package auto-highlight-symbol
-  :disabled t
   :ensure t
-  :config
-  ;; (add-hook 'prog-mode-hook #'auto-highlight-symbol-mode) ; highlight symbol at point
-  (global-auto-highlight-symbol-mode 1))
+  :config (add-hook 'prog-mode-hook #'auto-highlight-symbol-mode))
 
 ;; highlight certain words
 
@@ -55,7 +53,6 @@
   (add-hook 'prog-mode-hook #'turn-on-fic-mode))
 
 (use-package fic-ext-mode
-  :disabled t
   :ensure t
   :diminish fic-ext-mode
   :preface
@@ -64,7 +61,7 @@
     (dolist (mode mode-list)
       (add-hook (intern (concat (symbol-name mode) "-mode-hook")) something)))
   :init (fic-ext-mode 1)
-  :config (add-something-to-mode-hooks '(prog text markdown) 'fic-ext-mode))
+  :config (add-something-to-mode-hooks '(prog text) 'fic-ext-mode))
 
 (provide 'highlight-init)
 
