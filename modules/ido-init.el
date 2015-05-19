@@ -27,7 +27,8 @@
                              "*Messages*" "Async Shell Command")
         ido-enable-tramp-completion t)
   (ido-mode 1)
-  (ido-everywhere 1))
+  (ido-everywhere 1)
+  :bind ("<f9>" . ido-find-file))
 
 (use-package ido-vertical-mode
   :ensure t

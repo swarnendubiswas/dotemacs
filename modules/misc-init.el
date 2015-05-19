@@ -120,42 +120,6 @@
   :diminish pabbrev-mode
   :config (global-pabbrev-mode 1))
 
-(use-package projectile
-  :ensure t
-  :config
-  (setq projectile-enable-caching t
-        projectile-require-project-root nil)
-  (projectile-global-mode 1)
-  (use-package helm-projectile
-    :ensure t
-    ;;:if (eq dotemacs-helm-or-ido 'helm)
-    :config
-    (setq helm-projectile-fuzzy-match t
-          projectile-completion-system 'helm
-          ;; other options: 'helm-projectile-find-file
-          projectile-switch-project-action 'helm-projectile)
-    (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
-      (add-to-list 'projectile-globally-ignored-files item))
-    (helm-projectile-on))
-  :diminish projectile-mode
-  :bind ("C-c p h" . helm-projectile))
-
-(defhydra hydra-projectile (:color blue)
-  "projectile"
-  ("h" helm-projectile "helm-projectile")
-  ("f" helm-projectile-find-file-dwim "find file dwim")
-  ("d" helm-projectile-find-dir "find dir")
-  ("b" helm-projectile-switch-to-buffer "switch to another buffer in the project")
-  ("a" helm-projectile-find-other-file "find other file")
-  ("i" projectile-ibuffer "ibuffer")
-  ("S" projectile-save-project-buffers "save project buffers")
-  ("e" projectile-recentf "recentf")
-  ("r" projectile-replace "replace")
-  ("K" projectile-kill-buffers "kill buffers")
-  ("g" ggtags-update-tags "ggtags update tags"))
-(global-unset-key (kbd "C-c p"))
-(bind-key "C-c p" 'hydra-projectile/body)
-
 (use-package golden-ratio
   :ensure t
   :diminish golden-ratio-mode

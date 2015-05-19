@@ -91,6 +91,7 @@
 ;; configure the more useful extensions
 (require 'anzu-init)
 (require 'flyspell-init)
+(require 'projectile-init)
 
 ;; setup helper packages
 (require 'abbrev-init)
