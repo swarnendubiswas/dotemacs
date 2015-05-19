@@ -6,23 +6,26 @@
 ;;; Code:
 
 (use-package recentf
-  :init (recentf-mode 1)
+  :init 
+  ;; set this first so that recentf can load content from this
+  (setq recentf-save-file (concat dotemacs-temp-directory "recentf"))
   :config
   (setq recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
-        recentf-auto-cleanup 'never
+        ;; clean up after Emacs has been idle for 60 s
+        recentf-auto-cleanup 60
+        ;; check regex with re-builder
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
-                          ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el") ; "/ssh:"
-        recentf-save-file (concat dotemacs-temp-directory "recentf"))
-  (add-to-list 'recentf-exclude "[/\\]tmp/recentf-marker\\'")
-  
+                          ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
+                          "[/\\]tmp/recentf-marker\\'")) ; "/ssh:"
+  (recentf-mode 1)
+
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   ;;(recentf-auto-cleanup)
 
   ;; save file names relative to my current home directory
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
-  ;;(global-set-key [f8] 'recentf-open-files)
 
   ;; ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (eval-after-load 'recentf
@@ -34,7 +37,8 @@
   (use-package recentf-ext
     :ensure t)
   
-  ;; Useful for synchronizing updates in case more than one emacs window is open.
+  ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
+  ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
     :disabled t
     :load-path "lisp/"
