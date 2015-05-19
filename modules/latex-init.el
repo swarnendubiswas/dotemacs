@@ -8,6 +8,9 @@
 ;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
 (add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
 
+(use-package simple
+  :config (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill))
+
 (use-package tex
   :ensure auctex
   :config

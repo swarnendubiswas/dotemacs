@@ -4,8 +4,8 @@ This file lists useful keyboard shortcuts that might be difficult to remember. T
 default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am
 maintaining this for **my** ease of reference.
 
-Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m (describe-mode)` to view
-documentation for the current major mode, including a list of its key bindings.
+Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m
+(describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
 
 #### Text manipulation
 
@@ -48,7 +48,11 @@ documentation for the current major mode, including a list of its key bindings.
 
 * `C-c p f` - Display a list of all files in the project.
 * `C-c p d` - Display a list of all directories in the project.
+* `C-c p b` - List buffers local to current project.
+* `C-c p e` - Jump to recently visited files in project.
+* `C-c p r` - Simple refactoring with text replace in current project.
 * `C-c p S` - Save all project buffers.
+* `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects.
 
 #### Reftex
 
@@ -56,13 +60,18 @@ documentation for the current major mode, including a list of its key bindings.
 * `C-c )` - Look up a reference.
 * `C-c [` - Look up a bibliography reference.
 
+#### Etags/Ctags
+
+* `M-.` - Jump to tag underneath cursor.
+* `M-*` - Pop back to where you previously invoked `M-.`.
+
 #### Programming
 
 * `C-M-h` - Mark function body (`c-mark-function`).
 
-#### Use case
+#### Use Cases
 
-###### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+* ###### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
 
 Suggestions are welcome.
 

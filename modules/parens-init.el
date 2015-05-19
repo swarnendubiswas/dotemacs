@@ -68,7 +68,12 @@
   ;; tex-mode latex-mode
   (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
     (sp-local-tag "i" "\"<" "\">"))
-  
+
+  ;; when you press RET, the curly braces automatically add another newline
+  (sp-with-modes '(c-mode c++-mode)
+    (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
+    (sp-local-pair "/*" "*/" :post-handlers '((" | " "SPC")
+                                              ("* ||\n[i]" "RET"))))
   (eval-after-load "html-mode"
     '(require 'smartparens-html))
   (eval-after-load "latex"

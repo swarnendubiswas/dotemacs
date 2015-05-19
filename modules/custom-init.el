@@ -34,22 +34,6 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
-;; create tags for a latex project, no need to setup a keybinding
-;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
-(defun create-latex-etags ()
-  "Create etags for the current latex project."
-  (interactive)
-  (compile "find . -name \"*.tex\" -print | etags -"))
-
-(defun create-latex-ctags () ; (dir-name))
-  "Create ctags for the current latex project."
-  ;;(interactive "DDirectory: ")
-  ;; (shell-command
-  ;;  (format "ctags -o TAGS -R *.tex %s" (directory-file-name dir-name)))
-  (interactive)
-  ;;(compile "find . -name \"*.tex\" -print | ctags -a -u -o TAGS -")
-  (compile "find . -name \"*.tex\" -print | xargs ctags -o TAGS"))
-
 ;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
 (defun toggle-line-spacing ()
   "Toggle line spacing.  Increase the line spacing to help readability.

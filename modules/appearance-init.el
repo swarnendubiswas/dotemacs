@@ -46,22 +46,6 @@
 (use-package simple
   :config (column-number-mode 1))
 
-;; highlight current line
-(use-package hl-line
-  :ensure t
-  ;;:if (not (eq dotemacs-theme 'default))
-  :config
-  ;; (global-hl-line-mode 1)
-  ;; highlight only when idle
-  (use-package hl-line+
-    :ensure t
-    :config (toggle-hl-line-when-idle 1)))
-
-;; extension to linum-mode to highlight current line number in the margin
-(use-package hlinum
-  :ensure t
-  :config (hlinum-activate))
-
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
                                      :config
@@ -81,7 +65,8 @@
                                        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                      ;; customize the fringe marks on the sides
                                      (set-face-background 'fringe "wheat")
-                                     (set-face-attribute 'hl-line nil :background "lavender")))
+                                     (with-eval-after-load 'hl-line
+                                       (set-face-attribute 'hl-line nil :background "lavender"))))
       
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
@@ -111,7 +96,8 @@
                                       ;; (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
                                       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
-                                      (set-face-attribute 'hl-line nil :background "linen")
+                                      (with-eval-after-load 'hl-line
+                                        (set-face-attribute 'hl-line nil :background "linen"))
                                       (with-eval-after-load 'helm
                                         (set-face-attribute 'helm-selection nil :underline t))
                                       ;; org-mode customizations inspired from leuven theme
@@ -129,7 +115,8 @@
            (set-face-attribute 'default nil  :height 110)
          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
        (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-       (set-face-attribute 'hl-line nil :background "linen")))
+       (with-eval-after-load 'hl-line
+         (set-face-attribute 'hl-line nil :background "linen"))))
 
 (use-package display-theme
   :ensure t

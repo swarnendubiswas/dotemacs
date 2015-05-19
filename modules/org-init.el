@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(use-package simple
+  :config (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill))
+
 (use-package org
   :ensure t
   :defer t

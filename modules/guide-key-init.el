@@ -12,7 +12,8 @@
   (setq guide-key/guide-key-sequence t
         guide-key/recursive-key-sequence-flag t
         guide-key/popup-window-position 'bottom
-        guide-key/idle-delay 0.5)
+        ;; delay before the guide shows up, default is 1 s
+        guide-key/idle-delay 1.0)
   (guide-key-mode 1)
   
   (use-package guide-key-tip

@@ -124,7 +124,7 @@
   :ensure t
   :config
   (setq projectile-enable-caching t
-        projectile-require-project-root t)
+        projectile-require-project-root nil)
   (projectile-global-mode 1)
   (use-package helm-projectile
     :ensure t
@@ -140,11 +140,12 @@
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))
 
-(defhydra hydra-projectile (:color teal)
+(defhydra hydra-projectile (:color blue)
   "projectile"
   ("h" helm-projectile "helm-projectile")
   ("f" helm-projectile-find-file-dwim "find file dwim")
   ("d" helm-projectile-find-dir "find dir")
+  ("a" helm-projectile-find-other-file "find other file")
   ("i" projectile-ibuffer "ibuffer")
   ("r" projectile-recentf "recentf")
   ("K" projectile-kill-buffers "kill buffers")
@@ -163,6 +164,13 @@
 (use-package sudo-edit
   :ensure t
   :bind ("M-s e" . sudo-edit))
+
+(use-package keyfreq
+  :ensure t
+  :config
+  (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
 
 (provide 'misc-init)
 

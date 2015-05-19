@@ -5,6 +5,22 @@
 
 ;;; Code:
 
+;; highlight current line
+(use-package hl-line
+  :ensure t
+  ;;:if (not (eq dotemacs-theme 'default))
+  :config
+  ;; (global-hl-line-mode 1)
+  ;; highlight only when idle
+  (use-package hl-line+
+    :ensure t
+    :config (toggle-hl-line-when-idle 1)))
+
+;; extension to linum-mode to highlight current line number in the margin
+(use-package hlinum
+  :ensure t
+  :config (hlinum-activate))
+
 (use-package hilit-chg
   :disabled t
   :config (highlight-changes-mode 1) 
@@ -12,32 +28,39 @@
 
 (use-package highlight-numbers
   :ensure t
-  :config (highlight-numbers-mode 1))
+  :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
+;; https://github.com/nschum/highlight-symbol.el
+;; Navigate occurrences of the symbol under point with M-n and M-p, and
+;; highlight symbol occurrences
 (use-package highlight-symbol
-  :disabled t
   :ensure t
-  :config (highlight-symbol-mode 1)
+  :init
+  (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+         (add-hook 'prog-mode-hook #'highlight-symbol-mode))
+  :config
+  (setq highlight-symbol-idle-delay 1.0
+        highlight-symbol-on-navigation-p t)
   :diminish highlight-symbol-mode)
 
-(use-package idle-highlight
-  :disabled t
-  :ensure t
-  :config (idle-highlight))
+;; (use-package idle-highlight
+;;   :ensure t
+;;   :init (idle-highlight 1))
 
 ;; highlight all occurrences of word under the point
-(use-package idle-highlight-mode
-  :disabled t
-  :ensure t
-  :config
-  ;; (add-hook 'prog-mode-hook #'idle-highlight-mode)
-  ;; (add-hook 'find-file-hook #'idle-highlight-mode)
-  (idle-highlight-mode 1))
+;; (use-package idle-highlight-mode
+;;   :ensure t
+;;   :init (add-hook 'prog-mode-hook
+;;                   (lambda()
+;;                     (idle-highlight-mode 1))))
 
 ;; highlight symbol at point
 (use-package auto-highlight-symbol
   :ensure t
-  :config (add-hook 'prog-mode-hook #'auto-highlight-symbol-mode))
+  :init
+  (add-hook 'prog-mode-hook
+            (lambda()
+              (global-auto-highlight-symbol-mode 1))))
 
 ;; highlight certain words
 
@@ -48,9 +71,10 @@
 (use-package fic-mode
   :ensure t
   :diminish fic-mode
-  :config
-  (add-hook 'text-mode-hook #'turn-on-fic-mode)
-  (add-hook 'prog-mode-hook #'turn-on-fic-mode))
+  :init
+  (progn
+    ((add-hook 'text-mode-hook #'turn-on-fic-mode)
+     (add-hook 'prog-mode-hook #'turn-on-fic-mode))))
 
 (use-package fic-ext-mode
   :ensure t

@@ -42,7 +42,7 @@
 ;; (defcustom use-theme "eclipse"
 ;;   "Specify which Emacs theme to use.")
 (defcustom dotemacs-theme
-  'eclipse
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)

@@ -83,10 +83,10 @@
   (require 'auto-complete-init))
 
 ;;(if (bound-and-true-p use-helm)
-(if (eq dotemacs-helm-or-ido 'helm)
-    (require 'helm-init)
-  (require 'ido-init)
-  (require 'smex-init))
+;;(if (eq dotemacs-helm-or-ido 'helm)
+(require 'helm-init)
+(require 'ido-init)
+(require 'smex-init)
 
 ;; configure the more useful extensions
 (require 'anzu-init)
@@ -105,6 +105,7 @@
 (require 'rainbow-init)
 (require 'undo-tree-init)
 (require 'whitespace-init)
+(require 'tags-init)
 
 ;; configure individual programming or major modes
 (require 'text-init)
