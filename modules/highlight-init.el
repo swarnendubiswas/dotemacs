@@ -30,37 +30,16 @@
   :ensure t
   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
-;; https://github.com/nschum/highlight-symbol.el
-;; Navigate occurrences of the symbol under point with M-n and M-p, and
-;; highlight symbol occurrences
+;; Navigate occurrences of the symbol under point with M-n and M-p, and highlight symbol occurrences
 (use-package highlight-symbol
   :ensure t
   :init
-  (progn (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-         (add-hook 'prog-mode-hook #'highlight-symbol-mode))
+  (add-hook 'prog-mode-hook #'highlight-symbol-mode)
+  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode 1)
   :config
-  (setq highlight-symbol-idle-delay 1.0
+  (setq highlight-symbol-idle-delay 0.1
         highlight-symbol-on-navigation-p t)
   :diminish highlight-symbol-mode)
-
-;; (use-package idle-highlight
-;;   :ensure t
-;;   :init (idle-highlight 1))
-
-;; highlight all occurrences of word under the point
-;; (use-package idle-highlight-mode
-;;   :ensure t
-;;   :init (add-hook 'prog-mode-hook
-;;                   (lambda()
-;;                     (idle-highlight-mode 1))))
-
-;; highlight symbol at point
-(use-package auto-highlight-symbol
-  :ensure t
-  :init
-  (add-hook 'prog-mode-hook
-            (lambda()
-              (global-auto-highlight-symbol-mode 1))))
 
 ;; highlight certain words
 
@@ -85,7 +64,7 @@
     (dolist (mode mode-list)
       (add-hook (intern (concat (symbol-name mode) "-mode-hook")) something)))
   :init (fic-ext-mode 1)
-  :config (add-something-to-mode-hooks '(prog text) 'fic-ext-mode))
+  :config (add-something-to-mode-hooks '(prog text) #'fic-ext-mode))
 
 (provide 'highlight-init)
 

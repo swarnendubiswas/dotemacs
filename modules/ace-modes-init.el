@@ -61,7 +61,6 @@
 
 (use-package ace-jump-helm-line
   :ensure t
-  ;;:if (eq dotemacs-helm-or-ido 'helm)
   :config
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)

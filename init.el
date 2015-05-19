@@ -82,8 +82,6 @@
     (require 'company-init)
   (require 'auto-complete-init))
 
-;;(if (bound-and-true-p use-helm)
-;;(if (eq dotemacs-helm-or-ido 'helm)
 (require 'helm-init)
 (require 'ido-init)
 (require 'smex-init)
@@ -107,8 +105,9 @@
 (require 'undo-tree-init)
 (require 'whitespace-init)
 (require 'tags-init)
+(require 'highlight-init)
 
-;; configure individual programming or major modes
+;; configure individual major modes
 (require 'text-init)
 (require 'latex-init)
 (require 'org-init)

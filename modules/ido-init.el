@@ -26,7 +26,10 @@
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              "*Messages*" "Async Shell Command")
         ido-enable-tramp-completion t)
-  (ido-mode 1)
+  (setq ido-ignore-files
+        (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
+                ido-ignore-files))
+  (ido-mode 1) ; options: 'files, 'buffers
   (ido-everywhere 1)
   :bind ("<f9>" . ido-find-file))
 

@@ -27,16 +27,16 @@
           (const :tag "auto-complete" auto-complete))
   :group 'dotemacs)
 
-;; use either helm or other packages that provide similar functionality
-;; (defconst use-helm t
-;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities.")
-(defcustom dotemacs-helm-or-ido
-  'ido
-  "Prefer helm instead of ido and smex.  Helm provides similar functionalities."
-  :type '(radio
-          (const :tag "helm" helm)
-          (const :tag "ido" ido))
-  :group 'dotemacs)
+;; ;; use either helm or other packages that provide similar functionality
+;; ;; (defconst use-helm t
+;; ;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities.")
+;; (defcustom dotemacs-helm-or-ido
+;;   'ido
+;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities."
+;;   :type '(radio
+;;           (const :tag "helm" helm)
+;;           (const :tag "ido" ido))
+;;   :group 'dotemacs)
 
 ;; choices: "leuven", "professional", "eclipse", otherwise default.
 ;; (defcustom use-theme "eclipse"

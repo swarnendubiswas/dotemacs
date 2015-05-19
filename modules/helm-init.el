@@ -105,7 +105,6 @@
   ;; http://tuhdo.github.io/c-ide.html
   (use-package helm-gtags
     :ensure t
-    ;;:if (eq dotemacs-helm-or-ido 'helm)
     :defer t
     :init
     (setq helm-gtags-ignore-case t
@@ -122,9 +121,9 @@
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
   (bind-key "C-z" 'helm-select-action helm-map)
-  (when (eq dotemacs-helm-or-ido 'helm)
-    (define-key global-map [remap list-buffers] 'helm-buffers-list)
-    (define-key global-map [remap dabbrev-expand] 'helm-dabbrev))
+
+  (define-key global-map [remap list-buffers] 'helm-buffers-list)
+  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 
   :bind
   (("M-x" . helm-M-x)

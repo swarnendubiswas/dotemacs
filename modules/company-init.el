@@ -22,25 +22,26 @@
   (add-to-list 'company-backends 'company-files)
   (add-to-list 'company-backends 'company-capf)
 
-  (add-to-list 'company-backends 'company-gtags)
-  
-  (setq company-backends (delete 'company-semantic company-backends))
-  (setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
+  ;; enabling this seems to disable the company popup
+  ;;(add-to-list 'company-backends 'company-gtags)
+  ;;(setq company-backends (delete 'company-semantic company-backends))
+  ;;(setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
+
   (global-company-mode 1)
 
   (use-package company-dabbrev
-    :config ;; (add-to-list 'company-backends 'company-dabbrev)
-    )
+    :disabled t
+    :config (add-to-list 'company-backends 'company-dabbrev))
 
+  ;; enabling this seems to disable the company popup
   (use-package company-dabbrev-code
+    :disabled t
     :config
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t)
-    ;; (add-to-list 'company-backends 'company-dabbrev-code)
-    )
+    (add-to-list 'company-backends 'company-dabbrev-code))
   
   (use-package helm-company
-    :if (eq dotemacs-helm-or-ido 'helm)
     :ensure t)
   
   (use-package company-web
@@ -68,9 +69,7 @@
   
   (use-package company-quickhelp
     :ensure t
-    :config
-    ;;(add-hook 'global-company-mode-hook #'company-quickhelp-mode)
-    (company-quickhelp-mode 1)))
+    :config (company-quickhelp-mode 1)))
 
 (provide 'company-init)
 

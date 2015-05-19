@@ -11,12 +11,11 @@
   (setq projectile-enable-caching t
         ;; use projectile in every directory without requiring a project file
         projectile-require-project-root nil
-        (setq projectile-switch-project-action 'projectile-dired))
+        projectile-switch-project-action 'projectile-dired)
   (add-to-list 'projectile-globally-ignored-directories ".svn")
   (projectile-global-mode 1)
   (use-package helm-projectile
     :ensure t
-    ;;:if (eq dotemacs-helm-or-ido 'helm)
     :config
     (setq helm-projectile-fuzzy-match t
           projectile-completion-system 'helm

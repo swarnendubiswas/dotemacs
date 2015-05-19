@@ -53,10 +53,10 @@
 ;;(global-set-key (kbd "C-s") 'save-buffer)
 (bind-key "C-s" 'save-buffer)
 
-;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
-(when (auto-highlight-symbol-mode)
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil))
+;; ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
+;; (when (auto-highlight-symbol-mode)
+;;   (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
+;;   (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil))
 (add-hook 'org-mode-hook
           (lambda ()
             (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
