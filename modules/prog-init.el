@@ -13,34 +13,6 @@
             (lambda ()
               (which-function-mode 1))))
 
-(use-package semantic
-  :disabled t
-  :config
-  ;; (require 'semantic-ia)
-  ;; (require 'semantic-loaddefs)
-  ;; (require 'semanticdb)
-  ;; SemanticDB files
-  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
-  (global-semanticdb-minor-mode 1)
-  (global-semantic-highlight-func-mode 1)
-  (add-hook 'prog-mode-hook #'semantic-mode)
-  (semantic-mode 1))
-
-(use-package idle
-  :disabled t
-  :config
-  (global-semantic-idle-scheduler-mode 1)
-  (global-semantic-idle-completions-mode 1)
-  (global-semantic-idle-breadcrumbs-mode 1)
-  (global-semantic-idle-summary-mode 1))
-
-(use-package mode
-  :disabled t
-  :config
-  (global-semantic-decoration-mode 1)
-  ;; Enable SRecode (Template management) minor-mode.
-  (global-srecode-minor-mode 1))
-
 ;; this hides the tabbar
 (use-package stickyfunc-enhance
   :disabled t

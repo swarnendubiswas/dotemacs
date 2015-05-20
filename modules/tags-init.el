@@ -65,7 +65,8 @@
         helm-gtags-use-input-at-cursor t
         helm-gtags-pulse-at-cursor t
         helm-gtags-prefix-key "\C-c g"
-        helm-gtags-suggested-key-mapping t)
+        helm-gtags-suggested-key-mapping t
+        helm-gtags-ignore-case t)
   (add-hook 'prog-mode-hook #'helm-gtags-mode)
   (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
   (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)

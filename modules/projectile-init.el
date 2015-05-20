@@ -13,6 +13,8 @@
         projectile-require-project-root nil
         projectile-switch-project-action 'projectile-dired)
   (add-to-list 'projectile-globally-ignored-directories ".svn")
+  (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
+    (add-to-list 'projectile-globally-ignored-files item))
   (projectile-global-mode 1)
   (use-package helm-projectile
     :ensure t
@@ -21,8 +23,6 @@
           projectile-completion-system 'helm
           ;; other options: 'helm-projectile-find-file
           projectile-switch-project-action 'helm-projectile)
-    (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
-      (add-to-list 'projectile-globally-ignored-files item))
     (helm-projectile-on))
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))

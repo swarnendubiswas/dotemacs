@@ -129,17 +129,16 @@
   (("M-x" . helm-M-x)
    ("C-c h f" . helm-find-files)
    ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
-   ("<f1>" . helm-find-files)
+   ("<f9>" . helm-find-files)
    ("<f6>" . helm-mini)
    ("<f7>" . helm-buffers-list)
-   ;;  ("C-c h r" . helm-recentf) ;; not really required, can instead use 'helm-mini
-   ;;  ("C-c h l" . helm-locate)
-   ;;  ("C-c h y" . helm-show-kill-ring)
-   ;;  ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
-   ;;  ("C-c h s" . helm-swoop)
-   ;;  ("C-c h a" . helm-apropos)
-   ;;  ("C-c h g" . helm-do-grep)
-   )
+   ("C-c h r" . helm-recentf) ;; not really required, can instead use 'helm-mini
+   ("C-c h l" . helm-locate)
+   ("C-c h y" . helm-show-kill-ring)
+   ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
+   ("C-c h s" . helm-swoop)
+   ("C-c h a" . helm-apropos)
+   ("C-c h g" . helm-do-grep))
 
   :diminish helm-mode)
 

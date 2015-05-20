@@ -56,7 +56,7 @@
 (use-package auctex-latexmk
   :ensure t
   :config
-  (with-eval-after-load 'latex
+  (with-eval-after-load 'LaTeX
     (auctex-latexmk-setup)))
 
 (use-package latex-extra

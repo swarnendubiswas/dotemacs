@@ -189,6 +189,7 @@
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"
+        ;;uniquify-min-dir-content 0
         uniquify-after-kill-buffer-p t))
 
 ;; hippie expand is dabbrev expand on steroids

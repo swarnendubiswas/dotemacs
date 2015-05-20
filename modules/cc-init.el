@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; Available C style:
+;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
 ;; “gnu”: The default style for GNU projects
 ;; “k&r”: What Kernighan and Ritchie, the authors of C used in their book
 ;; “bsd”: What BSD developers use, aka “Allman style” after Eric Allman.
@@ -34,6 +34,8 @@
     (eval-after-load 'cc-mode
       '(global-cwarn-mode 1))))
 
+;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
+
 ;; http://tuhdo.github.io/c-ide.html
 (with-eval-after-load 'company 
   (setq company-backends (delete 'company-semantic company-backends))
@@ -55,6 +57,7 @@
   (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
 
 (use-package dep
+  :disabled t
   :config
   (semantic-add-system-include "/usr/local/include")
   (semantic-add-system-include "~/linux/include"))

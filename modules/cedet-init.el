@@ -6,11 +6,13 @@
 ;;; Code:
 
 (use-package cedet
+  :disabled t
   :load-path "lisp/cedet-1.1/common/"
   :config
   (require 'cedet-files))
 
 (use-package ede
+  :disabled t
   :config
   (global-ede-mode 1)
   (ede-enable-generic-projects))
@@ -45,6 +47,7 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
+  :disabled t
   :load-path "lisp/cedet-1.1/semantic/"
   :config
   (require 'semantic-ia)
@@ -72,18 +75,21 @@
   (global-semantic-highlight-func-mode 1))
 
 (use-package idle
+  :disabled t
   :config
   (global-semantic-idle-scheduler-mode 1)
   (global-semantic-idle-completions-mode 1)
   (global-semantic-idle-breadcrumbs-mode 1))
 
 (use-package mode
+  :disabled t
   :config
   (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
 
 (use-package ecb
+  :disabled t
   :ensure t
   :config
   (setq-default ecb-tip-of-the-day nil)

@@ -15,6 +15,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-t` - Transpose two characters (`transpose-chars`).
 * `C-x r t` - Prepend the selected region with characters.
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
+* `C-x h` - Mark whole buffer (`mark-whole-buffer`).
 
 #### Key motion
 

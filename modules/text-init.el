@@ -14,7 +14,7 @@
 ;; identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :ensure t
-  :bind* ("C-c g" . writegood-mode)
+  ;;:bind* ("C-c g" . writegood-mode)
   :diminish writegood-mode
   :init (add-hook 'text-mode-hook #'writegood-mode)
   :config (writegood-passive-voice-turn-off))
