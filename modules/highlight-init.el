@@ -35,7 +35,7 @@
   :ensure t
   :init
   (add-hook 'prog-mode-hook #'highlight-symbol-mode)
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode 1)
+  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
   :config
   (setq highlight-symbol-idle-delay 0.1
         highlight-symbol-on-navigation-p t)
@@ -48,14 +48,15 @@
   :init (fixme-mode 1))
 
 (use-package fic-mode
+  :disabled t
   :ensure t
   :diminish fic-mode
   :init
-  (progn
-    ((add-hook 'text-mode-hook #'turn-on-fic-mode)
-     (add-hook 'prog-mode-hook #'turn-on-fic-mode))))
+  (add-hook 'text-mode-hook #'fic-mode)
+  (add-hook 'prog-mode-hook #'fic-mode))
 
 (use-package fic-ext-mode
+  :disabled t
   :ensure t
   :diminish fic-ext-mode
   :preface

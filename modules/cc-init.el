@@ -40,9 +40,10 @@
 (with-eval-after-load 'company 
   (setq company-backends (delete 'company-semantic company-backends))
 
-  (with-eval-after-load 'cc-mode
-    (define-key c-mode-map  [(tab)] 'company-complete)
-    (define-key c++-mode-map  [(tab)] 'company-complete))
+  ;; SB: TODO: Do I want this?
+  ;; (with-eval-after-load 'cc-mode
+  ;;   (define-key c-mode-map  [(tab)] 'company-complete)
+  ;;   (define-key c++-mode-map  [(tab)] 'company-complete))
   
   (use-package company-c-headers
     :ensure t

@@ -15,6 +15,7 @@
         ibuffer-default-sorting-mode 'recency ; 'major-mode
         ;;ibuffer-sorting-mode 'recency
         ibuffer-use-header-line t
+        ibuffer-display-summary t
         ibuffer-show-empty-filter-groups nil)
   (add-hook 'ibuffer-mode-hook
             (lambda ()
@@ -27,7 +28,7 @@
   (use-package ibuffer-tramp
     :load-path "lisp/"
     :config
-    (add-hook 'ibuffer-hook
+    (add-hook 'ibuffer-mode-hook
               (lambda ()
                 (ibuffer-tramp-set-filter-groups-by-tramp-connection)
                 (ibuffer-do-sort-by-alphabetic))))
@@ -37,7 +38,7 @@
     :ensure t
     :defer t
     :config
-    (add-hook 'ibuffer-hook
+    (add-hook 'ibuffer-mode-hook
               (lambda ()
                 (ibuffer-vc-set-filter-groups-by-vc-root)
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
@@ -46,7 +47,7 @@
   (use-package ibuffer-projectile
     :ensure t
     :config
-    (add-hook 'ibuffer-hook
+    (add-hook 'ibuffer-mode-hook
               (lambda()
                 (ibuffer-projectile-set-filter-groups)
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
@@ -76,6 +77,7 @@
   ("v" Buffer-menu-select "select" :color blue)
   ("o" Buffer-menu-other-window "other-window" :color blue)
   ("q" quit-window "quit" :color blue))
+(bind-key "C-c b" 'hydra-buffer-menu/body)
 
 (provide 'ibuffer-init)
 

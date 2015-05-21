@@ -28,6 +28,13 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-{` - Move back to the previous paragraph beginning.
 * `M-}` - Move forward to the next paragraph end.
 
+#### Dired
+
+* `g` - Update the entire contents (`revert-buffer`).
+* `l` - Update the specified files (`dired-do-redisplay`).
+* `k` - Delete the specified file lines (`dired-do-kill-lines`).
+* `s` - Toggle between alphabetical and date/time order (`dired-sort-toggle-or-edit`).
+
 #### Ibuffer
 
 * `S` - Save file.

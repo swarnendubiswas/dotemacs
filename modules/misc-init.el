@@ -109,10 +109,13 @@
 ;; this package now provides ivy-mode
 (use-package swiper
   :ensure t
-  :defer t
   :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
   (use-package swiper-helm
-    :ensure t))
+    :ensure t)
+  :bind* (("C-f" . swiper)
+          ("C-r" . swiper)))
 
 (use-package pabbrev
   :disabled t

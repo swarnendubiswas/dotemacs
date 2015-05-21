@@ -70,7 +70,8 @@
   (add-hook 'prog-mode-hook #'helm-gtags-mode)
   (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
   (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
-  (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map))
+  (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
+  (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map))
 
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
