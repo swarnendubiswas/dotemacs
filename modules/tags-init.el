@@ -26,36 +26,28 @@
 
 (use-package ctags-update
   :ensure t
+  :defer t
   :diminish ctags-auto-update-mode
   :config
   (setq ctags-update-delay-seconds (* 30 60)) ; every 1/2 hour
   (ctags-auto-update-mode 1))
 
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
-;; front end to gnu global, use gtags -v
+;; front end to gnu global, use gtags -v -c.
 (use-package ggtags
   :ensure t
   :diminish ggtags-mode
   :config
   (setq ggtags-navigation-mode-lighter nil
-        ggtags-oversize-limit (* 30 1024 1024)
+        ggtags-oversize-limit (* 50 1024 1024)
         ;; use helm for completion
         ggtags-completing-read-function nil)
   (add-hook 'prog-mode-hook #'ggtags-mode))
 
-(defhydra hydra-ggtags (:color blue)
-  "ggtags"
-  ("s" 'ggtags-find-other-symbol "find other symbol")
-  ("h" 'ggtags-view-tag-history "view tag history")
-  ("r" 'ggtags-find-reference "find reference")
-  ("f" 'ggtags-find-file "find file")
-  ("c" 'ggtags-create-tags "create tags")
-  ("u" 'ggtags-update-tags "update tags"))
-(bind-key "C-c g" 'hydra-ggtags/body)
-
 ;; http://wikemacs.org/wiki/C-ide
 ;; http://tuhdo.github.io/c-ide.html
-;; use M-n to move to next candidate and M-p to move back previous candidate. Use M-g s to invoke Isearch on candidate buffer list 
+;; Use M-n to move to next candidate and M-p to move back previous candidate. Use M-g s to invoke Isearch on candidate
+;; buffer list.
 (use-package helm-gtags
   :ensure t
   :diminish helm-gtags-mode
@@ -64,14 +56,32 @@
         helm-gtags-auto-update t
         helm-gtags-use-input-at-cursor t
         helm-gtags-pulse-at-cursor t
-        helm-gtags-prefix-key "\C-c g"
+        ;;helm-gtags-prefix-key "\C-c g"
         helm-gtags-suggested-key-mapping t
-        helm-gtags-ignore-case t)
+        helm-gtags-ignore-case t
+        helm-gtags-fuzzy-match t
+        helm-gtags-maximum-candidates 1000
+        helm-gtags-cache-select-result t
+        helm-gtags-display-style 'detail)
   (add-hook 'prog-mode-hook #'helm-gtags-mode)
+  (add-hook 'dired-mode-hook #'helm-gtags-mode)
   (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
   (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
   (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
   (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map))
+
+(defhydra hydra-ggtags (:color blue)
+  "helm gtags"
+  ("h" 'helm-gtags-previous-history "previous history")
+  ("c" 'helm-gtags-create-tags "create tags")
+  ("u" 'helm-gtags-update-tags "update tags")
+  ("s" 'helm-gtags-find-symbol "find symbol")
+  ("r" 'helm-gtags-find-rtag "find rtag")
+  ("p" 'helm-gtags-parse-file "parse file")
+  ("t" 'helm-gtags-find-tag "find tag")
+  ("g" 'helm-gtags-find-pattern "find pattern")
+  ("f" 'helm-gtags-find-files "find files"))
+(bind-key "C-c g" 'hydra-ggtags/body)
 
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs

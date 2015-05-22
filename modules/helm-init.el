@@ -102,20 +102,6 @@
           helm-swoop-split-direction #'split-window-vertically
           helm-swoop-split-with-multiple-windows nil
           helm-swoop-use-line-number-face t))
-  ;; http://tuhdo.github.io/c-ide.html
-  (use-package helm-gtags
-    :ensure t
-    :defer t
-    :init
-    (setq helm-gtags-ignore-case t
-          helm-gtags-auto-update t
-          helm-gtags-use-input-at-cursor t
-          helm-gtags-pulse-at-cursor t
-          helm-gtags-prefix-key "\C-cg"
-          helm-gtags-suggested-key-mapping t)
-    :config
-    (add-hook 'dired-mode-hook 'helm-gtags-mode)
-    (add-hook 'prog-mode-hook 'helm-gtags-mode))
   (use-package helm-make
     :ensure t)
 

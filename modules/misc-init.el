@@ -24,9 +24,25 @@
   (setq large-file-warning-threshold (* 50 1024 1024))
   (use-package vlf-setup))
 
+;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
+;; http://stackoverflow.com/questions/15735163/update-tabbar-when-nothing-to-save#
+;; https://github.com/tomekowal/dotfiles/blob/master/.emacs.d/my-tabbar.el
 (use-package tabbar
   :ensure t
+  :preface
+  (defun tabbar/modification-state-change ()
+    (tabbar-set-template tabbar-current-tabset nil)
+    (tabbar-display-update))
+
+  (defun tabbar/on-buffer-modification ()
+    (set-buffer-modified-p t)
+    (tabbar/modification-state-change))
+
   :config
+  (add-hook 'after-save-hook #'tabbar/modification-state-change)
+  (add-hook 'after-revert-hook #'tabbar/modification-state-change)
+  (add-hook 'first-change-hook #'tabbar/on-buffer-modification)
+
   ;; Add a buffer modification state indicator in the tab label, and place a
   ;; space around the label to make it looks less crowd.
   (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
@@ -40,9 +56,11 @@
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
   (set-face-attribute 'tabbar-default nil :background "gray80")
-  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil :height 1.0)
-  (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t :height 1.2 :bold t)
-  (set-face-attribute 'tabbar-highlight nil :underline t)
+  (set-face-attribute 'tabbar-unselected nil :background "gray88" :foreground "gray30" :box nil :height 1.1)
+  ;;(set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black" :box nil :underline t :height 1.2 :bold t)
+  (set-face-attribute 'tabbar-selected nil :background "#f2f2f6" :foreground "black"
+                      :box '(:line-width 1 :color "black" :style nil) :height 1.3 :bold t :underline nil)
+  (set-face-attribute 'tabbar-highlight nil :underline t :background "lemon chiffon")
   (set-face-attribute 'tabbar-button nil :box '(:line-width 1 :color "gray72" :style released-button))
   ;;(set-face-attribute 'tabbar-button-highlight ((t (:inherit tabbar-default))))
   (set-face-attribute 'tabbar-separator nil :height 1.0)
@@ -109,11 +127,12 @@
 ;; this package now provides ivy-mode
 (use-package swiper
   :ensure t
-  :config
+  :init
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   (use-package swiper-helm
     :ensure t)
+  :diminish ivy-mode
   :bind* (("C-f" . swiper)
           ("C-r" . swiper)))
 

@@ -34,6 +34,12 @@
     (eval-after-load 'cc-mode
       '(global-cwarn-mode 1))))
 
+(use-package google-c-style
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook #'google-set-c-style)
+  (add-hook 'c-mode-common-hook #'google-make-newline-indent))
+
 ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 
 ;; http://tuhdo.github.io/c-ide.html

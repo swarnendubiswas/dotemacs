@@ -53,7 +53,7 @@
                                      (use-package smart-mode-line
                                        :ensure t
                                        :config
-                                       (setq sml/theme 'light 
+                                       (setq sml/theme 'light
                                              sml/no-confirm-load-theme t
                                              sml/mode-width 'full
                                              sml/shorten-modes t
@@ -93,7 +93,6 @@
                                       (set-background-color "white")
                                       (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil :bold nil)
                                       (set-face-attribute 'mode-line-inactive nil :box nil)
-                                      ;; (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
                                       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
                                       (with-eval-after-load 'hl-line
@@ -120,6 +119,7 @@
 
 (use-package display-theme
   :ensure t
+  :if (not (eq dotemacs-theme 'default))
   :config (global-display-theme-mode))
 
 (provide 'appearance-init)
