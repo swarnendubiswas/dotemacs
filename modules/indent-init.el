@@ -36,9 +36,10 @@
 ;; indentation guide: doesn't seem to work well with company-mode and auto-complete-mode
 (use-package indent-guide
   :ensure t
+  :diminish indent-guide-mode
   :config
-  (setq indent-guide-delay 0.5) ; show guide lines only in idle-time
-  (indent-guide-global-mode 1))
+  (setq indent-guide-delay 1.0) ; show guide lines only in idle-time
+  (add-hook 'prog-mode-hook #'indent-guide-mode))
 
 ;; smart tabs (indent with tabs, align with spaces)
 (use-package smart-tabs
