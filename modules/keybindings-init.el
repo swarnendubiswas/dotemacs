@@ -57,6 +57,7 @@
 ;; (when (auto-highlight-symbol-mode)
 ;;   (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
 ;;   (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil))
+
 (add-hook 'org-mode-hook
           (lambda ()
             (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)

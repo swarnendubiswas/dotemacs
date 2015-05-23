@@ -7,6 +7,7 @@
 
 (use-package fill-column-indicator
   :disabled t
+  :ensure t
   :preface
   (defun auto-fci-mode (&optional unused)
     (if (> (frame-width) 120)
@@ -16,8 +17,7 @@
   (define-globalized-minor-mode global-fci-mode fci-mode
     (lambda ()
       (fci-mode 1)))
-  
-  :ensure t
+
   :config
   (setq-default fci-rule-column 120)
   (setq fci-handle-truncate-lines nil

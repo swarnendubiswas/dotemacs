@@ -23,7 +23,7 @@
 
 (use-package hilit-chg
   :disabled t
-  :config (highlight-changes-mode 1) 
+  :config (highlight-changes-mode 1)
   :bind ("M-o C" . highlight-changes-mode))
 
 (use-package highlight-numbers

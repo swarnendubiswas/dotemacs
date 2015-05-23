@@ -28,8 +28,8 @@
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
 
   ;; ;; Periodically (600 s) save recently opened files, in case emacs crashes
-  ;; (eval-after-load 'recentf
-  ;;   '(run-with-timer 0 (* 600 60) 'recentf-save-list))
+  ;; (with-eval-after-load "recentf"
+  ;;   (run-with-timer 0 (* 600 60) 'recentf-save-list))
 
   ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
   
@@ -40,7 +40,6 @@
   ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
-    :disabled t
     :load-path "lisp/"
     :config (recentf-auto-cleanup))
   

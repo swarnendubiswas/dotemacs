@@ -36,12 +36,12 @@
   
   (require 'org-inlinetask)
   
-  ;; (eval-after-load 'org
-  ;;   '(bind-key "C-c C-d" 'duplicate-thing org-mode-map))
-  ;; (eval-after-load 'org
-  ;;   '(define-key org-mode-map (kbd "C-c C-d") nil))
-  ;; (eval-after-load 'org
-  ;;   '(define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
+  ;; (with-eval-after-load "org"
+  ;;   (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
+  ;; (with-eval-after-load "org"
+  ;;   (define-key org-mode-map (kbd "C-c C-d") nil))
+  ;; (with-eval-after-load "org"
+  ;;   (define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
   ;; (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
   
@@ -55,7 +55,7 @@
 (use-package ox-latex
   :defer t
   :config
-  (with-eval-after-load 'org
+  (with-eval-after-load "org"
     ;; include the listings package
     (add-to-list 'org-latex-packages-alist '("" "listings"))
     ;; if you want colored source code then you need to include the color package
@@ -77,7 +77,7 @@
   :defer t
   :diminish org-indent-mode
   :config
-  (with-eval-after-load 'org
+  (with-eval-after-load "org"
     (org-indent-mode 1)))
 
 (use-package org-ref
@@ -87,10 +87,12 @@
   :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
 
 (use-package org-bullets
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package org-autolist
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (provide 'org-init)
 

@@ -29,7 +29,7 @@
               sml/shorten-directory t)
         (sml/setup)))
 
-    ;; use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
+    ;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
     (use-package powerline
       :disabled t
       :load-path "lisp/emacs-powerline/"

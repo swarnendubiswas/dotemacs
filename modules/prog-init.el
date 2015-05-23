@@ -54,7 +54,7 @@
           sr-speedbar-default-width 30
           sr-speedbar-skip-other-window-p t))
   ;; (add-hook 'prog-mode-hook
-  ;;           '(lambda ()
+  ;;           (lambda ()
   ;;              (when (window-system)
   ;;                (sr-speedbar-open))))
   )
@@ -64,7 +64,7 @@
   :diminish ws-butler-mode
   :config
   ;;(add-hook 'c-mode-common-hook 'ws-butler-mode)
-  (add-hook 'prog-mode-hook 'ws-butler-mode))
+  (add-hook 'prog-mode-hook #'ws-butler-mode))
 
 (use-package dtrt-indent
   :ensure t

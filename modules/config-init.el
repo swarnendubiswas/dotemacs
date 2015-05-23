@@ -28,8 +28,6 @@
   :group 'dotemacs)
 
 ;; ;; use either helm or other packages that provide similar functionality
-;; ;; (defconst use-helm t
-;; ;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities.")
 ;; (defcustom dotemacs-helm-or-ido
 ;;   'ido
 ;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities."
@@ -39,8 +37,6 @@
 ;;   :group 'dotemacs)
 
 ;; choices: "leuven", "professional", "eclipse", otherwise default.
-;; (defcustom use-theme "eclipse"
-;;   "Specify which Emacs theme to use.")
 (defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."

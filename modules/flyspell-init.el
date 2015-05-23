@@ -24,10 +24,8 @@
 
   :init
   (use-package flyspell-lazy
-    :disabled t
     :ensure t
-    :config
-    (flyspell-lazy-mode 1))
+    :config (flyspell-lazy-mode 1))
   
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
@@ -39,8 +37,8 @@
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)
   
-  ;; (eval-after-load "flyspell"
-  ;;   '(diminish 'flyspell-mode))
+  ;; (with-eval-after-load "flyspell"
+  ;;   (diminish 'flyspell-mode))
   :diminish flyspell-mode
   :bind
   (("C-c i f" . flyspell-mode)
@@ -52,8 +50,8 @@
   (use-package helm-flyspell
     :ensure t
     :config
-    (eval-after-load 'flyspell
-      '(define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
+    (with-eval-after-load "flyspell"
+      (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
   (use-package ace-flyspell
     :ensure t))
 

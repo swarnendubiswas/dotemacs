@@ -24,7 +24,9 @@
 (use-package auto-indent-mode
   :ensure t
   :diminish auto-indent-mode
-  :config (auto-indent-global-mode 1))
+  :config
+  (setq auto-indent-on-visit-file t)
+  (auto-indent-global-mode 1))
 
 (use-package highlight-indentation
   :disabled t
@@ -33,10 +35,9 @@
 
 ;; indentation guide: doesn't seem to work well with company-mode and auto-complete-mode
 (use-package indent-guide
-  :disabled t
   :ensure t
   :config
-  (setq indent-guide-delay 0.1) ; show guide lines only in idle-time
+  (setq indent-guide-delay 0.5) ; show guide lines only in idle-time
   (indent-guide-global-mode 1))
 
 ;; smart tabs (indent with tabs, align with spaces)

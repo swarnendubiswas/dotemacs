@@ -32,7 +32,7 @@
                 (company-mode -1))))
   (when (fboundp 'auto-complete-mode)
     (add-to-list 'ac-modes 'shell-mode)
-    (add-hook 'shell-mode-hook 'ac-rlc-setup-sources)))
+    (add-hook 'shell-mode-hook #'ac-rlc-setup-sources)))
 
 (use-package bash-completion
   :ensure t

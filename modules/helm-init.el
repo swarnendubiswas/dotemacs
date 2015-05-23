@@ -13,7 +13,7 @@
   (helm-autoresize-mode 1)
   :config
   (setq helm-quick-update t ; do not display invisible candidates
-        helm-candidate-number-limit 80
+        helm-candidate-number-limit 100
         helm-M-x-fuzzy-match t
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
@@ -105,7 +105,7 @@
   (use-package helm-make
     :ensure t)
 
-  (bind-key "<tab>" 'helm-execute-persistent-action helm-map)
+  (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 
   (define-key global-map [remap list-buffers] 'helm-buffers-list)
@@ -118,10 +118,9 @@
    ("<f9>" . helm-find-files)
    ("<f6>" . helm-mini)
    ("<f7>" . helm-buffers-list)
-   ("C-c h r" . helm-recentf) ;; not really required, can instead use 'helm-mini
+   ("C-c h r" . helm-recentf) ; not really required, can instead use 'helm-mini
    ("C-c h l" . helm-locate)
    ("C-c h y" . helm-show-kill-ring)
-   ;;("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
    ("C-c h s" . helm-swoop)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep))

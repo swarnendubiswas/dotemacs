@@ -74,12 +74,13 @@
     (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
     (sp-local-pair "/*" "*/" :post-handlers '((" | " "SPC")
                                               ("* ||\n[i]" "RET"))))
-  (eval-after-load "html-mode"
-    '(require 'smartparens-html))
-  (eval-after-load "latex"
-    '(require 'smartparens-latex))
-  (eval-after-load "tex-mode"
-    '(require 'smartparens-latex))
+  (with-eval-after-load "html-mode"
+    (require 'smartparens-html))
+  (with-eval-after-load "latex"
+    (require 'smartparens-latex))
+  (with-eval-after-load "tex-mode"
+    (require 'smartparens-latex))
+
   :config (make-variable-buffer-local 'show-paren-mode))
 
 (provide 'parens-init)

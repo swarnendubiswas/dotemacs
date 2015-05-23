@@ -70,7 +70,6 @@
   ;; (require 'semantic/db-global)
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)
   ;; (semanticdb-enable-gnu-global-databases 'c++-mode))
-  
   (global-semanticdb-minor-mode 1)
   (global-semantic-highlight-func-mode 1))
 
@@ -93,7 +92,7 @@
   :ensure t
   :config
   (setq-default ecb-tip-of-the-day nil)
-  (add-hook 'prog-mode-hook 'ecb-auto-activate))
+  (add-hook 'prog-mode-hook #'ecb-auto-activate))
 
 (provide 'cedet-init)
 

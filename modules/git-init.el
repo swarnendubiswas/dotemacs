@@ -15,27 +15,27 @@
         magit-last-seen-setup-instructions "1.4.0"))
 
 ;; Git commit message mode
-(use-package git-commit-mode            
+(use-package git-commit-mode
   :ensure t
   :defer t)
 
 ;; Git configuration mode
-(use-package gitconfig-mode             
+(use-package gitconfig-mode
   :ensure t
   :defer t)
 
 ;; .gitignore mode
-(use-package gitignore-mode             
+(use-package gitignore-mode
   :ensure t
   :defer t)
 
 ;; Git attributes mode
-(use-package gitattributes-mode         
+(use-package gitattributes-mode
   :ensure t
   :defer t)
 
 ;; Mode for git rebase -i
-(use-package git-rebase-mode            
+(use-package git-rebase-mode
   :ensure t
   :defer t)
 

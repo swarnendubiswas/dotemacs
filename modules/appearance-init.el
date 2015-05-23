@@ -95,12 +95,12 @@
                                       (set-face-attribute 'mode-line-inactive nil :box nil)
                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
                                       (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
-                                      (with-eval-after-load 'hl-line
+                                      (with-eval-after-load "hl-line"
                                         (set-face-attribute 'hl-line nil :background "linen"))
-                                      (with-eval-after-load 'helm
+                                      (with-eval-after-load "helm"
                                         (set-face-attribute 'helm-selection nil :underline t))
                                       ;; org-mode customizations inspired from leuven theme
-                                      (with-eval-after-load 'org
+                                      (with-eval-after-load "org"
                                         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
                                                             :foreground "#3C3C3C" :background "#F5F5F5")
                                         (set-face-attribute 'org-level-2 nil
@@ -114,7 +114,7 @@
            (set-face-attribute 'default nil  :height 110)
          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
        (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-       (with-eval-after-load 'hl-line
+       (with-eval-after-load "hl-line"
          (set-face-attribute 'hl-line nil :background "linen"))))
 
 (use-package display-theme

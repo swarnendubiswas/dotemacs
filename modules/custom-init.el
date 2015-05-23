@@ -37,7 +37,6 @@ If region is active, apply to active region instead."
 ;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
 (defun toggle-line-spacing ()
   "Toggle line spacing.  Increase the line spacing to help readability.
-
 Increase line spacing by two line height."
   (interactive)
   (if (eq line-spacing nil)

@@ -41,10 +41,11 @@
   (use-package auto-complete-c-headers
     :ensure t
     :config
+    // FIXME: Should this be with-eval-after-load so that is executed only once?
     (add-hook 'c-mode-hook
               (lambda ()
-                (add-to-list 'ac-sources 'ac-sources-c-headers)
-                (add-to-list 'ac-sources 'ac-sources-c-headers-symbols t))))
+                (add-to-list 'ac-sources #'ac-sources-c-headers)
+                (add-to-list 'ac-sources #'ac-sources-c-headers-symbols t))))
   (use-package ac-capf
     :ensure t)
   (use-package ac-etags

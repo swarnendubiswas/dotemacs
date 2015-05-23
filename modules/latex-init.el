@@ -17,17 +17,36 @@
   (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
         TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
-        TeX-default-mode 'latex-mode
+        TeX-default-mode 'LaTeX-mode
         TeX-force-default-mode t
         TeX-auto-untabify t ; remove all tabs before saving
         TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
         TeX-source-correlate-mode t)
-  (setq-default TeX-master nil ; query for master file
-                TeX-command-default "LatexMk")
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+  (setq-default TeX-master nil) ; query for master file
+
+  ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html
+  ;; When defining a lambda expression that is to be used as an anonymous function, you can in principle use any method
+  ;; to construct the list. But typically you should use the lambda macro, or the function special form, or the #' read
+  ;; syntax which is a short-hand for using function. Quoting a lambda form means the anonymous function is not
+  ;; byte-compiled. The following forms are all equivalent:
+  ;; (lambda (x) (* x x))
+  ;; (function (lambda (x) (* x x)))
+  ;; #'(lambda (x) (* x x))
+
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (push
+               '("Latexmk" "latexmk -pdf %s" TeX-run-background nil t
+                 :help "Run Latexmk on file")
+               TeX-command-list)))
+  ;; this variable is buffer-local
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (setq TeX-command-default "Latexmk")))
+
+  (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
   ;; compile files to pdf by default
-  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
+  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode)
   ;; unset "C-c ;" since we want to bind it to 'comment-line
   (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
@@ -43,20 +62,20 @@
   :config
   (setq LaTeX-syntactic-comments t)
   (latex-electric-env-pair-mode 1)
-  ;;(add-hook 'LaTeX-mode-hook 'latex-extra-mode)
-  ;;(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
+  ;;(add-hook 'LaTeX-mode-hook #'visual-line-mode)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-  ;; (eval-after-load 'LaTeX
-  ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") nil))
-  ;; (eval-after-load 'LaTeX
-  ;;   '(define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
+  ;; (with-eval-after-load "LaTeX"
+  ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") nil))
+  ;; (with-eval-after-load "LaTeX"
+  ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;;(bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
   )
 
 (use-package auctex-latexmk
   :ensure t
   :config
-  (with-eval-after-load 'LaTeX
+  (with-eval-after-load "LaTeX"
     (auctex-latexmk-setup)))
 
 (use-package latex-extra
@@ -81,7 +100,7 @@
 (use-package magic-latex-buffer
   :disabled t
   :ensure t
-  :config (add-hook 'LaTeX-mode-hook 'magic-latex-buffer))
+  :config (add-hook 'LaTeX-mode-hook #'magic-latex-buffer))
 
 (use-package math-symbol-lists
   :ensure t)
@@ -103,8 +122,8 @@
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t
         reftex-default-bibliography '("~/workspace/bib/plass.bib"))
-  ;; (eval-after-load "reftex"
-  ;;   '(diminish 'reftex-mode))
+  ;; (with-eval-after-load "reftex"
+  ;;   (diminish 'reftex-mode))
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook #'reftex-mode))
 

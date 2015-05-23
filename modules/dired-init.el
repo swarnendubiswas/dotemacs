@@ -8,18 +8,18 @@
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
   :preface
-  (defun dired-go-home ()
+  (defun dired--go-home ()
     (interactive)
     (dired "~/"))
   
   ;; M-<up> is nicer in dired if it moves to the first file
-  (defun dired-back-to-top ()
+  (defun dired--jump-to-top ()
     (interactive)
     (beginning-of-buffer)
     (dired-next-line 2))
   
   ;; M-<down> is nicer in dired if it moves to the last file
-  (defun dired-jump-to-bottom ()
+  (defun dired--jump-to-bottom ()
     (interactive)
     (end-of-buffer)
     (dired-next-line -1))
@@ -38,15 +38,15 @@
   ;;                 (lambda ()
   ;;                   (interactive)
   ;;                   (dired "~/")))
-  (bind-key "M-<home>" 'dired-go-home dired-mode-map)
-  ;; (eval-after-load 'dired
-  ;;   '(define-key dired-mode-map (kbd "i") 'ido-find-file))
+  (bind-key "M-<home>" 'dired--go-home dired-mode-map)
+  ;; (with-eval-after-load "dired"
+  ;;   (define-key dired-mode-map (kbd "i") 'ido-find-file))
   (bind-key "i" 'ido-find-file dired-mode-map)
-  ;; (eval-after-load 'dired
-  ;;   '(define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top))
+  ;; (with-eval-after-load "dired"
+  ;;   (define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top))
   (bind-key "M-<up>" 'dired-back-to-top dired-mode-map)
-  ;; (eval-after-load 'dired
-  ;;   '(define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom))
+  ;; (with-eval-after-load "dired"
+  ;;   (define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom))
   (bind-key "M-<down>" 'dired-jump-to-bottom dired-mode-map))
 
 ;; Jump to dired buffer corresponding to current buffer.

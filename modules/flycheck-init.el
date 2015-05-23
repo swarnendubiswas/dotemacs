@@ -24,7 +24,6 @@
     :config (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
   (use-package flycheck-color-mode-line
-    :disabled t
     :ensure t
     :config (add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode))
 

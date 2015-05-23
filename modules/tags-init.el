@@ -32,6 +32,12 @@
   (setq ctags-update-delay-seconds (* 30 60)) ; every 1/2 hour
   (ctags-auto-update-mode 1))
 
+(use-package jtags
+  :ensure t
+  :defer t
+  ;;:init (autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
+  :config (add-hook 'java-mode-hook #'jtags-mode))
+
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; front end to gnu global, use gtags -v -c.
 (use-package ggtags
@@ -85,12 +91,12 @@
 
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
-(defun create-latex-etags ()
+(defun dotemacs--create-latex-etags ()
   "Create etags for the current latex project."
   (interactive)
   (compile "find . -type f -name \"*.tex\" -print | etags -a -"))
 
-(defun create-latex-ctags () ; (dir-name))
+(defun dotemacs--create-latex-ctags () ; (dir-name))
   "Create ctags for the current latex project."
   ;;(interactive "DDirectory: ")
   ;; (shell-command

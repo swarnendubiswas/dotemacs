@@ -23,8 +23,8 @@
         company-begin-commands '(self-insert-command))
 
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
-  (add-to-list 'company-backends 'company-files)
-  (add-to-list 'company-backends 'company-capf)
+  (add-to-list 'company-backends #'company-files)
+  (add-to-list 'company-backends #'company-capf)
 
   ;; enabling this seems to disable the company popup
   ;;(add-to-list 'company-backends 'company-gtags)
@@ -35,7 +35,7 @@
 
   (use-package company-dabbrev
     :disabled t
-    :config (add-to-list 'company-backends 'company-dabbrev))
+    :config (add-to-list 'company-backends #'company-dabbrev))
 
   ;; enabling this seems to disable the company popup
   (use-package company-dabbrev-code
@@ -43,7 +43,7 @@
     :config
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t)
-    (add-to-list 'company-backends 'company-dabbrev-code))
+    (add-to-list 'company-backends #'company-dabbrev-code))
   
   (use-package helm-company
     :ensure t)
@@ -51,11 +51,11 @@
   (use-package company-web
     :ensure t
     :preface
-    (defun company-web/setup ()
+    (defun company-web--setup ()
       (setq-local company-backends
                   (append '(company-web-html company-web-jade company-web-slim)
                           company-backends)))
-    :config (add-hook 'web-mode-hook 'company-web/setup))
+    :config (add-hook 'web-mode-hook #'company-web--setup))
 
   (use-package company-auctex
     :ensure t
@@ -69,11 +69,11 @@
   (use-package company-math
     :ensure t
     :preface
-    (defun company-math/setup ()
+    (defun company-math--setup ()
       (setq-local company-backends
                   (append '(company-math-symbols-latex company-math-symbols-unicode company-latex-commands)
                           company-backends)))
-    :config (add-hook 'LaTeX-mode-hook 'company-math/setup))
+    :config (add-hook 'LaTeX-mode-hook #'company-math--setup))
 
   (use-package company-quickhelp
     :ensure t

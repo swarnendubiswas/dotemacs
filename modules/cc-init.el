@@ -16,6 +16,7 @@
 ;; “python”: What Python developers use for extension modules
 ;; “java”: The default style for java-mode (see below)
 ;; “user”: When you want to define your own style
+
 (setq c-default-style '((java-mode . "java")
                         (c-mode . "k&r")
                         (c++-mode . "stroustrup")
@@ -31,8 +32,8 @@
   (use-package cwarn
     :defer t
     :config
-    (eval-after-load 'cc-mode
-      '(global-cwarn-mode 1))))
+    (with-eval-after-load "cc-mode"
+      (global-cwarn-mode 1))))
 
 (use-package google-c-style
   :ensure t
@@ -43,7 +44,7 @@
 ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 
 ;; http://tuhdo.github.io/c-ide.html
-(with-eval-after-load 'company 
+(with-eval-after-load "company"
   (setq company-backends (delete 'company-semantic company-backends))
 
   ;; SB: TODO: Do I want this?
@@ -54,7 +55,7 @@
   (use-package company-c-headers
     :ensure t
     :config
-    (add-to-list 'company-backends 'company-c-headers)
+    (add-to-list 'company-backends #'company-c-headers)
     (cond ((string-equal system-name "rain.cse.ohio-state.edu")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
            (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))

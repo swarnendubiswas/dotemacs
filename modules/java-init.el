@@ -18,20 +18,6 @@
   :ensure t
   :defer t)
 
-(use-package jtags
-  :ensure t
-  :defer t
-  ;;:init (autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
-  :config (add-hook 'java-mode-hook 'jtags-mode))
-
-(use-package javap-mode
-  :ensure t
-  :defer t)
-
-(use-package autodisass-java-bytecode
-  :ensure t
-  :defer t)
-
 (provide 'java-init)
 
 ;;; java-init.el ends here

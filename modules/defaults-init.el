@@ -21,7 +21,7 @@
 (setq locale-coding-system 'utf-8)
 
 (use-package mule
-  :config 
+  :config
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8))
@@ -69,7 +69,7 @@
                 global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1))
 
-  ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
+;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
   :config (delete-selection-mode 1))
 
@@ -88,8 +88,7 @@
   (use-package password-cache
     :config (setq password-cache-expiry nil))
   (use-package tramp-term
-    :ensure t
-    :defer t))
+    :ensure t))
 
 ;; ;; disable version control
 ;; (setq vc-ignore-dir-regexp
@@ -128,7 +127,7 @@
 
 ;; fontification: turn on syntax coloring, on by default since Emacs 22
 (use-package font-core
-  :config (global-font-lock-mode 1)) 
+  :config (global-font-lock-mode 1))
 
 (use-package font-lock
   :config

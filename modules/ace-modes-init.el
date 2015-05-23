@@ -11,9 +11,7 @@
   :bind*
   ;; ("C-c SPC" . ace-jump-mode)
   ("C-'" . ace-jump-mode)
-  :config
-  ;; (define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
-  (ace-jump-mode-enable-mark-sync))
+  :config (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
@@ -53,11 +51,8 @@
   (setq bs-cycle-configuration-name "files")
   (setq-default ajb-bs-configuration "files")
   ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
-  ;;(global-set-key (kbd "M-b") 'ace-jump-buffer)
-  
-  :bind
-  ;;("M-b" . ace-jump-buffer)
-  ("<f5>" . ace-jump-buffer))
+
+  :bind ("<f5>" . ace-jump-buffer))
 
 (use-package ace-jump-helm-line
   :ensure t

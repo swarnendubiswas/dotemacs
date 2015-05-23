@@ -13,7 +13,7 @@
         ;;ibuffer-shrink-to-minimum-size t
         ibuffer-always-show-last-buffer nil
         ibuffer-default-sorting-mode 'recency ; 'major-mode
-        ;;ibuffer-sorting-mode 'recency
+        ibuffer-sorting-mode 'recency
         ibuffer-use-header-line t
         ibuffer-display-summary t
         ibuffer-show-empty-filter-groups nil)
@@ -36,7 +36,6 @@
   ;; use ibuffer-vc to sort buffers by VC status
   (use-package ibuffer-vc
     :ensure t
-    :defer t
     :config
     (add-hook 'ibuffer-mode-hook
               (lambda ()
@@ -56,7 +55,6 @@
   
   :bind ("C-x C-b" . ibuffer))
 
-;; FIXME: How to activate this?
 (defhydra hydra-buffer-menu (:color pink)
   "Buffer menu commands"
   ("m" Buffer-menu-mark "mark")
