@@ -41,7 +41,7 @@
   (use-package auto-complete-c-headers
     :ensure t
     :config
-    // FIXME: Should this be with-eval-after-load so that is executed only once?
+    // FIXME: Should this be with-eval-after-load so that is executed only once? Like c-initialization-hook?
     (add-hook 'c-mode-hook
               (lambda ()
                 (add-to-list 'ac-sources #'ac-sources-c-headers)

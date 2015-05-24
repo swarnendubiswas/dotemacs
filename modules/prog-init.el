@@ -74,6 +74,34 @@
             (lambda()
               (dtrt-indent-mode 1))))
 
+;; web-mode
+(use-package web-mode
+  :ensure t
+  :defer t
+  :config
+  (use-package web-beautify
+    :ensure t
+    :config
+    (with-eval-after-load "js2-mode"
+      (add-hook 'js2-mode-hook
+                (lambda ()
+                  (add-hook 'before-save-hook 'web-beautify-js-buffer t t))))
+
+    (with-eval-after-load "json-mode"
+      (add-hook 'json-mode-hook
+                (lambda ()
+                  (add-hook 'before-save-hook 'web-beautify-js-buffer t t))))
+
+    (with-eval-after-load "sgml-mode"
+      (add-hook 'html-mode-hook
+                (lambda ()
+                  (add-hook 'before-save-hook 'web-beautify-html-buffer t t))))
+
+    (with-eval-after-load "css-mode"
+      (add-hook 'css-mode-hook
+                (lambda ()
+                  (add-hook 'before-save-hook 'web-beautify-css-buffer t t))))))
+
 (provide 'prog-init)
 
 ;;; prog-init.el ends here

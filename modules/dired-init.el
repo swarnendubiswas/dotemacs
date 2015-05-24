@@ -59,8 +59,8 @@
   (add-hook 'dired-mode-hook #'dired-omit-mode)
 
   ;; SB: This does not work.
-  ;; (eval-after-load "dired-omit-mode"
-  ;;   '(diminish dired-omit-mode))
+  ;; (with-eval-after-load "dired-omit-mode"
+  ;;   (diminish dired-omit-mode))
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Make sure to remove \"Omit\" from the modeline."
@@ -103,7 +103,8 @@
 ;;   :ensure t)
 
 (use-package dired-rainbow
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package dired-hacks-utils
   :ensure t

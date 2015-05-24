@@ -33,22 +33,16 @@
   ;; (function (lambda (x) (* x x)))
   ;; #'(lambda (x) (* x x))
 
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (push
-               '("Latexmk" "latexmk -pdf %s" TeX-run-background nil t
-                 :help "Run Latexmk on file")
-               TeX-command-list)))
-  ;; this variable is buffer-local
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (setq TeX-command-default "Latexmk")))
+  ;; (add-hook 'LaTeX-mode-hook
+  ;;           (lambda ()
+  ;;             (push
+  ;;              '("Latexmk" "latexmk -pdf %s" TeX-run-background nil t
+  ;;                :help "Run Latexmk on file")
+  ;;              TeX-command-list)))
 
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
   ;; compile files to pdf by default
-  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode)
-  ;; unset "C-c ;" since we want to bind it to 'comment-line
-  (define-key LaTeX-mode-map (kbd "C-c ;") nil))
+  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode))
 
 (use-package tex-site
   :ensure auctex)
@@ -65,18 +59,37 @@
   ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook #'visual-line-mode)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+
   ;; (with-eval-after-load "LaTeX"
   ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") nil))
   ;; (with-eval-after-load "LaTeX"
   ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;;(bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
-  )
+
+  ;; unset "C-c ;" since we want to bind it to 'comment-line
+  (define-key LaTeX-mode-map (kbd "C-c ;") nil))
+
+(use-package company-auctex
+  :ensure t
+  :if (eq dotemacs-completion 'company)
+  :init
+  ;; https://github.com/syl20bnr/spacemacs/blob/b89ce54df3b7df6284cae56f115db75a83721e17/contrib/auctex/packages.el
+  ;; (with-eval-after-load "tex"
+  ;;   (push 'company-auctex-labels company-backends-LaTeX-mode)
+  ;;   (push 'company-auctex-bibs company-backends-LaTeX-mode)
+  ;;   (push '(company-auctex-macros company-auctex-symbols company-auctex-environments)
+  ;;         company-backends-LaTeX-mode))
+  :config (company-auctex-init))
 
 (use-package auctex-latexmk
   :ensure t
   :config
   (with-eval-after-load "LaTeX"
-    (auctex-latexmk-setup)))
+    (auctex-latexmk-setup)
+    ;; this variable is buffer-local
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (setq TeX-command-default "LatexMk")))))
 
 (use-package latex-extra
   :disabled t

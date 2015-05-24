@@ -9,7 +9,7 @@
   :disabled t
   :ensure t
   :preface
-  (defun auto-fci-mode (&optional unused)
+  (defun dotemacs--auto-fci-mode (&optional unused)
     (if (> (frame-width) 120)
         (fci-mode 1)
       (fci-mode 0)))
@@ -23,13 +23,12 @@
   (setq fci-handle-truncate-lines nil
         fci-rule-width 1
         fci-rule-color "grey40")
-  (add-hook 'text-mode-hook #'fci-mode)
-  (add-hook 'prog-mode-hook #'fci-mode)
-  (add-hook 'after-change-major-mode-hook #'auto-fci-mode)
-  (add-hook 'window-size-change-functions #'auto-fci-mode)
+  ;;(add-hook 'text-mode-hook #'fci-mode)
+  ;;(add-hook 'prog-mode-hook #'fci-mode)
+  ;;(add-hook 'after-change-major-mode-hook #'dotemacs--auto-fci-mode)
+  ;;(add-hook 'window-size-change-functions #'dotemacs--auto-fci-mode)
   
-  ;; (global-fci-mode 1)
-  )
+  (global-fci-mode 1))
 
 (provide 'fci-init)
 

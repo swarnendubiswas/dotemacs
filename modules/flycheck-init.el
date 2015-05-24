@@ -13,7 +13,9 @@
   :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
   :config
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        flycheck-completion-system 'ido)
+        flycheck-completion-system 'ido
+        flycheck-standard-error-navigation nil
+        flycheck-check-syntax-automatically '(save mode-enabled))
   
   (use-package flycheck-tip
     :ensure t)
@@ -21,9 +23,10 @@
   ;; Show flycheck messages in popups
   (use-package flycheck-pos-tip
     :ensure t
-    :config (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+    :init (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
   (use-package flycheck-color-mode-line
+    :disabled t
     :ensure t
     :config (add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode))
 

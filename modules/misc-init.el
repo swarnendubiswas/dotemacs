@@ -158,9 +158,17 @@
 (use-package golden-ratio
   :ensure t
   :diminish golden-ratio-mode
+  :preface
+  ;; http://tuhdo.github.io/helm-intro.html
+  (defun dotemacs/helm-alive-p ()
+    (if (boundp 'helm-alive-p)
+        (symbol-value 'helm-alive-p)))
   :config
+  (add-to-list 'golden-ratio-inhibit-functions #'dotemacs/helm-alive-p)
   (golden-ratio-mode 1)
-  (setq golden-ratio-auto-scale t))
+  (setq golden-ratio-auto-scale t
+        ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
+        split-width-threshold nil))
 
 ;; Edit file with sudo
 (use-package sudo-edit
