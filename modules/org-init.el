@@ -90,11 +90,7 @@
 (use-package org-bullets
   :ensure t
   :defer t
-<<<<<<< HEAD
   :init (add-hook 'org-mode-hook #'org-bullets-mode))
-=======
-  :init (add-hook 'org-mode-hook 'org-bullets-mode))
->>>>>>> 281d75bf9ab687ff36e1863b5ac68e47790d0a54
 
 (use-package org-autolist
   :ensure t
