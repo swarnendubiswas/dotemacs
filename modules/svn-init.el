@@ -14,7 +14,7 @@
         svn-status-auto-revert-buffers t
         svn-status-use-ido-completion t)
   ;; SB: I use svn and emacs mostly for LaTeX files.
-  (add-hook 'text-mode-hook #'svn-status)
+  (add-hook 'LaTex-mode-hook #'svn-status)
   (add-hook 'prog-mode-hook #'svn-status))
 
 (provide 'svn-init)

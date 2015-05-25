@@ -68,7 +68,8 @@
         helm-gtags-fuzzy-match t
         helm-gtags-maximum-candidates 1000
         helm-gtags-cache-select-result t
-        helm-gtags-display-style 'detail)
+        helm-gtags-display-style 'detail
+        helm-gtags-update-interval-second 60)
   (add-hook 'prog-mode-hook #'helm-gtags-mode)
   (add-hook 'dired-mode-hook #'helm-gtags-mode)
   (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
@@ -86,7 +87,8 @@
   ("p" 'helm-gtags-parse-file "parse file")
   ("t" 'helm-gtags-find-tag "find tag")
   ("g" 'helm-gtags-find-pattern "find pattern")
-  ("f" 'helm-gtags-find-files "find files"))
+  ("f" 'helm-gtags-find-files "find files")
+  ("o" 'helm-gtags-find-tag-other-window "find tag other window"))
 (bind-key "C-c g" 'hydra-ggtags/body)
 
 ;; create tags for a latex project, no need to setup a keybinding
@@ -98,7 +100,7 @@
 
 (defun dotemacs--create-latex-ctags () ; (dir-name))
   "Create ctags for the current latex project."
-  ;;(interactive "DDirectory: ")
+  ;;(interactive "Directory: ")
   ;; (shell-command
   ;;  (format "ctags -o TAGS -R *.tex %s" (directory-file-name dir-name)))
   (interactive)

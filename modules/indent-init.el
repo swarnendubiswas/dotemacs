@@ -18,8 +18,7 @@
 
 ;; intelligent indentation, on by default from Emacs 24.4
 (use-package electric
-  :disabled t
-  :config (electric-indent-mode -1))
+  :config (electric-indent-mode 1))
 
 (use-package auto-indent-mode
   :ensure t
@@ -31,14 +30,18 @@
 (use-package highlight-indentation
   :disabled t
   :ensure t
-  :config (highlight-indentation-mode 1))
+  :init
+  (highlight-indentation-mode 1)
+  (highlight-indentation-current-column-mode 1))
 
-;; indentation guide: doesn't seem to work well with company-mode and auto-complete-mode
+;; indentation guide: doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode as well
 (use-package indent-guide
+  :disabled t
   :ensure t
   :diminish indent-guide-mode
   :config
-  (setq indent-guide-delay 1.0) ; show guide lines only in idle-time
+  (setq indent-guide-delay 1.0 ; show guide lines only in idle-time
+        indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
 
 ;; smart tabs (indent with tabs, align with spaces)

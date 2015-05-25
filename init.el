@@ -82,8 +82,8 @@
     (require 'company-init)
   (require 'auto-complete-init))
 
-(require 'helm-init)
 (require 'ido-init)
+(require 'helm-init)
 (require 'smex-init)
 
 ;; configure the more useful extensions
@@ -104,7 +104,6 @@
 (require 'rainbow-init)
 (require 'undo-tree-init)
 (require 'whitespace-init)
-(require 'tags-init)
 (require 'highlight-init)
 
 ;; configure individual major modes
@@ -115,6 +114,11 @@
 (require 'cc-init)
 (require 'java-init)
 (require 'shell-init)
+(require 'svn-init)
+
+;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
+;; enabled on startup.
+(require 'tags-init)
 
 ;; generic keybindings, package-specific are usually in their own modules
 (require 'keybindings-init)
@@ -123,7 +127,6 @@
 (require 'custom-init)
 
 ;; temporary modules
-;; (require 'svn-init)
 ;; (require 'git-init)
 
 ;; (require 'cedet-init) ;; does not work perfectly

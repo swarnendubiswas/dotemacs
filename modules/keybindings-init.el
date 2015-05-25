@@ -44,14 +44,15 @@
 ;;(global-set-key (kbd "C-c m") #'uncomment-region)
 (bind-key "C-c m" 'uncomment-region)
 ;;(global-set-key (kbd "C-c ;") #'comment-line)
-(bind-key "C-c ;" 'comment-line)
+(bind-key "C-c ;" 'dotemacs--comment-line)
 
 ;; buffers
 ;;(global-set-key (kbd "C-c k") #'kill-other-buffers) ; kill all non-special buffers
-(bind-key "<f3>" 'kill-other-buffers)
+(bind-key "<f3>" 'dotemacs--kill-other-buffers)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 ;;(global-set-key (kbd "C-s") 'save-buffer)
 (bind-key "C-s" 'save-buffer)
+(bind-key "C-S-s" 'dotemacs--save-all-buffers)
 
 ;; ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
 ;; (when (auto-highlight-symbol-mode)

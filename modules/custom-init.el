@@ -7,8 +7,15 @@
 
 ;; custom functions
 
+;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
+;; save all modified buffers
+(defun dotemacs--save-all-buffers ()
+  "Save all modified buffers without prompting."
+  (interactive)
+  (save-some-buffers t))
+
 ;; kill all non-special buffers but the current one
-(defun kill-other-buffers ()
+(defun dotemacs--kill-other-buffers ()
   "Kill all buffers but the current one.  Don't mess with special buffers."
   (interactive)
   (dolist (buffer (buffer-list))
@@ -16,7 +23,7 @@
       (kill-buffer buffer))))
 
 ;; http://endlessparentheses.com/new-in-emacs-25-1-comment-line.html
-(defun comment-line (n)
+(defun dotemacs--comment-line (n)
   "Comment or uncomment current line and leave point after it.
 With positive prefix, apply to N lines including current one.
 With negative prefix, apply to -N lines above.
@@ -35,7 +42,7 @@ If region is active, apply to active region instead."
     (back-to-indentation)))
 
 ;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
-(defun toggle-line-spacing ()
+(defun dotemacs--toggle-line-spacing ()
   "Toggle line spacing.  Increase the line spacing to help readability.
 Increase line spacing by two line height."
   (interactive)

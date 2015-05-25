@@ -123,7 +123,8 @@
    ("C-c h y" . helm-show-kill-ring)
    ("C-c h s" . helm-swoop)
    ("C-c h a" . helm-apropos)
-   ("C-c h g" . helm-do-grep))
+   ("C-c h g" . helm-do-grep)
+   ("C-c h u" . helm-resume))
 
   :diminish helm-mode)
 
@@ -139,7 +140,8 @@
   ("y" helm-show-kill-ring "helm-show-kill-ring")
   ("s" helm-swoop "helm-swoop")
   ("a" helm-apropos "helm-apropos")
-  ("g" helm-do-grep "helm-do-grep"))
+  ("g" helm-do-grep "helm-do-grep")
+  ("u" helm-resume "helm-resume"))
 (global-unset-key (kbd "C-b"))
 (bind-key "C-b" 'hydra-helm/body)
 

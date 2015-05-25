@@ -14,6 +14,7 @@
   :config
   (setq org-completion-use-ido t
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
+        org-startup-indented t
         org-src-preserve-indentation t
         org-src-tabs-acts-natively t
         org-src-window-setup 'current-window
@@ -35,7 +36,7 @@
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   
   (require 'org-inlinetask)
-  
+
   ;; (with-eval-after-load "org"
   ;;   (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
   ;; (with-eval-after-load "org"
@@ -88,7 +89,8 @@
 
 (use-package org-bullets
   :ensure t
-  :defer t)
+  :defer t
+  :init (add-hook 'org-mode-hook #'org-bullets-mode))
 
 (use-package org-autolist
   :ensure t
