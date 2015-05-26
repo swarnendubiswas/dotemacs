@@ -104,6 +104,9 @@
           helm-swoop-use-line-number-face t))
   (use-package helm-make
     :ensure t)
+  (use-package helm-company
+    :ensure t
+    :if (eq dotemacs-completion 'company))
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)

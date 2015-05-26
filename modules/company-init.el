@@ -60,9 +60,6 @@
           company-dabbrev-code-everywhere t)
     (add-to-list 'company-backends #'company-dabbrev-code))
   
-  (use-package helm-company
-    :ensure t)
-  
   (use-package company-web
     :ensure t
     :preface

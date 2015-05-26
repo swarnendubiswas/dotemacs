@@ -6,13 +6,10 @@
 ;;; Code:
 
 (use-package cedet
-  :disabled t
-  :load-path "lisp/cedet-1.1/common/"
   :config
   (require 'cedet-files))
 
 (use-package ede
-  :disabled t
   :config
   (global-ede-mode 1)
   (ede-enable-generic-projects))
@@ -47,11 +44,9 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
-  :disabled t
-  :load-path "lisp/cedet-1.1/semantic/"
   :config
-  (require 'semantic-ia)
-  (require 'semantic-loaddefs)
+  ;;(require 'semantic-ia)
+  ;;(require 'semantic-loaddefs)
   ;; Copied from https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
@@ -63,7 +58,7 @@
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
   ;; (semantic-mode 1)
-  (require 'semanticdb)
+  ;;(require 'semanticdb)
   ;;SemanticDB files
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
@@ -74,25 +69,34 @@
   (global-semantic-highlight-func-mode 1))
 
 (use-package idle
-  :disabled t
   :config
   (global-semantic-idle-scheduler-mode 1)
   (global-semantic-idle-completions-mode 1)
   (global-semantic-idle-breadcrumbs-mode 1))
 
 (use-package mode
-  :disabled t
   :config
   (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
 
 (use-package ecb
-  :disabled t
   :ensure t
-  :config
+  :load-path "elpa/ecb-20140215.114"
+  :init
   (setq-default ecb-tip-of-the-day nil)
-  (add-hook 'prog-mode-hook #'ecb-auto-activate))
+  ;;(add-hook 'prog-mode-hook #'ecb-minor-mode)
+  )
+
+(defhydra hydra-ecb (:color blue)
+  ("ecb commands")
+  ("g h" ecb-goto-window-history "history")
+  ("g m" ecb-goto-window-methods "methods")
+  ("g s" ecb-goto-window-sources "sources")
+  ("g d" ecb-goto-window-directories "directories")
+  ("g y" ecb-goto-window-symboldef "symbol def")
+  ("l u" ecb-redraw-layout "redraw layout"))
+(bind-key "C-c ." 'hydra-ecb/body)
 
 (provide 'cedet-init)
 

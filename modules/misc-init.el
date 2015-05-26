@@ -128,6 +128,7 @@
   :defer t)
 
 (use-package popwin
+  :disabled t
   :ensure t
   :config
   (if (string-equal system-name "XXX")
@@ -156,6 +157,7 @@
   :config (global-pabbrev-mode 1))
 
 (use-package golden-ratio
+  :disabled t
   :ensure t
   :diminish golden-ratio-mode
   :preface

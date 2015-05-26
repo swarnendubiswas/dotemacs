@@ -39,7 +39,7 @@
   :config (add-hook 'java-mode-hook #'jtags-mode))
 
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
-;; front end to gnu global, use gtags -v -c.
+;; front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 (use-package ggtags
   :ensure t
   :diminish ggtags-mode
@@ -48,7 +48,7 @@
         ggtags-oversize-limit (* 50 1024 1024)
         ;; use helm for completion
         ggtags-completing-read-function nil)
-  (add-hook 'prog-mode-hook #'ggtags-mode))
+  (add-hook 'c-mode-common-hook #'ggtags-mode))
 
 ;; http://wikemacs.org/wiki/C-ide
 ;; http://tuhdo.github.io/c-ide.html

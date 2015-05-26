@@ -64,9 +64,9 @@
             (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
             (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)))
 ;;(global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
-(bind-key "M-<left>" 'tabbar-backward-tab)
+(bind-key* "M-<left>" 'tabbar-backward-tab)
 ;;(global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
-(bind-key "M-<right>" 'tabbar-forward-tab)
+(bind-key* "M-<right>" 'tabbar-forward-tab)
 
 ;; with bind-key, you do not need an explicit "(kbd ...)"
 (bind-key "C-+" 'text-scale-increase)
