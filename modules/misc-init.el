@@ -128,27 +128,12 @@
   :defer t)
 
 (use-package popwin
-  :disabled t
   :ensure t
   :config
   (if (string-equal system-name "XXX")
       (setq popwin:popup-window-height 15)
     (setq popwin:popup-window-height 15))
   (popwin-mode 1))
-
-;; this package now provides ivy-mode
-(use-package swiper
-  :ensure t
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t
-        ;; be less noisy
-        swiper-min-highlight 3)
-  (use-package swiper-helm
-    :ensure t)
-  :diminish ivy-mode
-  :bind* (("C-f" . swiper-helm)
-          ("C-r" . swiper-helm)))
 
 (use-package pabbrev
   :disabled t
@@ -183,6 +168,13 @@
   (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
+
+;; hide "Auto-saving...done" messages
+;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
+(defun my-auto-save-wrapper (save-fn &rest args)
+  (apply save-fn '(t)))
+
+(advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
 (provide 'misc-init)
 

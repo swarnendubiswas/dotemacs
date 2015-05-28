@@ -19,7 +19,7 @@
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-apropos-fuzzy-match t
-        helm-split-window-default-side 'right
+        helm-split-window-default-side 'below
         ;; open helm buffer inside current window, not occupy whole other window
         helm-split-window-in-side-p t
         ido-use-virtual-buffers 'auto
@@ -40,19 +40,23 @@
                                     helm-source-recentf
                                     helm-source-dired-recent-dirs
                                     helm-source-buffer-not-found))
+
   (use-package helm-plugin
     :config
     ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
     (defadvice helm-display-mode-line (after undisplay-header activate)
       (setq header-line-format nil)))
+
   (use-package helm-buffers
     :config
     ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t))
+
   (use-package helm-utils
     :config
     (setq helm-highlight-number-lines-around-point 10
           helm-yank-symbol-first t))
+
   (use-package helm-files
     :config
     (setq helm-file-cache-fuzzy-match t
@@ -66,34 +70,47 @@
                                                  "\\.elc$"
                                                  "\\#$"
                                                  "\\~$"))))
+
   (use-package helm-dabbrev
     :config (setq helm-dabbrev-cycle-threshold 2))
+
   (use-package helm-org
     :config (setq helm-org-headings-fontify t))
+
   (use-package helm-dired-recent-dirs
     :ensure t
     :config (setq helm-dired-recent-dirs-max 50))
+
   (use-package helm-adaptive
     :config
     (setq helm-adaptive-history-file (concat dotemacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
+
   (use-package helm-descbinds
     :ensure t
     :init (helm-descbinds-mode 1))
+
   (use-package helm-words
     :disabled t
     :ensure t)
+
   (use-package helm-bibtex
     :ensure t
+    :commands helm-bibtex
     :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
+
   (use-package helm-orgcard
     :ensure t)
+
   (use-package helm-mode-manager
     :ensure t)
+
   (use-package helm-themes
     :ensure t)
+
   (use-package helm-helm-commands
     :ensure t)
+
   (use-package helm-swoop
     :ensure t
     :config
@@ -102,11 +119,18 @@
           helm-swoop-split-direction #'split-window-vertically
           helm-swoop-split-with-multiple-windows nil
           helm-swoop-use-line-number-face t))
+
   (use-package helm-make
     :ensure t)
+
+  ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
   (use-package helm-company
     :ensure t
-    :if (eq dotemacs-completion 'company))
+    :if (eq dotemacs-completion 'company)
+    :init (with-eval-after-load 'company
+            (bind-key [remap completion-at-point] #'helm-company company-mode-map)
+            (bind-key "C-:" #'helm-company company-mode-map)
+            (bind-key "C-:" #'helm-company company-active-map)))
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)

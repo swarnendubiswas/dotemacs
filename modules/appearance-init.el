@@ -16,7 +16,9 @@
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
+;; SB: You can learn many shortcuts from the menu bar entries.
 (use-package menu-bar
+  :disabled t
   :config
   (when (fboundp 'menu-bar-mode)
     (menu-bar-mode -1)))

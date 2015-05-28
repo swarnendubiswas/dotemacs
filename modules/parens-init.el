@@ -44,13 +44,15 @@
   :diminish smartparens-mode
   :init
   (require 'smartparens-config)
+  (smartparens-global-mode 1)
+  (show-smartparens-global-mode 1)
+  ;;(sp-use-smartparens-bindings)
+
+  :config
   (setq sp-autoskip-closing-pair 'always
         sp-navigate-close-if-unbalanced t
         sp-show-pair-from-inside t
         sp-autoescape-string-quote nil)
-  (smartparens-global-mode 1)
-  (show-smartparens-global-mode 1)
-  ;;(sp-use-smartparens-bindings)
   
   ;; pair management
   (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)

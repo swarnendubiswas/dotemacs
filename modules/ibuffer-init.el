@@ -53,7 +53,8 @@
                   (ibuffer-do-sort-by-mode-name)
                   (ibuffer-do-sort-by-major-mode)))))
   
-  :bind ("C-x C-b" . ibuffer))
+  :bind (;;([remap list-buffers] . ibuffer)
+         ("C-x C-b" . ibuffer)))
 
 (defhydra hydra-buffer-menu (:color pink)
   "Buffer menu commands"

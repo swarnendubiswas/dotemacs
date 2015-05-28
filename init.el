@@ -114,11 +114,6 @@
 (require 'cc-init)
 (require 'java-init)
 (require 'shell-init)
-(require 'svn-init)
-
-;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
-;; enabled on startup.
-(require 'tags-init)
 
 ;; generic keybindings, package-specific are usually in their own modules
 (require 'keybindings-init)
@@ -127,10 +122,15 @@
 (require 'custom-init)
 
 ;; temporary modules
+(require 'svn-init)
 ;; (require 'git-init)
 
-;; (require 'cedet-init) ;; does not work perfectly
-;; (require 'jdee-init)
+(require 'cedet-init)
+(require 'jdee-init)
+
+;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
+;; enabled on startup.
+(require 'tags-init)
 
 ;; start the daemon/server
 ;; (require 'server-init)

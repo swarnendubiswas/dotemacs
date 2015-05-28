@@ -25,7 +25,8 @@
         ido-use-virtual-buffers 'auto
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              "*Messages*" "Async Shell Command")
-        ido-enable-tramp-completion t)
+        ido-enable-tramp-completion t
+        ido-ignore-extensions t)
   (setq ido-ignore-files
         (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
                 ido-ignore-files))

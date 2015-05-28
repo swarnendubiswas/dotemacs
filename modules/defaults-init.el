@@ -146,6 +146,8 @@
   :config (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
+;; This config needs to be modified for Emacs 25+, check this link
+;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
 ;; remember cursor position in files
 (use-package saveplace
   :config

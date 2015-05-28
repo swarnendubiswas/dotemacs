@@ -16,14 +16,16 @@
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
   (projectile-global-mode 1)
+
   (use-package helm-projectile
     :ensure t
     :config
     (setq helm-projectile-fuzzy-match t
           projectile-completion-system 'helm
           ;; other options: 'helm-projectile-find-file
-          projectile-switch-project-action 'helm-projectile)
+          projectile-switch-project-action #'helm-projectile)
     (helm-projectile-on))
+
   :diminish projectile-mode
   :bind ("C-c p h" . helm-projectile))
 

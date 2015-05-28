@@ -42,7 +42,8 @@
   ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
-    :load-path "lisp/"
+    :ensure t
+    ;;:load-path "lisp/"
     :config (recentf-auto-cleanup))
   
   :bind ("<f8>" . recentf-open-files))
