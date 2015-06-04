@@ -73,10 +73,11 @@
 (bind-key "C--" 'text-scale-decrease)
 
 ;; globally unset M-x
-(global-unset-key (kbd "M-x"))
+;;(global-unset-key (kbd "M-x"))
 
 ;; the command `key-chord-describe' lists currently defined key chords.
 (use-package key-chord
+  :disabled t
   :ensure t
   :init (key-chord-mode 1)
   :config
