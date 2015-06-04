@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: exampleblock
+# key: ex
+# --
+\begin{exampleblock}{$2}
+        $0
+\end{exampleblock}
