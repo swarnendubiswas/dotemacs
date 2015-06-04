@@ -26,9 +26,9 @@
 ;;(global-set-key [f2] 'split-window-vertically)
 ;;(global-set-key [f3] 'split-window-horizontally)
 ;; switch to the other buffer
-(bind-key "<f2>" 'other-window)
+(bind-key "<f9>" 'other-window)
 ;;(global-set-key [f4] 'delete-other-windows)
-(bind-key "<f4>" 'delete-other-windows)
+(bind-key "<f11>" 'delete-other-windows)
 
 ;;(global-set-key (kbd "M-/") 'hippie-expand) ;; replace dabbrev-expand
 (bind-key "M-/" 'hippie-expand)
@@ -48,7 +48,7 @@
 
 ;; buffers
 ;;(global-set-key (kbd "C-c k") #'kill-other-buffers) ; kill all non-special buffers
-(bind-key "<f3>" 'dotemacs--kill-other-buffers)
+(bind-key "<f10>" 'dotemacs--kill-other-buffers)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 ;;(global-set-key (kbd "C-s") 'save-buffer)
 (bind-key "C-s" 'save-buffer)
@@ -71,6 +71,22 @@
 ;; with bind-key, you do not need an explicit "(kbd ...)"
 (bind-key "C-+" 'text-scale-increase)
 (bind-key "C--" 'text-scale-decrease)
+
+;; globally unset M-x
+(global-unset-key (kbd "M-x"))
+
+;; the command `key-chord-describe' lists currently defined key chords.
+(use-package key-chord
+  :ensure t
+  :init (key-chord-mode 1)
+  :config
+  ;; good choices in English: hj
+  (key-chord-define-global "jj" 'avy-goto-word-1)
+  (key-chord-define-global "uu" 'undo-tree-visualize)
+  (key-chord-define-global "xx" 'smex)
+  ;; (key-chord-define c++-mode-map ";;"  "\C-e;")
+  ;; (key-chord-define c++-mode-map "{}"  "{\n\n}\C-p\t")
+  )
 
 (provide 'keybindings-init)
 

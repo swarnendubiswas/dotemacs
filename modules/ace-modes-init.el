@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package ace-jump-mode
+  :disabled t ;; prefer ace-window/avy
   :ensure t
   ;;:init  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind*
@@ -54,6 +55,7 @@
 
   :bind ("<f5>" . ace-jump-buffer))
 
+;; ace-jump in helm buffers
 (use-package ace-jump-helm-line
   :ensure t
   :config
@@ -62,13 +64,13 @@
   (bind-key "C-'" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
-  :ensure t
+  :ensure avy
   :bind ("M-b" . avy-goto-word-1)
   :config
-  (setq avy-background nil)
-  (ace-window-display-mode 1)
-  (use-package avy-jump
-    :config (avy-setup-default)))
+  (use-package avy
+    :config (avy-setup-default)
+    (setq avy-background nil))
+    (ace-window-display-mode 1))
 
 (provide 'ace-modes-init)
 

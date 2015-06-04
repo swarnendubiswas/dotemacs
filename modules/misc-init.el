@@ -55,6 +55,7 @@
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
+  ;; https://gist.github.com/ShingoFukuyama/7245914
   (set-face-attribute 'tabbar-default nil
                       :background "gray80")
   (set-face-attribute 'tabbar-unselected nil
@@ -76,7 +77,9 @@
                       :box '(:line-width 1 :color "gray72" :style released-button))
   (set-face-attribute 'tabbar-separator nil
                       :height 1.0)
-  (setq tabbar-use-images nil) ; speed up by not using images
+  (setq tabbar-use-images nil ; speed up by not using images
+        tabbar-auto-scroll-flag t
+        tabbar-separator '(1.1))
   (tabbar-mode 1))
 
 (use-package jgraph-mode

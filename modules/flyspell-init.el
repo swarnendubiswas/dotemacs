@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package flyspell
+  :if (eq system-type 'gnu/linux)
   :preface
   (defun activate-flyspell ()
     "Turn on flyspell-mode and call flyspell-buffer."

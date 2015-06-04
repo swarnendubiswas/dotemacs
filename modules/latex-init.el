@@ -45,7 +45,8 @@
   (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode))
 
 (use-package tex-site
-  :ensure auctex)
+  :ensure auctex
+  :mode ("\\.tex\\'" . LaTeX-mode))
 
 (use-package tex-mode
   :ensure auctex

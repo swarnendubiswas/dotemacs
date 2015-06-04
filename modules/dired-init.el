@@ -44,10 +44,10 @@
   (bind-key "i" 'ido-find-file dired-mode-map)
   ;; (with-eval-after-load "dired"
   ;;   (define-key dired-mode-map (kbd "M-<up>") 'dired-back-to-top))
-  (bind-key "M-<up>" 'dired-back-to-top dired-mode-map)
+  (bind-key "M-<up>" 'dired--jump-to-top dired-mode-map)
   ;; (with-eval-after-load "dired"
   ;;   (define-key dired-mode-map (kbd "M-<down>") 'dired-jump-to-bottom))
-  (bind-key "M-<down>" 'dired-jump-to-bottom dired-mode-map))
+  (bind-key "M-<down>" 'dired--jump-to-bottom dired-mode-map))
 
 ;; Jump to dired buffer corresponding to current buffer.
 (use-package dired-x
@@ -89,6 +89,7 @@
 (use-package dired-efap
   :ensure t
   :config
+  (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
   ;; (when (dired-mode)
   ;;   (define-key dired-mode-map (kbd "<f2>") nil))
   ;;(define-key dired-mode-map [f2] 'dired-efap)

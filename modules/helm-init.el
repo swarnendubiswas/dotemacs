@@ -88,7 +88,9 @@
 
   (use-package helm-descbinds
     :ensure t
-    :init (helm-descbinds-mode 1))
+    :init
+    (fset 'describe-bindings 'helm-descbinds)
+    (helm-descbinds-mode 1))
 
   (use-package helm-words
     :disabled t
@@ -111,13 +113,15 @@
   (use-package helm-helm-commands
     :ensure t)
 
+  ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
     :ensure t
     :config
-    (setq helm-multi-swoop-edit-save t
-          helm-swoop-speed-or-color t
+    (setq helm-multi-swoop-edit-save t ; save buffer when helm-multi-swoop-edit complete
+          helm-swoop-speed-or-color nil
           helm-swoop-split-direction #'split-window-vertically
           helm-swoop-split-with-multiple-windows nil
+          helm-swoop-move-to-line-cycle t ; go to the opposite side of line from the end or beginning of line
           helm-swoop-use-line-number-face t))
 
   (use-package helm-make
@@ -132,6 +136,9 @@
             (bind-key "C-:" #'helm-company company-mode-map)
             (bind-key "C-:" #'helm-company company-active-map)))
 
+  (use-package helm-package
+    :ensure t)
+
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 
@@ -139,19 +146,22 @@
   (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 
   :bind
-  (("M-x" . helm-M-x)
+  (("<f1>" . helm-M-x)
    ("C-c h f" . helm-find-files)
    ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
-   ("<f9>" . helm-find-files)
+   ("<f3>" . helm-find-files)
    ("<f6>" . helm-mini)
    ("<f7>" . helm-buffers-list)
    ("C-c h r" . helm-recentf) ; not really required, can instead use 'helm-mini
    ("C-c h l" . helm-locate)
    ("C-c h y" . helm-show-kill-ring)
    ("C-c h s" . helm-swoop)
+   ("C-c h /" . helm-multi-swoop)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
-   ("C-c h u" . helm-resume))
+   ("C-c h u" . helm-resume)
+   ;; swoop is better than occur
+   ("C-c h o" . helm-occur))
 
   :diminish helm-mode)
 
@@ -166,9 +176,12 @@
   ("l" helm-locate "helm-locate")
   ("y" helm-show-kill-ring "helm-show-kill-ring")
   ("s" helm-swoop "helm-swoop")
+  ("/" helm-multi-swoop "helm-multi-swoop")
   ("a" helm-apropos "helm-apropos")
   ("g" helm-do-grep "helm-do-grep")
-  ("u" helm-resume "helm-resume"))
+  ("u" helm-resume "helm-resume")
+  ;; swoop is better than occur
+  ("o" helm-occur "helm-occur"))
 (global-unset-key (kbd "C-b"))
 (bind-key "C-b" 'hydra-helm/body)
 

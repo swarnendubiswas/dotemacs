@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package anzu
-  ;;:disabled t ; since we are using swiper
+  :disabled t ; since we are using swiper
   :ensure t
   :diminish anzu-mode
   :config

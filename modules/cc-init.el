@@ -35,6 +35,10 @@
     (with-eval-after-load "cc-mode"
       (global-cwarn-mode 1))))
 
+;; this is already the default, but I have this as a reminder.
+(with-eval-after-load "cc-mode"
+  (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))
+
 (use-package google-c-style
   :ensure t
   :config
@@ -69,6 +73,9 @@
   :config
   (semantic-add-system-include "/usr/local/include")
   (semantic-add-system-include "~/linux/include"))
+
+(use-package hideif
+  :config (hide-ifdef-mode 1))
 
 (provide 'cc-init)
 

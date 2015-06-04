@@ -32,7 +32,7 @@
                 ido-ignore-files))
   (ido-mode 1) ; options: 'files, 'buffers
   (ido-everywhere 1)
-  :bind ("<f1>" . ido-find-file))
+  :bind ("<f2>" . ido-find-file))
 
 (use-package ido-vertical-mode
   :ensure t

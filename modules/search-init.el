@@ -42,6 +42,20 @@
   :bind* (("C-f" . swiper-helm)
           ("C-r" . swiper-helm)))
 
+(use-package color-moccur
+  :commands (isearch-moccur isearch-all)
+  :bind ("M-s O" . moccur)
+  :init
+  (bind-key "M-o" 'isearch-moccur isearch-mode-map)
+  (bind-key "M-O" 'isearch-moccur-all isearch-mode-map)
+  :config
+  (use-package moccur-edit))
+
+(use-package loccur
+  :ensure t
+  :config (loccur-mode 1)
+  :diminish loccur-mode)
+
 (provide 'search-init)
 
 ;;; search-init.el ends here

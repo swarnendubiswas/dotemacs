@@ -18,15 +18,15 @@
         company-tooltip-flip-when-above t
         company-tooltip-align-annotations t
         company-tooltip-limit 20
-        company-idle-delay 0.3
         ;; start autocompletion only after typing
-        company-begin-commands '(self-insert-command))
+        ;;company-begin-commands '(self-insert-command)
+        company-idle-delay 0.3)
 
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
   (add-to-list 'company-backends #'company-files)
   (add-to-list 'company-backends #'company-capf)
 
-  ;; enabling this seems to disable the company popup
+  ;; FIXME: enabling this seems to disable the company popup
   ;;(add-to-list 'company-backends 'company-gtags)
   ;;(setq company-backends (delete 'company-semantic company-backends))
   ;;(setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))

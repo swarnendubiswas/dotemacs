@@ -31,8 +31,8 @@
 
   ;; Allow syntax highlighting for parts of a word
   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode
-  (setcar org-emphasis-regexp-components " \t('\"{[:alpha:]")
-  (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}\\")
+  (setcar org-emphasis-regexp-components " \t('\"{[:alpha:]=")
+  (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}=\\")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   
   (require 'org-inlinetask)

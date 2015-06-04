@@ -16,9 +16,10 @@
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
 
+;; always referesh contents so that new packages added to the repositories are available
+(package-refresh-contents)
 ;; setup use-package
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
   (package-install 'use-package))
 
 (require 'use-package)
@@ -39,6 +40,7 @@
 
 (use-package paradox
   :ensure t
+  :defer 5
   :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t))

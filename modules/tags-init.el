@@ -11,11 +11,19 @@
 
 (use-package ctags
   :ensure t
-  :defer t)
+  :disabled t)
 
 (use-package ctags-update
   :ensure t
-  :defer t)
+  :disabled t)
+
+(use-package ctags-update
+  :ensure t
+  :disabled t
+  :diminish ctags-auto-update-mode
+  :config
+  (setq ctags-update-delay-seconds (* 30 60)) ; every 1/2 hour
+  (ctags-auto-update-mode 1))
 
 (use-package etags
   :bind ("M-T" . tags-search))
@@ -24,17 +32,9 @@
   :ensure t
   :defer t)
 
-(use-package ctags-update
-  :ensure t
-  :defer t
-  :diminish ctags-auto-update-mode
-  :config
-  (setq ctags-update-delay-seconds (* 30 60)) ; every 1/2 hour
-  (ctags-auto-update-mode 1))
-
 (use-package jtags
   :ensure t
-  :defer t
+  :disabled t
   ;;:init (autoload 'jtags-mode "jtags" "Toggle jtags mode." t)
   :config (add-hook 'java-mode-hook #'jtags-mode))
 
@@ -42,6 +42,7 @@
 ;; front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 (use-package ggtags
   :ensure t
+  :if (eq system-type 'gnu/linux)
   :diminish ggtags-mode
   :config
   (setq ggtags-navigation-mode-lighter nil
@@ -56,6 +57,7 @@
 ;; buffer list.
 (use-package helm-gtags
   :ensure t
+  :if (eq system-type 'gnu/linux)
   :diminish helm-gtags-mode
   :config
   (setq helm-gtags-ignore-case t
@@ -70,8 +72,7 @@
         helm-gtags-cache-select-result t
         helm-gtags-display-style 'detail
         helm-gtags-update-interval-second 60)
-  (add-hook 'prog-mode-hook #'helm-gtags-mode)
-  (add-hook 'dired-mode-hook #'helm-gtags-mode)
+  (add-hook 'c-mode-common-hook #'helm-gtags-mode)
   (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
   (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
   (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
