@@ -98,20 +98,25 @@
 
   (use-package helm-bibtex
     :ensure t
+    :defer t
     :commands helm-bibtex
     :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
 
   (use-package helm-orgcard
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package helm-mode-manager
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package helm-themes
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package helm-helm-commands
-    :ensure t)
+    :ensure t
+    :defer t)
 
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
@@ -139,6 +144,15 @@
   (use-package helm-package
     :ensure t)
 
+  (use-package helm-grep
+    :config
+    ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
+    (global-set-key [f12]
+                    (lambda ()
+                      (interactive)
+                      (let ((current-prefix-arg 't))
+                        (call-interactively 'helm-do-grep)))))
+
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 
@@ -147,6 +161,7 @@
 
   :bind
   (("<f1>" . helm-M-x)
+   ("M-x" . helm-M-x)
    ("C-c h f" . helm-find-files)
    ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
    ("<f3>" . helm-find-files)

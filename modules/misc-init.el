@@ -165,13 +165,6 @@
   :ensure t
   :bind ("M-s e" . sudo-edit))
 
-(use-package keyfreq
-  :ensure t
-  :config
-  (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
-  (keyfreq-mode 1)
-  (keyfreq-autosave-mode 1))
-
 ;; hide "Auto-saving...done" messages
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)

@@ -79,7 +79,6 @@
 (use-package key-chord
   :disabled t
   :ensure t
-  :init (key-chord-mode 1)
   :config
   ;; good choices in English: hj
   (key-chord-define-global "jj" 'avy-goto-word-1)
@@ -87,7 +86,16 @@
   (key-chord-define-global "xx" 'smex)
   ;; (key-chord-define c++-mode-map ";;"  "\C-e;")
   ;; (key-chord-define c++-mode-map "{}"  "{\n\n}\C-p\t")
-  )
+  :init (key-chord-mode 1))
+
+(use-package keyfreq
+  :disabled t
+  :ensure t
+  :config
+  (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
+
 
 (provide 'keybindings-init)
 

@@ -10,7 +10,7 @@
   :ensure t
   :preface
   (defun dotemacs--auto-fci-mode (&optional unused)
-    (if (> (frame-width) 120)
+    (if (> frame-width 120)
         (fci-mode 1)
       (fci-mode 0)))
 
@@ -27,7 +27,6 @@
   ;;(add-hook 'prog-mode-hook #'fci-mode)
   ;;(add-hook 'after-change-major-mode-hook #'dotemacs--auto-fci-mode)
   ;;(add-hook 'window-size-change-functions #'dotemacs--auto-fci-mode)
-  
   (global-fci-mode 1))
 
 (provide 'fci-init)

@@ -8,7 +8,7 @@
 (use-package flyspell
   :if (eq system-type 'gnu/linux)
   :preface
-  (defun activate-flyspell ()
+  (defun dotemacs--activate-flyspell ()
     "Turn on flyspell-mode and call flyspell-buffer."
     (interactive)
     ;; This next line REALLY slows buffer switching.
@@ -16,12 +16,8 @@
     (flyspell-buffer))
 
   (defvar customised-hooks-alist
-    '(text-mode-hook org-mode-hook LaTeX-mode-hook)
+    '(text-mode-hook)
     "An alist of hooks that require customizations.")
-
-  ;; (unless noninteractive
-  ;;   ;; Activate flyspell for various major modes.
-  ;;   (add-hook-list customised-hooks-alist 'activate-flyspell))
 
   :init
   (use-package flyspell-lazy
@@ -37,9 +33,11 @@
   (add-hook 'find-file-hooks #'turn-on-flyspell)
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)
-  
-  ;; (with-eval-after-load "flyspell"
-  ;;   (diminish 'flyspell-mode))
+
+  ;; ;; Activate flyspell for various major modes.
+  ;; (unless noninteractive
+  ;;   (add-hook-list customised-hooks-alist 'activate-flyspell))
+
   :diminish flyspell-mode
   :bind
   (("C-c i f" . flyspell-mode)
@@ -50,10 +48,9 @@
   :config
   (use-package helm-flyspell
     :ensure t
-    :config
-    (with-eval-after-load "flyspell"
-      (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct)))
+    :config (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))
   (use-package ace-flyspell
+    :defer t
     :ensure t))
 
 (defhydra hydra-flyspell (:color blue)

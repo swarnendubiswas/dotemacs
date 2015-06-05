@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+;; FIXME: Enabling this package seems to cause problems with tramp.
+
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
   :disabled t

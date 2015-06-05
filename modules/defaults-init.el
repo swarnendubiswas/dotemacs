@@ -113,6 +113,15 @@
 (use-package advice
   :config (setq ad-redefinition-action 'accept))
 
+;; Enable disabled commands
+(put 'downcase-region  'disabled nil)   ; Let downcasing work
+(put 'erase-buffer     'disabled nil)
+(put 'eval-expression  'disabled nil)   ; Let ESC-ESC work
+(put 'narrow-to-page   'disabled nil)   ; Let narrowing work
+(put 'narrow-to-region 'disabled nil)   ; Let narrowing work
+(put 'set-goal-column  'disabled nil)
+(put 'upcase-region    'disabled nil)   ; Let upcasing work
+
 ;; desktop save mode
 (use-package desktop
   :disabled t

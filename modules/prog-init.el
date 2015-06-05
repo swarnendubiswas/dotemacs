@@ -29,6 +29,15 @@
           (lambda ()
             (abbrev-mode -1)))
 
+;; lisp and variants
+(use-package eldoc
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode)
+  (add-hook 'ielm-mode-hook #'turn-on-eldoc-mode)
+  (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode)
+  :diminish eldoc-mode)
+
 ;; add makefile.rules to makefile-gmake-mode for Intel Pin
 (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
 
@@ -78,7 +87,19 @@
 (use-package web-mode
   :ensure t
   :defer t
+  :mode
+  (("\\.phtml\\'" . web-mode)
+   ("\\.jsp\\'" . web-mode)
+   ("\\.html\\'" . web-mode)
+   ("\\.hb\\.html\\'" . web-mode)
+   ("\\.tpl\\.php\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode))
   :config
+  ;; everything is indented 2 spaces
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2)
+
   (use-package web-beautify
     :ensure t
     :config

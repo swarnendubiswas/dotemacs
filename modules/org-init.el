@@ -60,9 +60,10 @@
     ;; include the listings package
     (add-to-list 'org-latex-packages-alist '("" "listings"))
     ;; if you want colored source code then you need to include the color package
-    (add-to-list 'org-latex-packages-alist '("" "color"))
+    ;;(add-to-list 'org-latex-packages-alist '("" "color"))
     ;; Add minted to the defaults packages to include when exporting.
-    (add-to-list 'org-latex-packages-alist '("" "minted")))
+    ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
+    )
   ;; tell org to use listings, options: t, 'minted
   (setq org-latex-listings 't))
 
