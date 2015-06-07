@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package projectile
+  :defer t
   :ensure t
   :config
   (setq projectile-enable-caching t

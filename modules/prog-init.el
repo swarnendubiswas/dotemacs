@@ -71,9 +71,7 @@
 (use-package ws-butler
   :ensure t
   :diminish ws-butler-mode
-  :config
-  ;;(add-hook 'c-mode-common-hook 'ws-butler-mode)
-  (add-hook 'prog-mode-hook #'ws-butler-mode))
+  :config (add-hook 'prog-mode-hook #'ws-butler-mode))
 
 (use-package dtrt-indent
   :ensure t
@@ -83,7 +81,6 @@
             (lambda()
               (dtrt-indent-mode 1))))
 
-;; web-mode
 (use-package web-mode
   :ensure t
   :defer t

@@ -159,6 +159,7 @@
 ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
 ;; remember cursor position in files
 (use-package saveplace
+  :defer 2
   :config
   (setq-default save-place t
                 save-place-file (concat dotemacs-temp-directory "places")))
@@ -179,6 +180,7 @@
 
 ;; save minibuffer histories across sessions
 (use-package savehist
+  :defer 5
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
@@ -195,6 +197,7 @@
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
+  :defer 2
   :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
@@ -219,6 +222,7 @@
     :ensure t))
 
 (use-package subword
+  :defer 2
   :diminish subword-mode
   :config (global-subword-mode 1))
 

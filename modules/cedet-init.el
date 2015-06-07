@@ -57,7 +57,7 @@
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
-  ;; (semantic-mode 1)
+  (semantic-mode 1)
   ;;(require 'semanticdb)
   ;;SemanticDB files
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))

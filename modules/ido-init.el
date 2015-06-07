@@ -24,7 +24,7 @@
         ido-use-faces nil ; disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
-                             "*Messages*" "Async Shell Command")
+                             "*Messages*" "Async Shell Command" "*Paradox Report*")
         ido-enable-tramp-completion t
         ido-ignore-extensions t)
   (setq ido-ignore-files

@@ -83,7 +83,7 @@
   (with-eval-after-load "tex-mode"
     (require 'smartparens-latex))
 
-  :config (make-variable-buffer-local 'show-paren-mode))
+  (make-variable-buffer-local 'show-paren-mode))
 
 (provide 'parens-init)
 

@@ -10,8 +10,9 @@
   :ensure t
   ;;:init  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind*
-  ;; ("C-c SPC" . ace-jump-mode)
-  ("C-'" . ace-jump-mode)
+  (("C-c a f" . ace-jump-mode)
+   ("C-c a b" . ace-jump-mode-pop-mark)
+   ("C-'" . ace-jump-mode))
   :config (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns

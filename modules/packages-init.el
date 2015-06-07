@@ -17,7 +17,7 @@
 (package-initialize)
 
 ;; always referesh contents so that new packages added to the repositories are available
-(package-refresh-contents)
+;;(package-refresh-contents)
 ;; setup use-package
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
