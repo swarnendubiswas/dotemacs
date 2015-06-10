@@ -38,6 +38,7 @@
   (add-to-list 'ac-sources 'ac-source-yasnippet)
   (ac-flyspell-workaround)
   (ac-config-default)
+
   (use-package auto-complete-c-headers
     :ensure t
     :config
@@ -46,48 +47,74 @@
               (lambda ()
                 (add-to-list 'ac-sources #'ac-sources-c-headers)
                 (add-to-list 'ac-sources #'ac-sources-c-headers-symbols t))))
+
+  ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
+  (defun ac-turn-off-line-truncation (orig &optional force)
+    (toggle-truncate-lines -1)
+    (funcall orig force)
+    (toggle-truncate-lines 1))
+  (advice-add 'ac-quick-help :around #'ac-turn-off-line-truncation)
+
   (use-package ac-capf
     :ensure t)
+
   (use-package ac-etags
     :ensure t
     :config (ac-etags-setup))
+
   (use-package ac-helm
     :ensure t)
+
   (use-package ac-ispell
     :ensure t)
+
   (use-package ac-math
     :ensure t)
+
   (use-package ac-python
     :ensure t)
+
   (use-package ac-dabbrev
     :ensure t)
+
   (use-package auto-complete-clang
     :ensure t)
+
   (use-package auto-complete-etags
     :ensure t)
+
   (use-package auto-complete-exuberant-ctags
     :ensure t)
+
   (use-package ac-html
     :ensure t)
+
   (use-package auto-complete-nxml
     :ensure t)
+
   (use-package auto-complete-auctex
     :ensure t)
+
   (use-package org-ac
     :ensure t
     :config (org-ac/config-default))
+
   (use-package auto-complete-chunk
     :ensure t)
+
   (use-package ac-tex-ref
     :load-path "lisp")
+
   (use-package ac-html-bootstrap
     :ensure t)
+
   (use-package ac-html-csswatcher
     :ensure t
     :config
     (if (eq dotemacs-completion 'company)
         (company-web-csswatcher-setup)
       (ac-html-csswatcher-setup)))
+
   :diminish auto-complete-mode)
 
 (provide 'auto-complete-init)

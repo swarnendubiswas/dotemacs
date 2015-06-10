@@ -30,6 +30,10 @@
             (abbrev-mode -1)))
 
 ;; lisp and variants
+
+(add-hook 'emacs-lisp-mode-hook #'lispy-mnemonic-mode)
+(add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
+
 (use-package eldoc
   :config
   (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
@@ -51,17 +55,22 @@
 
 ;; enable speed bar
 (use-package speedbar
+  :defer t
   :config
   (setq speedbar-use-images nil
         speedbar-show-unknown-files t)
+
   (use-package sr-speedbar
     :ensure t
+    :commands sr-speedbar-open
+    :init (defalias 'speedbar 'sr-speedbar-open)
     :config
     (setq sr-speedbar-right-side nil
           sr-speedbar-max-width 40
           sr-speedbar-width 30
           sr-speedbar-default-width 30
           sr-speedbar-skip-other-window-p t))
+
   ;; (add-hook 'prog-mode-hook
   ;;           (lambda ()
   ;;              (when (window-system)
@@ -84,6 +93,7 @@
 (use-package web-mode
   :ensure t
   :defer t
+  :commands (web-beautify-css web-beautify-html web-beautify-js)
   :mode
   (("\\.phtml\\'" . web-mode)
    ("\\.jsp\\'" . web-mode)

@@ -13,7 +13,9 @@
   (("C-c a f" . ace-jump-mode)
    ("C-c a b" . ace-jump-mode-pop-mark)
    ("C-'" . ace-jump-mode))
-  :config (ace-jump-mode-enable-mark-sync))
+  :config
+  (set-face-attribute 'aw-leading-char-face nil :height 2.0)
+  (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
@@ -65,13 +67,25 @@
   (bind-key "C-'" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
+  :defer t
   :ensure avy
   :bind ("M-b" . avy-goto-word-1)
   :config
   (use-package avy
     :config (avy-setup-default)
-    (setq avy-background nil))
-    (ace-window-display-mode 1))
+    (setq avy-background t
+          avy-style 'at-full))
+  (ace-window-display-mode 1))
+
+(defhydra hydra-avy-jump (:color blue)
+  "Avy jump."
+  ("c" avy-goto-char "char")
+  ("w" avy-goto-word-0 "word")
+  ("l" avy-goto-line "line")
+  ("s" avy-goto-subword-0 "subword")
+  ("C" goto-char "goto char")
+  ("L" goto-line "goto line"))
+(bind-key "M-g" #'hydra-avy-jump/body)
 
 (provide 'ace-modes-init)
 

@@ -96,6 +96,34 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+(defhydra hydra-mark-lines ()
+  "Mark lines"
+  ("m" next-line "next line")
+  ("n" next-line "next line")
+  ("p" previous-line "previous line"))
+
+(defhydra hydra-apropos (:color blue)
+  "Apropos"
+  ("a" apropos "apropos")
+  ("c" apropos-command "cmd")
+  ("d" apropos-documentation "doc")
+  ("e" apropos-value "val")
+  ("l" apropos-library "lib")
+  ("o" apropos-user-option "opt")
+  ("v" apropos-variable "var")
+  ("i" info-apropos "info")
+  ("t" tags-apropos "tags")
+  ("z" hydra-customize-apropos/body "customize"))
+(global-set-key (kbd "C-h a") #'hydra-apropos/body)
+
+(defhydra hydra-info (:color blue)
+  "Info"
+  ("e" (funcall (info-display-topic "emacs")) "Emacs")
+  ("l" (funcall (info-display-topic "elisp")) "Elisp")
+  ("m" (funcall (info-display-topic "magit")) "Magit")
+  ("o" (funcall (info-display-topic "org")) "Org Mode")
+  ("s" (funcall (info-display-topic "sicp")) "SICP"))
+(global-set-key (kbd "C-h i") #'hydra-info/body)
 
 (provide 'keybindings-init)
 

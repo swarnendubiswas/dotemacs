@@ -8,12 +8,16 @@
 (use-package projectile
   :defer t
   :ensure t
+  :commands (projectile-find-file projectile-switch-project)
   :config
   (setq projectile-enable-caching t
+        projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
+        projectile-completion-system 'helm
         ;; use projectile in every directory without requiring a project file
         projectile-require-project-root nil
         projectile-switch-project-action 'projectile-dired)
-  (add-to-list 'projectile-globally-ignored-directories ".svn")
+  (dolist (dirs '(".svn" ".dropbox"))
+    (add-to-list 'projectile-globally-ignored-directories dirs))
   ;; Don't consider my home dir as a project
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/"))
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
@@ -24,7 +28,6 @@
     :ensure t
     :config
     (setq helm-projectile-fuzzy-match t
-          projectile-completion-system 'helm
           ;; other options: 'helm-projectile-find-file
           projectile-switch-project-action #'helm-projectile)
     (helm-projectile-on))

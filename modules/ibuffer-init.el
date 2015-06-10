@@ -8,6 +8,10 @@
 (use-package ibuffer
   :defer t
   :init (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
+  :preface
+  (defun dotemacs--ibuffer-group-buffers ()
+    (ibuffer-switch-to-saved-filter-groups "Default"))
+
   :config
   (setq ibuffer-expert t
         ;;ibuffer-shrink-to-minimum-size t
@@ -17,9 +21,9 @@
         ibuffer-use-header-line t
         ibuffer-display-summary t
         ibuffer-show-empty-filter-groups nil)
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-auto-mode 1)))
+
+  (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode)
+  (add-hook 'ibuffer-mode-hook #'dotemacs--ibuffer-group-buffers)
   (add-hook 'ibuffer-mode-hook
             (lambda ()
               (ibuffer-do-sort-by-recency)))

@@ -74,9 +74,6 @@
   (use-package helm-dabbrev
     :config (setq helm-dabbrev-cycle-threshold 2))
 
-  (use-package helm-org
-    :config (setq helm-org-headings-fontify t))
-
   (use-package helm-dired-recent-dirs
     :ensure t
     :config (setq helm-dired-recent-dirs-max 50))

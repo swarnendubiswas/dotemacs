@@ -13,6 +13,7 @@
 
 (use-package tex
   :ensure auctex
+  :commands TeX-PDF-mode
   :config
   (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -50,13 +51,17 @@
 
 (use-package tex-mode
   :ensure auctex
-  :config (setq latex-run-command "latexmk"))
+  :commands latex-mode
+  :config
+  (setq latex-run-command "latexmk")
+  (add-hook 'LaTeX-mode-hook
+            (lambda()
+              (latex-electric-env-pair-mode 1))))
 
 (use-package latex
   :ensure auctex
   :config
   (setq LaTeX-syntactic-comments t)
-  (latex-electric-env-pair-mode 1)
   ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook #'visual-line-mode)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
@@ -119,8 +124,12 @@
 (use-package math-symbol-lists
   :ensure t)
 
-(use-package bibtex-utils
-  :ensure t)
+(use-package bibtex
+  :commands bibtex-mode
+  :config
+  (setq bibtex-maintain-sorted-entries t)
+  (use-package bibtex-utils
+    :ensure t))
 
 (use-package reftex
   ;; :init

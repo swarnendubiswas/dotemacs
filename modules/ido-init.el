@@ -30,6 +30,8 @@
   (setq ido-ignore-files
         (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
                 ido-ignore-files))
+  (dolist (dirs '(".svn" ".dropbox .git"))
+    (add-to-list 'ido-ignore-directories dirs))
   (ido-mode 1) ; options: 'files, 'buffers
   (ido-everywhere 1)
   :bind ("<f2>" . ido-find-file))

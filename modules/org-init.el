@@ -6,11 +6,12 @@
 ;;; Code:
 
 (use-package simple
-  :config (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill))
+  :config (add-hook 'org-mode-hook #'turn-on-auto-fill))
 
 (use-package org
   :ensure t
   :defer t
+  :commands org-mode
   :config
   (setq org-completion-use-ido t
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
@@ -27,14 +28,15 @@
         org-support-shift-select t ; use shift-select
         ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines.
         ;; See org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
-        org-use-speed-commands t)
+        org-use-speed-commands t
+        org-src-strip-leading-and-trailing-blank-lines t)
 
   ;; Allow syntax highlighting for parts of a word
   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode
-  (setcar org-emphasis-regexp-components " \t('\"{[:alpha:]=")
+  (setcar org-emphasis-regexp-components " \t('\"`{[:alpha:]=")
   (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}=\\")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
-  
+
   (require 'org-inlinetask)
 
   ;; (with-eval-after-load "org"
@@ -45,14 +47,19 @@
   ;;   (define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
   ;; (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
-  
+
   ;; turn on soft wrapping mode for org mode
   (add-hook 'org-mode-hook
             (lambda ()
-              (setq truncate-lines nil))))
+              (setq truncate-lines nil)))
+
+  (add-hook 'org-mode-hook #'org-toggle-blocks)
+  (add-hook 'org-mode-hook #'which-function-mode)
+
+  (use-package helm-org
+    :config (setq helm-org-headings-fontify t)))
 
 ;; require ox-latex so that the following variables are defined
-;;(require 'ox-latex)
 (use-package ox-latex
   :defer t
   :config
@@ -65,7 +72,8 @@
     ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
     )
   ;; tell org to use listings, options: t, 'minted
-  (setq org-latex-listings 't))
+  (setq org-latex-listings 't
+        org-latex-table-caption-above nil))
 
 (use-package simple
   :diminish visual-line-mode auto-fill-function
@@ -95,6 +103,16 @@
 
 (use-package org-autolist
   :ensure t
+  :defer t)
+
+(use-package org-footnote
+  :ensure nil
+  :config
+  (setq org-footnote-define-inline t
+        org-footnote-auto-label 'random))
+
+(use-package ox-md
+  :ensure nil
   :defer t)
 
 (provide 'org-init)

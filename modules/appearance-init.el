@@ -69,14 +69,14 @@
                                      (set-face-background 'fringe "wheat")
                                      (with-eval-after-load 'hl-line
                                        (set-face-attribute 'hl-line nil :background "lavender"))))
-      
+
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
                                            :config
                                            (load-theme 'professional t)
                                            ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
                                            (set-face-attribute 'default nil :height 110)))
-      
+
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
                                       :config
@@ -96,7 +96,7 @@
                                       (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil :bold nil)
                                       (set-face-attribute 'mode-line-inactive nil :box nil)
                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
-                                      (set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
+                                      ;;(set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
                                       (with-eval-after-load "hl-line"
                                         (set-face-attribute 'hl-line nil :background "linen"))
                                       (with-eval-after-load "helm"
@@ -123,6 +123,12 @@
   :ensure t
   :if (not (eq dotemacs-theme 'default))
   :config (global-display-theme-mode))
+
+(use-package frame
+  :config
+  ;; start with the emacs window maximized
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  (add-to-list 'default-frame-alist '(fullscreen . fullheight)))
 
 (provide 'appearance-init)
 

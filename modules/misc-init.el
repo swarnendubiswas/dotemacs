@@ -51,7 +51,7 @@
                    (buffer-file-name (tabbar-tab-value tab)))
               (concat " * " (concat ad-return-value " "))
             (concat " " (concat ad-return-value " ")))))
-  
+
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/

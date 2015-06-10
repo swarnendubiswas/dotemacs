@@ -18,11 +18,15 @@
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
                           "[/\\]tmp/recentf-marker\\'" "/company-statistics-cache.el$")) ; "/ssh:"
+
   (recentf-mode 1)
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   (recentf-cleanup)
 
   :config
+  (add-to-list 'recentf-used-hooks
+               '(dired-after-readin-hook recentf-track-opened-file))
+
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   (add-hook 'after-init-hook #'recentf-auto-cleanup)
 
@@ -34,18 +38,18 @@
   ;;   (run-with-timer 0 (* 600 60) 'recentf-save-list))
 
   ;;(add-hook 'kill-emacs-hook #'recentf-save-list)
-  
+
   ;; Add buffers to recent list.
   (use-package recentf-ext
     :ensure t)
-  
+
   ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
     :ensure t
     ;;:load-path "lisp/"
     :config (recentf-auto-cleanup))
-  
+
   :bind ("<f8>" . recentf-open-files))
 
 (provide 'recentf-init)

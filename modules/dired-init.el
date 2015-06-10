@@ -11,17 +11,17 @@
   (defun dired--go-home ()
     (interactive)
     (dired "~/"))
-  
+
   (defun dired--jump-to-top ()
     (interactive)
     (beginning-of-buffer)
     (dired-next-line 2))
-  
+
   (defun dired--jump-to-bottom ()
     (interactive)
     (end-of-buffer)
     (dired-next-line -1))
-  
+
   :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
@@ -30,7 +30,9 @@
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
-  
+
+  ;;(add-hook 'dired-mode-hook #'dired-hide-details-mode)
+
   (bind-key "M-<home>" 'dired--go-home dired-mode-map)
   (bind-key "i" 'ido-find-file dired-mode-map)
   (bind-key "M-<up>" 'dired--jump-to-top dired-mode-map)
@@ -51,7 +53,7 @@
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Make sure to remove \"Omit\" from the modeline."
     (diminish 'dired-omit-mode) dired-mode-map)
-  
+
   :bind*
   ;; C-x C-j opens dired with the cursor right on the file you're editing
   ("C-x C-j" . dired-jump))

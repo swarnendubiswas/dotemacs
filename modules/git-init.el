@@ -5,10 +5,12 @@
 
 ;;; Code:
 
+;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
 (use-package magit
   :disabled t
   :ensure t
   :diminish magit-auto-revert-mode
+  :commands magit-status
   :config
   (setq magit-auto-revert-mode nil
         magit-item-highlight-face 'bold

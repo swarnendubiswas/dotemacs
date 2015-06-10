@@ -58,7 +58,8 @@
         ;; use shift-select for marking
         shift-select-mode t)
   ;; Enable visual feedback on selections, default since v23
-  (transient-mark-mode 1))
+  (transient-mark-mode 1)
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
@@ -111,7 +112,9 @@
       use-file-dialog nil)
 
 (use-package advice
-  :config (setq ad-redefinition-action 'accept))
+  :config
+  ;; turn off the warnings due to functions being redefined
+  (setq ad-redefinition-action 'accept))
 
 ;; Enable disabled commands
 (put 'downcase-region  'disabled nil)   ; Let downcasing work
@@ -121,6 +124,10 @@
 (put 'narrow-to-region 'disabled nil)   ; Let narrowing work
 (put 'set-goal-column  'disabled nil)
 (put 'upcase-region    'disabled nil)   ; Let upcasing work
+
+(advice-add 'capitalize-word :before #'goto-beginning-of-word)
+(advice-add 'downcase-word :before #'goto-beginning-of-word)
+(advice-add 'upcase-word :before #'goto-beginning-of-word)
 
 ;; desktop save mode
 (use-package desktop
@@ -194,6 +201,7 @@
 (setq enable-recursive-minibuffers t)
 
 (use-package mb-depth
+  :defer t
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify

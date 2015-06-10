@@ -7,22 +7,39 @@
 
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
-      package-enable-at-startup nil
-      use-package-verbose t)
-
-;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-;;(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+      package-enable-at-startup nil)
 (package-initialize)
 
-;; always referesh contents so that new packages added to the repositories are available
-;;(package-refresh-contents)
 ;; setup use-package
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
-
 (require 'use-package)
+(setq use-package-always-ensure nil
+      use-package-verbose t)
+
+(use-package package
+  :commands list-packages
+  :config
+  ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
+  (add-to-list 'package-archives
+               '("marmalade" . "https://marmalade-repo.org/packages/") t)
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives
+               '("org" . "http://orgmode.org/elpa/") t)
+  ;; (add-to-list 'package-archives
+  ;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  ;; always referesh contents so that new packages added to the repositories are available
+  ;;(package-refresh-contents)
+  )
+
+;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
+;; (eval-and-compile
+;;   (mapc
+;;    #'(lambda (path)
+;;        (push (expand-file-name path user-emacs-directory) load-path))
+;;    '("site-lisp" "override" "lisp" "lisp/use-package" "lisp/bind-key" "lisp/diminish")))
+
 (require 'diminish)
 (require 'bind-key)
 
@@ -46,6 +63,7 @@
         paradox-github-token t))
 
 (use-package hydra
+  :defer t
   :ensure t)
 
 (provide 'packages-init)
