@@ -1,4 +1,4 @@
-;;; ibuffer-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; ibuffer-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; IBuffer configurations.
@@ -27,7 +27,7 @@
   (add-hook 'ibuffer-mode-hook
             (lambda ()
               (ibuffer-do-sort-by-recency)))
-  
+
   ;; Group ibuffer list by tramp connection
   (use-package ibuffer-tramp
     :load-path "lisp/"
@@ -56,7 +56,7 @@
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
                   (ibuffer-do-sort-by-mode-name)
                   (ibuffer-do-sort-by-major-mode)))))
-  
+
   :bind (;;([remap list-buffers] . ibuffer)
          ("C-x C-b" . ibuffer)))
 

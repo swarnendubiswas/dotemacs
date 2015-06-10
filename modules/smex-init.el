@@ -1,4 +1,4 @@
-;;; smex-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; smex-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup smex.

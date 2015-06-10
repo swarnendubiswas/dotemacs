@@ -1,4 +1,4 @@
-;;; guide-key-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; guide-key-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup guide key.
@@ -16,7 +16,7 @@
         ;; delay before the guide shows up, default is 1 s
         guide-key/idle-delay 1.0)
   (guide-key-mode 1)
-  
+
   (use-package guide-key-tip
     :disabled t
     :ensure t

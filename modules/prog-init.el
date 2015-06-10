@@ -1,4 +1,4 @@
-;;; prog-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; prog-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Programming mode specific.
@@ -31,8 +31,10 @@
 
 ;; lisp and variants
 
-(add-hook 'emacs-lisp-mode-hook #'lispy-mnemonic-mode)
-(add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
+(use-package prog-mode
+  :config
+  ;;(add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
+  (global-prettify-symbols-mode 1))
 
 (use-package eldoc
   :config

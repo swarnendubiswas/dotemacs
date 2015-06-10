@@ -1,4 +1,4 @@
-;;; parens-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; parens-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup parentheses. Highlight/track mismatched parentheses, auto-pairing, etc.
@@ -25,12 +25,12 @@
 (or (use-package elec-pair
       :disabled t
       :config (electric-pair-mode 1))
-    
+
     (use-package autopair
       :disabled t
       :ensure t
       :config (autopair-global-mode 1))
-    
+
     (use-package flex-autopair
       :disabled t
       :ensure t
@@ -53,20 +53,20 @@
         sp-navigate-close-if-unbalanced t
         sp-show-pair-from-inside t
         sp-autoescape-string-quote nil)
-  
+
   ;; pair management
   (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-  
+
   ;; do not autoinsert ' pair if the point is preceded by word. This will handle the situation when ' is used as a
   ;; contraction symbol in natural language. Nil for second argument means to keep the original definition of closing
   ;; pair.
   (sp-pair "'" nil :unless '(sp-point-after-word-p))
-  
+
   ;; emacs is lisp hacking enviroment, so we set up some most common lisp modes too
   (sp-with-modes sp--lisp-modes
     ;; disable ', it's the quote character!
     (sp-local-pair "'" nil :actions nil))
-  
+
   ;; tex-mode latex-mode
   (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
     (sp-local-tag "i" "\"<" "\">"))

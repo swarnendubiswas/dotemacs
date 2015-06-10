@@ -40,15 +40,17 @@
 ;;        (push (expand-file-name path user-emacs-directory) load-path))
 ;;    '("site-lisp" "override" "lisp" "lisp/use-package" "lisp/bind-key" "lisp/diminish")))
 
-(require 'diminish)
-(require 'bind-key)
+(use-package diminish
+  :ensure t)
+(use-package bind-key
+  :ensure t)
 
-;; prefer newer files
-(setq load-prefer-newer t)
-
+;; this only *recompiles* ELisp source files.
 (use-package auto-compile
-  :disabled t
   :ensure t
+  :init
+  ;; prefer newer files
+  (setq load-prefer-newer t)
   :config
   (setq auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)

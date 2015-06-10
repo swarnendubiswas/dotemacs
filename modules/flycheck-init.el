@@ -1,4 +1,4 @@
-;;; flycheck-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; flycheck-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure flycheck.
@@ -19,7 +19,7 @@
         flycheck-completion-system 'ido
         flycheck-standard-error-navigation nil
         flycheck-check-syntax-automatically '(save mode-enabled))
-  
+
   (use-package flycheck-tip
     :disabled t
     :ensure t)

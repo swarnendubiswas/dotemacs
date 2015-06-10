@@ -47,7 +47,11 @@
 ;;   "Emacs was a really great idea in the seventies and one of the frightening things about Emacs today is if you skip
 ;;    the last 20 years it is much the same." -- Don't use Emacs, says Java's father
 ;;    (http://www.computerworld.com.au/article/207799/don_t_use_emacs_says_java_father/).
-
+;;
+;;   "Bad programming is easy. Even Dummies can learn it in 21 days." -- Felleisen et al. in "How to
+;;    Design Programs".
+;;
+;;   "A language that doesn't affect the way you think about programming, is not worth knowing". -- Alan Perlis.
 
 ;;; Code:
 
@@ -74,7 +78,6 @@
 (require 'ibuffer-init)
 (require 'dired-init)
 (require 'search-init)
-;; helm is configured to make use of recentf
 (require 'recentf-init)
 
 ;;(if (bound-and-true-p use-company)
@@ -118,25 +121,21 @@
 ;; generic keybindings, package-specific are usually in their own modules
 (require 'keybindings-init)
 
-;; custom definitions
-(require 'custom-init)
-
 ;; temporary modules
 (require 'svn-init)
-;; (require 'git-init)
+(require 'git-init)
 
 (require 'cedet-init)
 (require 'jdee-init)
 
-;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
-;; enabled on startup.
+;; FIXME: for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
+;; not enabled on startup. Not sure why.
 (require 'tags-init)
+
+;; custom definitions
+(require 'custom-init)
 
 ;; start the daemon/server
 ;; (require 'server-init)
-
-;; start with the emacs window maximized
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
-(add-to-list 'default-frame-alist '(fullscreen . fullheight))
 
 ;;; init.el ends here

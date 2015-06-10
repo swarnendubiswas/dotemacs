@@ -1,4 +1,4 @@
-;;; cc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; cc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.
@@ -28,7 +28,7 @@
   :config
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2)
-  
+
   (use-package cwarn
     :defer t
     :config
@@ -55,7 +55,7 @@
   ;; (with-eval-after-load 'cc-mode
   ;;   (define-key c-mode-map  [(tab)] 'company-complete)
   ;;   (define-key c++-mode-map  [(tab)] 'company-complete))
-  
+
   (use-package company-c-headers
     :ensure t
     :config

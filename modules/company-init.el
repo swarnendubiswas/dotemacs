@@ -1,4 +1,4 @@
-;;; company-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; company-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Initialize company mode for auto completion.
@@ -59,7 +59,7 @@
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t)
     (add-to-list 'company-backends #'company-dabbrev-code))
-  
+
   (use-package company-web
     :ensure t
     :preface

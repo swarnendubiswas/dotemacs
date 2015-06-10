@@ -1,4 +1,4 @@
-;;; ace-modes-init.el --- Part of emacs initialization   -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; ace-modes-init.el --- Part of emacs initialization   -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup ace-xxx (jump/buffer/isearch) modes.
@@ -6,16 +6,14 @@
 ;;; Code:
 
 (use-package ace-jump-mode
-  :disabled t ;; prefer ace-window/avy
+  ;;:disabled t ;; prefer ace-window/avy
   :ensure t
   ;;:init  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind*
   (("C-c a f" . ace-jump-mode)
    ("C-c a b" . ace-jump-mode-pop-mark)
    ("C-'" . ace-jump-mode))
-  :config
-  (set-face-attribute 'aw-leading-char-face nil :height 2.0)
-  (ace-jump-mode-enable-mark-sync))
+  :config (ace-jump-mode-enable-mark-sync))
 
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
@@ -27,10 +25,10 @@
 
   (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$")
     "*Buffer regexps to never show when buffer switching.")
-  
+
   (defvar my-ido-ignore-dired-buffers nil
     "*If non-nil, buffer switching should ignore dired buffers.")
-  
+
   (defun my-bs-str-in-regexp-list (str regexp-list)
     "Return non-nil if str matches anything in regexp-list."
     (let ((case-fold-search nil))
@@ -38,7 +36,7 @@
         (dolist (regexp regexp-list)
           (when (string-match regexp str)
             (throw 'done t))))))
-  
+
   (defun my-bs-ignore-buffer (name)
     "Return non-nil if the named buffer should be ignored."
     (or (and (not (my-bs-str-in-regexp-list name my-bs-always-show-regexps))
@@ -47,7 +45,7 @@
              (save-excursion
                (set-buffer name)
                (equal major-mode 'dired-mode)))))
-  
+
   :config
   (setq bs-configurations
         '(("all" nil nil nil nil nil)
@@ -75,17 +73,19 @@
     :config (avy-setup-default)
     (setq avy-background t
           avy-style 'at-full))
+
   (ace-window-display-mode 1))
 
-(defhydra hydra-avy-jump (:color blue)
-  "Avy jump."
-  ("c" avy-goto-char "char")
-  ("w" avy-goto-word-0 "word")
-  ("l" avy-goto-line "line")
-  ("s" avy-goto-subword-0 "subword")
+(defhydra hydra-jump-commands (:color blue)
+  "Different jump commands."
+  ("c" avy-goto-char "avy char")
+  ("w" avy-goto-word-0 "avy word")
+  ("L" avy-goto-line "avy line")
+  ("s" avy-goto-subword-0 "avy subword")
   ("C" goto-char "goto char")
-  ("L" goto-line "goto line"))
-(bind-key "M-g" #'hydra-avy-jump/body)
+  ("l" goto-line "goto line")
+  ("b" ace-jump-mode "ace jump"))
+(bind-key "M-g" #'hydra-jump-commands/body)
 
 (provide 'ace-modes-init)
 

@@ -1,4 +1,4 @@
-;;; cedet-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; cedet-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup cedet, ede, and semantic mode.
@@ -6,10 +6,12 @@
 ;;; Code:
 
 (use-package cedet
+  :defer t
   :config
   (require 'cedet-files))
 
 (use-package ede
+  :defer t
   :config
   (global-ede-mode 1)
   (ede-enable-generic-projects))
@@ -44,6 +46,7 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
+  :defer t
   :config
   ;;(require 'semantic-ia)
   ;;(require 'semantic-loaddefs)
@@ -69,18 +72,21 @@
   (global-semantic-highlight-func-mode 1))
 
 (use-package idle
+  :defer t
   :config
   (global-semantic-idle-scheduler-mode 1)
   (global-semantic-idle-completions-mode 1)
   (global-semantic-idle-breadcrumbs-mode 1))
 
 (use-package mode
+  :defer t
   :config
   (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
 
 (use-package ecb
+  :defer t
   :ensure t
   :load-path "elpa/ecb-20140215.114"
   :init
