@@ -24,6 +24,7 @@
 (use-package readline-complete
   :ensure t
   :defer t
+  :functions ac-modes ac-rlc-setup-sources
   :config
   (when (fboundp 'company-mode)
     (push 'company-readline company-backends)

@@ -66,9 +66,10 @@
                                          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
                                        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                      ;; customize the fringe marks on the sides
-                                     (set-face-background 'fringe "wheat")
-                                     (with-eval-after-load 'hl-line
-                                       (set-face-attribute 'hl-line nil :background "lavender"))))
+                                     ;; (set-face-background 'fringe "wheat")
+                                     ;; (with-eval-after-load 'hl-line
+                                     ;; (set-face-attribute 'hl-line nil :background "lavender"))
+                                     ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
@@ -173,7 +174,7 @@
                       :background "#f2f2f6"
                       :foreground "black"
                       :box '(:line-width 1 :color "black" :style pressed-button)
-                      :height 1.2
+                      :height 1.1
                       :bold t
                       :underline nil)
   (set-face-attribute 'tabbar-highlight nil
@@ -185,7 +186,7 @@
                       :height 1.0)
   (setq tabbar-use-images nil ; speed up by not using images
         tabbar-auto-scroll-flag t
-        tabbar-separator '(1.0))
+        tabbar-separator '(0.5))
   (tabbar-mode 1))
 
 (provide 'appearance-init)

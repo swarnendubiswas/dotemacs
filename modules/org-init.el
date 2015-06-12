@@ -6,7 +6,10 @@
 ;;; Code:
 
 (use-package simple
-  :config (add-hook 'org-mode-hook #'turn-on-auto-fill))
+  :diminish visual-line-mode
+  :config
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  (add-hook 'org-mode-hook #'turn-on-auto-fill))
 
 (use-package org
   :ensure t
@@ -16,6 +19,7 @@
   (setq org-completion-use-ido t
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-startup-indented t
+        org-startup-truncated nil
         org-src-preserve-indentation t
         org-src-tabs-acts-natively t
         org-src-window-setup 'current-window
@@ -37,6 +41,10 @@
   (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}=\\")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
 
+  ;; SB: Does not work for me
+  ;; disable including title if not explicitly specified, default was to use the buffer name
+  ;;(defadvice org-export-grab-title-from-buffer (around org-export-grab-title-from-buffer-disable activate))
+
   (require 'org-inlinetask)
 
   ;; (with-eval-after-load "org"
@@ -47,11 +55,6 @@
   ;;   (define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
   ;; (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
-
-  ;; turn on soft wrapping mode for org mode
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (setq truncate-lines nil)))
 
   (add-hook 'org-mode-hook #'org-toggle-blocks)
   (add-hook 'org-mode-hook #'which-function-mode)
@@ -74,10 +77,6 @@
   ;; tell org to use listings, options: t, 'minted
   (setq org-latex-listings 't
         org-latex-table-caption-above nil))
-
-(use-package simple
-  :diminish visual-line-mode auto-fill-function
-  :config (add-hook 'org-mode-hook #'visual-line-mode))
 
 (use-package org-beautify-theme
   :disabled t

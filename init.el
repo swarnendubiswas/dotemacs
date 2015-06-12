@@ -128,14 +128,14 @@
 (require 'cedet-init)
 (require 'jdee-init)
 
-;; FIXME: for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
-;; not enabled on startup. Not sure why.
+;; For some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
+;; enabled on startup. Not sure why.
 (require 'tags-init)
 
 ;; custom definitions
 (require 'custom-init)
 
 ;; start the daemon/server
-;; (require 'server-init)
+(require 'server-init)
 
 ;;; init.el ends here

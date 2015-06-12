@@ -1,4 +1,4 @@
-;;; mode-line-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; mode-line-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Tweak mode line.
@@ -32,6 +32,7 @@
     ;; Use a fork of powerline: https://github.com/jonathanchu/emacs-powerline/
     (use-package powerline
       :disabled t
+      ;; If the path is relative, it is expanded within user-emacs-directory
       :load-path "lisp/emacs-powerline/"
       :config
       (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
