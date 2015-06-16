@@ -8,7 +8,7 @@
 (use-package simple
   :diminish visual-line-mode
   :config
-  (add-hook 'org-mode-hook #'visual-line-mode)
+  ;;(add-hook 'org-mode-hook #'visual-line-mode)
   (add-hook 'org-mode-hook #'turn-on-auto-fill))
 
 (use-package org

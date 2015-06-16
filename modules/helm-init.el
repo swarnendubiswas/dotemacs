@@ -150,6 +150,9 @@
                       (let ((current-prefix-arg 't))
                         (call-interactively 'helm-do-grep)))))
 
+  (use-package helm-fuzzy-find
+    :ensure t)
+
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 

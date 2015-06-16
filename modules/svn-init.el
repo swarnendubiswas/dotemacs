@@ -5,7 +5,8 @@
 
 ;;; Code:
 
-;; SB: These packages seems to mess up tags and indentation
+;; SB: FIXME: These packages seems to mess up tags and indentation
+
 (use-package psvn
   :disabled t
   :ensure t
@@ -14,7 +15,6 @@
         svn-status-display-full-path t
         svn-status-auto-revert-buffers t
         svn-status-use-ido-completion t)
-  ;; SB: I use svn and emacs mostly for LaTeX files.
   (add-hook 'LaTex-mode-hook #'svn-status)
   (add-hook 'prog-mode-hook #'svn-status))
 
@@ -22,9 +22,12 @@
   :disabled t
   :ensure t
   :config
-  ;; SB: I use svn and emacs mostly for LaTeX files.
   (add-hook 'LaTex-mode-hook #'svn-status)
   (add-hook 'prog-mode-hook #'svn-status))
+
+(use-package helm-ls-svn
+  :disabled t
+  :ensure t)
 
 (provide 'svn-init)
 
