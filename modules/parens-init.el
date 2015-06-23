@@ -1,4 +1,4 @@
-;;; parens-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; parens-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup parentheses. Highlight/track mismatched parentheses, auto-pairing, etc.

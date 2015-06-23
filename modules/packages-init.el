@@ -47,6 +47,7 @@
 
 ;; this only *recompiles* ELisp source files.
 (use-package auto-compile
+  :disabled t
   :ensure t
   :init
   ;; prefer newer files

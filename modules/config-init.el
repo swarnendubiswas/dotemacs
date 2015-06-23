@@ -38,7 +38,7 @@
 
 ;; choices: "leuven", "professional", "eclipse", otherwise default.
 (defcustom dotemacs-theme
-  'leuven
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)

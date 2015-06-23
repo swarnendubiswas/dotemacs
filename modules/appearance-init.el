@@ -1,4 +1,4 @@
-;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Tweak emacs appearance.
@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;; better frame titles
-;; (setq frame-title-format (concat  "%b - emacs@" (system-name)))
+;; (setq frame-title-format (concat  "%b - GNU Emacs@" (system-name)))
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 (setq-default indicate-buffer-boundaries 'right)
@@ -32,7 +32,10 @@
 (use-package frame
   :config
   ;; enable/disable blinking cursor
-  (blink-cursor-mode 1))
+  (blink-cursor-mode 1)
+  ;; start with the emacs window maximized
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  (add-to-list 'default-frame-alist '(fullscreen . fullheight)))
 
 ;; displays the time and date in the mode line
 (use-package time
@@ -101,7 +104,7 @@
                                       (with-eval-after-load "hl-line"
                                         (set-face-attribute 'hl-line nil :background "linen"))
                                       (with-eval-after-load "helm"
-                                        (set-face-attribute 'helm-selection nil :underline t))
+                                        (set-face-attribute 'helm-selection nil :underline nil))
                                       ;; org-mode customizations inspired from leuven theme
                                       (with-eval-after-load "org"
                                         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
@@ -124,12 +127,6 @@
   :ensure t
   :if (not (eq dotemacs-theme 'default))
   :config (global-display-theme-mode))
-
-(use-package frame
-  :config
-  ;; start with the emacs window maximized
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  (add-to-list 'default-frame-alist '(fullscreen . fullheight)))
 
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
 ;; http://stackoverflow.com/questions/15735163/update-tabbar-when-nothing-to-save#
@@ -186,7 +183,7 @@
                       :height 1.0)
   (setq tabbar-use-images nil ; speed up by not using images
         tabbar-auto-scroll-flag t
-        tabbar-separator '(0.5))
+        tabbar-separator '(0.3))
   (tabbar-mode 1))
 
 (provide 'appearance-init)

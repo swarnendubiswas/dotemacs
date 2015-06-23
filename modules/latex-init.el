@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -145,8 +145,6 @@
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t
         reftex-default-bibliography '("~/workspace/bib/plass.bib"))
-  ;; (with-eval-after-load "reftex"
-  ;;   (diminish 'reftex-mode))
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook #'reftex-mode))
 

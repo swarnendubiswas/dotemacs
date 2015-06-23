@@ -1,4 +1,4 @@
-;;; git-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; git-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup git.
@@ -38,6 +38,10 @@
 
   ;; Mode for git rebase -i
   (use-package git-rebase-mode
+    :ensure t
+    :defer t)
+
+  (use-package helm-ls-git
     :ensure t
     :defer t))
 

@@ -1,4 +1,4 @@
-;;; ido-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; ido-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure ido.
@@ -34,7 +34,11 @@
     (add-to-list 'ido-ignore-directories dirs))
   (ido-mode 1) ; options: 'files, 'buffers
   (ido-everywhere 1)
-  :bind ("<f2>" . ido-find-file))
+  :bind
+  (("<f2>" . ido-find-file)
+   ("C-x C-f" . ido-find-file)
+   ("C-x b" . ido-switch-buffer)
+   ("C-x d" . ido-dired)))
 
 (use-package ido-vertical-mode
   :ensure t

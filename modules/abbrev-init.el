@@ -1,4 +1,4 @@
-;;; abbrev-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; abbrev-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup abbrev.
@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package abbrev
+  :disabled t
   :diminish abbrev-mode
   :config
   (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))

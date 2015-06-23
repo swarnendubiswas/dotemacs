@@ -1,4 +1,4 @@
-;;; cedet-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; cedet-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup cedet, ede, and semantic mode.
@@ -46,10 +46,14 @@
 ;;(semantic-load-enable-excessive-code-helpers)
 
 (use-package semantic
-  :defer t
+  :preface
+  (defun dotemacs--semantic-functions ()
+    (semantic-mode 1)
+    (global-semanticdb-minor-mode 1)
+    (global-semantic-highlight-func-mode 1))
   :config
-  ;;(require 'semantic-ia)
-  ;;(require 'semantic-loaddefs)
+  ;; (require 'semantic-ia)
+  ;; (require 'semantic-loaddefs)
   ;; Copied from https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
@@ -60,16 +64,15 @@
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
-  (semantic-mode 1)
-  ;;(require 'semanticdb)
-  ;;SemanticDB files
+
+  ;; (require 'semanticdb)
+  ;; SemanticDB files
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
   ;; (require 'semantic/db-global)
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)
   ;; (semanticdb-enable-gnu-global-databases 'c++-mode))
-  (global-semanticdb-minor-mode 1)
-  (global-semantic-highlight-func-mode 1))
+  (add-hook 'prog-mode-hook #'dotemacs--semantic-functions))
 
 (use-package idle
   :defer t
@@ -86,13 +89,12 @@
   (global-srecode-minor-mode 1))
 
 (use-package ecb
-  :defer t
+  :disabled t
   :ensure t
   :load-path "elpa/ecb-20140215.114"
   :init
   (setq-default ecb-tip-of-the-day nil)
-  ;;(add-hook 'prog-mode-hook #'ecb-minor-mode)
-  )
+  (add-hook 'prog-mode-hook #'ecb-minor-mode))
 
 (defhydra hydra-ecb (:color blue)
   ("ecb commands")

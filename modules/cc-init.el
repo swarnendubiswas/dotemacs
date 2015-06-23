@@ -1,4 +1,4 @@
-;;; cc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; cc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.
@@ -33,38 +33,43 @@
     :defer t
     :config
     (with-eval-after-load "cc-mode"
-      (global-cwarn-mode 1))))
+      (global-cwarn-mode 1)))
+
+  (use-package hideif
+    :config
+    (setq hide-ifdef-initially t)
+    (hide-ifdef-mode 1))
+
+  (use-package google-c-style
+    :ensure t
+    :config
+    (add-hook 'c-mode-common-hook #'google-set-c-style)
+    (add-hook 'c-mode-common-hook #'google-make-newline-indent)))
 
 ;; this is already the default, but I have this as a reminder.
 (with-eval-after-load "cc-mode"
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))
 
-(use-package google-c-style
-  :ensure t
-  :config
-  (add-hook 'c-mode-common-hook #'google-set-c-style)
-  (add-hook 'c-mode-common-hook #'google-make-newline-indent))
-
 ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 
 ;; http://tuhdo.github.io/c-ide.html
 (with-eval-after-load "company"
-  (setq company-backends (delete 'company-semantic company-backends))
+  (setq company-backends (delete 'company-semantic company-backends)))
 
-  ;; SB: TODO: Do I want this?
-  ;; (with-eval-after-load 'cc-mode
-  ;;   (define-key c-mode-map  [(tab)] 'company-complete)
-  ;;   (define-key c++-mode-map  [(tab)] 'company-complete))
+;; SB: TODO: Do I want this?
+;; (with-eval-after-load 'cc-mode
+;;   (define-key c-mode-map  [(tab)] 'company-complete)
+;;   (define-key c++-mode-map  [(tab)] 'company-complete))
 
-  (use-package company-c-headers
-    :ensure t
-    :config
-    (add-to-list 'company-backends #'company-c-headers)
-    (cond ((string-equal system-name "rain.cse.ohio-state.edu")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
-           (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
-          ((string-equal system-name "biswass-Dell-System-XPS-L502X")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))
+(use-package company-c-headers
+  :ensure t
+  :config
+  (add-to-list 'company-backends #'company-c-headers)
+  (cond ((string-equal system-name "rain.cse.ohio-state.edu")
+         (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
+         (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
+        ((string-equal system-name "biswass-Dell-System-XPS-L502X")
+         (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9")))
   (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
   (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
 
@@ -73,9 +78,6 @@
   :config
   (semantic-add-system-include "/usr/local/include")
   (semantic-add-system-include "~/linux/include"))
-
-(use-package hideif
-  :config (hide-ifdef-mode 1))
 
 (provide 'cc-init)
 

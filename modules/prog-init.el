@@ -1,4 +1,4 @@
-;;; prog-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; prog-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Programming mode specific.
@@ -8,6 +8,7 @@
 ;; show the name of the function in the modeline
 (use-package which-func
   :config
+  (set-face-attribute 'which-func nil :foreground "black")
   (setq which-func-modes t)
   (add-hook 'prog-mode-hook
             (lambda ()
