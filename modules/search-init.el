@@ -37,7 +37,7 @@
   (setq ivy-use-virtual-buffers t
         ;; be less noisy
         swiper-min-highlight 3)
-  (bind-key "<f6>" 'ivy-resume ivy-mode-map)
+  ;;(bind-key "<f6>" 'ivy-resume ivy-mode-map)
   (use-package swiper-helm
     :ensure t)
   :diminish ivy-mode

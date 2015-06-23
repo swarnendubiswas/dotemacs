@@ -40,6 +40,7 @@
 ;; https://github.com/Fuco1/smartparens/blob/master/smartparens-config.el
 ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
 (use-package smartparens
+  :disabled t
   :ensure t
   :diminish smartparens-mode
   :init

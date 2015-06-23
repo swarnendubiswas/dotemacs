@@ -12,15 +12,18 @@
               indent-tabs-mode nil)
 
 (use-package aggressive-indent
+  :disabled t
   :ensure t
   :config (global-aggressive-indent-mode 1)
   :diminish aggressive-indent-mode)
 
 ;; intelligent indentation, on by default from Emacs 24.4
 (use-package electric
+  :disabled t
   :config (electric-indent-mode 1))
 
 (use-package auto-indent-mode
+  :disabled t
   :ensure t
   :diminish auto-indent-mode
   :config

@@ -159,7 +159,7 @@
   (define-key global-map [remap list-buffers] 'helm-buffers-list)
   (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 
-  :bind
+  :bind*
   (("<f1>" . helm-M-x)
    ("M-x" . helm-M-x)
    ("C-c h f" . helm-find-files)

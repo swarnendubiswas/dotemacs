@@ -32,6 +32,16 @@
           projectile-switch-project-action #'helm-projectile)
     (helm-projectile-on))
 
+  (use-package ibuffer-projectile
+    :ensure t
+    :config
+    (add-hook 'ibuffer-mode-hook
+              (lambda()
+                (ibuffer-projectile-set-filter-groups)
+                (unless (eq ibuffer-sorting-mode 'alphabetic)
+                  (ibuffer-do-sort-by-mode-name)
+                  (ibuffer-do-sort-by-major-mode)))))
+
   (defhydra hydra-projectile (:color blue)
     "projectile"
     ("h" helm-projectile "helm-projectile")

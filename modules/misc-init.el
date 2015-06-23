@@ -24,10 +24,6 @@
   (setq large-file-warning-threshold (* 50 1024 1024))
   (use-package vlf-setup))
 
-(use-package jgraph-mode
-  :ensure t
-  :defer t)
-
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
   :ensure t
@@ -73,6 +69,7 @@
   :defer t)
 
 (use-package popwin
+  :disabled t
   :ensure t
   :config
   (if (string-equal system-name "XXX")

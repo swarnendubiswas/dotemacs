@@ -117,7 +117,7 @@
       ;; default
       ((eq dotemacs-theme 'default)
        (if (string= system-name "XXX")
-           (set-face-attribute 'default nil  :height 110)
+           (set-face-attribute 'default nil  :height 115)
          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
        (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
        (with-eval-after-load "hl-line"

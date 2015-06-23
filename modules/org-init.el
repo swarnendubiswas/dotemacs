@@ -60,59 +60,55 @@
   (add-hook 'org-mode-hook #'which-function-mode)
 
   (use-package helm-org
-    :config (setq helm-org-headings-fontify t)))
+    :config (setq helm-org-headings-fontify t))
 
-;; require ox-latex so that the following variables are defined
-(use-package ox-latex
-  :defer t
-  :config
-  (with-eval-after-load "org"
-    ;; include the listings package
-    (add-to-list 'org-latex-packages-alist '("" "listings"))
-    ;; if you want colored source code then you need to include the color package
-    ;;(add-to-list 'org-latex-packages-alist '("" "color"))
-    ;; Add minted to the defaults packages to include when exporting.
-    ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
-    )
-  ;; tell org to use listings, options: t, 'minted
-  (setq org-latex-listings 't
-        org-latex-table-caption-above nil))
+  ;; require ox-latex so that the following variables are defined
+  (use-package ox-latex
+    :config
+    (with-eval-after-load "org"
+      ;; include the listings package
+      (add-to-list 'org-latex-packages-alist '("" "listings"))
+      ;; if you want colored source code then you need to include the color package
+      ;;(add-to-list 'org-latex-packages-alist '("" "color"))
+      ;; Add minted to the defaults packages to include when exporting.
+      ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
+      )
+    ;; tell org to use listings, options: t, 'minted
+    (setq org-latex-listings 't
+          org-latex-table-caption-above nil))
 
-(use-package org-beautify-theme
-  :disabled t
-  :ensure t)
+  (use-package org-beautify-theme
+    :disabled t
+    :ensure t)
 
-(use-package org-indent
-  :defer t
-  :diminish org-indent-mode
-  :config
-  (with-eval-after-load "org"
-    (org-indent-mode 1)))
+  (use-package org-indent
+    :diminish org-indent-mode
+    :config
+    (with-eval-after-load "org"
+      (org-indent-mode 1)))
 
-(use-package org-ref
-  :disabled t
-  :load-path "lisp/org-ref"
-  :init (org-babel-load-file "org-ref.org")
-  :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
+  (use-package org-ref
+    :disabled t
+    :load-path "lisp/org-ref"
+    :init (org-babel-load-file "org-ref.org")
+    :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
 
-(use-package org-bullets
-  :ensure t
-  :defer t
-  :init (add-hook 'org-mode-hook #'org-bullets-mode))
+  (use-package org-bullets
+    :ensure t
+    :init (add-hook 'org-mode-hook #'org-bullets-mode))
 
-(use-package org-autolist
-  :ensure t
-  :defer t)
+  (use-package org-autolist
+    :ensure t)
 
-(use-package org-footnote
-  :ensure nil
-  :config
-  (setq org-footnote-define-inline t
-        org-footnote-auto-label 'random))
+  (use-package org-footnote
+    :ensure nil
+    :defer t
+    :config
+    (setq org-footnote-define-inline t
+          org-footnote-auto-label 'random))
 
-(use-package ox-md
-  :ensure nil
-  :defer t)
+  (use-package ox-md
+    :ensure nil))
 
 (provide 'org-init)
 

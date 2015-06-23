@@ -47,16 +47,6 @@
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
                   (ibuffer-do-sort-by-alphabetic)))))
 
-  (use-package ibuffer-projectile
-    :ensure t
-    :config
-    (add-hook 'ibuffer-mode-hook
-              (lambda()
-                (ibuffer-projectile-set-filter-groups)
-                (unless (eq ibuffer-sorting-mode 'alphabetic)
-                  (ibuffer-do-sort-by-mode-name)
-                  (ibuffer-do-sort-by-major-mode)))))
-
   :bind (;;([remap list-buffers] . ibuffer)
          ("C-x C-b" . ibuffer)))
 

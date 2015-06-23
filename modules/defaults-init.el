@@ -21,14 +21,16 @@
 (setq locale-coding-system 'utf-8)
 
 (use-package mule
+  :if (eq system-type 'windows-nt)
   :config
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8))
 
-(set-language-environment 'utf-8)
-(prefer-coding-system 'utf-8)
-(set-input-method nil)
+(when (eq system-type 'windows-nt)
+  (set-language-environment 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (set-input-method nil))
 
 (use-package files
   :config
@@ -63,6 +65,7 @@
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
+  :defer 2
   :config
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
@@ -201,7 +204,7 @@
 (setq enable-recursive-minibuffers t)
 
 (use-package mb-depth
-  :defer t
+  :defer 2
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
@@ -215,6 +218,7 @@
 
 ;; hippie expand is dabbrev expand on steroids
 (use-package hippie-exp
+  :defer 2
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
