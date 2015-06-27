@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs--fci-p
-  'false
+  nil
   "Control display of fci."
   :type    'boolean
   :group   'dotemacs)

@@ -21,6 +21,7 @@
   :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
 
 (use-package electric
+  :defer t
   :init
   (add-hook 'prog-mode-hook
             (lambda ()
@@ -28,16 +29,19 @@
 
 (use-package electric-operator
   :ensure t
+  :defer t
   :init (add-hook 'c-mode-common-hook #'electric-operator-mode))
 
 ;; lisp and variants
 
 (use-package prog-mode
+  :defer t
   :init
   ;;(add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
   (global-prettify-symbols-mode 1))
 
 (use-package eldoc
+  :defer t
   :init
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
@@ -50,6 +54,7 @@
 ;; shell script mode
 (use-package sh-script
   :defer t
+  :mode ("\\.zsh\\'" . sh-mode)
   :init
   (setq sh-basic-offset 4
         sh-indent-comment t
@@ -132,6 +137,12 @@
       (add-hook 'css-mode-hook
                 (lambda ()
                   (add-hook 'before-save-hook 'web-beautify-css-buffer t t))))))
+
+(use-package nxml-mode
+  :defer t
+  ;; Complete closing tags, and insert XML declarations into empty files
+  :config (setq nxml-slash-auto-complete-flag t
+                nxml-auto-insert-xml-declaration-flag t))
 
 (provide 'prog-init)
 

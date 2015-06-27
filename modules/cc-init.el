@@ -28,6 +28,7 @@
   :init
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2)
+  :config
   (c-toggle-electric-state +1)
   (c-toggle-syntactic-indentation +1)
 

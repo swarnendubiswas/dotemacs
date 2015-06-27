@@ -35,7 +35,7 @@
   (global-company-mode 1)
 
   ;; https://github.com/company-mode/company-mode/issues/180
-  (when (boundp 'dotemacs--fci-p)
+  (when (bound-and-true-p dotemacs--fci-p)
     (defvar-local company-fci-mode-on-p nil)
 
     (defun company-turn-off-fci (&rest ignore)

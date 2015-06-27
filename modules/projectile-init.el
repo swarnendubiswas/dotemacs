@@ -9,12 +9,14 @@
   :defer t
   :ensure t
   :commands (projectile-find-file projectile-switch-project)
+  :init (projectile-global-mode 1)
   :config
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs--temp-directory "projectile.cache")
         projectile-completion-system 'helm
         ;; use projectile in every directory without requiring a project file
         projectile-require-project-root nil
+        projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-dired)
   (dolist (dirs '(".svn" ".dropbox"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
@@ -22,10 +24,10 @@
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/"))
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
-  (projectile-global-mode 1)
 
   (use-package helm-projectile
     :ensure t
+    :defer t
     :config
     (setq helm-projectile-fuzzy-match t
           ;; other options: 'helm-projectile-find-file
@@ -60,8 +62,7 @@
   (global-unset-key (kbd "C-c p"))
   (bind-key "C-c p" 'hydra-projectile/body)
 
-  :diminish projectile-mode
-  :bind ("C-c p h" . helm-projectile))
+  :diminish projectile-mode)
 
 (provide 'projectile-init)
 

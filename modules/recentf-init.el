@@ -22,7 +22,7 @@
   (recentf-mode 1)
 
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
-  ;;(recentf-cleanup)
+  (recentf-cleanup)
 
   :config
   (add-to-list 'recentf-used-hooks
