@@ -7,12 +7,12 @@
 
 (use-package cedet
   :defer t
-  :config
+  :init
   (require 'cedet-files))
 
 (use-package ede
   :defer t
-  :config
+  :init
   (global-ede-mode 1)
   (ede-enable-generic-projects))
 
@@ -51,7 +51,8 @@
     (semantic-mode 1)
     (global-semanticdb-minor-mode 1)
     (global-semantic-highlight-func-mode 1))
-  :config
+
+  :init
   ;; (require 'semantic-ia)
   ;; (require 'semantic-loaddefs)
   ;; Copied from https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
@@ -67,7 +68,7 @@
 
   ;; (require 'semanticdb)
   ;; SemanticDB files
-  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
+  (setq semanticdb-default-save-directory (concat dotemacs--temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
   ;; (require 'semantic/db-global)
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)
@@ -76,15 +77,15 @@
 
 (use-package idle
   :defer t
-  :config
+  :init
   (global-semantic-idle-scheduler-mode 1)
   (global-semantic-idle-completions-mode 1)
   (global-semantic-idle-breadcrumbs-mode 1))
 
 (use-package mode
   :defer t
+  :init (global-semantic-decoration-mode 1)
   :config
-  (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
 
@@ -97,7 +98,7 @@
   (add-hook 'prog-mode-hook #'ecb-minor-mode))
 
 (defhydra hydra-ecb (:color blue)
-  ("ecb commands")
+  "ecb commands"
   ("g h" ecb-goto-window-history "history")
   ("g m" ecb-goto-window-methods "methods")
   ("g s" ecb-goto-window-sources "sources")

@@ -25,30 +25,33 @@
 
 (use-package cc-mode
   :defer t
-  :config
+  :init
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2)
+  (c-toggle-electric-state +1)
+  (c-toggle-syntactic-indentation +1)
 
+  :config
   (use-package cwarn
     :defer t
-    :config
+    :init
     (with-eval-after-load "cc-mode"
       (global-cwarn-mode 1)))
 
   (use-package hideif
-    :config
+    :init
     (setq hide-ifdef-initially t)
     (hide-ifdef-mode 1))
 
   (use-package google-c-style
     :ensure t
-    :config
+    :init
     (add-hook 'c-mode-common-hook #'google-set-c-style)
-    (add-hook 'c-mode-common-hook #'google-make-newline-indent)))
+    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
-;; this is already the default, but I have this as a reminder.
-(with-eval-after-load "cc-mode"
-  (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))
+  ;; this is already the default, but I have this as a reminder.
+  (with-eval-after-load "cc-mode"
+    (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)))
 
 ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 

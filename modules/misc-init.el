@@ -19,7 +19,8 @@
 ;; speed up emacs for large files
 (use-package vlf
   :ensure t
-  :config
+  :defer 2
+  :init
   ;; warn when opening files bigger than 50MB
   (setq large-file-warning-threshold (* 50 1024 1024))
   (use-package vlf-setup))
@@ -27,7 +28,7 @@
 ;; erase 'all' consecutive white space characters in a given direction
 (use-package hungry-delete
   :ensure t
-  :config (global-hungry-delete-mode 1))
+  :init (global-hungry-delete-mode 1))
 
 (use-package fish-mode
   :disabled t
@@ -36,7 +37,7 @@
 ;; move text with M-<up> and M-<down> like eclipse
 (use-package move-text
   :ensure t
-  :config (move-text-default-bindings))
+  :init (move-text-default-bindings))
 
 (use-package duplicate-thing
   :ensure t
@@ -71,8 +72,8 @@
 (use-package popwin
   :disabled t
   :ensure t
-  :config
-  (if (string-equal system-name "XXX")
+  :init
+  (if (string-equal system-name "rain.cse.ohio-state.edu")
       (setq popwin:popup-window-height 15)
     (setq popwin:popup-window-height 15))
   (popwin-mode 1))
@@ -81,7 +82,7 @@
   :disabled t
   :ensure t
   :diminish pabbrev-mode
-  :config (global-pabbrev-mode 1))
+  :init (global-pabbrev-mode 1))
 
 (use-package golden-ratio
   :disabled t
@@ -92,7 +93,7 @@
   (defun dotemacs/helm-alive-p ()
     (if (boundp 'helm-alive-p)
         (symbol-value 'helm-alive-p)))
-  :config
+  :init
   (add-to-list 'golden-ratio-inhibit-functions #'dotemacs/helm-alive-p)
   (golden-ratio-mode 1)
   (setq golden-ratio-auto-scale t
@@ -102,6 +103,7 @@
 ;; Edit file with sudo
 (use-package sudo-edit
   :ensure t
+  :defer t
   :bind ("M-s e" . sudo-edit))
 
 ;; hide "Auto-saving...done" messages
@@ -110,6 +112,9 @@
   (apply save-fn '(t)))
 
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
+
+(use-package ssh-file-modes
+  :ensure t)
 
 (provide 'misc-init)
 

@@ -20,7 +20,7 @@
         ac-trigger-key "TAB"
         tab-always-indent 'complete
         ac-dwim t
-        ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat"))
+        ac-comphist-file (concat dotemacs--temp-directory "ac-comphist.dat"))
   (require 'auto-complete-config)
   (global-auto-complete-mode)
   (ac-linum-workaround)
@@ -111,7 +111,7 @@
   (use-package ac-html-csswatcher
     :ensure t
     :config
-    (if (eq dotemacs-completion 'company)
+    (if (eq dotemacs--completion 'company)
         (company-web-csswatcher-setup)
       (ac-html-csswatcher-setup)))
 

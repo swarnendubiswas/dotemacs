@@ -71,6 +71,8 @@
   ("o" Buffer-menu-other-window "other-window" :color blue)
   ("q" quit-window "quit" :color blue))
 (bind-key "C-c b" 'hydra-buffer-menu/body)
+(with-eval-after-load "ibuffer"
+  (bind-key "." 'hydra-buffer-menu/body ibuffer-mode-map))
 
 (provide 'ibuffer-init)
 

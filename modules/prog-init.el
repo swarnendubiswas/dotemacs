@@ -7,12 +7,12 @@
 
 ;; show the name of the function in the modeline
 (use-package which-func
-  :config
-  (set-face-attribute 'which-func nil :foreground "black")
+  :init
   (setq which-func-modes t)
   (add-hook 'prog-mode-hook
             (lambda ()
-              (which-function-mode 1))))
+              (which-function-mode 1)))
+  :config (set-face-attribute 'which-func nil :foreground "black"))
 
 ;; this hides the tabbar
 (use-package stickyfunc-enhance
@@ -21,24 +21,24 @@
   :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
 
 (use-package electric
-  :config
+  :init
   (add-hook 'prog-mode-hook
             (lambda ()
               (electric-layout-mode 1))))
 
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (abbrev-mode -1)))
+(use-package electric-operator
+  :ensure t
+  :init (add-hook 'c-mode-common-hook #'electric-operator-mode))
 
 ;; lisp and variants
 
 (use-package prog-mode
-  :config
+  :init
   ;;(add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
   (global-prettify-symbols-mode 1))
 
 (use-package eldoc
-  :config
+  :init
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'eldoc-mode)
@@ -50,7 +50,7 @@
 ;; shell script mode
 (use-package sh-script
   :defer t
-  :config
+  :init
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4))
@@ -58,15 +58,15 @@
 ;; enable speed bar
 (use-package speedbar
   :defer t
-  :config
+  :init
   (setq speedbar-use-images nil
         speedbar-show-unknown-files t)
 
+  :config
   (use-package sr-speedbar
     :ensure t
     :commands sr-speedbar-open
     :init (defalias 'speedbar 'sr-speedbar-open)
-    :config
     (setq sr-speedbar-right-side nil
           sr-speedbar-max-width 40
           sr-speedbar-width 30
@@ -75,18 +75,18 @@
 
   ;; (add-hook 'prog-mode-hook
   ;;           (lambda ()
-  ;;              (when (window-system)
+  ;;              (when (display-graphic-p)
   ;;                (sr-speedbar-open))))
   )
 
 (use-package ws-butler
   :ensure t
   :diminish ws-butler-mode
-  :config (add-hook 'prog-mode-hook #'ws-butler-mode))
+  :init (add-hook 'prog-mode-hook #'ws-butler-mode))
 
 (use-package dtrt-indent
   :ensure t
-  :config
+  :init
   (setq dtrt-indent-verbosity 0)
   (add-hook 'prog-mode-hook
             (lambda()
@@ -103,15 +103,16 @@
    ("\\.hb\\.html\\'" . web-mode)
    ("\\.tpl\\.php\\'" . web-mode)
    ("\\.as[cp]x\\'" . web-mode))
-  :config
+  :init
   ;; everything is indented 2 spaces
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
 
+  :config
   (use-package web-beautify
     :ensure t
-    :config
+    :init
     (with-eval-after-load "js2-mode"
       (add-hook 'js2-mode-hook
                 (lambda ()

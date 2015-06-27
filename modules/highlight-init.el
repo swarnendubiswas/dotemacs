@@ -8,18 +8,19 @@
 ;; highlight current line
 (use-package hl-line
   :ensure t
-  ;;:if (not (eq dotemacs-theme 'default))
-  :config
+  ;;:if (not (eq dotemacs--theme 'default))
+  :init
   ;; (global-hl-line-mode 1)
+
   ;; highlight only when idle
   (use-package hl-line+
     :ensure t
-    :config (toggle-hl-line-when-idle 1)))
+    :init (toggle-hl-line-when-idle 1)))
 
 ;; extension to linum-mode to highlight current line number in the margin
 (use-package hlinum
   :ensure t
-  :config (hlinum-activate))
+  :init (hlinum-activate))
 
 (use-package hilit-chg
   :disabled t
@@ -36,7 +37,6 @@
   :init
   (add-hook 'prog-mode-hook #'highlight-symbol-mode)
   (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-  :config
   (setq highlight-symbol-idle-delay 0.1
         highlight-symbol-on-navigation-p t)
   :diminish highlight-symbol-mode)
@@ -65,7 +65,8 @@
     (dolist (mode mode-list)
       (add-hook (intern (concat (symbol-name mode) "-mode-hook")) something)))
   :init (fic-ext-mode 1)
-  :config (add-something-to-mode-hooks '(prog text) #'fic-ext-mode))
+  ;;:config (add-something-to-mode-hooks '(prog text) #'fic-ext-mode)
+  )
 
 (provide 'highlight-init)
 

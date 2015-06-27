@@ -12,25 +12,25 @@
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
-  :config
+  :init
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
 ;; SB: You can learn many shortcuts from the menu bar entries.
 (use-package menu-bar
   :disabled t
-  :config
+  :init
   (when (fboundp 'menu-bar-mode)
     (menu-bar-mode -1)))
 
 (use-package tooltip
-  :config (tooltip-mode -1))
+  :init (tooltip-mode -1))
 
 (use-package scroll-bar
-  :config (scroll-bar-mode 1))
+  :init (scroll-bar-mode 1))
 
 (use-package frame
-  :config
+  :init
   ;; enable/disable blinking cursor
   (blink-cursor-mode 1)
   ;; start with the emacs window maximized
@@ -39,19 +39,19 @@
 
 ;; displays the time and date in the mode line
 (use-package time
-  :config
+  :init
   (setq display-time-day-and-date t
         display-time-24hr-format nil)
   (display-time))
 
 ;; display line numbers in margin
 (use-package linum
-  :config (global-linum-mode 1))
+  :init (global-linum-mode 1))
 
 (use-package simple
   :config (column-number-mode 1))
 
-(cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
+(cond ((eq dotemacs--theme 'leuven) (use-package leuven-theme
                                      :ensure t
                                      :config
                                      (load-theme 'leuven t)
@@ -74,19 +74,20 @@
                                      ;; (set-face-attribute 'hl-line nil :background "lavender"))
                                      ))
 
-      ((eq dotemacs-theme 'professional) (use-package professional-theme
+      ((eq dotemacs--theme 'professional) (use-package professional-theme
                                            :ensure t
                                            :config
                                            (load-theme 'professional t)
                                            ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
                                            (set-face-attribute 'default nil :height 110)))
 
-      ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
+      ((eq dotemacs--theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
                                       :config
                                       (load-theme 'eclipse t)
                                       (use-package powerline
                                         :ensure t
+                                        :if (display-graphic-p) ;; only enable for graphics displays
                                         :config
                                         (setq powerline-display-mule-info nil
                                               powerline-display-buffer-size t
@@ -115,17 +116,31 @@
                                       (set-face-background 'fringe "lavender")))
 
       ;; default
-      ((eq dotemacs-theme 'default)
-       (if (string= system-name "XXX")
+      ((eq dotemacs--theme 'default)
+       (use-package powerline
+         :disabled t
+         :ensure t
+         :if (display-graphic-p) ;; only enable for graphics displays
+         :config
+         (setq powerline-display-mule-info nil
+               powerline-display-buffer-size t
+               powerline-display-hud nil)
+         ;;(set-face-attribute 'mode-line-inactive nil :foreground "grey20" :background "grey90" :box nil)
+         (set-face-attribute 'powerline-active1 nil :background "grey22" :foreground "white" :box nil)
+         (set-face-attribute 'powerline-active2 nil :background "grey40" :foreground "white" :box nil)
+         (set-face-attribute 'powerline-inactive1 nil :background "grey22" :foreground "white" :box nil)
+         (set-face-attribute 'powerline-inactive2 nil :background "grey40" :foreground "white" :box nil)
+         (powerline-default-theme))
+       (if (string= system-name "rain.cse.ohio-state.edu")
            (set-face-attribute 'default nil  :height 115)
-         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 115))
        (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
        (with-eval-after-load "hl-line"
          (set-face-attribute 'hl-line nil :background "linen"))))
 
 (use-package display-theme
   :ensure t
-  :if (not (eq dotemacs-theme 'default))
+  :if (not (eq dotemacs--theme 'default))
   :config (global-display-theme-mode))
 
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible

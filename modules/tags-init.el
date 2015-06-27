@@ -30,7 +30,7 @@
 
 (use-package gtags
   :ensure t
-  :defer t)
+  :disabled t)
 
 (use-package jtags
   :ensure t
@@ -44,39 +44,41 @@
   :ensure t
   :if (eq system-type 'gnu/linux)
   :diminish ggtags-mode
-  :config
+  :init
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
         ;; use helm for completion
         ggtags-completing-read-function nil)
-  (add-hook 'c-mode-common-hook #'ggtags-mode))
+  (add-hook 'c-mode-common-hook #'ggtags-mode)
 
-;; http://wikemacs.org/wiki/C-ide
-;; http://tuhdo.github.io/c-ide.html
-;; Use M-n to move to next candidate and M-p to move back previous candidate. Use M-g s to invoke Isearch on candidate
-;; buffer list.
-(use-package helm-gtags
-  :ensure t
-  :if (eq system-type 'gnu/linux)
-  :diminish helm-gtags-mode
   :config
-  (setq helm-gtags-ignore-case t
-        helm-gtags-auto-update t
-        helm-gtags-use-input-at-cursor t
-        helm-gtags-pulse-at-cursor t
-        ;;helm-gtags-prefix-key "\C-c g"
-        helm-gtags-suggested-key-mapping t
-        helm-gtags-ignore-case t
-        helm-gtags-fuzzy-match t
-        helm-gtags-maximum-candidates 1000
-        helm-gtags-cache-select-result t
-        helm-gtags-display-style 'detail
-        helm-gtags-update-interval-second 60)
-  (add-hook 'c-mode-common-hook #'helm-gtags-mode)
-  (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
-  (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
-  (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
-  (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map))
+  ;; http://wikemacs.org/wiki/C-ide
+  ;; http://tuhdo.github.io/c-ide.html
+  ;; Use M-n to move to next candidate and M-p to move back previous candidate. Use M-g s to invoke Isearch on candidate
+  ;; buffer list.
+  (use-package helm-gtags
+    :ensure t
+    :if (eq system-type 'gnu/linux)
+    :diminish helm-gtags-mode
+    :init
+    (setq helm-gtags-ignore-case t
+          helm-gtags-auto-update t
+          helm-gtags-use-input-at-cursor t
+          helm-gtags-pulse-at-cursor t
+          ;;helm-gtags-prefix-key "\C-c g"
+          helm-gtags-suggested-key-mapping t
+          helm-gtags-ignore-case t
+          helm-gtags-fuzzy-match t
+          helm-gtags-maximum-candidates 1000
+          helm-gtags-cache-select-result t
+          helm-gtags-display-style 'detail
+          helm-gtags-update-interval-second 60)
+    (add-hook 'c-mode-common-hook #'helm-gtags-mode)
+    :config
+    (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
+    (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
+    (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
+    (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map)))
 
 (defhydra hydra-ggtags (:color blue)
   "helm gtags"

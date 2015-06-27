@@ -11,7 +11,6 @@
   (require 'helm-config)
   (helm-mode 1)
   (helm-autoresize-mode 1)
-  :config
   (setq helm-quick-update t ; do not display invisible candidates
         helm-candidate-number-limit 100
         helm-M-x-fuzzy-match t
@@ -41,24 +40,25 @@
                                     helm-source-dired-recent-dirs
                                     helm-source-buffer-not-found))
 
+  :config
   (use-package helm-plugin
-    :config
+    :init
     ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
     (defadvice helm-display-mode-line (after undisplay-header activate)
       (setq header-line-format nil)))
 
   (use-package helm-buffers
-    :config
+    :init
     ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t))
 
   (use-package helm-utils
-    :config
+    :init
     (setq helm-highlight-number-lines-around-point 10
           helm-yank-symbol-first t))
 
   (use-package helm-files
-    :config
+    :init
     (setq helm-file-cache-fuzzy-match t
           helm-ff-transformer-show-only-basename nil
           helm-ff-file-name-history-use-recentf t
@@ -72,15 +72,15 @@
                                                  "\\~$"))))
 
   (use-package helm-dabbrev
-    :config (setq helm-dabbrev-cycle-threshold 2))
+    :init (setq helm-dabbrev-cycle-threshold 2))
 
   (use-package helm-dired-recent-dirs
     :ensure t
-    :config (setq helm-dired-recent-dirs-max 50))
+    :init (setq helm-dired-recent-dirs-max 50))
 
   (use-package helm-adaptive
-    :config
-    (setq helm-adaptive-history-file (concat dotemacs-temp-directory "helm-adaptive-history"))
+    :init
+    (setq helm-adaptive-history-file (concat dotemacs--temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
 
   (use-package helm-descbinds
@@ -118,7 +118,7 @@
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
     :ensure t
-    :config
+    :init
     (setq helm-multi-swoop-edit-save t ; save buffer when helm-multi-swoop-edit complete
           helm-swoop-speed-or-color nil
           helm-swoop-split-direction #'split-window-vertically
@@ -132,7 +132,7 @@
   ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
   (use-package helm-company
     :ensure t
-    :if (eq dotemacs-completion 'company)
+    :if (eq dotemacs--completion 'company)
     :init (with-eval-after-load 'company
             (bind-key [remap completion-at-point] #'helm-company company-mode-map)
             (bind-key "C-:" #'helm-company company-mode-map)

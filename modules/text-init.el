@@ -23,7 +23,7 @@
   :disabled t
   :ensure t
   :diminish artbollocks-mode
-  :config (add-hook 'text-mode-hook #'artbollocks-mode))
+  :init (add-hook 'text-mode-hook #'artbollocks-mode))
 
 (use-package markdown-mode
   :ensure t
@@ -31,6 +31,7 @@
   :mode
   (("\\.markdown\\'" . markdown-mode)
    ("\\.md\\'" . markdown-mode))
+
   :config
   ;;(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))

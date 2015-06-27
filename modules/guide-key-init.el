@@ -9,7 +9,7 @@
   :ensure t
   :defer 5
   :diminish guide-key-mode
-  :config
+  :init
   (setq guide-key/guide-key-sequence t
         guide-key/recursive-key-sequence-flag t
         guide-key/popup-window-position 'bottom
@@ -17,10 +17,11 @@
         guide-key/idle-delay 1.0)
   (guide-key-mode 1)
 
+  :config
   (use-package guide-key-tip
     :disabled t
     :ensure t
-    :config (setq guide-key-tip/enabled t)))
+    :init (setq guide-key-tip/enabled t)))
 
 (provide 'guide-key-init)
 

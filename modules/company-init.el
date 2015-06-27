@@ -8,7 +8,7 @@
 (use-package company
   :ensure t
   :diminish company-mode
-  :config
+  :init
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
         company-dabbrev-ignore-case nil
         company-show-numbers t ; show quick-access numbers for the first ten candidates
@@ -22,6 +22,7 @@
         ;;company-begin-commands '(self-insert-command)
         company-idle-delay 0.3)
 
+  :config
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
   (add-to-list 'company-backends #'company-files)
   (add-to-list 'company-backends #'company-capf)
@@ -34,19 +35,20 @@
   (global-company-mode 1)
 
   ;; https://github.com/company-mode/company-mode/issues/180
-  (defvar-local company-fci-mode-on-p nil)
+  (when (boundp 'dotemacs--fci-p)
+    (defvar-local company-fci-mode-on-p nil)
 
-  (defun company-turn-off-fci (&rest ignore)
-    (when (boundp 'fci-mode)
-      (setq company-fci-mode-on-p fci-mode)
-      (when fci-mode (fci-mode -1))))
+    (defun company-turn-off-fci (&rest ignore)
+      (when (boundp 'fci-mode)
+        (setq company-fci-mode-on-p fci-mode)
+        (when fci-mode (fci-mode -1))))
 
-  (defun company-maybe-turn-on-fci (&rest ignore)
-    (when company-fci-mode-on-p (fci-mode 1)))
+    (defun company-maybe-turn-on-fci (&rest ignore)
+      (when company-fci-mode-on-p (fci-mode 1)))
 
-  (add-hook 'company-completion-started-hook 'company-turn-off-fci)
-  (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-  (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+    (add-hook 'company-completion-started-hook 'company-turn-off-fci)
+    (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
+    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
 
   (use-package company-dabbrev
     :disabled t
@@ -67,11 +69,12 @@
       (setq-local company-backends
                   (append '(company-web-html company-web-jade company-web-slim)
                           company-backends)))
-    :config (add-hook 'web-mode-hook #'company-web--setup))
+    :init (add-hook 'web-mode-hook #'company-web--setup))
 
   (use-package company-statistics
     :ensure t
-    :config (company-statistics-mode 1))
+    :defer 2
+    :init (company-statistics-mode 1))
 
   ;; https://github.com/vspinu/company-math
   (use-package company-math
@@ -81,11 +84,11 @@
       (setq-local company-backends
                   (append '(company-math-symbols-latex company-math-symbols-unicode company-latex-commands)
                           company-backends)))
-    :config (add-hook 'LaTeX-mode-hook #'company-math--setup))
+    :init (add-hook 'LaTeX-mode-hook #'company-math--setup))
 
   (use-package company-quickhelp
     :ensure t
-    :config (company-quickhelp-mode 1)))
+    :init (company-quickhelp-mode 1)))
 
 (provide 'company-init)
 

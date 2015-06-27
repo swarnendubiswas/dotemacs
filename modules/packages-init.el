@@ -19,7 +19,7 @@
 
 (use-package package
   :commands list-packages
-  :config
+  :init
   ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
   (add-to-list 'package-archives
                '("marmalade" . "https://marmalade-repo.org/packages/") t)
@@ -29,6 +29,8 @@
                '("org" . "http://orgmode.org/elpa/") t)
   ;; (add-to-list 'package-archives
   ;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+
+  ;; Possibly no longer needed since use-package does that automatically
   ;; always referesh contents so that new packages added to the repositories are available
   ;;(package-refresh-contents)
   )
@@ -42,6 +44,7 @@
 
 (use-package diminish
   :ensure t)
+
 (use-package bind-key
   :ensure t)
 
@@ -52,7 +55,6 @@
   :init
   ;; prefer newer files
   (setq load-prefer-newer t)
-  :config
   (setq auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)
   (auto-compile-on-load-mode 1)
@@ -61,7 +63,7 @@
 (use-package paradox
   :ensure t
   :defer 5
-  :config
+  :init
   (setq paradox-execute-asynchronously t
         paradox-github-token t))
 

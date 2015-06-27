@@ -22,7 +22,7 @@
   :init
   (use-package flyspell-lazy
     :ensure t
-    :config (flyspell-lazy-mode 1))
+    :init (flyspell-lazy-mode 1))
 
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
@@ -31,6 +31,7 @@
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
   (add-hook 'find-file-hooks #'turn-on-flyspell)
+
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)
 

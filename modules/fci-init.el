@@ -6,8 +6,8 @@
 ;;; Code:
 
 (use-package fill-column-indicator
-  :disabled t
   :ensure t
+  :if (boundp 'dotemacs--fci-p)
   :preface
   (defun dotemacs--auto-fci-mode (&optional unused)
     (if (> frame-width 120)

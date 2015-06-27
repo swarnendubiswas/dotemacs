@@ -6,10 +6,9 @@
 ;;; Code:
 
 (use-package anzu
-  :disabled t ; since we are using swiper
   :ensure t
   :diminish anzu-mode
-  :config
+  :init
   (global-anzu-mode 1)
   (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'bold))
 

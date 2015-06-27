@@ -8,16 +8,16 @@
 (use-package rainbow-mode
   :disabled t
   :ensure t
-  :config (add-hook 'prog-mode-hook #'rainbow-mode))
+  :init (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package rainbow-identifiers
   :disabled t
   :ensure t
-  :config (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
+  :init (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-delimiters
   :ensure t
-  :config (rainbow-delimiters-mode 1))
+  :init (rainbow-delimiters-mode 1))
 
 (use-package rainbow-blocks
   :disabled t

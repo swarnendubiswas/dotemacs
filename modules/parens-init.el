@@ -8,14 +8,14 @@
 (or (use-package mic-paren
       :disabled t
       :ensure t
-      :config
+      :init
       (setq paren-highlight-at-point t)
       (paren-activate)
       (make-variable-buffer-local 'show-paren-mode))
 
     (use-package paren
       :disabled t
-      :config
+      :init
       (setq show-paren-delay 0
             show-paren-style 'parenthesis) ; 'expression, 'parenthesis, 'mixed
       (when (fboundp 'show-paren-mode)
@@ -24,23 +24,22 @@
 
 (or (use-package elec-pair
       :disabled t
-      :config (electric-pair-mode 1))
+      :init (electric-pair-mode 1))
 
     (use-package autopair
       :disabled t
       :ensure t
-      :config (autopair-global-mode 1))
+      :init (autopair-global-mode 1))
 
     (use-package flex-autopair
       :disabled t
       :ensure t
-      :config (flex-autopair-mode 1)))
+      :init (flex-autopair-mode 1)))
 
 ;; https://github.com/xiaohanyu/oh-my-emacs/blob/master/core/ome-miscs.org
 ;; https://github.com/Fuco1/smartparens/blob/master/smartparens-config.el
 ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
 (use-package smartparens
-  :disabled t
   :ensure t
   :diminish smartparens-mode
   :init
@@ -49,7 +48,6 @@
   (show-smartparens-global-mode 1)
   ;;(sp-use-smartparens-bindings)
 
-  :config
   (setq sp-autoskip-closing-pair 'always
         sp-navigate-close-if-unbalanced t
         sp-show-pair-from-inside t

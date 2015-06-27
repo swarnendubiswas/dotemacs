@@ -9,17 +9,17 @@
   "Custom configuration for dotemacs."
   :group 'local)
 
-(defcustom dotemacs-temp-directory (concat user-emacs-directory "tmp/")
+(defcustom dotemacs--temp-directory (concat user-emacs-directory "tmp/")
   "Storage location for various configuration files."
   :group 'dotemacs)
 
-(unless (file-exists-p dotemacs-temp-directory)
-  (make-directory dotemacs-temp-directory))
+(unless (file-exists-p dotemacs--temp-directory)
+  (make-directory dotemacs--temp-directory))
 
 ;; use either auto-complete or company for auto completion support
 ;; (defconst use-company t
 ;;   "Choose company over auto-complete for completion.")
-(defcustom dotemacs-completion
+(defcustom dotemacs--completion
   'company
   "Choose company over auto-complete for completion."
   :type '(radio
@@ -37,7 +37,7 @@
 ;;   :group 'dotemacs)
 
 ;; choices: "leuven", "professional", "eclipse", otherwise default.
-(defcustom dotemacs-theme
+(defcustom dotemacs--theme
   'default
   "Specify which Emacs theme to use."
   :type '(radio
@@ -47,13 +47,19 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
-(defcustom dotemacs-window-split
+(defcustom dotemacs--window-split
   'vertical
   "Specify the direction in which the windows should be split."
   :type '(radio
           (const :tag "vertical" vertical)
           (const :tag "horizontal" horizontal))
   :group 'dotemacs)
+
+(defcustom dotemacs--fci-p
+  'false
+  "Control display of fci."
+  :type    'boolean
+  :group   'dotemacs)
 
 (provide 'config-init)
 

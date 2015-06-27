@@ -33,7 +33,7 @@
   (set-input-method nil))
 
 (use-package files
-  :config
+  :init
   (setq require-final-newline t ; Always end a file with a newline.
         make-backup-files nil ; Stop making backup ~ files
         ;; Disable backup for a per-file basis, not to be used by major modes.
@@ -48,7 +48,9 @@
       line-number-display-limit 2000000)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
-(toggle-indicate-empty-lines 1)
+
+(use-package menu-bar
+  :init (toggle-indicate-empty-lines 1))
 
 (use-package simple
   :config
@@ -60,13 +62,12 @@
         ;; use shift-select for marking
         shift-select-mode t)
   ;; Enable visual feedback on selections, default since v23
-  (transient-mark-mode 1)
-  (add-hook 'before-save-hook #'delete-trailing-whitespace))
+  (transient-mark-mode 1))
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
   :defer 2
-  :config
+  :init
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
@@ -75,22 +76,23 @@
 
 ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
-  :config (delete-selection-mode 1))
+  :init (delete-selection-mode 1))
 
 (setq delete-by-moving-to-trash t)
 
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
 (use-package tramp
   :defer t
-  :config
+  :init
   (setq tramp-default-method "ssh" ; faster than the default scp
-        tramp-default-user "XXX"
-        tramp-default-host "XXX"
+        tramp-default-user "biswass"
+        tramp-default-host "sunshine.cse.ohio-state.edu"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
-        tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
+        tramp-persistency-file-name (concat dotemacs--temp-directory "tramp"))
+  :config
   (use-package password-cache
-    :config (setq password-cache-expiry nil))
+    :init (setq password-cache-expiry nil))
   (use-package tramp-term
     :ensure t))
 
@@ -115,8 +117,8 @@
       use-file-dialog nil)
 
 (use-package advice
-  :config
-  ;; turn off the warnings due to functions being redefined
+  :init
+  ;; turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
 ;; Enable disabled commands
@@ -146,23 +148,23 @@
 
 ;; fontification: turn on syntax coloring, on by default since Emacs 22
 (use-package font-core
-  :config (global-font-lock-mode 1))
+  :init (global-font-lock-mode 1))
 
 (use-package font-lock
-  :config
+  :init
   (setq font-lock-maximum-decoration t ; maximum fontification possible
         ;; jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock
-  :config
+  :init
   (setq jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
         jit-lock-stealth-time 10
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
 
 (use-package hi-lock
-  :config (global-hi-lock-mode 1)
+  :init (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
 ;; This config needs to be modified for Emacs 25+, check this link
@@ -170,15 +172,15 @@
 ;; remember cursor position in files
 (use-package saveplace
   :defer 2
-  :config
+  :init
   (setq-default save-place t
-                save-place-file (concat dotemacs-temp-directory "places")))
+                save-place-file (concat dotemacs--temp-directory "places")))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
   :disabled t
+  :init (icomplete-mode 1)
   :config
-  (icomplete-mode 1)
   (use-package icomplete+
     :ensure t)
   (setq icomplete-prospects-height 2
@@ -186,15 +188,15 @@
 
 (use-package icicles
   :disabled t
-  :config (icy-mode 1))
+  :init (icy-mode 1))
 
 ;; save minibuffer histories across sessions
 (use-package savehist
   :defer 5
-  :config
+  :init
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
-        savehist-file (concat dotemacs-temp-directory "savehist")
+        savehist-file (concat dotemacs--temp-directory "savehist")
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring))
@@ -205,11 +207,11 @@
 
 (use-package mb-depth
   :defer 2
-  :config (minibuffer-depth-indicate-mode 1))
+  :init (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
   :defer 2
-  :config
+  :init
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"
@@ -219,7 +221,7 @@
 ;; hippie expand is dabbrev expand on steroids
 (use-package hippie-exp
   :defer 2
-  :config
+  :init
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
                                            try-expand-dabbrev-from-kill
@@ -231,12 +233,14 @@
                                            try-complete-lisp-symbol-partially
                                            try-complete-lisp-symbol))
   (use-package hippie-exp-ext
-    :ensure t))
+    :ensure t)
+
+  :bind* ("M-/" . hippie-expand))
 
 (use-package subword
   :defer 2
   :diminish subword-mode
-  :config (global-subword-mode 1))
+  :init (global-subword-mode 1))
 
 ;; FIXME: Set Emacs split to horizontal or vertical
 ;; (if (eq dotemacs-window-split 'horizontal)

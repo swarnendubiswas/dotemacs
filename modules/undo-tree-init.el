@@ -8,7 +8,8 @@
 ;; Visualize with C-x u
 (use-package undo-tree
   :ensure t
-  :config
+  :defer t
+  :init
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t
         undo-tree-visualizer-relative-timestamps t

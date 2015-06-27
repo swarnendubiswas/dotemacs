@@ -59,6 +59,7 @@
 ;; ace-jump in helm buffers
 (use-package ace-jump-helm-line
   :ensure t
+  :defer t
   :config
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)
@@ -73,7 +74,6 @@
     :config (avy-setup-default)
     (setq avy-background t
           avy-style 'at-full))
-
   (ace-window-display-mode 1))
 
 (defhydra hydra-jump-commands (:color blue)

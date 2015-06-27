@@ -28,7 +28,7 @@
 ;; switch to the other buffer
 (bind-key "<f9>" 'other-window)
 ;;(global-set-key [f4] 'delete-other-windows)
-(bind-key "<f11>" 'delete-other-windows)
+(bind-key "<f10>" 'delete-other-windows)
 
 ;;(global-set-key (kbd "M-/") 'hippie-expand) ;; replace dabbrev-expand
 (bind-key "M-/" 'hippie-expand)
@@ -48,7 +48,7 @@
 
 ;; buffers
 ;;(global-set-key (kbd "C-c k") #'kill-other-buffers) ; kill all non-special buffers
-(bind-key "<f10>" 'dotemacs--kill-other-buffers)
+(bind-key "<f11>" 'dotemacs--kill-other-buffers)
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 ;;(global-set-key (kbd "C-s") 'save-buffer)
 (bind-key "C-s" 'save-buffer)
@@ -92,7 +92,7 @@
   :disabled t
   :ensure t
   :config
-  (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
+  (setq keyfreq-file (concat dotemacs--temp-directory "keyfreq"))
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
@@ -124,6 +124,11 @@
   ("o" (funcall (info-display-topic "org")) "Org Mode")
   ("s" (funcall (info-display-topic "sicp")) "SICP"))
 (global-set-key (kbd "C-h i") #'hydra-info/body)
+
+(defhydra hydra-zoom (global-map "<f12>")
+  "zoom"
+  ("g" text-scale-increase "in")
+  ("l" text-scale-decrease "out"))
 
 (provide 'keybindings-init)
 

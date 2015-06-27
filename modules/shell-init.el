@@ -6,13 +6,14 @@
 ;;; Code:
 
 (use-package comint
-  :config
+  :init
   (setq comint-scroll-to-bottom-on-input t   ;; always insert at the bottom
         ;; no duplicates in command history
         comint-input-ignoredups t))
 
 (use-package shell-command
-  :config (shell-command-completion-mode 1))
+  :ensure t
+  :init (shell-command-completion-mode 1))
 
 ;; The following setup is from readline-complete package at
 ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
@@ -38,7 +39,7 @@
 (use-package bash-completion
   :ensure t
   :defer t
-  :config (bash-completion-setup))
+  :init (bash-completion-setup))
 
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)

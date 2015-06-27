@@ -22,7 +22,7 @@
     (end-of-buffer)
     (dired-next-line -1))
 
-  :config
+  :init
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
@@ -33,6 +33,7 @@
 
   ;;(add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
+  :config
   (bind-key "M-<home>" 'dired--go-home dired-mode-map)
   (bind-key "i" 'ido-find-file dired-mode-map)
   (bind-key "M-<up>" 'dired--jump-to-top dired-mode-map)
@@ -61,9 +62,10 @@
 (use-package dired+
   :ensure t
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-  :init (setq-default diredp-hide-details-initially-flag nil
-                      diredp-hide-details-propagate-flag nil)
-  :config (diredp-toggle-find-file-reuse-dir 1))
+  :init
+  (setq-default diredp-hide-details-initially-flag nil
+                diredp-hide-details-propagate-flag nil)
+  (diredp-toggle-find-file-reuse-dir 1))
 
 ;; direx:jump-to-directory is a good explorer
 (use-package direx
@@ -76,7 +78,7 @@
 
 (use-package dired-efap
   :ensure t
-  :config
+  :init
   (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
   (bind-key "<f2>" 'dired-efap dired-mode-map))
 

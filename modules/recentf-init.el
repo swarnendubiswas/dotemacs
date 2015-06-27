@@ -8,7 +8,7 @@
 (use-package recentf
   :init
   ;; set this first so that recentf can load content from this
-  (setq recentf-save-file (concat dotemacs-temp-directory "recentf")
+  (setq recentf-save-file (concat dotemacs--temp-directory "recentf")
         recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
         ;; clean up after Emacs has been idle for certain number of seconds
@@ -20,15 +20,16 @@
                           "[/\\]tmp/recentf-marker\\'" "/company-statistics-cache.el$")) ; "/ssh:"
 
   (recentf-mode 1)
+
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
-  (recentf-cleanup)
+  ;;(recentf-cleanup)
 
   :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
 
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
-  (add-hook 'after-init-hook #'recentf-auto-cleanup)
+  ;;(add-hook 'after-init-hook #'recentf-auto-cleanup)
 
   ;; save file names relative to my current home directory
   ;;(add-to-list 'recentf-filename-handlers 'abbreviate-file-name)
@@ -47,8 +48,9 @@
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
     :ensure t
+    :pin melpa
     ;;:load-path "lisp/"
-    :config (recentf-auto-cleanup))
+    :init (recentf-auto-cleanup))
 
   :bind ("<f8>" . recentf-open-files))
 

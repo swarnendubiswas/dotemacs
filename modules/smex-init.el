@@ -10,7 +10,7 @@
   ;;:init (autoload 'smex "smex")
   :config
   ;;(smex-initialize)
-  (setq smex-save-file (expand-file-name ".smex-items" dotemacs-temp-directory)
+  (setq smex-save-file (expand-file-name ".smex-items" dotemacs--temp-directory)
         smex-completion-method 'ivy)
   :bind* (;;("M-x" . smex)
           ("M-X" . smex-major-mode-commands)))

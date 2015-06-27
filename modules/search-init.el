@@ -31,6 +31,7 @@
 
 ;; this package now provides ivy-mode
 (use-package swiper
+  :disabled t ;; performs poorly if there are a large number of matches
   :ensure t
   :config
   (ivy-mode 1)
@@ -55,6 +56,7 @@
 
 (use-package loccur
   :ensure t
+  :defer t
   :config (loccur-mode 1)
   :diminish loccur-mode)
 

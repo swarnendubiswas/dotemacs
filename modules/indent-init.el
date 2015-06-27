@@ -12,21 +12,18 @@
               indent-tabs-mode nil)
 
 (use-package aggressive-indent
-  :disabled t
   :ensure t
-  :config (global-aggressive-indent-mode 1)
+  :init (global-aggressive-indent-mode 1)
   :diminish aggressive-indent-mode)
 
 ;; intelligent indentation, on by default from Emacs 24.4
 (use-package electric
-  :disabled t
-  :config (electric-indent-mode 1))
+  :init (electric-indent-mode 1))
 
 (use-package auto-indent-mode
-  :disabled t
   :ensure t
   :diminish auto-indent-mode
-  :config
+  :init
   (setq auto-indent-on-visit-file t)
   (auto-indent-global-mode 1))
 
@@ -42,7 +39,7 @@
   :disabled t
   :ensure t
   :diminish indent-guide-mode
-  :config
+  :init
   (setq indent-guide-delay 1.0 ; show guide lines only in idle-time
         indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
