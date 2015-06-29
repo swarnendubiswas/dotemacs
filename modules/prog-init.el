@@ -97,6 +97,7 @@
             (lambda()
               (dtrt-indent-mode 1))))
 
+;; web mode
 (use-package web-mode
   :ensure t
   :defer t
@@ -138,6 +139,7 @@
                 (lambda ()
                   (add-hook 'before-save-hook 'web-beautify-css-buffer t t))))))
 
+;; xml mode
 (use-package nxml-mode
   :defer t
   ;; Complete closing tags, and insert XML declarations into empty files

@@ -30,6 +30,7 @@
 
   ;; Group ibuffer list by tramp connection
   (use-package ibuffer-tramp
+    :defer t
     :load-path "lisp/"
     :config
     (add-hook 'ibuffer-mode-hook
@@ -40,6 +41,7 @@
   ;; use ibuffer-vc to sort buffers by VC status
   (use-package ibuffer-vc
     :ensure t
+    :defer t
     :config
     (add-hook 'ibuffer-mode-hook
               (lambda ()
@@ -47,8 +49,10 @@
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
                   (ibuffer-do-sort-by-alphabetic)))))
 
-  :bind (;;([remap list-buffers] . ibuffer)
-         ("C-x C-b" . ibuffer)))
+  :bind (
+         ([remap list-buffers] . ibuffer)
+         ;;("C-x C-b" . ibuffer)
+         ))
 
 (defhydra hydra-buffer-menu (:color pink)
   "Buffer menu commands"

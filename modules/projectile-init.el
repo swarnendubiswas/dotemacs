@@ -34,8 +34,10 @@
           projectile-switch-project-action #'helm-projectile)
     (helm-projectile-on))
 
+  ;; Group buffers by Projectile project
   (use-package ibuffer-projectile
     :ensure t
+    :defer t
     :config
     (add-hook 'ibuffer-mode-hook
               (lambda()

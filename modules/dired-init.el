@@ -7,6 +7,7 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
+  :defer t
   :preface
   (defun dired--go-home ()
     (interactive)

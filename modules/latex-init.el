@@ -74,7 +74,10 @@
   ;;(bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
 
   ;; unset "C-c ;" since we want to bind it to 'comment-line
-  (define-key LaTeX-mode-map (kbd "C-c ;") nil))
+  (define-key LaTeX-mode-map (kbd "C-c ;") nil)
+
+  (use-package latex-pretty-symbols
+    :ensure t))
 
 (use-package company-auctex
   :ensure t
@@ -102,10 +105,6 @@
   :disabled t
   :ensure t
   :config (latex/setup-keybinds))
-
-(use-package latex-pretty-symbols
-  :disabled t
-  :ensure t)
 
 ;; currently does not support multi-file parsing
 (use-package latex-preview-pane

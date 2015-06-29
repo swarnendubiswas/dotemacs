@@ -76,6 +76,7 @@
 
 ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
+  :defer t
   :init (delete-selection-mode 1))
 
 (setq delete-by-moving-to-trash t)
@@ -238,7 +239,7 @@
   :bind* ("M-/" . hippie-expand))
 
 (use-package subword
-  :defer 2
+  :defer t
   :diminish subword-mode
   :init (global-subword-mode 1))
 

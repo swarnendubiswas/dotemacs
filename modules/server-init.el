@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package server
-  :disabled t
+  :defer t
   :init
   ;; start server if not root user
   (unless (string-equal "root" (getenv "USER"))

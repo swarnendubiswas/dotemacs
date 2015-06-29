@@ -63,7 +63,9 @@
 (use-package paradox
   :ensure t
   :defer 5
-  :init
+  :bind (("C-c d p" . paradox-list-packages)
+         ("C-c d u" . paradox-upgrade-packages))
+  :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t))
 

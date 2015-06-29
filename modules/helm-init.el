@@ -48,9 +48,14 @@
       (setq header-line-format nil)))
 
   (use-package helm-buffers
+    :defer t
     :init
     ;; fuzzy matching buffer names when non--nil
-    (setq helm-buffers-fuzzy-matching t))
+    (setq helm-buffers-fuzzy-matching t)
+    :bind ([remap switch-to-buffer] . helm-mini))
+
+  (use-package helm-command
+    :bind ([remap execute-extended-command] . helm-M-x))
 
   (use-package helm-utils
     :init
@@ -69,7 +74,8 @@
                                                '("\\.undo$"
                                                  "\\.elc$"
                                                  "\\#$"
-                                                 "\\~$"))))
+                                                 "\\~$")))
+    :bind (([remap find-file] . helm-find-files)))
 
   (use-package helm-dabbrev
     :init (setq helm-dabbrev-cycle-threshold 2))
@@ -118,6 +124,7 @@
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
     :ensure t
+    :defer t
     :init
     (setq helm-multi-swoop-edit-save t ; save buffer when helm-multi-swoop-edit complete
           helm-swoop-speed-or-color nil
@@ -132,6 +139,7 @@
   ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
   (use-package helm-company
     :ensure t
+    :defer t
     :if (eq dotemacs--completion 'company)
     :init (with-eval-after-load 'company
             (bind-key [remap completion-at-point] #'helm-company company-mode-map)
@@ -142,6 +150,7 @@
     :ensure t)
 
   (use-package helm-grep
+    :defer t
     :config
     ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
     (global-set-key [f12]
@@ -151,7 +160,8 @@
                         (call-interactively 'helm-do-grep)))))
 
   (use-package helm-fuzzy-find
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
@@ -161,7 +171,7 @@
 
   :bind*
   (("<f1>" . helm-M-x)
-   ("M-x" . helm-M-x)
+   ;;("M-x" . helm-M-x)
    ("C-c h f" . helm-find-files)
    ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
    ("<f3>" . helm-find-files)
