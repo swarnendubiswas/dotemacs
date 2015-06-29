@@ -1,7 +1,7 @@
 ;;; parens-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup parentheses. Highlight/track mismatched parentheses, auto-pairing, etc.
+;; Setup parentheses. Highlight/track matching/mismatched parentheses, auto-pairing, etc.
 
 ;;; Code:
 
@@ -15,11 +15,13 @@
 
     (use-package paren
       :disabled t
-      :init
+      :init (show-paren-mode 1)
+      :config
       (setq show-paren-delay 0
-            show-paren-style 'parenthesis) ; 'expression, 'parenthesis, 'mixed
+            show-paren-style 'parenthesis ; 'expression, 'parenthesis, 'mixed
+            show-paren-when-point-inside-paren t
+            show-paren-when-point-in-periphery t)
       (when (fboundp 'show-paren-mode)
-        (show-paren-mode 1) ; highlight matching parentheses when the point is on them
         (make-variable-buffer-local 'show-paren-mode))))
 
 (or (use-package elec-pair
@@ -43,11 +45,12 @@
   :ensure t
   :diminish smartparens-mode
   :init
-  (require 'smartparens-config)
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
   ;;(sp-use-smartparens-bindings)
 
+  :config
+  (require 'smartparens-config)
   (setq sp-autoskip-closing-pair 'always
         sp-navigate-close-if-unbalanced t
         sp-show-pair-from-inside t
@@ -61,7 +64,7 @@
   ;; pair.
   (sp-pair "'" nil :unless '(sp-point-after-word-p))
 
-  ;; emacs is lisp hacking enviroment, so we set up some most common lisp modes too
+  ;; Emacs is lisp hacking enviroment, so we set up some most common lisp modes too
   (sp-with-modes sp--lisp-modes
     ;; disable ', it's the quote character!
     (sp-local-pair "'" nil :actions nil))

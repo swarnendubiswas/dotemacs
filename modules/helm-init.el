@@ -165,6 +165,9 @@
     :ensure t
     :defer t)
 
+  (use-package helm-ring
+    :bind (([remap yank-pop] . helm-show-kill-ring)))
+
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 

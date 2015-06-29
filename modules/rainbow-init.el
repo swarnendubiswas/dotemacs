@@ -17,7 +17,10 @@
 
 (use-package rainbow-delimiters
   :ensure t
-  :init (rainbow-delimiters-mode 1))
+  :defer t
+  :init
+  (dolist (hook '(text-mode-hook prog-mode-hook))
+    (add-hook hook #'rainbow-delimiters-mode)))
 
 (use-package rainbow-blocks
   :disabled t

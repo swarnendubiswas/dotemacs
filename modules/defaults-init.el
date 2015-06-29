@@ -40,7 +40,8 @@
         backup-inhibited t
         auto-save-default t
         ;; 'y-or-n-p
-        confirm-kill-emacs nil))
+        confirm-kill-emacs nil)
+  :bind (("C-c d r" . revert-buffer)))
 
 (setq sentence-end-double-space nil
       ;; Enable use of system clipboard across emacs and other applications.
