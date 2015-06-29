@@ -37,7 +37,7 @@
         helm-case-fold-search 'smart)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
-                                    helm-source-dired-recent-dirs
+                                    ;;helm-source-dired-recent-dirs
                                     helm-source-buffer-not-found))
 
   :config
@@ -82,7 +82,9 @@
 
   (use-package helm-dired-recent-dirs
     :ensure t
-    :init (setq helm-dired-recent-dirs-max 50))
+    :init
+    (setq shell-file-name "/usr/bin/fish"
+          helm-dired-recent-dirs-max 50))
 
   (use-package helm-adaptive
     :init

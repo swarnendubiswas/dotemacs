@@ -56,17 +56,8 @@
                                       :ensure t
                                       :init (load-theme 'leuven t)
                                       :config
-                                      (use-package smart-mode-line
-                                        :ensure t
-                                        :config
-                                        (setq sml/theme 'light
-                                              sml/no-confirm-load-theme t
-                                              sml/mode-width 'full
-                                              sml/shorten-modes t
-                                              sml/shorten-directory t)
-                                        (sml/setup))
                                       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                      (if (string-equal system-name "rain.cse.ohio-state.edu")
+                                      (if (string-equal system-name "XXX")
                                           (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
                                         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                       ;; customize the fringe marks on the sides
@@ -86,16 +77,8 @@
                                        :ensure t
                                        :init (load-theme 'eclipse t)
                                        :config
-                                       (use-package powerline
-                                         :ensure t
-                                         :if (display-graphic-p) ;; only enable for graphics displays
-                                         :config
-                                         (setq powerline-display-mule-info nil
-                                               powerline-display-buffer-size t
-                                               powerline-display-hud nil)
-                                         (powerline-default-theme))
                                        ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                       (if (string-equal system-name "rain.cse.ohio-state.edu")
+                                       (if (string-equal system-name "XXX")
                                            (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
                                          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
                                        (set-background-color "white")
@@ -118,21 +101,7 @@
 
       ;; default
       ((eq dotemacs--theme 'default)
-       (use-package powerline
-         :disabled t
-         :ensure t
-         :if (display-graphic-p) ;; only enable for graphics displays
-         :config
-         (setq powerline-display-mule-info nil
-               powerline-display-buffer-size t
-               powerline-display-hud nil)
-         ;;(set-face-attribute 'mode-line-inactive nil :foreground "grey20" :background "grey90" :box nil)
-         (set-face-attribute 'powerline-active1 nil :background "grey22" :foreground "white" :box nil)
-         (set-face-attribute 'powerline-active2 nil :background "grey40" :foreground "white" :box nil)
-         (set-face-attribute 'powerline-inactive1 nil :background "grey22" :foreground "white" :box nil)
-         (set-face-attribute 'powerline-inactive2 nil :background "grey40" :foreground "white" :box nil)
-         (powerline-default-theme))
-       (if (string= system-name "rain.cse.ohio-state.edu")
+       (if (string= system-name "XXX")
            (set-face-attribute 'default nil  :height 115)
          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 115))
        (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")

@@ -50,9 +50,15 @@
   (use-package helm-flyspell
     :ensure t
     :config (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))
+
   (use-package ace-flyspell
     :defer t
-    :ensure t))
+    :ensure t)
+
+  (use-package flyspell-popup
+    :ensure t
+    :config
+    (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map)))
 
 (defhydra hydra-flyspell (:color blue)
   "flyspell mode"

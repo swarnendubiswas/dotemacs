@@ -16,6 +16,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-x r t` - Prepend the selected region with characters.
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
 * `C-x h` - Mark whole buffer (`mark-whole-buffer`).
+* `M-h` - Put region around current paragraph (`mark-paragraph`).
 
 #### Key motion
 
@@ -82,4 +83,3 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * ###### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
 
 Suggestions are welcome.
-

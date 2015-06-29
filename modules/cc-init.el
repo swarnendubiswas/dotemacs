@@ -69,7 +69,7 @@
   :ensure t
   :config
   (add-to-list 'company-backends #'company-c-headers)
-  (cond ((string-equal system-name "rain.cse.ohio-state.edu")
+  (cond ((string-equal system-name "XXX")
          (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
          (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
         ((string-equal system-name "biswass-Dell-System-XPS-L502X")

@@ -87,7 +87,7 @@
   :init
   (setq tramp-default-method "ssh" ; faster than the default scp
         tramp-default-user "biswass"
-        tramp-default-host "sunshine.cse.ohio-state.edu"
+        tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
         tramp-persistency-file-name (concat dotemacs--temp-directory "tramp"))

@@ -73,7 +73,7 @@
   :disabled t
   :ensure t
   :init
-  (if (string-equal system-name "rain.cse.ohio-state.edu")
+  (if (string-equal system-name "XXX")
       (setq popwin:popup-window-height 15)
     (setq popwin:popup-window-height 15))
   (popwin-mode 1))
