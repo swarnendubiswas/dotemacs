@@ -1,4 +1,4 @@
-;;; highlight-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; highlight-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure sentence, line, word highlighting.
@@ -32,16 +32,30 @@
   :defer t
   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
-;; Navigate occurrences of the symbol under point with M-n and M-p, and highlight symbol occurrences
 (use-package highlight-symbol
   :ensure t
   :defer t
   :init
   (add-hook 'prog-mode-hook #'highlight-symbol-mode)
+  ;; Navigate occurrences of the symbol under point with M-n and M-p, and highlight symbol occurrences
   (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
   (setq highlight-symbol-idle-delay 0.5
         highlight-symbol-on-navigation-p t)
   :diminish highlight-symbol-mode)
+
+(use-package auto-highlight-symbol
+  :disabled t
+  :ensure t
+  :init
+  (global-auto-highlight-symbol-mode 1)
+  (setq ahs-default-range 'ahs-range-whole-buffer)
+  ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
+  (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
+  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
+  (bind-keys
+   :map auto-highlight-symbol-mode-map
+   ("M-<"         . ahs-backward)
+   ("M->"         . ahs-forward)))
 
 ;; highlight certain words
 

@@ -1,7 +1,7 @@
-;;; indent-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; indent-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup indentation in emacs.
+;; Setup indentation in Emacs.
 
 ;;; Code:
 
@@ -20,11 +20,15 @@
 (use-package electric
   :init (electric-indent-mode 1))
 
+;; If you wish to use this with autopairs and yasnippet, please load this library first.
 (use-package auto-indent-mode
+  :disabled t
   :ensure t
   :diminish auto-indent-mode
   :init
-  (setq auto-indent-on-visit-file t)
+  (setq auto-indent-on-visit-file t
+        ;; other option: aggressive
+        auto-indent-indent-style 'conservative)
   (auto-indent-global-mode 1))
 
 (use-package highlight-indentation

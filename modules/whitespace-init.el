@@ -5,8 +5,7 @@
 
 ;;; Code:
 
-(use-package simple
-  :config (add-hook 'before-save-hook #'delete-trailing-whitespace))
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 
 (use-package whitespace
   :disabled t

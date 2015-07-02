@@ -1,4 +1,4 @@
-;;; keybindings-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; keybindings-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Custom keybindings. Use M-x describe-personal-keybindings to see modifications.
@@ -38,11 +38,6 @@
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (bind-key "C-s" 'save-buffer)
 (bind-key "C-S-s" #'dotemacs--save-all-buffers)
-
-;; ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
-;; (when (auto-highlight-symbol-mode)
-;;   (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-;;   (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil))
 
 (add-hook 'org-mode-hook
           (lambda ()

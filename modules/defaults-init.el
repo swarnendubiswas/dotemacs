@@ -1,7 +1,7 @@
-;;; defaults-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; defaults-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup and tweak emacs defaults.
+;; Setup and tweak Emacs defaults.
 
 ;;; Code:
 
@@ -44,7 +44,7 @@
   :bind (("C-c d r" . revert-buffer)))
 
 (setq sentence-end-double-space nil
-      ;; Enable use of system clipboard across emacs and other applications.
+      ;; Enable use of system clipboard across Emacs and other applications.
       x-select-enable-clipboard t
       line-number-display-limit 2000000)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
@@ -62,8 +62,10 @@
         suggest-key-bindings t
         ;; use shift-select for marking
         shift-select-mode t)
+
   ;; Enable visual feedback on selections, default since v23
-  (transient-mark-mode 1))
+  (transient-mark-mode 1)
+  (column-number-mode 1))
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
@@ -215,7 +217,7 @@
   :defer 2
   :init
   ;; options: post-forward, reverse, forward
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; emacs 24.4 style ⁖ cat.png<dirName>
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; Emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"
         ;;uniquify-min-dir-content 0
         uniquify-after-kill-buffer-p t))

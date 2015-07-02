@@ -1,7 +1,7 @@
-;;; appearance-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; appearance-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Tweak emacs appearance.
+;; Tweak Emacs appearance.
 
 ;;; Code:
 
@@ -33,7 +33,7 @@
   :init
   ;; enable/disable blinking cursor
   (blink-cursor-mode 1)
-  ;; start with the emacs window maximized
+  ;; start with Emacs window maximized
   :config
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
   (add-to-list 'default-frame-alist '(fullscreen . fullheight)))
@@ -48,9 +48,6 @@
 ;; display line numbers in margin
 (use-package linum
   :init (global-linum-mode 1))
-
-(use-package simple
-  :config (column-number-mode 1))
 
 (cond ((eq dotemacs--theme 'leuven) (use-package leuven-theme
                                       :ensure t

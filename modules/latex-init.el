@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; latex-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -14,8 +14,9 @@
 
 ;;; Code:
 
-(use-package simple
-  :config (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill))
+(add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+(with-eval-after-load "auto-fill-mode"
+  (diminish auto-fill-mode))
 
 (use-package tex
   :ensure auctex

@@ -1,4 +1,4 @@
-;;; helm-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; helm-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Configure helm.
@@ -49,10 +49,10 @@
 
   (use-package helm-buffers
     :defer t
+    ;;:bind ([remap switch-to-buffer] . helm-mini)
     :init
     ;; fuzzy matching buffer names when non--nil
-    (setq helm-buffers-fuzzy-matching t)
-    :bind ([remap switch-to-buffer] . helm-mini))
+    (setq helm-buffers-fuzzy-matching t))
 
   (use-package helm-command
     :bind ([remap execute-extended-command] . helm-M-x))
@@ -171,8 +171,8 @@
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 
-  (define-key global-map [remap list-buffers] 'helm-buffers-list)
-  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
+  ;;(define-key global-map [remap list-buffers] 'helm-buffers-list)
+  ;;(define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 
   :bind*
   (("<f1>" . helm-M-x)

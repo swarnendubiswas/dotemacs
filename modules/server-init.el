@@ -1,7 +1,7 @@
-;;; server-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; server-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Setup emacs server.
+;; Setup Emacs server.
 
 ;;; Code:
 

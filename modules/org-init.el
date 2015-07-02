@@ -5,11 +5,12 @@
 
 ;;; Code:
 
-(use-package simple
-  :diminish visual-line-mode
-  :config
-  ;;(add-hook 'org-mode-hook #'visual-line-mode)
-  (add-hook 'org-mode-hook #'turn-on-auto-fill))
+(add-hook 'org-mode-hook #'visual-line-mode)
+(with-eval-after-load "visual-line-mode"
+  (diminish visual-line-mode))
+(add-hook 'org-mode-hook #'turn-on-auto-fill)
+(with-eval-after-load "auto-fill-mode"
+  (diminish auto-fill-mode))
 
 (use-package org
   :ensure t

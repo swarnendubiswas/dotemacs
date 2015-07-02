@@ -42,6 +42,7 @@
 ;; https://github.com/Fuco1/smartparens/blob/master/smartparens-config.el
 ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
 (use-package smartparens
+  :disabled t
   :ensure t
   :diminish smartparens-mode
   :init
@@ -56,22 +57,22 @@
         sp-show-pair-from-inside t
         sp-autoescape-string-quote nil)
 
-  ;; pair management
-  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+  ;; ;; pair management
+  ;; (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
 
-  ;; do not autoinsert ' pair if the point is preceded by word. This will handle the situation when ' is used as a
-  ;; contraction symbol in natural language. Nil for second argument means to keep the original definition of closing
-  ;; pair.
-  (sp-pair "'" nil :unless '(sp-point-after-word-p))
+  ;; ;; do not autoinsert ' pair if the point is preceded by word. This will handle the situation when ' is used as a
+  ;; ;; contraction symbol in natural language. Nil for second argument means to keep the original definition of closing
+  ;; ;; pair.
+  ;; (sp-pair "'" nil :unless '(sp-point-after-word-p))
 
   ;; Emacs is lisp hacking enviroment, so we set up some most common lisp modes too
   (sp-with-modes sp--lisp-modes
     ;; disable ', it's the quote character!
     (sp-local-pair "'" nil :actions nil))
 
-  ;; tex-mode latex-mode
-  (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
-    (sp-local-tag "i" "\"<" "\">"))
+  ;; ;; tex-mode latex-mode
+  ;; (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
+  ;;   (sp-local-tag "i" "\"<" "\">"))
 
   ;; when you press RET, the curly braces automatically add another newline
   (sp-with-modes '(c-mode c++-mode)

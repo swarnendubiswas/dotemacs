@@ -1,4 +1,4 @@
-;;; ace-modes-init.el --- Part of emacs initialization   -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; ace-modes-init.el --- Part of Emacs initialization   -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup ace-xxx (jump/buffer/isearch) modes.
