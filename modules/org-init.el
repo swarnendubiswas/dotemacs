@@ -5,18 +5,15 @@
 
 ;;; Code:
 
-(add-hook 'org-mode-hook #'visual-line-mode)
-(with-eval-after-load "visual-line-mode"
-  (diminish visual-line-mode))
-(add-hook 'org-mode-hook #'turn-on-auto-fill)
-(with-eval-after-load "auto-fill-mode"
-  (diminish auto-fill-mode))
-
 (use-package org
   :ensure t
   :defer t
   :commands org-mode
   :config
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  (diminish 'visual-line-mode)
+  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+
   (setq org-completion-use-ido t
         org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-startup-indented t
@@ -66,14 +63,12 @@
   ;; require ox-latex so that the following variables are defined
   (use-package ox-latex
     :config
-    (with-eval-after-load "org"
-      ;; include the listings package
-      (add-to-list 'org-latex-packages-alist '("" "listings"))
-      ;; if you want colored source code then you need to include the color package
-      ;;(add-to-list 'org-latex-packages-alist '("" "color"))
-      ;; Add minted to the defaults packages to include when exporting.
-      ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
-      )
+    ;; include the listings package
+    (add-to-list 'org-latex-packages-alist '("" "listings"))
+    ;; if you want colored source code then you need to include the color package
+    ;;(add-to-list 'org-latex-packages-alist '("" "color"))
+    ;; Add minted to the defaults packages to include when exporting.
+    ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
     ;; tell org to use listings, options: t, 'minted
     (setq org-latex-listings 't
           org-latex-table-caption-above nil))
@@ -84,9 +79,7 @@
 
   (use-package org-indent
     :diminish org-indent-mode
-    :config
-    (with-eval-after-load "org"
-      (org-indent-mode 1)))
+    :config (org-indent-mode 1))
 
   (use-package org-ref
     :disabled t

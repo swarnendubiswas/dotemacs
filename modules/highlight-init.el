@@ -46,16 +46,16 @@
 (use-package auto-highlight-symbol
   :disabled t
   :ensure t
-  :init
-  (global-auto-highlight-symbol-mode 1)
+  :init (global-auto-highlight-symbol-mode 1)
+  :config
   (setq ahs-default-range 'ahs-range-whole-buffer)
   ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
   (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
   (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
   (bind-keys
    :map auto-highlight-symbol-mode-map
-   ("M-<"         . ahs-backward)
-   ("M->"         . ahs-forward)))
+   ("M-<" . ahs-backward)
+   ("M->" . ahs-forward)))
 
 ;; highlight certain words
 
@@ -80,10 +80,9 @@
         "helper function to add a callback to multiple hooks"
         (dolist (mode mode-list)
           (add-hook (intern (concat (symbol-name mode) "-mode-hook")) something)))
-      :init (fic-ext-mode 1)
-      :config
+      :init
       ;;(add-something-to-mode-hooks '(prog text) #'fic-ext-mode)
-      ))
+      (fic-ext-mode 1)))
 
 (provide 'highlight-init)
 

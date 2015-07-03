@@ -11,6 +11,7 @@
   (require 'helm-config)
   (helm-mode 1)
   (helm-autoresize-mode 1)
+  :config
   (setq helm-quick-update t ; do not display invisible candidates
         helm-candidate-number-limit 100
         helm-M-x-fuzzy-match t
@@ -40,7 +41,6 @@
                                     ;;helm-source-dired-recent-dirs
                                     helm-source-buffer-not-found))
 
-  :config
   (use-package helm-plugin
     :init
     ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
@@ -48,7 +48,6 @@
       (setq header-line-format nil)))
 
   (use-package helm-buffers
-    :defer t
     ;;:bind ([remap switch-to-buffer] . helm-mini)
     :init
     ;; fuzzy matching buffer names when non--nil
@@ -105,7 +104,7 @@
     :ensure t
     :defer t
     :commands helm-bibtex
-    :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
+    :init (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
 
   (use-package helm-orgcard
     :ensure t
@@ -136,7 +135,8 @@
           helm-swoop-use-line-number-face t))
 
   (use-package helm-make
-    :ensure t)
+    :ensure t
+    :defer t)
 
   ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
   (use-package helm-company
@@ -152,8 +152,7 @@
     :ensure t)
 
   (use-package helm-grep
-    :defer t
-    :config
+    :init
     ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
     (global-set-key [f12]
                     (lambda ()

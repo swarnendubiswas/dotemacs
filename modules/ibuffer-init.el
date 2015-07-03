@@ -49,10 +49,8 @@
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
                   (ibuffer-do-sort-by-alphabetic)))))
 
-  :bind (
-         ([remap list-buffers] . ibuffer)
-         ;;("C-x C-b" . ibuffer)
-         ))
+  :bind (;;("C-x C-b" . ibuffer)
+         ([remap list-buffers] . ibuffer)))
 
 (defhydra hydra-buffer-menu (:color pink)
   "Buffer menu commands"

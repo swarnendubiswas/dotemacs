@@ -7,8 +7,7 @@
 
 (use-package cedet
   :disabled t
-  :init
-  (require 'cedet-files))
+  :init (require 'cedet-files))
 
 (use-package ede
   :disabled t
@@ -54,8 +53,12 @@
     (global-semantic-highlight-func-mode 1))
 
   :init
-  ;; (require 'semantic-ia)
-  ;; (require 'semantic-loaddefs)
+  (require 'semantic-ia)
+  (require 'semantic-loaddefs)
+  (require 'semanticdb)
+  (require 'semantic/db-global)
+
+  :config
   ;; Copied from https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
@@ -67,11 +70,9 @@
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
 
-  ;; (require 'semanticdb)
   ;; SemanticDB files
   (setq semanticdb-default-save-directory (concat dotemacs--temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
-  ;; (require 'semantic/db-global)
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)
   ;; (semanticdb-enable-gnu-global-databases 'c++-mode))
   (add-hook 'prog-mode-hook #'dotemacs--semantic-functions))
@@ -85,8 +86,8 @@
 
 (use-package mode
   :disabled t
-  ;;:init (global-semantic-decoration-mode 1)
-  :config
+  :init
+  ;; (global-semantic-decoration-mode 1)
   ;; Enable SRecode (Template management) minor-mode.
   (global-srecode-minor-mode 1))
 
@@ -106,9 +107,8 @@
     ("g s" ecb-goto-window-sources "sources")
     ("g d" ecb-goto-window-directories "directories")
     ("g y" ecb-goto-window-symboldef "symbol def")
-    ("l u" ecb-redraw-layout "redraw layout")))
-
-(bind-key "C-c ." 'hydra-ecb/body)
+    ("l u" ecb-redraw-layout "redraw layout"))
+  (bind-key "C-c ." 'hydra-ecb/body))
 
 (provide 'cedet-init)
 

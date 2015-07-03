@@ -18,16 +18,18 @@
     (lambda ()
       (fci-mode 1)))
 
-  :config
-  (setq-default fci-rule-column 120)
-  (setq fci-handle-truncate-lines nil
-        fci-rule-width 1
-        fci-rule-color "grey40")
+  :init
+  (global-fci-mode 1)
   ;;(add-hook 'text-mode-hook #'fci-mode)
   ;;(add-hook 'prog-mode-hook #'fci-mode)
   ;;(add-hook 'after-change-major-mode-hook #'dotemacs--auto-fci-mode)
   ;;(add-hook 'window-size-change-functions #'dotemacs--auto-fci-mode)
-  (global-fci-mode 1))
+
+  :config
+  (setq-default fci-rule-column 120)
+  (setq fci-handle-truncate-lines nil
+        fci-rule-width 1
+        fci-rule-color "grey40"))
 
 (provide 'fci-init)
 

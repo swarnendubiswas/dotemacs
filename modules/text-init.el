@@ -9,8 +9,6 @@
 ;; derived from a basic mode such as text-mode.
 
 (add-hook 'text-mode-hook #'turn-off-auto-fill)
-(with-eval-after-load "auto-fill-mode"
-  (diminish auto-fill-mode))
 
 ;; identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode

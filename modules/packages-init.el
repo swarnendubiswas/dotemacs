@@ -17,6 +17,9 @@
 (setq use-package-always-ensure nil
       use-package-verbose t)
 
+;; SB: :init always happens before package load, whether :config has been deferred or not. This implies :init is never
+;; deferred.
+
 (use-package package
   :commands list-packages
   :init
@@ -46,7 +49,8 @@
   :ensure t)
 
 (use-package bind-key
-  :ensure t)
+  :ensure t
+  :bind ("C-c d k" . describe-personal-keybindings))
 
 ;; this only *recompiles* ELisp source files.
 (use-package auto-compile

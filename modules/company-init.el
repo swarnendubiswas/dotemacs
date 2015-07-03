@@ -8,7 +8,8 @@
 (use-package company
   :ensure t
   :diminish company-mode
-  :init
+  :init (global-company-mode 1)
+  :config
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
         company-dabbrev-ignore-case nil
         company-show-numbers t ; show quick-access numbers for the first ten candidates
@@ -22,7 +23,6 @@
         ;;company-begin-commands '(self-insert-command)
         company-idle-delay 0.3)
 
-  :config
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
   (add-to-list 'company-backends #'company-files)
   (add-to-list 'company-backends #'company-capf)
@@ -31,8 +31,6 @@
   ;;(add-to-list 'company-backends 'company-gtags)
   ;;(setq company-backends (delete 'company-semantic company-backends))
   ;;(setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
-
-  (global-company-mode 1)
 
   ;; https://github.com/company-mode/company-mode/issues/180
   (when (bound-and-true-p dotemacs--fci-p)
@@ -64,6 +62,7 @@
 
   (use-package company-web
     :ensure t
+    :defer 2
     :preface
     (defun company-web--setup ()
       (setq-local company-backends
@@ -79,6 +78,7 @@
   ;; https://github.com/vspinu/company-math
   (use-package company-math
     :ensure t
+    :defer 2
     :preface
     (defun company-math--setup ()
       (setq-local company-backends

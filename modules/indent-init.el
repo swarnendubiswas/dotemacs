@@ -25,11 +25,10 @@
   :disabled t
   :ensure t
   :diminish auto-indent-mode
-  :init
+  :init (auto-indent-global-mode 1)
   (setq auto-indent-on-visit-file t
         ;; other option: aggressive
-        auto-indent-indent-style 'conservative)
-  (auto-indent-global-mode 1))
+        auto-indent-indent-style 'conservative))
 
 (use-package highlight-indentation
   :disabled t
@@ -52,12 +51,11 @@
 (use-package smart-tabs
   :disabled t
   :ensure t
-  ;; :init
+  :init
   ;; (autoload 'smart-tabs-mode "smart-tabs-mode"
   ;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
   ;; (autoload 'smart-tabs-advice "smart-tabs-mode")
   ;; (autoload 'smart-tabs-insinuate "smart-tabs-mode")
-  :config
   ;; (smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
   (global-smart-tab-mode 1))
 

@@ -18,7 +18,7 @@
 
       (use-package smart-mode-line
         :ensure t
-        :if (eq dotemacs--theme 'leuven)
+        :if (or (eq dotemacs--theme 'leuven) (eq dotemacs--theme 'default))
         :config
         (use-package smart-mode-line-powerline-theme
           :ensure t
@@ -34,6 +34,7 @@
       ;; SB: I find the melpa powerline package more difficult to configure than this fork:
       ;; https://github.com/jonathanchu/emacs-powerline/
       (use-package powerline
+        :disabled t
         :if (eq dotemacs--theme 'default)
         ;; If the path is relative, it is expanded within user-emacs-directory
         :load-path "lisp/emacs-powerline/"

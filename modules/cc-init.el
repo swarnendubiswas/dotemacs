@@ -11,7 +11,8 @@
 ;; “bsd”: What BSD developers use, aka “Allman style” after Eric Allman.
 ;; “whitesmith”: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
 ;; “stroustrup”: What Stroustrup, the author of C++ used in his book
-;; “ellemtel”: Popular C++ coding standards as defined by “Programming in C++, Rules and Recommendations,” Erik Nyquist and Mats Henricson, Ellemtel
+;; “ellemtel”: Popular C++ coding standards as defined by “Programming in C++, Rules and Recommendations,” Erik Nyquist
+;; and Mats Henricson, Ellemtel
 ;; “linux”: What the Linux developers use for kernel development
 ;; “python”: What Python developers use for extension modules
 ;; “java”: The default style for java-mode (see below)
@@ -34,10 +35,7 @@
 
   :config
   (use-package cwarn
-    :defer t
-    :init
-    (with-eval-after-load "cc-mode"
-      (global-cwarn-mode 1)))
+    :init (global-cwarn-mode 1))
 
   (use-package hideif
     :init
@@ -51,8 +49,7 @@
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
   ;; this is already the default, but I have this as a reminder.
-  (with-eval-after-load "cc-mode"
-    (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)))
+  (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))
 
 ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 
@@ -69,11 +66,14 @@
   :ensure t
   :config
   (add-to-list 'company-backends #'company-c-headers)
+
   (cond ((string-equal system-name "XXX")
          (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
          (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
+
         ((string-equal system-name "biswass-Dell-System-XPS-L502X")
          (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9")))
+
   (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
   (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
 

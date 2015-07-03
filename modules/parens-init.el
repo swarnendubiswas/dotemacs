@@ -14,7 +14,7 @@
       (make-variable-buffer-local 'show-paren-mode))
 
     (use-package paren
-      :disabled t
+      ;;:disabled t
       :init (show-paren-mode 1)
       :config
       (setq show-paren-delay 0

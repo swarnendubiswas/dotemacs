@@ -66,49 +66,75 @@
       ((eq dotemacs--theme 'professional) (use-package professional-theme
                                             :ensure t
                                             :init (load-theme 'professional t)
-                                            :config
-                                            ;; set font size, value is in 1/10pt, so 100 will give you 10pt)
-                                            (set-face-attribute 'default nil :height 110)))
+                                            :config (set-face-attribute 'default nil
+                                                                        :height 110)))
 
       ((eq dotemacs--theme 'eclipse) (use-package eclipse-theme
                                        :ensure t
                                        :init (load-theme 'eclipse t)
                                        :config
-                                       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
                                        (if (string-equal system-name "XXX")
-                                           (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
-                                         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+                                           (set-face-attribute 'default nil
+                                                               :family "Dejavu Sans Mono"
+                                                               :height 110)
+                                         (set-face-attribute 'default nil
+                                                             :family "Dejavu Sans Mono"
+                                                             :height 110))
                                        (set-background-color "white")
-                                       (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil :bold nil)
-                                       (set-face-attribute 'mode-line-inactive nil :box nil)
-                                       (set-face-attribute 'region nil :background "#164040" :foreground "white")
-                                       ;;(set-face-attribute 'linum nil :background "#006666" :foreground "#FFFFDD" :height 0.98)
+                                       ;; (set-face-attribute 'mode-line nil
+                                       ;;                     :background "grey88"
+                                       ;;                     :foreground "black"
+                                       ;;                     :box nil :bold nil)
+                                       ;; (set-face-attribute 'mode-line-inactive nil
+                                       ;;                     :box nil)
+                                       (set-face-attribute 'region nil
+                                                           :background "#164040"
+                                                           :foreground "white")
+                                       ;; (set-face-attribute 'linum nil
+                                       ;;                     :background "#006666"
+                                       ;;                     :foreground "#FFFFDD"
+                                       ;;                     :height 0.98)
                                        (with-eval-after-load "hl-line"
-                                         (set-face-attribute 'hl-line nil :background "linen"))
+                                         (set-face-attribute 'hl-line nil
+                                                             :background "linen"))
                                        (with-eval-after-load "helm"
-                                         (set-face-attribute 'helm-selection nil :underline nil))
+                                         (set-face-attribute 'helm-selection nil
+                                                             :underline nil))
                                        ;; org-mode customizations inspired from leuven theme
                                        (with-eval-after-load "org"
-                                         (set-face-attribute 'org-level-1 nil :height 1.2 :overline "#A7A7A7" ;;:weight bold
-                                                             :foreground "#3C3C3C" :background "#F5F5F5")
+                                         (set-face-attribute 'org-level-1 nil
+                                                             :height 1.2
+                                                             :overline "#A7A7A7"
+                                                             ;;:weight bold
+                                                             :foreground "#3C3C3C"
+                                                             :background "#F5F5F5")
                                          (set-face-attribute 'org-level-2 nil
-                                                             :height 1.1 :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
+                                                             :height 1.1
+                                                             :overline "#123555"
+                                                             :foreground "#123555"
+                                                             :background "#E5F4FB"))
                                        ;; customize the fringe marks on the sides
                                        (set-face-background 'fringe "lavender")))
 
       ;; default
       ((eq dotemacs--theme 'default)
        (if (string= system-name "XXX")
-           (set-face-attribute 'default nil  :height 115)
-         (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 115))
-       (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+           (set-face-attribute 'default nil
+                               :height 115)
+         (set-face-attribute 'default nil
+                             :family "Dejavu Sans Mono"
+                             :height 115))
+       (set-face-attribute 'region nil
+                           :background "LemonChiffon"
+                           :foreground "black")
        (with-eval-after-load "hl-line"
-         (set-face-attribute 'hl-line nil :background "linen"))))
+         (set-face-attribute 'hl-line nil
+                             :background "linen"))))
 
 (use-package display-theme
   :ensure t
   :if (not (eq dotemacs--theme 'default))
-  :config (global-display-theme-mode))
+  :init (global-display-theme-mode))
 
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
 ;; http://stackoverflow.com/questions/15735163/update-tabbar-when-nothing-to-save#
@@ -123,6 +149,8 @@
   (defun tabbar--on-buffer-modification ()
     (set-buffer-modified-p t)
     (tabbar--modification-state-change))
+
+  :init (tabbar-mode 1)
 
   :config
   (add-hook 'after-save-hook #'tabbar--modification-state-change)
@@ -165,8 +193,7 @@
                       :height 1.0)
   (setq tabbar-use-images nil ; speed up by not using images
         tabbar-auto-scroll-flag t
-        tabbar-separator '(0.3))
-  (tabbar-mode 1))
+        tabbar-separator '(0.3)))
 
 (provide 'appearance-init)
 

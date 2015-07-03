@@ -8,6 +8,9 @@
 (use-package ido
   :ensure t
   :init
+  (ido-mode 1) ; options: 'files, 'buffers
+  (ido-everywhere 1)
+  :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
         ido-max-prospects 10
@@ -28,10 +31,7 @@
                              "Async Shell Command" "*Paradox Report*")
         ido-enable-tramp-completion t
         ido-ignore-extensions t)
-  (ido-mode 1) ; options: 'files, 'buffers
-  (ido-everywhere 1)
 
-  :config
   (setq ido-ignore-files
         (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
                 ido-ignore-files))

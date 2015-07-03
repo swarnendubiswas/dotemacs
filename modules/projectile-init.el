@@ -17,7 +17,10 @@
         ;; use projectile in every directory without requiring a project file
         projectile-require-project-root nil
         projectile-find-dir-includes-top-level t
-        projectile-switch-project-action 'projectile-dired)
+        projectile-switch-project-action 'projectile-dired
+        projectile-mode-line '(:propertize
+                               (:eval (concat " " (projectile-project-name)))
+                               face font-lock-constant-face))
   (dolist (dirs '(".svn" ".dropbox"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   ;; Don't consider my home dir as a project
@@ -28,17 +31,16 @@
   (use-package helm-projectile
     :ensure t
     :defer t
+    :init (helm-projectile-on)
     :config
     (setq helm-projectile-fuzzy-match t
           ;; other options: 'helm-projectile-find-file
-          projectile-switch-project-action #'helm-projectile)
-    (helm-projectile-on))
+          projectile-switch-project-action #'helm-projectile))
 
   ;; Group buffers by Projectile project
   (use-package ibuffer-projectile
     :ensure t
-    :defer t
-    :config
+    :init
     (add-hook 'ibuffer-mode-hook
               (lambda()
                 (ibuffer-projectile-set-filter-groups)

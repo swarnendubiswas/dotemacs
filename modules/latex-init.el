@@ -14,10 +14,6 @@
 
 ;;; Code:
 
-(add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
-(with-eval-after-load "auto-fill-mode"
-  (diminish auto-fill-mode))
-
 (use-package tex
   :ensure auctex
   :commands TeX-PDF-mode
@@ -63,6 +59,7 @@
   ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
   ;;(add-hook 'LaTeX-mode-hook #'visual-line-mode)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
 
   ;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
   ;;(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))

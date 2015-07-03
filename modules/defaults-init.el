@@ -54,7 +54,7 @@
   :init (toggle-indicate-empty-lines 1))
 
 (use-package simple
-  :config
+  :init
   ;; We need to paste something from another program, but sometimes we do real paste after some kill
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
   (setq save-interprogram-paste-before-kill t
@@ -65,17 +65,21 @@
 
   ;; Enable visual feedback on selections, default since v23
   (transient-mark-mode 1)
-  (column-number-mode 1))
+  (column-number-mode 1)
+
+  (auto-fill-mode 1)
+  ;; This is not a library/file, so eval-after-load does not work
+  (diminish 'auto-fill-function))
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
   :defer 2
-  :init
+  :init (global-auto-revert-mode 1)
+  :config
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
-                global-auto-revert-non-file-buffers t)
-  (global-auto-revert-mode 1))
+                global-auto-revert-non-file-buffers t))
 
 ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
@@ -87,14 +91,13 @@
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
 (use-package tramp
   :defer t
-  :init
+  :config
   (setq tramp-default-method "ssh" ; faster than the default scp
         tramp-default-user "biswass"
         tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
         tramp-persistency-file-name (concat dotemacs--temp-directory "tramp"))
-  :config
   (use-package password-cache
     :init (setq password-cache-expiry nil))
   (use-package tramp-term
@@ -121,7 +124,8 @@
       use-file-dialog nil)
 
 (use-package advice
-  :init
+  :defer 2
+  :config
   ;; turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
@@ -141,10 +145,10 @@
 ;; desktop save mode
 (use-package desktop
   :disabled t
+  :init (desktop-save-mode -1)
   :config
   (setq-default desktop-restore-frames nil ; no need to restore frames
-                desktop-load-locked-desktop nil)
-  (desktop-save-mode -1))
+                desktop-load-locked-desktop nil))
 
 ;; fully redraw the display before queued input events are processed
 ;; don't defer screen updates when performing operations
@@ -176,7 +180,7 @@
 ;; remember cursor position in files
 (use-package saveplace
   :defer 2
-  :init
+  :config
   (setq-default save-place t
                 save-place-file (concat dotemacs--temp-directory "places")))
 
@@ -197,15 +201,15 @@
 ;; save minibuffer histories across sessions
 (use-package savehist
   :defer 5
-  :init
+  :init (savehist-mode 1)
+  :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
         savehist-file (concat dotemacs--temp-directory "savehist")
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring))
-  (setq-default history-length 50)
-  (savehist-mode 1))
+  (setq-default history-length 50))
 
 (setq enable-recursive-minibuffers t)
 
@@ -219,13 +223,13 @@
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; Emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"
-        ;;uniquify-min-dir-content 0
+        ;; uniquify-min-dir-content 0
         uniquify-after-kill-buffer-p t))
 
 ;; hippie expand is dabbrev expand on steroids
 (use-package hippie-exp
   :defer 2
-  :init
+  :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
                                            try-expand-dabbrev-from-kill
@@ -238,7 +242,6 @@
                                            try-complete-lisp-symbol))
   (use-package hippie-exp-ext
     :ensure t)
-
   :bind* ("M-/" . hippie-expand))
 
 (use-package subword

@@ -35,81 +35,88 @@
   ;;(add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
   :config
-  (bind-key "M-<home>" 'dired--go-home dired-mode-map)
-  (bind-key "i" 'ido-find-file dired-mode-map)
-  (bind-key "M-<up>" 'dired--jump-to-top dired-mode-map)
-  (bind-key "M-<down>" 'dired--jump-to-bottom dired-mode-map))
+  (bind-keys
+   :map dired-mode-map
+   ("M-<home>" . dired--go-home)
+   ("i" . ido-find-file)
+   ("M-<up>" . dired--jump-to-top)
+   ("M-<down>" . dired--jump-to-bottom))
 
-(use-package dired-x
-  :commands dired-jump
-  :config
-  (setq dired-bind-jump t
-        ;; do not show messages when omitting files
-        dired-omit-verbose nil)
-  (add-hook 'dired-mode-hook #'dired-omit-mode)
+  ;; (bind-key "M-<home>" 'dired--go-home dired-mode-map)
+  ;; (bind-key "i" 'ido-find-file dired-mode-map)
+  ;; (bind-key "M-<up>" 'dired--jump-to-top dired-mode-map)
+  ;; (bind-key "M-<down>" 'dired--jump-to-bottom dired-mode-map)
 
-  ;; SB: This does not work.
-  ;; (with-eval-after-load "dired-omit-mode"
-  ;;   (diminish dired-omit-mode))
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Make sure to remove \"Omit\" from the modeline."
-    (diminish 'dired-omit-mode) dired-mode-map)
+  (use-package dired-x
+    :commands dired-jump
+    :config
+    (setq dired-bind-jump t
+          ;; do not show messages when omitting files
+          dired-omit-verbose nil)
+    (add-hook 'dired-mode-hook #'dired-omit-mode)
 
-  :bind*
-  ;; C-x C-j opens dired with the cursor right on the file you're editing
-  ("C-x C-j" . dired-jump))
+    ;; SB: This does not work.
+    ;; (with-eval-after-load "dired-omit-mode"
+    ;;   (diminish dired-omit-mode))
+    ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+    (defadvice dired-omit-startup (after diminish-dired-omit activate)
+      "Make sure to remove \"Omit\" from the modeline."
+      (diminish 'dired-omit-mode) dired-mode-map)
 
-(use-package dired+
-  :ensure t
-  ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-  :init
-  (setq-default diredp-hide-details-initially-flag nil
-                diredp-hide-details-propagate-flag nil)
-  (diredp-toggle-find-file-reuse-dir 1))
+    :bind*
+    ;; C-x C-j opens dired with the cursor right on the file you're editing
+    ("C-x C-j" . dired-jump))
 
-;; direx:jump-to-directory is a good explorer
-(use-package direx
-  :disabled t
-  :ensure t)
+  (use-package dired+
+    :ensure t
+    ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
+    :init
+    (setq-default diredp-hide-details-initially-flag nil
+                  diredp-hide-details-propagate-flag nil)
+    (diredp-toggle-find-file-reuse-dir 1))
 
-(use-package direx-grep
-  :disabled t
-  :ensure t)
+  ;; direx:jump-to-directory is a good explorer
+  (use-package direx
+    :disabled t
+    :ensure t)
 
-(use-package dired-efap
-  :ensure t
-  :init
-  (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
-  (bind-key "<f2>" 'dired-efap dired-mode-map))
+  (use-package direx-grep
+    :disabled t
+    :ensure t)
 
-;; Not required starting from Emacs 24.4
-;; (use-package dired-details
-;;   :ensure t
-;;   :config (setq dired-details-hide-link-targets nil))
+  (use-package dired-efap
+    :ensure t
+    :init
+    (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
+    (bind-key "<f2>" 'dired-efap dired-mode-map))
 
-;; (use-package dired-details+
-;;   :ensure t)
+  ;; Not required starting from Emacs 24.4
+  ;; (use-package dired-details
+  ;;   :ensure t
+  ;;   :config (setq dired-details-hide-link-targets nil))
 
-(use-package dired-rainbow
-  :disabled t
-  :ensure t)
+  ;; (use-package dired-details+
+  ;;   :ensure t)
 
-(use-package dired-hacks-utils
-  :ensure t
-  :disabled t)
+  (use-package dired-rainbow
+    :disabled t
+    :ensure t)
 
-(use-package nav
-  :disabled t
-  :load-path "lisp/emacs-nav-49/"
-  :config
-  (nav-mode)
-  ;;(nav-disable-overeager-window-splitting)
-  :bind ("<f6>" . nav-toggle))
+  (use-package dired-hacks-utils
+    :ensure t
+    :disabled t)
 
-(use-package dired-nav-enhance
-  :ensure t
-  :disabled t)
+  (use-package nav
+    :disabled t
+    :load-path "lisp/emacs-nav-49/"
+    :config
+    (nav-mode)
+    ;;(nav-disable-overeager-window-splitting)
+    :bind ("<f6>" . nav-toggle))
+
+  (use-package dired-nav-enhance
+    :ensure t
+    :disabled t))
 
 ;; FIXME: How is this useful?
 ;; http://oremacs.com/2015/02/21/hydra-docstring-sexp

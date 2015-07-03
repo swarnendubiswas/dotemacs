@@ -7,6 +7,12 @@
 
 (use-package auto-complete
   :ensure t
+  :init
+  (require 'auto-complete-config)
+  (global-auto-complete-mode)
+  (ac-linum-workaround)
+  (ac-config-default)
+
   :config
   (setq ac-auto-start 4
         ac-auto-show-menu t
@@ -21,9 +27,6 @@
         tab-always-indent 'complete
         ac-dwim t
         ac-comphist-file (concat dotemacs--temp-directory "ac-comphist.dat"))
-  (require 'auto-complete-config)
-  (global-auto-complete-mode)
-  (ac-linum-workaround)
   (add-to-list 'ac-sources 'ac-source-words-in-buffer)
   (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
   (add-to-list 'ac-sources 'ac-source-words-in-all-buffers)
@@ -37,7 +40,6 @@
   (add-to-list 'ac-sources 'ac-source-semantic-raw)
   (add-to-list 'ac-sources 'ac-source-yasnippet)
   (ac-flyspell-workaround)
-  (ac-config-default)
 
   (use-package auto-complete-c-headers
     :ensure t

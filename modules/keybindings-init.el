@@ -43,9 +43,7 @@
           (lambda ()
             (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
             (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)))
-;;(global-set-key (kbd "M-<left>") 'tabbar-backward-tab)
 (bind-key* "M-<left>" 'tabbar-backward-tab)
-;;(global-set-key (kbd "M-<right>") 'tabbar-forward-tab)
 (bind-key* "M-<right>" 'tabbar-forward-tab)
 
 ;; with bind-key, you do not need an explicit "(kbd ...)"
@@ -59,19 +57,19 @@
 (use-package key-chord
   :disabled t
   :ensure t
-  :config
+  :init
   ;; good choices in English: hj
   (key-chord-define-global "jj" 'avy-goto-word-1)
   (key-chord-define-global "uu" 'undo-tree-visualize)
   (key-chord-define-global "xx" 'smex)
   ;; (key-chord-define c++-mode-map ";;"  "\C-e;")
   ;; (key-chord-define c++-mode-map "{}"  "{\n\n}\C-p\t")
-  :init (key-chord-mode 1))
+  (key-chord-mode 1))
 
 (use-package keyfreq
   :disabled t
   :ensure t
-  :config
+  :init
   (setq keyfreq-file (concat dotemacs--temp-directory "keyfreq"))
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
@@ -94,7 +92,7 @@
   ("i" info-apropos "info")
   ("t" tags-apropos "tags")
   ("z" hydra-customize-apropos/body "customize"))
-(global-set-key (kbd "C-h a") #'hydra-apropos/body)
+(bind-key "C-h a" #'hydra-apropos/body)
 
 (defhydra hydra-info (:color blue)
   "Info"
@@ -103,10 +101,10 @@
   ("m" (funcall (info-display-topic "magit")) "Magit")
   ("o" (funcall (info-display-topic "org")) "Org Mode")
   ("s" (funcall (info-display-topic "sicp")) "SICP"))
-(global-set-key (kbd "C-h i") #'hydra-info/body)
+(bind-key "C-h i" #'hydra-info/body)
 
-(defhydra hydra-zoom (global-map "<f12>")
-  "zoom"
+(defhydra hydra-zoom (global-map "C-c d z")
+  "zoom commands"
   ("g" text-scale-increase "in")
   ("l" text-scale-decrease "out"))
 

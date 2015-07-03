@@ -17,8 +17,6 @@
   (make-directory dotemacs--temp-directory))
 
 ;; use either auto-complete or company for auto completion support
-;; (defconst use-company t
-;;   "Choose company over auto-complete for completion.")
 (defcustom dotemacs--completion
   'company
   "Choose company over auto-complete for completion."
@@ -27,16 +25,17 @@
           (const :tag "auto-complete" auto-complete))
   :group 'dotemacs)
 
-;; ;; use either helm or other packages that provide similar functionality
-;; (defcustom dotemacs-helm-or-ido
-;;   'ido
-;;   "Prefer helm instead of ido and smex.  Helm provides similar functionalities."
-;;   :type '(radio
-;;           (const :tag "helm" helm)
-;;           (const :tag "ido" ido))
-;;   :group 'dotemacs)
+;; use either helm or other packages that provide similar functionality
+(defcustom dotemacs--helm-or-ido
+  'both
+  "Prefer helm instead of ido and smex, or use both."
+  :type '(radio
+          (const :tag "helm" helm)
+          (const :tag "ido" ido)
+          (const :tag "both" both))
+  :group 'dotemacs)
 
-;; choices: "leuven", "professional", "eclipse", otherwise default.
+;; choices: leuven, professional, eclipse, default.
 (defcustom dotemacs--theme
   'default
   "Specify which Emacs theme to use."
@@ -60,6 +59,14 @@
   "Control display of fci."
   :type    'boolean
   :group   'dotemacs)
+
+(defcustom dotemacs--enable-whitespace-module
+  t
+  "Control whether the whitespace module should be enabled or
+disabled. Sometimes we do not want to unnecessarily add
+differences due to whitespaces."
+  :type 'boolean
+  :group 'dotemacs)
 
 (provide 'config-init)
 

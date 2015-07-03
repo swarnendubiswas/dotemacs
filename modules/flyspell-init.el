@@ -20,6 +20,8 @@
     "An alist of hooks that require customizations.")
 
   :init
+  (add-hook 'find-file-hooks #'turn-on-flyspell)
+
   (use-package flyspell-lazy
     :ensure t
     :init (flyspell-lazy-mode 1))
@@ -30,7 +32,6 @@
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
-  (add-hook 'find-file-hooks #'turn-on-flyspell)
 
   ;; this is useful but slow
   ;;(add-hook 'before-save-hook 'flyspell-buffer)

@@ -8,7 +8,6 @@
 ;; custom functions
 
 ;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
-;; save all modified buffers
 (defun dotemacs--save-all-buffers ()
   "Save all modified buffers without prompting."
   (interactive)
@@ -16,7 +15,8 @@
 
 ;; kill all non-special buffers but the current one
 (defun dotemacs--kill-other-buffers ()
-  "Kill all buffers but the current one.  Don't mess with special buffers."
+  "Kill all buffers but the current one. Don't mess with special
+buffers."
   (interactive)
   (dolist (buffer (buffer-list))
     (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
