@@ -54,7 +54,7 @@
     (setq helm-buffers-fuzzy-matching t))
 
   (use-package helm-command
-    :bind ([remap execute-extended-command] . helm-M-x))
+    :bind* ([remap execute-extended-command] . helm-M-x))
 
   (use-package helm-utils
     :init
@@ -175,7 +175,7 @@
 
   :bind*
   (("<f1>" . helm-M-x)
-   ;;("M-x" . helm-M-x)
+   ("M-x" . helm-M-x)
    ("C-c h f" . helm-find-files)
    ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
    ("<f3>" . helm-find-files)

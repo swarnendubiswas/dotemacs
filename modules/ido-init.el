@@ -49,7 +49,9 @@
     :ensure t)
 
   (use-package ido-hacks
-    :ensure t)
+    :ensure t
+    :commands ido-hacks-mode
+    :init (ido-hacks-mode))
 
   ;; allow ido-style completion in more places
   (use-package ido-ubiquitous

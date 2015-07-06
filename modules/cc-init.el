@@ -29,11 +29,12 @@
   :init
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2)
+
   :config
   (c-toggle-electric-state +1)
   (c-toggle-syntactic-indentation +1)
+  (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode)
 
-  :config
   (use-package cwarn
     :init (global-cwarn-mode 1))
 
@@ -47,6 +48,13 @@
     :init
     (add-hook 'c-mode-common-hook #'google-set-c-style)
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
+
+  (use-package ctypes
+    :ensure t
+    :config
+    (setq ctypes-write-types-at-exit t)
+    (ctypes-read-file nil nil t t)
+    (ctypes-auto-parse-mode 1))
 
   ;; this is already the default, but I have this as a reminder.
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))

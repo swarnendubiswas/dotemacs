@@ -9,23 +9,22 @@
   :ensure t
   :diminish yas-minor-mode
   :commands yas-minor-mode
-
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :init
   (setq yas-triggers-in-field t)
   (yas-global-mode 1)
+
+  ;; this is already the default
+  ;;(add-to-list yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
   ;; (add-hook 'tex-mode-hook #'yas-minor-mode)
   ;; (add-hook 'org-mode-hook #'yas-minor-mode)
   ;; (add-hook 'prog-mode-hook #'yas-minor-mode)
   ;; (yas-reload-all)
 
-  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-
   :config
-  ;; this is already the default
-  ;;(add-to-list yas-snippet-dirs (concat user-emacs-directory "snippets"))
-
   (use-package helm-c-yasnippet
+    :defer t
     :ensure t
     :init
     (setq helm-yas-not-display-dups nil)

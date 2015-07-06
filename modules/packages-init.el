@@ -8,6 +8,19 @@
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
       package-enable-at-startup nil)
+
+;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
+(add-to-list 'package-archives
+             '("marmalade" . "https://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives
+             '("org" . "http://orgmode.org/elpa/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
+
+(when (not package-archive-contents)
+  (package-refresh-contents))
 (package-initialize)
 
 ;; setup use-package
@@ -19,24 +32,6 @@
 
 ;; SB: :init always happens before package load, whether :config has been deferred or not. This implies :init is never
 ;; deferred.
-
-(use-package package
-  :commands list-packages
-  :init
-  ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
-  (add-to-list 'package-archives
-               '("marmalade" . "https://marmalade-repo.org/packages/") t)
-  (add-to-list 'package-archives
-               '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-               '("org" . "http://orgmode.org/elpa/") t)
-  ;; (add-to-list 'package-archives
-  ;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-
-  ;; Possibly no longer needed since use-package does that automatically
-  ;; always referesh contents so that new packages added to the repositories are available
-  ;;(package-refresh-contents)
-  )
 
 ;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
 ;; (eval-and-compile

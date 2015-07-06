@@ -9,7 +9,7 @@
 (use-package undo-tree
   :ensure t
   :defer t
-  :init
+  :config
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t
         undo-tree-visualizer-relative-timestamps t

@@ -5,8 +5,8 @@
 
 ;;; Code:
 
+;; prefer ace-window/avy
 (use-package ace-jump-mode
-  ;;:disabled t ;; prefer ace-window/avy
   :ensure t
   ;;:init  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind*
@@ -23,7 +23,7 @@
   (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
     "*Buffer regexps to always show when buffer switching.")
 
-  (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$")
+  (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$" "GTAGS$")
     "*Buffer regexps to never show when buffer switching.")
 
   (defvar my-ido-ignore-dired-buffers nil
@@ -52,7 +52,7 @@
           ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
   (setq bs-cycle-configuration-name "files")
   (setq-default ajb-bs-configuration "files")
-  ;;(global-set-key (kbd "M-b") 'ace-jump-buffer-with-configuration)
+  (bind-key "M-B" 'ace-jump-buffer-with-configuration)
 
   :bind ("<f5>" . ace-jump-buffer))
 
@@ -69,12 +69,13 @@
   :defer t
   :ensure avy
   :bind ("M-b" . avy-goto-word-1)
+  :init (ace-window-display-mode 1)
   :config
   (use-package avy
-    :config (avy-setup-default)
+    :config
+    (avy-setup-default)
     (setq avy-background t
-          avy-style 'at-full))
-  (ace-window-display-mode 1))
+          avy-style 'at-full)))
 
 (defhydra hydra-jump-commands (:color blue)
   "Different jump commands."

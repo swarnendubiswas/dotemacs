@@ -8,7 +8,7 @@
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also get run for all modes
 ;; derived from a basic mode such as text-mode.
 
-(add-hook 'text-mode-hook #'turn-off-auto-fill)
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
@@ -35,6 +35,12 @@
   ;;(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (use-package markdown-mode+
+    :ensure t))
+
+(use-package csv-mode
+  :ensure t
+  :config
+  (use-package csv-nav
     :ensure t))
 
 (provide 'text-init)

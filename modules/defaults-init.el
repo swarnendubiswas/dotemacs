@@ -13,7 +13,8 @@
       initial-scratch-message nil
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead.
       initial-major-mode 'text-mode
-      inhibit-startup-echo-area-message t)
+      inhibit-startup-echo-area-message t
+      create-lockfiles nil)
 
 ;; major mode to use for files that do no specify a major mode, default value is fundamental-mode
 (setq-default major-mode 'text-mode)
@@ -224,7 +225,8 @@
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; Emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"
         ;; uniquify-min-dir-content 0
-        uniquify-after-kill-buffer-p t))
+        uniquify-after-kill-buffer-p t
+        uniquify-strip-common-suffix t))
 
 ;; hippie expand is dabbrev expand on steroids
 (use-package hippie-exp

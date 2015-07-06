@@ -9,7 +9,6 @@
   :ensure t
   :diminish company-mode
   :init (global-company-mode 1)
-  :config
   (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
         company-dabbrev-ignore-case nil
         company-show-numbers t ; show quick-access numbers for the first ten candidates
@@ -21,14 +20,21 @@
         company-tooltip-limit 20
         ;; start autocompletion only after typing
         ;;company-begin-commands '(self-insert-command)
-        company-idle-delay 0.3)
+        company-idle-delay 0.3
+        company-selection-wrap-around t
+        company-selection-changed t
+        company-require-match nil)
 
+  :config
+
+  ;; already present in the default value
   ;; http://emacs.stackexchange.com/questions/3654/filename-completion-using-company-mode
-  (add-to-list 'company-backends #'company-files)
-  (add-to-list 'company-backends #'company-capf)
+  ;; (add-to-list 'company-backends #'company-files)
+  ;; (add-to-list 'company-backends #'company-capf)
+  ;; (add-to-list 'company-backends 'company-gtags)
+  (add-to-list 'company-backends 'company-keywords)
 
   ;; FIXME: enabling this seems to disable the company popup
-  ;;(add-to-list 'company-backends 'company-gtags)
   ;;(setq company-backends (delete 'company-semantic company-backends))
   ;;(setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
 
@@ -49,16 +55,20 @@
     (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
 
   (use-package company-dabbrev
-    :disabled t
-    :config (add-to-list 'company-backends #'company-dabbrev))
+    :ensure company
+    ;;:init
+    ;; already added by default
+    ;;(add-to-list 'company-backends #'company-dabbrev)
+    )
 
-  ;; enabling this seems to disable the company popup
   (use-package company-dabbrev-code
-    :disabled t
-    :config
+    :ensure company
+    :init
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t)
-    (add-to-list 'company-backends #'company-dabbrev-code))
+    ;; already added by default
+    ;;(add-to-list 'company-backends #'company-dabbrev-code)
+    )
 
   (use-package company-web
     :ensure t
@@ -87,8 +97,12 @@
     :init (add-hook 'LaTeX-mode-hook #'company-math--setup))
 
   (use-package company-quickhelp
+    :disabled t
     :ensure t
-    :init (company-quickhelp-mode 1)))
+    :init
+    (company-quickhelp-mode 1)
+    (setq company-quickhelp-delay 1
+          company-quickhelp-max-lines 60)))
 
 (provide 'company-init)
 

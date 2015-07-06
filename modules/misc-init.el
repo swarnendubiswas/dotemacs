@@ -69,6 +69,13 @@
   :ensure t
   :defer t)
 
+(use-package pos-tip
+  :disabled t
+  :ensure t
+  :init
+  (setq pos-tip-background-color "#4e4e4e")
+  (setq pos-tip-foreground-color "#5fafd7"))
+
 (use-package popwin
   :disabled t
   :ensure t
