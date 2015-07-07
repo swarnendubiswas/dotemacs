@@ -215,11 +215,11 @@
 (setq enable-recursive-minibuffers t)
 
 (use-package mb-depth
-  :defer 2
+  :defer t
   :init (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
-  :defer 2
+  :defer t
   :init
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; Emacs 24.4 style ⁖ cat.png<dirName>
@@ -230,7 +230,7 @@
 
 ;; hippie expand is dabbrev expand on steroids
 (use-package hippie-exp
-  :defer 2
+  :defer t
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers

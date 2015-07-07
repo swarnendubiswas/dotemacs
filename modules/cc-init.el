@@ -36,6 +36,8 @@
   (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode)
 
   (use-package cwarn
+    :ensure t
+    :diminish cwarn-mode
     :init (global-cwarn-mode 1))
 
   (use-package hideif

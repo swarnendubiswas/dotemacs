@@ -58,7 +58,6 @@
     :init
     (setq LaTeX-syntactic-comments t)
     ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
-    ;;(add-hook 'LaTeX-mode-hook #'visual-line-mode)
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
     (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
     (add-hook 'LaTeX-mode-hook
@@ -76,10 +75,11 @@
     ;;(bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
 
     ;; unset "C-c ;" since we want to bind it to 'comment-line
-    (define-key LaTeX-mode-map (kbd "C-c ;") nil)
+    (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
-    (use-package latex-pretty-symbols
-      :ensure t))
+  (use-package latex-pretty-symbols
+    :disabled t
+    :ensure t)
 
   (use-package company-auctex
     :ensure t
@@ -96,12 +96,11 @@
   (use-package auctex-latexmk
     :ensure t
     :init
-    (with-eval-after-load "LaTeX"
-      (auctex-latexmk-setup)
-      ;; this variable is buffer-local
-      (add-hook 'LaTeX-mode-hook
-                (lambda ()
-                  (setq TeX-command-default "LatexMk")))))
+    (auctex-latexmk-setup)
+    ;; this variable is buffer-local
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (setq TeX-command-default "LatexMk"))))
 
   (use-package latex-extra
     :disabled t
@@ -121,13 +120,19 @@
   (use-package magic-latex-buffer
     :disabled t
     :ensure t
-    :config (add-hook 'LaTeX-mode-hook #'magic-latex-buffer))
+    :init (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
+    :config
+    (setq magic-latex-enable-block-highlight t
+          magic-latex-enable-suscript t
+          magic-latex-enable-pretty-symbols nil
+          magic-latex-enable-block-align t))
 
   (use-package math-symbol-lists
     :disabled t
     :ensure t)
 
   (use-package bibtex
+    :defer
     :commands bibtex-mode
     :config
     (setq bibtex-maintain-sorted-entries t)

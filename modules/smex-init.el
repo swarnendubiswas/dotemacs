@@ -7,11 +7,14 @@
 
 (use-package smex
   :ensure t
+  :defer t
   ;;:init (autoload 'smex "smex")
-  :config
   ;;(smex-initialize)
+  :config
   (setq smex-save-file (expand-file-name ".smex-items" dotemacs--temp-directory)
-        smex-completion-method 'ivy)
+        ;; this change is yet to be pulled into smex
+        ;;smex-completion-method 'ivy
+        )
   :bind* (;;("M-x" . smex)
           ("M-X" . smex-major-mode-commands)))
 

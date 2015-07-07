@@ -33,8 +33,8 @@
   :init
   ;; enable/disable blinking cursor
   (blink-cursor-mode 1)
-  ;; start with Emacs window maximized
   :config
+  ;; start with Emacs window maximized
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
   (add-to-list 'default-frame-alist '(fullscreen . fullheight)))
 
@@ -54,9 +54,9 @@
                                       :init (load-theme 'leuven t)
                                       :config
                                       ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                      (if (string-equal system-name "XXX")
-                                          (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110)
-                                        (set-face-attribute 'default nil :family "Dejavu Sans Mono" :height 110))
+                                      (set-face-attribute 'default nil
+                                                          :family "Dejavu Sans Mono"
+                                                          :height 110)
                                       ;; customize the fringe marks on the sides
                                       ;; (set-face-background 'fringe "wheat")
                                       ;; (with-eval-after-load 'hl-line
@@ -73,13 +73,9 @@
                                        :ensure t
                                        :init (load-theme 'eclipse t)
                                        :config
-                                       (if (string-equal system-name "XXX")
-                                           (set-face-attribute 'default nil
-                                                               :family "Dejavu Sans Mono"
-                                                               :height 110)
-                                         (set-face-attribute 'default nil
-                                                             :family "Dejavu Sans Mono"
-                                                             :height 110))
+                                       (set-face-attribute 'default nil
+                                                           :family "Dejavu Sans Mono"
+                                                           :height 110)
                                        (set-background-color "white")
                                        ;; (set-face-attribute 'mode-line nil
                                        ;;                     :background "grey88"
@@ -93,7 +89,7 @@
                                        ;; (set-face-attribute 'linum nil
                                        ;;                     :background "#006666"
                                        ;;                     :foreground "#FFFFDD"
-                                       ;;                     :height 0.98)
+                                       ;;                     :height 1.0)
                                        (with-eval-after-load "hl-line"
                                          (set-face-attribute 'hl-line nil
                                                              :background "linen"))
@@ -118,12 +114,9 @@
 
       ;; default
       ((eq dotemacs--theme 'default)
-       (if (string= system-name "XXX")
-           (set-face-attribute 'default nil
-                               :height 115)
-         (set-face-attribute 'default nil
-                             :family "Dejavu Sans Mono"
-                             :height 115))
+       (set-face-attribute 'default nil
+                           :family "Dejavu Sans Mono"
+                           :height 115)
        (set-face-attribute 'region nil
                            :background "LemonChiffon"
                            :foreground "black")

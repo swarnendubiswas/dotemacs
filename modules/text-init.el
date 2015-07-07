@@ -13,7 +13,9 @@
 ;; identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :ensure t
+  :defer t
   ;;:bind* ("C-c g" . writegood-mode)
+  :commands writegood-mode
   :diminish writegood-mode
   :init (add-hook 'text-mode-hook #'writegood-mode)
   :config (writegood-passive-voice-turn-off))
@@ -21,6 +23,7 @@
 (use-package artbollocks-mode
   :disabled t
   :ensure t
+  :commands artbollocks-mode
   :diminish artbollocks-mode
   :init (add-hook 'text-mode-hook #'artbollocks-mode))
 
@@ -30,7 +33,6 @@
   :mode
   (("\\.markdown\\'" . markdown-mode)
    ("\\.md\\'" . markdown-mode))
-
   :config
   ;;(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
@@ -39,6 +41,7 @@
 
 (use-package csv-mode
   :ensure t
+  :defer t
   :config
   (use-package csv-nav
     :ensure t))

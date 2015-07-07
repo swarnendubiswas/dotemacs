@@ -22,11 +22,14 @@
         ibuffer-display-summary t
         ibuffer-show-empty-filter-groups nil)
 
-  (add-hook 'ibuffer-mode-hook #'ibuffer-auto-mode)
-  (add-hook 'ibuffer-mode-hook #'dotemacs--ibuffer-group-buffers)
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-do-sort-by-recency)))
+  (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+
+  ;; Prefer ibuffer sorting based on projects via ibuffer-projectile
+
+  ;; (add-hook 'ibuffer-hook #'dotemacs--ibuffer-group-buffers)
+  ;; (add-hook 'ibuffer-hook
+  ;;           (lambda ()
+  ;;             (ibuffer-do-sort-by-recency)))
 
   ;; Group ibuffer list by tramp connection
   (use-package ibuffer-tramp

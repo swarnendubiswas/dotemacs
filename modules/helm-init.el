@@ -35,7 +35,8 @@
         ;; both the min and max height are set to be equal on purpose
         helm-autoresize-max-height 60
         helm-autoresize-min-height 60
-        helm-case-fold-search 'smart)
+        helm-case-fold-search 'smart
+        helm-ff-search-library-in-sexp t)
   (setq helm-mini-default-sources '(helm-source-buffers-list
                                     helm-source-recentf
                                     ;;helm-source-dired-recent-dirs
@@ -176,13 +177,15 @@
   :bind*
   (("<f1>" . helm-M-x)
    ("M-x" . helm-M-x)
-   ("C-c h f" . helm-find-files)
    ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
    ("<f3>" . helm-find-files)
    ("<f6>" . helm-mini)
    ("<f7>" . helm-buffers-list)
+   ("C-c h f" . helm-find-files)
    ("C-c h r" . helm-recentf) ; not really required, can instead use 'helm-mini
    ("C-c h l" . helm-locate)
+   ("C-c h m" . helm-mini)
+   ("C-c h b" . helm-buffers-list)
    ("C-c h y" . helm-show-kill-ring)
    ("C-c h s" . helm-swoop)
    ("C-c h /" . helm-multi-swoop)
