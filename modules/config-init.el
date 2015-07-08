@@ -47,12 +47,15 @@
   :group 'dotemacs)
 
 (defcustom dotemacs--window-split
-  'vertical
+  'horizontal
   "Specify the direction in which the windows should be split."
   :type '(radio
           (const :tag "vertical" vertical)
           (const :tag "horizontal" horizontal))
   :group 'dotemacs)
+
+(defconst dotemacs--fill-column 120
+  "Column beyond which lines should not extend.")
 
 (defcustom dotemacs--fci-p
   nil

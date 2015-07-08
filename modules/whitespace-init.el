@@ -13,10 +13,11 @@
     :diminish global-whitespace-mode
     :init
     ;;(global-whitespace-mode 1)
-    (setq-default indicate-empty-lines nil ; show empty lines after buffer end
-                  show-trailing-whitespace t
-                  ;;whitespace-style '(face empty spaces tabs newline space-mark tab-mark newline-mark lines-tail trailing)
-                  whitespace-style '(tabs lines-tail face tab-mark))
+    (setq-default show-trailing-whitespace t
+                  whitespace-line-column 'dotemacs--fill-column
+                  ;; whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
+                  ;;                         space-after-tab space-mark tab-mark newline-mark)
+                  whitespace-style '(faces trailing empty lines-tail))
     ;;(set-face-attribute 'whitespace-line nil :background "red1" :foreground "yellow" :weight 'bold)
     )
 

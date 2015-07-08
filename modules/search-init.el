@@ -8,7 +8,8 @@
 (use-package isearch
   :defer t
   :config
-  (setq search-highlight t) ; highlight incremental search
+  (setq search-highlight t ; highlight incremental search
+        isearch-allow-scroll t)
   (use-package isearch+
     :ensure t)
   (use-package isearch-dabbrev

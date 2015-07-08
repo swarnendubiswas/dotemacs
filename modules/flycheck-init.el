@@ -9,7 +9,6 @@
 
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
-  :disabled t
   :ensure t
   ;;:if (not (string-equal system-name "XXX"))
   :diminish flycheck-mode
@@ -26,7 +25,6 @@
 
   ;; Show flycheck messages in popups
   (use-package flycheck-pos-tip
-    :disabled t
     :ensure t
     :init (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
@@ -48,11 +46,11 @@
   ;; https://github.com/flycheck/flycheck-google-cpplint
   ;; Add Google C++ Style checker. By default, syntax checked by Clang and Cppcheck (Windows?). Also, need to setup cpplint.py.
   (use-package flycheck-google-cpplint
-    :disabled t
     :ensure t
+    :if (eq system-type 'gnu/linux)
     :config
     (flycheck-add-next-checker 'c/c++-clang '(t . c/c++-googlelint) t)
-    (setq flycheck-googlelint-linelength 120
+    (setq flycheck-googlelint-linelength 'dotemacs--fill-column
           flycheck-googlelint-filter "-whitespace/line_length")))
 
 (provide 'flycheck-init)

@@ -10,7 +10,6 @@
   :ensure t
   :commands (projectile-find-file projectile-switch-project)
   :init (projectile-global-mode 1)
-
   :config
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs--temp-directory "projectile.cache")
@@ -30,13 +29,13 @@
     (add-to-list 'projectile-globally-ignored-files item))
 
   (use-package helm-projectile
-    :ensure t
-    :defer t
-    :init (helm-projectile-on)
-    :config
+    :ensure projectile
+    :disabled t ;; FIXME: latest helm update seems to broken this
+    :init
     (setq helm-projectile-fuzzy-match t
           ;; other options: 'helm-projectile-find-file
-          projectile-switch-project-action #'helm-projectile))
+          projectile-switch-project-action #'helm-projectile)
+    (helm-projectile-on))
 
   ;; Group buffers by Projectile project
   (use-package ibuffer-projectile

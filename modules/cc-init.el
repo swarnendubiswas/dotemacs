@@ -58,6 +58,14 @@
     (ctypes-read-file nil nil t t)
     (ctypes-auto-parse-mode 1))
 
+  (use-package function-args
+    :ensure t
+    :config
+    (set-default 'semantic-case-fold t)
+    ;; to include custom header locations
+    ;;(semantic-add-system-include "/usr/local/boost_1_54_0/" 'c++-mode)
+    (fa-config-default))
+
   ;; this is already the default, but I have this as a reminder.
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))
 
