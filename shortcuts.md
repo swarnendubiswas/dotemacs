@@ -17,6 +17,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
 * `C-x h` - Mark whole buffer (`mark-whole-buffer`).
 * `M-h` - Put region around current paragraph (`mark-paragraph`).
+* `M-@` - Mark the current word (`mark-word` or `subword-mark`).
 
 #### Key motion
 

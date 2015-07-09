@@ -143,7 +143,11 @@
     (set-buffer-modified-p t)
     (tabbar--modification-state-change))
 
-  :init (tabbar-mode 1)
+  :init
+  (setq tabbar-use-images nil ; speed up by not using images
+        tabbar-auto-scroll-flag t
+        tabbar-separator '(0.3))
+  (tabbar-mode 1)
 
   :config
   (add-hook 'after-save-hook #'tabbar--modification-state-change)
@@ -183,10 +187,7 @@
   (set-face-attribute 'tabbar-button nil
                       :box '(:line-width 1 :color "gray72" :style released-button))
   (set-face-attribute 'tabbar-separator nil
-                      :height 1.0)
-  (setq tabbar-use-images nil ; speed up by not using images
-        tabbar-auto-scroll-flag t
-        tabbar-separator '(0.3)))
+                      :height 1.0))
 
 (provide 'appearance-init)
 

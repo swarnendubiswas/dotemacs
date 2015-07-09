@@ -70,19 +70,17 @@
   :defer t)
 
 (use-package pos-tip
-  :disabled t
   :ensure t
-  :init
-  (setq pos-tip-background-color "#4e4e4e")
-  (setq pos-tip-foreground-color "#5fafd7"))
+  ;;:init
+  ;;(setq pos-tip-background-color "#4e4e4e")
+  ;;(setq pos-tip-foreground-color "#5fafd7")
+  )
 
 (use-package popwin
   :disabled t
   :ensure t
   :init
-  (if (string-equal system-name "XXX")
-      (setq popwin:popup-window-height 15)
-    (setq popwin:popup-window-height 15))
+  (setq popwin:popup-window-height 15)
   (popwin-mode 1))
 
 (use-package pabbrev
@@ -122,6 +120,16 @@
 
 (use-package ssh-file-modes
   :ensure t)
+
+;; Expand region by semantic units
+(use-package expand-region
+  :ensure t
+  :bind ("C-=" . er/expand-region)
+  :config
+  (use-package change-inner
+    :ensure t
+    :bind (("M-i" . change-inner)
+           ("M-o" . change-outer))))
 
 (provide 'misc-init)
 
