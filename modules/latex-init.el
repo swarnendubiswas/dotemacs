@@ -29,6 +29,9 @@
         TeX-source-correlate-start-server t)
   (setq-default TeX-master nil) ; query for master file
 
+  (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
+  ;; (setq TeX-view-program-selection '((output-pdf "Evince")))
+
   ;; (add-hook 'LaTeX-mode-hook
   ;;           (lambda ()
   ;;             (push
@@ -39,7 +42,7 @@
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
   ;; compile files to pdf by default
   (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode)
-
+  :config
   (use-package tex-site
     :ensure auctex)
 
@@ -123,7 +126,7 @@
     :init (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     :config
     (setq magic-latex-enable-block-highlight t
-          magic-latex-enable-suscript t
+          magic-latex-enable-subscript t
           magic-latex-enable-pretty-symbols nil
           magic-latex-enable-block-align t))
 

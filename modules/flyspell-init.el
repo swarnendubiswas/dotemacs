@@ -24,6 +24,7 @@
 
   (use-package flyspell-lazy
     :ensure t
+    :disabled t
     :init (flyspell-lazy-mode 1))
 
   (setq-default ispell-program-name "/usr/bin/aspell")

@@ -70,12 +70,17 @@
 
   (auto-fill-mode 1)
   ;; This is not a library/file, so eval-after-load does not work
-  (diminish 'auto-fill-function))
+  (diminish 'auto-fill-function)
+  :bind ("C-c d f" . auto-fill-mode))
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
   :defer 2
-  :init (global-auto-revert-mode 1)
+  :init
+  (global-auto-revert-mode 1)
+  ;; (add-hook 'text-mode-hook
+  ;;           (lambda ()
+  ;;             (auto-revert-tail-mode 1)))
   :config
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil

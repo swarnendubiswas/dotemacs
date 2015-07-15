@@ -51,16 +51,15 @@
 ;;   "Bad programming is easy. Even Dummies can learn it in 21 days." -- Felleisen et al. in "How to
 ;;    Design Programs".
 ;;
-;;   "A language that doesn't affect the way you think about programming, is not worth knowing". -- Alan Perlis.
+;;   "A language that doesn't affect the way you think about programming, is not worth knowing." -- Alan Perlis.
 
 ;;; Code:
 
-;; customizing packages
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/")) ; already added by default
+;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/")) ; already present by default
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp")) ; third-party packages
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/")) ; personal modules for customizing emacs initialization
 
-;; setup the packaging system
+;; setup the package system
 (require 'packages-init)
 
 ;; setup configuration variables
@@ -79,12 +78,9 @@
 (require 'dired-init)
 (require 'search-init)
 (require 'recentf-init)
-
-;;(if (bound-and-true-p use-company)
-(if (eq dotemacs-completion 'company)
+(if (eq dotemacs--completion 'company)
     (require 'company-init)
   (require 'auto-complete-init))
-
 (require 'ido-init)
 (require 'helm-init)
 (require 'smex-init)
@@ -92,14 +88,14 @@
 ;; configure the more useful extensions
 (require 'anzu-init)
 (require 'flyspell-init)
-(require 'projectile-init)
-
-;; setup helper packages
-(require 'abbrev-init)
 (require 'ace-modes-init)
-(require 'fci-init)
 (require 'indent-init)
 (require 'parens-init)
+
+;; setup helper packages
+(require 'projectile-init)
+(require 'abbrev-init)
+(require 'fci-init)
 (require 'misc-init)
 (require 'yasnippet-init)
 (require 'flycheck-init)
@@ -128,8 +124,8 @@
 (require 'cedet-init)
 (require 'jdee-init)
 
-;; For some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
-;; enabled on startup. Not sure why.
+;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
+;; enabled on startup.
 (require 'tags-init)
 
 ;; custom definitions

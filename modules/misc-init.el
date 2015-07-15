@@ -77,11 +77,25 @@
   )
 
 (use-package popwin
-  :disabled t
   :ensure t
-  :init
-  (setq popwin:popup-window-height 15)
-  (popwin-mode 1))
+  :config
+  (setq popwin:popup-window-height 20)
+  (popwin-mode 1)
+  (setq display-buffer-function 'popwin:display-buffer)
+  (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
+  (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
+  ;; M-x dired-jump-other-window
+  (push '(dired-mode :position top) popwin:special-display-config)
+  ;; M-!
+  (push "*Shell Command Output*" popwin:special-display-config)
+  ;; M-x compile
+  (push '(compilation-mode :noselect t) popwin:special-display-config)
+  (push '("^\*compilation*$" :regexp t) popwin:special-display-config)
+  ;; *svn info*
+  (push '("*svn-info*" :noselect t) popwin:special-display-config)
+  (push '(svn-info-mode :noselect t) popwin:special-display-config)
+  ;; *Paradox report-bugs
+  (push '("*Paradox Report*" :noselect t) popwin:special-display-config))
 
 (use-package pabbrev
   :disabled t
@@ -124,12 +138,12 @@
 ;; Expand region by semantic units
 (use-package expand-region
   :ensure t
-  :bind ("C-=" . er/expand-region)
+  :bind* ("C-=" . er/expand-region)
   :config
   (use-package change-inner
     :ensure t
-    :bind (("M-i" . change-inner)
-           ("M-o" . change-outer))))
+    :bind* (("M-i" . change-inner)
+            ("M-o" . change-outer))))
 
 (provide 'misc-init)
 
