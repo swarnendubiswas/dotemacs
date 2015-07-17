@@ -96,13 +96,11 @@
                           company-backends)))
     :init (add-hook 'LaTeX-mode-hook #'company-math--setup))
 
-  ;; FIXME: The quickhelp popup blocks company popup.
   (use-package company-quickhelp
-    :disabled t
     :ensure t
     :init
     (company-quickhelp-mode 1)
-    (setq company-quickhelp-delay 1
+    (setq company-quickhelp-delay 0.5
           company-quickhelp-max-lines 60)))
 
 (provide 'company-init)

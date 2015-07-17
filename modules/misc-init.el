@@ -94,6 +94,7 @@
   ;; *svn info*
   (push '("*svn-info*" :noselect t) popwin:special-display-config)
   (push '(svn-info-mode :noselect t) popwin:special-display-config)
+  (push '(svn-status-mode :noselect t) popwin:special-display-config)
   ;; *Paradox report-bugs
   (push '("*Paradox Report*" :noselect t) popwin:special-display-config))
 
