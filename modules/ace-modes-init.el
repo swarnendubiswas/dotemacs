@@ -7,6 +7,7 @@
 
 ;; prefer ace-window/avy
 (use-package ace-jump-mode
+  :disabled t ;; prefer avy
   :ensure t
   ;;:init  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
   :bind*
@@ -18,6 +19,7 @@
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
 (use-package ace-jump-buffer
+  :disabled t ;; prefer helm-mini
   :ensure t
   :preface
   (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
@@ -59,28 +61,34 @@
 ;; ace-jump in helm buffers
 (use-package ace-jump-helm-line
   :ensure t
-  :defer t
+  :disabled t
   :config
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)
   (bind-key "C-'" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
+  :ensure t
   :defer t
-  :ensure avy
-  :bind ("M-b" . avy-goto-word-1)
-  :init (ace-window-display-mode 1)
-  :config
-  (use-package avy
-    :config
-    (avy-setup-default)
-    (setq avy-background t
-          avy-style 'at-full)))
+  :config (ace-window-display-mode 1))
+
+(use-package avy
+  :ensure t
+  :bind (("M-b" . avy-goto-word-1)
+         ("C-'" . avy-goto-word-or-subword-1))
+  :init
+  ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one of the currently
+  ;; visible isearch candidates using avy.
+  (avy-setup-default)
+  (setq avy-background t
+        ;; options: pre, at, at-full, post, de-bruijn
+        avy-style 'pre))
 
 (defhydra hydra-jump-commands (:color blue)
   "Different jump commands."
   ("c" avy-goto-char "avy char")
   ("w" avy-goto-word-0 "avy word")
+  ("u" avy-goto-word-or-subword-1 "avy word or subword")
   ("L" avy-goto-line "avy line")
   ("s" avy-goto-subword-0 "avy subword")
   ("C" goto-char "goto char")

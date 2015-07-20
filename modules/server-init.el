@@ -2,6 +2,7 @@
 
 ;;; Commentary:
 ;; Setup Emacs server.
+;; Tips: http://www.emacswiki.org/emacs/EmacsAsDaemon
 
 ;;; Code:
 

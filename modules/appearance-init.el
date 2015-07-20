@@ -36,7 +36,8 @@
   :config
   ;; start with Emacs window maximized
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  (add-to-list 'default-frame-alist '(fullscreen . fullheight)))
+  ;; options: fullheight
+  (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
 ;; displays the time and date in the mode line
 (use-package time

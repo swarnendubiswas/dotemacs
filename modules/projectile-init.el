@@ -1,4 +1,4 @@
-;;; projectile-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; projectile-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup projectile for improved handling of projects.

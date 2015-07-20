@@ -48,8 +48,9 @@
     :ensure t)
   :bind* (("C-c f" . swiper-helm)
           ("C-c r" . swiper-helm)
-          ("C-f" . swiper)
-          ("C-r" . swiper)))
+          ;;("C-f" . swiper)
+          ;;("C-r" . swiper)
+          ))
 
 (use-package color-moccur
   :ensure t

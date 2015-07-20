@@ -256,7 +256,7 @@
   :diminish subword-mode
   :init (global-subword-mode 1))
 
-;; FIXME: Set Emacs split to horizontal or vertical
+;; Set Emacs split to horizontal or vertical
 ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
 ;; Use  (setq split-width-threshold nil) for vertical split.
 ;; Use  (setq split-width-threshold 1) for horizontal split.

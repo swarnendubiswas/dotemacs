@@ -1,11 +1,9 @@
-;;; svn-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; svn-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Setup svn.
 
 ;;; Code:
-
-;; SB: FIXME: These packages seems to mess up tags and indentation
 
 (use-package psvn
   :ensure t

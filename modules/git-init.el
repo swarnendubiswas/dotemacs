@@ -43,7 +43,10 @@
 
   (use-package helm-ls-git
     :ensure t
-    :defer t))
+    :defer t)
+
+  (use-package magit-svn
+    :ensure t))
 
 (provide 'git-init)
 

@@ -1,4 +1,4 @@
-;;; misc-init.el --- Part of emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; misc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
 ;; Miscellaneous package configurations.
@@ -16,7 +16,7 @@
   (setq achievements-idle-time 600) ; seconds
   (achievements-mode 1))
 
-;; speed up emacs for large files
+;; speed up Emacs for large files
 (use-package vlf
   :ensure t
   :defer 2
