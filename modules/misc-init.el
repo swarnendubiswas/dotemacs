@@ -5,14 +5,19 @@
 
 ;;; Code:
 
+(setq scroll-margin 0 ; Drag the point along while scrolling
+      scroll-conservatively 1000 ; Never recenter the screen while scrolling
+      scroll-error-top-bottom t) ; Move to beg/end of buffer before signalling an error
+
 (use-package smooth-scrolling
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 (use-package achievements
-  :disabled t
   :ensure t
+  :disabled t
   :diminish achievements-mode
-  :config
+  :init
   (setq achievements-idle-time 600) ; seconds
   (achievements-mode 1))
 
@@ -20,7 +25,7 @@
 (use-package vlf
   :ensure t
   :defer 2
-  :init
+  :config
   ;; warn when opening files bigger than 50MB
   (setq large-file-warning-threshold (* 50 1024 1024))
   (use-package vlf-setup))
@@ -62,7 +67,6 @@
 (use-package goto-last-change
   :ensure t
   :pin melpa
-  ;;:load-path "lisp/" ; prefer melpa
   :bind* ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
@@ -71,13 +75,11 @@
 
 (use-package pos-tip
   :ensure t
-  ;;:init
-  ;;(setq pos-tip-background-color "#4e4e4e")
-  ;;(setq pos-tip-foreground-color "#5fafd7")
-  )
+  :defer t)
 
 (use-package popwin
   :ensure t
+  :defer 2
   :config
   (setq popwin:popup-window-height 20)
   (popwin-mode 1)
@@ -105,8 +107,8 @@
   :init (global-pabbrev-mode 1))
 
 (use-package golden-ratio
-  :disabled t
   :ensure t
+  :disabled t
   :diminish golden-ratio-mode
   :preface
   ;; http://tuhdo.github.io/helm-intro.html
@@ -123,15 +125,7 @@
 ;; Edit file with sudo
 (use-package sudo-edit
   :ensure t
-  :defer t
   :bind ("M-s e" . sudo-edit))
-
-;; hide "Auto-saving...done" messages
-;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
-(defun my-auto-save-wrapper (save-fn &rest args)
-  (apply save-fn '(t)))
-
-(advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
 (use-package ssh-file-modes
   :ensure t)

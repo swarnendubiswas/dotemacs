@@ -88,7 +88,7 @@
 
   (use-package helm-adaptive
     :init
-    (setq helm-adaptive-history-file (concat dotemacs--temp-directory "helm-adaptive-history"))
+    (setq helm-adaptive-history-file (concat dotemacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
 
   (use-package helm-descbinds
@@ -143,7 +143,7 @@
   (use-package helm-company
     :ensure t
     :defer t
-    :if (eq dotemacs--completion 'company)
+    :if (eq dotemacs-completion 'company)
     :init (with-eval-after-load 'company
             (bind-key [remap completion-at-point] #'helm-company company-mode-map)
             (bind-key "C-:" #'helm-company company-mode-map)

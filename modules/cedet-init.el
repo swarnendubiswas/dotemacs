@@ -47,7 +47,7 @@
 (use-package semantic
   :disabled t
   :preface
-  (defun dotemacs--semantic-functions ()
+  (defun dotemacs-semantic-functions ()
     (semantic-mode 1)
     (global-semanticdb-minor-mode 1)
     (global-semantic-highlight-func-mode 1))
@@ -71,11 +71,11 @@
   ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
 
   ;; SemanticDB files
-  (setq semanticdb-default-save-directory (concat dotemacs--temp-directory "semanticdb"))
+  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
   ;; (semanticdb-enable-gnu-global-databases 'c-mode)
   ;; (semanticdb-enable-gnu-global-databases 'c++-mode))
-  (add-hook 'prog-mode-hook #'dotemacs--semantic-functions))
+  (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
 
 (use-package idle
   :disabled t

@@ -96,12 +96,12 @@
 
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
-(defun dotemacs--create-latex-etags ()
+(defun dotemacs-create-latex-etags ()
   "Create etags for the current latex project."
   (interactive)
   (compile "find . -type f -name \"*.tex\" -print | etags -a -"))
 
-(defun dotemacs--create-latex-ctags () ; (dir-name))
+(defun dotemacs-create-latex-ctags () ; (dir-name))
   "Create ctags for the current latex project."
   ;;(interactive "Directory: ")
   ;; (shell-command

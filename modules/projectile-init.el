@@ -12,7 +12,7 @@
   :init (projectile-global-mode 1)
   :config
   (setq projectile-enable-caching t
-        projectile-cache-file (concat dotemacs--temp-directory "projectile.cache")
+        projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-completion-system 'helm
         ;; use projectile in every directory without requiring a project file
         projectile-require-project-root nil

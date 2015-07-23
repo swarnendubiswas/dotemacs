@@ -9,15 +9,15 @@
   "Custom configuration for dotemacs."
   :group 'local)
 
-(defcustom dotemacs--temp-directory (concat user-emacs-directory "tmp/")
+(defcustom dotemacs-temp-directory (concat user-emacs-directory "tmp/")
   "Storage location for various configuration files."
   :group 'dotemacs)
 
-(unless (file-exists-p dotemacs--temp-directory)
-  (make-directory dotemacs--temp-directory))
+(unless (file-exists-p dotemacs-temp-directory)
+  (make-directory dotemacs-temp-directory))
 
 ;; use either auto-complete or company for auto completion support
-(defcustom dotemacs--completion
+(defcustom dotemacs-completion
   'company
   "Choose company over auto-complete for completion."
   :type '(radio
@@ -26,7 +26,7 @@
   :group 'dotemacs)
 
 ;; use either helm or other packages that provide similar functionality
-(defcustom dotemacs--helm-or-ido
+(defcustom dotemacs-helm-or-ido
   'both
   "Prefer helm instead of ido and smex, or use both."
   :type '(radio
@@ -36,7 +36,7 @@
   :group 'dotemacs)
 
 ;; choices: leuven, professional, eclipse, default.
-(defcustom dotemacs--theme
+(defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."
   :type '(radio
@@ -46,7 +46,7 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
-(defcustom dotemacs--window-split
+(defcustom dotemacs-window-split
   'horizontal
   "Specify the direction in which the windows should be split."
   :type '(radio
@@ -54,16 +54,16 @@
           (const :tag "horizontal" horizontal))
   :group 'dotemacs)
 
-(defconst dotemacs--fill-column 120
+(defconst dotemacs-fill-column 120
   "Column beyond which lines should not extend.")
 
-(defcustom dotemacs--fci-p
+(defcustom dotemacs-fci-p
   nil
   "Control display of fci."
   :type    'boolean
   :group   'dotemacs)
 
-(defcustom dotemacs--enable-whitespace-module
+(defcustom dotemacs-enable-whitespace-module
   t
   "Control whether the whitespace module should be enabled or
 disabled. Sometimes we do not want to unnecessarily add

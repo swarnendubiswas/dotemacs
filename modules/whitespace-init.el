@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-(when (bound-and-true-p dotemacs--enable-whitespace-module)
+(when (bound-and-true-p dotemacs-enable-whitespace-module)
   (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
   (use-package whitespace
@@ -14,7 +14,7 @@
     :init
     ;;(global-whitespace-mode 1)
     (setq-default show-trailing-whitespace t
-                  whitespace-line-column 'dotemacs--fill-column
+                  whitespace-line-column 'dotemacs-fill-column
                   ;; whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
                   ;;                         space-after-tab space-mark tab-mark newline-mark)
                   whitespace-style '(faces trailing empty lines-tail))

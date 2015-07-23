@@ -8,7 +8,7 @@
 (when (display-graphic-p)
   (or (use-package powerline
         :ensure t
-        :if (eq dotemacs--theme 'eclipse)
+        :if (eq dotemacs-theme 'eclipse)
         :ensure t
         :config
         (setq powerline-display-mule-info nil
@@ -18,7 +18,7 @@
 
       (use-package smart-mode-line
         :ensure t
-        :if (or (eq dotemacs--theme 'leuven) (eq dotemacs--theme 'default))
+        :if (or (eq dotemacs-theme 'leuven) (eq dotemacs-theme 'default))
         :config
         (use-package smart-mode-line-powerline-theme
           :ensure t
@@ -35,7 +35,7 @@
       ;; https://github.com/jonathanchu/emacs-powerline/
       (use-package powerline
         :disabled t
-        :if (eq dotemacs--theme 'default)
+        :if (eq dotemacs-theme 'default)
         ;; If the path is relative, it is expanded within user-emacs-directory
         :load-path "lisp/emacs-powerline/"
         :config

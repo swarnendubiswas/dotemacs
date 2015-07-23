@@ -8,7 +8,7 @@
 (use-package recentf
   :init
   ;; set this first so that recentf can load content from this
-  (setq recentf-save-file (concat dotemacs--temp-directory "recentf")
+  (setq recentf-save-file (concat dotemacs-temp-directory "recentf")
         recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
         ;; clean up after Emacs has been idle for certain number of seconds

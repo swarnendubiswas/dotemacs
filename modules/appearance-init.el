@@ -34,9 +34,12 @@
   ;; enable/disable blinking cursor
   (blink-cursor-mode 1)
   :config
-  ;; start with Emacs window maximized
+  ;; start with Emacs window maximized:
+  ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+  ;; only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; options: fullheight
+  ;; it will maximize all frames: both the first one and any others you create.
+  ;; options: fullheight, fullboth
   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
 ;; displays the time and date in the mode line
@@ -50,71 +53,71 @@
 (use-package linum
   :init (global-linum-mode 1))
 
-(cond ((eq dotemacs--theme 'leuven) (use-package leuven-theme
+(cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
+                                     :ensure t
+                                     :init (load-theme 'leuven t)
+                                     :config
+                                     ;; set font size, value is in 1/10pt, so 100 will give you 10pt
+                                     (set-face-attribute 'default nil
+                                                         :family "Dejavu Sans Mono"
+                                                         :height 110)
+                                     ;; customize the fringe marks on the sides
+                                     ;; (set-face-background 'fringe "wheat")
+                                     ;; (with-eval-after-load 'hl-line
+                                     ;; (set-face-attribute 'hl-line nil :background "lavender"))
+                                     ))
+
+      ((eq dotemacs-theme 'professional) (use-package professional-theme
+                                           :ensure t
+                                           :init (load-theme 'professional t)
+                                           :config (set-face-attribute 'default nil
+                                                                       :height 110)))
+
+      ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
-                                      :init (load-theme 'leuven t)
+                                      :init (load-theme 'eclipse t)
                                       :config
-                                      ;; set font size, value is in 1/10pt, so 100 will give you 10pt
                                       (set-face-attribute 'default nil
                                                           :family "Dejavu Sans Mono"
                                                           :height 110)
+                                      (set-background-color "white")
+                                      ;; (set-face-attribute 'mode-line nil
+                                      ;;                     :background "grey88"
+                                      ;;                     :foreground "black"
+                                      ;;                     :box nil :bold nil)
+                                      ;; (set-face-attribute 'mode-line-inactive nil
+                                      ;;                     :box nil)
+                                      (set-face-attribute 'region nil
+                                                          :background "#164040"
+                                                          :foreground "white")
+                                      ;; (set-face-attribute 'linum nil
+                                      ;;                     :background "#006666"
+                                      ;;                     :foreground "#FFFFDD"
+                                      ;;                     :height 1.0)
+                                      (with-eval-after-load "hl-line"
+                                        (set-face-attribute 'hl-line nil
+                                                            :background "linen"))
+                                      (with-eval-after-load "helm"
+                                        (set-face-attribute 'helm-selection nil
+                                                            :underline nil))
+                                      ;; org-mode customizations inspired from leuven theme
+                                      (with-eval-after-load "org"
+                                        (set-face-attribute 'org-level-1 nil
+                                                            :height 1.2
+                                                            :overline "#A7A7A7"
+                                                            ;;:weight bold
+                                                            :foreground "#3C3C3C"
+                                                            :background "#F5F5F5")
+                                        (set-face-attribute 'org-level-2 nil
+                                                            :height 1.1
+                                                            :overline "#123555"
+                                                            :foreground "#123555"
+                                                            :background "#E5F4FB"))
                                       ;; customize the fringe marks on the sides
-                                      ;; (set-face-background 'fringe "wheat")
-                                      ;; (with-eval-after-load 'hl-line
-                                      ;; (set-face-attribute 'hl-line nil :background "lavender"))
-                                      ))
-
-      ((eq dotemacs--theme 'professional) (use-package professional-theme
-                                            :ensure t
-                                            :init (load-theme 'professional t)
-                                            :config (set-face-attribute 'default nil
-                                                                        :height 110)))
-
-      ((eq dotemacs--theme 'eclipse) (use-package eclipse-theme
-                                       :ensure t
-                                       :init (load-theme 'eclipse t)
-                                       :config
-                                       (set-face-attribute 'default nil
-                                                           :family "Dejavu Sans Mono"
-                                                           :height 110)
-                                       (set-background-color "white")
-                                       ;; (set-face-attribute 'mode-line nil
-                                       ;;                     :background "grey88"
-                                       ;;                     :foreground "black"
-                                       ;;                     :box nil :bold nil)
-                                       ;; (set-face-attribute 'mode-line-inactive nil
-                                       ;;                     :box nil)
-                                       (set-face-attribute 'region nil
-                                                           :background "#164040"
-                                                           :foreground "white")
-                                       ;; (set-face-attribute 'linum nil
-                                       ;;                     :background "#006666"
-                                       ;;                     :foreground "#FFFFDD"
-                                       ;;                     :height 1.0)
-                                       (with-eval-after-load "hl-line"
-                                         (set-face-attribute 'hl-line nil
-                                                             :background "linen"))
-                                       (with-eval-after-load "helm"
-                                         (set-face-attribute 'helm-selection nil
-                                                             :underline nil))
-                                       ;; org-mode customizations inspired from leuven theme
-                                       (with-eval-after-load "org"
-                                         (set-face-attribute 'org-level-1 nil
-                                                             :height 1.2
-                                                             :overline "#A7A7A7"
-                                                             ;;:weight bold
-                                                             :foreground "#3C3C3C"
-                                                             :background "#F5F5F5")
-                                         (set-face-attribute 'org-level-2 nil
-                                                             :height 1.1
-                                                             :overline "#123555"
-                                                             :foreground "#123555"
-                                                             :background "#E5F4FB"))
-                                       ;; customize the fringe marks on the sides
-                                       (set-face-background 'fringe "lavender")))
+                                      (set-face-background 'fringe "lavender")))
 
       ;; default
-      ((eq dotemacs--theme 'default)
+      ((eq dotemacs-theme 'default)
        (set-face-attribute 'default nil
                            :family "Dejavu Sans Mono"
                            :height 115)
@@ -127,7 +130,7 @@
 
 (use-package display-theme
   :ensure t
-  :if (not (eq dotemacs--theme 'default))
+  :if (not (eq dotemacs-theme 'default))
   :init (global-display-theme-mode))
 
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible

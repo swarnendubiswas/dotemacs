@@ -8,7 +8,7 @@
 (use-package flyspell
   :if (eq system-type 'gnu/linux)
   :preface
-  (defun dotemacs--activate-flyspell ()
+  (defun dotemacs-activate-flyspell ()
     "Turn on flyspell-mode and call flyspell-buffer."
     (interactive)
     ;; This next line REALLY slows buffer switching.
@@ -20,22 +20,16 @@
     "An alist of hooks that require customizations.")
 
   :init
-  (add-hook 'find-file-hooks #'turn-on-flyspell)
-
-  (use-package flyspell-lazy
-    :ensure t
-    :disabled t
-    :init (flyspell-lazy-mode 1))
-
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
   (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
+  (add-hook 'find-file-hooks #'turn-on-flyspell)
 
   ;; this is useful but slow
-  ;;(add-hook 'before-save-hook 'flyspell-buffer)
+  ;; (add-hook 'before-save-hook 'flyspell-buffer)
 
   ;; ;; Activate flyspell for various major modes.
   ;; (unless noninteractive
@@ -49,18 +43,22 @@
    ("C-c i w" . ispell-word))
 
   :config
+  (use-package flyspell-lazy
+    :ensure t
+    :disabled t
+    :init (flyspell-lazy-mode 1))
+
   (use-package helm-flyspell
     :ensure t
     :config (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))
 
   (use-package ace-flyspell
-    :defer t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package flyspell-popup
     :ensure t
-    :config
-    (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map)))
+    :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map)))
 
 (defhydra hydra-flyspell (:color blue)
   "flyspell mode"

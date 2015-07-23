@@ -103,7 +103,7 @@
         tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
-        tramp-persistency-file-name (concat dotemacs--temp-directory "tramp"))
+        tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
   (use-package password-cache
     :init (setq password-cache-expiry nil))
   (use-package tramp-term
@@ -188,7 +188,7 @@
   :defer 2
   :config
   (setq-default save-place t
-                save-place-file (concat dotemacs--temp-directory "places")))
+                save-place-file (concat dotemacs-temp-directory "places")))
 
 ;; incremental minibuffer completion/suggestions
 (use-package icomplete
@@ -211,7 +211,7 @@
   :config
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
-        savehist-file (concat dotemacs--temp-directory "savehist")
+        savehist-file (concat dotemacs-temp-directory "savehist")
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring))
@@ -261,11 +261,17 @@
 ;; Use  (setq split-width-threshold nil) for vertical split.
 ;; Use  (setq split-width-threshold 1) for horizontal split.
 
-(if (eq dotemacs--window-split 'horizontal)
+(if (eq dotemacs-window-split 'horizontal)
     (setq split-height-threshold 0
           split-width-threshold nil)
   (setq split-height-threshold nil
         split-width-threshold 0))
+
+;; hide "Auto-saving...done" messages
+;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
+(defun my-auto-save-wrapper (save-fn &rest args)
+  (apply save-fn '(t)))
+(advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
 (provide 'defaults-init)
 

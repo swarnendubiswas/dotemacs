@@ -86,7 +86,7 @@
 
   (use-package company-auctex
     :ensure t
-    :if (eq dotemacs--completion 'company)
+    :if (eq dotemacs-completion 'company)
     :init
     ;; https://github.com/syl20bnr/spacemacs/blob/b89ce54df3b7df6284cae56f115db75a83721e17/contrib/auctex/packages.el
     ;; (with-eval-after-load "tex"

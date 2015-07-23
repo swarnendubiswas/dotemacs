@@ -11,7 +11,7 @@
   ;;:init (autoload 'smex "smex")
   ;;(smex-initialize)
   :config
-  (setq smex-save-file (expand-file-name ".smex-items" dotemacs--temp-directory)
+  (setq smex-save-file (expand-file-name ".smex-items" dotemacs-temp-directory)
         ;; this change is yet to be pulled into smex
         ;;smex-completion-method 'ivy
         )

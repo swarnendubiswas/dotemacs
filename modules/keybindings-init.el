@@ -31,13 +31,13 @@
 
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
-(bind-key "C-c ;" #'dotemacs--comment-line)
+(bind-key "C-c ;" #'dotemacs-comment-line)
 
 ;; buffers
-(bind-key "<f11>" #'dotemacs--kill-other-buffers) ; kill all non-special buffers
+(bind-key "<f11>" #'dotemacs-kill-other-buffers) ; kill all non-special buffers
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (bind-key "C-s" 'save-buffer)
-(bind-key "C-S-s" #'dotemacs--save-all-buffers)
+(bind-key "C-S-s" #'dotemacs-save-all-buffers)
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -70,7 +70,7 @@
   :disabled t
   :ensure t
   :init
-  (setq keyfreq-file (concat dotemacs--temp-directory "keyfreq"))
+  (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 

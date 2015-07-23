@@ -9,7 +9,7 @@
   :defer t
   :init (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   :preface
-  (defun dotemacs--ibuffer-group-buffers ()
+  (defun dotemacs-ibuffer-group-buffers ()
     (ibuffer-switch-to-saved-filter-groups "Default"))
 
   :config
@@ -26,7 +26,7 @@
 
   ;; Prefer ibuffer sorting based on projects via ibuffer-projectile
 
-  ;; (add-hook 'ibuffer-hook #'dotemacs--ibuffer-group-buffers)
+  ;; (add-hook 'ibuffer-hook #'dotemacs-ibuffer-group-buffers)
   ;; (add-hook 'ibuffer-hook
   ;;           (lambda ()
   ;;             (ibuffer-do-sort-by-recency)))

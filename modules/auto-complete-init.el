@@ -26,7 +26,7 @@
         ac-trigger-key "TAB"
         tab-always-indent 'complete
         ac-dwim t
-        ac-comphist-file (concat dotemacs--temp-directory "ac-comphist.dat"))
+        ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat"))
   (add-to-list 'ac-sources 'ac-source-words-in-buffer)
   (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
   (add-to-list 'ac-sources 'ac-source-words-in-all-buffers)
@@ -113,7 +113,7 @@
   (use-package ac-html-csswatcher
     :ensure t
     :config
-    (if (eq dotemacs--completion 'company)
+    (if (eq dotemacs-completion 'company)
         (company-web-csswatcher-setup)
       (ac-html-csswatcher-setup)))
 

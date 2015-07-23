@@ -5,23 +5,22 @@
 
 ;;; Code:
 
-;; FIXME: Enabling this package seems to cause problems with tramp.
-
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
   :ensure t
-  ;;:if (not (string-equal system-name "XXX"))
+  :disabled t
+  :if (not (string-equal system-name "rain.cse.ohio-state.edu"))
   :diminish flycheck-mode
   :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
-  :config
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-completion-system 'ido
         flycheck-standard-error-navigation nil
         flycheck-check-syntax-automatically '(save mode-enabled))
 
+  :config
   (use-package flycheck-tip
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   ;; Show flycheck messages in popups
   (use-package flycheck-pos-tip
@@ -29,19 +28,19 @@
     :init (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
   (use-package flycheck-color-mode-line
-    :disabled t
     :ensure t
+    :disabled t
     :config (add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode))
 
   ;; Check package conventions with flycheck
   (use-package flycheck-package
-    :disabled t
     :ensure t
+    :disabled t
     :init (flycheck-package-setup))
 
   (use-package helm-flycheck
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   ;; https://github.com/flycheck/flycheck-google-cpplint
   ;; Add Google C++ Style checker. By default, syntax checked by Clang and Cppcheck (Windows?). Also, need to setup cpplint.py.
@@ -50,7 +49,7 @@
     :if (eq system-type 'gnu/linux)
     :config
     (flycheck-add-next-checker 'c/c++-clang '(t . c/c++-googlelint) t)
-    (setq flycheck-googlelint-linelength 'dotemacs--fill-column
+    (setq flycheck-googlelint-linelength 'dotemacs-fill-column
           flycheck-googlelint-filter "-whitespace/line_length")))
 
 (provide 'flycheck-init)
