@@ -6,24 +6,19 @@
 ;;; Code:
 
 ;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key variants.
-
-;; Other variants
-;;(global-set-key (kbd "RET") 'newline-and-indent)
-;;(define-key global-map (kbd "RET") 'newline-and-indent)
+;; Other variants:
+;; (global-set-key (kbd "RET") 'newline-and-indent)
+;; (define-key global-map (kbd "RET") 'newline-and-indent)
 
 (bind-key "RET" 'newline-and-indent)
 (bind-key "C-l" 'goto-line)
 (bind-key "C-c z" 'repeat)
 (bind-key "C-z" 'undo)
 
-;; SB: Not useful
-;;(global-set-key [f1] 'shell)
-;;(global-set-key [f2] 'split-window-vertically)
-;;(global-set-key [f3] 'split-window-horizontally)
-
-;; switch to the other buffer
-(bind-key "<f9>" 'other-window)
-(bind-key "<f10>" 'delete-other-windows)
+;; Not useful
+;; (global-set-key [f1] 'shell)
+;; (global-set-key [f2] 'split-window-vertically)
+;; (global-set-key [f3] 'split-window-horizontally)
 
 (global-unset-key (kbd "C-s")) ; isearch-forward-regexp
 (bind-key "C-f" 'isearch-forward-regexp)
@@ -33,7 +28,9 @@
 (bind-key "C-c m" #'uncomment-region)
 (bind-key "C-c ;" #'dotemacs-comment-line)
 
-;; buffers
+(bind-key "<f9>" 'other-window) ; switch to the other buffer
+(bind-key "<f10>" 'delete-other-windows)
+
 (bind-key "<f11>" #'dotemacs-kill-other-buffers) ; kill all non-special buffers
 (global-unset-key (kbd "C-x C-s")) ; save-buffer
 (bind-key "C-s" 'save-buffer)
