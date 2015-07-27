@@ -31,26 +31,22 @@
       grep-scroll-output t)
 
 ;; this package now provides ivy-mode
+;; performs poorly if there are a large number of matches
 (use-package swiper
-  ;;:disabled t ;; performs poorly if there are a large number of matches
-  :defer t
   :ensure t
-  :init
+  :defer t
+  :config
   (use-package ivy
     :init (ivy-mode 1)
     :diminish ivy-mode)
-  :config
   (setq ivy-use-virtual-buffers t
         ;; be less noisy
         swiper-min-highlight 3)
   (bind-key "C-c u" 'ivy-resume ivy-mode-map)
   (use-package swiper-helm
     :ensure t)
-  :bind* (("C-c f" . swiper-helm)
-          ("C-c r" . swiper-helm)
-          ;;("C-f" . swiper)
-          ;;("C-r" . swiper)
-          ))
+  :bind* (("C-c f" . swiper)
+          ("C-c r" . swiper-helm)))
 
 (use-package color-moccur
   :ensure t
@@ -58,8 +54,10 @@
   :commands (isearch-moccur isearch-all)
   :bind ("M-s O" . moccur)
   :config
-  (bind-key "M-o" 'isearch-moccur isearch-mode-map)
-  (bind-key "M-O" 'isearch-moccur-all isearch-mode-map)
+  (bind-keys
+   :map isearch-mode-map
+   ("M-o" . isearch-moccur)
+   ("M-O" . isearch-moccur-all))
   (use-package moccur-edit))
 
 (use-package loccur

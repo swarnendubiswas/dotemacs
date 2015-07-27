@@ -10,7 +10,8 @@
   :diminish anzu-mode
   :init
   (global-anzu-mode 1)
-  (setq anzu-search-threshold 10000)
+  (setq anzu-search-threshold 10000
+        anzu-minimum-input-length 2)
   (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'bold))
 
 (provide 'anzu-init)

@@ -20,6 +20,7 @@
 
   :init
   (global-fci-mode 1)
+
   ;;(add-hook 'text-mode-hook #'fci-mode)
   ;;(add-hook 'prog-mode-hook #'fci-mode)
   ;;(add-hook 'after-change-major-mode-hook #'dotemacs-auto-fci-mode)

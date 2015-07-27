@@ -60,6 +60,7 @@
 
   (use-package function-args
     :ensure t
+    :diminish function-args-mode
     :config
     (set-default 'semantic-case-fold t)
     ;; to include custom header locations

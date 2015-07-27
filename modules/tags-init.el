@@ -58,7 +58,6 @@
   ;; buffer list.
   (use-package helm-gtags
     :ensure t
-    :if (eq system-type 'gnu/linux)
     :diminish helm-gtags-mode
     :init
     (setq helm-gtags-ignore-case t

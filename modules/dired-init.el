@@ -27,12 +27,10 @@
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
-        ;;dired-listing-switches "-ABhltc --si --group-directories-first"
+        ;; check ls for options
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
-
-  ;;(add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
   :config
   (bind-keys
@@ -42,11 +40,6 @@
    ("M-<up>" . dired--jump-to-top)
    ("M-<down>" . dired--jump-to-bottom))
 
-  ;; (bind-key "M-<home>" 'dired--go-home dired-mode-map)
-  ;; (bind-key "i" 'ido-find-file dired-mode-map)
-  ;; (bind-key "M-<up>" 'dired--jump-to-top dired-mode-map)
-  ;; (bind-key "M-<down>" 'dired--jump-to-bottom dired-mode-map)
-
   (use-package dired-x
     :commands dired-jump
     :config
@@ -55,16 +48,13 @@
           dired-omit-verbose nil)
     (add-hook 'dired-mode-hook #'dired-omit-mode)
 
-    ;; SB: This does not work.
-    ;; (with-eval-after-load "dired-omit-mode"
-    ;;   (diminish dired-omit-mode))
     ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
     (defadvice dired-omit-startup (after diminish-dired-omit activate)
       "Make sure to remove \"Omit\" from the modeline."
       (diminish 'dired-omit-mode) dired-mode-map)
 
     :bind*
-    ;; C-x C-j opens dired with the cursor right on the file you're editing
+    ;; open dired with the cursor right on the file you're editing
     ("C-x C-j" . dired-jump))
 
   (use-package dired+
@@ -75,10 +65,9 @@
                   diredp-hide-details-propagate-flag nil)
     (diredp-toggle-find-file-reuse-dir 1))
 
-  ;; direx:jump-to-directory is a good explorer
   (use-package direx
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package direx-grep
     :disabled t
@@ -99,8 +88,8 @@
   ;;   :ensure t)
 
   (use-package dired-rainbow
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package dired-hacks-utils
     :ensure t

@@ -1,7 +1,7 @@
 ;;; custom-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
 
 ;;; Commentary:
-;; Contains custom or temporary defintions.
+;; Contains custom or temporary definitions.
 
 ;;; Code:
 

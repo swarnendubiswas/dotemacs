@@ -44,12 +44,18 @@
         confirm-kill-emacs nil)
   :bind (("C-c d r" . revert-buffer)))
 
-(setq sentence-end-double-space nil
-      ;; Enable use of system clipboard across Emacs and other applications.
-      x-select-enable-clipboard t
-      line-number-display-limit 2000000)
+(setq-default sentence-end-double-space nil)
+
+(setq x-select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications.
+      line-number-display-limit 2000000
+      visible-bell nil
+      ;; draw underline lower
+      x-underline-at-descent-line t)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
+
+;; Mouse cursor in terminal mode
+(xterm-mouse-mode 1)
 
 (use-package menu-bar
   :init (toggle-indicate-empty-lines 1))

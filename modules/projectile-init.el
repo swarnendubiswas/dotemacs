@@ -6,8 +6,8 @@
 ;;; Code:
 
 (use-package projectile
-  :defer 2
   :ensure t
+  :defer 2
   :commands (projectile-find-file projectile-switch-project)
   :init (projectile-global-mode 1)
   :config
@@ -21,7 +21,7 @@
         projectile-mode-line '(:propertize
                                (:eval (concat " " (projectile-project-name)))
                                face font-lock-constant-face))
-  (dolist (dirs '(".svn" ".dropbox"))
+  (dolist (dirs '(".svn" ".dropbox" ".git"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   ;; Don't consider my home dir as a project
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/"))
@@ -30,7 +30,6 @@
 
   (use-package helm-projectile
     :ensure projectile
-    :disabled t ;; FIXME: latest helm update seems to broken this
     :init
     (setq helm-projectile-fuzzy-match t
           ;; other options: 'helm-projectile-find-file
@@ -67,7 +66,6 @@
   ("j" ggtags-update-tags "ggtags update tags"))
 (global-unset-key (kbd "C-c p"))
 (bind-key "C-c p" 'hydra-projectile/body)
-
 
 (provide 'projectile-init)
 

@@ -63,7 +63,7 @@
   :type    'boolean
   :group   'dotemacs)
 
-(defcustom dotemacs-enable-whitespace-module
+(defcustom dotemacs-enable-whitespace-module-p
   t
   "Control whether the whitespace module should be enabled or
 disabled. Sometimes we do not want to unnecessarily add

@@ -8,14 +8,14 @@
 (use-package ido
   :ensure t
   :init
-  (ido-mode 1) ; options: 'files, 'buffers
+  (ido-mode 1)
   (ido-everywhere 1)
   :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
         ido-max-prospects 10
         ido-case-fold t
-        ;;ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
+        ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
         ido-show-dot-for-dired nil ; don't show current directory as the first choice
         ido-create-new-buffer 'always ; other options: prompt, never
         ido-default-file-method 'selected-window
@@ -46,17 +46,20 @@
     (ido-vertical-mode 1))
 
   (use-package ido-yes-or-no
-    :ensure t)
+    :ensure t
+    :init (ido-yes-or-no-mode))
 
   (use-package ido-hacks
     :ensure t
     :commands ido-hacks-mode
     :init (ido-hacks-mode))
 
-  ;; allow ido-style completion in more places
-  (use-package ido-ubiquitous
+  (use-package ido-ubiquitous ; allow ido-style completion in more places
     :ensure t
     :init (ido-ubiquitous-mode 1))
+
+  (use-package ido-completing-read+
+    :ensure t)
 
   (use-package ido-better-flex
     :ensure t
@@ -66,16 +69,12 @@
     :ensure t
     :init (ido-at-point-mode 1))
 
-  ;; smarter fuzzy matching for ido
-  (use-package flx-ido
+  (use-package flx-ido ; smarter fuzzy matching for ido
     :ensure t
     :init (flx-ido-mode 1))
 
-  (use-package ido-completing-read+
-    :ensure t)
-
   :bind
-  (("<f2>" . ido-find-file)
+  (("<f3>" . ido-find-file)
    ("C-x C-f" . ido-find-file)
    ("C-x b" . ido-switch-buffer)
    ("C-x d" . ido-dired)))

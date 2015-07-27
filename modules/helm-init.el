@@ -37,10 +37,6 @@
         helm-autoresize-min-height 60
         helm-case-fold-search 'smart
         helm-ff-search-library-in-sexp t)
-  (setq helm-mini-default-sources '(helm-source-buffers-list
-                                    helm-source-recentf
-                                    ;;helm-source-dired-recent-dirs
-                                    helm-source-buffer-not-found))
 
   (use-package helm-plugin
     :init
@@ -49,13 +45,26 @@
       (setq header-line-format nil)))
 
   (use-package helm-buffers
-    ;;:bind ([remap switch-to-buffer] . helm-mini)
+    :bind
+    (;;([remap switch-to-buffer] . helm-mini)
+     ("C-c h m" . helm-mini)
+     ("<f6>" . helm-mini)
+     ("C-c h b" . helm-buffers-list)
+     ("<f7>" . helm-buffers-list))
     :init
     ;; fuzzy matching buffer names when non--nil
-    (setq helm-buffers-fuzzy-matching t))
+    (setq helm-buffers-fuzzy-matching t
+          helm-mini-default-sources '(helm-source-buffers-list
+                                      helm-source-recentf
+                                      ;;helm-source-dired-recent-dirs
+                                      helm-source-buffer-not-found)))
 
   (use-package helm-command
-    :bind* ([remap execute-extended-command] . helm-M-x))
+    :bind*
+    (([remap execute-extended-command] . helm-M-x)
+     ("M-x" . helm-M-x)
+     ;; convenient since it is a single keypress
+     ("<f1>" . helm-M-x)))
 
   (use-package helm-utils
     :init
@@ -75,7 +84,12 @@
                                                  "\\.elc$"
                                                  "\\#$"
                                                  "\\~$")))
-    :bind (([remap find-file] . helm-find-files)))
+    :bind*
+    (([remap find-file] . helm-find-files)
+     ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
+     ("<f4>" . helm-find-files)
+     ("C-c h f" . helm-find-files)
+     ("C-c h r" . helm-recentf)))
 
   (use-package helm-dabbrev
     :init (setq helm-dabbrev-cycle-threshold 2))
@@ -127,6 +141,9 @@
   (use-package helm-swoop
     :ensure t
     :defer t
+    :bind
+    (("C-c h s" . helm-swoop)
+     ("C-c h /" . helm-multi-swoop))
     :init
     (setq helm-multi-swoop-edit-save t ; save buffer when helm-multi-swoop-edit complete
           helm-swoop-speed-or-color nil
@@ -142,7 +159,7 @@
   ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
   (use-package helm-company
     :ensure t
-    :defer t
+    :disabled t
     :if (eq dotemacs-completion 'company)
     :init (with-eval-after-load 'company
             (bind-key [remap completion-at-point] #'helm-company company-mode-map)
@@ -150,7 +167,8 @@
             (bind-key "C-:" #'helm-company company-active-map)))
 
   (use-package helm-package
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package helm-grep
     :init
@@ -175,20 +193,8 @@
   ;;(define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
 
   :bind*
-  (("<f1>" . helm-M-x)
-   ("M-x" . helm-M-x)
-   ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
-   ("<f3>" . helm-find-files)
-   ("<f6>" . helm-mini)
-   ("<f7>" . helm-buffers-list)
-   ("C-c h f" . helm-find-files)
-   ("C-c h r" . helm-recentf) ; not really required, can instead use 'helm-mini
-   ("C-c h l" . helm-locate)
-   ("C-c h m" . helm-mini)
-   ("C-c h b" . helm-buffers-list)
+  (("C-c h l" . helm-locate)
    ("C-c h y" . helm-show-kill-ring)
-   ("C-c h s" . helm-swoop)
-   ("C-c h /" . helm-multi-swoop)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
    ("C-c h u" . helm-resume)

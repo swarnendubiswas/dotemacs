@@ -16,7 +16,7 @@
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
-;; SB: You can learn many shortcuts from the menu bar entries.
+;; You can learn many shortcuts from the menu bar entries.
 (use-package menu-bar
   :disabled t
   :init
@@ -32,7 +32,7 @@
 (use-package frame
   :init
   ;; enable/disable blinking cursor
-  (blink-cursor-mode 1)
+  (blink-cursor-mode 0)
   :config
   ;; start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
@@ -177,7 +177,7 @@
                       :background "gray88"
                       :foreground "gray30"
                       :box nil
-                      :height 1.1)
+                      :height 1.0)
   (set-face-attribute 'tabbar-selected nil
                       :background "#f2f2f6"
                       :foreground "black"

@@ -16,41 +16,40 @@
   :init (global-aggressive-indent-mode 1)
   :diminish aggressive-indent-mode)
 
-;; intelligent indentation, on by default from Emacs 24.4
-(use-package electric
+(use-package electric ; intelligent indentation, on by default from Emacs 24.4
   :init (electric-indent-mode 1))
 
-;; If you wish to use this with autopairs and yasnippet, please load this library first.
+;; If you wish to use this with autopairs and yasnippet, load this library first.
 (use-package auto-indent-mode
-  :disabled t
   :ensure t
+  :disabled t
   :diminish auto-indent-mode
-  :init (auto-indent-global-mode 1)
+  :init
+  (auto-indent-global-mode 1)
   (setq auto-indent-on-visit-file t
-        ;; other option: aggressive
+        ;; options: aggressive
         auto-indent-indent-style 'conservative))
 
 (use-package highlight-indentation
-  :disabled t
   :ensure t
+  :disabled t
   :init
   (highlight-indentation-mode 1)
   (highlight-indentation-current-column-mode 1))
 
-;; indentation guide: doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode as well
+;; Doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode.
 (use-package indent-guide
-  :disabled t
   :ensure t
+  :disabled t
   :diminish indent-guide-mode
   :init
   (setq indent-guide-delay 1.0 ; show guide lines only in idle-time
         indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
 
-;; smart tabs (indent with tabs, align with spaces)
-(use-package smart-tabs
-  :disabled t
+(use-package smart-tabs ; indent with tabs, align with spaces
   :ensure t
+  :disabled t
   :init
   ;; (autoload 'smart-tabs-mode "smart-tabs-mode"
   ;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")

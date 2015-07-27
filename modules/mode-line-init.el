@@ -31,13 +31,12 @@
               sml/shorten-directory t)
         (sml/setup))
 
-      ;; SB: I find the melpa powerline package more difficult to configure than this fork:
+      ;; I find the melpa powerline package more difficult to configure than this fork:
       ;; https://github.com/jonathanchu/emacs-powerline/
       (use-package powerline
         :disabled t
         :if (eq dotemacs-theme 'default)
-        ;; If the path is relative, it is expanded within user-emacs-directory
-        :load-path "lisp/emacs-powerline/"
+        :load-path "lisp/emacs-powerline/" ; If the path is relative, it is expanded within user-emacs-directory
         :config
         (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
         (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))))

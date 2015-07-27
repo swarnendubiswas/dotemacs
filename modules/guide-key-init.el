@@ -17,8 +17,8 @@
         ;; delay before the guide shows up, default is 1 s
         guide-key/idle-delay 1.0)
   (use-package guide-key-tip
-    :disabled t
     :ensure t
+    :disabled t
     :init (setq guide-key-tip/enabled t)))
 
 (provide 'guide-key-init)

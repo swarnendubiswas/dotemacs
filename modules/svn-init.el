@@ -7,7 +7,6 @@
 
 (use-package psvn
   :ensure t
-  :defer t
   :bind ("C-c d s" . svn-status)
   :config
   (setq svn-status-verbose nil

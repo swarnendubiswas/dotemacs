@@ -9,7 +9,7 @@
 (use-package flycheck
   :ensure t
   :disabled t
-  :if (not (string-equal system-name "rain.cse.ohio-state.edu"))
+  :if (not (string-equal system-name "XXX"))
   :diminish flycheck-mode
   :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list

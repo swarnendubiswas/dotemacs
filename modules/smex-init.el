@@ -9,13 +9,13 @@
   :ensure t
   :defer t
   ;;:init (autoload 'smex "smex")
-  ;;(smex-initialize)
   :config
+  ;;(smex-initialize)
   (setq smex-save-file (expand-file-name ".smex-items" dotemacs-temp-directory)
         ;; this change is yet to be pulled into smex
         ;;smex-completion-method 'ivy
         )
-  :bind* (;;("M-x" . smex)
+  :bind* (("<f2>" . smex)
           ("M-X" . smex-major-mode-commands)))
 
 (provide 'smex-init)

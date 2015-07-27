@@ -20,13 +20,23 @@
     "An alist of hooks that require customizations.")
 
   :init
+  ;; use this package if there are performance issues with flyspell, note that this package disables spell checks for
+  ;; certain special buffers, including *scratch*
+  (use-package flyspell-lazy
+    :ensure t
+    :disabled t
+    :init (flyspell-lazy-mode 1))
+
   (setq-default ispell-program-name "/usr/bin/aspell")
   ;; speed up aspell: ultra | fast | normal | bad-spellers
   (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
+
   (add-hook 'find-file-hooks #'turn-on-flyspell)
+  ;; this is to turn on spell check in *scratch* buffer, which is in text-mode.
+  (add-hook 'text-mode-hook #'turn-on-flyspell)
 
   ;; this is useful but slow
   ;; (add-hook 'before-save-hook 'flyspell-buffer)
@@ -43,11 +53,6 @@
    ("C-c i w" . ispell-word))
 
   :config
-  (use-package flyspell-lazy
-    :ensure t
-    :disabled t
-    :init (flyspell-lazy-mode 1))
-
   (use-package helm-flyspell
     :ensure t
     :config (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))

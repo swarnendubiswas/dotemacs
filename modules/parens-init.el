@@ -6,19 +6,18 @@
 ;;; Code:
 
 (or (use-package mic-paren
-      :disabled t
       :ensure t
+      :disabled t
       :init
       (setq paren-highlight-at-point t)
       (paren-activate)
       (make-variable-buffer-local 'show-paren-mode))
 
     (use-package paren
-      ;;:disabled t
-      :init (show-paren-mode 1)
-      :config
+      :init
+      (show-paren-mode 1)
       (setq show-paren-delay 0
-            show-paren-style 'parenthesis ; 'expression, 'parenthesis, 'mixed
+            show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
             show-paren-when-point-inside-paren t
             show-paren-when-point-in-periphery t)
       (when (fboundp 'show-paren-mode)
@@ -29,21 +28,21 @@
       :init (electric-pair-mode 1))
 
     (use-package autopair
-      :disabled t
       :ensure t
+      :disabled t
       :init (autopair-global-mode 1))
 
     (use-package flex-autopair
-      :disabled t
       :ensure t
+      :disabled t
       :init (flex-autopair-mode 1)))
 
 ;; https://github.com/xiaohanyu/oh-my-emacs/blob/master/core/ome-miscs.org
 ;; https://github.com/Fuco1/smartparens/blob/master/smartparens-config.el
 ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
 (use-package smartparens
-  :disabled t
   :ensure t
+  :disabled t
   :diminish smartparens-mode
   :init
   (smartparens-global-mode 1)
@@ -67,8 +66,8 @@
 
   ;; Emacs is lisp hacking enviroment, so we set up some most common lisp modes too
   (sp-with-modes sp--lisp-modes
-    ;; disable ', it's the quote character!
-    (sp-local-pair "'" nil :actions nil))
+                 ;; disable ', it's the quote character!
+                 (sp-local-pair "'" nil :actions nil))
 
   ;; ;; tex-mode latex-mode
   ;; (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
@@ -76,9 +75,9 @@
 
   ;; when you press RET, the curly braces automatically add another newline
   (sp-with-modes '(c-mode c++-mode)
-    (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
-    (sp-local-pair "/*" "*/" :post-handlers '((" | " "SPC")
-                                              ("* ||\n[i]" "RET"))))
+                 (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")))
+                 (sp-local-pair "/*" "*/" :post-handlers '((" | " "SPC")
+                                                           ("* ||\n[i]" "RET"))))
   (with-eval-after-load "html-mode"
     (require 'smartparens-html))
   (with-eval-after-load "latex"

@@ -10,22 +10,20 @@
 
 (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-;; identify weasel words, passive voice, and duplicate words
-(use-package writegood-mode
-  :ensure t
-  :defer t
-  ;;:bind* ("C-c g" . writegood-mode)
-  :commands writegood-mode
-  :diminish writegood-mode
-  :init (add-hook 'text-mode-hook #'writegood-mode)
-  :config (writegood-passive-voice-turn-off))
+(or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
+      :ensure t
+      :defer t
+      ;;:bind* ("C-c g" . writegood-mode)
+      :commands writegood-mode
+      :diminish writegood-mode
+      :init (add-hook 'text-mode-hook #'writegood-mode))
 
-(use-package artbollocks-mode
-  :disabled t
-  :ensure t
-  :commands artbollocks-mode
-  :diminish artbollocks-mode
-  :init (add-hook 'text-mode-hook #'artbollocks-mode))
+    (use-package artbollocks-mode
+      :ensure t
+      :disabled t
+      :commands artbollocks-mode
+      :diminish artbollocks-mode
+      :init (add-hook 'text-mode-hook #'artbollocks-mode)))
 
 (use-package markdown-mode
   :ensure t

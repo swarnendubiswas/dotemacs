@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-;; prefer ace-window/avy
 (use-package ace-jump-mode
   :disabled t ;; prefer avy
   :ensure t
@@ -61,11 +60,10 @@
 ;; ace-jump in helm buffers
 (use-package ace-jump-helm-line
   :ensure t
-  :disabled t
   :config
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)
-  (bind-key "C-'" 'ace-jump-helm-line helm-map))
+  (bind-key "C-;" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
   :ensure t
