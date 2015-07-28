@@ -14,14 +14,12 @@
               (which-function-mode 1)))
   :config (set-face-attribute 'which-func nil :foreground "black"))
 
-;; this hides the tabbar
-(use-package stickyfunc-enhance
-  :disabled t
+(use-package stickyfunc-enhance ; this hides the tabbar
   :ensure t
+  :disabled t
   :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
 
 (use-package electric
-  :defer t
   :init
   (add-hook 'prog-mode-hook
             (lambda ()
@@ -29,20 +27,15 @@
 
 (use-package electric-operator
   :ensure t
-  :defer t
   :init (add-hook 'c-mode-common-hook #'electric-operator-mode))
 
-;; lisp and variants
+;; lisp and its variants
 
 (use-package prog-mode
-  :defer t
-  :init
-  ;;(add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
-  (global-prettify-symbols-mode 1))
+  :config (global-prettify-symbols-mode 1))
 
 (use-package eldoc
-  :defer t
-  :init
+  :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'eldoc-mode)
@@ -51,11 +44,10 @@
 ;; add makefile.rules to makefile-gmake-mode for Intel Pin
 (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
 
-;; shell script mode
-(use-package sh-script
+(use-package sh-script ; shell script mode
   :defer t
   :mode ("\\.zsh\\'" . sh-mode)
-  :init
+  :config
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4))
@@ -63,11 +55,10 @@
 ;; enable speed bar
 (use-package speedbar
   :defer t
-  :init
+  :config
   (setq speedbar-use-images nil
         speedbar-show-unknown-files t)
 
-  :config
   (use-package sr-speedbar
     :ensure t
     :commands sr-speedbar-open
@@ -97,7 +88,6 @@
             (lambda()
               (dtrt-indent-mode 1))))
 
-;; web mode
 (use-package web-mode
   :ensure t
   :defer t
@@ -109,13 +99,11 @@
    ("\\.hb\\.html\\'" . web-mode)
    ("\\.tpl\\.php\\'" . web-mode)
    ("\\.as[cp]x\\'" . web-mode))
-  :init
+  :config
   ;; everything is indented 2 spaces
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
-
-  :config
   (use-package web-beautify
     :ensure t
     :init
@@ -139,10 +127,8 @@
                 (lambda ()
                   (add-hook 'before-save-hook 'web-beautify-css-buffer t t))))))
 
-;; xml mode
 (use-package nxml-mode
   :defer t
-  ;; Complete closing tags, and insert XML declarations into empty files
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t))
 

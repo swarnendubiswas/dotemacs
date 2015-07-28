@@ -6,26 +6,25 @@
 ;;; Code:
 
 (use-package rainbow-mode
-  :disabled t
   :ensure t
+  :disabled t
   :init (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package rainbow-identifiers
-  :disabled t
   :ensure t
+  :disabled t
   :init (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-delimiters
   :ensure t
-  :defer t
   :init
   (dolist (hook '(text-mode-hook prog-mode-hook))
     (add-hook hook #'rainbow-delimiters-mode)))
 
 (use-package rainbow-blocks
-  :disabled t
   :ensure t
-  :config (rainbow-blocks-mode 1)
+  :disabled t
+  :init (rainbow-blocks-mode 1)
   :diminish rainbow-blocks-mode)
 
 (provide 'rainbow-init)

@@ -39,9 +39,9 @@
   (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}=\\")
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
 
-  ;; SB: Does not work for me
+  ;; Does not work for me
   ;; disable including title if not explicitly specified, default was to use the buffer name
-  ;;(defadvice org-export-grab-title-from-buffer (around org-export-grab-title-from-buffer-disable activate))
+  ;; (defadvice org-export-grab-title-from-buffer (around org-export-grab-title-from-buffer-disable activate))
 
   (require 'org-inlinetask)
 
@@ -52,7 +52,6 @@
   ;; (with-eval-after-load "org"
   ;;   (define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
-  ;; (bind-key "C-c SPC" 'ace-jump-mode org-mode-map)
 
   (add-hook 'org-mode-hook #'org-toggle-blocks)
   (add-hook 'org-mode-hook #'which-function-mode)
@@ -66,16 +65,16 @@
     ;; include the listings package
     (add-to-list 'org-latex-packages-alist '("" "listings"))
     ;; if you want colored source code then you need to include the color package
-    ;;(add-to-list 'org-latex-packages-alist '("" "color"))
+    ;; (add-to-list 'org-latex-packages-alist '("" "color"))
     ;; Add minted to the defaults packages to include when exporting.
-    ;;(add-to-list 'org-latex-packages-alist '("" "minted"))
+    ;; (add-to-list 'org-latex-packages-alist '("" "minted"))
     ;; tell org to use listings, options: t, 'minted
     (setq org-latex-listings 't
           org-latex-table-caption-above nil))
 
   (use-package org-beautify-theme
-    :disabled t
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package org-indent
     :diminish org-indent-mode
@@ -84,7 +83,8 @@
   (use-package org-ref
     :disabled t
     :load-path "lisp/org-ref"
-    :init (org-babel-load-file "org-ref.org")
+    :init
+    (org-babel-load-file "org-ref.org")
     :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
 
   (use-package org-bullets

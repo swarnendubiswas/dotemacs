@@ -82,7 +82,7 @@
   ;; Not required starting from Emacs 24.4
   ;; (use-package dired-details
   ;;   :ensure t
-  ;;   :config (setq dired-details-hide-link-targets nil))
+  ;;   :init (setq dired-details-hide-link-targets nil))
 
   ;; (use-package dired-details+
   ;;   :ensure t)

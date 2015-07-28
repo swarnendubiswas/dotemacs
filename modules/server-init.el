@@ -6,9 +6,10 @@
 
 ;;; Code:
 
+;; I prefer to run the Emacs daemon at startup.
 (use-package server
   :disabled t
-  :init
+  :config
   ;; start server if not root user
   (unless (string-equal "root" (getenv "USER"))
     ;; http://stackoverflow.com/questions/9999320/how-to-check-if-a-function-e-g-server-running-p-is-available-under-emacs

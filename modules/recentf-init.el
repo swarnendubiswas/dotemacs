@@ -37,6 +37,7 @@
     :pin melpa
     :init (recentf-auto-cleanup))
 
+  (setq initial-buffer-choice 'recentf-open-files)
   :bind ("<f8>" . recentf-open-files))
 
 (provide 'recentf-init)

@@ -6,6 +6,7 @@
 ;;; Code:
 
 ;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key variants.
+;;  with bind-key, you do not need an explicit "(kbd ...)"
 ;; Other variants:
 ;; (global-set-key (kbd "RET") 'newline-and-indent)
 ;; (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -20,7 +21,7 @@
 ;; (global-set-key [f2] 'split-window-vertically)
 ;; (global-set-key [f3] 'split-window-horizontally)
 
-(global-unset-key (kbd "C-s")) ; isearch-forward-regexp
+(unbind-key "C-s") ; isearch-forward-regexp
 (bind-key "C-f" 'isearch-forward-regexp)
 (bind-key "C-f" 'isearch-repeat-forward isearch-mode-map)
 
@@ -32,7 +33,7 @@
 (bind-key "<f10>" 'delete-other-windows)
 
 (bind-key "<f11>" #'dotemacs-kill-other-buffers) ; kill all non-special buffers
-(global-unset-key (kbd "C-x C-s")) ; save-buffer
+(unbind-key "C-x C-s") ; save-buffer
 (bind-key "C-s" 'save-buffer)
 (bind-key "C-S-s" #'dotemacs-save-all-buffers)
 
@@ -43,7 +44,6 @@
 (bind-key* "M-<left>" 'tabbar-backward-tab)
 (bind-key* "M-<right>" 'tabbar-forward-tab)
 
-;; with bind-key, you do not need an explicit "(kbd ...)"
 (bind-key "C-+" 'text-scale-increase)
 (bind-key "C--" 'text-scale-decrease)
 

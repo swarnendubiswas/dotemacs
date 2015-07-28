@@ -14,34 +14,28 @@
              '("marmalade" . "https://marmalade-repo.org/packages/") t)
 (add-to-list 'package-archives
              '("org" . "http://orgmode.org/elpa/") t)
-;; (add-to-list 'package-archives
-;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
-;; (when (not package-archive-contents)
-;;   (package-refresh-contents))
+(when (not package-archive-contents)
+  (package-refresh-contents))
 (package-initialize)
 
-;; setup use-package
+;; setup use-package.
+;; :init always happens before package load, whether :config has been deferred or not. This implies
+;; :init is never deferred.
+; if the path is relative, it is expanded within user-emacs-directory
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure nil
       use-package-verbose t)
 
-;; SB: :init always happens before package load, whether :config has been deferred or not. This implies :init is never
-;; deferred.
-
-;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
-;; (eval-and-compile
-;;   (mapc
-;;    #'(lambda (path)
-;;        (push (expand-file-name path user-emacs-directory) load-path))
-;;    '("site-lisp" "override" "lisp" "lisp/use-package" "lisp/bind-key" "lisp/diminish")))
-
 (use-package diminish
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package bind-key
   :ensure t
@@ -49,19 +43,18 @@
 
 ;; this only *recompiles* ELisp source files.
 (use-package auto-compile
-  :disabled t
   :ensure t
+  :disabled t
   :init
-  ;; prefer newer files
-  (setq load-prefer-newer t)
-  (setq auto-compile-display-buffer nil
+  (setq load-prefer-newer t
+        auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)
   (auto-compile-on-load-mode 1)
   (auto-compile-on-save-mode 1))
 
 (use-package paradox
   :ensure t
-  :defer 5
+  :defer t
   :bind (("C-c d p" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages))
   :config
@@ -69,8 +62,8 @@
         paradox-github-token t))
 
 (use-package hydra
-  :defer t
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (provide 'packages-init)
 

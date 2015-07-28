@@ -15,8 +15,8 @@
         ;; this change is yet to be pulled into smex
         ;;smex-completion-method 'ivy
         )
-  :bind* (("<f2>" . smex)
-          ("M-X" . smex-major-mode-commands)))
+  :bind (("<f2>" . smex)
+         ("M-X" . smex-major-mode-commands)))
 
 (provide 'smex-init)
 

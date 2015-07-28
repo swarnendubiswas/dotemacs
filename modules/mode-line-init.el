@@ -36,7 +36,7 @@
       (use-package powerline
         :disabled t
         :if (eq dotemacs-theme 'default)
-        :load-path "lisp/emacs-powerline/" ; If the path is relative, it is expanded within user-emacs-directory
+        :load-path "lisp/emacs-powerline/"
         :config
         (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
         (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))))

@@ -21,12 +21,9 @@
   :init
   (global-fci-mode 1)
 
-  ;;(add-hook 'text-mode-hook #'fci-mode)
-  ;;(add-hook 'prog-mode-hook #'fci-mode)
   ;;(add-hook 'after-change-major-mode-hook #'dotemacs-auto-fci-mode)
   ;;(add-hook 'window-size-change-functions #'dotemacs-auto-fci-mode)
 
-  :config
   (setq-default fci-rule-column dotemacs-fill-column)
   (setq fci-handle-truncate-lines nil
         fci-rule-width 1

@@ -21,26 +21,23 @@
   (setq achievements-idle-time 600) ; seconds
   (achievements-mode 1))
 
-;; speed up Emacs for large files
-(use-package vlf
+(use-package vlf ; speed up Emacs for large files
   :ensure t
-  :defer 2
+  :defer 5
   :config
   ;; warn when opening files bigger than 50MB
   (setq large-file-warning-threshold (* 50 1024 1024))
   (use-package vlf-setup))
 
-;; erase 'all' consecutive white space characters in a given direction
-(use-package hungry-delete
+(use-package hungry-delete ; erase 'all' consecutive white space characters in a given direction
   :ensure t
   :init (global-hungry-delete-mode 1))
 
 (use-package fish-mode
-  :disabled t
-  :ensure t)
+  :ensure t
+  :defer t)
 
-;; move text with M-<up> and M-<down> like eclipse
-(use-package move-text
+(use-package move-text ; move text with M-<up> and M-<down> like eclipse
   :ensure t
   :init (move-text-default-bindings))
 
@@ -54,7 +51,6 @@
 
 (use-package manage-minor-mode
   :ensure t
-  :defer t
   :bind ("C-c d m" . manage-minor-mode))
 
 (use-package jgraph-mode
@@ -81,7 +77,7 @@
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 (use-package popwin
   :ensure t
-  :defer 2
+  :defer 5
   :config
   (popwin-mode 1)
   (setq popwin:popup-window-height 20
@@ -135,16 +131,15 @@
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
         split-width-threshold nil))
 
-;; Edit file with sudo
-(use-package sudo-edit
+(use-package sudo-edit ; Edit file with sudo
   :ensure t
   :bind ("M-s e" . sudo-edit))
 
 (use-package ssh-file-modes
-  :ensure t)
+  :ensure t
+  :defer t)
 
-;; Expand region by semantic units
-(use-package expand-region
+(use-package expand-region ; Expand region by semantic units
   :ensure t
   :bind* ("C-=" . er/expand-region)
   :config

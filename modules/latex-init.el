@@ -30,7 +30,6 @@
   (setq-default TeX-master nil) ; query for master file
 
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
-  ;; (setq TeX-view-program-selection '((output-pdf "Evince")))
 
   ;; (add-hook 'LaTeX-mode-hook
   ;;           (lambda ()
@@ -40,8 +39,8 @@
   ;;              TeX-command-list)))
 
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
-  ;; compile files to pdf by default
-  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode)
+  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ;; compile files to pdf by default
+
   :config
   (use-package tex-site
     :ensure auctex)
@@ -81,8 +80,8 @@
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
   (use-package latex-pretty-symbols
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package company-auctex
     :ensure t
@@ -106,33 +105,32 @@
                 (setq TeX-command-default "LatexMk"))))
 
   (use-package latex-extra
-    :disabled t
     :ensure t
+    :disabled t
     :config (latex/setup-keybinds))
 
-  ;; currently does not support multi-file parsing
-  (use-package latex-preview-pane
-    :disabled t
+  (use-package latex-preview-pane ; currently does not support multi-file parsing
     :ensure t
+    :disabled t
     :config (latex-preview-pane-enable))
 
   (use-package latex-math-preview
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package magic-latex-buffer
-    :disabled t
     :ensure t
-    :init (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
-    :config
+    :disabled t
+    :init
+    (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     (setq magic-latex-enable-block-highlight t
           magic-latex-enable-subscript t
           magic-latex-enable-pretty-symbols nil
           magic-latex-enable-block-align t))
 
   (use-package math-symbol-lists
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package bibtex
     :defer
@@ -160,8 +158,8 @@
     (add-hook 'LaTeX-mode-hook #'reftex-mode))
 
   (use-package ebib
-    :disabled t
     :ensure t
+    :disabled t
     :bind ("C-c e" . ebib))
 
   (use-package tex-smart-umlauts
