@@ -78,12 +78,12 @@
 (require 'dired-init)
 (require 'search-init)
 (require 'recentf-init)
-(if (eq dotemacs--completion 'company)
+(if (eq dotemacs-completion 'company)
     (require 'company-init)
   (require 'auto-complete-init))
 (require 'ido-init)
-(require 'helm-init)
 (require 'smex-init)
+(require 'helm-init)
 
 ;; configure the more useful extensions
 (require 'anzu-init)
@@ -99,7 +99,6 @@
 (require 'misc-init)
 (require 'yasnippet-init)
 (require 'flycheck-init)
-(require 'guide-key-init)
 (require 'rainbow-init)
 (require 'undo-tree-init)
 (require 'whitespace-init)
@@ -112,6 +111,7 @@
 (require 'prog-init)
 (require 'cc-init)
 (require 'java-init)
+(require 'python-init)
 (require 'shell-init)
 
 ;; generic keybindings, package-specific are usually in their own modules

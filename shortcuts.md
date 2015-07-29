@@ -18,6 +18,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-x h` - Mark whole buffer (`mark-whole-buffer`).
 * `M-h` - Put region around current paragraph (`mark-paragraph`).
 * `M-@` - Mark the current word (`mark-word` or `subword-mark`).
+* `C-M-h` - Select whole function definition (`mark-defun`).
 
 #### Key motion
 
@@ -43,6 +44,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `R` - Rename file.
 * `m` - Mark file.
 * `u` - Unmark file.
+
+#### Search
+
+* `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`.
 
 #### Org mode
 

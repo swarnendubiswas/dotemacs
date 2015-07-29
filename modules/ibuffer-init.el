@@ -22,6 +22,19 @@
         ibuffer-case-fold-search t ; ignore case when searching
         ibuffer-show-empty-filter-groups nil)
 
+  (setq ibuffer-formats
+        '((mark modified read-only " "
+                (name 30 30 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                filename-and-process)
+          (mark " "
+                (name 16 -1)
+                " " filename)))
+
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
   ;; Prefer ibuffer sorting based on projects via ibuffer-projectile

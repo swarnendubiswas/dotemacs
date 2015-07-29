@@ -54,6 +54,7 @@
     :init
     ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t
+          helm-buffer-max-length 45
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
                                       ;;helm-source-dired-recent-dirs
