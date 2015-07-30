@@ -155,7 +155,7 @@
 
   (use-package helm-make
     :ensure t
-    :defer t)
+    :bind ("C-c h k" . helm-make-projectile))
 
   ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
   (use-package helm-company

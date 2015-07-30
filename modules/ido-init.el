@@ -15,7 +15,7 @@
         ido-enable-prefix nil
         ido-max-prospects 10
         ido-case-fold t
-        ido-use-filename-at-point 'guess ; other options: 'ffap-guesser
+        ido-use-filename-at-point nil ; other options: 'ffap-guesser, 'guess
         ido-show-dot-for-dired nil ; don't show current directory as the first choice
         ido-create-new-buffer 'always ; other options: prompt, never
         ido-default-file-method 'selected-window

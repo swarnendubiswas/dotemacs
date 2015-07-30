@@ -105,6 +105,30 @@
   ("g" text-scale-increase "in")
   ("l" text-scale-decrease "out"))
 
+(use-package guide-key
+  :ensure t
+  :disabled t
+  :diminish guide-key-mode
+  :init (guide-key-mode 1)
+  :config
+  (setq guide-key/guide-key-sequence t
+        guide-key/recursive-key-sequence-flag t
+        guide-key/popup-window-position 'bottom
+        ;; delay before the guide shows up, default is 1 s
+        guide-key/idle-delay 1.0)
+  (use-package guide-key-tip
+    :ensure t
+    :disabled t
+    :init (setq guide-key-tip/enabled t)))
+
+(use-package which-key ; Show help popups for prefix keys
+  :ensure t
+  :init (which-key-mode)
+  :config
+  (setq which-key-idle-delay 1.0
+        which-key-popup-type 'minibuffer)
+  :diminish which-key-mode)
+
 (provide 'keybindings-init)
 
 ;;; keybindings-init.el ends here

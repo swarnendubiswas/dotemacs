@@ -7,7 +7,6 @@
 
 (use-package projectile
   :ensure t
-  :defer 2
   :commands (projectile-find-file projectile-switch-project)
   :init (projectile-global-mode 1)
   :config
@@ -38,15 +37,17 @@
 
   ;; Group buffers by Projectile project
   (use-package ibuffer-projectile
-    :ensure t
+    :ensure projectile
     :init
-    (add-hook 'ibuffer-hook
-              (lambda()
-                (ibuffer-projectile-set-filter-groups)
-                (unless (eq ibuffer-sorting-mode 'alphabetic)
-                  (ibuffer-do-sort-by-mode-name)
-                  (ibuffer-do-sort-by-major-mode))))
+    (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
+    ;; (add-hook 'ibuffer-hook
+    ;;           (lambda()
+    ;;             (ibuffer-projectile-set-filter-groups)
+    ;;             (unless (eq ibuffer-sorting-mode 'alphabetic)
+    ;;               (ibuffer-do-sort-by-mode-name)
+    ;;               (ibuffer-do-sort-by-major-mode))))
     (setq ibuffer-show-empty-filter-groups nil))
+
   :diminish projectile-mode)
 
 (defhydra hydra-projectile (:color blue)

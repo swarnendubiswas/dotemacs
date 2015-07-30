@@ -19,6 +19,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-h` - Put region around current paragraph (`mark-paragraph`).
 * `M-@` - Mark the current word (`mark-word` or `subword-mark`).
 * `C-M-h` - Select whole function definition (`mark-defun`).
+* `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
 
 #### Key motion
 

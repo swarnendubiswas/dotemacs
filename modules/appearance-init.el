@@ -6,7 +6,6 @@
 ;;; Code:
 
 ;; better frame titles
-;; (setq frame-title-format (concat  "%b - GNU Emacs@" (system-name)))
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 (setq-default indicate-buffer-boundaries 'right)
@@ -16,8 +15,7 @@
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
-;; You can learn many shortcuts from the menu bar entries.
-(use-package menu-bar
+(use-package menu-bar ; You can learn many shortcuts from the menu bar entries.
   :disabled t
   :init
   (when (fboundp 'menu-bar-mode)
@@ -30,9 +28,7 @@
   :init (scroll-bar-mode 1))
 
 (use-package frame
-  :init
-  ;; enable/disable blinking cursor
-  (blink-cursor-mode 0)
+  :init (blink-cursor-mode 0) ; enable/disable blinking cursor
   :config
   ;; start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
@@ -42,15 +38,13 @@
   ;; options: fullheight, fullboth
   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
-;; displays the time and date in the mode line
-(use-package time
+(use-package time ; displays the time and date in the mode line
   :init
   (setq display-time-day-and-date t
         display-time-24hr-format nil)
   (display-time))
 
-;; display line numbers in margin
-(use-package linum
+(use-package linum ; display line numbers in margin
   :init (global-linum-mode 1))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
@@ -81,12 +75,6 @@
                                                           :family "Dejavu Sans Mono"
                                                           :height 110)
                                       (set-background-color "white")
-                                      ;; (set-face-attribute 'mode-line nil
-                                      ;;                     :background "grey88"
-                                      ;;                     :foreground "black"
-                                      ;;                     :box nil :bold nil)
-                                      ;; (set-face-attribute 'mode-line-inactive nil
-                                      ;;                     :box nil)
                                       (set-face-attribute 'region nil
                                                           :background "#164040"
                                                           :foreground "white")
@@ -105,7 +93,6 @@
                                         (set-face-attribute 'org-level-1 nil
                                                             :height 1.2
                                                             :overline "#A7A7A7"
-                                                            ;;:weight bold
                                                             :foreground "#3C3C3C"
                                                             :background "#F5F5F5")
                                         (set-face-attribute 'org-level-2 nil

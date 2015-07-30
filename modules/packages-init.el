@@ -19,8 +19,9 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
-(when (not package-archive-contents)
-  (package-refresh-contents))
+;; need not have this enabled
+;; (when (not package-archive-contents)
+;;   (package-refresh-contents))
 (package-initialize)
 
 ;; setup use-package.
