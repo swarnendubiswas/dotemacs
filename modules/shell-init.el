@@ -1,4 +1,4 @@
-;;; shell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; shell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup shell, eshell, terminal emulation. This module is not to configure editing of shell scripts.
@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package shell
-  :defer t
+  :disabled t
   :config
   (use-package comint
     :init
@@ -45,12 +45,12 @@
     :init (bash-completion-setup))
 
   (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
-  (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
+  (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)
 
-(use-package term
-  :config
-  (use-package term+
-    :ensure t))
+  (use-package term
+    :config
+    (use-package term+
+      :ensure t)))
 
 (provide 'shell-init)
 

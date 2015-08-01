@@ -1,4 +1,4 @@
-;;; company-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; company-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Initialize company mode for auto completion.

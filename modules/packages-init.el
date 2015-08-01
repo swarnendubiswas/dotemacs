@@ -1,4 +1,4 @@
-;;; packages-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; packages-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup packages. Inspired from http://www.lunaryorn.com/2015/01/06/my-emacs-configuration-with-use-package.html
@@ -45,7 +45,7 @@
 ;; this only *recompiles* ELisp source files.
 (use-package auto-compile
   :ensure t
-  :disabled t
+  :commands auto-compile-on-load-mode
   :init
   (setq load-prefer-newer t
         auto-compile-display-buffer nil

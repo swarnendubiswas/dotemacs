@@ -1,4 +1,4 @@
-;;; projectile-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; projectile-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup projectile for improved handling of projects.
@@ -63,8 +63,7 @@
   ("e" helm-projectile-recentf "recentf")
   ("r" projectile-replace "replace")
   ("K" projectile-kill-buffers "kill buffers")
-  ("g" helm-projectile-grep "grep")
-  ("j" ggtags-update-tags "ggtags update tags"))
+  ("g" helm-projectile-grep "grep"))
 (global-unset-key (kbd "C-c p"))
 (bind-key "C-c p" 'hydra-projectile/body)
 

@@ -1,4 +1,4 @@
-;;; svn-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; svn-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup svn.
@@ -7,6 +7,7 @@
 
 (use-package psvn
   :ensure t
+  :commands svn-status-update-modeline
   :bind ("C-c d s" . svn-status)
   :config
   (setq svn-status-verbose nil

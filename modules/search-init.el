@@ -1,4 +1,4 @@
-;;; search-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; search-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure search and replace.
@@ -62,6 +62,7 @@
 
 (use-package loccur
   :ensure t
+  :commands loccur-mode
   :defer t
   :config (loccur-mode 1)
   :diminish loccur-mode)

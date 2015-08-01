@@ -1,4 +1,4 @@
-;;; config-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; config-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup configuration variables.
@@ -37,7 +37,7 @@
 
 ;; choices: leuven, professional, eclipse, default.
 (defcustom dotemacs-theme
-  'default
+  'leuven
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)

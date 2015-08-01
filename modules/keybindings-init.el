@@ -1,4 +1,4 @@
-;;; keybindings-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; keybindings-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Custom keybindings. Use M-x describe-personal-keybindings to see modifications.
@@ -47,8 +47,8 @@
 (bind-key "C-+" 'text-scale-increase)
 (bind-key "C--" 'text-scale-decrease)
 
-;; globally unset M-x
-;;(global-unset-key (kbd "M-x"))
+(bind-key "C-c d b" 'dotemacs-byte-compile-current-file)
+(bind-key "C-c d i" 'dotemacs-byte-compile-init-dir)
 
 ;; the command `key-chord-describe' lists currently defined key chords.
 (use-package key-chord

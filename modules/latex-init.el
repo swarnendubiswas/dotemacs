@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; latex-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -16,7 +16,7 @@
 
 (use-package tex
   :ensure auctex
-  :commands TeX-PDF-mode
+  :commands (TeX-PDF-mode TeX-source-correlate-mode)
   :init
   (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -47,7 +47,7 @@
 
   (use-package tex-mode
     :ensure auctex
-    :commands latex-mode
+    :commands (latex-mode latex-electric-env-pair-mode)
     :config
     (setq latex-run-command "latexmk")
     (add-hook 'LaTeX-mode-hook
@@ -57,6 +57,7 @@
   (use-package latex
     :ensure auctex
     :mode ("\\.tex\\'" . LaTeX-mode)
+    :commands LaTeX-math-mode
     :init
     (setq LaTeX-syntactic-comments t)
     ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)

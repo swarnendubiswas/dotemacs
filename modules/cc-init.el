@@ -1,4 +1,4 @@
-;;; cc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; cc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.
@@ -25,7 +25,7 @@
                         (awk-mode . "awk")))
 
 (use-package cc-mode
-  :defer t
+  :defer 5
   :init
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2)
@@ -37,17 +37,20 @@
 
   (use-package cwarn
     :ensure t
+    :defer 5
     :diminish cwarn-mode
-    :init (global-cwarn-mode 1))
+    :config (global-cwarn-mode 1))
 
   (use-package hideif
-    :init
+    :defer 5
+    :config
     (setq hide-ifdef-initially t)
     (hide-ifdef-mode 1))
 
   (use-package google-c-style
     :ensure t
-    :init
+    :defer 5
+    :config
     (add-hook 'c-mode-common-hook #'google-set-c-style)
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 

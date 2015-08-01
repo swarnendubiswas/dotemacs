@@ -1,4 +1,4 @@
-;;; org-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; org-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup org mode.
@@ -8,7 +8,7 @@
 (use-package org
   :ensure t
   :defer t
-  :commands org-mode
+  :commands (org-mode org-toggle-blocks org-indent-mode org-set-emph-re)
   :config
   (add-hook 'org-mode-hook #'visual-line-mode)
   (diminish 'visual-line-mode)

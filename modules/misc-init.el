@@ -1,4 +1,4 @@
-;;; misc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; misc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Miscellaneous package configurations.
@@ -81,6 +81,7 @@
   :config
   (popwin-mode 1)
   (setq popwin:popup-window-height 20
+        ;; display-buffer-function is an obsolete variable as of 24.3
         display-buffer-function 'popwin:display-buffer)
   (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
   (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
@@ -93,7 +94,9 @@
   (add-to-list 'popwin:special-display-config '("*Compile-Log*" :noselect t))
   (push '(svn-info-mode :noselect t) popwin:special-display-config)
   (push '(svn-status-mode) popwin:special-display-config)
+  (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '(manage-minor-mode :noselect t) popwin:special-display-config)
+  (push '("*manage-minor-mode*" :regexp t) popwin:special-display-config)
   ;; (push '(help-mode :noselect t) popwin:special-display-config)
   (push '("*Help*" :regexp t) popwin:special-display-config)
   ;; (add-to-list 'popwin:special-display-config '("*Help*"))

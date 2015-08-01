@@ -1,4 +1,4 @@
-;;; tags-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; tags-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup tags for different projects.
@@ -43,15 +43,15 @@
 (use-package ggtags
   :ensure t
   :if (eq system-type 'gnu/linux)
+  :defer 5
   :diminish ggtags-mode
-  :init
+  :config
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
         ;; use helm for completion
         ggtags-completing-read-function nil)
   (add-hook 'c-mode-common-hook #'ggtags-mode)
 
-  :config
   ;; http://wikemacs.org/wiki/C-ide
   ;; http://tuhdo.github.io/c-ide.html
   ;; Use M-n to move to next candidate and M-p to move back previous candidate. Use M-g s to invoke Isearch on candidate
@@ -59,7 +59,7 @@
   (use-package helm-gtags
     :ensure t
     :diminish helm-gtags-mode
-    :init
+    :config
     (setq helm-gtags-ignore-case t
           helm-gtags-auto-update t
           helm-gtags-use-input-at-cursor t
@@ -73,7 +73,7 @@
           helm-gtags-display-style 'detail
           helm-gtags-update-interval-second 60)
     (add-hook 'c-mode-common-hook #'helm-gtags-mode)
-    :config
+
     (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
     (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
     (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)

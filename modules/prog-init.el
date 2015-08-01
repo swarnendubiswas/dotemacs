@@ -1,4 +1,4 @@
-;;; prog-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; prog-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Programming mode specific.
@@ -77,12 +77,14 @@
 
 (use-package ws-butler
   :ensure t
+  :defer 5
   :diminish ws-butler-mode
-  :init (add-hook 'prog-mode-hook #'ws-butler-mode))
+  :config (add-hook 'prog-mode-hook #'ws-butler-mode))
 
 (use-package dtrt-indent
   :ensure t
-  :init
+  :defer 5
+  :config
   (setq dtrt-indent-verbosity 0)
   (add-hook 'prog-mode-hook
             (lambda()

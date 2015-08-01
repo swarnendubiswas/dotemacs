@@ -1,4 +1,4 @@
-;;; custom-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; custom-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Contains custom or temporary definitions.
@@ -50,6 +50,17 @@ Increase line spacing by two line height."
       (setq line-spacing 2)
     (setq line-spacing nil))
   (redraw-frame (selected-frame)))
+
+(defun dotemacs-byte-compile-current-file ()
+  "Byte compile the current file."
+  (interactive)
+  (byte-compile-file buffer-file-name))
+
+;; http://emacsredux.com/blog/2013/06/25/boost-performance-by-leveraging-byte-compilation/
+(defun dotemacs-byte-compile-init-dir ()
+  "Byte-compile all elisp files in the user init directory."
+  (interactive)
+  (byte-recompile-directory user-emacs-directory 0))
 
 (provide 'custom-init)
 
