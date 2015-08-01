@@ -9,16 +9,16 @@
 (use-package dired
   :defer t
   :preface
-  (defun dired--go-home ()
+  (defun dired-go-home ()
     (interactive)
     (dired "~/"))
 
-  (defun dired--jump-to-top ()
+  (defun dired-jump-to-top ()
     (interactive)
     (beginning-of-buffer)
     (dired-next-line 2))
 
-  (defun dired--jump-to-bottom ()
+  (defun dired-jump-to-bottom ()
     (interactive)
     (end-of-buffer)
     (dired-next-line -1))

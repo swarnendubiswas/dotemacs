@@ -12,7 +12,8 @@
   (global-anzu-mode 1)
   (setq anzu-search-threshold 10000
         anzu-minimum-input-length 2)
-  (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'bold))
+  (unless (eq dotemacs-theme 'leuven)
+    (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'bold)))
 
 (provide 'anzu-init)
 
