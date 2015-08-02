@@ -43,6 +43,7 @@
 
   (use-package hideif
     :defer 5
+    :diminish (hide-ifdef-mode hide-ifdef-hiding)
     :config
     (setq hide-ifdef-initially t)
     (hide-ifdef-mode 1))

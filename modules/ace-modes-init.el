@@ -87,8 +87,7 @@
   ("L" avy-goto-line "avy line")
   ("s" avy-goto-subword-0 "avy subword")
   ("C" goto-char "goto char")
-  ("l" goto-line "goto line")
-  ("b" ace-jump-mode "ace jump"))
+  ("l" goto-line "goto line"))
 (bind-key "M-g" #'hydra-jump-commands/body)
 
 (provide 'ace-modes-init)

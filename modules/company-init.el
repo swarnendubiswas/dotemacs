@@ -24,18 +24,16 @@
         company-selection-changed t
         company-require-match nil)
 
-  :config
-
   (use-package company-keywords
-    :config (add-to-list 'company-backends #'company-keywords))
+    :init (add-to-list 'company-backends #'company-keywords))
 
   (use-package company-dabbrev
-    :config
+    :init
     (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
           company-dabbrev-ignore-case nil))
 
   (use-package company-dabbrev-code
-    :config
+    :init
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t))
 
@@ -67,7 +65,7 @@
 
   (use-package company-statistics
     :ensure t
-    :defer 2
+    :defer 5
     :config (company-statistics-mode 1))
 
   (use-package company-math
