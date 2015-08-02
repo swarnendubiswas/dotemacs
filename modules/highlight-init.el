@@ -5,20 +5,17 @@
 
 ;;; Code:
 
-;; highlight current line
-(use-package hl-line
+(use-package hl-line ; highlight current line
   :ensure t
   :if (display-graphic-p)
   :init
   ;; (global-hl-line-mode 1)
 
-  ;; highlight only when idle
-  (use-package hl-line+
+  (use-package hl-line+ ; highlight only when idle
     :ensure t
     :init (toggle-hl-line-when-idle 1)))
 
-;; extension to linum-mode to highlight current line number in the margin
-(use-package hlinum
+(use-package hlinum ; extension to linum-mode to highlight current line number in the margin
   :ensure t
   :init (hlinum-activate))
 
@@ -44,8 +41,8 @@
   :diminish highlight-symbol-mode)
 
 (use-package auto-highlight-symbol
-  :disabled t
   :ensure t
+  :disabled t
   :init (global-auto-highlight-symbol-mode 1)
   :config
   (setq ahs-default-range 'ahs-range-whole-buffer)
@@ -64,16 +61,16 @@
       :init (fixme-mode 1))
 
     (use-package fic-mode
-      :disabled t
       :ensure t
+      :disabled t
       :diminish fic-mode
       :init
       (add-hook 'text-mode-hook #'fic-mode)
       (add-hook 'prog-mode-hook #'fic-mode))
 
     (use-package fic-ext-mode
-      :disabled t
       :ensure t
+      :disabled t
       :diminish fic-ext-mode
       :preface
       (defun add-something-to-mode-hooks (mode-list something)

@@ -50,13 +50,7 @@
 (use-package smart-tabs ; indent with tabs, align with spaces
   :ensure t
   :disabled t
-  :init
-  ;; (autoload 'smart-tabs-mode "smart-tabs-mode"
-  ;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
-  ;; (autoload 'smart-tabs-advice "smart-tabs-mode")
-  ;; (autoload 'smart-tabs-insinuate "smart-tabs-mode")
-  ;; (smart-tabs-insinuate 'c 'c++ 'java 'javascript 'cperl 'python 'ruby 'nxml)
-  (global-smart-tab-mode 1))
+  :init (global-smart-tab-mode 1))
 
 (provide 'indent-init)
 

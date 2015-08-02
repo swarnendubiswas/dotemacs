@@ -10,7 +10,7 @@
   :init
   (ido-mode 1)
   (ido-everywhere 1)
-  :config
+
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
         ido-max-prospects 10

@@ -20,7 +20,6 @@
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
   (recentf-cleanup)
 
-  :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
 

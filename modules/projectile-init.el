@@ -8,8 +8,8 @@
 (use-package projectile
   :ensure t
   :commands (projectile-find-file projectile-switch-project)
-  :init (projectile-global-mode 1)
-  :config
+  :init
+  (projectile-global-mode 1)
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-completion-system 'helm
@@ -35,18 +35,12 @@
           projectile-switch-project-action #'helm-projectile)
     (helm-projectile-on))
 
-  ;; Group buffers by Projectile project
-  (use-package ibuffer-projectile
+  (use-package ibuffer-projectile ; group buffers by projectile project
     :ensure projectile
     :init
-    (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
-    ;; (add-hook 'ibuffer-hook
-    ;;           (lambda()
-    ;;             (ibuffer-projectile-set-filter-groups)
-    ;;             (unless (eq ibuffer-sorting-mode 'alphabetic)
-    ;;               (ibuffer-do-sort-by-mode-name)
-    ;;               (ibuffer-do-sort-by-major-mode))))
-    (setq ibuffer-show-empty-filter-groups nil))
+    (with-eval-after-load "ibuffer"
+      (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
+      (setq ibuffer-show-empty-filter-groups nil)))
 
   :diminish projectile-mode)
 

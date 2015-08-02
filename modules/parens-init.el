@@ -84,7 +84,6 @@
     (require 'smartparens-latex))
   (with-eval-after-load "tex-mode"
     (require 'smartparens-latex))
-
   (make-variable-buffer-local 'show-paren-mode))
 
 (provide 'parens-init)
