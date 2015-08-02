@@ -7,12 +7,12 @@
 
 (use-package ibuffer
   :defer t
-  :init (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   :preface
   (defun dotemacs-ibuffer-group-buffers ()
     (ibuffer-switch-to-saved-filter-groups "Default"))
 
   :config
+  (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   (setq ibuffer-expert t
         ;;ibuffer-shrink-to-minimum-size t
         ibuffer-always-show-last-buffer nil

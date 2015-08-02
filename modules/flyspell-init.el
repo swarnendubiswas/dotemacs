@@ -55,6 +55,7 @@
   :config
   (use-package helm-flyspell
     :ensure t
+    :defer t
     :config (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))
 
   (use-package ace-flyspell

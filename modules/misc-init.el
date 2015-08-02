@@ -25,8 +25,7 @@
   :ensure t
   :defer 5
   :config
-  ;; warn when opening files bigger than 50MB
-  (setq large-file-warning-threshold (* 50 1024 1024))
+  (setq large-file-warning-threshold (* 50 1024 1024)) ; warn when opening files bigger than 50MB
   (use-package vlf-setup))
 
 (use-package hungry-delete ; erase 'all' consecutive white space characters in a given direction

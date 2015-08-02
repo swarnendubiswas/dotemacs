@@ -30,7 +30,6 @@
       grep-highlight-matches t
       grep-scroll-output t)
 
-;; this package now provides ivy-mode
 ;; performs poorly if there are a large number of matches
 (use-package swiper
   :ensure t

@@ -13,7 +13,7 @@
 (or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
       :ensure t
       :defer t
-      ;;:bind* ("C-c g" . writegood-mode)
+      :bind* ("C-c g" . writegood-mode)
       :commands writegood-mode
       :diminish writegood-mode
       :init (add-hook 'text-mode-hook #'writegood-mode))
@@ -25,6 +25,15 @@
       :diminish artbollocks-mode
       :init (add-hook 'text-mode-hook #'artbollocks-mode)))
 
+(use-package langtool
+  :ensure t
+  :disabled t
+  :init
+  (setq langtool-language-tool-jar (concat user-emacs-directory "lisp/languagetool-commandline.jar")
+        langtool-default-language "en-US"
+        langtool-java-bin "/usr/bin/java"
+        langtool-mother-tongue "en"))
+
 (use-package markdown-mode
   :ensure t
   :defer t
@@ -32,8 +41,6 @@
   (("\\.markdown\\'" . markdown-mode)
    ("\\.md\\'" . markdown-mode))
   :config
-  ;;(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  ;;(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (use-package markdown-mode+
     :ensure t))
 

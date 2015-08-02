@@ -45,12 +45,6 @@
 
   (require 'org-inlinetask)
 
-  ;; (with-eval-after-load "org"
-  ;;   (bind-key "C-c C-d" 'duplicate-thing org-mode-map))
-  ;; (with-eval-after-load "org"
-  ;;   (define-key org-mode-map (kbd "C-c C-d") nil))
-  ;; (with-eval-after-load "org"
-  ;;   (define-key org-mode-map (kbd "C-c C-d") 'duplicate-thing))
   ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
 
   (add-hook 'org-mode-hook #'org-toggle-blocks)
@@ -59,8 +53,7 @@
   (use-package helm-org
     :config (setq helm-org-headings-fontify t))
 
-  ;; require ox-latex so that the following variables are defined
-  (use-package ox-latex
+  (use-package ox-latex 
     :config
     ;; include the listings package
     (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -73,8 +66,7 @@
           org-latex-table-caption-above nil))
 
   (use-package org-beautify-theme
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package org-indent
     :diminish org-indent-mode
@@ -83,8 +75,7 @@
   (use-package org-ref
     :disabled t
     :load-path "lisp/org-ref"
-    :init
-    (org-babel-load-file "org-ref.org")
+    :init (org-babel-load-file "org-ref.org")
     :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
 
   (use-package org-bullets
