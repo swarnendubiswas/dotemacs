@@ -81,13 +81,12 @@
 
 ;; Auto-refresh all buffers, does not work for remote files.
 (use-package autorevert
-  :defer 2
-  :init
+  :defer 5
+  :config
   (global-auto-revert-mode 1)
   ;; (add-hook 'text-mode-hook
   ;;           (lambda ()
   ;;             (auto-revert-tail-mode 1)))
-  :config
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
@@ -95,8 +94,8 @@
 
 ;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
-  :defer t
-  :init (delete-selection-mode 1))
+  :defer 2
+  :config (delete-selection-mode 1))
 
 (setq delete-by-moving-to-trash t)
 
@@ -111,15 +110,11 @@
         ;; tramp history
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
   (use-package password-cache
-    :init (setq password-cache-expiry nil))
+    :disabled t
+    :config (setq password-cache-expiry nil))
   (use-package tramp-term
-    :ensure t))
-
-;; ;; disable version control
-;; (setq vc-ignore-dir-regexp
-;;       (format "\\(%s\\)\\|\\(%s\\)"
-;;               vc-ignore-dir-regexp
-;;               tramp-file-name-regexp))
+    :ensure t
+    :disabled t))
 
 (setq completion-ignore-case t ; ignore case when completing
       read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
@@ -153,9 +148,8 @@
 (advice-add 'capitalize-word :before #'goto-beginning-of-word)
 (advice-add 'downcase-word :before #'goto-beginning-of-word)
 (advice-add 'upcase-word :before #'goto-beginning-of-word)
-
-;; desktop save mode
-(use-package desktop
+            
+(use-package desktop ; desktop save mode
   :disabled t
   :init (desktop-save-mode -1)
   :config
@@ -164,10 +158,10 @@
 
 ;; fully redraw the display before queued input events are processed
 ;; don't defer screen updates when performing operations
+;; obsolete since 24.5
 (setq redisplay-dont-pause t)
 
-;; fontification: turn on syntax coloring, on by default since Emacs 22
-(use-package font-core
+(use-package font-core ; turn on syntax coloring, on by default since Emacs 22
   :init (global-font-lock-mode 1))
 
 (use-package font-lock
@@ -189,15 +183,13 @@
 
 ;; This config needs to be modified for Emacs 25+, check this link
 ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
-;; remember cursor position in files
-(use-package saveplace
+(use-package saveplace ; remember cursor position in files
   :defer 2
   :config
   (setq-default save-place t
                 save-place-file (concat dotemacs-temp-directory "places")))
 
-;; incremental minibuffer completion/suggestions
-(use-package icomplete
+(use-package icomplete ; incremental minibuffer completion/suggestions
   :disabled t
   :init (icomplete-mode 1)
   :config
@@ -213,8 +205,8 @@
 ;; save minibuffer histories across sessions
 (use-package savehist
   :defer 5
-  :init (savehist-mode 1)
   :config
+  (savehist-mode 1)
   (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t
         savehist-file (concat dotemacs-temp-directory "savehist")
@@ -226,8 +218,8 @@
 (setq enable-recursive-minibuffers t)
 
 (use-package mb-depth
-  :defer t
-  :init (minibuffer-depth-indicate-mode 1))
+  :defer 2
+  :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
   :defer t
@@ -258,9 +250,9 @@
   :bind* ("M-/" . hippie-expand))
 
 (use-package subword
-  :defer t
+  :defer 2
   :diminish subword-mode
-  :init (global-subword-mode 1))
+  :config (global-subword-mode 1))
 
 ;; Set Emacs split to horizontal or vertical
 ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
