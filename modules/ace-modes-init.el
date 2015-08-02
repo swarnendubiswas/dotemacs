@@ -6,9 +6,8 @@
 ;;; Code:
 
 (use-package ace-jump-mode
-  :disabled t ;; prefer avy
   :ensure t
-  ;;:init  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
+  :disabled t ;; prefer avy
   :bind*
   (("C-c a f" . ace-jump-mode)
    ("C-c a b" . ace-jump-mode-pop-mark)
@@ -18,15 +17,13 @@
 ;; leave out certain buffers based on file name patterns
 ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
 (use-package ace-jump-buffer
-  :disabled t ;; prefer helm-mini
   :ensure t
+  :disabled t ;; prefer helm-mini
   :preface
   (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
     "*Buffer regexps to always show when buffer switching.")
-
   (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$" "GTAGS$")
     "*Buffer regexps to never show when buffer switching.")
-
   (defvar my-ido-ignore-dired-buffers nil
     "*If non-nil, buffer switching should ignore dired buffers.")
 
@@ -57,9 +54,9 @@
 
   :bind ("<f5>" . ace-jump-buffer))
 
-;; ace-jump in helm buffers
-(use-package ace-jump-helm-line
+(use-package ace-jump-helm-line ; ace-jump in helm buffers
   :ensure t
+  :defer t
   :config
   ;; style: avy-jump and ace-jump-mode-style
   (setq ace-jump-helm-line-use-avy-style nil)

@@ -22,14 +22,16 @@
     (menu-bar-mode -1)))
 
 (use-package tooltip
-  :init (tooltip-mode -1))
+  :defer 2
+  :config (tooltip-mode -1))
 
 (use-package scroll-bar
   :init (scroll-bar-mode 1))
 
 (use-package frame
-  :init (blink-cursor-mode 0) ; enable/disable blinking cursor
+  :defer 2
   :config
+  (blink-cursor-mode 0) ; enable/disable blinking cursor
   ;; start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
   ;; only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
@@ -118,7 +120,8 @@
 (use-package display-theme
   :ensure t
   :if (not (eq dotemacs-theme 'default))
-  :init (global-display-theme-mode))
+  :defer 2
+  :config (global-display-theme-mode))
 
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
 ;; http://stackoverflow.com/questions/15735163/update-tabbar-when-nothing-to-save#
