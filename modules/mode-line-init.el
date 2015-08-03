@@ -19,7 +19,7 @@
       (use-package smart-mode-line
         :ensure t
         :if (or (eq dotemacs-theme 'leuven) (eq dotemacs-theme 'default))
-        :config
+        :init
         (use-package smart-mode-line-powerline-theme
           :ensure t
           :defer t)

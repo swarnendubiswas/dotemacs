@@ -26,7 +26,7 @@
         helm-completion-in-region-fuzzy-match t
         ;; move to end or beginning of source when reaching top or bottom of source
         helm-move-to-line-cycle-in-source t
-        helm-display-header-line t
+        helm-display-header-line nil
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
         ;; be idle for this many seconds, before updating candidate buffer
         helm-input-idle-delay 0.1

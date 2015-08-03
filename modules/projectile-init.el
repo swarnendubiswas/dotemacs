@@ -20,7 +20,7 @@
         projectile-mode-line '(:propertize
                                (:eval (concat " " (projectile-project-name)))
                                face font-lock-constant-face))
-  (dolist (dirs '(".svn" ".dropbox" ".git"))
+  (dolist (dirs '(".svn" ".dropbox" ".git" ".hg"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   ;; Don't consider my home dir as a project
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/"))

@@ -37,6 +37,7 @@
   (add-hook 'find-file-hooks #'turn-on-flyspell)
   ;; this is to turn on spell check in *scratch* buffer, which is in text-mode.
   (add-hook 'text-mode-hook #'turn-on-flyspell)
+  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
   ;; this is useful but slow
   ;; (add-hook 'before-save-hook 'flyspell-buffer)
@@ -45,17 +46,8 @@
   ;; (unless noninteractive
   ;;   (add-hook-list customised-hooks-alist 'activate-flyspell))
 
-  :diminish flyspell-mode
-  :bind
-  (("C-c i f" . flyspell-mode)
-   ("C-c i b" . flyspell-buffer)
-   ;; another alternative is M-$
-   ("C-c i w" . ispell-word))
-
-  :config
   (use-package helm-flyspell
     :ensure t
-    :defer t
     :config (define-key flyspell-mode-map (kbd "M-$") 'helm-flyspell-correct))
 
   (use-package ace-flyspell
@@ -64,7 +56,14 @@
 
   (use-package flyspell-popup
     :ensure t
-    :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map)))
+    :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
+
+  :diminish flyspell-mode
+  :bind
+  (("C-c i f" . flyspell-mode)
+   ("C-c i b" . flyspell-buffer)
+   ;; another alternative is M-$
+   ("C-c i w" . ispell-word)))
 
 (defhydra hydra-flyspell (:color blue)
   "flyspell mode"

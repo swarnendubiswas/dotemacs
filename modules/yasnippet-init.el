@@ -17,15 +17,9 @@
   ;; this is already the default
   ;; (add-to-list yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
-  ;; (add-hook 'tex-mode-hook #'yas-minor-mode)
-  ;; (add-hook 'org-mode-hook #'yas-minor-mode)
-  ;; (add-hook 'prog-mode-hook #'yas-minor-mode)
-  ;; (yas-reload-all)
-
-  :config
   (use-package helm-c-yasnippet
     :ensure t
-    :defer t
+    :disabled t
     :config
     (setq helm-yas-not-display-dups nil)
     (setq helm-yas-display-key-on-candidate t)))

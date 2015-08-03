@@ -52,7 +52,6 @@
         sh-indent-comment t
         sh-indentation 4))
 
-;; enable speed bar
 (use-package speedbar
   :defer t
   :config
@@ -62,7 +61,8 @@
   (use-package sr-speedbar
     :ensure t
     :commands sr-speedbar-open
-    :init (defalias 'speedbar 'sr-speedbar-open)
+    :init
+    (defalias 'speedbar 'sr-speedbar-open)
     (setq sr-speedbar-right-side nil
           sr-speedbar-max-width 40
           sr-speedbar-width 30
@@ -106,28 +106,29 @@
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
+  
   (use-package web-beautify
     :ensure t
     :init
     (with-eval-after-load "js2-mode"
       (add-hook 'js2-mode-hook
                 (lambda ()
-                  (add-hook 'before-save-hook 'web-beautify-js-buffer t t))))
+                  (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
 
     (with-eval-after-load "json-mode"
       (add-hook 'json-mode-hook
                 (lambda ()
-                  (add-hook 'before-save-hook 'web-beautify-js-buffer t t))))
+                  (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
 
     (with-eval-after-load "sgml-mode"
       (add-hook 'html-mode-hook
                 (lambda ()
-                  (add-hook 'before-save-hook 'web-beautify-html-buffer t t))))
+                  (add-hook 'before-save-hook #'web-beautify-html-buffer t t))))
 
     (with-eval-after-load "css-mode"
       (add-hook 'css-mode-hook
                 (lambda ()
-                  (add-hook 'before-save-hook 'web-beautify-css-buffer t t))))))
+                  (add-hook 'before-save-hook #'web-beautify-css-buffer t t))))))
 
 (use-package nxml-mode
   :defer t

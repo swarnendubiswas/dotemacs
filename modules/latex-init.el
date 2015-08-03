@@ -48,6 +48,7 @@
   (use-package tex-mode
     :ensure auctex
     :commands (latex-mode latex-electric-env-pair-mode)
+    :diminish latex-electric-env-pair-mode
     :config
     (setq latex-run-command "latexmk")
     (add-hook 'LaTeX-mode-hook

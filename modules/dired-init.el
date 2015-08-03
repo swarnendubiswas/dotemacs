@@ -15,12 +15,12 @@
 
   (defun dired-jump-to-top ()
     (interactive)
-    (beginning-of-buffer)
+    (goto-char (point-min)) ; faster than (beginning-of-buffer)
     (dired-next-line 2))
 
   (defun dired-jump-to-bottom ()
     (interactive)
-    (end-of-buffer)
+    (goto-char (point-max)) ; faster than (end-of-buffer)
     (dired-next-line -1))
 
   :init
@@ -35,13 +35,13 @@
   :config
   (bind-keys
    :map dired-mode-map
-   ("M-<home>" . dired--go-home)
+   ("M-<home>" . dired-go-home)
    ("i" . ido-find-file)
-   ("M-<up>" . dired--jump-to-top)
-   ("M-<down>" . dired--jump-to-bottom))
+   ("M-<up>" . dired-jump-to-top)
+   ("M-<down>" . dired-jump-to-bottom))
 
   (use-package dired-x
-    :commands dired-jump
+    :commands (dired-jump dired-omit-mode)
     :config
     (setq dired-bind-jump t
           ;; do not show messages when omitting files
@@ -70,8 +70,8 @@
     :disabled t)
 
   (use-package direx-grep
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package dired-efap
     :ensure t
@@ -105,23 +105,24 @@
 
   (use-package dired-nav-enhance
     :ensure t
-    :disabled t))
+    :disabled t)
 
-;; FIXME: How is this useful?
-;; http://oremacs.com/2015/02/21/hydra-docstring-sexp
-;; (defhydra hydra-dired-marked (dired-mode-map "" :color pink)
-;;   "Number of marked items: %(length (dired-get-marked-files))"
-;;   ("m"   dired-mark                      "mark")
-;;   ("u"   dired-unmark                    "unmark")
-;;   ("U"   dired-unmark-all-marks          "unmark ALL")
-;;   ("t"   dired-toggle-marks              "toggle marks")
-;;   ("P"   dired-prev-marked-file          "prev marked")
-;;   ("M-{" dired-prev-marked-file          "prev marked")
-;;   ("N"   dired-next-marked-file          "next marked")
-;;   ("M-}" dired-next-marked-file          "next marked")
-;;   ("w"   dired-copy-filename-as-kill     "copy file name(s)")
-;;   ("W"   (dired-copy-filename-as-kill 0) "copy file name(s) - full path")
-;;   ("C-g" nil                             "cancel" :color blue))
+  ;; http://oremacs.com/2015/02/21/hydra-docstring-sexp
+  (defhydra hydra-dired-marked (dired-mode-map "" :color pink)
+    "Number of marked items: %(length (dired-get-marked-files))"
+    ("m"   dired-mark                      "mark")
+    ("u"   dired-unmark                    "unmark")
+    ("U"   dired-unmark-all-marks          "unmark ALL")
+    ("t"   dired-toggle-marks              "toggle marks")
+    ("P"   dired-prev-marked-file          "prev marked")
+    ("M-{" dired-prev-marked-file          "prev marked")
+    ("N"   dired-next-marked-file          "next marked")
+    ("M-}" dired-next-marked-file          "next marked")
+    ("w"   dired-copy-filename-as-kill     "copy file name(s)")
+    ("W"   (dired-copy-filename-as-kill 0) "copy file name(s) - full path")
+    ("C-g" nil                             "cancel" :color blue))
+  (bind-key "." 'hydra-dired-marked/body dired-mode-map))
+
 
 (provide 'dired-init)
 

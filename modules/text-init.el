@@ -51,6 +51,10 @@
   (use-package csv-nav
     :ensure t))
 
+(use-package pdf-tools
+  :ensure t
+  :defer t)
+
 (provide 'text-init)
 
 ;;; text-init.el ends here

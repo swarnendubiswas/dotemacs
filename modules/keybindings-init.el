@@ -52,8 +52,8 @@
 
 ;; the command `key-chord-describe' lists currently defined key chords.
 (use-package key-chord
-  :disabled t
   :ensure t
+  :disabled t
   :init
   ;; good choices in English: hj
   (key-chord-define-global "jj" 'avy-goto-word-1)
@@ -64,8 +64,8 @@
   (key-chord-mode 1))
 
 (use-package keyfreq
-  :disabled t
   :ensure t
+  :disabled t
   :init
   (setq keyfreq-file (concat dotemacs-temp-directory "keyfreq"))
   (keyfreq-mode 1)
@@ -123,10 +123,9 @@
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  :init (which-key-mode)
-  :config
-  (setq which-key-idle-delay 1.0
-        which-key-popup-type 'minibuffer)
+  :init
+  (which-key-mode)
+  (setq which-key-idle-delay 1.0)
   :diminish which-key-mode)
 
 (provide 'keybindings-init)
