@@ -7,8 +7,8 @@
 
 ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
 (use-package magit
-  :disabled t
   :ensure t
+  :if (not (string-equal system-name "rain.cse.ohio-state.edu")) ; magit needs git >=1.9.4
   :diminish magit-auto-revert-mode
   :commands magit-status
   :config
@@ -16,28 +16,23 @@
         magit-item-highlight-face 'bold
         magit-last-seen-setup-instructions "1.4.0")
 
-  ;; Git commit message mode
-  (use-package git-commit-mode
+  (use-package git-commit-mode ; Git commit message mode
     :ensure t
     :defer t)
 
-  ;; Git configuration mode
-  (use-package gitconfig-mode
+  (use-package gitconfig-mode ; Git configuration mode
     :ensure t
     :defer t)
 
-  ;; .gitignore mode
-  (use-package gitignore-mode
+  (use-package gitignore-mode ; .gitignore mode
     :ensure t
     :defer t)
 
-  ;; Git attributes mode
-  (use-package gitattributes-mode
+  (use-package gitattributes-mode ; Git attributes mode
     :ensure t
     :defer t)
 
-  ;; Mode for git rebase -i
-  (use-package git-rebase-mode
+  (use-package git-rebase-mode ; Mode for git rebase -i
     :ensure t
     :defer t)
 
@@ -46,7 +41,8 @@
     :defer t)
 
   (use-package magit-svn
-    :ensure t))
+    :ensure t
+    :defer t))
 
 (provide 'git-init)
 

@@ -28,8 +28,8 @@
         org-hide-leading-stars-before-indent-mode t
         org-completion-use-ido t
         org-support-shift-select t ; use shift-select
-        ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines.
-        ;; See org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
+        ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines. See
+        ;; org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
         org-use-speed-commands t
         org-src-strip-leading-and-trailing-blank-lines t)
 
@@ -53,7 +53,7 @@
   (use-package helm-org
     :config (setq helm-org-headings-fontify t))
 
-  (use-package ox-latex 
+  (use-package ox-latex
     :config
     ;; include the listings package
     (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -64,9 +64,6 @@
     ;; tell org to use listings, options: t, 'minted
     (setq org-latex-listings 't
           org-latex-table-caption-above nil))
-
-  (use-package org-beautify-theme
-    :ensure t)
 
   (use-package org-indent
     :diminish org-indent-mode

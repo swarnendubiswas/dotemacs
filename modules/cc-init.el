@@ -46,7 +46,9 @@
     :diminish (hide-ifdef-mode hide-ifdef-hiding)
     :config
     (setq hide-ifdef-initially t)
-    (hide-ifdef-mode 1))
+    (add-hook 'c-mode-hook
+              (lambda()
+                (hide-ifdef-mode 1))))
 
   (use-package google-c-style
     :ensure t

@@ -8,6 +8,7 @@
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
   :defer t
+  :commands (dired-mark dired-unmark dired-unmark-all-marks dired-toggle-marks dired-prev-marked-file dired-next-marked-file dired-copy-filename-as-kill)
   :preface
   (defun dired-go-home ()
     (interactive)
@@ -23,7 +24,7 @@
     (goto-char (point-max)) ; faster than (end-of-buffer)
     (dired-next-line -1))
 
-  :init
+  :config
   (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; single prompt for all n directories
         dired-recursive-copies 'always
@@ -32,7 +33,6 @@
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
 
-  :config
   (bind-keys
    :map dired-mode-map
    ("M-<home>" . dired-go-home)
@@ -75,7 +75,7 @@
 
   (use-package dired-efap
     :ensure t
-    :init
+    :config
     (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
     (bind-key "<f2>" 'dired-efap dired-mode-map))
 
