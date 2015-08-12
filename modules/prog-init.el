@@ -39,6 +39,7 @@
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'eldoc-mode)
+  (add-hook 'python-mode-hook #'eldoc-mode)
   :diminish eldoc-mode)
 
 ;; add makefile.rules to makefile-gmake-mode for Intel Pin
@@ -83,7 +84,8 @@
 
 (use-package dtrt-indent
   :ensure t
-  :defer 5
+  :disabled t
+  :diminish dtrt-indent-mode
   :config
   (setq dtrt-indent-verbosity 0)
   (add-hook 'prog-mode-hook

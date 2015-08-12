@@ -18,6 +18,8 @@
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
 
 ;; need not have this enabled
 ;; (when (not package-archive-contents)
@@ -27,7 +29,7 @@
 ;; setup use-package.
 ;; :init always happens before package load, whether :config has been deferred or not. This implies
 ;; :init is never deferred.
-; if the path is relative, it is expanded within user-emacs-directory
+;; :load-path: if the path is relative, it is expanded within user-emacs-directory
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
@@ -42,7 +44,7 @@
   :ensure t
   :bind ("C-c d k" . describe-personal-keybindings))
 
-;; this only *recompiles* ELisp source files.
+;; this only *recompiles* elisp source files.
 (use-package auto-compile
   :ensure t
   :commands auto-compile-on-load-mode

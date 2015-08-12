@@ -29,6 +29,7 @@
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              ;; "*Messages*"
                              "Async Shell Command" "*Paradox Report*")
+        ido-confirm-unique-completion t
         ido-enable-tramp-completion t
         ido-ignore-extensions t)
 

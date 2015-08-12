@@ -77,21 +77,21 @@
     (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
     (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
     (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
-    (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map)))
+    (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map))
 
-(defhydra hydra-ggtags (:color blue)
-  "helm gtags"
-  ("h" 'helm-gtags-previous-history "previous history")
-  ("c" 'helm-gtags-create-tags "create tags")
-  ("u" 'helm-gtags-update-tags "update tags")
-  ("s" 'helm-gtags-find-symbol "find symbol")
-  ("r" 'helm-gtags-find-rtag "find rtag")
-  ("p" 'helm-gtags-parse-file "parse file")
-  ("t" 'helm-gtags-find-tag "find tag")
-  ("g" 'helm-gtags-find-pattern "find pattern")
-  ("f" 'helm-gtags-find-files "find files")
-  ("o" 'helm-gtags-find-tag-other-window "find tag other window"))
-(bind-key "C-c g" 'hydra-ggtags/body)
+  (defhydra hydra-ggtags (:color blue)
+    "helm gtags"
+    ("h" 'helm-gtags-previous-history "previous history")
+    ("c" 'helm-gtags-create-tags "create tags")
+    ("u" 'helm-gtags-update-tags "update tags")
+    ("s" 'helm-gtags-find-symbol "find symbol")
+    ("r" 'helm-gtags-find-rtag "find rtag")
+    ("p" 'helm-gtags-parse-file "parse file")
+    ("t" 'helm-gtags-find-tag "find tag")
+    ("g" 'helm-gtags-find-pattern "find pattern")
+    ("f" 'helm-gtags-find-files "find files")
+    ("o" 'helm-gtags-find-tag-other-window "find tag other window"))
+  (bind-key "C-c g" 'hydra-ggtags/body))
 
 ;; create tags for a latex project, no need to setup a keybinding
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
@@ -108,6 +108,11 @@
   (interactive)
   ;;(compile "find . -name \"*.tex\" -print | ctags -a -u -o TAGS -")
   (compile "find . -type f -name \"*.tex\" -print | xargs ctags -o TAGS"))
+
+(defun dotemacs-create-python-etags ()
+  "Create etags for the current python project."
+  (interactive)
+  (compile "find . -type f -name '*.py' | xargs etags -a -"))
 
 (provide 'tags-init)
 

@@ -11,7 +11,7 @@
   :init
   (global-company-mode 1)
   (setq company-show-numbers t ; show quick-access numbers for the first ten candidates
-        company-minimum-prefix-length 3
+        company-minimum-prefix-length 2
         ;; Invert the navigation direction if the completion popup is displayed on top (happens near the bottom of
         ;; windows).
         company-tooltip-flip-when-above t

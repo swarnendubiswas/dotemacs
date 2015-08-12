@@ -13,6 +13,7 @@
 
 (use-package aggressive-indent
   :ensure t
+  :disabled t
   :init (global-aggressive-indent-mode 1)
   :diminish aggressive-indent-mode)
 
@@ -32,10 +33,12 @@
 
 (use-package highlight-indentation
   :ensure t
-  :disabled t
+  :diminish highlight-indentation-mode
   :init
-  (highlight-indentation-mode 1)
-  (highlight-indentation-current-column-mode 1))
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (highlight-indentation-mode 1)
+              (highlight-indentation-current-column-mode -1))))
 
 ;; Doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode.
 (use-package indent-guide

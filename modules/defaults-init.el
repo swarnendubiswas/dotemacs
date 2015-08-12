@@ -109,6 +109,8 @@
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
+  (add-to-list 'backup-directory-alist
+               (cons tramp-file-name-regexp nil))
   (use-package password-cache
     :disabled t
     :config (setq password-cache-expiry nil))
@@ -223,7 +225,7 @@
 
 (use-package uniquify
   :defer t
-  :init
+  :config
   ;; options: post-forward, reverse, forward
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; Emacs 24.4 style ⁖ cat.png<dirName>
         uniquify-separator ":"

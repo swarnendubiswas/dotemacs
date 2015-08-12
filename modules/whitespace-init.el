@@ -12,7 +12,7 @@
     :diminish global-whitespace-mode
     :init
     ;;(global-whitespace-mode 1)
-    (setq-default show-trailing-whitespace t
+    (setq-default show-trailing-whitespace nil
                   whitespace-line-column 'dotemacs-fill-column
                   ;; '(face tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab
                   ;; space-mark tab-mark newline-mark)
