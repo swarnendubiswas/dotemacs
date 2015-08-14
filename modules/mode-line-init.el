@@ -18,7 +18,7 @@
 
       (use-package smart-mode-line
         :ensure t
-        :if (or (eq dotemacs-theme 'leuven) (eq dotemacs-theme 'default))
+        :if (eq dotemacs-theme 'leuven)
         :init
         (use-package smart-mode-line-powerline-theme
           :ensure t
@@ -39,7 +39,24 @@
         :load-path "lisp/emacs-powerline/"
         :config
         (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
-        (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))))
+        (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+
+      (use-package telephone-line
+        :ensure t
+        :if (eq dotemacs-theme 'default)
+        :init
+        (setq telephone-line-lhs
+              '((evil   . (telephone-line-evil-tag-segment))
+                (accent . (telephone-line-vc-segment
+                           telephone-line-erc-modified-channels-segment
+                           telephone-line-process-segment))
+                (nil    . (telephone-line-minor-mode-segment
+                           telephone-line-buffer-segment))))
+        (setq telephone-line-rhs
+              '((evil   . (telephone-line-airline-position-segment))
+                (accent . (telephone-line-major-mode-segment))
+                (nil    . (telephone-line-misc-info-segment))))
+        (telephone-line-mode 1))))
 
 (provide 'mode-line-init)
 

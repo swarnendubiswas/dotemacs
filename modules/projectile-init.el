@@ -13,17 +13,15 @@
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-completion-system 'helm
-        ;; use projectile in every directory without requiring a project file
-        projectile-require-project-root nil
+        projectile-require-project-root nil ; use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-dired
         projectile-mode-line '(:propertize
                                (:eval (concat " " (projectile-project-name)))
                                face font-lock-constant-face))
-  (dolist (dirs '(".svn" ".dropbox" ".git" ".hg"))
+  (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
-  ;; Don't consider my home dir as a project
-  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/"))
+  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Don't consider my home dir as a project
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
 

@@ -54,8 +54,7 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
-;; Mouse cursor in terminal mode
-(xterm-mouse-mode 1)
+(xterm-mouse-mode 1) ; Mouse cursor in terminal mode
 
 (use-package menu-bar
   :init (toggle-indicate-empty-lines 1))
@@ -70,37 +69,29 @@
         ;; use shift-select for marking
         shift-select-mode t)
 
-  ;; Enable visual feedback on selections, default since v23
-  (transient-mark-mode 1)
+  (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
 
   (auto-fill-mode 1)
-  ;; This is not a library/file, so eval-after-load does not work
-  (diminish 'auto-fill-function)
+  (diminish 'auto-fill-function)   ;; This is not a library/file, so eval-after-load does not work
   :bind ("C-c d f" . auto-fill-mode))
 
-;; Auto-refresh all buffers, does not work for remote files.
-(use-package autorevert
+(use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
   :defer 5
   :config
   (global-auto-revert-mode 1)
-  ;; (add-hook 'text-mode-hook
-  ;;           (lambda ()
-  ;;             (auto-revert-tail-mode 1)))
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
                 global-auto-revert-non-file-buffers t))
 
-;; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
-(use-package delsel
+(use-package delsel ; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
   :defer 2
   :config (delete-selection-mode 1))
 
 (setq delete-by-moving-to-trash t)
 
-;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
-(use-package tramp
+(use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
   :defer t
   :config
   (setq tramp-default-method "ssh" ; faster than the default scp
@@ -122,11 +113,9 @@
       read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
       read-buffer-completion-ignore-case t)
 
-;; increase gc threshold
-(setq gc-cons-threshold (* 10 1024 1024))
+(setq gc-cons-threshold (* 10 1024 1024)) ; increase gc threshold
 
-;; dim the ignored part of the file name
-(file-name-shadow-mode 1)
+(file-name-shadow-mode 1) ; dim the ignored part of the file name
 
 ;; do not use dialog boxes
 (setq use-dialog-box nil
@@ -158,10 +147,9 @@
   (setq-default desktop-restore-frames nil ; no need to restore frames
                 desktop-load-locked-desktop nil))
 
-;; fully redraw the display before queued input events are processed
-;; don't defer screen updates when performing operations
-;; obsolete since 24.5
-(setq redisplay-dont-pause t)
+;; fully redraw the display before queued input events are processed don't defer screen updates when performing
+;; operations, obsolete since 24.5
+;; (setq redisplay-dont-pause t)
 
 (use-package font-core ; turn on syntax coloring, on by default since Emacs 22
   :init (global-font-lock-mode 1))
@@ -180,6 +168,7 @@
         jit-lock-stealth-nice 0.5))
 
 (use-package hi-lock
+  :disabled t
   :init (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
@@ -204,20 +193,29 @@
   :disabled t
   :init (icy-mode 1))
 
-;; save minibuffer histories across sessions
-(use-package savehist
+(use-package savehist ; save minibuffer histories across sessions
   :defer 5
   :config
   (savehist-mode 1)
-  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
-        savehist-save-minibuffer-history t
+  (setq savehist-save-minibuffer-history t
         savehist-file (concat dotemacs-temp-directory "savehist")
         savehist-additional-variables '(kill-ring
                                         search-ring
-                                        regexp-search-ring))
+                                        regexp-search-ring)
+        savehist-autosave-interval 300)
   (setq-default history-length 50))
 
-(setq enable-recursive-minibuffers t)
+(setq enable-recursive-minibuffers t
+      delete-by-moving-to-trash t
+
+      scroll-margin 0 ; Drag the point along while scrolling
+      scroll-conservatively 1000 ; Never recenter the screen while scrolling
+      scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
+      scroll-preserve-screen-position t)
+
+(use-package bookmark
+  :defer t
+  :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
 
 (use-package mb-depth
   :defer 2
@@ -226,15 +224,13 @@
 (use-package uniquify
   :defer t
   :config
-  ;; options: post-forward, reverse, forward
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; Emacs 24.4 style ⁖ cat.png<dirName>
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; options: post-forward, reverse, forward
         uniquify-separator ":"
         ;; uniquify-min-dir-content 0
         uniquify-after-kill-buffer-p t
         uniquify-strip-common-suffix t))
 
-;; hippie expand is dabbrev expand on steroids
-(use-package hippie-exp
+(use-package hippie-exp ; hippie expand is dabbrev expand on steroids
   :defer t
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev

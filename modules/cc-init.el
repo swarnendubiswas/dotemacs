@@ -64,14 +64,15 @@
     (ctypes-read-file nil nil t t)
     (ctypes-auto-parse-mode 1))
 
-  (use-package function-args
+  (use-package function-args ; this overrides M-u
     :ensure t
     :diminish function-args-mode
     :config
     (set-default 'semantic-case-fold t)
     ;; to include custom header locations
     ;;(semantic-add-system-include "/usr/local/boost_1_54_0/" 'c++-mode)
-    (fa-config-default))
+    (fa-config-default)
+    (bind-key* "M-u" #'upcase-word))
 
   ;; this is already the default, but I have this as a reminder.
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))

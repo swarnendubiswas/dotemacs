@@ -44,8 +44,7 @@
   :ensure t
   :bind ("C-c d k" . describe-personal-keybindings))
 
-;; this only *recompiles* elisp source files.
-(use-package auto-compile
+(use-package auto-compile ; this only *recompiles* elisp source files.
   :ensure t
   :commands auto-compile-on-load-mode
   :init
@@ -65,8 +64,7 @@
         paradox-github-token t))
 
 (use-package hydra
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (provide 'packages-init)
 

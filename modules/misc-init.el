@@ -5,10 +5,6 @@
 
 ;;; Code:
 
-(setq scroll-margin 0 ; Drag the point along while scrolling
-      scroll-conservatively 1000 ; Never recenter the screen while scrolling
-      scroll-error-top-bottom t) ; Move to beg/end of buffer before signalling an error
-
 (use-package smooth-scrolling
   :ensure t
   :disabled t)

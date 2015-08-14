@@ -13,8 +13,10 @@
 
 (use-package aggressive-indent
   :ensure t
-  :disabled t
-  :init (global-aggressive-indent-mode 1)
+  :init
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (global-aggressive-indent-mode 1)))
   :diminish aggressive-indent-mode)
 
 (use-package electric ; intelligent indentation, on by default from Emacs 24.4
