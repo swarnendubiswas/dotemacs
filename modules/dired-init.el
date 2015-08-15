@@ -77,7 +77,7 @@
     :ensure t
     :config
     (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
-    (bind-key "<f2>" 'dired-efap dired-mode-map))
+    (bind-key "<f2>" #'dired-efap dired-mode-map))
 
   ;; Not required starting from Emacs 24.4
   ;; (use-package dired-details
