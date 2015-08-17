@@ -27,9 +27,9 @@
 
 (use-package langtool
   :ensure t
-  :disabled t
   :init
-  (setq langtool-language-tool-jar (concat user-emacs-directory "lisp/languagetool-commandline.jar")
+  (setq langtool-language-tool-jar (concat user-emacs-directory "packages/languagetool-commandline.jar")
+        langtool-java-classpath (concat user-emacs-directory "packages/LanguageTool-3.0")
         langtool-default-language "en-US"
         langtool-java-bin "/usr/bin/java"
         langtool-mother-tongue "en"))

@@ -105,7 +105,7 @@
     :ensure t)
 
   (use-package ac-tex-ref
-    :load-path "lisp")
+    :load-path "packages")
 
   (use-package ac-html-bootstrap
     :ensure t)

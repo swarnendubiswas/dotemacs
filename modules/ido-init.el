@@ -74,6 +74,9 @@
     :ensure t
     :init (flx-ido-mode 1))
 
+  (use-package ido-describe-bindings
+    :ensure t)
+
   :bind
   (("<f3>" . ido-find-file)
    ("C-x C-f" . ido-find-file)

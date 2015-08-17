@@ -36,7 +36,7 @@
 
   (use-package anaconda-mode
     :ensure t
-    :defer t
+    :disabled t
     :diminish anaconda-mode
     :init
     (add-hook 'python-mode-hook #'anaconda-mode)

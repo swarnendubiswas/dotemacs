@@ -20,6 +20,7 @@
 
   (use-package electric-operator
     :ensure t
+    :disabled t
     :init (add-hook 'prog-mode-hook #'electric-operator-mode))
 
   (use-package electric
