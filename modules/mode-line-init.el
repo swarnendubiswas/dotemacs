@@ -51,9 +51,9 @@
                          telephone-line-process-segment))
               (nil    . (telephone-line-buffer-segment))))
       (setq telephone-line-rhs
-            '((nil    . (telephone-line-airline-position-segment))
+            '((nil    . (telephone-line-misc-info-segment))
               (accent . (telephone-line-major-mode-segment))
-              (nil    . (telephone-line-misc-info-segment))))
+              (nil    . (telephone-line-airline-position-segment))))
       (telephone-line-mode 1)))
 
 (provide 'mode-line-init)
