@@ -35,10 +35,11 @@
   ;; start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
   ;; only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
   ;; it will maximize all frames: both the first one and any others you create.
   ;; options: fullheight, fullboth
-  (add-to-list 'default-frame-alist '(fullscreen . maximized)))
+  ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  )
 
 (use-package time ; displays the time and date in the mode line
   :init
