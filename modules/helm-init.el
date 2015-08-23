@@ -113,18 +113,18 @@
     (helm-descbinds-mode 1))
 
   (use-package helm-words
-    :disabled t
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package helm-bibtex
     :ensure t
-    :defer t
+    :disabled t
     :commands helm-bibtex
     :init (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
 
   (use-package helm-orgcard
     :ensure t
-    :defer t)
+    :disabled t)
 
   (use-package helm-mode-manager
     :ensure t

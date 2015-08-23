@@ -5,9 +5,10 @@
 
 ;;; Code:
 
-(use-package jde
-  :disabled t
-  :load-path "packages/jdee-2.4.1/lisp")
+(use-package jdee
+  :ensure t
+  ;; :load-path "packages/jdee-2.4.1/lisp"
+  )
 
 (provide 'jdee-init)
 

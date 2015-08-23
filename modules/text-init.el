@@ -12,7 +12,6 @@
 
 (or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
       :ensure t
-      :defer t
       :bind* ("C-c g" . writegood-mode)
       :commands writegood-mode
       :diminish writegood-mode
@@ -28,8 +27,8 @@
 (use-package langtool
   :ensure t
   :init
-  (setq langtool-language-tool-jar (concat user-emacs-directory "packages/languagetool-commandline.jar")
-        langtool-java-classpath (concat user-emacs-directory "packages/LanguageTool-3.0")
+  (setq langtool-language-tool-jar (concat user-emacs-directory "packages/LanguageTool-3.0/languagetool-commandline.jar")
+        langtool-java-classpath nil
         langtool-default-language "en-US"
         langtool-java-bin "/usr/bin/java"
         langtool-mother-tongue "en"))

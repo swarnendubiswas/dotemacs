@@ -117,6 +117,9 @@
         (company-web-csswatcher-setup)
       (ac-html-csswatcher-setup)))
 
+  (use-package ac-emoji
+    :ensure t)
+
   :diminish auto-complete-mode)
 
 (provide 'auto-complete-init)

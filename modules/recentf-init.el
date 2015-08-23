@@ -10,7 +10,7 @@
   (setq recentf-save-file (concat dotemacs-temp-directory "recentf") ; set this first so that recentf can load content from this
         recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 50 ; keep track of last xx files
-        recentf-auto-cleanup 45 ; clean up after Emacs has been idle for certain number of seconds
+        recentf-auto-cleanup 60 ; clean up after Emacs has been idle for certain number of seconds
         ;; check regex with re-builder
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
@@ -22,6 +22,8 @@
 
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
+
+  ;; (setq initial-buffer-choice 'recentf-open-files)
 
   ;; ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
@@ -36,7 +38,6 @@
     :pin melpa
     :init (recentf-auto-cleanup))
 
-  ;; (setq initial-buffer-choice 'recentf-open-files)
   :bind ("<f8>" . recentf-open-files))
 
 (provide 'recentf-init)
