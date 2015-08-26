@@ -17,7 +17,11 @@
     :ensure t
     :config
     (add-hook 'python-mode-hook 'jedi:setup)
-    (setq jedi:complete-on-dot t))
+    (setq jedi:complete-on-dot t)
+
+    (use-package company-jedi
+      :ensure t
+      :if (eq dotemacs-completion 'company)))
 
   (use-package pyenv-mode
     :ensure t
@@ -43,6 +47,7 @@
 
     (use-package company-anaconda
       :ensure t
+      :if (eq dotemacs-completion 'company)
       :init
       (with-eval-after-load "company"
         (add-to-list 'company-backends 'company-anaconda))))

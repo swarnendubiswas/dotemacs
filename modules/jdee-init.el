@@ -7,8 +7,7 @@
 
 (use-package jdee
   :ensure t
-  ;; :load-path "packages/jdee-2.4.1/lisp"
-  )
+  :defer t)
 
 (provide 'jdee-init)
 

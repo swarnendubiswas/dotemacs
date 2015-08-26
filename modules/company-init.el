@@ -67,7 +67,9 @@
   (use-package company-statistics
     :ensure t
     :defer 5
-    :config (company-statistics-mode 1))
+    :config
+    (company-statistics-mode 1)
+    (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el")))
 
   (use-package company-math
     :ensure t

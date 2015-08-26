@@ -16,7 +16,7 @@
   :init
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
-              (global-aggressive-indent-mode 1)))
+              (aggressive-indent-mode 1)))
   :diminish aggressive-indent-mode)
 
 (use-package electric ; intelligent indentation, on by default from Emacs 24.4

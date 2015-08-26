@@ -27,7 +27,7 @@
 
   (use-package helm-projectile
     :ensure projectile
-    :init
+    :config
     (setq helm-projectile-fuzzy-match t
           ;; other options: 'helm-projectile-find-file
           projectile-switch-project-action #'helm-projectile)
