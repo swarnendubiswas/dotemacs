@@ -8,8 +8,7 @@
 ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
 (use-package magit
   :ensure t
-  :if (not (string-equal system-name "rain.cse.ohio-state.edu")) ; magit needs git >=1.9.4
-  :diminish magit-auto-revert-mode
+  :if (not (string-equal system-name "rain.cse.ohio-state.edu")) ; Magit needs git >=1.9.4
   :commands magit-status
   :config
   (setq magit-auto-revert-mode nil

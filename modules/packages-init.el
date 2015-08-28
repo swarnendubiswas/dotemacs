@@ -21,7 +21,7 @@
 (add-to-list 'package-archives
              '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
 
-;; need not have this enabled
+;; need not have this enabled always
 ;; (when (not package-archive-contents)
 ;;   (package-refresh-contents))
 (package-initialize)
@@ -31,6 +31,7 @@
 ;; :init is never deferred.
 ;; :load-path: if the path is relative, it is expanded within user-emacs-directory
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure nil
