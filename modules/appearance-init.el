@@ -111,9 +111,9 @@
        (set-face-attribute 'default nil
                            :family "Dejavu Sans Mono"
                            :height 115)
-       (set-face-attribute 'region nil
-                           :background "LemonChiffon"
-                           :foreground "black")
+       ;; (set-face-attribute 'region nil
+       ;;                     :background "LemonChiffon"
+       ;;                     :foreground "black")
        (with-eval-after-load "hl-line"
          (set-face-attribute 'hl-line nil
                              :background "linen"))))
@@ -137,7 +137,7 @@
   (defun tabbar--on-buffer-modification ()
     (set-buffer-modified-p t)
     (tabbar--modification-state-change))
-
+  :commands tabbar-display-update
   :init
   (setq tabbar-use-images nil ; speed up by not using images
         tabbar-auto-scroll-flag t

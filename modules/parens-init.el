@@ -24,8 +24,10 @@
         (make-variable-buffer-local 'show-paren-mode))))
 
 (or (use-package elec-pair
-      :disabled t
-      :init (electric-pair-mode 1))
+      :init
+      (add-hook 'prog-mode-hook
+                (lambda ()
+                  (electric-pair-mode 1))))
 
     (use-package autopair
       :ensure t
