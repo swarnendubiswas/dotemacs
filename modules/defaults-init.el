@@ -201,9 +201,11 @@
         savehist-file (concat dotemacs-temp-directory "savehist")
         savehist-additional-variables '(kill-ring
                                         search-ring
-                                        regexp-search-ring)
+                                        regexp-search-ring
+                                        extended-command-history)
         savehist-autosave-interval 300)
-  (setq-default history-length 50))
+  (setq-default history-length 50
+                history-delete-duplicates t))
 
 (setq enable-recursive-minibuffers t
       delete-by-moving-to-trash t

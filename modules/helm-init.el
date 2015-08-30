@@ -9,8 +9,6 @@
   :ensure t
   :init
   (require 'helm-config)
-  (helm-mode 1)
-  (helm-autoresize-mode 1)
   :config
   (setq helm-quick-update t ; do not display invisible candidates
         helm-candidate-number-limit 100
@@ -27,6 +25,7 @@
         ;; move to end or beginning of source when reaching top or bottom of source
         helm-move-to-line-cycle-in-source t
         helm-display-header-line nil
+        helm-echo-input-in-header-line t
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
         ;; be idle for this many seconds, before updating candidate buffer
         helm-input-idle-delay 0.1
@@ -38,6 +37,15 @@
         helm-case-fold-search 'smart
         helm-ff-search-library-in-sexp t)
 
+  (use-package helm-core
+    :ensure t
+    :init (helm-autoresize-mode 1))
+
+  (use-package helm-mode
+    :init
+    (setq helm-completion-in-region-fuzzy-match t)
+    (helm-mode 1))
+
   (use-package helm-plugin
     :init
     ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
@@ -48,12 +56,13 @@
     :bind
     (;;([remap switch-to-buffer] . helm-mini)
      ("C-c h m" . helm-mini)
-     ("<f6>" . helm-mini)
+     ("<f5>" . helm-mini)
      ("C-c h b" . helm-buffers-list)
-     ("<f7>" . helm-buffers-list))
+     ("<f6>" . helm-buffers-list))
     :init
     ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t
+          helm-buffer-skip-remote-checking t
           helm-buffer-max-length 45
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
@@ -81,10 +90,7 @@
           helm-recentf-fuzzy-match t
           helm-ff-skip-boring-files t
           helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                               '("\\.undo$"
-                                                 "\\.elc$"
-                                                 "\\#$"
-                                                 "\\~$")))
+                                               '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\#$" "\\~$")))
     :bind*
     (([remap find-file] . helm-find-files)
      ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
@@ -93,7 +99,7 @@
      ("C-c h r" . helm-recentf)))
 
   (use-package helm-dabbrev
-    :init (setq helm-dabbrev-cycle-threshold 2))
+    :init (setq helm-dabbrev-cycle-threshold 5))
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -171,6 +177,13 @@
     :ensure t
     :defer t)
 
+  (use-package helm-dirset
+    :ensure t)
+
+  (use-package helm-bibtexkey
+    :ensure t
+    :config (setq helm-bibtexkey-filelist '("/home/biswass/bib/plass.bib")))
+
   (use-package helm-grep
     :init
     ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
@@ -185,7 +198,8 @@
     :defer t)
 
   (use-package helm-ring
-    :bind (([remap yank-pop] . helm-show-kill-ring)))
+    :bind (([remap yank-pop] . helm-show-kill-ring))
+    :init (helm-push-mark-mode 1))
 
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
@@ -198,6 +212,7 @@
    ("C-c h y" . helm-show-kill-ring)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
+   ("<f7>" . helm-resume)
    ("C-c h u" . helm-resume)
    ;; swoop is better than occur
    ("C-c h o" . helm-occur))

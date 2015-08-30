@@ -1,7 +1,17 @@
-##emacs
+##Emacs
 
-My emacs changes, all in one place. Most of the information here is collected from different sources on the Internet,
-dressed with my choices.
+My Emacs changes, all in one place. Most of the customizations included have been collected from different sources on
+the Internet, and tailored according to my preferences.
+
+#####Installation
+
+Use the following commands to checkout the sources:
+
+```
+git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
+```
+
+If your `.emacs.d` directory is not empty, then you might want to backup the contents.
 
 #####Directory structure
          * backup -- older changes

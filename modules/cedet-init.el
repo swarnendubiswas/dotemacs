@@ -15,35 +15,6 @@
   (global-ede-mode 1)
   (ede-enable-generic-projects))
 
-;; Enabling Semantic (code-parsing, smart completion) features
-;; Select one of the following:
-
-;; This enables the database and idle reparse engines
-;; (semantic-load-enable-minimum-features)
-
-;; This enables some tools useful for coding, such as summary mode,
-;;   imenu support, and the semantic navigator
-;; (semantic-load-enable-code-helpers)
-
-;; This enables even more coding tools such as intellisense mode,
-;;   decoration mode, and stickyfunc mode (plus regular code helpers)
-;; (semantic-load-enable-gaudy-code-helpers)
-
-;; This enables the use of Exuberant ctags if you have it installed.
-;;   If you use C++ templates or boost, you should NOT enable it.
-;; (semantic-load-enable-all-exuberent-ctags-support)
-;;   Or, use one of these two types of support.
-;;   Add support for new languages only via ctags.
-;; (semantic-load-enable-primary-exuberent-ctags-support)
-;;   Add support for using ctags as a backup parser.
-;; (semantic-load-enable-secondary-exuberent-ctags-support)
-
-;; (semantic-load-enable-excessive-code-helpers)
-;; (semantic-load-enable-semantic-debugging-helpers)
-
-;; Copied from http://stackoverflow.com/questions/10326001/updating-cedet-1-0-to-1-1
-;; (semantic-load-enable-excessive-code-helpers)
-
 (use-package semantic
   :preface
   (defun dotemacs-semantic-functions ()
@@ -52,16 +23,9 @@
     (global-semantic-highlight-func-mode 1)
     (global-semantic-decoration-mode 1)
     (global-semantic-idle-local-symbol-highlight-mode 1)
-    (global-semantic-idle-summary-mode 1)
-    (global-semantic-idle-completions-mode 1))
-
+    (global-semantic-idle-summary-mode 1))
   :config
-  ;; (require 'semantic-ia)
-  ;; (require 'semantic-loaddefs)
-  ;; (require 'semanticdb)
-  ;; (require 'semantic/db-global)
-
-  ;; Copied from https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
+  ;; https://github.com/randomphrase/dotfiles/blob/master/emacs.d/lisp/init/semantic.el
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
   ;; (add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode)
@@ -72,7 +36,6 @@
   ;; (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
   ;; (add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
 
-  ;; SemanticDB files
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
   (semanticdb-enable-gnu-global-databases 'c-mode)
@@ -80,27 +43,23 @@
   (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
 
 (use-package idle
-  :disabled t
-  :init
-  (global-semantic-idle-scheduler-mode 1)
-  (global-semantic-idle-completions-mode 1)
-  (global-semantic-idle-breadcrumbs-mode 1))
+  :preface
+  (defun dotemacs-idle-functions ()
+    (global-semantic-idle-scheduler-mode 1)
+    (global-semantic-idle-completions-mode 1)
+    (global-semantic-idle-breadcrumbs-mode 1))
+  :config (add-hook 'prog-mode-hook #'dotemacs-idle-functions))
 
 (use-package mode
-  :disabled t
-  :init
-  ;; (global-semantic-decoration-mode 1)
-  ;; Enable SRecode (Template management) minor-mode.
-  (global-srecode-minor-mode 1))
+  :init (add-hook 'prog-mode-hook #'global-srecode-minor-mode 1))
 
 (use-package ecb
-  :disabled t
   :ensure t
+  :disabled t
   :load-path "elpa/ecb-20140215.114"
   :init
   (setq-default ecb-tip-of-the-day nil)
   (add-hook 'prog-mode-hook #'ecb-minor-mode)
-
   :config
   (defhydra hydra-ecb (:color blue)
     "ecb commands"

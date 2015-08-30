@@ -21,7 +21,6 @@
 (add-to-list 'package-archives
              '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
 
-;; need not have this enabled always
 ;; (when (not package-archive-contents)
 ;;   (package-refresh-contents))
 (package-initialize)
