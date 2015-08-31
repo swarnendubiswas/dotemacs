@@ -16,6 +16,7 @@
   (ede-enable-generic-projects))
 
 (use-package semantic
+  :disabled t
   :preface
   (defun dotemacs-semantic-functions ()
     (semantic-mode 1)
@@ -43,6 +44,7 @@
   (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
 
 (use-package idle
+  :disabled t
   :preface
   (defun dotemacs-idle-functions ()
     (global-semantic-idle-scheduler-mode 1)
@@ -51,6 +53,7 @@
   :config (add-hook 'prog-mode-hook #'dotemacs-idle-functions))
 
 (use-package mode
+  :disabled t
   :init (add-hook 'prog-mode-hook #'global-srecode-minor-mode 1))
 
 (use-package ecb

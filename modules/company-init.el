@@ -91,7 +91,10 @@
 
   (use-package company-emoji
     :ensure t
-    :config (add-hook 'text-mode-hook 'company-emoji-init)))
+    :config (add-hook 'text-mode-hook 'company-emoji-init))
+
+  (use-package company-try-hard
+    :ensure t))
 
 (provide 'company-init)
 

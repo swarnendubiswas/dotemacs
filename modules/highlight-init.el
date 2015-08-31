@@ -10,7 +10,7 @@
   :if (display-graphic-p)
   :init
   ;; (global-hl-line-mode 1)
-
+  (setq hl-line-sticky-flag nil) ; Highlight the line only in the active window
   (use-package hl-line+ ; highlight only when idle
     :ensure t
     :init (toggle-hl-line-when-idle 1)))
