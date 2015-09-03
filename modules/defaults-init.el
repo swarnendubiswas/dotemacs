@@ -100,6 +100,7 @@
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         ;; tramp history
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
+  ;; disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
   (use-package password-cache

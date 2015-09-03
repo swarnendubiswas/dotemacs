@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization  -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; init.el --- Emacs customization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:
@@ -55,15 +55,10 @@
 
 ;;; Code:
 
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/elpa/")) ; already present by default
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp")) ; third-party packages
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/")) ; personal modules for customizing emacs initialization
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/")) ; personal modules for customizing Emacs initialization
 
-;; setup the package system
-(require 'packages-init)
-
-;; setup configuration variables
-(require 'config-init)
+(require 'packages-init) ; setup the package system
+(require 'config-init) ; setup configuration variables
 
 ;; now setup other modules
 
@@ -79,7 +74,7 @@
 (require 'search-init)
 (require 'recentf-init)
 (if (eq dotemacs-completion 'company)
-    (require 'company-init)
+   (require 'company-init)
   (require 'auto-complete-init))
 (require 'ido-init)
 (require 'smex-init)
@@ -113,14 +108,8 @@
 (require 'java-init)
 (require 'python-init)
 (require 'shell-init)
-
-;; generic keybindings, package-specific are usually in their own modules
-(require 'keybindings-init)
-
-;; temporary modules
 (require 'svn-init)
 (require 'git-init)
-
 (require 'cedet-init)
 (require 'jdee-init)
 
@@ -128,10 +117,10 @@
 ;; enabled on startup.
 (require 'tags-init)
 
-;; custom definitions
 (require 'custom-init)
 
-;; start the daemon/server
-(require 'server-init)
+(require 'keybindings-init) ; generic keybindings, package-specific are usually in their own modules
+
+(require 'server-init) ; start the daemon/server
 
 ;;; init.el ends here

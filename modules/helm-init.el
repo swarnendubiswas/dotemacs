@@ -201,6 +201,9 @@
     :bind (([remap yank-pop] . helm-show-kill-ring))
     :init (helm-push-mark-mode 1))
 
+  (use-package helm-elisp-package
+    :bind ("C-c h p" . helm-list-elisp-packages))
+
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 

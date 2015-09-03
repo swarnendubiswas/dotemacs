@@ -1,7 +1,7 @@
 ;;; python-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Configure Python programming mode.
+;; Configure Python programming mode. These settings are possibly a bit undercooked currently.
 
 ;;; Code:
 
@@ -15,6 +15,7 @@
 
   (use-package jedi
     :ensure t
+    :disabled t
     :config
     (add-hook 'python-mode-hook 'jedi:setup)
     (setq jedi:complete-on-dot t)
@@ -29,6 +30,7 @@
 
   (use-package pyvenv
     :ensure t
+    :disabled t
     :config (add-hook 'python-mode-hook #'pyvenv-mode))
 
   (use-package python-environment
@@ -36,6 +38,7 @@
 
   (use-package pyvirtualenv
     :ensure t
+    :disabled t
     :config (add-hook 'python-mode-hook #'pyvirtualenv-mode))
 
   (use-package anaconda-mode
@@ -69,6 +72,7 @@
 
   (use-package py-autopep8
     :ensure t
+    :disabled t
     :config
     (setq py-autopep8-options '("--max-line-length=100"))
     (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
@@ -84,15 +88,17 @@
     :disabled t)
 
   ;; Useful packages with pip: autopep8, pyflakes, setuptools, psutil. pip is bundled with python >= 3.4.
-  ;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes
+  ;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
   (use-package elpy
     :ensure t
+    :disabled t
     :diminish elpy-mode
     :config
     (elpy-enable))
 
   (use-package flymake-python-pyflakes
     :ensure t
+    :disabled t
     :config
     (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
     ;; (setq flymake-python-pyflakes-executable "flake8")
