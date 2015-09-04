@@ -37,8 +37,7 @@
       use-package-verbose t)
 
 (use-package diminish
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package bind-key
   :ensure t
@@ -56,7 +55,6 @@
 
 (use-package paradox
   :ensure t
-  :defer t
   :bind (("C-c d p" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages))
   :config

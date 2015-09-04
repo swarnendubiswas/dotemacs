@@ -16,16 +16,14 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
-;; use either auto-complete or company for auto completion support
 (defcustom dotemacs-completion
   'company
-  "Choose company over auto-complete for completion."
+  "Choose company or auto-complete for completion."
   :type '(radio
           (const :tag "company" company)
           (const :tag "auto-complete" auto-complete))
   :group 'dotemacs)
 
-;; use either helm or other packages that provide similar functionality
 (defcustom dotemacs-helm-or-ido
   'both
   "Prefer helm instead of ido and smex, or use both."
@@ -35,7 +33,6 @@
           (const :tag "both" both))
   :group 'dotemacs)
 
-;; choices: leuven, professional, eclipse, default.
 (defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."

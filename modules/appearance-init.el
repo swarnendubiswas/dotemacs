@@ -15,8 +15,8 @@
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
-(use-package menu-bar ; You can learn many shortcuts from the menu bar entries.
-  :disabled t
+(use-package menu-bar
+  :disabled t ; You can learn many shortcuts from the menu bar entries.
   :init
   (when (fboundp 'menu-bar-mode)
     (menu-bar-mode -1)))
@@ -58,6 +58,10 @@
                                      (set-face-attribute 'default nil
                                                          :family "Dejavu Sans Mono"
                                                          :height 110)
+                                     (with-eval-after-load "avy"
+                                       (set-face-attribute 'avy-background-face nil
+                                                           :background "WhiteSmoke"
+                                                           :foreground "black"))
                                      ;; customize the fringe marks on the sides
                                      ;; (set-face-background 'fringe "wheat")
                                      ;; (with-eval-after-load 'hl-line
@@ -150,7 +154,7 @@
   (add-hook 'first-change-hook #'tabbar--on-buffer-modification)
 
   ;; Add a buffer modification state indicator in the tab label, and place a
-  ;; space around the label to make it looks less crowd.
+  ;; space around the label to make it look less crowded.
   (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
     (setq ad-return-value
           (if (and (buffer-modified-p (tabbar-tab-value tab))

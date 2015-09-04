@@ -33,7 +33,7 @@
   :config
   (c-toggle-electric-state +1)
   (c-toggle-syntactic-indentation +1)
-  (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode)
+  (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
 
   (use-package cwarn
     :ensure t
@@ -95,13 +95,13 @@
 
   (cond ((string-equal system-name "XXX")
          (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
-         (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
+         (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0"))
 
         ((string-equal system-name "biswass-Dell-System-XPS-L502X")
          (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9")))
 
   (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
-  (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/tools/PlassInstrumentation/lib/boost_1_58_0"))
+  (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0"))
 
 (use-package dep
   :disabled t

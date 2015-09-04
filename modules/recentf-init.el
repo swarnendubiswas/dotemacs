@@ -18,7 +18,7 @@
                           "[/\\]tmp/recentf-marker\\'" "/company-statistics-cache.el$")) ; "/ssh:"
   (recentf-mode 1)
   ;; clean up recent files on startup, since otherwise the exclude list is not always respected
-  (recentf-cleanup)
+  ;;(recentf-cleanup)
 
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
@@ -36,7 +36,7 @@
   (use-package sync-recentf
     :ensure t
     :pin melpa
-    :init (recentf-auto-cleanup))
+    :init (recentf-cleanup))
 
   :bind ("<f8>" . recentf-open-files))
 

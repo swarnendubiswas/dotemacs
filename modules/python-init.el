@@ -6,7 +6,8 @@
 ;;; Code:
 
 (use-package python
-  :defer t
+  :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
+  :interpreter ("python" . python-mode)
   :config
   (add-hook 'python-mode-hook
             (lambda ()

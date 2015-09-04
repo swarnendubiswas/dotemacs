@@ -1,25 +1,25 @@
 ;;; ace-modes-init.el --- Part of Emacs initialization   -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup ace-xxx (jump/buffer/isearch) modes.
+;; Setup ace-xxx (jump/buffer/isearch) modes, and avy.
 
 ;;; Code:
 
 (use-package ace-jump-mode
   :ensure t
-  :disabled t ;; prefer avy
+  :disabled t ; prefer avy
   :bind*
   (("C-c a f" . ace-jump-mode)
    ("C-c a b" . ace-jump-mode-pop-mark)
    ("C-'" . ace-jump-mode))
   :config (ace-jump-mode-enable-mark-sync))
 
-;; leave out certain buffers based on file name patterns
-;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
 (use-package ace-jump-buffer
   :ensure t
-  :disabled t ;; prefer helm-mini
+  :disabled t ; prefer helm-mini
   :preface
+  ;; leave out certain buffers based on file name patterns
+  ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
   (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
     "*Buffer regexps to always show when buffer switching.")
   (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$" "GTAGS$")
@@ -58,8 +58,7 @@
   :ensure t
   :defer t
   :config
-  ;; style: avy-jump and ace-jump-mode-style
-  (setq ace-jump-helm-line-use-avy-style nil)
+  (setq ace-jump-helm-line-use-avy-style nil) ;; style: avy-jump and ace-jump-mode-style
   (bind-key "C-;" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
@@ -71,24 +70,22 @@
   :ensure t
   :bind (("M-b" . avy-goto-word-1)
          ("C-'" . avy-goto-word-or-subword-1))
-  :init
+  :config
   ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one of the currently
   ;; visible isearch candidates using avy.
   (avy-setup-default)
   (setq avy-background t
         ;; options: pre, at, at-full, post, de-bruijn
-        avy-style 'pre))
+        avy-style 'pre)
 
-(defhydra hydra-jump-commands (:color blue)
-  "Different jump commands."
-  ("c" avy-goto-char "avy char")
-  ("w" avy-goto-word-0 "avy word")
-  ("u" avy-goto-word-or-subword-1 "avy word or subword")
-  ("L" avy-goto-line "avy line")
-  ("s" avy-goto-subword-0 "avy subword")
-  ("C" goto-char "goto char")
-  ("l" goto-line "goto line"))
-(bind-key "M-g" #'hydra-jump-commands/body)
+  (defhydra hydra-jump-commands (:color blue)
+    "Different jump commands."
+    ("c" avy-goto-char "avy char")
+    ("w" avy-goto-word-0 "avy word")
+    ("u" avy-goto-word-or-subword-1 "avy word or subword")
+    ("L" avy-goto-line "avy line")
+    ("s" avy-goto-subword-0 "avy subword"))
+  (bind-key "M-g" #'hydra-jump-commands/body))
 
 (provide 'ace-modes-init)
 

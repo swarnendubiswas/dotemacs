@@ -7,7 +7,6 @@
 
 (use-package abbrev
   :diminish abbrev-mode
-  :defer t
   :config
   (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))
   (setq save-abbrevs 'silently ; do not ask to save new abbrevs when quitting
@@ -15,8 +14,7 @@
         dabbrev-case-replace nil)
   (if (file-exists-p abbrev-file-name)
       (quietly-read-abbrev-file))
-  ;; enable in all modes derived from text-mode
-  (add-hook 'text-mode-hook #'abbrev-mode)
+  (add-hook 'text-mode-hook #'abbrev-mode) ; enable in all modes derived from text-mode
   (add-hook 'prog-mode-hook
             (lambda ()
               (abbrev-mode -1))))

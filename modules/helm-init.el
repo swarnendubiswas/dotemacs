@@ -47,7 +47,7 @@
     (helm-mode 1))
 
   (use-package helm-plugin
-    :init
+    :config
     ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
     (defadvice helm-display-mode-line (after undisplay-header activate)
       (setq header-line-format nil)))
@@ -59,7 +59,7 @@
      ("<f5>" . helm-mini)
      ("C-c h b" . helm-buffers-list)
      ("<f6>" . helm-buffers-list))
-    :init
+    :config
     ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
@@ -99,7 +99,8 @@
      ("C-c h r" . helm-recentf)))
 
   (use-package helm-dabbrev
-    :init (setq helm-dabbrev-cycle-threshold 5))
+    :defer t
+    :config (setq helm-dabbrev-cycle-threshold 5))
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -124,9 +125,14 @@
 
   (use-package helm-bibtex
     :ensure t
-    :disabled t
+    :defer t
     :commands helm-bibtex
-    :init (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
+    :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
+
+  (use-package helm-bibtexkey
+    :ensure t
+    :defer t
+    :config (setq helm-bibtexkey-filelist '("~/workspace/bib/plass.bib")))
 
   (use-package helm-orgcard
     :ensure t
@@ -178,11 +184,8 @@
     :defer t)
 
   (use-package helm-dirset
-    :ensure t)
-
-  (use-package helm-bibtexkey
     :ensure t
-    :config (setq helm-bibtexkey-filelist '("/home/biswass/bib/plass.bib")))
+    :defer t)
 
   (use-package helm-grep
     :init
