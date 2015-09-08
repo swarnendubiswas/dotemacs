@@ -42,16 +42,22 @@
     (add-hook 'python-mode-hook #'eldoc-mode)
     :diminish eldoc-mode)
 
-  ;; add makefile.rules to makefile-gmake-mode for Intel Pin
-  (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
+  (use-package makefile-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
+    ;; add makefile.rules to makefile-gmake-mode for Intel Pin
+    (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
 
   (use-package sh-script ; shell script mode
-    :defer t
     :mode ("\\.zsh\\'" . sh-mode)
     :config
     (setq sh-basic-offset 4
           sh-indent-comment t
           sh-indentation 4))
+
+  (use-package fish-mode
+    :ensure t
+    :mode "\\.fish$")
 
   (use-package speedbar
     :defer t

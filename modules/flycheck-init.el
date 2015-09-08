@@ -50,7 +50,12 @@
     :config
     (flycheck-add-next-checker 'c/c++-clang '(t . c/c++-googlelint) t)
     (setq flycheck-googlelint-linelength 'dotemacs-fill-column
-          flycheck-googlelint-filter "-whitespace/line_length")))
+          flycheck-googlelint-filter "-whitespace/line_length"))
+
+  (use-package flycheck-pyflakes
+    :config
+    (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+    (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
 
 (provide 'flycheck-init)
 

@@ -95,7 +95,6 @@
 (require 'yasnippet-init)
 (require 'flycheck-init)
 (require 'rainbow-init)
-(require 'undo-tree-init)
 (require 'whitespace-init)
 (require 'highlight-init)
 

@@ -13,6 +13,7 @@
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-completion-system 'helm
+        projectile-verbose nil
         projectile-require-project-root nil ; use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-dired
@@ -30,8 +31,7 @@
     :ensure projectile
     :config
     (setq helm-projectile-fuzzy-match t
-          ;; other options: 'helm-projectile-find-file
-          projectile-switch-project-action #'helm-projectile)
+          projectile-switch-project-action #'helm-projectile-find-file)
     (helm-projectile-on))
 
   (use-package ibuffer-projectile ; group buffers by projectile project
@@ -55,7 +55,7 @@
     ("r" projectile-replace "replace")
     ("K" projectile-kill-buffers "kill buffers")
     ("g" helm-projectile-grep "grep"))
-  (global-unset-key (kbd "C-c p"))
+  (unbind-key "C-c p")
   (bind-key "C-c p" 'hydra-projectile/body)
 
   :diminish projectile-mode)

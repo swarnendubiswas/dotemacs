@@ -44,7 +44,8 @@
 (use-package time ; displays the time and date in the mode line
   :init
   (setq display-time-day-and-date t
-        display-time-24hr-format nil)
+        display-time-24hr-format nil
+        display-time-default-load-average nil)
   (display-time))
 
 (use-package linum ; display line numbers in margin
@@ -62,7 +63,6 @@
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
                                                            :foreground "black"))
-                                     ;; customize the fringe marks on the sides
                                      ;; (set-face-background 'fringe "wheat")
                                      ;; (with-eval-after-load 'hl-line
                                      ;; (set-face-attribute 'hl-line nil :background "lavender"))
@@ -108,7 +108,7 @@
                                                             :foreground "#123555"
                                                             :background "#E5F4FB"))
                                       ;; customize the fringe marks on the sides
-                                      (set-face-background 'fringe "lavender")))
+                                      (set-face-background 'fringe "wheat")))
 
       ;; default
       ((eq dotemacs-theme 'default)

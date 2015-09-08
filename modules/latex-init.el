@@ -61,7 +61,6 @@
     :commands LaTeX-math-mode
     :init
     (setq LaTeX-syntactic-comments t)
-    ;;(add-hook 'LaTeX-mode-hook #'latex-extra-mode)
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
     (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
     (add-hook 'LaTeX-mode-hook
@@ -108,8 +107,9 @@
 
   (use-package latex-extra
     :ensure t
-    :disabled t
-    :config (latex/setup-keybinds))
+    :config
+    ;; (latex/setup-keybinds)
+    (add-hook 'LaTeX-mode-hook #'latex-extra-mode))
 
   (use-package latex-preview-pane ; currently does not support multi-file parsing
     :ensure t

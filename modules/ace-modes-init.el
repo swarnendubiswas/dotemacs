@@ -79,11 +79,11 @@
         avy-style 'pre)
 
   (defhydra hydra-jump-commands (:color blue)
-    "Different jump commands."
+    "Different avy jump commands."
     ("c" avy-goto-char "avy char")
     ("w" avy-goto-word-0 "avy word")
     ("u" avy-goto-word-or-subword-1 "avy word or subword")
-    ("L" avy-goto-line "avy line")
+    ("l" avy-goto-line "avy line")
     ("s" avy-goto-subword-0 "avy subword"))
   (bind-key "M-g" #'hydra-jump-commands/body))
 

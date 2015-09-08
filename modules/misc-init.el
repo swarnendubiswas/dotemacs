@@ -28,10 +28,6 @@
   :ensure t
   :init (global-hungry-delete-mode 1))
 
-(use-package fish-mode
-  :ensure t
-  :defer t)
-
 (use-package move-text ; move text with M-<up> and M-<down> like eclipse
   :ensure t
   :init (move-text-default-bindings))

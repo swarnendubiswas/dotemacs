@@ -8,6 +8,7 @@
 (when (display-graphic-p)
   (or (use-package powerline
         :ensure t
+        :disabled t
         :if (eq dotemacs-theme 'eclipse)
         :ensure t
         :config
@@ -36,15 +37,15 @@
       ;; https://github.com/jonathanchu/emacs-powerline/
       (use-package powerline
         :disabled t
-        :if (eq dotemacs-theme 'default)
-        :load-path "lisp/emacs-powerline/"
+        :if (or (eq dotemacs-theme 'eclipse) (eq dotemacs-theme 'professional))
+        :load-path "packages/emacs-powerline/"
         :config
         (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
         (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
 
       (use-package telephone-line
         :ensure t
-        :if (eq dotemacs-theme 'default)
+        :if (or (eq dotemacs-theme 'default) (eq dotemacs-theme 'professional))
         :init
         (setq telephone-line-lhs
               '((nil    . (telephone-line-minor-mode-segment))

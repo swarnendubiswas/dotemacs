@@ -5,10 +5,9 @@
 
 ;;; Code:
 
-;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key variants.
-;;  with bind-key, you do not need an explicit "(kbd ...)"
-;; Other variants:
-;; (global-set-key (kbd "RET") 'newline-and-indent)
+;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key variants. with
+;; bind-key, you do not need an explicit "(kbd ...)".
+;; Other variants: (global-set-key (kbd "RET") 'newline-and-indent)
 ;; (define-key global-map (kbd "RET") 'newline-and-indent)
 
 (bind-key "RET" 'newline-and-indent)
@@ -16,7 +15,6 @@
 (bind-key "C-c z" 'repeat)
 (bind-key "C-z" 'undo)
 
-;; Not useful
 ;; (global-set-key [f1] 'shell)
 ;; (global-set-key [f2] 'split-window-vertically)
 ;; (global-set-key [f3] 'split-window-horizontally)
@@ -71,11 +69,11 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-(defhydra hydra-mark-lines ()
-  "Mark lines"
-  ("m" next-line "next line")
-  ("n" next-line "next line")
-  ("p" previous-line "previous line"))
+;; (defhydra hydra-mark-lines ()
+;;   "Mark lines"
+;;   ("m" next-line "next line")
+;;   ("n" next-line "next line")
+;;   ("p" previous-line "previous line"))
 
 (defhydra hydra-apropos (:color blue)
   "Apropos"
