@@ -146,6 +146,18 @@
     :bind* (("M-i" . change-inner)
             ("M-o" . change-outer))))
 
+(use-package undo-tree ; Visualize with C-x u
+  :ensure t
+  :defer t
+  :config
+  (setq undo-tree-mode-lighter ""
+        undo-tree-visualizer-timestamps t
+        undo-tree-visualizer-relative-timestamps t
+        undo-tree-auto-save-history nil
+        undo-tree-visualizer-diff t)
+  (global-undo-tree-mode 1)
+  :diminish undo-tree-mode)
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

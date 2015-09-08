@@ -6,9 +6,7 @@
 ;;; Code:
 
 (when (bound-and-true-p dotemacs-enable-whitespace-module-p)
-
   (use-package whitespace
-    :defer t
     :diminish global-whitespace-mode
     :init
     ;;(global-whitespace-mode 1)
@@ -18,8 +16,9 @@
                   ;; space-mark tab-mark newline-mark)
                   whitespace-style '(faces trailing empty lines-tail)))
 
-  ;; use the package instead, it is more comprehensive
+  ;; Use the whitespace-cleanup-mode package instead, it is more comprehensive
   ;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
+
   (use-package whitespace-cleanup-mode
     :ensure t
     :diminish whitespace-cleanup-mode

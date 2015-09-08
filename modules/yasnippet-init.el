@@ -13,16 +13,13 @@
   :init
   (setq yas-triggers-in-field t)
   (yas-global-mode 1)
-
-  ;; this is already the default
-  ;; (add-to-list yas-snippet-dirs (concat user-emacs-directory "snippets"))
-
+  :config
   (use-package helm-c-yasnippet
     :ensure t
     :disabled t
     :config
-    (setq helm-yas-not-display-dups nil)
-    (setq helm-yas-display-key-on-candidate t)))
+    (setq helm-yas-not-display-dups nil
+          helm-yas-display-key-on-candidate t)))
 
 (provide 'yasnippet-init)
 

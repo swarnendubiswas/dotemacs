@@ -26,6 +26,7 @@
 
 (use-package cc-mode
   :defer 5
+  :functions (c-toggle-electric-state c-toggle-syntactic-indentation c-fill-paragraph)
   :init
   (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
         c-basic-offset 2)
@@ -65,7 +66,7 @@
     (ctypes-auto-parse-mode 1))
 
   (use-package function-args ; this overrides M-u
-    :ensure t
+    :ensure swiper
     :diminish function-args-mode
     :config
     (set-default 'semantic-case-fold t)

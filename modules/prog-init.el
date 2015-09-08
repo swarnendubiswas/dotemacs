@@ -68,13 +68,7 @@
             sr-speedbar-max-width 40
             sr-speedbar-width 30
             sr-speedbar-default-width 30
-            sr-speedbar-skip-other-window-p t))
-
-    ;; (when (display-graphic-p)
-    ;;   (sr-speedbar-open))
-
-    )
-
+            sr-speedbar-skip-other-window-p t)))
 
   (use-package ws-butler
     :ensure t
@@ -132,7 +126,6 @@
                     (add-hook 'before-save-hook #'web-beautify-css-buffer t t)))))))
 
 (use-package nxml-mode
-  :defer t
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t))
 

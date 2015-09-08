@@ -27,6 +27,7 @@
 
   (use-package pyenv-mode
     :ensure t
+    :disabled t
     :config (add-hook 'python-mode-hook #'pyenv-mode))
 
   (use-package pyvenv
@@ -58,18 +59,20 @@
 
   (use-package pydoc
     :ensure t
+    :disabled t
     :config
     (use-package helm-pydoc
       :ensure t))
 
   (use-package python-docstring
     :ensure t
+    :disabled t
     :commands python-docstring-mode
     :config (python-docstring-mode 1))
 
   (use-package pip-requirements
     :ensure t
-    :defer t)
+    :disabled t)
 
   (use-package py-autopep8
     :ensure t
@@ -79,10 +82,12 @@
     (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
 
   (use-package py-import-check
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package py-isort
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package pycomplete
     :ensure t

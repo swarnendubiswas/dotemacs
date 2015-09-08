@@ -30,18 +30,17 @@
       grep-highlight-matches t
       grep-scroll-output t)
 
-;; performs poorly if there are a large number of matches
-(use-package swiper
+(use-package swiper ; performs poorly if there are a large number of matches
   :ensure t
   :defer t
   :config
   (use-package ivy
-    :init (ivy-mode 1)
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (bind-key "C-c u" 'ivy-resume ivy-mode-map)
     :diminish ivy-mode)
-  (setq ivy-use-virtual-buffers t
-        ;; be less noisy
-        swiper-min-highlight 3)
-  (bind-key "C-c u" 'ivy-resume ivy-mode-map)
+  (setq swiper-min-highlight 3) ; be less noisy
   (use-package swiper-helm
     :ensure t)
   :bind* (("C-c f" . swiper)

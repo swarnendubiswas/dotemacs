@@ -17,26 +17,25 @@
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
                           "[/\\]tmp/recentf-marker\\'" "/company-statistics-cache.el$")) ; "/ssh:"
   (recentf-mode 1)
-  ;; clean up recent files on startup, since otherwise the exclude list is not always respected
-  ;;(recentf-cleanup)
-
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
 
   ;; (setq initial-buffer-choice 'recentf-open-files)
 
-  ;; ;; Periodically (600 s) save recently opened files, in case emacs crashes
-  ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
-
-  (use-package recentf-ext ; Add directories to recent list.
+  (use-package recentf-ext ; Add directories to recent list
     :ensure t)
+
+  ;; Periodically (600 s) save recently opened files, in case emacs crashes
+  ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
 
   ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
     :ensure t
     :pin melpa
-    :init (recentf-cleanup))
+    :init
+    ;; clean up recent files on startup, since otherwise the exclude list is not always respected
+    (recentf-cleanup))
 
   :bind ("<f8>" . recentf-open-files))
 

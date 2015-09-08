@@ -8,7 +8,7 @@
 
 ;; I prefer to run the Emacs daemon at startup.
 (use-package server
-  :disabled t
+  :defer t
   :config
   ;; start server if not root user
   (unless (string-equal "root" (getenv "USER"))
