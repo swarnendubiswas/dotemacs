@@ -29,12 +29,12 @@
     :init (add-to-list 'company-backends #'company-keywords))
 
   (use-package company-dabbrev
-    :init
+    :config
     (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
           company-dabbrev-ignore-case nil))
 
   (use-package company-dabbrev-code
-    :init
+    :config
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t))
 
@@ -91,10 +91,12 @@
 
   (use-package company-emoji
     :ensure t
+    :disabled t
     :config (add-hook 'text-mode-hook 'company-emoji-init))
 
   (use-package company-try-hard
-    :ensure t))
+    :ensure t
+    :config (bind-key "C-z" #'company-try-hard company-active-map)))
 
 (provide 'company-init)
 

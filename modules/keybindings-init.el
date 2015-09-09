@@ -10,43 +10,43 @@
 ;; Other variants: (global-set-key (kbd "RET") 'newline-and-indent)
 ;; (define-key global-map (kbd "RET") 'newline-and-indent)
 
-(bind-key "RET" 'newline-and-indent)
-(bind-key "C-l" 'goto-line)
-(bind-key "C-c z" 'repeat)
-(bind-key "C-z" 'undo)
+(bind-key "RET" #'newline-and-indent)
+(bind-key "C-l" #'goto-line)
+(bind-key "C-c z" #'repeat)
+(bind-key "C-z" #'undo)
 
 ;; (global-set-key [f1] 'shell)
 ;; (global-set-key [f2] 'split-window-vertically)
 ;; (global-set-key [f3] 'split-window-horizontally)
 
 (unbind-key "C-s") ; isearch-forward-regexp
-(bind-key "C-f" 'isearch-forward-regexp)
-(bind-key "C-f" 'isearch-repeat-forward isearch-mode-map)
+(bind-key "C-f" #'isearch-forward-regexp)
+(bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
 
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
 (bind-key "C-c ;" #'dotemacs-comment-line)
 
-(bind-key "<f9>" 'other-window) ; switch to the other buffer
-(bind-key "<f10>" 'delete-other-windows)
+(bind-key "<f9>" #'other-window) ; switch to the other buffer
+(bind-key "<f10>" #'delete-other-windows)
 
 (bind-key "<f11>" #'dotemacs-kill-other-buffers) ; kill all non-special buffers
 (unbind-key "C-x C-s") ; save-buffer
-(bind-key "C-s" 'save-buffer)
+(bind-key "C-s" #'save-buffer)
 (bind-key "C-S-s" #'dotemacs-save-all-buffers)
 
 (add-hook 'org-mode-hook
           (lambda ()
             (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
             (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)))
-(bind-key* "M-<left>" 'tabbar-backward-tab)
-(bind-key* "M-<right>" 'tabbar-forward-tab)
+(bind-key* "M-<left>" #'tabbar-backward-tab)
+(bind-key* "M-<right>" #'tabbar-forward-tab)
 
-(bind-key "C-+" 'text-scale-increase)
-(bind-key "C--" 'text-scale-decrease)
+(bind-key "C-+" #'text-scale-increase)
+(bind-key "C--" #'text-scale-decrease)
 
-(bind-key "C-c d b" 'dotemacs-byte-compile-current-file)
-(bind-key "C-c d i" 'dotemacs-byte-compile-init-dir)
+(bind-key "C-c d b" #'dotemacs-byte-compile-current-file)
+(bind-key "C-c d i" #'dotemacs-byte-compile-init-dir)
 
 ;; the command `key-chord-describe' lists currently defined key chords.
 (use-package key-chord
@@ -69,12 +69,6 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-;; (defhydra hydra-mark-lines ()
-;;   "Mark lines"
-;;   ("m" next-line "next line")
-;;   ("n" next-line "next line")
-;;   ("p" previous-line "previous line"))
-
 (defhydra hydra-apropos (:color blue)
   "Apropos"
   ("a" apropos "apropos")
@@ -85,23 +79,8 @@
   ("o" apropos-user-option "opt")
   ("v" apropos-variable "var")
   ("i" info-apropos "info")
-  ("t" tags-apropos "tags")
-  ("z" hydra-customize-apropos/body "customize"))
+  ("t" tags-apropos "tags"))
 (bind-key "C-h a" #'hydra-apropos/body)
-
-(defhydra hydra-info (:color blue)
-  "Info"
-  ("e" (funcall (info-display-topic "emacs")) "Emacs")
-  ("l" (funcall (info-display-topic "elisp")) "Elisp")
-  ("m" (funcall (info-display-topic "magit")) "Magit")
-  ("o" (funcall (info-display-topic "org")) "Org Mode")
-  ("s" (funcall (info-display-topic "sicp")) "SICP"))
-(bind-key "C-h i" #'hydra-info/body)
-
-(defhydra hydra-zoom (global-map "C-c d z")
-  "zoom commands"
-  ("g" text-scale-increase "in")
-  ("l" text-scale-decrease "out"))
 
 (use-package guide-key
   :ensure t

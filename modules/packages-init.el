@@ -19,7 +19,7 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives
-             '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
+             '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
 
 ;; (when (not package-archive-contents)
 ;;   (package-refresh-contents))
