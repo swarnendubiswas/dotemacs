@@ -40,9 +40,12 @@
     (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
     (add-hook 'ielm-mode-hook #'eldoc-mode)
     (add-hook 'python-mode-hook #'eldoc-mode)
+    (use-package c-eldoc
+      :ensure t
+      :config (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode))
     :diminish eldoc-mode)
 
-  (use-package makefile-mode
+  (use-package make-mode
     :config
     (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
     ;; add makefile.rules to makefile-gmake-mode for Intel Pin
@@ -57,7 +60,7 @@
 
   (use-package fish-mode
     :ensure t
-    :mode "\\.fish$")
+    :mode ("\\.fish$" . fish-mode))
 
   (use-package speedbar
     :defer t
@@ -88,7 +91,7 @@
     :config
     (setq dtrt-indent-verbosity 0)
     (add-hook 'prog-mode-hook
-              (lambda()
+              (lambda ()
                 (dtrt-indent-mode 1)))))
 
 (use-package web-mode

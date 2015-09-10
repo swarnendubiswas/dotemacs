@@ -91,12 +91,12 @@
 
   (use-package company-emoji
     :ensure t
-    :disabled t
+    :defer t
     :config (add-hook 'text-mode-hook 'company-emoji-init))
 
   (use-package company-try-hard
     :ensure t
-    :config (bind-key "C-z" #'company-try-hard company-active-map)))
+    :init (bind-key "C-z" #'company-try-hard company-active-map)))
 
 (provide 'company-init)
 

@@ -20,7 +20,7 @@
       (use-package smart-mode-line
         :ensure t
         :if (eq dotemacs-theme 'leuven)
-        :commands (sml/faces-from-theme sml/theme-p)
+        :functions (sml/faces-from-theme sml/theme-p)
         :init
         (use-package smart-mode-line-powerline-theme
           :ensure t
