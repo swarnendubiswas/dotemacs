@@ -42,7 +42,7 @@
     (add-hook 'python-mode-hook #'eldoc-mode)
     (use-package c-eldoc
       :ensure t
-      :config (add-hook 'c-mode-hook 'c-turn-on-eldoc-mode))
+      :config (add-hook 'c-mode-hook #'eldoc-mode))
     :diminish eldoc-mode)
 
   (use-package make-mode

@@ -45,8 +45,7 @@
 
 (use-package auto-compile ; this only *recompiles* elisp source files.
   :ensure t
-  :commands auto-compile-on-load-mode
-  :init
+  :config
   (setq load-prefer-newer t
         auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)

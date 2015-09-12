@@ -49,7 +49,7 @@
 (use-package color-moccur
   :ensure t
   :defer t
-  :commands (isearch-moccur isearch-all)
+  :functions (isearch-moccur isearch-all)
   :bind ("M-s O" . moccur)
   :config
   (bind-keys

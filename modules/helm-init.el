@@ -126,7 +126,7 @@
   (use-package helm-bibtex
     :ensure t
     :defer t
-    :commands helm-bibtex
+    :functions helm-bibtex
     :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
 
   (use-package helm-bibtexkey

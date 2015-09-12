@@ -142,6 +142,14 @@
     :bind* (("M-i" . change-inner)
             ("M-o" . change-outer))))
 
+(use-package expand-line
+  :ensure t
+  :config (expand-line-mode 1))
+
+(use-package smart-mark
+  :ensure t
+  :init (smart-mark-mode 1))
+
 (use-package undo-tree ; Visualize with C-x u
   :ensure t
   :defer t

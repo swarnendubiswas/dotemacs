@@ -114,7 +114,8 @@
       ((eq dotemacs-theme 'default)
        (set-face-attribute 'default nil
                            :family "Dejavu Sans Mono"
-                           :height 115)
+                           :height 115
+                           :weight 'light)
        ;; (set-face-attribute 'region nil
        ;;                     :background "LemonChiffon"
        ;;                     :foreground "black")
