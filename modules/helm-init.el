@@ -124,10 +124,9 @@
     :disabled t)
 
   (use-package helm-bibtex
-    :ensure t
-    :defer t
-    :functions helm-bibtex
-    :config (setq helm-bibtex-bibliography "~/workspace/bib/plass.bib"))
+    :ensure parsebib
+    :commands helm-bibtex
+    :init (setq helm-bibtex-bibliography '("~/workspace/bib/plass.bib")))
 
   (use-package helm-bibtexkey
     :ensure t

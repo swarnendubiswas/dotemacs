@@ -107,6 +107,7 @@
 
   (use-package latex-extra
     :ensure t
+    :disabled t ; overrides a few useful keymap prefixes
     :config
     ;; (latex/setup-keybinds)
     (add-hook 'LaTeX-mode-hook #'latex-extra-mode))
@@ -144,23 +145,22 @@
 
   (use-package reftex
     :diminish reftex-mode
+    :commands reftex-citation
     :init
-    ;; (autoload 'reftex-mode    "reftex" "RefTeX Minor Mode" t)
-    ;; (autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
-    ;; (autoload 'reftex-citation "reftex-cite" "Make citation" nil)
-
     (setq reftex-plug-into-AUCTeX t
           reftex-insert-label-flags '(t t)
           reftex-cite-format 'abbrv
           reftex-save-parse-info t
           reftex-use-multiple-selection-buffers t
           reftex-enable-partial-scans t
-          reftex-default-bibliography '("~/workspace/bib/plass.bib"))
-    (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
-    (add-hook 'LaTeX-mode-hook #'reftex-mode))
+          reftex-default-bibliography '("~/workspace/bib/plass.bib")
+          reftex-idle-time 0.5)
+    (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; for use with AUCTeX
+    ;; for Emacs latex mode
+    (add-hook 'lateX-mode-hook #'turn-on-reftex))
 
   (use-package ebib
-    :ensure t
+    :ensure parsebib
     :disabled t
     :bind ("C-c e" . ebib))
 

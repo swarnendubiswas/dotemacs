@@ -20,6 +20,13 @@
     "An alist of hooks that require customizations.")
 
   :init
+  (use-package ispell
+    :config
+    (setq-default ispell-program-name "/usr/bin/aspell")
+    (setq ispell-dictionary "english"
+          ;; speed up aspell: ultra | fast | normal | bad-spellers
+          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")))
+
   ;; use this package if there are performance issues with flyspell, note that this package disables spell checks for
   ;; certain special buffers, including *scratch*
   (use-package flyspell-lazy
@@ -27,9 +34,6 @@
     :disabled t
     :init (flyspell-lazy-mode 1))
 
-  (setq-default ispell-program-name "/usr/bin/aspell")
-  ;; speed up aspell: ultra | fast | normal | bad-spellers
-  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)

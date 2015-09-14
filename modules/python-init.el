@@ -12,7 +12,8 @@
   (add-hook 'python-mode-hook
             (lambda ()
               (setq fill-column 78)
-              (turn-on-auto-fill)))
+              (turn-on-auto-fill)
+              (run-python)))
 
   (use-package jedi
     :ensure t

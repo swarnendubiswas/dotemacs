@@ -87,7 +87,9 @@
     :config
     (company-quickhelp-mode 1)
     (setq company-quickhelp-delay 0.5
-          company-quickhelp-max-lines 60))
+          company-quickhelp-max-lines 60)
+    (unbind-key "M-h" global-map)
+    (bind-key* "M-h" #'mark-paragraph))
 
   (use-package company-emoji
     :ensure t
