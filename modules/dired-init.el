@@ -107,6 +107,9 @@
     :ensure t
     :disabled t)
 
+  (use-package find-dired+
+    :ensure t)
+
   ;; http://oremacs.com/2015/02/21/hydra-docstring-sexp
   (defhydra hydra-dired-marked (dired-mode-map "" :color pink)
     "Number of marked items: %(length (dired-get-marked-files))"

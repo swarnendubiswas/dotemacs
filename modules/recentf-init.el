@@ -9,7 +9,7 @@
   :init
   (setq recentf-save-file (concat dotemacs-temp-directory "recentf") ; set this first so that recentf can load content from this
         recentf-max-menu-items 15 ; show in recent menu
-        recentf-max-saved-items 50 ; keep track of last xx files
+        recentf-max-saved-items 100 ; keep track of last xx files
         recentf-auto-cleanup 300 ; clean up after Emacs has been idle for certain number of seconds
         ;; check regex with re-builder
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"

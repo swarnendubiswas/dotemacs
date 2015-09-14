@@ -47,15 +47,15 @@
         :ensure t
         :if (or (eq dotemacs-theme 'default) (eq dotemacs-theme 'professional))
         :init
-        (setq telephone-line-lhs
-              '((nil    . (telephone-line-minor-mode-segment))
-                (accent . (telephone-line-vc-segment
-                           telephone-line-process-segment))
-                (nil    . (telephone-line-buffer-segment))))
-        (setq telephone-line-rhs
-              '((nil    . (telephone-line-misc-info-segment))
-                (accent . (telephone-line-major-mode-segment))
-                (nil    . (telephone-line-airline-position-segment))))
+        ;; (setq telephone-line-lhs
+        ;;       '((nil    . (telephone-line-minor-mode-segment))
+        ;;         (accent . (telephone-line-vc-segment
+        ;;                    telephone-line-process-segment))
+        ;;         (nil    . (telephone-line-buffer-segment))))
+        ;; (setq telephone-line-rhs
+        ;;       '((nil    . (telephone-line-misc-info-segment))
+        ;;         (accent . (telephone-line-major-mode-segment))
+        ;;         (nil    . (telephone-line-airline-position-segment))))
         (telephone-line-mode 1))))
 
 (provide 'mode-line-init)

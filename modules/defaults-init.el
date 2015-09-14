@@ -104,7 +104,6 @@
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
   (use-package password-cache
-    :disabled t
     :config (setq password-cache-expiry nil))
   (use-package tramp-term
     :ensure t
