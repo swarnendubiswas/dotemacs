@@ -22,11 +22,11 @@
 
   ;; (setq initial-buffer-choice 'recentf-open-files)
 
-  (use-package recentf-ext ; Add directories to recent list
-    :ensure t)
-
   ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
+
+  (use-package recentf-ext ; Add directories to recent list
+    :ensure t)
 
   ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
   ;; last window to close overwrites the recentf list.

@@ -71,7 +71,8 @@
     :config
     (set-default 'semantic-case-fold t)
     ;; to include custom header locations
-    ;;(semantic-add-system-include "/usr/local/boost_1_54_0/" 'c++-mode)
+    (when (string-equal system-name "XXX")
+      (semantic-add-system-include "/usr/include/boost148/" 'c++-mode))
     (fa-config-default)
     (bind-key* "M-u" #'upcase-word))
 

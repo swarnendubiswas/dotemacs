@@ -7,8 +7,7 @@
 
 (use-package helm
   :ensure t
-  :init
-  (require 'helm-config)
+  :init (require 'helm-config)
   :config
   (setq helm-quick-update t ; do not display invisible candidates
         helm-candidate-number-limit 100
@@ -18,24 +17,20 @@
         helm-lisp-fuzzy-completion t
         helm-apropos-fuzzy-match t
         helm-split-window-default-side 'below
-        ;; open helm buffer inside current window, not occupy whole other window
-        helm-split-window-in-side-p t
+        helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
         ido-use-virtual-buffers 'auto
         helm-completion-in-region-fuzzy-match t
-        ;; move to end or beginning of source when reaching top or bottom of source
-        helm-move-to-line-cycle-in-source t
+        helm-move-to-line-cycle-in-source t ; move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line nil
         helm-echo-input-in-header-line t
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
-        ;; be idle for this many seconds, before updating candidate buffer
-        helm-input-idle-delay 0.1
+        helm-input-idle-delay 0.1 ; be idle for this many seconds, before updating candidate buffer
         helm-follow-mode-persistent t
         helm-always-two-windows nil
         ;; both the min and max height are set to be equal on purpose
         helm-autoresize-max-height 60
         helm-autoresize-min-height 60
-        helm-case-fold-search 'smart
-        helm-ff-search-library-in-sexp t)
+        helm-case-fold-search 'smart)
 
   (use-package helm-core
     :ensure t
@@ -60,7 +55,6 @@
      ("C-c h b" . helm-buffers-list)
      ("<f6>" . helm-buffers-list))
     :config
-    ;; fuzzy matching buffer names when non--nil
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
           helm-buffer-max-length 45
@@ -86,6 +80,7 @@
     (setq helm-file-cache-fuzzy-match t
           helm-ff-transformer-show-only-basename nil
           helm-ff-file-name-history-use-recentf t
+          helm-ff-search-library-in-sexp t
           helm-ff-auto-update-initial-value t
           helm-recentf-fuzzy-match t
           helm-ff-skip-boring-files t

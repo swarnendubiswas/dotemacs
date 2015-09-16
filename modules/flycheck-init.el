@@ -8,10 +8,10 @@
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
   :ensure t
-  :disabled t
-  :if (not (string-equal system-name "XXX"))
+  ;; :if (not (string-equal system-name "XXX"))
   :diminish flycheck-mode
-  :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
+  :init
+  (add-hook 'prog-mode-hook #'global-flycheck-mode)
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-completion-system 'ido
         flycheck-standard-error-navigation nil
@@ -22,8 +22,7 @@
     :ensure t
     :disabled t)
 
-  ;; Show flycheck messages in popups
-  (use-package flycheck-pos-tip
+  (use-package flycheck-pos-tip ; Show flycheck messages in popups
     :ensure t
     :init (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
@@ -32,8 +31,7 @@
     :disabled t
     :config (add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode))
 
-  ;; Check package conventions with flycheck
-  (use-package flycheck-package
+  (use-package flycheck-package ; Check package conventions with flycheck
     :ensure t
     :disabled t
     :init (flycheck-package-setup))
@@ -48,7 +46,8 @@
     :ensure t
     :if (eq system-type 'gnu/linux)
     :config
-    (flycheck-add-next-checker 'c/c++-clang '(t . c/c++-googlelint) t)
+    (flycheck-add-next-checker 'c/c++-clang
+                               '(t . c/c++-googlelint) t)
     (setq flycheck-googlelint-linelength 'dotemacs-fill-column
           flycheck-googlelint-filter "-whitespace/line_length"))
 

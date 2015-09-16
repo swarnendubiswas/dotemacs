@@ -11,9 +11,10 @@
   :config
   (add-hook 'python-mode-hook
             (lambda ()
-              (setq fill-column 78)
+              (setq fill-column 78
+                    python-indent-offset 4)
               (turn-on-auto-fill)
-              (run-python)))
+              (run-python (python-shell-parse-command) nil nil)))
 
   (use-package jedi
     :ensure t
