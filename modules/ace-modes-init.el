@@ -56,14 +56,14 @@
 
 (use-package ace-jump-helm-line ; ace-jump in helm buffers
   :ensure t
-  :defer t
+  :disabled t
   :config
   (setq ace-jump-helm-line-use-avy-style nil) ;; style: avy-jump and ace-jump-mode-style
   (bind-key "C-;" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
   :ensure t
-  :defer t
+  :disabled t
   :config (ace-window-display-mode 1))
 
 (use-package avy

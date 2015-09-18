@@ -13,7 +13,7 @@
 (or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
       :ensure t
       :bind* ("C-c g" . writegood-mode)
-      :commands writegood-mode
+      :functions writegood-mode
       :diminish writegood-mode
       :init (add-hook 'text-mode-hook #'writegood-mode))
 
@@ -49,10 +49,6 @@
   :config
   (use-package csv-nav
     :ensure t))
-
-(use-package pdf-tools
-  :ensure t
-  :defer t)
 
 (provide 'text-init)
 

@@ -6,6 +6,7 @@
 ;;; Code:
 
 (use-package abbrev
+  :disabled t
   :diminish abbrev-mode
   :config
   (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))

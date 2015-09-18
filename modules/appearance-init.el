@@ -142,7 +142,7 @@
   (defun tabbar--on-buffer-modification ()
     (set-buffer-modified-p t)
     (tabbar--modification-state-change))
-  :commands tabbar-display-update
+  :functions tabbar-display-update
   :init
   (setq tabbar-use-images nil ; speed up by not using images
         tabbar-auto-scroll-flag t

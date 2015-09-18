@@ -6,9 +6,8 @@
 ;;; Code:
 
 (use-package helm
-  :ensure t
-  :init (require 'helm-config)
-  :config
+  :ensure helm-core
+  :init
   (setq helm-quick-update t ; do not display invisible candidates
         helm-candidate-number-limit 100
         helm-M-x-fuzzy-match t
@@ -16,42 +15,42 @@
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-apropos-fuzzy-match t
-        helm-split-window-default-side 'below
-        helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
+        ;; helm-split-window-default-side 'below
+        ;; helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
         ido-use-virtual-buffers 'auto
         helm-completion-in-region-fuzzy-match t
         helm-move-to-line-cycle-in-source t ; move to end or beginning of source when reaching top or bottom of source
-        helm-display-header-line nil
-        helm-echo-input-in-header-line t
+        ;; helm-display-header-line nil
+        ;; helm-echo-input-in-header-line t
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
         helm-input-idle-delay 0.1 ; be idle for this many seconds, before updating candidate buffer
         helm-follow-mode-persistent t
-        helm-always-two-windows nil
+        ;; helm-always-two-windows nil
         ;; both the min and max height are set to be equal on purpose
-        helm-autoresize-max-height 60
-        helm-autoresize-min-height 60
+        ;; helm-autoresize-max-height 60
+        ;; helm-autoresize-min-height 60
         helm-case-fold-search 'smart)
 
-  (use-package helm-core
-    :ensure t
-    :init (helm-autoresize-mode 1))
+  ;; (helm-autoresize-mode 1)
 
   (use-package helm-mode
+    :diminish helm-mode
     :init
     (setq helm-completion-in-region-fuzzy-match t)
     (helm-mode 1))
 
-  (use-package helm-plugin
-    :config
-    ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
-    (defadvice helm-display-mode-line (after undisplay-header activate)
-      (setq header-line-format nil)))
+  ;; (use-package helm-plugin
+  ;;   :config
+  ;;   ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
+  ;;   (defadvice helm-display-mode-line (after undisplay-header activate)
+  ;;     (setq header-line-format nil)))
 
   (use-package helm-buffers
     :bind
-    (;;([remap switch-to-buffer] . helm-mini)
-     ("C-c h m" . helm-mini)
+    (("C-c h m" . helm-mini)
      ("<f5>" . helm-mini)
+     ;; ([remap switch-to-buffer] . helm-mini)
+     ;; ([remap list-buffers] . helm-buffers-list)
      ("C-c h b" . helm-buffers-list)
      ("<f6>" . helm-buffers-list))
     :config
@@ -60,7 +59,7 @@
           helm-buffer-max-length 45
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
-                                      ;;helm-source-dired-recent-dirs
+                                      ;; helm-source-dired-recent-dirs
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
@@ -87,15 +86,17 @@
           helm-boring-file-regexp-list (append helm-boring-file-regexp-list
                                                '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\#$" "\\~$")))
     :bind*
-    (([remap find-file] . helm-find-files)
-     ;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
+    (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
      ("<f4>" . helm-find-files)
      ("C-c h f" . helm-find-files)
+     ;; ([remap find-file] . helm-find-files)
      ("C-c h r" . helm-recentf)))
 
   (use-package helm-dabbrev
     :defer t
-    :config (setq helm-dabbrev-cycle-threshold 5))
+    :config
+    ;;(define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
+    (setq helm-dabbrev-cycle-threshold 5))
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -114,44 +115,18 @@
     (fset 'describe-bindings 'helm-descbinds)
     (helm-descbinds-mode 1))
 
-  (use-package helm-words
-    :ensure t
-    :disabled t)
-
   (use-package helm-bibtex
     :ensure parsebib
     :commands helm-bibtex
     :init (setq helm-bibtex-bibliography '("~/workspace/bib/plass.bib")))
 
-  (use-package helm-bibtexkey
-    :ensure t
-    :defer t
-    :config (setq helm-bibtexkey-filelist '("~/workspace/bib/plass.bib")))
-
-  (use-package helm-orgcard
-    :ensure t
-    :disabled t)
-
-  (use-package helm-mode-manager
-    :ensure t
-    :defer t)
-
-  (use-package helm-themes
-    :ensure t
-    :defer t)
-
-  (use-package helm-helm-commands
-    :ensure t
-    :defer t)
-
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
     :ensure t
-    :defer t
     :bind
     (("C-c h s" . helm-swoop)
      ("C-c h /" . helm-multi-swoop))
-    :init
+    :config
     (setq helm-multi-swoop-edit-save t ; save buffer when helm-multi-swoop-edit complete
           helm-swoop-speed-or-color nil
           helm-swoop-split-direction #'split-window-vertically
@@ -173,14 +148,6 @@
             (bind-key "C-:" #'helm-company company-mode-map)
             (bind-key "C-:" #'helm-company company-active-map)))
 
-  (use-package helm-package
-    :ensure t
-    :defer t)
-
-  (use-package helm-dirset
-    :ensure t
-    :defer t)
-
   (use-package helm-grep
     :init
     ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
@@ -189,10 +156,6 @@
                       (interactive)
                       (let ((current-prefix-arg 't))
                         (call-interactively 'helm-do-grep)))))
-
-  (use-package helm-fuzzy-find
-    :ensure t
-    :defer t)
 
   (use-package helm-ring
     :bind (([remap yank-pop] . helm-show-kill-ring))
@@ -204,8 +167,25 @@
   (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
   (bind-key "C-z" 'helm-select-action helm-map)
 
-  ;;(define-key global-map [remap list-buffers] 'helm-buffers-list)
-  ;;(define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
+  ;; http://ericjmritz.name/2015/04/06/organizing-key-bindings-in-gnu-emacs-using-hydra/
+  (defhydra hydra-helm (:color blue)
+    "helm commands"
+    ("x" helm-M-x "helm-M-x")
+    ("b" helm-mini "helm-mini")
+    ("i" helm-buffers-list "helm-buffers-list")
+    ("f" helm-find-files "helm-find-files")
+    ("r" helm-recentf "helm-recentf")
+    ("l" helm-locate "helm-locate")
+    ("y" helm-show-kill-ring "helm-show-kill-ring")
+    ("s" helm-swoop "helm-swoop")
+    ("/" helm-multi-swoop "helm-multi-swoop")
+    ("a" helm-apropos "helm-apropos")
+    ("g" helm-do-grep "helm-do-grep")
+    ("u" helm-resume "helm-resume")
+    ;; swoop is better than occur
+    ("o" helm-occur "helm-occur"))
+  (global-unset-key (kbd "C-b"))
+  (bind-key "C-b" 'hydra-helm/body)
 
   :bind*
   (("C-c h l" . helm-locate)
@@ -215,29 +195,7 @@
    ("<f7>" . helm-resume)
    ("C-c h u" . helm-resume)
    ;; swoop is better than occur
-   ("C-c h o" . helm-occur))
-
-  :diminish helm-mode)
-
-;; http://ericjmritz.name/2015/04/06/organizing-key-bindings-in-gnu-emacs-using-hydra/
-(defhydra hydra-helm (:color blue)
-  "helm commands"
-  ("x" helm-M-x "helm-M-x")
-  ("b" helm-mini "helm-mini")
-  ("i" helm-buffers-list "helm-buffers-list")
-  ("f" helm-find-files "helm-find-files")
-  ("r" helm-recentf "helm-recentf")
-  ("l" helm-locate "helm-locate")
-  ("y" helm-show-kill-ring "helm-show-kill-ring")
-  ("s" helm-swoop "helm-swoop")
-  ("/" helm-multi-swoop "helm-multi-swoop")
-  ("a" helm-apropos "helm-apropos")
-  ("g" helm-do-grep "helm-do-grep")
-  ("u" helm-resume "helm-resume")
-  ;; swoop is better than occur
-  ("o" helm-occur "helm-occur"))
-(global-unset-key (kbd "C-b"))
-(bind-key "C-b" 'hydra-helm/body)
+   ("C-c h o" . helm-occur)))
 
 (provide 'helm-init)
 

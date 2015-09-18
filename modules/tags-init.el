@@ -37,7 +37,7 @@
 (use-package ggtags
   :ensure t
   :if (eq system-type 'gnu/linux)
-  :defer 5
+  :defer 2
   :diminish ggtags-mode
   :config
   (setq ggtags-navigation-mode-lighter nil

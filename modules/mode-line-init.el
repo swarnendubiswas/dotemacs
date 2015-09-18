@@ -9,7 +9,6 @@
   (or (use-package powerline
         :ensure t
         :disabled t
-        :if (eq dotemacs-theme 'eclipse)
         :ensure t
         :config
         (setq powerline-display-mule-info nil
@@ -19,12 +18,9 @@
 
       (use-package smart-mode-line
         :ensure t
-        :if (eq dotemacs-theme 'leuven)
+        :if (or (eq dotemacs-theme 'leuven) (eq dotemacs-theme 'default))
         :functions (sml/faces-from-theme sml/theme-p)
         :init
-        (use-package smart-mode-line-powerline-theme
-          :ensure t
-          :defer t)
         (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
               ;; sml/name-width 20
               sml/no-confirm-load-theme t
@@ -45,6 +41,7 @@
 
       (use-package telephone-line
         :ensure t
+        :disabled t
         :if (or (eq dotemacs-theme 'default) (eq dotemacs-theme 'professional))
         :init
         ;; (setq telephone-line-lhs

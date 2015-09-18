@@ -7,6 +7,7 @@
 
 (when (bound-and-true-p dotemacs-enable-whitespace-module-p)
   (use-package whitespace
+    :disabled t
     :diminish global-whitespace-mode
     :init
     ;;(global-whitespace-mode 1)
