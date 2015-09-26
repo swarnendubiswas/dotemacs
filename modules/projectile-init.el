@@ -7,41 +7,47 @@
 
 (use-package projectile
   :ensure t
-  :commands (projectile-find-file projectile-switch-project)
-  :init
+  :functions (projectile-find-file projectile-switch-project)
+  :config
   (projectile-global-mode 1)
+
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
-        projectile-completion-system 'helm
         projectile-verbose nil
         projectile-require-project-root nil ; use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-dired
         projectile-mode-line '(:propertize
                                (:eval (concat " " (projectile-project-name)))
-                               face font-lock-constant-face))
+                               face font-lock-constant-face)
+        projectile-file-exists-remote-cache-expire nil
+        projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld"))
+  (if (bound-and-true-p dotemacs-use-helm-p)
+      (setq projectile-completion-system 'helm)
+    (setq projectile-completion-system 'ido))
+
   (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Don't consider my home dir as a project
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
-  :config
   (use-package helm-projectile
-    :ensure projectile
+    :ensure t
+    :if (bound-and-true-p dotemacs-use-helm-p)
     :config
     (setq helm-projectile-fuzzy-match t
-          projectile-switch-project-action #'helm-projectile-find-file)
+          projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))
 
-  (use-package ibuffer-projectile ; group buffers by projectile project
-    :ensure projectile
-    :init
-    (with-eval-after-load "ibuffer"
+  (with-eval-after-load "ibuffer"
+    (use-package ibuffer-projectile ; group buffers by projectile project
+      :ensure t
+      :config
       (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
       (setq ibuffer-show-empty-filter-groups nil)))
 
-  (defhydra hydra-projectile (:color blue)
+  (defhydra hydra-projectile (:color teal)
     "projectile"
     ("h" helm-projectile "helm-projectile")
     ("p" helm-projectile-switch-project "switch project")
@@ -49,14 +55,15 @@
     ("d" helm-projectile-find-dir "find dir")
     ("b" helm-projectile-switch-to-buffer "switch to another buffer in the project")
     ("a" helm-projectile-find-other-file "find other file")
+    ("c" projectile-invalidate-cache "invalidate cache")
     ("i" projectile-ibuffer "ibuffer")
     ("S" projectile-save-project-buffers "save project buffers")
-    ("e" helm-projectile-recentf "recentf")
-    ("r" projectile-replace "replace")
+    ("l" projectile-replace "replace")
+    ("r" helm-projectile-recentf "recentf")
     ("K" projectile-kill-buffers "kill buffers")
-    ("g" helm-projectile-grep "grep"))
-  (unbind-key "C-c p")
-  (bind-key "C-c p" 'hydra-projectile/body)
+    ("g" helm-projectile-grep "grep")
+    ("o" projectile-multi-occur "multi-occur"))
+  (bind-key* "C-c p" 'hydra-projectile/body)
 
   :diminish projectile-mode)
 

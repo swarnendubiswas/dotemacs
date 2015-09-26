@@ -27,12 +27,6 @@
   :init (rainbow-blocks-mode 1)
   :diminish rainbow-blocks-mode)
 
-(defhydra hydra-rainbow ()
-  "rainbow"
-  ("b" rainbow-blocks-mode "blocks")
-  ("i" rainbow-identifiers-mode "identifiers")
-  ("d" rainbow-delimiters-mode "delimiters"))
-
 (provide 'rainbow-init)
 
 ;;; rainbow-init.el ends here

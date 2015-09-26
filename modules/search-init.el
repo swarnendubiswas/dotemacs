@@ -32,23 +32,18 @@
 
 (use-package swiper ; performs poorly if there are a large number of matches
   :ensure t
-  :defer t
   :config
   (use-package ivy
-    :config
+    :init
     (ivy-mode 1)
     (setq ivy-use-virtual-buffers t)
     (bind-key "C-c u" 'ivy-resume ivy-mode-map)
     :diminish ivy-mode)
   (setq swiper-min-highlight 3) ; be less noisy
-  (use-package swiper-helm
-    :ensure t)
-  :bind* (("C-c f" . swiper)
-          ("C-c r" . swiper-helm)))
+  :bind* ("C-c f" . swiper))
 
 (use-package color-moccur
   :ensure t
-  :defer t
   :functions (isearch-moccur isearch-all)
   :bind ("M-s O" . moccur)
   :config
@@ -60,7 +55,7 @@
 
 (use-package loccur
   :ensure t
-  :commands loccur-mode
+  :functions loccur-mode
   :defer t
   :config (loccur-mode 1)
   :diminish loccur-mode)

@@ -74,11 +74,12 @@
 (require 'search-init)
 (require 'recentf-init)
 (if (eq dotemacs-completion 'company)
-   (require 'company-init)
+    (require 'company-init)
   (require 'auto-complete-init))
 (require 'ido-init)
 (require 'smex-init)
-(require 'helm-init)
+(when (bound-and-true-p dotemacs-use-helm-p)
+  (require 'helm-init))
 
 ;; configure the more useful extensions
 (require 'anzu-init)
@@ -89,7 +90,6 @@
 
 ;; setup helper packages
 (require 'projectile-init)
-(require 'abbrev-init)
 (require 'fci-init)
 (require 'misc-init)
 (require 'yasnippet-init)
@@ -104,22 +104,17 @@
 (require 'org-init)
 (require 'prog-init)
 (require 'cc-init)
+(require 'cedet-init)
 (require 'java-init)
 (require 'python-init)
 (require 'shell-init)
 (require 'svn-init)
 (require 'git-init)
-(require 'cedet-init)
-(require 'jdee-init)
-
 ;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
 ;; enabled on startup.
 (require 'tags-init)
-
 (require 'custom-init)
-
 (require 'keybindings-init) ; generic keybindings, package-specific are usually in their own modules
-
 (require 'server-init) ; start the daemon/server
 
 ;;; init.el ends here

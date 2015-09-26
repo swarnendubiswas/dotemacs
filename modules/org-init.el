@@ -8,7 +8,7 @@
 (use-package org
   :ensure t
   :defer t
-  :commands (org-mode org-toggle-blocks org-indent-mode org-set-emph-re)
+  :functions (org-mode org-toggle-blocks org-indent-mode org-set-emph-re)
   :config
   (add-hook 'org-mode-hook #'visual-line-mode)
   (diminish 'visual-line-mode)
@@ -51,6 +51,7 @@
   (add-hook 'org-mode-hook #'which-function-mode)
 
   (use-package helm-org
+    :disabled t
     :config (setq helm-org-headings-fontify t))
 
   (use-package ox-latex
@@ -89,8 +90,10 @@
     (setq org-footnote-define-inline t
           org-footnote-auto-label 'random))
 
-  (use-package ox-md
-    :ensure nil)
+  (when (eq dotemacs-completion 'auto-complete)
+    (use-package org-ac
+      :ensure t
+      :config (org-ac/config-default)))
 
   (defhydra hydra-org (:color red :columns 3)
     "Org Mode Movements"

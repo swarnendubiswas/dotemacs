@@ -41,7 +41,7 @@
    ("M-<down>" . dired-jump-to-bottom))
 
   (use-package dired-x
-    :commands (dired-jump dired-omit-mode)
+    :functions (dired-jump dired-omit-mode)
     :config
     (setq dired-bind-jump t
           ;; do not show messages when omitting files
@@ -65,50 +65,11 @@
                   diredp-hide-details-propagate-flag nil)
     (diredp-toggle-find-file-reuse-dir 1))
 
-  (use-package direx
-    :ensure t
-    :disabled t)
-
-  (use-package direx-grep
-    :ensure t
-    :disabled t)
-
   (use-package dired-efap
     :ensure t
     :config
     (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
     (bind-key "<f2>" #'dired-efap dired-mode-map))
-
-  ;; Not required starting from Emacs 24.4
-  ;; (use-package dired-details
-  ;;   :ensure t
-  ;;   :init (setq dired-details-hide-link-targets nil))
-
-  ;; (use-package dired-details+
-  ;;   :ensure t)
-
-  (use-package dired-rainbow
-    :ensure t
-    :disabled t)
-
-  (use-package dired-hacks-utils
-    :ensure t
-    :disabled t)
-
-  (use-package nav
-    :disabled t
-    :load-path "packages/emacs-nav-49/"
-    :config
-    (nav-mode)
-    ;;(nav-disable-overeager-window-splitting)
-    :bind ("<f6>" . nav-toggle))
-
-  (use-package dired-nav-enhance
-    :ensure t
-    :disabled t)
-
-  (use-package find-dired+
-    :ensure t)
 
   ;; http://oremacs.com/2015/02/21/hydra-docstring-sexp
   (defhydra hydra-dired-marked (dired-mode-map "" :color pink)
@@ -125,7 +86,6 @@
     ("W"   (dired-copy-filename-as-kill 0) "copy file name(s) - full path")
     ("C-g" nil                             "cancel" :color blue))
   (bind-key "." 'hydra-dired-marked/body dired-mode-map))
-
 
 (provide 'dired-init)
 

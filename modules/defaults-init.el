@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-;; SB: Should we use use-package for managing built-in modules?
-
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup.
       inhibit-startup-screen t
       ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen.
@@ -14,31 +12,29 @@
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead.
       initial-major-mode 'text-mode
       inhibit-startup-echo-area-message t
-      create-lockfiles nil)
+      create-lockfiles nil
+      message-log-max 5000)
 
 ;; major mode to use for files that do no specify a major mode, default value is fundamental-mode
 (setq-default major-mode 'text-mode)
 
-(setq locale-coding-system 'utf-8)
-
-(use-package mule
-  :if (eq system-type 'windows-nt)
-  :config
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-  (set-selection-coding-system 'utf-8))
-
 (when (eq system-type 'windows-nt)
+  (setq locale-coding-system 'utf-8)
   (set-language-environment 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-input-method nil))
+  (set-input-method nil)
+
+  (use-package mule
+    :config
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (set-selection-coding-system 'utf-8)))
 
 (use-package files
   :init
   (setq require-final-newline t ; Always end a file with a newline.
         make-backup-files nil ; Stop making backup ~ files
-        ;; Disable backup for a per-file basis, not to be used by major modes.
-        backup-inhibited t
+        backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
         auto-save-default t
         ;; 'y-or-n-p
         confirm-kill-emacs nil)
@@ -46,7 +42,8 @@
 
 (setq-default sentence-end-double-space nil)
 
-(setq x-select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications.
+(setq x-select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications. This variable is
+                                  ; renamed to select-enable-clipboard from Emacs 25.1.
       line-number-display-limit 2000000
       visible-bell nil
       ;; draw underline lower
@@ -54,10 +51,13 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
-(xterm-mouse-mode 1) ; Mouse cursor in terminal mode
+;; (xterm-mouse-mode 1) ; Mouse cursor in terminal mode
 
 (use-package menu-bar
   :init (toggle-indicate-empty-lines 1))
+
+(setq-default truncate-lines nil
+              truncate-partial-width-windows nil)
 
 (use-package simple
   :init
@@ -68,16 +68,14 @@
         suggest-key-bindings t
         ;; use shift-select for marking
         shift-select-mode t)
-
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
-
   (auto-fill-mode 1)
-  (diminish 'auto-fill-function)   ;; This is not a library/file, so eval-after-load does not work
+  (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
   :bind ("C-c d f" . auto-fill-mode))
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
-  :defer 5
+  :defer 2
   :config
   (global-auto-revert-mode 1)
   (setq-default auto-revert-interval 10 ; Default is 5 s.
@@ -89,16 +87,13 @@
   :defer 2
   :config (delete-selection-mode 1))
 
-(setq delete-by-moving-to-trash t)
-
 (use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
   :defer t
   :config
-  (setq tramp-default-method "ssh" ; faster than the default scp
+  (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "biswass"
         tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
-        ;; tramp history
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
   ;; disable backup
   (add-to-list 'backup-directory-alist
@@ -128,13 +123,13 @@
   (setq ad-redefinition-action 'accept))
 
 ;; Enable disabled commands
-(put 'downcase-region  'disabled nil)   ; Let downcasing work
+(put 'downcase-region  'disabled nil) ; Let downcasing work
 (put 'erase-buffer     'disabled nil)
-(put 'eval-expression  'disabled nil)   ; Let ESC-ESC work
-(put 'narrow-to-page   'disabled nil)   ; Let narrowing work
-(put 'narrow-to-region 'disabled nil)   ; Let narrowing work
+(put 'eval-expression  'disabled nil) ; Let ESC-ESC work
+(put 'narrow-to-page   'disabled nil) ; Let narrowing work
+(put 'narrow-to-region 'disabled nil) ; Let narrowing work
 (put 'set-goal-column  'disabled nil)
-(put 'upcase-region    'disabled nil)   ; Let upcasing work
+(put 'upcase-region    'disabled nil) ; Let upcasing work
 
 (advice-add 'capitalize-word :before #'goto-beginning-of-word)
 (advice-add 'downcase-word :before #'goto-beginning-of-word)
@@ -177,7 +172,7 @@
 (use-package saveplace ; remember cursor position in files
   :defer 2
   :config
-  (setq-default save-place t
+  (setq-default save-place t ; This is replace by save-place-mode in Emacs 25.1.
                 save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package icomplete ; incremental minibuffer completion/suggestions
@@ -194,7 +189,7 @@
   :init (icy-mode 1))
 
 (use-package savehist ; save minibuffer histories across sessions
-  :defer 5
+  :defer 2
   :config
   (savehist-mode 1)
   (setq savehist-save-minibuffer-history t
@@ -209,7 +204,6 @@
 
 (setq enable-recursive-minibuffers t
       delete-by-moving-to-trash t
-
       scroll-margin 0 ; Drag the point along while scrolling
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
@@ -233,7 +227,6 @@
         uniquify-strip-common-suffix t))
 
 (use-package hippie-exp ; hippie expand is dabbrev expand on steroids
-  :defer t
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
@@ -250,9 +243,8 @@
   :bind* ("M-/" . hippie-expand))
 
 (use-package subword
-  :defer 2
   :diminish subword-mode
-  :config (global-subword-mode 1))
+  :init (global-subword-mode 1))
 
 ;; Set Emacs split to horizontal or vertical
 ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
@@ -270,6 +262,24 @@
 (defun my-auto-save-wrapper (save-fn &rest args)
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
+
+(use-package warnings
+  :config (add-to-list 'warning-suppress-types '(undo discard-info)))
+
+(use-package abbrev
+  :disabled t
+  :diminish abbrev-mode
+  :config
+  (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))
+  (setq save-abbrevs 'silently) ; do not ask to save new abbrevs when quitting
+  (if (file-exists-p abbrev-file-name)
+      (quietly-read-abbrev-file))
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (abbrev-mode -1)))
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (abbrev-mode -1))))
 
 (provide 'defaults-init)
 

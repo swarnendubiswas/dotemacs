@@ -15,10 +15,6 @@
 (bind-key "C-c z" #'repeat)
 (bind-key "C-z" #'undo)
 
-;; (global-set-key [f1] 'shell)
-;; (global-set-key [f2] 'split-window-vertically)
-;; (global-set-key [f3] 'split-window-horizontally)
-
 (unbind-key "C-s") ; isearch-forward-regexp
 (bind-key "C-f" #'isearch-forward-regexp)
 (bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
@@ -35,18 +31,12 @@
 (bind-key "C-s" #'save-buffer)
 (bind-key "C-S-s" #'dotemacs-save-all-buffers)
 
-(add-hook 'org-mode-hook
-          (lambda ()
-            (local-set-key (kbd "M-<left>") #'tabbar-backward-tab)
-            (local-set-key (kbd "M-<right>") #'tabbar-forward-tab)))
-(bind-key* "M-<left>" #'tabbar-backward-tab)
-(bind-key* "M-<right>" #'tabbar-forward-tab)
-
 (bind-key "C-+" #'text-scale-increase)
 (bind-key "C--" #'text-scale-decrease)
 
 (bind-key "C-c d b" #'dotemacs-byte-compile-current-file)
 (bind-key "C-c d i" #'dotemacs-byte-compile-init-dir)
+(bind-key "C-c d n" #'package-list-packages-no-fetch)
 
 ;; the command `key-chord-describe' lists currently defined key chords.
 (use-package key-chord
@@ -86,8 +76,8 @@
   :ensure t
   :disabled t
   :diminish guide-key-mode
-  :init (guide-key-mode 1)
-  :config
+  :init
+  (guide-key-mode 1)
   (setq guide-key/guide-key-sequence t
         guide-key/recursive-key-sequence-flag t
         guide-key/popup-window-position 'bottom

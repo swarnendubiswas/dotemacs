@@ -24,13 +24,10 @@
           (const :tag "auto-complete" auto-complete))
   :group 'dotemacs)
 
-(defcustom dotemacs-helm-or-ido
-  'both
-  "Prefer helm instead of ido and smex, or use both."
-  :type '(radio
-          (const :tag "helm" helm)
-          (const :tag "ido" ido)
-          (const :tag "both" both))
+(defcustom dotemacs-use-helm-p
+  t
+  "Configure and use helm."
+  :type  'boolean
   :group 'dotemacs)
 
 (defcustom dotemacs-theme

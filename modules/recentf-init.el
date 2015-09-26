@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package recentf
-  :init
+  :config
   (setq recentf-save-file (concat dotemacs-temp-directory "recentf") ; set this first so that recentf can load content from this
         recentf-max-menu-items 15 ; show in recent menu
         recentf-max-saved-items 100 ; keep track of last xx files
@@ -32,7 +32,6 @@
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
     :ensure t
-    :pin melpa
     :init
     ;; clean up recent files on startup, since otherwise the exclude list is not always respected
     (recentf-cleanup))

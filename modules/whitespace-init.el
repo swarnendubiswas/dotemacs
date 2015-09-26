@@ -7,10 +7,10 @@
 
 (when (bound-and-true-p dotemacs-enable-whitespace-module-p)
   (use-package whitespace
-    :disabled t
+    :defer t
     :diminish global-whitespace-mode
-    :init
-    ;;(global-whitespace-mode 1)
+    :config
+    ;; (global-whitespace-mode 1)
     (setq-default show-trailing-whitespace nil
                   whitespace-line-column 'dotemacs-fill-column
                   ;; '(face tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab

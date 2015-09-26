@@ -6,7 +6,6 @@
 ;;; Code:
 
 (use-package fill-column-indicator
-  :ensure t
   :if (bound-and-true-p dotemacs-fci-p)
   :preface
   (defun dotemacs-auto-fci-mode (&optional unused)
@@ -14,15 +13,15 @@
         (fci-mode 1)
       (fci-mode 0)))
 
-  (define-globalized-minor-mode global-fci-mode fci-mode
+  (define-globalized-minor-mode dotemacs-global-fci-mode fci-mode
     (lambda ()
       (fci-mode 1)))
 
-  :init
-  (global-fci-mode 1)
+  :config
+  (dotemacs-global-fci-mode 1)
 
-  ;;(add-hook 'after-change-major-mode-hook #'dotemacs-auto-fci-mode)
-  ;;(add-hook 'window-size-change-functions #'dotemacs-auto-fci-mode)
+  ;; (add-hook 'after-change-major-mode-hook #'dotemacs-auto-fci-mode)
+  ;; (add-hook 'window-size-change-functions #'dotemacs-auto-fci-mode)
 
   (setq-default fci-rule-column dotemacs-fill-column)
   (setq fci-handle-truncate-lines nil

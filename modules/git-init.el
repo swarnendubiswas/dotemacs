@@ -6,33 +6,27 @@
 ;;; Code:
 
 ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
+
+;; Magit needs git >=1.9.4
 (use-package magit
-  :ensure t
-  :if (not (string-equal system-name "rain.cse.ohio-state.edu")) ; Magit needs git >=1.9.4
-  :commands magit-status
+  :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
+  :functions magit-status
   :config
   (setq magit-auto-revert-mode nil
-        magit-item-highlight-face 'bold
-        magit-last-seen-setup-instructions "1.4.0")
+        magit-item-highlight-face 'bold)
+
+  (use-package magit-popup)
 
   (use-package gitconfig-mode ; Git configuration mode
-    :ensure t
     :defer t)
 
   (use-package gitignore-mode ; .gitignore mode
-    :ensure t
     :defer t)
 
   (use-package gitattributes-mode ; Git attributes mode
-    :ensure t
-    :defer t)
-
-  (use-package helm-ls-git
-    :ensure t
     :defer t)
 
   (use-package magit-svn
-    :ensure t
     :defer t))
 
 (provide 'git-init)

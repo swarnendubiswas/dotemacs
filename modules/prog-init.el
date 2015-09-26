@@ -10,6 +10,13 @@
   :config
   (global-prettify-symbols-mode 1)
 
+  (when (eq dotemacs-completion 'auto-complete)
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda ()
+                (add-to-list 'ac-sources 'ac-source-symbols)
+                (add-to-list 'ac-sources 'ac-source-variables)
+                (add-to-list 'ac-sources 'ac-source-functions))))
+
   (use-package which-func ; show the name of the function in the modeline
     :init
     (setq which-func-modes t)
@@ -35,6 +42,7 @@
     :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
 
   (use-package eldoc
+    :defer 2
     :config
     (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
@@ -46,7 +54,7 @@
     :diminish eldoc-mode)
 
   (use-package make-mode
-    :config
+    :init
     (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
     ;; add makefile.rules to makefile-gmake-mode for Intel Pin
     (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
@@ -63,7 +71,7 @@
     :mode ("\\.fish$" . fish-mode))
 
   (use-package speedbar
-    :defer t
+    :disabled t
     :config
     (setq speedbar-use-images nil
           speedbar-show-unknown-files t)
@@ -82,7 +90,7 @@
   (use-package ws-butler
     :ensure t
     :diminish ws-butler-mode
-    :config (add-hook 'prog-mode-hook #'ws-butler-mode))
+    :init (add-hook 'prog-mode-hook #'ws-butler-mode))
 
   (use-package dtrt-indent
     :ensure t
@@ -95,9 +103,7 @@
                 (dtrt-indent-mode 1)))))
 
 (use-package web-mode
-  :ensure t
-  :defer t
-  :commands (web-beautify-css web-beautify-html web-beautify-js)
+  :functions (web-beautify-css web-beautify-html web-beautify-js)
   :mode
   (("\\.phtml\\'" . web-mode)
    ("\\.jsp\\'" . web-mode)
@@ -110,6 +116,31 @@
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
+
+  (when (eq dotemacs-completion 'auto-complete)
+    (use-package ac-html
+      :ensure t)
+
+    (use-package ac-html-bootstrap
+      :ensure t)
+
+    (use-package ac-html-csswatcher
+      :ensure t
+      :config (ac-html-csswatcher-setup)))
+
+  (when (eq dotemacs-completion 'company)
+    (use-package ac-html-csswatcher
+      :ensure t
+      :config (company-web-csswatcher-setup))
+    
+    (use-package company-web
+      :ensure t
+      :preface
+      (defun company-web--setup ()
+        (setq-local company-backends
+                    (append '(company-web-html company-web-jade company-web-slim)
+                            company-backends)))
+      :config (add-hook 'web-mode-hook #'company-web--setup)))
 
   (use-package web-beautify
     :ensure t
@@ -135,8 +166,12 @@
                     (add-hook 'before-save-hook #'web-beautify-css-buffer t t)))))))
 
 (use-package nxml-mode
+  :defer t
   :config (setq nxml-slash-auto-complete-flag t
-                nxml-auto-insert-xml-declaration-flag t))
+                nxml-auto-insert-xml-declaration-flag t)
+  (when (eq dotemacs-completion 'auto-complete)
+    (use-package auto-complete-nxml
+      :ensure t)))
 
 (provide 'prog-init)
 

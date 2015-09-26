@@ -14,15 +14,13 @@
              '("marmalade" . "https://marmalade-repo.org/packages/") t)
 (add-to-list 'package-archives
              '("org" . "http://orgmode.org/elpa/") t)
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
 
-;; (when (not package-archive-contents)
-;;   (package-refresh-contents))
 (package-initialize)
 
 ;; setup use-package.
@@ -37,20 +35,20 @@
       use-package-verbose t)
 
 (use-package diminish
-  :ensure t)
+	     :ensure t)
 
 (use-package bind-key
-  :ensure t
-  :bind ("C-c d k" . describe-personal-keybindings))
+	     :ensure t
+	     :bind ("C-c d k" . describe-personal-keybindings))
 
 (use-package auto-compile ; this only *recompiles* elisp source files.
   :ensure t
-  :config
+  :init
   (setq load-prefer-newer t
         auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)
-  (auto-compile-on-load-mode 1)
-  (auto-compile-on-save-mode 1))
+  (auto-compile-on-save-mode 1)
+  :config (auto-compile-on-load-mode 1))
 
 (use-package paradox
   :ensure t

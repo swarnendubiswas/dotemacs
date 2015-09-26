@@ -5,54 +5,55 @@
 
 ;;; Code:
 
-(use-package ace-jump-mode
-  :ensure t
-  :disabled t ; prefer avy
-  :bind*
-  (("C-c a f" . ace-jump-mode)
-   ("C-c a b" . ace-jump-mode-pop-mark)
-   ("C-'" . ace-jump-mode))
-  :config (ace-jump-mode-enable-mark-sync))
+;; prefer helm-mini if helm is enabled
+(unless (bound-and-true-p dotemacs-use-helm-p)
+  (use-package ace-jump-buffer
+    :ensure t
+    :if (not (bound-and-true-p dotemacs-use-helm-p))
+    :preface
+    ;; leave out certain buffers based on file name patterns
+    ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
+    (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
+      "*Buffer regexps to always show when buffer switching.")
+    (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$" "GTAGS$")
+      "*Buffer regexps to never show when buffer switching.")
+    (defvar my-ido-ignore-dired-buffers nil
+      "*If non-nil, buffer switching should ignore dired buffers.")
 
-(use-package ace-jump-buffer
-  :ensure t
-  :disabled t ; prefer helm-mini
-  :preface
-  ;; leave out certain buffers based on file name patterns
-  ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
-  (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
-    "*Buffer regexps to always show when buffer switching.")
-  (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$" "GTAGS$")
-    "*Buffer regexps to never show when buffer switching.")
-  (defvar my-ido-ignore-dired-buffers nil
-    "*If non-nil, buffer switching should ignore dired buffers.")
+    (defun my-bs-str-in-regexp-list (str regexp-list)
+      "Return non-nil if str matches anything in regexp-list."
+      (let ((case-fold-search nil))
+        (catch 'done
+          (dolist (regexp regexp-list)
+            (when (string-match regexp str)
+              (throw 'done t))))))
 
-  (defun my-bs-str-in-regexp-list (str regexp-list)
-    "Return non-nil if str matches anything in regexp-list."
-    (let ((case-fold-search nil))
-      (catch 'done
-        (dolist (regexp regexp-list)
-          (when (string-match regexp str)
-            (throw 'done t))))))
+    (defun my-bs-ignore-buffer (name)
+      "Return non-nil if the named buffer should be ignored."
+      (or (and (not (my-bs-str-in-regexp-list name my-bs-always-show-regexps))
+               (my-bs-str-in-regexp-list name my-bs-never-show-regexps))
+          (and my-ido-ignore-dired-buffers
+               (save-excursion
+                 (set-buffer name)
+                 (equal major-mode 'dired-mode)))))
 
-  (defun my-bs-ignore-buffer (name)
-    "Return non-nil if the named buffer should be ignored."
-    (or (and (not (my-bs-str-in-regexp-list name my-bs-always-show-regexps))
-             (my-bs-str-in-regexp-list name my-bs-never-show-regexps))
-        (and my-ido-ignore-dired-buffers
-             (save-excursion
-               (set-buffer name)
-               (equal major-mode 'dired-mode)))))
+    :init
+    (use-package ace-jump-mode
+      :ensure t
+      :bind*
+      (("C-c a f" . ace-jump-mode)
+       ("C-c a b" . ace-jump-mode-pop-mark))
+      :config (ace-jump-mode-enable-mark-sync))
 
-  :config
-  (setq bs-configurations
-        '(("all" nil nil nil nil nil)
-          ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
-  (setq bs-cycle-configuration-name "files")
-  (setq-default ajb-bs-configuration "files")
-  (bind-key "M-B" 'ace-jump-buffer-with-configuration)
+    :config
+    (setq bs-configurations
+          '(("all" nil nil nil nil nil)
+            ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
+    (setq bs-cycle-configuration-name "files")
+    (setq-default ajb-bs-configuration "files")
+    (bind-key "M-B" 'ace-jump-buffer-with-configuration)
 
-  :bind ("<f5>" . ace-jump-buffer))
+    :bind ("<f5>" . ace-jump-buffer)))
 
 (use-package ace-jump-helm-line ; ace-jump in helm buffers
   :ensure t

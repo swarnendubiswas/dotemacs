@@ -7,8 +7,9 @@
 
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
-  :ensure t
-  ;; :if (not (string-equal system-name "XXX"))
+  :disabled t
+  :if (not (string-equal system-name "rain.cse.ohio-state.edu"))
+  :defer 2
   :diminish flycheck-mode
   :init
   (add-hook 'prog-mode-hook #'global-flycheck-mode)
@@ -34,27 +35,7 @@
   (use-package flycheck-package ; Check package conventions with flycheck
     :ensure t
     :disabled t
-    :init (flycheck-package-setup))
-
-  (use-package helm-flycheck
-    :ensure t
-    :disabled t)
-
-  ;; https://github.com/flycheck/flycheck-google-cpplint
-  ;; Add Google C++ Style checker. By default, syntax checked by Clang and Cppcheck (Windows?). Also, need to setup cpplint.py.
-  (use-package flycheck-google-cpplint
-    :ensure t
-    :if (eq system-type 'gnu/linux)
-    :config
-    (flycheck-add-next-checker 'c/c++-clang
-                               '(t . c/c++-googlelint) t)
-    (setq flycheck-googlelint-linelength 'dotemacs-fill-column
-          flycheck-googlelint-filter "-whitespace/line_length"))
-
-  (use-package flycheck-pyflakes
-    :config
-    (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-    (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
+    :init (flycheck-package-setup)))
 
 (provide 'flycheck-init)
 

@@ -59,7 +59,6 @@
 (use-package ecb
   :ensure t
   :disabled t
-  :load-path "elpa/ecb-20140215.114"
   :init
   (setq-default ecb-tip-of-the-day nil)
   (add-hook 'prog-mode-hook #'ecb-minor-mode)

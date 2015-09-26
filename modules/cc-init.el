@@ -25,25 +25,24 @@
                         (awk-mode . "awk")))
 
 (use-package cc-mode
-  :defer 5
+  :defer t
   :functions (c-toggle-electric-state c-toggle-syntactic-indentation c-fill-paragraph)
-  :init
-  (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
-        c-basic-offset 2)
-
   :config
-  (c-toggle-electric-state +1)
-  (c-toggle-syntactic-indentation +1)
+  (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
+        c-basic-offset 2
+        c-auto-newline 1)
+  (c-toggle-electric-state 1)
+  (c-toggle-syntactic-indentation 1)
   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
 
   (use-package cwarn
     :ensure t
-    :defer 5
+    :defer 2
     :diminish cwarn-mode
     :config (global-cwarn-mode 1))
 
   (use-package hideif
-    :defer 5
+    :defer 2
     :diminish (hide-ifdef-mode hide-ifdef-hiding)
     :config
     (setq hide-ifdef-initially t)
@@ -53,7 +52,7 @@
 
   (use-package google-c-style
     :ensure t
-    :defer 5
+    :defer 2
     :config
     (add-hook 'c-mode-common-hook #'google-set-c-style)
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
@@ -71,45 +70,64 @@
     :config
     (set-default 'semantic-case-fold t)
     ;; to include custom header locations
-    (when (string-equal system-name "XXX")
+    (when (string-equal system-name "rain.cse.ohio-state.edu")
       (semantic-add-system-include "/usr/include/boost148/" 'c++-mode))
     (fa-config-default)
     (bind-key* "M-u" #'upcase-word))
 
   ;; this is already the default, but I have this as a reminder.
-  (bind-key "M-q" #'c-fill-paragraph c-mode-base-map))
+  (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)
 
-;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
+  ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 
-;; http://tuhdo.github.io/c-ide.html
-(with-eval-after-load "company"
-  (setq company-backends (delete 'company-semantic company-backends)))
+  ;; http://tuhdo.github.io/c-ide.html
+  (with-eval-after-load "company"
+    (setq company-backends (delete 'company-semantic company-backends)))
 
-;; SB: TODO: Do I want this?
-;; (with-eval-after-load 'cc-mode
-;;   (define-key c-mode-map  [(tab)] 'company-complete)
-;;   (define-key c++-mode-map  [(tab)] 'company-complete))
+  (use-package company-c-headers
+    :ensure t
+    :if (eq dotemacs-completion 'company)
+    :config
+    (add-to-list 'company-backends #'company-c-headers)
+    (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
+    (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0")
+    (cond ((string-equal system-name "rain.cse.ohio-state.edu")
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
+           (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0"))
 
-(use-package company-c-headers
-  :ensure t
-  :config
-  (add-to-list 'company-backends #'company-c-headers)
+          ((string-equal system-name "biswass-Dell-System-XPS-L502X")
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))
 
-  (cond ((string-equal system-name "XXX")
-         (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
-         (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0"))
+  (when (eq dotemacs-completion 'auto-complete)
+    (add-to-list 'ac-sources 'ac-source-semantic)
+    (add-to-list 'ac-sources 'ac-source-semantic-raw)
+    (add-to-list 'ac-sources 'ac-source-gtags))
 
-        ((string-equal system-name "biswass-Dell-System-XPS-L502X")
-         (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9")))
+  (use-package auto-complete-c-headers
+    :ensure t
+    :if (eq dotemacs-completion 'auto-complete)
+    :config
+    (add-to-list 'ac-sources #'ac-sources-c-headers)
+    (add-to-list 'ac-sources #'ac-sources-c-headers-symbols t))
 
-  (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
-  (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0"))
+  (use-package auto-complete-clang
+    :ensure t
+    :if (eq dotemacs-completion 'auto-complete))
 
-(use-package dep
-  :disabled t
-  :config
-  (semantic-add-system-include "/usr/local/include")
-  (semantic-add-system-include "~/linux/include"))
+  (use-package dep
+    :config (semantic-add-system-include "/usr/include"))
+
+  ;; https://github.com/flycheck/flycheck-google-cpplint
+  ;; Add Google C++ Style checker. By default, syntax checked by Clang and Cppcheck (Windows?). Also, need to setup cpplint.py.
+  (with-eval-after-load "flycheck"
+    (use-package flycheck-google-cpplint
+      :ensure t
+      :if (eq system-type 'gnu/linux)
+      :config
+      (flycheck-add-next-checker 'c/c++-clang
+                                 '(t . c/c++-googlelint) t)
+      (setq flycheck-googlelint-linelength 'dotemacs-fill-column
+            flycheck-googlelint-filter "-whitespace/line_length"))))
 
 (provide 'cc-init)
 

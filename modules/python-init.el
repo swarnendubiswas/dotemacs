@@ -5,20 +5,47 @@
 
 ;;; Code:
 
-(use-package python
+;; Use either python-mode or elpy or anaconda-mode.
+
+(defun dotemacs--python-setup ()
+  "Helper function for configuring python mode."
+  (setq fill-column 78
+        python-indent-offset 4)
+  (turn-on-auto-fill)
+  (run-python (python-shell-parse-command) nil nil)
+
+  (when (eq dotemacs-completion 'auto-complete)
+    (use-package ac-python
+      :ensure t)
+    (use-package auto-complete-chunk
+      :ensure t
+      :init
+      (add-hook 'python-mode
+                (lambda ()
+                  ;; Make sure ac-source-chunk-list comes first.
+                  (setq ac-sources (append '(ac-source-chunk-list) ac-sources))
+                  (setq ac-chunk-list
+                        '("os.path.abspath" "os.path.altsep" "os.path.basename"))))))
+
+  (with-eval-after-load "flycheck"
+    (use-package flycheck-pyflakes
+      :ensure t
+      :config
+      (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+      (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
+
+(use-package python-mode
+  :disabled t
   :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
   :interpreter ("python" . python-mode)
   :config
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (setq fill-column 78
-                    python-indent-offset 4)
-              (turn-on-auto-fill)
-              (run-python (python-shell-parse-command) nil nil)))
+  (add-hook 'python-mode-hook #'dotemacs--python-setup)
 
   (use-package jedi
     :ensure t
     :config
+    (use-package virtualenv
+      :ensure t)
     (add-hook 'python-mode-hook 'jedi:setup)
     (setq jedi:complete-on-dot t)
 
@@ -27,99 +54,62 @@
       :if (eq dotemacs-completion 'company)
       :config
       (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-jedi))))
+        (add-to-list 'company-backends 'company-jedi)))))
 
-  (use-package pyenv-mode
+(use-package anaconda-mode
+  :ensure t
+  :disabled t
+  :diminish anaconda-mode
+  :init
+  (add-hook 'python-mode-hook #'anaconda-mode)
+
+  (use-package company-anaconda
     :ensure t
-    :disabled t
-    :config (add-hook 'python-mode-hook #'pyenv-mode))
-
-  (use-package pyvenv
-    :ensure t
-    :disabled t
-    :config (add-hook 'python-mode-hook #'pyvenv-mode))
-
-  (use-package python-environment
-    :ensure t)
-
-  (use-package pyvirtualenv
-    :ensure t
-    :disabled t
-    :config (add-hook 'python-mode-hook #'pyvirtualenv-mode))
-
-  (use-package anaconda-mode
-    :ensure t
-    :disabled t
-    :diminish anaconda-mode
+    :if (eq dotemacs-completion 'company)
     :init
-    (add-hook 'python-mode-hook #'anaconda-mode)
+    (with-eval-after-load "company"
+      (add-to-list 'company-backends 'company-anaconda))))
 
-    (use-package company-anaconda
+(use-package pydoc
+  :ensure t
+  :disabled t)
+
+(use-package python-docstring
+  :ensure t
+  :disabled t
+  :commands python-docstring-mode
+  :config (python-docstring-mode 1))
+
+(use-package py-autopep8
+  :ensure t
+  :disabled t
+  :config
+  (setq py-autopep8-options '("--max-line-length=100"))
+  (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
+
+(use-package py-import-check
+  :ensure t
+  :disabled t)
+
+(use-package py-isort
+  :ensure t
+  :disabled t)
+
+;; Useful packages with pip: autopep8, pyflakes, setuptools, psutil. pip is bundled with python >= 3.4.
+;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
+;; sudo pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
+(use-package elpy
+  :ensure t
+  :diminish elpy-mode
+  :preface
+  (defun dotemacs--elpy-setup ()
+    "Setup elpy and python configurations."
+    (dotemacs--python-setup)
+    (use-package pyvenv
       :ensure t
-      :if (eq dotemacs-completion 'company)
-      :init
-      (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-anaconda))))
-
-  (use-package pydoc
-    :ensure t
-    :disabled t
-    :config
-    (use-package helm-pydoc
-      :ensure t))
-
-  (use-package python-docstring
-    :ensure t
-    :disabled t
-    :commands python-docstring-mode
-    :config (python-docstring-mode 1))
-
-  (use-package pip-requirements
-    :ensure t
-    :disabled t)
-
-  (use-package py-autopep8
-    :ensure t
-    :disabled t
-    :config
-    (setq py-autopep8-options '("--max-line-length=100"))
-    (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
-
-  (use-package py-import-check
-    :ensure t
-    :disabled t)
-
-  (use-package py-isort
-    :ensure t
-    :disabled t)
-
-  (use-package pycomplete
-    :ensure t
-    :disabled t)
-
-  ;; Useful packages with pip: autopep8, pyflakes, setuptools, psutil. pip is bundled with python >= 3.4.
-  ;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
-  (use-package elpy
-    :ensure t
-    :disabled t
-    :diminish elpy-mode
-    :config
+      :init (pyvenv-mode 1))
     (elpy-enable))
-
-  (use-package flymake-python-pyflakes
-    :ensure t
-    :disabled t
-    :config
-    (add-hook 'python-mode-hook 'flymake-python-pyflakes-load)
-    ;; (setq flymake-python-pyflakes-executable "flake8")
-    ;; (setq flymake-python-pyflakes-extra-arguments '("--ignore=W806")))
-    )
-
-  ;; rope does not work with python3
-  (use-package pyde
-    :ensure t
-    :disabled t
-    :config (pyde-enable)))
+  :config (add-hook 'python-mode-hook #'dotemacs--elpy-setup))
 
 (provide 'python-init)
 

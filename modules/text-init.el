@@ -8,7 +8,12 @@
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also get run for all modes
 ;; derived from a basic mode such as text-mode.
 
-(add-hook 'text-mode-hook #'turn-off-auto-fill)
+(defun dotemacs--text-mode-setup ()
+  "Helper function for configuring text mode."
+  (setq truncate-lines nil
+        truncate-partial-width-windows nil)
+  (turn-off-hideshow))
+(add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 
 (or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
       :ensure t
@@ -20,7 +25,7 @@
     (use-package artbollocks-mode
       :ensure t
       :disabled t
-      :commands artbollocks-mode
+      :functions artbollocks-mode
       :diminish artbollocks-mode
       :init (add-hook 'text-mode-hook #'artbollocks-mode)))
 

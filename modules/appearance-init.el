@@ -15,11 +15,10 @@
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
-(use-package menu-bar
-  :disabled t ; You can learn many shortcuts from the menu bar entries.
+(use-package menu-bar ; You can learn many shortcuts from the menu bar entries.
   :init
   (when (fboundp 'menu-bar-mode)
-    (menu-bar-mode -1)))
+    (menu-bar-mode 1)))
 
 (use-package tooltip
   :defer 2
@@ -52,13 +51,8 @@
   :init (global-linum-mode 1))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
-                                     :ensure t
                                      :init (load-theme 'leuven t)
                                      :config
-                                     ;; set font size, value is in 1/10pt, so 100 will give you 10pt
-                                     (set-face-attribute 'default nil
-                                                         :family "Dejavu Sans Mono"
-                                                         :height 110)
                                      (with-eval-after-load "avy"
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
@@ -69,18 +63,11 @@
                                      ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
-                                           :ensure t
-                                           :init (load-theme 'professional t)
-                                           :config (set-face-attribute 'default nil
-                                                                       :height 110)))
+                                           :init (load-theme 'professional t)))
 
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
-                                      :ensure t
                                       :init (load-theme 'eclipse t)
                                       :config
-                                      (set-face-attribute 'default nil
-                                                          :family "Dejavu Sans Mono"
-                                                          :height 110)
                                       (set-background-color "white")
                                       (set-face-attribute 'region nil
                                                           :background "#164040"
@@ -112,16 +99,18 @@
 
       ;; default
       ((eq dotemacs-theme 'default)
-       (set-face-attribute 'default nil
-                           :family "Dejavu Sans Mono"
-                           :height 115
-                           :weight 'light)
-       ;; (set-face-attribute 'region nil
-       ;;                     :background "LemonChiffon"
-       ;;                     :foreground "black")
+       (set-face-attribute 'region nil
+                           :background "LemonChiffon"
+                           :foreground "black")
        (with-eval-after-load "hl-line"
          (set-face-attribute 'hl-line nil
                              :background "linen"))))
+
+;; set font face independent of the color theme
+(set-face-attribute 'default nil
+                    :family "Dejavu Sans Mono"
+                    :height 110 ; set font size, value is in 1/10pt, so 100 will give you 10pt
+                    :weight 'light)
 
 (use-package display-theme
   :ensure t
@@ -187,7 +176,10 @@
   (set-face-attribute 'tabbar-button nil
                       :box '(:line-width 1 :color "gray72" :style released-button))
   (set-face-attribute 'tabbar-separator nil
-                      :height 1.0))
+                      :height 1.0)
+
+  :bind* (("M-<left>" . tabbar-backward-tab)
+          ("M-<right>" . tabbar-forward-tab)))
 
 (provide 'appearance-init)
 

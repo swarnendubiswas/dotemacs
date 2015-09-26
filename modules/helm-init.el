@@ -15,13 +15,13 @@
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-apropos-fuzzy-match t
-        ;; helm-split-window-default-side 'below
-        ;; helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
+        helm-split-window-default-side 'below
+        helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
         ido-use-virtual-buffers 'auto
         helm-completion-in-region-fuzzy-match t
         helm-move-to-line-cycle-in-source t ; move to end or beginning of source when reaching top or bottom of source
-        ;; helm-display-header-line nil
-        ;; helm-echo-input-in-header-line t
+        helm-display-header-line t
+        helm-echo-input-in-header-line t
         helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
         helm-input-idle-delay 0.1 ; be idle for this many seconds, before updating candidate buffer
         helm-follow-mode-persistent t
@@ -39,12 +39,6 @@
     (setq helm-completion-in-region-fuzzy-match t)
     (helm-mode 1))
 
-  ;; (use-package helm-plugin
-  ;;   :config
-  ;;   ;; http://stackoverflow.com/questions/19949212/emacs-helm-completion-how-to-turn-off-persistent-help-line
-  ;;   (defadvice helm-display-mode-line (after undisplay-header activate)
-  ;;     (setq header-line-format nil)))
-
   (use-package helm-buffers
     :bind
     (("C-c h m" . helm-mini)
@@ -59,7 +53,7 @@
           helm-buffer-max-length 45
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
-                                      ;; helm-source-dired-recent-dirs
+                                      helm-source-dired-recent-dirs
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
@@ -91,12 +85,6 @@
      ("C-c h f" . helm-find-files)
      ;; ([remap find-file] . helm-find-files)
      ("C-c h r" . helm-recentf)))
-
-  (use-package helm-dabbrev
-    :defer t
-    :config
-    ;;(define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
-    (setq helm-dabbrev-cycle-threshold 5))
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -137,16 +125,6 @@
   (use-package helm-make
     :ensure t
     :bind ("C-c h k" . helm-make-projectile))
-
-  ;; https://github.com/lunaryorn/.emacs.d/blob/master/init.el
-  (use-package helm-company
-    :ensure t
-    :disabled t
-    :if (eq dotemacs-completion 'company)
-    :init (with-eval-after-load 'company
-            (bind-key [remap completion-at-point] #'helm-company company-mode-map)
-            (bind-key "C-:" #'helm-company company-mode-map)
-            (bind-key "C-:" #'helm-company company-active-map)))
 
   (use-package helm-grep
     :init

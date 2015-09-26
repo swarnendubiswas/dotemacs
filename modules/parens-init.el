@@ -27,6 +27,9 @@
       :init
       (add-hook 'prog-mode-hook
                 (lambda ()
+                  (electric-pair-mode 1)))
+      (add-hook 'LaTeX-mode-hook
+                (lambda ()
                   (electric-pair-mode 1))))
 
     (use-package autopair

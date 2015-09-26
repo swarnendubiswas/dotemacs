@@ -19,7 +19,7 @@
 
 (use-package vlf ; speed up Emacs for large files
   :ensure t
-  :defer 5
+  :defer 2
   :config
   (setq large-file-warning-threshold (* 50 1024 1024)) ; warn when opening files bigger than 50MB
   (use-package vlf-setup))
@@ -65,10 +65,16 @@
   :ensure t
   :defer t)
 
+;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
+(use-package popup
+  :ensure nil
+  :defer t
+  :config (setq popup-use-optimized-column-computation nil))
+
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 (use-package popwin
   :ensure t
-  :defer 5
+  :defer 2
   :config
   (popwin-mode 1)
   (setq popwin:popup-window-height 20
@@ -144,10 +150,12 @@
 
 (use-package expand-line
   :ensure t
-  :config (expand-line-mode 1))
+  :defines expand-line-mode
+  :init (expand-line-mode 1))
 
 (use-package smart-mark
   :ensure t
+  :disabled t
   :init (smart-mark-mode 1))
 
 (use-package undo-tree ; Visualize with C-x u
@@ -161,6 +169,12 @@
         undo-tree-visualizer-diff t)
   (global-undo-tree-mode 1)
   :diminish undo-tree-mode)
+
+;; avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating an inferior python
+;; process and aspell
+(add-hook 'comint-exec-hook
+          (lambda ()
+            (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
 
 (provide 'misc-init)
 

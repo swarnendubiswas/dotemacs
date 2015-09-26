@@ -8,7 +8,7 @@
 (use-package flyspell
   :if (eq system-type 'gnu/linux)
   :preface
-  (defun dotemacs-activate-flyspell ()
+  (defun dotemacs--activate-flyspell ()
     "Turn on flyspell-mode and call flyspell-buffer."
     (interactive)
     ;; This next line REALLY slows buffer switching.
@@ -27,20 +27,14 @@
           ;; speed up aspell: ultra | fast | normal | bad-spellers
           ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")))
 
-  ;; use this package if there are performance issues with flyspell, note that this package disables spell checks for
-  ;; certain special buffers, including *scratch*
-  (use-package flyspell-lazy
-    :ensure t
-    :disabled t
-    :init (flyspell-lazy-mode 1))
-
   (setq flyspell-sort-corrections t
         flyspell-check-region-doublons t
         flyspell-issue-message-flag nil)
 
-  (add-hook 'find-file-hooks #'turn-on-flyspell)
   ;; this is to turn on spell check in *scratch* buffer, which is in text-mode.
-  (add-hook 'text-mode-hook #'turn-on-flyspell)
+  (dolist (hook '(text-mode-hook find-file-hooks))
+    (add-hook hook #'turn-on-flyspell))
+
   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
   ;; this is useful but slow
@@ -48,19 +42,31 @@
 
   ;; ;; Activate flyspell for various major modes.
   ;; (unless noninteractive
-  ;;   (add-hook-list customised-hooks-alist 'activate-flyspell))
+  ;;   (add-hook-list customised-hooks-alist 'dotemacs--activate-flyspell))
+
+  :config
+  ;; use this package if there are performance issues with flyspell, note that this package disables spell checks for
+  ;; certain special buffers, including *scratch*
+  (use-package flyspell-lazy
+    :ensure t
+    :disabled t
+    :init (flyspell-lazy-mode 1))
 
   (use-package helm-flyspell
     :ensure t
+    :if (bound-and-true-p dotemacs-use-helm-p)
     :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))
-
-  (use-package ace-flyspell
-    :ensure t
-    :disabled t)
 
   (use-package flyspell-popup
     :ensure t
     :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
+
+  (defhydra hydra-flyspell (:color blue)
+    "flyspell mode"
+    ("f" flyspell-mode "flyspell-mode")
+    ("b" flyspell-buffer "flyspell-buffer")
+    ("w" ispell-word "ispell-word"))
+  (bind-key "C-c i" 'hydra-flyspell/body)
 
   :diminish flyspell-mode
   :bind
@@ -68,13 +74,6 @@
    ("C-c i b" . flyspell-buffer)
    ;; another alternative is M-$
    ("C-c i w" . ispell-word)))
-
-(defhydra hydra-flyspell (:color blue)
-  "flyspell mode"
-  ("f" flyspell-mode "flyspell-mode")
-  ("b" flyspell-buffer "flyspell-buffer")
-  ("w" ispell-word "ispell-word"))
-(bind-key "C-c i" 'hydra-flyspell/body)
 
 (provide 'flyspell-init)
 

@@ -7,7 +7,7 @@
 
 (use-package psvn
   :ensure t
-  :commands svn-status-update-modeline
+  :functions svn-status-update-modeline
   :bind ("C-c d s" . svn-status)
   :config
   (setq svn-status-verbose nil
@@ -15,10 +15,7 @@
         svn-status-hide-unmodified t
         svn-status-display-full-path t
         svn-status-auto-revert-buffers t
-        svn-status-use-ido-completion t)
-
-  (use-package helm-ls-svn
-    :ensure t))
+        svn-status-use-ido-completion t))
 
 (provide 'svn-init)
 

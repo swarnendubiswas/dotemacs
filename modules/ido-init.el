@@ -52,8 +52,8 @@
 
   (use-package ido-hacks
     :ensure t
-    :commands ido-hacks-mode
-    :init (ido-hacks-mode))
+    :functions ido-hacks-mode
+    :config (ido-hacks-mode))
 
   (use-package ido-ubiquitous ; allow ido-style completion in more places
     :ensure t
@@ -62,17 +62,18 @@
   (use-package ido-completing-read+
     :ensure t)
 
-  (use-package ido-better-flex
+  (or (use-package flx-ido ; smarter fuzzy matching for ido
     :ensure t
-    :init (ido-better-flex/enable))
+    :init (flx-ido-mode 1))
+
+  (use-package ido-better-flex ; can add more noise while matching patterns
+    :ensure t
+    :disabled t
+    :init (ido-better-flex/enable)))
 
   (use-package ido-at-point
     :ensure t
     :init (ido-at-point-mode 1))
-
-  (use-package flx-ido ; smarter fuzzy matching for ido
-    :ensure t
-    :init (flx-ido-mode 1))
 
   (use-package ido-describe-bindings
     :ensure t)
