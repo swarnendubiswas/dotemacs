@@ -43,6 +43,7 @@
 
 (use-package auto-compile ; this only *recompiles* elisp source files.
   :ensure t
+  :disabled t
   :init
   (setq load-prefer-newer t
         auto-compile-display-buffer nil

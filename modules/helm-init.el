@@ -69,7 +69,7 @@
           helm-yank-symbol-first t))
 
   (use-package helm-files
-    :init
+    :config
     (setq helm-file-cache-fuzzy-match t
           helm-ff-transformer-show-only-basename nil
           helm-ff-file-name-history-use-recentf t

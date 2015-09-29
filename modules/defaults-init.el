@@ -91,7 +91,7 @@
   :defer t
   :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
-        tramp-default-user "biswass"
+        tramp-default-user "XXX"
         tramp-default-host "XXX"
         tramp-auto-save-directory (locate-user-emacs-file "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))

@@ -18,7 +18,7 @@
 
       (use-package smart-mode-line
         :ensure t
-        :if (or (eq dotemacs-theme 'leuven) (eq dotemacs-theme 'default))
+        :if (eq dotemacs-theme 'leuven)
         :functions (sml/faces-from-theme sml/theme-p)
         :init
         (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
@@ -53,7 +53,34 @@
         ;;       '((nil    . (telephone-line-misc-info-segment))
         ;;         (accent . (telephone-line-major-mode-segment))
         ;;         (nil    . (telephone-line-airline-position-segment))))
-        (telephone-line-mode 1))))
+        (telephone-line-mode 1))
+
+      (use-package spaceline
+        :ensure t
+        :if (eq dotemacs-theme 'default)
+        :init
+        (require 'spaceline-config)
+        (spaceline-emacs-theme)
+        (setq powerline-height 20
+              ;; arrow, slant, chamfer, wave, brace, roundstub, zigzag, butt, rounded, contour, curve
+              powerline-default-separator 'wave
+              spaceline-anzu-p t)
+        (set-face-attribute 'spaceline-highlight-face nil
+                            :background "burlywood"
+                            :foreground "#3E3D31")
+        (set-face-attribute 'powerline-active1 nil
+                            :background "gray22"
+                            :foreground "white"
+                            :weight 'light)
+        (set-face-attribute 'powerline-inactive1 nil
+                            :background "grey11"
+                            :foreground "white")))
+
+  (use-package nyan-mode
+    :init
+    (nyan-mode 1)
+    ;; (nyan-start-animation)
+    (setq-default nyan-wavy-trail nil)))
 
 (provide 'mode-line-init)
 
