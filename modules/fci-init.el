@@ -18,6 +18,27 @@
       (fci-mode 1)))
 
   :config
+  ;; Turn off fci-mode when popups are activated
+  ;; https://github.com/alpaker/Fill-Column-Indicator/issues/21#issuecomment-6959718
+  (with-eval-after-load 'popup
+    (defvar sanityinc/fci-mode-suppressed nil)
+
+    (defun sanityinc/suppress-fci-mode (&rest args)
+      "Suspend fci-mode while popups are visible"
+      (setq-local sanityinc/fci-mode-suppressed fci-mode)
+      (when fci-mode
+        (turn-off-fci-mode)))
+    (advice-add 'popup-create :before #'sanityinc/suppress-fci-mode)
+
+    (defun sanityinc/restore-fci-mode (&rest args)
+      "Restore fci-mode when all popups have closed"
+      (when (and sanityinc/fci-mode-suppressed
+                 (null popup-instances))
+        (setq-local sanityinc/fci-mode-suppressed nil)
+        (turn-on-fci-mode)))
+
+    (advice-add 'popup-delete :after #'sanityinc/restore-fci-mode))
+
   (dotemacs-global-fci-mode 1)
 
   ;; (add-hook 'after-change-major-mode-hook #'dotemacs-auto-fci-mode)

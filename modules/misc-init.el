@@ -76,7 +76,6 @@
   :ensure t
   :defer 2
   :config
-  (popwin-mode 1)
   (setq popwin:popup-window-height 20
         ;; display-buffer-function is an obsolete variable as of 24.3
         display-buffer-function 'popwin:display-buffer)
@@ -85,7 +84,7 @@
   ;; M-x dired-jump-other-window
   (push '(dired-mode :position top) popwin:special-display-config)
   ;; M-x compile
-  ;; (push '(compilation-mode :noselect t) popwin:special-display-config)
+  (push '(compilation-mode :noselect t) popwin:special-display-config)
   (push '("^\*compilation*$" :regexp t) popwin:special-display-config)
   ;; (add-to-list 'popwin:special-display-config '("*compilation*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Compile-Log*" :noselect t))
@@ -107,7 +106,8 @@
   (add-to-list 'popwin:special-display-config '("*sdic*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '(" *auto-async-byte-compile*" :noselect t)))
+  (add-to-list 'popwin:special-display-config '(" *auto-async-byte-compile*" :noselect t))
+  (popwin-mode 1))
 
 (use-package pabbrev
   :ensure t

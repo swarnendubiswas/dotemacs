@@ -40,13 +40,6 @@
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))
 
-  (with-eval-after-load "ibuffer"
-    (use-package ibuffer-projectile ; group buffers by projectile project
-      :ensure t
-      :config
-      (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
-      (setq ibuffer-show-empty-filter-groups nil)))
-
   (defhydra hydra-projectile (:color teal)
     "projectile"
     ("h" helm-projectile "helm-projectile")

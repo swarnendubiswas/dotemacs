@@ -64,6 +64,12 @@
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
                   (ibuffer-do-sort-by-alphabetic)))))
 
+  (use-package ibuffer-projectile ; group buffers by projectile project
+    :ensure t
+    :config
+    (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
+    (setq ibuffer-show-empty-filter-groups nil))
+
   (defhydra hydra-buffer-menu (:color pink)
     "Buffer menu commands"
     ("m" Buffer-menu-mark "mark")

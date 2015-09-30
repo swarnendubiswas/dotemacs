@@ -42,9 +42,13 @@
 
 (setq-default sentence-end-double-space nil)
 
-(setq x-select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications. This variable is
-                                  ; renamed to select-enable-clipboard from Emacs 25.1.
-      line-number-display-limit 2000000
+;; Enable use of system clipboard across Emacs and other applications.
+(if (and (>= emacs-major-version 25)
+         (>= emacs-minor-version 1))
+    (setq select-enable-clipboard t)
+  (setq x-select-enable-clipboard t))
+
+(setq line-number-display-limit 2000000
       visible-bell nil
       ;; draw underline lower
       x-underline-at-descent-line t)
@@ -163,8 +167,9 @@
         jit-lock-stealth-nice 0.5))
 
 (use-package hi-lock
-  :disabled t
-  :init (global-hi-lock-mode 1)
+  :init
+  (setq hi-lock-auto-select-face t)
+  (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
 ;; This config needs to be modified for Emacs 25+, check this link
@@ -172,8 +177,11 @@
 (use-package saveplace ; remember cursor position in files
   :defer 2
   :config
-  (setq-default save-place t ; This is replace by save-place-mode in Emacs 25.1.
-                save-place-file (concat dotemacs-temp-directory "places")))
+  (if (and (>= emacs-major-version 25)
+           (>= emacs-minor-version 1))
+      (save-place-mode 1)
+    (setq-default save-place t))
+  (setq save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package icomplete ; incremental minibuffer completion/suggestions
   :disabled t
