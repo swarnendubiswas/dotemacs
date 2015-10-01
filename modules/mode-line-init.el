@@ -60,11 +60,11 @@
         :if (eq dotemacs-theme 'default)
         :init
         (require 'spaceline-config)
-        (spaceline-emacs-theme)
         (setq powerline-height 20
               ;; arrow, slant, chamfer, wave, brace, roundstub, zigzag, butt, rounded, contour, curve
               powerline-default-separator 'wave
               spaceline-anzu-p t)
+        (spaceline-emacs-theme)
         (set-face-attribute 'spaceline-highlight-face nil
                             :background "burlywood"
                             :foreground "#3E3D31")
@@ -77,6 +77,7 @@
                             :foreground "white")))
 
   (use-package nyan-mode
+    :ensure t
     :init
     (nyan-mode 1)
     ;; (nyan-start-animation)

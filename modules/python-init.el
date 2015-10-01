@@ -35,6 +35,7 @@
       (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
 
 (use-package python-mode
+  :ensure t
   :disabled t
   :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
   :interpreter ("python" . python-mode)
@@ -98,6 +99,7 @@
 ;; Useful packages with pip: autopep8, pyflakes, setuptools, psutil. pip is bundled with python >= 3.4.
 ;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
 ;; sudo pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
+;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
 (use-package elpy
   :ensure t
   :diminish elpy-mode
