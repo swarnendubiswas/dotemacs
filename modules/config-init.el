@@ -40,6 +40,17 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
+(defcustom dotemacs-mode-line-theme
+  'spaceline
+  "Specify the mode-line theme to use."
+  :type '(radio
+          (const :tag "powerline" powerline)
+          (const :tag "smart-mode-line" sml)
+          (const :tag "telephone-line" telephone-line)
+          (const :tag "spaceline" spaceline)
+          (const :tag "default" default))
+  :group 'dotemacs)
+
 (defcustom dotemacs-window-split
   'horizontal
   "Specify the direction in which the windows should be split."

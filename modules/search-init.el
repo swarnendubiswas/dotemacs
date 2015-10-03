@@ -60,6 +60,22 @@
   :config (loccur-mode 1)
   :diminish loccur-mode)
 
+(use-package ag
+  :ensure t
+  :config
+  (setq ag-reuse-buffers t
+        ag-highlight-search t)
+  (use-package helm-ag
+    :ensure t
+    :if (bound-and-true-p dotemacs-use-helm-p)
+    :config
+    (setq helm-ag-fuzzy-match t
+          helm-ag-insert-at-point 'symbol
+          helm-ag-source-type 'file-line))
+  :bind (("C-c s d" . ag-dired)
+         ("C-c s f" . ag-files)
+         ("C-c s h" . helm-ag)))
+
 (provide 'search-init)
 
 ;;; search-init.el ends here

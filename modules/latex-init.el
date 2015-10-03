@@ -69,8 +69,11 @@
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
   (use-package latex-pretty-symbols
-    :ensure t
-    :disabled t)
+    :ensure t)
+
+  ;; required by ac-math and company-math
+  (use-package math-symbol-lists
+    :ensure t)
 
   (when (eq dotemacs-completion 'auto-complete)
     (use-package auto-complete-auctex
@@ -128,29 +131,32 @@
     :config (latex-preview-pane-enable))
 
   (use-package latex-math-preview
-    :ensure t
-    :disabled t)
+    :load-path "packages")
 
   (use-package magic-latex-buffer
     :ensure t
-    :disabled t
+    :diminish magic-latex-buffer
     :init
     (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     (setq magic-latex-enable-block-highlight t
           magic-latex-enable-subscript t
-          magic-latex-enable-pretty-symbols nil
-          magic-latex-enable-block-align t))
-
-  (use-package math-symbol-lists
-    :ensure t
-    :disabled t)
+          magic-latex-enable-pretty-symbols t
+          magic-latex-enable-block-align t
+          magic-latex-enable-inline-image nil))
 
   (use-package bibtex
     :commands bibtex-mode
     :config
+    (add-hook 'bibtex-mode-hook #'BibTeX-auto-store)
     (setq bibtex-maintain-sorted-entries t)
     (use-package bibtex-utils
       :ensure t))
+
+  (use-package bib-cite
+    :diminish bib-cite-minor-mode
+    :config
+    (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
+    (setq bib-cite-use-reftex-view-crossref t))
 
   (use-package reftex
     :diminish reftex-mode

@@ -39,6 +39,13 @@
     (setq helm-completion-in-region-fuzzy-match t)
     (helm-mode 1))
 
+  (use-package helm-dired-recent-dirs
+    :ensure t
+    :disabled t
+    :init
+    (setq shell-file-name "/usr/bin/fish"
+          helm-dired-recent-dirs-max 50))
+
   (use-package helm-buffers
     :bind
     (("C-c h m" . helm-mini)
@@ -53,7 +60,7 @@
           helm-buffer-max-length 45
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
-                                      helm-source-dired-recent-dirs
+                                      ;; helm-source-dired-recent-dirs
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
@@ -85,12 +92,6 @@
      ("C-c h f" . helm-find-files)
      ;; ([remap find-file] . helm-find-files)
      ("C-c h r" . helm-recentf)))
-
-  (use-package helm-dired-recent-dirs
-    :ensure t
-    :init
-    (setq shell-file-name "/usr/bin/fish"
-          helm-dired-recent-dirs-max 50))
 
   (use-package helm-adaptive
     :init

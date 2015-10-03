@@ -12,6 +12,7 @@
   (setq fill-column 78
         python-indent-offset 4)
   (turn-on-auto-fill)
+  (flymake-mode-off)
   (run-python (python-shell-parse-command) nil nil)
 
   (when (eq dotemacs-completion 'auto-complete)
