@@ -152,11 +152,22 @@
     (use-package bibtex-utils
       :ensure t))
 
+  ;; "C-c b f" runs the command 'bib-find
   (use-package bib-cite
     :diminish bib-cite-minor-mode
     :config
-    (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (bib-cite-minor-mode 1)))
     (setq bib-cite-use-reftex-view-crossref t))
+
+  (use-package helm-bibtex
+    :ensure t
+    :if (bound-and-true-p dotemacs-use-helm-p)
+    :init
+    (use-package parsebib
+      :ensure t)
+    :config (setq helm-bibtex-bibliography '("~/workspace/bib/plass.bib")))
 
   (use-package reftex
     :diminish reftex-mode

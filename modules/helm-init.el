@@ -104,11 +104,6 @@
     (fset 'describe-bindings 'helm-descbinds)
     (helm-descbinds-mode 1))
 
-  (use-package helm-bibtex
-    :ensure parsebib
-    :commands helm-bibtex
-    :init (setq helm-bibtex-bibliography '("~/workspace/bib/plass.bib")))
-
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
     :ensure t
