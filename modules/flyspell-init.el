@@ -21,7 +21,7 @@
 
   :init
   (use-package ispell
-    :config
+    :init
     (setq-default ispell-program-name "/usr/bin/aspell")
     (setq ispell-dictionary "english"
           ;; speed up aspell: ultra | fast | normal | bad-spellers

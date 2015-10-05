@@ -35,7 +35,7 @@
   (use-package helm-projectile
     :ensure t
     :if (bound-and-true-p dotemacs-use-helm-p)
-    :config
+    :init
     (setq helm-projectile-fuzzy-match t
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))

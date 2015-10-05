@@ -6,12 +6,11 @@
 ;;; Code:
 
 (use-package ibuffer
-  :defer t
   :preface
   (defun dotemacs-ibuffer-group-buffers ()
     (ibuffer-switch-to-saved-filter-groups "Default"))
 
-  :config
+  :init
   (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   (setq ibuffer-expert t
         ;;ibuffer-shrink-to-minimum-size t
@@ -66,7 +65,7 @@
 
   (use-package ibuffer-projectile ; group buffers by projectile project
     :ensure t
-    :config
+    :init
     (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
     (setq ibuffer-show-empty-filter-groups nil))
 

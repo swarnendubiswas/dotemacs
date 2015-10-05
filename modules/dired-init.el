@@ -7,7 +7,6 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
-  :defer t
   :functions (dired-mark dired-unmark dired-unmark-all-marks dired-toggle-marks dired-prev-marked-file dired-next-marked-file dired-copy-filename-as-kill)
   :preface
   (defun dired-go-home ()
@@ -42,7 +41,7 @@
 
   (use-package dired-x
     :functions (dired-jump dired-omit-mode)
-    :config
+    :init
     (setq dired-bind-jump t
           ;; do not show messages when omitting files
           dired-omit-verbose nil)

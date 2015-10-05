@@ -63,13 +63,13 @@
     :ensure t)
 
   (or (use-package flx-ido ; smarter fuzzy matching for ido
-    :ensure t
-    :init (flx-ido-mode 1))
+        :ensure t
+        :init (flx-ido-mode 1))
 
-  (use-package ido-better-flex ; can add more noise while matching patterns
-    :ensure t
-    :disabled t
-    :init (ido-better-flex/enable)))
+      (use-package ido-better-flex ; can add more noise while matching patterns
+        :ensure t
+        :disabled t
+        :init (ido-better-flex/enable)))
 
   (use-package ido-at-point
     :ensure t

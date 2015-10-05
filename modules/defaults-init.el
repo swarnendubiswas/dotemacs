@@ -92,8 +92,7 @@
   :config (delete-selection-mode 1))
 
 (use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
-  :defer t
-  :config
+  :init
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "XXX"
         tramp-default-host "XXX"
@@ -121,8 +120,7 @@
       use-file-dialog nil)
 
 (use-package advice
-  :defer 2
-  :config
+  :init
   ;; turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 

@@ -63,7 +63,7 @@
     ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") nil))
     ;; (with-eval-after-load "LaTeX"
     ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
-    ;;(bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
+    ;; (bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
 
     ;; unset "C-c ;" since we want to bind it to 'comment-line
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
@@ -102,6 +102,7 @@
     (use-package company-auctex
       :ensure t
       :config (company-auctex-init))
+
     (use-package company-math
       :ensure t
       :config

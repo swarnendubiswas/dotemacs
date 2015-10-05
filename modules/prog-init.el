@@ -18,12 +18,12 @@
                 (add-to-list 'ac-sources 'ac-source-functions))))
 
   (use-package which-func ; show the name of the function in the modeline
-    :init
+    :config
     (setq which-func-modes t)
     (add-hook 'prog-mode-hook
               (lambda ()
                 (which-function-mode 1)))
-    :config (set-face-attribute 'which-func nil :foreground "black"))
+    (set-face-attribute 'which-func nil :foreground "black"))
 
   (use-package electric-operator
     :ensure t
@@ -42,7 +42,6 @@
     :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
 
   (use-package eldoc
-    :defer 2
     :config
     (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
