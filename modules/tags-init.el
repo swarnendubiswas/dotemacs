@@ -50,7 +50,11 @@
   :defer t
   :if (eq system-type 'gnu/linux)
   :diminish ggtags-mode
-  :init (add-hook 'c-mode-common-hook #'ggtags-mode)
+  :init
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                (ggtags-mode 1))))
   :config
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)

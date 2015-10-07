@@ -224,8 +224,7 @@
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
-  :defer t
-  :config
+  :init
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; options: post-forward, reverse, forward
         uniquify-separator ":"
         ;; uniquify-min-dir-content 0

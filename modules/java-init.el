@@ -10,17 +10,9 @@
             (setq c-basic-offset 2
                   c-set-style "java")))
 
-(use-package javap
-  :ensure t
-  :defer t)
-
-(use-package javap-mode
-  :ensure t
-  :defer t)
-
+;; can disassemble .class files from within jars as well
 (use-package autodisass-java-bytecode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package jdee
   :ensure t

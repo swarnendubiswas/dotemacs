@@ -26,7 +26,6 @@
         org-startup-folded 'showeverything ; options: nil
         org-hide-leading-stars t
         org-hide-leading-stars-before-indent-mode t
-        org-completion-use-ido t
         org-support-shift-select t ; use shift-select
         ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines. See
         ;; org-babel-describe-bindings will display a list of the code blocks commands and their related keys.

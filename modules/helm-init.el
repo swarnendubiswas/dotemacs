@@ -91,6 +91,8 @@
      ("<f4>" . helm-find-files)
      ("C-c h f" . helm-find-files)
      ;; ([remap find-file] . helm-find-files)
+     ("<f7>" . helm-for-files)
+     ("C-c h j" . helm-for-files)
      ("C-c h r" . helm-recentf)))
 
   (use-package helm-adaptive
@@ -166,7 +168,7 @@
    ("C-c h y" . helm-show-kill-ring)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
-   ("<f7>" . helm-resume)
+   ("<f9>" . helm-resume)
    ("C-c h u" . helm-resume)
    ;; swoop is better than occur
    ("C-c h o" . helm-occur)))

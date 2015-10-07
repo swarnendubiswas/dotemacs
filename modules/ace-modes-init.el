@@ -70,7 +70,7 @@
 (use-package avy
   :ensure t
   :bind (("M-b" . avy-goto-word-1)
-         ("C-'" . avy-goto-word-or-subword-1))
+         ("C-'" . avy-goto-char))
   :config
   ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one of the currently
   ;; visible isearch candidates using avy.
@@ -82,6 +82,7 @@
   (defhydra hydra-jump-commands (:color blue)
     "Different avy jump commands."
     ("c" avy-goto-char "avy char")
+    ("d" avy-goto-char-2 "avy char 2")
     ("w" avy-goto-word-0 "avy word")
     ("u" avy-goto-word-or-subword-1 "avy word or subword")
     ("l" avy-goto-line "avy line")

@@ -7,7 +7,7 @@
 
 (use-package hl-line ; highlight current line
   :ensure t
-  :if (display-graphic-p)
+  :if (bound-and-true-p display-graphic-p)
   :init
   ;; (global-hl-line-mode 1)
   (setq hl-line-sticky-flag nil) ; Highlight the line only in the active window
@@ -26,33 +26,31 @@
 
 (use-package highlight-numbers
   :ensure t
-  :defer t
   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
-(use-package highlight-symbol
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'prog-mode-hook #'highlight-symbol-mode)
-  ;; Navigate occurrences of the symbol under point with M-n and M-p, and highlight symbol occurrences
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-  (setq highlight-symbol-idle-delay 0.5
-        highlight-symbol-on-navigation-p t)
-  :diminish highlight-symbol-mode)
+(or (use-package highlight-symbol
+      :ensure t
+      :init
+      (add-hook 'prog-mode-hook #'highlight-symbol-mode)
+      ;; Navigate occurrences of the symbol under point with M-n and M-p, and highlight symbol occurrences
+      (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+      (setq highlight-symbol-idle-delay 0.5
+            highlight-symbol-on-navigation-p t)
+      :diminish highlight-symbol-mode)
 
-(use-package auto-highlight-symbol
-  :ensure t
-  :disabled t
-  :init (global-auto-highlight-symbol-mode 1)
-  :config
-  (setq ahs-default-range 'ahs-range-whole-buffer)
-  ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-  (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
-  (bind-keys
-   :map auto-highlight-symbol-mode-map
-   ("M-<" . ahs-backward)
-   ("M->" . ahs-forward)))
+    (use-package auto-highlight-symbol
+      :ensure t
+      :disabled t
+      :init (global-auto-highlight-symbol-mode 1)
+      :config
+      (setq ahs-default-range 'ahs-range-whole-buffer)
+      ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
+      (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
+      (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
+      (bind-keys
+       :map auto-highlight-symbol-mode-map
+       ("M-<" . ahs-backward)
+       ("M->" . ahs-forward))))
 
 ;; highlight certain words
 

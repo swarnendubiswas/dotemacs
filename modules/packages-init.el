@@ -54,10 +54,12 @@
 (use-package paradox
   :ensure t
   :bind (("C-c d p" . paradox-list-packages)
-         ("C-c d u" . paradox-upgrade-packages))
+         ("C-c d u" . paradox-upgrade-packages)
+      	 ("C-c d P" . paradox-list-packages-no-fetch))
   :config
   (setq paradox-execute-asynchronously t
-        paradox-github-token t))
+        paradox-github-token t
+        paradox-spinner-type 'moon))
 
 (use-package hydra
   :ensure t)

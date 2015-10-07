@@ -6,22 +6,22 @@
 ;;; Code:
 
 ;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
-;; “gnu”: The default style for GNU projects
-;; “k&r”: What Kernighan and Ritchie, the authors of C used in their book
-;; “bsd”: What BSD developers use, aka “Allman style” after Eric Allman.
-;; “whitesmith”: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
-;; “stroustrup”: What Stroustrup, the author of C++ used in his book
-;; “ellemtel”: Popular C++ coding standards as defined by “Programming in C++, Rules and Recommendations,” Erik Nyquist
+;; gnu: The default style for GNU projects
+;; k&r: What Kernighan and Ritchie, the authors of C used in their book
+;; bsd: What BSD developers use, aka "Allman style" after Eric Allman.
+;; whitesmith: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
+;; stroustrup: What Stroustrup, the author of C++ used in his book
+;; ellemtel: Popular C++ coding standards as defined by "Programming in C++, Rules and Recommendations," Erik Nyquist
 ;;  and Mats Henricson, Ellemtel
-;; “linux”: What the Linux developers use for kernel development
-;; “python”: What Python developers use for extension modules
-;; “java”: The default style for java-mode (see below)
-;; “user”: When you want to define your own style
+;; linux: What the Linux developers use for kernel development
+;; python: What Python developers use for extension modules
+;; java: The default style for java-mode (see below)
+;; user: When you want to define your own style
 
 (setq c-default-style '((java-mode . "java")
-                        (c-mode . "k&r")
                         (c++-mode . "stroustrup")
                         (other . "gnu/linux")
+                        (c-mode . "k&r")
                         (awk-mode . "awk")))
 
 (use-package cc-mode
@@ -34,6 +34,9 @@
   (c-toggle-electric-state 1)
   (c-toggle-syntactic-indentation 1)
   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
+  (add-hook 'c-mode-hook
+            (lambda ()
+              (abbrev-mode -1)))
 
   (use-package cwarn
     :ensure t
@@ -108,7 +111,7 @@
     :if (eq dotemacs-completion 'auto-complete)
     :config
     (add-to-list 'ac-sources #'ac-sources-c-headers)
-    (add-to-list 'ac-sources #'ac-sources-c-headers-symbols t))
+    (add-to-list 'ac-sources #'ac-sources-c-headers-symbols))
 
   (use-package auto-complete-clang
     :ensure t

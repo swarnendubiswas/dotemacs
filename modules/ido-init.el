@@ -48,6 +48,7 @@
 
   (use-package ido-yes-or-no
     :ensure t
+    :disabled t
     :init (ido-yes-or-no-mode))
 
   (use-package ido-hacks
