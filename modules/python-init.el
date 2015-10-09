@@ -31,32 +31,33 @@
   (with-eval-after-load "flycheck"
     (use-package flycheck-pyflakes
       :ensure t
+      :disabled t
       :config
       (add-to-list 'flycheck-disabled-checkers 'python-flake8)
       (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
 
 (use-package python-mode
   :ensure t
-  :disabled t
   :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
   :interpreter ("python" . python-mode)
   :config
-  (add-hook 'python-mode-hook #'dotemacs--python-setup)
+  (add-hook 'python-mode-hook #'dotemacs--python-setup))
 
-  (use-package jedi
+(use-package jedi
+  :ensure t
+  :disabled t
+  :config
+  (use-package virtualenv
+    :ensure t)
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (setq jedi:complete-on-dot t)
+
+  (use-package company-jedi
     :ensure t
+    :if (eq dotemacs-completion 'company)
     :config
-    (use-package virtualenv
-      :ensure t)
-    (add-hook 'python-mode-hook 'jedi:setup)
-    (setq jedi:complete-on-dot t)
-
-    (use-package company-jedi
-      :ensure t
-      :if (eq dotemacs-completion 'company)
-      :config
-      (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-jedi)))))
+    (with-eval-after-load "company"
+      (add-to-list 'company-backends 'company-jedi))))
 
 (use-package anaconda-mode
   :ensure t
@@ -103,6 +104,7 @@
 ;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
 (use-package elpy
   :ensure t
+  :disabled t
   :diminish elpy-mode
   :preface
   (defun dotemacs--elpy-setup ()

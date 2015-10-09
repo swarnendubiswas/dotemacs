@@ -91,6 +91,7 @@
   :defer 2
   :config (delete-selection-mode 1))
 
+;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 (use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
   :init
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
@@ -101,6 +102,12 @@
   ;; disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
+  ;; Disable version control. If you access remote files which are not under version control, a lot of check operations
+  ;; can be avoided by disabling VC.
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp))
   (use-package password-cache
     :init (setq password-cache-expiry nil))
   (use-package tramp-term

@@ -49,11 +49,10 @@
   (use-package helm-buffers
     :bind
     (("C-c h m" . helm-mini)
-     ("<f5>" . helm-mini)
      ;; ([remap switch-to-buffer] . helm-mini)
      ;; ([remap list-buffers] . helm-buffers-list)
-     ("C-c h b" . helm-buffers-list)
-     ("<f6>" . helm-buffers-list))
+     ("<f6>" . helm-buffers-list)
+     ("C-c h b" . helm-buffers-list))
     :config
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
@@ -64,7 +63,7 @@
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
-    :bind*
+    :bind
     (([remap execute-extended-command] . helm-M-x)
      ("M-x" . helm-M-x)
      ;; convenient since it is a single keypress
@@ -86,12 +85,12 @@
           helm-ff-skip-boring-files t
           helm-boring-file-regexp-list (append helm-boring-file-regexp-list
                                                '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\#$" "\\~$")))
-    :bind*
+    :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
      ("<f4>" . helm-find-files)
      ("C-c h f" . helm-find-files)
      ;; ([remap find-file] . helm-find-files)
-     ("<f7>" . helm-for-files)
+     ("<f5>" . helm-for-files)
      ("C-c h j" . helm-for-files)
      ("C-c h r" . helm-recentf)))
 
@@ -163,12 +162,12 @@
   (global-unset-key (kbd "C-b"))
   (bind-key "C-b" 'hydra-helm/body)
 
-  :bind*
+  :bind
   (("C-c h l" . helm-locate)
    ("C-c h y" . helm-show-kill-ring)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
-   ("<f9>" . helm-resume)
+   ("<f7>" . helm-resume)
    ("C-c h u" . helm-resume)
    ;; swoop is better than occur
    ("C-c h o" . helm-occur)))

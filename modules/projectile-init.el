@@ -56,6 +56,7 @@
     ("K" projectile-kill-buffers "kill buffers")
     ("g" helm-projectile-grep "grep")
     ("o" projectile-multi-occur "multi-occur"))
+  ;; i want my hydra bindings over projectile default
   (bind-key* "C-c p" 'hydra-projectile/body)
 
   :diminish projectile-mode)

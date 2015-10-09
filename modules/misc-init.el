@@ -74,29 +74,21 @@
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 (use-package popwin
   :ensure t
-  :defer 2
   :config
-  (setq popwin:popup-window-height 20
-        ;; display-buffer-function is an obsolete variable as of 24.3
-        display-buffer-function 'popwin:display-buffer)
+  (setq popwin:popup-window-height 20)
   (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
   (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
   ;; M-x dired-jump-other-window
   (push '(dired-mode :position top) popwin:special-display-config)
   ;; M-x compile
   (push '(compilation-mode :noselect t) popwin:special-display-config)
-  (push '("^\*compilation*$" :regexp t) popwin:special-display-config)
-  ;; (add-to-list 'popwin:special-display-config '("*compilation*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Compile-Log*" :noselect t))
   (push '(svn-info-mode :noselect t) popwin:special-display-config)
   (push '(svn-status-mode) popwin:special-display-config)
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '(manage-minor-mode :noselect t) popwin:special-display-config)
-  (push '("*manage-minor-mode*" :regexp t) popwin:special-display-config)
   ;; (push '(help-mode :noselect t) popwin:special-display-config)
   (push '("*Help*" :regexp t) popwin:special-display-config)
-  ;; (add-to-list 'popwin:special-display-config '("*Help*"))
-  ;; *Paradox report-bugs
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
