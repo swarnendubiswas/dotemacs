@@ -144,7 +144,7 @@
     (setq magic-latex-enable-block-highlight t
           magic-latex-enable-subscript t
           magic-latex-enable-pretty-symbols t
-          magic-latex-enable-block-align t
+          magic-latex-enable-block-align nil
           magic-latex-enable-inline-image nil))
 
   (use-package bibtex
