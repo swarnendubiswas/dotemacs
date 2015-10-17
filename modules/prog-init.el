@@ -84,22 +84,7 @@
             sr-speedbar-max-width 40
             sr-speedbar-width 30
             sr-speedbar-default-width 30
-            sr-speedbar-skip-other-window-p t)))
-
-  (use-package ws-butler
-    :ensure t
-    :diminish ws-butler-mode
-    :init (add-hook 'prog-mode-hook #'ws-butler-mode))
-
-  (use-package dtrt-indent
-    :ensure t
-    :disabled t
-    :diminish dtrt-indent-mode
-    :config
-    (setq dtrt-indent-verbosity 0)
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (dtrt-indent-mode 1)))))
+            sr-speedbar-skip-other-window-p t))))
 
 (use-package web-mode
   :functions (web-beautify-css web-beautify-html web-beautify-js)

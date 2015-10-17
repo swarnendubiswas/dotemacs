@@ -7,7 +7,12 @@
 
 (use-package helm
   :ensure helm-core
+  :if (bound-and-true-p dotemacs-use-helm-p)
   :init
+  (use-package helm-flx ;; recommended to load before helm
+    :ensure t
+    :config (helm-flx-mode 1))
+
   (setq helm-quick-update t ; do not display invisible candidates
         helm-candidate-number-limit 100
         helm-M-x-fuzzy-match t
@@ -31,13 +36,13 @@
         ;; helm-autoresize-min-height 60
         helm-case-fold-search 'smart)
 
-  ;; (helm-autoresize-mode 1)
-
   (use-package helm-mode
     :diminish helm-mode
     :init
     (setq helm-completion-in-region-fuzzy-match t)
     (helm-mode 1))
+
+  (helm-autoresize-mode 1)
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -139,8 +144,9 @@
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 
-  (bind-key "<tab>" 'helm-execute-persistent-action helm-map) ; do not rebind <tab> globally
-  (bind-key "C-z" 'helm-select-action helm-map)
+  (bind-keys :map helm-map
+             ("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
+             ("C-z" . helm-select-action))
 
   ;; http://ericjmritz.name/2015/04/06/organizing-key-bindings-in-gnu-emacs-using-hydra/
   (defhydra hydra-helm (:color blue)

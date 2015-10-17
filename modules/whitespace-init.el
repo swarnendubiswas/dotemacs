@@ -23,7 +23,12 @@
   (use-package whitespace-cleanup-mode
     :ensure t
     :diminish whitespace-cleanup-mode
-    :init (whitespace-cleanup-mode 1)))
+    :init (whitespace-cleanup-mode 1))
+
+  (use-package ws-butler
+    :ensure t
+    :diminish ws-butler-mode
+    :init (add-hook 'prog-mode-hook #'ws-butler-mode)))
 
 (provide 'whitespace-init)
 

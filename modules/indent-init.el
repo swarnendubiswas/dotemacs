@@ -57,6 +57,16 @@
   :disabled t
   :init (global-smart-tab-mode 1))
 
+(use-package dtrt-indent
+  :ensure t
+  :disabled t
+  :diminish dtrt-indent-mode
+  :config
+  (setq dtrt-indent-verbosity 0)
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (dtrt-indent-mode 1))))
+
 (provide 'indent-init)
 
 ;;; indent-init.el ends here

@@ -61,7 +61,11 @@
 
   (use-package company-try-hard
     :ensure t
-    :init (bind-key "C-z" #'company-try-hard company-active-map)))
+    :init (bind-key "C-z" #'company-try-hard company-active-map))
+
+  (use-package company-flx
+    :ensure t
+    :config (company-flx-mode 1)))
 
 (use-package company-statistics
   :ensure t

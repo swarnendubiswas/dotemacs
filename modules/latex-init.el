@@ -164,16 +164,15 @@
                 (bib-cite-minor-mode 1)))
     (setq bib-cite-use-reftex-view-crossref t))
 
-  (with-eval-after-load "helm"
-    (use-package helm-bibtex
-      :ensure t
-      :disabled t
-      :if (bound-and-true-p dotemacs-use-helm-p)
-      :init
-      (use-package parsebib
-        :ensure t)
-      :config
-      (setq helm-bibtex-bibliography '("~/workspace/bib/plass.bib"))))
+  ;; FIXME: Cannot get this to work.
+  (use-package helm-bibtex
+    :ensure t
+    :if (bound-and-true-p dotemacs-use-helm-p)
+    :init
+    (use-package parsebib
+      :ensure t)
+    :bind* ("C-c b" . helm-bibtex)
+    :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass.bib")))
 
   (use-package reftex
     :diminish reftex-mode

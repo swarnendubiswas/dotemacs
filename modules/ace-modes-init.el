@@ -77,7 +77,9 @@
   (avy-setup-default)
   (setq avy-background t
         ;; options: pre, at, at-full, post, de-bruijn
-        avy-style 'pre)
+        ;; pre is a bit distracting because of all the movement while highlighting selection keys. This causes 
+        ;; the eyes to lose focus.
+        avy-style 'at)
 
   (defhydra hydra-jump-commands (:color blue)
     "Different avy jump commands."
