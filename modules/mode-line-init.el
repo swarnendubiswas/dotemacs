@@ -77,6 +77,7 @@
 
 (use-package nyan-mode
   :ensure t
+  :if (when display-graphics-p)
   :init
   (nyan-mode 1)
   ;; (nyan-start-animation)
