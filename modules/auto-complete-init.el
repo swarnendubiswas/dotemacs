@@ -55,12 +55,12 @@
                                 inferior-emacs-lisp-mode))
     (add-to-list 'ac-modes mode))
 
-  ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
-  (defun ac-turn-off-line-truncation (orig &optional force)
-    (toggle-truncate-lines -1)
-    (funcall orig force)
-    (toggle-truncate-lines 1))
-  (advice-add 'ac-quick-help :around #'ac-turn-off-line-truncation)
+  ;; ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
+  ;; (defun ac-turn-off-line-truncation (orig &optional force)
+  ;;   (toggle-truncate-lines -1)
+  ;;   (funcall orig force)
+  ;;   (toggle-truncate-lines 1))
+  ;; (advice-add 'ac-quick-help :around #'ac-turn-off-line-truncation)
 
   (use-package ac-capf
     :ensure t

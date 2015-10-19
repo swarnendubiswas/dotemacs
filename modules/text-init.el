@@ -10,8 +10,6 @@
 
 (defun dotemacs--text-mode-setup ()
   "Helper function for configuring text mode."
-  (setq truncate-lines nil
-        truncate-partial-width-windows nil)
   (turn-off-hideshow))
 (add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 

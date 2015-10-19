@@ -75,13 +75,13 @@
 
       ((eq dotemacs-mode-line-theme 'default)))
 
-(use-package nyan-mode
-  :ensure t
-  :if (when display-graphics-p)
-  :init
-  (nyan-mode 1)
-  ;; (nyan-start-animation)
-  (setq-default nyan-wavy-trail nil))
+(when (fboundp 'display-graphics-p)
+  (use-package nyan-mode
+    :ensure t
+    :init
+    (nyan-mode 1)
+    ;; (nyan-start-animation)
+    (setq-default nyan-wavy-trail nil)))
 
 (provide 'mode-line-init)
 
