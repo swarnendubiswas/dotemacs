@@ -82,7 +82,10 @@
           helm-gtags-cache-select-result t
           helm-gtags-display-style 'detail
           helm-gtags-update-interval-second 60)
-    (add-hook 'c-mode-common-hook #'helm-gtags-mode)
+    (add-hook 'c-mode-common-hook
+              (lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                  (helm-gtags-mode 1))))
 
     (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
     (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
