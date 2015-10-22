@@ -17,6 +17,9 @@
     :config (bind-key "<tab>" 'isearch-dabbrev-expand isearch-mode-map))
   (use-package isearch-symbol-at-point
     :ensure t)
+  (unbind-key "C-s") ; isearch-forward-regexp
+  (bind-key "C-f" #'isearch-forward-regexp)
+  (bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
   :diminish isearch-mode)
 
 (use-package replace

@@ -15,10 +15,6 @@
 (bind-key "C-c z" #'repeat)
 (bind-key "C-z" #'undo)
 
-(unbind-key "C-s") ; isearch-forward-regexp
-(bind-key "C-f" #'isearch-forward-regexp)
-(bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
-
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
 (bind-key "C-c ;" #'dotemacs-comment-line)

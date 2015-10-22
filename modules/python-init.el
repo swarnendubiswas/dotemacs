@@ -31,7 +31,6 @@
   (with-eval-after-load "flycheck"
     (use-package flycheck-pyflakes
       :ensure t
-      :disabled t
       :config
       (add-to-list 'flycheck-disabled-checkers 'python-flake8)
       (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
@@ -40,8 +39,7 @@
   :ensure t
   :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
   :interpreter ("python" . python-mode)
-  :config
-  (add-hook 'python-mode-hook #'dotemacs--python-setup))
+  :config (add-hook 'python-mode-hook #'dotemacs--python-setup))
 
 (use-package jedi
   :ensure t

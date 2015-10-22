@@ -46,7 +46,8 @@
     (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
     (add-hook 'ielm-mode-hook #'eldoc-mode)
-    (add-hook 'python-mode-hook #'eldoc-mode)
+    ;; SB: I am not actively using Emacs for Python development
+    ;; (add-hook 'python-mode-hook #'eldoc-mode)
     (use-package c-eldoc
       :ensure t
       :config (add-hook 'c-mode-hook #'eldoc-mode))
