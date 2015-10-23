@@ -63,12 +63,13 @@
     :ensure t
     :init (bind-key "C-z" #'company-try-hard company-active-map))
 
-  (with-eval-after-load "company"
-    (use-package company-flx
-      :ensure t
-      :config
-      (setq company-flx-limit 50)
-      (company-flx-mode -1))))
+  :config
+  (use-package company-flx
+    :ensure t
+    :disabled t
+    :config
+    (setq company-flx-limit 50)
+    (company-flx-mode 1)))
 
 (use-package company-statistics
   :ensure t

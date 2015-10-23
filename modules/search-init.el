@@ -17,10 +17,11 @@
     :config (bind-key "<tab>" 'isearch-dabbrev-expand isearch-mode-map))
   (use-package isearch-symbol-at-point
     :ensure t)
-  (unbind-key "C-s") ; isearch-forward-regexp
-  (bind-key "C-f" #'isearch-forward-regexp)
-  (bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
   :diminish isearch-mode)
+
+(unbind-key "C-s") ; isearch-forward-regexp
+(bind-key "C-f" #'isearch-forward-regexp)
+(bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
 
 (use-package replace
   :defer t
@@ -39,10 +40,15 @@
   (use-package ivy
     :init
     (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
+    (setq ivy-use-virtual-buffers t
+          ivy-virtual-abbreviate 'full
+          ivy-wrap t)
     (bind-key "C-c s u" 'ivy-resume ivy-mode-map)
     :diminish ivy-mode)
   (setq swiper-min-highlight 3) ; be less noisy
+  (use-package swiper-helm
+    :ensure t
+    :bind ("C-c s h"))
   :bind ("C-c s s" . swiper))
 
 (use-package color-moccur
@@ -77,7 +83,7 @@
           helm-ag-source-type 'file-line))
   :bind (("C-c s d" . ag-dired)
          ("C-c s f" . ag-files)
-         ("C-c s h" . helm-ag)))
+         ("C-c s a" . helm-ag)))
 
 (provide 'search-init)
 

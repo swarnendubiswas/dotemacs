@@ -7,7 +7,7 @@
 
 (use-package ibuffer
   :preface
-  (defun dotemacs-ibuffer-group-buffers ()
+  (defun dotemacs--ibuffer-group-buffers ()
     (ibuffer-switch-to-saved-filter-groups "Default"))
 
   :init
@@ -36,11 +36,10 @@
 
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
-  ;; Prefer ibuffer sorting based on projects via ibuffer-projectile
-  ;; (add-hook 'ibuffer-hook #'dotemacs-ibuffer-group-buffers)
+  ;; (add-hook 'ibuffer-hook #'dotemacs--ibuffer-group-buffers)
   ;; (add-hook 'ibuffer-hook
   ;;           (lambda ()
-  ;;             (ibuffer-do-sort-by-recency)))
+  ;;             (ibuffer-do-sort-by-alphabetic))
 
   ;; Group ibuffer list by tramp connection
   (use-package ibuffer-tramp
@@ -65,10 +64,12 @@
 
   (use-package ibuffer-projectile ; group buffers by projectile project
     :ensure t
-    :init
+    :defer t
+    :config
     (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
     (setq ibuffer-show-empty-filter-groups nil))
 
+  :config
   (defhydra hydra-buffer-menu (:color pink)
     "Buffer menu commands"
     ("m" Buffer-menu-mark "mark")
