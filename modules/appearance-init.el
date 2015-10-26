@@ -181,6 +181,12 @@
   :bind* (("M-<left>" . tabbar-backward-tab)
           ("M-<right>" . tabbar-forward-tab)))
 
+(when (eq system-type 'windows-nt)
+(set-face-font 'default "-outline-Consolas-normal-r-normal-normal-*-*-96-96-c-*-iso8859-1")
+(set-face-font 'bold "-outline-Consolas-bold-r-normal-normal-*-*-96-96-c-*-iso8859-1")
+(set-face-font 'italic "-outline-Consolas-normal-i-normal-normal-*-*-96-96-c-*-iso8859-1")
+(set-face-font 'bold-italic "-outline-Consolas-bold-i-normal-normal-*-*-96-96-c-*-iso8859-1"))
+
 (provide 'appearance-init)
 
 ;;; appearance-init.el ends here

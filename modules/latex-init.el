@@ -142,7 +142,7 @@
     :init
     (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     (setq magic-latex-enable-block-highlight t
-          magic-latex-enable-subscript t
+          magic-latex-enable-subscript nil
           magic-latex-enable-pretty-symbols t
           magic-latex-enable-block-align nil
           magic-latex-enable-inline-image nil))

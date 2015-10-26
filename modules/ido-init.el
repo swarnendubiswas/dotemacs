@@ -79,6 +79,10 @@
   (use-package ido-describe-bindings
     :ensure t)
 
+  (use-package ido-grid-mode
+    :ensure t
+    :init (ido-grid-mode 1))
+
   :bind
   (("<f3>" . ido-find-file)
    ("C-x C-f" . ido-find-file)
