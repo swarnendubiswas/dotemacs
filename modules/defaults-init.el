@@ -79,7 +79,6 @@
   :bind ("C-c d f" . auto-fill-mode))
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
-  :defer 2
   :config
   (global-auto-revert-mode 1)
   (setq-default auto-revert-interval 10 ; Default is 5 s.
@@ -88,7 +87,6 @@
                 global-auto-revert-non-file-buffers t))
 
 (use-package delsel ; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
-  :defer 2
   :config (delete-selection-mode 1))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
@@ -180,7 +178,6 @@
 ;; This config needs to be modified for Emacs 25+, check this link
 ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
 (use-package saveplace ; remember cursor position in files
-  :defer 2
   :config
   (if (and (>= emacs-major-version 25)
            (>= emacs-minor-version 1))
@@ -202,7 +199,6 @@
   :init (icy-mode 1))
 
 (use-package savehist ; save minibuffer histories across sessions
-  :defer 2
   :config
   (savehist-mode 1)
   (setq savehist-save-minibuffer-history t
@@ -227,7 +223,6 @@
   :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
 
 (use-package mb-depth
-  :defer 2
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify

@@ -144,6 +144,10 @@
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 
+  (use-package helm-fuzzier
+    :ensure t
+    :init (helm-fuzzier-mode 1))
+
   (bind-keys :map helm-map
              ("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
              ("C-z" . helm-select-action))

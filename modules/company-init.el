@@ -73,14 +73,12 @@
 
 (use-package company-statistics
   :ensure t
-  :defer 2
   :config
   (company-statistics-mode 1)
   (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el")))
 
 (use-package company-quickhelp
   :ensure t
-  :defer 2
   :config
   (company-quickhelp-mode 1)
   (setq company-quickhelp-delay 0.5

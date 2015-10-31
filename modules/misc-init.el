@@ -19,7 +19,6 @@
 
 (use-package vlf ; speed up Emacs for large files
   :ensure t
-  :defer 2
   :config
   (setq large-file-warning-threshold (* 50 1024 1024)) ; warn when opening files bigger than 50MB
   (use-package vlf-setup))
