@@ -22,7 +22,7 @@
   (setq TeX-auto-save t ; enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
         TeX-clean-confirm nil
-        TeX-quote-after-quote t
+        TeX-quote-after-quote nil ; allow original LaTeX quotes
         TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
         TeX-default-mode 'LaTeX-mode
         TeX-force-default-mode t
