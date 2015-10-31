@@ -9,7 +9,6 @@
 (use-package flycheck
   :disabled t
   :if (not (string-equal system-name "XXX"))
-  :defer 2
   :diminish flycheck-mode
   :init
   (add-hook 'prog-mode-hook #'global-flycheck-mode)

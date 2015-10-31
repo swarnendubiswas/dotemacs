@@ -139,6 +139,7 @@
   (use-package magic-latex-buffer
     :ensure t
     :diminish magic-latex-buffer
+    :disabled t
     :init
     (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     (setq magic-latex-enable-block-highlight t

@@ -30,6 +30,15 @@
   :type  'boolean
   :group 'dotemacs)
 
+(defcustom dotemacs-ido-view-mode
+  'grid
+  "Specify which view to use for ido."
+  :type '(radio
+          (const :tag "vertical" vertical)
+          (const :tag "grid" grid)
+          (const :tag "default" default))
+  :group 'dotemacs)
+
 (defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."

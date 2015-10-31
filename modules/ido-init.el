@@ -39,14 +39,7 @@
   (dolist (dirs '(".svn" ".dropbox .git"))
     (add-to-list 'ido-ignore-directories dirs))
 
-  (use-package ido-vertical-mode
-    :ensure t
-    :init
-    ;; up and down keys to navigate options, left and right to move through history/directories
-    (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-    (ido-vertical-mode 1))
-
-  (use-package ido-yes-or-no
+  (use-package ido-yes-or-no ; overkill
     :ensure t
     :disabled t
     :init (ido-yes-or-no-mode))
@@ -79,9 +72,25 @@
   (use-package ido-describe-bindings
     :ensure t)
 
-  (use-package ido-grid-mode
-    :ensure t
-    :init (ido-grid-mode 1))
+  (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
+                                                 :ensure t
+                                                 :init
+                                                 ;; up and down keys to navigate options, left and right to move through history/directories
+                                                 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
+                                                 (ido-vertical-mode 1)))
+
+        ((eq dotemacs-ido-view-mode 'grid)   (use-package ido-grid-mode
+                                               :ensure t
+                                               :init
+                                               (ido-grid-mode 1)
+                                               ;;   (setq ido-grid-mode-max-columns nil
+                                               ;;         ido-grid-mode-max-rows nil
+                                               ;;         ido-grid-mode-prefix-scrolls t
+                                               ;;         ido-grid-mode-scroll-down #'ido-grid-mode-next-row
+                                               ;;         ido-grid-mode-scroll-up #'ido-grid-mode-previous-row
+                                               ;;         ido-grid-mode-order nil
+                                               ;;         ido-grid-mode-start-collapsed t)
+                                               )))
 
   :bind
   (("<f3>" . ido-find-file)

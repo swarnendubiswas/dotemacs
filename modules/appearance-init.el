@@ -21,14 +21,12 @@
     (menu-bar-mode 1)))
 
 (use-package tooltip
-  :defer 2
   :config (tooltip-mode -1))
 
 (use-package scroll-bar
   :init (scroll-bar-mode 1))
 
 (use-package frame
-  :defer 2
   :config
   (blink-cursor-mode 0) ; enable/disable blinking cursor
   ;; start with Emacs window maximized:
@@ -115,7 +113,6 @@
 (use-package display-theme
   :ensure t
   :if (not (eq dotemacs-theme 'default))
-  :defer 2
   :config (global-display-theme-mode))
 
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
