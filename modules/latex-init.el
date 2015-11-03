@@ -139,13 +139,12 @@
   (use-package magic-latex-buffer
     :ensure t
     :diminish magic-latex-buffer
-    :disabled t
     :init
     (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
-    (setq magic-latex-enable-block-highlight t
+    (setq magic-latex-enable-block-highlight nil
           magic-latex-enable-subscript nil
-          magic-latex-enable-pretty-symbols t
-          magic-latex-enable-block-align nil
+          magic-latex-enable-pretty-symbols nil
+          magic-latex-enable-block-align t
           magic-latex-enable-inline-image nil))
 
   (use-package bibtex
@@ -165,7 +164,6 @@
                 (bib-cite-minor-mode 1)))
     (setq bib-cite-use-reftex-view-crossref t))
 
-  ;; FIXME: Cannot get this to work.
   (use-package helm-bibtex
     :ensure t
     :if (bound-and-true-p dotemacs-use-helm-p)
@@ -173,7 +171,7 @@
     (use-package parsebib
       :ensure t)
     :bind* ("C-c b" . helm-bibtex)
-    :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass.bib")))
+    :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-reformatted.bib")))
 
   (use-package reftex
     :diminish reftex-mode
