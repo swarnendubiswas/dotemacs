@@ -138,13 +138,14 @@
 
   (use-package magic-latex-buffer
     :ensure t
+    :disabled t
     :diminish magic-latex-buffer
     :init
     (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     (setq magic-latex-enable-block-highlight nil
           magic-latex-enable-subscript nil
           magic-latex-enable-pretty-symbols nil
-          magic-latex-enable-block-align t
+          magic-latex-enable-block-align nil
           magic-latex-enable-inline-image nil))
 
   (use-package bibtex
@@ -170,7 +171,7 @@
     :init
     (use-package parsebib
       :ensure t)
-    :bind* ("C-c b" . helm-bibtex)
+    :bind ("C-c b x" . helm-bibtex)
     :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-reformatted.bib")))
 
   (use-package reftex
