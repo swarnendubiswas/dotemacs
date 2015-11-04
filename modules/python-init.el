@@ -7,10 +7,14 @@
 
 ;; Use either python-mode or elpy or anaconda-mode.
 
+(use-package python ; Emacs built-in python mode
+  :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
+  :interpreter ("python" . python-mode))
+
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."
-  (setq fill-column 78
-        python-indent-offset 4)
+  (setq-default fill-column 78
+                python-indent-offset 4)
   (turn-on-auto-fill)
   (flymake-mode-off)
   (run-python (python-shell-parse-command) nil nil)
@@ -37,6 +41,7 @@
 
 (use-package python-mode
   :ensure t
+  :disabled t
   :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
   :interpreter ("python" . python-mode)
   :config (add-hook 'python-mode-hook #'dotemacs--python-setup))
