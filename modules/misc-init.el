@@ -49,7 +49,8 @@
 
 (use-package graphviz-dot-mode
   :ensure t
-  :defer t)
+  :defer t
+  :config (setq graphviz-dot-indent-width 4))
 
 (use-package goto-last-change
   :ensure t
@@ -166,6 +167,10 @@
 (add-hook 'comint-exec-hook
           (lambda ()
             (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
+
+(use-package ignoramus
+  :ensure t
+  :init (ignoramus-setup))
 
 (provide 'misc-init)
 

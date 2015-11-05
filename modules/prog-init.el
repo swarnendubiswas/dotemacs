@@ -51,6 +51,8 @@
     (use-package c-eldoc
       :ensure t
       :config (add-hook 'c-mode-hook #'eldoc-mode))
+    (use-package eldoc-extension
+      :ensure t)
     :diminish eldoc-mode)
 
   (use-package make-mode

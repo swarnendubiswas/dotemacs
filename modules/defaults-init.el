@@ -91,7 +91,8 @@
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 (use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
-  :init
+  :defer t
+  :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "XXX"
         tramp-default-host "XXX"
@@ -169,8 +170,9 @@
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
 
-(use-package hi-lock
-  :init
+(use-package hi-lock ; Custom regexp highlights
+  :defer t
+  :config
   (setq hi-lock-auto-select-face t)
   (global-hi-lock-mode 1)
   :diminish hi-lock-mode)

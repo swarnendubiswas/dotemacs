@@ -47,6 +47,12 @@
               (lambda()
                 (latex-electric-env-pair-mode 1))))
 
+  (use-package tex-buf
+    :config (setq TeX-save-query nil))
+
+  (use-package tex-fold
+    :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
+
   (use-package latex
     :mode ("\\.tex\\'" . LaTeX-mode)
     :functions LaTeX-math-mode
