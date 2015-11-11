@@ -7,7 +7,6 @@
 
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
-  :disabled t
   :if (not (string-equal system-name "XXX"))
   :diminish flycheck-mode
   :init

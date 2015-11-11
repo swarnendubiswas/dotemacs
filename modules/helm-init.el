@@ -13,22 +13,18 @@
     :ensure t
     :config (helm-flx-mode 1))
 
-  (setq helm-quick-update t ; do not display invisible candidates
-        helm-candidate-number-limit 100
-        helm-M-x-fuzzy-match t
+  (setq helm-quick-update t
+        helm-candidate-number-limit 50
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
-        helm-apropos-fuzzy-match t
         helm-split-window-default-side 'below
         helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
-        ido-use-virtual-buffers 'auto
-        helm-completion-in-region-fuzzy-match t
         helm-move-to-line-cycle-in-source t ; move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line t
         helm-echo-input-in-header-line t
-        helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
-        helm-input-idle-delay 0.1 ; be idle for this many seconds, before updating candidate buffer
+        ;; helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
+        ;; helm-input-idle-delay 0.1 ; be idle for this many seconds, before updating candidate buffer
         helm-follow-mode-persistent t
         ;; helm-always-two-windows nil
         ;; both the min and max height are set to be equal on purpose
@@ -42,7 +38,7 @@
     (setq helm-completion-in-region-fuzzy-match t)
     (helm-mode 1))
 
-  (helm-autoresize-mode 1)
+  (helm-autoresize-mode -1) ; distracting
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -68,6 +64,7 @@
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
+    :config (setq helm-M-x-fuzzy-match t)
     :bind
     (([remap execute-extended-command] . helm-M-x)
      ("M-x" . helm-M-x)

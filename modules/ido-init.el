@@ -83,12 +83,13 @@
                                                :ensure t
                                                :init
                                                (ido-grid-mode 1)
+                                               (setq ido-grid-mode-order t)
+
                                                ;;   (setq ido-grid-mode-max-columns nil
                                                ;;         ido-grid-mode-max-rows nil
                                                ;;         ido-grid-mode-prefix-scrolls t
                                                ;;         ido-grid-mode-scroll-down #'ido-grid-mode-next-row
                                                ;;         ido-grid-mode-scroll-up #'ido-grid-mode-previous-row
-                                               ;;         ido-grid-mode-order nil
                                                ;;         ido-grid-mode-start-collapsed t)
                                                )))
 

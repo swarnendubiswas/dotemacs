@@ -35,7 +35,8 @@
   (dolist (hook '(text-mode-hook find-file-hooks))
     (add-hook hook #'turn-on-flyspell))
 
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  ;; TODO: Is this slowing down editing Python?
+  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
   ;; this is useful but slow
   ;; (add-hook 'before-save-hook 'flyspell-buffer)

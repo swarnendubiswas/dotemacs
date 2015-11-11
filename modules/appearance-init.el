@@ -28,7 +28,6 @@
 
 (use-package frame
   :config
-  (blink-cursor-mode 0) ; enable/disable blinking cursor
   ;; start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
   ;; only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
@@ -36,7 +35,8 @@
   ;; it will maximize all frames: both the first one and any others you create.
   ;; options: fullheight, fullboth
   ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  )
+
+  (blink-cursor-mode 0))
 
 (use-package time ; displays the time and date in the mode line
   :init
@@ -49,6 +49,7 @@
   :init (global-linum-mode 1))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
+                                     :ensure t
                                      :init (load-theme 'leuven t)
                                      :config
                                      (with-eval-after-load "avy"
@@ -61,15 +62,20 @@
                                      ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
+                                           :ensure t
                                            :init (load-theme 'professional t)))
 
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
+                                      :ensure t
                                       :init (load-theme 'eclipse t)
                                       :config
                                       (set-background-color "white")
+                                      ;; (set-face-attribute 'region nil
+                                      ;;                     :background "#164040"
+                                      ;;                     :foreground "white")
                                       (set-face-attribute 'region nil
-                                                          :background "#164040"
-                                                          :foreground "white")
+                                                          :background "LemonChiffon"
+                                                          :foreground "black")
                                       ;; (set-face-attribute 'linum nil
                                       ;;                     :background "#006666"
                                       ;;                     :foreground "#FFFFDD"
@@ -80,6 +86,13 @@
                                       (with-eval-after-load "helm"
                                         (set-face-attribute 'helm-selection nil
                                                             :underline nil))
+                                      (with-eval-after-load "helm-buffers" ; TODO: Change font does not work
+                                        (set-face-attribute 'helm-buffer-file nil
+                                                            :foreground "black"))
+                                      (set-face-attribute 'mode-line nil
+                                                          :background "grey88"
+                                                          :foreground "black"
+                                                          :box nil)
                                       ;; org-mode customizations inspired from leuven theme
                                       (with-eval-after-load "org"
                                         (set-face-attribute 'org-level-1 nil
@@ -93,7 +106,8 @@
                                                             :foreground "#123555"
                                                             :background "#E5F4FB"))
                                       ;; customize the fringe marks on the sides
-                                      (set-face-background 'fringe "wheat")))
+                                      ;; (set-face-background 'fringe "wheat")
+                                      ))
 
       ;; default
       ((eq dotemacs-theme 'default)
