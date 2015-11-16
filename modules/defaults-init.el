@@ -9,14 +9,31 @@
       inhibit-startup-screen t
       ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen.
       initial-scratch-message nil
-      ;; *scratch* is in Lisp interaction mode by default, use text mode instead.
-      initial-major-mode 'text-mode
+      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead.
       inhibit-startup-echo-area-message t
       create-lockfiles nil
-      message-log-max 5000)
+      message-log-max 5000
+      line-number-display-limit 2000000
+      visible-bell nil
+      x-underline-at-descent-line t ; draw underline lower
+      completion-ignore-case t ; ignore case when completing
+      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
+      read-buffer-completion-ignore-case t
+      gc-cons-threshold (* 10 1024 1024) ; increase gc threshold
+      ;; do not use dialog boxes
+      use-dialog-box nil
+      use-file-dialog nil
+      enable-recursive-minibuffers t
+      delete-by-moving-to-trash t
+      scroll-margin 0 ; Drag the point along while scrolling
+      scroll-conservatively 1000 ; Never recenter the screen while scrolling
+      scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
+      scroll-preserve-screen-position t)
 
-;; major mode to use for files that do no specify a major mode, default value is fundamental-mode
-(setq-default major-mode 'text-mode)
+(setq-default major-mode 'text-mode ; major mode to use for files that do no specify a major mode, default value is fundamental-mode
+              sentence-end-double-space nil
+              truncate-lines nil
+              truncate-partial-width-windows nil)
 
 (when (eq system-type 'windows-nt)
   (setq locale-coding-system 'utf-8)
@@ -40,18 +57,12 @@
         confirm-kill-emacs nil)
   :bind (("C-c d r" . revert-buffer)))
 
-(setq-default sentence-end-double-space nil)
-
 ;; Enable use of system clipboard across Emacs and other applications.
 (if (and (>= emacs-major-version 25)
          (>= emacs-minor-version 1))
     (setq select-enable-clipboard t)
   (setq x-select-enable-clipboard t))
 
-(setq line-number-display-limit 2000000
-      visible-bell nil
-      ;; draw underline lower
-      x-underline-at-descent-line t)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
@@ -59,9 +70,6 @@
 
 (use-package menu-bar
   :init (toggle-indicate-empty-lines 1))
-
-(setq-default truncate-lines nil
-              truncate-partial-width-windows nil)
 
 (use-package simple
   :init
@@ -113,17 +121,7 @@
     :ensure t
     :disabled t))
 
-(setq completion-ignore-case t ; ignore case when completing
-      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
-      read-buffer-completion-ignore-case t)
-
-(setq gc-cons-threshold (* 10 1024 1024)) ; increase gc threshold
-
-(file-name-shadow-mode 1) ; dim the ignored part of the file name
-
-;; do not use dialog boxes
-(setq use-dialog-box nil
-      use-file-dialog nil)
+(file-name-shadow-mode 1) ; dim the ignored part of the file name in the minibuffer
 
 (use-package advice
   :init
@@ -212,13 +210,6 @@
         savehist-autosave-interval 300)
   (setq-default history-length 50
                 history-delete-duplicates t))
-
-(setq enable-recursive-minibuffers t
-      delete-by-moving-to-trash t
-      scroll-margin 0 ; Drag the point along while scrolling
-      scroll-conservatively 1000 ; Never recenter the screen while scrolling
-      scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
-      scroll-preserve-screen-position t)
 
 (use-package bookmark
   :defer t

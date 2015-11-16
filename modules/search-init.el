@@ -86,6 +86,10 @@
          ("C-c s f" . ag-files)
          ("C-c s a" . helm-ag)))
 
+(use-package find-file-in-project
+  :ensure t
+  :config (setq ffip-prefer-ido-mode t))
+
 (provide 'search-init)
 
 ;;; search-init.el ends here

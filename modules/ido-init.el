@@ -81,17 +81,12 @@
 
         ((eq dotemacs-ido-view-mode 'grid)   (use-package ido-grid-mode
                                                :ensure t
-                                               :init
-                                               (ido-grid-mode 1)
-                                               (setq ido-grid-mode-order t)
-
-                                               ;;   (setq ido-grid-mode-max-columns nil
-                                               ;;         ido-grid-mode-max-rows nil
-                                               ;;         ido-grid-mode-prefix-scrolls t
-                                               ;;         ido-grid-mode-scroll-down #'ido-grid-mode-next-row
-                                               ;;         ido-grid-mode-scroll-up #'ido-grid-mode-previous-row
-                                               ;;         ido-grid-mode-start-collapsed t)
-                                               )))
+                                               :init (ido-grid-mode 1)
+                                               :config
+                                               (setq ido-grid-mode-order t
+                                                     ;;ido-grid-mode-max-rows 3
+                                                     ;;ido-grid-mode-max-columns 6
+                                                     ))))
 
   :bind
   (("<f3>" . ido-find-file)
