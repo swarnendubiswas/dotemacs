@@ -70,6 +70,10 @@
     (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
     (bind-key "<f2>" #'dired-efap dired-mode-map))
 
+  (use-package diredful
+    :ensure t
+    :init (diredful-mode 1))
+
   ;; http://oremacs.com/2015/02/21/hydra-docstring-sexp
   (defhydra hydra-dired-marked (dired-mode-map "" :color pink)
     "Number of marked items: %(length (dired-get-marked-files))"
