@@ -55,7 +55,8 @@
 
 ;;; Code:
 
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/")) ; personal modules for customizing Emacs initialization
+;; personal modules for customizing Emacs initialization
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/"))
 
 (require 'packages-init) ; setup the package system
 (require 'config-init) ; setup configuration variables

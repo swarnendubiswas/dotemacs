@@ -25,6 +25,7 @@
 
 (use-package hungry-delete ; erase 'all' consecutive white space characters in a given direction
   :ensure t
+  :diminish hungry-delete-mode
   :init (global-hungry-delete-mode 1))
 
 (use-package move-text ; move text with M-<up> and M-<down> like eclipse

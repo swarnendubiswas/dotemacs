@@ -113,7 +113,11 @@
 
     (use-package ac-html-csswatcher
       :ensure t
-      :config (ac-html-csswatcher-setup)))
+      :config (ac-html-csswatcher-setup))
+
+    (use-package ac-html-angular
+      :ensure t
+      :config (ac-html-angular 1)))
 
   (when (eq dotemacs-completion 'company)
     (use-package ac-html-csswatcher

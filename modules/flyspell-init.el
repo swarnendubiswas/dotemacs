@@ -58,6 +58,10 @@
     :if (bound-and-true-p dotemacs-use-helm-p)
     :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))
 
+  (use-package helm-ispell
+    :ensure t
+    :if (bound-and-true-p dotemacs-use-helm-p))
+
   (use-package flyspell-popup
     :ensure t
     :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
