@@ -71,7 +71,9 @@
                                                                       :weight 'light)
                                                   (set-face-attribute 'powerline-inactive1 nil
                                                                       :background "grey11"
-                                                                      :foreground "white")))
+                                                                      :foreground "white")
+                                                  (when (bound-and-true-p dotemacs-use-helm-p)
+                                                    (spaceline-helm-mode))))
 
       ((eq dotemacs-mode-line-theme 'default)))
 
