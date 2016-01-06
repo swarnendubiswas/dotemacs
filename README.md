@@ -5,16 +5,14 @@ the Internet, and tailored according to my preferences.
 
 #####Installation
 
-Use the following commands to checkout the sources:
+First, if your `.emacs.d` directory is not empty, then you might want to backup the contents. Then, use the following command to checkout the source:
 
 ```
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 ```
 
-If your `.emacs.d` directory is not empty, then you might want to backup the contents.
-
 #####Directory structure
-         * backup -- older monolithic startup files, which I no longer use. I am now using [`(use-package)`](https://github.com/jwiegley/use-package).
+         * backup -- older startup files, which I no longer use. I am now using [`(use-package)`](https://github.com/jwiegley/use-package).
          * modules -- personal customizations
          * packages -- third-party packages (may not be available from the package archives)
          * reference-cards -- help files 
@@ -26,9 +24,11 @@ If your `.emacs.d` directory is not empty, then you might want to backup the con
 
 Here are a few customization options that you could use to tweak the default setup. These options can be modified from `modules/config-init.el`.
 
-* dotemacs-completion - Toggle between `company` and `auto-complete`, with `company` being the default.
-* dotemacs-theme - Set the desired theme.
-* dotemacs-use-helm-p - Helm often provides functionalities provided by other packages, such as ido, smex, ace-jump-buffer, etc. Use this variable to control enabling/disabling helm.
+* dotemacs-completion - Toggle between `company` and `auto-complete`, with `company` being default.
+* dotemacs-theme - Set the desired theme from `leuven`, `professional`, `eclipse`, and default.
+* dotemacs-modeline-theme - Set the desired modeline theme from `powerline`, `smart-mode-line`, `telephone-line`, `spaceline` and default.
+* dotemacs-use-helm-p - Helm often provides functionalities provided by other packages, such as `ido`, `smex`, `ace-jump-buffer`, etc. Use this variable to control enabling/disabling `helm`.
+* dotemacs-ido-view-mode - Choose how choices are displayed with `ido`. The options are vertical, grid, and default.
 
 Suggestions are welcome.
 
