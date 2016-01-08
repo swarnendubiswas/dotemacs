@@ -173,6 +173,10 @@
   :ensure t
   :init (ignoramus-setup))
 
+(use-package pdf-tools
+  :ensure t
+  :config (pdf-tools-install))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
