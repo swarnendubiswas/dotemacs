@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; better frame titles
+;; Better frame titles
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 (setq-default indicate-buffer-boundaries 'right)
@@ -28,24 +28,24 @@
 
 (use-package frame
   :config
-  ;; start with Emacs window maximized:
+  ;; Start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
-  ;; only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
+  ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
   ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; it will maximize all frames: both the first one and any others you create.
+  ;; It will maximize all frames: both the first one and any others you create.
   ;; options: fullheight, fullboth
   ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
   (blink-cursor-mode 0))
 
-(use-package time ; displays the time and date in the mode line
+(use-package time ; Displays the time and date in the mode line
   :init
   (setq display-time-day-and-date t
         display-time-24hr-format nil
         display-time-default-load-average nil)
   (display-time))
 
-(use-package linum ; display line numbers in margin
+(use-package linum ; Display line numbers in margin
   :init (global-linum-mode 1))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
@@ -56,9 +56,8 @@
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
                                                            :foreground "black"))
+                                     ;; customize the fringe marks on the sides
                                      ;; (set-face-background 'fringe "wheat")
-                                     ;; (with-eval-after-load 'hl-line
-                                     ;; (set-face-attribute 'hl-line nil :background "lavender"))
                                      ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
@@ -70,9 +69,6 @@
                                       :init (load-theme 'eclipse t)
                                       :config
                                       (set-background-color "white")
-                                      ;; (set-face-attribute 'region nil
-                                      ;;                     :background "#164040"
-                                      ;;                     :foreground "white")
                                       (set-face-attribute 'region nil
                                                           :background "LemonChiffon"
                                                           :foreground "black")
@@ -104,10 +100,7 @@
                                                             :height 1.1
                                                             :overline "#123555"
                                                             :foreground "#123555"
-                                                            :background "#E5F4FB"))
-                                      ;; customize the fringe marks on the sides
-                                      ;; (set-face-background 'fringe "wheat")
-                                      ))
+                                                            :background "#E5F4FB"))))
 
       ;; default
       ((eq dotemacs-theme 'default)

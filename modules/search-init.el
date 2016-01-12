@@ -47,10 +47,12 @@
     (bind-key "C-c s u" 'ivy-resume ivy-mode-map)
     :diminish ivy-mode)
   (setq swiper-min-highlight 3) ; be less noisy
-  (use-package swiper-helm
-    :ensure t
-    :bind ("C-c s h"))
   :bind ("C-c s s" . swiper))
+
+(use-package swiper-helm
+  :ensure t
+  :bind ("C-c s h"))
+
 
 (use-package color-moccur
   :ensure t

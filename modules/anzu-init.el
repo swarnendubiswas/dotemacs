@@ -11,8 +11,9 @@
   :init
   (global-anzu-mode 1)
   (setq anzu-search-threshold 10000
-        anzu-minimum-input-length 2
-        anzu-cons-mode-line-p nil)
+        anzu-minimum-input-length 2)
+  (when (eq dotemacs-mode-line-theme 'spaceline)
+    (setq anzu-cons-mode-line-p nil))
   (unless (eq dotemacs-theme 'leuven)
     (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'light)))
 
