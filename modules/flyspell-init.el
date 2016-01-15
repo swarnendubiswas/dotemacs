@@ -66,19 +66,13 @@
     :ensure t
     :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
 
-  (defhydra hydra-flyspell (:color blue)
-    "flyspell mode"
-    ("f" flyspell-mode "flyspell-mode")
-    ("b" flyspell-buffer "flyspell-buffer")
-    ("w" ispell-word "ispell-word"))
-  (bind-key "C-c i" 'hydra-flyspell/body)
 
   :diminish flyspell-mode
   :bind
-  (("C-c i f" . flyspell-mode)
-   ("C-c i b" . flyspell-buffer)
+  (("C-c f f" . flyspell-mode)
+   ("C-c f b" . flyspell-buffer)
    ;; another alternative is M-$
-   ("C-c i w" . ispell-word)))
+   ("C-c f w" . ispell-word)))
 
 (provide 'flyspell-init)
 

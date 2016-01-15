@@ -73,7 +73,7 @@
     :config
     (set-default 'semantic-case-fold t)
     ;; to include custom header locations
-    (when (string-equal system-name "XXX")
+    (when (string-equal system-name "rain.cse.ohio-state.edu")
       (semantic-add-system-include "/usr/include/boost148/" 'c++-mode))
     (fa-config-default)
     (bind-key* "M-u" #'upcase-word))
@@ -94,7 +94,7 @@
     (add-to-list 'company-backends #'company-c-headers)
     (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
     (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0")
-    (cond ((string-equal system-name "XXX")
+    (cond ((string-equal system-name "rain.cse.ohio-state.edu")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
            (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0"))
 

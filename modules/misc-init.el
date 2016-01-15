@@ -175,7 +175,7 @@
 
 (use-package pdf-tools
   :ensure t
-  :if (unless (string-equal system-name "XXX"))
+  :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
   :config (pdf-tools-install))
 
 (provide 'misc-init)

@@ -7,7 +7,8 @@
 
 ;; flycheck requires gcc 4.8 at least
 (use-package flycheck
-  :if (not (string-equal system-name "XXX"))
+  :ensure t
+  :if (not (string-equal system-name "rain.cse.ohio-state.edu"))
   :diminish flycheck-mode
   :init
   (add-hook 'prog-mode-hook #'global-flycheck-mode)

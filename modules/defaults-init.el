@@ -102,8 +102,8 @@
   :defer t
   :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
-        tramp-default-user "XXX"
-        tramp-default-host "XXX"
+        tramp-default-user "biswass"
+        tramp-default-host "stdlinux.cse.ohio-state.edu"
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
   ;; disable backup

@@ -6,7 +6,7 @@
 ;;; Code:
 
 (setq user-full-name "Swarnendu Biswas"
-      user-mail-address "XXX")
+      user-mail-address "biswass@cse.ohio-state.edu")
 
 (provide 'user-init)
 
