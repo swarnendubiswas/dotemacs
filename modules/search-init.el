@@ -53,17 +53,21 @@
   :ensure t
   :bind ("C-c s h"))
 
-
 (use-package color-moccur
   :ensure t
   :functions (isearch-moccur isearch-all)
   :bind ("M-s O" . moccur)
+  :init
+  (use-package moccur
+    :bind ("C-c o" . moccur)
+    :config
+    (use-package moccur-edit
+      :ensure t))
   :config
   (bind-keys
    :map isearch-mode-map
    ("M-o" . isearch-moccur)
-   ("M-O" . isearch-moccur-all))
-  (use-package moccur-edit))
+   ("M-O" . isearch-moccur-all)))
 
 (use-package loccur
   :ensure t

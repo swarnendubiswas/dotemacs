@@ -88,9 +88,8 @@
 
 (use-package py-autopep8
   :ensure t
-  :disabled t
   :config
-  (setq py-autopep8-options '("--max-line-length=100"))
+  (setq py-autopep8-options '("--max-line-length=120"))
   (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
 
 (use-package py-import-check
@@ -99,7 +98,7 @@
 
 (use-package py-isort
   :ensure t
-  :disabled t)
+  :config (add-hook 'before-save-hook 'py-isort-before-save nil t))
 
 ;; Useful packages with pip: autopep8, pyflakes, setuptools, psutil. pip is bundled with python >= 3.4.
 ;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8

@@ -82,14 +82,15 @@
                                       (with-eval-after-load "helm"
                                         (set-face-attribute 'helm-selection nil
                                                             :underline nil))
-                                      (with-eval-after-load "helm-buffers" ; TODO: Change font does not work
+                                      ;; TODO: Change font does not work (biswass 01-15-16)
+                                      (with-eval-after-load "helm-buffers"
                                         (set-face-attribute 'helm-buffer-file nil
                                                             :foreground "black"))
                                       (set-face-attribute 'mode-line nil
                                                           :background "grey88"
                                                           :foreground "black"
                                                           :box nil)
-                                      ;; org-mode customizations inspired from leuven theme
+                                      ;; Org-mode customizations inspired from leuven theme
                                       (with-eval-after-load "org"
                                         (set-face-attribute 'org-level-1 nil
                                                             :height 1.2
@@ -102,7 +103,7 @@
                                                             :foreground "#123555"
                                                             :background "#E5F4FB"))))
 
-      ;; default
+      ;; Default
       ((eq dotemacs-theme 'default)
        (set-face-attribute 'region nil
                            :background "LemonChiffon"
@@ -111,7 +112,7 @@
          (set-face-attribute 'hl-line nil
                              :background "linen"))))
 
-;; set font face independent of the color theme
+;; Set font face independent of the color theme
 (set-face-attribute 'default nil
                     :family "Dejavu Sans Mono"
                     :height 110 ; set font size, value is in 1/10pt, so 100 will give you 10pt
@@ -137,7 +138,7 @@
     (tabbar--modification-state-change))
   :functions tabbar-display-update
   :init
-  (setq tabbar-use-images nil ; speed up by not using images
+  (setq tabbar-use-images nil ; Speed up by not using images
         tabbar-auto-scroll-flag t
         tabbar-separator '(0.3))
   (tabbar-mode 1)

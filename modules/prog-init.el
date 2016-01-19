@@ -23,7 +23,9 @@
     (add-hook 'prog-mode-hook
               (lambda ()
                 (which-function-mode 1)))
-    (set-face-attribute 'which-func nil :foreground "black"))
+    (if (eq dotemacs-mode-line-theme 'spaceline)
+        (set-face-attribute 'which-func nil :foreground "white")
+      (set-face-attribute 'which-func nil :foreground "black")))
 
   (use-package electric-operator
     :ensure t

@@ -198,7 +198,7 @@
   :disabled t
   :init (icy-mode 1))
 
-(use-package savehist ; save minibuffer histories across sessions
+(use-package savehist ; Save minibuffer histories across sessions
   :config
   (savehist-mode 1)
   (setq savehist-save-minibuffer-history t
