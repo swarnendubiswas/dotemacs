@@ -15,11 +15,11 @@
       message-log-max 5000
       line-number-display-limit 2000000
       visible-bell nil
-      x-underline-at-descent-line t ; draw underline lower
-      completion-ignore-case t ; ignore case when completing
-      read-file-name-completion-ignore-case t ; ignore case when reading a file name completion
+      x-underline-at-descent-line t ; Draw underline lower
+      completion-ignore-case t ; Ignore case when completing
+      read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
-      gc-cons-threshold (* 10 1024 1024) ; increase gc threshold
+      gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
       ;; do not use dialog boxes
       use-dialog-box nil
       use-file-dialog nil
@@ -30,7 +30,7 @@
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t)
 
-(setq-default major-mode 'text-mode ; major mode to use for files that do no specify a major mode, default value is fundamental-mode
+(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is fundamental-mode
               sentence-end-double-space nil
               truncate-lines nil
               truncate-partial-width-windows nil)
@@ -78,7 +78,7 @@
   (setq save-interprogram-paste-before-kill t
         kill-whole-line t
         suggest-key-bindings t
-        ;; use shift-select for marking
+        ;; Use shift-select for marking
         shift-select-mode t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
@@ -106,7 +106,7 @@
         tramp-default-host "stdlinux.cse.ohio-state.edu"
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
-  ;; disable backup
+  ;; Disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
   ;; Disable version control. If you access remote files which are not under version control, a lot of check operations
@@ -121,11 +121,11 @@
     :ensure t
     :disabled t))
 
-(file-name-shadow-mode 1) ; dim the ignored part of the file name in the minibuffer
+(file-name-shadow-mode 1) ; Dim the ignored part of the file name in the minibuffer
 
 (use-package advice
   :init
-  ;; turn off warnings due to functions being redefined
+  ;; Turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
 ;; Enable disabled commands
@@ -141,29 +141,31 @@
 (advice-add 'downcase-word :before #'goto-beginning-of-word)
 (advice-add 'upcase-word :before #'goto-beginning-of-word)
             
-(use-package desktop ; desktop save mode
+(use-package desktop
   :disabled t
   :init (desktop-save-mode -1)
   :config
-  (setq-default desktop-restore-frames nil ; no need to restore frames
+  (setq-default desktop-restore-frames nil ; No need to restore frames
                 desktop-load-locked-desktop nil))
 
-;; fully redraw the display before queued input events are processed don't defer screen updates when performing
+;; Fully redraw the display before queued input events are processed don't defer screen updates when performing
 ;; operations, obsolete since 24.5
-;; (setq redisplay-dont-pause t)
+(if (and (<= emacs-major-version 24)
+         (<= emacs-minor-version 4))
+    (setq redisplay-dont-pause t))
 
-(use-package font-core ; turn on syntax coloring, on by default since Emacs 22
+(use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
   :init (global-font-lock-mode 1))
 
 (use-package font-lock
   :init
-  (setq font-lock-maximum-decoration t ; maximum fontification possible
-        ;; jit locking is better than fast-lock and lazy-lock
+  (setq font-lock-maximum-decoration t ; Maximum fontification possible
+        ;; Jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock
   :init
-  (setq jit-lock-defer-time 0.10 ; improve scrolling speed with jit fontification
+  (setq jit-lock-defer-time 0.10 ; Improve scrolling speed with jit fontification
         jit-lock-stealth-time 10
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
@@ -185,7 +187,7 @@
     (setq-default save-place t))
   (setq save-place-file (concat dotemacs-temp-directory "places")))
 
-(use-package icomplete ; incremental minibuffer completion/suggestions
+(use-package icomplete ; Incremental minibuffer completion/suggestions
   :disabled t
   :init (icomplete-mode 1)
   :config
@@ -226,7 +228,7 @@
         uniquify-after-kill-buffer-p t
         uniquify-strip-common-suffix t))
 
-(use-package hippie-exp ; hippie expand is dabbrev expand on steroids
+(use-package hippie-exp ; Hippie expand is dabbrev expand on steroids
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
@@ -267,11 +269,10 @@
   :config (add-to-list 'warning-suppress-types '(undo discard-info)))
 
 (use-package abbrev
-  :disabled t
   :diminish abbrev-mode
   :config
   (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))
-  (setq save-abbrevs 'silently) ; do not ask to save new abbrevs when quitting
+  (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
   (if (file-exists-p abbrev-file-name)
       (quietly-read-abbrev-file))
   (add-hook 'text-mode-hook

@@ -55,6 +55,15 @@
 
 ;;; Code:
 
+;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html
+;; When defining a lambda expression that is to be used as an anonymous function, you can in principle use any method
+;; to construct the list. But typically you should use the lambda macro, or the function special form, or the #' read
+;; syntax which is a short-hand for using function. Quoting a lambda form means the anonymous function is not
+;; byte-compiled. The following forms are all equivalent:
+;; (lambda (x) (* x x))
+;; (function (lambda (x) (* x x)))
+;; #'(lambda (x) (* x x))
+
 ;; personal modules for customizing Emacs initialization
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/"))
 
