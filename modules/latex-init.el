@@ -26,7 +26,9 @@
 
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
   (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ;; compile files to pdf by default
+
   (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
+  (diminish 'outline-minor-mode)
 
   (use-package tex-site)
 
