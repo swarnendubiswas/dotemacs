@@ -112,12 +112,6 @@
          (set-face-attribute 'hl-line nil
                              :background "linen"))))
 
-;; Set font face independent of the color theme
-(set-face-attribute 'default nil
-                    :family "Dejavu Sans Mono"
-                    :height 110 ; set font size, value is in 1/10pt, so 100 will give you 10pt
-                    :weight 'light)
-
 (use-package display-theme
   :ensure t
   :if (not (eq dotemacs-theme 'default))
@@ -186,11 +180,15 @@
   :bind* (("M-<left>" . tabbar-backward-tab)
           ("M-<right>" . tabbar-forward-tab)))
 
-(when (eq system-type 'windows-nt)
-(set-face-font 'default "-outline-Consolas-normal-r-normal-normal-*-*-96-96-c-*-iso8859-1")
-(set-face-font 'bold "-outline-Consolas-bold-r-normal-normal-*-*-96-96-c-*-iso8859-1")
-(set-face-font 'italic "-outline-Consolas-normal-i-normal-normal-*-*-96-96-c-*-iso8859-1")
-(set-face-font 'bold-italic "-outline-Consolas-bold-i-normal-normal-*-*-96-96-c-*-iso8859-1"))
+;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt
+(if (eq system-type 'windows-nt)
+    (set-face-attribute 'default nil
+                        :family "Consolas"
+                        :height 120)
+  (set-face-attribute 'default nil
+                      :family "Dejavu Sans Mono"
+                      :height 120
+                      :weight 'light))
 
 (provide 'appearance-init)
 
