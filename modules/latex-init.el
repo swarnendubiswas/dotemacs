@@ -25,10 +25,17 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
 
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ;; compile files to pdf by default
+
+  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; Compile files to pdf by default
+  (add-to-list 'TeX-command-list
+               '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
+                 (plain-tex-mode LaTeX-mode docTeX-mode)
+                 :help "Run PDFLaTeX"))
 
   (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
-  (diminish 'outline-minor-mode)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (diminish 'outline-minor-mode)))
 
   (use-package tex-site)
 
@@ -54,9 +61,6 @@
     (setq LaTeX-syntactic-comments t)
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
     (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (setq-default TeX-command-default "LatexMk")))
 
     ;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
     ;;(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
