@@ -52,6 +52,7 @@
     ;; (add-hook 'python-mode-hook #'eldoc-mode)
     (use-package c-eldoc
       :ensure t
+      :if (eq system-type 'gnu/linux) ; TODO: Doesn't seem to work on Windows
       :config (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode))
     (use-package eldoc-extension
       :ensure t)

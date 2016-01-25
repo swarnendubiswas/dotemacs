@@ -187,8 +187,8 @@
                         :height 120)
   (set-face-attribute 'default nil
                       :family "Dejavu Sans Mono"
-                      :height 120
-                      :weight 'light))
+                      ;; :weight 'light
+                      :height 110))
 
 (provide 'appearance-init)
 
