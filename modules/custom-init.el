@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; custom functions
+;; Custom functions
 
 ;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
 (defun dotemacs-save-all-buffers ()
@@ -13,7 +13,7 @@
   (interactive)
   (save-some-buffers t))
 
-;; kill all non-special buffers but the current one
+;; Kill all non-special buffers but the current one
 (defun dotemacs-kill-other-buffers ()
   "Kill all buffers but the current one. Don't mess with special
 buffers."

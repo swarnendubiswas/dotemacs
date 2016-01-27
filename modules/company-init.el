@@ -11,14 +11,14 @@
   :init
   (global-company-mode 1)
   (setq company-global-modes t
-        company-show-numbers t ; show quick-access numbers for the first ten candidates
+        company-show-numbers t ; Show quick-access numbers for the first ten candidates
         company-minimum-prefix-length 2
         ;; Invert the navigation direction if the completion popup is displayed on top (happens near the bottom of
         ;; windows).
         company-tooltip-flip-when-above t
         company-tooltip-align-annotations t
         company-tooltip-limit 20
-        ;; start autocompletion only after typing
+        ;; Start autocompletion only after typing
         ;; company-begin-commands '(self-insert-command)
         company-idle-delay 0.3
         company-selection-wrap-around t
@@ -30,7 +30,7 @@
 
   (use-package company-dabbrev
     :init
-    (setq company-dabbrev-downcase nil ; turn off auto downcasing of things
+    (setq company-dabbrev-downcase nil ; Turn off auto downcasing of things
           company-dabbrev-ignore-case nil))
 
   (use-package company-dabbrev-code
@@ -56,7 +56,7 @@
 
   (use-package company-emoji
     :ensure t
-    :defer t
+    :disabled t
     :config (add-hook 'text-mode-hook 'company-emoji-init))
 
   (use-package company-try-hard

@@ -15,7 +15,7 @@
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
-(use-package menu-bar ; You can learn many shortcuts from the menu bar entries.
+(use-package menu-bar ; Learn many shortcuts from the menu bar entries.
   :init
   (when (fboundp 'menu-bar-mode)
     (menu-bar-mode 1)))
