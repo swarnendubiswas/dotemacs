@@ -6,9 +6,9 @@
 ;;; Code:
 
 (setq-default fill-column dotemacs-fill-column
-              standard-indent 2 ; set standard indent to 2 rather that 4
+              standard-indent 2 ; Set standard indent to 2 rather that 4
               tab-width 2
-              ;; spaces instead of tabs by default
+              ;; Spaces instead of tabs by default
               indent-tabs-mode nil)
 
 (use-package aggressive-indent
@@ -19,7 +19,7 @@
               (aggressive-indent-mode 1)))
   :diminish aggressive-indent-mode)
 
-(use-package electric ; intelligent indentation, on by default from Emacs 24.4
+(use-package electric ; Intelligent indentation, on by default from Emacs 24.4
   :init (electric-indent-mode 1))
 
 ;; If you wish to use this with autopairs and yasnippet, load this library first.
@@ -48,11 +48,11 @@
   :disabled t
   :diminish indent-guide-mode
   :init
-  (setq indent-guide-delay 1.0 ; show guide lines only in idle-time
+  (setq indent-guide-delay 1.0 ; Show guide lines only in idle-time
         indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
 
-(use-package smart-tabs ; indent with tabs, align with spaces
+(use-package smart-tabs ; Indent with tabs, align with spaces
   :ensure t
   :disabled t
   :init (global-smart-tab-mode 1))

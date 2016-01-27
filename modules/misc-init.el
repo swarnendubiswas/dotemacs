@@ -6,29 +6,28 @@
 ;;; Code:
 
 (use-package smooth-scrolling
-  :ensure t
-  :disabled t)
+  :ensure t)
 
 (use-package achievements
   :ensure t
   :disabled t
   :diminish achievements-mode
   :init
-  (setq achievements-idle-time 600) ; seconds
+  (setq achievements-idle-time 600) ; Seconds
   (achievements-mode 1))
 
-(use-package vlf ; speed up Emacs for large files
+(use-package vlf ; Speed up Emacs for large files
   :ensure t
   :config
-  (setq large-file-warning-threshold (* 50 1024 1024)) ; warn when opening files bigger than 50MB
+  (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
   (use-package vlf-setup))
 
-(use-package hungry-delete ; erase 'all' consecutive white space characters in a given direction
+(use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
   :diminish hungry-delete-mode
   :init (global-hungry-delete-mode 1))
 
-(use-package move-text ; move text with M-<up> and M-<down> like eclipse
+(use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
   :ensure t
   :init (move-text-default-bindings))
 
@@ -163,7 +162,7 @@
   (global-undo-tree-mode 1)
   :diminish undo-tree-mode)
 
-;; avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating an inferior python
+;; Avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating an inferior python
 ;; process and aspell
 (add-hook 'comint-exec-hook
           (lambda ()
