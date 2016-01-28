@@ -17,7 +17,7 @@
                 (add-to-list 'ac-sources 'ac-source-variables)
                 (add-to-list 'ac-sources 'ac-source-functions))))
 
-  (use-package which-func ; show the name of the function in the modeline
+  (use-package which-func ; Show the name of the function in the modeline
     :config
     (setq which-func-modes t)
     (add-hook 'prog-mode-hook
@@ -61,10 +61,10 @@
   (use-package make-mode
     :init
     (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
-    ;; add makefile.rules to makefile-gmake-mode for Intel Pin
+    ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
     (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-  (use-package sh-script ; shell script mode
+  (use-package sh-script ; Shell script mode
     :mode ("\\.zsh\\'" . sh-mode)
     :config
     (setq sh-basic-offset 4
@@ -93,6 +93,7 @@
             sr-speedbar-skip-other-window-p t))))
 
 (use-package web-mode
+  :ensure t
   :functions (web-beautify-css web-beautify-html web-beautify-js)
   :mode
   (("\\.phtml\\'" . web-mode)
@@ -102,7 +103,7 @@
    ("\\.tpl\\.php\\'" . web-mode)
    ("\\.as[cp]x\\'" . web-mode))
   :config
-  ;; everything is indented 2 spaces
+  ;; Everything is indented 2 spaces
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
