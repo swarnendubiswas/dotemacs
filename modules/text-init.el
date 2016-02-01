@@ -15,10 +15,10 @@
 
 (or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
       :ensure t
-      :bind* ("C-c g" . writegood-mode)
+      ;; :bind* ("C-c g" . writegood-mode) ; Not very useful
       :functions writegood-mode
       :diminish writegood-mode
-      :init (add-hook 'text-mode-hook #'writegood-mode))
+      :config (add-hook 'text-mode-hook #'writegood-mode))
 
     (use-package artbollocks-mode
       :ensure t

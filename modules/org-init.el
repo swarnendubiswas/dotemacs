@@ -30,7 +30,11 @@
         ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines. See
         ;; org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
         org-use-speed-commands t
-        org-src-strip-leading-and-trailing-blank-lines t)
+        org-src-strip-leading-and-trailing-blank-lines t
+        ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
+        org-pretty-entities t
+        ;; Render subscripts and superscripts in org buffers
+        org-pretty-entities-include-sub-superscripts t)
 
   ;; Allow syntax highlighting for parts of a word
   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode

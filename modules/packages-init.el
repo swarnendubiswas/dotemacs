@@ -59,7 +59,8 @@
   :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t
-        paradox-spinner-type 'moon))
+        paradox-spinner-type 'moon)
+  (paradox-enable))
 
 (use-package hydra
   :ensure t)

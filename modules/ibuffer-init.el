@@ -9,13 +9,13 @@
   :preface
   (defun dotemacs--ibuffer-group-buffers ()
     (ibuffer-switch-to-saved-filter-groups "Default"))
-
+  :commands ibuffer
   :init
   (defalias 'list-buffers 'ibuffer) ; turn on ibuffer by default
   (setq ibuffer-expert t
         ;;ibuffer-shrink-to-minimum-size t
         ibuffer-always-show-last-buffer nil
-        ibuffer-default-sorting-mode 'alphabetic
+        ibuffer-default-sorting-mode 'alphabetic ; options: major-mode
         ibuffer-use-header-line t
         ibuffer-display-summary t
         ibuffer-case-fold-search t ; ignore case when searching
@@ -44,7 +44,7 @@
   ;; Group ibuffer list by tramp connection
   (use-package ibuffer-tramp
     :ensure t
-    :defer t
+    :disabled t
     :config
     (add-hook 'ibuffer-mode-hook
               (lambda ()
@@ -54,7 +54,7 @@
   ;; use ibuffer-vc to sort buffers by VC status
   (use-package ibuffer-vc
     :ensure t
-    :defer t
+    :disabled t
     :config
     (add-hook 'ibuffer-mode-hook
               (lambda ()
@@ -64,10 +64,16 @@
 
   (use-package ibuffer-projectile ; group buffers by projectile project
     :ensure t
-    :defer t
+    :preface
+    (defun dotemacs-ibuffer-customization ()
+      (ibuffer-projectile-set-filter-groups)
+      (setq ibuffer-show-empty-filter-groups nil)
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        ;; First do alphabetic sort, then do major-mode sort
+        (ibuffer-do-sort-by-alphabetic)
+        (ibuffer-do-sort-by-major-mode)))
     :config
-    (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
-    (setq ibuffer-show-empty-filter-groups nil))
+    (add-hook 'ibuffer-hook #'dotemacs-ibuffer-customization))
 
   :config
   (defhydra hydra-buffer-menu (:color pink)

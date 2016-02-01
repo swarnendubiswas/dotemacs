@@ -9,7 +9,7 @@
   :ensure helm-core
   :if (bound-and-true-p dotemacs-use-helm-p)
   :init
-  (use-package helm-flx ;; recommended to load before helm
+  (use-package helm-flx ;; Recommended to load before helm
     :ensure t
     :config (helm-flx-mode 1))
 
@@ -19,18 +19,19 @@
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-split-window-default-side 'below
-        helm-split-window-in-side-p t ; open helm buffer inside current window, not occupy whole other window
-        helm-move-to-line-cycle-in-source t ; move to end or beginning of source when reaching top or bottom of source
+        helm-split-window-in-side-p t ; Open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line t
         helm-echo-input-in-header-line t
-        ;; helm-idle-delay 0.1 ; be idle for this many seconds, before updating in delayed sources
-        ;; helm-input-idle-delay 0.1 ; be idle for this many seconds, before updating candidate buffer
+        ;; helm-idle-delay 0.1 ; Be idle for this many seconds, before updating in delayed sources
+        ;; helm-input-idle-delay 0.1 ; Be idle for this many seconds, before updating candidate buffer
         helm-follow-mode-persistent t
         ;; helm-always-two-windows nil
-        ;; both the min and max height are set to be equal on purpose
+        ;; Both the min and max height are set to be equal on purpose
         ;; helm-autoresize-max-height 60
         ;; helm-autoresize-min-height 60
-        helm-case-fold-search 'smart)
+        ;; Default is 'smart, searches and matches should ignore case
+        helm-case-fold-search t)
 
   (use-package helm-mode
     :diminish helm-mode
@@ -38,7 +39,7 @@
     (setq helm-completion-in-region-fuzzy-match t)
     (helm-mode 1))
 
-  (helm-autoresize-mode -1) ; distracting
+  (helm-autoresize-mode -1) ; Distracting
 
   (use-package helm-dired-recent-dirs
     :ensure t
@@ -68,7 +69,7 @@
     :bind
     (([remap execute-extended-command] . helm-M-x)
      ("M-x" . helm-M-x)
-     ;; convenient since it is a single keypress
+     ;; Convenient since it is a single keypress
      ("<f1>" . helm-M-x)))
 
   (use-package helm-utils
@@ -114,7 +115,7 @@
     (("C-c h s" . helm-swoop)
      ("C-c h /" . helm-multi-swoop))
     :config
-    (setq helm-multi-swoop-edit-save t ; save buffer when helm-multi-swoop-edit complete
+    (setq helm-multi-swoop-edit-save t ; Save buffer when helm-multi-swoop-edit complete
           helm-swoop-speed-or-color nil
           helm-swoop-split-direction #'split-window-vertically
           helm-swoop-split-with-multiple-windows nil
@@ -146,7 +147,7 @@
     :init (helm-fuzzier-mode 1))
 
   (bind-keys :map helm-map
-             ("<tab>" . helm-execute-persistent-action) ; do not rebind <tab> globally
+             ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
              ("C-z" . helm-select-action))
 
   ;; http://ericjmritz.name/2015/04/06/organizing-key-bindings-in-gnu-emacs-using-hydra/

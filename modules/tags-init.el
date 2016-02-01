@@ -47,7 +47,6 @@
 ;; front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 (use-package ggtags
   :ensure t
-  :defer t
   :if (eq system-type 'gnu/linux)
   :diminish ggtags-mode
   :init

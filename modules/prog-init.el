@@ -8,7 +8,8 @@
 (use-package prog-mode
   :defer t
   :config
-  (global-prettify-symbols-mode 1)
+
+  (add-hook 'prog-mode-hook #'prettify-symbols-mode)
 
   (when (eq dotemacs-completion 'auto-complete)
     (add-hook 'emacs-lisp-mode-hook
@@ -20,9 +21,7 @@
   (use-package which-func ; Show the name of the function in the modeline
     :config
     (setq which-func-modes t)
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (which-function-mode 1)))
+    (add-hook 'prog-mode-hook #'which-function-mode)
     (if (eq dotemacs-mode-line-theme 'spaceline)
         (set-face-attribute 'which-func nil :foreground "white")
       (set-face-attribute 'which-func nil :foreground "black")))

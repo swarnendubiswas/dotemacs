@@ -76,6 +76,7 @@
   :ensure t
   :config
   (setq popwin:popup-window-height 20)
+
   (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
   (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
   ;; M-x dired-jump-other-window
@@ -90,6 +91,8 @@
   ;; (push '(help-mode :noselect t) popwin:special-display-config)
   (push '("*Help*" :regexp t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
+  (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
+
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
@@ -99,6 +102,7 @@
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*"))
   (add-to-list 'popwin:special-display-config '(" *auto-async-byte-compile*" :noselect t))
+
   (popwin-mode 1))
 
 (use-package pabbrev
@@ -175,7 +179,10 @@
 (use-package pdf-tools
   :ensure t
   :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
-  :config (pdf-tools-install))
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-page) ; fit page by default
+  (setq pdf-view-resize-factor 1.10))
 
 (provide 'misc-init)
 
