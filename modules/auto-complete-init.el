@@ -7,7 +7,6 @@
 
 (use-package auto-complete
   :ensure t
-  :defer 2
   :config
   (ac-config-default)
   (global-auto-complete-mode 1)
@@ -20,16 +19,17 @@
                 ac-auto-start 3
                 ;; To get pop-ups with docs even if a word is uniquely completed
                 ac-dwim t)
+
   (setq ac-auto-show-menu t
         ac-show-menu-immediately-on-auto-complete t
         ac-disable-inline nil
-        ac-ignore-case 'smart
+        ac-ignore-case t ; options: 'smart
         ac-use-comphist t
         ac-use-quickhelp t
         ac-quick-help-delay 1.0
         ac-use-fuzzy t
-        ;; ac-trigger-key "TAB" ; should generally be used if ac-auto-start is nil
-        tab-always-indent 'complete ; use 't when auto-complete is disabled
+        ;; ac-trigger-key "TAB" ; Should generally be used if ac-auto-start is nil
+        tab-always-indent 'complete ; Use 't when auto-complete is disabled
         ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat")
         ac-dictionary-directories (concat dotemacs-temp-directory "ac-dict")
         ac-user-dictionary-files (concat dotemacs-temp-directory ".dict"))
@@ -68,12 +68,11 @@
 
   (use-package ac-helm
     :ensure t
-    :disabled t
     :if (bound-and-true-p dotemacs-use-helm-p))
 
   (use-package ac-ispell
     :ensure t
-    :disabled ; enabling this package seems to disable inline autocompletes or popups
+    :disabled ; FIXME: Enabling this package seems to disable inline autocompletes or popups
     :init
     (setq ac-ispell-requires 3
           ac-ispell-fuzzy-limit 2)
@@ -85,7 +84,7 @@
 
   (use-package ac-emoji
     :ensure t
-    :defer t)
+    :disabled t)
 
   :diminish auto-complete-mode)
 

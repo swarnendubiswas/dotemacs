@@ -63,7 +63,6 @@
 
 (use-package ace-window
   :ensure t
-  :disabled t
   :config (ace-window-display-mode 1))
 
 (use-package avy

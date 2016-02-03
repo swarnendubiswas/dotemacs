@@ -11,8 +11,7 @@
   (defun dotemacs--activate-flyspell ()
     "Turn on flyspell-mode and call flyspell-buffer."
     (interactive)
-    ;; This next line REALLY slows buffer switching.
-    (flyspell-mode)
+    (flyspell-mode) ; This REALLY slows buffer switching
     (flyspell-buffer))
 
   (defvar customised-hooks-alist
@@ -38,7 +37,7 @@
   ;; TODO: Is this slowing down editing Python?
   ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
-  ;; this is useful but slow
+  ;; This is useful but slow
   ;; (add-hook 'before-save-hook 'flyspell-buffer)
 
   ;; ;; Activate flyspell for various major modes.
@@ -46,7 +45,7 @@
   ;;   (add-hook-list customised-hooks-alist 'dotemacs--activate-flyspell))
 
   :config
-  ;; use this package if there are performance issues with flyspell, note that this package disables spell checks for
+  ;; Use this package if there are performance issues with flyspell, note that this package disables spell checks for
   ;; certain special buffers, including *scratch*
   (use-package flyspell-lazy
     :ensure t
