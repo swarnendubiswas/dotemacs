@@ -58,13 +58,14 @@
                                                   :init
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        ;; arrow, slant, chamfer, wave, brace, roundstub, zigzag, butt, rounded, contour, curve
+                                                        ;; Options: arrow, slant, chamfer, wave, brace, roundstub, zigzag, butt, rounded, contour, curve
                                                         powerline-default-separator 'wave
-                                                        spaceline-anzu-p t)
+                                                        spaceline-anzu-p t
+                                                        spaceline-hud-p nil)
                                                   (spaceline-emacs-theme)
                                                   (set-face-attribute 'spaceline-highlight-face nil
-                                                                      :background "burlywood"
-                                                                      :foreground "#3E3D31")
+                                                                      :background "#1A4B77"
+                                                                      :foreground "white")
                                                   (set-face-attribute 'powerline-active1 nil
                                                                       :background "gray22"
                                                                       :foreground "white"

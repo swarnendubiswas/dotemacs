@@ -14,19 +14,19 @@
     :config (helm-flx-mode 1))
 
   (setq helm-quick-update t
-        helm-candidate-number-limit 50
+        helm-candidate-number-limit 100
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-split-window-default-side 'below
         helm-split-window-in-side-p t ; Open helm buffer inside current window, not occupy whole other window
+        ;; helm-always-two-windows nil
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line t
         helm-echo-input-in-header-line t
         ;; helm-idle-delay 0.1 ; Be idle for this many seconds, before updating in delayed sources
         ;; helm-input-idle-delay 0.1 ; Be idle for this many seconds, before updating candidate buffer
         helm-follow-mode-persistent t
-        ;; helm-always-two-windows nil
         ;; Both the min and max height are set to be equal on purpose
         ;; helm-autoresize-max-height 60
         ;; helm-autoresize-min-height 60

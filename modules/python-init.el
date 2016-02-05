@@ -69,6 +69,13 @@
   :init
   (add-hook 'python-mode-hook #'anaconda-mode)
 
+  (use-package ac-anaconda
+    :ensure t
+    :if (eq dotemacs-completion 'auto-complete)
+    :init
+    (with-eval-after-load "auto-complete"
+      (add-hook 'python-mode-hook 'ac-anaconda-setup)))
+
   (use-package company-anaconda
     :ensure t
     :if (eq dotemacs-completion 'company)

@@ -59,7 +59,8 @@
 
   (use-package helm-ispell
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p))
+    :if (bound-and-true-p dotemacs-use-helm-p)
+    :commands helm-ispell)
 
   (use-package flyspell-popup
     :ensure t

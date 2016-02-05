@@ -79,7 +79,8 @@
         kill-whole-line t
         suggest-key-bindings t
         ;; Use shift-select for marking
-        shift-select-mode t)
+        shift-select-mode t
+        blink-matching-paren t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
   (auto-fill-mode 1)
@@ -230,6 +231,7 @@
 
 (use-package hippie-exp ; Hippie expand is dabbrev expand on steroids
   :config
+  ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
                                            try-expand-dabbrev-from-kill
