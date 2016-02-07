@@ -3,5 +3,5 @@
 # key: en
 # --
 \begin{enumerate}
-$0
+\item $0
 \end{enumerate}
