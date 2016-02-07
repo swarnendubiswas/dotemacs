@@ -3,5 +3,5 @@
 # key: desc
 # --
 \begin{description}
-$0
+\item $0
 \end{description}

@@ -81,6 +81,14 @@
   (use-package math-symbol-lists
     :ensure t)
 
+  (use-package latex-unicode-math
+    :ensure t
+    :config
+    ;; This converts LaTeX to Unicode inside math environments.
+    ;; (add-hook 'LaTeX-mode-hook 'latex-unicode-math-mode)
+    ;; This converts LaTeX to Unicode everwhere, not only in math environments.
+    (add-hook 'LaTeX-mode-hook 'latex-unicode-mode))
+
   (when (eq dotemacs-completion 'auto-complete)
     (use-package auto-complete-auctex
       :ensure t)
