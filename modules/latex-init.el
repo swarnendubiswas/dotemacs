@@ -81,8 +81,9 @@
   (use-package math-symbol-lists
     :ensure t)
 
-  (use-package latex-unicode-math
+  (use-package latex-unicode-math-mode
     :ensure t
+    :diminish latex-unicode-mode
     :config
     ;; This converts LaTeX to Unicode inside math environments.
     ;; (add-hook 'LaTeX-mode-hook 'latex-unicode-math-mode)
