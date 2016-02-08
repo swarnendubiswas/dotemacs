@@ -18,7 +18,7 @@
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
 (bind-key "C-c ;" #'dotemacs-comment-line)
-;; (bind-key "C-c b" #'comment-box) ; FIXME: Conflicts with bibtex keys.
+(bind-key* "C-c b" #'comment-box) ; Overrides bib-cite keys.
 
 (bind-key "<f9>" #'other-window) ; switch to the other buffer
 (bind-key "<f10>" #'delete-other-windows)

@@ -169,14 +169,24 @@
     (use-package bibtex-utils
       :ensure t))
 
-  ;; "C-c b f" runs the command 'bib-find
   (use-package bib-cite
     :diminish bib-cite-minor-mode
     :config
     (add-hook 'LaTeX-mode-hook
               (lambda ()
                 (bib-cite-minor-mode 1)))
-    (setq bib-cite-use-reftex-view-crossref t))
+    (setq bib-cite-use-reftex-view-crossref t)
+    ;; We use "C-c b" for comment-box
+    (bind-keys
+     :map bib-cite-minor-mode-map
+     ("C-c l a" . bib-apropos)
+     ("C-c l b" . bib-make-bibliography)
+     ("C-c l d" . bib-display)
+     ("C-c l e" . bib-etags)
+     ("C-c l f" . bib-find)
+     ("C-c l n" . bib-find-next)
+     ("C-c l h" . bib-highlight-mouse))
+    (unbind-key "C-c b"))
 
   (use-package helm-bibtex
     :ensure t
@@ -184,7 +194,7 @@
     :init
     (use-package parsebib
       :ensure t)
-    :bind ("C-c b x" . helm-bibtex)
+    :bind ("C-c l x" . helm-bibtex)
     :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-reformatted.bib")))
 
   (use-package reftex

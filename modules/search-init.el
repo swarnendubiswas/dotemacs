@@ -51,23 +51,21 @@
 
 (use-package swiper-helm
   :ensure t
-  :bind ("C-c s h"))
+  :bind ("C-c s h" . swiper-helm))
 
 (use-package color-moccur
   :ensure t
   :functions (isearch-moccur isearch-all)
-  :bind ("M-s O" . moccur)
-  :init
+  :bind ("C-c s o" . moccur)
+  :config
   (use-package moccur
-    :bind ("C-c o" . moccur)
     :config
     (use-package moccur-edit
       :ensure t))
-  :config
   (bind-keys
    :map isearch-mode-map
-   ("M-o" . isearch-moccur)
-   ("M-O" . isearch-moccur-all)))
+   ("C-c s i" . isearch-moccur)
+   ("C-c s m" . isearch-moccur-all)))
 
 (use-package loccur
   :ensure t
