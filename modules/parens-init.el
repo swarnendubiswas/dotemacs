@@ -1,7 +1,7 @@
 ;;; parens-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup parentheses. Highlight/track matching/mismatched parentheses, auto-pairing, etc.
+;; Setup parentheses.  Highlight/track matching/mismatched parentheses, auto-pairing, etc.
 
 ;;; Code:
 
@@ -17,7 +17,7 @@
       :init
       (show-paren-mode 1)
       (setq show-paren-delay 0
-            show-paren-style 'mixed ; 'expression, 'parenthesis, 'mixed
+            show-paren-style 'mixed ; Options: 'expression, 'parenthesis, 'mixed
             show-paren-when-point-inside-paren t
             show-paren-when-point-in-periphery t)
       (when (fboundp 'show-paren-mode)

@@ -72,13 +72,13 @@
     :diminish function-args-mode
     :config
     (set-default 'semantic-case-fold t)
-    ;; to include custom header locations
+    ;; Include custom header locations
     (when (string-equal system-name "rain.cse.ohio-state.edu")
       (semantic-add-system-include "/usr/include/boost148/" 'c++-mode))
     (fa-config-default)
     (bind-key* "M-u" #'upcase-word))
 
-  ;; this is already the default, but I have this as a reminder.
+  ;; This is already the default, but I have this as a reminder.
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)
 
   ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c

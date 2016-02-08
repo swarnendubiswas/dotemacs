@@ -25,7 +25,6 @@
         ac-disable-inline nil
         ac-ignore-case t ; options: 'smart
         ac-use-comphist t
-        ac-use-quickhelp t
         ac-quick-help-delay 1.0
         ac-use-fuzzy t
         ;; ac-trigger-key "TAB" ; Should generally be used if ac-auto-start is nil

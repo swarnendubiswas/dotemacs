@@ -10,7 +10,7 @@
             (setq c-basic-offset 2
                   c-set-style "java")))
 
-;; can disassemble .class files from within jars as well
+;; Can disassemble .class files from within jars as well
 (use-package autodisass-java-bytecode
   :ensure t)
 

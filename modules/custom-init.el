@@ -15,8 +15,8 @@
 
 ;; Kill all non-special buffers but the current one
 (defun dotemacs-kill-other-buffers ()
-  "Kill all buffers but the current one. Don't mess with special
-buffers."
+  "Kill all buffers but the current one.
+Don't mess with special buffers."
   (interactive)
   (dolist (buffer (buffer-list))
     (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))

@@ -20,7 +20,7 @@
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
-      ;; do not use dialog boxes
+      ;; Do not use dialog boxes
       use-dialog-box nil
       use-file-dialog nil
       enable-recursive-minibuffers t
@@ -261,9 +261,9 @@
   (setq split-height-threshold nil
         split-width-threshold 0))
 
-;; hide "Auto-saving...done" messages
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)
+  "Hide 'Auto-saving...done' messages."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
