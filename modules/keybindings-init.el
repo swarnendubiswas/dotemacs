@@ -1,7 +1,7 @@
 ;;; keybindings-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Custom keybindings. Use M-x describe-personal-keybindings to see modifications.
+;; Custom keybindings.  Use M-x describe-personal-keybindings to see modifications.
 
 ;;; Code:
 
@@ -18,6 +18,7 @@
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
 (bind-key "C-c ;" #'dotemacs-comment-line)
+(bind-key "C-c b" #'comment-box)
 
 (bind-key "<f9>" #'other-window) ; switch to the other buffer
 (bind-key "<f10>" #'delete-other-windows)
