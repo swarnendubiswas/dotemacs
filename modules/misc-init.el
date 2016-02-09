@@ -67,18 +67,20 @@
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
-  :ensure nil
-  :defer t
+  :ensure t
   :config (setq popup-use-optimized-column-computation nil))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 (use-package popwin
   :ensure t
   :config
-  (setq popwin:popup-window-height 20)
+  (setq popwin:popup-window-height 20
+        popwin:close-popup-window-timer-interval 0.5)
 
-  (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
-  (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
+  ;; Disable this if we are opening helm buffers on the right
+  ;; ;; (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
+  ;; ;; (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
+
   ;; M-x dired-jump-other-window
   (push '(dired-mode :position top) popwin:special-display-config)
   ;; M-x compile
@@ -88,8 +90,9 @@
   (push '(svn-status-mode) popwin:special-display-config)
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '(manage-minor-mode :noselect t) popwin:special-display-config)
-  ;; (push '(help-mode :noselect t) popwin:special-display-config)
-  (push '("*Help*" :regexp t) popwin:special-display-config)
+  (push '(help-mode :noselect t) popwin:special-display-config)
+  ;; Helm buffers include the "help" string
+  ;; (push '("*Help*" :regexp t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
 

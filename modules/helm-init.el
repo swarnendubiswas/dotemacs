@@ -18,8 +18,8 @@
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
-        helm-split-window-default-side 'below
-        helm-split-window-in-side-p t ; Open helm buffer inside current window, not occupy whole other window
+        helm-split-window-default-side 'right
+        ;; helm-split-window-in-side-p t ; Open helm buffer inside current window, not occupy whole other window
         ;; helm-always-two-windows nil
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line t
