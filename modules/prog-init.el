@@ -68,7 +68,13 @@
     :config
     (setq sh-basic-offset 4
           sh-indent-comment t
-          sh-indentation 4))
+          sh-indentation 4)
+
+    (when (eq dotemacs-completion 'company)
+      (use-package company-shell
+        :ensure t
+        :config
+        (add-to-list 'company-backends '((company-shell company-fish-shell))))))
 
   (use-package fish-mode
     :ensure t
@@ -120,7 +126,9 @@
 
     (use-package ac-html-angular
       :ensure t
-      :config (ac-html-angular 1)))
+      :config
+      ;; FIXME: Is this correct?
+      (ac-html-angular 1)))
 
   (when (eq dotemacs-completion 'company)
     (use-package ac-html-csswatcher

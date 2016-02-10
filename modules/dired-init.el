@@ -15,19 +15,19 @@
 
   (defun dired-jump-to-top ()
     (interactive)
-    (goto-char (point-min)) ; faster than (beginning-of-buffer)
+    (goto-char (point-min)) ; Faster than (beginning-of-buffer)
     (dired-next-line 2))
 
   (defun dired-jump-to-bottom ()
     (interactive)
-    (goto-char (point-max)) ; faster than (end-of-buffer)
+    (goto-char (point-max)) ; Faster than (end-of-buffer)
     (dired-next-line -1))
 
   :config
-  (setq dired-auto-revert-buffer t ; revert each dired buffer automatically when you visit it
-        dired-recursive-deletes 'always ; single prompt for all n directories
+  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you visit it
+        dired-recursive-deletes 'always ; Single prompt for all n directories
         dired-recursive-copies 'always
-        ;; check ls for options
+        ;; Check ls for additional options
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
@@ -43,7 +43,7 @@
     :functions (dired-jump dired-omit-mode)
     :init
     (setq dired-bind-jump t
-          ;; do not show messages when omitting files
+          ;; Do not show messages when omitting files
           dired-omit-verbose nil)
     (add-hook 'dired-mode-hook #'dired-omit-mode)
 
@@ -67,7 +67,7 @@
   (use-package dired-efap
     :ensure t
     :config
-    (setq dired-efap-initial-filename-selection nil) ; options: t, nil, no-extension
+    (setq dired-efap-initial-filename-selection nil) ; Options: t, nil, no-extension
     (bind-key "<f2>" #'dired-efap dired-mode-map))
 
   (use-package diredful

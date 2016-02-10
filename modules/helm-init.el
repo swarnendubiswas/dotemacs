@@ -13,13 +13,14 @@
     :ensure t
     :config (helm-flx-mode 1))
 
-  (setq helm-quick-update t
+  (setq helm-quick-update nil
         helm-candidate-number-limit 100
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
-        helm-split-window-default-side 'right
-        ;; helm-split-window-in-side-p t ; Open helm buffer inside current window, not occupy whole other window
+        helm-full-frame t
+        ;; helm-split-window-default-side 'right
+        ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
         ;; helm-always-two-windows nil
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line t
@@ -75,7 +76,8 @@
   (use-package helm-utils
     :init
     (setq helm-highlight-number-lines-around-point 10
-          helm-yank-symbol-first t))
+          helm-yank-symbol-first t)
+    (helm-popup-tip-mode 1))
 
   (use-package helm-files
     :config
@@ -107,6 +109,10 @@
     :init
     (fset 'describe-bindings 'helm-descbinds)
     (helm-descbinds-mode 1))
+
+  (use-package helm-describe-modes
+    :ensure t
+    :config (global-set-key [remap describe-mode] #'helm-describe-modes))
 
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop

@@ -38,7 +38,7 @@
   ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
   ;; This is useful but slow
-  ;; (add-hook 'before-save-hook 'flyspell-buffer)
+  ;; (add-hook 'before-save-hook #'flyspell-buffer)
 
   ;; ;; Activate flyspell for various major modes.
   ;; (unless noninteractive

@@ -1,7 +1,7 @@
 ;;; python-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Configure Python programming mode. These settings are possibly a bit undercooked currently.
+;; Configure Python programming mode.  These settings are possibly a bit undercooked currently.
 
 ;;; Code:
 
