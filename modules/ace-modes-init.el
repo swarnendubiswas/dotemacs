@@ -77,17 +77,7 @@
         avy-highlight-first t
         ;; Options: pre, at, at-full, post, de-bruijn. pre is a bit distracting because of all the movement while
         ;; highlighting selection keys. This causes the eyes to lose focus.
-        avy-style 'at)
-
-  (defhydra hydra-jump-commands (:color blue)
-    "Different avy jump commands."
-    ("c" avy-goto-char "avy char")
-    ("d" avy-goto-char-2 "avy char 2")
-    ("w" avy-goto-word-0 "avy word")
-    ("u" avy-goto-word-or-subword-1 "avy word or subword")
-    ("l" avy-goto-line "avy line")
-    ("s" avy-goto-subword-0 "avy subword"))
-  (bind-key "M-g" #'hydra-jump-commands/body))
+        avy-style 'at))
 
 (provide 'ace-modes-init)
 

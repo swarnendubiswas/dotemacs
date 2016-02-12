@@ -4,7 +4,7 @@
 ;;; Commentary:
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the whole buffer
-;; Use C-M-x to evaluate the current top-level s-expression. Use M-: to evaluate any Emacs Lisp expression and print the
+;; Use C-M-x to evaluate the current top-level s-expression.  Use M-: to evaluate any Emacs Lisp expression and print the
 ;; result.
 
 ;; Init file should not ideally contain calls to "load" or "require", since they cause eager loading and are expensive,
@@ -64,21 +64,20 @@
 ;; (function (lambda (x) (* x x)))
 ;; #'(lambda (x) (* x x))
 
-;; personal modules for customizing Emacs initialization
+;; Personal modules for customizing Emacs initialization
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/"))
 
-(require 'packages-init) ; setup the package system
-(require 'config-init) ; setup configuration variables
+(require 'config-init) ; Setup configuration variables
+(require 'packages-init) ; Setup the package system
 
-;; now setup other modules
+;; Now setup other modules
 
-;; user, defaults, and appearance
 (require 'user-init)
 (require 'defaults-init)
 (require 'appearance-init)
 (require 'mode-line-init)
 
-;; configure power packages
+;; Configure power packages
 (require 'ibuffer-init)
 (require 'dired-init)
 (require 'search-init)
@@ -91,14 +90,14 @@
 (when (bound-and-true-p dotemacs-use-helm-p)
   (require 'helm-init))
 
-;; configure the more useful extensions
+;; Configure the more useful extensions
 (require 'anzu-init)
 (require 'flyspell-init)
 (require 'ace-modes-init)
 (require 'indent-init)
 (require 'parens-init)
 
-;; setup helper packages
+;; Setup helper packages
 (require 'projectile-init)
 (require 'fci-init)
 (require 'misc-init)
@@ -108,7 +107,7 @@
 (require 'whitespace-init)
 (require 'highlight-init)
 
-;; configure individual major modes
+;; Configure individual major modes
 (require 'text-init)
 (require 'latex-init)
 (require 'org-init)
@@ -120,11 +119,15 @@
 (require 'shell-init)
 (require 'svn-init)
 (require 'git-init)
-;; for some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are not
-;; enabled on startup.
+
+;; FIXME: For some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
+;; not enabled on startup.
 (require 'tags-init)
 (require 'custom-init)
-(require 'keybindings-init) ; generic keybindings, package-specific are usually in their own modules
-(require 'server-init) ; start the daemon/server
+
+(require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
+(require 'hydra-init) ; All hydras are in one place
+
+(require 'server-init) ; Start the daemon/server
 
 ;;; init.el ends here

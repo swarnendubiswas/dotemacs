@@ -61,17 +61,7 @@
   :disabled t
   :init
   (setq-default ecb-tip-of-the-day nil)
-  (add-hook 'prog-mode-hook #'ecb-minor-mode)
-  :config
-  (defhydra hydra-ecb (:color blue)
-    "ecb commands"
-    ("g h" ecb-goto-window-history "history")
-    ("g m" ecb-goto-window-methods "methods")
-    ("g s" ecb-goto-window-sources "sources")
-    ("g d" ecb-goto-window-directories "directories")
-    ("g y" ecb-goto-window-symboldef "symbol def")
-    ("l u" ecb-redraw-layout "redraw layout"))
-  (bind-key "C-c ." 'hydra-ecb/body))
+  (add-hook 'prog-mode-hook #'ecb-minor-mode))
 
 (provide 'cedet-init)
 

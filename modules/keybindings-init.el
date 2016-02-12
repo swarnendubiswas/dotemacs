@@ -56,19 +56,6 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-(defhydra hydra-apropos (:color blue)
-  "Apropos"
-  ("a" apropos "apropos")
-  ("c" apropos-command "cmd")
-  ("d" apropos-documentation "doc")
-  ("e" apropos-value "val")
-  ("l" apropos-library "lib")
-  ("o" apropos-user-option "opt")
-  ("v" apropos-variable "var")
-  ("i" info-apropos "info")
-  ("t" tags-apropos "tags"))
-(bind-key "C-h a" #'hydra-apropos/body)
-
 (use-package guide-key
   :ensure t
   :disabled t

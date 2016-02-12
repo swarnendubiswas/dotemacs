@@ -43,24 +43,6 @@
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))
 
-  (defhydra hydra-projectile (:color teal)
-    "projectile"
-    ("h" helm-projectile "helm-projectile")
-    ("p" helm-projectile-switch-project "switch project")
-    ("f" helm-projectile-find-file-dwim "find file dwim")
-    ("d" helm-projectile-find-dir "find dir")
-    ("b" helm-projectile-switch-to-buffer "switch to another buffer in the project")
-    ("a" helm-projectile-find-other-file "find other file")
-    ("c" projectile-invalidate-cache "invalidate cache")
-    ("i" projectile-ibuffer "ibuffer")
-    ("S" projectile-save-project-buffers "save project buffers")
-    ("l" projectile-replace "replace")
-    ("r" helm-projectile-recentf "recentf")
-    ("K" projectile-kill-buffers "kill buffers")
-    ("g" helm-projectile-grep "grep")
-    ("o" projectile-multi-occur "multi-occur"))
-  ;; i want my hydra bindings over projectile default
-  (bind-key* "C-c p" 'hydra-projectile/body)
 
   :diminish projectile-mode)
 

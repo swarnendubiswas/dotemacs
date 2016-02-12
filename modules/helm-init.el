@@ -18,7 +18,7 @@
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
-        helm-full-frame t
+        helm-full-frame t ; Make the helm buffer occupy the full frame
         ;; helm-split-window-default-side 'right
         ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
         ;; helm-always-two-windows nil
@@ -37,7 +37,8 @@
   (use-package helm-mode
     :diminish helm-mode
     :init
-    (setq helm-completion-in-region-fuzzy-match t)
+    (setq helm-completion-in-region-fuzzy-match t
+          helm-mode-fuzzy-match t)
     (helm-mode 1))
 
   (helm-autoresize-mode -1) ; Distracting
@@ -155,26 +156,6 @@
   (bind-keys :map helm-map
              ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
              ("C-z" . helm-select-action))
-
-  ;; http://ericjmritz.name/2015/04/06/organizing-key-bindings-in-gnu-emacs-using-hydra/
-  (defhydra hydra-helm (:color blue)
-    "helm commands"
-    ("x" helm-M-x "helm-M-x")
-    ("b" helm-mini "helm-mini")
-    ("i" helm-buffers-list "helm-buffers-list")
-    ("f" helm-find-files "helm-find-files")
-    ("r" helm-recentf "helm-recentf")
-    ("l" helm-locate "helm-locate")
-    ("y" helm-show-kill-ring "helm-show-kill-ring")
-    ("s" helm-swoop "helm-swoop")
-    ("/" helm-multi-swoop "helm-multi-swoop")
-    ("a" helm-apropos "helm-apropos")
-    ("g" helm-do-grep "helm-do-grep")
-    ("u" helm-resume "helm-resume")
-    ;; swoop is better than occur
-    ("o" helm-occur "helm-occur"))
-  (global-unset-key (kbd "C-b"))
-  (bind-key "C-b" 'hydra-helm/body)
 
   :bind
   (("C-c h l" . helm-locate)

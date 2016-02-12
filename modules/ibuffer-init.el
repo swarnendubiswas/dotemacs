@@ -75,29 +75,6 @@
     :config
     (add-hook 'ibuffer-hook #'dotemacs-ibuffer-customization))
 
-  :config
-  (defhydra hydra-buffer-menu (:color pink)
-    "Buffer menu commands"
-    ("m" Buffer-menu-mark "mark")
-    ("u" Buffer-menu-unmark "unmark")
-    ("U" Buffer-menu-backup-unmark "backup-unmark")
-    ("d" Buffer-menu-delete "delete")
-    ("D" Buffer-menu-delete-backwards "delete-backwards")
-    ("s" Buffer-menu-save "save")
-    ("~" Buffer-menu-not-modified "not modified")
-    ("x" Buffer-menu-execute "execute")
-    ("b" Buffer-menu-bury "bury")
-    ("g" revert-buffer "revert")
-    ("T" Buffer-menu-toggle-files-only "toggle files only")
-    ("O" Buffer-menu-multi-occur "multi occur" :color blue)
-    ("I" Buffer-menu-isearch-buffers "isearch buffers" :color blue)
-    ("R" Buffer-menu-isearch-buffers-regexp "isearch buffers regexp" :color blue)
-    ("c" nil "cancel")
-    ("v" Buffer-menu-select "select" :color blue)
-    ("o" Buffer-menu-other-window "other-window" :color blue)
-    ("q" quit-window "quit" :color blue))
-  (bind-key "." 'hydra-buffer-menu/body ibuffer-mode-map)
-
   :bind (;;("C-x C-b" . ibuffer)
          ([remap list-buffers] . ibuffer)))
 

@@ -62,9 +62,6 @@
         paradox-spinner-type 'moon)
   (paradox-enable))
 
-(use-package hydra
-  :ensure t)
-
 (provide 'packages-init)
 
 ;;; packages-init.el ends here

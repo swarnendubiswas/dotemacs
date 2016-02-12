@@ -72,23 +72,7 @@
 
   (use-package diredful
     :ensure t
-    :init (diredful-mode 1))
-
-  ;; http://oremacs.com/2015/02/21/hydra-docstring-sexp
-  (defhydra hydra-dired-marked (dired-mode-map "" :color pink)
-    "Number of marked items: %(length (dired-get-marked-files))"
-    ("m"   dired-mark                      "mark")
-    ("u"   dired-unmark                    "unmark")
-    ("U"   dired-unmark-all-marks          "unmark ALL")
-    ("t"   dired-toggle-marks              "toggle marks")
-    ("P"   dired-prev-marked-file          "prev marked")
-    ("M-{" dired-prev-marked-file          "prev marked")
-    ("N"   dired-next-marked-file          "next marked")
-    ("M-}" dired-next-marked-file          "next marked")
-    ("w"   dired-copy-filename-as-kill     "copy file name(s)")
-    ("W"   (dired-copy-filename-as-kill 0) "copy file name(s) - full path")
-    ("C-g" nil                             "cancel" :color blue))
-  (bind-key "." 'hydra-dired-marked/body dired-mode-map))
+    :init (diredful-mode 1)))
 
 (provide 'dired-init)
 
