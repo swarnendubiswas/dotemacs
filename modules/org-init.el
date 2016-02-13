@@ -97,6 +97,7 @@
   (when (eq dotemacs-completion 'auto-complete)
     (use-package org-ac
       :ensure t
+      :config (org-ac/config-default))))
 
 (provide 'org-init)
 
