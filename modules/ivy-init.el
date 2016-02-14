@@ -13,8 +13,9 @@
   (setq ivy-use-virtual-buffers t
         ivy-virtual-abbreviate 'full
         ivy-wrap t
-        ivy-height 10
-        ivy-display-style 'fancy)
+        ivy-height 20
+        ivy-display-style 'fancy
+        ivy-count-format "(%d/%d) ")
   (global-set-key (kbd "<f12>") 'ivy-resume)
   (use-package counsel
     :ensure t
@@ -29,15 +30,10 @@
     (setq counsel-find-file-at-point t)
 
     ;; (global-set-key [remap execute-extended-command] #'counsel-M-x)
-    ;; (bind-key "M-x" #'counsel-M-x)
-
     ;; (global-set-key [remap describe-function] #'counsel-describe-function)
     ;; (global-set-key [remap describe-variable] #'counsel-describe-variable)
-
     ;; (global-set-key [remap find-file] #'counsel-find-file)
-    ;; (bind-key "<f3>" #'counsel-find-file)
 
-    ;; (bind-key "M-y" #'counsel-yank-pop)
     )
   :diminish ivy-mode)
 
