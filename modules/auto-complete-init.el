@@ -16,11 +16,12 @@
 
   ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-auto-complete.el
   (setq-default ac-expand-on-auto-complete t
-                ac-auto-start 3
+                ac-auto-start 4
                 ;; To get pop-ups with docs even if a word is uniquely completed
                 ac-dwim t)
 
   (setq ac-auto-show-menu t
+        ac-use-menu-map t
         ac-show-menu-immediately-on-auto-complete t
         ac-disable-inline nil
         ac-ignore-case t ; options: 'smart
@@ -40,6 +41,7 @@
                  ac-source-abbrev
                  ac-source-features
                  ac-source-dictionary
+                 ac-source-capf
                  ac-source-filename
                  ac-source-files-in-curren-dir
                  ac-source-yasnippet))

@@ -13,7 +13,8 @@
   :functions magit-status
   :config
   (setq magit-auto-revert-mode nil
-        magit-item-highlight-face 'bold)
+        magit-item-highlight-face 'bold
+        magit-completing-read-function 'ivy-completing-read)
 
   (use-package magit-popup)
 

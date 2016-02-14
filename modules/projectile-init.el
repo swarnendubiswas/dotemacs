@@ -27,7 +27,10 @@
         projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld"))
   (if (bound-and-true-p dotemacs-use-helm-p)
       (setq projectile-completion-system 'helm)
-    (setq projectile-completion-system 'ido))
+    (progn
+      (if (bound-and-true-p dotemacs-prefer-ivy-over-ido-p)
+          (setq projectile-completion-system 'ivy)
+        (setq projectile-completion-system 'ido))))
 
   (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))

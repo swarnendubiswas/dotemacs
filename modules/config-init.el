@@ -39,6 +39,12 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
+(defcustom dotemacs-prefer-ivy-over-ido-p
+  t
+  "Prefer ivy over ido for completion."
+  :type 'boolean
+  :group 'dotemacs)
+
 (defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."

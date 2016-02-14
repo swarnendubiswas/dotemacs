@@ -37,15 +37,6 @@
 (use-package swiper ; performs poorly if there are a large number of matches
   :ensure t
   :config
-  (use-package ivy
-    :init
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t
-          ivy-virtual-abbreviate 'full
-          ivy-wrap t
-          ivy-display-style 'fancy)
-    (bind-key "C-c s u" 'ivy-resume ivy-mode-map)
-    :diminish ivy-mode)
   (setq swiper-min-highlight 3) ; be less noisy
   :bind ("C-c s s" . swiper))
 

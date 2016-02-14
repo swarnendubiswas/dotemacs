@@ -83,6 +83,7 @@
 
   (use-package latex-unicode-math-mode
     :ensure t
+    :disabled t
     :diminish latex-unicode-mode
     :config
     ;; This converts LaTeX to Unicode inside math environments.

@@ -134,6 +134,7 @@
     :bind ("C-c h k" . helm-make-projectile))
 
   (use-package helm-grep
+    :disabled t
     :init
     ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
     (global-set-key [f12]
