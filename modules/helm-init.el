@@ -69,8 +69,8 @@
   (use-package helm-command
     :config (setq helm-M-x-fuzzy-match t)
     :bind
-    (([remap execute-extended-command] . helm-M-x)
-     ("M-x" . helm-M-x)
+    (;;([remap execute-extended-command] . helm-M-x)
+     ;;("M-x" . helm-M-x)
      ;; Convenient since it is a single keypress
      ("<f1>" . helm-M-x)))
 
