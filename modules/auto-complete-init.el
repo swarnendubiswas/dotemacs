@@ -41,7 +41,6 @@
                  ac-source-abbrev
                  ac-source-features
                  ac-source-dictionary
-                 ac-source-capf
                  ac-source-filename
                  ac-source-files-in-curren-dir
                  ac-source-yasnippet))

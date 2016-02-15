@@ -16,11 +16,11 @@
 ;; M-v (ivy-scroll-down-command) scrolls down by ivy-height lines ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; // (self-insert-command) Switch to the root directory.                                                                            ;;
-;; ~ (self-insert-command) Switch to the home directory.                                                                             ;;
-;; / (self-insert-command) If the current input matches an existing directory name exactly, switch the completion to that directory. ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; // (self-insert-command) Switch to the root directory. ;;
+;; ~ (self-insert-command) Switch to the home directory.  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (use-package ivy
   :ensure swiper
@@ -35,7 +35,7 @@
         ivy-height 25 ; Number of lines in the minibuffer window
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
-        ivy-re-builders-alist '((t . ivy--regex-plus))
+        ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format "(%d/%d) ")
   :bind
   (("<f12>" . ivy-resume)
