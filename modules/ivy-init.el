@@ -5,19 +5,42 @@
 
 ;;; Code:
 
+;; "C-o" in the minibuffer shows a Hydra menu.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C-n (ivy-next-line) selects the next candidate                 ;;
+;; C-p (ivy-previous-line) selects the previous candidate         ;;
+;; M-< (ivy-beginning-of-buffer) selects the first candidate      ;;
+;; M-> (ivy-end-of-buffer) selects the last candidate             ;;
+;; C-v (ivy-scroll-up-command) scrolls up by ivy-height lines     ;;
+;; M-v (ivy-scroll-down-command) scrolls down by ivy-height lines ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; // (self-insert-command) Switch to the root directory.                                                                            ;;
+;; ~ (self-insert-command) Switch to the home directory.                                                                             ;;
+;; / (self-insert-command) If the current input matches an existing directory name exactly, switch the completion to that directory. ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package ivy
   :ensure swiper
   :if (bound-and-true-p dotemacs-prefer-ivy-over-ido-p)
   :init
   (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t
+  (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
+                                  ; candidates.
         ivy-virtual-abbreviate 'full
-        ivy-wrap t
-        ivy-height 20
+        ivy-wrap t ; Specifies wrap around behavior for "C-n" and "C-p"
+        ivy-case-fold-search t
+        ivy-height 25 ; Number of lines in the minibuffer window
         ivy-display-style 'fancy
+        ivy-extra-directories nil ; Hide "." and ".."
         ivy-re-builders-alist '((t . ivy--regex-plus))
         ivy-count-format "(%d/%d) ")
-  (global-set-key (kbd "<f12>") 'ivy-resume)
+  :bind
+  (("<f12>" . ivy-resume)
+   ("C-c C-r" . ivy-recentf)
+   ("C-'" . ivy-avy))
   :config
   (use-package counsel
     :ensure t

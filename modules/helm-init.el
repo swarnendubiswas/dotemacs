@@ -131,7 +131,10 @@
 
   (use-package helm-make
     :ensure t
-    :bind ("C-c h k" . helm-make-projectile))
+    :bind ("C-c h k" . helm-make-projectile)
+    :config
+    (if (bound-and-true-p dotemacs-prefer-ivy-over-ido-p)
+        (setq helm-make-completion-method 'ivy)))
 
   (use-package helm-grep
     :disabled t
