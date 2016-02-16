@@ -5,26 +5,21 @@
 
 ;;; Code:
 
-;; "C-o" in the minibuffer shows a Hydra menu.
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C-n (ivy-next-line) selects the next candidate                 ;;
-;; C-p (ivy-previous-line) selects the previous candidate         ;;
-;; M-< (ivy-beginning-of-buffer) selects the first candidate      ;;
-;; M-> (ivy-end-of-buffer) selects the last candidate             ;;
-;; C-v (ivy-scroll-up-command) scrolls up by ivy-height lines     ;;
-;; M-v (ivy-scroll-down-command) scrolls down by ivy-height lines ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; // (self-insert-command) Switch to the root directory. ;;
-;; ~ (self-insert-command) Switch to the home directory.  ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C-o (hydra-ivy/body) In the minibuffer shows a Hydra menu.      ;;
+;; C-n (ivy-next-line) Selects the next candidate                  ;;
+;; C-p (ivy-previous-line) Selects the previous candidate          ;;
+;; M-< (ivy-beginning-of-buffer) Selects the first candidate       ;;
+;; M-> (ivy-end-of-buffer) Selects the last candidate              ;;
+;; C-v (ivy-scroll-up-command) Scrolls up by ivy-height lines      ;;
+;; M-v (ivy-scroll-down-command) Scrolls down by ivy-height lines  ;;
+;; //  (self-insert-command) Switch to the root directory.         ;;
+;; ~   (self-insert-command) Switch to the home directory.         ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ivy
   :ensure swiper
-  :if (bound-and-true-p dotemacs-prefer-ivy-over-ido-p)
+  :if (eq dotemacs-selection 'ivy)
   :init
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
@@ -46,21 +41,18 @@
     :ensure t
     :bind
     (([remap describe-function] . counsel-describe-function)
-     ;;("C-h f" . counsel-describe-function)
      ([remap describe-variable] . counsel-describe-variable)
-     ;;("C-h v" . counsel-describe-variable)
      ([remap execute-extended-command] . counsel-M-x)
-     ;; ("M-x" . counsel-M-x)
      ([remap find-file] . counsel-find-file)
-     ;;("C-x C-f" . counsel-find-file)
      ("<f3>" . counsel-find-file)
      ("M-y" . counsel-yank-pop))
-    :config
-    ;; (global-set-key [remap describe-function] #'counsel-describe-function)
-    ;; (global-set-key [remap describe-variable] #'counsel-describe-variable)
-    ;; (global-set-key [remap execute-extended-command] #'counsel-M-x)
-    ;; (global-set-key [remap find-file] #'counsel-find-file)
-    (setq counsel-find-file-at-point t))
+    :config (setq counsel-find-file-at-point t))
+
+  (when (eq dotemacs-selection 'ivy)
+    (progn
+      (bind-key "<f1>" #'counsel-M-x)
+      (bind-key "<f5>" #'ivy-switch-buffer)
+      (bind-key "<f6>" #'ivy-recentf)))
   :diminish ivy-mode)
 
 (provide 'ivy-init)

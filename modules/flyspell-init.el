@@ -54,24 +54,22 @@
 
   (use-package helm-flyspell
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p)
+    :if (eq dotemacs-selection 'helm)
     :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))
 
   (use-package helm-ispell
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p)
+    :if (eq dotemacs-selection 'helm)
     :commands helm-ispell)
 
   (use-package flyspell-popup
     :ensure t
     :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
 
-
   :diminish flyspell-mode
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
-   ;; another alternative is M-$
    ("C-c f w" . ispell-word)))
 
 (provide 'flyspell-init)

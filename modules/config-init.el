@@ -16,19 +16,22 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
-(defcustom dotemacs-completion
+(defcustom dotemacs-completion-in-buffer
   'auto-complete
-  "Choose company or auto-complete for completion."
+  "Choose company or auto-complete for in-buffer completion."
   :type '(radio
           (const :tag "company" company)
           (const :tag "auto-complete" auto-complete))
   :group 'dotemacs)
 
-(defcustom dotemacs-use-helm-p
-  t
-  "Configure and use helm."
-  :type  'boolean
-  :group 'dotemacs)
+(defcustom dotemacs-selection
+  'ivy
+  "Choose the framework to use for narrowing and selection."
+  :type '(radio
+          (const :tag "helm" helm)
+          (const :tag "ido" ido)
+          (const :tag "ivy" ivy)
+          (const :tag "none" none)))
 
 (defcustom dotemacs-ido-view-mode
   'grid
@@ -37,12 +40,6 @@
           (const :tag "vertical" vertical)
           (const :tag "grid" grid)
           (const :tag "default" default))
-  :group 'dotemacs)
-
-(defcustom dotemacs-prefer-ivy-over-ido-p
-  t
-  "Prefer ivy over ido for completion."
-  :type 'boolean
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
@@ -68,7 +65,8 @@
 
 (defcustom dotemacs-window-split
   'horizontal
-  "Specify the direction in which the windows should be split."
+  "Specify the direction in which the windows should be split.
+This depends on the orientation of the display."
   :type '(radio
           (const :tag "vertical" vertical)
           (const :tag "horizontal" horizontal))

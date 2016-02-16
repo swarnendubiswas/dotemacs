@@ -25,12 +25,10 @@
                                face font-lock-constant-face)
         projectile-file-exists-remote-cache-expire nil
         projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld"))
-  (if (bound-and-true-p dotemacs-use-helm-p)
-      (setq projectile-completion-system 'helm)
-    (progn
-      (if (bound-and-true-p dotemacs-prefer-ivy-over-ido-p)
-          (setq projectile-completion-system 'ivy)
-        (setq projectile-completion-system 'ido))))
+
+  (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
+        ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
+        ((eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy)))
 
   (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
@@ -40,12 +38,11 @@
 
   (use-package helm-projectile
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p)
+    :if (eq dotemacs-selection 'helm)
     :init
     (setq helm-projectile-fuzzy-match t
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))
-
 
   :diminish projectile-mode)
 

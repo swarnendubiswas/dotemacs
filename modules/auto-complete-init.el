@@ -68,7 +68,7 @@
 
   (use-package ac-helm
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p))
+    :if (eq dotemacs-selection 'helm))
 
   (use-package ac-ispell
     :ensure t

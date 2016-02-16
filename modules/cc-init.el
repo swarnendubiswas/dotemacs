@@ -89,7 +89,7 @@
 
   (use-package company-c-headers
     :ensure t
-    :if (eq dotemacs-completion 'company)
+    :if (eq dotemacs-completion-in-buffer 'company)
     :config
     (add-to-list 'company-backends #'company-c-headers)
     (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
@@ -101,21 +101,21 @@
           ((string-equal system-name "biswass-Dell-System-XPS-L502X")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))
 
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (add-to-list 'ac-sources 'ac-source-semantic)
     (add-to-list 'ac-sources 'ac-source-semantic-raw)
     (add-to-list 'ac-sources 'ac-source-gtags))
 
   (use-package auto-complete-c-headers
     :ensure t
-    :if (eq dotemacs-completion 'auto-complete)
+    :if (eq dotemacs-completion-in-buffer 'auto-complete)
     :config
     (add-to-list 'ac-sources #'ac-sources-c-headers)
     (add-to-list 'ac-sources #'ac-sources-c-headers-symbols))
 
   (use-package auto-complete-clang
     :ensure t
-    :if (eq dotemacs-completion 'auto-complete))
+    :if (eq dotemacs-completion-in-buffer 'auto-complete))
 
   (use-package dep
     :config (semantic-add-system-include "/usr/include"))

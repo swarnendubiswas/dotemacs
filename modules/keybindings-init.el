@@ -35,7 +35,7 @@
 (bind-key "C-c d i" #'dotemacs-byte-compile-init-dir)
 (bind-key "C-c d n" #'package-list-packages-no-fetch)
 
-;; the command `key-chord-describe' lists currently defined key chords.
+;; Command `key-chord-describe' lists currently defined key chords.
 (use-package key-chord
   :ensure t
   :disabled t
@@ -78,6 +78,15 @@
   (which-key-mode)
   (setq which-key-idle-delay 1.0)
   :diminish which-key-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C-M-n     forward-list     Move forward over a parenthetical group  ;;
+;; C-M-p     backward-list    Move backward over a parenthetical group ;;
+;; C-M-f     forward-sexp     Move forward over a balanced expression  ;;
+;; C-M-b     backward-sexp    Move backward over a balanced expression ;;
+;; C-M-k     kill-sexp        Kill balanced expression forward         ;;
+;; C-M-SPC   mark-sexp        Put the mark at the end of the sexp.     ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (provide 'keybindings-init)
 

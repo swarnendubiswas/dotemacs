@@ -73,7 +73,7 @@
                                                   (set-face-attribute 'powerline-inactive1 nil
                                                                       :background "grey11"
                                                                       :foreground "white")
-                                                  (when (bound-and-true-p dotemacs-use-helm-p)
+                                                  (when (eq dotemacs-selection 'helm)
                                                     (spaceline-helm-mode))))
 
       ((eq dotemacs-mode-line-theme 'default)))

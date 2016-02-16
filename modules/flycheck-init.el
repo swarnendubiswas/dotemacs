@@ -17,9 +17,8 @@
         flycheck-standard-error-navigation nil
         flycheck-check-syntax-automatically '(save mode-enabled))
 
-  (if (bound-and-true-p dotemacs-use-helm-p)
-      (setq flycheck-completion-system 'helm)
-    (setq flycheck-completion-system 'ido))
+  (cond ((eq dotemacs-selection 'helm) (setq flycheck-completion-system 'helm))
+        ((eq dotemacs-selection 'ido)  (setq flycheck-completion-system 'ido)))
 
   :config
   (use-package flycheck-pos-tip ; Show flycheck messages in popups

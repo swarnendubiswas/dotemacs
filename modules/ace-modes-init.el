@@ -8,7 +8,7 @@
 ;; prefer helm-mini if helm is enabled
 (use-package ace-jump-buffer
   :ensure t
-  :if (not (bound-and-true-p dotemacs-use-helm-p))
+  :if (eq dotemacs-selection 'none)
   :preface
   ;; leave out certain buffers based on file name patterns
   ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html

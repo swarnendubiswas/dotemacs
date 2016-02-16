@@ -72,7 +72,7 @@
 
   (use-package diredful
     :ensure t
-    :init (diredful-mode 1)))
+    :config (diredful-mode 1)))
 
 (provide 'dired-init)
 

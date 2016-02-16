@@ -7,7 +7,7 @@
 
 (use-package helm
   :ensure helm-core
-  :if (bound-and-true-p dotemacs-use-helm-p)
+  :if (eq dotemacs-selection 'helm)
   :init
   (use-package helm-flx ;; Recommended to load before helm
     :ensure t
@@ -133,8 +133,8 @@
     :ensure t
     :bind ("C-c h k" . helm-make-projectile)
     :config
-    (if (bound-and-true-p dotemacs-prefer-ivy-over-ido-p)
-        (setq helm-make-completion-method 'ivy)))
+    (when (eq dotemacs-selection 'ivy)
+      (setq helm-make-completion-method 'ivy)))
 
   (use-package helm-grep
     :disabled t
@@ -155,6 +155,7 @@
 
   (use-package helm-fuzzier
     :ensure t
+    :disabled t ; FIXME: Enable after https://github.com/EphramPerdition/helm-fuzzier/issues/12 is fixed.
     :init (helm-fuzzier-mode 1))
 
   (bind-keys :map helm-map

@@ -19,7 +19,7 @@
   (flymake-mode-off)
   (run-python (python-shell-parse-command) nil nil)
 
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package ac-python
       :ensure t)
     (use-package auto-complete-chunk
@@ -57,7 +57,7 @@
 
   (use-package company-jedi
     :ensure t
-    :if (eq dotemacs-completion 'company)
+    :if (eq dotemacs-completion-in-buffer 'company)
     :config
     (with-eval-after-load "company"
       (add-to-list 'company-backends 'company-jedi))))
@@ -71,14 +71,14 @@
 
   (use-package ac-anaconda
     :ensure t
-    :if (eq dotemacs-completion 'auto-complete)
+    :if (eq dotemacs-completion-in-buffer 'auto-complete)
     :init
     (with-eval-after-load "auto-complete"
       (add-hook 'python-mode-hook 'ac-anaconda-setup)))
 
   (use-package company-anaconda
     :ensure t
-    :if (eq dotemacs-completion 'company)
+    :if (eq dotemacs-completion-in-buffer 'company)
     :init
     (with-eval-after-load "company"
       (add-to-list 'company-backends 'company-anaconda))))

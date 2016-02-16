@@ -94,7 +94,7 @@
     (setq org-footnote-define-inline t
           org-footnote-auto-label 'random))
 
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package org-ac
       :ensure t
       :config (org-ac/config-default))))

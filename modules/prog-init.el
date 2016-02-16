@@ -11,7 +11,7 @@
 
   (add-hook 'prog-mode-hook #'prettify-symbols-mode)
 
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (add-hook 'emacs-lisp-mode-hook
               (lambda ()
                 (add-to-list 'ac-sources 'ac-source-symbols)
@@ -70,7 +70,7 @@
           sh-indent-comment t
           sh-indentation 4)
 
-    (when (eq dotemacs-completion 'company)
+    (when (eq dotemacs-completion-in-buffer 'company)
       (use-package company-shell
         :ensure t
         :config
@@ -113,7 +113,7 @@
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
 
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package ac-html
       :ensure t)
 
@@ -130,7 +130,7 @@
       ;; FIXME: Is this correct?
       (ac-html-angular 1)))
 
-  (when (eq dotemacs-completion 'company)
+  (when (eq dotemacs-completion-in-buffer 'company)
     (use-package ac-html-csswatcher
       :ensure t
       :config (company-web-csswatcher-setup))
@@ -171,7 +171,7 @@
   :defer t
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t)
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-nxml
       :ensure t)))
 

@@ -19,14 +19,14 @@
     :config
     (setq ctags-update-delay-seconds (* 30 60)) ; every 1/2 hour
     (ctags-auto-update-mode 1))
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-exuberant-ctags
       :ensure t)))
 
 (use-package etags
   :bind ("M-T" . tags-search)
   :config
-  (when (eq dotemacs-completion 'auto-complete)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-etags
       :ensure t
       :config (add-to-list 'ac-sources 'ac-source-etags))
@@ -67,7 +67,7 @@
   (use-package helm-gtags
     :ensure t
     :diminish helm-gtags-mode
-    :if (bound-and-true-p dotemacs-use-helm-p)
+    :if (eq dotemacs-selection 'helm)
     :config
     (setq helm-gtags-ignore-case t
           helm-gtags-auto-update t

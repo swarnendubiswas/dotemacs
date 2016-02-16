@@ -72,7 +72,7 @@
         ag-highlight-search t)
   (use-package helm-ag
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p)
+    :if (eq dotemacs-selection 'helm)
     :config
     (setq helm-ag-fuzzy-match t
           helm-ag-insert-at-point 'symbol
