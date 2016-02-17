@@ -56,4 +56,5 @@
   :diminish ivy-mode)
 
 (provide 'ivy-init)
+
 ;;; ivy-init.el ends here

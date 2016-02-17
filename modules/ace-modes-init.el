@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; prefer helm-mini if helm is enabled
+;; Prefer helm-mini if helm is enabled
 (use-package ace-jump-buffer
   :ensure t
   :if (eq dotemacs-selection 'none)
