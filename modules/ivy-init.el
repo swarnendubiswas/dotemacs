@@ -34,7 +34,7 @@
         ivy-count-format "(%d/%d) ")
   :bind
   (("<f12>" . ivy-resume)
-   ("C-c C-r" . ivy-recentf)
+   ("<f8>" . ivy-recentf)
    ("C-'" . ivy-avy))
   :config
   (use-package counsel
@@ -45,14 +45,15 @@
      ([remap execute-extended-command] . counsel-M-x)
      ([remap find-file] . counsel-find-file)
      ("<f3>" . counsel-find-file)
-     ("M-y" . counsel-yank-pop))
+     ([remap yank-pop] . counsel-yank-pop))
     :config (setq counsel-find-file-at-point t))
 
   (when (eq dotemacs-selection 'ivy)
     (progn
       (bind-key "<f1>" #'counsel-M-x)
-      (bind-key "<f5>" #'ivy-switch-buffer)
-      (bind-key "<f6>" #'ivy-recentf)))
+      (bind-key [remap switch-to-buffer] #'ivy-switch-buffer)
+      (bind-key "<f4>" #'ivy-switch-buffer)
+      (bind-key "<f8>" #'ivy-recentf)))
   :diminish ivy-mode)
 
 (provide 'ivy-init)

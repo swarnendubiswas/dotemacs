@@ -53,13 +53,13 @@
       (diminish 'dired-omit-mode) dired-mode-map)
 
     :bind*
-    ;; open dired with the cursor right on the file you're editing
+    ;; Open dired with the cursor right on the file you're editing
     ("C-x C-j" . dired-jump))
 
   (use-package dired+
     :ensure t
-    ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
     :init
+    ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
     (setq-default diredp-hide-details-initially-flag nil
                   diredp-hide-details-propagate-flag nil)
     (diredp-toggle-find-file-reuse-dir 1))
@@ -68,11 +68,7 @@
     :ensure t
     :config
     (setq dired-efap-initial-filename-selection nil) ; Options: t, nil, no-extension
-    (bind-key "<f2>" #'dired-efap dired-mode-map))
-
-  (use-package diredful
-    :ensure t
-    :config (diredful-mode 1)))
+    (bind-key "<f2>" #'dired-efap dired-mode-map)))
 
 (provide 'dired-init)
 

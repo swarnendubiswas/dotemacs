@@ -75,19 +75,19 @@
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
                                                  :ensure t
                                                  :init
-                                                 ;; up and down keys to navigate options, left and right to move through history/directories
+                                                 ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
                                                  (ido-vertical-mode 1)))
 
-        ((eq dotemacs-ido-view-mode 'grid)   (use-package ido-grid-mode
-                                               :ensure t
-                                               :init (ido-grid-mode 1)
-                                               :config (setq ido-grid-mode-order t))))
+        ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode
+                                             :ensure t
+                                             :init (ido-grid-mode 1)
+                                             :config (setq ido-grid-mode-order t))))
 
   :bind
-  (("<f3>" . ido-find-file)
-   ("C-x C-f" . ido-find-file)
-   ("C-x b" . ido-switch-buffer)
+  (([remap find-file] . ido-find-file)
+   ("<f3>" . ido-find-file)
+   ([remap switch-to-buffer] . ido-switch-buffer)
    ("C-x d" . ido-dired)))
 
 (provide 'ido-init)

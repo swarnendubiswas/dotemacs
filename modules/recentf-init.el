@@ -36,7 +36,9 @@
     ;; clean up recent files on startup, since otherwise the exclude list is not always respected
     (recentf-cleanup))
 
-  :bind ("<f8>" . recentf-open-files))
+  (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+    (bind-key "<f8>" #'recentf-open-files))
+  :bind ("C-c C-r" . recentf-open-files))
 
 (provide 'recentf-init)
 

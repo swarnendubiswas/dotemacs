@@ -18,6 +18,8 @@
         helm-apropos-fuzzy-match t
         helm-locate-fuzzy-match t
         helm-lisp-fuzzy-completion t
+        ;; I prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since long
+        ;; lines can get truncated.
         helm-full-frame t ; Make the helm buffer occupy the full frame
         ;; helm-split-window-default-side 'right
         ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
@@ -52,11 +54,8 @@
 
   (use-package helm-buffers
     :bind
-    (("C-c h m" . helm-mini)
-     ;; ([remap switch-to-buffer] . helm-mini)
-     ;; ([remap list-buffers] . helm-buffers-list)
-     ("<f6>" . helm-buffers-list)
-     ("C-c h b" . helm-buffers-list))
+    (([remap switch-to-buffer] . helm-mini)
+     ([remap list-buffers] . helm-buffers-list))
     :config
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
@@ -69,8 +68,7 @@
   (use-package helm-command
     :config (setq helm-M-x-fuzzy-match t)
     :bind
-    (;;([remap execute-extended-command] . helm-M-x)
-     ;;("M-x" . helm-M-x)
+    (([remap execute-extended-command] . helm-M-x)
      ;; Convenient since it is a single keypress
      ("<f1>" . helm-M-x)))
 
@@ -93,12 +91,10 @@
                                                '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\#$" "\\~$")))
     :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
-     ("<f4>" . helm-find-files)
-     ("C-c h f" . helm-find-files)
-     ;; ([remap find-file] . helm-find-files)
-     ("<f5>" . helm-for-files)
-     ("C-c h j" . helm-for-files)
-     ("C-c h r" . helm-recentf)))
+     ([remap find-file] . helm-find-files)
+     ("<f3>" . helm-find-files)
+     ("<f4>" . helm-for-files)
+     ("<f8>" . helm-recentf)))
 
   (use-package helm-adaptive
     :init
@@ -147,7 +143,7 @@
                         (call-interactively 'helm-do-grep)))))
 
   (use-package helm-ring
-    :bind (([remap yank-pop] . helm-show-kill-ring))
+    :bind ([remap yank-pop] . helm-show-kill-ring)
     :init (helm-push-mark-mode 1))
 
   (use-package helm-elisp-package
@@ -164,11 +160,9 @@
 
   :bind
   (("C-c h l" . helm-locate)
-   ("C-c h y" . helm-show-kill-ring)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
    ("<f7>" . helm-resume)
-   ("C-c h u" . helm-resume)
    ;; swoop is better than occur
    ("C-c h o" . helm-occur)))
 

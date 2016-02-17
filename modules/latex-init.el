@@ -32,6 +32,7 @@
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
 
+  ;; FIXME: How does this help?
   (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
   (add-hook 'LaTeX-mode-hook
             (lambda ()
@@ -51,6 +52,7 @@
   (use-package tex-buf
     :config (setq TeX-save-query nil))
 
+  ;; FIXME: How does this help?
   (use-package tex-fold
     :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
@@ -75,11 +77,8 @@
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
   (use-package latex-pretty-symbols
-    :ensure t)
-
-  ;; required by ac-math and company-math
-  (use-package math-symbol-lists
-    :ensure t)
+    :ensure t
+    :disabled t)
 
   (use-package latex-unicode-math-mode
     :ensure t
@@ -91,7 +90,11 @@
     ;; This converts LaTeX to Unicode everwhere, not only in math environments.
     (add-hook 'LaTeX-mode-hook 'latex-unicode-mode))
 
-  (when (eq dotemacs-completion 'auto-complete)
+  ;; Required by ac-math and company-math
+  (use-package math-symbol-lists
+    :ensure t)
+
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-auctex
       :ensure t)
 
@@ -114,7 +117,7 @@
       (add-hook 'TeX-mode-hook #'ac-latex-mode-setup)
       (setq ac-math-unicode-in-math-p t)))
 
-  (when (eq dotemacs-completion 'company)
+  (when (eq dotemacs-completion-in-buffer 'company)
     (use-package company-auctex
       :ensure t
       :config (company-auctex-init))
@@ -191,7 +194,7 @@
 
   (use-package helm-bibtex
     :ensure t
-    :if (bound-and-true-p dotemacs-use-helm-p)
+    :if (eq dotemacs-selection 'helm)
     :init
     (use-package parsebib
       :ensure t)
