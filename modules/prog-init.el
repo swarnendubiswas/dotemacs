@@ -47,11 +47,11 @@
     (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
     (add-hook 'ielm-mode-hook #'eldoc-mode)
-    ;; SB: I am not actively using Emacs for Python development
+    ;; I am not actively using Emacs for Python development
     ;; (add-hook 'python-mode-hook #'eldoc-mode)
     (use-package c-eldoc
       :ensure t
-      :if (eq system-type 'gnu/linux) ; TODO: Doesn't seem to work on Windows
+      :if (eq system-type 'gnu/linux) ; FIXME: Doesn't seem to work on Windows
       :config (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode))
     (use-package eldoc-extension
       :ensure t)
@@ -113,6 +113,10 @@
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2)
 
+  (use-package ac-html-angular ; Required by ac-html and company-web
+    :ensure t
+    :config (ac-html-angular+))
+
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package ac-html
       :ensure t)
@@ -122,13 +126,7 @@
 
     (use-package ac-html-csswatcher
       :ensure t
-      :config (ac-html-csswatcher-setup))
-
-    (use-package ac-html-angular
-      :ensure t
-      :config
-      ;; FIXME: Is this correct?
-      (ac-html-angular 1)))
+      :config (ac-html-csswatcher-setup)))
 
   (when (eq dotemacs-completion-in-buffer 'company)
     (use-package ac-html-csswatcher

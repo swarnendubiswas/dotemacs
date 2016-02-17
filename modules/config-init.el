@@ -78,11 +78,11 @@ This depends on the orientation of the display."
 (defcustom dotemacs-fci-p
   nil
   "Control display of fci."
-  :type    'boolean
-  :group   'dotemacs)
+  :type 'boolean
+  :group 'dotemacs)
 
 (defcustom dotemacs-enable-whitespace-module-p
-  t
+  nil
   "Control whitespace module.
 Control whether the whitespace module should be enabled or
 disabled.  Sometimes we do not want to unnecessarily add

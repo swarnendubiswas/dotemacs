@@ -7,8 +7,6 @@
 
 (use-package projectile
   :ensure t
-  ;; TODO: I read a post that says projectile-mode slows tramp. Currently I am no longer sorting buffers based on
-  ;; projects, so I want to check whether tramp is helped by disabling this module.
   :disabled t
   :functions (projectile-find-file projectile-switch-project)
   :config

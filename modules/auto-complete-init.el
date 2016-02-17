@@ -72,11 +72,11 @@
 
   (use-package ac-ispell
     :ensure t
-    :disabled ; FIXME: Enabling this package seems to disable inline autocompletes or popups
     :init
-    (setq ac-ispell-requires 3
+    (ac-ispell-setup)
+    (setq ac-ispell-requires 4
           ac-ispell-fuzzy-limit 2)
-    :config (add-hook 'text-mode-hook #'ac-ispell-setup))
+    (add-hook 'text-mode-hook #'ac-ispell-ac-setup))
 
   (use-package ac-dabbrev
     :ensure t

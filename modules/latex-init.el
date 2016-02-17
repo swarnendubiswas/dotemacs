@@ -25,18 +25,12 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
 
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
-
   (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; Compile files to pdf by default
+
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
-
-  ;; FIXME: How does this help?
-  (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (diminish 'outline-minor-mode)))
 
   (use-package tex-site)
 
@@ -51,10 +45,6 @@
 
   (use-package tex-buf
     :config (setq TeX-save-query nil))
-
-  ;; FIXME: How does this help?
-  (use-package tex-fold
-    :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
   (use-package latex
     :mode ("\\.tex\\'" . LaTeX-mode)

@@ -82,7 +82,7 @@
                                       (with-eval-after-load "helm"
                                         (set-face-attribute 'helm-selection nil
                                                             :underline nil))
-                                      ;; TODO: Change font does not work (biswass 01-15-16)
+                                      ;; FIXME: Change font does not work (biswass 01-15-16)
                                       (with-eval-after-load "helm-buffers"
                                         (set-face-attribute 'helm-buffer-file nil
                                                             :foreground "black"))
