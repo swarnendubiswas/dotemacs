@@ -110,7 +110,11 @@
                            :foreground "black")
        (with-eval-after-load "hl-line"
          (set-face-attribute 'hl-line nil
-                             :background "linen"))))
+                             :background "linen"))
+       (with-eval-after-load "ac-ispell"
+         (set-face-attribute 'ac-ispell-fuzzy-candidate-face nil
+                             :background "deep sky blue"
+                             :foreground "white"))))
 
 (use-package display-theme
   :ensure t
