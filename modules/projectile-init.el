@@ -30,7 +30,7 @@
 
   (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
-  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Don't consider my home dir as a project
+  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Don't consider the home dir as a project
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
 

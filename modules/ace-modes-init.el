@@ -5,12 +5,11 @@
 
 ;;; Code:
 
-;; Prefer helm-mini if helm is enabled
 (use-package ace-jump-buffer
   :ensure t
   :if (eq dotemacs-selection 'none)
   :preface
-  ;; leave out certain buffers based on file name patterns
+  ;; Leave out certain buffers based on file name patterns
   ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html
   (defvar my-bs-always-show-regexps '("\\*\\(scratch\\)\\*")
     "*Buffer regexps to always show when buffer switching.")
@@ -52,13 +51,13 @@
   (setq-default ajb-bs-configuration "files")
   (bind-key "M-B" 'ace-jump-buffer-with-configuration)
 
-  :bind ("<f5>" . ace-jump-buffer))
+  :bind ("<f4>" . ace-jump-buffer))
 
 (use-package ace-jump-helm-line ; ace-jump in helm buffers
   :ensure t
-  :disabled t
+  :if (eq dotemacs-selection 'helm)
   :config
-  (setq ace-jump-helm-line-use-avy-style nil) ;; style: avy-jump and ace-jump-mode-style
+  (setq ace-jump-helm-line-use-avy-style nil) ;; Style: avy-jump and ace-jump-mode-style
   (bind-key "C-;" 'ace-jump-helm-line helm-map))
 
 (use-package ace-window
