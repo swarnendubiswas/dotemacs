@@ -110,8 +110,10 @@
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'auto-complete)
     :config
-    (add-to-list 'ac-sources #'ac-sources-c-headers)
-    (add-to-list 'ac-sources #'ac-sources-c-headers-symbols))
+    (add-hook 'c-mode-hook
+              (lambda ()
+                (add-to-list 'ac-sources 'ac-source-c-headers)
+                (add-to-list 'ac-sources 'ac-source-c-header-symbols t))))
 
   (use-package auto-complete-clang
     :ensure t
