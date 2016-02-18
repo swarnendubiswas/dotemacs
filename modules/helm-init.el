@@ -164,6 +164,7 @@
    ("C-c h g" . helm-do-grep)
    ("<f7>" . helm-resume)
    ;; swoop is better than occur
+   ([remap occur] . helm-occur)
    ("C-c h o" . helm-occur)))
 
 (provide 'helm-init)
