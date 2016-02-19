@@ -21,7 +21,8 @@
   "Choose company or auto-complete for in-buffer completion."
   :type '(radio
           (const :tag "company" company)
-          (const :tag "auto-complete" auto-complete))
+          (const :tag "auto-complete" auto-complete)
+          (const :tag "none" none))
   :group 'dotemacs)
 
 (defcustom dotemacs-selection

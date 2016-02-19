@@ -80,15 +80,26 @@
 
   (use-package helm-files
     :config
-    (setq helm-file-cache-fuzzy-match t
-          helm-ff-transformer-show-only-basename nil
+    (setq helm-ff-transformer-show-only-basename t ; Do not show the complete path is non-nil
           helm-ff-file-name-history-use-recentf t
           helm-ff-search-library-in-sexp t
-          helm-ff-auto-update-initial-value t
-          helm-recentf-fuzzy-match t
+          helm-ff-auto-update-initial-value nil ; Auto update when only one candidate directory is matched
           helm-ff-skip-boring-files t
+          helm-ff-fuzzy-matching t
+          helm-ff-tramp-not-fancy nil
+          helm-ff-newfile-prompt-p t
+          helm-ff-guess-ffap-urls nil
+          helm-ff-guess-ffap-filenames nil
+          helm-file-cache-fuzzy-match t
+          helm-recentf-fuzzy-match t
           helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                               '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\#$" "\\~$")))
+                                               '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$"
+                                                 "\\.la$" "\\.o$" "\\#$" "\\~$"))
+          helm-for-files-preferred-list '(helm-source-buffers-list
+                                          helm-source-file-cache
+                                          helm-source-files-in-current-dir
+                                          helm-source-locate))
+
     :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
      ([remap find-file] . helm-find-files)

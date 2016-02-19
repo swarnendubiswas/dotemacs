@@ -7,7 +7,6 @@
 
 (use-package yasnippet
   :ensure t
-  :defer 2
   :diminish yas-minor-mode
   :commands yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
