@@ -45,13 +45,6 @@
 
   (helm-autoresize-mode -1) ; Distracting
 
-  (use-package helm-dired-recent-dirs
-    :ensure t
-    :disabled t
-    :init
-    (setq shell-file-name "/usr/bin/fish"
-          helm-dired-recent-dirs-max 50))
-
   (use-package helm-buffers
     :bind
     (([remap switch-to-buffer] . helm-mini)
@@ -59,7 +52,9 @@
     :config
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
-          helm-buffer-max-length 45
+          helm-buffer-max-length 45 ; When disabled (nil) use the longest buffer-name length found
+          helm-buffer-details-flag t
+          helm-buffers-truncate-lines nil
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
                                       ;; helm-source-dired-recent-dirs
@@ -98,6 +93,7 @@
           helm-for-files-preferred-list '(helm-source-buffers-list
                                           helm-source-file-cache
                                           helm-source-files-in-current-dir
+                                          helm-source-recentf
                                           helm-source-locate))
 
     :bind
@@ -112,6 +108,10 @@
     (setq helm-adaptive-history-file (concat dotemacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
 
+  (use-package helm-dabbrev
+    :config (setq helm-dabbrev-case-fold-search t)
+    :bind ([remap dabbrev-expand] . helm-dabbrev))
+
   (use-package helm-descbinds
     :ensure t
     :init
@@ -120,7 +120,14 @@
 
   (use-package helm-describe-modes
     :ensure t
-    :config (global-set-key [remap describe-mode] #'helm-describe-modes))
+    :bind ([remap describe-mode] . helm-describe-modes))
+
+  (use-package helm-dired-recent-dirs
+    :ensure t
+    :disabled t
+    :init
+    (setq shell-file-name "/usr/bin/fish"
+          helm-dired-recent-dirs-max 50))
 
   ;; "C-c C-e" to go into edit mode
   (use-package helm-swoop
@@ -144,7 +151,6 @@
       (setq helm-make-completion-method 'ivy)))
 
   (use-package helm-grep
-    :disabled t
     :init
     ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
     (global-set-key [f12]
@@ -170,7 +176,9 @@
              ("C-z" . helm-select-action))
 
   :bind
-  (("C-c h l" . helm-locate)
+  (([remap locate] . helm-locate)
+   ("C-c h l" . helm-locate)
+   ([remap apropos] . helm-apropos)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
    ("<f7>" . helm-resume)
