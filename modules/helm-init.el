@@ -29,7 +29,6 @@
         helm-echo-input-in-header-line t
         ;; helm-idle-delay 0.1 ; Be idle for this many seconds, before updating in delayed sources
         ;; helm-input-idle-delay 0.1 ; Be idle for this many seconds, before updating candidate buffer
-        helm-follow-mode-persistent t
         ;; Both the min and max height are set to be equal on purpose
         ;; helm-autoresize-max-height 60
         ;; helm-autoresize-min-height 60
