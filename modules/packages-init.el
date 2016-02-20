@@ -59,7 +59,7 @@
   :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t
-        paradox-spinner-type 'moon)
+        paradox-spinner-type 'random)
   (paradox-enable))
 
 (provide 'packages-init)
