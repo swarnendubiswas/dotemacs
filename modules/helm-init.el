@@ -168,7 +168,6 @@
 
   (use-package helm-fuzzier
     :ensure t
-    :disabled t ; FIXME: Enable after https://github.com/EphramPerdition/helm-fuzzier/issues/12 is fixed.
     :init (helm-fuzzier-mode 1))
 
   (bind-keys :map helm-map

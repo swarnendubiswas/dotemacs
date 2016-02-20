@@ -149,6 +149,8 @@
 
 (use-package expand-line
   :ensure t
+  ;; FIXME: https://github.com/cheunghy/expand-line/issues/2
+  :if (if (<= emacs-major-version 24))
   :defines expand-line-mode
   :init (expand-line-mode 1))
 
