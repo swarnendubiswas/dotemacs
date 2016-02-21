@@ -129,18 +129,20 @@
   ;; Turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
-;; Enable disabled commands
-(put 'downcase-region  'disabled nil) ; Let downcasing work
-(put 'upcase-region    'disabled nil) ; Let upcasing work
-(put 'erase-buffer     'disabled nil)
-(put 'eval-expression  'disabled nil) ; Let ESC-ESC work
-(put 'narrow-to-page   'disabled nil) ; Let narrowing work
-(put 'narrow-to-region 'disabled nil) ; Let narrowing work
-(put 'set-goal-column  'disabled nil)
+;; ;; Enable disabled commands
+;; (put 'downcase-region  'disabled nil) ; Let downcasing work
+;; (put 'upcase-region    'disabled nil) ; Let upcasing work
+;; (put 'erase-buffer     'disabled nil)
+;; (put 'eval-expression  'disabled nil) ; Let ESC-ESC work
+;; (put 'narrow-to-page   'disabled nil) ; Let narrowing work
+;; (put 'narrow-to-region 'disabled nil) ; Let narrowing work
+;; (put 'set-goal-column  'disabled nil)
 
-(advice-add 'capitalize-word :before #'goto-beginning-of-word)
-(advice-add 'downcase-word :before #'goto-beginning-of-word)
-(advice-add 'upcase-word :before #'goto-beginning-of-word)
+(when (<= emacs-major-version 24)
+  (progn
+    (advice-add 'capitalize-word :before #'goto-beginning-of-word)
+    (advice-add 'downcase-word :before #'goto-beginning-of-word)
+    (advice-add 'upcase-word :before #'goto-beginning-of-word)))
             
 (use-package desktop
   :disabled t
