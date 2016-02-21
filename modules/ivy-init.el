@@ -33,9 +33,11 @@
         ivy-re-builders-alist '((t . ivy--regex-fuzzy))
         ivy-count-format "(%d/%d) ")
   :bind
-  (("<f12>" . ivy-resume)
+  (("<f7>" . ivy-resume)
    ("<f8>" . ivy-recentf)
-   ("C-'" . ivy-avy))
+   ("C-'" . ivy-avy)
+   ([remap switch-to-buffer] . ivy-switch-buffer)
+   ("<f4>" . ivy-switch-buffer))
   :config
   (use-package counsel
     :ensure t
@@ -43,17 +45,11 @@
     (([remap describe-function] . counsel-describe-function)
      ([remap describe-variable] . counsel-describe-variable)
      ([remap execute-extended-command] . counsel-M-x)
+     ("<f1>" . counsel-M-x)
      ([remap find-file] . counsel-find-file)
      ("<f3>" . counsel-find-file)
      ([remap yank-pop] . counsel-yank-pop))
     :config (setq counsel-find-file-at-point t))
-
-  (when (eq dotemacs-selection 'ivy)
-    (progn
-      (bind-key "<f1>" #'counsel-M-x)
-      (bind-key [remap switch-to-buffer] #'ivy-switch-buffer)
-      (bind-key "<f4>" #'ivy-switch-buffer)
-      (bind-key "<f8>" #'ivy-recentf)))
   :diminish ivy-mode)
 
 (provide 'ivy-init)
