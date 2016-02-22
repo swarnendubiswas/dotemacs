@@ -72,6 +72,10 @@
     :ensure t
     :bind ([remap describe-bindings] . ido-describe-bindings))
 
+  (use-package ido-sort-mtime
+    :ensure t
+    :init (ido-sort-mtime-mode 1))
+
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
                                                  :ensure t
                                                  :init
