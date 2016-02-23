@@ -20,6 +20,19 @@
 (use-package ivy
   :ensure swiper
   :if (eq dotemacs-selection 'ivy)
+  :preface
+  ;; https://github.com/abo-abo/oremacs/blob/github/oleh/modes/ora-ivy.el
+  (defun ivy-dired ()
+    (interactive)
+    (if ivy--directory
+        (ivy-quit-and-run
+         (dired ivy--directory)
+         (when (re-search-forward
+                (regexp-quote
+                 (substring ivy--current 0 -1)) nil t)
+           (goto-char (match-beginning 0))))
+      (user-error
+       "Not completing files currently")))
   :init
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
@@ -39,6 +52,8 @@
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f4>" . ivy-switch-buffer))
   :config
+  (bind-key "<return>" #'ivy-alt-done ivy-minibuffer-map)
+  (bind-key "C-:" #'ivy-dired ivy-minibuffer-map)
   (use-package counsel
     :ensure t
     :bind

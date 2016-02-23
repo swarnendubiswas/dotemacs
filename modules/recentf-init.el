@@ -37,7 +37,7 @@
   (use-package sync-recentf
     :ensure t
     :if (<= emacs-major-version 24)
-    :init
+    :config
     ;; Clean up recent files on startup, since otherwise the exclude list is not always respected
     (recentf-cleanup))
 

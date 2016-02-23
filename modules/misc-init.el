@@ -52,6 +52,12 @@
   :defer t
   :config (setq graphviz-dot-indent-width 4))
 
+(use-package gnuplot
+  :ensure t
+  :mode        ("\\.gp\\'" . gnuplot-mode)
+  :interpreter ("gnuplot" . gnuplot-mode)
+  :defer t)
+
 (use-package goto-last-change
   :ensure t
   :pin melpa

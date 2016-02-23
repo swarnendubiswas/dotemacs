@@ -149,15 +149,6 @@
     (when (eq dotemacs-selection 'ivy)
       (setq helm-make-completion-method 'ivy)))
 
-  (use-package helm-grep
-    :init
-    ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
-    (global-set-key [f12]
-                    (lambda ()
-                      (interactive)
-                      (let ((current-prefix-arg 't))
-                        (call-interactively 'helm-do-grep)))))
-
   (use-package helm-ring
     :bind ([remap yank-pop] . helm-show-kill-ring)
     :init (helm-push-mark-mode 1))

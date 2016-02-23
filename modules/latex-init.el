@@ -9,6 +9,7 @@
   :ensure auctex
   :defer t
   :functions (TeX-PDF-mode TeX-source-correlate-mode)
+  :commands (TeX-PDF-mode)
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents

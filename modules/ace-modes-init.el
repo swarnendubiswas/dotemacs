@@ -62,7 +62,9 @@
 
 (use-package ace-window
   :ensure t
-  :config (ace-window-display-mode 1))
+  :config
+  (setq aw-background nil)
+  (ace-window-display-mode 1))
 
 (use-package avy
   :ensure t

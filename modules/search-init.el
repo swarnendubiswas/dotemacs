@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(setq case-fold-search t) ; Make search ignore case
+
 (use-package isearch
   :defer t
   :config
@@ -26,18 +28,14 @@
 (use-package replace
   :defer t
   :config
-  (setq query-replace-highlight t) ; highlight during query
+  (setq query-replace-highlight t) ; Highlight during query
   (use-package replace+
     :ensure t))
 
-(setq case-fold-search t ; make search ignore case
-      grep-highlight-matches t
-      grep-scroll-output t)
-
-(use-package swiper ; performs poorly if there are a large number of matches
+(use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
   :init
-  (setq swiper-min-highlight 3) ; be less noisy
+  (setq swiper-min-highlight 3) ; Be less noisy
   :bind (("C-c s s" . swiper)
          ("C-f" . swiper)
          ("C-r" . swiper)))
@@ -74,18 +72,39 @@
         ag-highlight-search t)
   (use-package helm-ag
     :ensure t
-    :if (eq dotemacs-selection 'helm)
+    :bind ("C-c s a" . helm-ag)
     :config
     (setq helm-ag-fuzzy-match t
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
   :bind (("C-c s d" . ag-dired)
-         ("C-c s f" . ag-files)
-         ("C-c s a" . helm-ag)))
+         ("C-c s f" . ag-files)))
 
 (use-package find-file-in-project
   :ensure t
   :config (setq ffip-prefer-ido-mode t))
+
+(use-package grep
+  :bind
+  (("C-c s g" . grep)
+   ("C-c s r" . rgrep)
+   ("C-c s l" . lgrep))
+  :config
+  (setq grep-highlight-matches t
+        grep-scroll-output t)
+  (use-package grep+
+    :ensure t)
+  (add-to-list 'grep-find-ignored-directories ".cache")
+  (add-to-list 'grep-find-ignored-directories "__pycache__"))
+
+(use-package helm-grep
+  :init
+  ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
+  (global-set-key [f12]
+                  (lambda ()
+                    (interactive)
+                    (let ((current-prefix-arg 't))
+                      (call-interactively 'helm-do-grep)))))
 
 (provide 'search-init)
 

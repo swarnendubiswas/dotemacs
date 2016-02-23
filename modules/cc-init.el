@@ -38,6 +38,13 @@
             (lambda ()
               (abbrev-mode -1)))
 
+  ;; Switch between header and implementation files
+  (use-package find-file
+    :ensure t
+    :commands ff-find-other-file
+    :init
+    (custom-set-key (kbd "C-c o") 'ff-find-other-file))
+
   (use-package cwarn
     :ensure t
     :defer 2
