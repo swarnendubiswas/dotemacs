@@ -17,6 +17,7 @@
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
                           "[/\\]tmp/recentf-marker\\'" "/company-statistics-cache.el$")) ; "/ssh:"
   (recentf-mode 1)
+  :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
 
@@ -25,7 +26,9 @@
   ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
 
-  :config
+  (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+    (bind-key "<f8>" #'recentf-open-files))
+
   (use-package recentf-ext ; Add directories to recent list
     :ensure t)
 
@@ -38,8 +41,6 @@
     ;; Clean up recent files on startup, since otherwise the exclude list is not always respected
     (recentf-cleanup))
 
-  (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
-    (bind-key "<f8>" #'recentf-open-files))
   :bind ("C-c C-r" . recentf-open-files))
 
 (provide 'recentf-init)

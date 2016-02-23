@@ -25,8 +25,8 @@
 
 (bind-key "<f11>" #'dotemacs-kill-other-buffers) ; kill all non-special buffers
 (unbind-key "C-x C-s") ; save-buffer
-(bind-key "C-s" #'save-buffer)
-(bind-key "C-S-s" #'dotemacs-save-all-buffers)
+(bind-key* "C-s" #'save-buffer)
+(bind-key* "C-S-s" #'dotemacs-save-all-buffers)
 
 (bind-key "C-+" #'text-scale-increase)
 (bind-key "C--" #'text-scale-decrease)
