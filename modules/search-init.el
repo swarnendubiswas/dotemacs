@@ -35,7 +35,8 @@
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
   :init
-  (setq swiper-min-highlight 3) ; Be less noisy
+  (setq swiper-min-highlight 3 ; Be less noisy
+        swiper-use-visual-line t)
   :bind (("C-c s s" . swiper)
          ("C-f" . swiper)
          ("C-r" . swiper)))

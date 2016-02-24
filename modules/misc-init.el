@@ -33,11 +33,11 @@
 
 (use-package duplicate-thing
   :ensure t
-  :bind* ("C-c C-d" . duplicate-thing))
+  :bind ("C-c C-d" . duplicate-thing))
 
 (use-package discover-my-major
   :ensure t
-  :bind* ("C-h C-m" . discover-my-major))
+  :bind ("C-h C-m" . discover-my-major))
 
 (use-package manage-minor-mode
   :ensure t
@@ -84,8 +84,11 @@
         popwin:close-popup-window-timer-interval 0.5)
 
   ;; Disable this if we are opening helm buffers on the right
-  ;; ;; (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
-  ;; ;; (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
+  ;; (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
+  ;; (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
+
+  ;; Helm buffers include the "help" string
+  ;; (push '("*Help*" :regexp t) popwin:special-display-config)
 
   ;; M-x dired-jump-other-window
   (push '(dired-mode :position top) popwin:special-display-config)
@@ -97,8 +100,6 @@
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '(manage-minor-mode :noselect t) popwin:special-display-config)
   (push '(help-mode :noselect t) popwin:special-display-config)
-  ;; Helm buffers include the "help" string
-  ;; (push '("*Help*" :regexp t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
 
@@ -150,11 +151,13 @@
   :config
   (use-package change-inner
     :ensure t
-    :bind* (("M-i" . change-inner)
-            ("M-o" . change-outer))))
+    :disabled t
+    :bind (("M-i" . change-inner)
+           ("M-o" . change-outer))))
 
 (use-package expand-line
   :ensure t
+  :disabled t
   ;; FIXME: https://github.com/cheunghy/expand-line/issues/2
   :if (<= emacs-major-version 24)
   :defines expand-line-mode
@@ -167,7 +170,7 @@
 
 (use-package undo-tree ; Visualize with C-x u
   :ensure t
-  :defer t
+  :disabled t
   :config
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t
@@ -194,6 +197,10 @@
   (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-page) ; fit page by default
   (setq pdf-view-resize-factor 1.10))
+
+;; Edit multiple regions in the same way simultaneously
+(use-package iedit
+  :ensure t)
 
 (provide 'misc-init)
 

@@ -33,6 +33,10 @@
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
 
+  (when (>= emacs-major-version 25)
+    (setq prettify-symbols-unprettify-at-point 'right-edge)
+    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
+
   (use-package tex-site)
 
   (use-package tex-mode

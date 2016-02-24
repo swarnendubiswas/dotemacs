@@ -17,7 +17,8 @@
       visible-bell nil
       x-underline-at-descent-line t ; Draw underline lower
       completion-ignore-case t ; Ignore case when completing
-      read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
+      ;; Ignore case when reading a file name completion
+      read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
       ;; Do not use dialog boxes
@@ -29,6 +30,13 @@
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t)
+
+;; Avoid completing temporary files
+;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
+(mapc (lambda (x)
+        (add-to-list 'completion-ignored-extensions x))
+      '(".aux" ".bbl" ".blg" ".exe" ".log" ".meta" ".out" ".pdf" ".synctex.gz" ".tdo"
+        ".toc" "-pkg.el" "-autoloads.el" "auto/"))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is fundamental-mode
               sentence-end-double-space nil

@@ -43,7 +43,7 @@
         ivy-height 25 ; Number of lines in the minibuffer window
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
-        ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+        ivy-re-builders-alist '((t . ivy--regex-plus))
         ivy-count-format "(%d/%d) ")
   :bind
   (("<f7>" . ivy-resume)

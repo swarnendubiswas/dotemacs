@@ -32,7 +32,8 @@
         tab-always-indent 'complete ; Use 't when auto-complete is disabled
         ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat")
         ac-dictionary-directories (concat dotemacs-temp-directory "ac-dict")
-        ac-user-dictionary-files (concat dotemacs-temp-directory ".dict"))
+        ac-user-dictionary-files (concat dotemacs-temp-directory ".dict")
+        popup-use-optimized-column-computation nil)
 
   (add-to-list 'ac-sources
                '(ac-source-words-in-buffer
@@ -55,6 +56,11 @@
                                 inferior-emacs-lisp-mode))
     (add-to-list 'ac-modes mode))
 
+  ;; Filter candidates by pattern
+  (bind-key "C-f" #'ac-isearch ac-completing-map)
+  (bind-key "C-f" #'ac-isearch ac-complete-mode-map)
+  (bind-key "C-f" #'ac-isearch ac-menu-map)
+
   ;; ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
   ;; (defun ac-turn-off-line-truncation (orig &optional force)
   ;;   (toggle-truncate-lines -1)
@@ -68,7 +74,9 @@
 
   (use-package ac-helm
     :ensure t
-    :if (eq dotemacs-selection 'helm))
+    :config
+    (bind-key "C-:" #'ac-complete-with-helm)
+    (bind-key "C-:" #'ac-complete-with-helm ac-complete-mode-map))
 
   (use-package ac-ispell
     :ensure t

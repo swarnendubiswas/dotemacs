@@ -9,7 +9,9 @@
   :defer t
   :config
 
-  (add-hook 'prog-mode-hook #'prettify-symbols-mode)
+  (when (>= emacs-major-version 25)
+    (setq prettify-symbols-unprettify-at-point 'right-edge)
+    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (add-hook 'emacs-lisp-mode-hook
