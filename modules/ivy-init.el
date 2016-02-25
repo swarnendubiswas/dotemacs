@@ -41,6 +41,7 @@
         ivy-wrap t ; Specifies wrap around behavior for "C-n" and "C-p"
         ivy-case-fold-search t
         ivy-height 25 ; Number of lines in the minibuffer window
+        ivy-fixed-height-minibuffer t
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-re-builders-alist '((t . ivy--regex-plus))
