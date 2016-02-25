@@ -107,6 +107,10 @@
                     (let ((current-prefix-arg 't))
                       (call-interactively 'helm-do-grep)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C-f M-n    swiper thing-at-point    Get the occurrences of the current symbol in the current file.    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (provide 'search-init)
 
 ;;; search-init.el ends here

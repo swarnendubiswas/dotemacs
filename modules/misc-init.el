@@ -115,15 +115,8 @@
 
   (popwin-mode 1))
 
-(use-package pabbrev
-  :ensure t
-  :disabled t
-  :diminish pabbrev-mode
-  :init (global-pabbrev-mode 1))
-
 (use-package golden-ratio
   :ensure t
-  :disabled t
   :diminish golden-ratio-mode
   :preface
   ;; http://tuhdo.github.io/helm-intro.html
@@ -131,8 +124,8 @@
     (if (boundp 'helm-alive-p)
         (symbol-value 'helm-alive-p)))
   :init
-  (add-to-list 'golden-ratio-inhibit-functions #'dotemacs/helm-alive-p)
   (golden-ratio-mode 1)
+  (add-to-list 'golden-ratio-inhibit-functions #'dotemacs/helm-alive-p)
   (setq golden-ratio-auto-scale t
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
         split-width-threshold nil))
