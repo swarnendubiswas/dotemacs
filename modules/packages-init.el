@@ -53,6 +53,7 @@
 
 (use-package paradox
   :ensure t
+  :if (<= emacs-major-version 24) ;; FIXME: Gets stuck with >= Emacs 25
   :bind (("C-c d p" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages)
          ("C-c d P" . package-list-packages))

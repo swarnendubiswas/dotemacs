@@ -14,7 +14,8 @@
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
-                          "[/\\]tmp/sync-recentf-marker\\'" "/company-statistics-cache.el$")) ; "/ssh:"
+                          ;;"[/\\]tmp/sync-recentf-marker\\'"
+                          "/company-statistics-cache.el$")) ; "/ssh:"
   (recentf-mode 1)
   :config
   (add-to-list 'recentf-used-hooks
