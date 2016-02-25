@@ -13,7 +13,6 @@
   :init
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
   (setq ibuffer-expert t
-        ;;ibuffer-shrink-to-minimum-size t
         ibuffer-always-show-last-buffer nil
         ibuffer-default-sorting-mode 'alphabetic ; options: major-mode
         ibuffer-use-header-line t
@@ -36,11 +35,6 @@
 
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
-  ;; (add-hook 'ibuffer-hook #'dotemacs--ibuffer-group-buffers)
-  ;; (add-hook 'ibuffer-hook
-  ;;           (lambda ()
-  ;;             (ibuffer-do-sort-by-alphabetic))
-
   ;; Group ibuffer list by tramp connection
   (use-package ibuffer-tramp
     :ensure t
@@ -51,7 +45,7 @@
                 (ibuffer-tramp-set-filter-groups-by-tramp-connection)
                 (ibuffer-do-sort-by-alphabetic))))
 
-  ;; use ibuffer-vc to sort buffers by VC status
+  ;; Use ibuffer-vc to sort buffers by VC status
   (use-package ibuffer-vc
     :ensure t
     :disabled t
@@ -62,18 +56,16 @@
                 (unless (eq ibuffer-sorting-mode 'alphabetic)
                   (ibuffer-do-sort-by-alphabetic)))))
 
-  (use-package ibuffer-projectile ; group buffers by projectile project
+  (use-package ibuffer-projectile ; Group buffers by projectile project
     :ensure t
     :preface
     (defun dotemacs-ibuffer-customization ()
       (ibuffer-projectile-set-filter-groups)
-      (setq ibuffer-show-empty-filter-groups nil)
       (unless (eq ibuffer-sorting-mode 'alphabetic)
         ;; First do alphabetic sort, then do major-mode sort
         (ibuffer-do-sort-by-alphabetic)
         (ibuffer-do-sort-by-major-mode)))
-    :config
-    (add-hook 'ibuffer-hook #'dotemacs-ibuffer-customization))
+    :config (add-hook 'ibuffer-hook #'dotemacs-ibuffer-customization))
 
   :bind (;;("C-x C-b" . ibuffer)
          ([remap list-buffers] . ibuffer)))

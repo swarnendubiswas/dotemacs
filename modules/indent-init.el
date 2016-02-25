@@ -30,7 +30,7 @@
   :init
   (auto-indent-global-mode 1)
   (setq auto-indent-on-visit-file t
-        ;; options: aggressive
+        ;; Options: aggressive
         auto-indent-indent-style 'conservative))
 
 (use-package highlight-indentation
