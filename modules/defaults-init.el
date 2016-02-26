@@ -286,12 +286,7 @@
   (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
   (if (file-exists-p abbrev-file-name)
       (quietly-read-abbrev-file))
-  (add-hook 'text-mode-hook
-            (lambda ()
-              (abbrev-mode -1)))
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (abbrev-mode -1))))
+  (abbrev-mode 1))
 
 (provide 'defaults-init)
 

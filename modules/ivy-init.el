@@ -51,10 +51,13 @@
    ("<f8>" . ivy-recentf)
    ("C-'" . ivy-avy)
    ([remap switch-to-buffer] . ivy-switch-buffer)
-   ("<f4>" . ivy-switch-buffer))
+   ("<f4>" . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("<return>" . ivy-alt-done)
+   ("C-:" . ivy-dired)
+   ("<left>" . ivy-previous-line)
+   ("<right>" . ivy-next-line))
   :config
-  (bind-key "<return>" #'ivy-alt-done ivy-minibuffer-map)
-  (bind-key "C-:" #'ivy-dired ivy-minibuffer-map)
   (use-package counsel
     :ensure t
     :bind

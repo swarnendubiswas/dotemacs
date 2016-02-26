@@ -180,9 +180,9 @@
                       :box '(:line-width 1 :color "gray72" :style released-button))
   (set-face-attribute 'tabbar-separator nil
                       :height 1.0)
-
-  :bind* (("M-<left>" . tabbar-backward-tab)
-          ("M-<right>" . tabbar-forward-tab)))
+  :bind (:map tabbar-mode-map
+              ("M-<left>" . tabbar-backward-tab)
+              ("M-<right>" . tabbar-forward-tab)))
 
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt
 (if (eq system-type 'windows-nt)

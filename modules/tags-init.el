@@ -85,11 +85,11 @@
               (lambda ()
                 (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
                   (helm-gtags-mode 1))))
-
-    (bind-key "M-." 'helm-gtags-dwim helm-gtags-mode-map)
-    (bind-key "M-," 'helm-gtags-pop-stack helm-gtags-mode-map)
-    (bind-key "M-'" 'helm-gtags-select helm-gtags-mode-map)
-    (bind-key "M-t" 'helm-gtags-find-tag helm-gtags-mode-map)))
+    :bind (:map helm-gtags-mode-map
+                ("M-." . helm-gtags-dwim)
+                ("M-," . helm-gtags-pop-stack)
+                ("M-'" . helm-gtags-select)
+                ("M-t" . helm-gtags-find-tag))))
 
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun dotemacs-create-latex-etags ()

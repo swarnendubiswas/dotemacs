@@ -23,6 +23,11 @@
     (goto-char (point-max)) ; Faster than (end-of-buffer)
     (dired-next-line -1))
 
+  :bind (:map dired-mode-map
+              ("M-<home>" . dired-go-home)
+              ("i" . ido-find-file)
+              ("M-<up>" . dired-jump-to-top)
+              ("M-<down>" . dired-jump-to-bottom))
   :config
   (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; Single prompt for all n directories
@@ -32,16 +37,9 @@
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t)
 
-  (bind-keys
-   :map dired-mode-map
-   ("M-<home>" . dired-go-home)
-   ("i" . ido-find-file)
-   ("M-<up>" . dired-jump-to-top)
-   ("M-<down>" . dired-jump-to-bottom))
-
   (use-package dired-x
     :functions (dired-jump dired-omit-mode)
-    :init
+    :config
     (setq dired-bind-jump t
           ;; Do not show messages when omitting files
           dired-omit-verbose nil)
@@ -52,7 +50,7 @@
       "Make sure to remove \"Omit\" from the modeline."
       (diminish 'dired-omit-mode) dired-mode-map)
 
-    :bind*
+    :bind
     ;; Open dired with the cursor right on the file you're editing
     ("C-x C-j" . dired-jump))
 
@@ -66,9 +64,9 @@
 
   (use-package dired-efap
     :ensure t
-    :config
-    (setq dired-efap-initial-filename-selection nil) ; Options: t, nil, no-extension
-    (bind-key "<f2>" #'dired-efap dired-mode-map)))
+    :config (setq dired-efap-initial-filename-selection nil) ; Options: t, nil, no-extension
+    :bind (:map dired-mode-map
+                ("<f2>" . dired-efap))))
 
 (provide 'dired-init)
 

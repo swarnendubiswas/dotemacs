@@ -63,15 +63,6 @@
 (use-package help-fns+
   :ensure t)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C-M-n     forward-list     Move forward over a parenthetical group  ;;
-;; C-M-p     backward-list    Move backward over a parenthetical group ;;
-;; C-M-f     forward-sexp     Move forward over a balanced expression  ;;
-;; C-M-b     backward-sexp    Move backward over a balanced expression ;;
-;; C-M-k     kill-sexp        Kill balanced expression forward         ;;
-;; C-M-SPC   mark-sexp        Put the mark at the end of the sexp.     ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (provide 'keybindings-init)
 
 ;;; keybindings-init.el ends here

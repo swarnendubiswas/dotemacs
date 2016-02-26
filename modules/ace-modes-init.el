@@ -49,16 +49,17 @@
           ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
   (setq bs-cycle-configuration-name "files")
   (setq-default ajb-bs-configuration "files")
-  (bind-key "M-B" 'ace-jump-buffer-with-configuration)
 
-  :bind ("<f4>" . ace-jump-buffer))
+  :bind
+  (("<f4>" . ace-jump-buffer)
+   ("M-B" . ace-jump-buffer-with-configuration)))
 
 (use-package ace-jump-helm-line ; ace-jump in helm buffers
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :config
-  (setq ace-jump-helm-line-use-avy-style nil) ;; Style: avy-jump and ace-jump-mode-style
-  (bind-key "C-;" 'ace-jump-helm-line helm-map))
+  :config (setq ace-jump-helm-line-use-avy-style nil) ;; Style: avy-jump and ace-jump-mode-style
+  :bind (:map helm-map
+              ("C-;" . ace-jump-helm-line)))
 
 (use-package ace-window
   :ensure t

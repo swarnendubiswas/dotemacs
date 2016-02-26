@@ -23,33 +23,36 @@
 
 (package-initialize)
 
-;; setup use-package.
-;; :init always happens before package load, whether :config has been deferred or not. This implies
-;; :init is never deferred.
-;; :load-path: if the path is relative, it is expanded within user-emacs-directory
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup use-package: https://github.com/jwiegley/use-package                                       ;;
+;; :init always happens before package load, whether :config has been deferred or not. This implies ;;
+;; :init is never deferred.                                                                         ;;
+;; :load-path: if the path is relative, it is expanded within user-emacs-directory                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure nil
+      use-package-check-before-init t
       use-package-verbose t)
 
-(use-package diminish
-	     :ensure t)
-
 (use-package bind-key
-	     :ensure t
-	     :bind ("C-c d k" . describe-personal-keybindings))
+  :ensure t
+  :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package auto-compile ; this only *recompiles* elisp source files.
+(use-package diminish
+  :ensure t)
+
+(use-package auto-compile ; This only *recompiles* elisp source files.
   :ensure t
   :disabled t
-  :init
+  :init (auto-compile-on-save-mode 1)
+  :config
   (setq load-prefer-newer t
         auto-compile-display-buffer nil
         auto-compile-mode-line-counter nil)
-  (auto-compile-on-save-mode 1)
-  :config (auto-compile-on-load-mode 1))
+  (auto-compile-on-load-mode 1))
 
 (use-package paradox
   :ensure t

@@ -56,11 +56,6 @@
                                 inferior-emacs-lisp-mode))
     (add-to-list 'ac-modes mode))
 
-  ;; Filter candidates by pattern
-  (bind-key "C-f" #'ac-isearch ac-completing-map)
-  (bind-key "C-f" #'ac-isearch ac-complete-mode-map)
-  (bind-key "C-f" #'ac-isearch ac-menu-map)
-
   ;; ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
   ;; (defun ac-turn-off-line-truncation (orig &optional force)
   ;;   (toggle-truncate-lines -1)
@@ -74,9 +69,8 @@
 
   (use-package ac-helm
     :ensure t
-    :config
-    (bind-key "C-:" #'ac-complete-with-helm)
-    (bind-key "C-:" #'ac-complete-with-helm ac-complete-mode-map))
+    :bind (:map ac-complete-mode-map
+                ("C-:" . ac-complete-with-helm)))
 
   (use-package ac-ispell
     :ensure t
@@ -94,6 +88,12 @@
     :ensure t
     :disabled t)
 
+  :bind (:map ac-completing-map
+         ("C-f" . ac-isearch) ;; Filter candidates by pattern
+         :map ac-complete-mode-map
+         ("C-f" . ac-isearch)
+         :map ac-menu-map
+         ("C-f" . ac-isearch))
   :diminish auto-complete-mode)
 
 (provide 'auto-complete-init)

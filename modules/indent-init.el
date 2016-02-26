@@ -13,6 +13,7 @@
 
 (use-package aggressive-indent
   :ensure t
+  :disabled t
   :init
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
