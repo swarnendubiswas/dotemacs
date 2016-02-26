@@ -15,7 +15,7 @@
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-verbose nil
-        projectile-require-project-root nil ; use projectile in every directory without requiring a project file
+        projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-dired
         projectile-mode-line '(:propertize
@@ -30,13 +30,12 @@
 
   (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
-  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Don't consider the home dir as a project
+  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
   (use-package helm-projectile
     :ensure t
-    :if (eq dotemacs-selection 'helm)
     :init
     (setq helm-projectile-fuzzy-match t
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
