@@ -41,23 +41,22 @@
 (use-package jtags
   :ensure t
   :disabled t
-  :init (add-hook 'java-mode-hook #'jtags-mode))
+  :config (add-hook 'java-mode-hook #'jtags-mode))
 
+;; Front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
-;; front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 (use-package ggtags
   :ensure t
   :if (eq system-type 'gnu/linux)
   :diminish ggtags-mode
-  :init
+  :config
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
                 (ggtags-mode 1))))
-  :config
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
-        ;; use helm for completion
+        ;; Use helm for completion
         ggtags-completing-read-function nil)
 
   ;; http://wikemacs.org/wiki/C-ide

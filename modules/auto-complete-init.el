@@ -74,7 +74,7 @@
 
   (use-package ac-ispell
     :ensure t
-    :init
+    :config
     (ac-ispell-setup)
     (setq ac-ispell-requires 4 ; Minimum input for starting completion
           ac-ispell-fuzzy-limit 4)

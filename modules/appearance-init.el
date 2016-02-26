@@ -11,12 +11,12 @@
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
-  :init
+  :config
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1)))
 
 (use-package menu-bar ; Learn many shortcuts from the menu bar entries.
-  :init
+  :config
   (when (fboundp 'menu-bar-mode)
     (menu-bar-mode 1)))
 
@@ -24,7 +24,7 @@
   :config (tooltip-mode -1))
 
 (use-package scroll-bar
-  :init (scroll-bar-mode 1))
+  :config (scroll-bar-mode 1))
 
 (use-package frame
   :config
@@ -39,35 +39,35 @@
   (blink-cursor-mode 0))
 
 (use-package time ; Displays the time and date in the mode line
-  :init
+  :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil
         display-time-default-load-average nil)
   (display-time))
 
 (use-package linum ; Display line numbers in margin
-  :init (global-linum-mode 1))
+  :config (global-linum-mode 1))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
-                                     :init (load-theme 'leuven t)
                                      :config
+                                     (load-theme 'leuven t)
                                      (with-eval-after-load "avy"
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
                                                            :foreground "black"))
-                                     ;; customize the fringe marks on the sides
+                                     ;; Customize the fringe marks on the sides
                                      ;; (set-face-background 'fringe "wheat")
                                      ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
-                                           :init (load-theme 'professional t)))
+                                           :config (load-theme 'professional t)))
 
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
-                                      :init (load-theme 'eclipse t)
                                       :config
+                                      (load-theme 'eclipse t)
                                       (set-background-color "white")
                                       (set-face-attribute 'region nil
                                                           :background "LemonChiffon"
@@ -104,17 +104,17 @@
                                                             :background "#E5F4FB"))))
 
       ;; Default
-      ((eq dotemacs-theme 'default)
-       (set-face-attribute 'region nil
-                           :background "LemonChiffon"
-                           :foreground "black")
-       (with-eval-after-load "hl-line"
-         (set-face-attribute 'hl-line nil
-                             :background "linen"))
-       (with-eval-after-load "ac-ispell"
-         (set-face-attribute 'ac-ispell-fuzzy-candidate-face nil
-                             :background "deep sky blue"
-                             :foreground "white"))))
+      ((eq dotemacs-theme 'default) (progn
+                                      (set-face-attribute 'region nil
+                                                          :background "LemonChiffon"
+                                                          :foreground "black")
+                                      (with-eval-after-load "hl-line"
+                                        (set-face-attribute 'hl-line nil
+                                                            :background "linen"))
+                                      (with-eval-after-load "ac-ispell"
+                                        (set-face-attribute 'ac-ispell-fuzzy-candidate-face nil
+                                                            :background "deep sky blue"
+                                                             :foreground "white")))))
 
 (use-package display-theme
   :ensure t
@@ -135,13 +135,12 @@
     (set-buffer-modified-p t)
     (tabbar--modification-state-change))
   :functions tabbar-display-update
-  :init
+  :init (tabbar-mode 1)
+  :config
   (setq tabbar-use-images nil ; Speed up by not using images
         tabbar-auto-scroll-flag t
         tabbar-separator '(0.3))
-  (tabbar-mode 1)
 
-  :config
   (add-hook 'after-save-hook #'tabbar--modification-state-change)
   (add-hook 'after-revert-hook #'tabbar--modification-state-change)
   (add-hook 'first-change-hook #'tabbar--on-buffer-modification)
