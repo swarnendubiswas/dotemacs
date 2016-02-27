@@ -8,23 +8,23 @@
 (use-package rainbow-mode
   :ensure t
   :disabled t
-  :init (add-hook 'prog-mode-hook #'rainbow-mode))
+  :config (add-hook 'prog-mode-hook #'rainbow-mode))
 
 (use-package rainbow-identifiers
   :ensure t
   :disabled t
-  :init (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
+  :config (add-hook 'prog-mode-hook #'rainbow-identifiers-mode))
 
 (use-package rainbow-delimiters
   :ensure t
-  :init
+  :config
   (dolist (hook '(text-mode-hook prog-mode-hook))
     (add-hook hook #'rainbow-delimiters-mode)))
 
 (use-package rainbow-blocks
   :ensure t
   :disabled t
-  :init (rainbow-blocks-mode 1)
+  :config (rainbow-blocks-mode 1)
   :diminish rainbow-blocks-mode)
 
 (provide 'rainbow-init)
