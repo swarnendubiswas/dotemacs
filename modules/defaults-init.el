@@ -5,11 +5,11 @@
 
 ;;; Code:
 
-(setq inhibit-default-init t ; Disable loading of "default.el" at startup.
+(setq inhibit-default-init t ; Disable loading of "default.el" at startup
       inhibit-startup-screen t
-      ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen.
+      ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen
       initial-scratch-message nil
-      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead.
+      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
       inhibit-startup-echo-area-message t
       create-lockfiles nil
       message-log-max 5000
@@ -38,7 +38,8 @@
       '(".aux" ".bbl" ".blg" ".exe" ".log" ".meta" ".out" ".pdf" ".synctex.gz" ".tdo"
         ".toc" "-pkg.el" "-autoloads.el" "auto/"))
 
-(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is fundamental-mode
+(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
+                                    ; fundamental-mode
               sentence-end-double-space nil
               truncate-lines nil
               truncate-partial-width-windows nil)
@@ -56,7 +57,7 @@
     (set-selection-coding-system 'utf-8)))
 
 (use-package files
-  :init
+  :config
   (setq require-final-newline t ; Always end a file with a newline.
         make-backup-files nil ; Stop making backup ~ files
         backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
@@ -76,10 +77,10 @@
 ;; (xterm-mouse-mode 1) ; Mouse cursor in terminal mode
 
 (use-package menu-bar
-  :init (toggle-indicate-empty-lines 1))
+  :config (toggle-indicate-empty-lines 1))
 
 (use-package simple
-  :init
+  :config
   ;; We need to paste something from another program, but sometimes we do real paste after some kill
   ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
   (setq save-interprogram-paste-before-kill t
@@ -96,11 +97,11 @@
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
   :config
-  (global-auto-revert-mode 1)
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
-                global-auto-revert-non-file-buffers t))
+                global-auto-revert-non-file-buffers t)
+  (global-auto-revert-mode 1))
 
 (use-package delsel ; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
   :config (delete-selection-mode 1))
@@ -124,7 +125,7 @@
                 vc-ignore-dir-regexp
                 tramp-file-name-regexp))
   (use-package password-cache
-    :init (setq password-cache-expiry nil))
+    :config (setq password-cache-expiry nil))
   (use-package tramp-term
     :ensure t
     :disabled t))
@@ -132,7 +133,7 @@
 (file-name-shadow-mode 1) ; Dim the ignored part of the file name in the minibuffer
 
 (use-package advice
-  :init
+  :config
   ;; Turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
@@ -153,28 +154,28 @@
             
 (use-package desktop
   :disabled t
-  :init (desktop-save-mode -1)
   :config
+  (desktop-save-mode -1)
   (setq-default desktop-restore-frames nil ; No need to restore frames
                 desktop-load-locked-desktop nil))
 
 ;; Fully redraw the display before queued input events are processed don't defer screen updates when performing
 ;; operations, obsolete since 24.5
-(if (and (<= emacs-major-version 24)
+(when (and (<= emacs-major-version 24)
          (<= emacs-minor-version 4))
     (setq redisplay-dont-pause t))
 
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
-  :init (global-font-lock-mode 1))
+  :config (global-font-lock-mode 1))
 
 (use-package font-lock
-  :init
+  :config
   (setq font-lock-maximum-decoration t ; Maximum fontification possible
         ;; Jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock
-  :init
+  :config
   (setq jit-lock-defer-time 0.10 ; Improve scrolling speed with jit fontification
         jit-lock-stealth-time 10
         jit-lock-defer-contextually t
@@ -199,8 +200,8 @@
 
 (use-package icomplete ; Incremental minibuffer completion/suggestions
   :disabled t
-  :init (icomplete-mode 1)
   :config
+  (icomplete-mode 1)
   (use-package icomplete+
     :ensure t)
   (setq icomplete-prospects-height 2
@@ -208,7 +209,7 @@
 
 (use-package icicles
   :disabled t
-  :init (icy-mode 1))
+  :config (icy-mode 1))
 
 (use-package savehist ; Save minibuffer histories across sessions
   :config
@@ -253,7 +254,7 @@
                                            try-complete-lisp-symbol))
   (use-package hippie-exp-ext
     :ensure t)
-  :bind* ("M-/" . hippie-expand))
+  :bind ("M-/" . hippie-expand))
 
 (use-package subword
   :diminish subword-mode

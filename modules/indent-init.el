@@ -14,30 +14,30 @@
 (use-package aggressive-indent
   :ensure t
   :disabled t
-  :init
+  :config
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
               (aggressive-indent-mode 1)))
   :diminish aggressive-indent-mode)
 
 (use-package electric ; Intelligent indentation, on by default from Emacs 24.4
-  :init (electric-indent-mode 1))
+  :config (electric-indent-mode 1))
 
 ;; If you wish to use this with autopairs and yasnippet, load this library first.
 (use-package auto-indent-mode
   :ensure t
   :disabled t
   :diminish auto-indent-mode
-  :init
-  (auto-indent-global-mode 1)
+  :config
   (setq auto-indent-on-visit-file t
         ;; Options: aggressive
-        auto-indent-indent-style 'conservative))
+        auto-indent-indent-style 'conservative)
+  (auto-indent-global-mode 1))
 
 (use-package highlight-indentation
   :ensure t
   :diminish highlight-indentation-mode
-  :init
+  :config
   (add-hook 'python-mode-hook
             (lambda ()
               (highlight-indentation-mode 1)
@@ -48,7 +48,7 @@
   :ensure t
   :disabled t
   :diminish indent-guide-mode
-  :init
+  :config
   (setq indent-guide-delay 1.0 ; Show guide lines only in idle-time
         indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
@@ -56,7 +56,7 @@
 (use-package smart-tabs ; Indent with tabs, align with spaces
   :ensure t
   :disabled t
-  :init (global-smart-tab-mode 1))
+  :config (global-smart-tab-mode 1))
 
 (use-package dtrt-indent
   :ensure t

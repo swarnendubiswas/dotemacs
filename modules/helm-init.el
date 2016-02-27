@@ -13,6 +13,7 @@
     :ensure t
     :config (helm-flx-mode 1))
 
+  :config
   (setq helm-quick-update nil
         helm-candidate-number-limit 100
         helm-apropos-fuzzy-match t
@@ -37,7 +38,7 @@
 
   (use-package helm-mode
     :diminish helm-mode
-    :init
+    :config
     (setq helm-completion-in-region-fuzzy-match t
           helm-mode-fuzzy-match t)
     (helm-mode 1))
@@ -67,7 +68,7 @@
      ("<f1>" . helm-M-x)))
 
   (use-package helm-utils
-    :init
+    :config
     (setq helm-highlight-number-lines-around-point 10
           helm-yank-symbol-first t)
     (helm-popup-tip-mode 1))
@@ -103,7 +104,7 @@
      ("<f8>" . helm-recentf)))
 
   (use-package helm-adaptive
-    :init
+    :config
     (setq helm-adaptive-history-file (concat dotemacs-temp-directory "helm-adaptive-history"))
     (helm-adaptive-mode 1))
 
@@ -113,7 +114,7 @@
 
   (use-package helm-descbinds
     :ensure t
-    :init
+    :config
     (fset 'describe-bindings 'helm-descbinds)
     (helm-descbinds-mode 1))
 
@@ -124,7 +125,7 @@
   (use-package helm-dired-recent-dirs
     :ensure t
     :disabled t
-    :init
+    :config
     (setq shell-file-name "/usr/bin/fish"
           helm-dired-recent-dirs-max 50))
 
@@ -151,18 +152,14 @@
 
   (use-package helm-ring
     :bind ([remap yank-pop] . helm-show-kill-ring)
-    :init (helm-push-mark-mode 1))
+    :config (helm-push-mark-mode 1))
 
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 
   (use-package helm-fuzzier
     :ensure t
-    :init (helm-fuzzier-mode 1))
-
-  (bind-keys :map helm-map
-             ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
-             ("C-z" . helm-select-action))
+    :config (helm-fuzzier-mode 1))
 
   :bind
   (([remap locate] . helm-locate)
@@ -173,7 +170,10 @@
    ("<f7>" . helm-resume)
    ;; swoop is better than occur
    ([remap occur] . helm-occur)
-   ("C-c h o" . helm-occur)))
+   ("C-c h o" . helm-occur)
+   :map helm-map
+   ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
+   ("C-z" . helm-select-action)))
 
 (provide 'helm-init)
 

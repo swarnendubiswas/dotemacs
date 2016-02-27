@@ -12,7 +12,7 @@
   :ensure t
   :disabled t
   :diminish achievements-mode
-  :init
+  :config
   (setq achievements-idle-time 600) ; Seconds
   (achievements-mode 1))
 
@@ -25,11 +25,11 @@
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
   :diminish hungry-delete-mode
-  :init (global-hungry-delete-mode 1))
+  :config (global-hungry-delete-mode 1))
 
 (use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
   :ensure t
-  :init (move-text-default-bindings))
+  :config (move-text-default-bindings))
 
 (use-package duplicate-thing
   :ensure t
@@ -61,7 +61,7 @@
 (use-package goto-last-change
   :ensure t
   :pin melpa
-  :bind* ("C-x C-\\" . goto-last-change))
+  :bind ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
   :ensure t
@@ -123,12 +123,12 @@
   (defun dotemacs/helm-alive-p ()
     (if (boundp 'helm-alive-p)
         (symbol-value 'helm-alive-p)))
-  :init
-  (golden-ratio-mode 1)
+  :config
   (add-to-list 'golden-ratio-inhibit-functions #'dotemacs/helm-alive-p)
   (setq golden-ratio-auto-scale t
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
-        split-width-threshold nil))
+        split-width-threshold nil)
+  (golden-ratio-mode 1))
 
 (use-package sudo-edit ; Edit file with sudo
   :ensure t
@@ -140,7 +140,7 @@
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
-  :bind* ("C-=" . er/expand-region)
+  :bind ("C-=" . er/expand-region)
   :config
   (use-package change-inner
     :ensure t
@@ -154,12 +154,12 @@
   ;; FIXME: https://github.com/cheunghy/expand-line/issues/2
   :if (<= emacs-major-version 24)
   :defines expand-line-mode
-  :init (expand-line-mode 1))
+  :config (expand-line-mode 1))
 
 (use-package smart-mark
   :ensure t
   :disabled t
-  :init (smart-mark-mode 1))
+  :config (smart-mark-mode 1))
 
 (use-package undo-tree ; Visualize with C-x u
   :ensure t
@@ -181,15 +181,15 @@
 
 (use-package ignoramus
   :ensure t
-  :init (ignoramus-setup))
+  :config (ignoramus-setup))
 
 (use-package pdf-tools
   :ensure t
   :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
   :config
-  (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-page) ; fit page by default
-  (setq pdf-view-resize-factor 1.10))
+  (setq pdf-view-resize-factor 1.10)
+  (pdf-tools-install))
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit

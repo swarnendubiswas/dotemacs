@@ -8,8 +8,7 @@
 (use-package company
   :ensure t
   :diminish company-mode
-  :init
-  (global-company-mode 1)
+  :config
   (setq company-global-modes t
         company-show-numbers t ; Show quick-access numbers for the first ten candidates
         company-minimum-prefix-length 4
@@ -24,17 +23,18 @@
         company-selection-wrap-around t
         company-selection-changed t
         company-require-match nil)
+  (global-company-mode 1)
 
   (use-package company-keywords
-    :init (add-to-list 'company-backends #'company-keywords))
+    :config (add-to-list 'company-backends #'company-keywords))
 
   (use-package company-dabbrev
-    :init
+    :config
     (setq company-dabbrev-downcase nil ; Turn off auto downcasing of things
           company-dabbrev-ignore-case nil))
 
   (use-package company-dabbrev-code
-    :init
+    :config
     (setq company-dabbrev-code-ignore-case nil
           company-dabbrev-code-everywhere t))
 
@@ -61,9 +61,9 @@
 
   (use-package company-try-hard
     :ensure t
-    :init (bind-key "C-z" #'company-try-hard company-active-map))
+    :bind (:map company-active-map
+                ("C-z" . company-try-hard)))
 
-  :config
   (use-package company-flx
     :ensure t
     :disabled t
@@ -74,17 +74,17 @@
 (use-package company-statistics
   :ensure t
   :config
-  (company-statistics-mode 1)
-  (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el")))
+  (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
+  (company-statistics-mode 1))
 
 (use-package company-quickhelp
   :ensure t
   :config
-  (company-quickhelp-mode 1)
   (setq company-quickhelp-delay 0.5
         company-quickhelp-max-lines 60)
-  (unbind-key "M-h" global-map)
-  (bind-key* "M-h" #'mark-paragraph))
+  (company-quickhelp-mode 1)
+  (unbind-key "M-h" company-quickhelp-mode-map)
+  (bind-key "M-h" #'mark-paragraph))
 
 (provide 'company-init)
 

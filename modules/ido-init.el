@@ -7,10 +7,7 @@
 
 (use-package ido
   :ensure t
-  :init
-  (ido-mode 1)
-  (ido-everywhere 1)
-
+  :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
         ido-max-prospects 10
@@ -38,10 +35,13 @@
   (dolist (dirs '(".svn" ".dropbox .git .hg"))
     (add-to-list 'ido-ignore-directories dirs))
 
+  (ido-mode 1)
+  (ido-everywhere 1)
+
   (use-package ido-yes-or-no ; Overkill
     :ensure t
     :disabled t
-    :init (ido-yes-or-no-mode))
+    :config (ido-yes-or-no-mode))
 
   (use-package ido-hacks
     :ensure t
@@ -50,23 +50,23 @@
 
   (use-package ido-ubiquitous ; Allow ido-style completion in more places
     :ensure t
-    :init (ido-ubiquitous-mode 1))
+    :config (ido-ubiquitous-mode 1))
 
   (use-package ido-completing-read+
     :ensure t)
 
   (or (use-package flx-ido ; Smarter fuzzy matching for ido
         :ensure t
-        :init (flx-ido-mode 1))
+        :config (flx-ido-mode 1))
 
       (use-package ido-better-flex ; Can add more noise while matching patterns
         :ensure t
         :disabled t
-        :init (ido-better-flex/enable)))
+        :config (ido-better-flex/enable)))
 
   (use-package ido-at-point
     :ensure t
-    :init (ido-at-point-mode 1))
+    :config (ido-at-point-mode 1))
 
   (use-package ido-describe-bindings
     :ensure t
@@ -74,23 +74,23 @@
 
   (use-package ido-sort-mtime
     :ensure t
-    :init (ido-sort-mtime-mode 1))
+    :config (ido-sort-mtime-mode 1))
 
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
                                                  :ensure t
-                                                 :init
+                                                 :config
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
                                                  (ido-vertical-mode 1)))
 
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode
                                              :ensure t
-                                             :init (ido-grid-mode 1)
                                              :config
                                              ;; t: left-right then top-bottom or
                                              ;; nil: top-bottom then left-right
                                              (setq ido-grid-mode-order t
-                                                   ido-grid-mode-min-rows 10))))
+                                                   ido-grid-mode-min-rows 10)
+                                             (ido-grid-mode 1))))
 
   :bind
   (([remap find-file] . ido-find-file)
