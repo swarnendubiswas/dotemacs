@@ -8,39 +8,39 @@
 (or (use-package mic-paren
       :ensure t
       :disabled t
-      :init
+      :config
       (setq paren-highlight-at-point t)
       (paren-activate)
       (make-variable-buffer-local 'show-paren-mode))
 
     (use-package paren
-      :init
-      (show-paren-mode 1)
+      :config
       (setq show-paren-delay 0
             show-paren-style 'mixed ; Options: 'expression, 'parenthesis, 'mixed
             show-paren-when-point-inside-paren t
             show-paren-when-point-in-periphery t)
+      (show-paren-mode 1)
       (when (fboundp 'show-paren-mode)
         (make-variable-buffer-local 'show-paren-mode))))
 
 (or (use-package elec-pair
-      :init
+      :config
       (add-hook 'prog-mode-hook
                 (lambda ()
                   (electric-pair-mode 1)))
-      (add-hook 'LaTeX-mode-hook
+      (add-hook 'text-mode-hook
                 (lambda ()
                   (electric-pair-mode 1))))
 
     (use-package autopair
       :ensure t
       :disabled t
-      :init (autopair-global-mode 1))
+      :config (autopair-global-mode 1))
 
     (use-package flex-autopair
       :ensure t
       :disabled t
-      :init (flex-autopair-mode 1)))
+      :config (flex-autopair-mode 1)))
 
 ;; https://github.com/xiaohanyu/oh-my-emacs/blob/master/core/ome-miscs.org
 ;; https://github.com/Fuco1/smartparens/blob/master/smartparens-config.el
@@ -49,12 +49,11 @@
   :ensure t
   :disabled t
   :diminish smartparens-mode
-  :init
+  :config
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
   ;;(sp-use-smartparens-bindings)
 
-  :config
   (require 'smartparens-config)
   (setq sp-autoskip-closing-pair 'always
         sp-navigate-close-if-unbalanced t

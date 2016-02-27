@@ -25,7 +25,7 @@
       :disabled t
       :functions artbollocks-mode
       :diminish artbollocks-mode
-      :init (add-hook 'text-mode-hook #'artbollocks-mode)))
+      :config (add-hook 'text-mode-hook #'artbollocks-mode)))
 
 (use-package langtool
   :ensure t

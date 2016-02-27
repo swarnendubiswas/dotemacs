@@ -33,8 +33,7 @@
            (goto-char (match-beginning 0))))
       (user-error
        "Not completing files currently")))
-  :init
-  (ivy-mode 1)
+  :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
                                   ; candidates.
         ivy-virtual-abbreviate 'full
@@ -46,18 +45,7 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-re-builders-alist '((t . ivy--regex-plus))
         ivy-count-format "(%d/%d) ")
-  :bind
-  (("<f7>" . ivy-resume)
-   ("<f8>" . ivy-recentf)
-   ("C-'" . ivy-avy)
-   ([remap switch-to-buffer] . ivy-switch-buffer)
-   ("<f4>" . ivy-switch-buffer)
-   :map ivy-minibuffer-map
-   ("<return>" . ivy-alt-done)
-   ("C-:" . ivy-dired)
-   ("<left>" . ivy-previous-line)
-   ("<right>" . ivy-next-line))
-  :config
+  (ivy-mode 1)
   (use-package counsel
     :ensure t
     :bind
@@ -69,6 +57,17 @@
      ("<f3>" . counsel-find-file)
      ([remap yank-pop] . counsel-yank-pop))
     :config (setq counsel-find-file-at-point t))
+    :bind
+  (("<f7>" . ivy-resume)
+   ("<f8>" . ivy-recentf)
+   ("C-'" . ivy-avy)
+   ([remap switch-to-buffer] . ivy-switch-buffer)
+   ("<f4>" . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("<return>" . ivy-alt-done)
+   ("C-:" . ivy-dired)
+   ("<left>" . ivy-previous-line)
+   ("<right>" . ivy-next-line))
   :diminish ivy-mode)
 
 (provide 'ivy-init)
