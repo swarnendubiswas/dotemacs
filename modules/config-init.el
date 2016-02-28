@@ -13,6 +13,10 @@
   "Storage location for various configuration files."
   :group 'dotemacs)
 
+(defcustom dotemacs-packages-directory (concat user-emacs-directory "packages/")
+  "Directory listing third-party packages and files."
+  :group 'dotemacs)
+
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 

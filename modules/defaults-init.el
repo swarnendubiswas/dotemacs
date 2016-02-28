@@ -282,12 +282,13 @@
 
 (use-package abbrev
   :diminish abbrev-mode
+  :init
+  (setq-default abbrev-file-name (concat dotemacs-packages-directory "abbrev_defs"))
+  (add-hook 'text-mode-hook #'abbrev-mode) ; Need this in :init to work
   :config
-  (setq-default abbrev-file-name (concat dotemacs-temp-directory "abbrev_defs"))
   (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
   (if (file-exists-p abbrev-file-name)
-      (quietly-read-abbrev-file))
-  (abbrev-mode 1))
+      (quietly-read-abbrev-file)))
 
 (provide 'defaults-init)
 
