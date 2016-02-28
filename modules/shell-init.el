@@ -1,7 +1,7 @@
 ;;; shell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup shell, eshell, terminal emulation. This module is not to configure editing of shell scripts.
+;; Setup shell, eshell, terminal emulation.  This module is not to configure editing of shell scripts.
 
 ;;; Code:
 
@@ -9,14 +9,14 @@
   :disabled t
   :config
   (use-package comint
-    :init
-    (setq comint-scroll-to-bottom-on-input t   ;; always insert at the bottom
-          ;; no duplicates in command history
+    :config
+    (setq comint-scroll-to-bottom-on-input t   ;; Always insert at the bottom
+          ;; No duplicates in command history
           comint-input-ignoredups t))
 
   (use-package shell-command
     :ensure t
-    :init (shell-command-completion-mode 1))
+    :config (shell-command-completion-mode 1))
 
   ;; The following setup is from readline-complete package at
   ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
@@ -40,15 +40,16 @@
 
   (use-package bash-completion
     :ensure t
-    :init (bash-completion-setup))
+    :config (bash-completion-setup))
 
   (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
-  (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)
+  (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
 
-  (use-package term
-    :config
-    (use-package term+
-      :ensure t)))
+(use-package term
+  :disabled t
+  :config
+  (use-package term+
+    :ensure t))
 
 (provide 'shell-init)
 

@@ -42,8 +42,7 @@
   (use-package find-file
     :ensure t
     :commands ff-find-other-file
-    :init
-    (custom-set-key (kbd "C-c o") 'ff-find-other-file))
+    :bind ("C-c o" . ff-find-other-file))
 
   (use-package cwarn
     :ensure t

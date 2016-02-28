@@ -29,7 +29,7 @@
       ((eq dotemacs-mode-line-theme 'sml) (use-package smart-mode-line
                                             :ensure t
                                             :functions (sml/faces-from-theme sml/theme-p)
-                                            :init
+                                            :config
                                             (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
                                                   ;; sml/name-width 20
                                                   sml/no-confirm-load-theme t
@@ -41,24 +41,15 @@
       ((eq dotemacs-mode-line-theme 'telephone-line) (use-package telephone-line
                                                        :ensure t
                                                        :if (bound-and-true-p display-graphic-p)
-                                                       :init
-                                                       ;; (setq telephone-line-lhs
-                                                       ;;       '((nil    . (telephone-line-minor-mode-segment))
-                                                       ;;         (accent . (telephone-line-vc-segment
-                                                       ;;                    telephone-line-process-segment))
-                                                       ;;         (nil    . (telephone-line-buffer-segment))))
-                                                       ;; (setq telephone-line-rhs
-                                                       ;;       '((nil    . (telephone-line-misc-info-segment))
-                                                       ;;         (accent . (telephone-line-major-mode-segment))
-                                                       ;;         (nil    . (telephone-line-airline-position-segment))))
-                                                       (telephone-line-mode 1)))
+                                                       :config (telephone-line-mode 1)))
 
       ((eq dotemacs-mode-line-theme 'spaceline) (use-package spaceline
                                                   :ensure t
-                                                  :init
+                                                  :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        ;; Options: arrow, slant, chamfer, wave, brace, roundstub, zigzag, butt, rounded, contour, curve
+                                                        ;; Options: arrow, slant, chamfer, wave, brace, roundstub,
+                                                        ;; zigzag, butt, rounded, contour, curve
                                                         powerline-default-separator 'wave
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil)
@@ -78,13 +69,20 @@
 
       ((eq dotemacs-mode-line-theme 'default)))
 
-(when (fboundp 'display-graphics-p)
-  (use-package nyan-mode
-    :ensure t
-    :init
-    (nyan-mode 1)
-    ;; (nyan-start-animation)
-    (setq-default nyan-wavy-trail nil)))
+;; https://github.com/cemerick/.emacs.d#nyan-mode
+(use-package nyan-mode
+  :ensure t
+  :init
+  (defun toggle-nyan-mode (&optional frame)
+    "Enable/disable nyan mode."
+    (if (display-graphic-p frame)
+        (progn
+          (nyan-mode 1)
+          (nyan-start-animation)
+          (setq-default nyan-wavy-trail t))
+      (nyan-mode -1)))
+  (add-hook 'after-make-frame-functions 'toggle-nyan-mode)
+  (add-hook 'after-init-hook 'toggle-nyan-mode))
 
 (provide 'mode-line-init)
 

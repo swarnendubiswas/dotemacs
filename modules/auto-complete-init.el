@@ -88,11 +88,15 @@
     :ensure t
     :disabled t)
 
-  :bind (:map ac-completing-map
-         ("C-f" . ac-isearch) ;; Filter candidates by pattern
+  :bind (;; Filter candidates by pattern
+         :map ac-completing-map
+         ("C-s" . nil)
+         ("C-f" . ac-isearch)
          :map ac-complete-mode-map
+         ("C-s" . nil)
          ("C-f" . ac-isearch)
          :map ac-menu-map
+         ("C-s" . nil)
          ("C-f" . ac-isearch))
   :diminish auto-complete-mode)
 

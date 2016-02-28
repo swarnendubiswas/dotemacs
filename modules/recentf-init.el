@@ -16,8 +16,8 @@
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
                           ;;"[/\\]tmp/sync-recentf-marker\\'"
                           "/company-statistics-cache.el$")) ; "/ssh:"
-  (recentf-mode 1)
   :config
+  (recentf-mode 1)
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
 

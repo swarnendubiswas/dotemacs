@@ -13,9 +13,8 @@
   (turn-off-hideshow))
 (add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 
-(or (use-package writegood-mode ; identify weasel words, passive voice, and duplicate words
+(or (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
       :ensure t
-      ;; :bind* ("C-c g" . writegood-mode) ; Not very useful
       :functions writegood-mode
       :diminish writegood-mode
       :config (add-hook 'text-mode-hook #'writegood-mode))

@@ -22,7 +22,7 @@
         TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
         TeX-source-correlate-mode t
         TeX-source-correlate-start-server t)
-  (setq-default TeX-master nil) ; query for master file
+  (setq-default TeX-master nil) ; Query for master file
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
 
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
@@ -68,7 +68,7 @@
     ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
     ;; (bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
 
-    ;; unset "C-c ;" since we want to bind it to 'comment-line
+    ;; Unset "C-c ;" since we want to bind it to 'comment-line
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
   (use-package latex-pretty-symbols
@@ -121,26 +121,25 @@
       :ensure t
       :config
       (add-to-list 'company-backends
-                   '(company-math-symbols-latex
-                     company-latex-commands))))
+                   '(company-math-symbols-latex company-latex-commands))))
 
   (use-package auctex-latexmk
     :ensure t
-    :init
+    :config
     (auctex-latexmk-setup)
-    ;; this variable is buffer-local
+    ;; This variable is buffer-local
     (add-hook 'LaTeX-mode-hook
               (lambda ()
                 (setq TeX-command-default "LatexMk"))))
 
   (use-package latex-extra
     :ensure t
-    :disabled t ; overrides a few useful keymap prefixes
+    :disabled t ; Overrides a few useful keymap prefixes
     :config
     (latex/setup-keybinds)
     (add-hook 'LaTeX-mode-hook #'latex-extra-mode))
 
-  (use-package latex-preview-pane ; currently does not support multi-file parsing
+  (use-package latex-preview-pane ; Currently does not support multi-file parsing
     :ensure t
     :disabled t
     :config (latex-preview-pane-enable))
@@ -152,7 +151,7 @@
     :ensure t
     :disabled t
     :diminish magic-latex-buffer
-    :init
+    :config
     (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
     (setq magic-latex-enable-block-highlight nil
           magic-latex-enable-subscript nil
@@ -176,16 +175,16 @@
                 (bib-cite-minor-mode 1)))
     (setq bib-cite-use-reftex-view-crossref t)
     ;; We use "C-c b" for comment-box
-    (bind-keys
-     :map bib-cite-minor-mode-map
+    :bind
+    (:map bib-cite-minor-mode-map
+     ("C-c b" . nil)
      ("C-c l a" . bib-apropos)
      ("C-c l b" . bib-make-bibliography)
      ("C-c l d" . bib-display)
      ("C-c l e" . bib-etags)
      ("C-c l f" . bib-find)
      ("C-c l n" . bib-find-next)
-     ("C-c l h" . bib-highlight-mouse))
-    (unbind-key "C-c b"))
+     ("C-c l h" . bib-highlight-mouse)))
 
   (use-package helm-bibtex
     :ensure t
@@ -198,7 +197,7 @@
 
   (use-package reftex
     :diminish reftex-mode
-    :init
+    :config
     (setq reftex-plug-into-AUCTeX t
           reftex-insert-label-flags '(t t)
           reftex-cite-format 'abbrv
@@ -208,20 +207,23 @@
           reftex-default-bibliography '("~/workspace/bib/plass.bib")
           reftex-idle-time 0.5
           reftex-toc-follow-mode t)
-    (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; for use with AUCTeX
-    ;; for Emacs latex mode
+    (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; Use with AUCTeX
+    ;; Emacs latex mode
     (add-hook 'lateX-mode-hook #'turn-on-reftex))
 
   (use-package tex-smart-umlauts
     :ensure t
-    :init (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-decode))
+    :config (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-decode))
 
   ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
   (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
     "This advice is meant to fix the issue where an extra blank
 line is naively added by `LaTeX-insert-item' when not already on
 an item line."
-    (check-item-entry)))
+    (check-item-entry))
+
+  :bind (:map LaTeX-mode-map
+         ("C-c C-d" . nil)))
 
 (provide 'latex-init)
 
