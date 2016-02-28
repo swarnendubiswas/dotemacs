@@ -32,7 +32,7 @@
         ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
                                  ido-ignore-files))
 
-  (dolist (dirs '(".svn" ".dropbox .git .hg"))
+  (dolist (dirs '(".svn" ".git" ".hg" ".dropbox[\-\_a-z]*"))
     (add-to-list 'ido-ignore-directories dirs))
 
   (ido-mode 1)
