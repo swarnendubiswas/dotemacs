@@ -54,17 +54,19 @@
         auto-compile-mode-line-counter nil)
   (auto-compile-on-load-mode 1))
 
-(use-package paradox
-  :ensure t
-  :if (<= emacs-major-version 24) ;; FIXME: Gets stuck with >= Emacs 25
-  :bind (("C-c d p" . paradox-list-packages)
-         ("C-c d u" . paradox-upgrade-packages)
-         ("C-c d P" . package-list-packages))
-  :config
-  (setq paradox-execute-asynchronously t
-        paradox-github-token t
-        paradox-spinner-type 'random)
-  (paradox-enable))
+;; FIXME: Paradox gets stuck refreshing with >= Emacs 25
+(if (<= emacs-major-version 24)
+    (progn
+      (use-package paradox
+        :ensure t
+        :bind (("C-c d p" . paradox-list-packages)
+               ("C-c d u" . paradox-upgrade-packages))
+        :config
+        (setq paradox-execute-asynchronously t
+              paradox-github-token t
+              paradox-spinner-type 'random)
+        (paradox-enable)))
+  (bind-key "C-c d p" #'package-list-packages))
 
 (provide 'packages-init)
 
