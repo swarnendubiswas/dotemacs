@@ -43,8 +43,8 @@
         ivy-fixed-height-minibuffer t
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
-        ivy-re-builders-alist '((t . ivy--regex-plus))
-        ivy-count-format "(%d/%d) ")
+        ;; ivy-count-format "(%d/%d) "
+        ivy-re-builders-alist '((t . ivy--regex-plus)))
   (ivy-mode 1)
   (use-package counsel
     :ensure t

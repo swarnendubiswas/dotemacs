@@ -52,7 +52,8 @@
                                                         ;; zigzag, butt, rounded, contour, curve
                                                         powerline-default-separator 'wave
                                                         spaceline-anzu-p t
-                                                        spaceline-hud-p nil)
+                                                        spaceline-hud-p nil
+                                                        spaceline-buffer-position-p nil)
                                                   (spaceline-emacs-theme)
                                                   (set-face-attribute 'spaceline-highlight-face nil
                                                                       :background "#1A4B77"

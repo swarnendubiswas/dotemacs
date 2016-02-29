@@ -17,6 +17,10 @@
   "Directory listing third-party packages and files."
   :group 'dotemacs)
 
+(defcustom dotemacs-modules-directory (concat user-emacs-directory "modules/")
+  "Directory containing setup files for customized configuration."
+  :group 'dotemacs)
+
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 

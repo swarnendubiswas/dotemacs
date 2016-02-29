@@ -23,14 +23,21 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Key motion
 
-* `C-M-n` - Move forward over a parenthetical group.
-* `C-M-p` - Move backward over a parenthetical group.
+* `C-M-n` - Move forward over a parenthetical group (`forward-list`).
+* `C-M-p` - Move backward over a parenthetical group (`backward-list`).
+C-M-f     forward-sexp     Move forward over a balanced expression  ;;
+C-M-b     backward-sexp    Move backward over a balanced expression ;;
+C-M-k     kill-sexp        Kill balanced expression forward         ;;
+C-M-SPC   mark-sexp        Put the mark at the end of the sexp.     ;;
+
 * `C-M-a` - Goto the start of a function.
 * `C-M-e` - Goto the end of a function.
 * `M-a` - Move back to the beginning of the sentence.
 * `M-e` - Move forward to the end of the sentence.
 * `M-{` - Move back to the previous paragraph beginning.
 * `M-}` - Move forward to the next paragraph end.
+
+
 
 #### Dired
 
@@ -88,5 +95,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 #### Use Cases
 
 * ###### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+
+* ###### [Search for the symbol at point with swiper] `C-f M-n`
 
 Suggestions are welcome.

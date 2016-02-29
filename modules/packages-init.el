@@ -54,20 +54,20 @@
         auto-compile-mode-line-counter nil)
   (auto-compile-on-load-mode 1))
 
-;; FIXME: Paradox gets stuck refreshing with >= Emacs 25
+;; Paradox installed from older Emacs versions gets stuck refreshing with >= Emacs 25 because of a *problem with
+;; macros*. The solution is to reinstall the package on >= Emacs 25.
 ;; https://github.com/Malabarba/paradox/issues/102
-(if (<= emacs-major-version 24)
-    (progn
-      (use-package paradox
-        :ensure t
-        :bind (("C-c d p" . paradox-list-packages)
-               ("C-c d u" . paradox-upgrade-packages))
-        :config
-        (setq paradox-execute-asynchronously t
-              paradox-github-token t
-              paradox-spinner-type 'random)
-        (paradox-enable)))
-  (bind-key "C-c d p" #'package-list-packages))
+;; https://github.com/Malabarba/paradox/issues/107
+(use-package paradox
+  :ensure t
+  :bind (("C-c d p" . paradox-list-packages)
+         ("C-c d u" . paradox-upgrade-packages)
+         ("C-c d P" . package-list-packages))
+  :config
+  (setq paradox-execute-asynchronously t
+        paradox-github-token t
+        paradox-spinner-type 'random)
+  (paradox-enable))
 
 (provide 'packages-init)
 
