@@ -56,7 +56,9 @@
      ([remap find-file] . counsel-find-file)
      ("<f3>" . counsel-find-file)
      ([remap yank-pop] . counsel-yank-pop))
-    :config (setq counsel-find-file-at-point t))
+    :config
+    (setq counsel-find-file-at-point t
+          counsel-find-file-ignore-regexp "\\`\\.dropbox"))
     :bind
   (("<f7>" . ivy-resume)
    ("<f8>" . ivy-recentf)

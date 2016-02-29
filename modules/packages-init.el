@@ -55,6 +55,7 @@
   (auto-compile-on-load-mode 1))
 
 ;; FIXME: Paradox gets stuck refreshing with >= Emacs 25
+;; https://github.com/Malabarba/paradox/issues/102
 (if (<= emacs-major-version 24)
     (progn
       (use-package paradox
