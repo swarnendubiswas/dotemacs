@@ -45,6 +45,12 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ;; ivy-count-format "(%d/%d) "
         ivy-re-builders-alist '((t . ivy--regex-plus)))
+  (dolist (buffer '("^\\*Backtrace\\*$"
+                  "^\\*Compile-Log\\*$"
+                  "^\\*.+Completions\\*$"
+                  "^\\*Help\\*$"
+                  "^\\*Ibuffer\\*$"))
+  (add-to-list 'ivy-ignore-buffers buffer))
   (ivy-mode 1)
   (use-package counsel
     :ensure t

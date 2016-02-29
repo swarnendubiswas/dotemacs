@@ -17,8 +17,6 @@
         company-tooltip-flip-when-above t
         company-tooltip-align-annotations t
         company-tooltip-limit 20
-        ;; Start autocompletion only after typing
-        ;; company-begin-commands '(self-insert-command)
         company-idle-delay 0.3
         company-selection-wrap-around t
         company-selection-changed t
@@ -66,7 +64,6 @@
 
   (use-package company-flx
     :ensure t
-    :disabled t
     :config
     (setq company-flx-limit 50)
     (company-flx-mode 1)))

@@ -75,9 +75,9 @@
   (use-package ac-ispell
     :ensure t
     :config
-    (ac-ispell-setup)
     (setq ac-ispell-requires 4 ; Minimum input for starting completion
-          ac-ispell-fuzzy-limit 4)
+          ac-ispell-fuzzy-limit 2)
+    (ac-ispell-setup)
     (add-hook 'text-mode-hook #'ac-ispell-ac-setup))
 
   (use-package ac-dabbrev

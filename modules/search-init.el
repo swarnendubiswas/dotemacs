@@ -79,7 +79,7 @@
           helm-ag-insert-at-point 'symbol
           helm-ag-source-type 'file-line))
   (when (eq dotemacs-selection 'ivy)
-    bind-key "C-c s c" #'counsel-ag)
+    (bind-key "C-c s c" #'counsel-ag))
   :bind (("C-c s d" . ag-dired)
          ("C-c s f" . ag-files)))
 

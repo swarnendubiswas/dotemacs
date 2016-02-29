@@ -108,9 +108,10 @@
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (add-to-list 'ac-sources 'ac-source-semantic)
-    (add-to-list 'ac-sources 'ac-source-semantic-raw)
-    (add-to-list 'ac-sources 'ac-source-gtags))
+    (with-eval-after-load "auto-complete"
+      (add-to-list 'ac-sources 'ac-source-semantic)
+      (add-to-list 'ac-sources 'ac-source-semantic-raw)
+      (add-to-list 'ac-sources 'ac-source-gtags)))
 
   (use-package auto-complete-c-headers
     :ensure t

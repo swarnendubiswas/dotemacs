@@ -76,7 +76,11 @@
       (use-package company-shell
         :ensure t
         :config
-        (add-to-list 'company-backends '((company-shell company-fish-shell))))))
+        (with-eval-after-load "company"
+          (progn
+          (add-to-list 'company-backends 'company-shell)
+          (add-to-list 'company-backends 'company-fish-shell)
+          (add-to-list 'company-backends 'company-tern))))))
 
   (use-package fish-mode
     :ensure t
