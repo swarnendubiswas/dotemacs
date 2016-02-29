@@ -57,8 +57,12 @@
      ("<f3>" . counsel-find-file)
      ([remap yank-pop] . counsel-yank-pop))
     :config
-    (setq counsel-find-file-at-point t
-          counsel-find-file-ignore-regexp "\\`\\.dropbox"))
+    (setq counsel-find-file-at-point nil
+          ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-counsel.el
+          counsel-find-file-ignore-regexp (concat
+                                           "\\(?:\\`[#.]\\)" ; File names beginning with # or .
+                                           ;; File names ending with # or ~
+                                           "\\|\\(?:\\`.+?[#~]\\'\\)")))
     :bind
   (("<f7>" . ivy-resume)
    ("<f8>" . ivy-recentf)
