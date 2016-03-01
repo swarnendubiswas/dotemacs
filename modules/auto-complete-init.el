@@ -28,8 +28,6 @@
         ac-use-comphist t
         ac-quick-help-delay 1.0
         ac-use-fuzzy t
-        ;; ac-trigger-key "TAB" ; Should generally be used if ac-auto-start is nil
-        tab-always-indent 'complete ; Use 't when auto-complete is disabled
         ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat")
         ac-dictionary-directories (concat dotemacs-temp-directory "ac-dict")
         ac-user-dictionary-files (concat dotemacs-temp-directory ".dict")

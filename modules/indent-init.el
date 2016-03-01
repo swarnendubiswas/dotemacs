@@ -8,12 +8,12 @@
 (setq-default fill-column dotemacs-fill-column
               standard-indent 2 ; Set standard indent to 2 rather that 4
               tab-width 2
+              tab-always-indent 'complete
               ;; Spaces instead of tabs by default
               indent-tabs-mode nil)
 
 (use-package aggressive-indent
   :ensure t
-  :disabled t
   :config
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
@@ -52,11 +52,6 @@
   (setq indent-guide-delay 1.0 ; Show guide lines only in idle-time
         indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
-
-(use-package smart-tabs ; Indent with tabs, align with spaces
-  :ensure t
-  :disabled t
-  :config (global-smart-tab-mode 1))
 
 (use-package dtrt-indent
   :ensure t
