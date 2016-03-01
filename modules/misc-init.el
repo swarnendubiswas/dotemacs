@@ -7,6 +7,7 @@
 
 (use-package smooth-scrolling
   :ensure t
+  :disabled t ;; This repositions the cursor while searching
   :config (smooth-scrolling-mode 1))
 
 (use-package achievements

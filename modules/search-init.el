@@ -71,17 +71,19 @@
   :config
   (setq ag-reuse-buffers t
         ag-highlight-search t)
-  (use-package helm-ag
-    :ensure t
-    :bind ("C-c s a" . helm-ag)
-    :config
-    (setq helm-ag-fuzzy-match t
-          helm-ag-insert-at-point 'symbol
-          helm-ag-source-type 'file-line))
-  (when (eq dotemacs-selection 'ivy)
-    (bind-key "C-c s c" #'counsel-ag))
   :bind (("C-c s d" . ag-dired)
          ("C-c s f" . ag-files)))
+
+(use-package helm-ag
+  :ensure t
+  :bind ("C-c s a" . helm-ag)
+  :config
+  (setq helm-ag-fuzzy-match t
+        helm-ag-insert-at-point 'symbol
+        helm-ag-source-type 'file-line))
+
+(when (eq dotemacs-selection 'ivy)
+  (bind-key "C-c s c" #'counsel-ag))
 
 (use-package find-file-in-project
   :ensure t

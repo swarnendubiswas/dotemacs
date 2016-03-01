@@ -46,11 +46,11 @@
         ;; ivy-count-format "(%d/%d) "
         ivy-re-builders-alist '((t . ivy--regex-plus)))
   (dolist (buffer '("^\\*Backtrace\\*$"
-                  "^\\*Compile-Log\\*$"
-                  "^\\*.+Completions\\*$"
-                  "^\\*Help\\*$"
-                  "^\\*Ibuffer\\*$"))
-  (add-to-list 'ivy-ignore-buffers buffer))
+                    "^\\*Compile-Log\\*$"
+                    "^\\*.+Completions\\*$"
+                    "^\\*Help\\*$"
+                    "^\\*Ibuffer\\*$"))
+    (add-to-list 'ivy-ignore-buffers buffer))
   (ivy-mode 1)
   (use-package counsel
     :ensure t
@@ -68,8 +68,9 @@
           counsel-find-file-ignore-regexp (concat
                                            "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                            ;; File names ending with # or ~
-                                           "\\|\\(?:\\`.+?[#~]\\'\\)")))
-    :bind
+                                           "\\|\\(?:\\`.+?[#~]\\'\\)"
+                                           "__pycache__")))
+  :bind
   (("<f7>" . ivy-resume)
    ("<f8>" . ivy-recentf)
    ("C-'" . ivy-avy)

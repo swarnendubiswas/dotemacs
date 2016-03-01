@@ -28,11 +28,6 @@
         (set-face-attribute 'which-func nil :foreground "white")
       (set-face-attribute 'which-func nil :foreground "black")))
 
-  (use-package electric-operator
-    :ensure t
-    :disabled t
-    :init (add-hook 'prog-mode-hook #'electric-operator-mode))
-
   (use-package electric
     :init
     (add-hook 'prog-mode-hook
@@ -78,9 +73,9 @@
         :config
         (with-eval-after-load "company"
           (progn
-          (add-to-list 'company-backends 'company-shell)
-          (add-to-list 'company-backends 'company-fish-shell)
-          (add-to-list 'company-backends 'company-tern))))))
+            (add-to-list 'company-backends 'company-shell)
+            (add-to-list 'company-backends 'company-fish-shell)
+            (add-to-list 'company-backends 'company-tern))))))
 
   (use-package fish-mode
     :ensure t
@@ -177,7 +172,14 @@
                 nxml-auto-insert-xml-declaration-flag t)
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-nxml
-      :ensure t)))
+      :ensure t
+      :demand t
+      :config (setq auto-complete-nxml-automatic-p t)))
+  (when (eq dotemacs-completion-in-buffer 'company)
+    (add-hook 'nxml-mode-hook
+              (lambda ()
+                (add-to-list (make-local-variable 'company-backends)
+                             'company-nxml)))))
 
 (provide 'prog-init)
 

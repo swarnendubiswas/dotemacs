@@ -27,12 +27,14 @@
   :bind ("M-T" . tags-search)
   :config
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package auto-complete-etags
-      :ensure t
-      :config (add-to-list 'ac-sources 'ac-source-etags))
-    (use-package ac-etags
-      :ensure t
-      :config (add-hook 'c-mode-common-hook 'ac-etags-ac-setup))))
+    (progn
+      ;; FIXME: Disabling these packages seems to disable auto-complete
+      (use-package auto-complete-etags
+        :ensure t
+        :config (add-to-list 'ac-sources 'ac-source-etags))
+      (use-package ac-etags
+        :ensure t
+        :config (add-hook 'c-mode-common-hook 'ac-etags-ac-setup)))))
 
 (use-package gtags
   :ensure t
