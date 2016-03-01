@@ -6,14 +6,15 @@
 ;;; Code:
 
 (use-package smooth-scrolling
-  :ensure t)
+  :ensure t
+  :config (smooth-scrolling-mode 1))
 
 (use-package achievements
   :ensure t
   :disabled t
   :diminish achievements-mode
   :config
-  (setq achievements-idle-time 600) ; Seconds
+  (setq achievements-idle-time 600)
   (achievements-mode 1))
 
 (use-package vlf ; Speed up Emacs for large files
@@ -56,13 +57,12 @@
 
 (use-package gnuplot
   :ensure t
-  :mode        ("\\.gp\\'" . gnuplot-mode)
+  :mode ("\\.gp\\'" . gnuplot-mode)
   :interpreter ("gnuplot" . gnuplot-mode)
   :defer t)
 
 (use-package goto-last-change
   :ensure t
-  :pin melpa
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
@@ -150,10 +150,10 @@
     :bind (("M-i" . change-inner)
            ("M-o" . change-outer))))
 
+;; FIXME: https://github.com/cheunghy/expand-line/issues/2
 (use-package expand-line
   :ensure t
   :disabled t
-  ;; FIXME: https://github.com/cheunghy/expand-line/issues/2
   :if (<= emacs-major-version 24)
   :defines expand-line-mode
   :config (expand-line-mode 1))

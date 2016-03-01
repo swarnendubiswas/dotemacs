@@ -64,9 +64,10 @@
 
   (use-package dired-efap
     :ensure t
-    :config (setq dired-efap-initial-filename-selection nil) ; Options: t, nil, no-extension
-    :bind (:map dired-mode-map
-                ("<f2>" . dired-efap))))
+    :init (bind-key "<f2>" #'dired-efap dired-mode-map)
+    :config
+    ;; Options: t, nil, no-extension
+    (setq dired-efap-initial-filename-selection nil)))
 
 (provide 'dired-init)
 

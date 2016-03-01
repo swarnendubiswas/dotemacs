@@ -41,27 +41,28 @@
   :ensure t
   :disabled t
   :diminish guide-key-mode
-  :init
-  (guide-key-mode 1)
+  :config
   (setq guide-key/guide-key-sequence t
         guide-key/recursive-key-sequence-flag t
         guide-key/popup-window-position 'bottom
         ;; Delay before the guide shows up, default is 1 s
         guide-key/idle-delay 1.0)
+  (guide-key-mode 1)
   (use-package guide-key-tip
     :ensure t
     :disabled t
-    :init (setq guide-key-tip/enabled t)))
+    :config (setq guide-key-tip/enabled t)))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  :init
-  (which-key-mode)
+  :config
   (setq which-key-idle-delay 1.0)
+  (which-key-mode 1)
   :diminish which-key-mode)
 
-(use-package help-fns+
-  :ensure t)
+(use-package help-fns+ ; Improved help commands
+  :ensure t
+  :commands (describe-buffer describe-command describe-file describe-keymap))
 
 (provide 'keybindings-init)
 

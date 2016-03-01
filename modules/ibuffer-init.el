@@ -10,14 +10,14 @@
   (defun dotemacs--ibuffer-group-buffers ()
     (ibuffer-switch-to-saved-filter-groups "Default"))
   :commands ibuffer
-  :init
+  :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
   (setq ibuffer-expert t
         ibuffer-always-show-last-buffer nil
-        ibuffer-default-sorting-mode 'alphabetic ; options: major-mode
+        ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
         ibuffer-use-header-line t
         ibuffer-display-summary t
-        ibuffer-case-fold-search t ; ignore case when searching
+        ibuffer-case-fold-search t ; Ignore case when searching
         ibuffer-show-empty-filter-groups nil)
 
   (setq ibuffer-formats
@@ -67,8 +67,7 @@
         (ibuffer-do-sort-by-major-mode)))
     :config (add-hook 'ibuffer-hook #'dotemacs-ibuffer-customization))
 
-  :bind (;;("C-x C-b" . ibuffer)
-         ([remap list-buffers] . ibuffer)))
+  :bind ([remap list-buffers] . ibuffer))
 
 (provide 'ibuffer-init)
 
