@@ -62,6 +62,12 @@
     :bind (:map company-active-map
                 ("C-z" . company-try-hard)))
 
+  (use-package company-dict
+    :ensure t
+    :config
+    (setq company-dict-dir (concat dotemacs-temp-directory "dict/"))
+    (add-to-list 'company-backends 'company-dict))
+
   (use-package company-flx
     :ensure t
     :config
