@@ -29,12 +29,19 @@
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (progn
       ;; FIXME: Disabling these packages seems to disable auto-complete
-      (use-package auto-complete-etags
-        :ensure t
-        :config (add-to-list 'ac-sources 'ac-source-etags))
-      (use-package ac-etags
-        :ensure t
-        :config (add-hook 'c-mode-common-hook 'ac-etags-ac-setup)))))
+      (or
+       (use-package ac-etags
+         :ensure t
+         :config
+         (setq ac-etags-requires 4)
+         (ac-etags-setup)
+         (add-hook 'c-mode-common-hook 'ac-etags-ac-setup))
+       (use-package auto-complete-etags
+         :ensure t
+         :disabled t
+         :config
+         (setq ac-etags-use-document t)
+         (add-to-list 'ac-sources 'ac-source-etags))))))
 
 (use-package gtags
   :ensure t

@@ -24,7 +24,7 @@
         ac-use-menu-map t
         ac-show-menu-immediately-on-auto-complete t
         ac-disable-inline nil
-        ac-ignore-case t ; options: 'smart
+        ac-ignore-case t ; Options: 'smart
         ac-use-comphist t
         ac-quick-help-delay 1.0
         ac-use-fuzzy t
@@ -41,8 +41,7 @@
                  ac-source-features
                  ac-source-dictionary
                  ac-source-filename
-                 ac-source-files-in-curren-dir
-                 ac-source-yasnippet))
+                 ac-source-files-in-curren-dir))
 
   (dolist (mode '(log-edit-mode org-mode text-mode haml-mode
                                 git-commit-mode
@@ -88,14 +87,14 @@
 
   :bind (;; Filter candidates by pattern
          :map ac-completing-map
-         ("C-s" . nil)
-         ("C-f" . ac-isearch)
-         :map ac-complete-mode-map
-         ("C-s" . nil)
-         ("C-f" . ac-isearch)
-         :map ac-menu-map
-         ("C-s" . nil)
-         ("C-f" . ac-isearch))
+              ("C-s" . nil)
+              ("C-f" . ac-isearch)
+              :map ac-complete-mode-map
+              ("C-s" . nil)
+              ("C-f" . ac-isearch)
+              :map ac-menu-map
+              ("C-s" . nil)
+              ("C-f" . ac-isearch))
   :diminish auto-complete-mode)
 
 (provide 'auto-complete-init)

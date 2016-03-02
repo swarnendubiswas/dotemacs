@@ -12,7 +12,9 @@
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :config
   (setq yas-triggers-in-field t)
-  (yas-global-mode 1))
+  (yas-global-mode 1)
+  (when (eq dotemacs-completion-in-buffer 'auto-complete)
+    (add-to-list 'ac-sources 'ac-source-yasnippet)))
 
 (provide 'yasnippet-init)
 

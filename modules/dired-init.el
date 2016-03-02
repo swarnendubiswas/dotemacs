@@ -25,7 +25,7 @@
 
   :bind (:map dired-mode-map
               ("M-<home>" . dired-go-home)
-              ("i" . ido-find-file)
+              ("i" . find-file)
               ("M-<up>" . dired-jump-to-top)
               ("M-<down>" . dired-jump-to-bottom))
   :config
@@ -67,7 +67,12 @@
     :init (bind-key "<f2>" #'dired-efap dired-mode-map)
     :config
     ;; Options: t, nil, no-extension
-    (setq dired-efap-initial-filename-selection nil)))
+    (setq dired-efap-initial-filename-selection nil))
+
+  ;; Narrow dired to match filter
+  (use-package dired-narrow
+    :ensure t
+    :init (bind-key "/" #'dired-narrow dired-mode-map)))
 
 (provide 'dired-init)
 
