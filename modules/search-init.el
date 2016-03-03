@@ -22,8 +22,8 @@
   :diminish isearch-mode)
 
 (unbind-key "C-s") ; isearch-forward-regexp
-;; (bind-key "C-f" #'isearch-forward-regexp)
-;; (bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
+(bind-key "C-f" #'isearch-forward-regexp)
+(bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
 
 (use-package replace
   :defer t
@@ -37,9 +37,7 @@
   :config
   (setq swiper-min-highlight 3 ; Be less noisy
         swiper-use-visual-line t)
-  :bind (("C-c s s" . swiper)
-         ("C-f" . swiper)
-         ("C-r" . swiper)))
+  :bind ("C-c s s" . swiper))
 
 (use-package swiper-helm
   :ensure t
