@@ -64,14 +64,14 @@
 
   (use-package dired-efap
     :ensure t
+    :commands dired-efap
     :init (bind-key "<f2>" #'dired-efap dired-mode-map)
-    :config
-    ;; Options: t, nil, no-extension
-    (setq dired-efap-initial-filename-selection nil))
+    :config (setq dired-efap-initial-filename-selection nil))
 
   ;; Narrow dired to match filter
   (use-package dired-narrow
     :ensure t
+    :commands dired-narrow
     :init (bind-key "/" #'dired-narrow dired-mode-map)))
 
 (provide 'dired-init)
