@@ -75,9 +75,6 @@
 
   (use-package org-ref
     :ensure t
-    :pin melpa
-    :load-path "packages/org-ref"
-    :init (org-babel-load-file "org-ref.org")
     :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
 
   (use-package org-bullets

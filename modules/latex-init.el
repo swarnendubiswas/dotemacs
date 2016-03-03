@@ -177,18 +177,17 @@
     ;; We use "C-c b" for comment-box
     :bind
     (:map bib-cite-minor-mode-map
-     ("C-c b" . nil)
-     ("C-c l a" . bib-apropos)
-     ("C-c l b" . bib-make-bibliography)
-     ("C-c l d" . bib-display)
-     ("C-c l e" . bib-etags)
-     ("C-c l f" . bib-find)
-     ("C-c l n" . bib-find-next)
-     ("C-c l h" . bib-highlight-mouse)))
+          ("C-c b" . nil)
+          ("C-c l a" . bib-apropos)
+          ("C-c l b" . bib-make-bibliography)
+          ("C-c l d" . bib-display)
+          ("C-c l e" . bib-etags)
+          ("C-c l f" . bib-find)
+          ("C-c l n" . bib-find-next)
+          ("C-c l h" . bib-highlight-mouse)))
 
   (use-package helm-bibtex
     :ensure t
-    :if (eq dotemacs-selection 'helm)
     :init
     (use-package parsebib
       :ensure t)
@@ -223,7 +222,7 @@ an item line."
     (check-item-entry))
 
   :bind (:map LaTeX-mode-map
-         ("C-c C-d" . nil)))
+              ("C-c C-d" . nil)))
 
 (provide 'latex-init)
 
