@@ -7,7 +7,7 @@
 
 (use-package smooth-scrolling
   :ensure t
-  :disabled t ;; This repositions the cursor while searching
+  :disabled t ;; This repositions the cursor to the middle on scrolling if the search string is at the boundaries.
   :config (smooth-scrolling-mode 1))
 
 (use-package achievements
@@ -39,11 +39,11 @@
   :ensure t
   :bind ("C-c C-d" . duplicate-thing))
 
-(use-package discover-my-major
+(use-package discover-my-major ; Discover key bindings and their meaning for the current Emacs major mode
   :ensure t
   :bind ("C-h C-m" . discover-my-major))
 
-(use-package manage-minor-mode
+(use-package manage-minor-mode ; Manage your minor-mode on the dedicated interface buffer
   :ensure t
   :bind ("C-c d m" . manage-minor-mode))
 
@@ -72,7 +72,11 @@
 
 (use-package pos-tip
   :ensure t
-  :defer t)
+  :defer t
+  :config
+  ;; Keep frame maximized
+  (when (eq system-type 'windows-nt)
+    (pos-tip-w32-max-width-height t))
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
@@ -151,17 +155,9 @@
     :bind (("M-i" . change-inner)
            ("M-o" . change-outer))))
 
-;; FIXME: https://github.com/cheunghy/expand-line/issues/2
-(use-package expand-line
-  :ensure t
-  :disabled t
-  :if (<= emacs-major-version 24)
-  :defines expand-line-mode
-  :config (expand-line-mode 1))
-
+;; Restore point with "C-g" after marking a region.
 (use-package smart-mark
   :ensure t
-  :disabled t
   :config (smart-mark-mode 1))
 
 (use-package undo-tree ; Visualize with C-x u

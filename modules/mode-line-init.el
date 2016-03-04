@@ -25,7 +25,6 @@
                                                                           :foreground "black"
                                                                           :box nil))))
 
-
       ((eq dotemacs-mode-line-theme 'sml) (use-package smart-mode-line
                                             :ensure t
                                             :functions (sml/faces-from-theme sml/theme-p)
@@ -40,7 +39,6 @@
 
       ((eq dotemacs-mode-line-theme 'telephone-line) (use-package telephone-line
                                                        :ensure t
-                                                       :if (bound-and-true-p display-graphic-p)
                                                        :config (telephone-line-mode 1)))
 
       ((eq dotemacs-mode-line-theme 'spaceline) (use-package spaceline
@@ -80,7 +78,7 @@
         (progn
           (nyan-mode 1)
           (nyan-start-animation)
-          (setq-default nyan-wavy-trail t))
+          (setq-default nyan-wavy-trail nil))
       (nyan-mode -1)))
   (add-hook 'after-make-frame-functions 'toggle-nyan-mode)
   (add-hook 'after-init-hook 'toggle-nyan-mode))
