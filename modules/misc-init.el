@@ -76,7 +76,7 @@
   :config
   ;; Keep frame maximized
   (when (eq system-type 'windows-nt)
-    (pos-tip-w32-max-width-height t))
+    (pos-tip-w32-max-width-height t)))
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
