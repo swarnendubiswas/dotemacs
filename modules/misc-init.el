@@ -155,7 +155,7 @@
     :bind (("M-i" . change-inner)
            ("M-o" . change-outer))))
 
-;; Restore point with "C-g" after marking a region.
+;; Restore point with "C-g" after marking a region
 (use-package smart-mark
   :ensure t
   :config (smart-mark-mode 1))
@@ -171,12 +171,6 @@
         undo-tree-visualizer-diff t)
   (global-undo-tree-mode 1)
   :diminish undo-tree-mode)
-
-;; Avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating an inferior python
-;; process and aspell
-(add-hook 'comint-exec-hook
-          (lambda ()
-            (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
 
 (use-package ignoramus
   :ensure t

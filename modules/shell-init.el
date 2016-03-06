@@ -51,6 +51,12 @@
   (use-package term+
     :ensure t))
 
+;; Avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating an inferior python
+;; process and aspell
+(add-hook 'comint-exec-hook
+          (lambda ()
+            (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
+
 (provide 'shell-init)
 
 ;;; shell-init.el ends here
