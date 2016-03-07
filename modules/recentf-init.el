@@ -26,7 +26,7 @@
   ;; Periodically (600 s) save recently opened files, in case emacs crashes
   ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
 
-  (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+  (when (eq dotemacs-selection 'none)
     (bind-key "<f8>" #'recentf-open-files))
 
   (use-package recentf-ext ; Add directories to recent list

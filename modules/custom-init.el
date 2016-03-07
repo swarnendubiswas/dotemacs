@@ -62,6 +62,14 @@ Increase line spacing by two line height."
   (interactive)
   (byte-recompile-directory user-emacs-directory 0))
 
+;; https://github.com/thomasf/dotfiles-thomasf-emacs/blob/e14a7e857a89b7488ba5bdae54877abdc77fa9e6/emacs.d/init.el
+(defun switch-to-minibuffer ()
+  "Switch to minibuffer window."
+  (interactive)
+  (if (active-minibuffer-window)
+      (select-window (active-minibuffer-window))
+    (error "Minibuffer is not active")))
+
 (provide 'custom-init)
 
 ;;; custom-init.el ends here

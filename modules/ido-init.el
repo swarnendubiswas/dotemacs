@@ -7,6 +7,14 @@
 
 (use-package ido
   :ensure t
+  :preface
+  ;; https://www.masteringemacs.org/article/find-files-faster-recent-files-package
+  (defun ido-recentf-open ()
+    "Use `ido-completing-read' to \\[find-file] a recent file"
+    (interactive)
+    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+        (message "Opening file...")
+      (message "Aborting")))
   :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
@@ -97,7 +105,8 @@
    ("<f3>" . ido-find-file)
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f4>" . ido-switch-buffer)
-   ("C-x d" . ido-dired)))
+   ("C-x d" . ido-dired)
+   ("<f8>" . ido-recentf-open)))
 
 (provide 'ido-init)
 

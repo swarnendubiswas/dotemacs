@@ -35,22 +35,20 @@
 
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
-  ;; Group ibuffer list by tramp connection
-  (use-package ibuffer-tramp
+  (use-package ibuffer-tramp ; Group ibuffer list by tramp connection
     :ensure t
     :disabled t
     :config
-    (add-hook 'ibuffer-mode-hook
+    (add-hook 'ibuffer-hook
               (lambda ()
                 (ibuffer-tramp-set-filter-groups-by-tramp-connection)
                 (ibuffer-do-sort-by-alphabetic))))
 
-  ;; Use ibuffer-vc to sort buffers by VC status
-  (use-package ibuffer-vc
+  (use-package ibuffer-vc ; Sort buffers by VC status
     :ensure t
     :disabled t
     :config
-    (add-hook 'ibuffer-mode-hook
+    (add-hook 'ibuffer-hook
               (lambda ()
                 (ibuffer-vc-set-filter-groups-by-vc-root)
                 (unless (eq ibuffer-sorting-mode 'alphabetic)

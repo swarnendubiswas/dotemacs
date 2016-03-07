@@ -36,7 +36,7 @@
 (mapc (lambda (x)
         (add-to-list 'completion-ignored-extensions x))
       '(".aux" ".bbl" ".blg" ".exe" ".log" ".meta" ".out" ".pdf" ".synctex.gz" ".tdo"
-        ".toc" "-pkg.el" "-autoloads.el" "auto/"))
+        ".toc" "-pkg.el" "-autoloads.el" "auto/" ".idx" ".lot" ".lof" ".elc" ".pyc"))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
                                     ; fundamental-mode
