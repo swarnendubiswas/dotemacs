@@ -18,7 +18,7 @@
   :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
-        ido-max-prospects 10
+        ido-max-prospects 20
         ido-case-fold t ; Searching of buffer and file names should ignore case
         ido-use-filename-at-point nil ; Other options: 'ffap-guesser, 'guess
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
@@ -34,7 +34,7 @@
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
                              ;; "*Messages*"
                              "Async Shell Command" "*Paradox Report*")
-        ido-confirm-unique-completion t
+        ido-confirm-unique-completion nil
         ido-enable-tramp-completion t
         ido-ignore-extensions t
         ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
@@ -54,7 +54,7 @@
   (use-package ido-hacks
     :ensure t
     :functions ido-hacks-mode
-    :config (ido-hacks-mode))
+    :config (ido-hacks-mode 1))
 
   (use-package ido-ubiquitous ; Allow ido-style completion in more places
     :ensure t
