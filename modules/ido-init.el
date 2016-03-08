@@ -8,6 +8,7 @@
 (use-package ido
   :ensure t
   :preface
+  ;; https://www.emacswiki.org/emacs/RecentFiles#toc5
   ;; https://www.masteringemacs.org/article/find-files-faster-recent-files-package
   (defun ido-recentf-open ()
     "Use `ido-completing-read' to \\[find-file] a recent file"

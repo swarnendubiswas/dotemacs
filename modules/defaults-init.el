@@ -114,12 +114,14 @@
         tramp-default-user "biswass"
         tramp-default-host "stdlinux.cse.ohio-state.edu"
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
-        tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
+        tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
+        tramp-verbose 1)
   ;; Disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
   ;; Disable version control. If you access remote files which are not under version control, a lot of check operations
   ;; can be avoided by disabling VC.
+  ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
   (setq vc-ignore-dir-regexp
         (format "\\(%s\\)\\|\\(%s\\)"
                 vc-ignore-dir-regexp
