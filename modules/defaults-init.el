@@ -17,9 +17,6 @@
       visible-bell nil
       x-underline-at-descent-line t ; Draw underline lower
       completion-ignore-case t ; Ignore case when completing
-      ;; Ignore case when reading a file name completion
-      read-file-name-completion-ignore-case t
-      read-buffer-completion-ignore-case t
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
       ;; Do not use dialog boxes
       use-dialog-box nil
@@ -31,12 +28,13 @@
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t)
 
+;; Ignore case when reading a file name completion
+(setq read-file-name-completion-ignore-case t
+      read-buffer-completion-ignore-case t)
 ;; Avoid completing temporary files
 ;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
-(mapc (lambda (x)
-        (add-to-list 'completion-ignored-extensions x))
-      '(".aux" ".bbl" ".blg" ".exe" ".log" ".meta" ".out" ".pdf" ".synctex.gz" ".tdo"
-        ".toc" "-pkg.el" "-autoloads.el" "auto/" ".idx" ".lot" ".lof" ".elc" ".pyc"))
+(dolist (ext '(".aux" ".bbl" ".blg" ".exe" ".log" ".out" ".toc" "-pkg.el" "-autoloads.el" "auto/" ".idx" ".lot" ".lof" ".elc" ".pyc" ".fls"))
+  (add-to-list 'completion-ignored-extensions ext))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
                                     ; fundamental-mode
@@ -264,14 +262,11 @@
 
 ;; Set Emacs split to horizontal or vertical
 ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
-;; Use  (setq split-width-threshold nil) for vertical split.
-;; Use  (setq split-width-threshold 1) for horizontal split.
-
 (if (eq dotemacs-window-split 'horizontal)
-    (setq split-height-threshold 0
-          split-width-threshold nil)
-  (setq split-height-threshold nil
-        split-width-threshold 0))
+    (setq split-height-threshold nil
+          split-width-threshold 0)
+  (setq split-height-threshold 0
+        split-width-threshold nil))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)

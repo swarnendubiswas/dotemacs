@@ -109,6 +109,7 @@
   (push '(help-mode :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
+  (push '("*Kill Ring*") popwin:special-display-config) ; Browse Kill Ring
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
@@ -187,6 +188,14 @@
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
   :ensure t)
+
+(use-package browse-kill-ring
+  :ensure t
+  :if (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
+  :config
+  (use-package browse-kill-ring+
+    :ensure t)
+  :bind ("M-y" . browse-kill-ring))
 
 (provide 'misc-init)
 

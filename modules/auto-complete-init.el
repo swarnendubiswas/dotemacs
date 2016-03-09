@@ -9,7 +9,6 @@
   :ensure t
   :config
   (ac-config-default)
-  (global-auto-complete-mode 1)
 
   (ac-linum-workaround)
   (ac-flyspell-workaround)
@@ -35,11 +34,8 @@
 
   (add-to-list 'ac-sources
                '(ac-source-words-in-buffer
-                 ac-source-words-in-same-mode-buffers
                  ac-source-words-in-all-buffers
-                 ac-source-abbrev
                  ac-source-features
-                 ac-source-dictionary
                  ac-source-filename
                  ac-source-files-in-curren-dir))
 
@@ -69,8 +65,9 @@
     :bind (:map ac-complete-mode-map
                 ("C-:" . ac-complete-with-helm)))
 
-  (use-package ac-ispell
+  (use-package ac-ispell ; Ispell/aspell completion source for auto-complete
     :ensure t
+    :disabled t ; Seems to add noise
     :config
     (setq ac-ispell-requires 4 ; Minimum input for starting completion
           ac-ispell-fuzzy-limit 2)
@@ -87,11 +84,17 @@
 
   :bind (;; Filter candidates by pattern
          :map ac-completing-map
+              ("C-n" . ac-next)
+              ("C-p" . ac-previous)
               ("C-s" . nil)
               ("C-f" . ac-isearch)
+              ("C-g" . ac-stop)
               :map ac-complete-mode-map
+              ("C-n" . ac-next)
+              ("C-p" . ac-previous)
               ("C-s" . nil)
               ("C-f" . ac-isearch)
+              ("C-g" . ac-stop)
               :map ac-menu-map
               ("C-s" . nil)
               ("C-f" . ac-isearch))
