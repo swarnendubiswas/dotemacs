@@ -99,6 +99,13 @@ differences due to whitespaces."
   :type 'boolean
   :group 'dotemacs)
 
+(defcustom dotemacs-use-ignoramus-p
+  t
+  "Should the ignoramus package be used?
+The package controls ignoring boring file expressions."
+  :type 'boolean
+  :group 'dotemacs)
+
 (provide 'config-init)
 
 ;;; config-init.el ends here

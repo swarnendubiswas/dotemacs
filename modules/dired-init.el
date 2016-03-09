@@ -43,12 +43,14 @@
     (setq dired-bind-jump t
           ;; Do not show messages when omitting files
           dired-omit-verbose nil)
-    (add-hook 'dired-mode-hook #'dired-omit-mode)
 
-    ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-    (defadvice dired-omit-startup (after diminish-dired-omit activate)
-      "Make sure to remove \"Omit\" from the modeline."
-      (diminish 'dired-omit-mode) dired-mode-map)
+    (unless (bound-and-true-p dotemacs-use-ignoramus-p)
+      (add-hook 'dired-mode-hook #'dired-omit-mode)
+
+      ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+      (defadvice dired-omit-startup (after diminish-dired-omit activate)
+        "Make sure to remove \"Omit\" from the modeline."
+        (diminish 'dired-omit-mode) dired-mode-map))
 
     :bind
     ;; Open dired with the cursor right on the file you're editing

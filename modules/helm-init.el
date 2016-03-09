@@ -87,14 +87,16 @@
           helm-ff-guess-ffap-filenames nil
           helm-file-cache-fuzzy-match t
           helm-recentf-fuzzy-match t
-          helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                               '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$"
-                                                 "\\.la$" "\\.o$" "\\#$" "\\~$"))
           helm-for-files-preferred-list '(helm-source-buffers-list
                                           helm-source-file-cache
                                           helm-source-files-in-current-dir
                                           helm-source-recentf
                                           helm-source-locate))
+
+    (unless (bound-and-true-p dotemacs-use-ignoramus-p)
+      (setq helm-boring-file-regexp-list (append helm-boring-file-regexp-list
+                                                 '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$"
+                                                   "\\.la$" "\\.o$" "\\#$" "\\~$"))))
 
     :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.

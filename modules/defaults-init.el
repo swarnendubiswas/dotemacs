@@ -31,10 +31,11 @@
 ;; Ignore case when reading a file name completion
 (setq read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t)
-;; Avoid completing temporary files
-;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
-(dolist (ext '(".aux" ".bbl" ".blg" ".exe" ".log" ".out" ".toc" "-pkg.el" "-autoloads.el" "auto/" ".idx" ".lot" ".lof" ".elc" ".pyc" ".fls"))
-  (add-to-list 'completion-ignored-extensions ext))
+(unless (bound-and-true-p dotemacs-use-ignoramus-p)
+  ;; Avoid completing temporary files
+  ;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
+  (dolist (ext '(".aux" ".bbl" ".blg" ".exe" ".log" ".out" ".toc" "-pkg.el" "-autoloads.el" "auto/" ".idx" ".lot" ".lof" ".elc" ".pyc" ".fls"))
+    (add-to-list 'completion-ignored-extensions ext)))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
                                     ; fundamental-mode

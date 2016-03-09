@@ -142,7 +142,7 @@
   :ensure t
   :bind ("M-s e" . sudo-edit))
 
-(use-package ssh-file-modes
+(use-package ssh-file-modes ; Edit ssh .config files
   :ensure t
   :defer t)
 
@@ -173,12 +173,19 @@
   (global-undo-tree-mode 1)
   :diminish undo-tree-mode)
 
-(use-package ignoramus
+(use-package ignoramus ; Ignore backups, build files, et al. in Emacs
   :ensure t
-  :config (ignoramus-setup))
+  :if (bound-and-true-p dotemacs-use-ignoramus-p)
+  :config
+  (dolist (ext '(".log" ".out" ".toc" "-pkg.el" ".idx" ".fls"))
+    (add-to-list 'ignoramus-file-basename-endings ext))
+  (dolist (dir '("auto"))
+    (add-to-list 'ignoramus-file-basename-exact-names dir))
+  (ignoramus-setup))
 
 (use-package pdf-tools
   :ensure t
+  :defer t
   :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
   :config
   (setq-default pdf-view-display-size 'fit-page) ; fit page by default
@@ -193,6 +200,10 @@
   :ensure t
   :if (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
   :config
+  (setq browse-kill-ring-highlight-current-entry t
+        browse-kill-ring-highlight-inserted-item t
+        browse-kill-ring-show-preview t
+        browse-kill-ring-display-duplicates t)
   (use-package browse-kill-ring+
     :ensure t)
   :bind ("M-y" . browse-kill-ring))
