@@ -185,7 +185,7 @@
 
 (use-package pdf-tools
   :ensure t
-  :defer t
+  :mode ("\\.pdf$" . pdf-view-mode)
   :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
   :config
   (setq-default pdf-view-display-size 'fit-page) ; fit page by default

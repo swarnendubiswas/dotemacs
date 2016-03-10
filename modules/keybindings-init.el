@@ -56,8 +56,10 @@
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
   :config
-  (setq which-key-idle-delay 1.0)
   (which-key-mode 1)
+  (setq which-key-idle-delay 1.0
+        which-key-popup-type 'side-window
+        which-key-side-window-location 'right)
   :diminish which-key-mode)
 
 (use-package help-fns+ ; Improved help commands
