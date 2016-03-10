@@ -142,10 +142,6 @@
   :ensure t
   :bind ("M-s e" . sudo-edit))
 
-(use-package ssh-file-modes ; Edit ssh .config files
-  :ensure t
-  :defer t)
-
 (use-package expand-region ; Expand region by semantic units
   :ensure t
   :bind ("C-=" . er/expand-region)
