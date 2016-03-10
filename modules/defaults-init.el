@@ -14,7 +14,9 @@
       create-lockfiles nil
       message-log-max 5000
       line-number-display-limit 2000000
-      visible-bell nil
+      ;; Turn off alarms completely
+      ;; https://www.emacswiki.org/emacs/AlarmBell
+      ring-bell-function 'ignore
       x-underline-at-descent-line t ; Draw underline lower
       completion-ignore-case t ; Ignore case when completing
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
