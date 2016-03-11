@@ -139,7 +139,7 @@
   (golden-ratio-mode 1))
 
 (use-package sudo-edit ; Edit file with sudo
-  :ensure (bound-and-true-p dotemacs-use-marmalade-repo-p)
+  :ensure t
   :bind ("M-s e" . sudo-edit))
 
 (use-package expand-region ; Expand region by semantic units
