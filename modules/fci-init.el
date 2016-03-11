@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package fill-column-indicator
-  :if (bound-and-true-p dotemacs-fci-p)
+  :if (bound-and-true-p dotemacs-use-fci-p)
   :preface
   (defun dotemacs-auto-fci-mode (&optional unused)
     (if (> frame-width dotemacs-fill-column)

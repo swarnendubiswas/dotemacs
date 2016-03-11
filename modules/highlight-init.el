@@ -55,7 +55,7 @@
 ;; highlight certain words
 
 (or (use-package fixme-mode
-      :ensure t
+      :ensure (bound-and-true-p dotemacs-use-marmalade-repo-p)
       :init (fixme-mode 1))
 
     (use-package fic-mode

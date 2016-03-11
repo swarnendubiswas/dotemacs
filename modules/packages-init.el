@@ -15,10 +15,12 @@
   (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
 
 ;; Marmalade repo often does not work reliably
-;; (add-to-list 'package-archives
-;;              '("marmalade" . "https://marmalade-repo.org/packages/") t)
-;; (add-to-list 'package-archives
-;;              '("marmalade" . "http://marmalade.ferrier.me.uk/") t)
+(when (bound-and-true-p dotemacs-use-marmalade-repo-p)
+  (add-to-list 'package-archives
+               '("marmalade" . "https://marmalade-repo.org/packages/") t)
+  ;; (add-to-list 'package-archives
+  ;;              '("marmalade" . "http://marmalade.ferrier.me.uk/") t)
+  )
 
 (add-to-list 'package-archives
              '("org" . "http://orgmode.org/elpa/") t)

@@ -84,13 +84,13 @@ This depends on the orientation of the display."
 (defconst dotemacs-fill-column 120
   "Column beyond which lines should not extend.")
 
-(defcustom dotemacs-fci-p
+(defcustom dotemacs-use-fci-p
   nil
   "Control display of fci."
   :type 'boolean
   :group 'dotemacs)
 
-(defcustom dotemacs-enable-whitespace-module-p
+(defcustom dotemacs-use-whitespace-p
   nil
   "Control whitespace module.
 Control whether the whitespace module should be enabled or
@@ -103,6 +103,13 @@ differences due to whitespaces."
   t
   "Should the ignoramus package be used?
 The package controls ignoring boring file expressions."
+  :type 'boolean
+  :group 'dotemacs)
+
+(defcustom dotemacs-use-marmalade-repo-p
+  nil
+  "Should the marmalade repo be used?
+The repo often does not work and Emacs fails to connect to it."
   :type 'boolean
   :group 'dotemacs)
 

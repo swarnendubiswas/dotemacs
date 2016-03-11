@@ -37,7 +37,7 @@
           company-dabbrev-code-everywhere t))
 
   ;; https://github.com/company-mode/company-mode/issues/180
-  (when (bound-and-true-p dotemacs-fci-p)
+  (when (bound-and-true-p dotemacs-use-fci-p)
     (defvar-local company-fci-mode-on-p nil)
 
     (defun company-turn-off-fci (&rest ignore)

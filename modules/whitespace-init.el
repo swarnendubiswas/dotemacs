@@ -6,7 +6,7 @@
 ;;; Code:
 
 (use-package whitespace
-  :if (bound-and-true-p dotemacs-enable-whitespace-module-p)
+  :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode)
   :config
   (setq-default show-trailing-whitespace nil
