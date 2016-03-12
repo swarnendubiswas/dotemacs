@@ -53,31 +53,13 @@
        ("M->" . ahs-forward))))
 
 ;; highlight certain words
+(use-package fic-mode
+  :ensure t
+  :diminish fic-mode
+  :init
+  (add-hook 'text-mode-hook #'fic-mode)
+  (add-hook 'prog-mode-hook #'fic-mode))
 
-(or (use-package fixme-mode
-      :ensure t
-      :init (fixme-mode 1))
-
-    (use-package fic-mode
-      :ensure t
-      :disabled t
-      :diminish fic-mode
-      :init
-      (add-hook 'text-mode-hook #'fic-mode)
-      (add-hook 'prog-mode-hook #'fic-mode))
-
-    (use-package fic-ext-mode
-      :ensure t
-      :disabled t
-      :diminish fic-ext-mode
-      :preface
-      (defun add-something-to-mode-hooks (mode-list something)
-        "helper function to add a callback to multiple hooks"
-        (dolist (mode mode-list)
-          (add-hook (intern (concat (symbol-name mode) "-mode-hook")) something)))
-      :init
-      ;;(add-something-to-mode-hooks '(prog text) #'fic-ext-mode)
-      (fic-ext-mode 1)))
 
 (provide 'highlight-init)
 

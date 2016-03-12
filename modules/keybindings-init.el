@@ -59,7 +59,9 @@
   (which-key-mode 1)
   (setq which-key-idle-delay 1.0
         which-key-popup-type 'side-window
-        which-key-side-window-location 'right)
+        which-key-side-window-location 'right
+        which-key-use-C-h-for-paging t
+        which-key-prevent-C-h-from-cycling t)
   :diminish which-key-mode)
 
 (use-package help-fns+ ; Improved help commands
