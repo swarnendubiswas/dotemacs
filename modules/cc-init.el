@@ -59,13 +59,6 @@
               (lambda()
                 (hide-ifdef-mode 1))))
 
-  (use-package google-c-style
-    :ensure t
-    :defer 2
-    :config
-    (add-hook 'c-mode-common-hook #'google-set-c-style)
-    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
-
   (use-package ctypes
     :ensure t
     :config
@@ -129,15 +122,21 @@
   (use-package dep
     :config (semantic-add-system-include "/usr/include"))
 
-  ;; https://github.com/flycheck/flycheck-google-cpplint
-  ;; Add Google C++ Style checker. By default, syntax checked by Clang and Cppcheck (Windows?). Also, need to setup cpplint.py.
+  (use-package google-c-style ; Google's C/C++ style for c-mode
+    :ensure t
+    :config
+    (add-hook 'c-mode-common-hook #'google-set-c-style)
+    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
+
+  ;; Google C++ Style checker for Flycheck
+  ;; Also, need to setup cpplint.py.
   (with-eval-after-load "flycheck"
     (use-package flycheck-google-cpplint
       :ensure t
       :if (eq system-type 'gnu/linux)
       :config
       (flycheck-add-next-checker 'c/c++-clang
-                                 '(t . c/c++-googlelint) t)
+                                 '(warning . c/c++-googlelint))
       (setq flycheck-googlelint-linelength 'dotemacs-fill-column
             flycheck-googlelint-filter "-whitespace/line_length"))))
 

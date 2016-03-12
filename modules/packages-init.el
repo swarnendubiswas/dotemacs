@@ -17,10 +17,7 @@
 ;; Marmalade repo often does not work reliably
 (when (bound-and-true-p dotemacs-use-marmalade-repo-p)
   (add-to-list 'package-archives
-               '("marmalade" . "https://marmalade-repo.org/packages/") t)
-  ;; (add-to-list 'package-archives
-  ;;              '("marmalade" . "http://marmalade.ferrier.me.uk/") t)
-  )
+               '("marmalade" . "https://marmalade-repo.org/packages/") t))
 
 (add-to-list 'package-archives
              '("org" . "http://orgmode.org/elpa/") t)
