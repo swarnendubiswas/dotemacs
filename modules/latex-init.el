@@ -174,14 +174,13 @@
               (lambda ()
                 (bib-cite-minor-mode 1)))
     (setq bib-cite-use-reftex-view-crossref t)
-    ;; We use "C-c b" for comment-box
     :bind
     (:map bib-cite-minor-mode-map
-          ("C-c b" . nil)
+          ("C-c b" . nil) ; We use "C-c b" for comment-box
           ("C-c l a" . bib-apropos)
           ("C-c l b" . bib-make-bibliography)
           ("C-c l d" . bib-display)
-          ("C-c l e" . bib-etags)
+          ("C-c l t" . bib-etags)
           ("C-c l f" . bib-find)
           ("C-c l n" . bib-find-next)
           ("C-c l h" . bib-highlight-mouse)))
@@ -192,7 +191,19 @@
     (use-package parsebib
       :ensure t)
     :bind ("C-c l x" . helm-bibtex)
-    :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-reformatted.bib")))
+    :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")))
+
+  ;; http://joostkremers.github.io/ebib/ebib-manual.html#the-ebib-buffers
+  (use-package ebib
+    :ensure t
+    :bind ("C-c l e" . ebib)
+    :config
+    (setq ebib-bibtex-dialect 'BibTeX
+          ebib-uniquify-keys t
+          ebib-index-display-fields '("title")
+          ebib-file-associations '(("pdf" . "evince") ("ps" . "evince"))
+          ebib-bib-search-dirs '("/home/biswass/workspace/bib")
+          ebib-preload-bib-files '("/home/biswass/workspace/bib/plass-formatted.bib")))
 
   (use-package reftex
     :diminish reftex-mode

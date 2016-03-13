@@ -159,7 +159,6 @@
 
 (use-package undo-tree ; Visualize with C-x u
   :ensure t
-  :disabled t
   :config
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t
@@ -173,20 +172,11 @@
   :ensure t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
   :config
-  (dolist (ext '(".log" ".out" ".toc" "-pkg.el" ".idx" ".fls"))
+  (dolist (ext '(".log" ".out" ".toc" "-pkg.el" ".idx" ".fls" ".rel"))
     (add-to-list 'ignoramus-file-basename-endings ext))
   (dolist (dir '("auto"))
     (add-to-list 'ignoramus-file-basename-exact-names dir))
   (ignoramus-setup))
-
-(use-package pdf-tools
-  :ensure t
-  :mode ("\\.pdf$" . pdf-view-mode)
-  :if (unless (string-equal system-name "rain.cse.ohio-state.edu"))
-  :config
-  (setq-default pdf-view-display-size 'fit-page) ; fit page by default
-  (setq pdf-view-resize-factor 1.10)
-  (pdf-tools-install))
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
