@@ -64,10 +64,6 @@
         which-key-prevent-C-h-from-cycling t)
   :diminish which-key-mode)
 
-(use-package help-fns+ ; Improved help commands
-  :ensure t
-  :commands (describe-buffer describe-command describe-file describe-keymap))
-
 (provide 'keybindings-init)
 
 ;;; keybindings-init.el ends here

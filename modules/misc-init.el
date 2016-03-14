@@ -5,6 +5,13 @@
 
 ;;; Code:
 
+(use-package help+
+  :ensure t)
+
+(use-package help-fns+ ; Improved help commands
+  :ensure t
+  :commands (describe-buffer describe-command describe-file describe-keymap))
+
 (use-package smooth-scrolling
   :ensure t
   :disabled t ;; This repositions the cursor to the middle on scrolling if the search string is at the boundaries.
@@ -72,11 +79,7 @@
 
 (use-package pos-tip
   :ensure t
-  :defer t
-  :config
-  ;; Keep frame maximized
-  (when (eq system-type 'windows-nt)
-    (pos-tip-w32-max-width-height t)))
+  :defer t)
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
