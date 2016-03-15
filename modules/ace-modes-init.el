@@ -63,6 +63,7 @@
 
 (use-package ace-window
   :ensure t
+  :bind ("C-c w" . ace-window)
   :config
   (setq aw-background nil)
   (ace-window-display-mode 1))
