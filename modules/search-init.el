@@ -8,22 +8,29 @@
 (setq case-fold-search t) ; Make search ignore case
 
 (use-package isearch
-  :defer t
-  :config
+  :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
+  :preface
+  ;; https://www.reddit.com/r/emacs/comments/3yxk2x/flexible_isearch_without_a_package/
+  (defun dotemacs--isearch-fuzzy ()
+    (interactive)
+    (let ((search-whitespace-regexp ".*?"))
+      (call-interactively 'isearch-forward)))
+  :init
+  (unbind-key "C-s") ; isearch-forward-regexp
   (setq search-highlight t ; highlight incremental search
         isearch-allow-scroll t)
   (use-package isearch+
     :ensure t)
   (use-package isearch-dabbrev
     :ensure t
-    :config (bind-key "<tab>" 'isearch-dabbrev-expand isearch-mode-map))
+    :bind (:map isearch-mode-map
+                ("<tab>" . isearch-dabbrev-expand)))
   (use-package isearch-symbol-at-point
     :ensure t)
-  :diminish isearch-mode)
-
-(unbind-key "C-s") ; isearch-forward-regexp
-(bind-key "C-f" #'isearch-forward-regexp)
-(bind-key "C-f" #'isearch-repeat-forward isearch-mode-map)
+  :diminish isearch-mode
+  :bind (("C-f" . isearch-forward-regexp)
+         :map isearch-mode-map
+         ("C-f" . isearch-repeat-forward)))
 
 (use-package replace
   :defer t
