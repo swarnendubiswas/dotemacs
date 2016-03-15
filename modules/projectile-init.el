@@ -8,11 +8,11 @@
 (use-package projectile
   :ensure t
   :functions (projectile-find-file projectile-switch-project)
-  :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld"))
+  :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld")
+              projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
   :config
   (projectile-global-mode 1)
   (setq projectile-enable-caching t
-        projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-verbose nil
         projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
@@ -39,6 +39,9 @@
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))
 
+  :bind (("<f5>" . helm-projectile-find-file)
+         ("<f6>" . helm-projectile-switch-to-buffer)
+         ("<f7>" . helm-projectile-grep))
   :diminish projectile-mode)
 
 (provide 'projectile-init)
