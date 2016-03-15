@@ -7,11 +7,10 @@
 
 (use-package projectile
   :ensure t
-  :disabled t
   :functions (projectile-find-file projectile-switch-project)
+  :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld"))
   :config
   (projectile-global-mode 1)
-
   (setq projectile-enable-caching t
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
         projectile-verbose nil
@@ -21,14 +20,13 @@
         projectile-mode-line '(:propertize
                                (:eval (concat " " (projectile-project-name)))
                                face font-lock-constant-face)
-        projectile-file-exists-remote-cache-expire nil
-        projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld"))
+        projectile-file-exists-remote-cache-expire nil)
 
   (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
         ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
         ((eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy)))
 
-  (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa"))
+  (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa" "auto"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
@@ -36,7 +34,7 @@
 
   (use-package helm-projectile
     :ensure t
-    :init
+    :config
     (setq helm-projectile-fuzzy-match t
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))

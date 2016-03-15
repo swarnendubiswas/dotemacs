@@ -170,9 +170,7 @@
   (use-package bib-cite
     :diminish bib-cite-minor-mode
     :config
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                (bib-cite-minor-mode 1)))
+    (bib-cite-minor-mode 1)
     (setq bib-cite-use-reftex-view-crossref t)
     :bind
     (:map bib-cite-minor-mode-map
