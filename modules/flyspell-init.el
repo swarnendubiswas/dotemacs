@@ -1,7 +1,7 @@
 ;;; flyspell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup spell check. Assume aspell is available.
+;; Setup spell check.  Assume aspell is available.
 
 ;;; Code:
 
@@ -39,13 +39,12 @@
   :config
   (use-package helm-flyspell
     :ensure t
-    :if (eq dotemacs-selection 'helm)
     :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))
 
   (use-package flyspell-popup
     :ensure t
-    :bind (:map flyspell-mode-map
-                ("C-;" . flyspell-popup-correct)))
+    :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
+
   :diminish flyspell-mode
   :bind
   (("C-c f f" . flyspell-mode)
