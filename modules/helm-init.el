@@ -177,6 +177,12 @@
    ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
    ("C-z" . helm-select-action)))
 
+(use-package helm-ispell ; Provides ispell completion with helm interface.
+  :ensure t
+  :disabled t
+  :if (eq dotemacs-selection 'helm)
+  :commands helm-ispell)
+
 (provide 'helm-init)
 
 ;;; helm-init.el ends here

@@ -8,6 +8,7 @@
 (use-package projectile
   :ensure t
   :functions (projectile-find-file projectile-switch-project)
+  :commands (projectile-switch-project)
   :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld")
               projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
   :config
@@ -32,6 +33,8 @@
   (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
+  ;; https://github.com/bbatsov/helm-projectile
+  ;; helm grep is different from projectile-grep because the helm grep is incremental
   (use-package helm-projectile
     :ensure t
     :config

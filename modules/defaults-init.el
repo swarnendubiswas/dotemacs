@@ -201,19 +201,6 @@
     (setq-default save-place t))
   (setq save-place-file (concat dotemacs-temp-directory "places")))
 
-(use-package icomplete ; Incremental minibuffer completion/suggestions
-  :disabled t
-  :config
-  (icomplete-mode 1)
-  (use-package icomplete+
-    :ensure t)
-  (setq icomplete-prospects-height 2
-        icomplete-compute-delay 0))
-
-(use-package icicles
-  :disabled t
-  :config (icy-mode 1))
-
 (use-package savehist ; Save minibuffer histories across sessions
   :config
   (savehist-mode 1)

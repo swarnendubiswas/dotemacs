@@ -11,7 +11,8 @@
   (ac-config-default)
 
   (ac-linum-workaround)
-  (ac-flyspell-workaround)
+  (with-eval-after-load "flyspell"
+    (ac-flyspell-workaround))
 
   ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-auto-complete.el
   (setq-default ac-expand-on-auto-complete t
