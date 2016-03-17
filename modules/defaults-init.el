@@ -116,6 +116,7 @@
         tramp-default-host "stdlinux.cse.ohio-state.edu"
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
+        tramp-ssh-controlmaster-options ""
         tramp-verbose 1)
   ;; Disable backup
   (add-to-list 'backup-directory-alist
@@ -267,6 +268,10 @@
 (use-package warnings
   :config (add-to-list 'warning-suppress-types '(undo discard-info)))
 
+;; M-x edit-abbrev
+;; C-x a i g inverse-add-global-abbrev
+;; C-x a i l inverse-add-mode-abbrev
+;; M-x write-abbrev-file
 (use-package abbrev
   :diminish abbrev-mode
   :init

@@ -25,7 +25,7 @@
   (make-directory dotemacs-temp-directory))
 
 (defcustom dotemacs-completion-in-buffer
-  'auto-complete
+  'company
   "Choose company or auto-complete for in-buffer completion."
   :type '(radio
           (const :tag "company" company)

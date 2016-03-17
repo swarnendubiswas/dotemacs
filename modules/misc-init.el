@@ -198,6 +198,12 @@
     :ensure t)
   :bind ("M-y" . browse-kill-ring))
 
+(use-package session
+  :ensure t
+  :init
+  (add-hook 'after-init-hook #'session-initialize)
+  (setq session-save-file (concat dotemacs-temp-directory ".session")))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

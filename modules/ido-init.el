@@ -98,8 +98,9 @@
                                              :config
                                              ;; t: left-right then top-bottom or
                                              ;; nil: top-bottom then left-right
-                                             (setq ido-grid-mode-order t
-                                                   ido-grid-mode-min-rows 10)
+                                             (setq ido-grid-mode-order nil
+                                                   ido-grid-mode-min-rows 15
+                                                   ido-grid-mode-max-rows 20)
                                              (ido-grid-mode 1))))
 
   :bind
