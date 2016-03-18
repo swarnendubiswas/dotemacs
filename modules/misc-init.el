@@ -184,7 +184,8 @@
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
-  :ensure t)
+  :ensure t
+  :init (bind-key* "C-." #'iedit-mode))
 
 (use-package browse-kill-ring
   :ensure t

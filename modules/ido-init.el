@@ -10,7 +10,7 @@
   :preface
   ;; https://www.emacswiki.org/emacs/RecentFiles#toc5
   ;; https://www.masteringemacs.org/article/find-files-faster-recent-files-package
-  (defun ido-recentf-open ()
+  (defun dotemacs--ido-recentf-open ()
     "Use `ido-completing-read' to \\[find-file] a recent file"
     (interactive)
     (if (find-file (ido-completing-read "Find recent file: " recentf-list))
@@ -22,6 +22,7 @@
         ido-max-prospects 20
         ido-case-fold t ; Searching of buffer and file names should ignore case
         ido-use-filename-at-point nil ; Other options: 'ffap-guesser, 'guess
+        ido-use-url-at-point nil
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
         ido-create-new-buffer 'always ; Other options: prompt, never
         ido-default-file-method 'selected-window
@@ -37,7 +38,7 @@
                              "Async Shell Command" "*Paradox Report*")
         ido-confirm-unique-completion nil
         ido-enable-tramp-completion t
-        ido-ignore-extensions t
+        ido-ignore-extensions t ; Make ido use completion-ignored-extensions
         ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
                                  ido-ignore-files))
 
@@ -99,7 +100,7 @@
                                              ;; t: left-right then top-bottom or
                                              ;; nil: top-bottom then left-right
                                              (setq ido-grid-mode-order nil
-                                                   ido-grid-mode-min-rows 15
+                                                   ido-grid-mode-min-rows 10
                                                    ido-grid-mode-max-rows 20)
                                              (ido-grid-mode 1))))
 
@@ -109,7 +110,7 @@
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f4>" . ido-switch-buffer)
    ("C-x d" . ido-dired)
-   ("<f8>" . ido-recentf-open)))
+   ("<f8>" . dotemacs--ido-recentf-open)))
 
 (provide 'ido-init)
 
