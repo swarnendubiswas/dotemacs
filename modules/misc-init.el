@@ -172,20 +172,40 @@
   (global-undo-tree-mode 1)
   :diminish undo-tree-mode)
 
-(use-package ignoramus ; Ignore backups, build files, et al. in Emacs
+(use-package ignoramus ; Ignore backups, build files, et al.
   :ensure t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
   :config
   (dolist (ext '(".log" ".out" ".toc" "-pkg.el" ".idx" ".fls" ".rel"))
     (add-to-list 'ignoramus-file-basename-endings ext))
-  (dolist (dir '("auto"))
+  (dolist (filenames '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS"))
+    (add-to-list 'ignoramus-file-basename-exact-names filenames))
+  (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
+  (dolist (dir '("auto" "\\`\\."))
     (add-to-list 'ignoramus-file-basename-exact-names dir))
   (ignoramus-setup))
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
   :ensure t
-  :init (bind-key* "C-." #'iedit-mode))
+  :preface
+  ;; https://www.masteringemacs.org/article/iedit-interactive-multi-occurrence-editing-in-your-buffer
+  (defun iedit-dwim (arg)
+    "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
+    (interactive "P")
+    (if arg
+        (iedit-mode)
+      (save-excursion
+        (save-restriction
+          (widen)
+          ;; this function determines the scope of `iedit-start'.
+          (if iedit-mode
+              (iedit-done)
+            ;; `current-word' can of course be replaced by other
+            ;; functions.
+            (narrow-to-defun)
+            (iedit-start (current-word) (point-min) (point-max)))))))
+  :init (bind-key* "C-." #'iedit-dwim))
 
 (use-package browse-kill-ring
   :ensure t
@@ -195,6 +215,7 @@
         browse-kill-ring-highlight-inserted-item t
         browse-kill-ring-show-preview t
         browse-kill-ring-display-duplicates t)
+  (browse-kill-ring-default-keybindings)
   (use-package browse-kill-ring+
     :ensure t)
   :bind ("M-y" . browse-kill-ring))

@@ -13,10 +13,9 @@
   ;; Start server if not root user
   (unless (string-equal "root" (getenv "USER"))
     ;; http://stackoverflow.com/questions/9999320/how-to-check-if-a-function-e-g-server-running-p-is-available-under-emacs
-    (if (and (fboundp 'server-running-p)
-             (not (server-running-p)))
-        ;;(server-force-delete)
-        (server-start))))
+    (when (and (fboundp 'server-running-p)
+               (not (server-running-p)))
+      (server-start))))
 
 (provide 'server-init)
 

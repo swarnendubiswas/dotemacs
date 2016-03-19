@@ -34,16 +34,16 @@
         ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
-                             ;; "*Messages*"
+                             ;; "*Messages*" "\\`\\*"
                              "Async Shell Command" "*Paradox Report*")
         ido-confirm-unique-completion nil
-        ido-enable-tramp-completion t
         ido-ignore-extensions t ; Make ido use completion-ignored-extensions
-        ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS")
-                                 ido-ignore-files))
+        ido-enable-tramp-completion t)
 
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
-    (dolist (dirs '(".svn" ".git" ".hg" ".dropbox[\-\_a-z]*"))
+    (setq ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS" "\\`\\.")
+                                    ido-ignore-files))
+    (dolist (dirs '(".svn" ".git" ".hg" "\\`\\."))
       (add-to-list 'ido-ignore-directories dirs)))
 
   (ido-mode 1)
