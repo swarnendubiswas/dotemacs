@@ -43,6 +43,8 @@
 
 (define-abbrev-table 'elisp-byte-code-mode-abbrev-table '())
 
+(define-abbrev-table 'emacs-lisp-byte-code-mode-abbrev-table '())
+
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table '())
 
 (define-abbrev-table 'epa-info-mode-abbrev-table '())
@@ -74,6 +76,7 @@
     ("accomodate" "accommodate" nil 0)
     ("accordingto" "according to" nil 0)
     ("accross" "across" nil 0)
+    ("acecss " "access" nil 0)
     ("acheive" "achieve" nil 0)
     ("acheived" "achieved" nil 0)
     ("acheiving" "achieving" nil 0)
@@ -516,7 +519,7 @@
     ("hvaing" "having" nil 0)
     ("hve" "have" nil 0)
     ("hwich" "which" nil 0)
-    ("i" "I" nil 2)
+    ("i" "I" nil 6)
     ("idae" "idea" nil 0)
     ("idaes" "ideas" nil 0)
     ("identifiy" "identify" nil 0)
@@ -534,6 +537,7 @@
     ("improvemnt" "improvement" nil 0)
     ("improvment" "improvement" nil 0)
     ("includ" "include" nil 0)
+    ("increassed" "increased" nil 0)
     ("indecate" "indicate" nil 0)
     ("indenpendence" "independence" nil 0)
     ("indenpendent" "independent" nil 0)
@@ -861,6 +865,7 @@
     ("sucess" "success" nil 0)
     ("sucessfull" "successful" nil 0)
     ("sufficiant" "sufficient" nil 0)
+    ("sumamry" "summary" nil 0)
     ("suposed" "supposed" nil 0)
     ("suppossed" "supposed" nil 0)
     ("suprise" "surprise" nil 0)
@@ -947,6 +952,7 @@
     ("untilll" "until" nil 0)
     ("useing" "using" nil 0)
     ("usualyl" "usually" nil 0)
+    ("versios" "versions" nil 1)
     ("veyr" "very" nil 0)
     ("viration" "variation" nil 1)
     ("virtualyl" "virtually" nil 0)
