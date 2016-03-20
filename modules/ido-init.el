@@ -21,7 +21,7 @@
         ido-enable-prefix nil
         ido-max-prospects 20
         ido-case-fold t ; Searching of buffer and file names should ignore case
-        ido-use-filename-at-point nil ; Other options: 'ffap-guesser, 'guess
+        ido-use-filename-at-point 'guess ; Other options: 'ffap-guesser, 'guess
         ido-use-url-at-point nil
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
         ido-create-new-buffer 'always ; Other options: prompt, never
@@ -42,7 +42,7 @@
 
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
     (setq ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS" "\\`\\.")
-                                    ido-ignore-files))
+                                   ido-ignore-files))
     (dolist (dirs '(".svn" ".git" ".hg" "\\`\\."))
       (add-to-list 'ido-ignore-directories dirs)))
 
@@ -85,6 +85,7 @@
 
   (use-package ido-sort-mtime
     :ensure t
+    :disabled t
     :config (ido-sort-mtime-mode 1))
 
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
