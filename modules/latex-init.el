@@ -188,8 +188,12 @@
     :init
     (use-package parsebib
       :ensure t)
+    (use-package bibtex-completion
+      :config
+      (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+            bibtex-completion-cite-prompt-for-optional-arguments nil))
     :bind ("C-c l x" . helm-bibtex)
-    :config (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")))
+    :config (setq helm-bibtex-full-frame t))
 
   ;; http://joostkremers.github.io/ebib/ebib-manual.html#the-ebib-buffers
   (use-package ebib

@@ -11,17 +11,17 @@
   :commands (projectile-switch-project)
   :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld")
               projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
+  (projectile-global-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   :config
-  (projectile-global-mode 1)
   (setq projectile-enable-caching t
+        projectile-file-exists-remote-cache-expire nil
         projectile-verbose nil
         projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-dired
         projectile-mode-line '(:propertize
                                (:eval (concat " " (projectile-project-name)))
-                               face font-lock-constant-face)
-        projectile-file-exists-remote-cache-expire nil)
+                               face font-lock-constant-face))
 
   (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
         ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))

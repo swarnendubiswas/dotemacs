@@ -40,7 +40,7 @@
 ;; https://github.com/emacsmirror/emacswiki.org/commit/301bf7df6e48a6b3227adb13d749f3753c9dc7dc
 (use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
   :ensure t
-  :config (move-text-default-bindings))
+  :init (move-text-default-bindings))
 
 (use-package duplicate-thing
   :ensure t

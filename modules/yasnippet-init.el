@@ -8,12 +8,11 @@
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  :commands yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  :init (yas-global-mode 1)
   :config
   (setq yas-triggers-in-field t)
-  (yas-global-mode 1)
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
+  (with-eval-after-load "auto-complete"
     (add-to-list 'ac-sources 'ac-source-yasnippet)))
 
 (provide 'yasnippet-init)
