@@ -98,9 +98,7 @@
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode
                                              :ensure t
                                              :config
-                                             ;; t: left-right then top-bottom or
-                                             ;; nil: top-bottom then left-right
-                                             (setq ido-grid-mode-order nil
+                                             (setq ido-grid-mode-order nil ;; Listing order, t: left-right then top-bottom, nil: top-bottom then left-right
                                                    ido-grid-mode-min-rows 10
                                                    ido-grid-mode-max-rows 20)
                                              (ido-grid-mode 1))))
