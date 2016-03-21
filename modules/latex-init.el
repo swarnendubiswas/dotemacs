@@ -15,13 +15,17 @@
         TeX-parse-self t ; Parse documents
         TeX-clean-confirm nil
         TeX-quote-after-quote nil ; Allow original LaTeX quotes
-        TeX-electric-sub-and-superscript t ; automatically insert braces in math mode
+        TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
         TeX-default-mode 'LaTeX-mode
         TeX-force-default-mode t
-        TeX-auto-untabify t ; remove all tabs before saving
-        TeX-source-correlate-method 'synctex ;; Provide forward and inverse search with SyncTeX
+        ;; Remove all tabs before saving
+        TeX-auto-untabify t)
+
+  ;; Provide forward (C-c C-v) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
+  (setq TeX-source-correlate-method 'synctex
         TeX-source-correlate-mode t
-        TeX-source-correlate-start-server t)
+        TeX-source-correlate-start-server 'ask)
+
   (setq-default TeX-master nil) ; Query for master file
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
 
