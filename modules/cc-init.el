@@ -59,15 +59,16 @@
               (lambda()
                 (hide-ifdef-mode 1))))
 
-  (use-package ctypes
+  (use-package ctypes ;; FIXME: What is this for?
     :ensure t
+    :disabled t
     :config
     (setq ctypes-write-types-at-exit t)
     (ctypes-read-file nil nil t t)
     (ctypes-auto-parse-mode 1))
 
   (use-package function-args ; this overrides M-u
-    :ensure swiper
+    :ensure t
     :diminish function-args-mode
     :config
     (set-default 'semantic-case-fold t)

@@ -45,7 +45,13 @@
   :bind (("<f5>" . helm-projectile-switch-project)
          ("<f6>" . helm-projectile-find-file)
          ("<f7>" . helm-projectile-switch-to-buffer)
-         ("<f8>" . helm-projectile-grep))
+         ("<f8>" . helm-projectile-grep)
+         :map helm-projectile-find-file-map
+         ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
+         ("C-z" . helm-select-action)
+         :map helm-projectile-projects-map
+         ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
+         ("C-z" . helm-select-action))
   :diminish projectile-mode)
 
 (provide 'projectile-init)

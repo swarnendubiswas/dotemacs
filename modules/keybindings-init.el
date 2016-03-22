@@ -26,7 +26,6 @@
 (bind-key "<f11>" #'delete-other-windows)
 
 (bind-key "<f12>" #'dotemacs-kill-other-buffers) ; Kill all non-special buffers
-(unbind-key "C-x C-s") ; save-buffer
 (bind-key* "C-s" #'save-buffer)
 (bind-key* "C-S-s" #'dotemacs-save-all-buffers)
 

@@ -21,7 +21,7 @@
         ;; Remove all tabs before saving
         TeX-auto-untabify t)
 
-  ;; Provide forward (C-c C-v) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
+  ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
   (setq TeX-source-correlate-method 'synctex
         TeX-source-correlate-mode t
         TeX-source-correlate-start-server 'ask)
