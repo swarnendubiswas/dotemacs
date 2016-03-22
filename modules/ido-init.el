@@ -110,7 +110,7 @@
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f4>" . ido-switch-buffer)
    ("C-x d" . ido-dired)
-   ("<f8>" . dotemacs--ido-recentf-open)))
+   ("<f9>" . dotemacs--ido-recentf-open)))
 
 (provide 'ido-init)
 

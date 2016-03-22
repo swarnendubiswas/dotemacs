@@ -99,9 +99,11 @@
   (("C-c s g" . grep)
    ("C-c s r" . rgrep)
    ("C-c s l" . lgrep))
-  :config
+  :init
   (setq grep-highlight-matches t
-        grep-scroll-output t)
+        grep-scroll-output t
+        grep-find-ignored-files '(".#*" "*~" "*.blg" "*.bbl" "*.elc" "*.lof" "*.idx" "*.lot" "*.toc" "*.aux"
+                                  "*.pyc" "*.pyo" "*.pdf"))
   (use-package grep+
     :ensure t)
   (add-to-list 'grep-find-ignored-directories "auto")

@@ -156,16 +156,6 @@
     :bind ([remap yank-pop] . helm-show-kill-ring)
     :config (helm-push-mark-mode 1))
 
-  (use-package helm-grep
-    :disabled t
-    :init
-    ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
-    (global-set-key [f12]
-                    (lambda ()
-                      (interactive)
-                      (let ((current-prefix-arg 't))
-                        (call-interactively 'helm-do-grep)))))
-
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 

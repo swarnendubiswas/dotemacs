@@ -36,7 +36,8 @@
 ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
 ;; last window to close overwrites the recentf list.
 (use-package sync-recentf
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 (provide 'recentf-init)
 
