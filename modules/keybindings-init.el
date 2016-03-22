@@ -22,10 +22,10 @@
 (bind-key "C-c ;" #'dotemacs-comment-line)
 (bind-key* "C-c b" #'comment-box) ; Overrides bib-cite keys
 
-(bind-key "<f9>" #'other-window) ; Switch to the other buffer
-(bind-key "<f10>" #'delete-other-windows)
+(bind-key "<f10>" #'other-window) ; Switch to the other buffer
+(bind-key "<f11>" #'delete-other-windows)
 
-(bind-key "<f11>" #'dotemacs-kill-other-buffers) ; Kill all non-special buffers
+(bind-key "<f12>" #'dotemacs-kill-other-buffers) ; Kill all non-special buffers
 (unbind-key "C-x C-s") ; save-buffer
 (bind-key* "C-s" #'save-buffer)
 (bind-key* "C-S-s" #'dotemacs-save-all-buffers)

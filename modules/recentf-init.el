@@ -17,6 +17,7 @@
                           ;;"[/\\]tmp/sync-recentf-marker\\'"
                           "/company-statistics-cache.el$")) ; "/ssh:"
   (recentf-mode 1) ; This is needed in :init for <f8> to work
+
   :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
@@ -27,17 +28,15 @@
   ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
 
   (when (eq dotemacs-selection 'none)
-    (bind-key "<f8>" #'recentf-open-files))
+    (bind-key "<f9>" #'recentf-open-files))
 
   (use-package recentf-ext ; Add directories to recent list
-    :ensure t)
-  :bind ("C-c C-r" . recentf-open-files))
+    :ensure t))
 
 ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
 ;; last window to close overwrites the recentf list.
 (use-package sync-recentf
-  :ensure t
-  :disabled t)
+  :ensure t)
 
 (provide 'recentf-init)
 

@@ -104,17 +104,9 @@
         grep-scroll-output t)
   (use-package grep+
     :ensure t)
+  (add-to-list 'grep-find-ignored-directories "auto")
   (add-to-list 'grep-find-ignored-directories ".cache")
   (add-to-list 'grep-find-ignored-directories "__pycache__"))
-
-(use-package helm-grep
-  :init
-  ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
-  (global-set-key [f12]
-                  (lambda ()
-                    (interactive)
-                    (let ((current-prefix-arg 't))
-                      (call-interactively 'helm-do-grep)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C-f M-n    swiper thing-at-point    Get the occurrences of the current symbol in the current file.    ;;

@@ -104,7 +104,8 @@
                                              (ido-grid-mode 1))))
 
   :bind
-  (([remap find-file] . ido-find-file)
+  (("<f1>" . smex)
+   ([remap find-file] . ido-find-file)
    ("<f3>" . ido-find-file)
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f4>" . ido-switch-buffer)

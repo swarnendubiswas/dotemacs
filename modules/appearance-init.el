@@ -106,15 +106,15 @@
       ;; Default
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
-                                                          :background "LemonChiffon"
-                                                          :foreground "black")
+                                                          :background "deep sky blue"
+                                                          :foreground "white")
                                       (with-eval-after-load "hl-line"
                                         (set-face-attribute 'hl-line nil
                                                             :background "linen"))
                                       (with-eval-after-load "ac-ispell"
                                         (set-face-attribute 'ac-ispell-fuzzy-candidate-face nil
                                                             :background "deep sky blue"
-                                                             :foreground "white")))))
+                                                            :foreground "white")))))
 
 (use-package display-theme
   :ensure t

@@ -103,7 +103,7 @@
      ([remap find-file] . helm-find-files)
      ("<f3>" . helm-find-files)
      ("<f4>" . helm-for-files)
-     ("<f8>" . helm-recentf)))
+     ("<f9>" . helm-recentf)))
 
   (use-package helm-adaptive
     :config
@@ -156,6 +156,16 @@
     :bind ([remap yank-pop] . helm-show-kill-ring)
     :config (helm-push-mark-mode 1))
 
+  (use-package helm-grep
+    :disabled t
+    :init
+    ;; http://stackoverflow.com/questions/28316688/how-to-bind-helm-do-grep-1-to-a-key-in-emacs
+    (global-set-key [f12]
+                    (lambda ()
+                      (interactive)
+                      (let ((current-prefix-arg 't))
+                        (call-interactively 'helm-do-grep)))))
+
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 
@@ -169,7 +179,7 @@
    ([remap apropos] . helm-apropos)
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
-   ("<f7>" . helm-resume)
+   ("C-c h r" . helm-resume)
    ;; swoop is better than occur
    ([remap occur] . helm-occur)
    ("C-c h o" . helm-occur)

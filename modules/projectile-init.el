@@ -42,9 +42,10 @@
           projectile-switch-project-action #'helm-projectile-find-file-dwim)
     (helm-projectile-on))
 
-  :bind (("<f5>" . helm-projectile-find-file)
-         ("<f6>" . helm-projectile-switch-to-buffer)
-         ("<f7>" . helm-projectile-grep))
+  :bind (("<f5>" . helm-projectile-switch-project)
+         ("<f6>" . helm-projectile-find-file)
+         ("<f7>" . helm-projectile-switch-to-buffer)
+         ("<f8>" . helm-projectile-grep))
   :diminish projectile-mode)
 
 (provide 'projectile-init)
