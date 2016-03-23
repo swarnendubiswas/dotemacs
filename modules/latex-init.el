@@ -34,6 +34,9 @@
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
+  ;; Save all files before compilation, https://github.com/grettke/home/blob/master/.emacs.el
+  (defadvice TeX-command-master (before before-TeX-command-master activate)
+    (dotemacs-save-all-buffers))
   ;; http://stackoverflow.com/questions/6138029/how-to-add-a-hook-to-only-run-in-a-particular-mode
   (add-hook 'LaTeX-mode-hook
             (lambda()

@@ -66,6 +66,10 @@
                                                   (when (eq dotemacs-selection 'helm)
                                                     (spaceline-helm-mode))))
 
+      ((eq dotemacs-mode-line-theme 'ergoemacs-status) (use-package ergoemacs-status
+                                                         :ensure t
+                                                         :config (ergoemacs-status-mode 1)))
+
       ((eq dotemacs-mode-line-theme 'default)))
 
 ;; https://github.com/cemerick/.emacs.d#nyan-mode

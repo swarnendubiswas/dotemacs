@@ -207,19 +207,6 @@
             (iedit-start (current-word) (point-min) (point-max)))))))
   :init (bind-key* "C-." #'iedit-dwim))
 
-(use-package browse-kill-ring
-  :ensure t
-  :if (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
-  :config
-  (setq browse-kill-ring-highlight-current-entry t
-        browse-kill-ring-highlight-inserted-item t
-        browse-kill-ring-show-preview t
-        browse-kill-ring-display-duplicates t)
-  (browse-kill-ring-default-keybindings)
-  (use-package browse-kill-ring+
-    :ensure t)
-  :bind ("M-y" . browse-kill-ring))
-
 (use-package session
   :ensure t
   :init

@@ -69,6 +69,7 @@
           (const :tag "smart-mode-line" sml)
           (const :tag "telephone-line" telephone-line)
           (const :tag "spaceline" spaceline)
+          (const :tag "ergoemacs-status" ergoemacs-status)
           (const :tag "default" default))
   :group 'dotemacs)
 
