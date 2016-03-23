@@ -114,7 +114,6 @@
   (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
   (push '("*Kill Ring*") popwin:special-display-config) ; Browse Kill Ring
   (push '("*Selection Ring:") popwin:special-display-config) ; Selection Ring
-  (push '("*helm projectile*" :noselect t) popwin:special-display-config) ; Helm projectile
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
