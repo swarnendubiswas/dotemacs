@@ -25,23 +25,23 @@
   (setq TeX-source-correlate-method 'synctex
         TeX-source-correlate-mode t
         TeX-source-correlate-start-server 'ask)
+  (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
+  (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
   (setq-default TeX-master nil) ; Query for master file
-  (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
-
-  (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
   (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; Compile files to pdf by default
-
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
+  ;; http://stackoverflow.com/questions/6138029/how-to-add-a-hook-to-only-run-in-a-particular-mode
+  (add-hook 'LaTeX-mode-hook
+            (lambda()
+              (add-hook 'after-save-hook #'TeX-command-master nil 'make-it-local)))
 
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
-
-  (use-package tex-site)
 
   (use-package tex-mode
     :functions (latex-mode latex-electric-env-pair-mode)

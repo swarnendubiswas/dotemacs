@@ -66,7 +66,7 @@
     (setq sh-basic-offset 4
           sh-indent-comment t
           sh-indentation 4)
-
+    (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
     (when (eq dotemacs-completion-in-buffer 'company)
       (use-package company-shell
         :ensure t
