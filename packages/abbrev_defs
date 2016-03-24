@@ -290,6 +290,7 @@
     ("conjuntion" "conjunction" nil 0)
     ("considerit" "considerate" nil 0)
     ("considerite" "considerate" nil 0)
+    ("consisdered" "considered" nil 1)
     ("consistant" "consistent" nil 0)
     ("consonent" "consonant" nil 0)
     ("conspiricy" "conspiracy" nil 0)
@@ -900,6 +901,7 @@
     ("talior" "tailor" nil 0)
     ("talkign" "talking" nil 0)
     ("tath" "that" nil 0)
+    ("techinques" "techniques" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
     ("teh" "the" nil 6)
@@ -1125,6 +1127,10 @@
 (define-abbrev-table 'python-mode-abbrev-table '())
 
 (define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+
+(define-abbrev-table 'reftex-select-bib-mode-abbrev-table '())
+
+(define-abbrev-table 'reftex-select-label-mode-abbrev-table '())
 
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
 

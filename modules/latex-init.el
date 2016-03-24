@@ -34,6 +34,8 @@
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
+  (add-to-list 'TeX-command-list
+               '("View" "%V" TeX-run-discard nil t))
   ;; ;; Save all files before compilation, https://github.com/grettke/home/blob/master/.emacs.el
   ;; (defadvice TeX-command-master (before before-TeX-command-master activate)
   ;;   (progn
