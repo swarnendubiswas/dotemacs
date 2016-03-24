@@ -127,13 +127,13 @@
 (use-package tabbar
   :ensure t
   :preface
-  (defun tabbar--modification-state-change ()
+  (defun dotemacs--tabbar-modification-state-change ()
     (tabbar-set-template tabbar-current-tabset nil)
     (tabbar-display-update))
 
-  (defun tabbar--on-buffer-modification ()
+  (defun dotemacs--tabbar-on-buffer-modification ()
     (set-buffer-modified-p t)
-    (tabbar--modification-state-change))
+    (dotemacs--tabbar-modification-state-change))
   :functions tabbar-display-update
   :init (tabbar-mode 1)
   :config
@@ -141,9 +141,9 @@
         tabbar-auto-scroll-flag t
         tabbar-separator '(0.3))
 
-  (add-hook 'after-save-hook #'tabbar--modification-state-change)
-  (add-hook 'after-revert-hook #'tabbar--modification-state-change)
-  (add-hook 'first-change-hook #'tabbar--on-buffer-modification)
+  (add-hook 'after-save-hook #'dotemacs--tabbar-modification-state-change)
+  (add-hook 'after-revert-hook #'dotemacs--tabbar-modification-state-change)
+  (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
 
   ;; Add a buffer modification state indicator in the tab label, and place a
   ;; space around the label to make it look less crowded.

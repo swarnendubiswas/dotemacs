@@ -9,7 +9,7 @@
 (use-package flycheck
   :ensure t
   :diminish flycheck-mode
-  :init (add-hook 'after-init-hook #'global-flycheck-mode) ; Enable where possible
+  :init (add-hook 'prog-mode-hook #'global-flycheck-mode) ; Enable where possible
   :config
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-standard-error-navigation nil

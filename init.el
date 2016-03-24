@@ -65,7 +65,7 @@
 ;; #'(lambda (x) (* x x))
 
 ;; Personal modules for customizing Emacs initialization
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/modules/"))
+(add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
 (require 'config-init) ; Setup configuration variables
 (require 'packages-init) ; Setup the package system
@@ -96,6 +96,8 @@
 (require 'ace-modes-init)
 (require 'indent-init)
 (require 'parens-init)
+(require 'abbrev-init)
+(require 'kill-ring-init)
 
 ;; Setup helper packages
 (require 'projectile-init)
