@@ -28,8 +28,6 @@
                 " "
                 (mode 16 16 :left :elide)
                 " "
-                (vc-status 16 16 :left)
-                " "
                 filename-and-process)
           (mark " "
                 (name 16 -1)
