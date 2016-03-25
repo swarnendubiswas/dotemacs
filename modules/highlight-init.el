@@ -20,46 +20,29 @@
   :init (hlinum-activate))
 
 (use-package hilit-chg
-  :disabled t
-  :init (highlight-changes-mode 1)
-  :bind ("M-o C" . highlight-changes-mode))
+  :config (highlight-changes-mode 1))
 
 (use-package highlight-numbers
   :ensure t
   :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
-(or (use-package highlight-symbol
-      :ensure t
-      :init
-      (add-hook 'prog-mode-hook #'highlight-symbol-mode)
-      ;; Navigate occurrences of the symbol under point with M-n and M-p, and highlight symbol occurrences
-      (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-      (setq highlight-symbol-idle-delay 0.5
-            highlight-symbol-on-navigation-p t)
-      :diminish highlight-symbol-mode)
+(use-package highlight-symbol ; Highlight symbol under point
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook #'highlight-symbol-mode)
+  ;; Navigate occurrences of the symbol under point with M-n and M-p
+  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+  :config
+  (setq highlight-symbol-idle-delay 0.5
+        highlight-symbol-on-navigation-p t)
+  :diminish highlight-symbol-mode)
 
-    (use-package auto-highlight-symbol
-      :ensure t
-      :disabled t
-      :init (global-auto-highlight-symbol-mode 1)
-      :config
-      (setq ahs-default-range 'ahs-range-whole-buffer)
-      ;; M-<left>/<right> is overwritten by 'ahs-backward/forward, which is not useful
-      (define-key auto-highlight-symbol-mode-map (kbd "M-<left>") nil)
-      (define-key auto-highlight-symbol-mode-map (kbd "M-<right>") nil)
-      (bind-keys
-       :map auto-highlight-symbol-mode-map
-       ("M-<" . ahs-backward)
-       ("M->" . ahs-forward))))
-
-;; highlight certain words
-(use-package fic-mode
+(use-package fic-mode ; Highlight certain words
   :ensure t
   :diminish fic-mode
   :init
   (add-hook 'text-mode-hook #'fic-mode)
   (add-hook 'prog-mode-hook #'fic-mode))
-
 
 (provide 'highlight-init)
 
