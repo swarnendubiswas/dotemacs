@@ -9,7 +9,7 @@
   :init
   (setq recentf-save-file (concat dotemacs-temp-directory "recentf") ; Set this first so that recentf can load content from this
         recentf-max-menu-items 15 ; Show in recent menu
-        recentf-max-saved-items 100 ; Keep track of last xx files
+        recentf-max-saved-items 200 ; Keep track of last xx files
         ;; Check regex with re-builder
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
