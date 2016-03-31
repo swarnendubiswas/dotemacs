@@ -219,6 +219,10 @@
           ebib-bib-search-dirs '("/home/biswass/workspace/bib")
           ebib-preload-bib-files '("/home/biswass/workspace/bib/plass-formatted.bib")))
 
+  ;; C-c = reftex-toc
+  ;; C-c [
+  ;; C-c (
+  ;; C-c )
   (use-package reftex
     :diminish reftex-mode
     :config
