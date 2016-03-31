@@ -46,6 +46,7 @@
          ("<f6>" . helm-projectile-find-file)
          ("<f7>" . helm-projectile-switch-to-buffer)
          ("<f8>" . helm-projectile-grep)
+         ("C-c r" . helm-resume)
          :map helm-projectile-find-file-map
          ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
          ("C-z" . helm-select-action)

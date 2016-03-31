@@ -170,6 +170,7 @@
    ("C-c h a" . helm-apropos)
    ("C-c h g" . helm-do-grep)
    ("C-c h r" . helm-resume)
+   ("C-c r" . helm-resume)
    ;; swoop is better than occur
    ([remap occur] . helm-occur)
    ("C-c h o" . helm-occur)

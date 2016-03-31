@@ -15,29 +15,23 @@
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
                           ;;"[/\\]tmp/sync-recentf-marker\\'"
-                          "/company-statistics-cache.el$")) ; "/ssh:"
-  (recentf-mode 1) ; This is needed in :init for <f8> to work
+                          "/company-statistics-cache.el$") ; "/ssh:"
+        recentf-auto-cleanup 300)
+  (recentf-mode 1) ; This is needed in :init for the keybinding to work
 
   :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
-
-  ;; (setq initial-buffer-choice 'recentf-open-files)
-
-  ;; Periodically (600 s) save recently opened files, in case emacs crashes
-  ;; (run-with-timer 0 (* 600 60) 'recentf-save-list)
-
   (when (eq dotemacs-selection 'none)
     (bind-key "<f9>" #'recentf-open-files))
 
   (use-package recentf-ext ; Add directories to recent list
-    :ensure t))
+    :ensure t)
 
-;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
-;; last window to close overwrites the recentf list.
-(use-package sync-recentf
-  :ensure t
-  :disabled t)
+  ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
+  ;; last window to close overwrites the recentf list.
+  (use-package sync-recentf
+    :ensure t))
 
 (provide 'recentf-init)
 

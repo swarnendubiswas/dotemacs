@@ -71,7 +71,7 @@
                                            "\\|\\(?:\\`.+?[#~]\\'\\)"
                                            "__pycache__")))
   :bind
-  (("C-c C-r" . ivy-resume)
+  (("C-c r" . ivy-resume)
    ("<f9>" . ivy-recentf)
    ("C-'" . ivy-avy)
    ([remap switch-to-buffer] . ivy-switch-buffer)

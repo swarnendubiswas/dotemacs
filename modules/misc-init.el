@@ -213,6 +213,10 @@
   (add-hook 'after-init-hook #'session-initialize)
   (setq session-save-file (concat dotemacs-temp-directory ".session")))
 
+(use-package persistent-scratch
+  :ensure t
+  :config (persistent-scratch-setup-default))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
