@@ -57,6 +57,8 @@
 
 (define-abbrev-table 'epa-key-mode-abbrev-table '())
 
+(define-abbrev-table 'eshell-mode-abbrev-table '())
+
 (define-abbrev-table 'flycheck-error-list-mode-abbrev-table '())
 
 (define-abbrev-table 'fundamental-mode-abbrev-table '())
@@ -258,6 +260,7 @@
     ("commadn" "command" nil 0)
     ("comming" "coming" nil 0)
     ("commitee" "committee" nil 0)
+    ("commiting" "committing" nil 1)
     ("committe" "committee" nil 0)
     ("committment" "commitment" nil 0)
     ("committments" "commitments" nil 0)
@@ -326,6 +329,7 @@
     ("danceing" "dancing" nil 0)
     ("dcument" "document" nil 0)
     ("deatils" "details" nil 0)
+    ("decied" "decided" nil 1)
     ("decison" "decision" nil 0)
     ("decisons" "decisions" nil 0)
     ("decor" "decor" nil 0)
@@ -533,7 +537,6 @@
     ("hvaing" "having" nil 0)
     ("hve" "have" nil 0)
     ("hwich" "which" nil 0)
-    ("i" "I" nil 10)
     ("idae" "idea" nil 0)
     ("idaes" "ideas" nil 0)
     ("identifiy" "identify" nil 0)
@@ -615,6 +618,7 @@
     ("lieutenent" "lieutenant" nil 0)
     ("liev" "live" nil 0)
     ("likly" "likely" nil 0)
+    ("lineearly" "linearly" nil 1)
     ("lisense" "license" nil 0)
     ("littel" "little" nil 0)
     ("litttle" "little" nil 0)
@@ -846,6 +850,7 @@
     ("shouldent" "shouldn't" nil 0)
     ("shouldnt" "shouldn't" nil 0)
     ("showinf" "showing" nil 0)
+    ("shwos" "shows" nil 1)
     ("signifacnt" "significant" nil 0)
     ("simalar" "similar" nil 0)
     ("similiar" "similar" nil 0)
@@ -904,7 +909,7 @@
     ("techinques" "techniques" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 6)
+    ("teh" "the" nil 10)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
     ("termoil" "turmoil" nil 0)
@@ -1078,6 +1083,8 @@
 
 (define-abbrev-table 'jdee-run-mode-abbrev-table '())
 
+(define-abbrev-table 'jgraph-mode-abbrev-table '())
+
 (define-abbrev-table 'latex-math-preview-expression-mode-abbrev-table '())
 
 (define-abbrev-table 'latex-mode-abbrev-table '())
@@ -1133,6 +1140,8 @@
 (define-abbrev-table 'reftex-select-label-mode-abbrev-table '())
 
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
+
+(define-abbrev-table 'sh-mode-abbrev-table '())
 
 (define-abbrev-table 'shell-mode-abbrev-table '())
 
