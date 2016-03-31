@@ -20,6 +20,7 @@
   :init (hlinum-activate))
 
 (use-package hilit-chg
+  :defer t
   :config (highlight-changes-mode 1))
 
 (use-package highlight-numbers

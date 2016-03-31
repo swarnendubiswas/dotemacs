@@ -193,6 +193,13 @@
                       ;; :weight 'light
                       :height 110))
 
+(use-package tramp-theme
+  :ensure t
+  :init
+  (add-hook 'tramp-mode-hook
+            (lambda ()
+              (load-theme #'tramp t))))
+
 (provide 'appearance-init)
 
 ;;; appearance-init.el ends here
