@@ -42,7 +42,8 @@
     (add-hook 'ibuffer-hook
               (lambda ()
                 (ibuffer-tramp-set-filter-groups-by-tramp-connection)
-                (ibuffer-do-sort-by-alphabetic))))
+                (unless (eq ibuffer-sorting-mode 'alphabetic)
+                  (ibuffer-do-sort-by-alphabetic)))))
 
   (use-package ibuffer-vc ; Sort buffers by VC status
     :ensure t
@@ -57,13 +58,13 @@
   (use-package ibuffer-projectile ; Group buffers by projectile project
     :ensure t
     :preface
-    (defun dotemacs-ibuffer-customization ()
+    (defun dotemacs--ibuffer-customization ()
       (ibuffer-projectile-set-filter-groups)
       (unless (eq ibuffer-sorting-mode 'alphabetic)
         ;; First do alphabetic sort, then do major-mode sort
         (ibuffer-do-sort-by-alphabetic)
         (ibuffer-do-sort-by-major-mode)))
-    :config (add-hook 'ibuffer-hook #'dotemacs-ibuffer-customization))
+    :config (add-hook 'ibuffer-hook #'dotemacs--ibuffer-customization))
 
   :bind ([remap list-buffers] . ibuffer))
 

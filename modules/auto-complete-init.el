@@ -40,14 +40,19 @@
                  ac-source-filename
                  ac-source-files-in-curren-dir))
 
-  (dolist (mode '(log-edit-mode org-mode text-mode haml-mode
-                                git-commit-mode
-                                sass-mode yaml-mode csv-mode espresso-mode haskell-mode
-                                html-mode nxml-mode sh-mode smarty-mode clojure-mode
-                                lisp-mode textile-mode markdown-mode tuareg-mode
-                                js3-mode css-mode less-css-mode sql-mode
-                                sql-interactive-mode
-                                inferior-emacs-lisp-mode))
+  (dolist (mode '(csv-mode
+                  git-commit-mode
+                  html-mode
+                  inferior-emacs-lisp-mode
+                  js3-mode
+                  less-css-mode
+                  log-edit-mode
+                  markdown-mode
+                  nxml-mode
+                  org-mode
+                  sass-mode
+                  sh-mode
+                  text-mode))
     (add-to-list 'ac-modes mode))
 
   ;; ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
