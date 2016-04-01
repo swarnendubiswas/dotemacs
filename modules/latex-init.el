@@ -8,8 +8,6 @@
 (use-package tex
   :ensure auctex
   :defer t
-  :functions (TeX-PDF-mode TeX-source-correlate-mode)
-  :commands (TeX-PDF-mode)
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -29,13 +27,16 @@
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
   (setq-default TeX-master nil) ; Query for master file
-  (add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; Compile files to pdf by default
+
+  ;; Compile files to pdf by default, this is already the default from AUCTeX 11.88, but we want to be sure
+  (TeX-global-PDF-mode 1)
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
+
   ;; ;; Save all files before compilation, https://github.com/grettke/home/blob/master/.emacs.el
   ;; (defadvice TeX-command-master (before before-TeX-command-master activate)
   ;;   (progn
