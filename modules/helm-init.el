@@ -12,13 +12,9 @@
   (use-package helm-flx ;; Recommended to load before helm
     :ensure t
     :config (helm-flx-mode 1))
-
   :config
-  (setq helm-quick-update nil
-        helm-candidate-number-limit 100
-        helm-apropos-fuzzy-match t
+  (setq helm-candidate-number-limit 100
         helm-locate-fuzzy-match t
-        helm-lisp-fuzzy-completion t
         ;; I prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since long
         ;; lines can get truncated.
         helm-full-frame t ; Make the helm buffer occupy the full frame
@@ -28,11 +24,6 @@
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line t
         helm-echo-input-in-header-line t
-        ;; helm-idle-delay 0.1 ; Be idle for this many seconds, before updating in delayed sources
-        ;; helm-input-idle-delay 0.1 ; Be idle for this many seconds, before updating candidate buffer
-        ;; Both the min and max height are set to be equal on purpose
-        ;; helm-autoresize-max-height 60
-        ;; helm-autoresize-min-height 60
         ;; Default is 'smart, searches and matches should ignore case
         helm-case-fold-search t)
 
@@ -46,9 +37,25 @@
   (helm-autoresize-mode -1) ; Distracting
 
   (use-package helm-buffers
+    :preface
+    ;; https://github.com/zeltak/.emacs.d/blob/master/settings.el
+    (defun dotemacs--sort-dired-buffers (buffers)
+      "Sort BUFFERS by moving all Dired buffers to the end."
+      (let (dired-buffers other-buffers)
+        (dolist (buf buffers)
+          (if (with-current-buffer buf
+                (eq major-mode 'dired-mode))
+              (push buf dired-buffers)
+            (push buf other-buffers)))
+        (nreverse (append dired-buffers other-buffers))))
+
+    (defun dotemacs--helm-buffers-sort-dired-buffers (orig-fun &rest args)
+      (dotemacs--sort-dired-buffers (apply orig-fun args)))
+
     :bind
     (([remap switch-to-buffer] . helm-mini)
      ([remap list-buffers] . helm-buffers-list))
+    ;; :init (advice-add 'helm-buffers-sort-transformer :around #'dotemacs--helm-buffers-sort-dired-buffers)
     :config
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
@@ -64,7 +71,7 @@
     :config (setq helm-M-x-fuzzy-match t)
     :bind
     (([remap execute-extended-command] . helm-M-x)
-     ;; Convenient since it is a single keypress
+     ;; Convenient since it is a single key press
      ("<f1>" . helm-M-x)))
 
   (use-package helm-utils
@@ -78,7 +85,7 @@
     (setq helm-ff-transformer-show-only-basename t ; Do not show the complete path is non-nil
           helm-ff-file-name-history-use-recentf t
           helm-ff-search-library-in-sexp t
-          helm-ff-auto-update-initial-value nil ; Auto update when only one candidate directory is matched
+          helm-ff-auto-update-initial-value t ; Auto update when only one candidate directory is matched
           helm-ff-skip-boring-files t
           helm-ff-fuzzy-matching t
           helm-ff-tramp-not-fancy nil
@@ -95,8 +102,17 @@
 
     (unless (bound-and-true-p dotemacs-use-ignoramus-p)
       (setq helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                                 '("\\.undo$" "\\.elc$" "\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$"
-                                                   "\\.la$" "\\.o$" "\\#$" "\\~$"))))
+                                                 '("\\.undo$"
+                                                   "\\.elc$"
+                                                   "\\.git$"
+                                                   "\\.hg$"
+                                                   "\\.svn$"
+                                                   "\\.CVS$"
+                                                   "\\._darcs$"
+                                                   "\\.la$"
+                                                   "\\.o$"
+                                                   "\\#$"
+                                                   "\\~$"))))
 
     :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
@@ -114,6 +130,11 @@
     :config (setq helm-dabbrev-case-fold-search t)
     :bind ([remap dabbrev-expand] . helm-dabbrev))
 
+  (use-package helm-elisp
+    :config
+    (setq helm-apropos-fuzzy-match t
+          helm-lisp-fuzzy-completion t))
+
   (use-package helm-descbinds
     :ensure t
     :config
@@ -126,7 +147,7 @@
 
   (use-package helm-dired-recent-dirs
     :ensure t
-    :disabled t
+    :bind ("C-c h v" . helm-dired-recent-dirs-view)
     :config
     (setq shell-file-name "/usr/bin/fish"
           helm-dired-recent-dirs-max 50))

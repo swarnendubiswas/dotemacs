@@ -33,17 +33,31 @@
         confirm-nonexistent-file-or-buffer nil
         ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
-        ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*" "*Compile-Log*" "Flycheck error messages*"
-                             ;; "*Messages*" "\\`\\*"
-                             "Async Shell Command" "*Paradox Report*")
+        ido-ignore-buffers '("^ "
+                             "*Completions*"
+                             "*Shell Command Output*"
+                             "*Compile-Log*"
+                             "Flycheck error messages*"
+                             ;; "*Messages*"
+                             "\\`\\*"
+                             "Async Shell Command"
+                             "*Paradox Report*")
         ido-confirm-unique-completion nil
         ido-ignore-extensions t ; Make ido use completion-ignored-extensions
         ido-enable-tramp-completion t)
 
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
-    (setq ido-ignore-files (append '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS" "\\`\\.")
+    (setq ido-ignore-files (append '("GTAGS"
+                                     "GPATH"
+                                     "GRTAGS"
+                                     "GSYMS"
+                                     "TAGS"
+                                     "\\`\\.")
                                    ido-ignore-files))
-    (dolist (dirs '(".svn" ".git" ".hg" "\\`\\."))
+    (dolist (dirs '(".svn"
+                    ".git"
+                    ".hg"
+                    "\\`\\."))
       (add-to-list 'ido-ignore-directories dirs)))
 
   (ido-mode 1)
