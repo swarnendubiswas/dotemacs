@@ -48,6 +48,7 @@
 
 (use-package swiper-helm
   :ensure t
+  :if (eq dotemacs-selection 'helm)
   :bind ("C-c s h" . swiper-helm))
 
 (use-package color-moccur
@@ -81,6 +82,7 @@
 
 (use-package helm-ag
   :ensure t
+  :if (eq dotemacs-selection 'helm)
   :bind ("C-c s a" . helm-ag)
   :config
   (setq helm-ag-fuzzy-match t

@@ -6,13 +6,11 @@
 ;;; Code:
 
 (or (use-package helm-ring
-      :if (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'helm))
       :bind ([remap yank-pop] . helm-show-kill-ring)
       :config (helm-push-mark-mode 1))
 
     (use-package browse-kill-ring
       :ensure t
-      :if (eq dotemacs-selection 'none)
       :config
       (setq browse-kill-ring-highlight-current-entry t
             browse-kill-ring-highlight-inserted-item t

@@ -75,7 +75,8 @@
 
   (use-package org-ref
     :ensure t
-    :config (setq org-ref-default-bibliography '("~/workspace/bib/plass.bib")))
+    :disabled t
+    :config (setq org-ref-default-bibliography '("~/workspace/bib/plass-formatted.bib")))
 
   (use-package org-bullets
     :ensure t

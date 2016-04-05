@@ -67,8 +67,7 @@
           ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-counsel.el
           counsel-find-file-ignore-regexp (concat
                                            "\\(?:\\`[#.]\\)" ; File names beginning with # or .
-                                           ;; File names ending with # or ~
-                                           "\\|\\(?:\\`.+?[#~]\\'\\)"
+                                           "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
                                            "__pycache__")))
   :bind
   (("C-c r" . ivy-resume)

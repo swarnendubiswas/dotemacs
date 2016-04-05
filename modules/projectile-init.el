@@ -27,14 +27,22 @@
         ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
         ((eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy)))
 
-  (dolist (dirs '(".svn" ".dropbox" ".git" ".hg" ".cache" "elpa" "auto"))
-    (add-to-list 'projectile-globally-ignored-directories dirs))
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
-  (dolist (item '("GTAGS" "GRTAGS" "GPATH" "TAGS" "GSYMS"))
+  (dolist (dirs '(".cache"
+                  ".dropbox"
+                  ".git"
+                  ".hg"
+                  ".svn"
+                  "elpa"
+                  "auto"))
+    (add-to-list 'projectile-globally-ignored-directories dirs))
+  (dolist (item '("GPATH"
+                  "GRTAGS"
+                  "GTAGS"
+                  "GSYMS"
+                  "TAGS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
-  ;; https://github.com/bbatsov/helm-projectile
-  ;; helm grep is different from projectile-grep because the helm grep is incremental
   (use-package helm-projectile
     :ensure t
     :config
@@ -45,14 +53,8 @@
   :bind (("<f5>" . helm-projectile-switch-project)
          ("<f6>" . helm-projectile-find-file)
          ("<f7>" . helm-projectile-switch-to-buffer)
-         ("<f8>" . helm-projectile-grep)
-         ("C-c r" . helm-resume)
-         :map helm-projectile-find-file-map
-         ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
-         ("C-z" . helm-select-action)
-         :map helm-projectile-projects-map
-         ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
-         ("C-z" . helm-select-action))
+         ;; helm grep is different from projectile-grep because the helm grep is incremental
+         ("<f8>" . helm-projectile-grep))
   :diminish projectile-mode)
 
 (provide 'projectile-init)
