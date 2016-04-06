@@ -61,7 +61,8 @@
      ("<f1>" . counsel-M-x)
      ([remap find-file] . counsel-find-file)
      ("<f3>" . counsel-find-file)
-     ([remap yank-pop] . counsel-yank-pop))
+     ;; ([remap yank-pop] . counsel-yank-pop)
+     )
     :config
     (setq counsel-find-file-at-point nil
           ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-counsel.el

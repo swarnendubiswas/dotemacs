@@ -11,6 +11,7 @@
 
     (use-package browse-kill-ring
       :ensure t
+      :disabled t
       :config
       (setq browse-kill-ring-highlight-current-entry t
             browse-kill-ring-highlight-inserted-item t
