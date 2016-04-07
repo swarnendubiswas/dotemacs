@@ -5,6 +5,7 @@
 
 ;;; Code:
 
+;; C-j to create a new buffer rather than switching to an existing buffer
 (use-package ido
   :ensure t
   :preface

@@ -17,12 +17,14 @@
 ;; ~   (self-insert-command) Switch to the home directory.         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; C-M-j which calls ivy-immediate-done
+
 (use-package ivy
   :ensure swiper
   :if (eq dotemacs-selection 'ivy)
   :preface
   ;; https://github.com/abo-abo/oremacs/blob/github/oleh/modes/ora-ivy.el
-  (defun ivy-dired ()
+  (defun dotemacs--ivy-dired ()
     (interactive)
     (if ivy--directory
         (ivy-quit-and-run
@@ -33,18 +35,31 @@
            (goto-char (match-beginning 0))))
       (user-error
        "Not completing files currently")))
+
+  ;; https://github.com/johnchunwai/devhome/blob/9920abd385c07b97dddb2f81c6037eaa2c0f48c7/.emacs.d/lisp/init-swiper.el
+  (defun dotemacs--ivy-format-function (cands)
+    "Add an arrow to the front of current selected candidate among CANDS."
+    (let ((i -1))
+      (mapconcat
+       (lambda (s)
+         (concat (if (eq (cl-incf i) ivy--index)
+                     "> "
+                   "  ")
+                 s))
+       cands "\n")))
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
-                                  ; candidates.
-        ivy-virtual-abbreviate 'full
-        ivy-wrap t ; Specifies wrap around behavior for "C-n" and "C-p"
-        ivy-case-fold-search t
-        ivy-height 25 ; Number of lines in the minibuffer window
-        ivy-fixed-height-minibuffer t
+                                        ; candidates.
+        ivy-virtual-abbreviate 'full ; Easier to distinguish files
+        ivy-wrap t ; Useful to be able to wrap around boundary items
+        ivy-case-fold-search t ; Ignore case while searching
+        ivy-height 25 ; This seems a good number to see several options at a time
+        ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
-        ;; ivy-count-format "(%d/%d) "
-        ivy-re-builders-alist '((t . ivy--regex-plus)))
+        ivy-format-function 'ivy-format-function-arrow
+        ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
+        ivy-re-builders-alist '((t . ivy--regex-fuzzy))) ;; ivy--regex-fuzzy adds noise
   (dolist (buffer '("^\\*Backtrace\\*$"
                     "^\\*Compile-Log\\*$"
                     "^\\*.+Completions\\*$"

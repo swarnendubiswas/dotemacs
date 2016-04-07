@@ -13,6 +13,8 @@
 
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
+(define-abbrev-table 'biblio-selection-mode-abbrev-table '())
+
 (define-abbrev-table 'bibtex-mode-abbrev-table '())
 
 (define-abbrev-table 'bookmark-bmenu-mode-abbrev-table '())
@@ -721,6 +723,7 @@
     ("peopel" "people" nil 0)
     ("percentof" "percent of" nil 0)
     ("percentto" "percent to" nil 0)
+    ("percetnages" "percentages" nil 1)
     ("performace" "performance" nil 1)
     ("performence" "performance" nil 0)
     ("perhasp" "perhaps" nil 0)
@@ -1132,6 +1135,10 @@
 (define-abbrev-table 'process-menu-mode-abbrev-table '())
 
 (define-abbrev-table 'prog-mode-abbrev-table '())
+
+(define-abbrev-table 'ps-mode-abbrev-table '())
+
+(define-abbrev-table 'ps-run-mode-abbrev-table '())
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
