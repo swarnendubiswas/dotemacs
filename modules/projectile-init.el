@@ -61,7 +61,7 @@
       (bind-key "<f5>" #'projectile-switch-project)
       (bind-key "<f6>" #'projectile-find-file)
       (bind-key "<f7>" #'projectile-switch-to-buffer)
-      (bind-key "<f8>" #'projectile-grep)))
+      (bind-key "<f8>" #'projectile-ag)))
 
   :diminish projectile-mode)
 

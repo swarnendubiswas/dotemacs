@@ -79,6 +79,7 @@
     ("aboutit" "about it" nil 0)
     ("aboutthe" "about the" nil 0)
     ("abscence" "absence" nil 0)
+    ("absoluate" "absolute" nil 1)
     ("accesories" "accessories" nil 0)
     ("accidant" "accident" nil 0)
     ("accomodate" "accommodate" nil 0)

@@ -5,8 +5,13 @@
 
 ;;; Code:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C-f M-n    swiper thing-at-point    Get the occurrences of the current symbol in the current file.    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (setq case-fold-search t) ; Make search ignore case
 
+;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
 (use-package isearch
   :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
   :preface
@@ -17,7 +22,7 @@
       (call-interactively 'isearch-forward)))
   :init
   (unbind-key "C-s") ; isearch-forward-regexp
-  (setq search-highlight t ; highlight incremental search
+  (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
   (use-package isearch+
     :ensure t)
@@ -42,7 +47,8 @@
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
   :config
-  (setq swiper-min-highlight 3 ; Be less noisy
+  (setq swiper-min-highlight 3
+        swiper-history t
         swiper-use-visual-line t)
   :bind ("C-c s s" . swiper))
 
@@ -111,10 +117,6 @@
   (add-to-list 'grep-find-ignored-directories "auto")
   (add-to-list 'grep-find-ignored-directories ".cache")
   (add-to-list 'grep-find-ignored-directories "__pycache__"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C-f M-n    swiper thing-at-point    Get the occurrences of the current symbol in the current file.    ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (provide 'search-init)
 
