@@ -43,18 +43,26 @@
                   "TAGS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
-  (use-package helm-projectile
-    :ensure t
-    :config
-    (setq helm-projectile-fuzzy-match t
-          projectile-switch-project-action #'helm-projectile-find-file-dwim)
-    (helm-projectile-on))
+  (if (eq dotemacs-selection 'helm)
+      (progn
+        (use-package helm-projectile
+          :ensure t
+          :if (eq dotemacs-selection 'helm)
+          :config
+          (setq helm-projectile-fuzzy-match t
+                projectile-switch-project-action #'helm-projectile-find-file-dwim)
+          (helm-projectile-on)
+          :bind (("<f5>" . helm-projectile-switch-project)
+                 ("<f6>" . helm-projectile-find-file)
+                 ("<f7>" . helm-projectile-switch-to-buffer)
+                 ;; helm grep is different from projectile-grep because the helm grep is incremental
+                 ("<f8>" . helm-projectile-grep))))
+    (progn
+      (bind-key "<f5>" #'projectile-switch-project)
+      (bind-key "<f6>" #'projectile-find-file)
+      (bind-key "<f7>" #'projectile-switch-to-buffer)
+      (bind-key "<f8>" #'projectile-grep)))
 
-  :bind (("<f5>" . helm-projectile-switch-project)
-         ("<f6>" . helm-projectile-find-file)
-         ("<f7>" . helm-projectile-switch-to-buffer)
-         ;; helm grep is different from projectile-grep because the helm grep is incremental
-         ("<f8>" . helm-projectile-grep))
   :diminish projectile-mode)
 
 (provide 'projectile-init)
