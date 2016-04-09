@@ -80,7 +80,8 @@
                                            "\\|.log$"
                                            "\\|.out$"
                                            "\\|.pyc$"
-                                           "\\|.rel$"))
+                                           "\\|.rel$"
+                                           "\\|.synctex.gz"))
     (counsel-mode 1)
     :diminish counsel-mode)
   :bind

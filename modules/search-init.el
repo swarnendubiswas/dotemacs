@@ -46,10 +46,6 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :config
-  (setq swiper-min-highlight 3
-        swiper-history t
-        swiper-use-visual-line t)
   :bind ("C-c s s" . swiper))
 
 (use-package swiper-helm
