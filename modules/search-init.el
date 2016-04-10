@@ -20,6 +20,13 @@
     (interactive)
     (let ((search-whitespace-regexp ".*?"))
       (call-interactively 'isearch-forward)))
+
+  ;; http://endlessparentheses.com/leave-the-cursor-at-start-of-match-after-isearch.html?source=rss
+  (defun dotemacs--isearch-exit-other-end ()
+    "Exit isearch, at the opposite end of the string."
+    (interactive)
+    (isearch-exit)
+    (goto-char isearch-other-end))
   :init
   (unbind-key "C-s") ; isearch-forward-regexp
   (setq search-highlight t ; Highlight incremental search
@@ -35,7 +42,8 @@
   :diminish isearch-mode
   :bind (("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
-         ("C-f" . isearch-repeat-forward)))
+         ("C-f" . isearch-repeat-forward)
+         ("C-<return>" . isearch-exit-other-end)))
 
 (use-package replace
   :defer t
@@ -46,7 +54,7 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :bind ("C-c s s" . swiper))
+  :bind ("C-c s" . swiper))
 
 (use-package swiper-helm
   :ensure t
@@ -55,6 +63,7 @@
 
 (use-package color-moccur
   :ensure t
+  :disabled t
   :functions (isearch-moccur isearch-all)
   :bind ("C-c s o" . moccur)
   :config
@@ -70,7 +79,7 @@
 (use-package loccur
   :ensure t
   :functions loccur-mode
-  :defer t
+  :disabled t
   :config (loccur-mode 1)
   :diminish loccur-mode)
 
@@ -85,14 +94,16 @@
 (use-package helm-ag
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :bind ("C-c s a" . helm-ag)
+  :bind ("C-c a" . helm-ag)
   :config
   (setq helm-ag-fuzzy-match t
         helm-ag-insert-at-point 'symbol
         helm-ag-source-type 'file-line))
 
 (when (eq dotemacs-selection 'ivy)
-  (bind-key "C-c s c" #'counsel-ag))
+  (bind-key "C-c a" #'counsel-ag)
+  ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+  (bind-key "C-c g" #'counsel-git-grep))
 
 (use-package find-file-in-project
   :ensure t
@@ -106,8 +117,19 @@
   :init
   (setq grep-highlight-matches t
         grep-scroll-output t
-        grep-find-ignored-files '(".#*" "*~" "*.blg" "*.bbl" "*.elc" "*.lof" "*.idx" "*.lot" "*.toc" "*.aux"
-                                  "*.pyc" "*.pyo" "*.pdf"))
+        grep-find-ignored-files '(".#*"
+                                  "*~"
+                                  "*.aux"
+                                  "*.blg"
+                                  "*.bbl"
+                                  "*.elc"
+                                  "*.lof"
+                                  "*.idx"
+                                  "*.lot"
+                                  "*.toc"
+                                  "*.pyc"
+                                  "*.pyo"
+                                  "*.pdf"))
   (use-package grep+
     :ensure t)
   (add-to-list 'grep-find-ignored-directories "auto")
