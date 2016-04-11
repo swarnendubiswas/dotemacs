@@ -83,13 +83,19 @@
   :config (loccur-mode 1)
   :diminish loccur-mode)
 
+;; Move between results by pressing n and p
+;; Visit the file by pressing <return> or clicking
+;; Run the search again by pressing g
+;; Close the buffer with q
+;; Kill the buffer with k
 (use-package ag
   :ensure t
+  ;; :bind (("C-c s d" . ag-dired)
+  ;;        ("C-c s f" . ag-files))
   :config
   (setq ag-reuse-buffers t
-        ag-highlight-search t)
-  :bind (("C-c s d" . ag-dired)
-         ("C-c s f" . ag-files)))
+        ag-reuse-window t
+        ag-highlight-search t))
 
 (use-package helm-ag
   :ensure t
@@ -110,10 +116,10 @@
   :config (setq ffip-prefer-ido-mode t))
 
 (use-package grep
-  :bind
-  (("C-c s g" . grep)
-   ("C-c s r" . rgrep)
-   ("C-c s l" . lgrep))
+  ;; :bind
+  ;; (("C-c s g" . grep)
+  ;;  ("C-c s r" . rgrep)
+  ;;  ("C-c s l" . lgrep))
   :init
   (setq grep-highlight-matches t
         grep-scroll-output t

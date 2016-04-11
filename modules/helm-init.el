@@ -25,7 +25,8 @@
         helm-display-header-line t
         helm-echo-input-in-header-line t
         ;; Default is 'smart, searches and matches should ignore case
-        helm-case-fold-search t)
+        helm-case-fold-search t
+        helm-follow-mode-persistent t)
 
   (use-package helm-mode
     :diminish helm-mode
