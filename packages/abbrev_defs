@@ -11,6 +11,8 @@
 
 (define-abbrev-table 'ad-javap-mode-abbrev-table '())
 
+(define-abbrev-table 'ag-mode-abbrev-table '())
+
 (define-abbrev-table 'awk-mode-abbrev-table '())
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
@@ -733,6 +735,7 @@
     ("perminent" "permanent" nil 0)
     ("perscriptions" "prescriptions" nil 0)
     ("personalyl" "personally" nil 0)
+    ("pleaase" "please" nil 1)
     ("pleasent" "pleasant" nil 0)
     ("plugin" "plug-in" nil 0)
     ("poeple" "people" nil 0)
@@ -777,6 +780,7 @@
     ("reccomend" "recommend" nil 0)
     ("reccommend" "recommend" nil 0)
     ("receieve" "receive" nil 0)
+    ("recenlty" "recently" nil 1)
     ("recieve" "receive" nil 0)
     ("recieved" "received" nil 0)
     ("recieving" "receiving" nil 0)
@@ -979,6 +983,7 @@
     ("tyhat" "that" nil 0)
     ("tyhe" "the" nil 0)
     ("udnerstand" "understand" nil 0)
+    ("udpate" "update" nil 1)
     ("understnad" "understand" nil 0)
     ("undert he" "under the" nil 0)
     ("unicode" "Unicode" nil 0)
@@ -1039,6 +1044,7 @@
     ("wroet" "wrote" nil 0)
     ("wroking" "working" nil 0)
     ("wtih" "with" nil 0)
+    ("wuold" "would" nil 1)
     ("wuould" "would" nil 0)
     ("wya" "way" nil 0)
     ("yera" "year" nil 0)
@@ -1050,7 +1056,7 @@
     ("youre" "you're" nil 0)
     ("youve" "you've" nil 0)
     ("ytou" "you" nil 0)
-    ("yuo" "you" nil 0)
+    ("yuo" "you" nil 1)
     ("yuor" "your" nil 0)
    ))
 
@@ -1185,6 +1191,8 @@
 (define-abbrev-table 'vc-git-region-history-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-svn-log-view-mode-abbrev-table '())
+
+(define-abbrev-table 'web-mode-abbrev-table '())
 
 (define-abbrev-table 'xref--xref-buffer-mode-abbrev-table '())
 
