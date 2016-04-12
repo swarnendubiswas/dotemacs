@@ -38,7 +38,9 @@
         sp-highlight-wrap-tag-overlay t)
   (smartparens-global-mode)
   (show-smartparens-global-mode 1)
+
   (sp-use-smartparens-bindings)
+  (unbind-key "C-S-<backspace>" smartparens-mode-map)
 
   (sp-with-modes sp-lisp-modes
     ;; Disable ', it's the quote character!
