@@ -196,18 +196,6 @@
           ("C-c l n" . bib-find-next)
           ("C-c l h" . bib-highlight-mouse)))
 
-  (use-package helm-bibtex
-    :ensure t
-    :init
-    (use-package parsebib
-      :ensure t)
-    (use-package bibtex-completion)
-    :bind ("C-c l x" . helm-bibtex)
-    :config
-    (setq helm-bibtex-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-          helm-bibtex-cite-prompt-for-optional-arguments nil
-          helm-bibtex-full-frame t))
-
   ;; http://joostkremers.github.io/ebib/ebib-manual.html#the-ebib-buffers
   (use-package ebib
     :ensure t
@@ -253,6 +241,26 @@ an item line."
 
   :bind (:map LaTeX-mode-map
               ("C-c C-d" . nil)))
+
+(use-package bibtex-completion
+  :after tex
+  :config
+  (use-package parsebib
+    :ensure t)
+  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+        bibtex-completion-cite-prompt-for-optional-arguments nil))
+
+(use-package helm-bibtex
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :after bibtex-completion
+  :bind ("C-c l x" . helm-bibtex)
+  :config (setq helm-bibtex-full-frame t))
+
+(use-package ivy-bibtex
+  :if (eq dotemacs-selection 'ivy)
+  :after bibtex-completion
+  :bind ("C-c l x" . ivy-bibtex))
 
 (provide 'latex-init)
 
