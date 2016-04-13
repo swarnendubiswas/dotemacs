@@ -66,8 +66,7 @@
 (use-package gnuplot
   :ensure t
   :mode ("\\.gp\\'" . gnuplot-mode)
-  :interpreter ("gnuplot" . gnuplot-mode)
-  :defer t)
+  :interpreter ("gnuplot" . gnuplot-mode))
 
 (use-package goto-last-change
   :ensure t
@@ -114,16 +113,13 @@
   (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
   (push '("*Kill Ring*") popwin:special-display-config) ; Browse Kill Ring
   (push '("*Selection Ring:") popwin:special-display-config) ; Selection Ring
+  (push '("*ag search*") popwin:special-display-config) ; Silver searcher
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  (add-to-list 'popwin:special-display-config '("*Remember*" :stick t))
-  (add-to-list 'popwin:special-display-config '("*Org Agenda*"))
-  (add-to-list 'popwin:special-display-config '("*sdic*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '(" *auto-async-byte-compile*" :noselect t))
 
   (popwin-mode 1))
 
@@ -148,13 +144,14 @@
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
-  :bind ("C-=" . er/expand-region)
-  :config
-  (use-package change-inner
-    :ensure t
-    :disabled t
-    :bind (("M-i" . change-inner)
-           ("M-o" . change-outer))))
+  :bind ("C-=" . er/expand-region))
+
+(use-package change-inner
+  :ensure t
+  :disabled t
+  :after expand-region
+  :bind (("M-i" . change-inner)
+         ("M-o" . change-outer)))
 
 ;; Restore point with "C-g" after marking a region
 (use-package smart-mark
@@ -176,12 +173,23 @@
   :ensure t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
   :config
-  (dolist (ext '(".log" ".out" ".toc" "-pkg.el" ".idx" ".fls" ".rel"))
+  (dolist (ext '(".fls"
+                 ".idx"
+                 ".log"
+                 ".out"
+                 "-pkg.el"
+                 ".rel"
+                 ".toc"))
     (add-to-list 'ignoramus-file-basename-endings ext))
-  (dolist (filenames '("GTAGS" "GPATH" "GRTAGS" "GSYMS" "TAGS"))
+  (dolist (filenames '("GPATH"
+                       "GRTAGS"
+                       "GSYMS"
+                       "GTAGS"
+                       "TAGS"))
     (add-to-list 'ignoramus-file-basename-exact-names filenames))
   (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
-  (dolist (dir '("auto" "\\`\\."))
+  (dolist (dir '("\\`\\."
+                 "auto"))
     (add-to-list 'ignoramus-file-basename-exact-names dir))
   (ignoramus-setup))
 
@@ -201,11 +209,10 @@
           ;; this function determines the scope of `iedit-start'.
           (if iedit-mode
               (iedit-done)
-            ;; `current-word' can of course be replaced by other
-            ;; functions.
+            ;; `current-word' can of course be replaced by other functions.
             (narrow-to-defun)
             (iedit-start (current-word) (point-min) (point-max)))))))
-  :init (bind-key* "C-." #'iedit-dwim))
+  :init (bind-key* "C-." #'iedit-mode))
 
 (use-package session
   :ensure t

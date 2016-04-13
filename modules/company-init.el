@@ -52,11 +52,6 @@
     (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
     (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
 
-  (use-package company-emoji
-    :ensure t
-    :disabled t
-    :config (add-hook 'text-mode-hook 'company-emoji-init))
-
   (use-package company-try-hard
     :ensure t
     :bind (:map company-active-map
@@ -76,12 +71,14 @@
 
 (use-package company-statistics
   :ensure t
+  :after company
   :config
   (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
   (company-statistics-mode 1))
 
 (use-package company-quickhelp
   :ensure t
+  :after company
   :config
   (setq company-quickhelp-delay 0.5
         company-quickhelp-max-lines 60)

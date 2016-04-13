@@ -68,6 +68,7 @@
 
   (use-package ac-helm
     :ensure t
+    :if (eq dotemacs-selection 'helm)
     :bind (:map ac-complete-mode-map
                 ("C-:" . ac-complete-with-helm)))
 
@@ -83,10 +84,6 @@
   (use-package ac-dabbrev
     :ensure t
     :config (add-to-list 'ac-sources 'ac-source-dabbrev))
-
-  (use-package ac-emoji
-    :ensure t
-    :disabled t)
 
   :bind (;; Filter candidates by pattern
          :map ac-completing-map
