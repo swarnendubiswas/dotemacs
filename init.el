@@ -52,6 +52,11 @@
 ;;    Design Programs".
 ;;
 ;;   "A language that doesn't affect the way you think about programming, is not worth knowing." -- Alan Perlis.
+;;
+;;   "I swear you spend just as much time configuring Emacs as you do coding other stuff"
+;;
+;;   "Emacs saves you time when you work, and takes it back when you play with it" -- http://puntoblogspot.blogspot.com/
+
 
 ;;; Code:
 

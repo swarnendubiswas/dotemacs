@@ -48,6 +48,9 @@
 (use-package linum ; Display line numbers in margin
   :config (global-linum-mode 1))
 
+(use-package custom
+  :config (setq custom-safe-themes t))
+
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
                                      :config

@@ -17,6 +17,8 @@
 (bind-key "C-c z" #'repeat)
 (bind-key "C-z" #'undo)
 
+;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the comment, NOT UNCOMMENTING
+;; but removing all commentted text and the comment marker itself.
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
 (bind-key "C-c ;" #'dotemacs-comment-line)
@@ -36,31 +38,16 @@
 (bind-key "C-c d i" #'dotemacs-byte-compile-init-dir)
 (bind-key "C-c d n" #'package-list-packages-no-fetch)
 
-(use-package guide-key
-  :ensure t
-  :disabled t
-  :diminish guide-key-mode
-  :config
-  (setq guide-key/guide-key-sequence t
-        guide-key/recursive-key-sequence-flag t
-        guide-key/popup-window-position 'bottom
-        ;; Delay before the guide shows up, default is 1 s
-        guide-key/idle-delay 1.0)
-  (guide-key-mode 1)
-  (use-package guide-key-tip
-    :ensure t
-    :disabled t
-    :config (setq guide-key-tip/enabled t)))
-
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
   :config
   (which-key-mode 1)
+  ;; Will try to use the right, will switch to use the bottom if there is no space
   (setq which-key-idle-delay 1.0
         which-key-popup-type 'side-window
-        which-key-side-window-location 'right
-        which-key-use-C-h-for-paging t
-        which-key-prevent-C-h-from-cycling t)
+        which-key-side-window-location '(right bottom)
+        which-key-use-C-h-commands t)
+  (which-key-setup-side-window-right-bottom)
   :diminish which-key-mode)
 
 (provide 'keybindings-init)

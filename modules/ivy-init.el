@@ -54,36 +54,6 @@
                     "^\\*Ibuffer\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
   (ivy-mode 1)
-  (use-package counsel
-    :ensure t
-    :bind
-    (([remap describe-function] . counsel-describe-function)
-     ([remap describe-variable] . counsel-describe-variable)
-     ([remap yank-pop] . counsel-yank-pop)
-     ([remap execute-extended-command] . counsel-M-x)
-     ("<f1>" . counsel-M-x)
-     ([remap find-file] . counsel-find-file)
-     ("<f3>" . counsel-find-file))
-    :config
-    (setq counsel-mode-override-describe-bindings t
-          counsel-find-file-at-point nil)
-    (setq counsel-find-file-ignore-regexp (concat
-                                           "\\(?:\\`[#.]\\)" ; File names beginning with # or .
-                                           "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
-                                           "\\|__pycache__"
-                                           "\\|.aux$"
-                                           "\\|.bbl$"
-                                           "\\|.blg$"
-                                           "\\|.elc$"
-                                           "\\|.fdb_latexmk$"
-                                           "\\|.fls$"
-                                           "\\|.log$"
-                                           "\\|.out$"
-                                           "\\|.pyc$"
-                                           "\\|.rel$"
-                                           "\\|.synctex.gz"))
-    (counsel-mode 1)
-    :diminish counsel-mode)
   :bind
   (("C-c r" . ivy-resume)
    ("<f9>" . ivy-recentf)
@@ -96,6 +66,39 @@
    ("<left>" . ivy-previous-line)
    ("<right>" . ivy-next-line))
   :diminish ivy-mode)
+
+(use-package counsel
+  :ensure t
+  :after ivy
+  :bind
+  (([remap describe-function] . counsel-describe-function)
+   ([remap describe-variable] . counsel-describe-variable)
+   ([remap yank-pop] . counsel-yank-pop)
+   ([remap describe-bindings] . counsel-descbinds)
+   ([remap execute-extended-command] . counsel-M-x)
+   ("<f1>" . counsel-M-x)
+   ([remap find-file] . counsel-find-file)
+   ("<f3>" . counsel-find-file))
+  :config
+  (setq counsel-mode-override-describe-bindings t
+        counsel-find-file-at-point nil)
+  (setq counsel-find-file-ignore-regexp (concat
+                                         "\\(?:\\`[#.]\\)" ; File names beginning with # or .
+                                         "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
+                                         "\\|__pycache__"
+                                         "\\|.aux$"
+                                         "\\|.bbl$"
+                                         "\\|.blg$"
+                                         "\\|.elc$"
+                                         "\\|.fdb_latexmk$"
+                                         "\\|.fls$"
+                                         "\\|.log$"
+                                         "\\|.out$"
+                                         "\\|.pyc$"
+                                         "\\|.rel$"
+                                         "\\|.synctex.gz"))
+  (counsel-mode 1)
+  :diminish counsel-mode)
 
 (provide 'ivy-init)
 

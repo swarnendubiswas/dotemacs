@@ -15,7 +15,7 @@
     ;; http://stackoverflow.com/questions/9999320/how-to-check-if-a-function-e-g-server-running-p-is-available-under-emacs
     (when (and (fboundp 'server-running-p)
                (not (server-running-p)))
-      (server-start))))
+      (server-mode))))
 
 (provide 'server-init)
 

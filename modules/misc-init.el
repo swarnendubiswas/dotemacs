@@ -223,7 +223,7 @@
 (use-package persistent-scratch
   :ensure t
   :config
-  (setq persistent-scratch-save-file (concat dotemacs-temp-directory ".persistent-scratch"))
+  (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
   (persistent-scratch-setup-default))
 
 (provide 'misc-init)

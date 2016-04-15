@@ -54,7 +54,8 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :bind ("C-c s" . swiper))
+  :bind (("C-c s" . swiper)
+         ("C-c S" . swiper-all)))
 
 (use-package swiper-helm
   :ensure t
