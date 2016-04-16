@@ -55,7 +55,10 @@
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
   :bind (("C-c s" . swiper)
-         ("C-c S" . swiper-all)))
+         ("C-c S" . swiper-all))
+  :config
+  ;; Long lines are truncated at the right without visual line
+  (setq swiper-use-visual-line t))
 
 (use-package swiper-helm
   :ensure t
@@ -110,7 +113,8 @@
 (when (eq dotemacs-selection 'ivy)
   (bind-key "C-c a" #'counsel-ag)
   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
-  (bind-key "C-c g" #'counsel-git-grep))
+  (bind-key "C-c g" #'counsel-git-grep)
+  (bind-key "C-c o" #'counsel-grep-or-swiper))
 
 (use-package find-file-in-project
   :ensure t

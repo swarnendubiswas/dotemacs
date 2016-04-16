@@ -25,7 +25,7 @@
 (use-package ws-butler
   :ensure t
   :diminish ws-butler-mode
-  :config (add-hook 'prog-mode-hook #'ws-butler-mode))
+  :init (add-hook 'prog-mode-hook #'ws-butler-mode))
 
 (provide 'whitespace-init)
 

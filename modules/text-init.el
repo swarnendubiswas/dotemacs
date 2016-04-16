@@ -13,18 +13,11 @@
   (turn-off-hideshow))
 (add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 
-(or (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
-      :ensure t
-      :functions writegood-mode
-      :diminish writegood-mode
-      :config (add-hook 'text-mode-hook #'writegood-mode))
-
-    (use-package artbollocks-mode
-      :ensure t
-      :disabled t
-      :functions artbollocks-mode
-      :diminish artbollocks-mode
-      :config (add-hook 'text-mode-hook #'artbollocks-mode)))
+(use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
+  :ensure t
+  :functions writegood-mode
+  :diminish writegood-mode
+  :config (add-hook 'text-mode-hook #'writegood-mode))
 
 (use-package langtool
   :ensure t

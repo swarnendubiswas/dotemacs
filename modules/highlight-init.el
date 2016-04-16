@@ -5,17 +5,16 @@
 
 ;;; Code:
 
-(use-package hl-line ; highlight current line
+(use-package hl-line ; Highlight current line
   :ensure t
-  :if (bound-and-true-p display-graphic-p)
-  :init
-  ;; (global-hl-line-mode 1)
-  (setq hl-line-sticky-flag nil) ; Highlight the line only in the active window
-  (use-package hl-line+ ; highlight only when idle
-    :ensure t
-    :init (toggle-hl-line-when-idle 1)))
+  :config (setq hl-line-sticky-flag nil))
 
-(use-package hlinum ; extension to linum-mode to highlight current line number in the margin
+(use-package hl-line+ ; Highlight only when idle
+  :ensure t
+  :after hl-line
+  :config (toggle-hl-line-when-idle 1))
+
+(use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
   :ensure t
   :init (hlinum-activate))
 

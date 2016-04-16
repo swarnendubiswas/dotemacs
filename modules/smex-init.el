@@ -8,7 +8,7 @@
 (use-package smex
   :ensure t
   :config
-  (setq smex-save-file (expand-file-name ".smex-items" dotemacs-temp-directory)
+  (setq smex-save-file (expand-file-name "smex-items" dotemacs-temp-directory)
         smex-auto-update t)
   (smex-initialize)
   :bind (("<f2>" . smex)
