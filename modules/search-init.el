@@ -54,8 +54,22 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :bind (("C-c s" . swiper)
-         ("C-c S" . swiper-all))
+  :preface
+  ;; For certain files with long lines, the results in the swiper buffer is truncated to the right. These wrapper
+  ;; methods are to get around that problem.
+  (defun dotemacs-swiper-with-visual-line-mode ()
+    (interactive)
+    (visual-line-mode 1)
+    (swiper)
+    (visual-line-mode -1))
+
+  (defun dotemacs-swiper-all-with-visual-line-mode ()
+    (interactive)
+    (visual-line-mode 1)
+    (swiper-all)
+    (visual-line-mode -1))
+  :bind (("C-c s" . dotemacs-swiper-with-visual-line-mode)
+         ("C-c S" . dotemacs-swiper-all-with-visual-line-mode))
   :config
   ;; Long lines are truncated at the right without visual line
   (setq swiper-use-visual-line t))
