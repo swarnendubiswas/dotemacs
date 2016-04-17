@@ -8,7 +8,7 @@
 ;; Use either python-mode or elpy or anaconda-mode.
 
 (use-package python ; Emacs built-in python mode
-  :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
+  :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode))
 
 (defun dotemacs--python-setup ()
@@ -43,43 +43,6 @@
   :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
   :interpreter ("python" . python-mode)
   :config (add-hook 'python-mode-hook #'dotemacs--python-setup))
-
-(use-package jedi
-  :ensure t
-  :disabled t
-  :config
-  (use-package virtualenv
-    :ensure t)
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (setq jedi:complete-on-dot t)
-
-  (use-package company-jedi
-    :ensure t
-    :if (eq dotemacs-completion-in-buffer 'company)
-    :config
-    (with-eval-after-load "company"
-      (add-to-list 'company-backends 'company-jedi))))
-
-(use-package anaconda-mode
-  :ensure t
-  :disabled t
-  :diminish anaconda-mode
-  :init
-  (add-hook 'python-mode-hook #'anaconda-mode)
-
-  (use-package ac-anaconda
-    :ensure t
-    :if (eq dotemacs-completion-in-buffer 'auto-complete)
-    :init
-    (with-eval-after-load "auto-complete"
-      (add-hook 'python-mode-hook 'ac-anaconda-setup)))
-
-  (use-package company-anaconda
-    :ensure t
-    :if (eq dotemacs-completion-in-buffer 'company)
-    :init
-    (with-eval-after-load "company"
-      (add-to-list 'company-backends 'company-anaconda))))
 
 (use-package pydoc
   :ensure t
