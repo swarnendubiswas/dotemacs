@@ -20,8 +20,6 @@
   (run-python (python-shell-parse-command) nil nil)
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package ac-python
-      :ensure t)
     (use-package auto-complete-chunk
       :ensure t
       :init
