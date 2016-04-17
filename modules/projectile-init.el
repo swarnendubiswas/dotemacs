@@ -43,28 +43,36 @@
                   "TAGS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
-  (if (eq dotemacs-selection 'helm)
-      (progn
-        (use-package helm-projectile
-          :ensure t
-          :if (eq dotemacs-selection 'helm)
-          :config
-          (setq helm-projectile-fuzzy-match t
-                projectile-switch-project-action #'helm-projectile-find-file-dwim)
-          (helm-projectile-on)
-          :bind (("<f5>" . helm-projectile-switch-project)
-                 ("<f6>" . helm-projectile-find-file)
-                 ("<f7>" . helm-projectile-switch-to-buffer)
-                 ;; helm grep is different from projectile-grep because the helm grep is incremental
-                 ("<f8>" . helm-projectile-grep))))
-    (progn
-      (bind-key "<f5>" #'projectile-switch-project)
-      (bind-key "<f6>" #'projectile-find-file)
-      (bind-key "<f7>" #'projectile-switch-to-buffer)
-      ;; projectile-grep fails with fish shell
-      (bind-key "<f8>" #'projectile-ag)))
+  (when (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
+    (bind-key "<f5>" #'projectile-switch-project)
+    (bind-key "<f6>" #'projectile-find-file)
+    (bind-key "<f7>" #'projectile-switch-to-buffer)
+    ;; projectile-grep fails with fish shell
+    (bind-key "<f8>" #'projectile-ag))
 
   :diminish projectile-mode)
+
+(use-package helm-projectile
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :config
+  (setq helm-projectile-fuzzy-match t
+        projectile-switch-project-action #'helm-projectile-find-file-dwim)
+  (helm-projectile-on)
+  :bind (("<f5>" . helm-projectile-switch-project)
+         ("<f6>" . helm-projectile-find-file)
+         ("<f7>" . helm-projectile-switch-to-buffer)
+         ;; helm grep is different from projectile-grep because the helm grep is incremental
+         ("<f8>" . helm-projectile-grep)))
+
+(use-package counsel-projectile
+  :ensure t
+  :if (eq dotemacs-selection 'ivy)
+  :bind (("<f5>" . counsel-projectile)
+         ("<f6>" . counsel-projectile-find-file)
+         ("<f7>" . counsel-projectile-switch-to-buffer)
+         ;; projectile-grep fails with fish shell
+         ("<f8>" . projectile-ag)))
 
 (provide 'projectile-init)
 

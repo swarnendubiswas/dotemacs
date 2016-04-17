@@ -23,7 +23,7 @@
   :ensure t
   :defer t
   :config
-  (setq langtool-language-tool-jar (concat user-emacs-directory "packages/LanguageTool-3.0/languagetool-commandline.jar")
+  (setq langtool-language-tool-jar (concat user-emacs-directory "packages/LanguageTool-3.3/languagetool-commandline.jar")
         langtool-java-classpath nil
         langtool-default-language "en-US"
         langtool-java-bin "/usr/bin/java"

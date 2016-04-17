@@ -12,6 +12,12 @@
   :ensure t
   :commands (describe-buffer describe-command describe-file describe-keymap))
 
+(use-package help-mode+
+  :ensure t)
+
+(use-package info+
+  :ensure t)
+
 (use-package smooth-scrolling
   :ensure t
   :disabled t ;; This repositions the cursor to the middle on scrolling if the search string is at the boundaries.
@@ -218,7 +224,7 @@
   :ensure t
   :init
   (add-hook 'after-init-hook #'session-initialize)
-  (setq session-save-file (concat dotemacs-temp-directory ".session")))
+  (setq session-save-file (concat dotemacs-temp-directory "session")))
 
 (use-package persistent-scratch
   :ensure t

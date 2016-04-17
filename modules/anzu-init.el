@@ -14,7 +14,9 @@
   (when (eq dotemacs-mode-line-theme 'spaceline)
     (setq anzu-cons-mode-line-p nil))
   (unless (eq dotemacs-theme 'leuven)
-    (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'light))
+    (set-face-attribute 'anzu-mode-line nil
+                        :foreground "blue"
+                        :weight 'light))
   (global-anzu-mode 1))
 
 (provide 'anzu-init)

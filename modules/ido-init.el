@@ -27,7 +27,7 @@
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
         ido-create-new-buffer 'always ; Other options: prompt, never
         ido-default-file-method 'selected-window
-        ido-save-directory-list-file (concat dotemacs-temp-directory ".ido.last")
+        ido-save-directory-list-file (concat dotemacs-temp-directory "ido.last")
         ido-enable-last-directory-history t
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
