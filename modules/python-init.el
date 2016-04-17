@@ -74,6 +74,7 @@
 ;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
 (use-package elpy
   :ensure t
+  :disabled t
   :diminish elpy-mode
   :preface
   (defun dotemacs--elpy-setup ()
