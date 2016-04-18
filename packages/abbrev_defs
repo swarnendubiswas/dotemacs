@@ -39,6 +39,20 @@
 
 (define-abbrev-table 'completion-list-mode-abbrev-table '())
 
+(define-abbrev-table 'conf-colon-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-javaprop-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-ppd-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-space-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-unix-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-windows-mode-abbrev-table '())
+
+(define-abbrev-table 'conf-xdefaults-mode-abbrev-table '())
+
 (define-abbrev-table 'data-debug-mode-abbrev-table '())
 
 (define-abbrev-table 'diff-mode-abbrev-table '())
@@ -165,6 +179,7 @@
     ("articel" "article" nil 0)
     ("asdvertising" "advertising" nil 0)
     ("assistent" "assistant" nil 0)
+    ("assuem" "assume" nil 1)
     ("asthe" "as the" nil 0)
     ("atention" "attention" nil 0)
     ("atmospher" "atmosphere" nil 0)
@@ -175,6 +190,7 @@
     ("authetication" "authentication" nil 0)
     ("avaiability" "availability" nil 1)
     ("availalbe" "available" nil 0)
+    ("avialable" "available" nil 1)
     ("awya" "away" nil 0)
     ("aywa" "away" nil 0)
     ("bakc" "back" nil 0)
@@ -273,6 +289,7 @@
     ("comntain" "contain" nil 0)
     ("comntains" "contains" nil 0)
     ("compair" "compare" nil 0)
+    ("comparign" "comparing" nil 1)
     ("comparisions" "comparisons" nil 0)
     ("compatable" "compatible" nil 0)
     ("compleated" "completed" nil 0)
@@ -288,6 +305,7 @@
     ("comunicate" "communicate" nil 0)
     ("comunity" "community" nil 0)
     ("condersider" "consider" nil 0)
+    ("conditinally" "Conditionally" nil 2)
     ("condolances" "condolences" nil 0)
     ("conected" "connected" nil 0)
     ("conferance" "conference" nil 0)
@@ -367,6 +385,7 @@
     ("develpment" "development" nil 0)
     ("devloped" "developed" nil 0)
     ("diaplay" "display" nil 0)
+    ("dicuss" "discuss" nil 1)
     ("didint" "didn't" nil 0)
     ("didnot" "did not" nil 0)
     ("didnt" "didn't" nil 0)
@@ -487,6 +506,7 @@
     ("geting" "getting" nil 0)
     ("gettin" "getting" nil 0)
     ("gievn" "given" nil 0)
+    ("giong" "going" nil 1)
     ("giveing" "giving" nil 0)
     ("gloabl" "global" nil 0)
     ("goign" "going" nil 0)
@@ -868,6 +888,7 @@
     ("similiar" "similar" nil 0)
     ("simpilified" "simplified" nil 0)
     ("simpyl" "simply" nil 0)
+    ("simualtor" "simulator" nil 1)
     ("sincerly" "sincerely" nil 0)
     ("sitll" "still" nil 0)
     ("smae" "same" nil 0)
@@ -922,7 +943,7 @@
     ("techinques" "techniques" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 11)
+    ("teh" "the" nil 14)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
     ("termoil" "turmoil" nil 0)
