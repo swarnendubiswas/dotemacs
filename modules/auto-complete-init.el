@@ -7,9 +7,8 @@
 
 (use-package auto-complete
   :ensure t
+  :init (ac-config-default)
   :config
-  (ac-config-default)
-
   (ac-linum-workaround)
   (with-eval-after-load "flyspell"
     (ac-flyspell-workaround))
