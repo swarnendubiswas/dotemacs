@@ -32,6 +32,7 @@
       (or
        (use-package ac-etags
          :ensure t
+         :after auto-complete
          :config
          (setq ac-etags-requires 4)
          (ac-etags-setup)
@@ -39,6 +40,7 @@
        (use-package auto-complete-etags
          :ensure t
          :disabled t
+         :after auto-complete
          :config
          (setq ac-etags-use-document t)
          (add-to-list 'ac-sources 'ac-source-etags))))))
