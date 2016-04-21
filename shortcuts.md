@@ -25,10 +25,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 * `C-M-n` - Move forward over a parenthetical group (`forward-list`).
 * `C-M-p` - Move backward over a parenthetical group (`backward-list`).
-C-M-f     forward-sexp     Move forward over a balanced expression  ;;
-C-M-b     backward-sexp    Move backward over a balanced expression ;;
-C-M-k     kill-sexp        Kill balanced expression forward         ;;
-C-M-SPC   mark-sexp        Put the mark at the end of the sexp.     ;;
+* `C-M-f` - Move forward over a balanced expression (`forward-sexp`).
+* `C-M-b` - Move backward over a balanced expression (`backward-sexp`).
+* `C-M-k` - Kill balanced expression forward (`kill-sexp`).
+* `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`).
 
 * `C-M-a` - Goto the start of a function.
 * `C-M-e` - Goto the end of a function.
@@ -37,14 +37,15 @@ C-M-SPC   mark-sexp        Put the mark at the end of the sexp.     ;;
 * `M-{` - Move back to the previous paragraph beginning.
 * `M-}` - Move forward to the next paragraph end.
 
-
-
 #### Dired
 
 * `g` - Update the entire contents (`revert-buffer`).
 * `l` - Update the specified files (`dired-do-redisplay`).
 * `k` - Delete the specified file lines (`dired-do-kill-lines`).
 * `s` - Toggle between alphabetical and date/time order (`dired-sort-toggle-or-edit`).
+* `C` - Copy the specified files (`dired-do-copy`).
+* `D` - Delete the specified files (`dired-do-delete`).
+* `R` - Rename the specified files (`dired-do-rename`).
 
 #### Ibuffer
 
@@ -56,6 +57,9 @@ C-M-SPC   mark-sexp        Put the mark at the end of the sexp.     ;;
 #### Search
 
 * `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`.
+
+#### Swiper
+
 
 #### Org mode
 

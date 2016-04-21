@@ -25,10 +25,10 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 Here are a few customization options that you could use to tweak the default setup. These options can be modified from `modules/config-init.el`.
 
 * `dotemacs-completion-in-buffer` - Toggle between `company` or `auto-complete`, with `company` being default.
-* `dotemacs-theme` - Set the desired theme from `leuven`, `professional`, `eclipse`, and default.
-* `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `telephone-line`, `spaceline` and default.
-* `dotemacs-selection` - Choose the completion framework, between `helm`, `ido`, or `ivy`. 
+* `dotemacs-selection` - Choose the completion framework, between `helm`, `ido`, or `ivy`.
 * `dotemacs-ido-view-mode` - Choose how choices are displayed with `ido`. The options are vertical, grid, and default.
+* `dotemacs-theme` - Set the desired theme from `leuven`, `professional`, `eclipse`, and default. 
+* `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `telephone-line`, `spaceline` and default.
 
 Suggestions are welcome.
 
