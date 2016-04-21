@@ -13,6 +13,7 @@
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
 (use-package isearch
+  :disabled t
   :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
   :preface
   ;; https://www.reddit.com/r/emacs/comments/3yxk2x/flexible_isearch_without_a_package/
@@ -46,7 +47,7 @@
          ("C-<return>" . isearch-exit-other-end)))
 
 (use-package replace
-  :defer t
+  :disabled t
   :config
   (setq query-replace-highlight t) ; Highlight during query
   (use-package replace+
@@ -132,9 +133,11 @@
 
 (use-package find-file-in-project
   :ensure t
+  :disabled t
   :config (setq ffip-prefer-ido-mode t))
 
 (use-package grep
+  :disabled t
   ;; :bind
   ;; (("C-c s g" . grep)
   ;;  ("C-c s r" . rgrep)

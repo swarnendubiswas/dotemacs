@@ -127,9 +127,9 @@
 (require 'svn-init)
 (require 'git-init)
 
-;; FIXME: For some reason, this needs to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
-;; not enabled on startup.
-(require 'tags-init)
+;; FIXME: For some reason, this needed to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
+;; not enabled on startup. I am not using this module currently.
+;; (require 'tags-init)
 (require 'custom-init)
 
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
