@@ -258,6 +258,7 @@ an item line."
   :config (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
+  :ensure t
   :if (eq dotemacs-selection 'ivy)
   :after bibtex-completion
   :bind ("C-c l x" . ivy-bibtex))

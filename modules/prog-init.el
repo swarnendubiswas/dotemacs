@@ -40,6 +40,7 @@
     :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
 
   (use-package eldoc
+    :disabled t
     :config
     (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
     (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
