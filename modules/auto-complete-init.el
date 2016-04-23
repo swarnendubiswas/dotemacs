@@ -53,29 +53,6 @@
                   text-mode))
     (add-to-list 'ac-modes mode))
 
-  (use-package ac-capf
-    :ensure t
-    :config (ac-capf-setup))
-
-  (use-package ac-helm
-    :ensure t
-    :if (eq dotemacs-selection 'helm)
-    :bind (:map ac-complete-mode-map
-                ("C-:" . ac-complete-with-helm)))
-
-  (use-package ac-ispell ; Ispell/aspell completion source for auto-complete
-    :ensure t
-    :disabled t ; Seems to add noise
-    :config
-    (setq ac-ispell-requires 4 ; Minimum input for starting completion
-          ac-ispell-fuzzy-limit 2)
-    (ac-ispell-setup)
-    (add-hook 'text-mode-hook #'ac-ispell-ac-setup))
-
-  (use-package ac-dabbrev
-    :ensure t
-    :config (add-to-list 'ac-sources 'ac-source-dabbrev))
-
   :bind (;; Filter candidates by pattern with "C-f"
          :map ac-completing-map
               ("C-n" . ac-next)
@@ -93,6 +70,26 @@
               ("C-s" . nil)
               ("C-f" . ac-isearch))
   :diminish auto-complete-mode)
+
+(use-package ac-capf
+  :ensure t
+  :after auto-complete
+  :config (ac-capf-setup))
+
+(use-package ac-ispell ; Ispell/aspell completion source for auto-complete
+  :ensure t
+  :after auto-complete
+  :disabled t ; Seems to add noise
+  :config
+  (setq ac-ispell-requires 4 ; Minimum input for starting completion
+        ac-ispell-fuzzy-limit 2)
+  (ac-ispell-setup)
+  (add-hook 'text-mode-hook #'ac-ispell-ac-setup))
+
+(use-package ac-dabbrev
+  :ensure t
+  :after auto-complete
+  :config (add-to-list 'ac-sources 'ac-source-dabbrev))
 
 (provide 'auto-complete-init)
 
