@@ -18,7 +18,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ivy
-  :ensure swiper
+  :ensure t
   :if (eq dotemacs-selection 'ivy)
   :preface
   ;; https://github.com/abo-abo/oremacs/blob/github/oleh/modes/ora-ivy.el
