@@ -15,11 +15,18 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-t` - Transpose two characters (`transpose-chars`).
 * `C-x r t` - Prepend the selected region with characters.
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
+* `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
+
+#### Marking
+
+* `C-M-h` - Mark function body (`c-mark-function`).
 * `C-x h` - Mark whole buffer (`mark-whole-buffer`).
 * `M-h` - Put region around current paragraph (`mark-paragraph`).
 * `M-@` - Mark the current word (`mark-word` or `subword-mark`).
 * `C-M-h` - Select whole function definition (`mark-defun`).
-* `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
+* `C-M-@` - Set mark after end of following balanced expression (`mark-sexp`).
+* `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`).
+* `C-x C-p` - Move point to the beginning of the current page, and set mark at the end (`mark-page`).
 
 #### Key motion
 
@@ -28,7 +35,6 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-M-f` - Move forward over a balanced expression (`forward-sexp`).
 * `C-M-b` - Move backward over a balanced expression (`backward-sexp`).
 * `C-M-k` - Kill balanced expression forward (`kill-sexp`).
-* `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`).
 
 * `C-M-a` - Goto the start of a function.
 * `C-M-e` - Goto the end of a function.
@@ -60,6 +66,19 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Swiper
 
+
+#### Ivy
+
+* `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`).
+* `C-n` - Selects the next candidate (`ivy-next-line`).
+* `C-p` - Selects the previous candidate (`ivy-previous-line`).
+* `M-<` - Selects the first candidate (`ivy-beginning-of-buffer`).
+* `M->` - Selects the last candidate (`ivy-end-of-buffer`).
+* `C-v` - Scrolls up by ivy-height lines (`ivy-scroll-up-command`).
+* `M-v` - Scrolls down by ivy-height lines (`ivy-scroll-down-command`).
+* `//` - Switch to the root directory (`self-insert-command`).
+* `~` - Switch to the home directory (`self-insert-command`).
+* `C-c C-o` - Permanently save any completion session (`ivy-occur`).
 
 #### Org mode
 
@@ -94,7 +113,6 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Programming
 
-* `C-M-h` - Mark function body (`c-mark-function`).
 
 #### Use Cases
 

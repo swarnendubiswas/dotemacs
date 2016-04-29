@@ -15,6 +15,8 @@
 ;; M-v (ivy-scroll-down-command) Scrolls down by ivy-height lines  ;;
 ;; //  (self-insert-command) Switch to the root directory.         ;;
 ;; ~   (self-insert-command) Switch to the home directory.         ;;
+;; C-c C-o (ivy-occur) Permanently save any completion session
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ivy
