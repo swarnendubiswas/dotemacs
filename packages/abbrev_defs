@@ -776,6 +776,7 @@
     ("prelease" "release" nil 0)
     ("prerelease" "pre-release" nil 0)
     ("presance" "presence" nil 0)
+    ("presennce" "presence" nil 1)
     ("presenoce" "presence" nil 1)
     ("privleged" "privileged" nil 0)
     ("probelm" "problem" nil 0)
