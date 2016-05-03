@@ -113,11 +113,7 @@
                                                           :foreground "white")
                                       (with-eval-after-load "hl-line"
                                         (set-face-attribute 'hl-line nil
-                                                            :background "linen"))
-                                      (with-eval-after-load "ac-ispell"
-                                        (set-face-attribute 'ac-ispell-fuzzy-candidate-face nil
-                                                            :background "deep sky blue"
-                                                            :foreground "white")))))
+                                                            :background "linen")))))
 
 (use-package display-theme
   :ensure t
@@ -186,19 +182,6 @@
   :bind (:map tabbar-mode-map
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
-
-(use-package tabbar-ruler
-  :ensure t
-  :disabled t
-  :after tabbar
-  :config
-  (setq tabbar-ruler-global-tabbar t) ; If you want tabbar
-  (setq tabbar-ruler-global-ruler t) ; If you want a global ruler
-  (setq tabbar-ruler-popup-menu t) ; If you want a popup menu.
-  (setq tabbar-ruler-popup-toolbar t) ; If you want a popup toolbar
-  (setq tabbar-ruler-popup-scrollbar t) ; If you want to only show the scroll bar when your mouse is moving.
-  (with-eval-after-load "projectile"
-    (tabbar-ruler-group-by-projectile-project)))
 
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt
 (if (eq system-type 'windows-nt)

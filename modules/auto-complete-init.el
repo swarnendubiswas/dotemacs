@@ -78,8 +78,8 @@
 
 (use-package ac-ispell ; Ispell/aspell completion source for auto-complete
   :ensure t
+  :disabled t
   :after auto-complete
-  :disabled t ; Seems to add noise
   :config
   (setq ac-ispell-requires 4 ; Minimum input for starting completion
         ac-ispell-fuzzy-limit 2)
