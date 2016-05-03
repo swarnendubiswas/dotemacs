@@ -33,6 +33,8 @@
 
 (define-abbrev-table 'c-mode-abbrev-table '())
 
+(define-abbrev-table 'calendar-mode-abbrev-table '())
+
 (define-abbrev-table 'change-log-mode-abbrev-table '())
 
 (define-abbrev-table 'comint-mode-abbrev-table '())
@@ -305,6 +307,7 @@
     ("comtains" "contains" nil 0)
     ("comunicate" "communicate" nil 0)
     ("comunity" "community" nil 0)
+    ("concrrent" "concurrent" nil 1)
     ("condersider" "consider" nil 0)
     ("conditinally" "Conditionally" nil 2)
     ("condolances" "condolences" nil 0)
@@ -433,6 +436,7 @@
     ("eforts" "efforts" nil 0)
     ("ehr" "her" nil 0)
     ("ehre" "here" nil 0)
+    ("elborate" "elaborate" nil 1)
     ("eligable" "eligible" nil 0)
     ("emacs" "Emacs" nil 0)
     ("embarass" "embarrass" nil 0)
@@ -606,6 +610,7 @@
     ("inthe" "in the" nil 0)
     ("inturn" "in turn" nil 0)
     ("invitaion" "invitation" nil 0)
+    ("invlaidation" "invalidation" nil 1)
     ("invstigated" "investigated" nil 0)
     ("inwhich" "in which" nil 0)
     ("isngihtful" "insightful" nil 1)
@@ -789,6 +794,7 @@
     ("proceding" "proceeding" nil 0)
     ("proctetion" "protection" nil 0)
     ("prominant" "prominent" nil 0)
+    ("propposed" "proposed" nil 1)
     ("propsoe" "propose" nil 1)
     ("protction" "protection" nil 0)
     ("protoge" "protege" nil 0)
@@ -957,7 +963,7 @@
     ("techinques" "techniques" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 16)
+    ("teh" "the" nil 17)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
     ("termoil" "turmoil" nil 0)
@@ -1056,6 +1062,7 @@
     ("wief" "wife" nil 0)
     ("wierd" "weird" nil 0)
     ("wihch" "which" nil 0)
+    ("wihout" "Without" nil 1)
     ("wiht" "with" nil 0)
     ("willbe" "will be" nil 0)
     ("windoes" "windows" nil 0)
@@ -1141,6 +1148,8 @@
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
+(define-abbrev-table 'log4e-mode-abbrev-table '())
+
 (define-abbrev-table 'makefile-automake-mode-abbrev-table '())
 
 (define-abbrev-table 'makefile-bsdmake-mode-abbrev-table '())
@@ -1164,6 +1173,10 @@
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-mode-abbrev-table '())
+
+(define-abbrev-table 'org-export-stack-mode-abbrev-table '())
+
+(define-abbrev-table 'org-mode-abbrev-table '())
 
 (define-abbrev-table 'outline-mode-abbrev-table '())
 
