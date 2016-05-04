@@ -87,8 +87,7 @@
   (setq save-interprogram-paste-before-kill t
         kill-whole-line t
         suggest-key-bindings t
-        ;; Use shift-select for marking
-        shift-select-mode t
+        shift-select-mode t ; Use shift-select for marking
         blink-matching-paren t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)

@@ -71,7 +71,8 @@
 (use-package avy
   :ensure t
   :bind (("M-b" . avy-goto-word-1)
-         ("C-'" . avy-goto-char))
+         ("C-'" . avy-goto-char)
+         ("C-/" . avy-goto-line))
   :config
   ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one of the currently
   ;; visible isearch candidates using avy.

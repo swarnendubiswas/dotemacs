@@ -77,17 +77,19 @@
 ;; https://github.com/cemerick/.emacs.d#nyan-mode
 (use-package nyan-mode
   :ensure t
-  :init
-  (defun toggle-nyan-mode (&optional frame)
+  :preface
+  (defun dotemacs--toggle-nyan-mode (&optional frame)
     "Enable/disable nyan mode."
     (if (display-graphic-p frame)
         (progn
           (nyan-mode 1)
           (nyan-start-animation)
-          (setq-default nyan-wavy-trail nil))
+          (setq-default nyan-wavy-trail nil
+                        nyan-cat-face-number 2))
       (nyan-mode -1)))
-  (add-hook 'after-make-frame-functions 'toggle-nyan-mode)
-  (add-hook 'after-init-hook 'toggle-nyan-mode))
+  :init
+  (add-hook 'after-make-frame-functions 'dotemacs--toggle-nyan-mode)
+  (add-hook 'after-init-hook 'dotemacs--toggle-nyan-mode))
 
 (provide 'mode-line-init)
 

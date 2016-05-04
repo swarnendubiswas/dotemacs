@@ -5,6 +5,11 @@
 
 ;;; Code:
 
+(use-package simple
+  :config
+  (setq kill-ring-max 200
+        kill-do-not-save-duplicates t))
+
 (or (use-package helm-ring
       :bind ([remap yank-pop] . helm-show-kill-ring)
       :config (helm-push-mark-mode 1))
