@@ -79,6 +79,7 @@
   (avy-setup-default)
   (setq avy-background t
         avy-highlight-first t
+        avy-all-windows nil
         ;; Options: pre, at, at-full, post, de-bruijn. pre is a bit distracting because of all the movement while
         ;; highlighting selection keys. This causes the eyes to lose focus.
         avy-style 'at))

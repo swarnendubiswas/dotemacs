@@ -11,20 +11,19 @@
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
-  :config
-  (when (fboundp 'tool-bar-mode)
-    (tool-bar-mode -1)))
+  :if (fboundp 'tool-bar-mode)
+  :config (tool-bar-mode -1))
 
-(use-package menu-bar ; Learn many shortcuts from the menu bar entries.
-  :config
-  (when (fboundp 'menu-bar-mode)
-    (menu-bar-mode 1)))
+(use-package menu-bar ; You can learn many shortcuts from the menu bar entries.
+  :if (fboundp 'menu-bar-mode)
+  :config (menu-bar-mode 1))
 
 (use-package tooltip
   :config (tooltip-mode -1))
 
 (use-package scroll-bar
-  :config (scroll-bar-mode 1))
+  :if (fboundp 'scroll-bar-mode)
+  :config (scroll-bar-mode -1))
 
 (use-package frame
   :config
@@ -106,7 +105,6 @@
                                                             :foreground "#123555"
                                                             :background "#E5F4FB"))))
 
-      ;; Default
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"

@@ -5,20 +5,6 @@
 
 ;;; Code:
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C-o (hydra-ivy/body) In the minibuffer shows a Hydra menu.      ;;
-;; C-n (ivy-next-line) Selects the next candidate                  ;;
-;; C-p (ivy-previous-line) Selects the previous candidate          ;;
-;; M-< (ivy-beginning-of-buffer) Selects the first candidate       ;;
-;; M-> (ivy-end-of-buffer) Selects the last candidate              ;;
-;; C-v (ivy-scroll-up-command) Scrolls up by ivy-height lines      ;;
-;; M-v (ivy-scroll-down-command) Scrolls down by ivy-height lines  ;;
-;; //  (self-insert-command) Switch to the root directory.         ;;
-;; ~   (self-insert-command) Switch to the home directory.         ;;
-;; C-c C-o (ivy-occur) Permanently save any completion session
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (use-package ivy
   :ensure t
   :if (eq dotemacs-selection 'ivy)
