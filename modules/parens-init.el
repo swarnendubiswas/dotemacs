@@ -28,8 +28,7 @@
   :config
   (require 'smartparens-config)
   (setq sp-autoskip-closing-pair 'always
-        ;; Don't kill entire symbol on C-k
-        sp-hybrid-kill-entire-symbol nil
+        sp-hybrid-kill-entire-symbol nil ; Don't kill entire symbol on C-k
         sp-navigate-close-if-unbalanced t
         sp-show-pair-from-inside t
         sp-autoinsert-quote-if-followed-by-closing-pair nil
@@ -38,9 +37,6 @@
         sp-highlight-wrap-tag-overlay t)
   (smartparens-global-mode)
   (show-smartparens-global-mode 1)
-
-  ;; (sp-use-smartparens-bindings)
-  ;; (unbind-key "C-S-<backspace>" smartparens-mode-map)
 
   (sp-with-modes sp-lisp-modes
     ;; Disable ', it's the quote character!

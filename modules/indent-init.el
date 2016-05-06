@@ -26,12 +26,11 @@
 ;; If you wish to use this with autopairs and yasnippet, load this library first.
 (use-package auto-indent-mode
   :ensure t
-  :disabled t
   :diminish auto-indent-mode
   :config
   (setq auto-indent-on-visit-file t
-        ;; Options: aggressive
-        auto-indent-indent-style 'conservative)
+        auto-indent-indent-style 'conservative ; Indent only the local area if within a repository
+        auto-indent-mode-untabify-on-yank-or-paste t)
   (auto-indent-global-mode 1))
 
 (use-package highlight-indentation

@@ -44,6 +44,11 @@
   (add-hook 'text-mode-hook #'fic-mode)
   (add-hook 'prog-mode-hook #'fic-mode))
 
+(use-package volatile-highlights
+  :ensure t
+  :diminish volatile-highlights-mode
+  :config (volatile-highlights-mode 1))
+
 (provide 'highlight-init)
 
 ;;; highlight-init.el ends here
