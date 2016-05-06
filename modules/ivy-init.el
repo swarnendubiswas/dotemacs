@@ -33,7 +33,7 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-arrow
         ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
-        ivy-re-builders-alist '((t . ivy--regex-fuzzy)) ;; ivy--regex-fuzzy adds noise
+        ivy-re-builders-alist '((t . ivy--regex-ignore-order)) ; ivy--regex-fuzzy adds noise
         ivy-flx-limit 200)
   (dolist (buffer '("^\\*Backtrace\\*$"
                     "^\\*Compile-Log\\*$"
