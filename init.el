@@ -20,6 +20,8 @@
 ;;   "Emacs is like a laser guided missile. It only has to be slightly mis-configured to ruin your whole day." -- Sean
 ;;    McGrath.
 ;;
+;;   "While any text editor can save your files, only Emacs can save your soul." -- Per Abrahamsen.
+;;
 ;;   "Emacs outshines all other editing software in approximately the same way that the noonday sun does the stars. It
 ;;    is not just bigger and brighter; it simply makes everything else vanish." -- Neal Stephenson, "In the Beginning
 ;;    was the Command Line".
@@ -48,8 +50,7 @@
 ;;    the last 20 years it is much the same." -- Don't use Emacs, says Java's father
 ;;    (http://www.computerworld.com.au/article/207799/don_t_use_emacs_says_java_father/).
 ;;
-;;   "Bad programming is easy. Even Dummies can learn it in 21 days." -- Felleisen et al. in "How to
-;;    Design Programs".
+;;   "Bad programming is easy. Even Dummies can learn it in 21 days." -- Felleisen et al. in "How to Design Programs".
 ;;
 ;;   "A language that doesn't affect the way you think about programming, is not worth knowing." -- Alan Perlis.
 ;;

@@ -78,7 +78,11 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-v` - Scrolls down by ivy-height lines (`ivy-scroll-down-command`).
 * `//` - Switch to the root directory (`self-insert-command`).
 * `~` - Switch to the home directory (`self-insert-command`).
-* `C-c C-o` - Permanently save any completion session (`ivy-occur`).
+* `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`).
+* `C-m` - Calls the default action and exits minibuffer (`ivy-done`).
+* `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
+* `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`).
+* `C-'` - Use `avy` to select candidates (`ivy-avy`).
 
 #### Org mode
 
