@@ -55,6 +55,13 @@
   :after flyspell
   :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
 
+(use-package flyspell-correct
+  :ensure t
+  :after flyspell
+  :config
+  (setq flyspell-correct-interface 'flyspell-correct-ivy)
+  (bind-key "M-$" #'flyspell-correct-word-generic flyspell-mode-map))
+
 (provide 'flyspell-init)
 
 ;;; flyspell-init.el ends here

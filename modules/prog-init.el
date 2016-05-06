@@ -8,7 +8,6 @@
 (use-package prog-mode
   :defer t
   :config
-
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
@@ -18,86 +17,54 @@
               (lambda ()
                 (add-to-list 'ac-sources 'ac-source-symbols)
                 (add-to-list 'ac-sources 'ac-source-variables)
-                (add-to-list 'ac-sources 'ac-source-functions))))
+                (add-to-list 'ac-sources 'ac-source-functions)))))
 
-  (use-package which-func ; Show the name of the function in the modeline
-    :config
-    (setq which-func-modes t)
-    (add-hook 'prog-mode-hook #'which-function-mode)
-    (if (eq dotemacs-mode-line-theme 'spaceline)
-        (set-face-attribute 'which-func nil :foreground "white")
-      (set-face-attribute 'which-func nil :foreground "black")))
+(use-package make-mode
+  :after prog-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
+  ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
+  (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-  (use-package electric
-    :init
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (electric-layout-mode 1))))
-
-  (use-package stickyfunc-enhance ; this hides the tabbar
-    :ensure t
-    :disabled t
-    :init (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode))
-
-  (use-package eldoc
-    :disabled t
-    :config
-    (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-    (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-    (add-hook 'ielm-mode-hook #'eldoc-mode)
-    ;; I am not actively using Emacs for Python development
-    ;; (add-hook 'python-mode-hook #'eldoc-mode)
-    (use-package c-eldoc
+(use-package sh-script ; Shell script mode
+  :after prog-mode
+  :mode ("\\.zsh\\'" . sh-mode)
+  :config
+  (setq sh-basic-offset 4
+        sh-indent-comment t
+        sh-indentation 4)
+  (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
+  (when (eq dotemacs-completion-in-buffer 'company)
+    (use-package company-shell
       :ensure t
-      :if (eq system-type 'gnu/linux) ; FIXME: Doesn't seem to work on Windows
-      :config (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode))
-    (use-package eldoc-extension
-      :ensure t)
-    :diminish eldoc-mode)
+      :config
+      (with-eval-after-load "company"
+        (progn
+          (add-to-list 'company-backends 'company-shell)
+          (add-to-list 'company-backends 'company-fish-shell)
+          (add-to-list 'company-backends 'company-tern))))))
 
-  (use-package make-mode
-    :init
-    (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
-    ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
-    (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
+(use-package fish-mode
+  :ensure t
+  :mode ("\\.fish$" . fish-mode))
 
-  (use-package sh-script ; Shell script mode
-    :mode ("\\.zsh\\'" . sh-mode)
-    :config
-    (setq sh-basic-offset 4
-          sh-indent-comment t
-          sh-indentation 4)
-    (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
-    (when (eq dotemacs-completion-in-buffer 'company)
-      (use-package company-shell
-        :ensure t
-        :config
-        (with-eval-after-load "company"
-          (progn
-            (add-to-list 'company-backends 'company-shell)
-            (add-to-list 'company-backends 'company-fish-shell)
-            (add-to-list 'company-backends 'company-tern))))))
+(use-package speedbar
+  :disabled t
+  :after prog-mode
+  :config
+  (setq speedbar-use-images nil
+        speedbar-show-unknown-files t)
 
-  (use-package fish-mode
+  (use-package sr-speedbar
     :ensure t
-    :mode ("\\.fish$" . fish-mode))
-
-  (use-package speedbar
-    :disabled t
-    :config
-    (setq speedbar-use-images nil
-          speedbar-show-unknown-files t)
-
-    (use-package sr-speedbar
-      :ensure t
-      :commands sr-speedbar-open
-      :init
-      (defalias 'speedbar 'sr-speedbar-open)
-      (setq sr-speedbar-right-side nil
-            sr-speedbar-max-width 40
-            sr-speedbar-width 30
-            sr-speedbar-default-width 30
-            sr-speedbar-skip-other-window-p t))))
+    :commands sr-speedbar-open
+    :init
+    (defalias 'speedbar 'sr-speedbar-open)
+    (setq sr-speedbar-right-side nil
+          sr-speedbar-max-width 40
+          sr-speedbar-width 30
+          sr-speedbar-default-width 30
+          sr-speedbar-skip-other-window-p t)))
 
 (use-package web-mode
   :ensure t
@@ -181,6 +148,39 @@
               (lambda ()
                 (add-to-list (make-local-variable 'company-backends)
                              'company-nxml)))))
+
+(use-package which-func ; Show the name of the function in the modeline
+  :after prog-mode
+  :config
+  (setq which-func-modes t)
+  (add-hook 'prog-mode-hook #'which-function-mode)
+  (if (eq dotemacs-mode-line-theme 'spaceline)
+      (set-face-attribute 'which-func nil :foreground "white")
+    (set-face-attribute 'which-func nil :foreground "black")))
+
+(use-package electric
+  :after prog-mode
+  :init
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (electric-layout-mode 1))))
+
+(use-package eldoc
+  :disabled t
+  :after prog-mode
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
+  (add-hook 'ielm-mode-hook #'eldoc-mode)
+  ;; I am not actively using Emacs for Python development
+  ;; (add-hook 'python-mode-hook #'eldoc-mode)
+  (use-package c-eldoc
+    :ensure t
+    :if (eq system-type 'gnu/linux) ; FIXME: Doesn't seem to work on Windows
+    :config (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode))
+  (use-package eldoc-extension
+    :ensure t)
+  :diminish eldoc-mode)
 
 (provide 'prog-init)
 
