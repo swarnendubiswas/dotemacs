@@ -26,6 +26,8 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
+  (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
+
   (setq-default TeX-master nil) ; Query for master file
 
   ;; Compile files to pdf by default, this is already the default from AUCTeX 11.88, but we want to be sure

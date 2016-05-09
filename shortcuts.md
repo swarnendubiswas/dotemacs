@@ -104,6 +104,13 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c p S` - Save all project buffers.
 * `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects.
 
+#### LaTeX
+
+* `C-c @ C-n` - Move to next heading (at any level)
+* `C-c @ C-p` - Move to previous heading (at any level)
+* `C-c @ C-f` - Move Forward to next heading at the same level
+* `C-c @ C-b` - Move Backward to previous heading at the same level
+
 #### Reftex
 
 * `C-c (` - Create a label.
