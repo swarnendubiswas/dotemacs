@@ -67,9 +67,10 @@
 ;; https://github.com/Malabarba/paradox/issues/107
 (use-package paradox
   :ensure t
-  :bind (("C-c d p" . paradox-list-packages)
-         ("C-c d u" . paradox-upgrade-packages)
-         ("C-c d P" . package-list-packages))
+  ;; Keybindings should no longer be required with spu.
+  ;; :bind (("C-c d p" . paradox-list-packages)
+  ;;        ("C-c d u" . paradox-upgrade-packages)
+  ;;        ("C-c d P" . package-list-packages))
   :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t

@@ -52,7 +52,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'leuven
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -62,7 +62,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-mode-line-theme
-  'default
+  'sml
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
