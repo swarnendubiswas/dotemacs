@@ -76,6 +76,11 @@
         paradox-spinner-type 'random)
   (paradox-enable))
 
+(use-package spu
+  :ensure t
+  :defer 5
+  :config (spu-package-upgrade-daily))
+
 (provide 'packages-init)
 
 ;;; packages-init.el ends here

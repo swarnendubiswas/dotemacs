@@ -34,12 +34,15 @@
         ivy-format-function 'ivy-format-function-arrow
         ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
         ivy-re-builders-alist '((t . ivy--regex-ignore-order)) ; ivy--regex-fuzzy adds noise
-        ivy-flx-limit 200)
+        ivy-flx-limit 200
+        ;; Always ignore buffers set in ivy-ignore-buffers
+        ivy-use-ignore-default 'always)
   (dolist (buffer '("^\\*Backtrace\\*$"
                     "^\\*Compile-Log\\*$"
                     "^\\*.+Completions\\*$"
                     "^\\*Help\\*$"
-                    "^\\*Ibuffer\\*$"))
+                    "^\\*Ibuffer\\*$"
+                    "company-statistics-cache.el"))
     (add-to-list 'ivy-ignore-buffers buffer))
   (ivy-mode 1)
   :bind
@@ -69,8 +72,8 @@
    ("<f3>" . counsel-find-file))
   :config
   (setq counsel-mode-override-describe-bindings t
-        counsel-find-file-at-point nil)
-  (setq counsel-find-file-ignore-regexp (concat
+        counsel-find-file-at-point nil
+        counsel-find-file-ignore-regexp (concat
                                          "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                          "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
                                          "\\|__pycache__"
