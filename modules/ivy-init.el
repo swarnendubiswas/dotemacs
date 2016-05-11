@@ -50,7 +50,7 @@
    ("<f9>" . ivy-recentf)
    ("C-'" . ivy-avy)
    ([remap switch-to-buffer] . ivy-switch-buffer)
-   ("<f4>" . ivy-switch-buffer)
+   ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("<return>" . ivy-alt-done)
    ("C-:" . ivy-dired)
@@ -69,7 +69,7 @@
    ([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
-   ("<f3>" . counsel-find-file))
+   ("<f2>" . counsel-find-file))
   :config
   (setq counsel-mode-override-describe-bindings t
         counsel-find-file-at-point nil

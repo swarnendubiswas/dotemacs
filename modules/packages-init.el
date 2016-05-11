@@ -61,10 +61,6 @@
         auto-compile-mode-line-counter nil)
   (auto-compile-on-load-mode 1))
 
-;; Paradox installed from older Emacs versions gets stuck refreshing with >= Emacs 25 because of a *problem with
-;; macros*. The solution is to reinstall the package on >= Emacs 25.
-;; https://github.com/Malabarba/paradox/issues/102
-;; https://github.com/Malabarba/paradox/issues/107
 (use-package paradox
   :ensure t
   ;; Keybindings should no longer be required with spu.

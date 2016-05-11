@@ -13,7 +13,6 @@
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
 (use-package isearch
-  :disabled t
   :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
   :preface
   ;; https://www.reddit.com/r/emacs/comments/3yxk2x/flexible_isearch_without_a_package/
@@ -47,7 +46,6 @@
          ("C-<return>" . isearch-exit-other-end)))
 
 (use-package replace
-  :disabled t
   :config
   (setq query-replace-highlight t) ; Highlight during query
   (use-package replace+
@@ -130,8 +128,7 @@
   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
   (bind-key "C-c g" #'counsel-git-grep)
   (bind-key "C-c o" #'counsel-grep-or-swiper)
-  (bind-key "C-f" #'counsel-grep-or-swiper)
-  (bind-key "C-r" #'counsel-grep-or-swiper))
+  (bind-key "<f4>" #'counsel-grep-or-swiper))
 
 (use-package find-file-in-project
   :ensure t

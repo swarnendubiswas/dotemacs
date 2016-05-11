@@ -585,6 +585,7 @@
     ("impilies" "implies" nil 0)
     ("impleentation" "implementation" nil 0)
     ("implemenation" "implementation" nil 0)
+    ("implemetnation" "implementation" nil 1)
     ("implmentation" "implementation" nil 1)
     ("importent" "important" nil 0)
     ("importnat" "important" nil 0)
