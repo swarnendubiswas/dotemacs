@@ -26,6 +26,7 @@
 ;; If you wish to use this with autopairs and yasnippet, load this library first.
 (use-package auto-indent-mode
   :ensure t
+  :disabled t
   :diminish auto-indent-mode
   :config
   (setq auto-indent-on-visit-file t
@@ -33,14 +34,14 @@
         auto-indent-mode-untabify-on-yank-or-paste t)
   (auto-indent-global-mode 1))
 
-(use-package highlight-indentation
+(use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
   :ensure t
   :diminish highlight-indentation-mode
   :config
   (add-hook 'python-mode-hook
             (lambda ()
               (highlight-indentation-mode 1)
-              (highlight-indentation-current-column-mode -1))))
+              (highlight-indentation-current-column-mode 1))))
 
 ;; Doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode.
 (use-package indent-guide

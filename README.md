@@ -3,6 +3,10 @@
 My Emacs changes, all in one place. Most of the customizations included have been collected from different sources on
 the Internet, and tailored according to my preferences.
 
+######Note
+
+The setup is not perfect for programming with C/C++ and Python. For Java, I think Eclipse is way better. 
+
 #####Installation
 
 First, if your `.emacs.d` directory is not empty, then you might want to backup the contents. Then, use the following command to checkout the source:

@@ -63,20 +63,24 @@
 
 (use-package paradox
   :ensure t
-  ;; Keybindings should no longer be required with spu.
-  ;; :bind (("C-c d p" . paradox-list-packages)
-  ;;        ("C-c d u" . paradox-upgrade-packages)
-  ;;        ("C-c d P" . package-list-packages))
+  :bind (("C-c d p" . paradox-list-packages)
+         ("C-c d u" . paradox-upgrade-packages)
+         ("C-c d P" . package-list-packages))
   :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t
         paradox-spinner-type 'random)
   (paradox-enable))
 
+;; This does not work properly with Emacs 25 because of a bug with threading.
+;; https://github.com/mola-T/SPU/issues/3
 (use-package spu
   :ensure t
+  :if (<= emacs-major-version 24)
   :defer 5
-  :config (spu-package-upgrade-daily))
+  :config
+  (setq spu-log-path (concat dotemacs-temp-directory "spu_log"))
+  (spu-package-upgrade-daily))
 
 (provide 'packages-init)
 

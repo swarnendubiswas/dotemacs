@@ -58,6 +58,9 @@
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
                                                            :foreground "black"))
+                                     (with-eval-after-load "highlight-indentation"
+                                       (set-face-background 'highlight-indentation-face "WhiteSmoke")
+                                       (set-face-background 'highlight-indentation-current-column-face "wheat"))
                                      ;; Customize the fringe marks on the sides
                                      ;; (set-face-background 'fringe "wheat")
                                      ))

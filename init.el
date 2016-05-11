@@ -123,7 +123,7 @@
 (require 'cc-init)
 ;; (require 'cedet-init)
 ;; (require 'java-init)
-;; (require 'python-init)
+(require 'python-init)
 (require 'shell-init)
 ;; (require 'svn-init)
 ;; (require 'git-init)

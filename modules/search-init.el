@@ -46,11 +46,9 @@
          ("C-f" . isearch-repeat-forward)
          ("C-<return>" . isearch-exit-other-end)))
 
-(use-package replace
-  :config
-  (setq query-replace-highlight t) ; Highlight during query
-  (use-package replace+
-    :ensure t))
+(use-package replace+
+  :ensure t
+  :after replace)
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
