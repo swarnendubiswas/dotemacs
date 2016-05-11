@@ -11,7 +11,7 @@
   (setq smex-save-file (expand-file-name "smex-items" dotemacs-temp-directory)
         smex-auto-update t)
   (smex-initialize)
-  :bind (("<f2>" . smex)
+  :bind (("<M-x>" . smex)
          ("M-X" . smex-major-mode-commands)))
 
 (provide 'smex-init)

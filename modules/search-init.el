@@ -31,6 +31,7 @@
   (unbind-key "C-s") ; isearch-forward-regexp
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
+  :config
   (use-package isearch+
     :ensure t)
   (use-package isearch-dabbrev
