@@ -70,9 +70,11 @@
                                                          :ensure t
                                                          :config (ergoemacs-status-mode 1)))
 
-      ((eq dotemacs-mode-line-theme 'default) (use-package mode-icons
-                                                :ensure t
-                                                :config (mode-icons-mode))))
+      ((eq dotemacs-mode-line-theme 'default) ))
+
+(use-package mode-icons
+  :ensure t
+  :config (mode-icons-mode 1))
 
 ;; https://github.com/cemerick/.emacs.d#nyan-mode
 (use-package nyan-mode

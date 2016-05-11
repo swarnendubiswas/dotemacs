@@ -76,6 +76,7 @@
 ;; https://github.com/mola-T/SPU/issues/3
 (use-package spu
   :ensure t
+  :disabled t
   :if (<= emacs-major-version 24)
   :defer 5
   :config

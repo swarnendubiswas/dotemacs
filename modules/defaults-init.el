@@ -28,7 +28,9 @@
       scroll-margin 0 ; Drag the point along while scrolling
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
-      scroll-preserve-screen-position t)
+      scroll-preserve-screen-position t
+      ;; Disabling this is one way to speed up Emacs with buffers with long lines
+      bidi-display-reordering nil)
 
 ;; Ignore case when reading a file name completion
 (setq read-file-name-completion-ignore-case t

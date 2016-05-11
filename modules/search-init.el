@@ -5,10 +5,6 @@
 
 ;;; Code:
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C-f M-n    swiper thing-at-point    Get the occurrences of the current symbol in the current file.    ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (setq case-fold-search t) ; Make search ignore case
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
@@ -70,7 +66,8 @@
          ("C-c S" . dotemacs-swiper-all-with-visual-line-mode))
   :config
   ;; Long lines are truncated at the right without visual line
-  (setq swiper-use-visual-line t))
+  (setq swiper-use-visual-line t
+        swiper-action-recenter t))
 
 (use-package swiper-helm
   :ensure t
