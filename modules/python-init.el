@@ -73,7 +73,8 @@
                        elpy-module-yasnippet
                        elpy-module-sane-defaults))
   (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
-  (bind-key "M-." #'elpy-goto-definition-or-rgrep elpy-mode-map))
+  (unbind-key "M-<left>" elpy-mode-map)
+  (unbind-key "M-<right>" elpy-mode-map))
 
 (use-package pydoc
   :ensure t
