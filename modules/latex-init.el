@@ -26,8 +26,6 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
-  (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
-
   (setq-default TeX-master nil) ; Query for master file
 
   ;; Compile files to pdf by default, this is already the default from AUCTeX 11.88, but we want to be sure
@@ -264,6 +262,19 @@ an item line."
   :if (eq dotemacs-selection 'ivy)
   :after bibtex-completion
   :bind ("C-c l x" . ivy-bibtex))
+
+(use-package outline
+  :ensure t
+  :after tex
+  :diminish outline-minor-mode
+  :init (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
+  :config
+  (use-package outline-magic
+    :ensure t
+    :init
+    (add-hook 'outline-mode-hook
+              (lambda ()
+                (require 'outline-cycle)))))
 
 (provide 'latex-init)
 
