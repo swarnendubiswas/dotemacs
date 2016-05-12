@@ -80,7 +80,11 @@
   ;; Everything is indented 2 spaces
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2)
+        web-mode-code-indent-offset 2
+        web-mode-indent-style 2
+        web-mode-style-padding 1
+        web-mode-script-padding 1
+        web-mode-block-padding 0)
 
   (use-package ac-html-angular ; Required by ac-html and company-web
     :ensure t

@@ -107,7 +107,7 @@
       :ensure t)
 
     (use-package ac-tex-ref
-      :load-path "packages"
+      :load-path "extras"
       :config
       (setq ac-sources
             (append '(ac-source-tex-ref ac-source-tex-cite)
@@ -158,7 +158,7 @@
     :config (latex-preview-pane-enable))
 
   (use-package latex-math-preview
-    :load-path "packages")
+    :load-path "extras")
 
   (use-package magic-latex-buffer
     :ensure t

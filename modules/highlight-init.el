@@ -49,6 +49,21 @@
   :diminish volatile-highlights-mode
   :config (volatile-highlights-mode 1))
 
+(use-package highlight-tail
+  :ensure t
+  :diminish highlight-tail-mode
+  :config (highlight-tail-mode 1))
+
+(use-package stripe-buffer
+  :ensure t
+  :load-path "extras"
+  :init
+  ;;(add-hook 'dired-mode-hook 'turn-on-stripe-buffer-mode)
+  (add-hook 'dired-mode-hook 'stripe-listify-buffer)
+  :config
+  (set-face-attribute 'stripe-highlight nil
+                      :background "gray90"))
+
 (provide 'highlight-init)
 
 ;;; highlight-init.el ends here

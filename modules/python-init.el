@@ -7,6 +7,9 @@
 
 ;; Use either python-mode or elpy or anaconda-mode.
 
+;; Set PYTHONPATH
+(setenv "PYTHONPATH" "python3")
+
 (use-package python ; Emacs built-in python mode
   :disabled t
   :mode ("\\.py\\'" . python-mode)
@@ -16,6 +19,8 @@
   "Helper function for configuring python mode."
   (setq-default fill-column 78
                 python-indent-offset 4)
+  (setq python-shell-interpreter "python3")
+
   (turn-on-auto-fill)
   (flymake-mode-off)
   (run-python (python-shell-parse-command) nil nil)
@@ -34,16 +39,41 @@
   (with-eval-after-load "flycheck"
     (use-package flycheck-pyflakes
       :ensure t
+      :disabled t
       :config
       (add-to-list 'flycheck-disabled-checkers 'python-flake8)
       (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
 
-(use-package python-mode
+;; sudo <path-to-pip3> install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8
+;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
+(use-package elpy
   :ensure t
-  :disabled t
-  :mode ("\\.py\\'" . python-mode) ; implies ":defer t"
-  :interpreter ("python" . python-mode)
-  :config (add-hook 'python-mode-hook #'dotemacs--python-setup))
+  :diminish elpy-mode
+  :preface
+  (defun dotemacs--elpy-setup ()
+    "Setup elpy and python configurations."
+    (dotemacs--python-setup)
+    (use-package pyvenv
+      :ensure t
+      :init (pyvenv-mode 1))
+    (elpy-enable))
+
+  (defun elpy-goto-definition-or-rgrep ()
+    "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
+    (interactive)
+    (ring-insert find-tag-marker-ring (point-marker))
+    (condition-case nil (elpy-goto-definition)
+      (error (elpy-rgrep-symbol
+              (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
+  :config
+  (setq elpy-modules '(elpy-module-company
+                       elpy-module-eldoc
+                       elpy-module-pyvenv
+                       elpy-module-highlight-indentation
+                       elpy-module-yasnippet
+                       elpy-module-sane-defaults))
+  (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
+  (bind-key "M-." #'elpy-goto-definition-or-rgrep elpy-mode-map))
 
 (use-package pydoc
   :ensure t
@@ -57,6 +87,7 @@
 
 (use-package py-autopep8
   :ensure t
+  :disabled t
   :config
   (setq py-autopep8-options '("--max-line-length=120"))
   (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
@@ -67,24 +98,8 @@
 
 (use-package py-isort
   :ensure t
+  :disabled t
   :config (add-hook 'before-save-hook 'py-isort-before-save nil t))
-
-;; Useful packages with pip: autopep8, pyflakes, setuptools, psutil. pip is bundled with python >= 3.4.
-;; sudo /usr/local/bin/python3.4 -m pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
-;; sudo pip install [--upgrade] pyflakes flake8 importmagic jedi autopep8
-;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
-(use-package elpy
-  :ensure t
-  :diminish elpy-mode
-  :preface
-  (defun dotemacs--elpy-setup ()
-    "Setup elpy and python configurations."
-    (dotemacs--python-setup)
-    (use-package pyvenv
-      :ensure t
-      :init (pyvenv-mode 1))
-    (elpy-enable))
-  :config (add-hook 'python-mode-hook #'dotemacs--elpy-setup))
 
 (provide 'python-init)
 

@@ -36,7 +36,7 @@
 
 (use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
   :ensure t
-  :diminish highlight-indentation-mode
+  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :config
   (add-hook 'python-mode-hook
             (lambda ()

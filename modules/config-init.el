@@ -13,7 +13,7 @@
   "Storage location for various configuration files."
   :group 'dotemacs)
 
-(defcustom dotemacs-packages-directory (concat user-emacs-directory "packages/")
+(defcustom dotemacs-extras-directory (concat user-emacs-directory "extras/")
   "Directory listing third-party packages and files."
   :group 'dotemacs)
 
@@ -25,7 +25,7 @@
   (make-directory dotemacs-temp-directory))
 
 (defcustom dotemacs-completion-in-buffer
-  'auto-complete
+  'company
   "Choose company or auto-complete for in-buffer completion."
   :type '(radio
           (const :tag "company" company)

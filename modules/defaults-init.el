@@ -225,8 +225,9 @@
 
 (use-package uniquify
   :init
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets ; options: post-forward, reverse, forward
-        uniquify-separator ":"
+  (setq uniquify-buffer-name-style 'forward ; Options: post-forward, reverse, forward
+        uniquify-separator "/"
+        uniquify-ignore-buffers-re "^\\*"
         ;; uniquify-min-dir-content 0
         uniquify-after-kill-buffer-p t
         uniquify-strip-common-suffix t))

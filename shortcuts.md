@@ -66,6 +66,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Swiper
 
+* `X M-n` - Search for the symbol at point in the current file (`swiper` `thing-at-point`).
 
 #### Ivy
 
@@ -122,7 +123,13 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-.` - Jump to tag underneath cursor.
 * `M-*` - Pop back to where you previously invoked `M-.`.
 
-#### Programming
+#### Python and Elpy
+
+* `C-c C-d` - Get object or function docs (`elpy-doc`).
+* `M-<left>` -
+* `M-<right>` -
+* `C-c C-o` - Overview of the definitions in the current file.
+* `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 
 
 #### Use Cases

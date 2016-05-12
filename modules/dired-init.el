@@ -35,46 +35,50 @@
         ;; Check ls for additional options
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
-        dired-dwim-target t)
+        dired-dwim-target t))
 
-  (use-package dired-x
-    :functions (dired-jump dired-omit-mode)
-    :config
-    (setq dired-bind-jump t
-          ;; Do not show messages when omitting files
-          dired-omit-verbose nil)
+(use-package dired-x
+  :after dired
+  :functions (dired-jump dired-omit-mode)
+  :config
+  (setq dired-bind-jump t
+        ;; Do not show messages when omitting files
+        dired-omit-verbose nil)
 
-    (unless (bound-and-true-p dotemacs-use-ignoramus-p)
-      (add-hook 'dired-mode-hook #'dired-omit-mode))
+  (unless (bound-and-true-p dotemacs-use-ignoramus-p)
+    (add-hook 'dired-mode-hook #'dired-omit-mode))
 
-    ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-    (defadvice dired-omit-startup (after diminish-dired-omit activate)
-      "Make sure to remove \"Omit\" from the modeline."
-      (diminish 'dired-omit-mode) dired-mode-map)
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Make sure to remove \"Omit\" from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map)
 
-    :bind
-    ;; Open dired with the cursor right on the file you're editing
-    ("C-x C-j" . dired-jump))
+  :bind
+  ;; Open dired with the cursor right on the file you're editing
+  ("C-x C-j" . dired-jump))
 
-  (use-package dired+
-    :ensure t
-    :init
-    ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-    (setq-default diredp-hide-details-initially-flag nil
-                  diredp-hide-details-propagate-flag nil)
-    (diredp-toggle-find-file-reuse-dir 1))
+(use-package dired+
+  :ensure t
+  :after dired
+  :init
+  ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
+  (setq-default diredp-hide-details-initially-flag nil
+                diredp-hide-details-propagate-flag nil)
+  (diredp-toggle-find-file-reuse-dir 1))
 
-  (use-package dired-efap
-    :ensure t
-    :commands dired-efap
-    :init (bind-key "<f2>" #'dired-efap dired-mode-map)
-    :config (setq dired-efap-initial-filename-selection nil))
+(use-package dired-efap
+  :ensure t
+  :after dired
+  :commands dired-efap
+  :init (bind-key "<f2>" #'dired-efap dired-mode-map)
+  :config (setq dired-efap-initial-filename-selection nil))
 
-  ;; Narrow dired to match filter
-  (use-package dired-narrow
-    :ensure t
-    :commands dired-narrow
-    :init (bind-key "/" #'dired-narrow dired-mode-map)))
+;; Narrow dired to match filter
+(use-package dired-narrow
+  :ensure t
+  :after dired
+  :commands dired-narrow
+  :init (bind-key "/" #'dired-narrow dired-mode-map))
 
 (provide 'dired-init)
 
