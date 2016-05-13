@@ -33,16 +33,22 @@
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4)
-  (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
-  (when (eq dotemacs-completion-in-buffer 'company)
-    (use-package company-shell
-      :ensure t
-      :config
-      (with-eval-after-load "company"
-        (progn
-          (add-to-list 'company-backends 'company-shell)
-          (add-to-list 'company-backends 'company-fish-shell)
-          (add-to-list 'company-backends 'company-tern))))))
+  ;; Was bound to sh-cd-here
+  (unbind-key "C-c C-d" sh-mode-map))
+
+(use-package company-shell
+  :ensure t
+  :if (eq dotemacs-completion-in-buffer 'company)
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-shell)
+  (add-to-list 'company-backends 'company-fish-shell))
+
+(use-package company-tern
+  :ensure t
+  :if (eq dotemacs-completion-in-buffer 'company)
+  :after company
+  :config (add-to-list 'company-backends 'company-tern))
 
 (use-package fish-mode
   :ensure t

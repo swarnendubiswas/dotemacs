@@ -11,9 +11,9 @@
 (setenv "PYTHONPATH" "python3")
 
 (use-package python ; Emacs built-in python mode
-  :disabled t
   :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python" . python-mode))
+  :interpreter ("python" . python-mode)
+  :config (setq python-shell-completion-native-enable nil))
 
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."

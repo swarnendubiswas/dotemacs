@@ -13,7 +13,8 @@
   :config
   (setq yas-triggers-in-field t)
   (with-eval-after-load "auto-complete"
-    (add-to-list 'ac-sources 'ac-source-yasnippet)))
+    (add-to-list 'ac-sources 'ac-source-yasnippet))
+  (unbind-key "<tab>" yas-minor-mode-map))
 
 (provide 'yasnippet-init)
 
