@@ -32,6 +32,7 @@
   ;; last window to close overwrites the recentf list.
   (use-package sync-recentf
     :ensure t
+    :disabled t
     :config (recentf-cleanup)))
 
 (provide 'recentf-init)

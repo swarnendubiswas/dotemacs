@@ -713,6 +713,7 @@
     ("occurence" "occurrence" nil 0)
     ("occurences" "occurrences" nil 0)
     ("occurrance" "occurrence" nil 0)
+    ("ocnflicts" "conflicts" nil 1)
     ("ocur" "occur" nil 0)
     ("odbc" "ODBC" nil 0)
     ("oeprations" "operations" nil 1)
@@ -1229,6 +1230,8 @@
 (define-abbrev-table 'special-mode-abbrev-table '())
 
 (define-abbrev-table 'speedbar-mode-abbrev-table '())
+
+(define-abbrev-table 'spu-package-menu-mode-abbrev-table '())
 
 (define-abbrev-table 'tabulated-list-mode-abbrev-table '())
 

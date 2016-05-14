@@ -27,28 +27,27 @@
   (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 (use-package sh-script ; Shell script mode
-  :after prog-mode
   :mode ("\\.zsh\\'" . sh-mode)
   :config
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4)
   ;; Was bound to sh-cd-here
-  (unbind-key "C-c C-d" sh-mode-map))
+  (unbind-key "C-c C-d" sh-mode-map)
 
-(use-package company-shell
-  :ensure t
-  :if (eq dotemacs-completion-in-buffer 'company)
-  :after company
-  :config
-  (add-to-list 'company-backends 'company-shell)
-  (add-to-list 'company-backends 'company-fish-shell))
+  (use-package company-shell
+    :ensure t
+    :if (eq dotemacs-completion-in-buffer 'company)
+    :after company
+    :config
+    (add-to-list 'company-backends 'company-shell)
+    (add-to-list 'company-backends 'company-fish-shell))
 
-(use-package company-tern
-  :ensure t
-  :if (eq dotemacs-completion-in-buffer 'company)
-  :after company
-  :config (add-to-list 'company-backends 'company-tern))
+  (use-package company-tern
+    :ensure t
+    :if (eq dotemacs-completion-in-buffer 'company)
+    :after company
+    :config (add-to-list 'company-backends 'company-tern)))
 
 (use-package fish-mode
   :ensure t

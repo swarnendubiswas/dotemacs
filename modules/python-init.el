@@ -48,6 +48,7 @@
 ;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
 (use-package elpy
   :ensure t
+  :defer t
   :diminish elpy-mode
   :preface
   (defun dotemacs--elpy-setup ()
@@ -65,6 +66,7 @@
     (condition-case nil (elpy-goto-definition)
       (error (elpy-rgrep-symbol
               (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
+  :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
   :config
   (setq elpy-modules '(elpy-module-company
                        elpy-module-eldoc
@@ -72,7 +74,6 @@
                        elpy-module-highlight-indentation
                        elpy-module-yasnippet
                        elpy-module-sane-defaults))
-  (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
   (unbind-key "M-<left>" elpy-mode-map)
   (unbind-key "M-<right>" elpy-mode-map))
 
