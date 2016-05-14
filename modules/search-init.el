@@ -123,6 +123,7 @@
   (bind-key "C-c a" #'counsel-ag)
   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
   (bind-key "C-c g" #'counsel-git-grep)
+  (setq counsel-grep-swiper-limit 500000) ; Number of characters in the buffer
   (bind-key "C-c o" #'counsel-grep-or-swiper)
   (bind-key "<f4>" #'counsel-grep-or-swiper))
 

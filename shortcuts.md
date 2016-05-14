@@ -126,7 +126,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 #### Python and Elpy
 
 * `C-c C-d` - Get object or function docs (`elpy-doc`).
-* `M-<left>` -
+* `M-<left>` - (`elpy-nav-indent-shift-left`)
 * `M-<right>` -
 * `C-c C-o` - Overview of the definitions in the current file.
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).

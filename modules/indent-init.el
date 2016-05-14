@@ -41,7 +41,9 @@
   (add-hook 'python-mode-hook
             (lambda ()
               (highlight-indentation-mode 1)
-              (highlight-indentation-current-column-mode 1))))
+              (highlight-indentation-current-column-mode 1)))
+  (set-face-background 'highlight-indentation-face "WhiteSmoke")
+  (set-face-background 'highlight-indentation-current-column-face "wheat"))
 
 ;; Doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode.
 (use-package indent-guide
