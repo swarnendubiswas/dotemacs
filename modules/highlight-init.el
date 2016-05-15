@@ -7,12 +7,19 @@
 
 (use-package hl-line ; Highlight current line
   :ensure t
-  :config (setq hl-line-sticky-flag nil))
+  :config
+  (setq hl-line-sticky-flag nil)
+  (global-hl-line-mode 1)
+  (set-face-attribute 'hl-line nil
+                      :background "old lace"))
 
 (use-package hl-line+ ; Highlight only when idle
   :ensure t
+  :disabled t
   :after hl-line
-  :config (toggle-hl-line-when-idle 1))
+  :config
+  (global-hl-line-mode -1)
+  (toggle-hl-line-when-idle 1))
 
 (use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
   :ensure t
@@ -62,7 +69,10 @@
   (add-hook 'dired-mode-hook 'stripe-listify-buffer)
   :config
   (set-face-attribute 'stripe-highlight nil
-                      :background "gray90"))
+                      :background "gray90")
+  (set-face-attribute 'stripe-hl-line nil
+                      :background "khaki"
+                      :foreground "black"))
 
 (provide 'highlight-init)
 

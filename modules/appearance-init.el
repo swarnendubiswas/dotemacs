@@ -58,8 +58,7 @@
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
                                                            :foreground "black"))
-                                     ;; Customize the fringe marks on the sides
-                                     ;; (set-face-background 'fringe "wheat")
+                                     ;; (set-face-background 'fringe "wheat") ; Customize the fringe marks on the sides
                                      ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
@@ -78,9 +77,6 @@
                                       ;;                     :background "#006666"
                                       ;;                     :foreground "#FFFFDD"
                                       ;;                     :height 1.0)
-                                      (with-eval-after-load "hl-line"
-                                        (set-face-attribute 'hl-line nil
-                                                            :background "linen"))
                                       (with-eval-after-load "helm"
                                         (set-face-attribute 'helm-selection nil
                                                             :underline nil))
@@ -108,10 +104,7 @@
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"
-                                                          :foreground "white")
-                                      (with-eval-after-load "hl-line"
-                                        (set-face-attribute 'hl-line nil
-                                                            :background "linen")))))
+                                                          :foreground "white"))))
 
 (use-package display-theme
   :ensure t
