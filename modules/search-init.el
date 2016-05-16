@@ -72,6 +72,7 @@
 
 (use-package swiper-helm
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'helm)
   :bind ("C-c s h" . swiper-helm))
 
@@ -92,6 +93,7 @@
 
 (use-package helm-ag
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'helm)
   :bind ("C-c a" . helm-ag)
   :config

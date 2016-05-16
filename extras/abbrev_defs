@@ -955,6 +955,7 @@
     ("sucess" "success" nil 0)
     ("sucessfull" "successful" nil 1)
     ("sufficiant" "sufficient" nil 0)
+    ("suggestiosn" "suggestions" nil 1)
     ("sumamry" "summary" nil 0)
     ("superflous" "superfluous" nil 1)
     ("suposed" "supposed" nil 0)

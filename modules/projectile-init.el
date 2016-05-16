@@ -54,6 +54,7 @@
 
 (use-package helm-projectile
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'helm)
   :config
   (setq helm-projectile-fuzzy-match t

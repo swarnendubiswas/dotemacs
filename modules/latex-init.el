@@ -252,6 +252,7 @@ an item line."
 
 (use-package helm-bibtex
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'helm)
   :after bibtex-completion
   :bind ("C-c l x" . helm-bibtex)

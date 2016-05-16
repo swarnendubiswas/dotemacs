@@ -74,6 +74,7 @@
                        elpy-module-highlight-indentation
                        elpy-module-yasnippet
                        elpy-module-sane-defaults))
+  (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
   (unbind-key "M-<left>" elpy-mode-map)
   (unbind-key "M-<right>" elpy-mode-map))
 

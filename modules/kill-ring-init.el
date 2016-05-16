@@ -11,6 +11,7 @@
         kill-do-not-save-duplicates t))
 
 (or (use-package helm-ring
+      :disabled t
       :bind ([remap yank-pop] . helm-show-kill-ring)
       :config (helm-push-mark-mode 1))
 

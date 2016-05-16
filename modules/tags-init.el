@@ -76,6 +76,7 @@
   ;; buffer list.
   (use-package helm-gtags
     :ensure t
+    :disabled t
     :diminish helm-gtags-mode
     :if (eq dotemacs-selection 'helm)
     :config

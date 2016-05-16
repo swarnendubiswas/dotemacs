@@ -46,6 +46,7 @@
 
 (use-package helm-flyspell
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'helm)
   :after flyspell
   :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))
