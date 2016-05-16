@@ -52,12 +52,14 @@
   ;; For certain files with long lines, the results in the swiper buffer is truncated to the right. These wrapper
   ;; methods are to get around that problem.
   (defun dotemacs-swiper-with-visual-line-mode ()
+    "Long lines are truncated at the right without visual line"
     (interactive)
     (visual-line-mode 1)
     (swiper)
     (visual-line-mode -1))
 
   (defun dotemacs-swiper-all-with-visual-line-mode ()
+    "Long lines are truncated at the right without visual line"
     (interactive)
     (visual-line-mode 1)
     (swiper-all)
@@ -65,7 +67,6 @@
   :bind (("C-c s" . dotemacs-swiper-with-visual-line-mode)
          ("C-c S" . dotemacs-swiper-all-with-visual-line-mode))
   :config
-  ;; Long lines are truncated at the right without visual line
   (setq swiper-use-visual-line t
         swiper-action-recenter t))
 
@@ -74,33 +75,12 @@
   :if (eq dotemacs-selection 'helm)
   :bind ("C-c s h" . swiper-helm))
 
-(use-package color-moccur
-  :ensure t
-  :disabled t
-  :functions (isearch-moccur isearch-all)
-  :bind ("C-c s o" . moccur)
-  :config
-  (use-package moccur
-    :config
-    (use-package moccur-edit
-      :ensure t))
-  (bind-keys
-   :map isearch-mode-map
-   ("C-c s i" . isearch-moccur)
-   ("C-c s m" . isearch-moccur-all)))
-
-(use-package loccur
-  :ensure t
-  :functions loccur-mode
-  :disabled t
-  :config (loccur-mode 1)
-  :diminish loccur-mode)
-
 ;; Move between results by pressing n and p
 ;; Visit the file by pressing <return> or clicking
 ;; Run the search again by pressing g
 ;; Close the buffer with q
 ;; Kill the buffer with k
+;; C-h m inside a results buffer will show all the keybindings available to you.
 (use-package ag
   :ensure t
   ;; :bind (("C-c s d" . ag-dired)
