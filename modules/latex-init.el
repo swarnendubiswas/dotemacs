@@ -242,26 +242,32 @@ an item line."
   :bind (:map LaTeX-mode-map
               ("C-c C-d" . nil)))
 
-(use-package bibtex-completion
-  :after tex
-  :config
-  (use-package parsebib
-    :ensure t)
-  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-        bibtex-completion-cite-prompt-for-optional-arguments nil))
-
 (use-package helm-bibtex
   :ensure t
   :disabled t
   :if (eq dotemacs-selection 'helm)
-  :after bibtex-completion
+  :after tex
+  :config
+  (use-package parsebib
+    :ensure t)
+  (use-package bibtex-completion
+  :config
+  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+        bibtex-completion-cite-prompt-for-optional-arguments nil))
   :bind ("C-c l x" . helm-bibtex)
   :config (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)
-  :after bibtex-completion
+  :after tex
+  :config
+  (use-package parsebib
+    :ensure t)
+  (use-package bibtex-completion
+  :config
+  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+        bibtex-completion-cite-prompt-for-optional-arguments nil))
   :bind ("C-c l x" . ivy-bibtex))
 
 (use-package outline

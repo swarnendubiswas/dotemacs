@@ -68,6 +68,8 @@
          ("C-c d u" . paradox-upgrade-packages)
          ("C-c d P" . package-list-packages))
   :config
+  (use-package async
+    :ensure t)
   (setq paradox-execute-asynchronously t
         paradox-github-token t
         paradox-spinner-type 'random)

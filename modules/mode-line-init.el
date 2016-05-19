@@ -64,7 +64,8 @@
                                                                       :background "grey11"
                                                                       :foreground "white")
                                                   (when (eq dotemacs-selection 'helm)
-                                                    (spaceline-helm-mode))))
+                                                    (spaceline-helm-mode))
+                                                  (spaceline-info-mode)))
 
       ((eq dotemacs-mode-line-theme 'ergoemacs-status) (use-package ergoemacs-status
                                                          :ensure t

@@ -233,6 +233,10 @@
   (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
   (persistent-scratch-setup-default))
 
+(use-package immortal-scratch
+  :ensure t
+  :config (immortal-scratch-mode 1))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
