@@ -42,10 +42,9 @@
   :ensure t
   :config
   (which-key-mode 1)
-  ;; Will try to use the right, will switch to use the bottom if there is no space
   (setq which-key-idle-delay 1.0
         which-key-popup-type 'side-window
-        which-key-side-window-location '(right bottom)
+        which-key-side-window-location '(right bottom) ; Try to use the right, switch to use the bottom if there is no space
         which-key-use-C-h-commands t)
   (which-key-setup-side-window-right-bottom)
   :diminish which-key-mode)

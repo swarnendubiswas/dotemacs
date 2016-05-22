@@ -81,6 +81,8 @@
 
 (define-abbrev-table 'eshell-mode-abbrev-table '())
 
+(define-abbrev-table 'fish-mode-abbrev-table '())
+
 (define-abbrev-table 'flycheck-error-list-mode-abbrev-table '())
 
 (define-abbrev-table 'fundamental-mode-abbrev-table '())
@@ -195,6 +197,7 @@
     ("audiance" "audience" nil 0)
     ("authetication" "authentication" nil 0)
     ("avaiability" "availability" nil 1)
+    ("availabe" "available" nil 1)
     ("availalbe" "available" nil 0)
     ("avialable" "available" nil 1)
     ("awya" "away" nil 0)
@@ -292,7 +295,7 @@
     ("comming" "coming" nil 0)
     ("commitee" "committee" nil 0)
     ("commiting" "committing" nil 1)
-    ("committe" "committee" nil 0)
+    ("committe" "committee" nil 1)
     ("committment" "commitment" nil 0)
     ("committments" "commitments" nil 0)
     ("committy" "committee" nil 0)
@@ -369,6 +372,7 @@
     ("decisons" "decisions" nil 0)
     ("decor" "decor" nil 0)
     ("defendent" "defendant" nil 0)
+    ("deffered" "deferred" nil 1)
     ("definately" "definitely" nil 0)
     ("definded" "defined" nil 0)
     ("dependances" "dependencies" nil 0)
@@ -987,7 +991,7 @@
     ("techinques" "techniques" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 23)
+    ("teh" "the" nil 26)
     ("tehre" "there" nil 1)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)

@@ -24,7 +24,7 @@
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
                                         ; candidates.
-        ivy-virtual-abbreviate 'name ; Easier to distinguish files
+        ivy-virtual-abbreviate 'name
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-case-fold-search t ; Ignore case while searching
         ivy-height 25 ; This seems a good number to see several options at a time
@@ -61,6 +61,19 @@
 (use-package counsel
   :ensure t
   :after ivy
+  :preface
+  ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
+  (defun dotemacs-counsel-goto-recent-directory ()
+    "Open recent directory with dired"
+    (interactive)
+    (unless recentf-mode (recentf-mode 1))
+    (let ((collection
+           (delete-dups
+            (append (mapcar 'file-name-directory recentf-list)
+                    ;; fasd history
+                    (if (executable-find "fasd")
+                        (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
+      (ivy-read "directories:" collection :action 'dired)))
   :bind
   (([remap describe-function] . counsel-describe-function)
    ([remap describe-variable] . counsel-describe-variable)
