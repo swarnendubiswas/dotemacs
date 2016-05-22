@@ -9,32 +9,20 @@
   :ensure t
   :diminish company-mode
   :config
-  (setq company-global-modes t
-        company-show-numbers t ; Show quick-access numbers for the first ten candidates
-        company-minimum-prefix-length 4
-        ;; Invert the navigation direction if the completion popup is displayed on top (happens near the bottom of
-        ;; windows).
-        company-tooltip-flip-when-above t
+  (setq company-global-modes t ; Turn on company-mode for all major modes
+        company-show-numbers t ; Quick-access numbers for the first ten candidates
+        company-minimum-prefix-length 3
+        company-tooltip-flip-when-above t ; Invert the navigation direction if the completion popup is displayed on top
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-idle-delay 0.3
         company-selection-wrap-around t
-        company-selection-changed t
-        company-require-match nil)
+        company-dabbrev-downcase nil ; Turn off auto downcasing of things
+        company-dabbrev-ignore-case nil
+        company-dabbrev-code-ignore-case nil
+        ;; Offer completions in comments and strings
+        company-dabbrev-code-everywhere t)
   (global-company-mode 1)
-
-  (use-package company-keywords
-    :config (add-to-list 'company-backends #'company-keywords))
-
-  (use-package company-dabbrev
-    :config
-    (setq company-dabbrev-downcase nil ; Turn off auto downcasing of things
-          company-dabbrev-ignore-case nil))
-
-  (use-package company-dabbrev-code
-    :config
-    (setq company-dabbrev-code-ignore-case nil
-          company-dabbrev-code-everywhere t))
 
   ;; https://github.com/company-mode/company-mode/issues/180
   (when (bound-and-true-p dotemacs-use-fci-p)
@@ -50,24 +38,21 @@
 
     (add-hook 'company-completion-started-hook 'company-turn-off-fci)
     (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
+    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)))
 
-  (use-package company-try-hard
-    :ensure t
-    :bind (:map company-active-map
-                ("C-z" . company-try-hard)))
+(use-package company-dict
+  :ensure t
+  :after company
+  :config
+  (setq company-dict-dir (concat dotemacs-temp-directory "dict/"))
+  (add-to-list 'company-backends 'company-dict))
 
-  (use-package company-dict
-    :ensure t
-    :config
-    (setq company-dict-dir (concat dotemacs-temp-directory "dict/"))
-    (add-to-list 'company-backends 'company-dict))
-
-  (use-package company-flx
-    :ensure t
-    :config
-    (setq company-flx-limit 50)
-    (company-flx-mode 1)))
+(use-package company-flx
+  :ensure t
+  :after company
+  :config
+  (setq company-flx-limit 50)
+  (company-flx-mode 1))
 
 (use-package company-statistics
   :ensure t
