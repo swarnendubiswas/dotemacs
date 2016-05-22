@@ -64,6 +64,7 @@
 (use-package stripe-buffer
   :ensure t
   :load-path "extras"
+  :disabled t
   :init
   ;;(add-hook 'dired-mode-hook 'turn-on-stripe-buffer-mode)
   (add-hook 'dired-mode-hook 'stripe-listify-buffer)

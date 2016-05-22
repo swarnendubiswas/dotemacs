@@ -121,9 +121,9 @@
   :bind
   (("<f1>" . smex)
    ([remap find-file] . ido-find-file)
-   ("<f3>" . ido-find-file)
+   ("<f2>" . ido-find-file)
    ([remap switch-to-buffer] . ido-switch-buffer)
-   ("<f4>" . ido-switch-buffer)
+   ("<f3>" . ido-switch-buffer)
    ("C-x d" . ido-dired)
    ("<f9>" . dotemacs--ido-recentf-open)))
 

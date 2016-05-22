@@ -76,7 +76,7 @@
   (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
   (company-statistics-mode 1))
 
-(use-package company-quickhelp
+(use-package company-quickhelp ;; FIXME: This is not working
   :ensure t
   :after company
   :config

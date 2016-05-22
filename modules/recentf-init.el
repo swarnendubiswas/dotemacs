@@ -16,24 +16,27 @@
                           ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
                           ;;"[/\\]tmp/sync-recentf-marker\\'"
                           "/company-statistics-cache.el$") ; "/ssh:"
-        recentf-auto-cleanup 300)
+        ;;recentf-auto-cleanup 300
+        )
   (recentf-mode 1) ; This is needed in :init for the keybinding to work
 
   :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
   (when (eq dotemacs-selection 'none)
-    (bind-key "<f9>" #'recentf-open-files))
+    (bind-key "<f9>" #'recentf-open-files)))
 
-  (use-package recentf-ext ; Add directories to recent list
-    :ensure t)
+(use-package recentf-ext ; Add directories to recent list
+  :ensure t
+  :after recentf)
 
-  ;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
-  ;; last window to close overwrites the recentf list.
-  (use-package sync-recentf
-    :ensure t
-    :disabled t
-    :config (recentf-cleanup)))
+;; Useful for synchronizing updates in case more than one emacs window is open. If more than one window is open, the
+;; last window to close overwrites the recentf list.
+(use-package sync-recentf
+  :ensure t
+  :disabled t
+  :after recentf
+  :config (recentf-cleanup))
 
 (provide 'recentf-init)
 

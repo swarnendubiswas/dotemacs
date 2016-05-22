@@ -24,7 +24,7 @@
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
                                         ; candidates.
-        ivy-virtual-abbreviate 'full ; Easier to distinguish files
+        ivy-virtual-abbreviate 'name ; Easier to distinguish files
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-case-fold-search t ; Ignore case while searching
         ivy-height 25 ; This seems a good number to see several options at a time

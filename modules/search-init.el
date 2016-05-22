@@ -25,6 +25,7 @@
     (goto-char isearch-other-end))
   :init
   (unbind-key "C-s") ; isearch-forward-regexp
+  (unbind-key "C-s" isearch-mode-map) ; isearch-repeat-forward
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
   :config
@@ -93,7 +94,6 @@
 
 (use-package helm-ag
   :ensure t
-  :disabled t
   :if (eq dotemacs-selection 'helm)
   :bind ("C-c a" . helm-ag)
   :config

@@ -5,13 +5,22 @@
 
 ;;; Code:
 
+(use-package helm-flx ;; Recommended to load before helm
+  :ensure t
+  :config (helm-flx-mode 1))
+
+(use-package helm-mode
+  :after helm-flx
+  :diminish helm-mode
+  :config
+  (setq helm-completion-in-region-fuzzy-match t
+        helm-mode-fuzzy-match t)
+  (helm-mode 1))
+
 (use-package helm
   :ensure helm-core
   :if (eq dotemacs-selection 'helm)
-  :init
-  (use-package helm-flx ;; Recommended to load before helm
-    :ensure t
-    :config (helm-flx-mode 1))
+  :after helm-flx
   :config
   (setq helm-candidate-number-limit 100
         helm-locate-fuzzy-match t
@@ -27,13 +36,6 @@
         ;; Default is 'smart, searches and matches should ignore case
         helm-case-fold-search t
         helm-follow-mode-persistent t)
-
-  (use-package helm-mode
-    :diminish helm-mode
-    :config
-    (setq helm-completion-in-region-fuzzy-match t
-          helm-mode-fuzzy-match t)
-    (helm-mode 1))
 
   (helm-autoresize-mode -1) ; Distracting
 
@@ -118,8 +120,8 @@
     :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
      ([remap find-file] . helm-find-files)
-     ("<f3>" . helm-find-files)
-     ("<f4>" . helm-for-files)
+     ("<f2>" . helm-find-files)
+     ("<f3>" . helm-for-files)
      ("<f9>" . helm-recentf)))
 
   (use-package helm-adaptive
@@ -199,12 +201,6 @@
    :map helm-map
    ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
    ("C-z" . helm-select-action)))
-
-(use-package helm-ispell ; Provides ispell completion with helm interface.
-  :ensure t
-  :disabled t
-  :if (eq dotemacs-selection 'helm)
-  :commands helm-ispell)
 
 (provide 'helm-init)
 

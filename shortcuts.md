@@ -32,6 +32,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 * `C-M-n` - Move forward over a parenthetical group (`forward-list`).
 * `C-M-p` - Move backward over a parenthetical group (`backward-list`).
+* `C-M-u` - Move up in parenthesis structure (`backward-up-list`).
+* `C-M-d` - Move down in parenthesis structure (`down-list`).
 * `C-M-f` - Move forward over a balanced expression (`forward-sexp`).
 * `C-M-b` - Move backward over a balanced expression (`backward-sexp`).
 * `C-M-k` - Kill balanced expression forward (`kill-sexp`).
