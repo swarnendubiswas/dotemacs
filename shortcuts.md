@@ -16,6 +16,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-x r t` - Prepend the selected region with characters.
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
 * `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
+* `M-;` - Invoke comment-dwim (`comment-dwim`).
 
 #### Marking
 
