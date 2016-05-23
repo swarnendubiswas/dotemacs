@@ -57,6 +57,9 @@
 ;;   "I swear you spend just as much time configuring Emacs as you do coding other stuff"
 ;;
 ;;   "Emacs saves you time when you work, and takes it back when you play with it" -- http://puntoblogspot.blogspot.com/
+;;
+;;   "Emacs isn't an editor. It's an interpreter that happens to ship with an editor program. It makes a lot more sense
+;;   with this mindset." -- Wilfred Hughes.
 
 
 ;;; Code:

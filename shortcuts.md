@@ -13,7 +13,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-c` - Capitalize the following word (`capitalize-word`).
 * `M-u` - Convert following word to upper case (`upcase-word`).
 * `C-t` - Transpose two characters (`transpose-chars`).
-* `C-x r t` - Prepend the selected region with characters.
+* `C-x r t` - Prepend the selected region with characters (`string-rectangle`).
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
 * `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
 * `M-;` - Invoke comment-dwim (`comment-dwim`).
@@ -39,12 +39,12 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-M-b` - Move backward over a balanced expression (`backward-sexp`).
 * `C-M-k` - Kill balanced expression forward (`kill-sexp`).
 
-* `C-M-a` - Goto the start of a function.
-* `C-M-e` - Goto the end of a function.
-* `M-a` - Move back to the beginning of the sentence.
-* `M-e` - Move forward to the end of the sentence.
-* `M-{` - Move back to the previous paragraph beginning.
-* `M-}` - Move forward to the next paragraph end.
+* `C-M-a` - Goto the start of a function (`beginning-of-defun`).
+* `C-M-e` - Goto the end of a function (`end-of-defun`).
+* `M-a` - Move back to the beginning of the sentence (`backward-sentence`).
+* `M-e` - Move forward to the end of the sentence (`forward-sentence`).
+* `M-{` - Move back to the previous paragraph beginning (`backward-paragraph`).
+* `M-}` - Move forward to the next paragraph end (`markdown-forward-paragraph`).
 
 #### Dired
 
@@ -87,6 +87,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
 * `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`).
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
+* `C-c r` - Resume the last ivy completion session (`ivy-resume`).
 
 #### Org mode
 

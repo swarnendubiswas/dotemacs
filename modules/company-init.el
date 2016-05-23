@@ -15,11 +15,10 @@
         company-tooltip-flip-when-above t ; Invert the navigation direction if the completion popup is displayed on top
         company-tooltip-align-annotations t
         company-tooltip-limit 20
-        company-idle-delay 0.3
         company-selection-wrap-around t
-        company-dabbrev-downcase nil ; Turn off auto downcasing of things
-        company-dabbrev-ignore-case nil
-        company-dabbrev-code-ignore-case nil
+        company-dabbrev-downcase 'case-replace
+        company-dabbrev-ignore-case 'keep-prefix
+        company-dabbrev-code-ignore-case t
         ;; Offer completions in comments and strings
         company-dabbrev-code-everywhere t)
   (global-company-mode 1)
@@ -40,11 +39,14 @@
     (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
     (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)))
 
-(use-package company-dict
+(use-package company-dict ; FIXME: yasnippet support disables company popup
   :ensure t
   :after company
+  :disabled t
   :config
-  (setq company-dict-dir (concat dotemacs-temp-directory "dict/"))
+  (setq company-dict-dir (concat dotemacs-temp-directory "dict/")
+        company-dict-enable-fuzzy t
+        company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
 
 (use-package company-flx

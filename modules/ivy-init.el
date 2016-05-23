@@ -26,6 +26,7 @@
                                         ; candidates.
         ivy-virtual-abbreviate 'name
         ivy-wrap t ; Useful to be able to wrap around boundary items
+        ivy-action-wrap t
         ivy-case-fold-search t ; Ignore case while searching
         ivy-height 25 ; This seems a good number to see several options at a time
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
