@@ -20,7 +20,6 @@
                 (add-to-list 'ac-sources 'ac-source-functions)))))
 
 (use-package make-mode
-  :after prog-mode
   :init
   (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
   ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
@@ -114,11 +113,11 @@
     (use-package company-web
       :ensure t
       :preface
-      (defun company-web--setup ()
+      (defun dotemacs-company-web--setup ()
         (setq-local company-backends
-                    (append '(company-web-html company-web-jade company-web-slim)
+                    (append '(company-web-html)
                             company-backends)))
-      :config (add-hook 'web-mode-hook #'company-web--setup)))
+      :config (add-hook 'web-mode-hook #'dotemacs-company-web--setup)))
 
   (use-package web-beautify
     :ensure t
@@ -168,7 +167,6 @@
     (set-face-attribute 'which-func nil :foreground "black")))
 
 (use-package electric
-  :after prog-mode
   :init
   (add-hook 'prog-mode-hook
             (lambda ()
@@ -181,8 +179,7 @@
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'eldoc-mode)
-  ;; I am not actively using Emacs for Python development
-  ;; (add-hook 'python-mode-hook #'eldoc-mode)
+  (add-hook 'python-mode-hook #'eldoc-mode)
   (use-package c-eldoc
     :ensure t
     :if (eq system-type 'gnu/linux) ; FIXME: Doesn't seem to work on Windows
