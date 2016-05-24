@@ -40,7 +40,8 @@
           (const :tag "helm" helm)
           (const :tag "ido" ido)
           (const :tag "ivy" ivy)
-          (const :tag "none" none)))
+          (const :tag "none" none))
+  :group 'dotemacs)
 
 (defcustom dotemacs-ido-view-mode
   'grid

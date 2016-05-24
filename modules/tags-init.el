@@ -6,7 +6,6 @@
 ;;; Code:
 
 (setq tags-revert-without-query t
-      ;; t=case-insensitive, nil=case-sensitive
       tags-case-fold-search nil)
 
 (use-package ctags

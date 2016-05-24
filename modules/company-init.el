@@ -42,8 +42,7 @@
 (use-package company-dict ; FIXME: yasnippet support disables company popup
   :ensure t
   :after company
-  :disabled t
-  :config
+  :init
   (setq company-dict-dir (concat dotemacs-temp-directory "dict/")
         company-dict-enable-fuzzy t
         company-dict-enable-yasnippet nil)
