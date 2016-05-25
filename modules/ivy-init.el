@@ -83,7 +83,10 @@
    ([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
-   ("<f2>" . counsel-find-file))
+   ("<f2>" . counsel-find-file)
+   ([remap load-theme] . counsel-load-theme)
+   ([remap load-library] . counsel-load-library)
+   ([remap info-lookup-symbol] . counsel-info-lookup-symbol))
   :config
   (setq counsel-mode-override-describe-bindings t
         counsel-find-file-at-point nil
