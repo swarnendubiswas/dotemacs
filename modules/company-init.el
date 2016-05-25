@@ -42,7 +42,7 @@
 (use-package company-dict ; FIXME: yasnippet support disables company popup
   :ensure t
   :after company
-  :init
+  :config
   (setq company-dict-dir (concat dotemacs-temp-directory "dict/")
         company-dict-enable-fuzzy t
         company-dict-enable-yasnippet nil)
@@ -62,11 +62,11 @@
   (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
   (company-statistics-mode 1))
 
-(use-package company-quickhelp ;; FIXME: This is not working
+(use-package company-quickhelp
   :ensure t
   :after company
   :config
-  (setq company-quickhelp-delay 0.5
+  (setq company-quickhelp-delay 0.2
         company-quickhelp-max-lines 60)
   (company-quickhelp-mode 1)
   (unbind-key "M-h" company-quickhelp-mode-map)

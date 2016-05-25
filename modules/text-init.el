@@ -35,6 +35,9 @@
   (("\\.markdown\\'" . markdown-mode)
    ("\\.md\\'" . markdown-mode))
   :config
+  (setq markdown-enable-wiki-links t
+        markdown-italic-underscore t
+        markdown-enable-math t)
   (use-package markdown-mode+
     :ensure t))
 
