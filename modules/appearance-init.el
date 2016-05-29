@@ -170,6 +170,17 @@
                       :box '(:line-width 1 :color "gray72" :style released-button))
   (set-face-attribute 'tabbar-separator nil
                       :height 1.0)
+  (set-face-attribute 'tabbar-modified nil
+                      :background "#f2f2f6"
+                      :foreground "red"
+                      :box '(:line-width 1 :color "black" :style sunken))
+  (set-face-attribute 'tabbar-selected-modified nil
+                      :background "gray88"
+                      :foreground "dark green"
+                      :box '(:line-width 1 :color "black" :style sunken)
+                      :height 1.1
+                      :bold t
+                      :underline nil)
   :bind (:map tabbar-mode-map
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
