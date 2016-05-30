@@ -128,8 +128,8 @@
 ;; (require 'java-init)
 (require 'python-init)
 (require 'shell-init)
-;; (require 'svn-init)
-;; (require 'git-init)
+(require 'svn-init)
+(require 'git-init)
 
 ;; FIXME: For some reason, this needed to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
 ;; not enabled on startup. I am not using this module currently.

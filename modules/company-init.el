@@ -20,7 +20,8 @@
         company-dabbrev-ignore-case 'keep-prefix
         company-dabbrev-code-ignore-case t
         ;; Offer completions in comments and strings
-        company-dabbrev-code-everywhere t)
+        company-dabbrev-code-everywhere t
+        company-begin-commands '(self-insert-command))
   (global-company-mode 1)
 
   ;; https://github.com/company-mode/company-mode/issues/180
@@ -37,12 +38,26 @@
 
     (add-hook 'company-completion-started-hook 'company-turn-off-fci)
     (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)))
+    (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
 
-(use-package company-dict ; FIXME: yasnippet support disables company popup
+  (cond ((eq dotemacs-selection 'ivy) (progn
+                                        (with-eval-after-load "counsel"
+                                          (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
+                                          (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
+                                          (bind-key "C-:" #'counsel-company company-mode-map)
+                                          (bind-key "C-:" #'counsel-company company-active-map))))
+        ((eq dotemacs-selection 'helm) (progn
+                                         (with-eval-after-load "helm"
+                                           (bind-key [remap complete-symbol] #'helm-company company-mode-map)
+                                           (bind-key [remap completion-at-point] #'helm-company company-mode-map)
+                                           (bind-key "C-:" #'helm-company company-mode-map)
+                                           (bind-key "C-:" #'helm-company company-active-map))))))
+
+(use-package company-dict ; FIXME: Disables company popup
   :ensure t
   :after company
-  :disabled t 
+  :commands company-dict
+  :disabled t
   :config
   (setq company-dict-dir (concat user-emacs-directory "dicts/company-dict/")
         company-dict-enable-fuzzy t

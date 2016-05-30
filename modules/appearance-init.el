@@ -178,7 +178,7 @@
                       :background "gray88"
                       :foreground "dark green"
                       :box '(:line-width 1 :color "black" :style sunken)
-                      :height 1.1
+                      :height 1.2
                       :bold t
                       :underline nil)
   :bind (:map tabbar-mode-map
