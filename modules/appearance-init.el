@@ -175,7 +175,7 @@
                       :foreground "red"
                       :box '(:line-width 1 :color "black" :style sunken))
   (set-face-attribute 'tabbar-selected-modified nil
-                      :background "gray88"
+                      :background "#f2f2f6"
                       :foreground "dark green"
                       :box '(:line-width 1 :color "black" :style sunken)
                       :height 1.2
