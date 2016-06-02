@@ -203,7 +203,15 @@
    ("C-z" . helm-select-action)))
 
 (use-package helm-company
-  :ensure t)
+  :ensure t
+  :after helm)
+
+(use-package helm-smex
+  :ensure t
+  :after helm
+  :bind
+  (([remap execute-extended-command] . helm-smex)
+   ("M-X" . helm-smex-major-mode-commands)))
 
 (provide 'helm-init)
 
