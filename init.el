@@ -94,12 +94,12 @@
 (if (eq dotemacs-completion-in-buffer 'company)
     (require 'company-init)
   (require 'auto-complete-init))
+(require 'smex-init)
 (cond ((eq dotemacs-selection 'helm) (require 'helm-init))
       ((eq dotemacs-selection 'ido)  (require 'ido-init))
       ((eq dotemacs-selection 'ivy)  (require 'ivy-init)))
 
 ;; Configure the more useful extensions
-(require 'smex-init)
 (require 'anzu-init)
 (require 'flyspell-init)
 (require 'ace-modes-init)
