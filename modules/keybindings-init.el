@@ -30,6 +30,8 @@
 (bind-key "<f12>" #'dotemacs-kill-other-buffers) ; Kill all non-special buffers
 (bind-key* "C-s" #'save-buffer)
 (bind-key* "C-S-s" #'dotemacs-save-all-buffers)
+(unbind-key "C-x s") ; Bound to save-some-buffers
+(bind-key "C-x s" #'dotemacs-switch-to-scratch)
 
 (bind-key "C-+" #'text-scale-increase)
 (bind-key "C--" #'text-scale-decrease)

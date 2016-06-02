@@ -63,12 +63,17 @@ Increase line spacing by two line height."
   (byte-recompile-directory user-emacs-directory 0))
 
 ;; https://github.com/thomasf/dotfiles-thomasf-emacs/blob/e14a7e857a89b7488ba5bdae54877abdc77fa9e6/emacs.d/init.el
-(defun switch-to-minibuffer ()
+(defun dotemacs-switch-to-minibuffer ()
   "Switch to minibuffer window."
   (interactive)
   (if (active-minibuffer-window)
       (select-window (active-minibuffer-window))
     (error "Minibuffer is not active")))
+
+(defun dotemacs-switch-to-scratch ()
+  "Switch to the *scratch* buffer."
+  (interactive)
+  (switch-to-buffer "*scratch*"))
 
 (provide 'custom-init)
 

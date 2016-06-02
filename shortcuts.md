@@ -69,7 +69,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Swiper
 
-* `X M-n` - Search for the symbol at point in the current file (`swiper` `thing-at-point`).
+* `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
 
 #### Ivy
 
@@ -88,6 +88,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`).
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
+* `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
 
 #### Org mode
 

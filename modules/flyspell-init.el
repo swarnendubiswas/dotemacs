@@ -60,6 +60,7 @@
   :ensure t
   :after flyspell
   :config
+  ;; Use ivy-read-action (C-M-a) to invoke "correct", "save", "accept" options
   (setq flyspell-correct-interface 'flyspell-correct-ivy)
   (bind-key "M-$" #'flyspell-correct-word-generic flyspell-mode-map))
 

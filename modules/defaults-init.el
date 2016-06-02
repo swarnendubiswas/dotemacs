@@ -45,7 +45,9 @@
                                     ; fundamental-mode
               sentence-end-double-space nil
               truncate-lines nil
-              truncate-partial-width-windows nil)
+              truncate-partial-width-windows nil
+              history-length 50
+              history-delete-duplicates t)
 
 (when (eq system-type 'windows-nt)
   (setq locale-coding-system 'utf-8)
@@ -205,7 +207,6 @@
 
 (use-package savehist ; Save minibuffer histories across sessions
   :config
-  (savehist-mode 1)
   (setq savehist-save-minibuffer-history t
         savehist-file (concat dotemacs-temp-directory "savehist")
         savehist-additional-variables '(kill-ring
@@ -213,8 +214,7 @@
                                         regexp-search-ring
                                         extended-command-history)
         savehist-autosave-interval 300)
-  (setq-default history-length 50
-                history-delete-duplicates t))
+  (savehist-mode 1))
 
 (use-package bookmark
   :defer t
@@ -228,7 +228,6 @@
   (setq uniquify-buffer-name-style 'forward ; Options: post-forward, reverse, forward
         uniquify-separator "/"
         uniquify-ignore-buffers-re "^\\*"
-        ;; uniquify-min-dir-content 0
         uniquify-after-kill-buffer-p t
         uniquify-strip-common-suffix t))
 
