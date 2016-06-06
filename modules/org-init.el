@@ -54,7 +54,7 @@
   (add-hook 'org-mode-hook #'which-function-mode)
 
   (use-package helm-org
-    :disabled t
+    :if (eq dotemacs-selection 'helm)
     :config (setq helm-org-headings-fontify t))
 
   (use-package ox-latex
@@ -72,11 +72,6 @@
   (use-package org-indent
     :diminish org-indent-mode
     :config (org-indent-mode 1))
-
-  (use-package org-ref
-    :ensure t
-    :disabled t
-    :config (setq org-ref-default-bibliography '("~/workspace/bib/plass-formatted.bib")))
 
   (use-package org-bullets
     :ensure t

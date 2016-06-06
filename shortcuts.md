@@ -92,7 +92,9 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Org mode
 
-* `C-u C-c .` - Insert date and time.
+* `C-u C-c .` - Insert date and time (`org-time-stamp`).
+* `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`).
+* `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`).
 
 #### Helm
 

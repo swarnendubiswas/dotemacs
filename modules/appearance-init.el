@@ -160,7 +160,7 @@
                       :background "#f2f2f6"
                       :foreground "black"
                       :box '(:line-width 1 :color "black" :style pressed-button)
-                      :height 1.1
+                      :height 1.2
                       :bold t
                       :underline nil)
   (set-face-attribute 'tabbar-highlight nil
@@ -171,7 +171,7 @@
   (set-face-attribute 'tabbar-separator nil
                       :height 1.0)
   (set-face-attribute 'tabbar-modified nil
-                      :background "#f2f2f6"
+                      :background "gray88"
                       :foreground "red"
                       :box '(:line-width 1 :color "black" :style sunken))
   (set-face-attribute 'tabbar-selected-modified nil
