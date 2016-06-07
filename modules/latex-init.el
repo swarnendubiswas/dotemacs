@@ -242,18 +242,22 @@ an item line."
   :bind (:map LaTeX-mode-map
               ("C-c C-d" . nil)))
 
+(use-package parsebib
+  :ensure t
+  :after tex)
+
+(use-package bibtex-completion
+  :after tex
+  :config
+  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+        bibtex-completion-cite-prompt-for-optional-arguments nil
+        bibtex-completion-cite-default-as-initial-input t))
+
 (use-package helm-bibtex
   :ensure t
-  :disabled t
   :if (eq dotemacs-selection 'helm)
   :after tex
   :config
-  (use-package parsebib
-    :ensure t)
-  (use-package bibtex-completion
-  :config
-  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-        bibtex-completion-cite-prompt-for-optional-arguments nil))
   :bind ("C-c l x" . helm-bibtex)
   :config (setq helm-bibtex-full-frame t))
 
@@ -262,12 +266,20 @@ an item line."
   :if (eq dotemacs-selection 'ivy)
   :after tex
   :config
-  (use-package parsebib
-    :ensure t)
-  (use-package bibtex-completion
-  :config
-  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-        bibtex-completion-cite-prompt-for-optional-arguments nil))
+  ;; https://github.com/tmalsburg/helm-bibtex/
+  (defun ivy-bibtex (&optional arg)
+    "Search BibTeX entries using ivy.
+
+With a prefix ARG the cache is invalidated and the bibliography
+reread."
+    (interactive "P")
+    (when arg
+      (setq bibtex-completion-bibliography-hash ""))
+    (bibtex-completion-init)
+    (ivy-read "BibTeX Items: "
+              (bibtex-completion-candidates 'ivy-bibtex-candidates-formatter)
+              :caller 'ivy-bibtex
+              :action 'bibtex-completion-insert-key))
   :bind ("C-c l x" . ivy-bibtex))
 
 (use-package outline
