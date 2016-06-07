@@ -60,10 +60,16 @@
   :ensure t
   :after flyspell
   :config
-  (cond ((eq dotemacs-selection 'helm) (setq flyspell-correct-interface 'flyspell-correct-helm))
+  (cond ((eq dotemacs-selection 'helm) (use-package flyspell-correct-helm
+                                         :ensure t
+                                         :config (setq flyspell-correct-interface 'flyspell-correct-helm)))
         ;; Use ivy-read-action (C-M-a) to invoke "correct", "save", "accept" options
-        ((eq dotemacs-selection 'ivy) (setq flyspell-correct-interface 'flyspell-correct-ivy))
-        t (setq flyspell-correct-interface 'flyspell-correct-popup))
+        ((eq dotemacs-selection 'ivy) (use-package flyspell-correct-ivy
+                                        :ensure t
+                                        :config (setq flyspell-correct-interface 'flyspell-correct-ivy)))
+        t (use-package flyspell-correct-popup
+            :ensure t
+            :config (setq flyspell-correct-interface 'flyspell-correct-popup)))
   (bind-key "M-$" #'flyspell-correct-word-generic flyspell-mode-map))
 
 (provide 'flyspell-init)

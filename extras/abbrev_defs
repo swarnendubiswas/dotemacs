@@ -55,6 +55,8 @@
 
 (define-abbrev-table 'conf-xdefaults-mode-abbrev-table '())
 
+(define-abbrev-table 'css-mode-abbrev-table '())
+
 (define-abbrev-table 'data-debug-mode-abbrev-table '())
 
 (define-abbrev-table 'diff-mode-abbrev-table '())
@@ -153,7 +155,7 @@
     ("alwats" "always" nil 0)
     ("alway" "always" nil 0)
     ("alwyas" "always" nil 0)
-    ("amd" "and" nil 1)
+    ("amd" "and" nil 2)
     ("amde" "made" nil 0)
     ("ameria" "America" nil 0)
     ("amke" "make" nil 0)
@@ -180,6 +182,7 @@
     ("approrpriate" "appropriate" nil 0)
     ("aquisition" "acquisition" nil 0)
     ("aquisitions" "acquisitions" nil 0)
+    ("architechture" "Architecture" nil 1)
     ("arent" "aren't" nil 0)
     ("arguement" "argument" nil 0)
     ("arguements" "arguments" nil 0)
@@ -1172,6 +1175,8 @@
 
 (define-abbrev-table 'help-mode-abbrev-table '())
 
+(define-abbrev-table 'html-mode-abbrev-table '())
+
 (define-abbrev-table 'ibuffer-mode-abbrev-table '())
 
 (define-abbrev-table 'idl-mode-abbrev-table '())
@@ -1264,7 +1269,11 @@
 
 (define-abbrev-table 'reftex-select-label-mode-abbrev-table '())
 
+(define-abbrev-table 'scss-mode-abbrev-table '())
+
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
+
+(define-abbrev-table 'sgml-mode-abbrev-table '())
 
 (define-abbrev-table 'sh-mode-abbrev-table '())
 
