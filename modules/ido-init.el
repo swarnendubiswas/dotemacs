@@ -31,7 +31,7 @@
         ido-enable-last-directory-history t
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
-        confirm-nonexistent-file-or-buffer nil
+        confirm-nonexistent-file-or-buffer t
         ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-ignore-buffers '("^ "

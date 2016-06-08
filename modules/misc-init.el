@@ -186,6 +186,7 @@
                  ".out"
                  "-pkg.el"
                  ".rel"
+                 ".rip"
                  ".toc"))
     (add-to-list 'ignoramus-file-basename-endings ext))
   (dolist (filenames '("GPATH"

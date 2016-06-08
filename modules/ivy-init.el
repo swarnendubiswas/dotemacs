@@ -23,7 +23,8 @@
        "Not completing files currently")))
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
-                                        ; candidates.
+                                  ; candidates
+        confirm-nonexistent-file-or-buffer t
         ivy-virtual-abbreviate 'name
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
@@ -46,6 +47,8 @@
                     "company-statistics-cache.el"))
     (add-to-list 'ivy-ignore-buffers buffer))
   (ivy-mode 1)
+  (use-package ivy-hydra
+    :ensure t)
   :bind
   (("C-c r" . ivy-resume)
    ("<f9>" . ivy-recentf)
@@ -104,6 +107,7 @@
                                          "\\|.out$"
                                          "\\|.pyc$"
                                          "\\|.rel$"
+                                         "\\|.rip$"
                                          "\\|.synctex.gz"))
   (counsel-mode 1)
   :diminish counsel-mode)

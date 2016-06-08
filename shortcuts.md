@@ -104,13 +104,14 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Projectile
 
-* `C-c p f` - Display a list of all files in the project.
-* `C-c p d` - Display a list of all directories in the project.
-* `C-c p b` - List buffers local to current project.
-* `C-c p e` - Jump to recently visited files in project.
-* `C-c p r` - Simple refactoring with text replace in current project.
-* `C-c p S` - Save all project buffers.
-* `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects.
+* `C-c p f` - Display a list of all files in the project (`projectile-find-file`).
+* `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`).
+* `C-c p b` - List buffers local to current project (`projectile-switch-to-buffer`).
+* `C-c p e` - Jump to recently visited files in project (`projectile-recentf`).
+* `C-c p r` - Simple refactoring with text replace in current project (`projectile-replace`).
+* `C-c p S` - Save all project buffers (`projectile-save-project-buffers`).
+* `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`).
+* `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
 
 #### LaTeX
 

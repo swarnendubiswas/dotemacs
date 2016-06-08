@@ -68,6 +68,7 @@
 
 (use-package dired-efap
   :ensure t
+  :disabled t
   :after dired
   :commands dired-efap
   :init (bind-key "<f2>" #'dired-efap dired-mode-map)

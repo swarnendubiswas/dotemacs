@@ -221,7 +221,7 @@
           reftex-save-parse-info t
           reftex-use-multiple-selection-buffers t
           reftex-enable-partial-scans t
-          reftex-default-bibliography '("~/workspace/bib/plass.bib")
+          reftex-default-bibliography '("~/workspace/bib/plass-formatted.bib")
           reftex-idle-time 0.5
           reftex-toc-follow-mode t)
     (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; Use with AUCTeX

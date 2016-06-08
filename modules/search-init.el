@@ -109,6 +109,7 @@
   (bind-key "C-c o" #'counsel-grep-or-swiper)
   (bind-key "<f4>" #'counsel-grep-or-swiper))
 
+;; Uses ivy by default for completing reads, if ivy is installed.
 (use-package find-file-in-project
   :ensure t
   :disabled t
