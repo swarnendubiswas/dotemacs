@@ -47,7 +47,7 @@
                                           (bind-key "C-:" #'counsel-company company-mode-map)
                                           (bind-key "C-:" #'counsel-company company-active-map))))
         ((eq dotemacs-selection 'helm) (progn
-                                         (with-eval-after-load "helm"
+                                         (with-eval-after-load "helm-company"
                                            (bind-key [remap complete-symbol] #'helm-company company-mode-map)
                                            (bind-key [remap completion-at-point] #'helm-company company-mode-map)
                                            (bind-key "C-:" #'helm-company company-mode-map)

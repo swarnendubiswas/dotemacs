@@ -204,7 +204,7 @@
 
 (use-package helm-company
   :ensure t
-  :after helm)
+  :after company)
 
 (use-package helm-smex
   :ensure t

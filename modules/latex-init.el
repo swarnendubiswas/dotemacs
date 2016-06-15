@@ -134,15 +134,15 @@
       :ensure t
       :config
       (add-to-list 'company-backends
-                   '(company-math-symbols-latex company-latex-commands))))
+                   '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
 
   (use-package auctex-latexmk
     :ensure t
     :config
     (auctex-latexmk-setup)
-    ;; This variable is buffer-local
     (add-hook 'LaTeX-mode-hook
               (lambda ()
+                ;; This variable is buffer-local
                 (setq TeX-command-default "LatexMk"))))
 
   (use-package latex-extra
