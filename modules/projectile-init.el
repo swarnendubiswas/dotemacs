@@ -9,7 +9,7 @@
   :ensure t
   :functions (projectile-find-file projectile-switch-project)
   :commands (projectile-switch-project)
-  :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-bookmarks.eld")
+  :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
               projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
   (projectile-global-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   :config

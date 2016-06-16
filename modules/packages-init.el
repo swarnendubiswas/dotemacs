@@ -86,6 +86,12 @@
   (setq spu-log-path (concat dotemacs-temp-directory "spu_log"))
   (spu-package-upgrade-daily))
 
+(use-package no-littering
+  :ensure t
+  :init
+  (setq no-littering-etc-directory dotemacs-temp-directory
+        no-littering-var-directory dotemacs-temp-directory))
+
 (provide 'packages-init)
 
 ;;; packages-init.el ends here

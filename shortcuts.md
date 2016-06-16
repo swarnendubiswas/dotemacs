@@ -85,7 +85,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`).
 * `C-m` - Calls the default action and exits minibuffer (`ivy-done`).
 * `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
-* `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`).
+* `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when copying/renaming files with names that match existing files.
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
 * `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
