@@ -122,9 +122,11 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Reftex
 
-* `C-c (` - Create a label.
-* `C-c )` - Look up a reference.
-* `C-c [` - Look up a bibliography reference.
+* `C-c (` - Create a label (`reftex-label`).
+* `C-c )` - Look up a reference (`reftex-reference`).
+* `C-c [` - Look up a bibliography reference (`reftex-citation`).
+
+To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
 
 #### Etags/Ctags
 

@@ -184,6 +184,7 @@
                  ".idx"
                  ".log"
                  ".out"
+                 ".pdf"
                  "-pkg.el"
                  ".rel"
                  ".rip"
