@@ -13,7 +13,9 @@
 (use-package python ; Emacs built-in python mode
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
-  :config (setq python-shell-completion-native-enable nil))
+  :config
+  (setq python-shell-completion-native-enable nil
+        python-shell-unbuffered nil))
 
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."
@@ -74,7 +76,6 @@
                        elpy-module-highlight-indentation
                        elpy-module-yasnippet
                        elpy-module-sane-defaults))
-  (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
   (unbind-key "M-<left>" elpy-mode-map)
   (unbind-key "M-<right>" elpy-mode-map))
 

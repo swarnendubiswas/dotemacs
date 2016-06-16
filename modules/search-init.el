@@ -68,6 +68,7 @@
   :bind (("C-c s" . dotemacs-swiper-with-visual-line-mode)
          ("C-c S" . dotemacs-swiper-all-with-visual-line-mode))
   :config
+  (setq ivy-height 25) ; This seems a good number to see several options at a time
   (setq swiper-use-visual-line t
         swiper-action-recenter t))
 
@@ -101,13 +102,12 @@
         helm-ag-insert-at-point 'symbol
         helm-ag-source-type 'file-line))
 
-(when (eq dotemacs-selection 'ivy)
-  (bind-key "C-c a" #'counsel-ag)
-  ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
-  (bind-key "C-c g" #'counsel-git-grep)
-  (setq counsel-grep-swiper-limit 500000) ; Number of characters in the buffer
-  (bind-key "C-c o" #'counsel-grep-or-swiper)
-  (bind-key "<f4>" #'counsel-grep-or-swiper))
+(bind-key "C-c a" #'counsel-ag)
+;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+(bind-key "C-c g" #'counsel-git-grep)
+(setq counsel-grep-swiper-limit 500000) ; Number of characters in the buffer
+(bind-key "C-c o" #'counsel-grep-or-swiper)
+(bind-key "<f4>" #'counsel-grep-or-swiper)
 
 ;; Uses ivy by default for completing reads, if ivy is installed.
 (use-package find-file-in-project

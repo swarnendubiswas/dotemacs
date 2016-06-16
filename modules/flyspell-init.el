@@ -69,9 +69,9 @@
         ((eq dotemacs-selection 'ivy) (use-package flyspell-correct-ivy
                                         :ensure t
                                         :config (setq flyspell-correct-interface 'flyspell-correct-ivy)))
-        t (use-package flyspell-correct-popup
-            :ensure t
-            :config (setq flyspell-correct-interface 'flyspell-correct-popup)))
+        (t (use-package flyspell-correct-popup
+             :ensure t
+             :config (setq flyspell-correct-interface 'flyspell-correct-popup))))
   (bind-key "M-$" #'flyspell-correct-word-generic flyspell-mode-map))
 
 (provide 'flyspell-init)
