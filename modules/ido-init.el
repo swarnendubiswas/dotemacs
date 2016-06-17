@@ -6,6 +6,7 @@
 ;;; Code:
 
 ;; C-j to create a new buffer rather than switching to an existing buffer
+;; C-x C-f C-f to kick you out of ido mode into "normal" find file mode
 (use-package ido
   :ensure t
   :preface
@@ -34,6 +35,7 @@
         confirm-nonexistent-file-or-buffer t
         ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
+        ido-auto-merge-work-directories-length -1
         ido-ignore-buffers '("^ "
                              "*Completions*"
                              "*Shell Command Output*"

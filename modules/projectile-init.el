@@ -18,7 +18,10 @@
         projectile-verbose nil
         projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
-        projectile-switch-project-action 'projectile-dired)
+        projectile-switch-project-action 'projectile-dired
+        projectile-mode-line '(:propertize
+                               (:eval (concat " " (projectile-project-name)))
+                               face font-lock-constant-face))
 
   (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
         ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
@@ -45,9 +48,7 @@
     (bind-key "<f6>" #'projectile-find-file)
     (bind-key "<f7>" #'projectile-switch-to-buffer)
     ;; projectile-grep fails with fish shell
-    (bind-key "<f8>" #'projectile-ag))
-
-  :diminish projectile-mode)
+    (bind-key "<f8>" #'projectile-ag)))
 
 (use-package helm-projectile
   :ensure t
