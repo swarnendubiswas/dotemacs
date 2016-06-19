@@ -18,10 +18,7 @@
         projectile-verbose nil
         projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
-        projectile-switch-project-action 'projectile-dired
-        projectile-mode-line '(:propertize
-                               (:eval (concat " " (projectile-project-name)))
-                               face font-lock-constant-face))
+        projectile-switch-project-action 'projectile-dired)
 
   (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
         ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
@@ -33,6 +30,7 @@
                   ".git"
                   ".hg"
                   ".svn"
+                  ".nx"
                   "elpa"
                   "auto"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
