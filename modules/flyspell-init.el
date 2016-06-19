@@ -54,9 +54,7 @@
 (use-package flyspell-popup
   :ensure t
   :after flyspell
-  :config
-  (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map)
-  (add-hook 'flyspell-mode-hook #'flyspell-popup-auto-correct-mode))
+  :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
 
 (use-package flyspell-correct
   :ensure t

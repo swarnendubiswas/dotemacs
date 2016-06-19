@@ -108,8 +108,17 @@
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
                                                  :ensure t
                                                  :config
+                                                 (set-face-attribute 'ido-vertical-first-match-face nil
+                                                                     :background nil
+                                                                     :foreground "orange")
+                                                 (set-face-attribute 'ido-vertical-only-match-face nil
+                                                                     :background nil
+                                                                     :foreground nil)
+                                                 (set-face-attribute 'ido-vertical-match-face nil
+                                                                     :foreground nil)
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
-                                                 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
+                                                 (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
+                                                       ido-vertical-show-count t)
                                                  (ido-vertical-mode 1)))
 
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode

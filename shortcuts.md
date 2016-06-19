@@ -71,6 +71,12 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 * `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
 
+#### Ido
+
+* `C-j` - Use the current input string verbatim.
+
+#### Helm
+
 #### Ivy
 
 * `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`).

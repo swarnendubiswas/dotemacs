@@ -66,7 +66,8 @@
     (swiper-all)
     (visual-line-mode -1))
   :bind (("C-c s" . dotemacs-swiper-with-visual-line-mode)
-         ("C-c S" . dotemacs-swiper-all-with-visual-line-mode))
+         ("C-c S" . dotemacs-swiper-all-with-visual-line-mode)
+         ("C-c r" . ivy-resume))
   :config
   (setq ivy-height 25) ; This seems a good number to see several options at a time
   (setq swiper-use-visual-line t
@@ -74,7 +75,6 @@
 
 (use-package swiper-helm
   :ensure t
-  :disabled t
   :if (eq dotemacs-selection 'helm)
   :bind ("C-c s h" . swiper-helm))
 
