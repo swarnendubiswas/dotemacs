@@ -16,9 +16,7 @@
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
-        company-dabbrev-downcase 'case-replace
-        company-dabbrev-ignore-case 'keep-prefix
-        company-dabbrev-code-ignore-case t
+        company-dabbrev-downcase nil
         ;; Offer completions in comments and strings
         company-dabbrev-code-everywhere t
         company-begin-commands '(self-insert-command))
