@@ -16,9 +16,8 @@
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
-        company-dabbrev-downcase nil
-        ;; Offer completions in comments and strings
-        company-dabbrev-code-everywhere t
+        company-dabbrev-downcase nil ; Do not downcase the returned candidates
+        company-dabbrev-code-everywhere t ; Offer completions in comments and strings
         company-begin-commands '(self-insert-command))
   (global-company-mode 1)
 

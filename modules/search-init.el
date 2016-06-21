@@ -109,6 +109,10 @@
 (bind-key "C-c o" #'counsel-grep-or-swiper)
 (bind-key "<f4>" #'counsel-grep-or-swiper)
 
+;; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
+(use-package wgrep
+  :ensure t)
+
 ;; Uses ivy by default for completing reads, if ivy is installed.
 (use-package find-file-in-project
   :ensure t

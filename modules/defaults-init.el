@@ -82,7 +82,9 @@
 ;; (xterm-mouse-mode 1) ; Mouse cursor in terminal mode
 
 (use-package menu-bar
-  :config (toggle-indicate-empty-lines 1))
+  :config
+  (toggle-indicate-empty-lines 1)
+  (next-error-follow-minor-mode 1))
 
 (use-package simple
   :config
