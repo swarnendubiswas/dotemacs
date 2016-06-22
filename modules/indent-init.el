@@ -6,7 +6,7 @@
 ;;; Code:
 
 (setq-default fill-column dotemacs-fill-column
-              standard-indent 2 ; Set standard indent to 2 rather that 4
+              standard-indent 2
               tab-width 2
               tab-always-indent 'complete
               ;; Spaces instead of tabs by default
@@ -54,16 +54,6 @@
   (setq indent-guide-delay 1.0 ; Show guide lines only in idle-time
         indent-guide-recursive t)
   (add-hook 'prog-mode-hook #'indent-guide-mode))
-
-(use-package dtrt-indent
-  :ensure t
-  :disabled t
-  :diminish dtrt-indent-mode
-  :config
-  (setq dtrt-indent-verbosity 0)
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (dtrt-indent-mode 1))))
 
 (provide 'indent-init)
 

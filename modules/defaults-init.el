@@ -6,11 +6,10 @@
 ;;; Code:
 
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup
-      inhibit-startup-screen t
-      ;; inhibit-splash-screen t ; Actually an alias of inhibit-startup-screen
-      initial-scratch-message nil
-      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
+      inhibit-startup-screen t ; inhibit-splash-screen is an alias
       inhibit-startup-echo-area-message t
+      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
+      initial-scratch-message nil
       create-lockfiles nil
       message-log-max 5000
       line-number-display-limit 2000000
@@ -36,13 +35,28 @@
 (setq read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t)
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
-  ;; Avoid completing temporary files
-  ;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
-  (dolist (ext '(".aux" ".bbl" ".blg" ".exe" ".log" ".out" ".toc" "-pkg.el" "-autoloads.el" "auto/" ".idx" ".lot" ".lof" ".elc" ".pyc" ".fls"))
+  ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
+  (dolist (ext '("auto/"
+                 "-autoloads.el"
+                 ".aux"
+                 ".bbl"
+                 ".blg"
+                 ".elc"
+                 ".exe"
+                 ".fls"
+                 ".idx"
+                 ".lof"
+                 ".log"
+                 ".lot"
+                 ".out"
+                 ".pdf"
+                 "-pkg.el"
+                 ".pyc"
+                 ".toc"))
     (add-to-list 'completion-ignored-extensions ext)))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
-                                    ; fundamental-mode
+                                        ; fundamental-mode
               sentence-end-double-space nil
               truncate-lines nil
               truncate-partial-width-windows nil
@@ -79,7 +93,8 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
-;; (xterm-mouse-mode 1) ; Mouse cursor in terminal mode
+(use-package xt-mouse ; Mouse cursor in terminal mode
+  :config (xterm-mouse-mode -1))
 
 (use-package menu-bar
   :config
@@ -88,9 +103,9 @@
 
 (use-package simple
   :config
-  ;; We need to paste something from another program, but sometimes we do real paste after some kill
-  ;; action, that will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
-  (setq save-interprogram-paste-before-kill t
+  (setq save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
+                                        ; real paste after some kill action, that will erase the clipboard, so
+                                        ; we need to save it to kill ring. Paste it using "C-y M-y".
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking
@@ -109,8 +124,10 @@
                 global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1))
 
-(use-package delsel ; typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
-  :config (delete-selection-mode 1))
+(use-package delsel
+  :config
+  ;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
+  (delete-selection-mode 1))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 (use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
@@ -134,10 +151,7 @@
                 vc-ignore-dir-regexp
                 tramp-file-name-regexp))
   (use-package password-cache
-    :config (setq password-cache-expiry nil))
-  (use-package tramp-term
-    :ensure t
-    :disabled t))
+    :config (setq password-cache-expiry nil)))
 
 (file-name-shadow-mode 1) ; Dim the ignored part of the file name in the minibuffer
 
@@ -146,14 +160,14 @@
   ;; Turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
-;; ;; Enable disabled commands
-;; (put 'downcase-region  'disabled nil) ; Let downcasing work
-;; (put 'upcase-region    'disabled nil) ; Let upcasing work
-;; (put 'erase-buffer     'disabled nil)
-;; (put 'eval-expression  'disabled nil) ; Let ESC-ESC work
-;; (put 'narrow-to-page   'disabled nil) ; Let narrowing work
-;; (put 'narrow-to-region 'disabled nil) ; Let narrowing work
-;; (put 'set-goal-column  'disabled nil)
+;; Enable disabled commands
+(put 'downcase-region  'disabled nil) ; Let downcasing work
+(put 'upcase-region    'disabled nil) ; Let upcasing work
+(put 'erase-buffer     'disabled nil)
+(put 'eval-expression  'disabled nil) ; Let ESC-ESC work
+(put 'narrow-to-page   'disabled nil) ; Let narrowing work
+(put 'narrow-to-region 'disabled nil) ; Let narrowing work
+(put 'set-goal-column  'disabled nil)
 
 (when (<= emacs-major-version 24)
   (progn
@@ -197,14 +211,14 @@
   (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
-;; This config needs to be modified for Emacs 25+, check this link
-;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
 (use-package saveplace ; remember cursor position in files
   :config
+  ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
   (if (and (>= emacs-major-version 25)
            (>= emacs-minor-version 1))
       (save-place-mode 1)
-    (setq-default save-place t))
+    (setq-default save-place t
+                  save-place-limit nil))
   (setq save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package savehist ; Save minibuffer histories across sessions

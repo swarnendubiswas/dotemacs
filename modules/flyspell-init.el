@@ -25,6 +25,46 @@
     (flyspell-mode) ; This REALLY slows buffer switching
     (flyspell-buffer))
 
+  ;; Move point to previous error, based on code by hatschipuh at http://emacs.stackexchange.com/a/14912/2017
+  ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
+  (defun dotemacs-flyspell-goto-previous-error (arg)
+    "Go to arg previous spelling error."
+    (interactive "p")
+    (while (not (= 0 arg))
+      (let ((pos (point))
+            (min (point-min)))
+        (if (and (eq (current-buffer) flyspell-old-buffer-error)
+                 (eq pos flyspell-old-pos-error))
+            (progn
+              (if (= flyspell-old-pos-error min)
+                  ;; goto beginning of buffer
+                  (progn
+                    (message "Restarting from end of buffer")
+                    (goto-char (point-max)))
+                (backward-word 1))
+              (setq pos (point))))
+        ;; seek the next error
+        (while (and (> pos min)
+                    (let ((ovs (overlays-at pos))
+                          (r '()))
+                      (while (and (not r) (consp ovs))
+                        (if (flyspell-overlay-p (car ovs))
+                            (setq r t)
+                          (setq ovs (cdr ovs))))
+                      (not r)))
+          (backward-word 1)
+          (setq pos (point)))
+        ;; save the current location for next invocation
+        (setq arg (1- arg))
+        (setq flyspell-old-pos-error pos)
+        (setq flyspell-old-buffer-error (current-buffer))
+        (goto-char pos)
+        (if (= pos min)
+            (progn
+              (message "No more miss-spelled word!")
+              (setq arg 0))
+          (forward-word)))))
+
   :init
   (setq flyspell-sort-corrections t
         flyspell-issue-message-flag nil)
@@ -38,6 +78,9 @@
   ;; This is useful but slow
   ;; (add-hook 'before-save-hook #'flyspell-buffer)
 
+  :config
+  (unbind-key "C-,")
+  (bind-key "C-," #'dotemacs-flyspell-goto-previous-error)
   :diminish flyspell-mode
   :bind
   (("C-c f f" . flyspell-mode)

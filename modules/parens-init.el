@@ -43,6 +43,8 @@
     (sp-local-pair "'" nil :actions nil))
 
   (make-variable-buffer-local 'show-paren-mode)
+  :bind (("C-M-a" . sp-beginning-of-sexp)
+         ("C-M-e" . sp-end-of-sexp))
   :diminish smartparens-mode)
 
 (provide 'parens-init)
