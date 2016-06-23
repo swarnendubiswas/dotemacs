@@ -23,10 +23,14 @@
   (electric-pair-mode 1))
 
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
+;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :config
+  :init
+  (smartparens-global-mode 1)
+  (show-smartparens-global-mode 1)
   (require 'smartparens-config)
+  :config
   (setq sp-autoskip-closing-pair 'always
         sp-hybrid-kill-entire-symbol nil ; Don't kill entire symbol on C-k
         sp-navigate-close-if-unbalanced t
@@ -35,16 +39,19 @@
         sp-highlight-pair-overlay t
         sp-highlight-wrap-overlay t
         sp-highlight-wrap-tag-overlay t)
-  (smartparens-global-mode)
-  (show-smartparens-global-mode 1)
-
-  (sp-with-modes sp-lisp-modes
-    ;; Disable ', it's the quote character!
-    (sp-local-pair "'" nil :actions nil))
-
   (make-variable-buffer-local 'show-paren-mode)
   :bind (("C-M-a" . sp-beginning-of-sexp)
-         ("C-M-e" . sp-end-of-sexp))
+         ("C-M-e" . sp-end-of-sexp)
+         ("C-<down>" . sp-down-exp)
+         ("C-<up>" . sp-up-exp)
+         ("M-<down>" . sp-backward-down-sexp)
+         ("M-<up>" . sp-backward-up-sexp)
+         ("C-M-f" . sp-forward-sexp)
+         ("C-M-b" . sp-backward-sexp)
+         ("C-M-n" . sp-next-sexp)
+         ("C-M-p" . sp-previous-sexp)
+         ("C-S-b" . sp-backward-symbol)
+         ("C-S-f" . sp-forward-symbol))
   :diminish smartparens-mode)
 
 (provide 'parens-init)
