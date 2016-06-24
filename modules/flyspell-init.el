@@ -78,9 +78,7 @@
   ;; This is useful but slow
   ;; (add-hook 'before-save-hook #'flyspell-buffer)
 
-  :config
-  (unbind-key "C-,")
-  (bind-key "C-," #'dotemacs-flyspell-goto-previous-error)
+  :config (bind-key* "C-," #'dotemacs-flyspell-goto-previous-error)
   :diminish flyspell-mode
   :bind
   (("C-c f f" . flyspell-mode)

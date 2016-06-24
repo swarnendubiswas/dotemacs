@@ -73,10 +73,6 @@
                                       (set-face-attribute 'region nil
                                                           :background "LemonChiffon"
                                                           :foreground "black")
-                                      ;; (set-face-attribute 'linum nil
-                                      ;;                     :background "#006666"
-                                      ;;                     :foreground "#FFFFDD"
-                                      ;;                     :height 1.0)
                                       (with-eval-after-load "helm"
                                         (set-face-attribute 'helm-selection nil
                                                             :underline nil))
