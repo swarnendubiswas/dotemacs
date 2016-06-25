@@ -52,6 +52,7 @@
                  ".pdf"
                  "-pkg.el"
                  ".pyc"
+                 ".rip"
                  ".toc"))
     (add-to-list 'completion-ignored-extensions ext)))
 
