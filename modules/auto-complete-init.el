@@ -14,7 +14,7 @@
     (ac-flyspell-workaround))
 
   (setq-default ac-expand-on-auto-complete t
-                ac-auto-start 4
+                ac-auto-start 3
                 ac-dwim t
                 ac-dwim-enable t)
 

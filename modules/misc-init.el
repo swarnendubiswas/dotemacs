@@ -146,7 +146,8 @@
 
 (use-package sudo-edit ; Edit file with sudo
   :ensure t
-  :bind ("M-s e" . sudo-edit))
+  :bind (("M-s e" . sudo-edit)
+         ("M-s c" . sudo-edit-current-file)))
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
