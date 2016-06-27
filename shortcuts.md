@@ -121,16 +121,19 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### LaTeX
 
-* `C-c @ C-n` - Move to next heading (at any level)
-* `C-c @ C-p` - Move to previous heading (at any level)
-* `C-c @ C-f` - Move Forward to next heading at the same level
-* `C-c @ C-b` - Move Backward to previous heading at the same level
+* `C-c @ C-n` - Move to next heading (at any level).
+* `C-c @ C-p` - Move to previous heading (at any level).
+* `C-c @ C-f` - Move Forward to next heading at the same level.
+* `C-c @ C-b` - Move Backward to previous heading at the same level.
+* `C-c C-e` - Make LaTeX environment (\begin{...}-\end{...} pair) (`LaTeX-environment`).
+
 
 #### Reftex
 
 * `C-c (` - Create a label (`reftex-label`).
 * `C-c )` - Look up a reference (`reftex-reference`).
 * `C-c [` - Look up a bibliography reference (`reftex-citation`).
+* `C-c =` - Look up the TOC (`reftex-toc`).
 
 To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
 

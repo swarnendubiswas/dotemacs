@@ -1,9 +1,9 @@
 ;;; ac-tex-ref.el --- auto-complete for tex-mode \ref and \cite labels
 
-;; Copyright 2013, 2014 Kevin Ryde
+;; Copyright 2013, 2014, 2015 Kevin Ryde
 
-;; Author: Kevin Ryde <user42@zip.com.au>
-;; Version: 2
+;; Author: Kevin Ryde <user42_kevin@yahoo.com.au>
+;; Version: 3
 ;; Keywords: wp, TeX, LaTeX, auto-complete
 ;; URL: http://user42.tuxfamily.org/ac-tex-ref/index.html
 
@@ -23,12 +23,12 @@
 
 ;;; Commentary:
 ;;
-;; This is an auto-complete.el add-on making completion sources for label
+;; This is an auto-complete.el add-on with completion sources for label
 ;; names in LaTeX \ref{} and \cite{}.
 ;;
-;; Refs and cites are completed from \label{} and \bibitem{}s in the current
-;; buffer.  There's no support for multi-file documents.  (AUCTeX and RefTeX
-;; have things for that, and for new label creating macros too.)
+;; Label names and cite names are found from \label{} and \bibitem{}s in the
+;; current buffer.  There's no support for multi-file documents.  (AUCTeX
+;; and RefTeX have things for that, and for new label creating macros too.)
 
 ;;; Install:
 ;;
@@ -53,12 +53,14 @@
 ;; 
 ;; Version 1 - the first version
 ;; Version 2 - require 'thingatpt
+;; Version 3 - new email
 
 
 ;;; Code:
 
 (require 'thingatpt)
 
+;; Docs:
 ;; /usr/share/doc/auto-complete-el/doc/manual.txt
 
 ;;-----------------------------------------------------------------------------
@@ -67,7 +69,7 @@
 (defun ac-tex-ref-labels-list ()
   "Return a list of \label{} names in the current buffer.
 This is an internal part of ac-tex-ref.el.
-For example if the buffer contains
+If the buffer contains for example
 
     \\=\\label{foo}
     \\=\\label{bar}
@@ -218,11 +220,11 @@ URL `http://user42.tuxfamily.org/ac-tex-ref/index.html'")
 (defun ac-tex-ref-bibitem-list ()
   "Return a list of \\=\\bibitem{} names in the current buffer.
 This is an internal part of ac-tex-ref.el.
-For example if the buffer contains
+If the buffer contains for example
 
     \\=\\bibitem{Foo} ...
 
-then the return is a list (\"Foo\").  Commented-out items are
+then the return is a list (\"Foo\").  Commented-out bibitems are
 ignored."
 
   (let (ret)

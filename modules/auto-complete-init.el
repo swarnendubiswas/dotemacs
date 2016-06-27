@@ -26,9 +26,9 @@
         ac-use-comphist t
         ac-quick-help-delay 1.0
         ac-use-fuzzy t
-        ac-comphist-file (concat dotemacs-temp-directory "ac-comphist.dat")
-        ac-dictionary-directories (concat dotemacs-temp-directory "ac-dict")
-        ac-user-dictionary-files (concat dotemacs-temp-directory "dict")
+        ac-comphist-file (concat dotemacs-temp-directory "ac-dict/ac-comphist.dat")
+        ac-dictionary-directories (concat user-emacs-directory "ac-dict")
+        ac-user-dictionary-files (concat user-emacs-directory "ac-dict/dict")
         popup-use-optimized-column-computation nil)
 
   (add-to-list 'ac-sources
