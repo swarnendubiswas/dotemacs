@@ -119,14 +119,21 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`).
 * `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
 
-#### LaTeX
+#### LaTeX/AUCTeX
 
 * `C-c @ C-n` - Move to next heading (at any level).
 * `C-c @ C-p` - Move to previous heading (at any level).
 * `C-c @ C-f` - Move Forward to next heading at the same level.
 * `C-c @ C-b` - Move Backward to previous heading at the same level.
 * `C-c C-e` - Make LaTeX environment (\begin{...}-\end{...} pair) (`LaTeX-environment`).
-
+* `C-c ]` - Close LaTeX environment.
+* `C-c C-o C-f` - Toggle folding mode.
+* `C-c C-f C-e` - Insert emphasized text.
+* `C-c C-f C-b` - Insert bold text.
+* `C-c C-f C-i` - Insert italicized text.
+* `C-c C-f C-r` - Insert roman text.
+* `C-c C-f C-t` - Insert typewriter text.
+* `C-c C-f C-s` - Insert slanted text.
 
 #### Reftex
 

@@ -18,7 +18,11 @@
         company-selection-wrap-around t
         company-dabbrev-downcase nil ; Do not downcase the returned candidates
         company-dabbrev-code-everywhere t ; Offer completions in comments and strings
-        company-begin-commands '(self-insert-command))
+        ;; https://github.com/company-mode/company-mode/wiki/Switching-from-AC
+        company-begin-commands '(self-insert-command)
+        company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                            company-preview-frontend
+                            company-echo-metadata-frontend))
   (global-company-mode 1)
 
   ;; https://github.com/company-mode/company-mode/issues/180
@@ -49,17 +53,6 @@
                                            (bind-key [remap completion-at-point] #'helm-company company-mode-map)
                                            (bind-key "C-:" #'helm-company company-mode-map)
                                            (bind-key "C-:" #'helm-company company-active-map))))))
-
-(use-package company-dict ; FIXME: Disables company popup
-  :ensure t
-  :after company
-  :commands company-dict
-  :disabled t
-  :config
-  (setq company-dict-dir (concat user-emacs-directory "dicts/company-dict/")
-        company-dict-enable-fuzzy t
-        company-dict-enable-yasnippet nil)
-  (add-to-list 'company-backends 'company-dict))
 
 (use-package company-flx
   :ensure t

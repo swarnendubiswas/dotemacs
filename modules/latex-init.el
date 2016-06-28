@@ -70,7 +70,8 @@
   :functions LaTeX-math-mode
   :config
   (setq LaTeX-syntactic-comments t
-        LaTeX-electric-left-right-brace t)
+        ;; This is not needed if we have auto-pairs enabled.
+        LaTeX-electric-left-right-brace nil)
   (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
   (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
   ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el

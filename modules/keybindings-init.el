@@ -21,7 +21,7 @@
 ;; but removing all commentted text and the comment marker itself.
 (bind-key "C-c n" #'comment-region)
 (bind-key "C-c m" #'uncomment-region)
-(bind-key "C-c ;" #'dotemacs-comment-line)
+(bind-key* "C-c ;" #'dotemacs-comment-line)
 (bind-key* "C-c b" #'comment-box) ; Overrides bib-cite keys
 
 (bind-key "<f10>" #'other-window) ; Switch to the other buffer
