@@ -17,6 +17,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
 * `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
 * `M-;` - Invoke comment-dwim (`comment-dwim`).
+* `M-/` - Try to expand text before point (`hippie-expand`).
 
 #### Marking
 
@@ -58,10 +59,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Ibuffer
 
-* `S` - Save file.
-* `R` - Rename file.
-* `m` - Mark file.
-* `u` - Unmark file.
+* `S` - Save file (`ibuffer-do-save`).
+* `R` - Rename file (`ibuffer-do-rename-uniquely`).
+* `m` - Mark file (`ibuffer-mark-forward`).
+* `u` - Unmark file (`ibuffer-unmark-forward`).
 
 #### Search
 
@@ -73,9 +74,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Ido
 
-* `C-j` - Use the current input string verbatim.
-
-#### Helm
+* `C-j` - Use the current input string verbatim (``).
 
 #### Ivy
 
@@ -104,9 +103,9 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### Helm
 
-* `C-SPC` - Mark buffer
-* `M-D` - Kill marked buffers and quit Helm
-* `C-c d` - Kill marked buffers and keep Helm session
+* `C-SPC` - Mark buffer (``).
+* `M-D` - Kill marked buffers and quit Helm (``).
+* `C-c d` - Kill marked buffers and keep Helm session (``).
 
 #### Projectile
 
@@ -121,19 +120,20 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 #### LaTeX/AUCTeX
 
-* `C-c @ C-n` - Move to next heading (at any level).
-* `C-c @ C-p` - Move to previous heading (at any level).
-* `C-c @ C-f` - Move Forward to next heading at the same level.
-* `C-c @ C-b` - Move Backward to previous heading at the same level.
+* `C-c @ C-n` - Move to next heading (at any level) (`outline-next-visible-heading`).
+* `C-c @ C-p` - Move to previous heading (at any level) (`outline-previous-visible-heading`).
+* `C-c @ C-f` - Move Forward to next heading at the same level (`outline-forward-same-level`).
+* `C-c @ C-b` - Move Backward to previous heading at the same level (`outline-backward-same-level`).
 * `C-c C-e` - Make LaTeX environment (\begin{...}-\end{...} pair) (`LaTeX-environment`).
-* `C-c ]` - Close LaTeX environment.
-* `C-c C-o C-f` - Toggle folding mode.
-* `C-c C-f C-e` - Insert emphasized text.
-* `C-c C-f C-b` - Insert bold text.
-* `C-c C-f C-i` - Insert italicized text.
-* `C-c C-f C-r` - Insert roman text.
-* `C-c C-f C-t` - Insert typewriter text.
-* `C-c C-f C-s` - Insert slanted text.
+* `C-c ]` - Close LaTeX environment (`LaTeX-close-environment`).
+* `C-c C-o C-f` - Toggle folding mode (`TeX-fold-mode`).
+* `C-c C-f C-e` - Insert formatted text (`TeX-font`).
+  * `C-e` - Insert emphasized text.
+  * `C-b` - Insert bold text.
+  * `C-i` - Insert italicized text.
+  * `C-r` - Insert roman text.
+  * `C-t` - Insert typewriter text.
+  * `C-s` - Insert slanted text.
 
 #### Reftex
 

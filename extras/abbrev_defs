@@ -806,6 +806,7 @@
     ("owuld" "would" nil 0)
     ("oxident" "oxidant" nil 0)
     ("papaer" "paper" nil 0)
+    ("paragrpah" "paragraph" nil 1)
     ("parliment" "parliament" nil 0)
     ("partof" "part of" nil 0)
     ("paticular" "particular" nil 0)

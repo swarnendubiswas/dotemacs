@@ -96,9 +96,8 @@
   (setq py-autopep8-options '("--max-line-length=120"))
   (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
 
-(use-package py-import-check
-  :ensure t
-  :disabled t)
+(use-package pyimport
+  :ensure t)
 
 (use-package py-isort
   :ensure t
