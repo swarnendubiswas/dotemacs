@@ -68,6 +68,12 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 * `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`.
 
+##### Ag
+
+* `<f8>` - Run an ag search in the project (`projectile-ag`).
+* `C-c C-p` -
+* `C-x C-s` -
+
 #### Swiper
 
 * `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
@@ -117,6 +123,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c p S` - Save all project buffers (`projectile-save-project-buffers`).
 * `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`).
 * `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
+* `<f8>` - Run an ag search in the project (`projectile-ag`).
 
 #### LaTeX/AUCTeX
 
@@ -134,6 +141,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
   * `C-r` - Insert roman text.
   * `C-t` - Insert typewriter text.
   * `C-s` - Insert slanted text.
+* `C-c _` - Set master file (``).
+* `C-c ^` - Switch to master file (`TeX-home-buffer`).
 
 #### Reftex
 

@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-(setq inhibit-default-init t ; Disable loading of "default.el" at startup
+(setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
       inhibit-startup-echo-area-message t
       initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
