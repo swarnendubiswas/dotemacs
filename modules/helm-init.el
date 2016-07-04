@@ -176,10 +176,6 @@
     (when (eq dotemacs-selection 'ivy)
       (setq helm-make-completion-method 'ivy)))
 
-  (use-package helm-ring
-    :bind ([remap yank-pop] . helm-show-kill-ring)
-    :config (helm-push-mark-mode 1))
-
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 

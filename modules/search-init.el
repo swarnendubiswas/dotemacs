@@ -105,7 +105,7 @@
 (bind-key "C-c a" #'counsel-ag)
 ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
 (bind-key "C-c g" #'counsel-git-grep)
-(setq counsel-grep-swiper-limit 500000) ; Number of characters in the buffer
+(setq counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
 (bind-key "C-c o" #'counsel-grep-or-swiper)
 (bind-key "<f4>" #'counsel-grep-or-swiper)
 
@@ -146,6 +146,11 @@
   (add-to-list 'grep-find-ignored-directories "auto")
   (add-to-list 'grep-find-ignored-directories ".cache")
   (add-to-list 'grep-find-ignored-directories "__pycache__"))
+
+(use-package swoop
+  :ensure t
+  :config (setq swoop-use-target-magnifier t
+                swoop-use-target-magnifier-size 1.2))
 
 (provide 'search-init)
 

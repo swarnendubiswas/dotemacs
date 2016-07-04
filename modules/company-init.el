@@ -8,6 +8,7 @@
 (use-package company
   :ensure t
   :diminish company-mode
+  :init (global-company-mode 1)
   :config
   (setq company-global-modes t ; Turn on company-mode for all major modes
         company-show-numbers t ; Quick-access numbers for the first ten candidates
@@ -23,7 +24,6 @@
         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                             company-preview-frontend
                             company-echo-metadata-frontend))
-  (global-company-mode 1)
 
   ;; https://github.com/company-mode/company-mode/issues/180
   (when (bound-and-true-p dotemacs-use-fci-p)
@@ -52,7 +52,10 @@
                                            (bind-key [remap complete-symbol] #'helm-company company-mode-map)
                                            (bind-key [remap completion-at-point] #'helm-company company-mode-map)
                                            (bind-key "C-:" #'helm-company company-mode-map)
-                                           (bind-key "C-:" #'helm-company company-active-map))))))
+                                           (bind-key "C-:" #'helm-company company-active-map)))))
+  :bind (:map company-active-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous)))
 
 (use-package company-flx
   :ensure t

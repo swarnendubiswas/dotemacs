@@ -11,13 +11,13 @@
         kill-do-not-save-duplicates t))
 
 (or (use-package helm-ring
-      :disabled t
+      :if (eq dotemacs-selection 'helm)
       :bind ([remap yank-pop] . helm-show-kill-ring)
       :config (helm-push-mark-mode 1))
 
     (use-package browse-kill-ring
       :ensure t
-      :disabled t
+      :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
       :config
       (setq browse-kill-ring-highlight-current-entry t
             browse-kill-ring-highlight-inserted-item t
