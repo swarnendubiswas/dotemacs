@@ -118,7 +118,8 @@
                                                                      :foreground nil)
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
-                                                       ido-vertical-show-count t)
+                                                       ido-vertical-show-count t
+                                                       ido-vertical-pad-list t)
                                                  (ido-vertical-mode 1)))
 
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode

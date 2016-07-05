@@ -51,7 +51,8 @@
          ("C-M-n" . sp-next-sexp)
          ("C-M-p" . sp-previous-sexp)
          ("C-S-b" . sp-backward-symbol)
-         ("C-S-f" . sp-forward-symbol))
+         ("C-S-f" . sp-forward-symbol)
+         ("C-M-k" . sp-splice-sexp))
   :diminish smartparens-mode)
 
 (provide 'parens-init)

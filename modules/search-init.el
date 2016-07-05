@@ -48,7 +48,6 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :requires ivy
   :preface
   ;; For certain files with long lines, the results in the swiper buffer is truncated to the right. These wrapper
   ;; methods are to get around that problem.
@@ -70,7 +69,9 @@
          ("C-c r" . ivy-resume))
   :config
   (setq swiper-use-visual-line t
-        swiper-action-recenter t))
+        swiper-action-recenter t)
+  (when (not (eq dotemacs-selection 'ivy))
+    (setq ivy-height 20)))
 
 (use-package swiper-helm
   :ensure t

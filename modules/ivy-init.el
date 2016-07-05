@@ -65,7 +65,6 @@
 (use-package counsel
   :ensure t
   :after ivy
-  :requires swiper
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun dotemacs-counsel-goto-recent-directory ()

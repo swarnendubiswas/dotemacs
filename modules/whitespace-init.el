@@ -8,21 +8,21 @@
 (use-package whitespace
   :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode)
+  :init
+  (dolist (hook '(prog-mode-hook text-mode-hook))
+    (add-hook hook #'whitespace-mode))
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-line-column 'dotemacs-fill-column
-                ;; Options: '(face tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab
-                ;; space-mark tab-mark newline-mark)
-                whitespace-style '(faces trailing empty lines-tail))
-  (global-whitespace-mode 1))
+                whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
+                space-after-tab space-mark tab-mark newline-markl)))
 
 (use-package whitespace-cleanup-mode
   :ensure t
   :diminish whitespace-cleanup-mode
   :config (global-whitespace-cleanup-mode 1))
 
-;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
+(use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :diminish ws-butler-mode
   :init (add-hook 'prog-mode-hook #'ws-butler-mode))

@@ -310,6 +310,7 @@
     ("committment" "commitment" nil 0)
     ("committments" "commitments" nil 0)
     ("committy" "committee" nil 0)
+    ("commmit" "commit" nil 1)
     ("comntain" "contain" nil 0)
     ("comntains" "contains" nil 0)
     ("compair" "compare" nil 0)
