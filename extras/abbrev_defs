@@ -155,7 +155,7 @@
     ("alwats" "always" nil 0)
     ("alway" "always" nil 0)
     ("alwyas" "always" nil 0)
-    ("amd" "and" nil 2)
+    ("amd" "and" nil 3)
     ("amde" "made" nil 0)
     ("ameria" "America" nil 0)
     ("amke" "make" nil 0)
@@ -471,7 +471,7 @@
     ("efort" "effort" nil 0)
     ("eforts" "efforts" nil 0)
     ("ehr" "her" nil 0)
-    ("ehre" "here" nil 1)
+    ("ehre" "here" nil 2)
     ("elborate" "elaborate" nil 1)
     ("eligable" "eligible" nil 0)
     ("emacs" "Emacs" nil 0)
@@ -829,6 +829,7 @@
     ("perminent" "permanent" nil 0)
     ("perormance" "performance" nil 2)
     ("perscriptions" "prescriptions" nil 0)
+    ("persits" "persist" nil 1)
     ("personalyl" "personally" nil 0)
     ("pleaase" "please" nil 1)
     ("pleasent" "pleasant" nil 0)
@@ -974,7 +975,7 @@
     ("similiar" "similar" nil 0)
     ("simpilified" "simplified" nil 0)
     ("simpyl" "simply" nil 0)
-    ("simualtor" "simulator" nil 1)
+    ("simualtor" "simulator" nil 2)
     ("simualtors" "simulators" nil 1)
     ("sincerly" "sincerely" nil 0)
     ("sitll" "still" nil 0)
@@ -983,6 +984,7 @@
     ("soem" "some" nil 0)
     ("sohw" "show" nil 0)
     ("soical" "social" nil 0)
+    ("somehwat" "somewhat" nil 1)
     ("somethign" "something" nil 0)
     ("someting" "something" nil 0)
     ("somewaht" "somewhat" nil 0)
@@ -1039,7 +1041,7 @@
     ("techinques" "techniques" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 31)
+    ("teh" "the" nil 32)
     ("tehre" "there" nil 2)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
@@ -1288,9 +1290,15 @@
 
 (define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
+(define-abbrev-table 'reb-lisp-mode-abbrev-table '())
+
+(define-abbrev-table 'reb-mode-abbrev-table '())
+
 (define-abbrev-table 'reftex-select-bib-mode-abbrev-table '())
 
 (define-abbrev-table 'reftex-select-label-mode-abbrev-table '())
+
+(define-abbrev-table 'rxt-help-mode-abbrev-table '())
 
 (define-abbrev-table 'scss-mode-abbrev-table '())
 
