@@ -23,10 +23,10 @@
         ido-enable-prefix nil
         ido-max-prospects 20
         ido-case-fold t ; Searching of buffer and file names should ignore case
-        ido-use-filename-at-point 'guess ; Other options: 'ffap-guesser, 'guess
+        ido-use-filename-at-point 'guess
         ido-use-url-at-point nil
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
-        ido-create-new-buffer 'always ; Other options: prompt, never
+        ido-create-new-buffer 'always
         ido-default-file-method 'selected-window
         ido-save-directory-list-file (concat dotemacs-temp-directory "ido.last")
         ido-enable-last-directory-history t
@@ -124,7 +124,9 @@
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode
                                              :ensure t
                                              :config
-                                             (setq ido-grid-mode-order nil ;; Listing order, t: left-right then top-bottom, nil: top-bottom then left-right
+                                             (setq ido-grid-mode-order nil ;; Listing order, t: left-right then
+                                                   ;; top-bottom, nil: top-bottom then
+                                                   ;; left-right
                                                    ido-grid-mode-min-rows 10
                                                    ido-grid-mode-max-rows 20)
                                              (ido-grid-mode 1))))

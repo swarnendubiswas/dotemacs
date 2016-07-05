@@ -36,16 +36,6 @@
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
   :bind ([remap list-buffers] . ibuffer))
 
-(use-package ibuffer-tramp ; Group ibuffer list by tramp connection
-  :ensure t
-  :disabled t
-  :config
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (ibuffer-tramp-set-filter-groups-by-tramp-connection)
-              (unless (eq ibuffer-sorting-mode 'alphabetic)
-                (ibuffer-do-sort-by-alphabetic)))))
-
 (use-package ibuffer-vc ; Sort buffers by VC status
   :ensure t
   :disabled t
@@ -66,9 +56,7 @@
       (ibuffer-do-sort-by-alphabetic)
       (ibuffer-do-sort-by-major-mode)))
   :after ibuffer
-  :config
-  ;; (add-hook 'ibuffer-hook #'dotemacs--ibuffer-customization)
-  (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
+  :config (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (provide 'ibuffer-init)
 

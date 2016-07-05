@@ -9,7 +9,7 @@
   :init
   (setq-default ispell-program-name "/usr/bin/aspell")
   (setq ispell-dictionary "english"
-        ;; speed up aspell: ultra | fast | normal | bad-spellers
+        ;; aspell speed: ultra | fast | normal | bad-spellers
         ispell-extra-args '("--sug-mode=ultra"
                             "--lang=en_US")
         ;; Save a new word to personal dictionary without asking
@@ -64,7 +64,6 @@
               (message "No more miss-spelled word!")
               (setq arg 0))
           (forward-word)))))
-
   :init
   (setq flyspell-sort-corrections t
         flyspell-issue-message-flag nil)
@@ -75,7 +74,7 @@
     (add-hook hook #'turn-on-flyspell))
   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
-  ;; This is useful but slow
+  ;; This is useful but SLOW
   ;; (add-hook 'before-save-hook #'flyspell-buffer)
 
   :config (bind-key* "C-," #'dotemacs-flyspell-goto-previous-error)
@@ -87,7 +86,6 @@
 
 (use-package helm-flyspell
   :ensure t
-  :disabled t
   :if (eq dotemacs-selection 'helm)
   :after flyspell
   :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))

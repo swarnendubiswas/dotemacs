@@ -11,8 +11,9 @@
   (setq smex-save-file (expand-file-name "smex-items" dotemacs-temp-directory)
         smex-auto-update t)
   (smex-initialize)
-  :bind (("<M-x>" . smex)
-         ("M-X" . smex-major-mode-commands)))
+  (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+    (bind-key "M-x" #'smex)
+    (bind-key "M-X" #'smex-major-mode-commands)))
 
 (provide 'smex-init)
 

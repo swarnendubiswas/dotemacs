@@ -16,7 +16,6 @@
     (interactive)
     (let ((search-whitespace-regexp ".*?"))
       (call-interactively 'isearch-forward)))
-
   ;; http://endlessparentheses.com/leave-the-cursor-at-start-of-match-after-isearch.html?source=rss
   (defun dotemacs--isearch-exit-other-end ()
     "Exit isearch, at the opposite end of the string."
@@ -49,6 +48,7 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
+  :requires ivy
   :preface
   ;; For certain files with long lines, the results in the swiper buffer is truncated to the right. These wrapper
   ;; methods are to get around that problem.
@@ -69,7 +69,6 @@
          ("C-c S" . dotemacs-swiper-all-with-visual-line-mode)
          ("C-c r" . ivy-resume))
   :config
-  (setq ivy-height 25) ; This seems a good number to see several options at a time
   (setq swiper-use-visual-line t
         swiper-action-recenter t))
 
