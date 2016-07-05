@@ -29,8 +29,7 @@
                                             :ensure t
                                             :functions (sml/faces-from-theme sml/theme-p)
                                             :config
-                                            (setq sml/theme 'light ; options: dark, light, respectful, automatic, powerline
-                                                  ;; sml/name-width 20
+                                            (setq sml/theme 'light
                                                   sml/no-confirm-load-theme t
                                                   sml/mode-width 'full
                                                   sml/shorten-modes t
@@ -67,20 +66,16 @@
                                                     (spaceline-helm-mode))
                                                   (spaceline-info-mode)))
 
-      ((eq dotemacs-mode-line-theme 'ergoemacs-status) (use-package ergoemacs-status
-                                                         :ensure t
-                                                         :config (ergoemacs-status-mode 1)))
-
       ((eq dotemacs-mode-line-theme 'default) ))
 
 (use-package mode-icons
   :ensure t
   :config (mode-icons-mode 1))
 
-;; https://github.com/cemerick/.emacs.d#nyan-mode
 (use-package nyan-mode
   :ensure t
   :preface
+  ;; https://github.com/cemerick/.emacs.d#nyan-mode
   (defun dotemacs--toggle-nyan-mode (&optional frame)
     "Enable/disable nyan mode."
     (if (display-graphic-p frame)

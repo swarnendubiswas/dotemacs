@@ -53,11 +53,11 @@
                   text-mode))
     (add-to-list 'ac-modes mode))
 
-  :bind (;; Filter candidates by pattern with "C-f"
-         :map ac-completing-map
+  :bind (:map ac-completing-map
               ("C-n" . ac-next)
               ("C-p" . ac-previous)
               ("C-s" . nil)
+              ;; Filter candidates by pattern with ac-isearch
               ("C-f" . ac-isearch)
               ("C-g" . ac-stop)
               :map ac-complete-mode-map

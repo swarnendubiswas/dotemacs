@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; Better frame titles
+;; Better frame title
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
 (setq-default indicate-buffer-boundaries 'right)
@@ -14,7 +14,7 @@
   :if (fboundp 'tool-bar-mode)
   :config (tool-bar-mode -1))
 
-(use-package menu-bar ; You can learn many shortcuts from the menu bar entries.
+(use-package menu-bar ; One can learn many shortcuts from the menu bar entries.
   :if (fboundp 'menu-bar-mode)
   :config (menu-bar-mode 1))
 
@@ -31,8 +31,7 @@
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
   ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
   ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; It will maximize all frames: both the first one and any others you create.
-  ;; options: fullheight, fullboth
+  ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
   ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
   (blink-cursor-mode 0))
@@ -54,12 +53,11 @@
                                      :ensure t
                                      :config
                                      (load-theme 'leuven t)
+                                     ;; (set-face-background 'fringe "wheat") ; Customize the fringe marks on the sides
                                      (with-eval-after-load "avy"
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
-                                                           :foreground "black"))
-                                     ;; (set-face-background 'fringe "wheat") ; Customize the fringe marks on the sides
-                                     ))
+                                                           :foreground "black"))))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
@@ -132,8 +130,8 @@
   (add-hook 'after-revert-hook #'dotemacs--tabbar-modification-state-change)
   (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
 
-  ;; Add a buffer modification state indicator in the tab label, and place a
-  ;; space around the label to make it look less crowded.
+  ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
+  ;; crowded.
   (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
     (setq ad-return-value
           (if (and (buffer-modified-p (tabbar-tab-value tab))
@@ -181,14 +179,13 @@
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
 
-;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt
+;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (if (eq system-type 'windows-nt)
     (set-face-attribute 'default nil
                         :family "Consolas"
                         :height 120)
   (set-face-attribute 'default nil
                       :family "Dejavu Sans Mono"
-                      ;; :weight 'light
                       :height 110))
 
 (use-package tramp-theme

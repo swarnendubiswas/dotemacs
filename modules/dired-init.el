@@ -68,18 +68,17 @@
 
 (use-package dired-efap
   :ensure t
-  :disabled t
   :after dired
   :commands dired-efap
-  :init (bind-key "<f2>" #'dired-efap dired-mode-map)
-  :config (setq dired-efap-initial-filename-selection nil))
+  :config
+  (setq dired-efap-initial-filename-selection nil)
+  (bind-key "r" #'dired-efap dired-mode-map))
 
-;; Narrow dired to match filter
-(use-package dired-narrow
+(use-package dired-narrow ; Narrow dired to match filter
   :ensure t
   :after dired
   :commands dired-narrow
-  :init (bind-key "/" #'dired-narrow dired-mode-map))
+  :config (bind-key "/" #'dired-narrow dired-mode-map))
 
 (provide 'dired-init)
 

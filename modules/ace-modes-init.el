@@ -57,7 +57,7 @@
 (use-package ace-jump-helm-line ; ace-jump in helm buffers
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :config (setq ace-jump-helm-line-use-avy-style nil) ;; Style: avy-jump and ace-jump-mode-style
+  :config (setq ace-jump-helm-line-use-avy-style nil) ; Style: avy-jump and ace-jump-mode-style
   :bind (:map helm-map
               ("C-;" . ace-jump-helm-line)))
 

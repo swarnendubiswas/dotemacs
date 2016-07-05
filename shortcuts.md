@@ -56,12 +56,13 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C` - Copy the specified files (`dired-do-copy`).
 * `D` - Delete the specified files (`dired-do-delete`).
 * `R` - Rename the specified files (`dired-do-rename`).
-* `i` - Find file.
-* `/` - Filter files.
-* `M-<home>` - Go to HOME directory.
-* `M-<up>` - Go to the first file/directory.
-* `M-<down>` - Go the last file/directory.
-* `C-u q` - Kill dired buffer.
+* `r` - Rename the specified file (`dired-efap`).
+* `i` - Find file (`counsel-find-file`).
+* `/` - Filter files (`dired-narrow`).
+* `M-<home>` - Go to HOME directory (`dired-go-home`).
+* `M-<up>` - Go to the first file/directory (`dired-jump-to-top`).
+* `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`).
+* `q` - Kill dired buffer (`quite-window`).
 
 #### Ibuffer
 
