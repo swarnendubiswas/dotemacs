@@ -204,7 +204,10 @@ an item line."
   :after tex
   :config
   :bind ("C-c l x" . helm-bibtex)
-  :config (setq helm-bibtex-full-frame t))
+  :config
+  (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
+  (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
+  (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
   :ensure t

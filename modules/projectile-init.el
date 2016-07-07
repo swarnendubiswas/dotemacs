@@ -41,6 +41,14 @@
                   "TAGS"))
     (add-to-list 'projectile-globally-ignored-files item))
 
+  (dolist (list '("\\.log$"
+                  "\\.out$"
+                  "\\.pdf$"
+                  "\\.pyc$"
+                  "\\.rel$"
+                  "\\.rip$"))
+    (add-to-list 'projectile-globally-ignored-file-suffixes list))
+
   (when (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)
@@ -50,7 +58,6 @@
 
 (use-package helm-projectile
   :ensure t
-  :disabled t
   :if (eq dotemacs-selection 'helm)
   :config
   (setq helm-projectile-fuzzy-match t

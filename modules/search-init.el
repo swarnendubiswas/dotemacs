@@ -76,7 +76,7 @@
 (use-package swiper-helm
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :bind ("C-c s h" . swiper-helm))
+  :bind ("<f4>" . swiper-helm))
 
 ;; Move between results by pressing n and p
 ;; Visit the file by pressing <return> or clicking
@@ -102,12 +102,13 @@
         helm-ag-insert-at-point 'symbol
         helm-ag-source-type 'file-line))
 
-(bind-key "C-c a" #'counsel-ag)
-;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
-(bind-key "C-c g" #'counsel-git-grep)
-(setq counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
-(bind-key "C-c o" #'counsel-grep-or-swiper)
-(bind-key "<f4>" #'counsel-grep-or-swiper)
+(when (eq dotemacs-selection 'ivy)
+  (bind-key "C-c a" #'counsel-ag)
+  ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+  (bind-key "C-c g" #'counsel-git-grep)
+  (setq counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
+  (bind-key "C-c o" #'counsel-grep-or-swiper)
+  (bind-key "<f4>" #'counsel-grep-or-swiper))
 
 ;; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
 (use-package wgrep

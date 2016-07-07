@@ -5,12 +5,9 @@
 
 ;;; Code:
 
-(use-package helm-flx ;; Recommended to load before helm
-  :ensure t
-  :config (helm-flx-mode 1))
-
 (use-package helm-mode
-  :after helm-flx
+  :ensure helm
+  :if (eq dotemacs-selection 'helm)
   :diminish helm-mode
   :config
   (setq helm-completion-in-region-fuzzy-match t
@@ -20,12 +17,11 @@
 (use-package helm
   :ensure helm-core
   :if (eq dotemacs-selection 'helm)
-  :after helm-flx
   :config
   (setq helm-candidate-number-limit 100
         helm-locate-fuzzy-match t
-        ;; I prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since long
-        ;; lines can get truncated.
+        ;; I now prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since
+        ;; long lines can get truncated.
         helm-full-frame t ; Make the helm buffer occupy the full frame
         ;; helm-split-window-default-side 'right
         ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
@@ -101,22 +97,29 @@
                                           helm-source-file-cache
                                           helm-source-files-in-current-dir
                                           helm-source-recentf
-                                          helm-source-locate))
+                                          ;; helm-source-locate
+                                          ))
 
     (unless (bound-and-true-p dotemacs-use-ignoramus-p)
       (setq helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                                 '("\\.undo$"
+                                                 '("\\._darcs$"
+                                                   "\\.CVS$"
                                                    "\\.elc$"
+                                                   "\\.fdb_latexmk$"
+                                                   "\\.fls$"
                                                    "\\.git$"
                                                    "\\.hg$"
-                                                   "\\.svn$"
-                                                   "\\.CVS$"
-                                                   "\\._darcs$"
                                                    "\\.la$"
+                                                   "\\.log$"
                                                    "\\.o$"
+                                                   "\\.out$"
+                                                   "\\.pdf$"
+                                                   "\\.pyc$"
+                                                   "\\.rel$"
+                                                   "\\.rip$"
+                                                   "\\.undo$"
                                                    "\\#$"
                                                    "\\~$"))))
-
     :bind
     (;; Starting helm-find-files with C-u will show you a little history of the last visited directories.
      ([remap find-file] . helm-find-files)
@@ -200,14 +203,22 @@
 
 (use-package helm-company
   :ensure t
+  :if (eq dotemacs-selection 'helm)
   :after company)
 
 (use-package helm-smex
   :ensure t
+  :if (eq dotemacs-selection 'helm)
   :after helm
   :bind
   (([remap execute-extended-command] . helm-smex)
    ("M-X" . helm-smex-major-mode-commands)))
+
+(use-package helm-flx
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :after helm
+  :config (helm-flx-mode 1))
 
 (provide 'helm-init)
 
