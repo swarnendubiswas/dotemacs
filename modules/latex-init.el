@@ -35,6 +35,10 @@
                  :help "Run PDFLaTeX"))
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              ;; This variable is buffer-local
+              (setq TeX-command-default "LatexMk")))
 
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
@@ -44,6 +48,7 @@
   :after tex
   :functions (latex-mode latex-electric-env-pair-mode)
   :diminish latex-electric-env-pair-mode
+  :mode ("\\.tex\\'" . LaTeX-mode)
   :config
   (setq latex-run-command "latexmk")
   ;; This is not needed if we have auto-pairs enabled.
@@ -55,7 +60,6 @@
   :config (setq TeX-save-query nil))
 
 (use-package latex
-  :mode ("\\.tex\\'" . LaTeX-mode)
   :functions LaTeX-math-mode
   :config
   (setq LaTeX-syntactic-comments t
@@ -119,13 +123,7 @@ an item line."
 
 (use-package auctex-latexmk
   :ensure t
-  :after tex
-  :config
-  (auctex-latexmk-setup)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              ;; This variable is buffer-local
-              (setq TeX-command-default "LatexMk"))))
+  :config (auctex-latexmk-setup))
 
 (use-package latex-math-preview
   :load-path "extras")

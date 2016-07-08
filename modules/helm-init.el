@@ -81,30 +81,26 @@
 
   (use-package helm-files
     :config
-    (setq helm-ff-transformer-show-only-basename t ; Do not show the complete path is non-nil
+    (setq helm-ff-transformer-show-only-basename t ; Do not show the complete path
           helm-ff-file-name-history-use-recentf t
           helm-ff-search-library-in-sexp t
-          helm-ff-auto-update-initial-value t ; Auto update when only one candidate directory is matched
+          helm-ff-auto-update-initial-value nil ; Auto update when only one candidate directory is matched
           helm-ff-skip-boring-files t
           helm-ff-fuzzy-matching t
           helm-ff-tramp-not-fancy nil
           helm-ff-newfile-prompt-p t
           helm-ff-guess-ffap-urls nil
-          helm-ff-guess-ffap-filenames nil
+          helm-ff-guess-ffap-filenames t
           helm-file-cache-fuzzy-match t
           helm-recentf-fuzzy-match t
           helm-for-files-preferred-list '(helm-source-buffers-list
                                           helm-source-file-cache
                                           helm-source-files-in-current-dir
-                                          helm-source-recentf
-                                          ;; helm-source-locate
-                                          ))
+                                          helm-source-recentf))
 
     (unless (bound-and-true-p dotemacs-use-ignoramus-p)
       (setq helm-boring-file-regexp-list (append helm-boring-file-regexp-list
-                                                 '("\\._darcs$"
-                                                   "\\.CVS$"
-                                                   "\\.elc$"
+                                                 '("\\.elc$"
                                                    "\\.fdb_latexmk$"
                                                    "\\.fls$"
                                                    "\\.git$"
@@ -114,6 +110,7 @@
                                                    "\\.o$"
                                                    "\\.out$"
                                                    "\\.pdf$"
+                                                   "\\.ps$"
                                                    "\\.pyc$"
                                                    "\\.rel$"
                                                    "\\.rip$"
@@ -141,36 +138,8 @@
     (setq helm-apropos-fuzzy-match t
           helm-lisp-fuzzy-completion t))
 
-  (use-package helm-descbinds
-    :ensure t
-    :config
-    (fset 'describe-bindings 'helm-descbinds)
-    (helm-descbinds-mode 1))
-
-  (use-package helm-describe-modes
-    :ensure t
-    :bind ([remap describe-mode] . helm-describe-modes))
-
-  (use-package helm-dired-recent-dirs
-    :ensure t
-    :bind ("C-c h v" . helm-dired-recent-dirs-view)
-    :config
-    (setq shell-file-name "/usr/bin/fish"
-          helm-dired-recent-dirs-max 50))
-
-  (use-package helm-make
-    :ensure t
-    :bind ("C-c h k" . helm-make-projectile)
-    :config
-    (when (eq dotemacs-selection 'ivy)
-      (setq helm-make-completion-method 'ivy)))
-
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
-
-  (use-package helm-fuzzier
-    :ensure t
-    :config (helm-fuzzier-mode 1))
 
   :bind
   (([remap locate] . helm-locate)
@@ -200,11 +169,31 @@
   (([remap execute-extended-command] . helm-smex)
    ("M-X" . helm-smex-major-mode-commands)))
 
+(use-package helm-fuzzier
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :after helm
+  :config (helm-fuzzier-mode 1))
+
 (use-package helm-flx
   :ensure t
   :if (eq dotemacs-selection 'helm)
   :after helm
   :config (helm-flx-mode 1))
+
+(use-package helm-descbinds
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :after helm
+  :config
+  (fset 'describe-bindings 'helm-descbinds)
+  (helm-descbinds-mode 1))
+
+(use-package helm-describe-modes
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :after helm
+  :bind ([remap describe-mode] . helm-describe-modes))
 
 (provide 'helm-init)
 
