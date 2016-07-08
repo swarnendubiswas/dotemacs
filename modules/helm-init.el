@@ -22,7 +22,7 @@
         helm-locate-fuzzy-match t
         ;; I now prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since
         ;; long lines can get truncated.
-        helm-full-frame t ; Make the helm buffer occupy the full frame
+        helm-full-frame nil ; Make the helm buffer occupy the full frame
         ;; helm-split-window-default-side 'right
         ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
         ;; helm-always-two-windows nil
@@ -157,20 +157,6 @@
     :config
     (setq shell-file-name "/usr/bin/fish"
           helm-dired-recent-dirs-max 50))
-
-  ;; "C-c C-e" to go into edit mode
-  (use-package helm-swoop
-    :ensure t
-    :bind
-    (("C-c h s" . helm-swoop)
-     ("C-c h /" . helm-multi-swoop))
-    :config
-    (setq helm-multi-swoop-edit-save t ; Save buffer when helm-multi-swoop-edit complete
-          helm-swoop-speed-or-color nil
-          helm-swoop-split-direction #'split-window-vertically
-          helm-swoop-split-with-multiple-windows nil
-          helm-swoop-move-to-line-cycle t ; go to the opposite side of line from the end or beginning of line
-          helm-swoop-use-line-number-face t))
 
   (use-package helm-make
     :ensure t

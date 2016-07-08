@@ -153,6 +153,22 @@
   :config (setq swoop-use-target-magnifier t
                 swoop-use-target-magnifier-size 1.2))
 
+;; "C-c C-e" to go into edit mode
+(use-package helm-swoop
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :bind
+  (("C-c h s" . helm-swoop)
+   ("C-c h /" . helm-multi-swoop))
+  :config
+  (setq helm-multi-swoop-edit-save t ; Save buffer when helm-multi-swoop-edit complete
+        helm-swoop-speed-or-color nil
+        helm-swoop-split-direction #'split-window-vertically
+        helm-swoop-split-with-multiple-windows nil
+        helm-swoop-move-to-line-cycle t ; go to the opposite side of line from the end or beginning of line
+        helm-swoop-use-line-number-face t))
+
+
 (provide 'search-init)
 
 ;;; search-init.el ends here
