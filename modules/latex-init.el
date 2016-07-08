@@ -36,17 +36,6 @@
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
 
-  ;; ;; Save all files before compilation, https://github.com/grettke/home/blob/master/.emacs.el
-  ;; (defadvice TeX-command-master (before before-TeX-command-master activate)
-  ;;   (progn
-  ;;     (dotemacs-save-all-buffers)
-  ;;     (dotemacs--tabbar-modification-state-change)
-  ;;     (dotemacs--tabbar-on-buffer-modification)))
-  ;;   ;; http://stackoverflow.com/questions/6138029/how-to-add-a-hook-to-only-run-in-a-particular-mode
-  ;;   (add-hook 'LaTeX-mode-hook
-  ;;             (lambda()
-  ;;               (add-hook 'after-save-hook #'TeX-command-master nil 'make-it-local)))
-
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
@@ -149,25 +138,20 @@ an item line."
   (use-package bibtex-utils
     :ensure t))
 
-(use-package bib-cite
-  :diminish bib-cite-minor-mode
-  :config
-  (bib-cite-minor-mode 1)
-  (setq bib-cite-use-reftex-view-crossref t)
-  :bind
-  (:map bib-cite-minor-mode-map
-        ("C-c b" . nil) ; We use "C-c b" for comment-box
-        ("C-c l a" . bib-apropos)
-        ("C-c l b" . bib-make-bibliography)
-        ("C-c l d" . bib-display)
-        ("C-c l t" . bib-etags)
-        ("C-c l f" . bib-find)
-        ("C-c l n" . bib-find-next)
-        ("C-c l h" . bib-highlight-mouse)))
-
 (use-package reftex
   :after tex
   :diminish reftex-mode
+  :preface
+  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+  (defun dotemacs--get-bibtex-keys (file)
+    (with-current-buffer (find-file-noselect file)
+      (mapcar 'car (bibtex-parse-keys))))
+
+  (defun dotemacs--reftex-add-all-bibitems-from-bibtex ()
+    (interactive)
+    (mapc 'LaTeX-add-bibitems
+          (apply 'append
+                 (mapcar 'dotemacs--get-bibtex-keys (reftex-get-bibfile-list)))))
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)
@@ -175,12 +159,32 @@ an item line."
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
         reftex-enable-partial-scans t
-        reftex-default-bibliography '("~/workspace/bib/plass-formatted.bib")
+        reftex-allow-automatic-rescan t
+        reftex-default-bibliography '("~/workspace/bib/plass.bib")
         reftex-idle-time 0.5
-        reftex-toc-follow-mode t)
+        reftex-toc-follow-mode t
+        reftex-use-fonts t
+        reftex-highlight-selection 'both)
+  (add-hook 'reftex-mode-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; Use with AUCTeX
   ;; Emacs latex mode
-  (add-hook 'lateX-mode-hook #'turn-on-reftex))
+  (add-hook 'lateX-mode-hook #'turn-on-reftex)
+
+  (use-package bib-cite
+    :diminish bib-cite-minor-mode
+    :config
+    (bib-cite-minor-mode 1)
+    (setq bib-cite-use-reftex-view-crossref t)
+    :bind
+    (:map bib-cite-minor-mode-map
+          ("C-c b" . nil) ; We use "C-c b" for comment-box
+          ("C-c l a" . bib-apropos)
+          ("C-c l b" . bib-make-bibliography)
+          ("C-c l d" . bib-display)
+          ("C-c l t" . bib-etags)
+          ("C-c l f" . bib-find)
+          ("C-c l n" . bib-find-next)
+          ("C-c l h" . bib-highlight-mouse))))
 
 (use-package tex-smart-umlauts
   :ensure t
@@ -191,19 +195,17 @@ an item line."
   :ensure t
   :after tex)
 
-(use-package bibtex-completion
-  :after tex
-  :config
-  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-        bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t))
-
 (use-package helm-bibtex
   :ensure t
   :if (eq dotemacs-selection 'helm)
   :after tex
-  :config
   :bind ("C-c l x" . helm-bibtex)
+  :init
+  (use-package bibtex-completion
+    :config
+    (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+          bibtex-completion-cite-prompt-for-optional-arguments nil
+          bibtex-completion-cite-default-as-initial-input t))
   :config
   (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
   (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
@@ -213,6 +215,12 @@ an item line."
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :after tex
+  :init
+  (use-package bibtex-completion
+    :config
+    (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+          bibtex-completion-cite-prompt-for-optional-arguments nil
+          bibtex-completion-cite-default-as-initial-input t))
   :config
   ;; https://github.com/tmalsburg/helm-bibtex/
   (defun ivy-bibtex (&optional arg)

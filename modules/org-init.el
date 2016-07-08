@@ -48,8 +48,6 @@
 
   (require 'org-inlinetask)
 
-  ;; (bind-key "C-c C-d" 'duplicate-thing org-mode-map)
-
   (add-hook 'org-mode-hook #'org-toggle-blocks)
   (add-hook 'org-mode-hook #'which-function-mode)
 
