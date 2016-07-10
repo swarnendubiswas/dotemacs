@@ -25,10 +25,10 @@
         helm-full-frame nil ; Make the helm buffer occupy the full frame
         ;; helm-split-window-default-side 'right
         ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
-        ;; helm-always-two-windows nil
+        helm-always-two-windows t
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
-        helm-display-header-line t
-        helm-echo-input-in-header-line t
+        helm-display-header-line nil
+        helm-echo-input-in-header-line nil
         ;; Default is 'smart, searches and matches should ignore case
         helm-case-fold-search t
         helm-follow-mode-persistent t)

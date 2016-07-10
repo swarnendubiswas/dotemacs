@@ -119,6 +119,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-SPC` - Mark buffer (``).
 * `M-D` - Kill marked buffers and quit Helm (``).
 * `C-c d` - Kill marked buffers and keep Helm session (``).
+* `M-SPC` - Marks a candidate (``).
+* `C-h m` - Shows other key bindings besides those shown in the modeline (``).
+* `M-n` - Copies yanked symbol to minibuffer (``).
+* `C-w` - Appends word next to point to the minibuffer (``).
 
 #### Projectile
 
