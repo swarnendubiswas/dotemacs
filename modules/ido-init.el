@@ -32,7 +32,7 @@
         ido-enable-last-directory-history t
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
-        ido-max-window-height 20
+        ido-max-window-height 20 ; Increase the height of the minibuffer
         confirm-nonexistent-file-or-buffer t
         ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto

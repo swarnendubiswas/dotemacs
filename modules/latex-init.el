@@ -45,10 +45,8 @@
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
 (use-package tex-mode
-  :after tex
   :functions (latex-mode latex-electric-env-pair-mode)
   :diminish latex-electric-env-pair-mode
-  :mode ("\\.tex\\'" . LaTeX-mode)
   :config
   (setq latex-run-command "latexmk")
   ;; This is not needed if we have auto-pairs enabled.
@@ -60,6 +58,7 @@
   :config (setq TeX-save-query nil))
 
 (use-package latex
+  :mode ("\\.tex\\'" . LaTeX-mode)
   :functions LaTeX-math-mode
   :config
   (setq LaTeX-syntactic-comments t
@@ -79,16 +78,13 @@ an item line."
 
 ;; Required by ac-math and company-math
 (use-package math-symbol-lists
-  :ensure t
-  :after tex)
+  :ensure t)
 
 (when (eq dotemacs-completion-in-buffer 'auto-complete)
   (use-package auto-complete-auctex
-    :ensure t
-    :after tex)
+    :ensure t)
 
   (use-package ac-tex-ref
-    :after tex
     :load-path "extras"
     :config
     (setq ac-sources
@@ -97,7 +93,6 @@ an item line."
 
   (use-package ac-math
     :ensure t
-    :after tex
     :preface
     (defun ac-latex-mode-setup ()
       (setq ac-sources
@@ -111,12 +106,10 @@ an item line."
 (when (eq dotemacs-completion-in-buffer 'company)
   (use-package company-auctex
     :ensure t
-    :after tex
     :config (company-auctex-init))
 
   (use-package company-math
     :ensure t
-    :after tex
     :config
     (add-to-list 'company-backends
                  '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
@@ -137,7 +130,6 @@ an item line."
     :ensure t))
 
 (use-package reftex
-  :after tex
   :diminish reftex-mode
   :preface
   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -186,17 +178,14 @@ an item line."
 
 (use-package tex-smart-umlauts
   :ensure t
-  :after tex
   :config (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-decode))
 
 (use-package parsebib
-  :ensure t
-  :after tex)
+  :ensure t)
 
 (use-package helm-bibtex
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :after tex
   :bind ("C-c l x" . helm-bibtex)
   :init
   (use-package bibtex-completion
@@ -212,7 +201,6 @@ an item line."
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)
-  :after tex
   :init
   (use-package bibtex-completion
     :config
@@ -238,7 +226,6 @@ reread."
 
 (use-package outline
   :ensure t
-  :after tex
   :diminish outline-minor-mode
   :init (add-hook 'LaTeX-mode-hook
                   (lambda ()
