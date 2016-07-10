@@ -18,7 +18,7 @@
         projectile-verbose nil
         projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
-        projectile-switch-project-action 'projectile-dired
+        projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
         projectile-mode-line nil)
 
   (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
