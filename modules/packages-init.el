@@ -75,23 +75,6 @@
         paradox-spinner-type 'random)
   (paradox-enable))
 
-;; This does not work properly with Emacs 25 because of a bug with threading.
-;; https://github.com/mola-T/SPU/issues/3
-(use-package spu
-  :ensure t
-  :disabled t
-  :if (<= emacs-major-version 24)
-  :defer 5
-  :config
-  (setq spu-log-path (concat dotemacs-temp-directory "spu_log"))
-  (spu-package-upgrade-daily))
-
-(use-package no-littering
-  :ensure t
-  :init
-  (setq no-littering-etc-directory dotemacs-temp-directory
-        no-littering-var-directory dotemacs-temp-directory))
-
 (provide 'packages-init)
 
 ;;; packages-init.el ends here

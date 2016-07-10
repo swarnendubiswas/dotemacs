@@ -67,13 +67,14 @@
   :bind (("C-c s" . dotemacs-swiper-with-visual-line-mode)
          ("C-c S" . dotemacs-swiper-all-with-visual-line-mode)
          ("C-c r" . ivy-resume))
-  :config
-  (setq swiper-use-visual-line t
-        swiper-action-recenter t)
+  :init
   (when (not (eq dotemacs-selection 'ivy))
     (progn
       (setq ivy-height 20)
-      (bind-key "<f4>" #'swiper))))
+      (bind-key "<f4>" #'swiper)))
+  :config
+  (setq swiper-use-visual-line t
+        swiper-action-recenter t))
 
 (use-package swiper-helm
   :ensure t
