@@ -71,7 +71,9 @@
   (setq swiper-use-visual-line t
         swiper-action-recenter t)
   (when (not (eq dotemacs-selection 'ivy))
-    (setq ivy-height 20)))
+    (progn
+      (setq ivy-height 20)
+      (bind-key "<f4>" #'swiper))))
 
 (use-package swiper-helm
   :ensure t

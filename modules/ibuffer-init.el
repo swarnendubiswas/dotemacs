@@ -55,7 +55,6 @@
       ;; First do alphabetic sort, then do major-mode sort
       (ibuffer-do-sort-by-alphabetic)
       (ibuffer-do-sort-by-major-mode)))
-  :after ibuffer
   :config (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (provide 'ibuffer-init)

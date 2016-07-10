@@ -34,7 +34,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-selection
-  'helm
+  'ido
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "helm" helm)

@@ -9,8 +9,9 @@
   :ensure t
   :functions (projectile-find-file projectile-switch-project)
   :commands (projectile-switch-project)
-  :init (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
-              projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
+  :init
+  (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
+        projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
   (projectile-global-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   :config
   (setq projectile-enable-caching t
@@ -18,7 +19,8 @@
         projectile-verbose nil
         projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
         projectile-find-dir-includes-top-level t
-        projectile-switch-project-action 'projectile-dired)
+        projectile-switch-project-action 'projectile-dired
+        projectile-mode-line nil)
 
   (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
         ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
@@ -40,7 +42,6 @@
                   "GSYMS"
                   "TAGS"))
     (add-to-list 'projectile-globally-ignored-files item))
-
   (dolist (list '("\\.log$"
                   "\\.out$"
                   "\\.pdf$"

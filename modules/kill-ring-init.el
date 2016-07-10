@@ -23,10 +23,10 @@
             browse-kill-ring-highlight-inserted-item t
             browse-kill-ring-show-preview t
             browse-kill-ring-display-duplicates t)
+      ;; Binds "M-y" to browse-kill-ring
       (browse-kill-ring-default-keybindings)
       (use-package browse-kill-ring+
-        :ensure t)
-      :bind ("M-y" . browse-kill-ring)))
+        :ensure t)))
 
 (provide 'kill-ring-init)
 
