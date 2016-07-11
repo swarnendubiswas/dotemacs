@@ -45,13 +45,35 @@
                                                   :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        ;; Options: arrow, slant, chamfer, wave, brace, roundstub,
-                                                        ;; zigzag, butt, rounded, contour, curve
                                                         powerline-default-separator 'wave
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil
-                                                        spaceline-buffer-position-p nil)
-                                                  (spaceline-emacs-theme)
+                                                        spaceline-buffer-position-p nil
+                                                        spaceline-projectile-root-p t)
+                                                  (spaceline-compile
+                                                   'biswass
+                                                   ;; Left side of the mode line
+                                                   '(((buffer-modified buffer-size) :face highlight-face)
+                                                     anzu
+                                                     '(buffer-id remote-host)
+                                                     major-mode
+                                                     (process :when active)
+                                                     ((flycheck-error flycheck-warning flycheck-info) :when active)
+                                                     (minor-modes :when active)
+                                                     nyan-cat)
+                                                   ;; Right segment
+                                                   '(((which-function projectile-root) :separator " | ")
+                                                     (python-pyvenv :fallback python-pyenv)
+                                                     (version-control :when active)
+                                                     (battery :when active)
+                                                     selection-info
+                                                     input-method
+                                                     ((buffer-encoding-abbrev point-position line-column) :separator " | ")
+                                                     (global :when active)
+                                                     ,@additional-segments
+                                                     buffer-position
+                                                     hud))
+                                                  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-biswass))))
                                                   (set-face-attribute 'spaceline-highlight-face nil
                                                                       :background "#1A4B77"
                                                                       :foreground "white")
