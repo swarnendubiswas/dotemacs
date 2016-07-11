@@ -50,6 +50,7 @@
                                                         spaceline-hud-p nil
                                                         spaceline-buffer-position-p nil
                                                         spaceline-projectile-root-p t)
+                                                  ;; Adapted from https://github.com/lunaryorn/.emacs.d/blob/master/init.el
                                                   (spaceline-compile
                                                    'biswass
                                                    ;; Left side of the mode line
