@@ -113,7 +113,6 @@
         blink-matching-paren t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
-  (auto-fill-mode 1)
   (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
   :bind ("C-c d f" . auto-fill-mode))
 

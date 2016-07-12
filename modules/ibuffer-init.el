@@ -36,18 +36,9 @@
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
   :bind ([remap list-buffers] . ibuffer))
 
-(use-package ibuffer-vc ; Sort buffers by VC status
-  :ensure t
-  :disabled t
-  :config
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (ibuffer-vc-set-filter-groups-by-vc-root)
-              (unless (eq ibuffer-sorting-mode 'alphabetic)
-                (ibuffer-do-sort-by-alphabetic)))))
-
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
+  :after ibuffer
   :preface
   (defun dotemacs--ibuffer-customization ()
     (ibuffer-projectile-set-filter-groups)
