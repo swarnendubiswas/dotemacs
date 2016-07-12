@@ -45,7 +45,7 @@
                                                   :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        powerline-default-separator 'wave
+                                                        powerline-default-separator 'arrow
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil
                                                         spaceline-buffer-position-p nil

@@ -8,7 +8,6 @@
 ;; Flycheck requires gcc 4.8 at least
 (use-package flycheck
   :ensure t
-  :disabled t
   :diminish flycheck-mode
   :init (add-hook 'prog-mode-hook #'global-flycheck-mode) ; Enable where possible
   :config
