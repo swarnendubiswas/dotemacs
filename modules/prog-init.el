@@ -163,10 +163,7 @@
   :after prog-mode
   :config
   (setq which-func-modes t)
-  (add-hook 'prog-mode-hook #'which-function-mode)
-  (if (eq dotemacs-mode-line-theme 'spaceline)
-      (set-face-attribute 'which-func nil :foreground "white")
-    (set-face-attribute 'which-func nil :foreground "black")))
+  (add-hook 'prog-mode-hook #'which-function-mode))
 
 (use-package electric
   :init
