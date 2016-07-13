@@ -37,17 +37,6 @@
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
 
-  ;; ;; Save all files before compilation, https://github.com/grettke/home/blob/master/.emacs.el
-  ;; (defadvice TeX-command-master (before before-TeX-command-master activate)
-  ;;   (progn
-  ;;     (dotemacs-save-all-buffers)
-  ;;     (dotemacs--tabbar-modification-state-change)
-  ;;     (dotemacs--tabbar-on-buffer-modification)))
-  ;;   ;; http://stackoverflow.com/questions/6138029/how-to-add-a-hook-to-only-run-in-a-particular-mode
-  ;;   (add-hook 'LaTeX-mode-hook
-  ;;             (lambda()
-  ;;               (add-hook 'after-save-hook #'TeX-command-master nil 'make-it-local)))
-
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
@@ -72,31 +61,8 @@
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
     (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
 
-    ;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
-    ;;(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
-
-    ;; (with-eval-after-load "LaTeX"
-    ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") nil))
-    ;; (with-eval-after-load "LaTeX"
-    ;;   (define-key LaTeX-mode-map (kbd "C-c C-d") 'duplicate-thing))
-    ;; (bind-key "C-c C-d" 'duplicate-thing LaTeX-mode-map)
-
     ;; Unset "C-c ;" since we want to bind it to 'comment-line
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
-
-  (use-package latex-pretty-symbols
-    :ensure t
-    :disabled t)
-
-  (use-package latex-unicode-math-mode
-    :ensure t
-    :disabled t
-    :diminish latex-unicode-mode
-    :config
-    ;; This converts LaTeX to Unicode inside math environments.
-    ;; (add-hook 'LaTeX-mode-hook 'latex-unicode-math-mode)
-    ;; This converts LaTeX to Unicode everwhere, not only in math environments.
-    (add-hook 'LaTeX-mode-hook 'latex-unicode-mode))
 
   ;; Required by ac-math and company-math
   (use-package math-symbol-lists
@@ -145,33 +111,6 @@
                 ;; This variable is buffer-local
                 (setq TeX-command-default "LatexMk"))))
 
-  (use-package latex-extra
-    :ensure t
-    :disabled t ; Overrides a few useful keymap prefixes
-    :config
-    (latex/setup-keybinds)
-    (add-hook 'LaTeX-mode-hook #'latex-extra-mode))
-
-  (use-package latex-preview-pane ; Currently does not support multi-file parsing
-    :ensure t
-    :disabled t
-    :config (latex-preview-pane-enable))
-
-  (use-package latex-math-preview
-    :load-path "extras")
-
-  (use-package magic-latex-buffer
-    :ensure t
-    :disabled t
-    :diminish magic-latex-buffer
-    :config
-    (add-hook 'LaTeX-mode-hook #'magic-latex-buffer)
-    (setq magic-latex-enable-block-highlight nil
-          magic-latex-enable-subscript nil
-          magic-latex-enable-pretty-symbols nil
-          magic-latex-enable-block-align nil
-          magic-latex-enable-inline-image nil))
-
   (use-package bibtex
     :commands bibtex-mode
     :config
@@ -195,18 +134,6 @@
           ("C-c l f" . bib-find)
           ("C-c l n" . bib-find-next)
           ("C-c l h" . bib-highlight-mouse)))
-
-  ;; http://joostkremers.github.io/ebib/ebib-manual.html#the-ebib-buffers
-  (use-package ebib
-    :ensure t
-    :bind ("C-c l e" . ebib)
-    :config
-    (setq ebib-bibtex-dialect 'BibTeX
-          ebib-uniquify-keys t
-          ebib-index-display-fields '("title")
-          ebib-file-associations '(("pdf" . "evince") ("ps" . "evince"))
-          ebib-bib-search-dirs '("/home/biswass/workspace/bib")
-          ebib-preload-bib-files '("/home/biswass/workspace/bib/plass-formatted.bib")))
 
   ;; C-c = reftex-toc
   ;; C-c [
@@ -246,26 +173,35 @@ an item line."
   :ensure t
   :after tex)
 
-(use-package bibtex-completion
-  :after tex
-  :config
-  (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-        bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t))
-
 (use-package helm-bibtex
   :ensure t
   :if (eq dotemacs-selection 'helm)
   :after tex
-  :config
   :bind ("C-c l x" . helm-bibtex)
-  :config (setq helm-bibtex-full-frame t))
+  :config
+  (use-package bibtex-completion
+    :after tex
+    :config
+    (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+          bibtex-completion-cite-prompt-for-optional-arguments nil
+          bibtex-completion-cite-default-as-initial-input t))
+  (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
+  (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
+  (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :after tex
+  :bind ("C-c l x" . ivy-bibtex)
   :config
+  (use-package bibtex-completion
+    :after tex
+    :config
+    (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
+          bibtex-completion-cite-prompt-for-optional-arguments nil
+          bibtex-completion-cite-default-as-initial-input t))
+
   ;; https://github.com/tmalsburg/helm-bibtex/
   (defun ivy-bibtex (&optional arg)
     "Search BibTeX entries using ivy.
@@ -279,8 +215,7 @@ reread."
     (ivy-read "BibTeX Items: "
               (bibtex-completion-candidates 'ivy-bibtex-candidates-formatter)
               :caller 'ivy-bibtex
-              :action 'bibtex-completion-insert-key))
-  :bind ("C-c l x" . ivy-bibtex))
+              :action 'bibtex-completion-insert-key)))
 
 (use-package outline
   :ensure t
