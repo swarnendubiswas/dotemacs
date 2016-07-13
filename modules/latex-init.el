@@ -5,6 +5,10 @@
 
 ;;; Code:
 
+(defvar dotemacs-completion-in-buffer)
+(defvar dotemacs-selection)
+(defvar prettify-symbols-unprettify-at-point)
+
 (use-package tex
   :ensure auctex
   :defer t
@@ -119,28 +123,20 @@
     (use-package bibtex-utils
       :ensure t))
 
-  (use-package bib-cite
-    :diminish bib-cite-minor-mode
-    :config
-    (bib-cite-minor-mode 1)
-    (setq bib-cite-use-reftex-view-crossref t)
-    :bind
-    (:map bib-cite-minor-mode-map
-          ("C-c b" . nil) ; We use "C-c b" for comment-box
-          ("C-c l a" . bib-apropos)
-          ("C-c l b" . bib-make-bibliography)
-          ("C-c l d" . bib-display)
-          ("C-c l t" . bib-etags)
-          ("C-c l f" . bib-find)
-          ("C-c l n" . bib-find-next)
-          ("C-c l h" . bib-highlight-mouse)))
-
-  ;; C-c = reftex-toc
-  ;; C-c [
-  ;; C-c (
-  ;; C-c )
   (use-package reftex
+    :after tex
     :diminish reftex-mode
+    :preface
+    ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+    (defun dotemacs--get-bibtex-keys (file)
+      (with-current-buffer (find-file-noselect file)
+        (mapcar 'car (bibtex-parse-keys))))
+
+    (defun dotemacs--reftex-add-all-bibitems-from-bibtex ()
+      (interactive)
+      (mapc 'LaTeX-add-bibitems
+            (apply 'append
+                   (mapcar 'dotemacs--get-bibtex-keys (reftex-get-bibfile-list)))))
     :config
     (setq reftex-plug-into-AUCTeX t
           reftex-insert-label-flags '(t t)
@@ -148,12 +144,32 @@
           reftex-save-parse-info t
           reftex-use-multiple-selection-buffers t
           reftex-enable-partial-scans t
-          reftex-default-bibliography '("~/workspace/bib/plass-formatted.bib")
+          reftex-allow-automatic-rescan t
+          reftex-default-bibliography '("~/workspace/bib/plass.bib")
           reftex-idle-time 0.5
-          reftex-toc-follow-mode t)
+          reftex-toc-follow-mode t
+          reftex-use-fonts t
+          reftex-highlight-selection 'both)
+    (add-hook 'reftex-mode-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
     (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; Use with AUCTeX
     ;; Emacs latex mode
-    (add-hook 'lateX-mode-hook #'turn-on-reftex))
+    (add-hook 'lateX-mode-hook #'turn-on-reftex)
+
+    (use-package bib-cite
+      :diminish bib-cite-minor-mode
+      :config
+      (bib-cite-minor-mode 1)
+      (setq bib-cite-use-reftex-view-crossref t)
+      :bind
+      (:map bib-cite-minor-mode-map
+            ("C-c b" . nil) ; We use "C-c b" for comment-box
+            ("C-c l a" . bib-apropos)
+            ("C-c l b" . bib-make-bibliography)
+            ("C-c l d" . bib-display)
+            ("C-c l t" . bib-etags)
+            ("C-c l f" . bib-find)
+            ("C-c l n" . bib-find-next)
+            ("C-c l h" . bib-highlight-mouse))))
 
   (use-package tex-smart-umlauts
     :ensure t
