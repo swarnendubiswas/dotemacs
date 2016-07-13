@@ -19,7 +19,7 @@
                                                       :disabled t
                                                       :load-path "packages/emacs-powerline/"
                                                       :config
-                                                      (setq powerline-arrow-shape 'arrow) ; curve, arrow, half, arrow14
+                                                      (setq powerline-arrow-shape 'arrow)
                                                       (set-face-attribute 'mode-line nil
                                                                           :background "grey88"
                                                                           :foreground "black"

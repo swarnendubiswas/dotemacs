@@ -53,7 +53,6 @@
                                      :ensure t
                                      :config
                                      (load-theme 'leuven t)
-                                     ;; (set-face-background 'fringe "wheat") ; Customize the fringe marks on the sides
                                      (with-eval-after-load "avy"
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"
