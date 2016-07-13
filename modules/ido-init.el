@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar recentf-list)
+
 ;; C-j to create a new buffer rather than switching to an existing buffer
 ;; C-x C-f C-f to kick you out of ido mode into "normal" find file mode
 (use-package ido
@@ -26,31 +28,33 @@
         ido-use-filename-at-point 'guess
         ido-use-url-at-point nil
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
+        ido-enable-dot-prefix t
         ido-create-new-buffer 'always
         ido-default-file-method 'selected-window
         ido-save-directory-list-file (concat dotemacs-temp-directory "ido.last")
         ido-enable-last-directory-history t
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
-        ido-max-window-height 20 ; Increase the height of the minibuffer
         confirm-nonexistent-file-or-buffer t
         ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-auto-merge-work-directories-length -1
-        ido-ignore-buffers '("^ "
-                             "*Completions*"
-                             "*Shell Command Output*"
-                             "*Compile-Log*"
-                             "Flycheck error messages*"
-                             ;; "*Messages*"
-                             "\\`\\*"
-                             "Async Shell Command"
-                             "*Paradox Report*")
         ido-confirm-unique-completion nil
         ido-ignore-extensions t ; Make ido use completion-ignored-extensions
-        ido-enable-tramp-completion t)
+        ido-enable-tramp-completion t
+        ;; The ido-completion-help window is distracting
+        ido-cannot-complete-command 'ido-next-match)
 
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
+    (setq ido-ignore-buffers (append '("^ "
+                                       "*Completions*"
+                                       "*Shell Command Output*"
+                                       "*Compile-Log*"
+                                       "Flycheck error messages*"
+                                       "\\`\\*"
+                                       "Async Shell Command"
+                                       "*Paradox Report*")
+                                     ido-ignore-buffers))
     (setq ido-ignore-files (append '("GTAGS"
                                      "GPATH"
                                      "GRTAGS"
@@ -67,11 +71,6 @@
   (ido-mode 1)
   (ido-everywhere 1)
 
-  (use-package ido-yes-or-no ; Overkill
-    :ensure t
-    :disabled t
-    :config (ido-yes-or-no-mode))
-
   (use-package ido-hacks
     :ensure t
     :functions ido-hacks-mode
@@ -84,14 +83,9 @@
   (use-package ido-completing-read+
     :ensure t)
 
-  (or (use-package flx-ido ; Smarter fuzzy matching for ido
-        :ensure t
-        :config (flx-ido-mode 1))
-
-      (use-package ido-better-flex ; Can add more noise while matching patterns
-        :ensure t
-        :disabled t
-        :config (ido-better-flex/enable)))
+  (use-package flx-ido ; Smarter fuzzy matching for ido
+    :ensure t
+    :config (flx-ido-mode 1))
 
   (use-package ido-at-point
     :ensure t
@@ -103,7 +97,6 @@
 
   (use-package ido-sort-mtime
     :ensure t
-    :disabled t
     :config (ido-sort-mtime-mode 1))
 
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
@@ -120,6 +113,7 @@
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
                                                        ido-vertical-show-count t
+                                                       ido-max-window-height 20 ; Increase the height of the minibuffer
                                                        ido-vertical-pad-list t)
                                                  (ido-vertical-mode 1)))
 

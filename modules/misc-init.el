@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+
 (use-package help+
   :ensure t)
 

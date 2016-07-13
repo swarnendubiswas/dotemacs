@@ -5,6 +5,13 @@
 
 ;;; Code:
 
+(defvar spaceline-anzu-p)
+(defvar spaceline-hud-p)
+(defvar spaceline-buffer-position-p)
+(defvar spaceline-projectile-root-p)
+(defvar dotemacs-mode-line-theme)
+(defvar dotemacs-selection)
+
 (cond ((eq dotemacs-mode-line-theme 'powerline) (or (use-package powerline
                                                       :ensure t
                                                       :config
@@ -47,7 +54,7 @@
                                                   (setq powerline-height 20
                                                         powerline-default-separator 'arrow
                                                         spaceline-anzu-p t
-                                                        spaceline-hud-p nil
+                                                        spaceline-hud-p nil ; Prefer nyan cat mode
                                                         spaceline-buffer-position-p nil
                                                         spaceline-projectile-root-p t)
                                                   ;; Adapted from https://github.com/lunaryorn/.emacs.d/blob/master/init.el
@@ -93,6 +100,7 @@
 
 (use-package mode-icons
   :ensure t
+  :if (not (eq dotemacs-mode-line-theme 'spaceline)) ;; https://github.com/TheBB/spaceline/issues/84
   :config (mode-icons-mode 1))
 
 (use-package nyan-mode
