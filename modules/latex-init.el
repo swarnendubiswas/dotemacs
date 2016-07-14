@@ -173,7 +173,7 @@
 
   (use-package tex-smart-umlauts
     :ensure t
-    :config (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-decode))
+    :config (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
 
   ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
   (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
