@@ -8,10 +8,13 @@
 (defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-selection)
 (defvar prettify-symbols-unprettify-at-point)
+(defvar helm-bibtex-full-frame)
+
+(use-package tex-site
+  :ensure auctex)
 
 (use-package tex
   :ensure auctex
-  :defer t
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -31,168 +34,163 @@
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
   (setq-default TeX-master nil) ; Query for master file
-
-  ;; Compile files to pdf by default, this is already the default from AUCTeX 11.88, but we want to be sure
-  (TeX-global-PDF-mode 1)
+  (TeX-PDF-mode 1)
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
-                 (plain-tex-mode LaTeX-mode docTeX-mode)
+                 (plain-tex-mode tex-mode TeX-mode LaTeX-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
 
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
-    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
+    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
-  (use-package tex-mode
-    :functions (latex-mode latex-electric-env-pair-mode)
-    :diminish latex-electric-env-pair-mode
-    :config
-    (setq latex-run-command "latexmk")
-    (add-hook 'LaTeX-mode-hook
-              (lambda()
-                (latex-electric-env-pair-mode 1))))
+(use-package tex-buf
+  :config (setq TeX-save-query nil))
 
-  (use-package tex-buf
-    :config (setq TeX-save-query nil))
+(use-package tex-fold
+  :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
-  (use-package latex
-    :mode ("\\.tex\\'" . LaTeX-mode)
-    :functions LaTeX-math-mode
-    :config
-    (setq LaTeX-syntactic-comments t)
-    (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-    (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+(use-package tex-mode
+  :functions (latex-mode latex-electric-env-pair-mode)
+  :diminish latex-electric-env-pair-mode
+  :config
+  (setq latex-run-command "latexmk")
+  (add-hook 'TeX-mode-hook
+            (lambda()
+              (latex-electric-env-pair-mode 1))))
 
-    ;; Unset "C-c ;" since we want to bind it to 'comment-line
-    (define-key LaTeX-mode-map (kbd "C-c ;") nil))
+(use-package latex
+  :functions LaTeX-math-mode
+  :init
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+  :config
+  (setq LaTeX-syntactic-comments t)
+  ;; Unset "C-c ;" since we want to bind it to 'comment-line
+  (unbind-key "C-c ;" LaTeX-mode-map))
 
-  ;; Required by ac-math and company-math
-  (use-package math-symbol-lists
+(use-package auctex-latexmk
+  :ensure t
+  :after latex
+  :config
+  (auctex-latexmk-setup)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              ;; This variable is buffer-local
+              (setq TeX-command-default "LatexMk"))))
+
+;; Required by ac-math and company-math
+(use-package math-symbol-lists
+  :ensure t)
+
+(when (eq dotemacs-completion-in-buffer 'auto-complete)
+  (use-package auto-complete-auctex
     :ensure t)
 
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package auto-complete-auctex
-      :ensure t)
+  (use-package ac-tex-ref
+    :load-path "extras"
+    :config
+    (setq ac-sources
+          (append '(ac-source-tex-ref ac-source-tex-cite)
+                  ac-sources)))
 
-    (use-package ac-tex-ref
-      :load-path "extras"
-      :config
-      (setq ac-sources
-            (append '(ac-source-tex-ref ac-source-tex-cite)
-                    ac-sources)))
-
-    (use-package ac-math
-      :ensure t
-      :preface
-      (defun ac-latex-mode-setup ()
-        (setq ac-sources
-              (append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands ac-source-auctex-labels)
-                      ac-sources)))
-      :config
-      (add-to-list 'ac-modes 'latex-mode)
-      (add-hook 'TeX-mode-hook #'ac-latex-mode-setup)
-      (setq ac-math-unicode-in-math-p t)))
-
-  (when (eq dotemacs-completion-in-buffer 'company)
-    (use-package company-auctex
-      :ensure t
-      :config (company-auctex-init))
-
-    (use-package company-math
-      :ensure t
-      :config
-      (add-to-list 'company-backends
-                   '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
-
-  (use-package auctex-latexmk
+  (use-package ac-math
     :ensure t
-    :config
-    (auctex-latexmk-setup)
-    (add-hook 'LaTeX-mode-hook
-              (lambda ()
-                ;; This variable is buffer-local
-                (setq TeX-command-default "LatexMk"))))
-
-  (use-package bibtex
-    :commands bibtex-mode
-    :config
-    (add-hook 'bibtex-mode-hook #'BibTeX-auto-store)
-    (setq bibtex-maintain-sorted-entries t)
-    (use-package bibtex-utils
-      :ensure t))
-
-  (use-package reftex
-    :after tex
-    :diminish reftex-mode
     :preface
-    ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-    (defun dotemacs--get-bibtex-keys (file)
-      (with-current-buffer (find-file-noselect file)
-        (mapcar 'car (bibtex-parse-keys))))
-
-    (defun dotemacs--reftex-add-all-bibitems-from-bibtex ()
-      (interactive)
-      (mapc 'LaTeX-add-bibitems
-            (apply 'append
-                   (mapcar 'dotemacs--get-bibtex-keys (reftex-get-bibfile-list)))))
+    (defun ac-latex-mode-setup ()
+      (setq ac-sources
+            (append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands ac-source-auctex-labels)
+                    ac-sources)))
     :config
-    (setq reftex-plug-into-AUCTeX t
-          reftex-insert-label-flags '(t t)
-          reftex-cite-format 'abbrv
-          reftex-save-parse-info t
-          reftex-use-multiple-selection-buffers t
-          reftex-enable-partial-scans t
-          reftex-allow-automatic-rescan t
-          reftex-default-bibliography '("~/workspace/bib/plass.bib")
-          reftex-idle-time 0.5
-          reftex-toc-follow-mode t
-          reftex-use-fonts t
-          reftex-highlight-selection 'both)
-    (add-hook 'reftex-mode-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
-    (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; Use with AUCTeX
-    ;; Emacs latex mode
-    (add-hook 'lateX-mode-hook #'turn-on-reftex)
+    (add-to-list 'ac-modes 'latex-mode)
+    (add-hook 'TeX-mode-hook #'ac-latex-mode-setup)
+    (setq ac-math-unicode-in-math-p t)))
 
-    (use-package bib-cite
-      :diminish bib-cite-minor-mode
-      :config
-      (bib-cite-minor-mode 1)
-      (setq bib-cite-use-reftex-view-crossref t)
-      :bind
-      (:map bib-cite-minor-mode-map
-            ("C-c b" . nil) ; We use "C-c b" for comment-box
-            ("C-c l a" . bib-apropos)
-            ("C-c l b" . bib-make-bibliography)
-            ("C-c l d" . bib-display)
-            ("C-c l t" . bib-etags)
-            ("C-c l f" . bib-find)
-            ("C-c l n" . bib-find-next)
-            ("C-c l h" . bib-highlight-mouse))))
-
-  (use-package tex-smart-umlauts
+(when (eq dotemacs-completion-in-buffer 'company)
+  (use-package company-auctex
     :ensure t
-    :config (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
+    :config (company-auctex-init))
 
-  ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
-  (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
-    "This advice is meant to fix the issue where an extra blank
-line is naively added by `LaTeX-insert-item' when not already on
-an item line."
-    (check-item-entry))
+  (use-package company-math
+    :ensure t
+    :config
+    (add-to-list 'company-backends
+                 '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
 
-  :bind (:map LaTeX-mode-map
-              ("C-c C-d" . nil)))
+;; ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
+;; (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
+;;   "This advice is meant to fix the issue where an extra blank
+;; line is naively added by `LaTeX-insert-item' when not already on
+;; an item line."
+;;   (check-item-entry))
+
+(use-package bibtex
+  :init
+  (add-hook 'bibtex-mode-hook #'BibTeX-auto-store)
+  (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+  :config
+  (setq bibtex-maintain-sorted-entries t)
+  (use-package bibtex-utils
+    :ensure t))
+
+(use-package reftex
+  :diminish reftex-mode
+  :preface
+  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+  (defun dotemacs--get-bibtex-keys (file)
+    (with-current-buffer (find-file-noselect file)
+      (mapcar 'car (bibtex-parse-keys))))
+
+  (defun dotemacs--reftex-add-all-bibitems-from-bibtex ()
+    (interactive)
+    (mapc 'LaTeX-add-bibitems
+          (apply 'append
+                 (mapcar 'dotemacs--get-bibtex-keys (reftex-get-bibfile-list)))))
+  :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  :config
+  (setq reftex-plug-into-AUCTeX t
+        reftex-insert-label-flags '(t t)
+        reftex-cite-format 'abbrv
+        reftex-save-parse-info t
+        reftex-use-multiple-selection-buffers t
+        reftex-enable-partial-scans t
+        reftex-allow-automatic-rescan t
+        reftex-default-bibliography '("~/workspace/bib/plass.bib")
+        reftex-idle-time 0.5
+        reftex-toc-follow-mode t
+        reftex-use-fonts t
+        reftex-highlight-selection 'both)
+  (add-hook 'reftex-mode-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
+  (add-hook 'reftex-load-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
+
+  (use-package bib-cite
+    :diminish bib-cite-minor-mode
+    :config
+    (bib-cite-minor-mode 1)
+    (setq bib-cite-use-reftex-view-crossref t)
+    :bind
+    (:map bib-cite-minor-mode-map
+          ("C-c b" . nil) ; We use "C-c b" for comment-box
+          ("C-c l a" . bib-apropos)
+          ("C-c l b" . bib-make-bibliography)
+          ("C-c l d" . bib-display)
+          ("C-c l t" . bib-etags)
+          ("C-c l f" . bib-find)
+          ("C-c l n" . bib-find-next)
+          ("C-c l h" . bib-highlight-mouse))))
+
+(use-package tex-smart-umlauts
+  :ensure t
+  :init (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
 
 (use-package parsebib
-  :ensure t
-  :after tex)
+  :ensure t)
 
 (use-package helm-bibtex
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :after tex
   :bind ("C-c l x" . helm-bibtex)
   :config
   (use-package bibtex-completion
@@ -208,7 +206,6 @@ an item line."
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)
-  :after tex
   :bind ("C-c l x" . ivy-bibtex)
   :config
   (use-package bibtex-completion
