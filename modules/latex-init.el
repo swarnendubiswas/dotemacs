@@ -10,8 +10,12 @@
 (defvar prettify-symbols-unprettify-at-point)
 (defvar helm-bibtex-full-frame)
 
+(put 'TeX-narrow-to-group 'disabled nil)
+(put 'LaTeX-narrow-to-environment 'disabled nil)
+
 (use-package tex-site
-  :ensure auctex)
+  :ensure auctex
+  :mode ("\\.tex\\'" . TeX-latex-mode))
 
 (use-package tex
   :ensure auctex
@@ -137,17 +141,6 @@
 
 (use-package reftex
   :diminish reftex-mode
-  :preface
-  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-  (defun dotemacs--get-bibtex-keys (file)
-    (with-current-buffer (find-file-noselect file)
-      (mapcar 'car (bibtex-parse-keys))))
-
-  (defun dotemacs--reftex-add-all-bibitems-from-bibtex ()
-    (interactive)
-    (mapc 'LaTeX-add-bibitems
-          (apply 'append
-                 (mapcar 'dotemacs--get-bibtex-keys (reftex-get-bibfile-list)))))
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
   (setq reftex-plug-into-AUCTeX t
@@ -162,8 +155,34 @@
         reftex-toc-follow-mode t
         reftex-use-fonts t
         reftex-highlight-selection 'both)
-  (add-hook 'reftex-mode-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
-  (add-hook 'reftex-load-hook #'dotemacs--reftex-add-all-bibitems-from-bibtex)
+
+  (use-package reftex-cite
+    :preface
+    ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+    (defun get-bibtex-keys (file)
+      (with-current-buffer (find-file-noselect file)
+        (mapcar 'car (bibtex-parse-keys))))
+
+    (defun find-bibliography-file ()
+      "Try to find a bibliography file using RefTeX."
+      ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
+      (interactive)
+      (let ((bibfile-list nil))
+        (condition-case nil
+            (setq bibfile-list (reftex-get-bibfile-list))
+          (error (ignore-errors
+                   (setq bibfile-list (reftex-default-bibliography)))))
+        (if bibfile-list
+            (car bibfile-list) "")))
+
+    (defun reftex-add-all-bibitems-from-bibtex ()
+      (interactive)
+      (mapc 'LaTeX-add-bibitems
+            (apply 'append
+                   (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+    :config
+    (add-hook 'reftex-mode-hook #'reftex-add-all-bibitems-from-bibtex)
+    (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex))
 
   (use-package bib-cite
     :diminish bib-cite-minor-mode
