@@ -184,23 +184,23 @@
                    (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
     :config
     (add-hook 'reftex-mode-hook #'reftex-add-all-bibitems-from-bibtex)
-    (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex))
+    (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
-  (use-package bib-cite
-    :diminish bib-cite-minor-mode
-    :config
-    (bib-cite-minor-mode 1)
-    (setq bib-cite-use-reftex-view-crossref t)
-    :bind
-    (:map bib-cite-minor-mode-map
-          ("C-c b" . nil) ; We use "C-c b" for comment-box
-          ("C-c l a" . bib-apropos)
-          ("C-c l b" . bib-make-bibliography)
-          ("C-c l d" . bib-display)
-          ("C-c l t" . bib-etags)
-          ("C-c l f" . bib-find)
-          ("C-c l n" . bib-find-next)
-          ("C-c l h" . bib-highlight-mouse))))
+(use-package bib-cite
+  :diminish bib-cite-minor-mode
+  :config
+  (bib-cite-minor-mode 1)
+  (setq bib-cite-use-reftex-view-crossref t)
+  :bind
+  (:map bib-cite-minor-mode-map
+        ("C-c b" . nil) ; We use "C-c b" for comment-box
+        ("C-c l a" . bib-apropos)
+        ("C-c l b" . bib-make-bibliography)
+        ("C-c l d" . bib-display)
+        ("C-c l t" . bib-etags)
+        ("C-c l f" . bib-find)
+        ("C-c l n" . bib-find-next)
+        ("C-c l h" . bib-highlight-mouse)))
 
 (use-package tex-smart-umlauts
   :ensure t
@@ -220,6 +220,7 @@
     (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
           bibtex-completion-cite-prompt-for-optional-arguments nil
           bibtex-completion-cite-default-as-initial-input t))
+
   (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
   (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
   (setq helm-bibtex-full-frame t))
@@ -236,7 +237,6 @@
           bibtex-completion-cite-prompt-for-optional-arguments nil
           bibtex-completion-cite-default-as-initial-input t))
 
-  ;; https://github.com/tmalsburg/helm-bibtex/
   (defun ivy-bibtex (&optional arg)
     "Search BibTeX entries using ivy.
 

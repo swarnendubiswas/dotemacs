@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; latex-init-working.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -9,6 +9,9 @@
 (defvar dotemacs-selection)
 (defvar prettify-symbols-unprettify-at-point)
 (defvar helm-bibtex-full-frame)
+
+(put 'TeX-narrow-to-group 'disabled nil)
+(put 'LaTeX-narrow-to-environment 'disabled nil)
 
 (use-package tex
   :ensure auctex
@@ -58,17 +61,18 @@
   (use-package tex-buf
     :config (setq TeX-save-query nil))
 
+  (use-package tex-fold
+    :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
+
   (use-package latex
     :mode ("\\.tex\\'" . LaTeX-mode)
     :functions LaTeX-math-mode
-    :config
-    (setq LaTeX-syntactic-comments t)
+    :init
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
     (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
-
-    ;; http://stackoverflow.com/questions/17777189/what-is-the-difference-of-tex-mode-and-latex-mode-and-latex-mode-in-emacs
-    ;;(add-to-list 'auto-mode-alist '("\\.tex$" . LaTeX-mode))
-
+    (message "swarnendu auto fill is enabled in latex mode")
+    :config
+    (setq LaTeX-syntactic-comments t)
     ;; Unset "C-c ;" since we want to bind it to 'comment-line
     (define-key LaTeX-mode-map (kbd "C-c ;") nil))
 
@@ -153,17 +157,48 @@
           reftex-cite-format 'abbrv
           reftex-save-parse-info t
           reftex-use-multiple-selection-buffers t
+          reftex-auto-update-selection-buffers t
           reftex-enable-partial-scans t
+          reftex-allow-automatic-rescan t
           reftex-default-bibliography '("~/workspace/bib/plass.bib")
           reftex-idle-time 0.5
-          reftex-toc-follow-mode t)
-    (add-hook 'LaTeX-mode-hook #'turn-on-reftex) ; Use with AUCTeX
-    ;; Emacs latex mode
-    (add-hook 'lateX-mode-hook #'turn-on-reftex))
+          reftex-toc-follow-mode t
+          reftex-use-fonts t
+          reftex-highlight-selection 'both)
+    (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+
+    (use-package reftex-cite
+      :preface
+      ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+      (defun get-bibtex-keys (file)
+        (with-current-buffer (find-file-noselect file)
+          (mapcar 'car (bibtex-parse-keys))))
+
+      (defun find-bibliography-file ()
+        "Try to find a bibliography file using RefTeX."
+        ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
+        (interactive)
+        (let ((bibfile-list nil))
+          (condition-case nil
+              (setq bibfile-list (reftex-get-bibfile-list))
+            (error (ignore-errors
+                     (setq bibfile-list (reftex-default-bibliography)))))
+          (if bibfile-list
+              (car bibfile-list) "")))
+
+      (defun reftex-add-all-bibitems-from-bibtex ()
+        (interactive)
+        (message "reftex-add-all-bibitems-from-bibtex is getting called")
+        (mapc 'LaTeX-add-bibitems
+              (apply 'append
+                     (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+      :config
+      (add-hook 'reftex-mode-hook #'reftex-add-all-bibitems-from-bibtex)
+      (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
   (use-package tex-smart-umlauts
     :ensure t
-    :config (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
+    :init (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
 
   ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
   (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
@@ -191,14 +226,16 @@ an item line."
   :if (eq dotemacs-selection 'helm)
   :after tex
   :bind ("C-c l x" . helm-bibtex)
-  :config (setq helm-bibtex-full-frame t))
+  :config
+  (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
+  (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
+  (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :after tex
   :config
-  ;; https://github.com/tmalsburg/helm-bibtex/
   (defun ivy-bibtex (&optional arg)
     "Search BibTeX entries using ivy.
 
@@ -227,6 +264,6 @@ reread."
               (lambda ()
                 (require 'outline-cycle)))))
 
-(provide 'latex-init)
+(provide 'latex-init-working)
 
-;;; latex-init.el ends here
+;;; latex-init-working.el ends here
