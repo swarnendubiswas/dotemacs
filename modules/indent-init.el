@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-fill-column)
+
 (setq-default fill-column dotemacs-fill-column
               standard-indent 2
               tab-width 2

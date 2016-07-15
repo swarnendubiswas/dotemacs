@@ -44,7 +44,10 @@
   (display-time))
 
 (use-package linum ; Display line numbers in margin
-  :config (global-linum-mode 1))
+  :config
+  ;; linum-mode can slow down Emacs for large files:
+  ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
+  (global-linum-mode 1))
 
 (use-package custom
   :config (setq custom-safe-themes t))

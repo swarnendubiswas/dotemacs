@@ -15,7 +15,7 @@
 
 (use-package tex-site
   :ensure auctex
-  :mode ("\\.tex\\'" . TeX-latex-mode))
+  :mode ("\\.tex\\'" . LaTeX-mode))
 
 (use-package tex
   :ensure auctex
@@ -38,10 +38,11 @@
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
   (setq-default TeX-master nil) ; Query for master file
+
   (TeX-PDF-mode 1)
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
-                 (plain-tex-mode tex-mode TeX-mode LaTeX-mode docTeX-mode)
+                 (plain-tex-mode tex-mode TeX-mode LaTeX-mode TeX-latex-mode docTeX-mode)
                  :help "Run PDFLaTeX"))
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
@@ -51,7 +52,9 @@
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
 (use-package tex-buf
-  :config (setq TeX-save-query nil))
+  :config
+  (setq TeX-save-query nil)
+  (unbind-key "C-c C-d" LaTeX-mode-map))
 
 (use-package tex-fold
   :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
@@ -59,7 +62,7 @@
 (use-package tex-mode
   :functions (latex-mode latex-electric-env-pair-mode)
   :diminish latex-electric-env-pair-mode
-  :config
+  :init
   (setq latex-run-command "latexmk")
   (add-hook 'TeX-mode-hook
             (lambda()
@@ -77,12 +80,10 @@
 
 (use-package auctex-latexmk
   :ensure t
-  :after latex
   :config
   (auctex-latexmk-setup)
   (add-hook 'LaTeX-mode-hook
             (lambda ()
-              ;; This variable is buffer-local
               (setq TeX-command-default "LatexMk"))))
 
 ;; Required by ac-math and company-math
@@ -148,6 +149,7 @@
         reftex-cite-format 'abbrv
         reftex-save-parse-info t
         reftex-use-multiple-selection-buffers t
+        reftex-auto-update-selection-buffers t
         reftex-enable-partial-scans t
         reftex-allow-automatic-rescan t
         reftex-default-bibliography '("~/workspace/bib/plass.bib")

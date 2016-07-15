@@ -5,8 +5,11 @@
 
 ;;; Code:
 
+(defvar ac-sources)
+
 (use-package yasnippet
   :ensure t
+  :commands (yas-expand yas-minor-mode)
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :init (yas-global-mode 1)

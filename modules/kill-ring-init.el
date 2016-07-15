@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+
 (use-package simple
   :config
   (setq kill-ring-max 200
@@ -18,6 +20,7 @@
     (use-package browse-kill-ring
       :ensure t
       :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+      :commands browse-kill-ring
       :config
       (setq browse-kill-ring-highlight-current-entry t
             browse-kill-ring-highlight-inserted-item t
