@@ -22,8 +22,6 @@
         TeX-clean-confirm nil
         TeX-quote-after-quote nil ; Allow original LaTeX quotes
         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
-        TeX-default-mode 'LaTeX-mode
-        TeX-force-default-mode t
         ;; Remove all tabs before saving
         TeX-auto-untabify t)
 
@@ -37,7 +35,7 @@
   (setq-default TeX-master nil) ; Query for master file
 
   ;; Compile files to pdf by default, this is already the default from AUCTeX 11.88, but we want to be sure
-  (TeX-global-PDF-mode 1)
+  (TeX-PDF-mode 1)
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode LaTeX-mode docTeX-mode)
@@ -68,13 +66,14 @@
     :mode ("\\.tex\\'" . LaTeX-mode)
     :functions LaTeX-math-mode
     :init
+    ;; FIXME: These are not working
     (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
     (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
     (message "swarnendu auto fill is enabled in latex mode")
     :config
     (setq LaTeX-syntactic-comments t)
     ;; Unset "C-c ;" since we want to bind it to 'comment-line
-    (define-key LaTeX-mode-map (kbd "C-c ;") nil))
+    (unbind-key "C-c ;" LaTeX-mode-map))
 
   ;; Required by ac-math and company-math
   (use-package math-symbol-lists
@@ -186,6 +185,7 @@
           (if bibfile-list
               (car bibfile-list) "")))
 
+      ;; FIXME: This seems to work if we have latex-math-mode, auto-fill-function, and TeX-PDF-mode enabled.
       (defun reftex-add-all-bibitems-from-bibtex ()
         (interactive)
         (message "reftex-add-all-bibitems-from-bibtex is getting called")

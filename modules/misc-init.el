@@ -20,11 +20,6 @@
 (use-package info+
   :ensure t)
 
-(use-package smooth-scrolling
-  :ensure t
-  ;; :disabled t ;; This repositions the cursor to the middle on scrolling if the search string is at the boundaries.
-  :config (smooth-scrolling-mode 1))
-
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
   :config
