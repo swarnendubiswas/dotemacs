@@ -10,6 +10,7 @@
 (defvar prettify-symbols-unprettify-at-point)
 (defvar helm-bibtex-full-frame)
 
+(require 'tex)
 (require 'tex-site)
 (require 'tex-mode)
 (require 'tex-buf)
@@ -38,8 +39,6 @@
 
 (setq-default TeX-master nil) ; Query for master file
 
-;; Compile files to pdf by default, this is already the default from AUCTeX 11.88, but we want to be sure
-(TeX-PDF-mode 1)
 (add-to-list 'TeX-command-list
              '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                (plain-tex-mode LaTeX-mode docTeX-mode)
@@ -59,12 +58,12 @@
 (setq TeX-save-query nil)
 
 (add-hook 'TeX-mode-hook #'TeX-fold-mode)
-
-(add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook #'auto-fill-mode)
-(add-hook 'TeX-latex-mode-hook #'auto-fill-mode)
-(add-hook 'latex-mode-hook #'auto-fill-mode)
-(add-hook 'latex-mode-hook #'auto-fill-function)
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (progn
+              ((TeX-PDF-mode 1)
+               (LaTeX-math-mode 1)
+               (auto-fill-mode 1)))))
 
 (setq LaTeX-syntactic-comments t)
 ;; Unset "C-c ;" since we want to bind it to 'comment-line
@@ -96,6 +95,7 @@
 
 (require 'bib-cite)
 (bib-cite-minor-mode 1)
+(diminish 'bib-cite-minor-mode)
 (setq bib-cite-use-reftex-view-crossref t)
 (bind-keys :map bib-cite-minor-mode-map
            ("C-c b" . nil) ; We use "C-c b" for comment-box
@@ -107,7 +107,10 @@
            ("C-c l n" . bib-find-next)
            ("C-c l h" . bib-highlight-mouse))
 
-(require 'reftex)
+(autoload 'reftex-mode "reftex" "RefTeX Minor Mode" t)
+(autoload 'turn-on-reftex "reftex" "RefTeX Minor Mode" t)
+(autoload 'reftex-citation "reftex-cite" "Make citation" nil)
+(diminish 'reftex-mode)
 (setq reftex-plug-into-AUCTeX t
       reftex-insert-label-flags '(t t)
       reftex-cite-format 'abbrv
@@ -119,6 +122,8 @@
       reftex-default-bibliography '("~/workspace/bib/plass.bib")
       reftex-idle-time 0.5
       reftex-toc-follow-mode t
+      reftex-auto-view-crossref t
+      reftex-auto-recenter-toc t
       reftex-use-fonts t
       reftex-highlight-selection 'both)
 (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
@@ -208,6 +213,7 @@ reread."
 
 (require 'outline)
 (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
+(diminish 'outline-minor-mode)
 
 (require 'outline-magic)
 (add-hook 'outline-mode-hook

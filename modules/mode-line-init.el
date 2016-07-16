@@ -71,12 +71,13 @@
                                                      nyan-cat)
                                                    ;; Right segment
                                                    '(((which-function projectile-root) :separator " | ")
-                                                     (python-pyvenv :fallback python-pyenv)
+                                                     ;; (python-pyvenv :fallback python-pyenv)
                                                      (version-control :when active)
                                                      (battery :when active)
                                                      selection-info
                                                      input-method
-                                                     ((buffer-encoding-abbrev point-position line-column) :separator " | ")
+                                                     ;; ((buffer-encoding-abbrev point-position line-column) :separator " | ")
+                                                     ((point-position line-column) :separator " | ")
                                                      (global :when active)
                                                      ,@additional-segments
                                                      buffer-position
