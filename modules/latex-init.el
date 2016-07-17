@@ -13,7 +13,7 @@
 (put 'TeX-narrow-to-group 'disabled nil)
 (put 'LaTeX-narrow-to-environment 'disabled nil)
 
-(use-package tex-site
+(use-package tex-site ; Initialize auctex
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
 
