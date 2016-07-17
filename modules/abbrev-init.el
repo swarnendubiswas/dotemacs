@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-extras-directory)
+
 ;; M-x edit-abbrev
 ;; C-x a i g inverse-add-global-abbrev
 ;; C-x a i l inverse-add-mode-abbrev

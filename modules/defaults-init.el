@@ -5,6 +5,10 @@
 
 ;;; Code:
 
+(defvar dotemacs-window-split)
+(defvar dotemacs-temp-directory)
+(defvar tramp-persistency-file-name)
+
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
       inhibit-startup-echo-area-message t
@@ -182,12 +186,6 @@
   (setq-default desktop-restore-frames nil ; No need to restore frames
                 desktop-load-locked-desktop nil))
 
-;; Fully redraw the display before queued input events are processed don't defer screen updates when performing
-;; operations, obsolete since 24.5
-(when (and (<= emacs-major-version 24)
-         (<= emacs-minor-version 4))
-    (setq redisplay-dont-pause t))
-
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
   :config (global-font-lock-mode 1))
 
@@ -212,6 +210,7 @@
   :diminish hi-lock-mode)
 
 (use-package saveplace ; remember cursor position in files
+  :functions save-place-mode
   :config
   ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
   (if (and (>= emacs-major-version 25)

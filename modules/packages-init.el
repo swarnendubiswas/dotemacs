@@ -52,24 +52,16 @@
 (use-package diminish
   :ensure t)
 
-(use-package auto-compile ; This only *recompiles* elisp source files.
-  :ensure t
-  :disabled t
-  :init (auto-compile-on-save-mode 1)
-  :config
-  (setq load-prefer-newer t
-        auto-compile-display-buffer nil
-        auto-compile-mode-line-counter nil)
-  (auto-compile-on-load-mode 1))
-
 (use-package paradox
   :ensure t
+  :functions paradox-enable
   :bind (("C-c d p" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages)
          ("C-c d P" . package-list-packages))
-  :config
+  :init
   (use-package async
     :ensure t)
+  :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t
         paradox-spinner-type 'random)

@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+(defvar dotemacs-selection)
+
 (use-package smex
   :ensure t
   :config

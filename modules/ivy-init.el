@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+
 (use-package ivy
   :ensure t
   :if (eq dotemacs-selection 'ivy)
@@ -23,7 +25,7 @@
        "Not completing files currently")))
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
-                                  ; candidates
+                                        ; candidates
         confirm-nonexistent-file-or-buffer t
         ivy-virtual-abbreviate 'name
         ivy-wrap t ; Useful to be able to wrap around boundary items

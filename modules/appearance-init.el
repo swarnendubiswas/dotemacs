@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-theme)
+
 ;; Better frame title
 (setq frame-title-format
       (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))

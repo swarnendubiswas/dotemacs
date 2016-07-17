@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-mode-line-theme)
+(defvar dotemacs-theme)
+
 (use-package anzu
   :ensure t
   :diminish anzu-mode

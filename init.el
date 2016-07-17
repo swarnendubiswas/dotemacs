@@ -122,9 +122,9 @@
 (require 'text-init)
 
 ;; The refactored latex module does not work perfectly.
-(require 'latex-no-use-package)
-;;(require 'latex-init-working)
-;;(require 'latex-init)
+;; (require 'latex-no-use-package)
+;; (require 'latex-init-working)
+(require 'latex-init)
 
 (require 'org-init)
 (require 'prog-init)
