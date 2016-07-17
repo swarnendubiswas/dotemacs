@@ -17,18 +17,21 @@
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
 
-(use-package tex
-  :ensure auctex
+(use-package tex-buf ; Requires tex and latex
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
         TeX-clean-confirm nil
         TeX-quote-after-quote nil ; Allow original LaTeX quotes
         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
-        TeX-default-mode 'LaTeX-mode
-        TeX-force-default-mode t
-        ;; Remove all tabs before saving
-        TeX-auto-untabify t)
+        TeX-auto-untabify t ; Remove all tabs before saving
+        TeX-save-query nil
+        LaTeX-syntactic-comments t)
+
+  (setq-default TeX-master nil) ; Query for master file
+
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
 
   ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
   (setq TeX-source-correlate-method 'synctex
@@ -37,9 +40,6 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
-  (setq-default TeX-master nil) ; Query for master file
-
-  (TeX-PDF-mode 1)
   (add-to-list 'TeX-command-list
                '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
                  (plain-tex-mode tex-mode TeX-mode LaTeX-mode TeX-latex-mode docTeX-mode)
@@ -49,34 +49,23 @@
 
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
-    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
+    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
 
-(use-package tex-buf
-  :config
-  (setq TeX-save-query nil)
-  (unbind-key "C-c C-d" LaTeX-mode-map))
+  (unbind-key "C-c C-d" LaTeX-mode-map)
+
+  ;; Unset "C-c ;" since we want to bind it to 'comment-line
+  (unbind-key "C-c ;" LaTeX-mode-map))
 
 (use-package tex-fold
   :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
 (use-package tex-mode
-  :functions (latex-mode latex-electric-env-pair-mode)
   :diminish latex-electric-env-pair-mode
   :init
   (setq latex-run-command "latexmk")
   (add-hook 'TeX-mode-hook
             (lambda()
               (latex-electric-env-pair-mode 1))))
-
-(use-package latex
-  :functions LaTeX-math-mode
-  :init
-  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
-  :config
-  (setq LaTeX-syntactic-comments t)
-  ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  (unbind-key "C-c ;" LaTeX-mode-map))
 
 (use-package auctex-latexmk
   :ensure t
@@ -132,9 +121,7 @@
 ;;   (check-item-entry))
 
 (use-package bibtex
-  :init
-  (add-hook 'bibtex-mode-hook #'BibTeX-auto-store)
-  (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+  :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
   :config
   (setq bibtex-maintain-sorted-entries t)
   (use-package bibtex-utils
@@ -142,6 +129,7 @@
 
 (use-package reftex
   :diminish reftex-mode
+  :commands (reftex-citation)
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
   (setq reftex-plug-into-AUCTeX t
@@ -182,9 +170,7 @@
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
-    :config
-    (add-hook 'reftex-mode-hook #'reftex-add-all-bibitems-from-bibtex)
-    (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
+    :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
 (use-package bib-cite
   :diminish bib-cite-minor-mode
