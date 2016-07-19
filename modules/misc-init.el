@@ -223,7 +223,8 @@
   :ensure t
   :config
   (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
-  (persistent-scratch-setup-default))
+  ;; Enable both autosave and restore on startup
+  (ignore-errors (persistent-scratch-setup-default)))
 
 (use-package immortal-scratch
   :ensure t
