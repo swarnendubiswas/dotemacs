@@ -27,7 +27,6 @@
   (unbind-key "C-s" isearch-mode-map) ; isearch-repeat-forward
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
-  :config
   (use-package isearch+
     :ensure t)
   (use-package isearch-dabbrev
@@ -117,12 +116,6 @@
 (use-package wgrep
   :ensure t)
 
-;; Uses ivy by default for completing reads, if ivy is installed.
-(use-package find-file-in-project
-  :ensure t
-  :disabled t
-  :config (setq ffip-prefer-ido-mode t))
-
 (use-package grep
   :disabled t
   ;; :bind
@@ -170,7 +163,6 @@
         helm-swoop-split-with-multiple-windows nil
         helm-swoop-move-to-line-cycle t ; go to the opposite side of line from the end or beginning of line
         helm-swoop-use-line-number-face t))
-
 
 (provide 'search-init)
 
