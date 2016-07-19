@@ -142,12 +142,16 @@
   :ensure t
   :bind ("C-=" . er/expand-region))
 
-(use-package change-inner
+(use-package change-inner ; This might be useful for programming
   :ensure t
   :disabled t
   :after expand-region
   :bind (("M-i" . change-inner)
          ("M-o" . change-outer)))
+
+(use-package expand-line
+  :ensure t
+  :bind ("M-i" . turn-on-expand-line-mode))
 
 ;; Restore point with "C-g" after marking a region
 (use-package smart-mark

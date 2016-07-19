@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+(defvar flycheck-completion-system)
+
 ;; Flycheck requires gcc 4.8 at least
 (use-package flycheck
   :ensure t
