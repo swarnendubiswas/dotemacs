@@ -120,12 +120,7 @@
 
 ;; Configure individual major modes
 (require 'text-init)
-
-;; The refactored latex module does not work perfectly.
-;; (require 'latex-no-use-package)
-;; (require 'latex-init-working)
 (require 'latex-init)
-
 (require 'org-init)
 (require 'prog-init)
 (require 'cc-init)
@@ -142,7 +137,6 @@
 (require 'custom-init)
 
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
-;; (require 'hydra-init) ; All hydras are in one place
 
 (require 'server-init) ; Start the daemon/server
 
