@@ -93,10 +93,10 @@
     :config
     (add-to-list 'company-backends #'company-c-headers)
     (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
-    (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0")
+    (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0/boost")
     (cond ((string-equal system-name "rain.cse.ohio-state.edu")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
-           (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0"))
+           (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0/boost"))
 
           ((string-equal system-name "biswass-Dell-System-XPS-L502X")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))

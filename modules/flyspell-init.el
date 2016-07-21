@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+
 (use-package ispell
   :init
   (setq-default ispell-program-name "/usr/bin/aspell")

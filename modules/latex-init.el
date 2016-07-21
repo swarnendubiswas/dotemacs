@@ -201,7 +201,6 @@
   :bind ("C-c l x" . helm-bibtex)
   :config
   (use-package bibtex-completion
-    :after tex
     :config
     (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
           bibtex-completion-cite-prompt-for-optional-arguments nil
@@ -217,7 +216,6 @@
   :bind ("C-c l x" . ivy-bibtex)
   :config
   (use-package bibtex-completion
-    :after tex
     :config
     (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
           bibtex-completion-cite-prompt-for-optional-arguments nil

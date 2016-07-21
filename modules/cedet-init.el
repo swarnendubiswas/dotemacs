@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+
 (use-package semantic
   :preface
   (defun dotemacs-semantic-functions ()
@@ -27,12 +29,6 @@
   :disabled t
   :init (require 'cedet-files))
 
-(use-package ede
-  :disabled t
-  :init
-  (global-ede-mode 1)
-  (ede-enable-generic-projects))
-
 (use-package idle
   :disabled t
   :preface
@@ -41,17 +37,6 @@
     (global-semantic-idle-completions-mode 1)
     (global-semantic-idle-breadcrumbs-mode 1))
   :config (add-hook 'prog-mode-hook #'dotemacs-idle-functions))
-
-(use-package mode
-  :disabled t
-  :init (add-hook 'prog-mode-hook #'global-srecode-minor-mode 1))
-
-(use-package ecb
-  :ensure t
-  :disabled t
-  :init
-  (setq-default ecb-tip-of-the-day nil)
-  (add-hook 'prog-mode-hook #'ecb-minor-mode))
 
 (provide 'cedet-init)
 

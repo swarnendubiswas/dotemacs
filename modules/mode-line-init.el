@@ -106,6 +106,7 @@
 
 (use-package nyan-mode
   :ensure t
+  :functions nyan-start-animation
   :preface
   ;; https://github.com/cemerick/.emacs.d#nyan-mode
   (defun dotemacs--toggle-nyan-mode (&optional frame)
@@ -115,7 +116,9 @@
           (nyan-mode 1)
           (nyan-start-animation)
           (setq-default nyan-wavy-trail nil
-                        nyan-cat-face-number 2))
+                        nyan-cat-face-number 2
+                        nyan-animate-nyancat t
+                        nyan-bar-length 24))
       (nyan-mode -1)))
   :init
   (add-hook 'after-make-frame-functions 'dotemacs--toggle-nyan-mode)
