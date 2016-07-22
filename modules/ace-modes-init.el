@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+(defvar dotemacs-selection)
+
 (use-package ace-jump-buffer
   :ensure t
   :if (eq dotemacs-selection 'none)
@@ -54,10 +57,9 @@
   (("<f4>" . ace-jump-buffer)
    ("M-B" . ace-jump-buffer-with-configuration)))
 
-(use-package ace-jump-helm-line ; ace-jump in helm buffers
+(use-package ace-jump-helm-line ; Jump in helm buffers
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :config (setq ace-jump-helm-line-use-avy-style nil) ; Style: avy-jump and ace-jump-mode-style
   :bind (:map helm-map
               ("C-;" . ace-jump-helm-line)))
 
@@ -83,6 +85,16 @@
         ;; Options: pre, at, at-full, post, de-bruijn. pre is a bit distracting because of all the movement while
         ;; highlighting selection keys. This causes the eyes to lose focus.
         avy-style 'at))
+
+(use-package bookmark
+  :defer t
+  :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
+
+(use-package bm
+  :ensure t
+  :bind (("C-<f1>" . bm-toggle)
+         ("C-<f2>" . bm-next)
+         ("C-<f3>" . bm-previous)))
 
 (provide 'ace-modes-init)
 

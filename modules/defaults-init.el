@@ -230,10 +230,6 @@
         savehist-autosave-interval 300)
   (savehist-mode 1))
 
-(use-package bookmark
-  :defer t
-  :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
-
 (use-package mb-depth
   :config (minibuffer-depth-indicate-mode 1))
 
