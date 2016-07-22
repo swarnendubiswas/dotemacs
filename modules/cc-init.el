@@ -33,10 +33,15 @@
         c-auto-newline 1)
   (c-toggle-electric-state 1)
   (c-toggle-syntactic-indentation 1)
-  (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
   (add-hook 'c-mode-hook
             (lambda ()
               (abbrev-mode -1)))
+
+  (use-package e-eldoc
+    :ensure t
+    :init
+    (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
+    (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
 
   ;; Switch between header and implementation files
   (use-package find-file
@@ -59,7 +64,7 @@
               (lambda()
                 (hide-ifdef-mode 1))))
 
-  (use-package function-args ; this overrides M-u
+  (use-package function-args
     :ensure t
     :diminish function-args-mode
     :config
@@ -68,6 +73,7 @@
     (when (string-equal system-name "rain.cse.ohio-state.edu")
       (semantic-add-system-include "/usr/include/boost148/" 'c++-mode))
     (fa-config-default)
+    ;; This overrides M-u
     (bind-key* "M-u" #'upcase-word))
 
   ;; This is already the default, but I have this as a reminder.
@@ -84,14 +90,14 @@
     :if (eq dotemacs-completion-in-buffer 'company)
     :config
     (add-to-list 'company-backends #'company-c-headers)
-    (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/source/include")
-    (add-to-list 'company-clang-arguments "-I/home/biswass/workspace/intel-pintool/lib/boost_1_58_0/boost")
+    (add-to-list 'company-clang-arguments "-I/home/biswass/intel-pintool/source/include")
+    (add-to-list 'company-clang-arguments "-I/home/biswass//intel-pintool/lib/boost_1_58_0/boost")
     (cond ((string-equal system-name "rain.cse.ohio-state.edu")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
-           (add-to-list 'company-c-headers-path-system "~/workspace/intel-pintool/lib/boost_1_58_0/boost"))
+           (add-to-list 'company-c-headers-path-system "/home/biswass/intel-pintool/lib/boost_1_58_0/boost"))
 
           ((string-equal system-name "biswass-Dell-System-XPS-L502X")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.9"))))
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/"))))
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (with-eval-after-load "auto-complete"

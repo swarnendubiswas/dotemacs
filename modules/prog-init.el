@@ -29,9 +29,8 @@
     (global-semantic-highlight-func-mode 1)
     (global-semantic-decoration-mode 1)
     (global-semantic-idle-local-symbol-highlight-mode 1)
-    ;; (global-semantic-idle-summary-mode 1)
-    ;; (global-semantic-idle-completions-mode 1)
-    )
+    (global-semantic-idle-summary-mode 1)
+    (global-semantic-idle-completions-mode 1))
   :config
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
@@ -41,7 +40,6 @@
   (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
 
 (use-package idle
-  :disabled t
   :preface
   (defun dotemacs-idle-functions ()
     (global-semantic-idle-scheduler-mode 1)
@@ -203,17 +201,12 @@
               (electric-layout-mode 1))))
 
 (use-package eldoc
-  :disabled t
   :after prog-mode
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'eldoc-mode)
   (add-hook 'python-mode-hook #'eldoc-mode)
-  (use-package c-eldoc
-    :ensure t
-    :if (eq system-type 'gnu/linux) ; FIXME: Doesn't seem to work on Windows
-    :config (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode))
   (use-package eldoc-extension
     :ensure t)
   :diminish eldoc-mode)
