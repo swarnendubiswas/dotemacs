@@ -28,7 +28,7 @@
   :defer t
   :functions (c-toggle-electric-state c-toggle-syntactic-indentation c-fill-paragraph)
   :config
-  (setq c-set-style "cc-mode" ; options: bsd, linux, gnu
+  (setq c-set-style "cc-mode"
         c-basic-offset 2
         c-auto-newline 1)
   (c-toggle-electric-state 1)
@@ -58,14 +58,6 @@
     (add-hook 'c-mode-hook
               (lambda()
                 (hide-ifdef-mode 1))))
-
-  (use-package ctypes ;; FIXME: What is this for?
-    :ensure t
-    :disabled t
-    :config
-    (setq ctypes-write-types-at-exit t)
-    (ctypes-read-file nil nil t t)
-    (ctypes-auto-parse-mode 1))
 
   (use-package function-args ; this overrides M-u
     :ensure t
@@ -120,26 +112,22 @@
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'auto-complete))
 
-  (use-package dep
-    :config (semantic-add-system-include "/usr/include"))
-
   (use-package google-c-style ; Google's C/C++ style for c-mode
     :ensure t
     :config
     (add-hook 'c-mode-common-hook #'google-set-c-style)
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
-  ;; Google C++ Style checker for Flycheck
-  ;; Also, need to setup cpplint.py.
-  (with-eval-after-load "flycheck"
-    (use-package flycheck-google-cpplint
-      :ensure t
-      :if (eq system-type 'gnu/linux)
-      :config
-      (flycheck-add-next-checker 'c/c++-clang
-                                 '(warning . c/c++-googlelint))
-      (setq flycheck-googlelint-linelength 'dotemacs-fill-column
-            flycheck-googlelint-filter "-whitespace/line_length"))))
+  ;; Google C++ Style checker for Flycheck, also need to setup cpplint.py.
+  (use-package flycheck-google-cpplint
+    :ensure t
+    :after flycheck
+    :if (eq system-type 'gnu/linux)
+    :config
+    (flycheck-add-next-checker 'c/c++-clang
+                               '(warning . c/c++-googlelint))
+    (setq flycheck-googlelint-linelength 'dotemacs-fill-column
+          flycheck-googlelint-filter "-whitespace/line_length")))
 
 (provide 'cc-init)
 

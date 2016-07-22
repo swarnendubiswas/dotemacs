@@ -8,6 +8,7 @@
 (defvar dotemacs-window-split)
 (defvar dotemacs-temp-directory)
 (defvar tramp-persistency-file-name)
+(defvar select-enable-clipboard)
 
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
@@ -17,8 +18,7 @@
       create-lockfiles nil
       message-log-max 5000
       line-number-display-limit 2000000
-      ;; Turn off alarms completely
-      ;; https://www.emacswiki.org/emacs/AlarmBell
+      ;; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
       ring-bell-function 'ignore
       x-underline-at-descent-line t ; Draw underline lower
       completion-ignore-case t ; Ignore case when completing
@@ -86,7 +86,6 @@
         make-backup-files nil ; Stop making backup ~ files
         backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
         auto-save-default t
-        ;; 'y-or-n-p
         confirm-kill-emacs nil))
 
 ;; Enable use of system clipboard across Emacs and other applications.
@@ -109,8 +108,8 @@
 (use-package simple
   :config
   (setq save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
-                                        ; real paste after some kill action, that will erase the clipboard, so
-                                        ; we need to save it to kill ring. Paste it using "C-y M-y".
+                                        ; real paste after some kill action, that will erase the clipboard, so we need
+                                        ; to save it to kill ring. Paste it using "C-y M-y".
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking
@@ -209,7 +208,7 @@
   (global-hi-lock-mode 1)
   :diminish hi-lock-mode)
 
-(use-package saveplace ; remember cursor position in files
+(use-package saveplace ; Remember cursor position in files
   :functions save-place-mode
   :config
   ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
@@ -277,7 +276,7 @@
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)
-  "Hide 'Auto-saving...done' messages."
+  "Hide 'Auto-saving...done' messages by calling the method SAVE-FN with non-nil ARGS."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 

@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-completion-in-buffer)
+
 (use-package prog-mode
   :defer t
   :config
@@ -18,6 +20,34 @@
                 (add-to-list 'ac-sources 'ac-source-symbols)
                 (add-to-list 'ac-sources 'ac-source-variables)
                 (add-to-list 'ac-sources 'ac-source-functions)))))
+
+(use-package semantic
+  :preface
+  (defun dotemacs-semantic-functions ()
+    (semantic-mode 1)
+    (global-semanticdb-minor-mode 1)
+    (global-semantic-highlight-func-mode 1)
+    (global-semantic-decoration-mode 1)
+    (global-semantic-idle-local-symbol-highlight-mode 1)
+    ;; (global-semantic-idle-summary-mode 1)
+    ;; (global-semantic-idle-completions-mode 1)
+    )
+  :config
+  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
+  ;; Ensure semantic can get info from gnu global
+  (semanticdb-enable-gnu-global-databases 'c-mode)
+  (semanticdb-enable-gnu-global-databases 'c++-mode)
+  (semantic-add-system-include "/usr/include")
+  (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
+
+(use-package idle
+  :disabled t
+  :preface
+  (defun dotemacs-idle-functions ()
+    (global-semantic-idle-scheduler-mode 1)
+    (global-semantic-idle-completions-mode 1)
+    (global-semantic-idle-breadcrumbs-mode 1))
+  :config (add-hook 'prog-mode-hook #'dotemacs-idle-functions))
 
 (use-package make-mode
   :init

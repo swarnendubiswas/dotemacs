@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+(defvar dotemacs-selection)
+
 (use-package recentf
   :init
   (setq recentf-save-file (concat dotemacs-temp-directory "recentf") ; Set this first so that recentf can load content from this

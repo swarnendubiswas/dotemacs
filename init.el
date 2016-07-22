@@ -124,7 +124,6 @@
 (require 'org-init)
 (require 'prog-init)
 (require 'cc-init)
-(require 'cedet-init)
 (require 'java-init)
 (require 'python-init)
 (require 'shell-init)
