@@ -13,20 +13,20 @@
   (setq recentf-save-file (concat dotemacs-temp-directory "recentf") ; Set this first so that recentf can load content from this
         recentf-max-menu-items 15 ; Show in recent menu
         recentf-max-saved-items 200 ; Keep track of last xx files
-        ;;recentf-auto-cleanup 300
+        ;; Disable this so that recentf does not attempt to stat remote files: https://www.emacswiki.org/emacs/RecentFiles
+        recentf-auto-cleanup 'never
         ;; Check regex with re-builder
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"
-                          ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$"
-                          ;;"[/\\]tmp/sync-recentf-marker\\'"
-                          ;; "/ssh:"
+                          ".*/recentf\\'" "~$" "/.autosaves/" ".*-loaddefs.el" "/TAGS$" "/ssh:"
                           "/company-statistics-cache.el$"))
   (recentf-mode 1) ; This is needed in :init for the keybinding to work
   :config
   (add-to-list 'recentf-used-hooks
                '(dired-after-readin-hook recentf-track-opened-file))
   (when (eq dotemacs-selection 'none)
-    (bind-key "<f9>" #'recentf-open-files)))
+    (bind-key "<f9>" #'recentf-open-files))
+  (run-at-time nil (* 5 60) 'recentf-save-list))
 
 (use-package recentf-ext ; Add directories to recent list
   :ensure t

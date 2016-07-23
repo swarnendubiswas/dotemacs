@@ -6,6 +6,7 @@
 ;;; Code:
 
 (defvar recentf-list)
+(defvar dotemacs-temp-directory)
 
 ;; C-j to create a new buffer rather than switching to an existing buffer
 ;; C-x C-f C-f to kick you out of ido mode into "normal" find file mode
@@ -20,6 +21,13 @@
     (if (find-file (ido-completing-read "Find recent file: " recentf-list))
         (message "Opening file...")
       (message "Aborting")))
+  ;; https://www.emacswiki.org/emacs/RecentFiles
+  (defun dotemacs--recentf-ido-find-file ()
+    "Find a recent file using Ido."
+    (interactive)
+    (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+      (when file
+        (find-file file))))
   :config
   (setq ido-enable-flex-matching t
         ido-enable-prefix nil
@@ -134,7 +142,7 @@
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f3>" . ido-switch-buffer)
    ("C-x d" . ido-dired)
-   ("<f9>" . dotemacs--ido-recentf-open)))
+   ("<f9>" . dotemacs--recentf-ido-find-file)))
 
 (provide 'ido-init)
 

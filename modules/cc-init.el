@@ -37,7 +37,7 @@
             (lambda ()
               (abbrev-mode -1)))
 
-  (use-package e-eldoc
+  (use-package c-eldoc
     :ensure t
     :init
     (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
