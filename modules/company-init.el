@@ -5,6 +5,10 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+(defvar dotemacs-temp-directory)
+(defvar dotemacs-use-fci-p)
+
 (use-package company
   :ensure t
   :diminish company-mode

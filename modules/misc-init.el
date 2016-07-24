@@ -142,7 +142,7 @@
   :ensure t
   :bind ("C-=" . er/expand-region))
 
-(use-package change-inner ; This might be useful for programming
+(use-package change-inner ; This might be useful for programming modes
   :ensure t
   :disabled t
   :after expand-region
@@ -151,10 +151,10 @@
 
 (use-package expand-line
   :ensure t
+  :defines expand-line-mode
   :bind ("M-i" . turn-on-expand-line-mode))
 
-;; Restore point with "C-g" after marking a region
-(use-package smart-mark
+(use-package smart-mark ; Restore point with "C-g" after marking a region
   :ensure t
   :config (smart-mark-mode 1))
 
@@ -196,8 +196,7 @@
     (add-to-list 'ignoramus-file-basename-exact-names dir))
   (ignoramus-setup))
 
-;; Edit multiple regions in the same way simultaneously
-(use-package iedit
+(use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
   :preface
   ;; https://www.masteringemacs.org/article/iedit-interactive-multi-occurrence-editing-in-your-buffer
@@ -242,6 +241,11 @@
   (crux-with-region-or-line comment-or-uncomment-region)
   :bind (("C-c i" . crux-ispell-word-then-abbrev)
          ("C-c C-r" . crux-recentf-find-file)))
+
+(use-package pdf-tools
+  :ensure t
+  :init (pdf-tools-install)
+  :mode ("\\.pdf$" . pdf-view-mode))
 
 (provide 'misc-init)
 

@@ -7,25 +7,18 @@
 
 (defvar recentf-list)
 (defvar dotemacs-temp-directory)
+(defvar dotemacs-ido-view-mode)
 
 ;; C-j to create a new buffer rather than switching to an existing buffer
 ;; C-x C-f C-f to kick you out of ido mode into "normal" find file mode
 (use-package ido
   :ensure t
   :preface
-  ;; https://www.emacswiki.org/emacs/RecentFiles#toc5
-  ;; https://www.masteringemacs.org/article/find-files-faster-recent-files-package
-  (defun dotemacs--ido-recentf-open ()
-    "Use `ido-completing-read' to \\[find-file] a recent file"
-    (interactive)
-    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
-        (message "Opening file...")
-      (message "Aborting")))
   ;; https://www.emacswiki.org/emacs/RecentFiles
   (defun dotemacs--recentf-ido-find-file ()
     "Find a recent file using Ido."
     (interactive)
-    (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+    (let ((file (ido-completing-read "Choose recent file: " (mapcar #'abbreviate-file-name recentf-list) nil t)))
       (when file
         (find-file file))))
   :config
@@ -44,7 +37,7 @@
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
         confirm-nonexistent-file-or-buffer t
-        ido-use-faces nil ; Disable ido faces to see flx highlights
+        ido-use-faces t ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-auto-merge-work-directories-length -1
         ido-confirm-unique-completion nil
@@ -81,7 +74,6 @@
 
   (use-package ido-hacks
     :ensure t
-    :functions ido-hacks-mode
     :config (ido-hacks-mode 1))
 
   (use-package ido-ubiquitous ; Allow ido-style completion in more places
@@ -110,14 +102,23 @@
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
                                                  :ensure t
                                                  :config
+                                                 ;; (set-face-attribute 'ido-vertical-first-match-face nil
+                                                 ;;                     :background nil
+                                                 ;;                     :foreground "orange")
+                                                 ;; (set-face-attribute 'ido-vertical-only-match-face nil
+                                                 ;;                     :background nil
+                                                 ;;                     :foreground nil)
+                                                 ;; (set-face-attribute 'ido-vertical-match-face nil
+                                                 ;;                     :foreground nil)
+
                                                  (set-face-attribute 'ido-vertical-first-match-face nil
-                                                                     :background nil
-                                                                     :foreground "orange")
+                                                                     :background "#e5b7c0")
                                                  (set-face-attribute 'ido-vertical-only-match-face nil
-                                                                     :background nil
-                                                                     :foreground nil)
+                                                                     :background "#e52b50"
+                                                                     :foreground "white")
                                                  (set-face-attribute 'ido-vertical-match-face nil
-                                                                     :foreground nil)
+                                                                     :foreground "#b00000")
+
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
                                                        ido-vertical-show-count t
@@ -128,11 +129,11 @@
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode
                                              :ensure t
                                              :config
-                                             (setq ido-grid-mode-order nil ;; Listing order, t: left-right then
-                                                   ;; top-bottom, nil: top-bottom then
+                                             (setq ido-grid-mode-min-rows 10
+                                                   ido-grid-mode-max-rows 20
+                                                   ;; Listing order, t: left-right then top-bottom, nil: top-bottom then
                                                    ;; left-right
-                                                   ido-grid-mode-min-rows 10
-                                                   ido-grid-mode-max-rows 20)
+                                                   ido-grid-mode-order nil)
                                              (ido-grid-mode 1))))
 
   :bind

@@ -208,6 +208,7 @@
     ("audiance" "audience" nil 0)
     ("authetication" "authentication" nil 0)
     ("avaiability" "availability" nil 1)
+    ("avaialable" "available" nil 1)
     ("availabe" "available" nil 1)
     ("availalbe" "available" nil 0)
     ("avialable" "available" nil 1)
@@ -636,8 +637,9 @@
     ("impilies" "implies" nil 0)
     ("impleentation" "implementation" nil 0)
     ("implemenation" "implementation" nil 0)
-    ("implemetnation" "implementation" nil 1)
+    ("implemetnation" "implementation" nil 2)
     ("implemntation" "implementation" nil 1)
+    ("implmenetation" "implementation" nil 1)
     ("implmentation" "implementation" nil 1)
     ("importent" "important" nil 0)
     ("importnat" "important" nil 0)
@@ -792,6 +794,7 @@
     ("oppasite" "opposite" nil 0)
     ("opperation" "operation" nil 0)
     ("oppertunity" "opportunity" nil 0)
+    ("opporutinity" "opportunity" nil 1)
     ("opposate" "opposite" nil 0)
     ("opposible" "opposable" nil 0)
     ("opposit" "opposite" nil 0)
@@ -1014,6 +1017,7 @@
     ("streamign" "streaming" nil 1)
     ("strentgh" "strength" nil 0)
     ("stroy" "story" nil 0)
+    ("strucutre" "structure" nil 1)
     ("struggel" "struggle" nil 0)
     ("strugle" "struggle" nil 0)
     ("studnet" "student" nil 0)
@@ -1142,6 +1146,7 @@
     ("wasnt" "wasn't" nil 0)
     ("watn" "want" nil 0)
     ("wehn" "when" nil 0)
+    ("wehther" "whether" nil 1)
     ("wernt" "weren't" nil 0)
     ("werre" "were" nil 0)
     ("wethee" "whether" nil 0)
@@ -1283,6 +1288,8 @@
 
 (define-abbrev-table 'paradox-menu-mode-abbrev-table '())
 
+(define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
+
 (define-abbrev-table 'pike-mode-abbrev-table '())
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
@@ -1328,6 +1335,8 @@
 (define-abbrev-table 'speedbar-mode-abbrev-table '())
 
 (define-abbrev-table 'spu-package-menu-mode-abbrev-table '())
+
+(define-abbrev-table 'tablist-mode-abbrev-table '())
 
 (define-abbrev-table 'tabulated-list-mode-abbrev-table '())
 
