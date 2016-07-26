@@ -37,7 +37,7 @@
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
         confirm-nonexistent-file-or-buffer t
-        ido-use-faces t ; Disable ido faces to see flx highlights
+        ido-use-faces nil ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-auto-merge-work-directories-length -1
         ido-confirm-unique-completion nil
@@ -102,23 +102,14 @@
   (cond ((eq dotemacs-ido-view-mode 'vertical) (use-package ido-vertical-mode
                                                  :ensure t
                                                  :config
-                                                 ;; (set-face-attribute 'ido-vertical-first-match-face nil
-                                                 ;;                     :background nil
-                                                 ;;                     :foreground "orange")
-                                                 ;; (set-face-attribute 'ido-vertical-only-match-face nil
-                                                 ;;                     :background nil
-                                                 ;;                     :foreground nil)
-                                                 ;; (set-face-attribute 'ido-vertical-match-face nil
-                                                 ;;                     :foreground nil)
-
                                                  (set-face-attribute 'ido-vertical-first-match-face nil
-                                                                     :background "#e5b7c0")
+                                                                     :background nil
+                                                                     :foreground "orange")
                                                  (set-face-attribute 'ido-vertical-only-match-face nil
-                                                                     :background "#e52b50"
-                                                                     :foreground "white")
+                                                                     :background nil
+                                                                     :foreground nil)
                                                  (set-face-attribute 'ido-vertical-match-face nil
-                                                                     :foreground "#b00000")
-
+                                                                     :foreground nil)
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
                                                        ido-vertical-show-count t

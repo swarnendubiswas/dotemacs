@@ -6,6 +6,7 @@
 ;;; Code:
 
 (defvar dotemacs-selection)
+(defvar recentf-list)
 
 (use-package ivy
   :ensure t
@@ -23,6 +24,16 @@
            (goto-char (match-beginning 0))))
       (user-error
        "Not completing files currently")))
+
+  (defun dotemacs--ivy-recentf ()
+    "Find a file on `recentf-list'."
+    (interactive)
+    (ivy-read "Recentf: " (mapcar #'abbreviate-file-name recentf-list)
+              :action
+              (lambda (f)
+                (with-ivy-window
+                  (find-file f)))
+              :caller 'ivy-recentf))
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
                                         ; candidates
@@ -53,7 +64,7 @@
     :ensure t)
   :bind
   (("C-c r" . ivy-resume)
-   ("<f9>" . ivy-recentf)
+   ("<f9>" . dotemacs--ivy-recentf)
    ("C-'" . ivy-avy)
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)

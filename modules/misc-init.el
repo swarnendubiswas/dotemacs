@@ -242,11 +242,6 @@
   :bind (("C-c i" . crux-ispell-word-then-abbrev)
          ("C-c C-r" . crux-recentf-find-file)))
 
-(use-package pdf-tools
-  :ensure t
-  :init (pdf-tools-install)
-  :mode ("\\.pdf$" . pdf-view-mode))
-
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
