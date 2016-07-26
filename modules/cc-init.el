@@ -39,6 +39,7 @@
 
   (use-package c-eldoc
     :ensure t
+    :if (eq system-type 'gnu/linux)
     :init
     (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
     (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))

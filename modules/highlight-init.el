@@ -61,6 +61,11 @@
   :diminish highlight-tail-mode
   :config (highlight-tail-mode 1))
 
+(use-package beacon ; Highlight cursor position in buffer after scrolling
+  :ensure t
+  :config (beacon-mode 1)
+  :diminish beacon-mode)
+
 (provide 'highlight-init)
 
 ;;; highlight-init.el ends here

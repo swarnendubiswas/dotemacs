@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(setq load-prefer-newer t)
+
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
       package-enable-at-startup nil)
