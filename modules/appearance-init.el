@@ -99,6 +99,10 @@
                                                             :foreground "#123555"
                                                             :background "#E5F4FB"))))
 
+      ((eq dotemacs-theme 'spacemacs-light) (progn
+                                              ;; https://github.com/nashamri/spacemacs-theme/issues/42
+                                              (load-theme 'spacemacs-light t)))
+
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"

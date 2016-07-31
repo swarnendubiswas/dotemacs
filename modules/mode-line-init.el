@@ -52,7 +52,7 @@
                                                   :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        powerline-default-separator 'arrow
+                                                        powerline-default-separator 'box
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil ; Prefer nyan cat mode
                                                         spaceline-buffer-position-p nil
@@ -86,10 +86,15 @@
                                                   (set-face-attribute 'spaceline-highlight-face nil
                                                                       :background "#1A4B77"
                                                                       :foreground "white")
-                                                  (set-face-attribute 'powerline-active1 nil
-                                                                      :background "gray22"
-                                                                      :foreground "white"
-                                                                      :weight 'light)
+                                                  (if (eq dotemacs-theme 'spacemacs-light)
+                                                      (set-face-attribute 'powerline-active1 nil
+                                                                          :background "gray32"
+                                                                          :foreground "white"
+                                                                          :weight 'light)
+                                                    (set-face-attribute 'powerline-active1 nil
+                                                                        :background "gray22"
+                                                                        :foreground "white"
+                                                                        :weight 'light))
                                                   (set-face-attribute 'powerline-inactive1 nil
                                                                       :background "grey11"
                                                                       :foreground "white")
