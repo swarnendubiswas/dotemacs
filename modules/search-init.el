@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+
 (setq case-fold-search t) ; Make search ignore case
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.

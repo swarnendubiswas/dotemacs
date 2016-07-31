@@ -6,8 +6,8 @@
 
 ;;; Code:
 
-;; I prefer to run the Emacs daemon at startup.
 (use-package server
+  :disabled t ; I prefer to run the Emacs daemon at startup.
   :defer t
   :config
   ;; Start server if not root user
