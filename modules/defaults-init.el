@@ -279,6 +279,9 @@
 (use-package warnings
   :config (add-to-list 'warning-suppress-types '(undo discard-info)))
 
+(use-package doc-view
+  :diminish doc-view-minor-mode)
+
 (provide 'defaults-init)
 
 ;;; defaults-init.el ends here

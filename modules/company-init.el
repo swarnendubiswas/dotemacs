@@ -12,6 +12,12 @@
 (use-package company
   :ensure t
   :diminish company-mode
+  :preface
+  (defun dotemacs-quit-company-save-buffer ()
+    "Wrapper function to quit company popup, and then save the buffer using the same keybinding used to save a buffer."
+    (interactive)
+    (company-abort)
+    (save-buffer))
   :init (global-company-mode 1)
   :config
   (setq company-global-modes t ; Turn on company-mode for all major modes
@@ -65,7 +71,8 @@
                                            (bind-key "C-:" #'helm-company company-active-map)))))
   :bind (:map company-active-map
               ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)))
+              ("C-p" . company-select-previous)
+              ("C-s" . dotemacs-quit-company-save-buffer)))
 
 (use-package company-flx
   :ensure t

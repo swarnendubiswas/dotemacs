@@ -46,7 +46,7 @@
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
-        ivy-format-function 'ivy-format-function-arrow
+        ivy-format-function 'ivy-format-function-line
         ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
         ivy-re-builders-alist '((t . ivy--regex-ignore-order)) ; ivy--regex-fuzzy adds noise
         ivy-flx-limit 200

@@ -52,7 +52,7 @@
                                                   :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        powerline-default-separator 'box
+                                                        powerline-default-separator 'arrow
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil ; Prefer nyan cat mode
                                                         spaceline-buffer-position-p nil
