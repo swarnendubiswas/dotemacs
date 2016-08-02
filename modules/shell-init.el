@@ -5,8 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-completion-in-buffer)
+
 (use-package shell
-  :disabled t
   :config
   (use-package comint
     :config
@@ -29,12 +30,13 @@
     :ensure t
     :functions (ac-modes ac-rlc-setup-sources)
     :config
-    (when (fboundp 'company-mode)
+    (when (eq dotemacs-completion-in-buffer 'company)
       (push 'company-readline company-backends)
       (add-hook 'rlc-no-readline-hook
                 (lambda ()
                   (company-mode -1))))
-    (when (fboundp 'auto-complete-mode)
+
+    (when (eq dotemacs-completion-in-buffer 'auto-complete)
       (add-to-list 'ac-modes 'shell-mode)
       (add-hook 'shell-mode-hook #'ac-rlc-setup-sources)))
 
@@ -42,6 +44,7 @@
     :ensure t
     :config (bash-completion-setup))
 
+  ;; http://www.joshstaiger.org/archives/2005/07/fixing_garbage.html
   (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
   (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
 

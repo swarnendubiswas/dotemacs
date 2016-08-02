@@ -56,6 +56,7 @@
 (use-package sh-script ; Shell script mode
   :mode ("\\.zsh\\'" . sh-mode)
   :config
+  (add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4
