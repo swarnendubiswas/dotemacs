@@ -12,25 +12,20 @@
 (defvar dotemacs-mode-line-theme)
 (defvar dotemacs-selection)
 
-(cond ((eq dotemacs-mode-line-theme 'powerline) (or (use-package powerline
-                                                      :ensure t
-                                                      :config
-                                                      (setq powerline-display-mule-info nil
-                                                            powerline-display-buffer-size t
-                                                            powerline-display-hud nil)
-                                                      (powerline-default-theme))
-
-                                                    ;; I find the melpa powerline package more difficult to configure than this fork:
-                                                    ;; https://github.com/jonathanchu/emacs-powerline/
-                                                    (use-package powerline
-                                                      :disabled t
-                                                      :load-path "packages/emacs-powerline/"
-                                                      :config
-                                                      (setq powerline-arrow-shape 'arrow)
-                                                      (set-face-attribute 'mode-line nil
-                                                                          :background "grey88"
-                                                                          :foreground "black"
-                                                                          :box nil))))
+(cond ((eq dotemacs-mode-line-theme 'powerline) (use-package powerline
+                                                  :ensure t
+                                                  :config
+                                                  (setq powerline-display-mule-info nil
+                                                        powerline-display-buffer-size t
+                                                        powerline-display-hud nil)
+                                                  (powerline-default-theme)
+                                                  (set-face-attribute 'powerline-active1 nil
+                                                                      :background "gray22"
+                                                                      :foreground "white"
+                                                                      :weight 'light)
+                                                  (set-face-attribute 'powerline-active2 nil
+                                                                      :background "grey88"
+                                                                      :foreground "black")))
 
       ((eq dotemacs-mode-line-theme 'sml) (use-package smart-mode-line
                                             :ensure t
