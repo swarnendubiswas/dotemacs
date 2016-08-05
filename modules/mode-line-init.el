@@ -17,7 +17,9 @@
                                                   :config
                                                   (setq powerline-display-mule-info nil
                                                         powerline-display-buffer-size t
-                                                        powerline-display-hud nil)
+                                                        powerline-display-hud nil
+                                                        powerline-gui-use-vcs-glyph t
+                                                        powerline-default-separator 'slant)
                                                   (powerline-default-theme)
                                                   (set-face-attribute 'powerline-active1 nil
                                                                       :background "gray22"
@@ -116,7 +118,6 @@
           (nyan-mode 1)
           (nyan-start-animation)
           (setq-default nyan-wavy-trail nil
-                        nyan-cat-face-number 2
                         nyan-animate-nyancat t
                         nyan-bar-length 24))
       (nyan-mode -1)))
