@@ -103,7 +103,7 @@
 
 (use-package mode-icons
   :ensure t
-  :if (not (eq dotemacs-mode-line-theme 'spaceline)) ;; https://github.com/TheBB/spaceline/issues/84
+  :if (eq dotemacs-mode-line-theme 'default) ;; https://github.com/TheBB/spaceline/issues/84
   :config (mode-icons-mode 1))
 
 (use-package nyan-mode

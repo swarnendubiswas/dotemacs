@@ -792,6 +792,7 @@
     ("onyl" "only" nil 0)
     ("opcode" "op-code" nil 0)
     ("operaror" "operator" nil 0)
+    ("operatoins" "operations" nil 1)
     ("opitmizations" "optimizations" nil 1)
     ("oppasite" "opposite" nil 0)
     ("opperation" "operation" nil 0)

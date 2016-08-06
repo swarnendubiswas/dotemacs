@@ -166,6 +166,11 @@
         helm-swoop-move-to-line-cycle t ; go to the opposite side of line from the end or beginning of line
         helm-swoop-use-line-number-face t))
 
+(use-package ace-isearch
+  :ensure t
+  :diminish  ace-isearch-mode
+  :config (global-ace-isearch-mode 1))
+
 (provide 'search-init)
 
 ;;; search-init.el ends here
