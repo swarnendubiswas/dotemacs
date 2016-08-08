@@ -37,11 +37,11 @@
                             company-echo-metadata-frontend)
         company-require-match 'never)
 
-  ;; https://github.com/company-mode/company-mode/issues/87
-  (defadvice company-pseudo-tooltip-unless-just-one-frontend
-      (around only-show-tooltip-when-invoked activate)
-    (when (company-explicit-action-p)
-      ad-do-it))
+  ;; ;; https://github.com/company-mode/company-mode/issues/87
+  ;; (defadvice company-pseudo-tooltip-unless-just-one-frontend
+  ;;     (around only-show-tooltip-when-invoked activate)
+  ;;   (when (company-explicit-action-p)
+  ;;     ad-do-it))
 
   ;; https://github.com/company-mode/company-mode/issues/180
   (when (bound-and-true-p dotemacs-use-fci-p)
