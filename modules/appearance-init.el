@@ -58,6 +58,14 @@
                                      :ensure t
                                      :config
                                      (load-theme 'leuven t)
+                                     (set-face-attribute 'mode-line nil
+                                                         :background "grey88"
+                                                         :foreground "black")
+                                     (set-face-attribute 'mode-line-buffer-id nil
+                                                         :background "grey88"
+                                                         :foreground "black"
+                                                         :weight 'bold)
+
                                      (with-eval-after-load "avy"
                                        (set-face-attribute 'avy-background-face nil
                                                            :background "WhiteSmoke"

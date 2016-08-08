@@ -11,6 +11,7 @@
 (defvar spaceline-projectile-root-p)
 (defvar dotemacs-mode-line-theme)
 (defvar dotemacs-selection)
+(defvar dotemacs-theme)
 
 (cond ((eq dotemacs-mode-line-theme 'powerline) (use-package powerline
                                                   :ensure t
@@ -92,6 +93,10 @@
                                                                         :background "gray22"
                                                                         :foreground "white"
                                                                         :weight 'light))
+                                                  (when (eq dotemacs-theme 'leuven)
+                                                    (set-face-attribute 'powerline-active2 nil
+                                                                        :background "grey88"
+                                                                        :foreground "black"))
                                                   (set-face-attribute 'powerline-inactive1 nil
                                                                       :background "grey11"
                                                                       :foreground "white")
