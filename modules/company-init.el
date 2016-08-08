@@ -31,9 +31,11 @@
         company-dabbrev-code-everywhere t ; Offer completions in comments and strings
         ;; https://github.com/company-mode/company-mode/wiki/Switching-from-AC
         company-begin-commands '(self-insert-command)
+        ;; https://github.com/company-mode/company-mode/issues/123
         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                             company-preview-frontend
-                            company-echo-metadata-frontend))
+                            company-echo-metadata-frontend)
+        company-require-match 'never)
 
   ;; https://github.com/company-mode/company-mode/issues/87
   (defadvice company-pseudo-tooltip-unless-just-one-frontend
