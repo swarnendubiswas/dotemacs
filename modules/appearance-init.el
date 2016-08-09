@@ -172,7 +172,7 @@
                       :background "#f2f2f6"
                       :foreground "black"
                       :box '(:line-width 1 :color "black" :style pressed-button)
-                      :height 1.2
+                      :height 1.3
                       :bold t
                       :underline nil)
   (set-face-attribute 'tabbar-highlight nil
@@ -190,7 +190,7 @@
                       :background "#f2f2f6"
                       :foreground "dark green"
                       :box '(:line-width 1 :color "black" :style sunken)
-                      :height 1.2
+                      :height 1.3
                       :bold t
                       :underline nil)
   :bind (:map tabbar-mode-map
