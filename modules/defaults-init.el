@@ -56,6 +56,7 @@
                  ".pdf"
                  "-pkg.el"
                  ".pyc"
+                 ".rel"
                  ".rip"
                  ".toc"))
     (add-to-list 'completion-ignored-extensions ext)))
@@ -281,6 +282,9 @@
 
 (use-package doc-view
   :diminish doc-view-minor-mode)
+
+(use-package image-mode
+  :diminish image-minor-mode)
 
 (provide 'defaults-init)
 
