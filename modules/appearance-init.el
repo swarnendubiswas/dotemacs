@@ -61,15 +61,13 @@
                                      (set-face-attribute 'mode-line nil
                                                          :background "grey88"
                                                          :foreground "black")
-                                     (set-face-attribute 'mode-line-buffer-id nil
+                                     (set-face-attribute 'mode-line-inactive nil
                                                          :background "grey88"
+                                                         :foreground "black")
+                                     (set-face-attribute 'mode-line-buffer-id nil
+                                                         :weight 'bold
                                                          :foreground "black"
-                                                         :weight 'bold)
-
-                                     (with-eval-after-load "avy"
-                                       (set-face-attribute 'avy-background-face nil
-                                                           :background "WhiteSmoke"
-                                                           :foreground "black"))))
+                                                         :inherit 'mode-line)))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t

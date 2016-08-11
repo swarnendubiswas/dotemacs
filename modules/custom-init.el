@@ -75,6 +75,14 @@ Increase line spacing by two line height."
   (interactive)
   (switch-to-buffer "*scratch*"))
 
+;; https://www.emacswiki.org/emacs/InsertDate
+(defun dotemacs-insert-date (arg)
+  "Insert today's date.  With prefix argument ARG, use a different format."
+  (interactive "P")
+  (insert (if arg
+              (format-time-string "%d.%m.%Y")
+            (format-time-string "%Y-%m-%d"))))
+
 (provide 'custom-init)
 
 ;;; custom-init.el ends here

@@ -990,6 +990,7 @@
     ("shouldent" "shouldn't" nil 0)
     ("shouldnt" "shouldn't" nil 0)
     ("showinf" "showing" nil 0)
+    ("shwon" "shown" nil 1)
     ("shwos" "shows" nil 2)
     ("signifacnt" "significant" nil 0)
     ("simalar" "similar" nil 0)
