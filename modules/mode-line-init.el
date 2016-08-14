@@ -53,7 +53,7 @@
                                                         powerline-default-separator 'slant
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil ; Prefer nyan cat mode
-                                                        spaceline-buffer-position-p nil
+                                                        spaceline-buffer-position-p t
                                                         spaceline-projectile-root-p t)
                                                   ;; Adapted from https://github.com/lunaryorn/.emacs.d/blob/master/init.el
                                                   (spaceline-compile
@@ -66,19 +66,16 @@
                                                      (process :when active)
                                                      ((flycheck-error flycheck-warning flycheck-info) :when active)
                                                      (minor-modes :when active)
-                                                     nyan-cat)
+                                                     ((nyan-cat buffer-position) :separator " | "))
                                                    ;; Right segment
                                                    '(((which-function projectile-root) :separator " | ")
-                                                     ;; (python-pyvenv :fallback python-pyenv)
                                                      (version-control :when active)
                                                      (battery :when active)
                                                      selection-info
                                                      input-method
-                                                     ;; ((buffer-encoding-abbrev point-position line-column) :separator " | ")
                                                      ((point-position line-column) :separator " | ")
                                                      (global :when active)
                                                      ,@additional-segments
-                                                     buffer-position
                                                      hud))
                                                   (setq-default mode-line-format '("%e" (:eval (spaceline-ml-biswass))))
                                                   (set-face-attribute 'spaceline-highlight-face nil

@@ -286,6 +286,9 @@
 (use-package image-mode
   :diminish image-minor-mode)
 
+(use-package smerge-mode
+  :diminish smerge-mode)
+
 (provide 'defaults-init)
 
 ;;; defaults-init.el ends here
