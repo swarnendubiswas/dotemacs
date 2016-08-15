@@ -58,16 +58,17 @@
                                      :ensure t
                                      :config
                                      (load-theme 'leuven t)
-                                     (set-face-attribute 'mode-line nil
-                                                         :background "grey88"
-                                                         :foreground "black")
-                                     (set-face-attribute 'mode-line-inactive nil
-                                                         :background "grey88"
-                                                         :foreground "black")
-                                     (set-face-attribute 'mode-line-buffer-id nil
-                                                         :weight 'bold
-                                                         :foreground "black"
-                                                         :inherit 'mode-line)))
+                                     ;; (set-face-attribute 'mode-line nil
+                                     ;;                     :background "grey70"
+                                     ;;                     :foreground "black")
+                                     ;; (set-face-attribute 'mode-line-inactive nil
+                                     ;;                     :background "grey70"
+                                     ;;                     :foreground "black")
+                                     ;; (set-face-attribute 'mode-line-buffer-id nil
+                                     ;;                     :weight 'bold
+                                     ;;                     :foreground "black"
+                                     ;;                     :inherit 'mode-line)
+                                     ))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
@@ -108,7 +109,8 @@
                                               :ensure spacemacs-theme
                                               :config
                                               ;; https://github.com/nashamri/spacemacs-theme/issues/42
-                                              (load-theme 'spacemacs-light t)))
+                                              (load-theme 'spacemacs-light t)
+                                              (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))))
 
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
@@ -117,6 +119,7 @@
 
 (use-package display-theme
   :ensure t
+  :disabled t ; This shrinks other segment sizes on the modeline
   :if (not (eq dotemacs-theme 'default))
   :config (global-display-theme-mode))
 

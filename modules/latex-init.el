@@ -73,7 +73,7 @@
   (auctex-latexmk-setup)
   (add-hook 'LaTeX-mode-hook
             (lambda ()
-              (setq TeX-command-default "LatexMk"))))
+              (setq TeX-command-default "LaTeXMk"))))
 
 ;; Required by ac-math and company-math
 (use-package math-symbol-lists
@@ -247,6 +247,13 @@ reread."
     (add-hook 'outline-mode-hook
               (lambda ()
                 (require 'outline-cycle)))))
+
+;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
+;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+(add-hook 'after-save-hook
+          (lambda ()
+            (when (string= major-mode "latex-mode")
+              (TeX-command-menu "LaTeXMk"))))
 
 (provide 'latex-init)
 

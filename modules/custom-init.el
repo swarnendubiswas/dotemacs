@@ -83,6 +83,13 @@ Increase line spacing by two line height."
               (format-time-string "%d.%m.%Y")
             (format-time-string "%Y-%m-%d"))))
 
+(defun dotemacs-save-buffer-and-run-latexmk ()
+  "Save the current buffer and run LaTeXMk also."
+  (interactive)
+  (let ((process (TeX-active-process))) (if process (delete-process process)))
+  (let ((TeX-save-query nil)) (TeX-save-document ""))
+  (TeX-command-menu "LaTeXMk"))
+
 (provide 'custom-init)
 
 ;;; custom-init.el ends here

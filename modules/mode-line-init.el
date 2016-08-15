@@ -78,25 +78,39 @@
                                                      ,@additional-segments
                                                      hud))
                                                   (setq-default mode-line-format '("%e" (:eval (spaceline-ml-biswass))))
-                                                  (set-face-attribute 'spaceline-highlight-face nil
-                                                                      :background "#1A4B77"
-                                                                      :foreground "white")
-                                                  (if (eq dotemacs-theme 'spacemacs-light)
-                                                      (set-face-attribute 'powerline-active1 nil
-                                                                          :background "gray32"
-                                                                          :foreground "white"
-                                                                          :weight 'light)
-                                                    (set-face-attribute 'powerline-active1 nil
-                                                                        :background "gray22"
-                                                                        :foreground "white"
-                                                                        :weight 'light))
-                                                  (when (eq dotemacs-theme 'leuven)
-                                                    (set-face-attribute 'powerline-active2 nil
-                                                                        :background "grey88"
-                                                                        :foreground "black"))
-                                                  (set-face-attribute 'powerline-inactive1 nil
-                                                                      :background "grey11"
-                                                                      :foreground "white")
+                                                  ;; (set-face-attribute 'spaceline-highlight-face nil
+                                                  ;;                     :background "#1A4B77"
+                                                  ;;                     :foreground "white")
+                                                  ;; (set-face-attribute 'powerline-active1 nil
+                                                  ;;                     :background "gray22"
+                                                  ;;                     :foreground "white"
+                                                  ;;                     :weight 'light)
+                                                  ;; (set-face-attribute 'powerline-inactive1 nil
+                                                  ;;                     :background "grey11"
+                                                  ;;                     :foreground "white")
+                                                  ;; (when (eq dotemacs-theme 'spacemacs-light)
+                                                  ;;   (set-face-attribute 'powerline-active1 nil
+                                                  ;;                       :background "gray22"
+                                                  ;;                       :foreground "white"
+                                                  ;;                       :weight 'light))
+                                                  ;; (when (eq dotemacs-theme 'leuven)
+                                                  ;;   (set-face-attribute 'powerline-active1 nil
+                                                  ;;                       :background "gray22"
+                                                  ;;                       :foreground "white"
+                                                  ;;                       :weight 'light)
+                                                  ;;   ;; (set-face-attribute 'powerline-active2 nil
+                                                  ;;   ;;                     :background "#1A4B7"
+                                                  ;;   ;;                     :foreground "white")
+                                                  ;;   (set-face-attribute 'mode-line nil
+                                                  ;;                       :background "grey88"
+                                                  ;;                       :foreground "black")
+                                                  ;;   (set-face-attribute 'mode-line-inactive nil
+                                                  ;;                       :background "grey88"
+                                                  ;;                       :foreground "black")
+                                                  ;;   (set-face-attribute 'mode-line-buffer-id nil
+                                                  ;;                       :weight 'bold
+                                                  ;;                       :foreground "black"
+                                                  ;;                       :inherit 'mode-line))
                                                   (when (eq dotemacs-selection 'helm)
                                                     (spaceline-helm-mode))
                                                   (spaceline-info-mode)))
