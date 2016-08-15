@@ -17,6 +17,14 @@
 
 (use-package jdee
   :ensure t
+  :init
+  (setq jdee-server-dir dotemacs-extras-directory
+        jdee-complete-function 'jdee-complete-minibuf
+        jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/rt.jar"
+                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jce.jar"
+                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jsse.jar"
+                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/charsets.jar"
+                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/resources.jar"))
   :defer t)
 
 (use-package emacs-eclim
@@ -24,7 +32,7 @@
   :init
   (use-package eclimd)
   (setq eclim-eclipse-dirs "/home/biswass/software/eclipse-neon-java/"
-        eclim-executable "~/nonStandard/eclipse/eclim"
+        eclim-executable "~/eclipse/eclim"
         eclim-default-workspace "/home/biswass/workspace")
   :config
   (global-eclim-mode)

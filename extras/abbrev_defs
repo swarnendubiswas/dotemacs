@@ -13,7 +13,9 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table '())
+(define-abbrev-table 'awk-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -29,9 +31,13 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table '())
+(define-abbrev-table 'c++-mode-abbrev-table
+  '(
+   ))
 
-(define-abbrev-table 'c-mode-abbrev-table '())
+(define-abbrev-table 'c-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
@@ -402,6 +408,7 @@
     ("deffered" "deferred" nil 1)
     ("definately" "definitely" nil 0)
     ("definded" "defined" nil 0)
+    ("deparment" "department" nil 1)
     ("dependances" "dependencies" nil 0)
     ("deptartment" "department" nil 0)
     ("desicion" "decision" nil 0)
@@ -454,6 +461,7 @@
     ("dissonent" "dissonant" nil 0)
     ("distribusion" "distribution" nil 0)
     ("distrubution" "distribution" nil 0)
+    ("disucssed" "discussed" nil 1)
     ("divsion" "division" nil 0)
     ("docuement" "documents" nil 0)
     ("docuemnt" "document" nil 0)
@@ -577,6 +585,7 @@
     ("govenment" "government" nil 0)
     ("goverment" "government" nil 0)
     ("granuarlity" "granularity" nil 1)
+    ("graudation" "graduation" nil 1)
     ("gruop" "group" nil 0)
     ("gruops" "groups" nil 0)
     ("grwo" "grow" nil 0)
@@ -737,7 +746,7 @@
     ("mantain" "maintain" nil 0)
     ("marraige" "marriage" nil 0)
     ("meausre" "measure" nil 1)
-    ("mechanims" "mechanism" nil 1)
+    ("mechanims" "mechanism" nil 2)
     ("memeber" "member" nil 0)
     ("memmory" "memory" nil 1)
     ("memroy" "memory" nil 1)
@@ -898,6 +907,7 @@
     ("quetions" "questions" nil 0)
     ("raidus" "RADIUS" nil 0)
     ("realyl" "really" nil 0)
+    ("reasearch" "research" nil 1)
     ("reasonble" "reasonable" nil 1)
     ("reccomend" "recommend" nil 0)
     ("reccommend" "recommend" nil 0)
@@ -973,6 +983,7 @@
     ("securtiy" "security" nil 0)
     ("seh" "she" nil 0)
     ("selectoin" "selection" nil 0)
+    ("sememster" "semester" nil 1)
     ("sensistive" "sensitive" nil 1)
     ("sentance" "sentence" nil 0)
     ("separeate" "separate" nil 0)
@@ -1052,6 +1063,8 @@
     ("suprisingly" "surprisingly" nil 0)
     ("surpirisingly" "surprisingly" nil 1)
     ("swiming" "swimming" nil 0)
+    ("syserr" "System.err.println();" nil 0)
+    ("sysout" "System.out.println();" nil 0)
     ("sytems" "systems" nil 1)
     ("tahn" "than" nil 0)
     ("taht" "that" nil 1)
@@ -1065,7 +1078,7 @@
     ("techique" "technique" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 33)
+    ("teh" "the" nil 34)
     ("tehre" "there" nil 2)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
@@ -1241,11 +1254,13 @@
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table '())
+(define-abbrev-table 'java-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
-    ("catch" "catch" c-electric-continued-statement 0)
+    ("catch" "catch" c-electric-continued-statement 2)
     ("else" "else" c-electric-continued-statement 0)
     ("finally" "finally" c-electric-continued-statement 0)
     ("while" "while" c-electric-continued-statement 0)
@@ -1281,7 +1296,9 @@
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table '())
+(define-abbrev-table 'objc-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -1301,7 +1318,9 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table '())
+(define-abbrev-table 'pike-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 

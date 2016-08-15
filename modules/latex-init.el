@@ -250,10 +250,17 @@ reread."
 
 ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-(add-hook 'after-save-hook
+;; This hook works well for paper directories, but not with dissertation directories.
+;; (add-hook 'after-save-hook
+;;           (lambda ()
+;;             (when (string= major-mode "latex-mode")
+;;               (TeX-command-menu "LaTeXMk")
+;;               (revert-buffer :ignore-auto :noconfirm)
+;;               (find-alternate-file (current-buffer)))))
+
+(add-hook 'LaTeX-mode-hook
           (lambda ()
-            (when (string= major-mode "latex-mode")
-              (TeX-command-menu "LaTeXMk"))))
+            (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
 
 (provide 'latex-init)
 

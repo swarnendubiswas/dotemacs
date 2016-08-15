@@ -116,13 +116,16 @@
                                          "\\|.elc$"
                                          "\\|.fdb_latexmk$"
                                          "\\|.fls$"
+                                         "\\|.lof$"
                                          "\\|.log$"
+                                         "\\|.lot$"
                                          "\\|.out$"
                                          "\\|.pdf$"
                                          "\\|.pyc$"
                                          "\\|.rel$"
                                          "\\|.rip$"
-                                         "\\|.synctex.gz"))
+                                         "\\|.synctex.gz"
+                                         "\\|.toc"))
   (counsel-mode 1)
   :diminish counsel-mode)
 
