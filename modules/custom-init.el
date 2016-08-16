@@ -83,6 +83,7 @@ Increase line spacing by two line height."
               (format-time-string "%d.%m.%Y")
             (format-time-string "%Y-%m-%d"))))
 
+;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (defun dotemacs-save-buffer-and-run-latexmk ()
   "Save the current buffer and run LaTeXMk also."
   (interactive)

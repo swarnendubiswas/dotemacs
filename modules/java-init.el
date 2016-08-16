@@ -19,12 +19,18 @@
   :ensure t
   :init
   (setq jdee-server-dir dotemacs-extras-directory
-        jdee-complete-function 'jdee-complete-minibuf
-        jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/rt.jar"
-                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jce.jar"
-                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jsse.jar"
-                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/charsets.jar"
-                                "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/resources.jar"))
+        jdee-complete-function 'jdee-complete-minibuf)
+  (if (string-equal system-name "rain.cse.ohio-state.edu")
+      (setq jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/rt.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jce.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jsse.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/charsets.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/resources.jar"))
+    (setq jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/rt.jar"
+                                  "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/jce.jar"
+                                  "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/jsse.jar"
+                                  "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/charsets.jar"
+                                  "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/resources.jar")))
   :defer t)
 
 (use-package emacs-eclim
