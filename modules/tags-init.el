@@ -24,6 +24,7 @@
 
 (use-package etags
   :bind ("M-T" . tags-search)
+  :if (eq system-type 'windows-nt)
   :config
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (progn
@@ -44,10 +45,6 @@
          (setq ac-etags-use-document t)
          (add-to-list 'ac-sources 'ac-source-etags))))))
 
-(use-package gtags
-  :ensure t
-  :disabled t)
-
 (use-package jtags
   :ensure t
   :disabled t
@@ -55,9 +52,10 @@
 
 ;; Front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
+;; http://tuhdo.github.io/c-ide.html
 (use-package ggtags
   :ensure t
-  :if (eq system-type 'gnu/linux)
+  :if (and (eq system-type 'gnu/linux) (not (eq dotemacs-selection 'helm)))
   :diminish ggtags-mode
   :config
   (add-hook 'c-mode-common-hook
@@ -68,38 +66,45 @@
         ggtags-oversize-limit (* 50 1024 1024)
         ;; Use helm for completion
         ggtags-completing-read-function nil)
+  :bind (:map ggtags-mode-map
+              ("C-c g s" . ggtags-find-other-symbol)
+              ("C-c g h" . ggtags-view-tag-history)
+              ("C-c g r" . ggtags-find-reference)
+              ("C-c g f" . ggtags-find-file)
+              ("C-c g c" . ggtags-create-tags)
+              ("C-c g u" . ggtags-update-tags)
+              ("M-," . pop-tag-mark)))
 
-  ;; http://wikemacs.org/wiki/C-ide
-  ;; http://tuhdo.github.io/c-ide.html
-  ;; Use M-n to move to next candidate and M-p to move back previous candidate. Use "M-g s" to invoke Isearch on candidate
-  ;; buffer list.
-  (use-package helm-gtags
-    :ensure t
-    :disabled t
-    :diminish helm-gtags-mode
-    :if (eq dotemacs-selection 'helm)
-    :config
-    (setq helm-gtags-ignore-case t
-          helm-gtags-auto-update t
-          helm-gtags-use-input-at-cursor t
-          helm-gtags-pulse-at-cursor t
-          ;; helm-gtags-prefix-key "\C-c g"
-          helm-gtags-suggested-key-mapping t
-          helm-gtags-ignore-case t
-          helm-gtags-fuzzy-match t
-          helm-gtags-maximum-candidates 1000
-          helm-gtags-cache-select-result t
-          helm-gtags-display-style 'detail
-          helm-gtags-update-interval-second 60)
-    (add-hook 'c-mode-common-hook
-              (lambda ()
-                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                  (helm-gtags-mode 1))))
-    :bind (:map helm-gtags-mode-map
-                ("M-." . helm-gtags-dwim)
-                ("M-," . helm-gtags-pop-stack)
-                ("M-'" . helm-gtags-select)
-                ("M-t" . helm-gtags-find-tag))))
+;; http://wikemacs.org/wiki/C-ide
+;; http://tuhdo.github.io/c-ide.html
+;; Use M-n to move to next candidate and M-p to move back previous candidate. Use "M-g s" to invoke Isearch on candidate
+;; buffer list.
+(use-package helm-gtags
+  :ensure t
+  :diminish helm-gtags-mode
+  :if (eq dotemacs-selection 'helm)
+  :config
+  (setq helm-gtags-ignore-case t
+        helm-gtags-auto-update t
+        helm-gtags-use-input-at-cursor t
+        helm-gtags-pulse-at-cursor t
+        ;; helm-gtags-prefix-key "\C-c g"
+        helm-gtags-suggested-key-mapping t
+        helm-gtags-ignore-case t
+        helm-gtags-fuzzy-match t
+        helm-gtags-maximum-candidates 1000
+        helm-gtags-cache-select-result t
+        helm-gtags-display-style 'detail
+        helm-gtags-update-interval-second 60)
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                (helm-gtags-mode 1))))
+  :bind (:map helm-gtags-mode-map
+              ("M-." . helm-gtags-dwim)
+              ("M-," . helm-gtags-pop-stack)
+              ("M-'" . helm-gtags-select)
+              ("M-t" . helm-gtags-find-tag)))
 
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun dotemacs-create-latex-etags ()

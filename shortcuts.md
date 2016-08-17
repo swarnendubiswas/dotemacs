@@ -81,7 +81,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c C-p` -
 * `C-x C-s` -
 
-#### Swiper
+##### Swiper
 
 * `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
 
@@ -164,9 +164,9 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
 
-#### Etags/Ctags
+#### GGtags/Etags/Ctags
 
-* `M-.` - Jump to tag underneath cursor.
+* `M-.` - Jump to tag underneath cursor (`find-tags`).
 * `M-*` - Pop back to where you previously invoked `M-.`.
 
 #### Python and Elpy
@@ -177,6 +177,13 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-o` - Overview of the definitions in the current file.
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 
+#### C/C++
+
+* `C-M-a` - Jump backward to the beginning of the current function (`c-beginning-of-defun`).
+* `C-M-e` - Jump forward to the end of the current function (`c-end-of-defun`).
+* `C-M-h` - Mark the current function (`c-mark-function`).
+* `C-M-k` - Jump to a tag in the current file (`moo-jump-local`).
+* `C-M-v` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`).
 
 #### Use Cases
 

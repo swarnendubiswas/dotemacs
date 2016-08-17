@@ -270,6 +270,7 @@
     ("caharcter" "character" nil 0)
     ("calcullated" "calculated" nil 0)
     ("calulated" "calculated" nil 0)
+    ("cancelled" "canceled" nil 0)
     ("canddiate" "candidate" nil 1)
     ("candidtae" "candidate" nil 0)
     ("candidtaes" "candidates" nil 0)
