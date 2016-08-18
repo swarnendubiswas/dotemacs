@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-completion-in-buffer)
+(defvar dotemacs-extras-directory)
+
 (add-hook 'java-mode-hook
           (lambda ()
             (setq c-basic-offset 2
@@ -33,18 +36,23 @@
                                   "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/resources.jar")))
   :defer t)
 
-(use-package emacs-eclim
-  :ensure t
+(use-package eclim
+  :ensure emacs-eclim
   :init
   (use-package eclimd)
   (setq eclim-eclipse-dirs "/home/biswass/software/eclipse-neon-java/"
-        eclim-executable "~/eclipse/eclim"
-        eclim-default-workspace "/home/biswass/workspace")
-  :config
-  (global-eclim-mode)
+        eclim-executable "/home/biswass/software/eclipse-neon-java/eclim"
+        eclim-default-workspace "/home/biswass/workspace"
+        eclim-auto-save t)
+  :config (add-hook 'java-mode-hook #'eclim-mode)
   (use-package company-emacs-eclim
+    :ensure t
+    :if (eq dotemacs-completion-in-buffer 'company)
     :functions company-emacs-eclim-setup
-    :config (company-emacs-eclim-setup)))
+    :config (company-emacs-eclim-setup))
+  (use-package ac-emacs-eclim
+    :ensure t
+    :if (eq dotemacs-completion-in-buffer 'auto-complete)))
 
 (provide 'java-init)
 

@@ -71,12 +71,19 @@
     :config
     (set-default 'semantic-case-fold t)
     ;; Include custom header locations
-    (when (string-equal system-name "rain.cse.ohio-state.edu")
-      (semantic-add-system-include "/usr/include/boost148/" 'c++-mode)
-      (semantic-add-system-include "/home/biswass/intel-pintool/source/include/pin" 'c++-mode))
+    (if (string-equal system-name "rain.cse.ohio-state.edu")
+        (progn
+          (semantic-add-system-include "/usr/include/boost148" 'c++-mode)
+          (semantic-add-system-include "/home/biswass/intel-pintool/source/include/pin" 'c++-mode))
+      (progn
+        (semantic-add-system-include "/usr/include/boost")))
     (fa-config-default)
     ;; This overrides M-u
-    (bind-key* "M-u" #'upcase-word))
+    ;; (bind-key* "M-u" #'upcase-word)
+    :bind (:map function-args-mode-map
+                ("M-u" . nil)
+                ("C-M-k" . nil)
+                ("C-M-j" . nil)))
 
   ;; This is already the default, but I have this as a reminder.
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)
@@ -94,8 +101,8 @@
     (add-to-list 'company-backends #'company-c-headers)
     (add-to-list 'company-clang-arguments "-I/home/biswass/intel-pintool/source/include/pin")
     (add-to-list 'company-clang-arguments "-I/home/biswass/intel-pintool/lib/boost_1_58_0/boost")
+    (add-to-list 'company-c-headers-path-system "/usr/include/")
     (cond ((string-equal system-name "rain.cse.ohio-state.edu")
-           (add-to-list 'company-c-headers-path-system "/usr/include/")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
            (add-to-list 'company-c-headers-path-system "/home/biswass/intel-pintool/lib/boost_1_58_0/boost")
            (add-to-list 'company-c-headers-path-system "/home/biswass/intel-pintool/source/include/pin"))

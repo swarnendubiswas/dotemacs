@@ -15,6 +15,7 @@
         recentf-max-saved-items 200 ; Keep track of last xx files
         ;; Disable this so that recentf does not attempt to stat remote files: https://www.emacswiki.org/emacs/RecentFiles
         recentf-auto-cleanup 'never
+        recentf-menu-filter 'recentf-sort-descending
         ;; Check regex with re-builder
         recentf-exclude '("[/\\]\\.elpa/" "[/\\]\\.ido\\.last\\'" "[/\\]\\.git/" ".*\\.gz\\'" ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "url/cookies" "[/\\]tmp/.*"

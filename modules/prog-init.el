@@ -6,6 +6,7 @@
 ;;; Code:
 
 (defvar dotemacs-completion-in-buffer)
+(defvar dotemacs-temp-directory)
 
 (use-package prog-mode
   :defer t

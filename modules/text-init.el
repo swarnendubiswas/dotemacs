@@ -39,7 +39,10 @@
         markdown-italic-underscore t
         markdown-enable-math t)
   (use-package markdown-mode+
-    :ensure t))
+    :ensure t)
+  (use-package pandoc-mode
+    :ensure t
+    :init (add-hook 'markdown-mode-hook #'pandoc-mode)))
 
 (use-package csv-mode
   :ensure t
