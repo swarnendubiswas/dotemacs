@@ -73,6 +73,7 @@
               ("C-c g f" . ggtags-find-file)
               ("C-c g c" . ggtags-create-tags)
               ("C-c g u" . ggtags-update-tags)
+              ("M-." . ggtags-find-tag-dwim)
               ("M-," . pop-tag-mark)))
 
 ;; http://wikemacs.org/wiki/C-ide

@@ -175,7 +175,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-M-e` - Jump forward to the end of the current function (`c-end-of-defun`).
 * `C-M-h` - Mark the current function (`c-mark-function`).
 * `C-M-k` - Jump to a tag in the current file (`moo-jump-local`).
-* `C-M-v` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`).
+* `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`).
 
 #### Python and Elpy
 
