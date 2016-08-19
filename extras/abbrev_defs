@@ -97,6 +97,8 @@
 
 (define-abbrev-table 'fundamental-mode-abbrev-table '())
 
+(define-abbrev-table 'gdb-script-mode-abbrev-table '())
+
 (define-abbrev-table 'gfm-mode-abbrev-table '())
 
 (define-abbrev-table 'ggtags-global-mode-abbrev-table '())
@@ -868,6 +870,7 @@
     ("possable" "possible" nil 0)
     ("possbile" "possible" nil 1)
     ("possibilites" "possibilities" nil 1)
+    ("possiblities" "possibilities" nil 1)
     ("possilby" "possibly" nil 1)
     ("postition" "position" nil 0)
     ("potentialy" "potentially" nil 0)
@@ -1228,6 +1231,8 @@
    ))
 
 (define-abbrev-table 'grep-mode-abbrev-table '())
+
+(define-abbrev-table 'gud-mode-abbrev-table '())
 
 (define-abbrev-table 'helm-ag-mode-abbrev-table '())
 

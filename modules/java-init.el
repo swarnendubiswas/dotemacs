@@ -55,8 +55,6 @@
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'auto-complete)))
 
-(use-package company-emacs-eclim
-
 (provide 'java-init)
 
 ;;; java-init.el ends here

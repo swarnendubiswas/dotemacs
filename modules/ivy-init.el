@@ -33,7 +33,7 @@
               (lambda (f)
                 (with-ivy-window
                   (find-file f)))
-              :caller 'ivy-recentf))
+              :caller 'counsel-recentf))
   :config
   (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
                                         ; candidates

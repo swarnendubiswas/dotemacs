@@ -83,7 +83,9 @@
     :bind (:map function-args-mode-map
                 ("M-u" . nil)
                 ("C-M-k" . nil)
-                ("C-M-j" . nil)))
+                ("C-c c k" . moo-jump-local)
+                ("C-M-j" . nil)
+                ("C-c c j" . moo-jump-directory)))
 
   ;; This is already the default, but I have this as a reminder.
   (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)
