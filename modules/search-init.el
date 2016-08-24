@@ -65,9 +65,7 @@
     (visual-line-mode 1)
     (swiper-all)
     (visual-line-mode -1))
-  :bind (("C-c s" . dotemacs-swiper-with-visual-line-mode)
-         ("C-c S" . dotemacs-swiper-all-with-visual-line-mode)
-         ("C-c r" . ivy-resume))
+  :bind ("C-c r" . ivy-resume)
   :init
   (when (not (eq dotemacs-selection 'ivy))
     (progn
@@ -90,8 +88,6 @@
 ;; C-h m inside a results buffer will show all the keybindings available to you.
 (use-package ag
   :ensure t
-  ;; :bind (("C-c s d" . ag-dired)
-  ;;        ("C-c s f" . ag-files))
   :config
   (setq ag-reuse-buffers t
         ag-reuse-window t
@@ -114,16 +110,11 @@
   (bind-key "C-c o" #'counsel-grep-or-swiper)
   (bind-key "<f4>" #'counsel-grep-or-swiper))
 
-;; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
-(use-package wgrep
+(use-package wgrep ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
   :ensure t)
 
 (use-package grep
   :disabled t
-  ;; :bind
-  ;; (("C-c s g" . grep)
-  ;;  ("C-c s r" . rgrep)
-  ;;  ("C-c s l" . lgrep))
   :init
   (setq grep-highlight-matches t
         grep-scroll-output t

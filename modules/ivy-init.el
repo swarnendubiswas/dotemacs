@@ -1,7 +1,7 @@
 ;;; ivy-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup ivy mode as a replacement for ido.
+;; Setup ivy mode for completion.
 
 ;;; Code:
 
