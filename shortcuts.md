@@ -1,13 +1,13 @@
-## Useful keyboard shortcuts
+# Useful keyboard shortcuts
 
 This file lists useful keyboard shortcuts that might be difficult to remember. These keybindings are mostly from a
 default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am
-maintaining this for **my** ease of reference.
+maintaining this for **my** ease of reference. Suggestions are welcome.
 
 Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m
 (describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
 
-#### Text manipulation
+## Text manipulation
 
 * `M-l` - Convert following word to lower case (`downcase-word`).
 * `M-c` - Capitalize the following word (`capitalize-word`).
@@ -19,7 +19,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-;` - Invoke comment-dwim (`comment-dwim`).
 * `M-/` - Try to expand text before point (`hippie-expand`).
 
-#### Marking
+## Marking
 
 * `C-M-h` - Mark function body (`c-mark-function`).
 * `C-x h` - Mark whole buffer (`mark-whole-buffer`).
@@ -30,7 +30,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`).
 * `C-x C-p` - Move point to the beginning of the current page, and set mark at the end (`mark-page`).
 
-#### Key motion
+## Key motion
 
 * `C-M-n` - Move forward over a parenthetical group (`forward-list`).
 * `C-M-p` - Move backward over a parenthetical group (`backward-list`).
@@ -47,7 +47,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-{` - Move back to the previous paragraph beginning (`backward-paragraph`).
 * `M-}` - Move forward to the next paragraph end (`markdown-forward-paragraph`).
 
-#### Dired
+## Dired
 
 * `g` - Update the entire contents (`revert-buffer`).
 * `l` - Update the specified files (`dired-do-redisplay`).
@@ -64,32 +64,32 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`).
 * `q` - Kill dired buffer (`quite-window`).
 
-#### Ibuffer
+## Ibuffer
 
 * `S` - Save file (`ibuffer-do-save`).
 * `R` - Rename file (`ibuffer-do-rename-uniquely`).
 * `m` - Mark file (`ibuffer-mark-forward`).
 * `u` - Unmark file (`ibuffer-unmark-forward`).
 
-#### Search
+## Search
 
 * `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`.
 
-##### Ag
+### Ag
 
 * `<f8>` - Run an ag search in the project (`projectile-ag`).
 * `C-c C-p` -
 * `C-x C-s` -
 
-##### Swiper
+### Swiper
 
 * `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
 
-#### Ido
+## Ido
 
 * `C-j` - Use the current input string verbatim (``).
 
-#### Ivy
+## Ivy
 
 * `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`).
 * `C-n` - Selects the next candidate (`ivy-next-line`).
@@ -108,13 +108,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
 * `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
 
-#### Org mode
-
-* `C-u C-c .` - Insert date and time (`org-time-stamp`).
-* `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`).
-* `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`).
-
-#### Helm
+## Helm
 
 * `C-SPC` - Mark buffer (``).
 * `M-D` - Kill marked buffers and quit Helm (``).
@@ -124,7 +118,13 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-n` - Copies yanked symbol to minibuffer (``).
 * `C-w` - Appends word next to point to the minibuffer (``).
 
-#### Projectile
+## Org mode
+
+* `C-u C-c .` - Insert date and time (`org-time-stamp`).
+* `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`).
+* `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`).
+
+## Projectile
 
 * `C-c p f` - Display a list of all files in the project (`projectile-find-file`).
 * `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`).
@@ -136,7 +136,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
 * `<f8>` - Run an ag search in the project (`projectile-ag`).
 
-#### LaTeX/AUCTeX
+## LaTeX/AUCTeX
 
 * `C-c @ C-n` - Move to next heading (at any level) (`outline-next-visible-heading`).
 * `C-c @ C-p` - Move to previous heading (at any level) (`outline-previous-visible-heading`).
@@ -155,7 +155,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c _` - Set master file (``).
 * `C-c ^` - Switch to master file (`TeX-home-buffer`).
 
-#### Reftex
+### Reftex
 
 * `C-c (` - Create a label (`reftex-label`).
 * `C-c )` - Look up a reference (`reftex-reference`).
@@ -164,12 +164,20 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
 
-#### GGtags/Etags/Ctags
+## Markdown
+
+* `C-c C-s e` - Make region or word italic (emphasis).
+* `C-c C-s s` - Make region or word bold or strong.
+* `C-c C-s s` - Insert or start blockquote.
+* `C-c C-s p` - Insert pre-formatted code blocks.
+* `C-c -` - Insert a horizontal rule.
+
+## GGtags/Etags/Ctags
 
 * `M-.` - Jump to tag underneath cursor (`find-tags`).
 * `M-*` - Pop back to where you previously invoked `M-.`.
 
-#### Programming
+## Programming
 
 * `C-M-a` - Jump backward to the beginning of the current function (`c-beginning-of-defun`).
 * `C-M-e` - Jump forward to the end of the current function (`c-end-of-defun`).
@@ -177,7 +185,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-M-k` - Jump to a tag in the current file (`moo-jump-local`).
 * `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`).
 
-#### Python and Elpy
+### Python and Elpy
 
 * `C-c C-d` - Get object or function docs (`elpy-doc`).
 * `M-<left>` - (`elpy-nav-indent-shift-left`)
@@ -185,10 +193,15 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-o` - Overview of the definitions in the current file.
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 
-#### Use Cases
+## Use Cases
 
-* ###### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
 
-* ###### [Search for the symbol at point with swiper] `C-f M-n`
+### Search for the symbol at point
 
-Suggestions are welcome.
+#### Isearch
+* `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
+
+#### Swiper
+* `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).
+* `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).

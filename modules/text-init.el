@@ -31,13 +31,15 @@
 
 (use-package markdown-mode
   :ensure t
-  :mode
-  (("\\.markdown\\'" . markdown-mode)
-   ("\\.md\\'" . markdown-mode))
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.markdown\\'" . markdown-mode)
+         ("\\.md\\'" . markdown-mode))
   :config
   (setq markdown-enable-wiki-links t
         markdown-italic-underscore t
-        markdown-enable-math t)
+        markdown-enable-math t
+        markdown-command "pandoc -f markdown -s ")
   (use-package markdown-mode+
     :ensure t)
   (use-package pandoc-mode
