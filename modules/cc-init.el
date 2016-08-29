@@ -68,8 +68,8 @@
   (use-package function-args
     :ensure t
     :diminish function-args-mode
+    :init (function-args-mode)
     :config
-    (set-default 'semantic-case-fold t)
     ;; Include custom header locations
     (if (string-equal system-name "rain.cse.ohio-state.edu")
         (progn
@@ -82,6 +82,11 @@
     ;; (bind-key* "M-u" #'upcase-word)
     :bind (:map function-args-mode-map
                 ("M-u" . nil)
+                ("C-c c s" . fa-show)
+                ("C-c c u" . fa-idx-cycle-up)
+                ("C-c c d" . fa-idx-cycle-down)
+                ("C-c c b" . fa-jump-maybe)
+                ("C-c c c" . moo-complete)
                 ("C-M-k" . nil)
                 ("C-c c k" . moo-jump-local)
                 ("C-M-j" . nil)

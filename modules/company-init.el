@@ -96,8 +96,7 @@
   :config
   (setq company-quickhelp-delay 0.2
         company-quickhelp-max-lines 60)
-  (company-quickhelp-mode 1)
-  (unbind-key "M-h" company-quickhelp-mode-map))
+  (company-quickhelp-mode 1))
 
 (provide 'company-init)
 
