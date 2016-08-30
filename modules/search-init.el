@@ -96,18 +96,18 @@
 (use-package helm-ag
   :ensure t
   :if (eq dotemacs-selection 'helm)
-  :bind ("C-c a" . helm-ag)
+  :bind ("C-c s a" . helm-ag)
   :config
   (setq helm-ag-fuzzy-match t
         helm-ag-insert-at-point 'symbol
         helm-ag-source-type 'file-line))
 
 (when (eq dotemacs-selection 'ivy)
-  (bind-key "C-c a" #'counsel-ag)
+  (bind-key "C-c s a" #'counsel-ag)
   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
-  (bind-key "C-c g" #'counsel-git-grep)
+  (bind-key "C-c s g" #'counsel-git-grep)
   (setq counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
-  (bind-key "C-c o" #'counsel-grep-or-swiper)
+  (bind-key "C-c s o" #'counsel-grep-or-swiper)
   (bind-key "<f4>" #'counsel-grep-or-swiper))
 
 (use-package wgrep ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode

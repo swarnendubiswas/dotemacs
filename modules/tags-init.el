@@ -45,11 +45,6 @@
          (setq ac-etags-use-document t)
          (add-to-list 'ac-sources 'ac-source-etags))))))
 
-(use-package jtags
-  :ensure t
-  :disabled t
-  :config (add-hook 'java-mode-hook #'jtags-mode))
-
 ;; Front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; http://tuhdo.github.io/c-ide.html
@@ -57,14 +52,14 @@
   :ensure t
   :if (and (eq system-type 'gnu/linux) (not (eq dotemacs-selection 'helm)))
   :diminish ggtags-mode
-  :config
+  :init
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
                 (ggtags-mode 1))))
+  :config
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
-        ;; Use helm for completion
         ggtags-completing-read-function nil)
   :bind (:map ggtags-mode-map
               ("C-c g s" . ggtags-find-other-symbol)
