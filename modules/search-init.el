@@ -30,7 +30,8 @@
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
   (use-package isearch+
-    :ensure t)
+    :ensure t
+    :diminish isearch-mode)
   (use-package isearch-dabbrev
     :ensure t
     :bind (:map isearch-mode-map
@@ -110,8 +111,11 @@
   (bind-key "C-c s o" #'counsel-grep-or-swiper)
   (bind-key "<f4>" #'counsel-grep-or-swiper))
 
-(use-package wgrep ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
-  :ensure t)
+(use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
+  :ensure wgrep
+  :init
+  (use-package wgrep)
+  (add-hook 'ag-mode-hook #'wgrep-ag-setup))
 
 (use-package grep
   :disabled t

@@ -12,19 +12,6 @@
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :preface
-  ;; https://github.com/abo-abo/oremacs/blob/github/oleh/modes/ora-ivy.el
-  (defun dotemacs--ivy-dired ()
-    (interactive)
-    (if ivy--directory
-        (ivy-quit-and-run
-         (dired ivy--directory)
-         (when (re-search-forward
-                (regexp-quote
-                 (substring ivy--current 0 -1)) nil t)
-           (goto-char (match-beginning 0))))
-      (user-error
-       "Not completing files currently")))
-
   (defun dotemacs--ivy-recentf ()
     "Find a file on `recentf-list'."
     (interactive)
@@ -70,7 +57,6 @@
    ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("<return>" . ivy-alt-done)
-   ("C-:" . ivy-dired)
    ("<left>" . ivy-previous-line)
    ("<right>" . ivy-next-line))
   :diminish ivy-mode)

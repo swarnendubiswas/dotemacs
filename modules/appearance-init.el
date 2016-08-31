@@ -14,18 +14,24 @@
 
 (use-package tool-bar
   :if (fboundp 'tool-bar-mode)
-  :config (tool-bar-mode -1))
+  :config
+  ;; Maximize the vertical space
+  (tool-bar-mode -1))
 
-(use-package menu-bar ; One can learn many shortcuts from the menu bar entries.
+(use-package menu-bar
   :if (fboundp 'menu-bar-mode)
-  :config (menu-bar-mode 1))
+  :config
+  ;; One can learn many shortcuts from the menu bar entries.
+  (menu-bar-mode 1))
 
 (use-package tooltip
   :config (tooltip-mode -1))
 
 (use-package scroll-bar
   :if (fboundp 'scroll-bar-mode)
-  :config (scroll-bar-mode -1))
+  :config
+  ;; Maximize the space for displaying the buffer.
+  (scroll-bar-mode -1))
 
 (use-package frame
   :config
@@ -36,20 +42,27 @@
   ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
   ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+  ;; Blinking cursor can be distracting
   (blink-cursor-mode 0))
 
-(use-package time ; Displays the time and date in the mode line
+(use-package time ; Display the time and date in the mode line
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil
         display-time-default-load-average nil)
   (display-time))
 
-(use-package linum ; Display line numbers in margin
-  :config
-  ;; linum-mode can slow down Emacs for large files:
-  ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
-  (global-linum-mode 1))
+;; Display line numbers in the margin
+(or (use-package linum
+      :disabled t ;; linum-mode can slow down Emacs for large files:
+      ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
+      :config (global-linum-mode 1))
+
+    (use-package nlinum ; Might improve performance with jit font locking.
+      :ensure t
+      :config
+      (global-nlinum-mode 1)
+      (setq nlinum-highlight-current-line t)))
 
 (use-package custom
   :config (setq custom-safe-themes t))

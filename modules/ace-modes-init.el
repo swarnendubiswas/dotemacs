@@ -1,7 +1,7 @@
 ;;; ace-modes-init.el --- Part of Emacs initialization   -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup ace-xxx (jump/buffer/isearch) modes, and avy.
+;; Setup quick buffer/line/word/character navigation modes (e.g., ace-xxx (jump/buffer/isearch) modes, avy, bm).
 
 ;;; Code:
 
@@ -18,7 +18,7 @@
     "*Buffer regexps to always show when buffer switching.")
   (defvar my-bs-never-show-regexps '("^\\s-" "^\\*" "TAGS$" "GTAGS$")
     "*Buffer regexps to never show when buffer switching.")
-  (defvar my-ido-ignore-dired-buffers nil
+  (defvar my-ignore-dired-buffers nil
     "*If non-nil, buffer switching should ignore dired buffers.")
 
   (defun my-bs-str-in-regexp-list (str regexp-list)
@@ -33,11 +33,10 @@
     "Return non-nil if the named buffer should be ignored."
     (or (and (not (my-bs-str-in-regexp-list name my-bs-always-show-regexps))
              (my-bs-str-in-regexp-list name my-bs-never-show-regexps))
-        (and my-ido-ignore-dired-buffers
+        (and my-ignore-dired-buffers
              (save-excursion
                (set-buffer name)
                (equal major-mode 'dired-mode)))))
-
   :init
   (use-package ace-jump-mode
     :ensure t
@@ -45,14 +44,12 @@
     (("C-c a f" . ace-jump-mode)
      ("C-c a b" . ace-jump-mode-pop-mark))
     :config (ace-jump-mode-enable-mark-sync))
-
   :config
   (setq bs-configurations
         '(("all" nil nil nil nil nil)
           ("files" nil nil nil (lambda (buf) (my-bs-ignore-buffer (buffer-name buf))) nil)))
   (setq bs-cycle-configuration-name "files")
   (setq-default ajb-bs-configuration "files")
-
   :bind
   (("<f4>" . ace-jump-buffer)
    ("M-B" . ace-jump-buffer-with-configuration)))
@@ -82,8 +79,8 @@
   (setq avy-background t
         avy-highlight-first t
         avy-all-windows nil
-        ;; Options: pre, at, at-full, post, de-bruijn. pre is a bit distracting because of all the movement while
-        ;; highlighting selection keys. This causes the eyes to lose focus.
+        ;; Options pre is a bit distracting because of all the movement while highlighting selection keys. This causes
+        ;; the eyes to lose focus.
         avy-style 'at))
 
 (use-package bookmark

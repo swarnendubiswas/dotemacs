@@ -13,7 +13,7 @@
   :ensure t
   :diminish company-mode
   :preface
-  (defun dotemacs-quit-company-save-buffer ()
+  (defun dotemacs--quit-company-save-buffer ()
     "Wrapper function to quit company popup, and then save the buffer using the same keybinding used to save a buffer."
     (interactive)
     (company-abort)
@@ -59,22 +59,20 @@
     (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
     (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
 
-  (cond ((eq dotemacs-selection 'ivy) (progn
-                                        (with-eval-after-load "counsel"
-                                          (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
-                                          (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
-                                          (bind-key "C-:" #'counsel-company company-mode-map)
-                                          (bind-key "C-:" #'counsel-company company-active-map))))
-        ((eq dotemacs-selection 'helm) (progn
-                                         (with-eval-after-load "helm-company"
-                                           (bind-key [remap complete-symbol] #'helm-company company-mode-map)
-                                           (bind-key [remap completion-at-point] #'helm-company company-mode-map)
-                                           (bind-key "C-:" #'helm-company company-mode-map)
-                                           (bind-key "C-:" #'helm-company company-active-map)))))
+  (cond ((eq dotemacs-selection 'ivy) (with-eval-after-load "counsel"
+                                        (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
+                                        (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
+                                        (bind-key "C-:" #'counsel-company company-mode-map)
+                                        (bind-key "C-:" #'counsel-company company-active-map)))
+        ((eq dotemacs-selection 'helm) (with-eval-after-load "helm-company"
+                                         (bind-key [remap complete-symbol] #'helm-company company-mode-map)
+                                         (bind-key [remap completion-at-point] #'helm-company company-mode-map)
+                                         (bind-key "C-:" #'helm-company company-mode-map)
+                                         (bind-key "C-:" #'helm-company company-active-map))))
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
-              ("C-s" . dotemacs-quit-company-save-buffer)))
+              ("C-s" . dotemacs--quit-company-save-buffer)))
 
 (use-package company-flx
   :ensure t
