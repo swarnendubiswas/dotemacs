@@ -75,7 +75,8 @@
                        elpy-module-pyvenv
                        elpy-module-highlight-indentation
                        elpy-module-yasnippet
-                       elpy-module-sane-defaults))
+                       elpy-module-sane-defaults)
+        elpy-rpc-python-command "python3")
   (unbind-key "M-<left>" elpy-mode-map)
   (unbind-key "M-<right>" elpy-mode-map))
 

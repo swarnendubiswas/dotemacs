@@ -125,6 +125,18 @@
                                               (load-theme 'spacemacs-light t)
                                               (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))))
 
+      ((eq dotemacs-theme 'solarized-light) (use-package solarized
+                                              :ensure solarized-theme
+                                              :config
+                                              (setq solarized-distinct-fringe-background t)
+                                              (load-theme 'solarized-light t)))
+
+      ((eq dotemacs-theme 'solarized-dark) (use-package solarized
+                                             :ensure solarized-theme
+                                             :config
+                                             (setq solarized-distinct-fringe-background t)
+                                             (load-theme 'solarized-dark t)))
+
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"

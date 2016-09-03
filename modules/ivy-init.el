@@ -88,7 +88,8 @@
    ("<f2>" . counsel-find-file)
    ([remap load-theme] . counsel-load-theme)
    ([remap load-library] . counsel-load-library)
-   ([remap info-lookup-symbol] . counsel-info-lookup-symbol))
+   ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
+   ("C-<f9>" . dotemacs-counsel-goto-recent-directory))
   :config
   (setq counsel-mode-override-describe-bindings t
         counsel-find-file-at-point nil

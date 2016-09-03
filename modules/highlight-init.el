@@ -5,13 +5,16 @@
 
 ;;; Code:
 
+(defvar dotemacs-theme)
+
 (use-package hl-line ; Highlight current line
   :ensure t
   :config
   (setq hl-line-sticky-flag nil)
   (global-hl-line-mode 1)
-  (set-face-attribute 'hl-line nil
-                      :background "old lace"))
+  (unless (eq dotemacs-theme 'solarized-dark)
+    (set-face-attribute 'hl-line nil
+                        :background "old lace")))
 
 (use-package hl-line+ ; Highlight only when idle
   :ensure t

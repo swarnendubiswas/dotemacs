@@ -60,6 +60,8 @@
           (const :tag "professional" professional)
           (const :tag "eclipse" eclipse)
           (const :tag "spacemacs-light" spacemacs-light)
+          (const :tag "solarized-light" solarized-light)
+          (const :tag "solarized-dark" solarized-dark)
           (const :tag "default" default))
   :group 'dotemacs)
 
