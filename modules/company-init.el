@@ -78,6 +78,9 @@
   :ensure t
   :after company
   :config
+  (add-hook 'company-mode-hook
+            (lambda ()
+              (add-to-list 'company-backends 'company-capf)))
   (setq company-flx-limit 50)
   (company-flx-mode 1))
 
