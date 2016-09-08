@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+(defvar dotemacs-selection)
+
 (use-package projectile
   :ensure t
   :functions (projectile-find-file projectile-switch-project)
@@ -49,6 +52,10 @@
                   "\\.rel$"
                   "\\.rip$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes list))
+
+  ;; https://www.reddit.com/r/emacs/comments/320cvb/projectile_slows_tramp_mode_to_a_crawl_is_there_a/
+  (defadvice projectile-project-root (around ignore-remote first activate)
+    (unless (file-remote-p default-directory) ad-do-it))
 
   (when (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
     (bind-key "<f5>" #'projectile-switch-project)

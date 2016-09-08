@@ -11,7 +11,7 @@
   :config
   (use-package comint
     :config
-    (setq comint-scroll-to-bottom-on-input t   ;; Always insert at the bottom
+    (setq comint-scroll-to-bottom-on-input t ; Always insert at the bottom
           ;; No duplicates in command history
           comint-input-ignoredups t))
 
@@ -19,12 +19,12 @@
     :ensure t
     :config (shell-command-completion-mode 1))
 
-  ;; The following setup is from readline-complete package at
-  ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
-  ;; set up shell (not eshell) mode
-  (setq explicit-shell-file-name "fish"
-        explicit-bash-args '("-c" "export EMACS=; stty echo; fish")
+  ;; Set up shell (not eshell) mode: https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
+  (setq explicit-shell-file-name "bash"
+        explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+        shell-file-name explicit-shell-file-name
         comint-process-echoes t)
+  (setenv "SHELL" shell-file-name)
 
   (use-package readline-complete
     :ensure t

@@ -5,14 +5,13 @@
 
 ;;; Code:
 
-;; Use either python-mode or elpy or anaconda-mode.
-
 ;; Set PYTHONPATH
 (setenv "PYTHONPATH" "python3")
 
 (use-package python ; Emacs built-in python mode
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
+  :disabled t
   :config
   (setq python-shell-completion-native-enable nil
         python-shell-unbuffered nil))
@@ -21,12 +20,12 @@
   "Helper function for configuring python mode."
   (setq-default fill-column 78
                 python-indent-offset 4)
-  (setq python-shell-interpreter "python3")
-
+  (setq python-shell-interpreter "python3"
+        python-shell-completion-native-enable nil
+        python-shell-unbuffered nil)
   (turn-on-auto-fill)
   (flymake-mode-off)
   (run-python (python-shell-parse-command) nil nil)
-
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-chunk
       :ensure t
@@ -94,7 +93,7 @@
   :ensure t
   :disabled t
   :config
-  (setq py-autopep8-options '("--max-line-length=120"))
+  (setq py-autopep8-options '("--max-line-length=80"))
   (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
 
 (use-package pyimport

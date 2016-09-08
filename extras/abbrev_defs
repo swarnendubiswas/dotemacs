@@ -680,6 +680,7 @@
     ("initalization" "initialization" nil 0)
     ("instaleld" "installed" nil 0)
     ("insted" "instead" nil 0)
+    ("insturance" "insurance" nil 1)
     ("insurence" "insurance" nil 0)
     ("inteh" "in the" nil 0)
     ("interum" "interim" nil 0)
@@ -1338,6 +1339,8 @@
 (define-abbrev-table 'ps-mode-abbrev-table '())
 
 (define-abbrev-table 'ps-run-mode-abbrev-table '())
+
+(define-abbrev-table 'pydoc-mode-abbrev-table '())
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 

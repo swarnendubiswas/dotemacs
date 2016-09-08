@@ -60,6 +60,7 @@
 
     (use-package nlinum ; Might improve performance with jit font locking.
       :ensure t
+      :disabled t
       :config
       (global-nlinum-mode 1)
       (setq nlinum-highlight-current-line t)))

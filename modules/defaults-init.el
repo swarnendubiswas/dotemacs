@@ -98,6 +98,11 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
+(use-package mouse
+  :config
+  ;; Text selected with the mouse is automatically copied to the clipboard.
+  (setq mouse-drag-copy-region t))
+
 (use-package xt-mouse ; Mouse cursor in terminal mode
   :config (xterm-mouse-mode -1))
 
@@ -140,7 +145,8 @@
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "biswass"
         tramp-default-host "stdlinux.cse.ohio-state.edu"
-        tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
+       	;; Auto-save to a local directory for better performance
+        tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save") 
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
         tramp-ssh-controlmaster-options ""
         tramp-verbose 1)
@@ -187,15 +193,18 @@
                 desktop-load-locked-desktop nil))
 
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
+  :disabled t
   :config (global-font-lock-mode 1))
 
 (use-package font-lock
+  :disabled t
   :config
   (setq font-lock-maximum-decoration t ; Maximum fontification possible
         ;; Jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock
+  :disabled t
   :config
   (setq jit-lock-defer-time 0.10 ; Improve scrolling speed with jit fontification
         jit-lock-stealth-time 10
@@ -203,7 +212,7 @@
         jit-lock-stealth-nice 0.5))
 
 (use-package hi-lock ; Custom regexp highlights
-  :defer t
+  :disabled t
   :config
   (setq hi-lock-auto-select-face t)
   (global-hi-lock-mode 1)
