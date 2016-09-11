@@ -12,33 +12,39 @@
 ;; (define-key global-map (kbd "RET") 'newline-and-indent)                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(bind-key "RET" #'newline-and-indent)
-(bind-key "C-l" #'goto-line)
-(bind-key "C-c z" #'repeat)
-(bind-key "C-z" #'undo)
+(bind-keys
+ ("RET" . newline-and-indent)
+ ("C-l" . goto-line)
+ ("C-c z" . repeat)
+ ("C-z" . undo))
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the comment, NOT UNCOMMENTING
 ;; but removing all commentted text and the comment marker itself.
-(bind-key "C-c n" #'comment-region)
-(bind-key "C-c m" #'uncomment-region)
-(bind-key* "C-c ;" #'dotemacs-comment-line)
-(bind-key* "C-c b" #'comment-box) ; Overrides bib-cite keys
+(bind-keys*
+ ("C-c n" . comment-region)
+ ("C-c m" . uncomment-region)
+ ("C-c ;" . dotemacs-comment-line)
+ ("C-c b" . comment-box))
 
-(bind-key "<f10>" #'other-window) ; Switch to the other buffer
-(bind-key "<f11>" #'delete-other-windows)
+(bind-keys
+ ("<f10>" . other-window) ; Switch to the other buffer
+ ("<f11>" . delete-other-windows))
 
-(bind-key "<f12>" #'dotemacs-kill-other-buffers) ; Kill all non-special buffers
-(bind-key* "C-s" #'save-buffer)
-(bind-key* "C-S-s" #'dotemacs-save-all-buffers)
+(bind-keys*
+ ("<f12>" . dotemacs-kill-other-buffers) ; Kill all non-special buffers
+ ("C-s" . save-buffer)
+ ("C-S-s" . dotemacs-save-all-buffers))
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'dotemacs-switch-to-scratch)
 
-(bind-key "C-+" #'text-scale-increase)
-(bind-key "C--" #'text-scale-decrease)
+(bind-keys
+ ("C-+" #'text-scale-increase)
+ ("C--" #'text-scale-decrease))
 
-(bind-key "C-c d b" #'dotemacs-byte-compile-current-file)
-(bind-key "C-c d i" #'dotemacs-byte-compile-init-dir)
-(bind-key "C-c d n" #'package-list-packages-no-fetch)
+(bind-keys
+ ("C-c d b" . dotemacs-byte-compile-current-file)
+ ("C-c d i" . dotemacs-byte-compile-init-dir)
+ ("C-c d n" . package-list-packages-no-fetch))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
