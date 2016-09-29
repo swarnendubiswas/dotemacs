@@ -80,7 +80,8 @@
 (use-package counsel-projectile
   :ensure t
   :if (eq dotemacs-selection 'ivy)
-  :bind (("<f5>" . counsel-projectile)
+  :config (counsel-projectile-on)
+  :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-switch-to-buffer)
          ;; projectile-grep fails with fish shell

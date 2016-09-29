@@ -35,7 +35,7 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-line
         ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
-        ivy-re-builders-alist '((t . ivy--regex-ignore-order)) ; ivy--regex-fuzzy adds noise
+        ivy-re-builders-alist '((t . ivy--regex-ignore-order)) ; Allow input in any order, ivy--regex-fuzzy adds noise
         ivy-flx-limit 200
         ;; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-ignore-default 'always)
@@ -58,7 +58,10 @@
    :map ivy-minibuffer-map
    ("<return>" . ivy-alt-done)
    ("<left>" . ivy-previous-line)
-   ("<right>" . ivy-next-line))
+   ("<right>" . ivy-next-line)
+   ;; http://pragmaticemacs.com/emacs/counsel-yank-pop-with-a-tweak/
+   :map ivy-minibuffer-map
+   ("M-y" . ivy-next-line))
   :diminish ivy-mode)
 
 (use-package counsel

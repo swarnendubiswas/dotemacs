@@ -28,7 +28,8 @@
 
 (bind-keys
  ("<f10>" . other-window) ; Switch to the other buffer
- ("<f11>" . delete-other-windows))
+ ("<f11>" . delete-other-windows)
+ ("C-x k" . kill-this-buffer))
 
 (bind-keys*
  ("<f12>" . dotemacs-kill-other-buffers) ; Kill all non-special buffers
