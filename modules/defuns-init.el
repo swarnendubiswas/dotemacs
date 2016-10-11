@@ -1,4 +1,4 @@
-;;; custom-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; defuns-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Contains custom or temporary definitions.
@@ -13,7 +13,6 @@
   (interactive)
   (save-some-buffers t))
 
-;; Kill all non-special buffers but the current one
 (defun dotemacs-kill-other-buffers ()
   "Kill all buffers but the current one.
 Don't mess with special buffers."
@@ -91,6 +90,6 @@ Increase line spacing by two line height."
   (let ((TeX-save-query nil)) (TeX-save-document ""))
   (TeX-command-menu "LaTeXMk"))
 
-(provide 'custom-init)
+(provide 'defuns-init)
 
-;;; custom-init.el ends here
+;;; defuns-init.el ends here

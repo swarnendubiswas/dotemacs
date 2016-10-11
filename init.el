@@ -133,7 +133,7 @@
 ;; FIXME: For some reason, this needed to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
 ;; not enabled on startup.
 (require 'tags-init)
-(require 'custom-init)
+(require 'defuns-init)
 
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
 

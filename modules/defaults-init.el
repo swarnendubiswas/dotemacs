@@ -87,7 +87,10 @@
         make-backup-files nil ; Stop making backup ~ files
         backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
         auto-save-default t
-        confirm-kill-emacs nil))
+        confirm-kill-emacs nil)
+  (when (and (>= emacs-major-version 26)
+             (>= emacs-minor-version 1))
+    (confirm-kill-processes nil)))
 
 ;; Enable use of system clipboard across Emacs and other applications.
 (if (and (>= emacs-major-version 25)
@@ -116,6 +119,8 @@
   (setq save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
                                         ; real paste after some kill action, that will erase the clipboard, so we need
                                         ; to save it to kill ring. Paste it using "C-y M-y".
+        ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
+        extended-command-suggest-shorter nil
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking
@@ -146,7 +151,7 @@
         tramp-default-user "biswass"
         tramp-default-host "stdlinux.cse.ohio-state.edu"
        	;; Auto-save to a local directory for better performance
-        tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save") 
+        tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
         tramp-ssh-controlmaster-options ""
         tramp-verbose 1)

@@ -24,6 +24,10 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
+(defcustom dotemacs-emacs-custom-file (concat dotemacs-temp-directory "custom.el")
+  "File to write Emacs customizations."
+  :group 'dotemacs)
+
 (defcustom dotemacs-completion-in-buffer
   'company
   "Choose company or auto-complete for in-buffer completion."

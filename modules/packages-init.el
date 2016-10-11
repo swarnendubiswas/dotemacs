@@ -69,6 +69,12 @@
         paradox-spinner-type 'random)
   (paradox-enable))
 
+(use-package cus-edit
+  :config
+  ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
+  (setq custom-file dotemacs-emacs-custom-file)
+  (load custom-file :noerror))
+
 (provide 'packages-init)
 
 ;;; packages-init.el ends here
