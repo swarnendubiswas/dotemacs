@@ -140,12 +140,17 @@
         reftex-auto-update-selection-buffers t
         reftex-enable-partial-scans t
         reftex-allow-automatic-rescan t
-        reftex-default-bibliography '("~/workspace/bib/plass.bib")
         reftex-idle-time 0.5
         reftex-toc-follow-mode t
         reftex-use-fonts t
         reftex-highlight-selection 'both)
-
+  (if (string-equal (system-name) "rain.cse.ohio-state.edu")
+      (setq reftex-default-bibliography '("/workspace/plass-workspace/bib/plass.bib"
+                                          "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
+                                          "/workspace/iss-workspace/bibtex/iss.bib"))
+    (setq reftex-default-bibliography '("~/plass-workspace/bib/plass.bib"
+                                        "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
+                                        "~/iss-workspace/bibtex/iss.bib")))
   (use-package reftex-cite
     :preface
     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -195,17 +200,24 @@
 (use-package parsebib
   :ensure t)
 
+(use-package bibtex-completion
+  :if (or (eq dotemacs-selection 'helm) (eq dotemacs-selection 'ivy))
+  :config
+  (setq bibtex-completion-cite-prompt-for-optional-arguments nil
+        bibtex-completion-cite-default-as-initial-input t)
+  (if (string-equal (system-name) "rain.cse.ohio-state.edu")
+      (setq bibtex-completion-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
+                                             "/workspace/iss-workspace/bibtex/iss.bib"
+                                             "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"))
+    (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
+                                           "~/iss-workspace/bibtex/iss.bib"
+                                           "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"))))
+
 (use-package helm-bibtex
   :ensure t
   :if (eq dotemacs-selection 'helm)
   :bind ("C-c l x" . helm-bibtex)
   :config
-  (use-package bibtex-completion
-    :config
-    (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-          bibtex-completion-cite-prompt-for-optional-arguments nil
-          bibtex-completion-cite-default-as-initial-input t))
-
   (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
   (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
   (setq helm-bibtex-full-frame t))
@@ -215,25 +227,7 @@
   :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
   :config
-  (use-package bibtex-completion
-    :config
-    (setq bibtex-completion-bibliography '("/home/biswass/workspace/bib/plass-formatted.bib")
-          bibtex-completion-cite-prompt-for-optional-arguments nil
-          bibtex-completion-cite-default-as-initial-input t))
-
-  (defun ivy-bibtex (&optional arg)
-    "Search BibTeX entries using ivy.
-
-With a prefix ARG the cache is invalidated and the bibliography
-reread."
-    (interactive "P")
-    (when arg
-      (setq bibtex-completion-bibliography-hash ""))
-    (bibtex-completion-init)
-    (ivy-read "BibTeX Items: "
-              (bibtex-completion-candidates 'ivy-bibtex-candidates-formatter)
-              :caller 'ivy-bibtex
-              :action 'bibtex-completion-insert-key)))
+  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
 
 (use-package outline
   :ensure t

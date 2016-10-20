@@ -85,7 +85,7 @@
    ([remap describe-variable] . counsel-describe-variable)
    ([remap yank-pop] . counsel-yank-pop)
    ([remap describe-bindings] . counsel-descbinds)
-   ([remap execute-extended-command] . counsel-M-x)
+   ;; ([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
@@ -96,6 +96,7 @@
   :config
   (setq counsel-mode-override-describe-bindings t
         counsel-find-file-at-point nil
+        counsel-yank-pop-separator "\n-----------------\n"
         counsel-find-file-ignore-regexp (concat
                                          "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                          "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
@@ -103,6 +104,9 @@
                                          "\\|.aux$"
                                          "\\|.bbl$"
                                          "\\|.blg$"
+                                         "\\|.cb$"
+                                         "\\|.cb2$"
+                                         "\\|.dvi$"
                                          "\\|.elc$"
                                          "\\|.fdb_latexmk$"
                                          "\\|.fls$"

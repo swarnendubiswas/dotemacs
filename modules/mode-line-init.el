@@ -65,6 +65,7 @@
                                                      major-mode
                                                      (process :when active)
                                                      ((flycheck-error flycheck-warning flycheck-info) :when active)
+                                                     (paradox-menu :when active)
                                                      (minor-modes :when active)
                                                      ((nyan-cat buffer-position) :separator " | "))
                                                    ;; Right segment

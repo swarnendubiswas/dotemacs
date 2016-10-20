@@ -174,7 +174,10 @@
   :ensure t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
   :config
-  (dolist (ext '(".fls"
+  (dolist (ext '(".cb"
+                 ".cb2"
+                 ".dvi"
+                 ".fls"
                  ".idx"
                  ".log"
                  ".out"
@@ -239,7 +242,8 @@
   (crux-with-region-or-buffer indent-region)
   (crux-with-region-or-buffer untabify)
   (crux-with-region-or-line comment-or-uncomment-region)
-  :bind (("C-c i" . crux-ispell-word-then-abbrev)
+  :bind (("C-c o" . crux-open-with)
+         ("C-c i" . crux-ispell-word-then-abbrev)
          ("C-c C-r" . crux-recentf-find-file)))
 
 (provide 'misc-init)

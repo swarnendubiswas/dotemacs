@@ -214,6 +214,10 @@
     :ensure t)
   :diminish eldoc-mode)
 
+(use-package focus
+  :ensure t
+  :config (add-hook 'prog-mode-hook #'focus-mode))
+
 (provide 'prog-init)
 
 ;;; prog-init.el ends here
