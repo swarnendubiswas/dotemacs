@@ -1,1 +1,4 @@
 *.elc
+elpa
+tmp
+auto-save-list
