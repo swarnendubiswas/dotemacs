@@ -8,14 +8,6 @@
 ;; Set PYTHONPATH
 (setenv "PYTHONPATH" "python3")
 
-(use-package python ; Emacs built-in python mode
-  :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python" . python-mode)
-  :disabled t
-  :config
-  (setq python-shell-completion-native-enable nil
-        python-shell-unbuffered nil))
-
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."
   (setq-default fill-column 78
@@ -76,6 +68,8 @@
                        elpy-module-yasnippet
                        elpy-module-sane-defaults)
         elpy-rpc-python-command "python3")
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook #'flycheck-mode)
   (unbind-key "M-<left>" elpy-mode-map)
   (unbind-key "M-<right>" elpy-mode-map))
 
@@ -91,10 +85,9 @@
 
 (use-package py-autopep8
   :ensure t
-  :disabled t
   :config
   (setq py-autopep8-options '("--max-line-length=80"))
-  (add-hook 'python-mode-hook #'py-autopep8-enable-on-save))
+  (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
 (use-package pyimport
   :ensure t)

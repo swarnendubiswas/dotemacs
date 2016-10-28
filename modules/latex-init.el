@@ -226,7 +226,17 @@
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
+  :config
+  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
+
+(use-package company-bibtex
+  :ensure t
+  :if (eq dotemacs-completion-in-buffer 'company)
+  :config
+  (add-to-list 'company-backends 'company-bibtex)
+  (setq company-bibtex-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
+                                      "/workspace/iss-workspace/bibtex/iss.bib"
+                                      "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
 
 (use-package outline
   :ensure t

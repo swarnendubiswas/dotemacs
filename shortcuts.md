@@ -172,7 +172,9 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-s p` - Insert pre-formatted code blocks.
 * `C-c -` - Insert a horizontal rule.
 
-## GGtags/Etags/Ctags
+## GGtags
+
+See the requirements: [https://github.com/leoliu/ggtags][]
 
 * `M-.` - Jump to tag underneath cursor (`find-tags`).
 * `M-*` - Pop back to where you previously invoked `M-.`.

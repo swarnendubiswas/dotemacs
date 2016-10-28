@@ -9,6 +9,7 @@
 
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
+      ;; Avoid loading packages twice
       package-enable-at-startup nil)
 
 ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured

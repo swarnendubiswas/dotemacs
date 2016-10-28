@@ -80,6 +80,10 @@
   :commands dired-narrow
   :config (bind-key "/" #'dired-narrow dired-mode-map))
 
+(use-package dired-icon
+  :ensure t
+  :init (add-hook 'dired-mode-hook 'dired-icon-mode))
+
 (provide 'dired-init)
 
 ;;; dired-init ends here

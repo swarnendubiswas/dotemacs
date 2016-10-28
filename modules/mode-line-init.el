@@ -84,11 +84,11 @@
                                                     (spaceline-helm-mode))
                                                   (spaceline-info-mode)
 
-                                                  ;; (when (eq dotemacs-theme 'spacemacs-light)
-                                                  ;;   (set-face-attribute 'powerline-active1 nil
-                                                  ;;                       :background "gray22"
-                                                  ;;                       :foreground "white"
-                                                  ;;                       :weight 'light))
+                                                  (when (eq dotemacs-theme 'spacemacs-light)
+                                                    (set-face-attribute 'powerline-active1 nil
+                                                                        :background "gray22"
+                                                                        :foreground "white"
+                                                                        :weight 'light))
 
                                                   ;; (when (eq dotemacs-theme 'leuven)
                                                   ;;   (set-face-attribute 'powerline-active1 nil
