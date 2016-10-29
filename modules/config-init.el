@@ -1,7 +1,7 @@
 ;;; config-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup configuration variables.
+;; Set configuration variables.
 
 ;;; Code:
 
@@ -11,14 +11,17 @@
 
 (defcustom dotemacs-temp-directory (concat user-emacs-directory "tmp/")
   "Storage location for various configuration files."
+  :type 'string
   :group 'dotemacs)
 
 (defcustom dotemacs-extras-directory (concat user-emacs-directory "extras/")
   "Directory listing third-party packages and files."
+  :type 'string
   :group 'dotemacs)
 
 (defcustom dotemacs-modules-directory (concat user-emacs-directory "modules/")
   "Directory containing setup files for customized configuration."
+  :type 'string
   :group 'dotemacs)
 
 (unless (file-exists-p dotemacs-temp-directory)
@@ -26,6 +29,7 @@
 
 (defcustom dotemacs-emacs-custom-file (concat dotemacs-temp-directory "custom.el")
   "File to write Emacs customizations."
+  :type 'string
   :group 'dotemacs)
 
 (defcustom dotemacs-completion-in-buffer

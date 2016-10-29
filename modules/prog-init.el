@@ -220,15 +220,20 @@
 
 (use-package matlab-mode
   :ensure t
-  :mode ("\\.m\\'" . matlab-mode)
   :config
   ;; Can optionally setup CEDET support with (matlab-cedet-setup)
   (setq matlab-indent-function t))
 
+(use-package octave
+  :mode ("\\.m\\'" . octave-mode))
+
 (use-package ess
   :ensure t
   :config
-  (setq inferior-R-args "--quiet --no-restore-history --no-save")
+  (setq inferior-R-args "--quiet --no-restore-history --no-save"
+        ess-indent-level 4
+        ess-arg-function-offset 4
+        ess-else-offset 4)
   (use-package ess-smart-underscore
     :ensure t))
 

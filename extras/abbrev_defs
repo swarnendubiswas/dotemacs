@@ -5,6 +5,40 @@
 
 (define-abbrev-table 'Info-edit-mode-abbrev-table '())
 
+(define-abbrev-table 'Rd-mode-abbrev-table
+  '(
+    ("`ag" "\\arguments" nil 0)
+    ("`al" "\\alias" nil 0)
+    ("`au" "\\author" nil 0)
+    ("`bf" "\\bold" nil 0)
+    ("`co" "\\code" nil 0)
+    ("`de" "\\describe" nil 0)
+    ("`dn" "\\description" nil 0)
+    ("`dt" "\\details" nil 0)
+    ("`em" "\\emph" nil 0)
+    ("`en" "\\enumerate" nil 0)
+    ("`ex" "\\examples" nil 0)
+    ("`fi" "\\file" nil 0)
+    ("`fo" "\\format" nil 0)
+    ("`it" "\\item" nil 0)
+    ("`iz" "\\itemize" nil 0)
+    ("`kw" "\\keyword" nil 0)
+    ("`li" "\\link" nil 0)
+    ("`me" "\\method" nil 0)
+    ("`na" "\\name" nil 0)
+    ("`no" "\\note" nil 0)
+    ("`re" "\\references" nil 0)
+    ("`sa" "\\seealso" nil 0)
+    ("`se" "\\section" nil 0)
+    ("`so" "\\source" nil 0)
+    ("`ss" "\\subsection" nil 0)
+    ("`sy" "\\synopsis" nil 0)
+    ("`ta" "\\tabular" nil 0)
+    ("`ti" "\\title" nil 0)
+    ("`us" "\\usage" nil 0)
+    ("`va" "\\value" nil 0)
+   ))
+
 (define-abbrev-table 'TeX-error-overview-mode-abbrev-table '())
 
 (define-abbrev-table 'TeX-output-mode-abbrev-table '())
@@ -13,9 +47,7 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'awk-mode-abbrev-table '())
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -31,13 +63,9 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'c++-mode-abbrev-table '())
 
-(define-abbrev-table 'c-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'c-mode-abbrev-table '())
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
@@ -90,6 +118,8 @@
 (define-abbrev-table 'epa-key-mode-abbrev-table '())
 
 (define-abbrev-table 'eshell-mode-abbrev-table '())
+
+(define-abbrev-table 'ess-julia-mode-abbrev-table '())
 
 (define-abbrev-table 'fish-mode-abbrev-table '())
 
@@ -813,7 +843,6 @@
     ("onde" "node" nil 1)
     ("oneof" "one of" nil 0)
     ("onepoint" "one point" nil 0)
-    ("online" "on-line" nil 0)
     ("ont he" "on the" nil 0)
     ("onthe" "on the" nil 0)
     ("onyl" "only" nil 0)
@@ -1271,15 +1300,15 @@
 
 (define-abbrev-table 'image-dired-thumbnail-mode-abbrev-table '())
 
+(define-abbrev-table 'inferior-julia-mode-abbrev-table '())
+
 (define-abbrev-table 'inferior-python-mode-abbrev-table '())
 
 (define-abbrev-table 'ivy-occur-grep-mode-abbrev-table '())
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'java-mode-abbrev-table '())
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
@@ -1292,6 +1321,8 @@
 (define-abbrev-table 'jdee-run-mode-abbrev-table '())
 
 (define-abbrev-table 'jgraph-mode-abbrev-table '())
+
+(define-abbrev-table 'julia-mode-abbrev-table '())
 
 (define-abbrev-table 'latex-math-preview-expression-mode-abbrev-table '())
 
@@ -1319,9 +1350,7 @@
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'objc-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -1343,9 +1372,7 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'pike-mode-abbrev-table '())
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 
@@ -1371,9 +1398,7 @@
 
 (define-abbrev-table 'reftex-select-label-mode-abbrev-table '())
 
-(define-abbrev-table 'rst-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'rst-mode-abbrev-table '())
 
 (define-abbrev-table 'rst-toc-mode-abbrev-table '())
 

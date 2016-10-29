@@ -61,10 +61,9 @@
   :bind (("C-c d p" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages)
          ("C-c d P" . package-list-packages))
-  :init
+  :config
   (use-package async
     :ensure t)
-  :config
   (setq paradox-execute-asynchronously t
         paradox-github-token t
         paradox-spinner-type 'random)

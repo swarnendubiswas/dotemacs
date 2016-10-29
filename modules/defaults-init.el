@@ -18,12 +18,10 @@
       create-lockfiles nil
       message-log-max 5000
       line-number-display-limit 2000000
-      ;; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
-      ring-bell-function 'ignore
+      ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
       x-underline-at-descent-line t ; Draw underline lower
       completion-ignore-case t ; Ignore case when completing
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
-      ;; Do not use dialog boxes
       use-dialog-box nil
       use-file-dialog nil
       enable-recursive-minibuffers t
@@ -33,11 +31,19 @@
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t
       ;; Disabling this is one way to speed up Emacs with buffers with long lines
-      bidi-display-reordering nil)
-
-;; Ignore case when reading a file name completion
-(setq read-file-name-completion-ignore-case t
+      bidi-display-reordering nil
+      ;; Ignore case when reading a file name completion
+      read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t)
+
+(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
+                                        ; fundamental-mode
+              sentence-end-double-space nil
+              truncate-lines nil
+              truncate-partial-width-windows nil
+              history-length 50
+              history-delete-duplicates t)
+
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
   (dolist (ext '("auto/"
@@ -63,14 +69,6 @@
                  ".rip"
                  ".toc"))
     (add-to-list 'completion-ignored-extensions ext)))
-
-(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
-                                        ; fundamental-mode
-              sentence-end-double-space nil
-              truncate-lines nil
-              truncate-partial-width-windows nil
-              history-length 50
-              history-delete-duplicates t)
 
 (when (eq system-type 'windows-nt)
   (setq locale-coding-system 'utf-8)
@@ -164,10 +162,8 @@
   ;; Disable version control. If you access remote files which are not under version control, a lot of check operations
   ;; can be avoided by disabling VC.
   ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp))
+  (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
+                                     tramp-file-name-regexp))
   (use-package password-cache
     :config (setq password-cache-expiry nil)))
 
@@ -200,6 +196,7 @@
   (setq-default desktop-restore-frames nil ; No need to restore frames
                 desktop-load-locked-desktop nil))
 
+;; I have turned this off to help with performance.
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
   :disabled t
   :config (global-font-lock-mode 1))
@@ -252,7 +249,7 @@
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
-  :init
+  :config
   (setq uniquify-buffer-name-style 'forward ; Options: post-forward, reverse, forward
         uniquify-separator "/"
         uniquify-ignore-buffers-re "^\\*"
@@ -278,7 +275,7 @@
 
 (use-package subword
   :diminish subword-mode
-  :init (global-subword-mode 1))
+  :config (global-subword-mode 1))
 
 ;; Set Emacs split to horizontal or vertical
 ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal

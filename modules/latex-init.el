@@ -69,7 +69,9 @@
 
 (use-package auctex-latexmk
   :ensure t
+  :disabled t
   :config
+  (setq auctex-latexmk-inherit-TeX-Ps9DF-mode t)
   (auctex-latexmk-setup)
   (add-hook 'LaTeX-mode-hook
             (lambda ()
