@@ -57,7 +57,7 @@
                                                         spaceline-projectile-root-p t)
                                                   ;; Adapted from https://github.com/lunaryorn/.emacs.d/blob/master/init.el
                                                   (spaceline-compile
-                                                   'biswass
+                                                   'compact
                                                    ;; Left side of the mode line
                                                    '(((buffer-modified buffer-size) :face highlight-face)
                                                      anzu
@@ -69,7 +69,8 @@
                                                      (minor-modes :when active)
                                                      ((nyan-cat buffer-position) :separator " | "))
                                                    ;; Right segment
-                                                   '(((which-function projectile-root) :separator " | ")
+                                                   '(;;((which-function projectile-root) :separator " | ")
+                                                     (which-function :when active)
                                                      (version-control :when active)
                                                      (battery :when active)
                                                      selection-info
@@ -78,7 +79,7 @@
                                                      (global :when active)
                                                      ,@additional-segments
                                                      hud))
-                                                  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-biswass))))
+                                                  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-compact))))
 
                                                   (when (eq dotemacs-selection 'helm)
                                                     (spaceline-helm-mode))

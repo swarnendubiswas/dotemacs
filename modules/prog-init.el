@@ -215,8 +215,7 @@
   :diminish eldoc-mode)
 
 (use-package focus
-  :ensure t
-  :config (add-hook 'prog-mode-hook #'focus-mode))
+  :ensure t)
 
 (use-package matlab-mode
   :ensure t

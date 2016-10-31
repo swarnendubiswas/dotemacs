@@ -9,7 +9,7 @@
 
 ;; Better frame title
 (setq frame-title-format
-      (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" system-name))
+      (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" (system-name)))
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
@@ -70,19 +70,7 @@
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
-                                     :config
-                                     (load-theme 'leuven t)
-                                     ;; (set-face-attribute 'mode-line nil
-                                     ;;                     :background "grey70"
-                                     ;;                     :foreground "black")
-                                     ;; (set-face-attribute 'mode-line-inactive nil
-                                     ;;                     :background "grey70"
-                                     ;;                     :foreground "black")
-                                     ;; (set-face-attribute 'mode-line-buffer-id nil
-                                     ;;                     :weight 'bold
-                                     ;;                     :foreground "black"
-                                     ;;                     :inherit 'mode-line)
-                                     ))
+                                     :config (load-theme 'leuven t)))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
