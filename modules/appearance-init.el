@@ -126,6 +126,10 @@
                                              (setq solarized-distinct-fringe-background t)
                                              (load-theme 'solarized-dark t)))
 
+      ((eq dotemacs-theme 'zenburn) (use-package zenburn-theme
+                                      :ensure t
+                                      :config (load-theme 'zenburn t)))
+
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"

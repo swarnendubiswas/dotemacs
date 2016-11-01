@@ -70,6 +70,7 @@
           (const :tag "spacemacs-light" spacemacs-light)
           (const :tag "solarized-light" solarized-light)
           (const :tag "solarized-dark" solarized-dark)
+          (const :tag "zenburn" zenburn)
           (const :tag "default" default))
   :group 'dotemacs)
 

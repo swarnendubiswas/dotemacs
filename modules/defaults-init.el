@@ -197,7 +197,6 @@
   (setq-default desktop-restore-frames nil ; No need to restore frames
                 desktop-load-locked-desktop nil))
 
-;; I have turned this off to help with performance.
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
   :disabled t
   :config (global-font-lock-mode 1))

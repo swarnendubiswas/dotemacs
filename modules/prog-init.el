@@ -217,14 +217,14 @@
 (use-package focus
   :ensure t)
 
+(use-package octave
+  :mode ("\\.m\\'" . octave-mode))
+
 (use-package matlab-mode
   :ensure t
   :config
   ;; Can optionally setup CEDET support with (matlab-cedet-setup)
   (setq matlab-indent-function t))
-
-(use-package octave
-  :mode ("\\.m\\'" . octave-mode))
 
 (use-package ess
   :ensure t
