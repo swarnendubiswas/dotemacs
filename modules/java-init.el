@@ -40,9 +40,9 @@
   :ensure t
   :init
   (use-package eclimd)
-  (setq eclim-eclipse-dirs "/home/biswass/software/eclipse-neon-java/"
-        eclim-executable "/home/biswass/software/eclipse-neon-java/eclim"
-        eclim-default-workspace "/home/biswass/workspace"
+  (setq eclim-eclipse-dirs "/home/sbiswas/software/eclipse-neon-java/"
+        eclim-executable "/home/sbiswas/software/eclipse-neon-java/eclim"
+        eclim-default-workspace "/home/sbiswas/workspace"
         eclim-auto-save t)
   (add-hook 'java-mode-hook #'eclim-mode)
   :config 

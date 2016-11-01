@@ -61,6 +61,7 @@
                  ".lof"
                  ".log"
                  ".lot"
+                 ".o"
                  ".out"
                  ".pdf"
                  "-pkg.el"

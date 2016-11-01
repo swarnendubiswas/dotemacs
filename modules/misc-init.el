@@ -180,6 +180,7 @@
                  ".fls"
                  ".idx"
                  ".log"
+                 ".o"
                  ".out"
                  ".pdf"
                  "-pkg.el"

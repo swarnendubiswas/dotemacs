@@ -18,6 +18,8 @@
 ;; java: The default style for java-mode (see below)
 ;; user: When you want to define your own style
 
+(defvar dotemacs-completion-in-buffer)
+
 (setq c-default-style '((java-mode . "java")
                         (c++-mode . "stroustrup")
                         (other . "gnu/linux")
@@ -74,7 +76,7 @@
     (if (string-equal system-name "rain.cse.ohio-state.edu")
         (progn
           (semantic-add-system-include "/usr/include/boost148" 'c++-mode)
-          (semantic-add-system-include "/home/biswass/intel-pintool/source/include/pin" 'c++-mode))
+          (semantic-add-system-include "/home/sbiswas/intel-pintool/source/include/pin" 'c++-mode))
       (progn
         (semantic-add-system-include "/usr/include/boost")))
     (fa-config-default)
@@ -106,15 +108,15 @@
     :if (eq dotemacs-completion-in-buffer 'company)
     :config
     (add-to-list 'company-backends #'company-c-headers)
-    (add-to-list 'company-clang-arguments "-I/home/biswass/intel-pintool/source/include/pin")
-    (add-to-list 'company-clang-arguments "-I/home/biswass/intel-pintool/lib/boost_1_58_0/boost")
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/source/include/pin")
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
     (add-to-list 'company-c-headers-path-system "/usr/include/")
-    (cond ((string-equal system-name "rain.cse.ohio-state.edu")
+    (cond ((string-equal (system-name) "rain.cse.ohio-state.edu")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
-           (add-to-list 'company-c-headers-path-system "/home/biswass/intel-pintool/lib/boost_1_58_0/boost")
-           (add-to-list 'company-c-headers-path-system "/home/biswass/intel-pintool/source/include/pin"))
+           (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
+           (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/source/include/pin"))
 
-          ((string-equal system-name "biswass-Dell-System-XPS-L502X")
+          ((string-equal system-name "sbiswas-Dell-System-XPS-L502X")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/"))))
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
