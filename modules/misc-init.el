@@ -11,8 +11,7 @@
   :ensure t)
 
 (use-package help-fns+ ; Improved help commands
-  :ensure t
-  :commands (describe-buffer describe-command describe-file describe-keymap))
+  :ensure t)
 
 (use-package help-mode+
   :ensure t)
@@ -50,12 +49,10 @@
   :bind ("C-c d m" . manage-minor-mode))
 
 (use-package jgraph-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package graphviz-dot-mode
   :ensure t
-  :defer t
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot
@@ -68,12 +65,10 @@
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package pos-tip
-  :ensure t
-  :defer t)
+  :ensure t)
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
@@ -135,8 +130,7 @@
 
 (use-package sudo-edit ; Edit file with sudo
   :ensure t
-  :bind (("M-s e" . sudo-edit)
-         ("M-s c" . sudo-edit-current-file)))
+  :bind ("M-s e" . sudo-edit))
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
@@ -151,7 +145,6 @@
 
 (use-package expand-line
   :ensure t
-  :defines expand-line-mode
   :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package smart-mark ; Restore point with "C-g" after marking a region
@@ -218,11 +211,11 @@
             ;; `current-word' can of course be replaced by other functions.
             (narrow-to-defun)
             (iedit-start (current-word) (point-min) (point-max)))))))
-  :init (bind-key* "C-." #'iedit-mode))
+  :bind* ("C-." #'iedit-mode))
 
 (use-package session
   :ensure t
-  :init
+  :config
   (add-hook 'after-init-hook #'session-initialize)
   (setq session-save-file (concat dotemacs-temp-directory "session")))
 
