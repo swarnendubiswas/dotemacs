@@ -24,7 +24,7 @@
     (interactive)
     (isearch-exit)
     (goto-char isearch-other-end))
-  :init
+  :config
   (unbind-key "C-s") ; isearch-forward-regexp
   (unbind-key "C-s" isearch-mode-map) ; isearch-repeat-forward
   (setq search-highlight t ; Highlight incremental search
@@ -50,6 +50,7 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
+  :disabled t
   :preface
   ;; For certain files with long lines, the results in the swiper buffer is truncated to the right. These wrapper
   ;; methods are to get around that problem.
@@ -67,12 +68,11 @@
     (swiper-all)
     (visual-line-mode -1))
   :bind ("C-c r" . ivy-resume)
-  :init
+  :config
   (when (not (eq dotemacs-selection 'ivy))
     (progn
       (setq ivy-height 20)
       (bind-key "<f4>" #'swiper)))
-  :config
   (setq swiper-use-visual-line t
         swiper-action-recenter t))
 
@@ -113,8 +113,9 @@
 
 (use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
   :ensure wgrep
-  :init
-  (use-package wgrep)
+  :config
+  (use-package wgrep
+    :config (setq wgrep-auto-save-buffer t))
   (add-hook 'ag-mode-hook #'wgrep-ag-setup))
 
 (use-package grep
@@ -143,12 +144,14 @@
 
 (use-package swoop
   :ensure t
+  :disabled t
   :config (setq swoop-use-target-magnifier t
                 swoop-use-target-magnifier-size 1.2))
 
 ;; "C-c C-e" to go into edit mode
 (use-package helm-swoop
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'helm)
   :bind
   (("C-c h s" . helm-swoop)

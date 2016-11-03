@@ -17,8 +17,11 @@
         ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
         ibuffer-use-header-line t
         ibuffer-display-summary t
-        ibuffer-case-fold-search t ; Ignore case when searching
-        ibuffer-show-empty-filter-groups nil)
+        ;; Ignore case when searching
+        ibuffer-case-fold-search t)
+
+  (use-package ibuf-ext
+    :config (setq ibuffer-show-empty-filter-groups nil))
 
   (setq ibuffer-formats
         '((mark modified read-only " "

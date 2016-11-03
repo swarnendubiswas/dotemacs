@@ -7,7 +7,6 @@
 
 ;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
-  :functions (dired-mark dired-unmark dired-unmark-all-marks dired-toggle-marks dired-prev-marked-file dired-next-marked-file dired-copy-filename-as-kill)
   :preface
   (defun dired-go-home ()
     (interactive)
@@ -32,8 +31,7 @@
   (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you visit it
         dired-recursive-deletes 'always ; Single prompt for all n directories
         dired-recursive-copies 'always
-        ;; Check ls for additional options
-        dired-listing-switches "-ABhl --si --group-directories-first"
+        dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-dwim-target t))
 

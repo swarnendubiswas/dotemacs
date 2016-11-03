@@ -6,6 +6,7 @@
 
 ;;; Code:
 
+;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package server
   :disabled t ; I prefer to run the Emacs daemon at startup.
   :defer t

@@ -27,8 +27,7 @@
                         (awk-mode . "awk")))
 
 (use-package cc-mode
-  :defer t
-  :functions (c-toggle-electric-state c-toggle-syntactic-indentation c-fill-paragraph)
+  :mode ("\\.h\\'" . c++-mode)
   :config
   (setq c-set-style "cc-mode"
         c-basic-offset 2
@@ -59,9 +58,8 @@
     :config (global-cwarn-mode 1))
 
   (use-package hideif
-    :defer 2
     :diminish (hide-ifdef-mode hide-ifdef-hiding)
-    :config
+    :init
     (setq hide-ifdef-initially t)
     (add-hook 'c-mode-hook
               (lambda()
@@ -73,12 +71,12 @@
     :init (function-args-mode)
     :config
     ;; Include custom header locations
-    (if (string-equal system-name "rain.cse.ohio-state.edu")
-        (progn
-          (semantic-add-system-include "/usr/include/boost148" 'c++-mode)
-          (semantic-add-system-include "/home/sbiswas/intel-pintool/source/include/pin" 'c++-mode))
-      (progn
-        (semantic-add-system-include "/usr/include/boost")))
+    (semantic-add-system-include "/usr/include/boost" 'c++-mode)
+    (when (string-equal (system-name) "consensus.ices.utexas.edu")
+      (semantic-add-system-include "/home/sbiswas/intel-pintool/source/include/pin" 'c++-mode)
+      (use-package semantic/bovine/c
+        :config (add-to-list 'semantic-lex-c-preprocessor-symbol-file
+                             "/usr/lib/gcc/x86_64-linux-gnu/4.8.1/include/stddef.h")))
     (fa-config-default)
     ;; This overrides M-u
     ;; (bind-key* "M-u" #'upcase-word)
@@ -153,7 +151,11 @@
     (flycheck-add-next-checker 'c/c++-clang
                                '(warning . c/c++-googlelint))
     (setq flycheck-googlelint-linelength 'dotemacs-fill-column
-          flycheck-googlelint-filter "-whitespace/line_length")))
+          flycheck-googlelint-filter "-whitespace/line_length"))
+
+  (unbind-key "C-M-a" c-mode-map)
+  :bind (("C-c c a" . c-beginning-of-defun)
+         ("C-c c e" . c-end-of-defun)))
 
 (provide 'cc-init)
 

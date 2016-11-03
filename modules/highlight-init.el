@@ -57,7 +57,7 @@
 (use-package volatile-highlights
   :ensure t
   :diminish volatile-highlights-mode
-  :config (volatile-highlights-mode 1))
+  :config (add-hook 'text-mode-hook #'volatile-highlights-mode))
 
 (use-package highlight-tail
   :ensure t

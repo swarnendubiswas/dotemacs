@@ -76,11 +76,16 @@
   :config (setq popup-use-optimized-column-computation nil))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
+;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :ensure t
+  :commands popwin-mode
+  :init (popwin-mode 1)
   :config
+  (defvar popwin:special-display-config-backup popwin:special-display-config)
   (setq popwin:popup-window-height 20
-        popwin:close-popup-window-timer-interval 0.5)
+        popwin:close-popup-window-timer-interval 0.5
+        display-buffer-function 'popwin:display-buffer)
 
   ;; Disable this if we are opening helm buffers on the right
   ;; (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
@@ -104,6 +109,8 @@
   (push '("*Kill Ring*") popwin:special-display-config) ; Browse Kill Ring
   (push '("*Selection Ring:") popwin:special-display-config) ; Selection Ring
   (push '("*ag search*") popwin:special-display-config) ; Silver searcher
+  (push '("*Completions*" :stick t :noselect t) popwin:special-display-config)
+  (push '("*ggtags-global*" :stick t :noselect t :height 30) popwin:special-display-config)
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
@@ -211,7 +218,7 @@
             ;; `current-word' can of course be replaced by other functions.
             (narrow-to-defun)
             (iedit-start (current-word) (point-min) (point-max)))))))
-  :bind* ("C-." #'iedit-mode))
+  :bind* ("C-." . iedit-mode))
 
 (use-package session
   :ensure t

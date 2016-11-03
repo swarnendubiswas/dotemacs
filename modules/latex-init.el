@@ -147,10 +147,10 @@
         reftex-use-fonts t
         reftex-highlight-selection 'both)
   (if (string-equal (system-name) "rain.cse.ohio-state.edu")
-      (setq reftex-default-bibliography '("/workspace/plass-workspace/bib/plass.bib"
+      (setq reftex-default-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
                                           "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
                                           "/workspace/iss-workspace/bibtex/iss.bib"))
-    (setq reftex-default-bibliography '("~/plass-workspace/bib/plass.bib"
+    (setq reftex-default-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
                                         "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
                                         "~/iss-workspace/bibtex/iss.bib")))
   (use-package reftex-cite

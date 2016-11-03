@@ -2,5 +2,6 @@
 elpa
 tmp
 auto-save-list
+.session
 session.*
 srecode-map.el

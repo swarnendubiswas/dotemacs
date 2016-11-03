@@ -91,24 +91,25 @@
                                                                         :foreground "white"
                                                                         :weight 'light))
 
-                                                  ;; (when (eq dotemacs-theme 'leuven)
-                                                  ;;   (set-face-attribute 'powerline-active1 nil
-                                                  ;;                       :background "gray22"
-                                                  ;;                       :foreground "white"
-                                                  ;;                       :weight 'light)
-                                                  ;;   ;; (set-face-attribute 'powerline-active2 nil
-                                                  ;;   ;;                     :background "#1A4B7"
-                                                  ;;   ;;                     :foreground "white")
-                                                  ;;   (set-face-attribute 'mode-line nil
-                                                  ;;                       :background "grey88"
-                                                  ;;                       :foreground "black")
-                                                  ;;   (set-face-attribute 'mode-line-inactive nil
-                                                  ;;                       :background "grey88"
-                                                  ;;                       :foreground "black")
-                                                  ;;   (set-face-attribute 'mode-line-buffer-id nil
-                                                  ;;                       :weight 'bold
-                                                  ;;                       :foreground "black"
-                                                  ;;                       :inherit 'mode-line))
+                                                  (when (eq dotemacs-theme 'leuven)
+                                                    (set-face-attribute 'powerline-active1 nil
+                                                                        :background "gray22"
+                                                                        :foreground "white"
+                                                                        :weight 'light)
+                                                    ;;   ;; (set-face-attribute 'powerline-active2 nil
+                                                    ;;   ;;                     :background "#1A4B7"
+                                                    ;;   ;;                     :foreground "white")
+                                                    ;;   (set-face-attribute 'mode-line nil
+                                                    ;;                       :background "grey88"
+                                                    ;;                       :foreground "black")
+                                                    (set-face-attribute 'mode-line-inactive nil
+                                                                        :background "grey88"
+                                                                        :foreground "black")
+                                                    ;;   (set-face-attribute 'mode-line-buffer-id nil
+                                                    ;;                       :weight 'bold
+                                                    ;;                       :foreground "black"
+                                                    ;;                       :inherit 'mode-line)
+                                                    )
 
                                                   (when (eq dotemacs-theme 'default)
                                                     (set-face-attribute 'spaceline-highlight-face nil
@@ -146,7 +147,7 @@
                         nyan-animate-nyancat t
                         nyan-bar-length 24))
       (nyan-mode -1)))
-  :init
+  :config
   (add-hook 'after-make-frame-functions 'dotemacs--toggle-nyan-mode)
   (add-hook 'after-init-hook 'dotemacs--toggle-nyan-mode))
 

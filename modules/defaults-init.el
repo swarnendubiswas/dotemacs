@@ -118,7 +118,8 @@
 
 (use-package simple
   :config
-  (setq save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
+  (setq idle-update-delay 2
+        save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
                                         ; real paste after some kill action, that will erase the clipboard, so we need
                                         ; to save it to kill ring. Paste it using "C-y M-y".
         ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
@@ -133,6 +134,7 @@
   :bind ("C-c d f" . auto-fill-mode))
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
+  :diminish auto-revert-mode
   :config
   (setq-default auto-revert-interval 10 ; Default is 5 s.
                 auto-revert-verbose nil
@@ -198,20 +200,17 @@
                 desktop-load-locked-desktop nil))
 
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
-  :disabled t
   :config (global-font-lock-mode 1))
 
 (use-package font-lock
-  :disabled t
   :config
   (setq font-lock-maximum-decoration t ; Maximum fontification possible
         ;; Jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
-(use-package jit-lock
-  :disabled t
+(use-package jit-lock ; Improve scrolling speed with jit fontification
   :config
-  (setq jit-lock-defer-time 0.10 ; Improve scrolling speed with jit fontification
+  (setq jit-lock-defer-time 0.10 
         jit-lock-stealth-time 10
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
