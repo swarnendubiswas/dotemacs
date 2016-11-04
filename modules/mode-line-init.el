@@ -28,7 +28,17 @@
                                                                       :weight 'light)
                                                   (set-face-attribute 'powerline-active2 nil
                                                                       :background "grey88"
-                                                                      :foreground "black")))
+                                                                      :foreground "black")
+                                                  (when (eq dotemacs-theme 'leuven)
+                                                    (set-face-attribute 'mode-line nil
+                                                                        :background "grey88"
+                                                                        :foreground "black")
+                                                    (set-face-attribute 'mode-line-buffer-id nil
+                                                                        :weight 'bold
+                                                                        :foreground "black"
+                                                                        :background "gray88")
+
+                                                    )))
 
       ((eq dotemacs-mode-line-theme 'sml) (use-package smart-mode-line
                                             :ensure t

@@ -29,7 +29,7 @@
   :init (hlinum-activate))
 
 (use-package hilit-chg
-  :defer t
+  :diminish highlight-changes-mode
   :config (highlight-changes-mode 1))
 
 (use-package highlight-numbers
@@ -38,11 +38,10 @@
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
-  :init
+  :config
   (add-hook 'prog-mode-hook #'highlight-symbol-mode)
   ;; Navigate occurrences of the symbol under point with M-n and M-p
   (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-  :config
   (setq highlight-symbol-idle-delay 0.5
         highlight-symbol-on-navigation-p t)
   :diminish highlight-symbol-mode)
@@ -61,11 +60,13 @@
 
 (use-package highlight-tail
   :ensure t
+  :disabled t
   :diminish highlight-tail-mode
   :config (highlight-tail-mode 1))
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
+  :disabled t
   :config (beacon-mode 1)
   :diminish beacon-mode)
 
