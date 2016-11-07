@@ -10,7 +10,6 @@
 
 (use-package projectile
   :ensure t
-  :functions (projectile-find-file projectile-switch-project)
   :commands (projectile-switch-project)
   :init
   (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")

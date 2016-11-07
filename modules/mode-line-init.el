@@ -42,7 +42,6 @@
 
       ((eq dotemacs-mode-line-theme 'sml) (use-package smart-mode-line
                                             :ensure t
-                                            :functions (sml/faces-from-theme sml/theme-p)
                                             :config
                                             (setq sml/theme 'light
                                                   sml/no-confirm-load-theme t
@@ -144,7 +143,6 @@
 
 (use-package nyan-mode
   :ensure t
-  :functions nyan-start-animation
   :preface
   ;; https://github.com/cemerick/.emacs.d#nyan-mode
   (defun dotemacs--toggle-nyan-mode (&optional frame)

@@ -104,7 +104,6 @@
 
 (use-package web-mode
   :ensure t
-  :functions (web-beautify-css web-beautify-html web-beautify-js)
   :mode
   (("\\.phtml\\'" . web-mode)
    ("\\.jsp\\'" . web-mode)

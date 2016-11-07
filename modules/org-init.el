@@ -8,7 +8,6 @@
 (use-package org
   :ensure t
   :defer t
-  :functions (org-mode org-toggle-blocks org-indent-mode org-set-emph-re)
   :config
   (add-hook 'org-mode-hook #'visual-line-mode)
   (diminish 'visual-line-mode)

@@ -151,13 +151,12 @@
 (use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
   :defer t
   :config
-  (setq tramp-default-method "ssh" ; ssh is faster than the default scp
+  (setq tramp-default-method "sshx" ; ssh is faster than the default scp
         tramp-default-user "biswass"
         tramp-default-host "stdlinux.cse.ohio-state.edu"
        	;; Auto-save to a local directory for better performance
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
-        tramp-ssh-controlmaster-options ""
         tramp-verbose 1)
   ;; Disable backup
   (add-to-list 'backup-directory-alist
@@ -223,7 +222,6 @@
   :diminish hi-lock-mode)
 
 (use-package saveplace ; Remember cursor position in files
-  :functions save-place-mode
   :config
   ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
   (if (and (>= emacs-major-version 25)

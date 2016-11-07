@@ -20,15 +20,15 @@
     :config (shell-command-completion-mode 1))
 
   ;; Set up shell (not eshell) mode: https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
-  (setq explicit-shell-file-name "bash"
-        explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-        shell-file-name explicit-shell-file-name
-        comint-process-echoes t)
-  (setenv "SHELL" shell-file-name)
+  ;; https://stackoverflow.com/questions/37409085/how-to-define-a-default-shell-for-emacs
+  (setq-default explicit-shell-file-name "/bin/bash"
+                shell-file-name explicit-shell-file-name
+                explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+                comint-process-echoes t)
+  (setenv "ESHELL" shell-file-name)
 
   (use-package readline-complete
     :ensure t
-    :functions (ac-modes ac-rlc-setup-sources)
     :config
     (when (eq dotemacs-completion-in-buffer 'company)
       (push 'company-readline company-backends)

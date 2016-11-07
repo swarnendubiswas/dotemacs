@@ -57,7 +57,6 @@
 
 (use-package paradox
   :ensure t
-  :functions paradox-enable
   :bind (("C-c d p" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages)
          ("C-c d P" . package-list-packages))

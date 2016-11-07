@@ -37,7 +37,6 @@
 
 (use-package dired-x
   :after dired
-  :functions (dired-jump dired-omit-mode)
   :config
   (setq dired-bind-jump t
         ;; Do not show messages when omitting files

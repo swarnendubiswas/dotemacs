@@ -154,7 +154,6 @@
   (defun dotemacs--tabbar-on-buffer-modification ()
     (set-buffer-modified-p t)
     (dotemacs--tabbar-modification-state-change))
-  :functions tabbar-display-update
   :init (tabbar-mode 1)
   :config
   (setq tabbar-use-images nil ; Speed up by not using images

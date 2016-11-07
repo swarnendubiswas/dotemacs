@@ -49,7 +49,6 @@
   (use-package company-emacs-eclim
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'company)
-    :functions company-emacs-eclim-setup
     :config (company-emacs-eclim-setup))
   (use-package ac-emacs-eclim
     :ensure t
