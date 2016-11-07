@@ -1,4 +1,4 @@
-;;; flyspell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; spell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup spell check.  Assume aspell is available.
@@ -6,12 +6,14 @@
 ;;; Code:
 
 (defvar dotemacs-selection)
+(defvar dotemacs-extras-directory)
 
 (use-package ispell
   :init
-  (setq-default ispell-program-name "/usr/bin/aspell")
+  (setq-default ispell-program-name (executable-find "aspell"))
   (setq ispell-dictionary "english"
-        ;; aspell speed: ultra | fast | normal | bad-spellers
+        ispell-personal-dictionary (concat dotemacs-extras-directory "spell")
+        ;; Aspell speed: ultra | fast | normal | bad-spellers
         ispell-extra-args '("--sug-mode=ultra"
                             "--lang=en_US")
         ;; Save a new word to personal dictionary without asking
@@ -113,6 +115,6 @@
              :config (setq flyspell-correct-interface 'flyspell-correct-popup))))
   (bind-key "M-$" #'flyspell-correct-word-generic flyspell-mode-map))
 
-(provide 'flyspell-init)
+(provide 'spell-init)
 
-;;; flyspell-init.el ends here
+;;; spell-init.el ends here

@@ -108,7 +108,7 @@
 
 ;; Configure the more useful extensions
 (require 'anzu-init)
-(require 'flyspell-init)
+(require 'spell-init)
 (require 'ace-modes-init)
 (require 'indent-init)
 (require 'parens-init)

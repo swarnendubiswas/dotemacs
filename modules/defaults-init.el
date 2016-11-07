@@ -30,8 +30,6 @@
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t
-      ;; Disabling this is one way to speed up Emacs with buffers with long lines
-      bidi-display-reordering nil
       ;; Ignore case when reading a file name completion
       read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t)
@@ -42,7 +40,9 @@
               truncate-lines nil
               truncate-partial-width-windows nil
               history-length 50
-              history-delete-duplicates t)
+              history-delete-duplicates t
+              ;; Disabling this is one way to speed up Emacs with buffers with long lines
+              bidi-display-reordering nil)
 
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
@@ -122,8 +122,6 @@
         save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
                                         ; real paste after some kill action, that will erase the clipboard, so we need
                                         ; to save it to kill ring. Paste it using "C-y M-y".
-        ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
-        extended-command-suggest-shorter nil
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking
@@ -299,6 +297,8 @@
 
 (use-package smerge-mode
   :diminish smerge-mode)
+
+(setq switch-to-buffer-preserve-window-point t)
 
 (provide 'defaults-init)
 
