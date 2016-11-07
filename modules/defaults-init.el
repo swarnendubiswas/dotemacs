@@ -32,7 +32,8 @@
       scroll-preserve-screen-position t
       ;; Ignore case when reading a file name completion
       read-file-name-completion-ignore-case t
-      read-buffer-completion-ignore-case t)
+      read-buffer-completion-ignore-case t
+      switch-to-buffer-preserve-window-point t)
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
                                         ; fundamental-mode
@@ -297,8 +298,6 @@
 
 (use-package smerge-mode
   :diminish smerge-mode)
-
-(setq switch-to-buffer-preserve-window-point t)
 
 (provide 'defaults-init)
 
