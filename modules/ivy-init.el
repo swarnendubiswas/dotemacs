@@ -29,7 +29,7 @@
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search t ; Ignore case while searching
-        ivy-height 25 ; This seems a good number to see several options at a time
+        ivy-height 15 ; This seems a good number to see several options at a time
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
