@@ -81,12 +81,12 @@
   ;; This is useful but SLOW
   ;; (add-hook 'before-save-hook #'flyspell-buffer)
 
-  :config (bind-key* "C-," #'dotemacs-flyspell-goto-previous-error)
   :diminish flyspell-mode
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
-   ("C-c f w" . ispell-word)))
+   ("C-c f w" . ispell-word)
+   ("C-," . dotemacs-flyspell-goto-previous-error)))
 
 (use-package helm-flyspell
   :ensure t
@@ -102,6 +102,7 @@
 (use-package flyspell-correct
   :ensure t
   :after flyspell
+  :disabled t
   :config
   (cond ((eq dotemacs-selection 'helm) (use-package flyspell-correct-helm
                                          :ensure t
