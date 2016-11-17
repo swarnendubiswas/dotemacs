@@ -14,7 +14,7 @@
   :init
   (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
-  (projectile-global-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
+  (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   :config
   (setq projectile-enable-caching t
         projectile-file-exists-remote-cache-expire nil

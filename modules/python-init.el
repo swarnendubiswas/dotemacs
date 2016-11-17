@@ -50,6 +50,10 @@
     (use-package pyvenv
       :ensure t
       :init (pyvenv-mode 1))
+    (use-package company-jedi
+      :ensure t
+      :if (eq dotemacs-completion-in-buffer 'company)
+      :config (add-to-list 'company-backends '(company-jedi company-files)))
     (elpy-enable))
 
   (defun elpy-goto-definition-or-rgrep ()

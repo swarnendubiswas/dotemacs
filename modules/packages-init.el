@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-emacs-custom-file)
+
 (setq load-prefer-newer t)
 
 (require 'package)

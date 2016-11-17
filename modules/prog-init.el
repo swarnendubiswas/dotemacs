@@ -119,7 +119,9 @@
         web-mode-indent-style 2
         web-mode-style-padding 1
         web-mode-script-padding 1
-        web-mode-block-padding 0)
+        web-mode-block-padding 0
+        web-mode-enable-auto-closing t
+        web-mode-enable-auto-quoting t)
 
   (use-package ac-html-angular ; Required by ac-html and company-web
     :ensure t

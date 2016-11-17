@@ -29,6 +29,7 @@
   :init (hlinum-activate))
 
 (use-package hilit-chg
+  :disabled t
   :diminish highlight-changes-mode
   :config (highlight-changes-mode 1))
 
