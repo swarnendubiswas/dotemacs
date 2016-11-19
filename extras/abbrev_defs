@@ -361,6 +361,7 @@
     ("comntain" "contain" nil 0)
     ("comntains" "contains" nil 0)
     ("compair" "compare" nil 0)
+    ("comparabl" "comparable" nil 1)
     ("comparign" "comparing" nil 1)
     ("comparision" "comparison" nil 1)
     ("comparisions" "comparisons" nil 1)

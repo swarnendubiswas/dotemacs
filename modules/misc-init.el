@@ -53,6 +53,7 @@
 
 (use-package graphviz-dot-mode
   :ensure t
+  :disabled t
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot

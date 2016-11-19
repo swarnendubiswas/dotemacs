@@ -11,7 +11,7 @@
 (use-package smex
   :ensure t
   :config
-  (setq smex-save-file (expand-file-name "smex-items" dotemacs-temp-directory)
+  (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
         smex-auto-update t)
   (smex-initialize)
   (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
