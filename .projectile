@@ -1,2 +1,10 @@
 -/elpa
 -/backup
+-/tmp
+-/.projectile
+-/.gitignore
+-*.zip
+-*.jar
+-*.pdf
+-/reference-cards
+-/snippets
