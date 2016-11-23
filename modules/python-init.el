@@ -37,7 +37,7 @@
       (add-to-list 'flycheck-disabled-checkers 'python-flake8)
       (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
 
-;; sudo <path-to-pip3> install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8
+;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8
 ;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
 (use-package elpy
   :ensure t
