@@ -103,13 +103,13 @@
   (push '(svn-info-mode :noselect t) popwin:special-display-config)
   (push '(svn-status-mode) popwin:special-display-config)
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
-  (push '(manage-minor-mode :noselect t) popwin:special-display-config)
-  (push '(help-mode :noselect t) popwin:special-display-config)
+  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
+  (push '("*Help*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
-  (push '(" *undo-tree*" :width 0.3 :position right) popwin:special-display-config)
-  (push '("*Kill Ring*") popwin:special-display-config) ; Browse Kill Ring
-  (push '("*Selection Ring:") popwin:special-display-config) ; Selection Ring
-  (push '("*ag search*") popwin:special-display-config) ; Silver searcher
+  (push '("*undo-tree*" :width 0.3 :position right) popwin:special-display-config)
+  (push '("*Kill Ring*") popwin:special-display-config)
+  (push '("*Selection Ring:") popwin:special-display-config)
+  (push '("*ag search*") popwin:special-display-config)
   (push '("*Completions*" :stick t :noselect t) popwin:special-display-config)
   (push '("*ggtags-global*" :stick t :noselect t :height 30) popwin:special-display-config)
 

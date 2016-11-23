@@ -52,6 +52,8 @@
                   sh-mode
                   text-mode))
     (add-to-list 'ac-modes mode))
+  ;; Remove python-mode from global modes since elpy uses company for completion
+  (setq ac-modes (delq 'python-mode ac-modes))
 
   :bind (:map ac-completing-map
               ("C-n" . ac-next)

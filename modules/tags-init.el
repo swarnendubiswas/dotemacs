@@ -8,20 +8,6 @@
 (setq tags-revert-without-query t
       tags-case-fold-search nil)
 
-(use-package ctags
-  :ensure t
-  :disabled t
-  :config
-  (use-package ctags-update
-    :ensure t
-    :diminish ctags-auto-update-mode
-    :config
-    (setq ctags-update-delay-seconds (* 30 60)) ; every 1/2 hour
-    (ctags-auto-update-mode 1))
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package auto-complete-exuberant-ctags
-      :ensure t)))
-
 (use-package etags
   :bind ("M-T" . tags-search)
   :if (eq system-type 'windows-nt)
@@ -57,19 +43,20 @@
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
                 (ggtags-mode 1))))
+  (add-hook 'python-mode-hook #'ggtags-mode)
   :config
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
         ggtags-completing-read-function nil)
-  :bind (:map ggtags-mode-map
-              ("C-c g s" . ggtags-find-other-symbol)
-              ("C-c g h" . ggtags-view-tag-history)
-              ("C-c g r" . ggtags-find-reference)
-              ("C-c g f" . ggtags-find-file)
-              ("C-c g c" . ggtags-create-tags)
-              ("C-c g u" . ggtags-update-tags)
-              ("M-." . ggtags-find-tag-dwim)
-              ("M-," . pop-tag-mark)))
+  :bind* (:map ggtags-mode-map
+               ("C-c g s" . ggtags-find-other-symbol)
+               ("C-c g h" . ggtags-view-tag-history)
+               ("C-c g r" . ggtags-find-reference)
+               ("C-c g f" . ggtags-find-file)
+               ("C-c g c" . ggtags-create-tags)
+               ("C-c g u" . ggtags-update-tags)
+               ("M-." . ggtags-find-tag-dwim)
+               ("M-," . pop-tag-mark)))
 
 ;; http://wikemacs.org/wiki/C-ide
 ;; http://tuhdo.github.io/c-ide.html

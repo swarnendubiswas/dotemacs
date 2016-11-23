@@ -477,6 +477,7 @@
     ("develpment" "development" nil 0)
     ("devloped" "developed" nil 0)
     ("diaplay" "display" nil 0)
+    ("dictonary" "dictionary" nil 1)
     ("dicuss" "discuss" nil 1)
     ("didint" "didn't" nil 0)
     ("didnot" "did not" nil 0)
@@ -545,6 +546,7 @@
     ("equippment" "equipment" nil 0)
     ("equivalant" "equivalent" nil 0)
     ("erorr" "error" nil 1)
+    ("erors" "errors" nil 1)
     ("escpeially" "especially" nil 1)
     ("esle" "else" nil 0)
     ("especally" "especially" nil 0)
@@ -1130,7 +1132,7 @@
     ("techique" "technique" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 39)
+    ("teh" "the" nil 40)
     ("tehre" "there" nil 2)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
@@ -1391,7 +1393,9 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 

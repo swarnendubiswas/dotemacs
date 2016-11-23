@@ -5,7 +5,9 @@
 
 ;;; Code:
 
-;; Set PYTHONPATH
+;; Install the following packages
+;; sudo pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint
+
 (setenv "PYTHONPATH" "python3")
 
 (defun dotemacs--python-setup ()
@@ -16,7 +18,6 @@
         python-shell-completion-native-enable nil
         python-shell-unbuffered nil)
   (turn-on-auto-fill)
-  (flymake-mode-off)
   (run-python (python-shell-parse-command) nil nil)
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-chunk
@@ -27,21 +28,11 @@
                   ;; Make sure ac-source-chunk-list comes first.
                   (setq ac-sources (append '(ac-source-chunk-list) ac-sources))
                   (setq ac-chunk-list
-                        '("os.path.abspath" "os.path.altsep" "os.path.basename"))))))
+                        '("os.path.abspath" "os.path.altsep" "os.path.basename")))))))
 
-  (with-eval-after-load "flycheck"
-    (use-package flycheck-pyflakes
-      :ensure t
-      :disabled t
-      :config
-      (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-      (add-to-list 'flycheck-disabled-checkers 'python-pylint))))
 
-;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8
-;; FIXME: It would be good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
 (use-package elpy
   :ensure t
-  :defer t
   :diminish elpy-mode
   :preface
   (defun dotemacs--elpy-setup ()
@@ -49,11 +40,11 @@
     (dotemacs--python-setup)
     (use-package pyvenv
       :ensure t
-      :init (pyvenv-mode 1))
+      :config (pyvenv-mode 1))
     (use-package company-jedi
       :ensure t
       :if (eq dotemacs-completion-in-buffer 'company)
-      :config (add-to-list 'company-backends '(company-jedi company-files)))
+      :config (add-to-list 'company-backends '(company-jedi company-files company-capf elpy-company-backend)))
     (elpy-enable))
 
   (defun elpy-goto-definition-or-rgrep ()
@@ -71,21 +62,14 @@
                        elpy-module-highlight-indentation
                        elpy-module-yasnippet
                        elpy-module-sane-defaults)
-        elpy-rpc-python-command "python3")
+        elpy-rpc-python-command "python3"
+        elpy-rpc-backend "jedi")
+  ;; It is good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
   (add-hook 'elpy-mode-hook #'flycheck-mode)
   (unbind-key "M-<left>" elpy-mode-map)
-  (unbind-key "M-<right>" elpy-mode-map))
-
-(use-package pydoc
-  :ensure t
-  :disabled t)
-
-(use-package python-docstring
-  :ensure t
-  :disabled t
-  :commands python-docstring-mode
-  :config (python-docstring-mode 1))
+  (unbind-key "M-<right>" elpy-mode-map)
+  (unbind-key "M-." elpy-mode-map))
 
 (use-package py-autopep8
   :ensure t
@@ -94,12 +78,10 @@
   (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
 (use-package pyimport
-  :ensure t)
-
-(use-package py-isort
   :ensure t
-  :disabled t
-  :config (add-hook 'before-save-hook 'py-isort-before-save nil t))
+  :config
+  (add-hook 'before-save-hook #'pyimport-insert-missing)
+  (add-hook 'before-save-hook #'pyimport-remove-unused))
 
 (provide 'python-init)
 

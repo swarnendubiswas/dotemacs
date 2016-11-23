@@ -11,7 +11,11 @@
   :diminish abbrev-mode
   :init
   (setq-default abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
-  (add-hook 'text-mode-hook #'abbrev-mode)
+  (dolist (hook '(text-mode-hook
+                  prog-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (abbrev-mode 1))))
   :config
   (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
   (if (file-exists-p abbrev-file-name)
