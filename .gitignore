@@ -5,3 +5,5 @@ auto-save-list
 .session
 session.*
 srecode-map.el
+irony
+.python-environment
