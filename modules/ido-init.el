@@ -23,7 +23,7 @@
         (find-file file))))
   :config
   (setq ido-enable-flex-matching t
-        ido-enable-prefix nil
+        ido-enable-prefix nil ; Disable matching only if the text is a prefix of a file name
         ido-max-prospects 20
         ido-case-fold t ; Searching of buffer and file names should ignore case
         ido-use-filename-at-point 'guess
@@ -128,8 +128,7 @@
                                              (ido-grid-mode 1))))
 
   :bind
-  (("<f1>" . smex)
-   ([remap find-file] . ido-find-file)
+  (([remap find-file] . ido-find-file)
    ("<f2>" . ido-find-file)
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f3>" . ido-switch-buffer)

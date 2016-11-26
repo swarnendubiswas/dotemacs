@@ -16,6 +16,7 @@
   (smex-initialize)
   (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
     (bind-key "M-x" #'smex)
+    (bind-key "<f1>" #'smex)
     (bind-key "M-X" #'smex-major-mode-commands)))
 
 (provide 'smex-init)

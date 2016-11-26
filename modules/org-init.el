@@ -13,8 +13,11 @@
   (diminish 'visual-line-mode)
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
-  (setq org-completion-use-ido t
-        org-src-fontify-natively t ; code block fontification using the major-mode of the code
+  (when (eq dotemacs-selection 'ido)
+    (setq org-completion-use-ido t
+          org-outline-path-complete-in-steps nil))
+
+  (setq org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-startup-indented t
         org-startup-truncated nil
         org-src-preserve-indentation t

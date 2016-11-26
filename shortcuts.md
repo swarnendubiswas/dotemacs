@@ -87,7 +87,12 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Ido
 
-* `C-j` - Use the current input string verbatim (``).
+* `C-j` - Use the current input string verbatim (`ido-select-text`).
+* `//` - Go to the root directory (``).
+* `~/` - Go to the home directory ().
+* `C-f` - Fall back to find file (without ido-mode).
+* `C-d` - Enter Dired for this directory.
+* `M-p` and `M-n` (or `M-UP` and `M-DOWN`) - Change to previous/next directories from history.
 
 ## Ivy
 
