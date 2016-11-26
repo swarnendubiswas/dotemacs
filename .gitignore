@@ -6,4 +6,5 @@ auto-save-list
 session.*
 srecode-map.el
 irony
-.python-environment
+.python-environments
+modules/flycheck_*.el
