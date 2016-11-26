@@ -18,7 +18,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 #####Directory structure
          * backup -- older startup files, which I no longer use. I am now using [`(use-package)`](https://github.com/jwiegley/use-package).
          * modules -- personal customizations
-         * packages -- third-party packages (may not be available from the package archives)
+         * extras -- third-party packages (may not be available from the package archives)
          * reference-cards -- help files 
          * snippets -- custom snippets
 
@@ -26,7 +26,8 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 #####Tweaking the default settings
 
-Here are a few customization options that you could use to tweak the default setup. These options can be modified from `modules/config-init.el`.
+Here are a few customization options that you could use to tweak the default setup. These options can be modified from
+`modules/config-init.el`. Check the module for more options.
 
 * `dotemacs-completion-in-buffer` - Toggle between `company` or `auto-complete`, with `company` being default.
 * `dotemacs-selection` - Choose the completion framework, between `helm`, `ido`, or `ivy`.
