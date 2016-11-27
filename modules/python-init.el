@@ -77,12 +77,6 @@
   (setq py-autopep8-options '("--max-line-length=80"))
   (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
-(use-package pyimport
-  :ensure t
-  :config
-  (add-hook 'before-save-hook #'pyimport-insert-missing)
-  (add-hook 'before-save-hook #'pyimport-remove-unused))
-
 (provide 'python-init)
 
 ;;; python-init.el ends here

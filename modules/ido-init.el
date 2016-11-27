@@ -26,7 +26,7 @@
         ido-enable-prefix nil ; Disable matching only if the text is a prefix of a file name
         ido-max-prospects 20
         ido-case-fold t ; Searching of buffer and file names should ignore case
-        ido-use-filename-at-point 'guess
+        ido-use-filename-at-point nil
         ido-use-url-at-point nil
         ido-show-dot-for-dired nil ; Don't show current directory as the first choice
         ido-enable-dot-prefix t
