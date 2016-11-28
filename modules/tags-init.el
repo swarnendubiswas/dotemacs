@@ -89,6 +89,16 @@
               ("M-'" . helm-gtags-select)
               ("M-t" . helm-gtags-find-tag)))
 
+(use-package counsel-gtags
+  :ensure t
+  :if (eq dotemacs-selection 'ivy)
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                (counsel-gtags-mode 1))))
+  (add-hook 'python-mode-hook #'counsel-gtags-mode))
+
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun dotemacs-create-latex-etags ()
   "Create etags for the current latex project."

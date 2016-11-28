@@ -7,7 +7,6 @@
 
 (defvar dotemacs-window-split)
 (defvar dotemacs-temp-directory)
-(defvar tramp-persistency-file-name)
 (defvar select-enable-clipboard)
 
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
@@ -145,28 +144,6 @@
   :config
   ;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
   (delete-selection-mode 1))
-
-;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
-(use-package tramp ; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
-  :defer t
-  :config
-  (setq tramp-default-method "sshx" ; ssh is faster than the default scp
-        tramp-default-user "biswass"
-        tramp-default-host "stdlinux.cse.ohio-state.edu"
-       	;; Auto-save to a local directory for better performance
-        tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
-        tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
-        tramp-verbose 1)
-  ;; Disable backup
-  (add-to-list 'backup-directory-alist
-               (cons tramp-file-name-regexp nil))
-  ;; Disable version control. If you access remote files which are not under version control, a lot of check operations
-  ;; can be avoided by disabling VC.
-  ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
-  (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
-                                     tramp-file-name-regexp))
-  (use-package password-cache
-    :config (setq password-cache-expiry nil)))
 
 (file-name-shadow-mode 1) ; Dim the ignored part of the file name in the minibuffer
 

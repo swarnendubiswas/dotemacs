@@ -124,6 +124,7 @@
 (require 'rainbow-init)
 (require 'whitespace-init)
 (require 'highlight-init)
+(require 'tramp-init)
 
 ;; Configure individual major modes
 (require 'text-init)
