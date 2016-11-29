@@ -112,6 +112,7 @@
   (push '("*ag search*") popwin:special-display-config)
   (push '("*Completions*" :stick t :noselect t) popwin:special-display-config)
   (push '("*ggtags-global*" :stick t :noselect t :height 30) popwin:special-display-config)
+  (push '("*Compile-Log*") popwin:special-display-config)
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
