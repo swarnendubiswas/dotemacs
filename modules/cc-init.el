@@ -45,24 +45,10 @@
     (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
     (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
 
-  ;; ;; Switch between header and implementation files
-  ;; (use-package find-file
-  ;;   :ensure t
-  ;;   :commands ff-find-other-file
-  ;;   :bind ("C-c o" . ff-find-other-file))
-
   (use-package cwarn
     :ensure t
     :diminish cwarn-mode
     :config (global-cwarn-mode 1))
-
-  (use-package hideif
-    :diminish (hide-ifdef-mode hide-ifdef-hiding)
-    :init
-    (setq hide-ifdef-initially t)
-    (add-hook 'c-mode-hook
-              (lambda()
-                (hide-ifdef-mode 1))))
 
   (use-package function-args
     :ensure t
@@ -108,12 +94,13 @@
     (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/source/include/pin")
     (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
     (add-to-list 'company-c-headers-path-system "/usr/include/")
-    (cond ((string-equal (system-name) "rain.cse.ohio-state.edu")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4/")
+
+    (cond ((string-equal (system-name) "consensus.ices.utexas.edu")
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/")
            (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
            (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/source/include/pin"))
 
-          ((string-equal system-name "sbiswas-Dell-System-XPS-L502X")
+          ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/"))))
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
@@ -164,7 +151,7 @@
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'objc-mode-hook 'irony-mode)
   :config
-  ;; replace the `completion-at-point' and `complete-symbol' bindings in
+  ;; Replace the `completion-at-point' and `complete-symbol' bindings in
   ;; irony-mode's buffers by irony-mode's function
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]
