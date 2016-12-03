@@ -58,6 +58,7 @@
 
   (use-package hideif
     :diminish (hide-ifdef-mode hide-ifdef-hiding)
+    :disabled t
     :init
     (setq hide-ifdef-initially t)
     (add-hook 'c-mode-hook
@@ -159,6 +160,7 @@
 (use-package irony
   :ensure t
   :diminish irony-mode
+  :defer t
   :init
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)

@@ -224,6 +224,7 @@
 
 (use-package session
   :ensure t
+  :disabled t
   :config
   (add-hook 'after-init-hook #'session-initialize)
   (setq session-save-file (concat dotemacs-temp-directory "session")))

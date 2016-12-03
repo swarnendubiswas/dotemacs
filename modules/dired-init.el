@@ -79,6 +79,7 @@
 
 (use-package dired-icon
   :ensure t
+  :diminish dired-icon-mode
   :init (add-hook 'dired-mode-hook 'dired-icon-mode))
 
 (provide 'dired-init)

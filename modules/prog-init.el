@@ -23,6 +23,7 @@
                 (add-to-list 'ac-sources 'ac-source-functions)))))
 
 (use-package semantic
+  :defer t
   :preface
   (defun dotemacs-semantic-functions ()
     (semantic-mode 1)
@@ -215,20 +216,19 @@
     :ensure t)
   :diminish eldoc-mode)
 
-(use-package focus
-  :ensure t)
-
 (use-package octave
   :mode ("\\.m\\'" . octave-mode))
 
 (use-package matlab-mode
   :ensure t
+  :defer t
   :config
   ;; Can optionally setup CEDET support with (matlab-cedet-setup)
   (setq matlab-indent-function t))
 
 (use-package ess
   :ensure t
+  :defer t
   :config
   (setq inferior-R-args "--quiet --no-restore-history --no-save"
         ess-indent-level 4

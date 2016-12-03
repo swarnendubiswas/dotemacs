@@ -34,6 +34,7 @@
 (use-package elpy
   :ensure t
   :diminish elpy-mode
+  :defer t
   :preface
   (defun dotemacs--elpy-setup ()
     "Setup elpy and python configurations."

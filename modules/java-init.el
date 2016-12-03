@@ -16,19 +16,21 @@
 (use-package ant)
 
 (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package jdee
   :ensure t
+  :defer t
   :init
   (setq jdee-server-dir dotemacs-extras-directory
         jdee-complete-function 'jdee-complete-minibuf)
-  (if (string-equal system-name "rain.cse.ohio-state.edu")
-      (setq jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/rt.jar"
-                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jce.jar"
-                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/jsse.jar"
-                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/charsets.jar"
-                                    "/usr/lib/jvm/java-1.8.0-openjdk.x86_64/jre/lib/resources.jar"))
+  (if (string-equal (system-name) "consensus.ices.utexas.edu")
+      (setq jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk/jre/lib/rt.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk/jre/lib/jce.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk/jre/lib/jsse.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk/jre/lib/charsets.jar"
+                                    "/usr/lib/jvm/java-1.8.0-openjdk/jre/lib/resources.jar"))
     (setq jdee-global-classpath '("/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/rt.jar"
                                   "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/jce.jar"
                                   "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/jsse.jar"
@@ -38,6 +40,7 @@
 
 (use-package eclim
   :ensure t
+  :defer t
   :init
   (use-package eclimd)
   (setq eclim-eclipse-dirs "/home/sbiswas/software/eclipse-neon-java/"

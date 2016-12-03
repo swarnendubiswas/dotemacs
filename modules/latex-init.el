@@ -18,6 +18,7 @@
   :mode ("\\.tex\\'" . LaTeX-mode))
 
 (use-package tex-buf ; Requires tex and latex
+  :defer t
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -57,10 +58,12 @@
   (unbind-key "C-c ;" LaTeX-mode-map))
 
 (use-package tex-fold
+  :defer t
   :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
 (use-package tex-mode
   :diminish latex-electric-env-pair-mode
+  :defer t
   :init
   (setq latex-run-command "latexmk")
   (add-hook 'TeX-mode-hook
@@ -69,7 +72,6 @@
 
 (use-package auctex-latexmk
   :ensure t
-  :disabled t
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   (auctex-latexmk-setup)
@@ -124,6 +126,7 @@
 
 (use-package bibtex
   :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+  :defer t
   :config
   (setq bibtex-maintain-sorted-entries t)
   (use-package bibtex-utils
@@ -133,6 +136,7 @@
   :diminish reftex-mode
   :commands (reftex-citation)
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  :defer t
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)
@@ -180,6 +184,7 @@
     :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
 (use-package bib-cite
+  :defer t
   :diminish bib-cite-minor-mode
   :config
   (bib-cite-minor-mode 1)
@@ -243,6 +248,7 @@
 (use-package outline
   :ensure t
   :after tex
+  :defer t
   :diminish outline-minor-mode
   :init (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
   :config
