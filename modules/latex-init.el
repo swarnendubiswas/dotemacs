@@ -247,6 +247,7 @@
 
 (use-package outline
   :ensure t
+  :disabled t
   :after tex
   :defer t
   :diminish outline-minor-mode

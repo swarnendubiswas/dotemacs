@@ -50,7 +50,6 @@
     :diminish cwarn-mode
     :config (global-cwarn-mode 1))
 
-<<<<<<< HEAD
   (use-package hideif
     :diminish (hide-ifdef-mode hide-ifdef-hiding)
     :disabled t
@@ -60,8 +59,6 @@
               (lambda()
                 (hide-ifdef-mode 1))))
 
-=======
->>>>>>> 2c7544cedcadd57cc6b535020a1413ecc9305b98
   (use-package function-args
     :ensure t
     :diminish function-args-mode
