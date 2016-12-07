@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;; Install the following packages
-;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint
+;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides
 
 (setenv "PYTHONPATH" "python3")
 
