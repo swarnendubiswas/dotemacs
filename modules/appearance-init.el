@@ -178,38 +178,38 @@
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
   ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
   ;; https://gist.github.com/ShingoFukuyama/7245914
-  (set-face-attribute 'tabbar-default nil
-                      :background "gray80")
-  (set-face-attribute 'tabbar-unselected nil
-                      :background "gray88"
-                      :foreground "gray30"
-                      :box nil
-                      :height 1.0)
-  (set-face-attribute 'tabbar-selected nil
-                      :background "#f2f2f6"
-                      :foreground "black"
-                      :box '(:line-width 1 :color "black" :style pressed-button)
-                      :height 1.3
-                      :bold t
-                      :underline nil)
-  (set-face-attribute 'tabbar-highlight nil
-                      :underline t
-                      :background "lemon chiffon")
-  (set-face-attribute 'tabbar-button nil
-                      :box '(:line-width 1 :color "gray72" :style released-button))
-  (set-face-attribute 'tabbar-separator nil
-                      :height 1.0)
-  (set-face-attribute 'tabbar-modified nil
-                      :background "gray88"
-                      :foreground "red"
-                      :box '(:line-width 1 :color "black" :style sunken))
-  (set-face-attribute 'tabbar-selected-modified nil
-                      :background "#f2f2f6"
-                      :foreground "dark green"
-                      :box '(:line-width 1 :color "black" :style sunken)
-                      :height 1.3
-                      :bold t
-                      :underline nil)
+  ;; (set-face-attribute 'tabbar-default nil
+  ;;                     :background "gray80")
+  ;; (set-face-attribute 'tabbar-unselected nil
+  ;;                     :background "gray88"
+  ;;                     :foreground "gray30"
+  ;;                     :box nil
+  ;;                     :height 1.0)
+  ;; (set-face-attribute 'tabbar-selected nil
+  ;;                     :background "#f2f2f6"
+  ;;                     :foreground "black"
+  ;;                     :box '(:line-width 1 :color "black" :style pressed-button)
+  ;;                     :height 1.3
+  ;;                     :bold t
+  ;;                     :underline nil)
+  ;; (set-face-attribute 'tabbar-highlight nil
+  ;;                     :underline t
+  ;;                     :background "lemon chiffon")
+  ;; (set-face-attribute 'tabbar-button nil
+  ;;                     :box '(:line-width 1 :color "gray72" :style released-button))
+  ;; (set-face-attribute 'tabbar-separator nil
+  ;;                     :height 1.0)
+  ;; (set-face-attribute 'tabbar-modified nil
+  ;;                     :background "gray88"
+  ;;                     :foreground "red"
+  ;;                     :box '(:line-width 1 :color "black" :style sunken))
+  ;; (set-face-attribute 'tabbar-selected-modified nil
+  ;;                     :background "#f2f2f6"
+  ;;                     :foreground "dark green"
+  ;;                     :box '(:line-width 1 :color "black" :style sunken)
+  ;;                     :height 1.3
+  ;;                     :bold t
+  ;;                     :underline nil)
   :bind (:map tabbar-mode-map
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
