@@ -86,6 +86,7 @@
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
    ("C-c f w" . ispell-word)
+   ("C-," . nil)
    ("C-," . dotemacs-flyspell-goto-previous-error)))
 
 (use-package helm-flyspell

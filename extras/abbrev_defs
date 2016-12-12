@@ -547,6 +547,7 @@
     ("erorr" "error" nil 1)
     ("erors" "errors" nil 1)
     ("escpeially" "especially" nil 1)
+    ("esimates" "estimates" nil 1)
     ("esle" "else" nil 0)
     ("especally" "especially" nil 0)
     ("especialyl" "especially" nil 0)
@@ -823,7 +824,7 @@
     ("nkow" "know" nil 0)
     ("nothign" "nothing" nil 0)
     ("nver" "never" nil 0)
-    ("nwe" "new" nil 0)
+    ("nwe" "new" nil 1)
     ("nwo" "now" nil 0)
     ("obediant" "obedient" nil 0)
     ("ocasion" "occasion" nil 0)
@@ -978,7 +979,9 @@
     ("regardsless" "regardless" nil 0)
     ("regession" "regression" nil 0)
     ("regresion" "regression" nil 0)
+    ("reiliability" "reliability" nil 1)
     ("releated" "related" nil 0)
+    ("reliability " "estimates" nil 0)
     ("religous" "religious" nil 0)
     ("relize" "realize" nil 0)
     ("reloacted" "relocated" nil 0)
@@ -1066,7 +1069,7 @@
     ("smae" "same" nil 0)
     ("smaler" "smaller" nil 1)
     ("smoe" "some" nil 0)
-    ("soem" "some" nil 0)
+    ("soem" "some" nil 1)
     ("sohw" "show" nil 0)
     ("soical" "social" nil 0)
     ("somehwat" "somewhat" nil 1)
@@ -1131,7 +1134,7 @@
     ("techique" "technique" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 40)
+    ("teh" "the" nil 41)
     ("tehre" "there" nil 2)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
@@ -1392,9 +1395,7 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 

@@ -1,8 +1,15 @@
-personal_ws-1.1 en 7 
+personal_ws-1.1 en 14 
+pseudocode
+whitebox
+blackbox
 unserializable
 programmability
+whitespace
+Atomicity
 serializability
 customizations
+functionalities
 interleavings
 transactional
 whitespaces
+tunable
