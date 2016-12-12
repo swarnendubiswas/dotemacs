@@ -223,7 +223,7 @@
 
 (use-package uniquify
   :config
-  (setq uniquify-buffer-name-style 'forward ; Options: post-forward, reverse, forward
+  (setq uniquify-buffer-name-style 'forward
         uniquify-separator "/"
         uniquify-ignore-buffers-re "^\\*"
         uniquify-after-kill-buffer-p t
@@ -236,8 +236,8 @@
                                            try-expand-dabbrev-all-buffers
                                            try-expand-dabbrev-from-kill
                                            try-complete-file-name-partially
-                                           try-complete-file-name
                                            try-expand-all-abbrevs
+                                           try-complete-file-name
                                            try-expand-list
                                            try-expand-line
                                            try-complete-lisp-symbol-partially

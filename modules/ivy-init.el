@@ -13,7 +13,7 @@
   :if (eq dotemacs-selection 'ivy)
   :preface
   (defun dotemacs--ivy-recentf ()
-    "Find a file on `recentf-list'."
+    "Find a file on `recentf-list' and abbreviate the home directory."
     (interactive)
     (ivy-read "Recentf: " (mapcar #'abbreviate-file-name recentf-list)
               :action
@@ -22,8 +22,7 @@
                   (find-file f)))
               :caller 'counsel-recentf))
   :config
-  (setq ivy-use-virtual-buffers t ; When non-nil, add recentf-mode and bookmarks to ivy-switch-buffer completion
-                                        ; candidates
+  (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
         confirm-nonexistent-file-or-buffer t
         ivy-virtual-abbreviate 'name
         ivy-wrap t ; Useful to be able to wrap around boundary items
@@ -66,6 +65,7 @@
 
 (use-package counsel
   :ensure t
+  :ensure ivy
   :after ivy
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
@@ -92,6 +92,7 @@
    ([remap load-theme] . counsel-load-theme)
    ([remap load-library] . counsel-load-library)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
+   ([remap completion-at-point] . counsel-company)
    ("C-<f9>" . dotemacs-counsel-goto-recent-directory))
   :config
   (setq counsel-mode-override-describe-bindings t
