@@ -187,7 +187,7 @@
                             :height 0.9)
         (set-face-attribute 'tabbar-selected nil
                             :inherit 'tabbar-default
-                            :height 1.2
+                            :height 1.1
                             :bold t
                             :underline nil)
         (set-face-attribute 'tabbar-separator nil
@@ -196,7 +196,12 @@
         (set-face-attribute 'tabbar-modified nil
                             :inherit 'tabbar-modified
                             :foreground "red"
-                            :height 1.1)
+<<<<<<< Updated upstream
+                            :height 1)
+=======
+                            :height 1
+                            :box '(:line-width 1 :color "black" :style sunken))
+>>>>>>> Stashed changes
         (set-face-attribute 'tabbar-selected-modified nil
                             :inherit 'tabbar-selected-modified
                             :foreground "dark green"

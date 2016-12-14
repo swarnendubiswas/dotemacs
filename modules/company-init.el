@@ -14,7 +14,7 @@
   :diminish company-mode
   :preface
   (defun dotemacs--quit-company-save-buffer ()
-    "Wrapper function to quit company popup, and then save the buffer using the same keybinding used to save a buffer."
+    "Quit company popup and save the buffer."
     (interactive)
     (company-abort)
     (save-buffer))
