@@ -196,16 +196,11 @@
         (set-face-attribute 'tabbar-modified nil
                             :inherit 'tabbar-modified
                             :foreground "red"
-                            :height 1.1
-                            :box '(:line-width 1 :color "black" :style sunken))
+                            :height 1.1)
         (set-face-attribute 'tabbar-selected-modified nil
                             :inherit 'tabbar-selected-modified
                             :foreground "dark green"
-                            :box '(:line-width 1 :color "black" :style sunken)
-                            :height 1.1
-                            ;; :bold t
-                            ;; :underline nil
-                            ))
+                            :height 1.1))
     (progn
       ((set-face-attribute 'tabbar-default nil
                            :background "gray80")

@@ -92,6 +92,7 @@
 (use-package counsel-gtags
   :ensure t
   :if (eq dotemacs-selection 'ivy)
+  :diminish counsel-gtags-mode
   :config
   (add-hook 'c-mode-common-hook
             (lambda ()
