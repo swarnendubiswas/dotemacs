@@ -196,12 +196,7 @@
         (set-face-attribute 'tabbar-modified nil
                             :inherit 'tabbar-modified
                             :foreground "red"
-<<<<<<< Updated upstream
                             :height 1)
-=======
-                            :height 1
-                            :box '(:line-width 1 :color "black" :style sunken))
->>>>>>> Stashed changes
         (set-face-attribute 'tabbar-selected-modified nil
                             :inherit 'tabbar-selected-modified
                             :foreground "dark green"
