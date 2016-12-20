@@ -125,6 +125,10 @@
   (counsel-mode 1)
   :diminish counsel-mode)
 
+(use-package ivy-rich
+  :ensure t
+  :config (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+
 (provide 'ivy-init)
 
 ;;; ivy-init.el ends here

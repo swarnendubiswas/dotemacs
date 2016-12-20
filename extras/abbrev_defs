@@ -730,6 +730,7 @@
     ("inthe" "in the" nil 0)
     ("inturn" "in turn" nil 0)
     ("invitaion" "invitation" nil 0)
+    ("invlaid" "invalid" nil 1)
     ("invlaidation" "invalidation" nil 1)
     ("invstigated" "investigated" nil 0)
     ("inwhich" "in which" nil 0)
@@ -1396,7 +1397,9 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 
