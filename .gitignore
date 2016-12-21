@@ -9,4 +9,4 @@ irony
 .python-environments
 modules/flycheck_*.el
 tramp
-acc-html-csswatcher
+ac-html-csswatcher
