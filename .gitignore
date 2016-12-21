@@ -8,3 +8,5 @@ srecode-map.el
 irony
 .python-environments
 modules/flycheck_*.el
+tramp
+acc-html-csswatcher

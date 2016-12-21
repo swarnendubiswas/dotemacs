@@ -127,6 +127,7 @@
 
 (use-package ivy-rich
   :ensure t
+  :if (eq dotemacs-selection 'ivy)
   :config (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (provide 'ivy-init)
