@@ -23,7 +23,6 @@
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
       use-dialog-box nil
       use-file-dialog nil
-      enable-recursive-minibuffers t
       delete-by-moving-to-trash t
       scroll-margin 0 ; Drag the point along while scrolling
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
@@ -43,6 +42,9 @@
               history-delete-duplicates t
               ;; Disabling this is one way to speed up Emacs with buffers with long lines
               bidi-display-reordering nil)
+
+(when (>= emacs-major-version 24)
+  (setq inhibit-message t))
 
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
@@ -166,7 +168,7 @@
     (advice-add 'capitalize-word :before #'goto-beginning-of-word)
     (advice-add 'downcase-word :before #'goto-beginning-of-word)
     (advice-add 'upcase-word :before #'goto-beginning-of-word)))
-            
+
 (use-package desktop
   :disabled t
   :config
@@ -218,7 +220,9 @@
         savehist-autosave-interval 300)
   (savehist-mode 1))
 
+(setq enable-recursive-minibuffers nil)
 (use-package mb-depth
+  :if (bound-and-true-p enable-recursive-minibuffers)
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify

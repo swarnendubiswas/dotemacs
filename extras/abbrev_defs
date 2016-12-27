@@ -363,7 +363,7 @@
     ("compair" "compare" nil 0)
     ("comparabl" "comparable" nil 1)
     ("comparign" "comparing" nil 1)
-    ("comparision" "comparison" nil 1)
+    ("comparision" "comparison" nil 2)
     ("comparisions" "comparisons" nil 1)
     ("compatable" "compatible" nil 0)
     ("compleated" "completed" nil 0)
@@ -1221,6 +1221,7 @@
     ("virtualyl" "virtually" nil 0)
     ("visibile" "visible" nil 0)
     ("vlaidation" "validation" nil 1)
+    ("vlaue" "value" nil 1)
     ("vrey" "very" nil 0)
     ("vulnerible" "vulnerable" nil 0)
     ("waht" "what" nil 0)
@@ -1397,9 +1398,7 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 

@@ -29,8 +29,9 @@
   (unbind-key "C-s" isearch-mode-map) ; isearch-repeat-forward
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
-  (use-package isearch+
+  (use-package isearch+ ;; FIXME: This is failing with Emacs snapshot.
     :ensure t
+    :disabled t
     :diminish isearch-mode)
   (use-package isearch-dabbrev
     :ensure t
@@ -44,9 +45,10 @@
          ("C-f" . isearch-repeat-forward)
          ("C-<return>" . isearch-exit-other-end)))
 
-(use-package replace+
+(use-package replace+ ;; FIXME: This is failing with Emacs snapshot.
   :ensure t
-  :after replace)
+  :after replace
+  :disabled t)
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
