@@ -150,13 +150,9 @@
         reftex-toc-follow-mode t
         reftex-use-fonts t
         reftex-highlight-selection 'both)
-  (if (string-equal (system-name) "rain.cse.ohio-state.edu")
-      (setq reftex-default-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
-                                          "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
-                                          "/workspace/iss-workspace/bibtex/iss.bib"))
-    (setq reftex-default-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                        "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
-                                        "~/iss-workspace/bibtex/iss.bib")))
+  (setq reftex-default-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
+                                      "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
+                                      "/workspace/iss-workspace/bibtex/iss.bib"))
   (use-package reftex-cite
     :preface
     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -212,13 +208,9 @@
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t)
-  (if (string-equal (system-name) "rain.cse.ohio-state.edu")
-      (setq bibtex-completion-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
-                                             "/workspace/iss-workspace/bibtex/iss.bib"
-                                             "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"))
-    (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                           "~/iss-workspace/bibtex/iss.bib"
-                                           "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"))))
+  (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
+                                         "~/iss-workspace/bibtex/iss.bib"
+                                         "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
 
 (use-package helm-bibtex
   :ensure t
@@ -233,8 +225,7 @@
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
-  :config
-  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
+  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
 
 (use-package company-bibtex
   :ensure t
