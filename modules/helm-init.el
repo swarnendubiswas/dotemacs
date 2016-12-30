@@ -23,6 +23,10 @@
   :config
   (setq helm-candidate-number-limit 100
         helm-locate-fuzzy-match t
+        helm-ag-fuzzy-match t
+        helm-apropos-fuzzy-match t
+        helm-lisp-fuzzy-completion t
+        helm-etags-fuzzy-match t
         ;; I now prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since
         ;; long lines can get truncated.
         helm-full-frame nil ; Make the helm buffer occupy the full frame
@@ -57,7 +61,7 @@
     :bind
     (([remap switch-to-buffer] . helm-mini)
      ([remap list-buffers] . helm-buffers-list))
-    ;; :init (advice-add 'helm-buffers-sort-transformer :around #'dotemacs--helm-buffers-sort-dired-buffers)
+    :init (advice-add 'helm-buffers-sort-transformer :around #'dotemacs--helm-buffers-sort-dired-buffers)
     :config
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
@@ -66,7 +70,7 @@
           helm-buffers-truncate-lines nil
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
-                                      ;; helm-source-dired-recent-dirs
+                                      helm-source-dired-recent-dirs
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
@@ -135,11 +139,6 @@
     :config (setq helm-dabbrev-case-fold-search t)
     :bind ([remap dabbrev-expand] . helm-dabbrev))
 
-  (use-package helm-elisp
-    :config
-    (setq helm-apropos-fuzzy-match t
-          helm-lisp-fuzzy-completion t))
-
   (use-package helm-elisp-package
     :bind ("C-c h p" . helm-list-elisp-packages))
 
@@ -151,7 +150,6 @@
    ("C-c h g" . helm-do-grep)
    ("C-c h r" . helm-resume)
    ("C-c r" . helm-resume)
-   ;; swoop is better than occur
    ([remap occur] . helm-occur)
    ("C-c h o" . helm-occur)
    :map helm-map
@@ -196,6 +194,12 @@
   :if (eq dotemacs-selection 'helm)
   :after helm
   :bind ([remap describe-mode] . helm-describe-modes))
+
+(use-package helm-ls-svn
+  :ensure t)
+
+(use-package helm-ls-git
+  :ensure t)
 
 (provide 'helm-init)
 

@@ -73,8 +73,8 @@
   :bind (("<f5>" . helm-projectile-switch-project)
          ("<f6>" . helm-projectile-find-file)
          ("<f7>" . helm-projectile-switch-to-buffer)
-         ;; helm grep is different from projectile-grep because the helm grep is incremental
-         ("<f8>" . helm-projectile-grep)))
+         ;; helm grep is different from projectile-grep because helm grep is incremental
+         ("<f8>" . helm-projectile-ag)))
 
 (use-package counsel-projectile
   :ensure t

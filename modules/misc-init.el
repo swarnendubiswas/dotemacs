@@ -80,26 +80,24 @@
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :ensure t
-  :commands popwin-mode
-  :init (popwin-mode 1)
   :config
+  (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
   (setq popwin:popup-window-height 20
         popwin:close-popup-window-timer-interval 0.5
-        display-buffer-function 'popwin:display-buffer)
+        ;; display-buffer-function 'popwin:display-buffer
+        )
 
   ;; Disable this if we are opening helm buffers on the right
-  ;; (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
-  ;; (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
+  (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
+  (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
 
   ;; Helm buffers include the "help" string
   ;; (push '("*Help*" :regexp t) popwin:special-display-config)
 
-  ;; M-x dired-jump-other-window
   (push '(dired-mode :position top) popwin:special-display-config)
-  ;; M-x compile
   (push '(compilation-mode :noselect t) popwin:special-display-config)
-  (add-to-list 'popwin:special-display-config '("*Compile-Log*" :noselect t))
+  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
   (push '(svn-info-mode :noselect t) popwin:special-display-config)
   (push '(svn-status-mode) popwin:special-display-config)
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
@@ -112,15 +110,12 @@
   (push '("*ag search*") popwin:special-display-config)
   (push '("*Completions*" :stick t :noselect t) popwin:special-display-config)
   (push '("*ggtags-global*" :stick t :noselect t :height 30) popwin:special-display-config)
-  (push '("*Compile-Log*") popwin:special-display-config)
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*"))
-
-  (popwin-mode 1))
+  (add-to-list 'popwin:special-display-config '("*Warnings*")))
 
 (use-package golden-ratio
   :ensure t

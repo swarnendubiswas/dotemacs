@@ -121,9 +121,9 @@
                                                     )
 
                                                   (when (eq dotemacs-theme 'default)
-                                                    (set-face-attribute 'spaceline-highlight-face nil
-                                                                        :background "#1A4B77"
-                                                                        :foreground "white")
+                                                    ;; (set-face-attribute 'spaceline-highlight-face nil
+                                                    ;;                     :background "#1A4B77"
+                                                    ;;                     :foreground "white")
                                                     (set-face-attribute 'powerline-active1 nil
                                                                         :background "gray22"
                                                                         :foreground "white"

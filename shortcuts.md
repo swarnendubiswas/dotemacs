@@ -116,12 +116,16 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 ## Helm
 
 * `C-SPC` - Mark buffer (`helm-toggle-visible-mark`).
+* `M-a` - Select all buffers (``.)
 * `M-D` - Kill marked buffers and quit Helm (`helm-buffer-run-kill-buffers`).
 * `C-c d` - Kill marked buffers and keep Helm session (``).
 * `M-SPC` - Marks a candidate (``).
-* `C-h m` - Shows other key bindings besides those shown in the modeline (``).
+* `C-h m` - Shows a general information buffer (including key bindings other than those shown in the modeline) (``).
 * `M-n` - Copies yanked symbol to minibuffer (``).
 * `C-w` - Appends word next to point to the minibuffer (``).
+* `C-c ?` - Pops a special info buffer of the current helm command (``).
+* `C-x b` -
+* `C-x C-b` -
 
 ## Org mode
 
