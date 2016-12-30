@@ -115,8 +115,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Helm
 
-* `C-SPC` - Mark buffer (``).
-* `M-D` - Kill marked buffers and quit Helm (``).
+* `C-SPC` - Mark buffer (`helm-toggle-visible-mark`).
+* `M-D` - Kill marked buffers and quit Helm (`helm-buffer-run-kill-buffers`).
 * `C-c d` - Kill marked buffers and keep Helm session (``).
 * `M-SPC` - Marks a candidate (``).
 * `C-h m` - Shows other key bindings besides those shown in the modeline (``).

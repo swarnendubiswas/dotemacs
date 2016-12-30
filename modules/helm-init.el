@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+(defvar dotemacs-temp-directory)
+
 (use-package helm-mode
   :ensure helm
   :if (eq dotemacs-selection 'helm)
@@ -69,13 +72,12 @@
   (use-package helm-command
     :config (setq helm-M-x-fuzzy-match t)
     :bind
-    (;; ([remap execute-extended-command] . helm-M-x)
-     ;; Convenient since it is a single key press
-     ("<f1>" . helm-M-x)))
+    ;; Convenient since it is a single key press
+    ("<f1>" . helm-M-x))
 
   (use-package helm-utils
     :config
-    (setq helm-highlight-number-lines-around-point 10
+    (setq helm-highlight-matches-around-point-max-lines 10
           helm-yank-symbol-first t)
     (helm-popup-tip-mode 1))
 

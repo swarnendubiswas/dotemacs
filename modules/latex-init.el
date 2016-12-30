@@ -150,9 +150,9 @@
         reftex-toc-follow-mode t
         reftex-use-fonts t
         reftex-highlight-selection 'both)
-  (setq reftex-default-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
-                                      "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
-                                      "/workspace/iss-workspace/bibtex/iss.bib"))
+  (setq reftex-default-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
+                                      "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
+                                      "~/iss-workspace/bibtex/iss.bib"))
   (use-package reftex-cite
     :preface
     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -232,9 +232,9 @@
   :if (eq dotemacs-completion-in-buffer 'company)
   :config
   (add-to-list 'company-backends 'company-bibtex)
-  (setq company-bibtex-bibliography '("/workspace/plass-workspace/bib/plass-formatted.bib"
-                                      "/workspace/iss-workspace/bibtex/iss.bib"
-                                      "/workspace/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
+  (setq company-bibtex-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
+                                      "~/iss-workspace/bibtex/iss.bib"
+                                      "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
 
 (use-package outline
   :ensure t
