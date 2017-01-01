@@ -72,11 +72,18 @@
         helm-ag-source-type 'file-line))
 
 (use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
-  :ensure wgrep
+  :ensure t
   :config
   (use-package wgrep
+    :ensure t
     :config (setq wgrep-auto-save-buffer t))
   (add-hook 'ag-mode-hook #'wgrep-ag-setup))
+
+(use-package ido-occur
+  :ensure t
+  :if (eq dotemacs-selection 'ido)
+  :bind (("C-c o" . ido-occur)
+         ("C-c O" . ido-occur-at-point)))
 
 (use-package swoop
   :ensure t

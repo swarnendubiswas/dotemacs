@@ -26,26 +26,22 @@
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :init
+  :config
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
-  (require 'smartparens-config)
-  :config
+  (smartparens-global-strict-mode 1)
   (setq sp-autoskip-closing-pair 'always
-        sp-hybrid-kill-entire-symbol nil ; Don't kill entire symbol on C-k
-        sp-navigate-close-if-unbalanced t
-        sp-show-pair-from-inside t
-        sp-autoinsert-quote-if-followed-by-closing-pair nil
-        sp-highlight-pair-overlay t
-        sp-highlight-wrap-overlay t
-        sp-highlight-wrap-tag-overlay t)
-  (make-variable-buffer-local 'show-paren-mode)
+        ;; Don't kill entire symbol on C-k
+        sp-hybrid-kill-entire-symbol nil)
+  ;; http://emacs.stackexchange.com/questions/26912/smartparens-do-not-insert-parenthesis-pair-when-point-is-at-the-beginning-of-wo
+  (sp-pair "(" nil :unless '(sp-point-before-word-p))
+  (sp-pair "[" nil :unless '(sp-point-before-word-p))
+  (sp-pair "{" nil :unless '(sp-point-before-word-p))
+  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
   :bind (("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)
          ("C-M-w" . sp-down-sexp)
-         ;; ("M-<up>" . sp-backward-up-sexp)
-         ;; ("M-<down>" . sp-backward-down-sexp)
          ("C-M-f" . sp-forward-sexp)
          ("C-M-b" . sp-backward-sexp)
          ("C-M-n" . sp-next-sexp)

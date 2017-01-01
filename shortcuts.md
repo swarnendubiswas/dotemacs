@@ -94,7 +94,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Ido
 
-* `C-j` - Use the current input string verbatim (`ido-select-text`).
+* `C-j` - Use the current input string verbatim (`ido-select-text`). Create a new buffer rather than switching to an
+  existing buffer.
 * `//` - Go to the root directory (``).
 * `~/` - Go to the home directory (``).
 * `C-f` - Fall back to find file (without ido-mode) (``).

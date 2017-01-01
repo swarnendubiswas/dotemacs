@@ -9,6 +9,7 @@
 
 ;; Magit needs git >=1.9.4
 (use-package magit
+  :ensure t
   :functions magit-status
   :config
   (setq magit-auto-revert-mode nil

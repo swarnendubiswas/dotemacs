@@ -154,14 +154,14 @@
   ;; Turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
-;; Enable disabled commands
-(put 'downcase-region  'disabled nil) ; Let downcasing work
-(put 'upcase-region    'disabled nil) ; Let upcasing work
-(put 'erase-buffer     'disabled nil)
-(put 'eval-expression  'disabled nil) ; Let ESC-ESC work
-(put 'narrow-to-page   'disabled nil) ; Let narrowing work
-(put 'narrow-to-region 'disabled nil) ; Let narrowing work
-(put 'set-goal-column  'disabled nil)
+;; ;; Enable disabled commands
+;; (put 'downcase-region  'disabled nil) ; Let downcasing work
+;; (put 'upcase-region    'disabled nil) ; Let upcasing work
+;; (put 'erase-buffer     'disabled nil)
+;; (put 'eval-expression  'disabled nil) ; Let ESC-ESC work
+;; (put 'narrow-to-page   'disabled nil) ; Let narrowing work
+;; (put 'narrow-to-region 'disabled nil) ; Let narrowing work
+;; (put 'set-goal-column  'disabled nil)
 
 (when (<= emacs-major-version 24)
   (progn
@@ -180,12 +180,14 @@
   :config (global-font-lock-mode 1))
 
 (use-package font-lock
+  :disabled t
   :config
   (setq font-lock-maximum-decoration t ; Maximum fontification possible
         ;; Jit locking is better than fast-lock and lazy-lock
         font-lock-support-mode 'jit-lock-mode))
 
 (use-package jit-lock ; Improve scrolling speed with jit fontification
+  :disabled t
   :config
   (setq jit-lock-defer-time 0.10 
         jit-lock-stealth-time 10

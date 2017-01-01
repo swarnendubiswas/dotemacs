@@ -19,7 +19,7 @@
               :action
               (lambda (f)
                 (with-ivy-window
-                  (find-file f)))
+                 (find-file f)))
               :caller 'counsel-recentf))
   :config
   (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates

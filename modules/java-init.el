@@ -13,7 +13,8 @@
             (setq c-basic-offset 2
                   c-set-style "java")))
 
-(use-package ant)
+(use-package ant
+  :ensure t)
 
 (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
   :ensure t
@@ -21,8 +22,7 @@
 
 (use-package jdee
   :ensure t
-  :defer t
-  :init
+  :config
   (setq jdee-server-dir dotemacs-extras-directory
         jdee-complete-function 'jdee-complete-minibuf)
   (if (string-equal (system-name) "consensus.ices.utexas.edu")
