@@ -83,8 +83,7 @@
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-switch-to-buffer)
-         ;; projectile-grep fails with fish shell
-         ("<f8>" . projectile-ag)))
+         ("<f8>" . counsel-projectile-ag)))
 
 (provide 'projectile-init)
 

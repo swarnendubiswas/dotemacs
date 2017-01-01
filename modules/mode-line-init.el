@@ -36,9 +36,7 @@
                                                     (set-face-attribute 'mode-line-buffer-id nil
                                                                         :weight 'bold
                                                                         :foreground "black"
-                                                                        :background "gray88")
-
-                                                    )))
+                                                                        :background "gray88"))))
 
       ((eq dotemacs-mode-line-theme 'sml) (use-package smart-mode-line
                                             :ensure t
@@ -49,10 +47,6 @@
                                                   sml/shorten-modes t
                                                   sml/shorten-directory t)
                                             (sml/setup)))
-
-      ((eq dotemacs-mode-line-theme 'telephone-line) (use-package telephone-line
-                                                       :ensure t
-                                                       :config (telephone-line-mode 1)))
 
       ((eq dotemacs-mode-line-theme 'spaceline) (use-package spaceline
                                                   :ensure t
@@ -153,7 +147,8 @@
           (nyan-start-animation)
           (setq-default nyan-wavy-trail nil
                         nyan-animate-nyancat t
-                        nyan-bar-length 24))
+                        nyan-bar-length 16
+                        nyan-cat-face-number 5))
       (nyan-mode -1)))
   :config
   (add-hook 'after-make-frame-functions 'dotemacs--toggle-nyan-mode)

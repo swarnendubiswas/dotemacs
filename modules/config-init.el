@@ -42,7 +42,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-selection
-  'helm
+  'ido
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "helm" helm)
@@ -68,9 +68,6 @@
           (const :tag "professional" professional)
           (const :tag "eclipse" eclipse)
           (const :tag "spacemacs-light" spacemacs-light)
-          (const :tag "solarized-light" solarized-light)
-          (const :tag "solarized-dark" solarized-dark)
-          (const :tag "zenburn" zenburn)
           (const :tag "default" default))
   :group 'dotemacs)
 
@@ -80,7 +77,6 @@
   :type '(radio
           (const :tag "powerline" powerline)
           (const :tag "smart-mode-line" sml)
-          (const :tag "telephone-line" telephone-line)
           (const :tag "spaceline" spaceline)
           (const :tag "default" default))
   :group 'dotemacs)

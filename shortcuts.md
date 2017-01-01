@@ -78,21 +78,28 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 ### Ag
 
 * `<f8>` - Run an ag search in the project (`projectile-ag`).
+* `<return>` - Visit the file (``).
+* `n` and `p` - Move between results (``).
+* `g` - Run the search again (``).
+* `q` - Close the buffer (``).
+* `k` - Kill the buffer (``).
 * `C-c C-p` -
 * `C-x C-s` -
+* `C-h m` - Show all the keybindings available inside a results buffer (``).
 
 ### Swiper
 
-* `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
+* `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper`
+  `thing-at-point`).
 
 ## Ido
 
 * `C-j` - Use the current input string verbatim (`ido-select-text`).
 * `//` - Go to the root directory (``).
-* `~/` - Go to the home directory ().
-* `C-f` - Fall back to find file (without ido-mode).
-* `C-d` - Enter Dired for this directory.
-* `M-p` and `M-n` (or `M-UP` and `M-DOWN`) - Change to previous/next directories from history.
+* `~/` - Go to the home directory (``).
+* `C-f` - Fall back to find file (without ido-mode) (``).
+* `C-d` - Enter Dired for this directory (``).
+* `M-p` and `M-n` (or `M-UP` and `M-DOWN`) - Change to previous/next directories from history (``).
 
 ## Ivy
 
@@ -107,8 +114,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `~` - Switch to the home directory (`self-insert-command`).
 * `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`).
 * `C-m` - Calls the default action and exits minibuffer (`ivy-done`).
-* `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
-* `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when copying/renaming files with names that match existing files.
+* `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there.
+  Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
+* `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when
+  copying/renaming files with names that match existing files.
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
 * `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
@@ -171,15 +180,16 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c [` - Look up a bibliography reference (`reftex-citation`).
 * `C-c =` - Look up the TOC (`reftex-toc`).
 
-To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
+To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the
+label selection buffer, the table of contents buffer, or the index buffer.
 
 ## Markdown
 
-* `C-c C-s e` - Make region or word italic (emphasis).
-* `C-c C-s s` - Make region or word bold or strong.
-* `C-c C-s s` - Insert or start blockquote.
-* `C-c C-s p` - Insert pre-formatted code blocks.
-* `C-c -` - Insert a horizontal rule.
+* `C-c C-s e` - Make region or word italic (emphasis) (``).
+* `C-c C-s s` - Make region or word bold or strong (``).
+* `C-c C-s s` - Insert or start blockquote (``).
+* `C-c C-s p` - Insert pre-formatted code blocks (``).
+* `C-c -` - Insert a horizontal rule (``).
 
 ## GGtags
 
@@ -211,7 +221,8 @@ See the requirements: [https://github.com/leoliu/ggtags][]
 ### Search for the symbol at point
 
 #### Isearch
-* `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
+* `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the
+  search (`isearch-forward-regexp`).
 
 #### Swiper
 * `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).

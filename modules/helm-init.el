@@ -36,8 +36,7 @@
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line nil
         helm-echo-input-in-header-line nil
-        ;; Default is 'smart, searches and matches should ignore case
-        helm-case-fold-search t
+        helm-case-fold-search t ; Default is 'smart, searches and matches should ignore case
         helm-follow-mode-persistent t)
 
   (helm-autoresize-mode -1) ; Distracting
@@ -155,11 +154,6 @@
    :map helm-map
    ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
    ("C-z" . helm-select-action)))
-
-(use-package helm-company
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :after company)
 
 (use-package helm-smex
   :ensure t

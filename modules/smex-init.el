@@ -10,14 +10,14 @@
 
 (use-package smex
   :ensure t
+  :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
   :config
   (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
         smex-auto-update t)
   (smex-initialize)
-  (when (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
-    (bind-key "M-x" #'smex)
-    (bind-key "<f1>" #'smex)
-    (bind-key "M-X" #'smex-major-mode-commands)))
+  :bind (("M-x" . smex)
+         ("<f1>" . smex)
+         ("M-X" . smex-major-mode-commands)))
 
 (provide 'smex-init)
 
