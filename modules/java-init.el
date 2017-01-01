@@ -42,10 +42,11 @@
   :ensure t
   :defer t
   :init
-  (use-package eclimd)
+  (use-package eclimd
+    :config (setq eclimd-autostart t))
   (setq eclim-eclipse-dirs "/home/sbiswas/software/eclipse-neon-java/"
         eclim-executable "/home/sbiswas/software/eclipse-neon-java/eclim"
-        eclim-default-workspace "/home/sbiswas/workspace"
+        eclim-default-workspace "/home/sbiswas/plass-workspace"
         eclim-auto-save t)
   (add-hook 'java-mode-hook #'eclim-mode)
   :config 
@@ -55,7 +56,8 @@
     :config (company-emacs-eclim-setup))
   (use-package ac-emacs-eclim
     :ensure t
-    :if (eq dotemacs-completion-in-buffer 'auto-complete)))
+    :if (eq dotemacs-completion-in-buffer 'auto-complete)
+    :config (ac-emacs-eclim-config)))
 
 (provide 'java-init)
 
