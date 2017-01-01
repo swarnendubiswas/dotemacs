@@ -230,7 +230,7 @@
   (crux-with-region-or-buffer indent-region)
   (crux-with-region-or-buffer untabify)
   (crux-with-region-or-line comment-or-uncomment-region)
-  :bind (("C-c o" . crux-open-with)
+  :bind (("C-c C-o" . crux-open-with)
          ("C-c i" . crux-ispell-word-then-abbrev)
          ("C-c C-r" . crux-recentf-find-file)))
 

@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-fill-column)
+
 (use-package fill-column-indicator
   :ensure t
   :if (bound-and-true-p dotemacs-use-fci-p)

@@ -86,9 +86,6 @@
                 ("C-M-j" . nil)
                 ("C-c c j" . moo-jump-directory)))
 
-  ;; This is already the default, but I have this as a reminder.
-  (bind-key "M-q" #'c-fill-paragraph c-mode-base-map)
-
   ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
 
   ;; http://tuhdo.github.io/c-ide.html
@@ -110,7 +107,7 @@
            (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/source/include/pin"))
 
           ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
-           (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/"))))
+           (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/"))))
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (with-eval-after-load "auto-complete"
@@ -150,17 +147,16 @@
 
   (unbind-key "C-M-a" c-mode-map)
   :bind (("C-c c a" . c-beginning-of-defun)
-         ("C-c c e" . c-end-of-defun)))
+         ("C-c c e" . c-end-of-defun)
+         :map c-mode-base-map
+         ("M-q" . c-fill-paragraph)))
 
 (use-package irony
   :ensure t
   :diminish irony-mode
+  :commands irony-mode
   :defer t
-  :init
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'objc-mode-hook 'irony-mode)
-  :config
+  :preface
   ;; Replace the `completion-at-point' and `complete-symbol' bindings in
   ;; irony-mode's buffers by irony-mode's function
   (defun my-irony-mode-hook ()
@@ -168,20 +164,30 @@
       'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol]
       'irony-completion-at-point-async))
+  :init
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  :config
   (add-hook 'irony-mode-hook #'my-irony-mode-hook)
   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
+  (add-hook 'irony-mode-hook #'flycheck-irony-setup)
 
   (use-package company-irony
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'company)
+    :commands company-irony-setup-begin-commands
     :init
     (use-package company-irony-c-headers
       :ensure t)
+    (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
     :config
     (add-to-list 'company-backends '(company-irony-c-headers
                                      company-irony)))
+
   (use-package irony-eldoc
     :ensure t
+    :commands irony-eldoc
     :config (add-hook 'irony-mode-hook #'irony-eldoc)))
 
 (provide 'cc-init)

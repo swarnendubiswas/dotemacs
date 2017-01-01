@@ -14,8 +14,7 @@
   (setq ispell-dictionary "english"
         ispell-personal-dictionary (concat dotemacs-extras-directory "spell")
         ;; Aspell speed: ultra | fast | normal | bad-spellers
-        ispell-extra-args '("--sug-mode=ultra"
-                            "--lang=en_US")
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")
         ;; Save a new word to personal dictionary without asking
         ispell-silently-savep t))
 
@@ -93,17 +92,21 @@
   :ensure t
   :if (eq dotemacs-selection 'helm)
   :after flyspell
-  :config (bind-key "M-$" #'helm-flyspell-correct flyspell-mode-map))
+  :bind (:map flyspell-mode-map
+              ("M-$" . helm-flyspell-correct)))
 
 (use-package flyspell-popup
   :ensure t
   :after flyspell
-  :config (bind-key "C-;" #'flyspell-popup-correct flyspell-mode-map))
+  :bind (:map flyspell-mode-map
+              ("C-;" . flyspell-popup-correct)))
 
 (use-package flyspell-correct
   :ensure t
   :after flyspell
   :disabled t
+  :bind (:map flyspell-mode-map
+              ("M-$" . flyspell-correct-word-generic))
   :config
   (cond ((eq dotemacs-selection 'helm) (use-package flyspell-correct-helm
                                          :ensure t
@@ -114,8 +117,7 @@
                                         :config (setq flyspell-correct-interface 'flyspell-correct-ivy)))
         (t (use-package flyspell-correct-popup
              :ensure t
-             :config (setq flyspell-correct-interface 'flyspell-correct-popup))))
-  (bind-key "M-$" #'flyspell-correct-word-generic flyspell-mode-map))
+             :config (setq flyspell-correct-interface 'flyspell-correct-popup)))))
 
 (provide 'spell-init)
 

@@ -34,6 +34,12 @@
     (global-semantic-idle-summary-mode 1)
     (global-semantic-idle-completions-mode 1))
   :config
+  (require 'semantic/ia)
+  (require 'semantic/db)
+  (require 'semantic/sb)
+  (require 'semantic/bovine)
+  (require 'semantic/bovine/c)
+  (require 'semantic/bovine/gcc)
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   ;; Ensure semantic can get info from gnu global
   (semanticdb-enable-gnu-global-databases 'c-mode)
@@ -41,7 +47,7 @@
   (semantic-add-system-include "/usr/include")
   (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
 
-(use-package idle
+(use-package semantic/idle
   :preface
   (defun dotemacs-idle-functions ()
     (global-semantic-idle-scheduler-mode 1)

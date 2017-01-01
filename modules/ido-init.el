@@ -9,8 +9,6 @@
 (defvar dotemacs-temp-directory)
 (defvar dotemacs-ido-view-mode)
 
-;; C-j to create a new buffer rather than switching to an existing buffer
-;; C-x C-f C-f to kick you out of ido mode into "normal" find file mode
 (use-package ido
   :ensure t
   :preface
