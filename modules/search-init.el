@@ -13,11 +13,6 @@
 (use-package isearch
   :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
   :preface
-  ;; https://www.reddit.com/r/emacs/comments/3yxk2x/flexible_isearch_without_a_package/
-  (defun dotemacs--isearch-fuzzy ()
-    (interactive)
-    (let ((search-whitespace-regexp ".*?"))
-      (call-interactively 'isearch-forward)))
   ;; http://endlessparentheses.com/leave-the-cursor-at-start-of-match-after-isearch.html?source=rss
   (defun dotemacs--isearch-exit-other-end ()
     "Exit isearch, at the opposite end of the string."
@@ -25,13 +20,10 @@
     (isearch-exit)
     (goto-char isearch-other-end))
   :config
-  (unbind-key "C-s") ; isearch-forward-regexp
-  (unbind-key "C-s" isearch-mode-map) ; isearch-repeat-forward
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
-  (use-package isearch+ ;; FIXME: This is failing with Emacs snapshot.
+  (use-package isearch+
     :ensure t
-    :disabled t
     :diminish isearch-mode)
   (use-package isearch-dabbrev
     :ensure t
@@ -39,55 +31,30 @@
                 ("<tab>" . isearch-dabbrev-expand)))
   (use-package isearch-symbol-at-point
     :ensure t)
-  :diminish isearch-mode
-  :bind (("C-f" . isearch-forward-regexp)
+  :bind (("C-s" . nil) ; isearch-forward-regexp
+         ("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
+         ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)
          ("C-<return>" . isearch-exit-other-end)))
 
-(use-package replace+ ;; FIXME: This is failing with Emacs snapshot.
+(use-package replace+
   :ensure t
-  :after replace
-  :disabled t)
+  :after replace)
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :preface
-  ;; For certain files with long lines, the results in the swiper buffer is truncated to the right. These wrapper
-  ;; methods are to get around that problem.
-  (defun dotemacs-swiper-with-visual-line-mode ()
-    "Long lines are truncated at the right without visual line"
-    (interactive)
-    (visual-line-mode 1)
-    (swiper)
-    (visual-line-mode -1))
-
-  (defun dotemacs-swiper-all-with-visual-line-mode ()
-    "Long lines are truncated at the right without visual line"
-    (interactive)
-    (visual-line-mode 1)
-    (swiper-all)
-    (visual-line-mode -1))
+  :bind ("<f4>" . swiper)
   :config
-  (when (not (eq dotemacs-selection 'ivy))
-    (progn
-      (setq ivy-height 20)
-      (bind-key "<f4>" #'swiper)))
   (setq swiper-use-visual-line t
-        swiper-action-recenter t)
-  (bind-key "C-c r" #'ivy-resume))
+        swiper-action-recenter t))
 
 (use-package swiper-helm
   :ensure t
+  :after swiper
   :if (eq dotemacs-selection 'helm)
   :bind ("<f4>" . swiper-helm))
 
-;; Move between results by pressing n and p
-;; Visit the file by pressing <return> or clicking
-;; Run the search again by pressing g
-;; Close the buffer with q
-;; Kill the buffer with k
-;; C-h m inside a results buffer will show all the keybindings available to you.
 (use-package ag
   :ensure t
   :config
@@ -104,14 +71,6 @@
         helm-ag-insert-at-point 'symbol
         helm-ag-source-type 'file-line))
 
-(when (eq dotemacs-selection 'ivy)
-  (bind-key "C-c s a" #'counsel-ag)
-  ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
-  (bind-key "C-c s g" #'counsel-git-grep)
-  (setq counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
-  (bind-key "C-c s o" #'counsel-grep-or-swiper)
-  (bind-key "<f4>" #'counsel-grep-or-swiper))
-
 (use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
   :ensure wgrep
   :config
@@ -119,50 +78,24 @@
     :config (setq wgrep-auto-save-buffer t))
   (add-hook 'ag-mode-hook #'wgrep-ag-setup))
 
-(use-package grep
-  :disabled t
-  :init
-  (setq grep-highlight-matches t
-        grep-scroll-output t
-        grep-find-ignored-files '(".#*"
-                                  "*~"
-                                  "*.aux"
-                                  "*.blg"
-                                  "*.bbl"
-                                  "*.elc"
-                                  "*.lof"
-                                  "*.idx"
-                                  "*.lot"
-                                  "*.toc"
-                                  "*.pyc"
-                                  "*.pyo"
-                                  "*.pdf"))
-  (use-package grep+
-    :ensure t)
-  (add-to-list 'grep-find-ignored-directories "auto")
-  (add-to-list 'grep-find-ignored-directories ".cache")
-  (add-to-list 'grep-find-ignored-directories "__pycache__"))
-
 (use-package swoop
   :ensure t
-  :disabled t
   :config (setq swoop-use-target-magnifier t
                 swoop-use-target-magnifier-size 1.2))
 
 ;; "C-c C-e" to go into edit mode
 (use-package helm-swoop
   :ensure t
-  :disabled t
   :if (eq dotemacs-selection 'helm)
   :bind
   (("C-c h s" . helm-swoop)
    ("C-c h /" . helm-multi-swoop))
   :config
   (setq helm-multi-swoop-edit-save t ; Save buffer when helm-multi-swoop-edit complete
-        helm-swoop-speed-or-color nil
+        helm-swoop-speed-or-color nil ; If nil, you can slightly boost invoke speed in exchange for text color
         helm-swoop-split-direction #'split-window-vertically
         helm-swoop-split-with-multiple-windows nil
-        helm-swoop-move-to-line-cycle t ; go to the opposite side of line from the end or beginning of line
+        helm-swoop-move-to-line-cycle t ; Go to the opposite side of line from the end or beginning of line
         helm-swoop-use-line-number-face t))
 
 (use-package ace-isearch

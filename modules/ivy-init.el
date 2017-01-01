@@ -24,7 +24,7 @@
   :config
   (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
         confirm-nonexistent-file-or-buffer t
-        ivy-virtual-abbreviate 'name
+        ivy-virtual-abbreviate 'full
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search t ; Ignore case while searching
@@ -34,7 +34,7 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-arrow
         ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
-        ivy-re-builders-alist '((t . ivy--regex-ignore-order)) ; Allow input in any order, ivy--regex-fuzzy adds noise
+        ivy-re-builders-alist '((t . ivy--regex-ignore-order))
         ivy-flx-limit 200
         ;; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-ignore-default 'always)
@@ -93,9 +93,14 @@
    ([remap load-library] . counsel-load-library)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap completion-at-point] . counsel-company)
-   ("C-<f9>" . dotemacs-counsel-goto-recent-directory))
+   ("C-<f9>" . dotemacs-counsel-goto-recent-directory)
+   ("C-c s a" . counsel-ag)
+   ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+   ("C-c s o" . counsel-grep-or-swiper)
+   ("<f4>" . counsel-grep-or-swiper))
   :config
   (setq counsel-mode-override-describe-bindings t
+        counsel-grep-swiper-limit 1000000 ; Number of characters in the buffer
         counsel-find-file-at-point nil
         counsel-yank-pop-separator "\n-----------------\n"
         counsel-find-file-ignore-regexp (concat
@@ -128,8 +133,9 @@
 (use-package ivy-rich
   :ensure t
   :if (eq dotemacs-selection 'ivy)
-  :disabled t
-  :config (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+  :config
+  (setq ivy-rich-switch-buffer-align-virtual-buffer t)
+  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (provide 'ivy-init)
 

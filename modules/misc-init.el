@@ -93,7 +93,7 @@
   (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
 
   ;; Helm buffers include the "help" string
-  ;; (push '("*Help*" :regexp t) popwin:special-display-config)
+  (push '("*Help*" :regexp t) popwin:special-display-config)
 
   (push '(dired-mode :position top) popwin:special-display-config)
   (push '(compilation-mode :noselect t) popwin:special-display-config)
@@ -108,10 +108,9 @@
   (push '("*Kill Ring*") popwin:special-display-config)
   (push '("*Selection Ring:") popwin:special-display-config)
   (push '("*ag search*") popwin:special-display-config)
-  (push '("*Completions*" :stick t :noselect t) popwin:special-display-config)
   (push '("*ggtags-global*" :stick t :noselect t :height 30) popwin:special-display-config)
 
-  (add-to-list 'popwin:special-display-config '("*Completions*" :noselect t))
+  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect t))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
@@ -120,13 +119,7 @@
 (use-package golden-ratio
   :ensure t
   :diminish golden-ratio-mode
-  :preface
-  ;; http://tuhdo.github.io/helm-intro.html
-  (defun dotemacs/helm-alive-p ()
-    (if (boundp 'helm-alive-p)
-        (symbol-value 'helm-alive-p)))
   :config
-  (add-to-list 'golden-ratio-inhibit-functions #'dotemacs/helm-alive-p)
   (setq golden-ratio-auto-scale t
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
         split-width-threshold nil)
@@ -142,10 +135,7 @@
 
 (use-package change-inner ; This might be useful for programming modes
   :ensure t
-  :disabled t
-  :after expand-region
-  :bind (("M-i" . change-inner)
-         ("M-o" . change-outer)))
+  :after expand-region)
 
 (use-package expand-line
   :ensure t
@@ -219,8 +209,7 @@
 
 (use-package session
   :ensure t
-  :disabled t
-  :config
+  :init
   (add-hook 'after-init-hook #'session-initialize)
   (setq session-save-file (concat dotemacs-temp-directory "session")))
 

@@ -8,6 +8,7 @@
 (defvar dotemacs-selection)
 (defvar dotemacs-temp-directory)
 (defvar dotemacs-use-fci-p)
+(defvar dotemacs-completion-in-buffer)
 
 (use-package company
   :ensure t
@@ -36,17 +37,6 @@
                             company-preview-frontend
                             company-echo-metadata-frontend)
         company-require-match 'never)
-
-  ;; (cond ((eq dotemacs-selection 'ivy) (with-eval-after-load "counsel"
-  ;;                                       (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
-  ;;                                       (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
-  ;;                                       (bind-key "C-:" #'counsel-company company-mode-map)
-  ;;                                       (bind-key "C-:" #'counsel-company company-active-map)))
-  ;;       ((eq dotemacs-selection 'helm) (with-eval-after-load "helm-company"
-  ;;                                        (bind-key [remap complete-symbol] #'helm-company company-mode-map)
-  ;;                                        (bind-key [remap completion-at-point] #'helm-company company-mode-map)
-  ;;                                        (bind-key "C-:" #'helm-company company-mode-map)
-  ;;                                        (bind-key "C-:" #'helm-company company-active-map))))
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
@@ -76,6 +66,33 @@
   (setq company-quickhelp-delay 0.2
         company-quickhelp-max-lines 60)
   (company-quickhelp-mode 1))
+
+(use-package company-dict
+  :ensure t
+  :after company
+  :config
+  (setq company-dict-dir (concat dotemacs-temp-directory "dict/")
+        company-dict-enable-fuzzy t
+        company-dict-enable-yasnippet nil)
+  (add-to-list 'company-backends 'company-dict))
+
+(use-package helm-company
+  :ensure t
+  :if (and (eq dotemacs-selection 'helm) (eq dotemacs-completion-in-buffer 'company))
+  :after company
+  :bind (:map company-mode-map
+              ([remap complete-symbol] . helm-company)
+              ([remap completion-at-point] . helm-company)
+              ("C-:" . helm-company)
+              :map company-active-map
+              ("C-:" . helm-company)))
+
+(when (and (eq dotemacs-selection 'ivy) (eq dotemacs-completion-in-buffer 'ivy))
+  (with-eval-after-load "counsel"
+    (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
+    (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
+    (bind-key "C-:" #'counsel-company company-mode-map)
+    (bind-key "C-:" #'counsel-company company-active-map)))
 
 (provide 'company-init)
 
