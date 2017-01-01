@@ -110,7 +110,6 @@
       ((eq dotemacs-theme 'spacemacs-light) (use-package spacemacs-common
                                               :ensure spacemacs-theme
                                               :config
-                                              ;; https://github.com/nashamri/spacemacs-theme/issues/42
                                               (load-theme 'spacemacs-light t)
                                               (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))))
 
