@@ -82,8 +82,8 @@
 (use-package ido-occur
   :ensure t
   :if (eq dotemacs-selection 'ido)
-  :bind (("C-c o" . ido-occur)
-         ("C-c O" . ido-occur-at-point)))
+  :bind (("C-c s o" . ido-occur)
+         ("C-c s O" . ido-occur-at-point)))
 
 (use-package swoop
   :ensure t

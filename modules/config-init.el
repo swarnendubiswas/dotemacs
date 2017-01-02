@@ -42,7 +42,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-selection
-  'ido
+  'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "helm" helm)
@@ -52,7 +52,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-ido-view-mode
-  'vertical
+  'grid
   "Specify which view to use for ido."
   :type '(radio
           (const :tag "vertical" vertical)
