@@ -10,6 +10,7 @@
 ;; Magit needs git >=1.9.4
 (use-package magit
   :ensure t
+  :if (unless (string-equal (system-name) "consensus.ices.utexas.edu"))
   :functions magit-status
   :config
   (setq magit-auto-revert-mode nil

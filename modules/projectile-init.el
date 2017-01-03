@@ -36,7 +36,9 @@
                   ".svn"
                   ".nx"
                   "elpa"
-                  "auto"))
+                  "auto"
+                  "__pycache__"
+                  ))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   (dolist (item '("GPATH"
                   "GRTAGS"
@@ -49,7 +51,8 @@
                   "\\.pdf$"
                   "\\.pyc$"
                   "\\.rel$"
-                  "\\.rip$"))
+                  "\\.rip$"
+                  "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes list))
 
   ;; https://www.reddit.com/r/emacs/comments/320cvb/projectile_slows_tramp_mode_to_a_crawl_is_there_a/

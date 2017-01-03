@@ -14,7 +14,6 @@
   :config
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (progn
-      ;; FIXME: Disabling these packages seems to disable auto-complete
       (or
        (use-package ac-etags
          :ensure t
@@ -31,12 +30,12 @@
          (setq ac-etags-use-document t)
          (add-to-list 'ac-sources 'ac-source-etags))))))
 
-;; Front end to gnu global, use gtags -v -c. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
+;; Front end to GNU Global, use `gtags -v -c`. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; http://tuhdo.github.io/c-ide.html
 (use-package ggtags
   :ensure t
-  :if (and (eq system-type 'gnu/linux) (not (eq dotemacs-selection 'helm)))
+  :if (and (eq system-type 'gnu/linux) (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none)))
   :diminish ggtags-mode
   :init
   (add-hook 'c-mode-common-hook
@@ -48,15 +47,15 @@
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
         ggtags-completing-read-function nil)
-  :bind* (:map ggtags-mode-map
-               ("C-c g s" . ggtags-find-other-symbol)
-               ("C-c g h" . ggtags-view-tag-history)
-               ("C-c g r" . ggtags-find-reference)
-               ("C-c g f" . ggtags-find-file)
-               ("C-c g c" . ggtags-create-tags)
-               ("C-c g u" . ggtags-update-tags)
-               ("M-." . ggtags-find-tag-dwim)
-               ("M-," . pop-tag-mark)))
+  :bind (:map ggtags-mode-map
+              ("C-c g s" . ggtags-find-other-symbol)
+              ("C-c g h" . ggtags-view-tag-history)
+              ("C-c g r" . ggtags-find-reference)
+              ("C-c g f" . ggtags-find-file)
+              ("C-c g c" . ggtags-create-tags)
+              ("C-c g u" . ggtags-update-tags)
+              ("M-." . ggtags-find-tag-dwim)
+              ("M-," . pop-tag-mark)))
 
 ;; http://wikemacs.org/wiki/C-ide
 ;; http://tuhdo.github.io/c-ide.html
@@ -65,7 +64,7 @@
 (use-package helm-gtags
   :ensure t
   :diminish helm-gtags-mode
-  :if (eq dotemacs-selection 'helm)
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'helm))
   :config
   (setq helm-gtags-ignore-case t
         helm-gtags-auto-update t
@@ -79,6 +78,7 @@
         helm-gtags-cache-select-result t
         helm-gtags-display-style 'detail
         helm-gtags-update-interval-second 60)
+  :init
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
@@ -91,14 +91,32 @@
 
 (use-package counsel-gtags
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'ivy))
   :diminish counsel-gtags-mode
-  :config
+  :commands (counsel-gtags-find-definition
+             counsel-gtags-find-reference
+             counsel-gtags-find-symbol
+             counsel-gtags-find-file
+             counsel-gtags-pop
+             counsel-gtags-create-tags
+             counsel-gtags-update-tags
+             counsel-gtags-dwim)
+  :init
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
                 (counsel-gtags-mode 1))))
-  (add-hook 'python-mode-hook #'counsel-gtags-mode))
+  (add-hook 'python-mode-hook #'counsel-gtags-mode)
+  :config
+  (setq counsel-gtags-ignore-case t
+        counsel-gtags-auto-update t)
+  :bind (:map counsel-gtags-mode-map
+              ("M-." . counsel-gtags-dwim)
+              ("M-," . counsel-gtags-pop)
+              ("C-c g s" . counsel-gtags-find-other-symbol)
+              ("C-c g r" . counsel-gtags-find-reference)
+              ("C-c g c" . counsel-gtags-create-tags)
+              ("C-c g u" . counsel-gtags-update-tags)))
 
 ;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
 (defun dotemacs-create-latex-etags ()
