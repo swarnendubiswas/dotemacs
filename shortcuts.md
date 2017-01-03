@@ -117,7 +117,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-m` - Calls the default action and exits minibuffer (`ivy-done`).
 * `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there.
   Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
-* `C-M-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when
+* `C-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when
   copying/renaming files with names that match existing files.
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
@@ -206,6 +206,7 @@ See the requirements: [https://github.com/leoliu/ggtags][]
 * `C-M-h` - Mark the current function (`c-mark-function`).
 * `C-M-k` - Jump to a tag in the current file (`moo-jump-local`).
 * `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`).
+* `C-M-i` - Complete symbol at point (`complete-symbol`).
 
 ### Python and Elpy
 

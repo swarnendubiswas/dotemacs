@@ -31,6 +31,7 @@
                         '("os.path.abspath" "os.path.altsep" "os.path.basename")))))))
 
 
+;; FIXME: Create a hydra for elpy-nav-indent-shift-left/right.
 (use-package elpy
   :ensure t
   :diminish elpy-mode

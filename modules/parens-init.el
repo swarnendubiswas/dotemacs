@@ -29,15 +29,17 @@
   :config
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
-  (smartparens-global-strict-mode 1)
+  ;; (smartparens-global-strict-mode 1)
   (setq sp-autoskip-closing-pair 'always
         ;; Don't kill entire symbol on C-k
         sp-hybrid-kill-entire-symbol nil)
-  ;; http://emacs.stackexchange.com/questions/26912/smartparens-do-not-insert-parenthesis-pair-when-point-is-at-the-beginning-of-wo
-  (sp-pair "(" nil :unless '(sp-point-before-word-p))
-  (sp-pair "[" nil :unless '(sp-point-before-word-p))
-  (sp-pair "{" nil :unless '(sp-point-before-word-p))
-  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
+
+  ;; ;; http://emacs.stackexchange.com/questions/26912/smartparens-do-not-insert-parenthesis-pair-when-point-is-at-the-beginning-of-wo
+  ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
+  ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
+  ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
+  ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
+
   :bind (("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)
