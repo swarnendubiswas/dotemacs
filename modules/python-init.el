@@ -30,12 +30,9 @@
                   (setq ac-chunk-list
                         '("os.path.abspath" "os.path.altsep" "os.path.basename")))))))
 
-
-;; FIXME: Create a hydra for elpy-nav-indent-shift-left/right.
 (use-package elpy
   :ensure t
   :diminish elpy-mode
-  :defer t
   :preface
   (defun dotemacs--elpy-setup ()
     "Setup elpy and python configurations."
@@ -46,7 +43,7 @@
     (use-package company-jedi
       :ensure t
       :if (eq dotemacs-completion-in-buffer 'company)
-      :config (add-to-list 'company-backends '(company-jedi company-files company-capf elpy-company-backend)))
+      :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
     (elpy-enable))
 
   (defun elpy-goto-definition-or-rgrep ()
