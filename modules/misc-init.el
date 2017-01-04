@@ -155,7 +155,8 @@
         undo-tree-visualizer-diff t)
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
-  :diminish undo-tree-mode)
+  :diminish undo-tree-mode
+  :bind ("C-x u" . undo-tree-visualize))
 
 (use-package ignoramus ; Ignore backups, build files, et al.
   :ensure t

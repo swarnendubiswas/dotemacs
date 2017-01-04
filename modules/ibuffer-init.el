@@ -6,9 +6,6 @@
 ;;; Code:
 
 (use-package ibuffer
-  :preface
-  (defun dotemacs--ibuffer-group-buffers ()
-    (ibuffer-switch-to-saved-filter-groups "Default"))
   :commands ibuffer
   :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
@@ -42,13 +39,6 @@
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
   :after ibuffer
-  :preface
-  (defun dotemacs--ibuffer-customization ()
-    (ibuffer-projectile-set-filter-groups)
-    (unless (eq ibuffer-sorting-mode 'alphabetic)
-      ;; First do alphabetic sort, then do major-mode sort
-      (ibuffer-do-sort-by-alphabetic)
-      (ibuffer-do-sort-by-major-mode)))
   :config (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (provide 'ibuffer-init)
