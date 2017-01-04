@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-;; Use "C-x d", or "M-x dired". Kill whole dired buffer with "C-u q".
 (use-package dired
   :preface
   (defun dired-go-home ()
@@ -41,7 +40,6 @@
   (setq dired-bind-jump t
         ;; Do not show messages when omitting files
         dired-omit-verbose nil)
-
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
     (add-hook 'dired-mode-hook #'dired-omit-mode))
 
@@ -49,10 +47,7 @@
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Make sure to remove \"Omit\" from the modeline."
     (diminish 'dired-omit-mode) dired-mode-map)
-
-  :bind
-  ;; Open dired with the cursor right on the file you're editing
-  ("C-x C-j" . dired-jump))
+  :bind ("C-x C-j" . dired-jump))
 
 (use-package dired+
   :ensure t
@@ -65,22 +60,23 @@
 
 (use-package dired-efap
   :ensure t
-  :after dired
+  ;; :after dired
   :commands dired-efap
-  :config
-  (setq dired-efap-initial-filename-selection nil)
-  (bind-key "r" #'dired-efap dired-mode-map))
+  :config (setq dired-efap-initial-filename-selection nil)
+  :bind (:map dired-mode-map
+              ("r" . dired-efap )))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
   :after dired
   :commands dired-narrow
-  :config (bind-key "/" #'dired-narrow dired-mode-map))
+  :bind (:map dired-mode-map
+              ("/" . dired-narrow)))
 
 (use-package dired-icon
   :ensure t
   :diminish dired-icon-mode
-  :init (add-hook 'dired-mode-hook 'dired-icon-mode))
+  :init (add-hook 'dired-mode-hook #'dired-icon-mode))
 
 (provide 'dired-init)
 

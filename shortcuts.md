@@ -49,6 +49,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Dired
 
+* `C-x d` - Show dired buffer (`dired`).
 * `g` - Update the entire contents (`revert-buffer`).
 * `l` - Update the specified files (`dired-do-redisplay`).
 * `k` - Delete the specified file lines (`dired-do-kill-lines`).
@@ -62,7 +63,9 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-<home>` - Go to HOME directory (`dired-go-home`).
 * `M-<up>` - Go to the first file/directory (`dired-jump-to-top`).
 * `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`).
-* `q` - Kill dired buffer (`quite-window`).
+* `q` - Kill dired buffer (`quit-window`).
+* `C-u q` - Kill dired buffer (``).
+* `C-x C-j` - Open dired with cursor right on the file you are editing (`dired-jump`).
 
 ## Ibuffer
 

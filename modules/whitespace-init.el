@@ -9,9 +9,6 @@
   :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :commands (whitespace-cleanup whitespace-mode)
-  :init
-  (dolist (hook '(prog-mode-hook text-mode-hook))
-    (add-hook hook #'whitespace-mode))
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t

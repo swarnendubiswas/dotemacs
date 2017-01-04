@@ -274,12 +274,15 @@
   :config (add-to-list 'warning-suppress-types '(undo discard-info)))
 
 (use-package doc-view
+  :defer t
   :diminish doc-view-minor-mode)
 
 (use-package image-mode
+  :defer t
   :diminish image-minor-mode)
 
 (use-package smerge-mode
+  :defer t
   :diminish smerge-mode)
 
 (provide 'defaults-init)

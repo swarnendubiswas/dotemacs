@@ -66,12 +66,15 @@
                        elpy-module-sane-defaults)
         elpy-rpc-python-command "python3"
         elpy-rpc-backend "jedi")
-  ;; It is good to disable flymake mode, since it becomes slow if there are a lot of guideline errors.
+  ;; Disable flymake mode, since it becomes slow if there are a lot of guideline errors.
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
   (add-hook 'elpy-mode-hook #'flycheck-mode)
-  (unbind-key "M-<left>" elpy-mode-map)
-  (unbind-key "M-<right>" elpy-mode-map)
-  (unbind-key "M-." elpy-mode-map))
+  :bind (("C-c c l" . elpy-nav-indent-shift-left)
+         ("C-c c r" . elpy-nav-indent-shift-right)
+         :map elpy-mode-map
+         ("M-<left>" . nil)
+         ("M-<right>" . nil)
+         ("M-." . nil)))
 
 (use-package py-autopep8
   :ensure t

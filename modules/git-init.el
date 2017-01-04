@@ -7,25 +7,27 @@
 
 ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
 
-;; Magit needs git >=1.9.4
 (use-package magit
   :ensure t
-  :if (unless (string-equal (system-name) "consensus.ices.utexas.edu"))
-  :functions magit-status
+  :if (unless (string-equal (system-name) "consensus.ices.utexas.edu")) ; Magit needs git >=1.9.4
   :config
   (setq magit-auto-revert-mode nil
-        magit-item-highlight-face 'bold
-        magit-completing-read-function 'ivy-completing-read)
+        magit-item-highlight-face 'bold)
+  (when (eq dotemacs-selection 'ivy)
+    (setq magit-completing-read-function 'ivy-completing-read))
 
   (use-package magit-popup)
 
-  (use-package gitconfig-mode ; Git configuration mode
+  (use-package gitconfig-mode
+    :ensure t
     :defer t)
 
-  (use-package gitignore-mode ; .gitignore mode
+  (use-package gitignore-mode
+    :ensure t
     :defer t)
 
-  (use-package gitattributes-mode ; Git attributes mode
+  (use-package gitattributes-mode
+    :ensure t
     :defer t)
 
   (use-package magit-svn
