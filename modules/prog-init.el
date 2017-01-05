@@ -109,17 +109,18 @@
           sr-speedbar-default-width 30
           sr-speedbar-skip-other-window-p t)))
 
-(use-package web-mode
+(use-package web-mode ; http://web-mode.org/
   :ensure t
   :mode
-  (("\\.phtml\\'" . web-mode)
-   ("\\.jsp\\'" . web-mode)
-   ("\\.html\\'" . web-mode)
+  (("\\.html?\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.phtml\\'" . web-mode)
    ("\\.hb\\.html\\'" . web-mode)
    ("\\.tpl\\.php\\'" . web-mode)
-   ("\\.as[cp]x\\'" . web-mode))
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode))
   :config
-  ;; Everything is indented 2 spaces
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
@@ -127,8 +128,14 @@
         web-mode-style-padding 1
         web-mode-script-padding 1
         web-mode-block-padding 0
+        web-mode-comment-style 2
+        web-mode-enable-auto-pairing t
         web-mode-enable-auto-closing t
-        web-mode-enable-auto-quoting t)
+        web-mode-enable-auto-quoting t
+        web-mode-enable-css-colorization t
+        web-mode-enable-comment-keywords t
+        web-mode-enable-current-element-highlight t
+        web-mode-enable-current-column-highlight t)
 
   (use-package ac-html-angular ; Required by ac-html and company-web
     :ensure t
