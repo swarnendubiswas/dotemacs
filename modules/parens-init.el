@@ -20,7 +20,9 @@
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :config (require 'smartparens-config)
+  :init
+  (smartparens-global-mode 1)
+  (show-smartparens-global-mode 1)
   :bind (("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)
