@@ -9,7 +9,8 @@
 
 (use-package magit
   :ensure t
-  :if (unless (string-equal (system-name) "consensus.ices.utexas.edu")) ; Magit needs git >=1.9.4
+  :if (and (eq system-type 'gnu/linux) (unless (string-equal (system-name) "consensus.ices.utexas.edu"))) ; Magit needs
+                                        ; git >=1.9.4
   :config
   (setq magit-auto-revert-mode nil
         magit-item-highlight-face 'bold)

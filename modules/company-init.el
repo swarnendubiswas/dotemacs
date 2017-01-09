@@ -28,8 +28,9 @@
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
-        ;; company-dabbrev-downcase nil ; Do not downcase the returned candidates
-        ;; company-dabbrev-code-everywhere t ; Offer completions in comments and strings
+        company-dabbrev-downcase nil ; Do not downcase the returned candidates
+        company-dabbrev-ignore-case t
+        company-dabbrev-code-everywhere t ; Offer completions in comments and strings
         ;; ;; https://github.com/company-mode/company-mode/wiki/Switching-from-AC
         ;; company-begin-commands '(self-insert-command)
         ;; https://github.com/company-mode/company-mode/issues/123
