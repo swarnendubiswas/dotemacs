@@ -250,6 +250,19 @@
   (use-package ess-smart-underscore
     :ensure t))
 
-(provide 'prog-init)
+(use-package cmake-mode
+  :ensure t
+  :config
+  (use-package cmake-font-lock
+    :ensure t)
+  (use-package cpputils-cmake
+    :ensure t
+    :config
+    (add-hook 'c-mode-common-hook
+              (lambda ()
+                (if (derived-mode-p 'c-mode 'c++-mode)
+                    (cppcm-reload-all))))))
+
+  (provide 'prog-init)
 
 ;;; prog-init.el ends here

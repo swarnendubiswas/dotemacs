@@ -5,6 +5,7 @@ irony
 tramp
 ac-html-csswatcher
 eshell
+semanticdb
 
 *.elc
 .session
