@@ -20,11 +20,11 @@
 
 (defvar dotemacs-completion-in-buffer)
 
-(setq c-default-style '((java-mode . "java")
-                        (c++-mode . "stroustrup")
-                        (other . "gnu/linux")
-                        (c-mode . "k&r")
-                        (awk-mode . "awk")))
+(setq-default c-default-style '((java-mode . "java")
+                                (c++-mode . "stroustrup")
+                                (other . "gnu/linux")
+                                (c-mode . "k&r")
+                                (awk-mode . "awk")))
 
 (use-package cc-mode
   :mode ("\\.h\\'" . c++-mode)
@@ -90,21 +90,21 @@
 
   ;; http://tuhdo.github.io/c-ide.html
   (with-eval-after-load "company"
-    (setq company-backends (delete 'company-semantic company-backends)))
+    (setq company-backends (delete 'company-semantic company-backends))
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/source/include/pin")
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost"))
 
   (use-package company-c-headers
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'company)
     :config
-    (add-to-list 'company-backends #'company-c-headers)
-    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/source/include/pin")
-    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
+    (add-to-list 'company-backends 'company-c-headers)
     (add-to-list 'company-c-headers-path-system "/usr/include/")
 
     (cond ((string-equal (system-name) "consensus.ices.utexas.edu")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/")
-           (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
-           (add-to-list 'company-c-headers-path-system "/home/sbiswas/intel-pintool/source/include/pin"))
+           (add-to-list 'company-c-headers-path-system "/h2/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
+           (add-to-list 'company-c-headers-path-system "/h2/sbiswas/intel-pintool/source/include/pin"))
 
           ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
            (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/"))))
@@ -134,8 +134,7 @@
     (add-hook 'c-mode-common-hook #'google-set-c-style)
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
-  ;; Google C++ Style checker for Flycheck, also need to setup cpplint.py.
-  (use-package flycheck-google-cpplint
+  (use-package flycheck-google-cpplint ; Google C++ Style checker for Flycheck, also need to setup cpplint.
     :ensure t
     :after flycheck
     :if (eq system-type 'gnu/linux)
@@ -176,11 +175,9 @@
   (use-package company-irony
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'company)
-    :commands company-irony-setup-begin-commands
     :init
     (use-package company-irony-c-headers
       :ensure t)
-    (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
     :config
     (add-to-list 'company-backends '(company-irony-c-headers
                                      company-irony)))
@@ -188,7 +185,7 @@
   (use-package irony-eldoc
     :ensure t
     :commands irony-eldoc
-    :config (add-hook 'irony-mode-hook #'irony-eldoc)))
+    :init (add-hook 'irony-mode-hook #'irony-eldoc)))
 
 (provide 'cc-init)
 

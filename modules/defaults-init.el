@@ -44,7 +44,9 @@
               bidi-display-reordering nil)
 
 (when (>= emacs-major-version 24)
-  (setq inhibit-message t))
+  ;; This is effective to turn off "Writing .." messages, but then it would disable other useful information from eldoc
+  ;; and Flycheck.
+  (setq inhibit-message nil))
 
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html

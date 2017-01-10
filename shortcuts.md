@@ -219,6 +219,21 @@ See the requirements: [https://github.com/leoliu/ggtags][]
 * `C-c C-o` - Overview of the definitions in the current file.
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 
+### Flycheck
+
+Within the error list the following key bindings are available:
+
+* `RET` - Go to the current error in the source buffer (``).
+* `n` -	Jump to the next error (``).
+* `p` -	Jump to the previous error (``).
+* `e` -	Explain the error (``).
+* `f` -	Filter the error list by level (``).
+* `F` -	Remove the filter (``).
+* `S` -	Sort the error list by the column at point (``).
+* `g` -	Check the source buffer and update the error list (``).
+* `q` -	Quit the error list and hide its window (``).
+
+
 ## Use Cases
 
 ### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)

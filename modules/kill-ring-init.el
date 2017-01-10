@@ -22,6 +22,7 @@
       :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
       :commands browse-kill-ring
       :config
+      (require 'popwin-browse-kill-ring)
       (setq browse-kill-ring-highlight-current-entry t
             browse-kill-ring-highlight-inserted-item t
             browse-kill-ring-show-preview t
