@@ -195,12 +195,16 @@ label selection buffer, the table of contents buffer, or the index buffer.
 * `C-c C-s p` - Insert pre-formatted code blocks (``).
 * `C-c -` - Insert a horizontal rule (``).
 
-## GGtags
+## GGtags/Helm Gtags/Counsel Gtags
 
 See the requirements: [https://github.com/leoliu/ggtags][]
 
 * `M-.` - Jump to tag underneath cursor (`find-tags`).
 * `M-*` - Pop back to where you previously invoked `M-.`.
+* `C-c g c` - Create tags (``).
+* `C-c g u` - Update tags (``).
+* `C-c g s` - Find other symbol (``).
+* `C-c g r` - Find reference (``).
 
 ## Programming
 
@@ -219,7 +223,7 @@ See the requirements: [https://github.com/leoliu/ggtags][]
 * `C-c C-o` - Overview of the definitions in the current file.
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 
-### Flycheck
+## Flycheck
 
 Within the error list the following key bindings are available:
 
@@ -233,6 +237,20 @@ Within the error list the following key bindings are available:
 * `g` -	Check the source buffer and update the error list (``).
 * `q` -	Quit the error list and hide its window (``).
 
+
+## Version system
+
+### Git
+
+### Svn
+
+* `g` - Refresh status of files (``).
+* `m` - Mark file at point (``).
+* `u` - Unmark file at point (``).
+* `c` - Commit marked files or file at point (``).
+* `l` - Display log for marked files or file at point (``).
+* `=` - Run diff on the marked files or file at point (``).
+* `U` - Update files for currently examined repository (``).
 
 ## Use Cases
 
