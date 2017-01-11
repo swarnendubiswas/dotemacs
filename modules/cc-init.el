@@ -136,7 +136,7 @@
 
   (use-package flycheck-google-cpplint ; Google C++ Style checker for Flycheck, also need to setup cpplint.
     :ensure t
-    :after flycheck
+    ;; :after flycheck
     :if (eq system-type 'gnu/linux)
     :config
     (flycheck-add-next-checker 'c/c++-clang
@@ -150,6 +150,7 @@
          :map c-mode-base-map
          ("M-q" . c-fill-paragraph)))
 
+;; Example to install irony-server: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20161227.348/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
   :ensure t
   :diminish irony-mode

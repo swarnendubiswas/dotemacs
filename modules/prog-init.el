@@ -252,16 +252,10 @@
 
 (use-package cmake-mode
   :ensure t
+  :defer t
   :config
   (use-package cmake-font-lock
-    :ensure t)
-  (use-package cpputils-cmake
-    :ensure t
-    :config
-    (add-hook 'c-mode-common-hook
-              (lambda ()
-                (if (derived-mode-p 'c-mode 'c++-mode)
-                    (cppcm-reload-all))))))
+    :ensure t))
 
   (provide 'prog-init)
 

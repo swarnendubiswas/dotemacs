@@ -236,21 +236,6 @@
                                       "~/iss-workspace/bibtex/iss.bib"
                                       "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
 
-(use-package outline
-  :ensure t
-  :disabled t
-  :after tex
-  :defer t
-  :diminish outline-minor-mode
-  :init (add-hook 'LaTeX-mode-hook #'outline-minor-mode)
-  :config
-  (use-package outline-magic
-    :ensure t
-    :init
-    (add-hook 'outline-mode-hook
-              (lambda ()
-                (require 'outline-cycle)))))
-
 ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 ;; This hook works well for paper directories, but not with dissertation directories.
