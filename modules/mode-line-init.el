@@ -132,7 +132,7 @@
   :ensure t
   :if (eq dotemacs-mode-line-theme 'default) ;; https://github.com/TheBB/spaceline/issues/84
   :config
-  (setq mode-icons-use)-default-icon t
+  (setq mode-icons-use-default-icon t)
   (mode-icons-mode 1))
 
 (use-package nyan-mode
