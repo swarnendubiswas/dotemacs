@@ -134,6 +134,7 @@
 (require 'cc-init)
 (require 'java-init)
 (require 'python-init)
+(require 'shell-script-init)
 (require 'shell-init)
 (require 'svn-init)
 (require 'git-init)
