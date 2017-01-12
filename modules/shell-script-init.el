@@ -35,4 +35,6 @@
   :ensure t
   :mode ("\\.fish$" . fish-mode))
 
+(provide 'shell-script-init)
+
 ;;; shell-script-init.el ends here
