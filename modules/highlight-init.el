@@ -54,7 +54,8 @@
   (add-hook 'text-mode-hook #'fic-mode)
   (add-hook 'prog-mode-hook #'fic-mode)
   :config
-  (add-to-list 'fic-highlighted-words '"XXX"))
+  (add-to-list 'fic-highlighted-words '"XXX")
+  (add-to-list 'fic-highlighted-words '"LATER"))
 
 (use-package volatile-highlights
   :ensure t

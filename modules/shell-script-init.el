@@ -5,16 +5,17 @@
 
 ;;; Code:
 
+(defvar dotemacs-completion-in-buffer)
+
 (use-package sh-script ; Shell script mode
-  :mode ("\\.zsh\\'" . sh-mode)
+  :mode (("\\.zsh\\'" . sh-mode)
+         ("\\bashrc\\'" . sh-mode))
   :config
-  (add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
   (setq sh-basic-offset 4
         sh-indent-comment t
         sh-indentation 4
         sh-indent-after-continuation 'always)
-  ;; Was bound to sh-cd-here
-  (unbind-key "C-c C-d" sh-mode-map)
+  (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
 
   (use-package company-shell
     :ensure t
