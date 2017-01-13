@@ -113,7 +113,7 @@
   :bind (:map counsel-gtags-mode-map
               ("M-." . counsel-gtags-dwim)
               ("M-," . counsel-gtags-pop)
-              ("C-c g s" . counsel-gtags-find-other-symbol)
+              ("C-c g s" . counsel-gtags-find-symbol)
               ("C-c g r" . counsel-gtags-find-reference)
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags)))
