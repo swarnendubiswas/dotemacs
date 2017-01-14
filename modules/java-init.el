@@ -22,6 +22,7 @@
 
 (use-package jdee
   :ensure t
+  :disabled t
   :config
   (setq jdee-server-dir dotemacs-extras-directory
         jdee-complete-function 'jdee-complete-minibuf)
@@ -46,10 +47,10 @@
     :config (setq eclimd-autostart t))
   (setq eclim-eclipse-dirs "/home/sbiswas/software/Eclipse/eclipse-neon-java/"
         eclim-executable "/home/sbiswas/software/Eclipse/eclipse-neon-java/eclim"
-        eclim-default-workspace "/home/sbiswas/plass-workspace"
+        ;; eclim-default-workspace "/home/sbiswas/plass-workspace"
         eclim-auto-save t)
   (add-hook 'java-mode-hook #'eclim-mode)
-  :config 
+  :config
   (use-package company-emacs-eclim
     :ensure t
     :if (eq dotemacs-completion-in-buffer 'company)
