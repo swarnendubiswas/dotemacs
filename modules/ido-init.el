@@ -40,7 +40,7 @@
         ido-auto-merge-work-directories-length -1
         ido-confirm-unique-completion nil
         ido-ignore-extensions t ; Make ido use completion-ignored-extensions
-        ido-enable-tramp-completion t
+        ido-enable-tramp-completion nil ; Do not allow ido to invoke tramp
         ;; The ido-completion-help window is distracting
         ido-cannot-complete-command 'ido-next-match)
 

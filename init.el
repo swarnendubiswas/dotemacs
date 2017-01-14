@@ -125,6 +125,7 @@
 (require 'whitespace-init)
 (require 'highlight-init)
 (require 'tramp-init)
+(require 'imenu-init)
 
 ;; Configure individual major modes
 (require 'text-init)
