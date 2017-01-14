@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;; Install the following packages
-;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint
+;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc
 
 (setenv "PYTHONPATH" "python3")
 
@@ -68,6 +68,9 @@
   (add-hook 'elpy-mode-hook #'flycheck-mode)
   :bind (("C-c c l" . elpy-nav-indent-shift-left)
          ("C-c c r" . elpy-nav-indent-shift-right)
+         ("C-c c e" . python-nav-forward-defun)
+         ("C-c c a" . python-nav-backward-defun)
+         ("C-c c i" . elpy-importmagic-fixup)
          :map elpy-mode-map
          ("M-<left>" . nil)
          ("M-<right>" . nil)
@@ -78,6 +81,12 @@
   :config
   (setq py-autopep8-options '("--max-line-length=80"))
   (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
+
+(use-package python-docstring
+  :ensure t
+  :diminish python-docstring-mode
+  :config
+  (add-hook 'python-mode-hook #'python-docstring-mode))
 
 (provide 'python-init)
 
