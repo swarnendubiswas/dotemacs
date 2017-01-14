@@ -1036,6 +1036,7 @@
     ("scedule" "schedule" nil 0)
     ("sceduled" "scheduled" nil 0)
     ("scen" "scene" nil 0)
+    ("sclaed" "scaled" nil 1)
     ("scneario" "scenario" nil 1)
     ("scol" "scowl" nil 0)
     ("scoli" "scowl" nil 0)
@@ -1143,7 +1144,7 @@
     ("techique" "technique" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 41)
+    ("teh" "the" nil 42)
     ("tehre" "there" nil 2)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
@@ -1411,7 +1412,9 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 
