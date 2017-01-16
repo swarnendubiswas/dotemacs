@@ -40,8 +40,6 @@
         markdown-enable-math t
         markdown-make-gfm-checkboxes-buttons t
         markdown-command "pandoc -f markdown -s ")
-  (add-hook 'markdown-mode-hook #'turn-on-auto-fill)
-  (add-hook 'gfm-mode-hook #'turn-on-auto-fill)
   (use-package markdown-mode+
     :ensure t)
   (use-package pandoc-mode
