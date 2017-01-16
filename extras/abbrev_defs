@@ -723,6 +723,7 @@
     ("indepedent" "independent" nil 0)
     ("independance" "independence" nil 0)
     ("independant" "independent" nil 0)
+    ("infalted" "inflated" nil 1)
     ("influance" "influence" nil 0)
     ("infomation" "information" nil 0)
     ("infomration" "information" nil 1)

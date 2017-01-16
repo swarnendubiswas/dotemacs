@@ -16,3 +16,4 @@ modules/flycheck_*.el
 recentf
 recentf~
 smex-items
+/.project

@@ -74,7 +74,9 @@
          :map elpy-mode-map
          ("M-<left>" . nil)
          ("M-<right>" . nil)
-         ("M-." . nil)))
+         ("M-." . nil)
+         ("C-c C-d" . nil)
+         ("C-c C-r i" . nil)))
 
 (use-package py-autopep8
   :ensure t
