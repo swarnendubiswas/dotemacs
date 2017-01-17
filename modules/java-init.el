@@ -10,8 +10,8 @@
 
 (add-hook 'java-mode-hook
           (lambda ()
-            (setq c-basic-offset 2
-                  c-set-style "java")))
+            (setq-default c-basic-offset 2
+                          c-set-style "java")))
 
 (use-package ant
   :ensure t)
@@ -36,8 +36,7 @@
                                   "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/jce.jar"
                                   "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/jsse.jar"
                                   "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/charsets.jar"
-                                  "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/resources.jar")))
-  :defer t)
+                                  "/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/resources.jar"))))
 
 (use-package eclim
   :ensure t
@@ -47,7 +46,6 @@
     :config (setq eclimd-autostart t))
   (setq eclim-eclipse-dirs "/home/sbiswas/software/Eclipse/eclipse-neon-java/"
         eclim-executable "/home/sbiswas/software/Eclipse/eclipse-neon-java/eclim"
-        ;; eclim-default-workspace "/home/sbiswas/plass-workspace"
         eclim-auto-save t)
   (add-hook 'java-mode-hook #'eclim-mode)
   :config

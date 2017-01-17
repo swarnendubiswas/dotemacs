@@ -148,14 +148,14 @@
   (add-hook 'after-revert-hook #'dotemacs--tabbar-modification-state-change)
   (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
 
-  ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
-  ;; crowded.
-  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-    (setq ad-return-value
-          (if (and (buffer-modified-p (tabbar-tab-value tab))
-                   (buffer-file-name (tabbar-tab-value tab)))
-              (concat " * " (concat ad-return-value " "))
-            (concat " " (concat ad-return-value " ")))))
+  ;; ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
+  ;; ;; crowded.
+  ;; (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+  ;;   (setq ad-return-value
+  ;;         (if (and (buffer-modified-p (tabbar-tab-value tab))
+  ;;                  (buffer-file-name (tabbar-tab-value tab)))
+  ;;             (concat " * " (concat ad-return-value " "))
+  ;;           (concat " " (concat ad-return-value " ")))))
 
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
