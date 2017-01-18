@@ -43,7 +43,7 @@
         ido-enable-tramp-completion nil ; Do not allow ido to invoke tramp
         ;; The ido-completion-help window is distracting
         ido-cannot-complete-command 'ido-next-match)
-
+  (add-to-list 'ido-work-directory-list-ignore-regexps tramp-file-name-regexp)
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
     (setq ido-ignore-buffers (append '("^ "
                                        "*Completions*"
