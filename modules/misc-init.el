@@ -84,7 +84,7 @@
   :config
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
-  (setq popwin:popup-window-height 20
+  (setq popwin:popup-window-height 15
         popwin:close-popup-window-timer-interval 0.5)
 
   ;; Disable this if we are opening helm buffers on the right
