@@ -111,15 +111,15 @@
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
                                                        ido-vertical-show-count t
-                                                       ido-max-window-height 20 ; Increase the height of the minibuffer
+                                                       ido-max-window-height 15 ; Increase the height of the minibuffer
                                                        ido-vertical-pad-list t)
                                                  (ido-vertical-mode 1)))
 
         ((eq dotemacs-ido-view-mode 'grid) (use-package ido-grid-mode
                                              :ensure t
                                              :config
-                                             (setq ido-grid-mode-min-rows 10
-                                                   ido-grid-mode-max-rows 20
+                                             (setq ido-grid-mode-min-rows 5
+                                                   ido-grid-mode-max-rows 15
                                                    ;; Listing order, t: left-right then top-bottom, nil: top-bottom then
                                                    ;; left-right
                                                    ido-grid-mode-order nil)

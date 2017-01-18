@@ -8,10 +8,10 @@
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also get run for all modes
 ;; derived from a basic mode such as text-mode.
 
-(defun dotemacs--text-mode-setup ()
-  "Helper function for configuring text mode."
-  (turn-off-hideshow))
-(add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
+;; (defun dotemacs--text-mode-setup ()
+;;   "Helper function for configuring text mode."
+;;   (turn-off-hideshow))
+;; (add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
@@ -22,7 +22,7 @@
   :ensure t
   :defer t
   :config
-  (setq langtool-language-tool-jar (concat user-emacs-directory "packages/LanguageTool-3.6/languagetool-commandline.jar")
+  (setq langtool-language-tool-jar (concat user-emacs-directory "extras/LanguageTool-3.6/languagetool-commandline.jar")
         langtool-java-classpath nil
         langtool-default-language "en-US"
         langtool-java-bin "/usr/bin/java"
@@ -44,7 +44,7 @@
     :ensure t)
   (use-package pandoc-mode
     :ensure t
-    :init (add-hook 'markdown-mode-hook #'pandoc-mode)))
+    :config (add-hook 'markdown-mode-hook #'pandoc-mode)))
 
 (use-package csv-mode
   :ensure t

@@ -30,7 +30,7 @@
          (setq ac-etags-use-document t)
          (add-to-list 'ac-sources 'ac-source-etags))))))
 
-;; Front end to GNU Global, use `gtags -v -c`. Languages supported are C, C++, Yacc, Java, PHP4 and assembly.
+;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; http://tuhdo.github.io/c-ide.html
 (use-package ggtags
@@ -51,7 +51,6 @@
               ("C-c g s" . ggtags-find-other-symbol)
               ("C-c g h" . ggtags-view-tag-history)
               ("C-c g r" . ggtags-find-reference)
-              ("C-c g f" . ggtags-find-file)
               ("C-c g c" . ggtags-create-tags)
               ("C-c g u" . ggtags-update-tags)
               ("M-." . ggtags-find-tag-dwim)
