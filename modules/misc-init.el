@@ -21,6 +21,7 @@
 
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
+  :defer t
   :config
   (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
   (use-package vlf-setup))
@@ -84,9 +85,7 @@
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
   (setq popwin:popup-window-height 20
-        popwin:close-popup-window-timer-interval 0.5
-        ;; display-buffer-function 'popwin:display-buffer
-        )
+        popwin:close-popup-window-timer-interval 0.5)
 
   ;; Disable this if we are opening helm buffers on the right
   (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
