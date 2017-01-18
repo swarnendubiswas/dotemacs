@@ -126,6 +126,9 @@
 (require 'highlight-init)
 (require 'tramp-init)
 (require 'imenu-init)
+;; FIXME: For some reason, this needed to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
+;; not enabled on startup.
+(require 'tags-init)
 
 ;; Configure individual major modes
 (require 'text-init)
@@ -140,13 +143,8 @@
 (require 'svn-init)
 (require 'git-init)
 
-;; FIXME: For some reason, this needed to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
-;; not enabled on startup.
-(require 'tags-init)
 (require 'defuns-init)
-
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
-
 (require 'server-init) ; Start the daemon/server
 
 ;;; init.el ends here
