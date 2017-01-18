@@ -66,6 +66,18 @@
   ;; Disable flymake mode, since it becomes slow if there are a lot of guideline errors.
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
   (add-hook 'elpy-mode-hook #'flycheck-mode)
+
+  (use-package py-autopep8
+    :ensure t
+    :config
+    (setq py-autopep8-options '("--max-line-length=80"))
+    (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
+
+  (use-package python-docstring
+    :ensure t
+    :diminish python-docstring-mode
+    :config
+    (add-hook 'python-mode-hook #'python-docstring-mode))
   :bind (("C-c c l" . elpy-nav-indent-shift-left)
          ("C-c c r" . elpy-nav-indent-shift-right)
          ("C-c c e" . python-nav-forward-defun)
@@ -77,18 +89,6 @@
          ("M-." . nil)
          ("C-c C-d" . nil)
          ("C-c C-r i" . nil)))
-
-(use-package py-autopep8
-  :ensure t
-  :config
-  (setq py-autopep8-options '("--max-line-length=80"))
-  (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
-
-(use-package python-docstring
-  :ensure t
-  :diminish python-docstring-mode
-  :config
-  (add-hook 'python-mode-hook #'python-docstring-mode))
 
 (provide 'python-init)
 
