@@ -42,7 +42,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-selection
-  'ido
+  'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "helm" helm)
@@ -72,7 +72,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-mode-line-theme
-  'spaceline
+  'sml
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
