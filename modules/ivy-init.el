@@ -121,7 +121,7 @@
    ([remap describe-variable] . counsel-describe-variable)
    ([remap yank-pop] . counsel-yank-pop)
    ([remap describe-bindings] . counsel-descbinds)
-   ;; ([remap execute-extended-command] . counsel-M-x)
+   ([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
@@ -133,7 +133,9 @@
    ("C-c s a" . counsel-ag)
    ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
    ("C-c s o" . counsel-grep-or-swiper)
-   ("<f4>" . counsel-grep-or-swiper))
+   ("<f4>" . counsel-grep-or-swiper)
+   ("C-c C-m" . counsel-mark-ring)
+   ("C-c C-j" . counsel-imenu))
   :config
   (setq counsel-mode-override-describe-bindings t
         counsel-grep-swiper-limit 1000000 ; Number of characters in the buffer

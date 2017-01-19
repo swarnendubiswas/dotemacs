@@ -10,7 +10,8 @@
 (use-package simple
   :config
   (setq kill-ring-max 200
-        kill-do-not-save-duplicates t))
+        kill-do-not-save-duplicates t
+        set-mark-command-repeat-pop t))
 
 (or (use-package helm-ring
       :if (eq dotemacs-selection 'helm)
