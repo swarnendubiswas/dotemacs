@@ -1,11 +1,8 @@
 # Useful keyboard shortcuts
 
-This file lists useful keyboard shortcuts that might be difficult to remember. These keybindings are mostly from a
-default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am
-maintaining this for **my** ease of reference. Suggestions are welcome.
+This file lists useful keyboard shortcuts that might be difficult to remember. These keybindings are mostly from a default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am maintaining this for **my** ease of reference. Suggestions are welcome.
 
-Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m
-(describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
+Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m (describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
 
 ## Text manipulation
 
@@ -18,6 +15,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
 * `M-;` - Invoke comment-dwim (`comment-dwim`).
 * `M-/` - Try to expand text before point (`hippie-expand`).
+* `C-M-\` - Indent all the lines in the region (`indent-region`).
+* `M-q` - Fill paragraph at or after point (`fill-paragraph`).
 
 ## Marking
 
@@ -29,6 +28,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-M-@` - Set mark after end of following balanced expression (`mark-sexp`).
 * `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`).
 * `C-x C-p` - Move point to the beginning of the current page, and set mark at the end (`mark-page`).
+* `C-c C-m` - Jump to a visited position in the current buffer (`counsel-mark-ring`).
+* `C-x C-@` - Jump to the buffer and position of the latest entry in the global mark ring (`pop-global-mark`)
 
 ## Key motion
 
@@ -97,8 +98,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Ido
 
-* `C-j` - Use the current input string verbatim (`ido-select-text`). Create a new buffer rather than switching to an
-  existing buffer.
+* `C-j` - Use the current input string verbatim (`ido-select-text`). Create a new buffer rather than switching to an existing buffer.
 * `//` - Go to the root directory (``).
 * `~/` - Go to the home directory (``).
 * `C-f` - Fall back to find file (without ido-mode) (``).
@@ -118,10 +118,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `~` - Switch to the home directory (`self-insert-command`).
 * `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`).
 * `C-m` - Calls the default action and exits minibuffer (`ivy-done`).
-* `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there.
-  Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
-* `C-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when
-  copying/renaming files with names that match existing files.
+* `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
+* `C-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when copying/renaming files with names that match existing files.
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
 * `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
@@ -184,8 +182,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c [` - Look up a bibliography reference (`reftex-citation`).
 * `C-c =` - Look up the TOC (`reftex-toc`).
 
-To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the
-label selection buffer, the table of contents buffer, or the index buffer.
+To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
 
 ## Markdown
 
@@ -264,8 +261,7 @@ Within the error list the following key bindings are available:
 ### Search for the symbol at point
 
 #### Isearch
-* `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the
-  search (`isearch-forward-regexp`).
+* `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
 
 #### Swiper
 * `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).

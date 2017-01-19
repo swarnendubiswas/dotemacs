@@ -43,7 +43,7 @@
                                             :config
                                             (setq sml/theme 'light
                                                   sml/no-confirm-load-theme t
-                                                  sml/mode-width 'full
+                                                  sml/mode-width 'full ; Everything after the minor-modes will be right-indented
                                                   sml/shorten-modes t
                                                   sml/shorten-directory t)
                                             (sml/setup)))
