@@ -24,7 +24,11 @@
     :init (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
     :config
     ;; Long timeouts hinder visibility
-    (setq flycheck-pos-tip-timeout 2)))
+    (setq flycheck-pos-tip-timeout 2))
+
+  (use-package flycheck-color-mode-line
+    :ensure t
+    :config (add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode)))
 
 (use-package flycheck-irony
   :ensure t
