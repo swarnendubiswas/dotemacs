@@ -113,7 +113,12 @@
 
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package ac-html
-      :ensure t)
+      :ensure t
+      :config
+      (add-to-list 'web-mode-ac-sources-alist
+                   '("html" . (ac-source-html-tag
+                               ac-source-html-attr
+                               ac-source-html-attrv))))
 
     (use-package ac-html-bootstrap
       :ensure t)
@@ -199,6 +204,7 @@
     :ensure t)
   (use-package eldoc-overlay-mode
     :ensure t
+    :diminish eldoc-overlay-mode
     :config (eldoc-overlay-mode 1))
   :diminish eldoc-mode)
 
