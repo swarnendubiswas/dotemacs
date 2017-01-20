@@ -197,6 +197,9 @@
   (add-hook 'python-mode-hook #'eldoc-mode)
   (use-package eldoc-extension
     :ensure t)
+  (use-package eldoc-overlay-mode
+    :ensure t
+    :config (eldoc-overlay-mode 1))
   :diminish eldoc-mode)
 
 (use-package octave
