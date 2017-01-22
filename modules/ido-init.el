@@ -40,7 +40,7 @@
         ido-auto-merge-work-directories-length -1
         ido-confirm-unique-completion nil
         ido-ignore-extensions t ; Make ido use completion-ignored-extensions
-        ido-enable-tramp-completion nil ; Do not allow ido to invoke tramp
+        ido-enable-tramp-completion t ; Allow ido to invoke tramp?
         ;; The ido-completion-help window is distracting
         ido-cannot-complete-command 'ido-next-match)
   (add-to-list 'ido-work-directory-list-ignore-regexps tramp-file-name-regexp)
@@ -59,11 +59,13 @@
                                      "GRTAGS"
                                      "GSYMS"
                                      "TAGS"
+                                     "__init__.py"
                                      "\\`\\.")
                                    ido-ignore-files))
     (dolist (dirs '(".svn"
                     ".git"
                     ".hg"
+                    "__pycache__"
                     "\\`\\."))
       (add-to-list 'ido-ignore-directories dirs)))
 

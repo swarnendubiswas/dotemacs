@@ -204,6 +204,7 @@
     :ensure t)
   (use-package eldoc-overlay-mode
     :ensure t
+    :disabled t ; Too intrusive
     :diminish eldoc-overlay-mode
     :config (eldoc-overlay-mode 1))
   :diminish eldoc-mode)
