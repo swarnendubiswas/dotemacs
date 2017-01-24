@@ -52,7 +52,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-ido-view-mode
-  'grid
+  'vertical
   "Specify which view to use for ido."
   :type '(radio
           (const :tag "vertical" vertical)

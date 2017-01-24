@@ -180,10 +180,12 @@
                        "GRTAGS"
                        "GSYMS"
                        "GTAGS"
-                       "TAGS"))
+                       "TAGS"
+                       "__init__.py"))
     (add-to-list 'ignoramus-file-basename-exact-names filenames))
   (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
   (dolist (dir '("\\`\\."
+                 "__pycache__"
                  "auto"))
     (add-to-list 'ignoramus-file-basename-exact-names dir))
   (ignoramus-setup))

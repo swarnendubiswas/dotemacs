@@ -191,7 +191,7 @@
 (use-package jit-lock ; Improve scrolling speed with jit fontification
   :disabled t
   :config
-  (setq jit-lock-defer-time 0.10 
+  (setq jit-lock-defer-time 0.10
         jit-lock-stealth-time 10
         jit-lock-defer-contextually t
         jit-lock-stealth-nice 0.5))
@@ -220,7 +220,9 @@
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring
-                                        extended-command-history)
+                                        extended-command-history
+                                        file-name-history
+                                        command-history)
         savehist-autosave-interval 300)
   (savehist-mode 1))
 
