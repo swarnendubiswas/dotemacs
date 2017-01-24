@@ -126,8 +126,6 @@
 (require 'highlight-init)
 (require 'tramp-init)
 (require 'imenu-init)
-;; FIXME: For some reason, this needed to be loaded after svn-init module. Otherwise, the ggtags and helm-gtags modes are
-;; not enabled on startup.
 (require 'tags-init)
 
 ;; Configure individual major modes
