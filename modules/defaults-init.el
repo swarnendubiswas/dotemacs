@@ -289,9 +289,6 @@
   :defer t
   :diminish smerge-mode)
 
-(use-package imenu
-  :config (setq imenu-auto-rescan t))
-
 (provide 'defaults-init)
 
 ;;; defaults-init.el ends here
