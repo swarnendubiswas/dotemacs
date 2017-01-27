@@ -603,6 +603,7 @@
     ("foloowing" "following" nil 0)
     ("fora" "for a" nil 0)
     ("foriegn" "foreign" nil 0)
+    ("formualte" "formulate" nil 1)
     ("forthe" "for the" nil 0)
     ("forwrd" "forward" nil 0)
     ("forwrds" "forwards" nil 0)
@@ -1147,7 +1148,7 @@
     ("techique" "technique" nil 1)
     ("techqnieu" "technique" nil 1)
     ("tecnical" "technical" nil 0)
-    ("teh" "the" nil 42)
+    ("teh" "the" nil 43)
     ("tehre" "there" nil 2)
     ("tehy" "they" nil 0)
     ("terminiated" "terminated" nil 0)
@@ -1206,6 +1207,7 @@
     ("truley" "truly" nil 0)
     ("tryed" "tried" nil 0)
     ("tthe" "the" nil 0)
+    ("tunalbe" "tunable" nil 1)
     ("tyhat" "that" nil 0)
     ("tyhe" "the" nil 0)
     ("udnerstand" "understand" nil 0)
@@ -1415,9 +1417,7 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 

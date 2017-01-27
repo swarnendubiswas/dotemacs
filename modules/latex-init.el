@@ -53,7 +53,6 @@
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
 
   (unbind-key "C-c C-d" LaTeX-mode-map)
-
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   (unbind-key "C-c ;" LaTeX-mode-map))
 

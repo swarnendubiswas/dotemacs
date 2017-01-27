@@ -35,7 +35,7 @@
         ido-max-work-directory-list 50
         ido-max-work-file-list 50
         confirm-nonexistent-file-or-buffer t
-        ido-use-faces nil ; Disable ido faces to see flx highlights
+        ido-use-faces t ; Disable ido faces to see flx highlights
         ido-use-virtual-buffers 'auto
         ido-auto-merge-work-directories-length -1
         ido-confirm-unique-completion nil
@@ -60,6 +60,7 @@
                                      "GSYMS"
                                      "TAGS"
                                      "__init__.py"
+                                     "__pycache__"
                                      "\\`\\.")
                                    ido-ignore-files))
     (dolist (dirs '(".svn"
@@ -104,12 +105,16 @@
                                                  :config
                                                  (set-face-attribute 'ido-vertical-first-match-face nil
                                                                      :background nil
-                                                                     :foreground "orange")
+                                                                     :foreground "#1A4B77")
                                                  (set-face-attribute 'ido-vertical-only-match-face nil
                                                                      :background nil
-                                                                     :foreground nil)
+                                                                     :foreground nil
+                                                                     :weight 'bold)
                                                  (set-face-attribute 'ido-vertical-match-face nil
-                                                                     :foreground nil)
+                                                                     :foreground "brown")
+                                                 (set-face-attribute 'ido-subdir nil
+                                                                     :foreground "blue3"
+                                                                     :background "white smoke")
                                                  ;; Up and down keys to navigate options, left and right to move through history/directories
                                                  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
                                                        ido-vertical-show-count t
@@ -125,7 +130,9 @@
                                                    ;; Listing order, t: left-right then top-bottom, nil: top-bottom then
                                                    ;; left-right
                                                    ido-grid-mode-order nil)
-                                             (ido-grid-mode 1))))
+                                             (ido-grid-mode 1)
+                                             (use-package ido-describe-prefix-bindings
+                                               :load-path "extras"))))
 
   :bind
   (([remap find-file] . ido-find-file)
