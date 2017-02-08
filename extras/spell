@@ -1,11 +1,13 @@
-personal_ws-1.1 en 20 
+personal_ws-1.1 en 24 
 pseudocode
+recalibration
 locksteps
 whitebox
 Refactor
 FIXME
 blackbox
 unserializable
+recalibrates
 programmability
 whitespace
 precimonious
@@ -15,6 +17,8 @@ serializability
 customizations
 functionalities
 programmatically
+analytics
+Scalable
 interleavings
 transactional
 whitespaces
