@@ -48,7 +48,8 @@
   (require 'use-package))
 (setq use-package-always-ensure nil
       use-package-check-before-init t
-      use-package-verbose t)
+      use-package-verbose t
+      use-package-enable-imenu-support t)
 
 (use-package bind-key
   :ensure t
