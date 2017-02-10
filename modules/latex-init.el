@@ -150,8 +150,7 @@
         reftex-use-fonts t
         reftex-highlight-selection 'both)
   (setq reftex-default-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                      "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib"
-                                      "~/iss-workspace/bibtex/iss.bib"))
+                                      "~/iss-workspace/approximate-bib/paper.bib"))
   (use-package reftex-cite
     :preface
     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -208,8 +207,7 @@
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t)
   (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                         "~/iss-workspace/bibtex/iss.bib"
-                                         "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
+                                         "~/iss-workspace/approximate-bib/paper.bib")))
 
 (use-package helm-bibtex
   :ensure t
@@ -232,8 +230,7 @@
   :config
   (add-to-list 'company-backends 'company-bibtex)
   (setq company-bibtex-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                      "~/iss-workspace/bibtex/iss.bib"
-                                      "~/iss-workspace/NSFApprox2016/bibs/pingali/approx.bib")))
+                                      "~/iss-workspace/approximate-bib/paper.bib")))
 
 ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs

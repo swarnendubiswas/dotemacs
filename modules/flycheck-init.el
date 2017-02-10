@@ -28,6 +28,7 @@
 
   (use-package flycheck-color-mode-line
     :ensure t
+    :disabled t
     :config (add-hook 'flycheck-mode-hook #'flycheck-color-mode-line-mode)))
 
 (use-package flycheck-irony
