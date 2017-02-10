@@ -1,4 +1,4 @@
-personal_ws-1.1 en 24 
+personal_ws-1.1 en 28 
 pseudocode
 recalibration
 locksteps
@@ -16,11 +16,14 @@ hardcoded
 serializability
 customizations
 functionalities
+optimizations
 programmatically
 analytics
-Scalable
 Jikes
+piecewise
+Scalable
 interleavings
 transactional
+partitioner
 whitespaces
 tunable

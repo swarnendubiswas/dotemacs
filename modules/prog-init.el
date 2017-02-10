@@ -24,6 +24,7 @@
 
 (use-package semantic
   :defer t
+  :disabled t
   :preface
   (defun dotemacs-semantic-functions ()
     (semantic-mode 1)
@@ -48,6 +49,7 @@
   (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
 
 (use-package semantic/idle
+  :disabled t
   :preface
   (defun dotemacs-idle-functions ()
     (global-semantic-idle-scheduler-mode -1)
@@ -195,6 +197,7 @@
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
+  :disabled t
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)

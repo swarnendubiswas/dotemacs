@@ -41,12 +41,14 @@
   (use-package c-eldoc
     :ensure t
     :if (eq system-type 'gnu/linux)
+    :disabled t
     :init
     (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
     (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
 
   (use-package cwarn
     :ensure t
+    :disabled t
     :diminish cwarn-mode
     :config (global-cwarn-mode 1))
 
@@ -62,6 +64,7 @@
   (use-package function-args
     :ensure t
     :diminish function-args-mode
+    :disabled t
     :init (function-args-mode)
     :config
     ;; Include custom header locations
