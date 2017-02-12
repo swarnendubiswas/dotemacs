@@ -63,6 +63,7 @@
 
   (use-package function-args
     :ensure t
+    :disabled t
     :diminish function-args-mode
     :disabled t
     :init (function-args-mode)

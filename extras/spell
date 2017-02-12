@@ -1,4 +1,5 @@
-personal_ws-1.1 en 28 
+personal_ws-1.1 en 31 
+scalability
 pseudocode
 recalibration
 locksteps
@@ -15,13 +16,15 @@ Atomicity
 hardcoded
 serializability
 customizations
+reimplement
 functionalities
 optimizations
 programmatically
 analytics
 Jikes
 piecewise
-Scalable
+scalable
+multithreaded
 interleavings
 transactional
 partitioner
