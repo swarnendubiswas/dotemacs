@@ -16,7 +16,8 @@
                 python-indent-offset 4)
   (setq python-shell-interpreter "python3"
         python-shell-completion-native-enable nil
-        python-shell-unbuffered nil)
+        python-shell-unbuffered nil
+        python-check-command "flake8")
   (turn-on-auto-fill)
   (run-python (python-shell-parse-command) nil nil)
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
@@ -44,6 +45,8 @@
       :ensure t
       :if (eq dotemacs-completion-in-buffer 'company)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
+    ;; (add-hook 'before-save-hook #'elpy-format-code nil t)
+    ;; (add-hook 'before-save-hook #'delete-trailing-whitespace nil t)
     (elpy-enable))
 
   (defun elpy-goto-definition-or-rgrep ()
@@ -70,7 +73,7 @@
   (use-package py-autopep8
     :ensure t
     :config
-    (setq py-autopep8-options '("--max-line-length=80"))
+    (setq py-autopep8-options '("--max-line-length=120"))
     (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
   (use-package python-docstring

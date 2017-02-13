@@ -55,49 +55,50 @@
             nil
           ;; Files is sorted by mtime
           (time-less-p y-mtime x-mtime)))))
-    :config
-    (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
-          confirm-nonexistent-file-or-buffer t
-          ivy-virtual-abbreviate 'full
-          ivy-wrap t ; Useful to be able to wrap around boundary items
-          ivy-action-wrap t
-          ivy-case-fold-search t ; Ignore case while searching
-          ivy-height 15 ; This seems a good number to see several options at a time
-          ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
-          ivy-display-style 'fancy
-          ivy-extra-directories nil ; Hide "." and ".."
-          ivy-format-function 'ivy-format-function-arrow
-          ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
-          ivy-re-builders-alist '((t . ivy--regex-ignore-order))
-          ivy-flx-limit 200
-          ;; Always ignore buffers set in ivy-ignore-buffers
-          ivy-use-ignore-default 'always)
-    (dolist (buffer '("^\\*Backtrace\\*$"
-                      "^\\*Compile-Log\\*$"
-                      "^\\*.+Completions\\*$"
-                      "^\\*Help\\*$"
-                      "^\\*Ibuffer\\*$"
-                      "company-statistics-cache.el"))
-      (add-to-list 'ivy-ignore-buffers buffer))
-    (add-to-list 'ivy-sort-functions-alist
-             '(read-file-name-internal . eh-ivy-sort-file-function))
-    (ivy-mode 1)
-    (use-package ivy-hydra
-      :ensure t)
-    :bind
-    (("C-c r" . ivy-resume)
-     ("<f9>" . dotemacs--ivy-recentf)
-     ("C-'" . ivy-avy)
-     ([remap switch-to-buffer] . ivy-switch-buffer)
-     ("<f3>" . ivy-switch-buffer)
-     :map ivy-minibuffer-map
-     ("<return>" . ivy-alt-done) ; Continue completion
-     ("C-j" . ivy-immediate-done) ; View the current directory
-     ("<left>" . ivy-previous-line)
-     ("<right>" . ivy-next-line)
-     ;; http://pragmaticemacs.com/emacs/counsel-yank-pop-with-a-tweak/
-     ("M-y" . ivy-next-line))
-    :diminish ivy-mode)
+  :config
+  (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
+        confirm-nonexistent-file-or-buffer t
+        ivy-virtual-abbreviate 'full
+        ivy-wrap t ; Useful to be able to wrap around boundary items
+        ivy-action-wrap t
+        ivy-case-fold-search t ; Ignore case while searching
+        ivy-height 15 ; This seems a good number to see several options at a time
+        ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
+        ivy-display-style 'fancy
+        ivy-extra-directories nil ; Hide "." and ".."
+        ivy-format-function 'ivy-format-function-arrow
+        ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
+        ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
+                                (t . ivy--regex-ignore-order))
+        ivy-flx-limit 200
+        ;; Always ignore buffers set in ivy-ignore-buffers
+        ivy-use-ignore-default 'always)
+  (dolist (buffer '("^\\*Backtrace\\*$"
+                    "^\\*Compile-Log\\*$"
+                    "^\\*.+Completions\\*$"
+                    "^\\*Help\\*$"
+                    "^\\*Ibuffer\\*$"
+                    "company-statistics-cache.el"))
+    (add-to-list 'ivy-ignore-buffers buffer))
+  (add-to-list 'ivy-sort-functions-alist
+               '(read-file-name-internal . eh-ivy-sort-file-function))
+  (ivy-mode 1)
+  (use-package ivy-hydra
+    :ensure t)
+  :bind
+  (("C-c r" . ivy-resume)
+   ("<f9>" . dotemacs--ivy-recentf)
+   ("C-'" . ivy-avy)
+   ([remap switch-to-buffer] . ivy-switch-buffer)
+   ("<f3>" . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("<return>" . ivy-alt-done) ; Continue completion
+   ("C-j" . ivy-immediate-done) ; View the current directory
+   ("<left>" . ivy-previous-line)
+   ("<right>" . ivy-next-line)
+   ;; http://pragmaticemacs.com/emacs/counsel-yank-pop-with-a-tweak/
+   ("M-y" . ivy-next-line))
+  :diminish ivy-mode)
 
 (use-package counsel
   :ensure t

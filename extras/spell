@@ -1,4 +1,4 @@
-personal_ws-1.1 en 31 
+personal_ws-1.1 en 32 
 scalability
 pseudocode
 recalibration
@@ -17,9 +17,11 @@ hardcoded
 serializability
 customizations
 reimplement
+backend
 functionalities
 optimizations
 programmatically
+tradeoff
 analytics
 Jikes
 piecewise
@@ -28,5 +30,7 @@ multithreaded
 interleavings
 transactional
 partitioner
+combinational
 whitespaces
 tunable
+metadata
