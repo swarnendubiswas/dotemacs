@@ -9,7 +9,6 @@
 
 (use-package flycheck
   :ensure t
-  :diminish flycheck-mode
   :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
   :config
   (setq-default flycheck-disabled-checkers '(tex-chktex tex-lacheck)) ; Leave out LaTeX

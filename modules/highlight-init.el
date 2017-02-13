@@ -26,6 +26,7 @@
 
 (use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
   :ensure t
+  ;; FIXME:
   :init (hlinum-activate))
 
 (use-package hilit-chg
@@ -59,6 +60,7 @@
 
 (use-package volatile-highlights
   :ensure t
+  :disabled t
   :diminish volatile-highlights-mode
   :config (add-hook 'text-mode-hook #'volatile-highlights-mode))
 
