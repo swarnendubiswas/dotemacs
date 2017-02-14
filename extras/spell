@@ -1,4 +1,4 @@
-personal_ws-1.1 en 36 
+personal_ws-1.1 en 37 
 scalability
 pseudocode
 recalibration
@@ -15,6 +15,7 @@ whitespace
 precimonious
 Atomicity
 hardcoded
+TODO
 serializability
 customizations
 reimplement
