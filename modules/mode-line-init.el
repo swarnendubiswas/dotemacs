@@ -130,6 +130,7 @@
 
 (use-package mode-icons
   :ensure t
+  :disabled t
   :if (eq dotemacs-mode-line-theme 'default) ;; https://github.com/TheBB/spaceline/issues/84
   :config
   (setq mode-icons-use-default-icon t)
