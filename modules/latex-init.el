@@ -48,9 +48,9 @@
   (add-to-list 'TeX-command-list
                '("View" "%V" TeX-run-discard nil t))
 
-  (when (>= emacs-major-version 25)
-    (setq prettify-symbols-unprettify-at-point 'right-edge)
-    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
+  ;; (when (>= emacs-major-version 25)
+  ;;   (setq prettify-symbols-unprettify-at-point 'right-edge)
+  ;;   (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
 
   (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
@@ -112,6 +112,7 @@
 
   (use-package company-math
     :ensure t
+    :disabled t
     :config
     (add-to-list 'company-backends
                  '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
