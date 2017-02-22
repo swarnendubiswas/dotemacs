@@ -6,7 +6,6 @@
 ;;; Code:
 
 (use-package paren
-  :disabled t
   :config
   (setq show-paren-delay 0
         show-paren-style 'mixed ; Options: 'expression, 'parenthesis, 'mixed
@@ -20,6 +19,7 @@
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
+  :disabled t
   :init
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
@@ -42,6 +42,9 @@
          ("C-S-f" . sp-forward-symbol)
          ("C-M-k" . sp-splice-sexp))
   :diminish smartparens-mode)
+
+(use-package elec-pair
+  :config (electric-pair-mode 1))
 
 (provide 'parens-init)
 
