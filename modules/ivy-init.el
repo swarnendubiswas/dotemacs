@@ -69,6 +69,9 @@
         ivy-format-function 'ivy-format-function-arrow
         ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
         ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
+                                (read-file-name-internal . ivy--regex-fuzzy)
+                                (swiper . ivy--regex-plus)
+                                (ivy-switch-buffer . ivy--regex-plus)
                                 (t . ivy--regex-ignore-order))
         ivy-flx-limit 200
         ;; Always ignore buffers set in ivy-ignore-buffers

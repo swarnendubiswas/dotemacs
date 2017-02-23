@@ -112,7 +112,6 @@
 
   (use-package company-math
     :ensure t
-    :disabled t
     :config
     (add-to-list 'company-backends
                  '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
