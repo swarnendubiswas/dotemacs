@@ -110,6 +110,9 @@
   :diminish  ace-isearch-mode
   :config (global-ace-isearch-mode 1))
 
+(use-package ripgrep
+  :ensure t)
+
 (provide 'search-init)
 
 ;;; search-init.el ends here

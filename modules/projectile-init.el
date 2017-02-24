@@ -88,6 +88,9 @@
          ("<f7>" . counsel-projectile-switch-to-buffer)
          ("<f8>" . counsel-projectile-ag)))
 
+(use-package projectile-ripgrep
+  :ensure t)
+
 (provide 'projectile-init)
 
 ;;; projectile-init.el ends here
