@@ -47,7 +47,9 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table '())
+(define-abbrev-table 'awk-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -63,9 +65,13 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table '())
+(define-abbrev-table 'c++-mode-abbrev-table
+  '(
+   ))
 
-(define-abbrev-table 'c-mode-abbrev-table '())
+(define-abbrev-table 'c-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
@@ -300,6 +306,7 @@
     ("boundaris" "boundaries" nil 1)
     ("boxs" "boxes" nil 0)
     ("brodcast" "broadcast" nil 0)
+    ("bufer" "buffer" nil 0)
     ("butthe" "but the" nil 0)
     ("bve" "be" nil 0)
     ("cafe" "cafe" nil 0)
@@ -1007,6 +1014,7 @@
     ("requirment" "requirement" nil 0)
     ("requirments" "requirements" nil 0)
     ("reserach" "research" nil 0)
+    ("reslient" "resilient" nil 0)
     ("resollution" "resolution" nil 0)
     ("resorces" "resources" nil 0)
     ("respomd" "respond" nil 0)
@@ -1328,7 +1336,9 @@
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table '())
+(define-abbrev-table 'java-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
@@ -1370,7 +1380,11 @@
 
 (define-abbrev-table 'messages-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table '())
+(define-abbrev-table 'nroff-mode-abbrev-table '())
+
+(define-abbrev-table 'objc-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -1392,7 +1406,9 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table '())
+(define-abbrev-table 'pike-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 
@@ -1417,6 +1433,8 @@
 (define-abbrev-table 'reftex-select-bib-mode-abbrev-table '())
 
 (define-abbrev-table 'reftex-select-label-mode-abbrev-table '())
+
+(define-abbrev-table 'ripgrep-search-mode-abbrev-table '())
 
 (define-abbrev-table 'rst-mode-abbrev-table '())
 

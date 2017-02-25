@@ -109,6 +109,7 @@
   (push '("*ag search*" :noselect nil) popwin:special-display-config)
   (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
   (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
@@ -233,9 +234,10 @@
   (crux-with-region-or-buffer indent-region)
   (crux-with-region-or-buffer untabify)
   (crux-with-region-or-line comment-or-uncomment-region)
-  :bind (("C-c C-o" . crux-open-with)
-         ("C-c i" . crux-ispell-word-then-abbrev)
-         ("C-c C-r" . crux-recentf-find-file)))
+  :bind ("C-c i" . crux-ispell-word-then-abbrev))
+
+(use-package elf-mode
+  :ensure t)
 
 (provide 'misc-init)
 

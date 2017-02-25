@@ -33,6 +33,9 @@
 
 (use-package recentf-ext ; Add directories to recent list
   :ensure t
+  ;; Adding directories to the list of recent files decreases the number of entries of recent files. Therefore, we use a
+  ;; different command/keybinding to lookup recent directories.
+  :disabled t
   :after recentf)
 
 (provide 'recentf-init)
