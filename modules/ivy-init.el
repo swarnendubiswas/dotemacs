@@ -110,7 +110,7 @@
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun dotemacs-counsel-goto-recent-directory ()
-    "Open recent directory with dired"
+    "Open recent directories with dired."
     (interactive)
     (unless recentf-mode (recentf-mode 1))
     (let ((collection

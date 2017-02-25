@@ -111,7 +111,8 @@
   :config (global-ace-isearch-mode 1))
 
 (use-package ripgrep
-  :ensure t)
+  :ensure t
+  :bind ("C-c s r" . ripgrep-regexp))
 
 (provide 'search-init)
 
