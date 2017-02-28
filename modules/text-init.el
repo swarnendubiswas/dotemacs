@@ -8,9 +8,9 @@
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also get run for all modes
 ;; derived from a basic mode such as text-mode.
 
-;; (defun dotemacs--text-mode-setup ()
-;;   "Helper function for configuring text mode."
-;;   (turn-off-hideshow))
+(defun dotemacs--text-mode-setup ()
+  "Helper function for configuring text mode."
+  )
 ;; (add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
@@ -41,6 +41,8 @@
         markdown-make-gfm-checkboxes-buttons t
         markdown-command "pandoc -f markdown -s ")
   (use-package markdown-mode+
+    :ensure t)
+  (use-package pandoc
     :ensure t)
   (use-package pandoc-mode
     :ensure t

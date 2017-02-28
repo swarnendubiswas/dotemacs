@@ -180,9 +180,8 @@
 (use-package bib-cite
   :defer t
   :diminish bib-cite-minor-mode
-  :config
-  (bib-cite-minor-mode 1)
-  (setq bib-cite-use-reftex-view-crossref t)
+  :init  (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
+  :config (setq bib-cite-use-reftex-view-crossref t)
   :bind
   (:map bib-cite-minor-mode-map
         ("C-c b" . nil) ; We use "C-c b" for comment-box

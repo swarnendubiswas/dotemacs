@@ -176,7 +176,8 @@
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :config
-  (setq ivy-rich-switch-buffer-align-virtual-buffer t)
+  (setq ivy-rich-switch-buffer-align-virtual-buffer t
+        ivy-rich-abbreviate-paths t)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (provide 'ivy-init)
