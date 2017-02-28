@@ -44,7 +44,8 @@
                   "GRTAGS"
                   "GTAGS"
                   "GSYMS"
-                  "TAGS"))
+                  "TAGS"
+                  "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files item))
   (dolist (list '("\\.log$"
                   "\\.out$"
