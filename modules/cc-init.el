@@ -139,8 +139,7 @@
     (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
   (use-package flycheck-google-cpplint ; Google C++ Style checker for Flycheck, also need to setup cpplint.
-    :ensure t
-    ;; :after flycheck
+    :load-path "extras"
     :if (eq system-type 'gnu/linux)
     :config
     (flycheck-add-next-checker 'c/c++-clang

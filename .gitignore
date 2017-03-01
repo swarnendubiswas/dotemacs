@@ -19,3 +19,4 @@ smex-items
 /.project
 ido.last
 /ido.last~
+/async-bytecomp.log

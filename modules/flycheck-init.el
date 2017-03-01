@@ -34,6 +34,12 @@
   :ensure t
   :commands flycheck-irony-setup)
 
+(use-package avy-flycheck
+  :ensure t
+  :config
+  ;; Binds avy-flycheck-goto-error to C-c ! g
+  (avy-flycheck-setup))
+
 (provide 'flycheck-init)
 
 ;;; flycheck-init.el ends here
