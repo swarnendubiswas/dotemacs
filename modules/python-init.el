@@ -73,7 +73,7 @@
   (use-package py-autopep8
     :ensure t
     :config
-    (setq py-autopep8-options '("--max-line-length=120"))
+    (setq py-autopep8-options '("--max-line-length=80"))
     (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
   (use-package python-docstring

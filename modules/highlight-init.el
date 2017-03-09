@@ -9,6 +9,9 @@
 
 (use-package hl-line ; Highlight current line
   :ensure t
+  ;; This is useful, but does not work well with in the terminal mode.
+  ;; Checking for (display-graphics-p) and using hooks do not seem to help.
+  :disabled t
   :config
   (setq hl-line-sticky-flag nil)
   (global-hl-line-mode 1)

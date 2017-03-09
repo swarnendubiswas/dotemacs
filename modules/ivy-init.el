@@ -67,7 +67,7 @@
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-arrow
-        ;; ivy-count-format "(%d/%d) " ; There seems no added benefit
+        ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
         ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
                                 (read-file-name-internal . ivy--regex-fuzzy)
                                 (swiper . ivy--regex-plus)
