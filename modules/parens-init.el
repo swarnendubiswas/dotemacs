@@ -19,17 +19,16 @@
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :disabled t
   :init
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
   :config
   (setq sp-show-pair-from-inside t)
-  ;; http://emacs.stackexchange.com/questions/26912/smartparens-do-not-insert-parenthesis-pair-when-point-is-at-the-beginning-of-wo
-  (sp-pair "(" nil :unless '(sp-point-before-word-p))
-  (sp-pair "[" nil :unless '(sp-point-before-word-p))
-  (sp-pair "{" nil :unless '(sp-point-before-word-p))
-  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
+  ;; ;; http://emacs.stackexchange.com/questions/26912/smartparens-do-not-insert-parenthesis-pair-when-point-is-at-the-beginning-of-wo
+  ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
+  ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
+  ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
+  ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
   :bind (("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)
