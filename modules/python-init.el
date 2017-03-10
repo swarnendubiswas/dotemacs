@@ -8,11 +8,13 @@
 ;; Install the following packages
 ;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc
 
+(defvar dotemacs-completion-in-buffer)
+
 (setenv "PYTHONPATH" "python3")
 
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."
-  (setq-default fill-column 78
+  (setq-default fill-column 118
                 python-indent-offset 4)
   (setq python-shell-interpreter "python3"
         python-shell-completion-native-enable nil
@@ -73,7 +75,8 @@
   (use-package py-autopep8
     :ensure t
     :config
-    (setq py-autopep8-options '("--max-line-length=80"))
+    (setq py-autopep8-options '("--max-line-length=120"))
+    (add-hook 'python-mode-hook #'py-autopep8-enable-on-save)
     (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
   (use-package python-docstring
