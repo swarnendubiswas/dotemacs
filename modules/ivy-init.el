@@ -180,6 +180,13 @@
         ivy-rich-abbreviate-paths t)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
+(use-package historian
+  :ensure t
+  :config (historian-mode 1))
+
+(use-package ivy-historian
+  :ensure t)
+
 (provide 'ivy-init)
 
 ;;; ivy-init.el ends here
