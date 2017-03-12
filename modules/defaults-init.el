@@ -226,7 +226,7 @@
         savehist-autosave-interval 300)
   (savehist-mode 1))
 
-(setq enable-recursive-minibuffers nil)
+(setq enable-recursive-minibuffers t)
 (use-package mb-depth
   :if (bound-and-true-p enable-recursive-minibuffers)
   :config (minibuffer-depth-indicate-mode 1))
