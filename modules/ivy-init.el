@@ -7,6 +7,7 @@
 
 (defvar dotemacs-selection)
 (defvar recentf-list)
+(defvar dotemacs-temp-directory)
 
 (use-package ivy
   :ensure t
@@ -180,12 +181,13 @@
         ivy-rich-abbreviate-paths t)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
-(use-package historian
-  :ensure t
-  :config (historian-mode 1))
-
 (use-package ivy-historian
-  :ensure t)
+  :ensure t
+  :config
+  (use-package historian
+    :ensure t
+    :config (setq historian-save-file (concat dotemacs-temp-directory "historian")))
+  (ivy-historian-mode 1))
 
 (provide 'ivy-init)
 
