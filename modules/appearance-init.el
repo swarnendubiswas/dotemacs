@@ -54,16 +54,22 @@
 
 ;; Display line numbers in the margin
 (or (use-package linum
-      :disabled t ;; linum-mode can slow down Emacs for large files:
+      ;; linum-mode can slow down Emacs for large files:
       ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
+      :disabled t 
       :config (global-linum-mode 1))
 
     (use-package nlinum ; Might improve performance with jit font locking.
       :ensure t
       :disabled t
-      :config
-      (global-nlinum-mode 1)
-      (setq nlinum-highlight-current-line t)))
+      ;; Does not work with emacsclient, since the frame is created later. See Kaushal Modi's response.
+      :defer 1 
+      :config (global-nlinum-mode 1)))
+
+(use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
+  :ensure t
+  :disabled t
+  :config (hlinum-activate))
 
 (use-package custom
   :config (setq custom-safe-themes t))

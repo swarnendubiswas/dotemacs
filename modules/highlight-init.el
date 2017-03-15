@@ -27,11 +27,6 @@
   (global-hl-line-mode -1)
   (toggle-hl-line-when-idle 1))
 
-(use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
-  :ensure t
-  ;; FIXME:
-  :init (hlinum-activate))
-
 (use-package hilit-chg
   :disabled t
   :diminish highlight-changes-mode
