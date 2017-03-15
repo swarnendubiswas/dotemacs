@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;; Install the following packages
-;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc
+;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc futures flake8-docstring
 
 (defvar dotemacs-completion-in-buffer)
 
@@ -18,8 +18,7 @@
                 python-indent-offset 4)
   (setq python-shell-interpreter "python3"
         python-shell-completion-native-enable nil
-        python-shell-unbuffered nil
-        python-check-command "flake8")
+        python-shell-unbuffered nil)
   (turn-on-auto-fill)
   (run-python (python-shell-parse-command) nil nil)
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
@@ -40,6 +39,17 @@
   (defun dotemacs--elpy-setup ()
     "Setup elpy and python configurations."
     (dotemacs--python-setup)
+    (setq elpy-modules '(elpy-module-company
+                         elpy-module-eldoc
+                         elpy-module-pyvenv
+                         elpy-module-highlight-indentation
+                         elpy-module-yasnippet
+                         elpy-module-sane-defaults)
+          elpy-rpc-python-command "python3"
+          elpy-rpc-backend "jedi"
+          elpy-syntax-check-command "flake8 --max-line-length=120")
+    ;; Disable flymake mode, since it becomes slow if there are a lot of guideline errors.
+    ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (use-package pyvenv
       :ensure t
       :config (pyvenv-mode 1))
@@ -59,18 +69,7 @@
       (error (elpy-rgrep-symbol
               (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
   :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
-  :config
-  (setq elpy-modules '(elpy-module-company
-                       elpy-module-eldoc
-                       elpy-module-pyvenv
-                       elpy-module-highlight-indentation
-                       elpy-module-yasnippet
-                       elpy-module-sane-defaults)
-        elpy-rpc-python-command "python3"
-        elpy-rpc-backend "jedi")
-  ;; Disable flymake mode, since it becomes slow if there are a lot of guideline errors.
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  (add-hook 'elpy-mode-hook #'flycheck-mode)
+  :config (add-hook 'elpy-mode-hook #'flycheck-mode)
 
   (use-package py-autopep8
     :ensure t
