@@ -47,7 +47,7 @@
                          elpy-module-sane-defaults)
           elpy-rpc-python-command "python3"
           elpy-rpc-backend "jedi"
-          elpy-syntax-check-command "flake8 --max-line-length=120")
+          elpy-syntax-check-command "flake8")
     ;; Disable flymake mode, since it becomes slow if there are a lot of guideline errors.
     ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (use-package pyvenv
