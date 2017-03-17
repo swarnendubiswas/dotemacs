@@ -56,7 +56,7 @@
 (or (use-package linum
       ;; linum-mode can slow down Emacs for large files:
       ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
-      :disabled t 
+      :disabled t
       :config (global-linum-mode 1))
 
     (use-package nlinum ; Might improve performance with jit font locking.
@@ -236,9 +236,14 @@
     (set-face-attribute 'default nil
                         :family "Consolas"
                         :height 120)
-  (set-face-attribute 'default nil
-                      :family "Dejavu Sans Mono"
-                      :height 110))
+  (progn
+    (if (string-equal (system-name) "consensus.ices.utexas.edu")
+        (set-face-attribute 'default nil
+                            :family "Dejavu Sans Mono"
+                            :height 130)
+      (set-face-attribute 'default nil
+                          :family "Dejavu Sans Mono"
+                          :height 120))))
 
 (provide 'appearance-init)
 
