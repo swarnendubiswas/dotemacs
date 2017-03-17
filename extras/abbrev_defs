@@ -726,6 +726,7 @@
     ("influance" "influence" nil 0)
     ("infomation" "information" nil 0)
     ("infomration" "information" nil 1)
+    ("informaiton" "information" nil 0)
     ("informatoin" "information" nil 0)
     ("inital" "initial" nil 2)
     ("initalization" "initialization" nil 0)
@@ -1415,9 +1416,7 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 

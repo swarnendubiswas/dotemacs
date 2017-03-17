@@ -178,7 +178,9 @@
   :if (eq dotemacs-selection 'ivy)
   :config
   (setq ivy-rich-switch-buffer-align-virtual-buffer t
-        ivy-rich-abbreviate-paths t)
+        ivy-rich-abbreviate-paths t
+        ivy-rich-switch-buffer-name-max-length 48
+        ivy-rich-switch-buffer-project-max-length 32)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package ivy-historian
