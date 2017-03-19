@@ -63,7 +63,7 @@
       :ensure t
       :disabled t
       ;; Does not work with emacsclient, since the frame is created later. See Kaushal Modi's response.
-      :defer 1 
+      :defer 1
       :config (global-nlinum-mode 1)))
 
 (use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
