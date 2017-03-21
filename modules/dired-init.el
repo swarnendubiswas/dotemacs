@@ -79,6 +79,10 @@
   :diminish dired-icon-mode
   :init (add-hook 'dired-mode-hook #'dired-icon-mode))
 
+(use-package dired-quick-sort
+  :ensure t
+  :config (dired-quick-sort-setup))
+
 (provide 'dired-init)
 
 ;;; dired-init ends here

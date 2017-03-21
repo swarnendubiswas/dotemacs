@@ -37,15 +37,14 @@
                   ".nx"
                   "elpa"
                   "auto"
-                  "__pycache__"
-                  ))
+                  "__pycache__"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   (dolist (item '("GPATH"
                   "GRTAGS"
                   "GTAGS"
                   "GSYMS"
                   "TAGS"
-                  "__init__.py"))
+                  "__init__\\.py"))
     (add-to-list 'projectile-globally-ignored-files item))
   (dolist (list '("\\.log$"
                   "\\.out$"
