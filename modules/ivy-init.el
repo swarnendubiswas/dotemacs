@@ -13,16 +13,6 @@
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :preface
-  (defun dotemacs--ivy-recentf ()
-    "Find a file on `recentf-list' and abbreviate the home directory."
-    (interactive)
-    (ivy-read "Recentf: " (mapcar #'abbreviate-file-name recentf-list)
-              :action
-              (lambda (f)
-                (with-ivy-window
-                  (find-file f)))
-              :caller 'counsel-recentf))
-
   ;; https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
   (defun eh-ivy-return-recentf-index (dir)
     (when (and (boundp 'recentf-list)
@@ -54,7 +44,7 @@
             t)
         (if (file-directory-p y)
             nil
-          ;; Files is sorted by mtime
+          ;; File is sorted by mtime
           (time-less-p y-mtime x-mtime)))))
   :config
   (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
@@ -63,7 +53,7 @@
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
-        ivy-height 15 ; This seems a good number to see several options at a time
+        ivy-height 15 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
@@ -87,11 +77,8 @@
   (add-to-list 'ivy-sort-functions-alist
                '(read-file-name-internal . eh-ivy-sort-file-function))
   (ivy-mode 1)
-  (use-package ivy-hydra
-    :ensure t)
   :bind
   (("C-c r" . ivy-resume)
-   ("<f9>" . dotemacs--ivy-recentf)
    ("C-'" . ivy-avy)
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
@@ -109,6 +96,16 @@
   :ensure ivy
   :after ivy
   :preface
+  (defun dotemacs--counsel-recentf ()
+    "Find a file on `recentf-list' and abbreviate the home directory."
+    (interactive)
+    (ivy-read "Recentf: " (mapcar #'abbreviate-file-name recentf-list)
+              :action
+              (lambda (f)
+                (with-ivy-window
+                  (find-file f)))
+              :caller 'counsel-recentf))
+
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun dotemacs-counsel-goto-recent-directory ()
     "Open recent directories with dired."
@@ -134,6 +131,7 @@
    ([remap load-library] . counsel-load-library)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap completion-at-point] . counsel-company)
+   ("<f9>" . dotemacs--counsel-recentf)
    ("C-<f9>" . dotemacs-counsel-goto-recent-directory)
    ("C-c s a" . counsel-ag)
    ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
