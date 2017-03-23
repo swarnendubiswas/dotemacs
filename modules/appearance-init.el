@@ -9,7 +9,9 @@
 
 ;; Better frame title
 (setq frame-title-format
-      (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" (system-name)))
+      (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" (system-name))
+      indicate-empty-lines t)
+
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
