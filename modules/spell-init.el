@@ -22,12 +22,6 @@
   :if (eq system-type 'gnu/linux)
   :after ispell
   :preface
-  (defun dotemacs--activate-flyspell ()
-    "Turn on flyspell-mode and call flyspell-buffer."
-    (interactive)
-    (flyspell-mode) ; This REALLY slows buffer switching
-    (flyspell-buffer))
-
   ;; Move point to previous error, based on code by hatschipuh at http://emacs.stackexchange.com/a/14912/2017
   ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
   (defun dotemacs-flyspell-goto-previous-error (arg)
@@ -85,7 +79,8 @@
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
    ("C-c f w" . ispell-word)
-   ("C-," . nil)
+   :map flyspell-mode-map
+   ("C-;" . nil)
    ("C-," . dotemacs-flyspell-goto-previous-error)))
 
 (use-package helm-flyspell

@@ -6,7 +6,6 @@
 ;;; Code:
 
 (use-package paren
-  :disabled t
   :config
   (setq show-paren-delay 0
         show-paren-style 'mixed ; Options: 'expression, 'parenthesis, 'mixed

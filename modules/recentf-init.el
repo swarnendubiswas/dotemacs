@@ -38,6 +38,12 @@
   :disabled t
   :after recentf)
 
+(defun dotemacs-recentf-save-list (orig-fun & rest args)
+  "Hide messages appearing in ORIG-FUN."
+  (let ((inhibit-message t))
+    (res (apply orig-fun args))))
+(advice-add 'recentf-save-list :around #'dotemacs-recentf-save-list)
+
 (provide 'recentf-init)
 
 ;;; recentf-init.el ends here

@@ -116,9 +116,7 @@
   :config (xterm-mouse-mode -1))
 
 (use-package menu-bar
-  :config
-  (toggle-indicate-empty-lines 1)
-  (next-error-follow-minor-mode 1))
+  :config (next-error-follow-minor-mode 1))
 
 (use-package simple
   :config
