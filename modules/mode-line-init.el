@@ -59,8 +59,10 @@
                                                         powerline-default-separator 'slant
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil ; Prefer nyan cat mode
+                                                        spaceline-buffer-modified-p t
                                                         spaceline-buffer-position-p t
-                                                        spaceline-projectile-root-p t)
+                                                        spaceline-projectile-root-p t
+                                                        spaceline-paradox-menu-p t)
                                                   ;; Adapted from https://github.com/lunaryorn/.emacs.d/blob/master/init.el
                                                   (spaceline-compile
                                                    'compact
@@ -77,6 +79,7 @@
                                                    ;; Right segment
                                                    '(;;((which-function projectile-root) :separator " | ")
                                                      (which-function :when active)
+                                                     (projectile-root :when active)
                                                      (version-control :when active)
                                                      (battery :when active)
                                                      selection-info
