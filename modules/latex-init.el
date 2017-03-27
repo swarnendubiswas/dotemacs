@@ -226,7 +226,7 @@
 (use-package company-bibtex
   :ensure t
   :if (eq dotemacs-completion-in-buffer 'company)
-  :config
+  :init
   (add-to-list 'company-backends 'company-bibtex)
   (setq company-bibtex-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
                                       "~/iss-workspace/papers/approximate-bib/paper.bib")))
@@ -244,6 +244,8 @@
 (add-hook 'LaTeX-mode-hook
           (lambda ()
             (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
+
+(require 'smartparens-latex)
 
 (provide 'latex-init)
 

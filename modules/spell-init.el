@@ -20,7 +20,6 @@
 
 (use-package flyspell
   :if (eq system-type 'gnu/linux)
-  :after ispell
   :preface
   ;; Move point to previous error, based on code by hatschipuh at http://emacs.stackexchange.com/a/14912/2017
   ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
@@ -93,26 +92,7 @@
 (use-package flyspell-popup
   :ensure t
   :after flyspell
-  :bind (:map flyspell-mode-map
-              ("C-;" . flyspell-popup-correct)))
-
-(use-package flyspell-correct
-  :ensure t
-  :after flyspell
-  :disabled t
-  :bind (:map flyspell-mode-map
-              ("M-$" . flyspell-correct-word-generic))
-  :config
-  (cond ((eq dotemacs-selection 'helm) (use-package flyspell-correct-helm
-                                         :ensure t
-                                         :config (setq flyspell-correct-interface 'flyspell-correct-helm)))
-        ;; Use ivy-read-action (C-M-a) to invoke "correct", "save", "accept" options
-        ((eq dotemacs-selection 'ivy) (use-package flyspell-correct-ivy
-                                        :ensure t
-                                        :config (setq flyspell-correct-interface 'flyspell-correct-ivy)))
-        (t (use-package flyspell-correct-popup
-             :ensure t
-             :config (setq flyspell-correct-interface 'flyspell-correct-popup)))))
+  :bind ("C-;" . flyspell-popup-correct))
 
 (provide 'spell-init)
 
