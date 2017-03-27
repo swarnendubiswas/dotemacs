@@ -40,7 +40,7 @@
 
 (defun dotemacs-recentf-save-list (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
-  (let (inhibit-message t)
+  (let ((inhibit-message t))
     (apply orig-fun args)))
 
 (advice-add 'recentf-save-list :around #'dotemacs-recentf-save-list)
