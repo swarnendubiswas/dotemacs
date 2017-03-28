@@ -27,17 +27,16 @@
         helm-apropos-fuzzy-match t
         helm-lisp-fuzzy-completion t
         helm-etags-fuzzy-match t
-        ;; I now prefer to open helm buffers in full frame since it gives more vertical space. Right side is bad since
-        ;; long lines can get truncated.
         helm-full-frame nil ; Make the helm buffer occupy the full frame
-        ;; helm-split-window-default-side 'right
+        ;; helm-split-window-default-side 'right ; Right side is bad since long lines can get truncated.
         ;; helm-split-window-in-side-p nil ; Open helm buffer inside current window, not occupy whole other window
         helm-always-two-windows t
         helm-move-to-line-cycle-in-source t ; Move to end or beginning of source when reaching top or bottom of source
         helm-display-header-line nil
         helm-echo-input-in-header-line nil
         helm-case-fold-search t ; Default is 'smart, searches and matches should ignore case
-        helm-follow-mode-persistent t)
+        helm-follow-mode-persistent t
+        helm-autoresize-max-height 20)
 
   (helm-autoresize-mode -1) ; Distracting
 
@@ -69,7 +68,6 @@
           helm-buffers-truncate-lines nil
           helm-mini-default-sources '(helm-source-buffers-list
                                       helm-source-recentf
-                                      helm-source-dired-recent-dirs
                                       helm-source-buffer-not-found)))
 
   (use-package helm-command
@@ -151,14 +149,16 @@
    ("C-c r" . helm-resume)
    ([remap occur] . helm-occur)
    ("C-c h o" . helm-occur)
+   ("C-c C-j" . helm-imenu)
    :map helm-map
    ("<tab>" . helm-execute-persistent-action) ; Do not rebind <tab> globally
    ("C-z" . helm-select-action)))
 
 (use-package helm-smex
   :ensure t
+  :ensure smex
   :if (eq dotemacs-selection 'helm)
-  :after helm
+  :after helm smex
   :bind
   (([remap execute-extended-command] . helm-smex)
    ("M-X" . helm-smex-major-mode-commands)))

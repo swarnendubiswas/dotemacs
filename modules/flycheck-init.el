@@ -27,8 +27,7 @@
 
 (use-package avy-flycheck
   :ensure t
-  :after avy
-  :after flycheck
+  :after avy flycheck
   :config
   ;; Binds avy-flycheck-goto-error to C-c ! g
   (avy-flycheck-setup))
@@ -45,7 +44,7 @@
     (use-package flycheck-title
       :ensure t
       :after flycheck
-      :config (flycheck-title-mode 1)))
+      :init (flycheck-title-mode 1)))
 
 (use-package flycheck-clang-tidy
   :ensure t
