@@ -51,7 +51,7 @@
 
 (use-package swiper-helm
   :ensure t
-  :after swiper
+  :after swiper helm
   :if (eq dotemacs-selection 'helm)
   :bind ("<f4>" . swiper-helm))
 

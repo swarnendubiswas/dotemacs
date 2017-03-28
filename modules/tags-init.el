@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-selection)
+
 (setq tags-revert-without-query t
       tags-case-fold-search nil)
 
@@ -82,6 +84,7 @@
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
                 (helm-gtags-mode 1))))
+  (add-hook 'python-mode-hook #'helm-gtags-mode)
   :bind (:map helm-gtags-mode-map
               ("M-." . helm-gtags-dwim)
               ("M-," . helm-gtags-pop-stack)
@@ -96,7 +99,6 @@
              counsel-gtags-find-reference
              counsel-gtags-find-symbol
              counsel-gtags-find-file
-             counsel-gtags-pop
              counsel-gtags-create-tags
              counsel-gtags-update-tags
              counsel-gtags-dwim)
@@ -111,7 +113,7 @@
         counsel-gtags-auto-update t)
   :bind (:map counsel-gtags-mode-map
               ("M-." . counsel-gtags-dwim)
-              ("M-," . counsel-gtags-pop)
+              ("M-," . counsel-gtags-go-backward)
               ("C-c g s" . counsel-gtags-find-symbol)
               ("C-c g r" . counsel-gtags-find-reference)
               ("C-c g c" . counsel-gtags-create-tags)
