@@ -40,8 +40,8 @@
 
   (use-package c-eldoc
     :ensure t
+    :after eldoc
     :if (eq system-type 'gnu/linux)
-    :disabled t
     :init
     (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
     (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
@@ -148,10 +148,10 @@
           flycheck-googlelint-filter "-whitespace/line_length"))
 
   (unbind-key "C-M-a" c-mode-map)
-  :bind (("C-c c a" . c-beginning-of-defun)
-         ("C-c c e" . c-end-of-defun)
-         :map c-mode-base-map
-         ("M-q" . c-fill-paragraph)))
+  :bind (:map c-mode-base-map
+              ("C-c c a" . c-beginning-of-defun)
+              ("C-c c e" . c-end-of-defun)
+              ("M-q" . c-fill-paragraph)))
 
 ;; Example to install irony-server: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20161227.348/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
@@ -190,6 +190,11 @@
     :ensure t
     :commands irony-eldoc
     :init (add-hook 'irony-mode-hook #'irony-eldoc)))
+
+(use-package clang-format
+  :ensure t
+  :after eldoc
+  :after cc-mode)
 
 (provide 'cc-init)
 
