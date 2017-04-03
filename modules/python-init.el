@@ -83,17 +83,17 @@
     :diminish python-docstring-mode
     :config
     (add-hook 'python-mode-hook #'python-docstring-mode))
-  :bind (("C-c c l" . elpy-nav-indent-shift-left)
-         ("C-c c r" . elpy-nav-indent-shift-right)
-         ("C-c c e" . python-nav-forward-defun)
-         ("C-c c a" . python-nav-backward-defun)
-         ("C-c c i" . elpy-importmagic-fixup)
-         :map elpy-mode-map
-         ("M-<left>" . nil)
-         ("M-<right>" . nil)
-         ("M-." . nil)
-         ("C-c C-d" . nil)
-         ("C-c C-r i" . nil)))
+  :bind (:map elpy-mode-map
+              ("C-c c l" . elpy-nav-indent-shift-left)
+              ("C-c c r" . elpy-nav-indent-shift-right)
+              ("C-c c e" . python-nav-forward-defun)
+              ("C-c c a" . python-nav-backward-defun)
+              ("C-c c i" . elpy-importmagic-fixup)
+              ("M-<left>" . nil)
+              ("M-<right>" . nil)
+              ("M-." . nil)
+              ("C-c C-d" . nil)
+              ("C-c C-r i" . nil)))
 
 (provide 'python-init)
 
