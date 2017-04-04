@@ -6,6 +6,7 @@
 ;;; Code:
 
 (defvar dotemacs-selection)
+(defvar dotemacs-completion-in-buffer)
 
 (setq tags-revert-without-query t
       tags-case-fold-search nil)

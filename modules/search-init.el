@@ -65,6 +65,7 @@
 (use-package helm-ag
   :ensure t
   :if (eq dotemacs-selection 'helm)
+  :after ag helm
   :bind ("C-c s a" . helm-ag)
   :config
   (setq helm-ag-fuzzy-match t
@@ -73,6 +74,7 @@
 
 (use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
   :ensure t
+  :after ag
   :config
   (use-package wgrep
     :ensure t
@@ -84,26 +86,6 @@
   :if (eq dotemacs-selection 'ido)
   :bind (("C-c s o" . ido-occur)
          ("C-c s O" . ido-occur-at-point)))
-
-(use-package swoop
-  :ensure t
-  :config (setq swoop-use-target-magnifier t
-                swoop-use-target-magnifier-size 1.2))
-
-;; "C-c C-e" to go into edit mode
-(use-package helm-swoop
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :bind
-  (("C-c h s" . helm-swoop)
-   ("C-c h /" . helm-multi-swoop))
-  :config
-  (setq helm-multi-swoop-edit-save t ; Save buffer when helm-multi-swoop-edit complete
-        helm-swoop-speed-or-color nil ; If nil, you can slightly boost invoke speed in exchange for text color
-        helm-swoop-split-direction #'split-window-vertically
-        helm-swoop-split-with-multiple-windows nil
-        helm-swoop-move-to-line-cycle t ; Go to the opposite side of line from the end or beginning of line
-        helm-swoop-use-line-number-face t))
 
 (use-package ace-isearch
   :ensure t
