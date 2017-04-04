@@ -47,7 +47,9 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table '())
+(define-abbrev-table 'awk-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -63,13 +65,19 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table '())
+(define-abbrev-table 'c++-mode-abbrev-table
+  '(
+   ))
 
-(define-abbrev-table 'c-mode-abbrev-table '())
+(define-abbrev-table 'c-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
 (define-abbrev-table 'change-log-mode-abbrev-table '())
+
+(define-abbrev-table 'cmake-mode-abbrev-table '())
 
 (define-abbrev-table 'comint-mode-abbrev-table '())
 
@@ -746,6 +754,7 @@
     ("invlaidation" "invalidation" nil 1)
     ("invstigated" "investigated" nil 0)
     ("inwhich" "in which" nil 0)
+    ("irritiating" "irritating" nil 0)
     ("isngihtful" "insightful" nil 1)
     ("isnt" "isn't" nil 0)
     ("isoaltion" "isolation" nil 1)
@@ -1345,7 +1354,9 @@
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table '())
+(define-abbrev-table 'java-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
@@ -1389,7 +1400,9 @@
 
 (define-abbrev-table 'nroff-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table '())
+(define-abbrev-table 'objc-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -1411,7 +1424,9 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table '())
+(define-abbrev-table 'pike-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 
