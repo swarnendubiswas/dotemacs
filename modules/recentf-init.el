@@ -8,6 +8,9 @@
 (defvar dotemacs-temp-directory)
 (defvar dotemacs-selection)
 
+;; Adding directories to the list of recent files decreases the number of entries of recent files. Therefore, we use a
+;; different command/keybinding to lookup recent directories.
+
 (use-package recentf
   :init
   (setq-default recentf-save-file (concat dotemacs-temp-directory "recentf") ; Set this first so that recentf can load content
@@ -31,13 +34,7 @@
     (bind-key "<f9>" #'recentf-open-files))
   (run-at-time nil (* 10 60) 'recentf-save-list))
 
-(use-package recentf-ext ; Add directories to recent list
-  :ensure t
-  ;; Adding directories to the list of recent files decreases the number of entries of recent files. Therefore, we use a
-  ;; different command/keybinding to lookup recent directories.
-  :disabled t
-  :after recentf)
-
+;; Hide the "wrote to recentf" message, which can be irritating.
 (defun dotemacs-recentf-save-list (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
   (let ((inhibit-message t))

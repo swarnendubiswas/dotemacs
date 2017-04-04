@@ -56,10 +56,6 @@
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   (unbind-key "C-c ;" LaTeX-mode-map))
 
-(use-package tex-fold
-  :defer t
-  :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
-
 (use-package tex-mode
   :diminish latex-electric-env-pair-mode
   :defer t

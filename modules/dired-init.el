@@ -27,12 +27,14 @@
               ("M-<up>" . dired-jump-to-top)
               ("M-<down>" . dired-jump-to-bottom))
   :config
-  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you visit it
+  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you "revisit" it
         dired-recursive-deletes 'always ; Single prompt for all n directories
         dired-recursive-copies 'always
         dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
         dired-ls-F-marks-symlinks t ; -F marks links with @
-        dired-dwim-target t))
+        dired-dwim-target t)
+  ;; Auto refresh dired when files change
+  (add-hook 'dired-mode-hook 'auto-revert-mode))
 
 (use-package dired-x
   :after dired

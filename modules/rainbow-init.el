@@ -5,11 +5,6 @@
 
 ;;; Code:
 
-(use-package rainbow-mode
-  :ensure t
-  :disabled t
-  :config (add-hook 'prog-mode-hook #'rainbow-mode))
-
 (use-package rainbow-delimiters
   :ensure t
   :init
