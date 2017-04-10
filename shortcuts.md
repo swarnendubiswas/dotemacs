@@ -107,6 +107,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Ivy
 
+* `M-o` - Execute an available action (`ivy-dispatching-done`).
 * `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`).
 * `C-n` - Selects the next candidate (`ivy-next-line`).
 * `C-p` - Selects the previous candidate (`ivy-previous-line`).
@@ -123,6 +124,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-'` - Use `avy` to select candidates (`ivy-avy`).
 * `C-c r` - Resume the last ivy completion session (`ivy-resume`).
 * `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
+
+Specify extra flags to the search commands with `C-u` (`universal-argument`) before the command.
 
 ## Helm
 
@@ -266,3 +269,6 @@ Within the error list the following key bindings are available:
 #### Swiper
 * `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).
 * `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).
+
+####
+* [An example of excluding *.el from the files searched by ag](https://github.com/abo-abo/swiper/pull/774)
