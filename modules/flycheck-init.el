@@ -27,6 +27,7 @@
 
 (use-package avy-flycheck
   :ensure t
+  :ensure avy
   :after avy flycheck
   :config
   ;; Binds avy-flycheck-goto-error to C-c ! g
