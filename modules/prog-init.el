@@ -227,9 +227,8 @@
   :defer t
   :config
   (setq inferior-R-args "--quiet --no-restore-history --no-save"
-        ess-indent-level 4
-        ess-arg-function-offset 4
-        ess-else-offset 4)
+        ess-indent-offset 4
+        ess-indent-from-lhs 4)
   (use-package ess-smart-underscore
     :ensure t))
 
@@ -240,6 +239,10 @@
   (use-package cmake-font-lock
     :ensure t))
 
-  (provide 'prog-init)
+(use-package ini-mode
+  :ensure t
+  :mode ("\\.ini\\'" . ini-mode))
+
+(provide 'prog-init)
 
 ;;; prog-init.el ends here
