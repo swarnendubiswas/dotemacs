@@ -78,7 +78,8 @@
 
 ;; Configure individual major modes
 (require 'text-init)
-(require 'latex-init)
+;; (require 'latex-init)
+(require 'latex-new-init)
 (require 'org-init)
 (require 'prog-init)
 (require 'cc-init)

@@ -1,4 +1,4 @@
-personal_ws-1.1 en 49 
+personal_ws-1.1 en 50 
 scalability
 pseudocode
 Kolkata
@@ -28,6 +28,7 @@ functionalities
 optimizations
 summarization
 virtualizing
+deterministically
 Keshav
 programmatically
 associativity
