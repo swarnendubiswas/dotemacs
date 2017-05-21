@@ -18,7 +18,7 @@
   :mode ("\\.tex\\'" . LaTeX-mode))
 
 (use-package tex-buf ; Requires tex and latex
-  :defer t
+  ;; :defer t
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -58,7 +58,7 @@
 
 (use-package tex-mode
   :diminish latex-electric-env-pair-mode
-  :defer t
+  ;; :defer t
   :init
   (setq latex-run-command "latexmk")
   (add-hook 'TeX-mode-hook
@@ -202,6 +202,7 @@
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t)
   (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
+
                                          "~/iss-workspace/papers/approximate-bib/paper.bib")))
 
 (use-package helm-bibtex
@@ -225,7 +226,7 @@
   :init
   (add-to-list 'company-backends 'company-bibtex)
   (setq company-bibtex-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                      "~/iss-workspace/papers/approximate-bib/paper.bib")))
+                                      "~/iss-workspace/approximate-bib/paper.bib")))
 
 ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
