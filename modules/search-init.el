@@ -89,6 +89,8 @@
 
 (use-package ace-isearch
   :ensure t
+  :ensure avy
+  :ensure ace-jump-mode
   :diminish  ace-isearch-mode
   :config (global-ace-isearch-mode 1))
 

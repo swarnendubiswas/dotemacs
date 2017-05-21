@@ -197,7 +197,6 @@
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
-  :disabled t
   :config
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
