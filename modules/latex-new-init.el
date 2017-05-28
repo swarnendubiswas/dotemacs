@@ -11,6 +11,12 @@
 (defconst bibs-list '("~/plass-workspace/bib/plass-formatted.bib"
                       "~/iss-workspace/papers/approximate-bib/paper.bib"))
 
+;; prettify-symbol-mode is distracting while editing, and is buffer-local.
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (global-prettify-symbols-mode -1)
+            (prettify-symbols-mode -1)))
+
 (use-package reftex
   :diminish reftex-mode
   :commands (reftex-citation)
