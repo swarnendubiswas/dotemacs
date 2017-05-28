@@ -28,6 +28,10 @@
   ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
   (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
     (sp-local-tag "i" "\"<" "\">"))
+  ;; https://emacs.stackexchange.com/questions/27200/how-to-disable-pairing-in-latex-mode-in-spacemacs
+  ;; (sp-local-pair #'latex-mode "$" nil :actions :rem)
+  ;; (sp-local-pair 'LaTeX-mode "$" nil :actions :rem)
+
   (sp-with-modes '(c++-mode)
     (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
   (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
