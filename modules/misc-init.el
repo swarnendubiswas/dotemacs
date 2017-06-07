@@ -110,6 +110,7 @@
   (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
   (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
   (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
+  (push '(magit-diff-mode :noselect nil) popwin:special-display-config)
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))

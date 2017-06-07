@@ -1,4 +1,4 @@
-personal_ws-1.1 en 57 
+personal_ws-1.1 en 58 
 atomicity
 indices
 roundtrip
@@ -45,6 +45,7 @@ Kolkata
 serializability
 Dependences
 tradeoff
+parallelizing
 runtimes
 reimplement
 deterministically
