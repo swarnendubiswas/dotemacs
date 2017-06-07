@@ -409,7 +409,7 @@
     ("consumeable" "consumable" nil 0)
     ("contenxt" "context" nil 1)
     ("contitions" "conditions" nil 0)
-    ("contorl" "Control" nil 1)
+    ("contorl" "control" nil 1)
     ("controlable" "controllable" nil 0)
     ("convertable" "convertible" nil 0)
     ("cooparate" "cooperate" nil 0)
@@ -822,6 +822,7 @@
     ("mispell" "misspell" nil 0)
     ("mispelling" "misspelling" nil 0)
     ("mispellings" "misspellings" nil 0)
+    ("mistmatch" "mismatch" nil 0)
     ("mkae" "make" nil 0)
     ("mkaes" "makes" nil 0)
     ("mkaing" "making" nil 0)
@@ -1161,7 +1162,7 @@
     ("talkign" "talking" nil 0)
     ("targetd" "targeted" nil 2)
     ("tath" "that" nil 0)
-    ("techinical" "Technical" nil 1)
+    ("techinical" "technical" nil 1)
     ("techinques" "techniques" nil 2)
     ("techique" "technique" nil 1)
     ("techniuqe" "technique" nil 0)
@@ -1373,7 +1374,39 @@
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
+(define-abbrev-table 'log-edit-mode-abbrev-table '())
+
 (define-abbrev-table 'log4e-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-cherry-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-diff-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-log-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-log-select-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-merge-preview-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-popup-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-process-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-reflog-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-refs-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-repolist-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-revision-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-stash-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-stashes-mode-abbrev-table '())
+
+(define-abbrev-table 'magit-status-mode-abbrev-table '())
 
 (define-abbrev-table 'makefile-automake-mode-abbrev-table '())
 
