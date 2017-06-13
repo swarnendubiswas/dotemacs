@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+
 (use-package whitespace
   :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)

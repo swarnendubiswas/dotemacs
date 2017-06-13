@@ -56,7 +56,7 @@
                                                   :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20
-                                                        powerline-default-separator 'slant
+                                                        powerline-default-separator 'arrow
                                                         spaceline-anzu-p t
                                                         spaceline-hud-p nil ; Prefer nyan cat mode
                                                         spaceline-buffer-modified-p t
@@ -65,29 +65,29 @@
                                                         spaceline-paradox-menu-p t)
                                                   ;; Adapted from https://github.com/lunaryorn/.emacs.d/blob/master/init.el
                                                   (spaceline-compile
-                                                   'compact
-                                                   ;; Left side of the mode line
-                                                   '(((buffer-modified buffer-size) :face highlight-face)
-                                                     anzu
-                                                     '(buffer-id remote-host)
-                                                     major-mode
-                                                     (process :when active)
-                                                     ((flycheck-error flycheck-warning flycheck-info) :when active)
-                                                     (paradox-menu :when active)
-                                                     (minor-modes :when active)
-                                                     ((nyan-cat buffer-position) :separator " | "))
-                                                   ;; Right segment
-                                                   '(;;((which-function projectile-root) :separator " | ")
-                                                     (which-function :when active)
-                                                     (projectile-root :when active)
-                                                     (version-control :when active)
-                                                     (battery :when active)
-                                                     selection-info
-                                                     input-method
-                                                     ((point-position line-column) :separator " | ")
-                                                     (global :when active)
-                                                     ,@additional-segments
-                                                     hud))
+                                                    'compact
+                                                    ;; Left side of the mode line
+                                                    '(((buffer-modified buffer-size) :face highlight-face)
+                                                      anzu
+                                                      '(buffer-id remote-host)
+                                                      major-mode
+                                                      (process :when active)
+                                                      ((flycheck-error flycheck-warning flycheck-info) :when active)
+                                                      (paradox-menu :when active)
+                                                      (minor-modes :when active)
+                                                      ((nyan-cat buffer-position) :separator " | "))
+                                                    ;; Right segment
+                                                    '(;;((which-function projectile-root) :separator " | ")
+                                                      (which-function :when active)
+                                                      (projectile-root :when active)
+                                                      (version-control :when active)
+                                                      (battery :when active)
+                                                      selection-info
+                                                      input-method
+                                                      ((point-position line-column) :separator " | ")
+                                                      (global :when active)
+                                                      ,@additional-segments
+                                                      hud))
                                                   (setq-default mode-line-format '("%e" (:eval (spaceline-ml-compact))))
 
                                                   (when (eq dotemacs-selection 'helm)
