@@ -39,7 +39,7 @@
               truncate-lines nil
               truncate-partial-width-windows nil
               history-length 50
-              history-delete-duplicates t
+              history-delete-duplicates t ; Delete duplicate (identical and old) elements in the minibuffer history
               ;; Disabling this is one way to speed up Emacs with buffers with long lines
               bidi-display-reordering nil)
 
@@ -75,6 +75,7 @@
                  ".toc"))
     (add-to-list 'completion-ignored-extensions ext)))
 
+;; Activate utf8 mode
 (when (eq system-type 'windows-nt)
   (setq locale-coding-system 'utf-8)
   (set-language-environment 'utf-8)
