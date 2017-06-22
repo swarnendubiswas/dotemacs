@@ -6,7 +6,7 @@
 ;;; Code:
 
 ;; Install the following packages
-;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc futures flake8-docstring pydocstyle
+;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc futures flake8-docstring pydocstyle wheel dev sklearn tensorflow Cython isort tflearn
 
 (defvar dotemacs-completion-in-buffer)
 
@@ -57,8 +57,8 @@
       :ensure t
       :if (eq dotemacs-completion-in-buffer 'company)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
-    ;; (add-hook 'before-save-hook #'elpy-format-code nil t)
-    ;; (add-hook 'before-save-hook #'delete-trailing-whitespace nil t)
+    (add-hook 'before-save-hook #'elpy-format-code nil t)
+    (add-hook 'before-save-hook #'elpy-importmagic-fixup)
     (elpy-enable))
 
   (defun elpy-goto-definition-or-rgrep ()

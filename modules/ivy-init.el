@@ -8,6 +8,7 @@
 (defvar dotemacs-selection)
 (defvar recentf-list)
 (defvar dotemacs-temp-directory)
+(defvar savehist-additional-variables)
 
 (use-package ivy
   :ensure t
@@ -47,7 +48,7 @@
           ;; File is sorted by mtime
           (time-less-p y-mtime x-mtime)))))
   :config
-  (setq ivy-use-virtual-buffers t ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
+  (setq ivy-use-virtual-buffers nil ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
         confirm-nonexistent-file-or-buffer t
         ivy-virtual-abbreviate 'full
         ivy-wrap t ; Useful to be able to wrap around boundary items
@@ -194,6 +195,11 @@
     :ensure t
     :config (setq historian-save-file (concat dotemacs-temp-directory "historian")))
   (ivy-historian-mode 1))
+
+(use-package ivy-dired-history
+  :ensure t
+  :after savehist
+  :config (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
 
 (provide 'ivy-init)
 

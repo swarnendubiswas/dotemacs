@@ -1,16 +1,18 @@
 ##Emacs
 
-My Emacs changes, all in one place. Most of the customizations included have been collected from different sources on
+My Emacs customizations, all in one place. Many of the customizations included are collected from different sources on
 the Internet, and tailored according to my preferences.
 
 ######Note
 
-The setup is not perfect for programming with Java. I think Eclipse is way better with Java. 
+Other than text and elisp editing, I mostly use Emacs for editing C/C++, LaTeX, and Python files. The current setup
+should work fine for these major modes, and is not well-tuned for programming with Java. I think Eclipse is way better
+for working with Java.
 
 #####Installation
 
-First, if your `.emacs.d` directory is not empty, then you might want to backup the contents. Then, use the following
-command to checkout the source:
+You might want to backup your contents if your `.emacs.d` directory is not empty. Then, use the following command to
+checkout the source:
 
 ```
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
@@ -21,7 +23,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
          using [`(use-package)`](https://github.com/jwiegley/use-package). -->
          * modules -- elisp modules containing personal customizations
          * extras -- third-party packages (may not be available from the package archives)
-         * reference-cards -- help files 
+         * reference-cards -- help files
          * snippets -- custom snippets
 
 ####Setup
@@ -39,4 +41,3 @@ default setup. Check the module for more options.
   `spaceline` and default.
 
 Suggestions and pull requests are welcome.
-

@@ -1,4 +1,4 @@
-personal_ws-1.1 en 58 
+personal_ws-1.1 en 59 
 atomicity
 indices
 roundtrip
@@ -54,6 +54,7 @@ interleavings
 Refactor
 multithreaded
 optimality
+outliers
 precimonious
 covariance
 customizations

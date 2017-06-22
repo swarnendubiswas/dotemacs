@@ -244,7 +244,7 @@
                                                                                         :height 130))
           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
                                                                         :family "Dejavu Sans Mono"
-                                                                        :height 160))
+                                                                        :height 150))
           (t (set-face-attribute 'default nil
                                  :family "Dejavu Sans Mono"
                                  :height 110)))))
