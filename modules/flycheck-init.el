@@ -18,12 +18,10 @@
         ;; flycheck-standard-error-navigation nil
         flycheck-display-errors-delay 0.5)
   (when (eq dotemacs-mode-line-theme 'spaceline)
-    (setq flycheck-mode-line nil)))
-
-(use-package flycheck-irony
-  :ensure t
-  :after flycheck
-  :commands flycheck-irony-setup)
+    (setq flycheck-mode-line nil))
+  (dolist (inc-paths '("/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libgraphs/include/"
+                       "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libruntime/include/"))
+    (add-to-list 'flycheck-clang-include-path inc-paths)))
 
 (use-package avy-flycheck
   :ensure t

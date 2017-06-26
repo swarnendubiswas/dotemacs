@@ -71,7 +71,7 @@
     ;; Include custom header locations
     (semantic-add-system-include "/usr/include/boost" 'c++-mode)
     (when (string-equal (system-name) "consensus.ices.utexas.edu")
-      (semantic-add-system-include "/home/sbiswas/intel-pintool/source/include/pin" 'c++-mode)
+      (semantic-add-system-include "/h2/sbiswas/intel-pintool/source/include/pin" 'c++-mode)
       (use-package semantic/bovine/c
         :config (add-to-list 'semantic-lex-c-preprocessor-symbol-file
                              "/usr/lib/gcc/x86_64-linux-gnu/4.8.1/include/stddef.h")))
@@ -95,8 +95,9 @@
   ;; http://tuhdo.github.io/c-ide.html
   (with-eval-after-load "company"
     (setq company-backends (delete 'company-semantic company-backends))
-    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/source/include/pin")
-    (add-to-list 'company-clang-arguments "-I/home/sbiswas/intel-pintool/lib/boost_1_58_0/boost"))
+    (when (string-equal (system-name) "consensus.ices.utexas.edu")
+      (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/source/include/pin")
+      (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/lib/boost_1_58_0/boost")))
 
   (use-package company-c-headers
     :ensure t
@@ -153,7 +154,7 @@
               ("C-c c e" . c-end-of-defun)
               ("M-q" . c-fill-paragraph)))
 
-;; Example to install irony-server: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20161227.348/server && cmake --build . --use-stderr --config Release --target install
+;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
   :ensure t
   :diminish irony-mode
@@ -178,6 +179,7 @@
 
   (use-package company-irony
     :ensure t
+    :ensure irony
     :if (eq dotemacs-completion-in-buffer 'company)
     :init
     (use-package company-irony-c-headers
@@ -185,6 +187,12 @@
     :config
     (add-to-list 'company-backends '(company-irony-c-headers
                                      company-irony)))
+
+  (use-package flycheck-irony
+    :ensure t
+    :ensure irony
+    :after flycheck
+    :commands flycheck-irony-setup)
 
   (use-package irony-eldoc
     :ensure t
