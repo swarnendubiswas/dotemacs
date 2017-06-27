@@ -50,6 +50,12 @@
   :after flycheck
   :config (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup))
 
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :ensure flycheck
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
+
 (provide 'flycheck-init)
 
 ;;; flycheck-init.el ends here
