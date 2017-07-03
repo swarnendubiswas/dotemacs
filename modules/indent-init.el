@@ -47,16 +47,6 @@
   (set-face-background 'highlight-indentation-face "WhiteSmoke")
   (set-face-background 'highlight-indentation-current-column-face "wheat"))
 
-;; Doesn't seem to work well with company-mode, auto-complete-mode, and fci-mode.
-(use-package indent-guide
-  :ensure t
-  :disabled t
-  :diminish indent-guide-mode
-  :config
-  (setq indent-guide-delay 1.0 ; Show guide lines only in idle-time
-        indent-guide-recursive t)
-  (add-hook 'prog-mode-hook #'indent-guide-mode))
-
 (provide 'indent-init)
 
 ;;; indent-init.el ends here
