@@ -58,7 +58,7 @@
       :if (eq dotemacs-completion-in-buffer 'company)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
     (add-hook 'before-save-hook #'elpy-format-code nil t)
-    (add-hook 'before-save-hook #'elpy-importmagic-fixup)
+    ;; (add-hook 'before-save-hook #'elpy-importmagic-fixup)
     (elpy-enable))
 
   (defun elpy-goto-definition-or-rgrep ()

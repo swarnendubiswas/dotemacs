@@ -1,4 +1,4 @@
-personal_ws-1.1 en 59 
+personal_ws-1.1 en 62 
 atomicity
 indices
 roundtrip
@@ -11,6 +11,7 @@ partitioner
 whitebox
 analytics
 scalability
+multilayer
 metadata
 locksteps
 unserializable
@@ -20,7 +21,9 @@ analytical
 underperforms
 pseudocode
 whitespaces
+perceptron
 blackbox
+vertices
 scalable
 programmability
 reconvergence

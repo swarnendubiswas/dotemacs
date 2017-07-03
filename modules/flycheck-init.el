@@ -14,8 +14,6 @@
   :config
   (setq-default flycheck-disabled-checkers '(tex-chktex tex-lacheck)) ; Leave out LaTeX
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        ;; flycheck-display-error-at-point-timer 0.5
-        ;; flycheck-standard-error-navigation nil
         flycheck-display-errors-delay 0.5)
   (when (eq dotemacs-mode-line-theme 'spaceline)
     (setq flycheck-mode-line nil))
@@ -31,6 +29,7 @@
   ;; Binds avy-flycheck-goto-error to C-c ! g
   (avy-flycheck-setup))
 
+;; Control appearance of flycheck messages
 (or (use-package flycheck-pos-tip ; Show error messages in popups
       :ensure t
       :after flycheck
@@ -52,7 +51,6 @@
 
 (use-package flycheck-clang-analyzer
   :ensure t
-  :ensure flycheck
   :after flycheck
   :config (flycheck-clang-analyzer-setup))
 

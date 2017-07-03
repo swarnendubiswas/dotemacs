@@ -43,7 +43,7 @@
   ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
   ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
   ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
-  
+
   :bind (("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)
