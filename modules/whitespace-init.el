@@ -21,7 +21,7 @@
 (use-package whitespace-cleanup-mode
   :ensure t
   :diminish whitespace-cleanup-mode
-  :config (global-whitespace-cleanup-mode 1))
+  :init (add-hook 'prog-mode-hook #'global-whitespace-cleanup-mode))
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
