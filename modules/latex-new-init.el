@@ -11,11 +11,30 @@
 (defconst bibs-list '("~/plass-workspace/bib/plass-formatted.bib"
                       "~/iss-workspace/papers/approximate-bib/paper.bib"))
 
+(use-package tex-site ; Initialize auctex
+  :ensure auctex
+  :mode ("\\.tex\\'" . LaTeX-mode))
+
 ;; prettify-symbol-mode is distracting while editing, and is buffer-local.
 (add-hook 'LaTeX-mode-hook
           (lambda ()
             (global-prettify-symbols-mode -1)
             (prettify-symbols-mode -1)))
+
+;; Required by ac-math and company-math
+(use-package math-symbol-lists
+  :ensure t)
+
+(when (eq dotemacs-completion-in-buffer 'company)
+  (use-package company-auctex
+    :ensure t
+    :config (company-auctex-init))
+
+  (use-package company-math
+    :ensure t
+    :config
+    (add-to-list 'company-backends
+                 '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
 
 (use-package reftex
   :diminish reftex-mode
