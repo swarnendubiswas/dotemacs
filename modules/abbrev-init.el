@@ -10,12 +10,10 @@
 (use-package abbrev
   :diminish abbrev-mode
   :init
-  (setq-default abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
+  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
   (dolist (hook '(text-mode-hook
                   prog-mode-hook))
-    (add-hook hook
-              (lambda ()
-                (abbrev-mode 1))))
+    (add-hook hook #'abbrev-mode ))
   :config
   (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
   (if (file-exists-p abbrev-file-name)
