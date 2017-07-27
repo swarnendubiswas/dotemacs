@@ -17,9 +17,13 @@
         flycheck-display-errors-delay 0.5)
   (when (eq dotemacs-mode-line-theme 'spaceline)
     (setq flycheck-mode-line nil))
-  (dolist (inc-paths '("/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libgraphs/include/"
-                       "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libruntime/include/"))
-    (add-to-list 'flycheck-clang-include-path inc-paths)))
+  (when (string-equal (system-name) "consensus.ices.utexas.edu")
+    (dolist (inc-paths '("/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libgraphs/include/"
+                         "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libruntime/include/"))
+      (add-to-list 'flycheck-clang-include-path inc-paths)))
+  (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
+    (dolist (inc-paths '("/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/"))
+      (add-to-list 'flycheck-clang-include-path inc-paths))))
 
 (use-package avy-flycheck
   :ensure t
