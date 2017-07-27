@@ -100,7 +100,7 @@ This depends on the orientation of the display."
   :group 'dotemacs)
 
 (defcustom dotemacs-use-whitespace-p
-  nil
+  t
   "Control whitespace module.
 Control whether the whitespace module should be enabled or
 disabled.  Sometimes we do not want to unnecessarily add

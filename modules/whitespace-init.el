@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
-
 (use-package whitespace
   :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
@@ -18,8 +16,14 @@
                 whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
                                         space-after-tab space-mark tab-mark newline-markl)))
 
+;; This is different from whitespace-cleanup since this is unconditional
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+
+;; Calls whitespace-cleanup before saving the current buffer, but only if the whitespace in the buffer was initially
+;; clean
 (use-package whitespace-cleanup-mode
   :ensure t
+  :disabled t
   :diminish whitespace-cleanup-mode
   :init (add-hook 'prog-mode-hook #'global-whitespace-cleanup-mode))
 
