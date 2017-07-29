@@ -21,6 +21,15 @@
             (global-prettify-symbols-mode -1)
             (prettify-symbols-mode -1)))
 
+(use-package auctex-latexmk
+  :ensure t
+  :config
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+  (auctex-latexmk-setup)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (setq TeX-command-default "LaTeXMk"))))
+
 ;; Required by ac-math and company-math
 (use-package math-symbol-lists
   :ensure t)
