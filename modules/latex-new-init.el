@@ -15,6 +15,11 @@
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
 
+(use-package tex-mode
+  :bind
+  ;; Disable "LaTeX-insert-item" in favor of imenu
+  ("C-c C-j" . nil))
+
 ;; prettify-symbol-mode is distracting while editing, and is buffer-local.
 (add-hook 'LaTeX-mode-hook
           (lambda ()
