@@ -14,12 +14,14 @@
   :config
   (setq-default flycheck-disabled-checkers '(tex-chktex tex-lacheck)) ; Leave out LaTeX
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        flycheck-display-errors-delay 0.5)
+        flycheck-display-errors-delay 0.5
+        flycheck-clang-language-standard "c++11")
   (when (eq dotemacs-mode-line-theme 'spaceline)
     (setq flycheck-mode-line nil))
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (dolist (inc-paths '("/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libgraphs/include/"
-                         "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libruntime/include/"))
+                         "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libruntime/include/"
+                         "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libllvm/include"))
       (add-to-list 'flycheck-clang-include-path inc-paths)))
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
     (dolist (inc-paths '("/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/"))

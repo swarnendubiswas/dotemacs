@@ -8,10 +8,10 @@
 (defvar dotemacs-theme)
 
 ;; Better frame title
-(setq frame-title-format
-      (list '(buffer-file-name "%f" "%b") "  --  " "GNU Emacs " emacs-version "@" (system-name))
+(setq frame-title-format (list '(buffer-file-name "%f" "%b"))
       indicate-empty-lines t)
 
+;; This is a buffer-local variable.
 (setq-default indicate-buffer-boundaries 'right)
 
 (use-package tool-bar
@@ -63,8 +63,7 @@
 
     (use-package nlinum ; Might improve performance with jit font locking.
       :ensure t
-      :disabled t
-      ;; Does not work with emacsclient, since the frame is created later. See Kaushal Modi's response.
+      :disabled t ;; Does not work with emacsclient, since the frame is created later. See Kaushal Modi's response.
       :defer 1
       :config (global-nlinum-mode 1)))
 
