@@ -18,6 +18,17 @@
 ;; java: The default style for java-mode (see below)
 ;; user: When you want to define your own style
 
+
+(setq CONSENSUS '(""
+                  ""))
+
+(setq DELL-PERSONAL '(""
+                      ""))
+
+(setq DELL-UT '(""
+                ""))
+
+
 (defvar dotemacs-completion-in-buffer)
 
 (setq-default c-default-style '((java-mode . "java")
@@ -92,7 +103,9 @@
   (setq company-backends (delete 'company-semantic company-backends))
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/source/include/pin")
-    (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/lib/boost_1_58_0/boost"))
+    (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
+    (add-to-list 'company-clang-arguments "-I/workspace/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
+    (add-to-list 'company-clang-arguments "-I/workspace/sbiswas/iss-workspace/galois/GaloisCpp/include/Galois"))
 
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
     (add-to-list 'company-clang-arguments "-I/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
@@ -109,12 +122,14 @@
   (cond ((string-equal (system-name) "consensus.ices.utexas.edu")
          (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/")
          (add-to-list 'company-c-headers-path-system "/h2/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
-         (add-to-list 'company-c-headers-path-system "/h2/sbiswas/intel-pintool/source/include/pin"))
+         (add-to-list 'company-c-headers-path-system "/h2/sbiswas/intel-pintool/source/include/pin")
+         (add-to-list 'company-c-headers-path-system "/workspace/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
+         (add-to-list 'company-c-headers-path-system "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/include/Galois"))
 
-        ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
-         (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/")
-         (add-to-list 'company-c-headers-path-system "/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
-         (add-to-list 'company-c-headers-path-system "/home/sbiswas/plass-workspace/arc/intel-pintool-trunk/source/include/pin"))))
+    ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
+    (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/")
+    (add-to-list 'company-c-headers-path-system "/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
+    (add-to-list 'company-c-headers-path-system "/home/sbiswas/plass-workspace/arc/intel-pintool-trunk/source/include/pin"))))
 
 (when (eq dotemacs-completion-in-buffer 'auto-complete)
   (with-eval-after-load "auto-complete"
