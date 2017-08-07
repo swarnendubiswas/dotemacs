@@ -11,27 +11,27 @@
 (setq tags-revert-without-query t
       tags-case-fold-search nil)
 
-(use-package etags
-  :bind ("M-T" . tags-search)
-  :if (eq system-type 'windows-nt)
-  :config
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (progn
-      (or
-       (use-package ac-etags
-         :ensure t
-         :after auto-complete
-         :config
-         (setq ac-etags-requires 4)
-         (ac-etags-setup)
-         (add-hook 'c-mode-common-hook 'ac-etags-ac-setup))
-       (use-package auto-complete-etags
-         :ensure t
-         :disabled t
-         :after auto-complete
-         :config
-         (setq ac-etags-use-document t)
-         (add-to-list 'ac-sources 'ac-source-etags))))))
+;; (use-package etags
+;;   :bind ("M-T" . tags-search)
+;;   :if (eq system-type 'windows-nt)
+;;   :config
+;;   (when (eq dotemacs-completion-in-buffer 'auto-complete)
+;;     (progn
+;;       (or
+;;        (use-package ac-etags
+;;          :ensure t
+;;          :after auto-complete
+;;          :config
+;;          (setq ac-etags-requires 4)
+;;          (ac-etags-setup)
+;;          (add-hook 'c-mode-common-hook 'ac-etags-ac-setup))
+;;        (use-package auto-complete-etags
+;;          :ensure t
+;;          :disabled t
+;;          :after auto-complete
+;;          :config
+;;          (setq ac-etags-use-document t)
+;;          (add-to-list 'ac-sources 'ac-source-etags))))))
 
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el

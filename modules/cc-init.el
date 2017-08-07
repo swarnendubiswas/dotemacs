@@ -19,6 +19,8 @@
 ;; user: When you want to define your own style
 
 
+;; http://nilsdeppe.com/posts/emacs-c++-ide
+
 (setq CONSENSUS '(""
                   ""))
 
@@ -48,6 +50,10 @@
   (add-hook 'c-mode-hook
             (lambda ()
               (abbrev-mode -1)))
+
+  (define-key c-mode-map [(tab)] 'counsel-company)
+  (define-key c++-mode-map [(tab)] 'counsel-company)
+
   (unbind-key "C-M-a" c-mode-map)
   :bind (:map c-mode-base-map
               ("C-c c a" . c-beginning-of-defun)
@@ -175,8 +181,7 @@
   :commands irony-mode
   :defer t
   :preface
-  ;; Replace the `completion-at-point' and `complete-symbol' bindings in
-  ;; irony-mode's buffers by irony-mode's function
+  ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]
       'irony-completion-at-point-async)
@@ -200,11 +205,14 @@
       :ensure t)
     :config
     (add-to-list 'company-backends '(company-irony-c-headers
-                                     company-irony)))
+                                     company-irony
+                                     company-yasnippet
+                                     company-clang)))
 
   (use-package flycheck-irony
     :ensure t
     :ensure irony
+    :ensure flycheck
     :after flycheck
     :commands flycheck-irony-setup)
 
@@ -217,6 +225,31 @@
   :ensure t
   :after eldoc
   :after cc-mode)
+
+(use-package flycheck-clang-tidy
+  :ensure t
+  :ensure flycheck
+  :after flycheck
+  :config (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup))
+
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :ensure flycheck
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
+
+;; Prohibit semantic from searching through system headers. We want
+;; company-clang to do that for us.
+;; (setq-mode-local c-mode semanticdb-find-default-throttle
+;;                  '(local project unloaded recursive))
+;; (setq-mode-local c++-mode semanticdb-find-default-throttle
+;; '(local project unloaded recursive))
+
+(with-eval-after-load 'cc-mode
+(semantic-remove-system-include "/usr/include/" 'c++-mode)
+(semantic-remove-system-include "/usr/local/include/" 'c++-mode)
+(add-hook 'semantic-init-hooks
+          'semantic-reset-system-include))
 
 (provide 'cc-init)
 
