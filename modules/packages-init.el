@@ -77,6 +77,12 @@
   (setq custom-file dotemacs-emacs-custom-file)
   (load custom-file :noerror))
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 (provide 'packages-init)
 
 ;;; packages-init.el ends here
