@@ -31,8 +31,6 @@
   :diminish hungry-delete-mode
   :config (global-hungry-delete-mode 1))
 
-;; https://github.com/emacsmirror/emacswiki.org/blob/master/move-text.el
-;; https://github.com/emacsmirror/emacswiki.org/commit/301bf7df6e48a6b3227adb13d749f3753c9dc7dc
 (use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
   :ensure t
   :init (move-text-default-bindings))
@@ -50,7 +48,8 @@
   :bind ("C-c d m" . manage-minor-mode))
 
 (use-package jgraph-mode
-  :ensure t)
+  :ensure t
+  :mode ("\\.jgr\\'" . jgraph-mode))
 
 (use-package graphviz-dot-mode
   :ensure t
@@ -147,7 +146,7 @@
   :ensure t
   :config (smart-mark-mode 1))
 
-(use-package undo-tree ; Visualize with C-x u
+(use-package undo-tree
   :ensure t
   :config
   (setq undo-tree-mode-lighter ""

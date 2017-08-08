@@ -61,7 +61,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'spacemacs-light
+  'leuven
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)

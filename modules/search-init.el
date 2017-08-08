@@ -72,14 +72,14 @@
         helm-ag-insert-at-point 'symbol
         helm-ag-source-type 'file-line))
 
+(use-package wgrep
+  :ensure t
+  :config (setq wgrep-auto-save-buffer t))
+
 (use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
   :ensure t
   :after ag
-  :config
-  (use-package wgrep
-    :ensure t
-    :config (setq wgrep-auto-save-buffer t))
-  (add-hook 'ag-mode-hook #'wgrep-ag-setup))
+  :config (add-hook 'ag-mode-hook #'wgrep-ag-setup))
 
 (use-package ido-occur
   :ensure t
@@ -91,7 +91,7 @@
   :ensure t
   :ensure avy
   :ensure ace-jump-mode
-  :diminish  ace-isearch-mode
+  :diminish ace-isearch-mode
   :config (global-ace-isearch-mode 1))
 
 (use-package ripgrep

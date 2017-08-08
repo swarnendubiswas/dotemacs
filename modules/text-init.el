@@ -11,7 +11,7 @@
 (defun dotemacs--text-mode-setup ()
   "Helper function for configuring text mode."
   )
-;; (add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
+(add-hook 'text-mode-hook #'dotemacs--text-mode-setup)
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
@@ -22,7 +22,7 @@
   :ensure t
   :defer t
   :config
-  (setq langtool-language-tool-jar (concat user-emacs-directory "extras/LanguageTool-3.6/languagetool-commandline.jar")
+  (setq langtool-language-tool-jar (concat user-emacs-directory "extras/LanguageTool-3.8/languagetool-commandline.jar")
         langtool-java-classpath nil
         langtool-default-language "en-US"
         langtool-java-bin "/usr/bin/java"
