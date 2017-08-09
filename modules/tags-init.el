@@ -11,6 +11,19 @@
 (setq tags-revert-without-query t
       tags-case-fold-search nil)
 
+;; Exuberant ctags is better than etags: https://www.emacswiki.org/emacs/BuildTags
+(setq path-to-ctags "/opt/local/bin/ctags") ;; <- your ctags path here
+(defun create-ctags (dir-name)
+  "Create tags file."
+  (interactive "DDirectory: ")
+  (shell-command
+   (format "%s -f TAGS -e -R %s" path-to-ctags (directory-file-name dir-name))))
+
+(defun dotemacs-create-latex-ctags () ; (dir-name))
+  "Create ctags for the current latex project."
+  (interactive)
+  (compile "find . -type f -name \"*.tex\" -print | xargs ctags -o TAGS"))
+
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; http://tuhdo.github.io/c-ide.html
@@ -50,7 +63,6 @@
         helm-gtags-auto-update t
         helm-gtags-use-input-at-cursor t
         helm-gtags-pulse-at-cursor t
-        ;; helm-gtags-prefix-key "\C-c g"
         helm-gtags-suggested-key-mapping t
         helm-gtags-ignore-case t
         helm-gtags-fuzzy-match t
@@ -98,21 +110,7 @@
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags)))
 
-;; http://stackoverflow.com/questions/548414/how-to-programmatically-create-update-a-tags-file-with-emacs
-(defun dotemacs-create-latex-etags ()
-  "Create etags for the current latex project."
-  (interactive)
-  (compile "find . -type f -name \"*.tex\" -print | etags -a -"))
-
-(defun dotemacs-create-latex-ctags () ; (dir-name))
-  "Create ctags for the current latex project."
-  (interactive)
-  (compile "find . -type f -name \"*.tex\" -print | xargs ctags -o TAGS"))
-
-(defun dotemacs-create-python-etags ()
-  "Create etags for the current python project."
-  (interactive)
-  (compile "find . -type f -name '*.py' | xargs etags -a -"))
+;; https://vxlabs.com/2016/04/11/step-by-step-guide-to-c-navigation-and-completion-with-emacs-and-the-clang-based-rtags/
 
 (provide 'tags-init)
 

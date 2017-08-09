@@ -48,7 +48,11 @@
     (use-package flycheck-title
       :ensure t
       :after flycheck
-      :init (flycheck-title-mode 1)))
+      :init (flycheck-title-mode 1))
+
+    (use-package flycheck-popup-tip
+      :ensure t
+      :config (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode)))
 
 (provide 'flycheck-init)
 

@@ -225,8 +225,7 @@ See the requirements: [https://github.com/leoliu/ggtags][]
 * `C-c C-o` - Overview of the definitions in the current file.
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 * `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`).
-* `C-<down>` - Go down along lines with same indentation as the current line
-  (`elpy-nav-forward-block`).
+* `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`).
 
 ## Flycheck
 
