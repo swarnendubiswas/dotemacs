@@ -12,7 +12,7 @@
       tags-case-fold-search nil)
 
 ;; Exuberant ctags is better than etags: https://www.emacswiki.org/emacs/BuildTags
-(setq path-to-ctags "/opt/local/bin/ctags") ;; <- your ctags path here
+(setq path-to-ctags "ctags") ;; <- your ctags path here
 (defun create-ctags (dir-name)
   "Create tags file."
   (interactive "DDirectory: ")
