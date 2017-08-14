@@ -14,7 +14,8 @@
   :ensure t)
 
 (use-package imenu-anywhere
-  :ensure t)
+  :ensure t
+  :bind ("C-c C-j" . imenu-anywhere))
 
 (use-package popup-imenu
   :ensure t)

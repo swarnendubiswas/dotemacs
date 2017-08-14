@@ -22,64 +22,11 @@
                 (add-to-list 'ac-sources 'ac-source-variables)
                 (add-to-list 'ac-sources 'ac-source-functions)))))
 
-(use-package semantic
-  :defer t
-  :disabled t
-  :preface
-  (defun dotemacs-semantic-functions ()
-    (semantic-mode 1)
-    (global-semanticdb-minor-mode 1)
-    (global-semantic-highlight-func-mode -1)
-    (global-semantic-decoration-mode -1)
-    (global-semantic-idle-local-symbol-highlight-mode -1)
-    (global-semantic-idle-summary-mode -1)
-    (global-semantic-idle-completions-mode -1))
-  :config
-  (require 'semantic/ia)
-  (require 'semantic/db)
-  (require 'semantic/sb)
-  (require 'semantic/bovine)
-  (require 'semantic/bovine/c)
-  (require 'semantic/bovine/gcc)
-  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
-  ;; Ensure semantic can get info from gnu global
-  (semanticdb-enable-gnu-global-databases 'c-mode)
-  (semanticdb-enable-gnu-global-databases 'c++-mode)
-  (semantic-add-system-include "/usr/include")
-  (add-hook 'prog-mode-hook #'dotemacs-semantic-functions))
-
-(use-package semantic/idle
-  :disabled t
-  :preface
-  (defun dotemacs-idle-functions ()
-    (global-semantic-idle-scheduler-mode -1)
-    (global-semantic-idle-completions-mode -1)
-    (global-semantic-idle-breadcrumbs-mode -1))
-  :config (add-hook 'prog-mode-hook #'dotemacs-idle-functions))
-
 (use-package make-mode
   :init
   (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
   ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
   (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
-
-(use-package speedbar
-  :disabled t
-  :after prog-mode
-  :config
-  (setq speedbar-use-images nil
-        speedbar-show-unknown-files t)
-
-  (use-package sr-speedbar
-    :ensure t
-    :commands sr-speedbar-open
-    :init
-    (defalias 'speedbar 'sr-speedbar-open)
-    (setq sr-speedbar-right-side nil
-          sr-speedbar-max-width 40
-          sr-speedbar-width 30
-          sr-speedbar-default-width 30
-          sr-speedbar-skip-other-window-p t)))
 
 (use-package web-mode ; http://web-mode.org/
   :ensure t
@@ -133,7 +80,7 @@
     (use-package ac-html-csswatcher
       :ensure t
       :config (company-web-csswatcher-setup))
-    
+
     (use-package company-web
       :ensure t
       :preface
@@ -183,7 +130,6 @@
 
 (use-package which-func ; Show the name of the function in the modeline
   :after prog-mode
-  :disabled t
   :init
   (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :config (which-function-mode 1))

@@ -21,7 +21,13 @@
 
 ;; http://nilsdeppe.com/posts/emacs-c++-ide
 
-(setq CONSENSUS '(""
+(defvar dotemacs-completion-in-buffer)
+
+(setq CONSENSUS '("/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libllvm/include"
+                  "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libdist/include"
+                  "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libsubstrate/include"
+                  "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/libgraphs/include"
+
                   ""))
 
 (setq DELL-PERSONAL '(""
@@ -29,9 +35,6 @@
 
 (setq DELL-UT '(""
                 ""))
-
-
-(defvar dotemacs-completion-in-buffer)
 
 (setq-default c-default-style '((java-mode . "java")
                                 (c++-mode . "stroustrup")
@@ -47,13 +50,6 @@
         c-auto-newline 1)
   (c-toggle-electric-state 1)
   (c-toggle-syntactic-indentation 1)
-  (add-hook 'c-mode-hook
-            (lambda ()
-              (abbrev-mode -1)))
-
-  (define-key c-mode-map [(tab)] 'counsel-company)
-  (define-key c++-mode-map [(tab)] 'counsel-company)
-
   (unbind-key "C-M-a" c-mode-map)
   :bind (:map c-mode-base-map
               ("C-c c a" . c-beginning-of-defun)
@@ -68,31 +64,14 @@
   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
   (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
 
-(use-package cwarn
-  :ensure t
-  :disabled t
-  :diminish cwarn-mode
-  :config (global-cwarn-mode 1))
-
 (use-package function-args
   :ensure t
-  :disabled t
   :diminish function-args-mode
-  :disabled t
   :init (function-args-mode)
   :config
-  ;; Include custom header locations
-  (when (string-equal (system-name) "consensus.ices.utexas.edu")
-    (semantic-add-system-include "/usr/include/boost" 'c++-mode)
-    (semantic-add-system-include "/h2/sbiswas/intel-pintool/source/include/pin" 'c++-mode))
-  (use-package semantic/bovine/c
-    :config (add-to-list 'semantic-lex-c-preprocessor-symbol-file
-                         "/usr/lib/gcc/x86_64-linux-gnu/4.8.1/include/stddef.h"))
   (fa-config-default)
-  ;; This overrides M-u
-  ;; (bind-key* "M-u" #'upcase-word)
   :bind (:map function-args-mode-map
-              ("M-u" . nil)
+              ("M-u" . nil)   ;; This overrides M-u
               ("C-c c s" . fa-show)
               ("C-c c u" . fa-idx-cycle-up)
               ("C-c c d" . fa-idx-cycle-down)
@@ -119,7 +98,7 @@
 
 (use-package company-c-headers
   :ensure t
-  :after company
+  :after (company cc-mode)
   :if (eq dotemacs-completion-in-buffer 'company)
   :config
   (add-to-list 'company-backends 'company-c-headers)
@@ -132,10 +111,10 @@
          (add-to-list 'company-c-headers-path-system "/workspace/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
          (add-to-list 'company-c-headers-path-system "/workspace/sbiswas/iss-workspace/galois/GaloisCpp/include/Galois"))
 
-    ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
-    (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/")
-    (add-to-list 'company-c-headers-path-system "/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
-    (add-to-list 'company-c-headers-path-system "/home/sbiswas/plass-workspace/arc/intel-pintool-trunk/source/include/pin"))))
+        ((string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
+         (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/")
+         (add-to-list 'company-c-headers-path-system "/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
+         (add-to-list 'company-c-headers-path-system "/home/sbiswas/plass-workspace/arc/intel-pintool-trunk/source/include/pin"))))
 
 (when (eq dotemacs-completion-in-buffer 'auto-complete)
   (with-eval-after-load "auto-complete"
@@ -223,7 +202,7 @@
 
 (use-package clang-format
   :ensure t
-  :after eldoc
+  :after cc-mode
   :after cc-mode)
 
 (use-package flycheck-clang-tidy
@@ -237,19 +216,6 @@
   :ensure flycheck
   :after flycheck
   :config (flycheck-clang-analyzer-setup))
-
-;; Prohibit semantic from searching through system headers. We want
-;; company-clang to do that for us.
-;; (setq-mode-local c-mode semanticdb-find-default-throttle
-;;                  '(local project unloaded recursive))
-;; (setq-mode-local c++-mode semanticdb-find-default-throttle
-;; '(local project unloaded recursive))
-
-(with-eval-after-load 'cc-mode
-(semantic-remove-system-include "/usr/include/" 'c++-mode)
-(semantic-remove-system-include "/usr/local/include/" 'c++-mode)
-(add-hook 'semantic-init-hooks
-          'semantic-reset-system-include))
 
 (provide 'cc-init)
 
