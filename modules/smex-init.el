@@ -10,6 +10,7 @@
 
 (use-package smex
   :ensure t
+  :disabled t
   :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
   :config
   (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
@@ -18,6 +19,10 @@
   :bind (("M-x" . smex)
          ("<f1>" . smex)
          ("M-X" . smex-major-mode-commands)))
+
+(use-package amx
+  :load-path "extras"
+  :config (amx-mode 1))
 
 (provide 'smex-init)
 
