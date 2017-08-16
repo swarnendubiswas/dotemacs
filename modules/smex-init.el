@@ -21,7 +21,7 @@
          ("M-X" . smex-major-mode-commands)))
 
 (use-package amx
-  :load-path "extras"
+  :ensure t
   :config (amx-mode 1))
 
 (provide 'smex-init)
