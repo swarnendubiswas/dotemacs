@@ -52,7 +52,7 @@
       :ensure t
       :disabled t
       :after flycheck
-      :init (flycheck-title-mode 1))
+      :config (flycheck-title-mode 1))
 
     (use-package flycheck-popup-tip
       :ensure t
