@@ -7,6 +7,7 @@
 
 (defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-temp-directory)
+(defvar dotemacs-mode-line-theme)
 
 (use-package prog-mode
   :defer t
@@ -132,7 +133,12 @@
   :after prog-mode
   :init
   (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
-  :config (which-function-mode 1))
+  :config
+  (which-function-mode 1)
+  (when (eq dotemacs-mode-line-theme 'sml)
+    (set-face-attribute 'which-func nil
+                        :foreground "black"
+                        :weight 'light)))
 
 (use-package electric
   :init

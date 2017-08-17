@@ -10,7 +10,7 @@
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :commands (whitespace-cleanup whitespace-mode)
   :config
-  (setq-default show-trailing-whitespace t
+  (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t
                 whitespace-line-column 'dotemacs-fill-column
                 whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
