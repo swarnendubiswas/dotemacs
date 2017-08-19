@@ -151,6 +151,11 @@
   (setq flycheck-googlelint-linelength 'dotemacs-fill-column
         flycheck-googlelint-filter "-whitespace/line_length"))
 
+  (use-package google-c-style ; Google's C/C++ style for c-mode
+    :ensure t
+    :config
+    (add-hook 'c-mode-common-hook #'google-set-c-style)
+    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
 ;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
