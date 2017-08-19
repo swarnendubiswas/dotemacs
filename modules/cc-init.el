@@ -67,9 +67,8 @@
 (use-package function-args
   :ensure t
   :diminish function-args-mode
-  :init (function-args-mode)
-  :config
-  (fa-config-default)
+  ;; :init (function-args-mode)
+  :config (fa-config-default)
   :bind (:map function-args-mode-map
               ("M-u" . nil)   ;; This overrides M-u
               ("C-c c s" . fa-show)

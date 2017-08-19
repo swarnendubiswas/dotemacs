@@ -35,6 +35,7 @@
     :ensure t)
   (use-package pandoc-mode
     :ensure t
+    :diminish pandoc-mode
     :config (add-hook 'markdown-mode-hook #'pandoc-mode)))
 
 (use-package csv-mode
