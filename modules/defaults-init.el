@@ -63,7 +63,6 @@
                  ".fls"
                  ".idx"
                  ".lof"
-                 ".log"
                  ".lot"
                  ".o"
                  ".out"

@@ -57,7 +57,7 @@
     (use-package flycheck-popup-tip
       :ensure t
       :after flycheck
-      :config (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode)))
+      :init (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode)))
 
 (provide 'flycheck-init)
 

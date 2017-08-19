@@ -168,7 +168,6 @@
                  ".dvi"
                  ".fls"
                  ".idx"
-                 ".log"
                  ".o"
                  ".out"
                  ".pdf"

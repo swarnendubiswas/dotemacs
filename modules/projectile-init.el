@@ -46,8 +46,7 @@
                   "TAGS"
                   "__init__\\.py"))
     (add-to-list 'projectile-globally-ignored-files item))
-  (dolist (list '("\\.log$"
-                  "\\.out$"
+  (dolist (list '("\\.out$"
                   "\\.pdf$"
                   "\\.pyc$"
                   "\\.rel$"
