@@ -77,6 +77,12 @@
     :ensure t
     :config (ido-hacks-mode 1))
 
+  ;; The ido-ubiquitous package is now redundant. All functionality,
+  ;; including ido-ubiquitous-mode, has been merged into the
+  ;; ido-completing-read+ package. You should replace ido-ubiquitous
+  ;; with ido-completing-read+ in your Emacs config. For more
+  ;; information, see:
+  ;; https://github.com/DarwinAwardWinner/ido-ubiquitous#version-40-changes
   (use-package ido-ubiquitous ; Allow ido-style completion in more places
     :ensure t
     :config (ido-ubiquitous-mode 1))

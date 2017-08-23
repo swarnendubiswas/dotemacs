@@ -24,6 +24,7 @@
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
+  :bind ("C-c C-d" . nil)
   :config
   (setq markdown-enable-wiki-links t
         markdown-italic-underscore t

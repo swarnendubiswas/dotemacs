@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+
 (use-package auto-complete
   :ensure t
   :init (ac-config-default)
