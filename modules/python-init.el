@@ -5,8 +5,8 @@
 
 ;;; Code:
 
-;; Install the following packages
-;; sudo -H pip3 install --upgrade pip numpy scipy psutil django setuptools jedi paramiko cffi rope importmagic yapf pyflakes flake8 importmagic autopep8 pep8 pylint overrides ggplot matplotlib ordered_set cpplint epc futures flake8-docstring pydocstyle wheel dev sklearn tensorflow Cython isort tflearn
+;; Install the following packages: sudo -H pip3 install --upgrade pip setuptools jedi rope importmagic yapf pyflakes
+;; flake8 autopep8 pep8 pylint flake8-docstring pydocstyle wheel isort
 
 (defvar dotemacs-completion-in-buffer)
 
@@ -16,14 +16,15 @@
   "Helper function for configuring python mode."
   (setq-default fill-column 118
                 python-indent-offset 4)
-  (setq python-shell-interpreter "python3"
-        python-shell-completion-native-enable nil
-        python-shell-unbuffered nil)
+  ;; (setq python-shell-completion-native-enable nil)
+  ;; (setq python-shell-interpreter "python3"
+  ;;       python-shell-unbuffered nil)
   (turn-on-auto-fill)
   (run-python (python-shell-parse-command) nil nil)
   (when (eq dotemacs-completion-in-buffer 'auto-complete)
     (use-package auto-complete-chunk
       :ensure t
+      :after auto-complete
       :init
       (add-hook 'python-mode
                 (lambda ()
@@ -48,31 +49,32 @@
           elpy-rpc-python-command "python3"
           elpy-rpc-backend "jedi"
           elpy-syntax-check-command "flake8")
-    ;; Disable flymake mode, since it becomes slow if there are a lot of guideline errors.
-    ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (use-package pyvenv
       :ensure t
       :config (pyvenv-mode 1))
     (use-package company-jedi
       :ensure t
+      :ensure company
+      :after company
       :if (eq dotemacs-completion-in-buffer 'company)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
     (add-hook 'before-save-hook #'elpy-format-code nil t)
     ;; (add-hook 'before-save-hook #'elpy-importmagic-fixup)
-    (elpy-enable))
+    (elpy-mode 1))
 
-  (defun elpy-goto-definition-or-rgrep ()
-    "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
-    (interactive)
-    (ring-insert find-tag-marker-ring (point-marker))
-    (condition-case nil (elpy-goto-definition)
-      (error (elpy-rgrep-symbol
-              (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
+  ;; (defun elpy-goto-definition-or-rgrep ()
+  ;;   "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
+  ;;   (interactive)
+  ;;   (ring-insert find-tag-marker-ring (point-marker))
+  ;;   (condition-case nil (elpy-goto-definition)
+  ;;     (error (elpy-rgrep-symbol
+  ;;             (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
   :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
   :config (add-hook 'elpy-mode-hook #'flycheck-mode)
 
   (use-package py-autopep8
     :ensure t
+    :disabled t
     :config
     (setq py-autopep8-options '("--max-line-length=120"))
     (add-hook 'python-mode-hook #'py-autopep8-enable-on-save)

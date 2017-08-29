@@ -28,9 +28,9 @@
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
-        company-dabbrev-downcase nil ; Do not downcase the returned candidates
-        company-dabbrev-ignore-case t
-        company-dabbrev-code-everywhere t ; Offer completions in comments and strings
+        ;; company-dabbrev-downcase nil ; Do not downcase the returned candidates
+        ;; company-dabbrev-ignore-case t
+        ;; company-dabbrev-code-everywhere t ; Offer completions in comments and strings
         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                             company-preview-frontend
                             company-echo-metadata-frontend)
@@ -44,9 +44,6 @@
   :ensure t
   :after company
   :config
-  ;; (add-hook 'company-mode-hook
-  ;;           (lambda ()
-  ;;             (add-to-list 'company-backends 'company-capf)))
   (setq company-flx-limit 50)
   (company-flx-mode 1))
 
