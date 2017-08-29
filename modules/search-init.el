@@ -22,21 +22,24 @@
   :config
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
-  (use-package isearch+
-    :ensure t
-    :diminish isearch-mode)
-  (use-package isearch-dabbrev
-    :ensure t
-    :bind (:map isearch-mode-map
-                ("<tab>" . isearch-dabbrev-expand)))
-  (use-package isearch-symbol-at-point
-    :ensure t)
   :bind (("C-s" . nil) ; isearch-forward-regexp
          ("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
          ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)
          ("C-<return>" . isearch-exit-other-end)))
+
+(use-package isearch+
+  :ensure t
+  :diminish isearch-mode)
+
+(use-package isearch-dabbrev
+  :ensure t
+  :bind (:map isearch-mode-map
+              ("<tab>" . isearch-dabbrev-expand)))
+
+(use-package isearch-symbol-at-point
+  :ensure t)
 
 (use-package replace+
   :ensure t

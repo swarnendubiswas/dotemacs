@@ -104,6 +104,15 @@
         bibtex-completion-cite-default-as-initial-input t
         bibtex-completion-bibliography bibs-list))
 
+(use-package helm-bibtex
+  :ensure t
+  :if (eq dotemacs-selection 'helm)
+  :bind ("C-c l x" . helm-bibtex)
+  :config
+  (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
+  (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
+  (setq helm-bibtex-full-frame t))
+
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)

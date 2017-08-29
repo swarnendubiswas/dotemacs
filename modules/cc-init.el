@@ -89,11 +89,14 @@
     (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/source/include/pin")
     (add-to-list 'company-clang-arguments "-I/h2/sbiswas/intel-pintool/lib/boost_1_58_0/boost")
     (add-to-list 'company-clang-arguments "-I/workspace/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
-    (add-to-list 'company-clang-arguments "-I/workspace/sbiswas/iss-workspace/galois/GaloisCpp/include/Galois"))
+    (add-to-list 'company-clang-arguments "-I/workspace/sbiswas/iss-workspace/galois/GaloisCpp/include/Galois")
+    (add-to-list 'company-clang-arguments "-I/workspace/sbiswas/iss-workspace/proteus/slambench-bitbucket/kfusion"))
 
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
     (add-to-list 'company-clang-arguments "-I/home/sbiswas/iss-workspace/galois/Galois-2.2.1/include/Galois")
-    (add-to-list 'company-clang-arguments "-I/home/sbiswas/plass-workspace/arc/intel-pintool-trunk/source/include/pin")))
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/iss-workspace/galois/GaloisCpp/include/Galois")
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/plass-workspace/arc/intel-pintool-trunk/source/include/pin")
+    (add-to-list 'company-clang-arguments "-I/home/sbiswas/iss-workspace/proteus/slambench-bitbucket/kfusion")))
 
 (use-package company-c-headers
   :ensure t
@@ -220,6 +223,12 @@
   :ensure flycheck
   :after flycheck
   :config (flycheck-clang-analyzer-setup))
+
+(use-package cuda-mode
+  :ensure t)
+
+(use-package opencl-mode
+  :ensure t)
 
 (provide 'cc-init)
 
