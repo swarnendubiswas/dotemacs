@@ -8,9 +8,6 @@
 (defvar dotemacs-selection)
 (defvar dotemacs-completion-in-buffer)
 
-(defconst bibs-list '("~/plass-workspace/bib/plass-formatted.bib"
-                      "~/iss-workspace/papers/approximate-bib/paper.bib"))
-
 (use-package tex-site ; Initialize auctex
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
@@ -66,8 +63,7 @@
         reftex-idle-time 0.5
         reftex-toc-follow-mode t
         reftex-use-fonts t
-        reftex-highlight-selection 'both
-        reftex-default-bibliography bibs-list)
+        reftex-highlight-selection 'both)
   (use-package reftex-cite
     :preface
     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -101,8 +97,7 @@
   :if (or (eq dotemacs-selection 'helm) (eq dotemacs-selection 'ivy))
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t
-        bibtex-completion-bibliography bibs-list))
+        bibtex-completion-cite-default-as-initial-input t))
 
 (use-package helm-bibtex
   :ensure t
@@ -122,9 +117,7 @@
 (use-package company-bibtex
   :ensure t
   :if (eq dotemacs-completion-in-buffer 'company)
-  :init
-  (add-to-list 'company-backends 'company-bibtex)
-  (setq company-bibtex-bibliography bibs-list))
+  :init (add-to-list 'company-backends 'company-bibtex))
 
 (add-hook 'LaTeX-mode-hook
           (lambda ()
