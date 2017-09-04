@@ -144,6 +144,7 @@
 
 (use-package nyan-mode
   :ensure t
+  :disabled t
   :preface
   ;; https://github.com/cemerick/.emacs.d#nyan-mode
   (defun dotemacs--toggle-nyan-mode (&optional frame)

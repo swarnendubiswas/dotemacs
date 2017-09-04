@@ -25,6 +25,7 @@
 
 (use-package auctex-latexmk
   :ensure t
+  :defer t
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   (auctex-latexmk-setup)
@@ -34,15 +35,18 @@
 
 ;; Required by ac-math and company-math
 (use-package math-symbol-lists
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (when (eq dotemacs-completion-in-buffer 'company)
   (use-package company-auctex
     :ensure t
+    :defer t
     :config (company-auctex-init))
 
   (use-package company-math
     :ensure t
+    :defer t
     :config
     (add-to-list 'company-backends
                  '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
@@ -91,10 +95,12 @@
     :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
 (use-package parsebib
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package bibtex-completion
   :if (or (eq dotemacs-selection 'helm) (eq dotemacs-selection 'ivy))
+  :defer t
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t))
@@ -116,6 +122,7 @@
 
 (use-package company-bibtex
   :ensure t
+  :defer t
   :if (eq dotemacs-completion-in-buffer 'company)
   :init (add-to-list 'company-backends 'company-bibtex))
 

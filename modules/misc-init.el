@@ -7,16 +7,20 @@
 (defvar dotemacs-temp-directory)
 
 (use-package help+
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package help-fns+ ; Improved help commands
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package help-mode+
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package info+
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
@@ -120,7 +124,7 @@
   :ensure t
   :diminish golden-ratio-mode
   :config
-  (setq golden-ratio-auto-scale nil
+  (setq golden-ratio-auto-scale t
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
         split-width-threshold nil)
   (golden-ratio-mode 1))

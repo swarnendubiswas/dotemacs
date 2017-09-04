@@ -60,6 +60,7 @@
 
 (use-package ag
   :ensure t
+  :defer t
   :config
   (setq ag-reuse-buffers t
         ag-reuse-window t
@@ -77,6 +78,7 @@
 
 (use-package wgrep
   :ensure t
+  :defer t
   :config (setq wgrep-auto-save-buffer t))
 
 (use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
@@ -95,6 +97,7 @@
   :ensure avy
   :ensure ace-jump-mode
   :diminish ace-isearch-mode
+  :defer t
   :config (global-ace-isearch-mode 1))
 
 (use-package ripgrep

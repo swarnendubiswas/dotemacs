@@ -104,11 +104,14 @@
 
 (use-package google-c-style ; Google's C/C++ style for c-mode
   :ensure t
+  :defer t
   :config
   (add-hook 'c-mode-common-hook #'google-set-c-style)
   (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 
 (use-package flycheck-google-cpplint ; Google C++ Style checker for Flycheck, also need to setup cpplint.
+  :defer t
+  :after flycheck
   :load-path "extras"
   :if (eq system-type 'gnu/linux)
   :config
@@ -172,7 +175,6 @@
 
 (use-package clang-format
   :ensure t
-  :after cc-mode
   :after cc-mode)
 
 (use-package flycheck-clang-tidy
@@ -188,10 +190,12 @@
   :config (flycheck-clang-analyzer-setup))
 
 (use-package cuda-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package opencl-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (provide 'cc-init)
 

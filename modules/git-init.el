@@ -10,6 +10,7 @@
 ;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
 (use-package magit
   :ensure t
+  :defer t
   :config
   (setq magit-auto-revert-mode nil
         magit-item-highlight-face 'bold)
