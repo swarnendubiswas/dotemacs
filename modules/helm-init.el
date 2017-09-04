@@ -21,7 +21,7 @@
   :ensure helm-core
   :if (eq dotemacs-selection 'helm)
   :config
-  (setq helm-candidate-number-limit 100
+  (setq helm-candidate-number-limit 50
         helm-locate-fuzzy-match t
         helm-ag-fuzzy-match t
         helm-apropos-fuzzy-match t
@@ -36,7 +36,7 @@
         helm-echo-input-in-header-line nil
         helm-case-fold-search t ; Default is 'smart, searches and matches should ignore case
         helm-follow-mode-persistent t
-        helm-autoresize-max-height 20)
+        helm-autoresize-max-height 15)
 
   (helm-autoresize-mode -1) ; Distracting
 
@@ -63,7 +63,7 @@
     :config
     (setq helm-buffers-fuzzy-matching t
           helm-buffer-skip-remote-checking t
-          helm-buffer-max-length 45 ; When disabled (nil) use the longest buffer-name length found
+          helm-buffer-max-length 45 ; When disabled, use the longest buffer-name length found
           helm-buffer-details-flag t
           helm-buffers-truncate-lines nil
           helm-mini-default-sources '(helm-source-buffers-list
@@ -109,7 +109,6 @@
                                                    "\\.git$"
                                                    "\\.hg$"
                                                    "\\.la$"
-                                                   "\\.log$"
                                                    "\\.o$"
                                                    "\\.out$"
                                                    "\\.pdf$"
@@ -188,12 +187,6 @@
   :if (eq dotemacs-selection 'helm)
   :after helm
   :bind ([remap describe-mode] . helm-describe-modes))
-
-(use-package helm-ls-svn
-  :ensure t)
-
-(use-package helm-ls-git
-  :ensure t)
 
 (provide 'helm-init)
 

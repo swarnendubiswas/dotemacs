@@ -62,12 +62,11 @@
   :diminish helm-gtags-mode
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'helm))
   :config
-  (setq helm-gtags-ignore-case t
+  (setq helm-gtags-ignore-case nil
         helm-gtags-auto-update t
         helm-gtags-use-input-at-cursor t
         helm-gtags-pulse-at-cursor t
         helm-gtags-suggested-key-mapping t
-        helm-gtags-ignore-case t
         helm-gtags-fuzzy-match t
         helm-gtags-maximum-candidates 1000
         helm-gtags-cache-select-result t
@@ -103,7 +102,7 @@
                 (counsel-gtags-mode 1))))
   (add-hook 'python-mode-hook #'counsel-gtags-mode)
   :config
-  (setq counsel-gtags-ignore-case t
+  (setq counsel-gtags-ignore-case nil
         counsel-gtags-auto-update t)
   :bind (:map counsel-gtags-mode-map
               ("M-." . counsel-gtags-dwim)

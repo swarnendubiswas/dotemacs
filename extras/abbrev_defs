@@ -47,7 +47,9 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table '())
+(define-abbrev-table 'awk-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -63,9 +65,13 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table '())
+(define-abbrev-table 'c++-mode-abbrev-table
+  '(
+   ))
 
-(define-abbrev-table 'c-mode-abbrev-table '())
+(define-abbrev-table 'c-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
@@ -92,6 +98,10 @@
 (define-abbrev-table 'conf-xdefaults-mode-abbrev-table '())
 
 (define-abbrev-table 'css-mode-abbrev-table '())
+
+(define-abbrev-table 'cuda-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'data-debug-mode-abbrev-table '())
 
@@ -171,7 +181,7 @@
     ("addtions" "additions" nil 0)
     ("adequit" "adequate" nil 0)
     ("adequite" "adequate" nil 0)
-    ("adn" "and" nil 2)
+    ("adn" "and" nil 3)
     ("advanage" "advantage" nil 0)
     ("affraid" "afraid" nil 0)
     ("afterthe" "after the" nil 0)
@@ -547,7 +557,7 @@
     ("enegery" "energy" nil 1)
     ("enforece" "enforce" nil 1)
     ("english" "English" nil 0)
-    ("engouh" "enough" nil 1)
+    ("engouh" "enough" nil 2)
     ("enought" "enough" nil 0)
     ("entree" "entree" nil 0)
     ("environements" "environments" nil 2)
@@ -736,8 +746,10 @@
     ("infomration" "information" nil 1)
     ("informaiton" "information" nil 0)
     ("informatoin" "information" nil 0)
+    ("infracstructure" "infrastructure" nil 0)
     ("inital" "initial" nil 2)
     ("initalization" "initialization" nil 0)
+    ("insignts" "insights" nil 0)
     ("instaleld" "installed" nil 0)
     ("insted" "instead" nil 0)
     ("insturance" "insurance" nil 1)
@@ -766,7 +778,7 @@
     ("itwas" "it was" nil 0)
     ("ivestigative" "investigative" nil 0)
     ("iwll" "will" nil 0)
-    ("iwth" "with" nil 1)
+    ("iwth" "with" nil 2)
     ("jsut" "just" nil 0)
     ("jugment" "judgment" nil 0)
     ("knowldge" "knowledge" nil 0)
@@ -1141,7 +1153,7 @@
     ("sucess" "success" nil 0)
     ("sucessfull" "successful" nil 1)
     ("sufficiant" "sufficient" nil 0)
-    ("suggestiosn" "suggestions" nil 1)
+    ("suggestiosn" "suggestions" nil 3)
     ("sumamry" "summary" nil 0)
     ("superflous" "superfluous" nil 1)
     ("suposed" "supposed" nil 0)
@@ -1350,11 +1362,15 @@
 
 (define-abbrev-table 'inferior-python-mode-abbrev-table '())
 
+(define-abbrev-table 'ini-mode-abbrev-table '())
+
 (define-abbrev-table 'ivy-occur-grep-mode-abbrev-table '())
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table '())
+(define-abbrev-table 'java-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
@@ -1430,11 +1446,15 @@
 
 (define-abbrev-table 'nroff-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table '())
+(define-abbrev-table 'objc-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-mode-abbrev-table '())
+
+(define-abbrev-table 'opencl-mode-abbrev-table '())
 
 (define-abbrev-table 'org-export-stack-mode-abbrev-table '())
 
@@ -1452,7 +1472,9 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table '())
+(define-abbrev-table 'pike-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 

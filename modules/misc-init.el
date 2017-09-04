@@ -1,5 +1,4 @@
 ;;; misc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
-
 ;;; Commentary:
 ;; Miscellaneous package configurations.
 
@@ -121,7 +120,7 @@
   :ensure t
   :diminish golden-ratio-mode
   :config
-  (setq golden-ratio-auto-scale t
+  (setq golden-ratio-auto-scale nil
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
         split-width-threshold nil)
   (golden-ratio-mode 1))
