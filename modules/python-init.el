@@ -15,7 +15,8 @@
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."
   (setq-default fill-column 118
-                python-indent-offset 4)
+                python-indent-offset 4
+                python-indent-guess-indent-offset nil)
   ;; (setq python-shell-completion-native-enable nil)
   ;; (setq python-shell-interpreter "python3"
   ;;       python-shell-unbuffered nil)
