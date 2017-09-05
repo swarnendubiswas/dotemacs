@@ -19,7 +19,7 @@
   (setq projectile-enable-caching t
         projectile-file-exists-remote-cache-expire nil
         projectile-verbose nil
-        projectile-require-project-root nil ; Use projectile in every directory without requiring a project file
+        projectile-require-project-root t ; Use projectile only in desired directories, too much noise otherwise
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
         projectile-mode-line nil)
@@ -43,8 +43,7 @@
                   "GRTAGS"
                   "GTAGS"
                   "GSYMS"
-                  "TAGS"
-                  "__init__\\.py"))
+                  "TAGS"))
     (add-to-list 'projectile-globally-ignored-files item))
   (dolist (list '("\\.out$"
                   "\\.pdf$"

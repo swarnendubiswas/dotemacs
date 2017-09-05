@@ -28,13 +28,16 @@
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
-        ;; company-dabbrev-downcase nil ; Do not downcase the returned candidates
-        ;; company-dabbrev-ignore-case t
-        ;; company-dabbrev-code-everywhere t ; Offer completions in comments and strings
+        company-dabbrev-downcase nil ; Do not downcase the returned candidates
+        company-dabbrev-ignore-case nil
+        company-dabbrev-code-everywhere t ; Offer completions in comments and strings
+        company-dabbrev-other-buffers t
+        company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes.
         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                             company-preview-frontend
                             company-echo-metadata-frontend)
-        company-require-match 'never)
+        ;; Allow typing keys that do not match any candidates
+        company-require-match nil)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
