@@ -123,6 +123,7 @@
 (use-package golden-ratio
   :ensure t
   :diminish golden-ratio-mode
+  :disabled t
   :config
   (setq golden-ratio-auto-scale t
         ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/

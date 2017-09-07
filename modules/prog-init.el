@@ -138,6 +138,10 @@
   (when (eq dotemacs-mode-line-theme 'sml)
     (set-face-attribute 'which-func nil
                         :foreground "black"
+                        :weight 'light))
+  (when (eq dotemacs-mode-line-theme 'spaceline)
+    (set-face-attribute 'which-func nil
+                        :foreground "white"
                         :weight 'light)))
 
 (use-package electric

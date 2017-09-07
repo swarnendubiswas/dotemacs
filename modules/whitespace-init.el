@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar dotemacs-fill-column)
+
 (use-package whitespace
   :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
@@ -12,7 +14,7 @@
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t
-                whitespace-line-column 'dotemacs-fill-column
+                whitespace-line-column dotemacs-fill-column
                 whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
                                         space-after-tab space-mark tab-mark newline-markl)))
 

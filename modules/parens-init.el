@@ -48,6 +48,7 @@
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)
          ("C-M-w" . sp-down-sexp)
+         ;; The following two are the more commonly required use cases.
          ("C-M-f" . sp-forward-sexp)
          ("C-M-b" . sp-backward-sexp)
          ("C-M-n" . sp-next-sexp)

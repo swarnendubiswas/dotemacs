@@ -31,6 +31,7 @@
 
 (use-package cc-mode
   :mode ("\\.h\\'" . c++-mode)
+  :mode ("\\.c\\'" . c++-mode)
   :config
   (setq c-set-style "cc-mode"
         c-basic-offset 2
@@ -130,7 +131,6 @@
 (use-package irony
   :ensure t
   :diminish irony-mode
-  :commands irony-mode
   :defer t
   :preface
   ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
@@ -142,7 +142,6 @@
   :init
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
-  (add-hook 'objc-mode-hook #'irony-mode)
   :config
   (add-hook 'irony-mode-hook #'my-irony-mode-hook)
   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
@@ -158,6 +157,7 @@
     :config
     (add-to-list 'company-backends '(company-irony-c-headers
                                      company-irony
+                                     company-gtags
                                      company-yasnippet
                                      company-clang)))
 

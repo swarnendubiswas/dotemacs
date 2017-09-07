@@ -9,7 +9,7 @@
 (defvar dotemacs-completion-in-buffer)
 
 (use-package tex-site ; Initialize auctex
-  :ensure auctex
+  :ensure auctex ; once installed, auctex overrides the tex package
   :mode ("\\.tex\\'" . LaTeX-mode))
 
 (use-package tex-mode
