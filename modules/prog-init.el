@@ -139,7 +139,7 @@
     (set-face-attribute 'which-func nil
                         :foreground "black"
                         :weight 'light))
-  (when (eq dotemacs-mode-line-theme 'spaceline)
+  (when (eq dotemacs-mode-line-theme 'powerline)
     (set-face-attribute 'which-func nil
                         :foreground "white"
                         :weight 'light)))

@@ -55,7 +55,6 @@
       ((eq dotemacs-selection 'ivy)  (require 'ivy-init)))
 
 ;; Configure the more useful extensions
-(require 'anzu-init)
 (require 'spell-init)
 (require 'ace-modes-init)
 (require 'indent-init)
