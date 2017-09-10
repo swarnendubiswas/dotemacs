@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        "elpa/": true,
+        "irony/": true,
+        "auto-save-list": true,
+        "eshell": true,
+        "reference-cards": true,
+        "tmp/semanticdb": true
+    }
+}
