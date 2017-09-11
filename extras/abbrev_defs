@@ -47,9 +47,7 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'awk-mode-abbrev-table '())
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -65,13 +63,9 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'c++-mode-abbrev-table '())
 
-(define-abbrev-table 'c-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'c-mode-abbrev-table '())
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
@@ -99,9 +93,7 @@
 
 (define-abbrev-table 'css-mode-abbrev-table '())
 
-(define-abbrev-table 'cuda-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'cuda-mode-abbrev-table '())
 
 (define-abbrev-table 'data-debug-mode-abbrev-table '())
 
@@ -545,6 +537,7 @@
     ("efel" "feel" nil 0)
     ("effecient" "efficient" nil 0)
     ("effectivenss" "effectiveness" nil 1)
+    ("efforst" "efforts" nil 0)
     ("efort" "effort" nil 0)
     ("eforts" "efforts" nil 0)
     ("ehr" "her" nil 0)
@@ -778,7 +771,7 @@
     ("itwas" "it was" nil 0)
     ("ivestigative" "investigative" nil 0)
     ("iwll" "will" nil 0)
-    ("iwth" "with" nil 2)
+    ("iwth" "with" nil 3)
     ("jsut" "just" nil 0)
     ("jugment" "judgment" nil 0)
     ("knowldge" "knowledge" nil 0)
@@ -1368,9 +1361,7 @@
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'java-mode-abbrev-table '())
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
@@ -1446,9 +1437,7 @@
 
 (define-abbrev-table 'nroff-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'objc-mode-abbrev-table '())
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -1472,9 +1461,7 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'pike-mode-abbrev-table '())
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 
