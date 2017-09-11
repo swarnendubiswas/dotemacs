@@ -13,7 +13,8 @@
   :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
   :config
   (setq-default flycheck-disabled-checkers '(tex-chktex tex-lacheck)) ; Leave out LaTeX
-  (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
+  (setq flycheck-emacs-lisp-load-path 'inherit
+        flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-display-errors-delay 0.5
         flycheck-clang-language-standard "c++11")
   (when (eq dotemacs-mode-line-theme 'spaceline)
