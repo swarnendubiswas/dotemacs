@@ -83,6 +83,9 @@
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :ensure t
+  ;; popwin does not support ecb or neotree. Only direx seems to be supported. Too bad, would loved to have both popwin and ecb enabled.
+  ;; https://github.com/m2ym/popwin-el/issues/9
+  :disabled t
   :config
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -94,7 +97,7 @@
   (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
 
   ;; Helm buffers include the "help" string
-  (push '("*Help*" :regexp t) popwin:special-display-config)
+  (push '("*Help*" :noselect t) popwin:special-display-config)
 
   (push '(dired-mode :position top) popwin:special-display-config)
   (push '(compilation-mode :noselect t) popwin:special-display-config)
@@ -103,7 +106,6 @@
   (push '(svn-status-mode) popwin:special-display-config)
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-  (push '("*Help*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   (push '("*undo-tree*" :width 0.3 :position right) popwin:special-display-config)
   (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
@@ -241,6 +243,16 @@
 
 (use-package elf-mode
   :ensure t)
+
+(use-package ecb
+  :ensure t
+  :config
+  (setq ecb-examples-bufferinfo-buffer-name nil
+        ecb-tip-of-the-day nil
+        ecb-tree-buffer-style 'ascii-guides
+        ecb-show-sources-in-directories-buffer 'always
+        ecb-layout-name "left3")
+  (ecb-activate))
 
 (provide 'misc-init)
 
