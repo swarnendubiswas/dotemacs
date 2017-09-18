@@ -118,7 +118,7 @@
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
+  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-bibtex
   :ensure t
@@ -126,9 +126,25 @@
   :if (eq dotemacs-completion-in-buffer 'company)
   :init (add-to-list 'company-backends 'company-bibtex))
 
-(add-hook 'LaTeX-mode-hook
+;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
+;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+;; (add-hook 'after-save-hook
+;;           (lambda ()
+;;             (when (string= major-mode "latex-mode")
+;;               (TeX-command-menu "LaTeXMk")
+;;               (revert-buffer :ignore-auto :noconfirm)
+;;               (find-alternate-file (current-buffer)))))
+
+(add-hook 'after-save-hook
           (lambda ()
-            (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
+            (when (string= major-mode "latex-mode")
+              (let ((process (TeX-active-process))) (if process (delete-process process)))
+              (TeX-command-menu "LaTeXMk"))))
+
+
+;; (add-hook 'LaTeX-mode-hook
+;;           (lambda ()
+;;             (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
 
 (provide 'latex-new-init)
 

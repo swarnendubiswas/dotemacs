@@ -175,7 +175,8 @@
 
 (use-package clang-format
   :ensure t
-  :after cc-mode)
+  :after cc-mode
+  :config (setq clang-format-style-option "google"))
 
 (use-package flycheck-clang-tidy
   :ensure t

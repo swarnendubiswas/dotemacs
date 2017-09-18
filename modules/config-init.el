@@ -85,7 +85,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-window-split
-  'horizontal
+  'vertical
   "Specify the direction in which the windows should be split.
 This depends on the orientation of the display."
   :type '(radio

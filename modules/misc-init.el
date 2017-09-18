@@ -247,11 +247,21 @@
 (use-package ecb
   :ensure t
   :config
+  (ecb-layout-define "swarna1" left nil
+                     (ecb-split-ver 0.5 t)
+                     (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
+                     (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+                     (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
+                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+                     )
   (setq ecb-examples-bufferinfo-buffer-name nil
+        ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
         ecb-tip-of-the-day nil
         ecb-tree-buffer-style 'ascii-guides
         ecb-show-sources-in-directories-buffer 'always
-        ecb-layout-name "left3")
+        ecb-layout-name "swarna1"
+        ecb-compile-window-height nil)
   (ecb-activate))
 
 (provide 'misc-init)
