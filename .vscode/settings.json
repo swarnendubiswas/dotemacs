@@ -5,6 +5,11 @@
         "auto-save-list": true,
         "eshell": true,
         "reference-cards": true,
-        "tmp/semanticdb": true
+        "tmp/semanticdb": true,
+        "session.*": true,
+        ".session*": true,
+        "ac-html-csswatcher": true,
+        ".python-environments": true,
+        "srecode-map.el": true
     }
 }
