@@ -40,7 +40,7 @@
 
 (use-package duplicate-thing
   :ensure t
-  :bind ("C-c C-d" . duplicate-thing))
+  :bind* ("C-c C-d" . duplicate-thing))
 
 (use-package discover-my-major ; Discover key bindings and their meaning for the current Emacs major mode
   :ensure t

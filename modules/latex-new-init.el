@@ -103,7 +103,8 @@
   :defer t
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t))
+        bibtex-completion-cite-default-as-initial-input t
+        bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
 
 (use-package helm-bibtex
   :ensure t

@@ -1,4 +1,4 @@
-personal_ws-1.1 en 66 
+personal_ws-1.1 en 67
 atomicity
 indices
 roundtrip
@@ -49,6 +49,7 @@ serializability
 dependences
 Dependences
 tradeoff
+multicore
 parallelizing
 runtimes
 reimplement
@@ -61,6 +62,7 @@ multithreaded
 optimality
 outliers
 Translational
+reproducability
 precimonious
 covariance
 customizations
