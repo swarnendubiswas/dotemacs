@@ -264,6 +264,9 @@
         ecb-compile-window-height nil)
   (ecb-activate))
 
+(use-package sr-speedbar
+  :ensure t)
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

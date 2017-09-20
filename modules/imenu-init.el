@@ -23,6 +23,9 @@
 (when (eq dotemacs-selection 'ido)
   (bind-key* "C-c C-j" #'ido-imenu-anywhere))
 
+(use-package imenu-list
+  :ensure t)
+
 (provide 'imenu-init)
 
 ;;; imenu-init.el ends here

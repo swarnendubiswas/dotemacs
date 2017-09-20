@@ -9,6 +9,14 @@
 (defvar dotemacs-temp-directory)
 (defvar dotemacs-mode-line-theme)
 
+(use-package semantic
+  :config
+  (semantic-mode 1)
+  (global-semanticdb-minor-mode 1)
+  (global-semantic-idle-summary-mode 1)
+  (global-semantic-idle-completions-mode 1)
+  (global-semantic-highlight-func-mode 1))
+
 (use-package prog-mode
   :defer t
   :config

@@ -5,6 +5,8 @@
         "auto-save-list": true,
         "eshell": true,
         "reference-cards": true,
-        "tmp/semanticdb": true
+        "tmp/semanticdb": true,
+        ".python-environments": true,
+        "ac-html-csswatcher": true
     }
 }
