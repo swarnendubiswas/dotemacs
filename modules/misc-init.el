@@ -5,6 +5,7 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
+(defvar dotemacs-use-ecb)
 
 (use-package help+
   :ensure t
@@ -85,7 +86,7 @@
   :ensure t
   ;; popwin does not support ecb or neotree. Only direx seems to be supported. Too bad, would loved to have both popwin and ecb enabled.
   ;; https://github.com/m2ym/popwin-el/issues/9
-  :disabled t
+  :if (not (bound-and-true-p dotemacs-use-ecb))
   :config
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -246,6 +247,7 @@
 
 (use-package ecb
   :ensure t
+  :if (bound-and-true-p dotemacs-use-ecb)
   :config
   (ecb-layout-define "swarna1" left nil
                      (ecb-split-ver 0.5 t)
@@ -262,7 +264,8 @@
         ecb-show-sources-in-directories-buffer 'always
         ecb-layout-name "swarna1"
         ecb-compile-window-height nil)
-  (ecb-activate))
+  (ecb-activate)
+  (add-hook 'compilation-finish-functions (lambda (buf strg) (kill-buffer buf))))
 
 (use-package sr-speedbar
   :ensure t)

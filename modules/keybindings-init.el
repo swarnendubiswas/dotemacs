@@ -12,6 +12,8 @@
 ;; (define-key global-map (kbd "RET") 'newline-and-indent)                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar dotemacs-use-ecb)
+
 (bind-keys
  ("RET" . newline-and-indent)
  ("C-l" . goto-line)
@@ -49,6 +51,7 @@
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
+  :if (not (bound-and-true-p dotemacs-use-ecb))
   :config
   (which-key-mode 1)
   (setq which-key-idle-delay 1.0

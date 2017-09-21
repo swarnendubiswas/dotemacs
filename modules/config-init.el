@@ -125,6 +125,12 @@ The repo often does not work and Emacs fails to connect to it."
   :type 'boolean
   :group 'dotemacs)
 
+(defcustom dotemacs-use-ecb
+  nil
+  "Should the ECB package be activated? If yes, then we disable some other packages, like popwin and which-key."
+  :type 'boolean
+  :group 'dotemacs)
+
 (provide 'config-init)
 
 ;;; config-init.el ends here
