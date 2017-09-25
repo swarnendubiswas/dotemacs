@@ -187,6 +187,7 @@
       (progn
         (set-face-attribute 'tabbar-unselected nil
                             :inherit 'tabbar-unselected
+                            ;; :background "gray90"
                             :height 0.9)
         (set-face-attribute 'tabbar-selected nil
                             :inherit 'tabbar-default
@@ -198,9 +199,11 @@
                             :height 1.0)
         (set-face-attribute 'tabbar-modified nil
                             :inherit 'tabbar-modified
+                            ;; :foreground "red"
                             :height 1)
         (set-face-attribute 'tabbar-selected-modified nil
                             :inherit 'tabbar-selected-modified
+                            ;; :foreground "dark green"
                             :height 1.1
                             :bold t))
     (progn
