@@ -1,4 +1,4 @@
-personal_ws-1.1 en 67
+personal_ws-1.1 en 68 
 atomicity
 indices
 roundtrip
@@ -22,8 +22,8 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-vertices
 blackbox
+vertices
 scalable
 programmability
 reconvergence
@@ -47,7 +47,6 @@ backend
 Kolkata
 serializability
 dependences
-Dependences
 tradeoff
 multicore
 parallelizing
@@ -63,6 +62,7 @@ optimality
 outliers
 Translational
 reproducability
+Biswas
 precimonious
 covariance
 customizations

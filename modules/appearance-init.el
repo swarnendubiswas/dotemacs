@@ -165,18 +165,18 @@
         tabbar-background-color nil
         tabbar-separator '(0.3))
 
-  (add-hook 'after-save-hook #'dotemacs--tabbar-modification-state-change)
-  (add-hook 'after-revert-hook #'dotemacs--tabbar-modification-state-change)
-  (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
+  ;; (add-hook 'after-save-hook #'dotemacs--tabbar-modification-state-change)
+  ;; (add-hook 'after-revert-hook #'dotemacs--tabbar-modification-state-change)
+  ;; (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
 
   ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
   ;; crowded.
-  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-    (setq ad-return-value
-          ;; (if (and (buffer-modified-p (tabbar-tab-value tab))
-          ;;          (buffer-file-name (tabbar-tab-value tab)))
-          ;;     (concat " * " (concat ad-return-value " "))
-          (concat " " (concat ad-return-value " "))))
+  ;; (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+  ;;   (setq ad-return-value
+  ;;         ;; (if (and (buffer-modified-p (tabbar-tab-value tab))
+  ;;         ;;          (buffer-file-name (tabbar-tab-value tab)))
+  ;;         ;;     (concat " * " (concat ad-return-value " "))
+  ;;         (concat " " (concat ad-return-value " "))))
 
   ;; Customize the tabbar faces, inspired from
   ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
@@ -187,7 +187,6 @@
       (progn
         (set-face-attribute 'tabbar-unselected nil
                             :inherit 'tabbar-unselected
-                            :background "gray90"
                             :height 0.9)
         (set-face-attribute 'tabbar-selected nil
                             :inherit 'tabbar-default
@@ -199,11 +198,9 @@
                             :height 1.0)
         (set-face-attribute 'tabbar-modified nil
                             :inherit 'tabbar-modified
-                            :foreground "red"
                             :height 1)
         (set-face-attribute 'tabbar-selected-modified nil
-                            ;; :inherit 'tabbar-selected-modified
-                            :foreground "dark green"
+                            :inherit 'tabbar-selected-modified
                             :height 1.1
                             :bold t))
     (progn
