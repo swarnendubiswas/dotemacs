@@ -8,7 +8,8 @@
 (defvar dotemacs-selection)
 
 (use-package imenu
-  :config (setq imenu-auto-rescan t))
+  :config
+  (setq imenu-auto-rescan t))
 
 (use-package imenu+
   :ensure t)
@@ -24,7 +25,12 @@
   (bind-key* "C-c C-j" #'ido-imenu-anywhere))
 
 (use-package imenu-list
-  :ensure t)
+  :ensure t
+  :config
+  (setq imenu-list-auto-resize t
+        imenu-list-size 0.2)
+  (add-hook 'prog-mode-hook #'imenu-list-minor-mode)
+  (add-hook 'LaTeX-mode-hook #'imenu-list-minor-mode))
 
 (provide 'imenu-init)
 

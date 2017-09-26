@@ -40,9 +40,9 @@
   ;; Start with Emacs window maximized:
   ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
   ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
-  ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
   ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
-  ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
   ;; Blinking cursor can be distracting
   (blink-cursor-mode 0))
@@ -200,7 +200,7 @@
         (set-face-attribute 'tabbar-modified nil
                             :inherit 'tabbar-modified
                             ;; :foreground "red"
-                            :height 1)
+                            :height 0.9)
         (set-face-attribute 'tabbar-selected-modified nil
                             :inherit 'tabbar-selected-modified
                             ;; :foreground "dark green"

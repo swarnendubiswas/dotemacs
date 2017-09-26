@@ -268,7 +268,36 @@
   (add-hook 'compilation-finish-functions (lambda (buf strg) (kill-buffer buf))))
 
 (use-package sr-speedbar
-  :ensure t)
+  :ensure t
+  :config
+  (setq sr-speedbar-right-side nil
+        sr-speedbar-width 15
+        sr-speedbar-default-width 15
+        sr-speedbar-max-width 20)
+  (sr-speedbar-open))
+
+(use-package treemacs
+  :ensure t
+  :config
+  (setq treemacs-follow-after-init          t
+        treemacs-width                      35
+        treemacs-indentation                2
+        treemacs-git-integration            t
+        treemacs-collapse-dirs              3
+        treemacs-silent-refresh             t
+        treemacs-change-root-without-asking t
+        treemacs-sorting                    'alphabetic-desc
+        treemacs-show-hidden-files          t
+        treemacs-never-persist              nil
+        treemacs-is-never-other-window      nil
+        treemacs-goto-tag-strategy          'refetch-index)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t))
+
+(use-package treemacs-projectile
+  :defer t
+  :ensure t
+  :config (setq treemacs-header-function #'treemacs-projectile-create-header))
 
 (provide 'misc-init)
 
