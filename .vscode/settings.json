@@ -10,6 +10,10 @@
         ".session*": true,
         "ac-html-csswatcher": true,
         ".python-environments": true,
-        "srecode-map.el": true
+        "srecode-map.el": true,
+        "ede-projects.el": true,
+        ".project": true,
+        ".projectile": true,
+        "network-security*": true
     }
 }
