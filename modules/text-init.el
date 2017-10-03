@@ -15,7 +15,7 @@
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
   :diminish writegood-mode
-  :config (add-hook 'text-mode-hook #'writegood-mode))
+  :init (add-hook 'text-mode-hook #'writegood-mode))
 
 (use-package markdown-mode
   :ensure t

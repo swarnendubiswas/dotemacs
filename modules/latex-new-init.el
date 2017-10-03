@@ -144,21 +144,19 @@
 ;;               (find-alternate-file (current-buffer))
 ;;               (TeX-command-menu "LaTeXMk"))))
 
-(defun run-latexmk ()
-  (when (string= major-mode "latex-mode")
-    (let ((TeX-save-query nil)
-          (TeX-process-asynchronous nil)
-          (master-file (TeX-master-file)))
-      (TeX-save-document "")
-      (TeX-run-TeX "LaTexmk"
-                   (TeX-command-expand "latexmk -pdf %t" 'TeX-master-file)
-                   master-file)
-      (if (plist-get TeX-error-report-switches (intern master-file))
-          (TeX-next-error t)
-        (minibuffer-message "LaTeXMk done")))))
-(add-hook 'after-save-hook #'run-latexmk)
-
-
+;; (defun run-latexmk ()
+;;   (when (string= major-mode "latex-mode")
+;;     (let ((TeX-save-query nil)
+;;           (TeX-process-asynchronous t)
+;;           (master-file (TeX-master-file)))
+;;       (TeX-save-document "")
+;;       (TeX-run-TeX "LaTexmk"
+;;                    (TeX-command-expand "latexmk -pdf %t" 'TeX-master-file)
+;;                    master-file)
+;;       (if (plist-get TeX-error-report-switches (intern master-file))
+;;           (TeX-next-error t)
+;;         (minibuffer-message "LaTeXMk done")))))
+;; (add-hook 'after-save-hook #'run-latexmk)
 
 ;; (add-hook 'LaTeX-mode-hook
 ;;           (lambda ()

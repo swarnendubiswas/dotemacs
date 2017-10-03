@@ -288,6 +288,7 @@
 
 (use-package sr-speedbar
   :ensure t
+  :disabled t
   :config
   (setq sr-speedbar-right-side nil
         sr-speedbar-width 15
@@ -296,6 +297,7 @@
 
 (use-package treemacs
   :ensure t
+  :disabled t
   :config
   (setq treemacs-follow-after-init          t
         treemacs-width                      35
@@ -314,6 +316,7 @@
 
 (use-package treemacs-projectile
   :ensure t
+  :disabled t ;; Delays loading of known projects
   :defer t
   :after treemacs
   :config (setq treemacs-header-function #'treemacs-projectile-create-header))
