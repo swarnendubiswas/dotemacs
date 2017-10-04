@@ -1,15 +1,15 @@
-##Emacs
+# Emacs
 
 My Emacs customizations, all in one place. Many of the customizations included are collected from different sources on
 the Internet, and tailored according to my preferences.
 
-######Note
+## Note
 
 Other than text and elisp editing, I mostly use Emacs for editing C/C++, LaTeX, and Python files. The current setup
 should work fine for these major modes, and is not well-tuned for programming with Java. I think Eclipse is way better
 for working with Java.
 
-#####Installation
+## Installation
 
 You might want to backup your contents if your `.emacs.d` directory is not empty. Then, use the following command to
 checkout the source:
@@ -18,7 +18,7 @@ checkout the source:
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 ```
 
-#####Directory structure
+## Directory structure
          <!-- * backup -- older startup files, which I no longer use. I am now
          using [`(use-package)`](https://github.com/jwiegley/use-package). -->
          * modules -- elisp modules containing personal customizations
@@ -26,9 +26,9 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
          * reference-cards -- help files
          * snippets -- custom snippets
 
-####Setup
+## Setup
 
-#####Tweaking the default settings
+## Tweaking the default settings
 
 The following are a few customization options defined in `modules/config-init.el` that you could use to tweak the
 default setup. Check the module for more options.

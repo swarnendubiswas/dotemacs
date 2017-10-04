@@ -312,14 +312,23 @@
         treemacs-is-never-other-window      nil
         treemacs-goto-tag-strategy          'refetch-index)
   (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t))
+  (treemacs-filewatch-mode t)
 
-(use-package treemacs-projectile
+  ;; Delays loading of known projectile projects, not sure why!
+  (use-package treemacs-projectile
+    :ensure t
+    :defer t
+    :after treemacs
+    :config (setq treemacs-header-function #'treemacs-projectile-create-header)))
+
+(use-package minimap
   :ensure t
-  :disabled t ;; Delays loading of known projects
-  :defer t
-  :after treemacs
-  :config (setq treemacs-header-function #'treemacs-projectile-create-header))
+  :diminish minimap-mode
+  :config
+  (add-to-list 'minimap-major-modes 'html-mode)
+  (add-to-list 'minimap-major-modes 'text-mode)
+  (add-to-list 'minimap-major-modes 'latex-mode)
+  (minimap-mode 1))
 
 (provide 'appearance-init)
 
