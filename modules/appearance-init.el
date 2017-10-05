@@ -147,9 +147,13 @@
   :if (not (eq dotemacs-theme 'default))
   :config (global-display-theme-mode))
 
+;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
+;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
+;; https://gist.github.com/ShingoFukuyama/7245914
 ;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
 ;; http://stackoverflow.com/questions/15735163/update-tabbar-when-nothing-to-save#
 ;; https://github.com/tomekowal/dotfiles/blob/master/.emacs.d/my-tabbar.el
+;; https://github.com/davidswelt/aquamacs-emacs/blob/a07bd68f5dd575b3f3c1346f937c9fe46b78cfc0/aquamacs/src/site-lisp/tabbar/tabbar-window.el
 (use-package tabbar
   :ensure t
   :preface
@@ -160,30 +164,30 @@
   (defun dotemacs--tabbar-on-buffer-modification ()
     (set-buffer-modified-p t)
     (dotemacs--tabbar-modification-state-change))
+
+  (defun dotemacs--tabbar-on-buffer-revert ()
+    (set-buffer-modified-p nil)
+    (dotemacs--tabbar-modification-state-change))
   :init (tabbar-mode 1)
   :config
   (setq tabbar-use-images nil ; Speed up by not using images
         tabbar-auto-scroll-flag t
         tabbar-background-color nil
         tabbar-separator '(0.3))
+  (setq tabbar-separator '(1)) ;; set tabbar-separator size to 1 pixel
 
-  ;; (add-hook 'after-save-hook #'dotemacs--tabbar-modification-state-change)
-  ;; (add-hook 'after-revert-hook #'dotemacs--tabbar-modification-state-change)
-  ;; (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
+  (add-hook 'after-save-hook #'dotemacs--tabbar-modification-state-change)
+  (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
+  (add-hook 'after-revert-hook #'dotemacs--tabbar-on-buffer-revert)
 
   ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
   ;; crowded.
-  ;; (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-  ;;   (setq ad-return-value
-  ;;         ;; (if (and (buffer-modified-p (tabbar-tab-value tab))
-  ;;         ;;          (buffer-file-name (tabbar-tab-value tab)))
-  ;;         ;;     (concat " * " (concat ad-return-value " "))
-  ;;         (concat " " (concat ad-return-value " "))))
-
-  ;; Customize the tabbar faces, inspired from
-  ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
-  ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
-  ;; https://gist.github.com/ShingoFukuyama/7245914
+  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+    (setq ad-return-value
+          (if (and (buffer-modified-p (tabbar-tab-value tab))
+                   (buffer-file-name (tabbar-tab-value tab)))
+              (concat " * " (concat ad-return-value " "))
+            (concat " " (concat ad-return-value " ")))))
 
   (if (eq dotemacs-theme 'spacemacs-light)
       (progn
@@ -210,32 +214,73 @@
                             :bold t))
     (progn
       (set-face-attribute 'tabbar-default nil
-                          :background "gray80")
-      (set-face-attribute 'tabbar-unselected nil
-                          :background "gray88"
-                          :foreground "gray30"
-                          :height 0.9)
+                          :inherit nil
+                          :height 110
+                          :weight 'normal
+                          :width 'normal
+                          :slant 'normal
+                          :underline nil
+                          :strike-through nil
+                          :stipple nil
+                          :background "gray80"
+                          :foreground "black"
+                          ;; :box '(:line-width 2 :color "white" :style nil)
+                          :box nil
+                          ;; :family "Lucida Grande"
+                          ;;:family "helvetica"
+                          )
+      ;; (set-face-attribute 'tabbar-default nil
+      ;;                     :background "gray80")
+
       (set-face-attribute 'tabbar-selected nil
                           :inherit 'tabbar-default
-                          :background "#f2f2f6"
-                          :foreground "black"
-                          ;; :box '(:line-width 1 :color "black" :style pressed-button)
-                          :height 1.2
-                          :bold t
-                          :underline nil)
+                          :background "gray95"
+                          :foreground "gray20"
+                          :box '(:line-width 3 :color "grey95" :style nil))
+      ;; (set-face-attribute 'tabbar-selected nil
+      ;;                 :inherit 'tabbar-default
+      ;;                 :background "#f2f2f6"
+      ;;                 :foreground "black"
+      ;;                 ;; :box '(:line-width 1 :color "black" :style pressed-button)
+      ;;                 :height 1.2
+      ;;                 :bold t
+      ;;                 :underline nil)
+
+
+      (set-face-attribute 'tabbar-unselected nil
+                          :inherit 'tabbar-default
+                          :background "gray80"
+                          :box '(:line-width 3 :color "grey80" :style nil))
+      ;; (set-face-attribute 'tabbar-unselected nil
+      ;;                     :background "gray88"
+      ;;                     :foreground "gray30"
+      ;;                     :height 0.9)
+
+      (set-face-attribute 'tabbar-button nil
+                          :inherit 'tabbar-default
+                          :box nil)
+
+      (set-face-attribute 'tabbar-separator nil
+                          :background "grey50"
+                          :foreground "grey50"
+                          :height 1.0)
+      ;; (set-face-attribute 'tabbar-separator nil
+      ;;                     :height 1.0)
+
       (set-face-attribute 'tabbar-highlight nil
                           :underline t
                           :background "lemon chiffon")
+
       (set-face-attribute 'tabbar-button nil
                           ;; :box '(:line-width 1 :color "gray72" :style released-button)
                           )
-      (set-face-attribute 'tabbar-separator nil
-                          :height 1.0)
+
       (set-face-attribute 'tabbar-modified nil
                           :background "gray88"
                           :foreground "red"
                           ;; :box '(:line-width 1 :color "black" :style sunken)
                           )
+
       (set-face-attribute 'tabbar-selected-modified nil
                           :background "#f2f2f6"
                           :foreground "dark green"
@@ -251,38 +296,38 @@
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (if (eq system-type 'windows-nt)
     (set-face-attribute 'default nil
-                        :family "Consolas"
-                        :height 120)
+			:family "Consolas"
+			:height 120)
   (progn
     (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute 'default nil
-                                                                                        :family "Dejavu Sans Mono"
-                                                                                        :height 130))
-          ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
-                                                                        :family "Dejavu Sans Mono"
-                                                                        :height 140))
-          (t (set-face-attribute 'default nil
-                                 :family "Dejavu Sans Mono"
-                                 :height 110)))))
+											:family "Dejavu Sans Mono"
+											:height 130))
+	  ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
+									:family "Dejavu Sans Mono"
+									:height 140))
+	  (t (set-face-attribute 'default nil
+				 :family "Dejavu Sans Mono"
+				 :height 110)))))
 
 (use-package ecb
   :ensure t
   :if (bound-and-true-p dotemacs-use-ecb)
   :config
   (ecb-layout-define "swarna1" left nil
-                     (ecb-split-ver 0.5 t)
-                     (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
-                     (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-                     (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
-                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-                     )
+		     (ecb-split-ver 0.5 t)
+		     (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
+		     (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+		     (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
+		     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+		     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+		     )
   (setq ecb-examples-bufferinfo-buffer-name nil
-        ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
-        ecb-tip-of-the-day nil
-        ecb-tree-buffer-style 'ascii-guides
-        ecb-show-sources-in-directories-buffer 'always
-        ecb-layout-name "swarna1"
-        ecb-compile-window-height nil)
+	ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
+	ecb-tip-of-the-day nil
+	ecb-tree-buffer-style 'ascii-guides
+	ecb-show-sources-in-directories-buffer 'always
+	ecb-layout-name "swarna1"
+	ecb-compile-window-height nil)
   (ecb-activate)
   (add-hook 'compilation-finish-functions (lambda (buf strg) (kill-buffer buf))))
 
@@ -291,26 +336,26 @@
   :disabled t
   :config
   (setq sr-speedbar-right-side nil
-        sr-speedbar-width 15
-        sr-speedbar-default-width 15
-        sr-speedbar-max-width 20))
+	sr-speedbar-width 15
+	sr-speedbar-default-width 15
+	sr-speedbar-max-width 20))
 
 (use-package treemacs
   :ensure t
   :disabled t
   :config
   (setq treemacs-follow-after-init          t
-        treemacs-width                      35
-        treemacs-indentation                2
-        treemacs-git-integration            t
-        treemacs-collapse-dirs              3
-        treemacs-silent-refresh             t
-        treemacs-change-root-without-asking t
-        treemacs-sorting                    'alphabetic-desc
-        treemacs-show-hidden-files          t
-        treemacs-never-persist              nil
-        treemacs-is-never-other-window      nil
-        treemacs-goto-tag-strategy          'refetch-index)
+	treemacs-width                      35
+	treemacs-indentation                2
+	treemacs-git-integration            t
+	treemacs-collapse-dirs              3
+	treemacs-silent-refresh             t
+	treemacs-change-root-without-asking t
+	treemacs-sorting                    'alphabetic-desc
+	treemacs-show-hidden-files          t
+	treemacs-never-persist              nil
+	treemacs-is-never-other-window      nil
+	treemacs-goto-tag-strategy          'refetch-index)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
 
