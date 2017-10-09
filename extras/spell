@@ -1,4 +1,4 @@
-personal_ws-1.1 en 71 
+personal_ws-1.1 en 72 
 atomicity
 indices
 roundtrip
@@ -22,8 +22,8 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-blackbox
 vertices
+blackbox
 scalable
 programmability
 reconvergence
@@ -52,6 +52,7 @@ tradeoff
 multicore
 parallelizing
 runtimes
+runtime
 reimplement
 unobservable
 deterministically

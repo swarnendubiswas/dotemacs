@@ -27,10 +27,11 @@
 (use-package imenu-list
   :ensure t
   :config
-  (setq imenu-list-auto-resize t
-        imenu-list-size 0.2)
+  (setq imenu-list-auto-resize nil
+        imenu-list-size 0.15)
   (add-hook 'prog-mode-hook #'imenu-list-minor-mode)
-  (add-hook 'LaTeX-mode-hook #'imenu-list-minor-mode))
+  (add-hook 'LaTeX-mode-hook #'imenu-list-minor-mode)
+  (add-hook 'bibtex-mode-hook #'imenu-list-minor-mode))
 
 (provide 'imenu-init)
 

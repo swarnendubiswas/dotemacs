@@ -176,7 +176,10 @@
 (use-package clang-format
   :ensure t
   :after cc-mode
-  :config (setq clang-format-style-option "google"))
+  :config
+  (setq clang-format-style-option "google"
+        clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")
+  (add-hook 'c++-mode-hook #'clang-format-buffer))
 
 (use-package flycheck-clang-tidy
   :ensure t
