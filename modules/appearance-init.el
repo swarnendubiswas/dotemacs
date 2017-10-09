@@ -296,18 +296,19 @@
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (if (eq system-type 'windows-nt)
     (set-face-attribute 'default nil
-			:family "Consolas"
-			:height 120)
+                        :family "Consolas"
+                        :height 120)
   (progn
-    (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute 'default nil
-											:family "Dejavu Sans Mono"
-											:height 130))
-	  ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
-									:family "Dejavu Sans Mono"
-									:height 140))
-	  (t (set-face-attribute 'default nil
-				 :family "Dejavu Sans Mono"
-				 :height 110)))))
+    (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
+                                                                     'default nil
+                                                                     :family "Dejavu Sans Mono"
+                                                                     :height 130))
+          ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
+                                                                        :family "Dejavu Sans Mono"
+                                                                        :height 130))
+          (t (set-face-attribute 'default nil
+                                 :family "Dejavu Sans Mono"
+                                 :height 110)))))
 
 (use-package ecb
   :ensure t
