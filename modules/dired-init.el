@@ -85,6 +85,9 @@
   :ensure t
   :config (dired-quick-sort-setup))
 
+(use-package dired-subtree
+  :ensure t)
+
 (provide 'dired-init)
 
 ;;; dired-init ends here
