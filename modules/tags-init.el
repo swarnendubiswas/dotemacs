@@ -25,7 +25,8 @@
   (compile "find . -type f -name \"*.tex\" -print | xargs ctags -o TAGS"))
 
 (use-package ctags-update
-  :ensure t)
+  :ensure t
+  :defer t)
 
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el

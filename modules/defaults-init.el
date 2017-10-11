@@ -108,11 +108,13 @@
 (fset 'display-startup-echo-area-message #'ignore)
 
 (use-package mouse
+  :disabled t
   :config
   ;; Text selected with the mouse is automatically copied to the clipboard.
   (setq mouse-drag-copy-region t))
 
 (use-package xt-mouse ; Mouse cursor in terminal mode
+  :disabled t
   :config (xterm-mouse-mode -1))
 
 (use-package menu-bar
@@ -221,6 +223,7 @@
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
+  :defer t
   :config
   (setq uniquify-buffer-name-style 'forward
         uniquify-separator "/"

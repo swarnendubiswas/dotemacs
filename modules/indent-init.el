@@ -16,25 +16,11 @@
 
 (use-package aggressive-indent
   :ensure t
-  :config
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (aggressive-indent-mode 1)))
+  :init (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
   :diminish aggressive-indent-mode)
 
 (use-package electric ; Intelligent indentation, on by default from Emacs 24.4
   :config (electric-indent-mode 1))
-
-;; If you wish to use this with autopairs and yasnippet, load this library first.
-(use-package auto-indent-mode
-  :ensure t
-  :disabled t
-  :diminish auto-indent-mode
-  :config
-  (setq auto-indent-on-visit-file t
-        auto-indent-indent-style 'conservative ; Indent only the local area if within a repository
-        auto-indent-mode-untabify-on-yank-or-paste t)
-  (auto-indent-global-mode 1))
 
 (use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
   :ensure t

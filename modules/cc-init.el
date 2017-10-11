@@ -176,21 +176,23 @@
 (use-package clang-format
   :ensure t
   :after cc-mode
-  :config
-  (setq clang-format-style-option "google"
+  :init
+  (setq clang-format-style-option "{BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120}"
         clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")
-  (add-hook 'c++-mode-hook #'clang-format-buffer))
+  (add-hook 'before-save-hook #'clang-format-buffer))
 
 (use-package flycheck-clang-tidy
   :ensure t
   :ensure flycheck
+  :after cc-mode
   :after flycheck
-  :config (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup))
+  :init (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup))
 
 (use-package flycheck-clang-analyzer
   :ensure t
   :ensure flycheck
   :after flycheck
+  :after cc-mode
   :config (flycheck-clang-analyzer-setup))
 
 (use-package cuda-mode

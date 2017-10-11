@@ -68,7 +68,8 @@
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package pos-tip
   :ensure t)
