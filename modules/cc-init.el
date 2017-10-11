@@ -177,9 +177,9 @@
   :ensure t
   :after cc-mode
   :init
-  (setq clang-format-style-option "{BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120}"
-        clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")
-  (add-hook 'before-save-hook #'clang-format-buffer))
+  (setq clang-format-style-option "{BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120}")
+  (when (string-equal (system-name) "consensus.ices.utexas.edu")
+    (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")))
 
 (use-package flycheck-clang-tidy
   :ensure t

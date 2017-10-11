@@ -65,8 +65,7 @@
         flyspell-issue-message-flag nil)
 
   ;; This is to turn on spell check in *scratch* buffer, which is in text-mode.
-  (dolist (hook '(text-mode-hook
-                  find-file-hooks))
+  (dolist (hook '(text-mode-hook find-file-hooks))
     (add-hook hook #'turn-on-flyspell))
   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 

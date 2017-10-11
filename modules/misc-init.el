@@ -242,7 +242,8 @@
   :bind ("C-c i" . crux-ispell-word-then-abbrev))
 
 (use-package elf-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (provide 'misc-init)
 

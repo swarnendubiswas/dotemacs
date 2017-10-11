@@ -112,7 +112,7 @@ differences due to whitespaces."
   :group 'dotemacs)
 
 (defcustom dotemacs-use-ignoramus-p
-  t
+  nil
   "Should the ignoramus package be used?
 The package controls ignoring boring file expressions."
   :type 'boolean
@@ -127,7 +127,8 @@ The repo often does not work and Emacs fails to connect to it."
 
 (defcustom dotemacs-use-ecb
   nil
-  "Should the ECB package be activated? If yes, then we disable some other packages, like popwin and which-key."
+  "Should the ECB package be activated?
+If yes, then we disable some other packages, like popwin and which-key."
   :type 'boolean
   :group 'dotemacs)
 
