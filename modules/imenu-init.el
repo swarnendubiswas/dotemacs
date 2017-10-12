@@ -27,8 +27,10 @@
 (use-package imenu-list
   :ensure t
   :config
-  (setq imenu-list-auto-resize nil
-        imenu-list-size 0.15)
+  (setq imenu-list-auto-resize nil)
+  (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
+      (setq imenu-list-size 0.1)
+    (setq imenu-list-size 0.15))
   (add-hook 'prog-mode-hook #'imenu-list-minor-mode)
   (add-hook 'LaTeX-mode-hook #'imenu-list-minor-mode)
   (add-hook 'bibtex-mode-hook #'imenu-list-minor-mode))

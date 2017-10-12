@@ -104,6 +104,9 @@
     (setq select-enable-clipboard t)
   (setq x-select-enable-clipboard t))
 
+;; Make cursor the width of the character it is under i.e. full width of a TAB
+(setq x-stretch-cursor t)
+
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
