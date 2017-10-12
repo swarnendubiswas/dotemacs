@@ -241,10 +241,23 @@ Within the error list the following key bindings are available:
 * `g` -	Check the source buffer and update the error list (``).
 * `q` -	Quit the error list and hide its window (``).
 
-
 ## Version system
 
 ### Git
+
+* `TAB` - Expand and collapse files.
+* `n` - Move to next section.
+* `p` - Move to previous section.
+* `M-n` - Move to next sibling section.
+* `M-p` - Move to previous sibling section.
+* `s` - Stage item.
+* `u` - Unstage item.
+* `c` - Commit menu.
+* `l` - Log menu.
+* `M-S` - Show all sections.
+* `M-H` - Hide all sections.
+* `k` - Delete file(s).
+* `C-u S` - Stage all untracked and tracked files.
 
 ### Svn
 

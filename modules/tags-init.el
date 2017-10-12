@@ -115,6 +115,28 @@
 
 ;; https://vxlabs.com/2016/04/11/step-by-step-guide-to-c-navigation-and-completion-with-emacs-and-the-clang-based-rtags/
 
+(use-package rtags
+  :ensure t
+  :config
+  (setq rtags-completions-enabled t
+        rtags-autostart-diagnostics t)
+  (rtags-enable-standard-keybindings)
+
+  (use-package ivy-rtags
+    :ensure t)
+
+  (use-package helm-rtags
+    :ensure t)
+
+  (use-package company-rtags
+    :ensure t
+    :after company
+    :config (add-to-list 'company-backends 'company-rtags))
+
+  (use-package flycheck-rtags
+    :ensure t
+    :init (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)))
+
 (provide 'tags-init)
 
 ;;; tags-init.el ends here

@@ -181,13 +181,6 @@
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")))
 
-(use-package flycheck-clang-tidy
-  :ensure t
-  :ensure flycheck
-  :after cc-mode
-  :after flycheck
-  :init (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup))
-
 (use-package flycheck-clang-analyzer
   :ensure t
   :ensure flycheck
