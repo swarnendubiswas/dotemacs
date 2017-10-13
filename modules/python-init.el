@@ -14,25 +14,14 @@
 
 (defun dotemacs--python-setup ()
   "Helper function for configuring python mode."
-  (setq-default fill-column 118
-                python-indent-offset 4
+  (setq-default python-indent-offset 4
                 python-indent-guess-indent-offset nil)
   ;; (setq python-shell-completion-native-enable nil)
   ;; (setq python-shell-interpreter "python3"
   ;;       python-shell-unbuffered nil)
-  (turn-on-auto-fill)
-  (run-python (python-shell-parse-command) nil nil)
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package auto-complete-chunk
-      :ensure t
-      :after auto-complete
-      :init
-      (add-hook 'python-mode
-                (lambda ()
-                  ;; Make sure ac-source-chunk-list comes first.
-                  (setq ac-sources (append '(ac-source-chunk-list) ac-sources))
-                  (setq ac-chunk-list
-                        '("os.path.abspath" "os.path.altsep" "os.path.basename")))))))
+  ;; (turn-on-auto-fill)
+  ;; (run-python (python-shell-parse-command) nil nil)
+  )
 
 (use-package elpy
   :ensure t
@@ -63,13 +52,6 @@
     ;; (add-hook 'before-save-hook #'elpy-importmagic-fixup)
     (elpy-mode 1))
 
-  ;; (defun elpy-goto-definition-or-rgrep ()
-  ;;   "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
-  ;;   (interactive)
-  ;;   (ring-insert find-tag-marker-ring (point-marker))
-  ;;   (condition-case nil (elpy-goto-definition)
-  ;;     (error (elpy-rgrep-symbol
-  ;;             (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
   :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
   :config (add-hook 'elpy-mode-hook #'flycheck-mode)
 

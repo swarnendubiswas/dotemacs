@@ -77,27 +77,6 @@
   (add-to-list 'company-backends 'company-c-headers)
   (add-to-list 'company-c-headers-path-system "/usr/include/"))
 
-(when (eq dotemacs-completion-in-buffer 'auto-complete)
-  (with-eval-after-load "auto-complete"
-    (add-to-list 'ac-sources 'ac-source-semantic)
-    (add-to-list 'ac-sources 'ac-source-semantic-raw)
-    (add-to-list 'ac-sources 'ac-source-gtags)))
-
-(use-package auto-complete-c-headers
-  :ensure t
-  :after auto-complete
-  :if (eq dotemacs-completion-in-buffer 'auto-complete)
-  :config
-  (add-hook 'c-mode-hook
-            (lambda ()
-              (add-to-list 'ac-sources 'ac-source-c-headers)
-              (add-to-list 'ac-sources 'ac-source-c-header-symbols t))))
-
-(use-package auto-complete-clang
-  :ensure t
-  :after auto-complete
-  :if (eq dotemacs-completion-in-buffer 'auto-complete))
-
 (use-package google-c-style ; Google's C/C++ style for c-mode
   :ensure t
   :defer t

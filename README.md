@@ -34,7 +34,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 The following are customization options defined in `modules/config-init.el` that you could use to tweak the
 default setup. Check the module for more options.
 
-* `dotemacs-completion-in-buffer` - Toggle between `company` or `auto-complete`, with `company` being the default.
+* `dotemacs-completion-in-buffer` - Enable `company` for auto-completion in buffer.
 * `dotemacs-selection` - Choose a selection and completion framework, between `helm`, `ido`, or `ivy`.
 * `dotemacs-ido-view-mode` - Choose how choices are displayed with `ido`. The options are vertical, grid, and default.
 * `dotemacs-theme` - Set the desired theme from `leuven`, `professional`, `eclipse`, and default.

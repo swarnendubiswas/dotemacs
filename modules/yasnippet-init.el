@@ -16,8 +16,6 @@
   :config
   (setq yas-triggers-in-field t
         yas-wrap-around-region t)
-  (with-eval-after-load "auto-complete"
-    (add-to-list 'ac-sources 'ac-source-yasnippet))
   (unbind-key "<tab>" yas-minor-mode-map))
 
 (provide 'yasnippet-init)

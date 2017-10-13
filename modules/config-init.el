@@ -33,12 +33,9 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-completion-in-buffer
-  'company
-  "Choose company or auto-complete for in-buffer completion."
-  :type '(radio
-          (const :tag "company" company)
-          (const :tag "auto-complete" auto-complete)
-          (const :tag "none" none))
+  t
+  "Choose company for in-buffer completion."
+  :type 'boolean
   :group 'dotemacs)
 
 (defcustom dotemacs-selection

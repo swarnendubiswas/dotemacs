@@ -35,11 +35,7 @@
       (push 'company-readline company-backends)
       (add-hook 'rlc-no-readline-hook
                 (lambda ()
-                  (company-mode -1))))
-
-    (when (eq dotemacs-completion-in-buffer 'auto-complete)
-      (add-to-list 'ac-modes 'shell-mode)
-      (add-hook 'shell-mode-hook #'ac-rlc-setup-sources)))
+                  (company-mode -1)))))
 
   (use-package bash-completion
     :ensure t

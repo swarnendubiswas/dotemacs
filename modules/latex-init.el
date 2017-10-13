@@ -78,29 +78,6 @@
 (use-package math-symbol-lists
   :ensure t)
 
-(when (eq dotemacs-completion-in-buffer 'auto-complete)
-  (use-package auto-complete-auctex
-    :ensure t)
-
-  (use-package ac-tex-ref
-    :load-path "extras"
-    :config
-    (setq ac-sources
-          (append '(ac-source-tex-ref ac-source-tex-cite)
-                  ac-sources)))
-
-  (use-package ac-math
-    :ensure t
-    :preface
-    (defun ac-latex-mode-setup ()
-      (setq ac-sources
-            (append '(ac-source-math-unicode ac-source-math-latex ac-source-latex-commands ac-source-auctex-labels)
-                    ac-sources)))
-    :config
-    (add-to-list 'ac-modes 'latex-mode)
-    (add-hook 'TeX-mode-hook #'ac-latex-mode-setup)
-    (setq ac-math-unicode-in-math-p t)))
-
 (when (eq dotemacs-completion-in-buffer 'company)
   (use-package company-auctex
     :ensure t

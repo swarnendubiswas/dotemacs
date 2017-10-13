@@ -22,14 +22,7 @@
   :config
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
-    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
-
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (add-hook 'emacs-lisp-mode-hook
-              (lambda ()
-                (add-to-list 'ac-sources 'ac-source-symbols)
-                (add-to-list 'ac-sources 'ac-source-variables)
-                (add-to-list 'ac-sources 'ac-source-functions)))))
+    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
 (use-package make-mode
   :init
@@ -68,22 +61,6 @@
   (use-package ac-html-angular ; Required by ac-html and company-web
     :ensure t
     :config (ac-html-angular+))
-
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package ac-html
-      :ensure t
-      :config
-      (add-to-list 'web-mode-ac-sources-alist
-                   '("html" . (ac-source-html-tag
-                               ac-source-html-attr
-                               ac-source-html-attrv))))
-
-    (use-package ac-html-bootstrap
-      :ensure t)
-
-    (use-package ac-html-csswatcher
-      :ensure t
-      :config (ac-html-csswatcher-setup)))
 
   (when (eq dotemacs-completion-in-buffer 'company)
     (use-package ac-html-csswatcher
@@ -126,11 +103,6 @@
   :defer t
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t)
-  (when (eq dotemacs-completion-in-buffer 'auto-complete)
-    (use-package auto-complete-nxml
-      :ensure t
-      :demand t
-      :config (setq auto-complete-nxml-automatic-p t)))
   (when (eq dotemacs-completion-in-buffer 'company)
     (add-hook 'nxml-mode-hook
               (lambda ()
