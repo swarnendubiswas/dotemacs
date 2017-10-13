@@ -202,6 +202,12 @@
   (use-package cmake-font-lock
     :ensure t))
 
+(use-package cmake-ide
+  :ensure t
+  :config
+  (setq cmake-ide-flags-c++ (append '("-std=c++11")))
+  (cmake-ide-setup))
+
 (use-package ini-mode
   :ensure t
   :mode ("\\.ini\\'" . ini-mode))

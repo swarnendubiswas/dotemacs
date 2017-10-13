@@ -47,7 +47,9 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
-(define-abbrev-table 'awk-mode-abbrev-table '())
+(define-abbrev-table 'awk-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'biblio-selection-mode-abbrev-table '())
 
@@ -63,9 +65,13 @@
 
 (define-abbrev-table 'bsh-script-mode-abbrev-table '())
 
-(define-abbrev-table 'c++-mode-abbrev-table '())
+(define-abbrev-table 'c++-mode-abbrev-table
+  '(
+   ))
 
-(define-abbrev-table 'c-mode-abbrev-table '())
+(define-abbrev-table 'c-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'calendar-mode-abbrev-table '())
 
@@ -215,7 +221,7 @@
     ("andt he" "and the" nil 0)
     ("andteh" "and the" nil 0)
     ("andthe" "and the" nil 0)
-    ("anlaysis" "analysis" nil 1)
+    ("anlaysis" "analysis" nil 2)
     ("anothe" "another" nil 0)
     ("anual" "annual" nil 0)
     ("apache" "Apache" nil 0)
@@ -412,6 +418,7 @@
     ("contenxt" "context" nil 1)
     ("contitions" "conditions" nil 0)
     ("contorl" "control" nil 1)
+    ("contributiosn" "contributions" nil 0)
     ("controlable" "controllable" nil 0)
     ("convertable" "convertible" nil 0)
     ("cooparate" "cooperate" nil 0)
@@ -549,7 +556,7 @@
     ("enahancements" "enhancements" nil 0)
     ("enegery" "energy" nil 1)
     ("enforece" "enforce" nil 1)
-    ("english" "English" nil 0)
+    ("english" "English" nil 2)
     ("engouh" "enough" nil 2)
     ("enought" "enough" nil 0)
     ("entree" "entree" nil 0)
@@ -626,6 +633,7 @@
     ("fromt he" "from the" nil 0)
     ("fromthe" "from the" nil 0)
     ("furneral" "funeral" nil 0)
+    ("futhremore" "furthermore" nil 0)
     ("fwe" "few" nil 1)
     ("garantee" "guarantee" nil 0)
     ("gaurd" "guard" nil 0)
@@ -1169,7 +1177,7 @@
     ("targetd" "targeted" nil 2)
     ("tath" "that" nil 0)
     ("techinical" "technical" nil 1)
-    ("techinques" "techniques" nil 2)
+    ("techinques" "techniques" nil 3)
     ("techique" "technique" nil 1)
     ("techniuqe" "technique" nil 0)
     ("techqnieu" "technique" nil 1)
@@ -1351,6 +1359,8 @@
 
 (define-abbrev-table 'image-dired-thumbnail-mode-abbrev-table '())
 
+(define-abbrev-table 'imenu-list-major-mode-abbrev-table '())
+
 (define-abbrev-table 'inferior-julia-mode-abbrev-table '())
 
 (define-abbrev-table 'inferior-python-mode-abbrev-table '())
@@ -1361,7 +1371,9 @@
 
 (define-abbrev-table 'ivy-occur-mode-abbrev-table '())
 
-(define-abbrev-table 'java-mode-abbrev-table '())
+(define-abbrev-table 'java-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'jdee-mode-abbrev-table
   '(
@@ -1437,7 +1449,9 @@
 
 (define-abbrev-table 'nroff-mode-abbrev-table '())
 
-(define-abbrev-table 'objc-mode-abbrev-table '())
+(define-abbrev-table 'objc-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'occur-edit-mode-abbrev-table '())
 
@@ -1461,7 +1475,9 @@
 
 (define-abbrev-table 'pdf-occur-buffer-mode-abbrev-table '())
 
-(define-abbrev-table 'pike-mode-abbrev-table '())
+(define-abbrev-table 'pike-mode-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'plain-tex-mode-abbrev-table '())
 
@@ -1492,6 +1508,20 @@
 (define-abbrev-table 'rst-mode-abbrev-table '())
 
 (define-abbrev-table 'rst-toc-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-dependency-tree-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-diagnostics-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-location-stack-visualize-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-preprocess-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-references-tree-mode-abbrev-table '())
+
+(define-abbrev-table 'rtags-taglist-mode-abbrev-table '())
 
 (define-abbrev-table 'rxt-help-mode-abbrev-table '())
 

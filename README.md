@@ -9,6 +9,9 @@ I use Emacs as my primary editor. Other than text and elisp editing, I use Emacs
 files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I
 think Eclipse is way better for working with Java.
 
+* Python - I use elpy and gtags (and its variants) for code completion
+* C/C++ - I use irony mode and rtags for code completion. Gtags should also work depending on preference.
+
 ## Installation
 
 You might want to backup your contents if your `.emacs.d` directory is not empty. Then, use the following command to

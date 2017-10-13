@@ -69,11 +69,6 @@
               ("C-M-j" . nil)
               ("C-c c j" . moo-jump-directory)))
 
-;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
-;; http://tuhdo.github.io/c-ide.html
-(with-eval-after-load "company"
-  (setq company-backends (delete 'company-semantic company-backends)))
-
 (use-package company-c-headers
   :ensure t
   :after (company cc-mode)
@@ -149,15 +144,18 @@
 
   (use-package company-irony
     :ensure t
-    :ensure irony
+    :after company
     :if (eq dotemacs-completion-in-buffer 'company)
     :init
     (use-package company-irony-c-headers
       :ensure t)
     :config
+    ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
+    ;; http://tuhdo.github.io/c-ide.html
+    (setq company-backends (delete 'company-semantic company-backends))
     (add-to-list 'company-backends '(company-irony-c-headers
                                      company-irony
-                                     company-gtags
+                                     ;; company-gtags
                                      company-yasnippet
                                      company-clang)))
 
@@ -185,7 +183,6 @@
   :ensure t
   :ensure flycheck
   :after flycheck
-  :after cc-mode
   :config (flycheck-clang-analyzer-setup))
 
 (use-package cuda-mode

@@ -36,10 +36,7 @@
   :if (and (eq system-type 'gnu/linux) (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none)))
   :diminish ggtags-mode
   :init
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                (ggtags-mode 1))))
+  (add-hook 'java-mode-hook #'ggtags-mode)
   (add-hook 'python-mode-hook #'ggtags-mode)
   :config
   (setq ggtags-navigation-mode-lighter nil
@@ -74,10 +71,7 @@
         helm-gtags-display-style 'detail
         helm-gtags-update-interval-second 60)
   :init
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                (helm-gtags-mode 1))))
+  (add-hook 'java-mode-hook #'helm-gtags-mode)
   (add-hook 'python-mode-hook #'helm-gtags-mode)
   :bind (:map helm-gtags-mode-map
               ("M-." . helm-gtags-dwim)
@@ -97,10 +91,7 @@
              counsel-gtags-update-tags
              counsel-gtags-dwim)
   :init
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                (counsel-gtags-mode 1))))
+  (add-hook 'java-mode-hook #'counsel-gtags-mode)
   (add-hook 'python-mode-hook #'counsel-gtags-mode)
   :config
   (setq counsel-gtags-ignore-case nil
@@ -115,12 +106,19 @@
 
 ;; https://vxlabs.com/2016/04/11/step-by-step-guide-to-c-navigation-and-completion-with-emacs-and-the-clang-based-rtags/
 
+;; c-C r [ rtags-location-stack-back Jumps to last visited tag.
+;; C-c r ] rtags-location-stack-forward Moves forward in location stack
 (use-package rtags
   :ensure t
+  :bind (:map rtags-mode-map
+              ("M-." . rtags-find-symbol-at-point)
+              ("M-," . pop-tag-mark))
   :config
   (setq rtags-completions-enabled t
         rtags-autostart-diagnostics t)
-  (rtags-enable-standard-keybindings)
+
+  (cond ((eq dotemacs-selection 'helm) (setq rtags-display-result-backend 'helm))
+        ((eq dotemacs-selection 'ivy)  (setq rtags-display-result-backend 'ivy)))
 
   (use-package ivy-rtags
     :ensure t)
@@ -128,14 +126,28 @@
   (use-package helm-rtags
     :ensure t)
 
-  (use-package company-rtags
-    :ensure t
-    :after company
-    :config (add-to-list 'company-backends 'company-rtags))
-
   (use-package flycheck-rtags
     :ensure t
-    :init (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)))
+    :disabled t
+    :preface
+    ;; https://github.com/Andersbakken/rtags/blob/7e6b6f21935eedbe4678ba91c5531ac162b51a5a/src/flycheck-rtags.el
+    (defun my-flycheck-rtags-setup ()
+      "Configure flycheck-rtags for better experience."
+      (flycheck-select-checker 'rtags)
+      (setq-local flycheck-check-syntax-automatically nil)
+      (setq-local flycheck-highlighting-mode nil)
+      (add-hook 'c-mode-hook #'my-flycheck-rtags-setup)
+      (add-hook 'c++-mode-hook #'my-flycheck-rtags-setup))
+    :init (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)))
+
+(use-package company-rtags
+  :ensure t
+  :after company
+  :init
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (if (symbolp 'company-backends)
+                  (add-to-list 'company-backends 'company-rtags)))))
 
 (provide 'tags-init)
 

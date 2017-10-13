@@ -241,7 +241,7 @@ Within the error list the following key bindings are available:
 * `g` -	Check the source buffer and update the error list (``).
 * `q` -	Quit the error list and hide its window (``).
 
-## Version system
+## Version control systems
 
 ### Git
 
@@ -269,18 +269,16 @@ Within the error list the following key bindings are available:
 * `=` - Run diff on the marked files or file at point (``).
 * `U` - Update files for currently examined repository (``).
 
-## Use Cases
+# Use Cases
 
-### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+## [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
 
-### Search for the symbol at point
+## Search for the symbol at point
 
-#### Isearch
+### Isearch
 * `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
 
-#### Swiper
+### Swiper
 * `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).
 * `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).
-
-####
 * [An example of excluding *.el from the files searched by ag](https://github.com/abo-abo/swiper/pull/774)
