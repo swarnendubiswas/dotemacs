@@ -246,6 +246,9 @@
   :ensure t
   :defer t)
 
+(use-package apt-sources-list
+  :ensure t)
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
