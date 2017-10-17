@@ -10,6 +10,7 @@
 (defvar dotemacs-mode-line-theme)
 
 (use-package semantic
+  :defer t
   :config
   (semantic-mode 1)
   (global-semanticdb-minor-mode 1)
@@ -25,6 +26,7 @@
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
 (use-package make-mode
+  :defer t
   :init
   (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
   ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
@@ -176,6 +178,7 @@
 
 (use-package cmake-ide
   :ensure t
+  :defer t
   :config
   (setq cmake-ide-flags-c++ (append '("-std=c++11")))
   (cmake-ide-setup))

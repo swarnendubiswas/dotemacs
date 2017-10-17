@@ -41,8 +41,8 @@
 (bind-key "C-x s" #'dotemacs-switch-to-scratch)
 
 (bind-keys
- ("C-+" #'text-scale-increase)
- ("C--" #'text-scale-decrease))
+ ("C-+" . #'text-scale-increase)
+ ("C--" . #'text-scale-decrease))
 
 (bind-keys
  ("C-c d b" . dotemacs-byte-compile-current-file)

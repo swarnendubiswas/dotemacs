@@ -110,6 +110,7 @@
 ;; C-c r ] rtags-location-stack-forward Moves forward in location stack
 (use-package rtags
   :ensure t
+  :defer t
   :bind (:map rtags-mode-map
               ("M-." . rtags-find-symbol-at-point)
               ("M-," . pop-tag-mark))
