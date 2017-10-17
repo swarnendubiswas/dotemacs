@@ -69,7 +69,7 @@
   :ensure t
   :after company
   :config
-  (setq company-dict-dir (concat dotemacs-temp-directory "dict/")
+  (setq company-dict-dir (concat user-emacs-directory "dict/")
         company-dict-enable-fuzzy t
         company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
