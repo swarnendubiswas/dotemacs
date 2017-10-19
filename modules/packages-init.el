@@ -81,6 +81,7 @@
   :ensure t
   :defer 5
   :config
+  (setq exec-path-from-shell-check-startup-files nil)
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 

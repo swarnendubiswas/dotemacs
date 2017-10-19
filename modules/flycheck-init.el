@@ -16,6 +16,7 @@
   (setq flycheck-emacs-lisp-load-path 'inherit
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-display-errors-delay 0.5
+        flycheck-highlighting-mode 'lines ; faster than the default
         flycheck-clang-language-standard "c++11")
   (when (eq dotemacs-mode-line-theme 'spaceline)
     (setq flycheck-mode-line nil)))

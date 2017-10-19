@@ -38,6 +38,33 @@
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
+  :preface
+  ;; http://www.wilfred.me.uk/.emacs.d/init.html
+  (defun highlight-symbol-first ()
+    "Jump to the first location of symbol at point."
+    (interactive)
+    (push-mark)
+    (eval
+     `(progn
+        (goto-char (point-min))
+        (let ((case-fold-search nil))
+          (search-forward-regexp
+           (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
+           nil t))
+        (beginning-of-thing 'symbol))))
+
+  (defun highlight-symbol-last ()
+    "Jump to the last location of symbol at point."
+    (interactive)
+    (push-mark)
+    (eval
+     `(progn
+        (goto-char (point-max))
+        (let ((case-fold-search nil))
+          (search-backward-regexp
+           (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
+           nil t)))))
+
   :config
   (add-hook 'prog-mode-hook #'highlight-symbol-mode)
   ;; Navigate occurrences of the symbol under point with M-n and M-p

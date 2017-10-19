@@ -10,6 +10,7 @@
 
 ;; A few hacks are from https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
+;; Open a file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
   :defer t
   :config

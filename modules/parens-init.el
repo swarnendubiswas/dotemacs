@@ -44,6 +44,7 @@
          ("C-M-p" . sp-previous-sexp)
          ("C-S-b" . sp-backward-symbol)
          ("C-S-f" . sp-forward-symbol)
+         ;; (foo bar) -> foo bar
          ("C-M-k" . sp-splice-sexp))
   :diminish smartparens-mode)
 

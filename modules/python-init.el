@@ -53,7 +53,12 @@
     (elpy-mode 1))
 
   :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
-  :config (add-hook 'elpy-mode-hook #'flycheck-mode)
+  :config
+  (add-hook 'elpy-mode-hook #'flycheck-mode)
+  ;; http://www.wilfred.me.uk/.emacs.d/init.html
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
 
   (use-package py-autopep8
     :ensure t

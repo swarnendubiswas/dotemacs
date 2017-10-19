@@ -58,7 +58,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'tangotango
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -68,6 +68,7 @@
           (const :tag "zenburn" zenburn)
           (const :tag "solarized-light" solarized-light)
           (const :tag "solarized-dark" solarized-dark)
+          (const :tag "tangotango" tangotango)
           (const :tag "default" default))
   :group 'dotemacs)
 

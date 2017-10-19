@@ -136,6 +136,11 @@
                                              :ensure solarized-theme
                                              :config (load-theme 'solarized-dark t)))
 
+      ((eq dotemacs-theme 'tangotango) (use-package tangotango-theme
+                                         :ensure t
+                                         :init (message "this is the tangotango theme")
+                                         :config (load-theme 'tangotango t)))
+
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"
@@ -236,6 +241,7 @@
                           :inherit 'tabbar-default
                           :background "gray95"
                           :foreground "gray20"
+                          :height 1.2
                           :box '(:line-width 3 :color "grey95" :style nil))
       ;; (set-face-attribute 'tabbar-selected nil
       ;;                 :inherit 'tabbar-default
@@ -245,7 +251,6 @@
       ;;                 :height 1.2
       ;;                 :bold t
       ;;                 :underline nil)
-
 
       (set-face-attribute 'tabbar-unselected nil
                           :inherit 'tabbar-default

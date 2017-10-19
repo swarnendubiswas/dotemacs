@@ -135,11 +135,12 @@
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
-  :config
+  :init
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
   (add-hook 'ielm-mode-hook #'eldoc-mode)
   (add-hook 'python-mode-hook #'eldoc-mode)
+  :config
   (use-package eldoc-extension
     :ensure t)
   (use-package eldoc-overlay-mode

@@ -38,18 +38,19 @@
   :ensure t
   :defer t)
 
-(when (eq dotemacs-completion-in-buffer 'company)
-  (use-package company-auctex
-    :ensure t
-    :defer t
-    :config (company-auctex-init))
+(use-package company-auctex
+  :ensure t
+  :defer t
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
+  :config (company-auctex-init))
 
-  (use-package company-math
-    :ensure t
-    :defer t
-    :config
-    (add-to-list 'company-backends
-                 '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
+(use-package company-math
+  :ensure t
+  :defer t
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
+  :config
+  (add-to-list 'company-backends
+               '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
 
 (use-package reftex
   :diminish reftex-mode
