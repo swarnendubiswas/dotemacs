@@ -31,7 +31,8 @@
   (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
       (setq imenu-list-size 0.12)
     (setq imenu-list-size 0.15))
-  (add-hook 'prog-mode-hook #'imenu-list-minor-mode)
+  (add-hook 'python-mode-hook #'imenu-list-minor-mode)
+  (add-hook 'c-mode-common-hook #'imenu-list-minor-mode)
   (add-hook 'LaTeX-mode-hook #'imenu-list-minor-mode)
   (add-hook 'bibtex-mode-hook #'imenu-list-minor-mode))
 
