@@ -147,8 +147,7 @@
   :init
   (add-hook 'c-mode-common-hook
             (lambda ()
-              (if (symbolp 'company-backends)
-                  (add-to-list 'company-backends 'company-rtags)))))
+              (add-to-list 'company-backends 'company-rtags))))
 
 (provide 'tags-init)
 

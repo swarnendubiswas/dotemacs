@@ -75,7 +75,8 @@
   :if (eq dotemacs-completion-in-buffer 'company)
   :config
   (add-to-list 'company-backends 'company-c-headers)
-  (add-to-list 'company-c-headers-path-system "/usr/include/"))
+  (when (string-equal (system-name) "consensus.ices.utexas.edu")
+    (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/x86_64-redhat-linux")))
 
 (use-package google-c-style ; Google's C/C++ style for c-mode
   :ensure t
@@ -87,6 +88,7 @@
 (use-package flycheck-google-cpplint ; Google C++ Style checker for Flycheck, also need to setup cpplint.
   :defer t
   :after flycheck
+  :disabled t
   :load-path "extras"
   :if (eq system-type 'gnu/linux)
   :config
@@ -154,15 +156,9 @@
   :ensure t
   :after cc-mode
   :init
-  (setq clang-format-style-option "{BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120}")
+  (setq clang-format-style-option "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")))
-
-(use-package flycheck-clang-analyzer
-  :ensure t
-  :ensure flycheck
-  :after flycheck
-  :config (flycheck-clang-analyzer-setup))
 
 (use-package cuda-mode
   :ensure t

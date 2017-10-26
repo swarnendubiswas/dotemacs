@@ -196,27 +196,28 @@
 
   (if (eq dotemacs-theme 'spacemacs-light)
       (progn
-        (set-face-attribute 'tabbar-unselected nil
-                            :inherit 'tabbar-unselected
-                            ;; :background "gray90"
-                            :height 0.9)
-        (set-face-attribute 'tabbar-selected nil
-                            :inherit 'tabbar-default
-                            :height 1.1
-                            :bold t
-                            :underline nil)
-        (set-face-attribute 'tabbar-separator nil
-                            :inherit 'tabbar-separator
-                            :height 1.0)
-        (set-face-attribute 'tabbar-modified nil
-                            :inherit 'tabbar-modified
-                            ;; :foreground "red"
-                            :height 0.9)
-        (set-face-attribute 'tabbar-selected-modified nil
-                            :inherit 'tabbar-selected-modified
-                            ;; :foreground "dark green"
-                            :height 1.1
-                            :bold t))
+        ;; (set-face-attribute 'tabbar-unselected nil
+        ;;                     :inherit 'tabbar-unselected
+        ;;                     ;; :background "gray90"
+        ;;                     :height 0.9)
+        ;; (set-face-attribute 'tabbar-selected nil
+        ;;                     :inherit 'tabbar-default
+        ;;                     :height 1
+        ;;                     :bold t
+        ;;                     :underline nil)
+        ;; (set-face-attribute 'tabbar-separator nil
+        ;;                     :inherit 'tabbar-separator
+        ;;                     :height 1.0)
+        ;; (set-face-attribute 'tabbar-modified nil
+        ;;                     :inherit 'tabbar-modified
+        ;;                     ;; :foreground "red"
+        ;;                     :height 0.9)
+        ;; (set-face-attribute 'tabbar-selected-modified nil
+        ;;                     :inherit 'tabbar-selected-modified
+        ;;                     ;; :foreground "dark green"
+        ;;                     :height 1.1
+        ;;                     :bold t)
+        )
     (progn
       (set-face-attribute 'tabbar-default nil
                           :inherit nil
@@ -320,20 +321,20 @@
   :if (bound-and-true-p dotemacs-use-ecb)
   :config
   (ecb-layout-define "swarna1" left nil
-		     (ecb-split-ver 0.5 t)
-		     (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
-		     (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-		     (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
-		     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-		     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-		     )
+                     (ecb-split-ver 0.5 t)
+                     (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
+                     (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+                     (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
+                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+                     )
   (setq ecb-examples-bufferinfo-buffer-name nil
-	ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
-	ecb-tip-of-the-day nil
-	ecb-tree-buffer-style 'ascii-guides
-	ecb-show-sources-in-directories-buffer 'always
-	ecb-layout-name "swarna1"
-	ecb-compile-window-height nil)
+        ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
+        ecb-tip-of-the-day nil
+        ecb-tree-buffer-style 'ascii-guides
+        ecb-show-sources-in-directories-buffer 'always
+        ecb-layout-name "swarna1"
+        ecb-compile-window-height nil)
   (ecb-activate)
   (add-hook 'compilation-finish-functions (lambda (buf strg) (kill-buffer buf))))
 
@@ -350,18 +351,18 @@
   :ensure t
   :disabled t
   :config
-  (setq treemacs-follow-after-init          t
-	treemacs-width                      35
-	treemacs-indentation                2
-	treemacs-git-integration            t
-	treemacs-collapse-dirs              3
-	treemacs-silent-refresh             t
-	treemacs-change-root-without-asking t
-	treemacs-sorting                    'alphabetic-desc
-	treemacs-show-hidden-files          t
-	treemacs-never-persist              nil
-	treemacs-is-never-other-window      nil
-	treemacs-goto-tag-strategy          'refetch-index)
+  (setq treemacs-follow-after-init t
+        treemacs-width 35
+        treemacs-indentation 2
+        treemacs-git-integration t
+        treemacs-collapse-dirs 3
+        treemacs-silent-refresh t
+        treemacs-change-root-without-asking t
+        treemacs-sorting 'alphabetic-desc
+        treemacs-show-hidden-files t
+        treemacs-never-persist nil
+        treemacs-is-never-other-window nil
+        treemacs-goto-tag-strategy 'refetch-index)
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
 
@@ -376,6 +377,9 @@
   :ensure t
   :diminish minimap-mode
   :config
+  (setq minimap-window-location 'left
+        minimap-minimum-width 10
+        minimap-width-fraction 0.08)
   (add-to-list 'minimap-major-modes 'html-mode)
   (add-to-list 'minimap-major-modes 'text-mode)
   (add-to-list 'minimap-major-modes 'latex-mode)

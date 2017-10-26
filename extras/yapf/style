@@ -1,3 +1,5 @@
 [style]
-based_on_style = google
+based_on_style = pep8
 column_limit=120
+split_before_logical_operator = false
+blank_line_before_class_docstring = false
