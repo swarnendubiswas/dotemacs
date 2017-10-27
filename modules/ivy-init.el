@@ -123,7 +123,7 @@
                     ;; fasd history
                     (if (executable-find "fasd")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
-      (ivy-read "directories:" collection :action 'dired)))
+      (ivy-read "Directories:" collection :action 'dired)))
   :bind
   (([remap describe-function] . counsel-describe-function)
    ([remap describe-variable] . counsel-describe-variable)
@@ -172,8 +172,8 @@
                                          "\\|.pyc$"
                                          "\\|.rel$"
                                          "\\|.rip$"
-                                         "\\|.synctex.gz"
-                                         "\\|.toc"))
+                                         "\\|.synctex.gz$"
+                                         "\\|.toc$"))
   (counsel-mode 1)
   :diminish counsel-mode)
 

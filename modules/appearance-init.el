@@ -196,15 +196,17 @@
 
   (if (eq dotemacs-theme 'spacemacs-light)
       (progn
-        ;; (set-face-attribute 'tabbar-unselected nil
-        ;;                     :inherit 'tabbar-unselected
-        ;;                     ;; :background "gray90"
-        ;;                     :height 0.9)
-        ;; (set-face-attribute 'tabbar-selected nil
-        ;;                     :inherit 'tabbar-default
-        ;;                     :height 1
-        ;;                     :bold t
-        ;;                     :underline nil)
+        (set-face-attribute 'tabbar-unselected nil
+                            :inherit 'tabbar-unselected
+                            ;; :background "gray90"
+                            ;; :height 0.9
+                            )
+        (set-face-attribute 'tabbar-selected nil
+                            :inherit 'tabbar-default
+                            :height 1.1
+                            ;; :bold t
+                            ;; :underline nil
+                            )
         ;; (set-face-attribute 'tabbar-separator nil
         ;;                     :inherit 'tabbar-separator
         ;;                     :height 1.0)

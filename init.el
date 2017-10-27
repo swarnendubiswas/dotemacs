@@ -47,7 +47,6 @@
 (require 'search-init)
 (require 'recentf-init)
 (require 'company-init)
-(require 'smex-init)
 (cond ((eq dotemacs-selection 'helm) (require 'helm-init))
       ((eq dotemacs-selection 'ido)  (require 'ido-init))
       ((eq dotemacs-selection 'ivy)  (require 'ivy-init)))

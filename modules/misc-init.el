@@ -249,6 +249,12 @@
 (use-package apt-sources-list
   :ensure t)
 
+(use-package amx
+  :ensure t
+  :config
+  (setq amx-save-file (concat dotemacs-temp-directory "amx-items"))
+  (amx-mode 1))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here
