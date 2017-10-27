@@ -15,6 +15,7 @@
 
 ;; This is a buffer-local variable.
 (setq-default indicate-buffer-boundaries 'right)
+(setq custom-safe-themes t)
 
 (use-package tool-bar
   :if (fboundp 'tool-bar-mode)
@@ -73,9 +74,6 @@
   :ensure t
   :disabled t
   :config (hlinum-activate))
-
-(use-package custom
-  :config (setq custom-safe-themes t))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -145,12 +143,6 @@
                                       (set-face-attribute 'region nil
                                                           :background "deep sky blue"
                                                           :foreground "white"))))
-
-(use-package display-theme
-  :ensure t
-  :disabled t ; This shrinks other segment sizes on the modeline
-  :if (not (eq dotemacs-theme 'default))
-  :config (global-display-theme-mode))
 
 ;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
 ;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
