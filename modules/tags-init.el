@@ -11,23 +11,6 @@
 (setq tags-revert-without-query t
       tags-case-fold-search nil)
 
-;; Exuberant ctags is better than etags: https://www.emacswiki.org/emacs/BuildTags
-(setq path-to-ctags "ctags") ;; <- your ctags path here
-(defun create-ctags (dir-name)
-  "Create tags file."
-  (interactive "DDirectory: ")
-  (shell-command
-   (format "%s -f TAGS -e -R %s" path-to-ctags (directory-file-name dir-name))))
-
-(defun dotemacs-create-latex-ctags () ; (dir-name))
-  "Create ctags for the current latex project."
-  (interactive)
-  (compile "find . -type f -name \"*.tex\" -print | xargs ctags -o TAGS"))
-
-(use-package ctags-update
-  :ensure t
-  :defer t)
-
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; http://tuhdo.github.io/c-ide.html

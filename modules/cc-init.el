@@ -78,31 +78,6 @@
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/x86_64-redhat-linux")))
 
-(use-package google-c-style ; Google's C/C++ style for c-mode
-  :ensure t
-  :defer t
-  :config
-  (add-hook 'c-mode-common-hook #'google-set-c-style)
-  (add-hook 'c-mode-common-hook #'google-make-newline-indent))
-
-(use-package flycheck-google-cpplint ; Google C++ Style checker for Flycheck, also need to setup cpplint.
-  :defer t
-  :after flycheck
-  :disabled t
-  :load-path "extras"
-  :if (eq system-type 'gnu/linux)
-  :config
-  (flycheck-add-next-checker 'c/c++-clang
-                             '(warning . c/c++-googlelint))
-  (setq flycheck-googlelint-linelength 'dotemacs-fill-column
-        flycheck-googlelint-filter "-whitespace/line_length"))
-
-  (use-package google-c-style ; Google's C/C++ style for c-mode
-    :ensure t
-    :config
-    (add-hook 'c-mode-common-hook #'google-set-c-style)
-    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
-
 ;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
   :ensure t
@@ -111,10 +86,8 @@
   :preface
   ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
   (defun my-irony-mode-hook ()
-    (define-key irony-mode-map [remap completion-at-point]
-      'irony-completion-at-point-async)
-    (define-key irony-mode-map [remap complete-symbol]
-      'irony-completion-at-point-async))
+    (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
+    (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async))
   :init
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
