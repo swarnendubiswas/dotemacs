@@ -63,6 +63,8 @@
         ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
                                 (read-file-name-internal . ivy--regex-ignore-order)
                                 (swiper . ivy--regex-plus)
+                                (counsel-rg . ivy--regex-plus)
+                                (counsel-grep-or-swiper . ivy--regex-plus)
                                 (ivy-switch-buffer . ivy--regex-plus)
                                 (t . ivy--regex-ignore-order))
         ivy-flx-limit 200

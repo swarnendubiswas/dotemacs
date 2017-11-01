@@ -85,6 +85,11 @@
               ("C-c C-d" . nil)
               ("C-c C-r i" . nil)))
 
+(defhydra hydra-python-indent (global-map "C-c c h")
+  "indent"
+  ("l" elpy-nav-indent-shift-left "left")
+  ("r" elpy-nav-indent-shift-right "right"))
+
 (provide 'python-init)
 
 ;;; python-init.el ends here

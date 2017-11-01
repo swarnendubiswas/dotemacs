@@ -29,26 +29,10 @@
   ;; Binds avy-flycheck-goto-error to C-c ! g
   (avy-flycheck-setup))
 
-;; Control appearance of flycheck messages
-(or (use-package flycheck-pos-tip ; Show error messages in popups
-      :ensure t
-      :after flycheck
-      :disabled t ; Hinders visibility
-      :init (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
-      :config
-      ;; Long timeouts hinder visibility
-      (setq flycheck-pos-tip-timeout 2))
-
-    (use-package flycheck-title
-      :ensure t
-      :disabled t
-      :after flycheck
-      :config (flycheck-title-mode 1))
-
-    (use-package flycheck-popup-tip
-      :ensure t
-      :after flycheck
-      :init (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode)))
+(use-package flycheck-popup-tip ; Show error messages in popups
+  :ensure t
+  :after flycheck
+  :init (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode))
 
 (provide 'flycheck-init)
 

@@ -93,13 +93,13 @@
 ;; C-c r ] rtags-location-stack-forward Moves forward in location stack
 (use-package rtags
   :ensure t
-  :defer t
-  :bind (:map rtags-mode-map
+  :bind (:map c++-mode-map
               ("M-." . rtags-find-symbol-at-point)
               ("M-," . pop-tag-mark))
-  :config
-  (setq rtags-completions-enabled t
-        rtags-autostart-diagnostics t)
+  :init
+  (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
+  (setq rtags-completions-enabled nil
+        rtags-autostart-diagnostics nil)
 
   (cond ((eq dotemacs-selection 'helm) (setq rtags-display-result-backend 'helm))
         ((eq dotemacs-selection 'ivy)  (setq rtags-display-result-backend 'ivy)))

@@ -302,7 +302,7 @@
     (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
                                                                      'default nil
                                                                      :family "Dejavu Sans Mono"
-                                                                     :height 140))
+                                                                     :height 135))
           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
                                                                         :family "Dejavu Sans Mono"
                                                                         :height 130))

@@ -123,16 +123,6 @@
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*")))
 
-(use-package golden-ratio
-  :ensure t
-  :diminish golden-ratio-mode
-  :disabled t
-  :config
-  (setq golden-ratio-auto-scale t
-        ;; https://truongtx.me/2014/11/15/auto-resize-windows-by-golden-ratio-in-emacs/
-        split-width-threshold nil)
-  (golden-ratio-mode 1))
-
 (use-package sudo-edit ; Edit file with sudo
   :ensure t
   :bind ("M-s e" . sudo-edit))
@@ -199,22 +189,6 @@
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
-  :preface
-  ;; https://www.masteringemacs.org/article/iedit-interactive-multi-occurrence-editing-in-your-buffer
-  (defun iedit-dwim (arg)
-    "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
-    (interactive "P")
-    (if arg
-        (iedit-mode)
-      (save-excursion
-        (save-restriction
-          (widen)
-          ;; this function determines the scope of `iedit-start'.
-          (if iedit-mode
-              (iedit-done)
-            ;; `current-word' can of course be replaced by other functions.
-            (narrow-to-defun)
-            (iedit-start (current-word) (point-min) (point-max)))))))
   :bind* ("C-." . iedit-mode))
 
 (use-package session

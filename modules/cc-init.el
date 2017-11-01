@@ -135,7 +135,7 @@
 
 (use-package cuda-mode
   :ensure t
-  :defer t)
+  :mode ("\\.cu\\'"	. cuda-mode))
 
 (use-package opencl-mode
   :ensure t
