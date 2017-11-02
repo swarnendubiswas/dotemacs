@@ -105,10 +105,12 @@
         ((eq dotemacs-selection 'ivy)  (setq rtags-display-result-backend 'ivy)))
 
   (use-package ivy-rtags
-    :ensure t)
+    :ensure t
+    :if (eq dotemacs-selection 'ivy))
 
   (use-package helm-rtags
-    :ensure t)
+    :ensure t
+    :if (eq dotemacs-selection 'helm))
 
   (use-package flycheck-rtags
     :ensure t
