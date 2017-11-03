@@ -95,7 +95,7 @@
   :ensure t
   :bind (:map c++-mode-map
               ("M-." . rtags-find-symbol-at-point)
-              ("M-," . pop-tag-mark))
+              ("M-," . rtags-location-stack-back))
   :init
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
   (setq rtags-completions-enabled nil
