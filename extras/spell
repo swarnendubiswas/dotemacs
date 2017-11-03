@@ -1,4 +1,4 @@
-personal_ws-1.1 en 74 
+personal_ws-1.1 en 75 
 atomicity
 indices
 roundtrip
@@ -23,8 +23,8 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-vertices
 blackbox
+vertices
 unscalable
 scalable
 programmability
@@ -64,6 +64,7 @@ Refactor
 multithreaded
 optimality
 outliers
+translational
 Translational
 reproducability
 Biswas
