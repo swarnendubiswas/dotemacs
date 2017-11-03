@@ -373,7 +373,9 @@
   :config
   (setq minimap-window-location 'left
         minimap-minimum-width 10
-        minimap-width-fraction 0.08)
+        minimap-width-fraction 0.08
+        minimap-update-delay 0.4
+        minimap-automatically-delete-window nil)
   (add-to-list 'minimap-major-modes 'html-mode)
   (add-to-list 'minimap-major-modes 'text-mode)
   (add-to-list 'minimap-major-modes 'latex-mode)

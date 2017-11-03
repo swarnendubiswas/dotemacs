@@ -25,11 +25,10 @@
 (use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
   :ensure t
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :init
+  (add-hook 'python-mode-hook #'highlight-indentation-mode)
+  (add-hook 'python-mode-hook #'highlight-indentation-current-column-mode)
   :config
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (highlight-indentation-mode 1)
-              (highlight-indentation-current-column-mode 1)))
   (set-face-background 'highlight-indentation-face "WhiteSmoke")
   (set-face-background 'highlight-indentation-current-column-face "wheat"))
 

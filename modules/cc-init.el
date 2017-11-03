@@ -30,6 +30,7 @@
                                 (awk-mode . "awk")))
 
 (use-package cc-mode
+  :defer t
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
   :config
@@ -46,7 +47,7 @@
 
 (use-package c-eldoc
   :ensure t
-  :after eldoc
+  :after (eldoc cc-mode elpy)
   :if (eq system-type 'gnu/linux)
   :init
   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
@@ -59,16 +60,17 @@
   :config
   (function-args-mode 1)
   (fa-config-default)
-  :bind (:map c++-mode-map
+  :bind (:map function-args-mode-map
+              ("C-M-k" . nil)
+              ("C-M-j" . nil)
+              :map c++-mode-map
               ("M-u" . nil)   ;; This overrides M-u
               ("C-c c s" . fa-show)
               ("C-c c u" . fa-idx-cycle-up)
               ("C-c c d" . fa-idx-cycle-down)
               ("C-c c b" . fa-jump-maybe)
               ("C-c c c" . moo-complete)
-              ("C-M-k" . nil)
               ("C-c c k" . moo-jump-local)
-              ("C-M-j" . nil)
               ("C-c c j" . moo-jump-directory)))
 
 (use-package company-c-headers
@@ -143,26 +145,29 @@
   :ensure t
   :defer t)
 
-;; (defun dotemacs--company-cc-backends ()
-;;   "Add backends for C/C++ completion in company mode"
-;;   (interactive)
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((;; Generic backends
-;;            company-files
-;;            company-keywords
-;;            company-dabbrev-code
-;;            ;; company-gtags
-;;            ;; company-semantic
-;;            company-capf
-;;            ;; C++ specific backends
-;;            company-clang
-;;            company-rtags
-;;            company-irony
-;;            company-irony-c-headers
-;;            company-cmake))))
-;; ;; push company backend
-;; (add-hook 'c++-mode-hook 'dotemacs--company-cc-backends)
+(defun dotemacs--company-cc-backends ()
+  "Add backends for C/C++ completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((;; Generic backends
+           company-files
+           company-keywords
+           company-dabbrev-code
+           ;; company-gtags
+           ;; company-semantic
+           company-capf
+           ;; C++ specific backends
+           company-clang
+           company-rtags
+           company-irony
+           company-irony-c-headers
+           company-cmake))))
+(add-hook 'c++-mode-hook 'dotemacs--company-cc-backends)
+
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (string-equal major-mode "c++-mode")
+              (clang-format-buffer))))
 
 (provide 'cc-init)
 

@@ -75,12 +75,6 @@
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package dired-icon
-  :ensure t
-  :disabled t
-  :diminish dired-icon-mode
-  :init (add-hook 'dired-mode-hook #'dired-icon-mode))
-
 (use-package dired-quick-sort
   :ensure t
   :config (dired-quick-sort-setup))

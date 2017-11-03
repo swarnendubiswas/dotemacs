@@ -55,6 +55,7 @@
 
 (use-package graphviz-dot-mode
   :ensure t
+  :defer t
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot
@@ -192,6 +193,7 @@
 
 (use-package session
   :ensure t
+  :disabled t
   :init
   (add-hook 'after-init-hook #'session-initialize)
   (setq session-save-file (concat dotemacs-temp-directory "session")))

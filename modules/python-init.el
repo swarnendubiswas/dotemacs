@@ -74,8 +74,6 @@
     :config
     (add-hook 'python-mode-hook #'python-docstring-mode))
   :bind (:map elpy-mode-map
-              ("C-c c l" . elpy-nav-indent-shift-left)
-              ("C-c c r" . elpy-nav-indent-shift-right)
               ("C-c c e" . python-nav-forward-defun)
               ("C-c c a" . python-nav-backward-defun)
               ("C-c c i" . elpy-importmagic-fixup)
@@ -85,10 +83,30 @@
               ("C-c C-d" . nil)
               ("C-c C-r i" . nil)))
 
-(defhydra hydra-python-indent (global-map "C-c c h")
+(defun dotemacs--company-python-backends ()
+  "Add backends for Python completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((;; Generic backends
+           company-files
+           company-keywords
+           company-dabbrev-code
+           company-gtags
+           company-capf
+           ;; Python specific backends
+           company-jedi
+           elpy-company-backend))))
+(add-hook 'python-mode-hook 'dotemacs--company-python-backends)
+
+(defhydra hydra-python-indent (global-map "C-c c n")
   "indent"
   ("l" elpy-nav-indent-shift-left "left")
   ("r" elpy-nav-indent-shift-right "right"))
+
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (string-equal major-mode "python-mode")
+              (elpy-format-code))))
 
 (provide 'python-init)
 
