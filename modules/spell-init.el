@@ -88,10 +88,17 @@
   :bind (:map flyspell-mode-map
               ("M-$" . helm-flyspell-correct)))
 
-(use-package flyspell-popup
-  :ensure t
-  :after flyspell
-  :bind ("C-;" . flyspell-popup-correct))
+(or
+ (use-package flyspell-popup
+   :ensure t
+   :disabled t
+   ;; :after flyspell
+   :bind ("C-;" . flyspell-popup-correct))
+
+ (use-package flyspell-correct-ivy
+   :ensure t
+   ;; :after flyspell
+   :bind ("C-;" . flyspell-correct-previous-word-generic)))
 
 (provide 'spell-init)
 

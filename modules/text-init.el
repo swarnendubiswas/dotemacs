@@ -47,6 +47,9 @@
   (use-package csv-nav
     :ensure t))
 
+(use-package json-mode
+  :ensure t)
+
 (provide 'text-init)
 
 ;;; text-init.el ends here

@@ -47,6 +47,8 @@
 
 (define-abbrev-table 'ag-mode-abbrev-table '())
 
+(define-abbrev-table 'apt-sources-list-mode-abbrev-table '())
+
 (define-abbrev-table 'awk-mode-abbrev-table
   '(
    ))
@@ -144,6 +146,8 @@
 (define-abbrev-table 'ggtags-global-mode-abbrev-table '())
 
 (define-abbrev-table 'ggtags-view-search-history-mode-abbrev-table '())
+
+(define-abbrev-table 'git-rebase-mode-abbrev-table '())
 
 (define-abbrev-table 'global-abbrev-table
   '(
@@ -797,7 +801,7 @@
     ("laslty" "Lastly" nil 1)
     ("lastyear" "last year" nil 0)
     ("learnign" "learning" nil 0)
-    ("lenght" "length" nil 0)
+    ("lenght" "length" nil 1)
     ("levle" "level" nil 0)
     ("libary" "library" nil 0)
     ("librarry" "library" nil 0)
@@ -1070,6 +1074,7 @@
     ("scedule" "schedule" nil 0)
     ("sceduled" "scheduled" nil 0)
     ("scen" "scene" nil 0)
+    ("schedulign" "scheduling" nil 0)
     ("sclaed" "scaled" nil 1)
     ("scneario" "scenario" nil 1)
     ("scol" "scowl" nil 0)
@@ -1120,7 +1125,7 @@
     ("somehting" "something" nil 0)
     ("somehwat" "somewhat" nil 1)
     ("somethign" "something" nil 0)
-    ("someting" "something" nil 0)
+    ("someting" "something" nil 1)
     ("somewaht" "somewhat" nil 0)
     ("somthing" "something" nil 0)
     ("somtimes" "sometimes" nil 0)
@@ -1493,7 +1498,9 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
 
 (define-abbrev-table 'reb-lisp-mode-abbrev-table '())
 

@@ -54,10 +54,12 @@
 
 (use-package function-args
   :ensure t
+  :after cc-mode
   :diminish function-args-mode
-  ;; :init (function-args-mode)
-  :config (fa-config-default)
-  :bind (:map function-args-mode-map
+  :config
+  (function-args-mode 1)
+  (fa-config-default)
+  :bind (:map c++-mode-map
               ("M-u" . nil)   ;; This overrides M-u
               ("C-c c s" . fa-show)
               ("C-c c u" . fa-idx-cycle-up)
@@ -140,6 +142,27 @@
 (use-package opencl-mode
   :ensure t
   :defer t)
+
+;; (defun dotemacs--company-cc-backends ()
+;;   "Add backends for C/C++ completion in company mode"
+;;   (interactive)
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((;; Generic backends
+;;            company-files
+;;            company-keywords
+;;            company-dabbrev-code
+;;            ;; company-gtags
+;;            ;; company-semantic
+;;            company-capf
+;;            ;; C++ specific backends
+;;            company-clang
+;;            company-rtags
+;;            company-irony
+;;            company-irony-c-headers
+;;            company-cmake))))
+;; ;; push company backend
+;; (add-hook 'c++-mode-hook 'dotemacs--company-cc-backends)
 
 (provide 'cc-init)
 

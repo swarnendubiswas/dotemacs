@@ -51,7 +51,7 @@
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (>= emacs-major-version 24) (>= emacs-minor-version 4)))
+  ;; :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (>= emacs-major-version 24) (>= emacs-minor-version 4)))
   :config
   (which-key-mode 1)
   (setq which-key-idle-delay 1.0
@@ -60,6 +60,9 @@
         which-key-use-C-h-commands t)
   (which-key-setup-side-window-right-bottom)
   :diminish which-key-mode)
+
+(use-package hydra
+  :ensure t)
 
 (provide 'keybindings-init)
 
