@@ -57,6 +57,11 @@
           (lambda ()
             (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
 
+(use-package fish-completion
+  :ensure t
+  :if (when (executable-find "fish"))
+  :config (global-fish-completion-mode))
+
 (provide 'shell-init)
 
 ;;; shell-init.el ends here

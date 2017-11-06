@@ -16,7 +16,6 @@
   :preface
   (defun dotemacs--quit-company-save-buffer ()
     "Quit company popup and save the buffer."
-    (interactive)
     (company-abort)
     (save-buffer))
   :init (global-company-mode 1)
@@ -24,7 +23,8 @@
   (setq company-global-modes t ; Turn on company-mode for all major modes
         company-show-numbers t ; Quick-access numbers for the first ten candidates
         company-minimum-prefix-length 3
-        company-tooltip-flip-when-above nil ; Invert the navigation direction if the completion popup is displayed on top
+        ;; Invert the navigation direction if the completion popup is displayed on top
+        company-tooltip-flip-when-above nil
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
@@ -32,7 +32,7 @@
         company-dabbrev-ignore-case nil
         company-dabbrev-code-everywhere t ; Offer completions in comments and strings
         company-dabbrev-other-buffers t
-        company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes.
+        company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes
         company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                             company-preview-frontend
                             company-echo-metadata-frontend)
@@ -47,12 +47,13 @@
   :ensure t
   :after company
   :config
-  (setq company-flx-limit 50)
+  (setq company-flx-limit 20)
   (company-flx-mode 1))
 
 (use-package company-statistics
   :ensure t
   :after company
+  :defer 2
   :config
   (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
   (company-statistics-mode 1))
@@ -60,6 +61,7 @@
 (use-package company-quickhelp
   :ensure t
   :after company
+  :defer 2
   :config
   (setq company-quickhelp-delay 0.2
         company-quickhelp-max-lines 60)
@@ -68,6 +70,7 @@
 (use-package company-dict
   :ensure t
   :after company
+  :defer 2
   :config
   (setq company-dict-dir (concat user-emacs-directory "dict/")
         company-dict-enable-fuzzy t

@@ -115,7 +115,7 @@
               :caller 'counsel-recentf))
 
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
-  (defun dotemacs-counsel-goto-recent-directory ()
+  (defun dotemacs--counsel-goto-recent-directory ()
     "Open recent directories with dired."
     (interactive)
     (unless recentf-mode (recentf-mode 1))
@@ -140,10 +140,9 @@
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap completion-at-point] . counsel-company)
    ("<f9>" . dotemacs--counsel-recentf)
-   ("C-<f9>" . dotemacs-counsel-goto-recent-directory)
+   ("C-<f9>" . dotemacs--counsel-goto-recent-directory)
    ("C-c s a" . counsel-ag)
    ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
-   ("C-c s o" . counsel-grep-or-swiper)
    ("C-c s r" . counsel-rg)
    ("<f4>" . counsel-grep-or-swiper)
    ("C-c C-m" . counsel-mark-ring)

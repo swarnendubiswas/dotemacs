@@ -42,5 +42,8 @@ default setup. Check the module for more options.
   `spaceline` and default.
 * `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
 
+## Dependencies
+
+* `aspell`, `gnu global`, `rtags`
 
 Suggestions and pull requests are welcome.

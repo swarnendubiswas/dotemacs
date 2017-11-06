@@ -23,7 +23,7 @@
   :preface
   ;; Move point to previous error, based on code by hatschipuh at http://emacs.stackexchange.com/a/14912/2017
   ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
-  (defun dotemacs-flyspell-goto-previous-error (arg)
+  (defun dotemacs--flyspell-goto-previous-error (arg)
     "Go to arg previous spelling error."
     (interactive "p")
     (while (not (= 0 arg))
@@ -61,16 +61,13 @@
               (setq arg 0))
           (forward-word)))))
   :init
-  (setq flyspell-sort-corrections t
+  (setq flyspell-sort-corrections nil
         flyspell-issue-message-flag nil)
 
   ;; This is to turn on spell check in *scratch* buffer, which is in text-mode.
   (dolist (hook '(text-mode-hook find-file-hooks))
     (add-hook hook #'turn-on-flyspell))
   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
-  ;; This is useful but SLOW
-  ;; (add-hook 'before-save-hook #'flyspell-buffer)
 
   :diminish flyspell-mode
   :bind
@@ -79,7 +76,7 @@
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ("C-," . dotemacs-flyspell-goto-previous-error)))
+   ("C-," . dotemacs--flyspell-goto-previous-error)))
 
 (use-package helm-flyspell
   :ensure t
@@ -98,6 +95,7 @@
  (use-package flyspell-correct-ivy
    :ensure t
    ;; :after flyspell
+   :if (eq dotemacs-selection 'ivy)
    :bind ("C-;" . flyspell-correct-previous-word-generic)))
 
 (provide 'spell-init)

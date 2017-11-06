@@ -57,9 +57,9 @@
   :ensure t
   :after cc-mode
   :diminish function-args-mode
-  :config
-  (function-args-mode 1)
-  (fa-config-default)
+  ;; :config
+  ;; (function-args-mode 1)
+  ;; (fa-config-default)
   :bind (:map function-args-mode-map
               ("C-M-k" . nil)
               ("C-M-j" . nil)
