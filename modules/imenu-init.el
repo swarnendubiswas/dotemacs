@@ -31,8 +31,9 @@
   (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
       (setq imenu-list-size 0.12)
     (setq imenu-list-size 0.10))
-  (add-hook 'python-mode-hook #'imenu-list-minor-mode)
-  (add-hook 'c-mode-common-hook #'imenu-list-minor-mode))
+  ;; (add-hook 'python-mode-hook #'imenu-list-minor-mode)
+  ;; (add-hook 'c-mode-common-hook #'imenu-list-minor-mode)
+  )
 
 (provide 'imenu-init)
 

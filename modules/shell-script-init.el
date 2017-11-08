@@ -36,6 +36,25 @@
   :ensure t
   :mode ("\\.fish$" . fish-mode))
 
+(defun dotemacs--company-sh-backends ()
+  "Add backends for C/C++ completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((;; Generic backends
+           company-files
+           company-keywords
+           company-dabbrev-code
+           company-capf
+           company-dict
+           company-semantic
+           company-dabbrev
+           company-dabbrev-code
+           ;; Mode-specific
+           company-tern
+           company-shell
+           company-fish-shell))))
+(add-hook 'sh-mode-hook 'dotemacs--company-sh-backends)
+
 (provide 'shell-script-init)
 
 ;;; shell-script-init.el ends here

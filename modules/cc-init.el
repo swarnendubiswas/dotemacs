@@ -57,21 +57,17 @@
   :ensure t
   :after cc-mode
   :diminish function-args-mode
-  ;; :config
-  ;; (function-args-mode 1)
-  ;; (fa-config-default)
+  :config (fa-config-default)
   :bind (:map function-args-mode-map
               ("C-M-k" . nil)
               ("C-M-j" . nil)
               :map c++-mode-map
               ("M-u" . nil)   ;; This overrides M-u
               ("C-c c s" . fa-show)
-              ("C-c c u" . fa-idx-cycle-up)
-              ("C-c c d" . fa-idx-cycle-down)
-              ("C-c c b" . fa-jump-maybe)
+              ("C-c c b" . fa-jump)
               ("C-c c c" . moo-complete)
-              ("C-c c k" . moo-jump-local)
-              ("C-c c j" . moo-jump-directory)))
+              ("C-c c l" . moo-jump-local)
+              ("C-c c d" . moo-jump-directory)))
 
 (use-package company-c-headers
   :ensure t
@@ -152,14 +148,17 @@
         '((;; Generic backends
            company-files
            company-keywords
+           company-dabbrev
            company-dabbrev-code
-           ;; company-gtags
-           ;; company-semantic
+           company-semantic
            company-capf
+           ;; company-gtags
            ;; C++ specific backends
            company-clang
+           company-cmake
            company-rtags
            company-irony
+           company-c-headers
            company-irony-c-headers
            company-cmake))))
 (add-hook 'c++-mode-hook 'dotemacs--company-cc-backends)

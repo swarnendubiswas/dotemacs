@@ -54,7 +54,7 @@
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
-        ivy-height 15 ; This seems a good number to see several options at a time without cluttering the view
+        ivy-height 20 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
@@ -180,16 +180,18 @@
 
 (use-package ivy-rich
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
+  :after ivy
   :config
   (setq ivy-rich-switch-buffer-align-virtual-buffer t
         ivy-rich-abbreviate-paths t
+        ivy-rich-path-style 'relative
         ivy-rich-switch-buffer-name-max-length 48
         ivy-rich-switch-buffer-project-max-length 32)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package ivy-historian
   :ensure t
+  :after ivy
   :config
   (use-package historian
     :ensure t
@@ -198,6 +200,7 @@
 
 (use-package ivy-dired-history
   :ensure t
+  :after ivy
   :after savehist
   :config (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
 

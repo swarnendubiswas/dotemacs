@@ -14,6 +14,7 @@
         "ede-projects.el": true,
         ".project": true,
         ".projectile": true,
-        "network-security*": true
+        "network-security*": true,
+        "semanticdb": true
     }
 }

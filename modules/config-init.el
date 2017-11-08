@@ -34,7 +34,7 @@
 
 (defcustom dotemacs-completion-in-buffer
   t
-  "Choose company for in-buffer completion."
+  "Use company for in-buffer completion."
   :type 'boolean
   :group 'dotemacs)
 
@@ -73,7 +73,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-mode-line-theme
-  'default
+  'spaceline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -110,7 +110,7 @@ differences due to whitespaces."
   :group 'dotemacs)
 
 (defcustom dotemacs-use-ignoramus-p
-  nil
+  t
   "Should the ignoramus package be used?
 The package controls ignoring boring file expressions."
   :type 'boolean
