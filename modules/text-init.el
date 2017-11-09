@@ -13,6 +13,17 @@
   :diminish writegood-mode
   :init (add-hook 'text-mode-hook #'writegood-mode))
 
+(defun dotemacs--company-text-backends ()
+  "Add backends for text completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((;; Generic backends
+           company-files
+           company-keywords
+           company-capf
+           company-dict))))
+(add-hook 'text-mode-hook #'dotemacs--company-text-backends)
+
 (use-package markdown-mode
   :ensure t
   :commands (markdown-mode gfm-mode)

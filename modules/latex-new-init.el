@@ -163,6 +163,24 @@
 ;;           (lambda ()
 ;;             (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
 
+(defun dotemacs--company-LaTeX-backends ()
+  "Add backends for LaTeX completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((;; Generic backends
+           company-files
+           company-keywords
+           company-capf
+           company-dict
+           ;; company-gtags
+           ;; LaTeX specific backends
+           company-bibtex
+           company-auctex
+           company-math-symbols-latex
+           company-latex-commands
+           company-math-symbols-unicode))))
+(add-hook 'LaTeX-mode-hook #'dotemacs--company-LaTeX-backends)
+
 (provide 'latex-new-init)
 
 ;;; latex-new-init.el ends here

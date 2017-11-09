@@ -48,7 +48,7 @@
       :after company
       :if (eq dotemacs-completion-in-buffer 'company)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
-    (add-hook 'before-save-hook #'elpy-format-code nil t)
+    (add-hook 'before-save-hook #'elpy-format-code)
     (elpy-mode 1))
 
   :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
@@ -95,7 +95,7 @@
            ;; Python specific backends
            company-jedi
            elpy-company-backend))))
-(add-hook 'python-mode-hook 'dotemacs--company-python-backends)
+(add-hook 'python-mode-hook #'dotemacs--company-python-backends)
 
 (defhydra hydra-python-indent (global-map "C-c c n")
   "indent"

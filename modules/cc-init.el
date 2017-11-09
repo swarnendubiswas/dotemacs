@@ -161,7 +161,7 @@
            company-c-headers
            company-irony-c-headers
            company-cmake))))
-(add-hook 'c++-mode-hook 'dotemacs--company-cc-backends)
+(add-hook 'c++-mode-hook #'dotemacs--company-cc-backends)
 
 (add-hook 'before-save-hook
           (lambda ()
