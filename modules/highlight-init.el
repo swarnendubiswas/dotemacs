@@ -82,23 +82,12 @@
   (add-hook 'prog-mode-hook #'fic-mode)
   :config
   (add-to-list 'fic-highlighted-words '"XXX")
-  (add-to-list 'fic-highlighted-words '"LATER"))
-
-(use-package volatile-highlights
-  :ensure t
-  :disabled t
-  :diminish volatile-highlights-mode
-  :config (add-hook 'text-mode-hook #'volatile-highlights-mode))
-
-(use-package highlight-tail
-  :ensure t
-  :disabled t
-  :diminish highlight-tail-mode
-  :config (highlight-tail-mode 1))
+  (add-to-list 'fic-highlighted-words '"LATER")
+  (add-to-list 'fic-highlighted-words '"IMP")
+  (add-to-list 'fic-highlighted-words '"NOTE"))
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
-  :disabled t
   :config (beacon-mode 1)
   :diminish beacon-mode)
 

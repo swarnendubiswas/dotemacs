@@ -96,7 +96,9 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper`
   `thing-at-point`).
 
-## Ido
+## Completion
+
+### Ido
 
 * `C-j` - Use the current input string verbatim (`ido-select-text`). Create a new buffer rather than switching to an existing buffer.
 * `//` - Go to the root directory (``).
@@ -105,7 +107,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-d` - Enter Dired for this directory (``).
 * `M-p` and `M-n` (or `M-UP` and `M-DOWN`) - Change to previous/next directories from history (``).
 
-## Ivy
+### Ivy
 
 * `M-o` - Execute an available action (`ivy-dispatching-done`).
 * `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`).
@@ -127,7 +129,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 Specify extra flags to the search commands with `C-u` (`universal-argument`) before the command.
 
-## Helm
+### Helm
 
 * `C-SPC` - Mark buffer (`helm-toggle-visible-mark`).
 * `M-a` - Select all buffers (``.)
@@ -195,6 +197,11 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-s p` - Insert pre-formatted code blocks (``).
 * `C-c -` - Insert a horizontal rule (``).
 
+## JSON
+
+* `C-c C-f` - Format the region/buffer (`json-reformat-region`).
+* `C-c C-p` - Display a path to the object at point (`json-mode-show-path`).
+
 ## GGtags/Helm Gtags/Counsel Gtags
 
 See the requirements: [https://github.com/leoliu/ggtags][]
@@ -226,6 +233,13 @@ See the requirements: [https://github.com/leoliu/ggtags][]
 * `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 * `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`).
 * `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`).
+
+### C/C++
+
+#### RTags
+
+* `M-.` - Jump to tag underneath cursor (``).
+* `M-,` - Pop stack location (``).
 
 ## Flycheck
 
@@ -276,9 +290,11 @@ Within the error list the following key bindings are available:
 ## Search for the symbol at point
 
 ### Isearch
+
 * `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
 
 ### Swiper
+
 * `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).
 * `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).
 * [An example of excluding *.el from the files searched by ag](https://github.com/abo-abo/swiper/pull/774)

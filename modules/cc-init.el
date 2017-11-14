@@ -55,6 +55,7 @@
 
 (use-package function-args
   :ensure t
+  :disabled t
   :after cc-mode
   :diminish function-args-mode
   :config (fa-config-default)

@@ -43,10 +43,10 @@
               ;; Disabling this is one way to speed up Emacs with buffers with long lines
               bidi-display-reordering nil)
 
-(when (>= emacs-major-version 24)
-  ;; This is effective to turn off "Writing .." messages, but then it would disable other useful information from eldoc
-  ;; and Flycheck.
-  (setq inhibit-message nil))
+;; (when (>= emacs-major-version 24)
+;;   ;; This is effective to turn off "Writing .." messages, but then it would disable other useful information from eldoc
+;;   ;; and Flycheck.
+;;   (setq inhibit-message nil))
 
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
@@ -81,11 +81,9 @@
   (prefer-coding-system 'utf-8)
   (set-input-method nil)
 
-  (use-package mule
-    :config
-    (set-terminal-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8)
-    (set-selection-coding-system 'utf-8)))
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8))
 
 (use-package files
   :config
@@ -109,16 +107,6 @@
 
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
-
-(use-package mouse
-  :disabled t
-  :config
-  ;; Text selected with the mouse is automatically copied to the clipboard.
-  (setq mouse-drag-copy-region t))
-
-(use-package xt-mouse ; Mouse cursor in terminal mode
-  :disabled t
-  :config (xterm-mouse-mode -1))
 
 (use-package menu-bar
   :config (next-error-follow-minor-mode 1))
@@ -164,13 +152,6 @@
     (advice-add 'capitalize-word :before #'goto-beginning-of-word)
     (advice-add 'downcase-word :before #'goto-beginning-of-word)
     (advice-add 'upcase-word :before #'goto-beginning-of-word)))
-
-(use-package desktop
-  :disabled t
-  :config
-  (desktop-save-mode -1)
-  (setq-default desktop-restore-frames nil ; No need to restore frames
-                desktop-load-locked-desktop nil))
 
 (use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
   :config (global-font-lock-mode 1))
