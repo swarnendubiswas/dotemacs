@@ -8,9 +8,6 @@
 (defvar dotemacs-selection)
 (defvar dotemacs-completion-in-buffer)
 
-(setq tags-revert-without-query t
-      tags-case-fold-search nil)
-
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
 ;; http://tuhdo.github.io/c-ide.html
@@ -88,7 +85,6 @@
               ("C-c g u" . counsel-gtags-update-tags)))
 
 ;; https://vxlabs.com/2016/04/11/step-by-step-guide-to-c-navigation-and-completion-with-emacs-and-the-clang-based-rtags/
-
 ;; c-C r [ rtags-location-stack-back Jumps to last visited tag.
 ;; C-c r ] rtags-location-stack-forward Moves forward in location stack
 (use-package rtags
@@ -98,8 +94,10 @@
               ("M-," . rtags-location-stack-back))
   :init
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
-  (setq rtags-completions-enabled nil
-        rtags-autostart-diagnostics nil)
+  (setq rtags-completions-enabled t
+        rtags-find-file-case-insensitive t
+        rtags-find-file-prefer-exact-match nil
+        rtags-autostart-diagnostics t)
 
   (cond ((eq dotemacs-selection 'helm) (setq rtags-display-result-backend 'helm))
         ((eq dotemacs-selection 'ivy)  (setq rtags-display-result-backend 'ivy)))

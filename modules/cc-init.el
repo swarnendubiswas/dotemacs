@@ -47,7 +47,7 @@
 
 (use-package c-eldoc
   :ensure t
-  :after (eldoc cc-mode elpy)
+  :after (eldoc cc-mode)
   :if (eq system-type 'gnu/linux)
   :init
   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
@@ -73,8 +73,9 @@
 (use-package company-c-headers
   :ensure t
   :after (company cc-mode)
-  :if (eq dotemacs-completion-in-buffer 'company)
+  :if (eq dotemacs-completion-in-buffer t)
   :config
+  (message "Okay here I am this is me")
   (add-to-list 'company-backends 'company-c-headers)
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/x86_64-redhat-linux")))
@@ -100,10 +101,11 @@
   (use-package company-irony
     :ensure t
     :after company
-    :if (eq dotemacs-completion-in-buffer 'company)
+    :if (bound-and-true-p dotemacs-completion-in-buffer)
     :init
     (use-package company-irony-c-headers
-      :ensure t)
+      :ensure t
+      :after irony)
     :config
     ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
     ;; http://tuhdo.github.io/c-ide.html
@@ -151,16 +153,15 @@
            company-keywords
            company-dabbrev
            company-dabbrev-code
-           company-semantic
+           ;;  company-semantic
            company-capf
            ;; company-gtags
            ;; C++ specific backends
            company-clang
-           company-cmake
            company-rtags
-           company-irony
            company-c-headers
            company-irony-c-headers
+           company-irony
            company-cmake))))
 (add-hook 'c++-mode-hook #'dotemacs--company-cc-backends)
 

@@ -78,7 +78,7 @@
 (use-package math-symbol-lists
   :ensure t)
 
-(when (eq dotemacs-completion-in-buffer 'company)
+(when (bound-and-true-p dotemacs-completion-in-buffer)
   (use-package company-auctex
     :ensure t
     :config (company-auctex-init))
@@ -199,7 +199,7 @@
 
 (use-package company-bibtex
   :ensure t
-  :if (eq dotemacs-completion-in-buffer 'company)
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :init
   (add-to-list 'company-backends 'company-bibtex)
   (setq company-bibtex-bibliography '("~/plass-workspace/bib/plass-formatted.bib"

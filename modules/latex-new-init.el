@@ -125,7 +125,7 @@
 (use-package company-bibtex
   :ensure t
   :defer t
-  :if (eq dotemacs-completion-in-buffer 'company)
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :init (add-to-list 'company-backends 'company-bibtex))
 
 ;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/

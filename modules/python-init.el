@@ -46,7 +46,7 @@
       :ensure t
       :ensure company
       :after company
-      :if (eq dotemacs-completion-in-buffer 'company)
+      :if (bound-and-true-p dotemacs-completion-in-buffer)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
     (add-hook 'before-save-hook #'elpy-format-code)
     (elpy-mode 1))

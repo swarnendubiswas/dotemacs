@@ -31,7 +31,7 @@
   (use-package readline-complete
     :ensure t
     :config
-    (when (eq dotemacs-completion-in-buffer 'company)
+    (when (bound-and-true-p dotemacs-completion-in-buffer)
       (push 'company-readline company-backends)
       (add-hook 'rlc-no-readline-hook
                 (lambda ()

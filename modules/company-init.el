@@ -79,7 +79,7 @@
 
 (use-package helm-company
   :ensure t
-  :if (and (eq dotemacs-selection 'helm) (eq dotemacs-completion-in-buffer 'company))
+  :if (and (eq dotemacs-selection 'helm) (bound-and-true-p dotemacs-completion-in-buffer))
   :after company
   :bind (:map company-mode-map
               ([remap complete-symbol] . helm-company)
@@ -88,7 +88,7 @@
               :map company-active-map
               ("C-:" . helm-company)))
 
-(when (and (eq dotemacs-selection 'ivy) (eq dotemacs-completion-in-buffer 'company))
+(when (and (eq dotemacs-selection 'ivy) (bound-and-true-p dotemacs-completion-in-buffer))
   (with-eval-after-load "counsel"
     (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
     (bind-key [remap completion-at-point] #'counsel-company company-mode-map)

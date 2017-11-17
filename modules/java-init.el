@@ -55,7 +55,7 @@
   :config
   (use-package company-emacs-eclim
     :ensure t
-    :if (eq dotemacs-completion-in-buffer 'company)
+    :if (bound-and-true-p dotemacs-completion-in-buffer)
     :config (company-emacs-eclim-setup)))
 
 (provide 'java-init)

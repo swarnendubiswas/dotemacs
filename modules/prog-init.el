@@ -64,7 +64,7 @@
     :ensure t
     :config (ac-html-angular+))
 
-  (when (eq dotemacs-completion-in-buffer 'company)
+  (when (bound-and-true-p dotemacs-completion-in-buffer)
     (use-package ac-html-csswatcher
       :ensure t
       :config (company-web-csswatcher-setup))
@@ -105,7 +105,7 @@
   :defer t
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t)
-  (when (eq dotemacs-completion-in-buffer 'company)
+  (when (bound-and-true-p dotemacs-completion-in-buffer)
     (add-hook 'nxml-mode-hook
               (lambda ()
                 (add-to-list (make-local-variable 'company-backends)

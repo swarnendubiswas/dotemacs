@@ -19,18 +19,12 @@
 
   (use-package company-shell
     :ensure t
-    :if (eq dotemacs-completion-in-buffer 'company)
+    :if (bound-and-true-p dotemacs-completion-in-buffer)
     :after company
     :config
     (setq company-shell-delete-duplicates t)
     (add-to-list 'company-backends 'company-shell)
-    (add-to-list 'company-backends 'company-fish-shell))
-
-  (use-package company-tern
-    :ensure t
-    :if (eq dotemacs-completion-in-buffer 'company)
-    :after company
-    :config (add-to-list 'company-backends 'company-tern)))
+    (add-to-list 'company-backends 'company-fish-shell)))
 
 (use-package fish-mode
   :ensure t
@@ -50,7 +44,6 @@
            company-dabbrev
            company-dabbrev-code
            ;; Mode-specific
-           company-tern
            company-shell
            company-fish-shell))))
 (add-hook 'sh-mode-hook 'dotemacs--company-sh-backends)
