@@ -22,6 +22,7 @@
 ;; http://nilsdeppe.com/posts/emacs-c++-ide
 
 (defvar dotemacs-completion-in-buffer)
+(defvar dotemacs-temp-directory)
 
 (setq-default c-default-style '((java-mode . "java")
                                 (c++-mode . "stroustrup")
@@ -91,6 +92,7 @@
     (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async))
   :init
+  (set irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
   :config

@@ -39,7 +39,7 @@
            company-keywords
            company-dabbrev-code
            company-capf
-           company-dict
+           ;; company-dict
            company-semantic
            company-dabbrev
            company-dabbrev-code

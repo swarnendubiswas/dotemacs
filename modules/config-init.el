@@ -42,7 +42,6 @@
   'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
-          (const :tag "helm" helm)
           (const :tag "ido" ido)
           (const :tag "ivy" ivy)
           (const :tag "none" none))

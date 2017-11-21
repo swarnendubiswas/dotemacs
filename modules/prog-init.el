@@ -10,7 +10,9 @@
 (defvar dotemacs-mode-line-theme)
 
 (use-package semantic
-  :defer t
+  :init
+  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
+  (add-hook 'prog-mode-hook #'semantic-mode)
   :config
   (semantic-mode 1)
   (global-semanticdb-minor-mode 1)
@@ -64,19 +66,15 @@
     :ensure t
     :config (ac-html-angular+))
 
-  (when (bound-and-true-p dotemacs-completion-in-buffer)
-    (use-package ac-html-csswatcher
-      :ensure t
-      :config (company-web-csswatcher-setup))
-
-    (use-package company-web
-      :ensure t
-      :preface
-      (defun dotemacs-company-web--setup ()
-        (setq-local company-backends
-                    (append '(company-web-html)
-                            company-backends)))
-      :config (add-hook 'web-mode-hook #'dotemacs-company-web--setup)))
+  (use-package company-web
+    :ensure t
+    :if (bound-and-true-p dotemacs-completion-in-buffer)
+    :preface
+    (defun dotemacs-company-web--setup ()
+      (setq-local company-backends
+                  (append '(company-web-html)
+                          company-backends)))
+    :config (add-hook 'web-mode-hook #'dotemacs-company-web--setup))
 
   (use-package web-beautify
     :ensure t
@@ -113,8 +111,7 @@
 
 (use-package which-func ; Show the name of the function in the modeline
   :after prog-mode
-  :init
-  (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
+  :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :config
   (which-function-mode 1)
   (when (eq dotemacs-mode-line-theme 'sml)

@@ -31,7 +31,8 @@
       ;; Ignore case when reading a file name completion
       read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t
-      switch-to-buffer-preserve-window-point t)
+      switch-to-buffer-preserve-window-point t
+      auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save"))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
                                         ; fundamental-mode
