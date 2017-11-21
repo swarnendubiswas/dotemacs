@@ -77,17 +77,6 @@
         company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
 
-(use-package helm-company
-  :ensure t
-  :if (and (eq dotemacs-selection 'helm) (bound-and-true-p dotemacs-completion-in-buffer))
-  :after company
-  :bind (:map company-mode-map
-              ([remap complete-symbol] . helm-company)
-              ([remap completion-at-point] . helm-company)
-              ("C-:" . helm-company)
-              :map company-active-map
-              ("C-:" . helm-company)))
-
 (when (and (eq dotemacs-selection 'ivy) (bound-and-true-p dotemacs-completion-in-buffer))
   (with-eval-after-load "counsel"
     (bind-key [remap complete-symbol] #'counsel-company company-mode-map)

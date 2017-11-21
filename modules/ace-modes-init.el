@@ -54,12 +54,6 @@
   (("<f4>" . ace-jump-buffer)
    ("M-B" . ace-jump-buffer-with-configuration)))
 
-(use-package ace-jump-helm-line ; Jump in helm buffers
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :bind (:map helm-map
-              ("C-;" . ace-jump-helm-line)))
-
 (use-package ace-window
   :ensure t
   :bind ("C-c w" . ace-window)

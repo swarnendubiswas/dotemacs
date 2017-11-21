@@ -68,12 +68,6 @@
   (setq swiper-use-visual-line t
         swiper-action-recenter t))
 
-(use-package swiper-helm
-  :ensure t
-  :after swiper helm
-  :if (eq dotemacs-selection 'helm)
-  :bind ("<f4>" . swiper-helm))
-
 (use-package ag
   :ensure t
   :defer t
@@ -81,16 +75,6 @@
   (setq ag-reuse-buffers t
         ag-reuse-window t
         ag-highlight-search t))
-
-(use-package helm-ag
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :after ag helm
-  :bind ("C-c s a" . helm-ag)
-  :config
-  (setq helm-ag-fuzzy-match t
-        helm-ag-insert-at-point 'symbol
-        helm-ag-source-type 'file-line))
 
 (use-package wgrep
   :ensure t

@@ -100,21 +100,12 @@
   :defer t)
 
 (use-package bibtex-completion
-  :if (or (eq dotemacs-selection 'helm) (eq dotemacs-selection 'ivy))
+  :if (eq dotemacs-selection 'ivy)
   :defer t
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t
         bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
-
-(use-package helm-bibtex
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :bind ("C-c l x" . helm-bibtex)
-  :config
-  (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
-  (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
-  (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
   :ensure t

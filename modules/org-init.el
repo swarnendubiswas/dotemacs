@@ -53,10 +53,6 @@
   (add-hook 'org-mode-hook #'org-toggle-blocks)
   (add-hook 'org-mode-hook #'which-function-mode)
 
-  (use-package helm-org
-    :if (eq dotemacs-selection 'helm)
-    :config (setq helm-org-headings-fontify t))
-
   (use-package ox-latex
     :config
     ;; include the listings package

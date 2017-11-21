@@ -13,25 +13,20 @@
         kill-do-not-save-duplicates t
         set-mark-command-repeat-pop t))
 
-(or (use-package helm-ring
-      :if (eq dotemacs-selection 'helm)
-      :bind ([remap yank-pop] . helm-show-kill-ring)
-      :config (helm-push-mark-mode 1))
-
-    (use-package browse-kill-ring
-      :ensure t
-      :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
-      :commands browse-kill-ring
-      :config
-      (require 'popwin-browse-kill-ring)
-      (setq browse-kill-ring-highlight-current-entry t
-            browse-kill-ring-highlight-inserted-item t
-            browse-kill-ring-show-preview t
-            browse-kill-ring-display-duplicates t)
-      ;; Binds "M-y" to browse-kill-ring
-      (browse-kill-ring-default-keybindings)
-      (use-package browse-kill-ring+
-        :ensure t)))
+(use-package browse-kill-ring
+  :ensure t
+  :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+  :commands browse-kill-ring
+  :config
+  (require 'popwin-browse-kill-ring)
+  (setq browse-kill-ring-highlight-current-entry t
+        browse-kill-ring-highlight-inserted-item t
+        browse-kill-ring-show-preview t
+        browse-kill-ring-display-duplicates t)
+  ;; Binds "M-y" to browse-kill-ring
+  (browse-kill-ring-default-keybindings)
+  (use-package browse-kill-ring+
+    :ensure t))
 
 (provide 'kill-ring-init)
 

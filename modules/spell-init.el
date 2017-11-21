@@ -78,13 +78,6 @@
    ("C-;" . nil)
    ("C-," . dotemacs--flyspell-goto-previous-error)))
 
-(use-package helm-flyspell
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :after flyspell
-  :bind (:map flyspell-mode-map
-              ("M-$" . helm-flyspell-correct)))
-
 (or
  (use-package flyspell-popup
    :ensure t

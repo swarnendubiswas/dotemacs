@@ -8,7 +8,6 @@
 (defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-selection)
 (defvar prettify-symbols-unprettify-at-point)
-(defvar helm-bibtex-full-frame)
 
 (put 'TeX-narrow-to-group 'disabled nil)
 (put 'LaTeX-narrow-to-environment 'disabled nil)
@@ -174,22 +173,12 @@
   :ensure t)
 
 (use-package bibtex-completion
-  :if (or (eq dotemacs-selection 'helm) (eq dotemacs-selection 'ivy))
+  :if (eq dotemacs-selection 'ivy)
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t)
   (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-
                                          "~/iss-workspace/papers/approximate-bib/paper.bib")))
-
-(use-package helm-bibtex
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :bind ("C-c l x" . helm-bibtex)
-  :config
-  (helm-delete-action-from-source "Insert BibTeX key" helm-source-bibtex)
-  (helm-add-action-to-source "Insert BibTeX key" 'bibtex-completion-insert-key helm-source-bibtex 0)
-  (setq helm-bibtex-full-frame t))
 
 (use-package ivy-bibtex
   :ensure t

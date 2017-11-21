@@ -31,34 +31,6 @@
               ("M-." . ggtags-find-tag-dwim)
               ("M-," . pop-tag-mark)))
 
-;; http://wikemacs.org/wiki/C-ide
-;; http://tuhdo.github.io/c-ide.html
-;; Use M-n to move to next candidate and M-p to move back previous candidate. Use "M-g s" to invoke Isearch on candidate
-;; buffer list.
-(use-package helm-gtags
-  :ensure t
-  :diminish helm-gtags-mode
-  :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'helm))
-  :config
-  (setq helm-gtags-ignore-case nil
-        helm-gtags-auto-update t
-        helm-gtags-use-input-at-cursor t
-        helm-gtags-pulse-at-cursor t
-        helm-gtags-suggested-key-mapping t
-        helm-gtags-fuzzy-match t
-        helm-gtags-maximum-candidates 1000
-        helm-gtags-cache-select-result t
-        helm-gtags-display-style 'detail
-        helm-gtags-update-interval-second 60)
-  :init
-  (add-hook 'java-mode-hook #'helm-gtags-mode)
-  (add-hook 'python-mode-hook #'helm-gtags-mode)
-  :bind (:map helm-gtags-mode-map
-              ("M-." . helm-gtags-dwim)
-              ("M-," . helm-gtags-pop-stack)
-              ("M-'" . helm-gtags-select)
-              ("M-t" . helm-gtags-find-tag)))
-
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'ivy))
@@ -99,16 +71,12 @@
         rtags-find-file-prefer-exact-match nil
         rtags-autostart-diagnostics t)
 
-  (cond ((eq dotemacs-selection 'helm) (setq rtags-display-result-backend 'helm))
-        ((eq dotemacs-selection 'ivy)  (setq rtags-display-result-backend 'ivy)))
+  (when (eq dotemacs-selection 'ivy)
+    (setq rtags-display-result-backend 'ivy))
 
   (use-package ivy-rtags
     :ensure t
     :if (eq dotemacs-selection 'ivy))
-
-  (use-package helm-rtags
-    :ensure t
-    :if (eq dotemacs-selection 'helm))
 
   (use-package flycheck-rtags
     :ensure t

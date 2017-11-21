@@ -93,10 +93,6 @@
   (setq popwin:popup-window-height 20
         popwin:close-popup-window-timer-interval 0.5)
 
-  ;; Disable this if we are opening helm buffers on the right
-  (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
-  (push '("^\*helm-.+\*$" :regexp t) popwin:special-display-config)
-
   ;; Helm buffers include the "help" string
   (push '("*Help*" :noselect t) popwin:special-display-config)
 

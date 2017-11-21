@@ -23,8 +23,7 @@
         projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
         projectile-mode-line nil)
 
-  (cond ((eq dotemacs-selection 'helm) (setq projectile-completion-system 'helm))
-        ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
+  (cond ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
         ((eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy)))
 
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
@@ -62,19 +61,6 @@
     (bind-key "<f7>" #'projectile-switch-to-buffer)
     ;; projectile-grep fails with fish shell
     (bind-key "<f8>" #'projectile-ag)))
-
-(use-package helm-projectile
-  :ensure t
-  :if (eq dotemacs-selection 'helm)
-  :config
-  (setq helm-projectile-fuzzy-match t
-        projectile-switch-project-action #'helm-projectile-find-file-dwim)
-  (helm-projectile-on)
-  :bind (("<f5>" . helm-projectile-switch-project)
-         ("<f6>" . helm-projectile-find-file)
-         ("<f7>" . helm-projectile-switch-to-buffer)
-         ;; helm grep is different from projectile-grep because helm grep is incremental
-         ("<f8>" . helm-projectile-ag)))
 
 (use-package counsel-projectile
   :ensure t

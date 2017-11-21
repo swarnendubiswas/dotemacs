@@ -91,12 +91,6 @@
                                       (set-face-attribute 'region nil
                                                           :background "LemonChiffon"
                                                           :foreground "black")
-                                      (with-eval-after-load "helm"
-                                        (set-face-attribute 'helm-selection nil
-                                                            :underline nil))
-                                      (with-eval-after-load "helm-buffers"
-                                        (set-face-attribute 'helm-buffer-file nil
-                                                            :foreground "black"))
                                       (set-face-attribute 'mode-line nil
                                                           :background "grey88"
                                                           :foreground "black"
