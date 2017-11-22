@@ -150,21 +150,24 @@
   "Add backends for C/C++ completion in company mode."
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((;; Generic backends
-           company-files
-           company-keywords
-           company-dabbrev
-           company-dabbrev-code
-           ;;  company-semantic
-           company-capf
-           ;; company-gtags
+        '((
            ;; C++ specific backends
-           company-clang
-           company-rtags
-           company-c-headers
-           company-irony-c-headers
-           company-irony
-           company-cmake))))
+           (company-clang
+            company-rtags
+            company-irony
+            company-cmake)
+           (company-c-headers
+            company-irony-c-headers)
+           ;; Generic backends
+           (company-files)
+           (company-keywords
+            company-dabbrev
+            company-dabbrev-code
+            company-capf)
+
+           ;;  company-semantic
+           ;; company-gtags
+           ))))
 (add-hook 'c++-mode-hook #'dotemacs--company-cc-backends)
 
 (add-hook 'before-save-hook

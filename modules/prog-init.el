@@ -18,7 +18,8 @@
   (semantic-mode 1)
   (global-semanticdb-minor-mode 1)
   (global-semantic-idle-summary-mode 1)
-  (global-semantic-idle-completions-mode 1)
+  ;;https://emacs.stackexchange.com/questions/32268/can-semantic-and-company-coexist
+  ;; (global-semantic-idle-completions-mode 1)
   (global-semantic-highlight-func-mode 1))
 
 (use-package prog-mode

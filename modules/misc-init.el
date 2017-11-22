@@ -104,7 +104,7 @@
   (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
-  (push '("*undo-tree*" :width 0.3 :position right) popwin:special-display-config)
+  (push '("*undo-tree\*" :width 0.3 :position right) popwin:special-display-config)
   (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
   (push '("*Selection Ring:") popwin:special-display-config)
   (push '("*ag search*" :noselect nil) popwin:special-display-config)
