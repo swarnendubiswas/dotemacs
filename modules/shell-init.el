@@ -45,12 +45,6 @@
   (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
   (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
 
-(use-package term
-  :disabled t
-  :config
-  (use-package term+
-    :ensure t))
-
 ;; Avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating an inferior python
 ;; process and aspell
 (add-hook 'comint-exec-hook

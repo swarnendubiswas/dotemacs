@@ -64,7 +64,7 @@
   :bind (:map c++-mode-map
               ("M-." . rtags-find-symbol-at-point)
               ("M-," . rtags-location-stack-back))
-  :init
+  :config
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
   (setq rtags-completions-enabled t
         rtags-find-file-case-insensitive t

@@ -10,6 +10,7 @@
 (defvar dotemacs-mode-line-theme)
 
 (use-package semantic
+  :defer 5
   :init
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   (add-hook 'prog-mode-hook #'semantic-mode)
@@ -120,7 +121,7 @@
                         :weight 'light))
   (when (or (eq dotemacs-mode-line-theme 'powerline) (eq dotemacs-mode-line-theme 'spaceline))
     (set-face-attribute 'which-func nil
-                        :foreground "white"
+                        ;; :foreground "white"
                         :weight 'light)))
 
 (use-package electric

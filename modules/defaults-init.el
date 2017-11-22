@@ -109,9 +109,6 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
-(use-package menu-bar
-  :config (next-error-follow-minor-mode 1))
-
 (use-package simple
   :config
   (setq idle-update-delay 2
@@ -124,6 +121,7 @@
         blink-matching-paren t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
+  (next-error-follow-minor-mode 1)
   (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
   :bind ("C-c d f" . auto-fill-mode))
 
@@ -153,31 +151,6 @@
     (advice-add 'capitalize-word :before #'goto-beginning-of-word)
     (advice-add 'downcase-word :before #'goto-beginning-of-word)
     (advice-add 'upcase-word :before #'goto-beginning-of-word)))
-
-(use-package font-core ; Turn on syntax coloring, on by default since Emacs 22
-  :config (global-font-lock-mode 1))
-
-(use-package font-lock
-  :disabled t
-  :config
-  (setq font-lock-maximum-decoration t ; Maximum fontification possible
-        ;; Jit locking is better than fast-lock and lazy-lock
-        font-lock-support-mode 'jit-lock-mode))
-
-(use-package jit-lock ; Improve scrolling speed with jit fontification
-  :disabled t
-  :config
-  (setq jit-lock-defer-time 0.10
-        jit-lock-stealth-time 10
-        jit-lock-defer-contextually t
-        jit-lock-stealth-nice 0.5))
-
-(use-package hi-lock ; Custom regexp highlights
-  :disabled t
-  :config
-  (setq hi-lock-auto-select-face t)
-  (global-hi-lock-mode 1)
-  :diminish hi-lock-mode)
 
 (use-package saveplace ; Remember cursor position in files
   :config

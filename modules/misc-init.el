@@ -197,6 +197,7 @@
 
 (use-package persistent-scratch
   :ensure t
+  :defer 5
   :config
   (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
   ;; Enable both autosave and restore on startup
@@ -219,13 +220,18 @@
   :defer t)
 
 (use-package apt-sources-list
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package amx
   :ensure t
+  :commands (amx amx-mode)
   :config
   (setq amx-save-file (concat dotemacs-temp-directory "amx-items"))
-  (amx-mode 1))
+  (amx-mode 1)
+  :bind*
+  (([remap execute-extended-command] . amx)
+   ("<f1>" . amx)))
 
 (provide 'misc-init)
 

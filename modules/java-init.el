@@ -14,7 +14,8 @@
                           c-set-style "java")))
 
 (use-package ant
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
   :ensure t

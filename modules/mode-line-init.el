@@ -53,6 +53,7 @@
 
       ((eq dotemacs-mode-line-theme 'spaceline) (use-package spaceline
                                                   :ensure t
+                                                  :defer 5
                                                   :config
                                                   (require 'spaceline-config)
                                                   (setq powerline-height 20

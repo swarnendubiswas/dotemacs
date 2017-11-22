@@ -99,10 +99,19 @@
    ("M-y" . ivy-next-line))
   :diminish ivy-mode)
 
+(use-package smex
+  :ensure t
+  :if (eq dotemacs-selection 'ivy)
+  :config
+  (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
+        smex-auto-update t)
+  (smex-initialize))
+
 (use-package counsel
   :ensure t
   :ensure ivy
   :after ivy
+  :ensure smex
   :preface
   (defun dotemacs--counsel-recentf ()
     "Find a file on `recentf-list' and abbreviate the home directory."
@@ -131,8 +140,9 @@
    ([remap describe-variable] . counsel-describe-variable)
    ([remap yank-pop] . counsel-yank-pop)
    ([remap describe-bindings] . counsel-descbinds)
-   ([remap execute-extended-command] . counsel-M-x)
-   ("<f1>" . counsel-M-x)
+   ;; counsel-M-x uses smex, I use amx
+   ;; ([remap execute-extended-command] . counsel-M-x)
+   ;; ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
    ([remap load-theme] . counsel-load-theme)

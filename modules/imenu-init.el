@@ -9,23 +9,21 @@
 
 (use-package imenu
   :config
-  (setq imenu-auto-rescan t))
-
-(use-package imenu+
-  :ensure t)
-
-(use-package imenu-anywhere
-  :ensure t
+  (setq imenu-auto-rescan t)
+  (use-package imenu+
+    :ensure t)
+  (use-package imenu-anywhere
+    :ensure t)
+  (use-package popup-imenu
+    :ensure t)
   :bind* ("C-c C-j" . imenu-anywhere))
-
-(use-package popup-imenu
-  :ensure t)
 
 (when (eq dotemacs-selection 'ido)
   (bind-key* "C-c C-j" #'ido-imenu-anywhere))
 
 (use-package imenu-list
   :ensure t
+  :after imenu
   :config
   (setq imenu-list-auto-resize nil)
   (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")

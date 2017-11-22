@@ -37,7 +37,7 @@
   (add-hook 'dired-mode-hook 'auto-revert-mode))
 
 (use-package dired-x
-  :after dired
+  :commands dired-jump
   :config
   (setq dired-bind-jump t
         ;; Do not show messages when omitting files
@@ -62,7 +62,6 @@
 
 (use-package dired-efap
   :ensure t
-  ;; :after dired
   :commands dired-efap
   :config (setq dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
@@ -77,10 +76,12 @@
 
 (use-package dired-quick-sort
   :ensure t
+  :after dired
   :config (dired-quick-sort-setup))
 
 (use-package dired-subtree
-  :ensure t)
+  :ensure t
+  :after dired)
 
 (provide 'dired-init)
 
