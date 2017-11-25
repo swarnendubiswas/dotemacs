@@ -81,12 +81,12 @@
 (or
  (use-package flyspell-popup
    :ensure t
-   :disabled t
    ;; :after flyspell
    :bind ("C-;" . flyspell-popup-correct))
 
  (use-package flyspell-correct-ivy
    :ensure t
+   :disabled t
    ;; :after flyspell
    :if (eq dotemacs-selection 'ivy)
    :bind ("C-;" . flyspell-correct-previous-word-generic)))

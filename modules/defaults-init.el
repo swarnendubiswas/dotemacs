@@ -112,9 +112,9 @@
 (use-package simple
   :config
   (setq idle-update-delay 2
-        save-interprogram-paste-before-kill t   ; We need to paste something from another program, but sometimes we do
-                                        ; real paste after some kill action, that will erase the clipboard, so we need
-                                        ; to save it to kill ring. Paste it using "C-y M-y".
+        ;; We need to paste something from another program, but sometimes we do real paste after some kill action, that
+        ;; will erase the clipboard, so we need to save it to kill ring. Paste it using "C-y M-y".
+        save-interprogram-paste-before-kill t
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking

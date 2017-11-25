@@ -302,7 +302,7 @@
                                                                         :height 135))
           (t (set-face-attribute 'default nil
                                  ;; :family "Dejavu Sans Mono"
-                                 :height 130)))))
+                                 :height 135)))))
 
 (use-package ecb
   :ensure t
