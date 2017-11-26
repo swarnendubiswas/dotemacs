@@ -221,7 +221,7 @@
 
 (use-package apt-sources-list
   :ensure t
-  :defer t)
+  :mode ("\\.list\\'" . apt-sources-list-mode))
 
 (use-package amx
   :ensure t
