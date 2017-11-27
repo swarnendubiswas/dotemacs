@@ -92,10 +92,10 @@
     (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async))
   :init
-  (set irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
   :config
+  (setq irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
   (add-hook 'irony-mode-hook #'dotemacs-irony-mode-hook)
   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
   (add-hook 'irony-mode-hook #'flycheck-irony-setup)
@@ -134,9 +134,11 @@
   :ensure t
   :after cc-mode
   :init
-  (setq clang-format-style-option "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
+  (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
-    (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format")))
+    (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format"))
+  (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
+    (setq clang-format-executable "/usr/bin/clang-format-5.0")))
 
 (use-package cuda-mode
   :ensure t

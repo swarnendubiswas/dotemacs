@@ -75,6 +75,9 @@
   :disabled t
   :config (hlinum-activate))
 
+(when (version<= "26.0.50" emacs-version )
+  (global-display-line-numbers-mode 1))
+
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
                                      :config (load-theme 'leuven t)))
@@ -130,7 +133,6 @@
 
       ((eq dotemacs-theme 'tangotango) (use-package tangotango-theme
                                          :ensure t
-                                         :init (message "this is the tangotango theme")
                                          :config (load-theme 'tangotango t)))
 
       ((eq dotemacs-theme 'default) (progn
@@ -209,7 +211,7 @@
     (progn
       (set-face-attribute 'tabbar-default nil
                           :inherit nil
-                          :height 110
+                          :height 1.0
                           :weight 'normal
                           :width 'normal
                           :slant 'normal
@@ -230,7 +232,7 @@
                           :inherit 'tabbar-default
                           :background "gray95"
                           :foreground "gray20"
-                          :height 1.2
+                          :height 1.1
                           :box '(:line-width 3 :color "grey95" :style nil))
       ;; (set-face-attribute 'tabbar-selected nil
       ;;                 :inherit 'tabbar-default
@@ -280,7 +282,7 @@
                           :foreground "dark green"
                           ;; :box '(:line-width 1 :color "black" :style sunken)
                           :box '(:style pressed-button)
-                          :height 1.2
+                          :height 1.1
                           :bold t
                           :underline nil)))
   :bind (:map tabbar-mode-map
@@ -301,8 +303,8 @@
                                                                         ;; :family "Dejavu Sans Mono"
                                                                         :height 135))
           (t (set-face-attribute 'default nil
-                                 ;; :family "Dejavu Sans Mono"
-                                 :height 140)))))
+                                 :family "Dejavu Sans Mono"
+                                 :height 120)))))
 
 (use-package ecb
   :ensure t

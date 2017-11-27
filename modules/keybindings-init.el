@@ -51,7 +51,7 @@
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  ;; :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (>= emacs-major-version 24) (>= emacs-minor-version 4)))
+  :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (version<= "24.4.0" emacs-version)))
   :config
   (which-key-mode 1)
   (setq which-key-idle-delay 1.0
