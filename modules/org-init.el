@@ -77,7 +77,6 @@
     :ensure t)
 
   (use-package org-footnote
-    :ensure nil
     :defer t
     :config
     (setq org-footnote-define-inline t
