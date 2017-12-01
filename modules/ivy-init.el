@@ -69,7 +69,9 @@
                                 (t . ivy--regex-ignore-order))
         ivy-flx-limit 200
         ;; Always ignore buffers set in ivy-ignore-buffers
-        ivy-use-ignore-default 'always)
+        ivy-use-ignore-default 'always
+        ivy-use-selectable-prompt t
+        ivy-auto-select-single-candidate t)
   (dolist (buffer '("^\\*Backtrace\\*$"
                     "^\\*Compile-Log\\*$"
                     "^\\*.+Completions\\*$"
