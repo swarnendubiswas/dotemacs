@@ -100,6 +100,10 @@
             (lambda ()
               (add-to-list 'company-backends 'company-rtags))))
 
+(use-package ivy-xref
+  :ensure t
+  :config (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
+
 (provide 'tags-init)
 
 ;;; tags-init.el ends here

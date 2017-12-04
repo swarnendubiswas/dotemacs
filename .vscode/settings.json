@@ -16,5 +16,15 @@
         ".projectile": true,
         "network-security*": true,
         "semanticdb": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/elpa/": true,
+        "**/irony/": true,
+        "auto-save-list": true,
+        "**/eshell": true,
+        "**/reference-cards": true,
+        "**/tmp": true
     }
 }

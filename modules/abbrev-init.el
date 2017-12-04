@@ -15,8 +15,9 @@
     (add-hook hook #'abbrev-mode ))
   :config
   (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
-  (if (file-exists-p abbrev-file-name)
-      (quietly-read-abbrev-file)))
+  ;; (if (file-exists-p abbrev-file-name)
+  ;;     (quietly-read-abbrev-file))
+  )
 
 (provide 'abbrev-init)
 
