@@ -35,12 +35,12 @@
   (run-at-time nil (* 10 60) 'recentf-save-list))
 
 ;; Hide the "wrote to recentf" message, which can be irritating.
-(defun dotemacs-recentf-save-list (orig-fun &rest args)
+(defun sb/recentf-save-list (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
   (let ((inhibit-message t))
     (apply orig-fun args)))
 
-(advice-add 'recentf-save-list :around #'dotemacs-recentf-save-list)
+(advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
 (provide 'recentf-init)
 

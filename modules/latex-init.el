@@ -17,7 +17,6 @@
   :mode ("\\.tex\\'" . LaTeX-mode))
 
 (use-package tex-buf ; Requires tex and latex
-  ;; :defer t
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -57,7 +56,6 @@
 
 (use-package tex-mode
   :diminish latex-electric-env-pair-mode
-  ;; :defer t
   :init
   (setq latex-run-command "latexmk")
   (add-hook 'TeX-mode-hook
@@ -73,20 +71,20 @@
             (lambda ()
               (setq TeX-command-default "LaTeXMk"))))
 
-;; Required by ac-math and company-math
 (use-package math-symbol-lists
   :ensure t)
 
-(when (bound-and-true-p dotemacs-completion-in-buffer)
-  (use-package company-auctex
-    :ensure t
-    :config (company-auctex-init))
+(use-package company-auctex
+  :ensure t
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
+  :config (company-auctex-init))
 
-  (use-package company-math
-    :ensure t
-    :config
-    (add-to-list 'company-backends
-                 '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))))
+(use-package company-math
+  :ensure t
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
+  :config
+  (add-to-list 'company-backends
+               '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
 
 ;; ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
 ;; (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
