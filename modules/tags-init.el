@@ -7,6 +7,7 @@
 
 (defvar dotemacs-selection)
 (defvar dotemacs-completion-in-buffer)
+(defvar dotemacs-cc-helper)
 
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
@@ -18,6 +19,11 @@
   :init
   (add-hook 'java-mode-hook #'ggtags-mode)
   (add-hook 'python-mode-hook #'ggtags-mode)
+  (when (eq dotemacs-cc-helper 'gtags)
+    (add-hook 'c-mode-common-hook
+              (lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode)
+                  (ggtags-mode 1)))))
   :config
   (setq ggtags-navigation-mode-lighter nil
         ggtags-oversize-limit (* 50 1024 1024)
@@ -45,6 +51,11 @@
   :init
   (add-hook 'java-mode-hook #'counsel-gtags-mode)
   (add-hook 'python-mode-hook #'counsel-gtags-mode)
+  (when (eq dotemacs-cc-helper 'gtags)
+    (add-hook 'c-mode-common-hook
+              (lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode)
+                  (counsel-gtags-mode 1)))))
   :config
   (setq counsel-gtags-ignore-case nil
         counsel-gtags-auto-update t)
@@ -61,9 +72,11 @@
 ;; C-c r ] rtags-location-stack-forward Moves forward in location stack
 (use-package rtags
   :ensure t
+  :if (eq dotemacs-cc-helper 'rtags)
   :bind (:map c++-mode-map
               ("M-." . rtags-find-symbol-at-point)
-              ("M-," . rtags-location-stack-back))
+              ("M-," . rtags-location-stack-back)
+              ("C-c C-j" . rtags-imenu))
   :config
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
   (setq rtags-completions-enabled t
@@ -94,6 +107,7 @@
 
 (use-package company-rtags
   :ensure t
+  :if (eq dotemacs-cc-helper 'rtags)
   :after company
   :init
   (add-hook 'c-mode-common-hook

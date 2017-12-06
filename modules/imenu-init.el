@@ -16,10 +16,10 @@
     :ensure t)
   (use-package popup-imenu
     :ensure t)
-  :bind* ("C-c C-j" . imenu-anywhere))
+  :bind ("C-c C-j" . imenu-anywhere))
 
 (when (eq dotemacs-selection 'ido)
-  (bind-key* "C-c C-j" #'ido-imenu-anywhere))
+  (bind-key "C-c C-j" #'ido-imenu-anywhere))
 
 (use-package imenu-list
   :ensure t

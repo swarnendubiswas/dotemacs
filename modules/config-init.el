@@ -129,6 +129,15 @@ If yes, then we disable some other packages, like popwin and which-key."
   :type 'boolean
   :group 'dotemacs)
 
+(defcustom dotemacs-cc-helper
+  'gtags
+  "Choose whether to use gtags or rtags for C/C++ programming."
+  :type '(radio
+          (const :tag "gtags" gtags)
+          (const :tag "rtags" rtags)
+          (const :tag "none" none))
+  :group 'dotemacs)
+
 (provide 'config-init)
 
 ;;; config-init.el ends here

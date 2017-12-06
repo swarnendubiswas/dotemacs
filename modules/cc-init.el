@@ -76,10 +76,18 @@
   :after (company cc-mode)
   :if (eq dotemacs-completion-in-buffer t)
   :config
-  (message "Okay here I am this is me")
   (add-to-list 'company-backends 'company-c-headers)
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
-    (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.8.5/x86_64-redhat-linux")))
+    (dolist (paths '(
+                     "/usr/include"
+                     "/usr/include/boost"
+                     "/usr/local/include"
+                     "/usr/include/c++/4.8.5"
+                     "/usr/include/c++/4.8.5/tr1"
+                     "/usr/include/c++/4.8.5/x86_64-redhat-linux"
+                     "/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include"
+                     ))
+      (add-to-list 'company-c-headers-path-system paths))))
 
 ;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
@@ -134,7 +142,7 @@
   :ensure t
   :after cc-mode
   :init
-  (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
+  ;; (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format"))
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
@@ -154,20 +162,19 @@
   (setq company-backends
         '((
            ;; C++ specific backends
-           (company-clang
-            company-rtags
-            company-irony
-            company-cmake)
-           (company-c-headers
-            company-irony-c-headers)
+           company-clang
+           company-rtags
+           company-irony
+           company-c-headers
+           company-irony-c-headers
            ;; Generic backends
-           (company-files)
-           (company-keywords
-            company-dabbrev
-            company-dabbrev-code
-            company-capf)
+           company-files
+           company-keywords
+           ;; company-dabbrev
+           ;; company-dabbrev-code
+           company-capf
 
-           ;;  company-semantic
+           ;; company-semantic
            ;; company-gtags
            ))))
 (add-hook 'c++-mode-hook #'dotemacs--company-cc-backends)

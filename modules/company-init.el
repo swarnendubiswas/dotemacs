@@ -38,6 +38,8 @@
                             company-echo-metadata-frontend)
         ;; Allow typing keys that do not match any candidates
         company-require-match nil)
+  (when (string-equal (system-name) "consensus.ices.utexas.edu")
+    (setq-default company-clang-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang"))
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)

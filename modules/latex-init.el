@@ -167,7 +167,7 @@
 
 (use-package tex-smart-umlauts
   :ensure t
-  :init (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
+  :hook LaTeX-mode-hook)
 
 (use-package parsebib
   :ensure t)
