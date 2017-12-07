@@ -18,8 +18,8 @@
                 whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
                                         space-after-tab space-mark tab-mark newline-markl)))
 
-;; This is different from whitespace-cleanup since this is unconditional
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
+;; ;; This is different from whitespace-cleanup since this is unconditional
+;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
 ;; Calls whitespace-cleanup before saving the current buffer, but only if the whitespace in the buffer was initially
 ;; clean
@@ -31,7 +31,7 @@
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :diminish ws-butler-mode
-  :init (add-hook 'prog-mode-hook #'ws-butler-mode))
+  :hook prog-mode)
 
 (provide 'whitespace-init)
 

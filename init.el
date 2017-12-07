@@ -91,7 +91,7 @@
 (require 'svn-init)
 (require 'git-init)
 
-(require 'defuns-init)
+(require 'functions-init)
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
 (require 'server-init) ; Start the daemon/server
 
