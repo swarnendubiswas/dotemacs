@@ -34,6 +34,9 @@
 ;; (put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
 (put 'company-clang-arguments 'safe-local-variable (lambda (xx) t))
 (put 'company-c-headers-path-user 'safe-local-variable (lambda (xx) t))
+(put 'reftex-default-bibliograph 'safe-local-variable (lambda (xx) t))
+(put 'company-bibtex-bibliography 'safe-local-variable (lambda (xx) t))
+(put 'bibtex-completion-bibliography 'safe-local-variable (lambda (xx) t))
 
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 

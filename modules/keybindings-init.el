@@ -25,28 +25,28 @@
 (bind-keys*
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)
- ("C-c ;" . dotemacs-comment-line)
+ ("C-c ;" . sb/comment-line)
  ("C-c b" . comment-box))
 
 (bind-keys
  ("<f10>" . other-window) ; Switch to the other buffer
  ("<f11>" . delete-other-windows)
  ("C-x k" . kill-this-buffer)
- ("<f12>" . dotemacs-kill-other-buffers))
+ ("<f12>" . sb/kill-other-buffers))
 
 (bind-keys*
  ("C-s" . save-buffer)
- ("C-S-s" . dotemacs-save-all-buffers))
+ ("C-S-s" . sb/save-all-buffers))
 (unbind-key "C-x s") ; Bound to save-some-buffers
-(bind-key "C-x s" #'dotemacs-switch-to-scratch)
+(bind-key "C-x s" #'sb/switch-to-scratch)
 
 (bind-keys
  ("C-+" . #'text-scale-increase)
  ("C--" . #'text-scale-decrease))
 
 (bind-keys
- ("C-c d b" . dotemacs-byte-compile-current-file)
- ("C-c d i" . dotemacs-byte-compile-init-dir)
+ ("C-c d b" . sb/byte-compile-current-file)
+ ("C-c d i" . sb/byte-compile-init-dir)
  ("C-c d n" . package-list-packages-no-fetch))
 
 (use-package which-key ; Show help popups for prefix keys

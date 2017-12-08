@@ -16,7 +16,7 @@
   :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
   :preface
   ;; http://endlessparentheses.com/leave-the-cursor-at-start-of-match-after-isearch.html?source=rss
-  (defun dotemacs--isearch-exit-other-end ()
+  (defun sb/isearch-exit-other-end ()
     "Exit isearch, at the opposite end of the string."
     (interactive)
     (isearch-exit)
@@ -24,17 +24,17 @@
   :config
   (setq search-highlight t ; Highlight incremental search
         isearch-allow-scroll t)
-(use-package isearch+
-  :ensure t
-  :diminish isearch-mode)
+  (use-package isearch+
+    :ensure t
+    :diminish isearch-mode)
   (use-package isearch-symbol-at-point
-  :ensure t)
+    :ensure t)
   :bind (("C-s" . nil) ; isearch-forward-regexp
          ("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
          ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)
-         ("C-<return>" . isearch-exit-other-end)))
+         ("C-<return>" . sb/isearch-exit-other-end)))
 
 (use-package isearch-dabbrev
   :ensure t
