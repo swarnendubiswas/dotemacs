@@ -31,7 +31,7 @@
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :diminish ws-butler-mode
-  :hook prog-mode)
+  :init (add-hook 'prog-mode #'ws-butler-global-mode))
 
 (provide 'whitespace-init)
 

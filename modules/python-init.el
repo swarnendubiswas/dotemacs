@@ -16,9 +16,9 @@
   "Helper function for configuring python mode."
   (setq-default python-indent-offset 4
                 python-indent-guess-indent-offset nil)
-  ;; (setq python-shell-completion-native-enable nil)
-  ;; (setq python-shell-interpreter "python3"
-  ;;       python-shell-unbuffered nil)
+  (setq python-shell-completion-native-enable nil)
+  (setq python-shell-interpreter "python3"
+        python-shell-unbuffered nil)
   ;; (turn-on-auto-fill)
   ;; (run-python (python-shell-parse-command) nil nil)
   )
@@ -27,7 +27,7 @@
   :ensure t
   :diminish elpy-mode
   :preface
-  (defun dotemacs--elpy-setup ()
+  (defun sb/elpy-setup ()
     "Setup elpy and python configurations."
     (dotemacs--python-setup)
     (setq elpy-modules '(elpy-module-company
@@ -51,7 +51,7 @@
     (add-hook 'before-save-hook #'elpy-format-code)
     (elpy-mode 1))
 
-  :init (add-hook 'python-mode-hook #'dotemacs--elpy-setup)
+  :init (add-hook 'python-mode-hook #'sb/elpy-setup)
   :config
   (add-hook 'elpy-mode-hook #'flycheck-mode)
   ;; http://www.wilfred.me.uk/.emacs.d/init.html
@@ -75,14 +75,13 @@
   :bind (:map elpy-mode-map
               ("C-c c e" . python-nav-forward-defun)
               ("C-c c a" . python-nav-backward-defun)
-              ("C-c c i" . elpy-importmagic-fixup)
               ("M-<left>" . nil)
               ("M-<right>" . nil)
               ("M-." . nil)
               ("C-c C-d" . nil)
               ("C-c C-r i" . nil)))
 
-(defun dotemacs--company-python-backends ()
+(defun sb/company-python-backends ()
   "Add backends for Python completion in company mode."
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -95,9 +94,9 @@
            ;; Python specific backends
            company-jedi
            elpy-company-backend))))
-(add-hook 'python-mode-hook #'dotemacs--company-python-backends)
+(add-hook 'python-mode-hook #'sb/company-python-backends)
 
-(defhydra hydra-python-indent (global-map "C-c c n")
+(defhydra sb/hydra-python-indent (global-map "C-c c n")
   "indent"
   ("l" elpy-nav-indent-shift-left "left")
   ("r" elpy-nav-indent-shift-right "right"))

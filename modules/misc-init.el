@@ -209,10 +209,10 @@
 
 (use-package crux
   :ensure t
-  :config
-  (crux-with-region-or-buffer indent-region)
-  (crux-with-region-or-buffer untabify)
-  (crux-with-region-or-line comment-or-uncomment-region)
+  ;; :config
+  ;; (crux-with-region-or-buffer indent-region)
+  ;; (crux-with-region-or-buffer untabify)
+  ;; (crux-with-region-or-line comment-or-uncomment-region)
   :bind ("C-c i" . crux-ispell-word-then-abbrev))
 
 (use-package elf-mode
