@@ -142,7 +142,7 @@
   :disabled t
   :preface
   ;; https://github.com/cemerick/.emacs.d#nyan-mode
-  (defun dotemacs--toggle-nyan-mode (&optional frame)
+  (defun sb/toggle-nyan-mode (&optional frame)
     "Enable/disable nyan mode."
     (if (display-graphic-p frame)
         (progn
@@ -154,8 +154,8 @@
                         nyan-cat-face-number 5))
       (nyan-mode -1)))
   :config
-  (add-hook 'after-make-frame-functions 'dotemacs--toggle-nyan-mode)
-  (add-hook 'after-init-hook 'dotemacs--toggle-nyan-mode))
+  (add-hook 'after-make-frame-functions 'sb/toggle-nyan-mode)
+  (add-hook 'after-init-hook 'sb/toggle-nyan-mode))
 
 (provide 'mode-line-init)
 

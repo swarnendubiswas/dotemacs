@@ -156,7 +156,7 @@
   :ensure t
   :defer t)
 
-(defun dotemacs--company-cc-backends ()
+(defun sb/company-cc-backends ()
   "Add backends for C/C++ completion in company mode."
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -177,7 +177,7 @@
            ;; company-semantic
            ;; company-gtags
            ))))
-(add-hook 'c++-mode-hook #'dotemacs--company-cc-backends)
+(add-hook 'c++-mode-hook #'sb/company-cc-backends)
 
 (add-hook 'before-save-hook
           (lambda ()

@@ -115,7 +115,7 @@
   :after ivy
   :ensure smex
   :preface
-  (defun dotemacs--counsel-recentf ()
+  (defun sb/counsel-recentf ()
     "Find a file on `recentf-list' and abbreviate the home directory."
     (interactive)
     (ivy-read "Recentf: " (mapcar #'abbreviate-file-name recentf-list)
@@ -126,7 +126,7 @@
               :caller 'counsel-recentf))
 
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
-  (defun dotemacs--counsel-goto-recent-directory ()
+  (defun sb/counsel-goto-recent-directory ()
     "Open recent directories with dired."
     (interactive)
     (unless recentf-mode (recentf-mode 1))
@@ -151,8 +151,8 @@
    ([remap load-library] . counsel-load-library)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap completion-at-point] . counsel-company)
-   ("<f9>" . dotemacs--counsel-recentf)
-   ("C-<f9>" . dotemacs--counsel-goto-recent-directory)
+   ("<f9>" . sb/counsel-recentf)
+   ("C-<f9>" . sb/counsel-goto-recent-directory)
    ("C-c s a" . counsel-ag)
    ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
    ("C-c s r" . counsel-rg)

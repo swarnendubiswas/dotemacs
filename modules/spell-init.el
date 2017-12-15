@@ -23,7 +23,7 @@
   :preface
   ;; Move point to previous error, based on code by hatschipuh at http://emacs.stackexchange.com/a/14912/2017
   ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
-  (defun dotemacs--flyspell-goto-previous-error (arg)
+  (defun sb/flyspell-goto-previous-error (arg)
     "Go to arg previous spelling error."
     (interactive "p")
     (while (not (= 0 arg))
@@ -76,7 +76,7 @@
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ("C-," . dotemacs--flyspell-goto-previous-error)))
+   ("C-," . sb/flyspell-goto-previous-error)))
 
 (or
  (use-package flyspell-popup

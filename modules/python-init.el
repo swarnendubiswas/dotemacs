@@ -12,16 +12,13 @@
 
 (setenv "PYTHONPATH" "python3")
 
-(defun dotemacs--python-setup ()
+(defun sb/python-setup ()
   "Helper function for configuring python mode."
   (setq-default python-indent-offset 4
                 python-indent-guess-indent-offset nil)
   (setq python-shell-completion-native-enable nil)
   (setq python-shell-interpreter "python3"
-        python-shell-unbuffered nil)
-  ;; (turn-on-auto-fill)
-  ;; (run-python (python-shell-parse-command) nil nil)
-  )
+        python-shell-unbuffered nil))
 
 (use-package elpy
   :ensure t
@@ -29,7 +26,7 @@
   :preface
   (defun sb/elpy-setup ()
     "Setup elpy and python configurations."
-    (dotemacs--python-setup)
+    (sb/python-setup)
     (setq elpy-modules '(elpy-module-company
                          elpy-module-eldoc
                          elpy-module-pyvenv
@@ -58,14 +55,6 @@
   (add-hook 'python-mode-hook
             (lambda ()
               (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
-
-  (use-package py-autopep8
-    :ensure t
-    :disabled t
-    :config
-    (setq py-autopep8-options '("--max-line-length=120"))
-    (add-hook 'python-mode-hook #'py-autopep8-enable-on-save)
-    (add-hook 'elpy-mode-hook #'py-autopep8-enable-on-save))
 
   (use-package python-docstring
     :ensure t

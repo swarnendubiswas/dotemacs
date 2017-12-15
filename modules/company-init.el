@@ -14,7 +14,7 @@
   :ensure t
   :diminish company-mode
   :preface
-  (defun dotemacs--quit-company-save-buffer ()
+  (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
     (company-abort)
     (save-buffer))
@@ -43,7 +43,7 @@
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
-              ("C-s" . dotemacs--quit-company-save-buffer)))
+              ("C-s" . sbquit-company-save-buffer)))
 
 (use-package company-flx
   :ensure t
