@@ -30,7 +30,8 @@
 ;; You may delete these explanatory comments.
 ;; (package-initialize)
 
-;; TODO: Mark safe variables
+;; TODO:
+;; Mark safe variables
 ;; (put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
 (put 'company-clang-arguments 'safe-local-variable (lambda (xx) t))
 (put 'company-c-headers-path-user 'safe-local-variable (lambda (xx) t))

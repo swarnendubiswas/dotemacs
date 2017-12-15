@@ -57,7 +57,11 @@
 (use-package json-mode
   :ensure t
   :defer t
-  :config (add-hook 'json-mode-hook #'flycheck-mode))
+  :config
+  (add-hook 'json-mode-hook #'flycheck-mode)
+  (add-hook 'json-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'json-mode-beautify t t))))
 
 (provide 'text-init)
 

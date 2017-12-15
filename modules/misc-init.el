@@ -22,6 +22,13 @@
   :ensure t
   :defer t)
 
+(use-package helpful
+  :ensure t
+  :bind
+  (("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-h f" . helpful-function)))
+
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
   :defer t

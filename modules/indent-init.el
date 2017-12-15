@@ -20,7 +20,8 @@
   :diminish aggressive-indent-mode)
 
 (use-package electric ; Intelligent indentation, on by default from Emacs 24.4
-  :config (electric-indent-mode 1))
+  :config (electric-indent-mode 1)
+  :bind ("C-j" . nil))
 
 (use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
   :ensure t
