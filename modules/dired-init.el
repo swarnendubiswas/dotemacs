@@ -62,6 +62,7 @@
 
 (use-package dired-efap
   :ensure t
+  :after dired
   :commands dired-efap
   :config (setq dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
