@@ -120,6 +120,7 @@
   (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   (push '("*xref*" :noselect nil) popwin:special-display-config)
+  (push '("*helpful\*" :noselect nil) popwin:special-display-config)
 
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))

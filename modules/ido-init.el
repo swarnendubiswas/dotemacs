@@ -13,7 +13,7 @@
   :ensure t
   :preface
   ;; https://www.emacswiki.org/emacs/RecentFiles
-  (defun dotemacs--recentf-ido-find-file ()
+  (defun sb/recentf-ido-find-file ()
     "Find a recent file using Ido."
     (interactive)
     (let ((file (ido-completing-read "Choose recent file: " (mapcar #'abbreviate-file-name recentf-list) nil t)))
@@ -146,7 +146,7 @@
    ([remap switch-to-buffer] . ido-switch-buffer)
    ("<f3>" . ido-switch-buffer)
    ("C-x d" . ido-dired)
-   ("<f9>" . dotemacs--recentf-ido-find-file)))
+   ("<f9>" . sb/recentf-ido-find-file)))
 
 (provide 'ido-init)
 

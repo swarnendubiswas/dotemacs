@@ -45,7 +45,6 @@
       :after company
       :if (bound-and-true-p dotemacs-completion-in-buffer)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
-    (add-hook 'before-save-hook #'elpy-format-code)
     (elpy-mode 1))
 
   :init (add-hook 'python-mode-hook #'sb/elpy-setup)
@@ -90,10 +89,10 @@
   ("l" elpy-nav-indent-shift-left "left")
   ("r" elpy-nav-indent-shift-right "right"))
 
-;; (add-hook 'before-save-hook
-;;           (lambda ()
-;;             (when (string-equal major-mode "python-mode")
-;;               (elpy-format-code))))
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (string-equal major-mode "python-mode")
+              (elpy-format-code))))
 
 (provide 'python-init)
 

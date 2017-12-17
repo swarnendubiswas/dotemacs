@@ -70,7 +70,7 @@
         ivy-flx-limit 200
         ;; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-ignore-default 'always
-        ivy-use-selectable-prompt t
+        ivy-use-selectable-prompt nil
         ivy-auto-select-single-candidate t)
   (dolist (buffer '("^\\*Backtrace\\*$"
                     "^\\*Compile-Log\\*$"
@@ -195,7 +195,6 @@
   :after ivy
   :config
   (setq ivy-rich-switch-buffer-align-virtual-buffer t
-        ivy-rich-abbreviate-paths t
         ivy-rich-path-style 'relative
         ivy-rich-switch-buffer-name-max-length 48
         ivy-rich-switch-buffer-project-max-length 32)
