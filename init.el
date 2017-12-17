@@ -46,7 +46,6 @@
 (put 'company-bibtex-bibliograph 'safe-local-variable 'listp)
 (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
 
-
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
 (require 'config-init) ; Setup configuration variables
