@@ -142,7 +142,7 @@
   :ensure t
   :after cc-mode
   :init
-  ;; (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
+  (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format"))
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")

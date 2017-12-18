@@ -65,7 +65,7 @@
 (use-package counsel-projectile
   :ensure t
   :if (eq dotemacs-selection 'ivy)
-  :config (counsel-projectile-on)
+  :config (counsel-projectile-mode)
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-switch-to-buffer)
