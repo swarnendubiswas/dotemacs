@@ -8,6 +8,7 @@
 (defvar dotemacs-selection)
 
 (use-package imenu
+  :disabled t
   :config
   (setq imenu-auto-rescan t)
   (use-package imenu+
