@@ -80,10 +80,6 @@
   :after dired
   :config (dired-quick-sort-setup))
 
-(use-package dired-subtree
-  :ensure t
-  :after dired)
-
 (provide 'dired-init)
 
 ;;; dired-init ends here

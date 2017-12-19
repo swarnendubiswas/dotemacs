@@ -14,10 +14,8 @@
   (dolist (hook '(text-mode-hook prog-mode-hook))
     (add-hook hook #'abbrev-mode ))
   :config
-  (setq save-abbrevs 'silently) ; Do not ask to save new abbrevs when quitting
-  ;; (if (file-exists-p abbrev-file-name)
-  ;;     (quietly-read-abbrev-file))
-  )
+  ;; Do not ask to save new abbrevs when quitting
+  (setq save-abbrevs 'silently))
 
 (provide 'abbrev-init)
 
