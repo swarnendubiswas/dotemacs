@@ -96,7 +96,7 @@
   :defer t
   :preface
   ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
-  (defun dotemacs-irony-mode-hook ()
+  (defun sb/irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async))
   :init
@@ -104,7 +104,7 @@
   (add-hook 'c-mode-hook #'irony-mode)
   :config
   (setq irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
-  (add-hook 'irony-mode-hook #'dotemacs-irony-mode-hook)
+  (add-hook 'irony-mode-hook #'sb/irony-mode-hook)
   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
   (add-hook 'irony-mode-hook #'flycheck-irony-setup)
 
