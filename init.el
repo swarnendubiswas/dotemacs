@@ -78,7 +78,6 @@
 
 ;; Setup helper packages
 (require 'projectile-init)
-(require 'fci-init)
 (require 'misc-init)
 (require 'yasnippet-init)
 (require 'flycheck-init)
