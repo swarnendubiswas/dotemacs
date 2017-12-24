@@ -45,6 +45,7 @@
 (put 'reftex-default-bibliograph 'safe-local-variable 'listp)
 (put 'company-bibtex-bibliograph 'safe-local-variable 'listp)
 (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
+(put 'flycheck-clang-include-path 'safe-local-variable 'listp)
 
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
