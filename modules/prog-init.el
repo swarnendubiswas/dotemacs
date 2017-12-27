@@ -142,7 +142,7 @@
   :config
   (use-package eldoc-extension
     :ensure t)
-  (use-package eldoc-overlay-mode
+  (use-package eldoc-overlay
     :ensure t
     :disabled t ; Too intrusive
     :diminish eldoc-overlay-mode

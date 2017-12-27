@@ -130,7 +130,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :group 'dotemacs)
 
 (defcustom dotemacs-cc-helper
-  'gtags
+  'rtags
   "Choose whether to use gtags or rtags for C/C++ programming."
   :type '(radio
           (const :tag "gtags" gtags)

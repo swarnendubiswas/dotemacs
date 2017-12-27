@@ -77,6 +77,12 @@
               ("M-." . rtags-find-symbol-at-point)
               ("M-," . rtags-location-stack-back)
               ("C-c C-j" . rtags-imenu))
+  :init
+  (when (eq dotemacs-cc-helper 'rtags)
+    (add-hook 'c-mode-common-hook
+              (lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode)
+                  (rtags-mode 1)))))
   :config
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
   (setq rtags-completions-enabled t
@@ -96,14 +102,14 @@
     :disabled t
     :preface
     ;; https://github.com/Andersbakken/rtags/blob/7e6b6f21935eedbe4678ba91c5531ac162b51a5a/src/flycheck-rtags.el
-    (defun my-flycheck-rtags-setup ()
+    (defun sb/flycheck-rtags-setup ()
       "Configure flycheck-rtags for better experience."
       (flycheck-select-checker 'rtags)
       (setq-local flycheck-check-syntax-automatically nil)
       (setq-local flycheck-highlighting-mode nil)
-      (add-hook 'c-mode-hook #'my-flycheck-rtags-setup)
-      (add-hook 'c++-mode-hook #'my-flycheck-rtags-setup))
-    :init (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)))
+      (add-hook 'c-mode-hook #'sb/flycheck-rtags-setup)
+      (add-hook 'c++-mode-hook #'sb/flycheck-rtags-setup))
+    :init (add-hook 'c-mode-common-hook #'sb/flycheck-rtags-setup)))
 
 (use-package company-rtags
   :ensure t

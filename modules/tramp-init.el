@@ -7,6 +7,7 @@
 
 (defvar tramp-persistency-file-name)
 (defvar dotemacs-temp-directory)
+(defvar dotemacs-selection)
 
 ;; A few hacks are from https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
@@ -24,7 +25,7 @@
         tramp-verbose 1 ; Default is 3
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         tramp-completion-reread-directory-timeout nil)
-
+  (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
   (add-to-list 'tramp-default-method-alist '("" "biswass" "ssh"))
   (add-to-list 'tramp-default-method-alist '("" "sbiswas" "ssh"))
   (add-to-list 'tramp-default-method-alist
@@ -39,6 +40,11 @@
                                      tramp-file-name-regexp))
   (use-package password-cache
     :config (setq password-cache-expiry nil)))
+
+(use-package counsel-tramp
+  :ensure t
+  :if (eq dotemacs-selection 'ivy)
+  :after tramp)
 
 (provide 'tramp-init)
 
