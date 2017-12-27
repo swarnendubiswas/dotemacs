@@ -81,7 +81,7 @@
 (or
  (use-package flyspell-popup
    :ensure t
-   ;; :after flyspell
+   :after flyspell
    :bind ("C-;" . flyspell-popup-correct))
 
  (use-package flyspell-correct-ivy

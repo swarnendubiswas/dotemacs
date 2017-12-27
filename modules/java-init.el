@@ -41,16 +41,14 @@
 
 (use-package eclim
   :ensure t
-  :disabled t
-  :defer t
   :init
   (use-package eclimd
     :config (setq eclimd-autostart t))
   (if (string-equal (system-name) "consensus.ices.utexas.edu")
-      (setq eclim-eclipse-dirs "/h2/sbiswas/software/Eclipse/eclipse-neon-java/"
-            eclim-executable "/h2/sbiswas/software/Eclipse/eclipse-neon-java/eclim")
-    (setq eclim-eclipse-dirs "/home/sbiswas/software/Eclipse/eclipse-neon-java/"
-          eclim-executable "/home/sbiswas/software/Eclipse/eclipse-neon-java/eclim"))
+      (setq eclim-eclipse-dirs "/h2/sbiswas/software/Eclipse/eclipse-oxygen-java/"
+            eclim-executable "/h2/sbiswas/software/Eclipse/eclipse-oxygen-java/eclim")
+    (setq eclim-eclipse-dirs "/home/sbiswas/software/Eclipse/eclipse-oxygen-java/"
+          eclim-executable "/home/sbiswas/software/Eclipse/eclipse-oxygen-java/eclim"))
   (setq eclim-auto-save t)
   (add-hook 'java-mode-hook #'eclim-mode)
   :config

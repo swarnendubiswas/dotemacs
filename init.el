@@ -30,22 +30,6 @@
 ;; You may delete these explanatory comments.
 ;; (package-initialize)
 
-;; TODO:
-;; Mark safe variables
-
-;; ;; (put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
-;; (put 'company-clang-arguments 'safe-local-variable (lambda (xx) t))
-;; (put 'company-c-headers-path-user 'safe-local-variable (lambda (xx) t))
-;; (put 'reftex-default-bibliograph 'safe-local-variable (lambda (xx) t))
-;; (put 'company-bibtex-bibliography 'safe-local-variable (lambda (xx) t))
-;; (put 'bibtex-completion-bibliography 'safe-local-variable (lambda (xx) t))
-
-(put 'company-clang-arguments 'safe-local-variable 'listp)
-(put 'company-c-headers-path-user 'safe-local-variable 'listp)
-(put 'reftex-default-bibliograph 'safe-local-variable 'listp)
-(put 'company-bibtex-bibliograph 'safe-local-variable 'listp)
-(put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
-
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
 (require 'config-init) ; Setup configuration variables
@@ -104,5 +88,20 @@
 (require 'functions-init)
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
 (require 'server-init) ; Start the daemon/server
+
+;; Mark safe variables
+
+;; ;; (put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
+;; (put 'company-clang-arguments 'safe-local-variable (lambda (xx) t))
+;; (put 'company-c-headers-path-user 'safe-local-variable (lambda (xx) t))
+;; (put 'reftex-default-bibliograph 'safe-local-variable (lambda (xx) t))
+;; (put 'company-bibtex-bibliography 'safe-local-variable (lambda (xx) t))
+;; (put 'bibtex-completion-bibliography 'safe-local-variable (lambda (xx) t))
+
+(put 'company-clang-arguments 'safe-local-variable 'listp)
+(put 'company-c-headers-path-user 'safe-local-variable 'listp)
+(put 'reftex-default-bibliograph 'safe-local-variable 'listp)
+(put 'company-bibtex-bibliograph 'safe-local-variable 'listp)
+(put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
 
 ;;; init.el ends here
