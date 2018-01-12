@@ -37,9 +37,9 @@
   :bind ([remap list-buffers] . ibuffer))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
-  :ensure t
   :after ibuffer
-  :config (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
+  :ensure t
+  :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (provide 'ibuffer-init)
 

@@ -51,6 +51,7 @@
   (blink-cursor-mode 0))
 
 (use-package time ; Display the time and date in the mode line
+  :defer t ; Not the most useful information within Emacs
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil

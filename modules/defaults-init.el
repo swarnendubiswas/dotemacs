@@ -132,7 +132,7 @@
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
                 global-auto-revert-non-file-buffers t)
-  (global-auto-revert-mode 1))
+  (add-hook 'find-file-hook #'global-auto-revert-mode))
 
 (use-package delsel
   :config

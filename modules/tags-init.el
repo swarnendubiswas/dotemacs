@@ -82,7 +82,7 @@
     (add-hook 'c-mode-common-hook
               (lambda ()
                 (when (derived-mode-p 'c-mode 'c++-mode)
-                  (rtags-mode 1)))))
+                  (rtags-mode)))))
   :config
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
   (setq rtags-completions-enabled t
@@ -114,7 +114,7 @@
 (use-package company-rtags
   :ensure t
   :if (eq dotemacs-cc-helper 'rtags)
-  :after company
+  :after (company rtags)
   :init
   (add-hook 'c-mode-common-hook
             (lambda ()

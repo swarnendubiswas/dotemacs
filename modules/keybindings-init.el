@@ -21,7 +21,7 @@
  ("C-z" . undo))
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the comment, NOT UNCOMMENTING
-;; but removing all commentted text and the comment marker itself.
+;; but removing all commented text and the comment marker itself.
 (bind-keys*
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)

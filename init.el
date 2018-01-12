@@ -23,7 +23,6 @@
 
 ;; Personal modules for customizing Emacs initialization
 
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -90,13 +89,6 @@
 (require 'server-init) ; Start the daemon/server
 
 ;; Mark safe variables
-
-;; ;; (put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
-;; (put 'company-clang-arguments 'safe-local-variable (lambda (xx) t))
-;; (put 'company-c-headers-path-user 'safe-local-variable (lambda (xx) t))
-;; (put 'reftex-default-bibliograph 'safe-local-variable (lambda (xx) t))
-;; (put 'company-bibtex-bibliography 'safe-local-variable (lambda (xx) t))
-;; (put 'bibtex-completion-bibliography 'safe-local-variable (lambda (xx) t))
 
 (put 'company-clang-arguments 'safe-local-variable 'listp)
 (put 'company-c-headers-path-user 'safe-local-variable 'listp)
