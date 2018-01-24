@@ -122,6 +122,7 @@
 
 (use-package ivy-xref
   :ensure t
+  :disabled t
   :config (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (provide 'tags-init)

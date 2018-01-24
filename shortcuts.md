@@ -257,7 +257,11 @@ Within the error list the following key bindings are available:
 
 ## Version control systems
 
-### Git
+### Git with Magit
+
+Use `magit-status` to display information about the current Git repository, and `magit-dispatch-popup` to see help with keybindings.
+
+https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automatic-Refreshing-of-Magit-Buffers
 
 * `TAB` - Expand and collapse files.
 * `n` - Move to next section.
@@ -272,6 +276,8 @@ Within the error list the following key bindings are available:
 * `M-H` - Hide all sections.
 * `k` - Delete file(s).
 * `C-u S` - Stage all untracked and tracked files.
+* `g` - Refresh the current buffer (`magit-refresh`).
+* `G` - Refreshes all magit buffers (`magit-refresh-all`).
 
 ### Svn
 

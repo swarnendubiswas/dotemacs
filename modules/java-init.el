@@ -41,6 +41,7 @@
 
 (use-package eclim
   :ensure t
+  :disabled t
   :init
   (use-package eclimd
     :config (setq eclimd-autostart t))

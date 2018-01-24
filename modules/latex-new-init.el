@@ -158,9 +158,9 @@
 ;;         (minibuffer-message "LaTeXMk done")))))
 ;; (add-hook 'after-save-hook #'run-latexmk)
 
-;; (add-hook 'LaTeX-mode-hook
-;;           (lambda ()
-;;             (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-x C-s") #'sb/save-buffer-and-run-latexmk)))
 
 (defun sb/company-LaTeX-backends ()
   "Add backends for LaTeX completion in company mode."

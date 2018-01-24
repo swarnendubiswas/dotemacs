@@ -205,7 +205,7 @@
 
 (use-package persistent-scratch
   :ensure t
-  :defer 5
+  :defer 2
   :config
   (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
   ;; Enable both autosave and restore on startup

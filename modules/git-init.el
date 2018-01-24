@@ -7,15 +7,19 @@
 
 (defvar dotemacs-selection)
 
-;; https://github.com/itsjeyd/.emacs.d/blob/emacs24/init.el
 (use-package magit
   :ensure t
   :defer t
   :config
-  (setq magit-auto-revert-mode nil
-        magit-item-highlight-face 'bold)
-  (when (eq dotemacs-selection 'ivy)
-    (setq magit-completing-read-function 'ivy-completing-read))
+  (setq magit-save-repository-buffers t)
+  (setq magit-post-display-buffer-hook
+        #'(lambda ()
+            (when (derived-mode-p 'magit-status-mode)
+              (delete-other-windows))))
+
+  (cond ((eq dotemacs-selection 'ido)  (setq magit-completing-read-function 'magit-ido-completing-read))
+        ((eq dotemacs-selection 'ivy)  (setq magit-completing-read-function 'ivy-completing-read)))
+
 
   (use-package magit-popup)
 

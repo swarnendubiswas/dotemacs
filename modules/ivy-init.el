@@ -209,6 +209,7 @@
 
 (use-package ivy-dired-history
   :ensure t
+  :disabled t
   :after ivy
   :after savehist
   :config (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))

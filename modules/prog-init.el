@@ -113,6 +113,7 @@
 
 (use-package which-func ; Show the name of the function in the modeline
   :after prog-mode
+  :disabled t
   :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :config
   (which-function-mode 1)

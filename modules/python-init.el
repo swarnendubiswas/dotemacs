@@ -92,6 +92,7 @@
 (add-hook 'before-save-hook
           (lambda ()
             (when (string-equal major-mode "python-mode")
+              (pyimport-remove-unused)
               (elpy-format-code))))
 
 (provide 'python-init)
