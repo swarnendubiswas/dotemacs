@@ -259,25 +259,31 @@ Within the error list the following key bindings are available:
 
 ### Git with Magit
 
-Use `magit-status` to display information about the current Git repository, and `magit-dispatch-popup` to see help with keybindings.
+Use `magit-status` to display information about the current Git repository, and `magit-dispatch-popup` to see help with keybindings. More documentation is available here: https://magit.vc/manual/magit/index.html#SEC_Contents.
 
-https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automatic-Refreshing-of-Magit-Buffers
-
-* `TAB` - Expand and collapse files.
-* `n` - Move to next section.
-* `p` - Move to previous section.
-* `M-n` - Move to next sibling section.
-* `M-p` - Move to previous sibling section.
-* `s` - Stage item.
-* `u` - Unstage item.
-* `c` - Commit menu.
-* `l` - Log menu.
+* `TAB` - Toggle the visibility of the body of the current section (`magit-section-toggle`).
+* `C-<tab>` - Cycle the visibility of the current section and its children (`magit-section-cycle`).
+* `n` - Move to next section (`magit-section-forward`).
+* `p` - Move to previous section (`magit-section-backward`).
+* `M-n` - Move to next sibling section (`magit-section-forward-siblings`).
+* `M-p` - Move to previous sibling section (`magit-section-backward-siblings`).
+* `^` - Move to the beginning of the parent of the current section (`magit-section-up`).
+* `s` - Add the change at point to the staging area (`magit-stage`).
+* `S` - Stage all changes to files modified in the worktree (`magit-stage-modified`).
+* `u` - Remove the change at point from the staging area (`magit-unstage`).
+* `U` - Remove all changes from the staging area (`magit-unstage-all`).
+* `c` - Commit popup (`magit-commit-popup`).
+* `l` - Log popup (`magit-log-popup`).
 * `M-S` - Show all sections.
 * `M-H` - Hide all sections.
 * `k` - Delete file(s).
 * `C-u S` - Stage all untracked and tracked files.
 * `g` - Refresh the current buffer (`magit-refresh`).
 * `G` - Refreshes all magit buffers (`magit-refresh-all`).
+* `C-c C-c` - Show popup commands (`magit-dispatch-popup`).
+* `q` - Bury the current buffer (`magit-mode-bury-buffer`).
+* `m` - Merge popup (`magit-merge-popup`).
+* `d` - Diff popup (`magit-diff-popup`).
 
 ### Svn
 

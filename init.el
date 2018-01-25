@@ -31,62 +31,62 @@
 
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
-(require 'config-init) ; Setup configuration variables
-(require 'packages-init) ; Setup the package system
+(require 'config) ; Setup configuration variables
+(require 'packages) ; Setup the package system
 
 ;; Now setup other modules
 
-(require 'user-init)
-(require 'defaults-init)
-(require 'appearance-init)
-(require 'mode-line-init)
+(require 'user)
+(require 'defaults)
+(require 'appearance)
+(require 'mode-line)
 
 ;; Configure power packages
-(require 'ibuffer-init)
-(require 'dired-init)
-(require 'search-init)
-(require 'recentf-init)
-(require 'company-init)
-(cond ((eq dotemacs-selection 'ido)  (require 'ido-init))
-      ((eq dotemacs-selection 'ivy)  (require 'ivy-init)))
+(require 'ibuffer)
+(require 'dired)
+(require 'search)
+(require 'recentf)
+(require 'company)
+(cond ((eq dotemacs-selection 'ido)  (require 'ido))
+      ((eq dotemacs-selection 'ivy)  (require 'ivy)))
 
 ;; Configure the more useful extensions
-(require 'spell-init)
-(require 'ace-modes-init)
-(require 'indent-init)
-(require 'parens-init)
-(require 'abbrev-init)
-(require 'kill-ring-init)
+(require 'spell)
+(require 'ace-modes)
+(require 'indent)
+(require 'parens)
+(require 'abbrev)
+(require 'kill-ring)
 
 ;; Setup helper packages
-(require 'projectile-init)
-(require 'misc-init)
-(require 'yasnippet-init)
-(require 'flycheck-init)
-(require 'rainbow-init)
-(require 'whitespace-init)
-(require 'highlight-init)
-(require 'tramp-init)
-(require 'imenu-init)
-(require 'tags-init)
+(require 'projectile)
+(require 'misc)
+(require 'yasnippet)
+(require 'flycheck)
+(require 'rainbow)
+(require 'whitespace)
+(require 'highlight)
+(require 'tramp)
+(require 'imenu)
+(require 'tags)
 
 ;; Configure individual major modes
-(require 'text-init)
-;; (require 'latex-init)
-(require 'latex-new-init)
-(require 'org-init)
-(require 'prog-init)
-(require 'cc-init)
-(require 'java-init)
-(require 'python-init)
-(require 'shell-script-init)
-(require 'shell-init)
-(require 'svn-init)
-(require 'git-init)
+(require 'text)
+;; (require 'latex)
+(require 'latex-new)
+(require 'org)
+(require 'prog)
+(require 'cc)
+(require 'java)
+(require 'python)
+(require 'shell-script)
+(require 'shell)
+(require 'svn)
+(require 'git)
 
-(require 'functions-init)
-(require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
-(require 'server-init) ; Start the daemon/server
+(require 'functions)
+(require 'keybindings) ; Generic keybindings, package-specific are usually in their own modules
+(require 'server) ; Start the daemon/server
 
 ;; Mark safe variables
 

@@ -1,4 +1,4 @@
-personal_ws-1.1 en 75 
+personal_ws-1.1 en 76 
 atomicity
 indices
 roundtrip
@@ -23,8 +23,8 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-vertices
 blackbox
+vertices
 unscalable
 scalable
 programmability
@@ -46,6 +46,7 @@ Swarnendu
 tunable
 unordered
 reimplementation
+suboptimal
 backend
 Kolkata
 serializability
