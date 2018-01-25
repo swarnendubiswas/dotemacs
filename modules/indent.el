@@ -1,4 +1,4 @@
-;;; indent-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; indent.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup indentation in Emacs.
@@ -35,4 +35,4 @@
 
 (provide 'indent)
 
-;;; indent-init.el ends here
+;;; indent.el ends here

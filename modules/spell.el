@@ -1,4 +1,4 @@
-;;; spell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; spell.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup spell check.  Assume aspell is available.
@@ -93,4 +93,4 @@
 
 (provide 'spell)
 
-;;; spell-init.el ends here
+;;; spell.el ends here

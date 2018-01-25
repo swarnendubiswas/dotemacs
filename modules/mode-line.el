@@ -1,4 +1,4 @@
-;;; mode-line-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; mode-line.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Tweak mode line themes.
@@ -159,4 +159,4 @@
 
 (provide 'mode-line)
 
-;;; mode-line-init.el ends here
+;;; mode-line.el ends here

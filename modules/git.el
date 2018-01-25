@@ -1,4 +1,4 @@
-;;; git-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; git.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup git.
@@ -43,4 +43,4 @@
 
 (provide 'git)
 
-;;; git-init.el ends here
+;;; git.el ends here

@@ -1,4 +1,4 @@
-;;; server-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; server.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup Emacs server.
@@ -19,4 +19,4 @@
 
 (provide 'server)
 
-;;; server-init.el ends here
+;;; server.el ends here

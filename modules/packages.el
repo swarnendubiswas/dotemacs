@@ -1,4 +1,4 @@
-;;; packages-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; packages.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup packages.
@@ -91,4 +91,4 @@
 
 (provide 'packages)
 
-;;; packages-init.el ends here
+;;; packages.el ends here

@@ -1,4 +1,4 @@
-;;; recentf-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; recentf.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Track recently-accessed files.
@@ -44,4 +44,4 @@
 
 (provide 'recentf)
 
-;;; recentf-init.el ends here
+;;; recentf.el ends here

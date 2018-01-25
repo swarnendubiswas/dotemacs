@@ -1,4 +1,4 @@
-;;; keybindings-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; keybindings.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Custom keybindings.  Use M-x describe-personal-keybindings to see modifications.
@@ -66,4 +66,4 @@
 
 (provide 'keybindings)
 
-;;; keybindings-init.el ends here
+;;; keybindings.el ends here

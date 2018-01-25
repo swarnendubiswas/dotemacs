@@ -1,4 +1,4 @@
-;;; flycheck-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; flycheck.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure flycheck.
@@ -36,4 +36,4 @@
 
 (provide 'flycheck)
 
-;;; flycheck-init.el ends here
+;;; flycheck.el ends here

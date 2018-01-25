@@ -1,4 +1,4 @@
-;;; kill-ring-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; kill-ring.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure browsing the kill ring.
@@ -30,4 +30,4 @@
 
 (provide 'kill-ring)
 
-;;; kill-ring-init.el ends here
+;;; kill-ring.el ends here

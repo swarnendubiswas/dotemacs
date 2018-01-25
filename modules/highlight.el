@@ -1,4 +1,4 @@
-;;; highlight-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; highlight.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure sentence, line, word highlighting.
@@ -94,4 +94,4 @@
 
 (provide 'highlight)
 
-;;; highlight-init.el ends here
+;;; highlight.el ends here

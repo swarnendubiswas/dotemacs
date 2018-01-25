@@ -1,4 +1,4 @@
-;;; prog-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; prog.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Programming mode specific.
@@ -190,4 +190,4 @@
 
 (provide 'prog)
 
-;;; prog-init.el ends here
+;;; prog.el ends here

@@ -1,4 +1,4 @@
-;;; cc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; cc.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.
@@ -186,4 +186,4 @@
 
 (provide 'cc)
 
-;;; cc-init.el ends here
+;;; cc.el ends here

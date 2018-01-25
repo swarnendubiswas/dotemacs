@@ -1,4 +1,4 @@
-;;; svn-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; svn.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup svn.
@@ -18,4 +18,4 @@
 
 (provide 'svn)
 
-;;; svn-init.el ends here
+;;; svn.el ends here

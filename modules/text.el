@@ -1,4 +1,4 @@
-;;; text-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; text.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup text mode.
@@ -65,4 +65,4 @@
 
 (provide 'text)
 
-;;; text-init.el ends here
+;;; text.el ends here

@@ -1,4 +1,4 @@
-;;; functions-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; functions.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Contains custom or temporary definitions.
@@ -109,4 +109,4 @@ Increase line spacing by two line height."
 
 (provide 'functions)
 
-;;; functions-init.el ends here
+;;; functions.el ends here

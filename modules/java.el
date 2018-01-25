@@ -1,4 +1,4 @@
-;;; java-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; java.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure Java programming mode.
@@ -60,4 +60,4 @@
 
 (provide 'java)
 
-;;; java-init.el ends here
+;;; java.el ends here

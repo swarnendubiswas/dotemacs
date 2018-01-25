@@ -1,4 +1,4 @@
-;;; tags-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; tags.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup tags for different projects.
@@ -127,4 +127,4 @@
 
 (provide 'tags)
 
-;;; tags-init.el ends here
+;;; tags.el ends here

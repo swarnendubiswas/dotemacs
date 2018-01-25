@@ -1,4 +1,4 @@
-;;; abbrev-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; abbrev.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup abbrev mode, useful for auto-correction.
@@ -26,4 +26,4 @@
 ;; ;; M-x write-abbrev-file               ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; abbrev-init.el ends here
+;;; abbrev.el ends here

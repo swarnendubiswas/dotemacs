@@ -1,4 +1,4 @@
-;;; shell-script-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; shell-script.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure editing shell scripts.
@@ -47,4 +47,4 @@
 
 (provide 'shell-script)
 
-;;; shell-script-init.el ends here
+;;; shell-script.el ends here

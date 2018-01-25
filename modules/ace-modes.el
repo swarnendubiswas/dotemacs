@@ -1,4 +1,4 @@
-;;; ace-modes-init.el --- Part of Emacs initialization   -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; ace-modes.el --- Part of Emacs initialization   -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup quick buffer/line/word/character navigation modes (e.g., ace-xxx (jump/buffer/isearch) modes, avy, bm).
@@ -89,4 +89,4 @@
 
 (provide 'ace-modes)
 
-;;; ace-modes-init.el ends here
+;;; ace-modes.el ends here

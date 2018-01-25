@@ -1,4 +1,4 @@
-;;; imenu-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; imenu.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup imenu.
@@ -36,4 +36,4 @@
 
 (provide 'imenu)
 
-;;; imenu-init.el ends here
+;;; imenu.el ends here

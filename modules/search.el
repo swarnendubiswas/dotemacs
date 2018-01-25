@@ -1,4 +1,4 @@
-;;; search-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; search.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure search and replace.
@@ -105,4 +105,4 @@
 
 (provide 'search)
 
-;;; search-init.el ends here
+;;; search.el ends here

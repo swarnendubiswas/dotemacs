@@ -1,4 +1,4 @@
-;;; tramp-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; tramp.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup tramp.
@@ -48,4 +48,4 @@
 
 (provide 'tramp)
 
-;;; tramp-init.el ends here
+;;; tramp.el ends here

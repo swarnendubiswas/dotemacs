@@ -1,4 +1,4 @@
-;;; misc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; misc.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 ;;; Commentary:
 ;; Miscellaneous package configurations.
 
@@ -243,4 +243,4 @@
 
 (provide 'misc)
 
-;;; misc-init.el ends here
+;;; misc.el ends here

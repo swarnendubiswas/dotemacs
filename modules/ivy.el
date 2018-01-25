@@ -1,4 +1,4 @@
-;;; ivy-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; ivy.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup ivy mode for completion.
@@ -216,4 +216,4 @@
 
 (provide 'ivy)
 
-;;; ivy-init.el ends here
+;;; ivy.el ends here

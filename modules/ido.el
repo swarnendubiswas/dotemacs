@@ -1,4 +1,4 @@
-;;; ido-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; ido.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure ido.
@@ -150,4 +150,4 @@
 
 (provide 'ido)
 
-;;; ido-init.el ends here
+;;; ido.el ends here

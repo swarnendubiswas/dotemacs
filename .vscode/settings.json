@@ -25,6 +25,8 @@
         "auto-save-list": true,
         "**/eshell": true,
         "**/reference-cards": true,
-        "**/tmp": true
+        "**/tmp": true,
+        "**/dict": true,
+        "**/extras": true
     }
 }

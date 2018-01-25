@@ -1,4 +1,4 @@
-;;; latex-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; latex.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure latex mode.
@@ -210,4 +210,4 @@
 
 (provide 'latex)
 
-;;; latex-init.el ends here
+;;; latex.el ends here

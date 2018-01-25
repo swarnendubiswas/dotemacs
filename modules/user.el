@@ -1,4 +1,4 @@
-;;; user-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; user.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup personal details.
@@ -10,4 +10,4 @@
 
 (provide 'user)
 
-;;; user-init.el ends here
+;;; user.el ends here

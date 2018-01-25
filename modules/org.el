@@ -1,4 +1,4 @@
-;;; org-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; org.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Setup org mode.
@@ -84,4 +84,4 @@
 
 (provide 'org)
 
-;;; org-init.el ends here
+;;; org.el ends here

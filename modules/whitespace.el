@@ -1,4 +1,4 @@
-;;; whitespace-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; whitespace.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Configure whitespace.
@@ -35,4 +35,4 @@
 
 (provide 'whitespace)
 
-;;; whitespace-init.el ends here
+;;; whitespace.el ends here

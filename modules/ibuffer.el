@@ -1,4 +1,4 @@
-;;; ibuffer-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; ibuffer.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; IBuffer configurations.
@@ -18,6 +18,7 @@
         ibuffer-case-fold-search t)
 
   (use-package ibuf-ext
+    :disabled t
     :config (setq ibuffer-show-empty-filter-groups nil))
 
   (setq ibuffer-formats
@@ -43,4 +44,4 @@
 
 (provide 'ibuffer)
 
-;;; ibuffer-init.el ends here
+;;; ibuffer.el ends here

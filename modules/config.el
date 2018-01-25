@@ -1,4 +1,4 @@
-;;; config-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; config.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; Set configuration variables.
@@ -140,4 +140,4 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (provide 'config)
 
-;;; config-init.el ends here
+;;; config.el ends here
