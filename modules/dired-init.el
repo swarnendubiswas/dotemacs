@@ -54,6 +54,7 @@
 (use-package dired+
   :ensure t
   :after dired
+  :load-path "extras"
   :init
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
   (setq-default diredp-hide-details-initially-flag nil

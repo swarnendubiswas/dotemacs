@@ -141,8 +141,6 @@
   (add-hook 'ielm-mode-hook #'eldoc-mode)
   (add-hook 'python-mode-hook #'eldoc-mode)
   :config
-  (use-package eldoc-extension
-    :ensure t)
   (use-package eldoc-overlay
     :ensure t
     :disabled t ; Too intrusive

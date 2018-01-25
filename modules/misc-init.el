@@ -6,22 +6,6 @@
 
 (defvar dotemacs-temp-directory)
 
-(use-package help+
-  :ensure t
-  :defer t)
-
-(use-package help-fns+ ; Improved help commands
-  :ensure t
-  :defer t)
-
-(use-package help-mode+
-  :ensure t
-  :defer t)
-
-(use-package info+
-  :ensure t
-  :defer t)
-
 (use-package helpful
   :ensure t
   :bind

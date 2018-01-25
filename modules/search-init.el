@@ -43,6 +43,7 @@
 
 (use-package replace+
   :ensure t
+  :load-path "extras"
   :after replace)
 
 (use-package anzu
