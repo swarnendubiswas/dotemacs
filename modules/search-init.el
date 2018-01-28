@@ -42,7 +42,6 @@
               ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package replace+
-  :ensure t
   :load-path "extras"
   :after replace)
 
@@ -86,19 +85,19 @@
   :after ag
   :config (add-hook 'ag-mode-hook #'wgrep-ag-setup))
 
-(use-package ido-occur
-  :ensure t
-  :if (eq dotemacs-selection 'ido)
-  :bind (("C-c s o" . ido-occur)
-         ("C-c s O" . ido-occur-at-point)))
+;; (use-package ido-occur
+;;   :ensure t
+;;   :if (eq dotemacs-selection 'ido)
+;;   :bind (("C-c s o" . ido-occur)
+;;          ("C-c s O" . ido-occur-at-point)))
 
-(use-package ace-isearch
-  :ensure t
-  :ensure avy
-  :ensure ace-jump-mode
-  :diminish ace-isearch-mode
-  :defer t
-  :config (global-ace-isearch-mode 1))
+;; (use-package ace-isearch
+;;   :ensure t
+;;   :ensure avy
+;;   :ensure ace-jump-mode
+;;   :diminish ace-isearch-mode
+;;   :defer t
+;;   :config (global-ace-isearch-mode 1))
 
 (use-package ripgrep
   :ensure t

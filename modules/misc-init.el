@@ -64,11 +64,13 @@
   :defer t)
 
 (use-package pos-tip
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
   :ensure t
+  :disabled t
   :config (setq popup-use-optimized-column-computation nil))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
@@ -180,12 +182,12 @@
   :ensure t
   :bind* ("C-." . iedit-mode))
 
-(use-package session
-  :ensure t
-  :disabled t
-  :init
-  (add-hook 'after-init-hook #'session-initialize)
-  (setq session-save-file (concat dotemacs-temp-directory "session")))
+;; (use-package session
+;;   :ensure t
+;;   :disabled t
+;;   :init
+;;   (add-hook 'after-init-hook #'session-initialize)
+;;   (setq session-save-file (concat dotemacs-temp-directory "session")))
 
 (use-package persistent-scratch
   :ensure t

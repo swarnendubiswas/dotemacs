@@ -13,6 +13,7 @@
 (use-package ivy
   :ensure t
   :if (eq dotemacs-selection 'ivy)
+  :demand t
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
   (defun eh-ivy-return-recentf-index (dir)
@@ -60,7 +61,7 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-arrow
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
-        ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
+        ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
                                 (swiper . ivy--regex-plus)
                                 (counsel-rg . ivy--regex-plus)
                                 (counsel-grep-or-swiper . ivy--regex-plus)
@@ -156,7 +157,7 @@
    ("C-c s r" . counsel-rg)
    ("<f4>" . counsel-grep-or-swiper)
    ("C-c C-m" . counsel-mark-ring)
-   ("C-c C-j" . counsel-imenu))
+   ("C-c C-j" . counsel-semantic-or-imenu))
   :config
   (setq counsel-mode-override-describe-bindings t
         counsel-grep-swiper-limit 1000000 ; Number of characters in the buffer

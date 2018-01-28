@@ -72,7 +72,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-mode-line-theme
-  'spaceline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -109,7 +109,7 @@ differences due to whitespaces."
   :group 'dotemacs)
 
 (defcustom dotemacs-use-ignoramus-p
-  t
+  nil
   "Should the ignoramus package be used?
 The package controls ignoring boring file expressions."
   :type 'boolean

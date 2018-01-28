@@ -92,8 +92,8 @@
 
 (put 'company-clang-arguments 'safe-local-variable 'listp)
 (put 'company-c-headers-path-user 'safe-local-variable 'listp)
-(put 'reftex-default-bibliograph 'safe-local-variable 'listp)
-(put 'company-bibtex-bibliograph 'safe-local-variable 'listp)
+(put 'reftex-default-bibliography 'safe-local-variable 'listp)
+(put 'company-bibtex-bibliography 'safe-local-variable 'listp)
 (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
 
 ;;; init.el ends here

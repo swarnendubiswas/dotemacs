@@ -52,7 +52,6 @@
   :bind ("C-x C-j" . dired-jump))
 
 (use-package dired+
-  :ensure t
   :after dired
   :load-path "extras"
   :init
