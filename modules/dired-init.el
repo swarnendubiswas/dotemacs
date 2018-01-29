@@ -58,7 +58,10 @@
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
   (setq-default diredp-hide-details-initially-flag nil
                 diredp-hide-details-propagate-flag nil)
-  (diredp-toggle-find-file-reuse-dir 1))
+  :config
+  (toggle-diredp-find-file-reuse-dir 1)
+  ;;(diredp-toggle-find-file-reuse-dir 1)
+  )
 
 (use-package dired-efap
   :ensure t

@@ -29,6 +29,9 @@
 ;; You may delete these explanatory comments.
 ;; (package-initialize)
 
+(setq user-full-name "Swarnendu Biswas"
+      user-mail-address "swarnendu_cse@yahoo.com")
+
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
 (require 'config-init) ; Setup configuration variables
@@ -36,7 +39,6 @@
 
 ;; Now setup other modules
 
-(require 'user-init)
 (require 'defaults-init)
 (require 'appearance-init)
 (require 'mode-line-init)
