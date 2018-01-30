@@ -93,12 +93,6 @@ This depends on the orientation of the display."
 (defconst dotemacs-fill-column 120
   "Column beyond which lines should not extend.")
 
-(defcustom dotemacs-use-fci-p
-  nil
-  "Control display of fci."
-  :type 'boolean
-  :group 'dotemacs)
-
 (defcustom dotemacs-use-whitespace-p
   t
   "Control whitespace module.
