@@ -7,19 +7,19 @@
 
 (defvar dotemacs-fill-column)
 
+;; This is different from whitespace-cleanup since this is unconditional
+;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
+
 (use-package whitespace
   :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :commands (whitespace-cleanup whitespace-mode)
+  :init (global-whitespace-mode 1)
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t
                 whitespace-line-column dotemacs-fill-column
-                whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation empty
-                                        space-after-tab space-mark tab-mark newline-markl)))
-
-;; ;; This is different from whitespace-cleanup since this is unconditional
-;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
+                whitespace-style '(face trailing space-before-tab empty indentation::tab indentation::space)))
 
 ;; Calls whitespace-cleanup before saving the current buffer, but only if the whitespace in the buffer was initially
 ;; clean
@@ -31,7 +31,8 @@
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :diminish ws-butler-mode
-  :init (add-hook 'prog-mode #'ws-butler-global-mode))
+  ;; :init (add-hook 'prog-mode #'ws-butler-global-mode)
+  :hook (prog-mode . ws-butler-mode))
 
 (provide 'whitespace-init)
 

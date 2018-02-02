@@ -42,6 +42,7 @@
               ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package replace+
+  :disabled t
   :load-path "extras"
   :after replace)
 

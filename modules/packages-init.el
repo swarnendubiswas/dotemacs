@@ -64,8 +64,7 @@
 (use-package paradox
   :ensure t
   :bind (("C-c d p" . paradox-list-packages)
-         ("C-c d u" . paradox-upgrade-packages)
-         ("C-c d P" . package-list-packages))
+         ("C-c d u" . paradox-upgrade-packages))
   :config
   (use-package async
     :ensure t)
@@ -84,7 +83,7 @@
 
 (use-package exec-path-from-shell
   :ensure t
-  :defer 5
+  :defer 2
   :config
   (setq exec-path-from-shell-check-startup-files nil)
   (when (memq window-system '(mac ns x))

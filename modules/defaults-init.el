@@ -153,6 +153,7 @@
     (advice-add 'upcase-word :before #'goto-beginning-of-word)))
 
 (use-package saveplace ; Remember cursor position in files
+  :unless noninteractive
   :config
   ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
   (if (and (>= emacs-major-version 25)
@@ -163,6 +164,7 @@
   (setq save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package savehist ; Save minibuffer histories across sessions
+  :unless noninteractive
   :config
   (setq savehist-save-minibuffer-history t
         savehist-file (concat dotemacs-temp-directory "savehist")

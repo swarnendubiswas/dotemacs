@@ -21,7 +21,14 @@
         ((eq dotemacs-selection 'ivy)  (setq magit-completing-read-function 'ivy-completing-read)))
 
 
-  (use-package magit-popup)
+  (use-package magit-popup
+    :defer t)
+
+  (use-package magit-commit
+    :config (use-package git-commit))
+
+  (use-package magit-files
+    :config (global-magit-file-mode))
 
   (use-package gitconfig-mode
     :ensure t

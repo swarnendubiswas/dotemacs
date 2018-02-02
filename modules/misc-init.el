@@ -22,6 +22,7 @@
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
+  :demand t
   :diminish hungry-delete-mode
   :config (global-hungry-delete-mode 1))
 
@@ -47,7 +48,7 @@
 
 (use-package graphviz-dot-mode
   :ensure t
-  :defer t
+  :mode "\\.dot\\'"
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot
@@ -136,6 +137,7 @@
 
 (use-package undo-tree
   :ensure t
+  :disabled t
   :config
   (setq undo-tree-mode-lighter ""
         undo-tree-visualizer-timestamps t

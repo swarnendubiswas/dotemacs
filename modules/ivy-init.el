@@ -111,8 +111,9 @@
 (use-package counsel
   :ensure t
   :ensure ivy
-  :after ivy
   :ensure smex
+  :after ivy
+  :demand t
   :preface
   (defun sb/counsel-recentf ()
     "Find a file on `recentf-list' and abbreviate the home directory."

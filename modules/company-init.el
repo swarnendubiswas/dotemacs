@@ -7,7 +7,6 @@
 
 (defvar dotemacs-selection)
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-use-fci-p)
 (defvar dotemacs-completion-in-buffer)
 
 (use-package company
@@ -85,6 +84,10 @@
     (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
     (bind-key "C-:" #'counsel-company company-mode-map)
     (bind-key "C-:" #'counsel-company company-active-map)))
+
+(use-package company-elisp
+  :after company
+  :config (push 'company-elisp company-backends))
 
 (provide 'company-init)
 

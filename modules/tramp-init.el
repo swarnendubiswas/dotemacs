@@ -17,7 +17,6 @@
   :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "sbiswas"
-        ;; tramp-default-host "stdlinux.cse.ohio-state.edu"
         tramp-default-host "consensus.ices.utexas.edu"
         ;; Auto-save to a local directory for better performance
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
@@ -34,13 +33,11 @@
   ;; Disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
+
   ;; Disable version control. If you access remote files which are not under version control, a lot of check operations
   ;; can be avoided by disabling VC.
   (setq vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
-                                     tramp-file-name-regexp))
-  (use-package password-cache
-    :config (setq password-cache-expiry nil)))
-
+                                     tramp-file-name-regexp)))
 (use-package counsel-tramp
   :ensure t
   :if (eq dotemacs-selection 'ivy)

@@ -16,12 +16,12 @@
 
 (use-package aggressive-indent
   :ensure t
-  :init (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+  ;; :init (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+  :hook (emacs-lisp-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode)
 
 (use-package electric ; Intelligent indentation, on by default from Emacs 24.4
-  :config (electric-indent-mode 1)
-  :bind ("C-j" . nil))
+  :config (electric-indent-mode 1))
 
 (use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
   :ensure t

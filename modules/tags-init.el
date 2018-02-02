@@ -73,16 +73,17 @@
 (use-package rtags
   :ensure t
   :if (eq dotemacs-cc-helper 'rtags)
-  :bind (:map c++-mode-map
+  :commands rtags-mode
+  :bind (:map c++-mode-map ; c-mode-base-map
               ("M-." . rtags-find-symbol-at-point)
               ("M-," . rtags-location-stack-back)
               ("C-c C-j" . rtags-imenu))
   :init
-  (when (eq dotemacs-cc-helper 'rtags)
-    (add-hook 'c-mode-common-hook
-              (lambda ()
-                (when (derived-mode-p 'c-mode 'c++-mode)
-                  (rtags-mode)))))
+  ;; (when (eq dotemacs-cc-helper 'rtags)
+  ;;   (add-hook 'c-mode-common-hook
+  ;;             (lambda ()
+  ;;               (when (derived-mode-p 'c-mode 'c++-mode)
+  ;;                 (rtags-mode)))))
   :config
   (add-hook 'c-mode-common-hook #'rtags-start-process-unless-running)
   (setq rtags-completions-enabled t
@@ -95,6 +96,7 @@
 
   (use-package ivy-rtags
     :ensure t
+    :after (ivy rtags)
     :if (eq dotemacs-selection 'ivy))
 
   (use-package flycheck-rtags

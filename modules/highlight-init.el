@@ -11,7 +11,8 @@
   :ensure t
   ;; This is useful, but does not work well with in the terminal mode.
   ;; Checking for (display-graphics-p) and using hooks do not seem to help.
-  :disabled t
+  ;; :disabled t
+  :commands hl-line-mode
   :config
   (setq hl-line-sticky-flag nil)
   (global-hl-line-mode 1)
@@ -34,7 +35,7 @@
 
 (use-package highlight-numbers
   :ensure t
-  :init (add-hook 'prog-mode-hook #'highlight-numbers-mode))
+  :hook (prog-mode . highlight-numbers-mode))
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
@@ -89,7 +90,9 @@
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
-  :config (beacon-mode 1)
+  ;; :demand t
+  :commands beacon-mode
+  :config (beacon-mode)
   :diminish beacon-mode)
 
 (provide 'highlight-init)

@@ -63,7 +63,9 @@
 (use-package reftex
   :diminish reftex-mode
   :commands (reftex-citation)
-  :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  :after auctex
+  :hook (LaTeX-mode . reftex-mode)
+  ;; :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)

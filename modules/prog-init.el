@@ -104,6 +104,7 @@
 
 (use-package nxml-mode
   :defer t
+  :init (defalias 'xml-mode 'nxml-mode)
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t)
   (when (bound-and-true-p dotemacs-completion-in-buffer)
@@ -115,7 +116,8 @@
 (use-package which-func ; Show the name of the function in the modeline
   :after prog-mode
   :disabled t
-  :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
+  ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
+  :hook (c-mode-common . which-function-mode)
   :config
   (which-function-mode 1)
   (when (eq dotemacs-mode-line-theme 'sml)
@@ -136,18 +138,20 @@
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
-  :init
-  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-  (add-hook 'ielm-mode-hook #'eldoc-mode)
-  (add-hook 'python-mode-hook #'eldoc-mode)
-  :config
-  (use-package eldoc-overlay
-    :ensure t
-    :disabled t ; Too intrusive
-    :diminish eldoc-overlay-mode
-    :config (eldoc-overlay-mode 1))
+  :hook ((c-mode-common emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
+  ;; :init
+  ;; (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+  ;; (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
+  ;; (add-hook 'ielm-mode-hook #'eldoc-mode)
+  ;; (add-hook 'python-mode-hook #'eldoc-mode)
   :diminish eldoc-mode)
+
+(use-package eldoc-overlay
+  :ensure t
+  :after eldoc
+  :disabled t ; Too intrusive
+  :diminish eldoc-overlay-mode
+  :config (eldoc-overlay-mode 1))
 
 (use-package octave
   :mode ("\\.m\\'" . octave-mode))
@@ -171,10 +175,11 @@
 
 (use-package cmake-mode
   :ensure t
-  :defer t
+  :mode ("CMakeLists.txt" "\\.cmake\\'")
   :config
   (use-package cmake-font-lock
-    :ensure t))
+    :ensure t
+    :hook (cmake-mode . cmake-font-lock-activate)))
 
 (use-package cmake-ide
   :ensure t
@@ -186,6 +191,11 @@
 (use-package ini-mode
   :ensure t
   :mode ("\\.ini\\'" . ini-mode))
+
+(add-hook 'after-save-hook
+          (lambda ()
+            (when (or (string-equal major-mode "lisp-mode") (string-equal major-mode "emacs-lisp-mode"))
+              (check-parens))))
 
 (provide 'prog-init)
 

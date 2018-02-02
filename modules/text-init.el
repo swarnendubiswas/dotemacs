@@ -13,6 +13,9 @@
   :diminish writegood-mode
   :init (add-hook 'text-mode-hook #'writegood-mode))
 
+(use-package langtool
+  :ensure t)
+
 (defun sb/company-text-backends ()
   "Add backends for text completion in company mode."
   (make-local-variable 'company-backends)
@@ -45,23 +48,25 @@
   (use-package pandoc-mode
     :ensure t
     :diminish pandoc-mode
+    :hook (markdown-mode . pandoc-mode)
     :config (add-hook 'markdown-mode-hook #'pandoc-mode)))
 
 (use-package csv-mode
   :ensure t
-  :defer t
-  :config
-  (use-package csv-nav
-    :ensure t))
+  :mode "\\.csv\\'")
 
 (use-package json-mode
   :ensure t
-  :defer t
+  :mode "\\.json\\'"
   :config
   (add-hook 'json-mode-hook #'flycheck-mode)
   (add-hook 'json-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'json-mode-beautify t t))))
+
+(use-package yaml-mode
+  :ensure t
+  :mode "\\.ya?ml\\'")
 
 (provide 'text-init)
 
