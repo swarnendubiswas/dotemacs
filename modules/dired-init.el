@@ -123,7 +123,6 @@
 (use-package treemacs
   :ensure t
   :commands (treemacs treemacs-toggle)
-  :demand t
   :config
   (setq treemacs-follow-after-init t
         treemacs-width 35
