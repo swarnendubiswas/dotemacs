@@ -144,7 +144,7 @@
   (treemacs-follow-mode t)
   (treemacs-filewatch-mode t)
   (treemacs-git-mode 'extended)
-  :bind ("C-j" . treemacs-toggle))
+  :bind* ("C-j" . treemacs-toggle))
 
 ;; Delays loading of known projectile projects, not sure why!
 (use-package treemacs-projectile

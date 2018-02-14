@@ -173,21 +173,6 @@
   (use-package ess-smart-underscore
     :ensure t))
 
-(use-package cmake-mode
-  :ensure t
-  :mode ("CMakeLists.txt" "\\.cmake\\'")
-  :config
-  (use-package cmake-font-lock
-    :ensure t
-    :hook (cmake-mode . cmake-font-lock-activate)))
-
-(use-package cmake-ide
-  :ensure t
-  :defer t
-  :config
-  (setq cmake-ide-flags-c++ (append '("-std=c++11")))
-  (cmake-ide-setup))
-
 (use-package ini-mode
   :ensure t
   :mode ("\\.ini\\'" . ini-mode))

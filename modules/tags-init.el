@@ -89,29 +89,30 @@
   (setq rtags-completions-enabled t
         rtags-find-file-case-insensitive t
         rtags-find-file-prefer-exact-match nil
-        rtags-autostart-diagnostics t)
-
+        rtags-autostart-diagnostics t
+        rtags-display-summary-as-tooltip t)
   (when (eq dotemacs-selection 'ivy)
     (setq rtags-display-result-backend 'ivy))
+  (rtags-diagnostics))
 
-  (use-package ivy-rtags
-    :ensure t
-    :after (ivy rtags)
-    :if (eq dotemacs-selection 'ivy))
+(use-package ivy-rtags
+  :ensure t
+  :after (ivy rtags)
+  :if (eq dotemacs-selection 'ivy))
 
-  (use-package flycheck-rtags
-    :ensure t
-    :disabled t
-    :preface
-    ;; https://github.com/Andersbakken/rtags/blob/7e6b6f21935eedbe4678ba91c5531ac162b51a5a/src/flycheck-rtags.el
-    (defun sb/flycheck-rtags-setup ()
-      "Configure flycheck-rtags for better experience."
-      (flycheck-select-checker 'rtags)
-      (setq-local flycheck-check-syntax-automatically nil)
-      (setq-local flycheck-highlighting-mode nil)
-      (add-hook 'c-mode-hook #'sb/flycheck-rtags-setup)
-      (add-hook 'c++-mode-hook #'sb/flycheck-rtags-setup))
-    :init (add-hook 'c-mode-common-hook #'sb/flycheck-rtags-setup)))
+(use-package flycheck-rtags
+  :ensure t
+  :disabled t
+  :preface
+  ;; https://github.com/Andersbakken/rtags/blob/7e6b6f21935eedbe4678ba91c5531ac162b51a5a/src/flycheck-rtags.el
+  (defun sb/flycheck-rtags-setup ()
+    "Configure flycheck-rtags for better experience."
+    (flycheck-select-checker 'rtags)
+    (setq-local flycheck-check-syntax-automatically nil)
+    (setq-local flycheck-highlighting-mode nil)
+    (add-hook 'c-mode-hook #'sb/flycheck-rtags-setup)
+    (add-hook 'c++-mode-hook #'sb/flycheck-rtags-setup))
+  :init (add-hook 'c-mode-common-hook #'sb/flycheck-rtags-setup))
 
 (use-package company-rtags
   :ensure t

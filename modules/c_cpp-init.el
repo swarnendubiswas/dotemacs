@@ -1,4 +1,4 @@
-;;; cc-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; c_cpp-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
 ;; C/C++ programming mode specific.
@@ -94,19 +94,18 @@
   :ensure t
   :diminish irony-mode
   :defer t
-  :preface
-  ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
-  (defun sb/irony-mode-hook ()
-    (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
-    (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async))
   :init
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
   :config
   (setq irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
-  (add-hook 'irony-mode-hook #'sb/irony-mode-hook)
   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
-  (add-hook 'irony-mode-hook #'flycheck-irony-setup)
+  ;; Use compilation database first, clang_complete as fallback.
+  (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
+                                                  irony-cdb-clang-complete))
+  ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
+  (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async)
 
   (use-package company-irony
     :ensure t
@@ -148,6 +147,11 @@
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
     (setq clang-format-executable "/usr/bin/clang-format-5.0")))
 
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (string-equal major-mode "c++-mode")
+              (clang-format-buffer))))
+
 (use-package cuda-mode
   :ensure t
   :mode ("\\.cu\\'"	. cuda-mode))
@@ -179,11 +183,21 @@
            ))))
 (add-hook 'c++-mode-hook #'sb/company-cc-backends)
 
-(add-hook 'before-save-hook
-          (lambda ()
-            (when (string-equal major-mode "c++-mode")
-              (clang-format-buffer))))
+(use-package cmake-mode
+  :ensure t
+  :mode ("CMakeLists.txt" "\\.cmake\\'")
+  :config
+  (use-package cmake-font-lock
+    :ensure t
+    :hook (cmake-mode . cmake-font-lock-activate)))
 
-(provide 'cc-init)
+(use-package cmake-ide
+  :ensure t
+  :defer t
+  :config
+  (setq cmake-ide-flags-c++ (append '("-std=c++11")))
+  (cmake-ide-setup))
 
-;;; cc-init.el ends here
+(provide 'c_cpp-init)
+
+;;; c_cpp-init.el ends here

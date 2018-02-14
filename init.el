@@ -78,7 +78,7 @@
 (require 'latex-new-init)
 (require 'org-init)
 (require 'prog-init)
-(require 'cc-init)
+(require 'c_cpp-init)
 (require 'java-init)
 (require 'python-init)
 (require 'shell-script-init)
@@ -97,5 +97,7 @@
 (put 'reftex-default-bibliography 'safe-local-variable 'listp)
 (put 'company-bibtex-bibliography 'safe-local-variable 'listp)
 (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
+(put 'flycheck-clang-include-path 'safe-local-variable 'listp)
+(put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
 
 ;;; init.el ends here

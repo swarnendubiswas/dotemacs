@@ -68,6 +68,11 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-u q` - Kill dired buffer (``).
 * `C-x C-j` - Open dired with cursor right on the file you are editing (`dired-jump`).
 
+## Treemacs
+
+*
+*
+
 ## Ibuffer
 
 * `S` - Save file (`ibuffer-do-save`).
@@ -90,6 +95,11 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 * `C-c C-p` -
 * `C-x C-s` -
 * `C-h m` - Show all the keybindings available inside a results buffer (``).
+
+### Ripgrep
+
+*
+*
 
 ### Swiper
 
@@ -152,6 +162,7 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 ## Projectile
 
 * `C-c p f` - Display a list of all files in the project (`projectile-find-file`).
+* `C-c p g` - Jump to a project's files using completion based on context (`projectile-find-file-dwim`).
 * `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`).
 * `C-c p b` - List buffers local to current project (`projectile-switch-to-buffer`).
 * `C-c p e` - Jump to recently visited files in project (`projectile-recentf`).

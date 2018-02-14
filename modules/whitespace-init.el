@@ -18,7 +18,7 @@
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t
-                whitespace-style '(face trailing space-before-tab empty indentation::tab indentation::space)
+                whitespace-style nil
                 whitespace-line-column dotemacs-fill-column))
 
 ;; Calls whitespace-cleanup before saving the current buffer, but only if the whitespace in the buffer was initially

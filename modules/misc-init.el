@@ -15,7 +15,6 @@
 
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
-  :defer t
   :config
   (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
   (use-package vlf-setup))
@@ -61,12 +60,7 @@
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
-  :ensure t
-  :defer t)
-
-(use-package pos-tip
-  :ensure t
-  :disabled t)
+  :ensure t)
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
@@ -81,6 +75,7 @@
   ;; popwin does not support ecb or neotree. Only direx seems to be supported. Too bad, would loved to have both popwin and ecb enabled.
   ;; https://github.com/m2ym/popwin-el/issues/9
   :if (not (bound-and-true-p dotemacs-use-ecb))
+  :demand t
   :config
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -135,20 +130,6 @@
   :ensure t
   :config (smart-mark-mode 1))
 
-(use-package undo-tree
-  :ensure t
-  :disabled t
-  :config
-  (setq undo-tree-mode-lighter ""
-        undo-tree-visualizer-timestamps t
-        undo-tree-visualizer-relative-timestamps t
-        undo-tree-auto-save-history nil
-        undo-tree-visualizer-diff t)
-  (global-undo-tree-mode 1)
-  (unbind-key "C-/" undo-tree-map)
-  :diminish undo-tree-mode
-  :bind ("C-x u" . undo-tree-visualize))
-
 (use-package ignoramus ; Ignore backups, build files, et al.
   :ensure t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
@@ -184,13 +165,6 @@
   :ensure t
   :bind* ("C-." . iedit-mode))
 
-;; (use-package session
-;;   :ensure t
-;;   :disabled t
-;;   :init
-;;   (add-hook 'after-init-hook #'session-initialize)
-;;   (setq session-save-file (concat dotemacs-temp-directory "session")))
-
 (use-package persistent-scratch
   :ensure t
   :defer 2
@@ -205,15 +179,10 @@
 
 (use-package crux
   :ensure t
-  ;; :config
-  ;; (crux-with-region-or-buffer indent-region)
-  ;; (crux-with-region-or-buffer untabify)
-  ;; (crux-with-region-or-line comment-or-uncomment-region)
   :bind ("C-c i" . crux-ispell-word-then-abbrev))
 
 (use-package elf-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package apt-sources-list
   :ensure t
