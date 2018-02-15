@@ -55,18 +55,18 @@
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
-        ivy-height 20 ; This seems a good number to see several options at a time without cluttering the view
+        ivy-height 30 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-arrow
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
-        ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
+        ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
                                 (swiper . ivy--regex-plus)
                                 (counsel-rg . ivy--regex-plus)
                                 (counsel-grep-or-swiper . ivy--regex-plus)
                                 (ivy-switch-buffer . ivy--regex-plus)
-                                (t . ivy--regex-ignore-order))
+                                (t . ivy--regex-fuzzy))
         ivy-flx-limit 200
         ivy-use-ignore-default 'always ; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-selectable-prompt nil

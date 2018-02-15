@@ -138,12 +138,7 @@
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
-  :hook ((c-mode-common emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
-  ;; :init
-  ;; (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  ;; (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-  ;; (add-hook 'ielm-mode-hook #'eldoc-mode)
-  ;; (add-hook 'python-mode-hook #'eldoc-mode)
+  :hook ((emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
   :diminish eldoc-mode)
 
 (use-package eldoc-overlay
