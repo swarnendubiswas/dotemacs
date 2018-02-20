@@ -21,9 +21,11 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
-  :bind
-  ;; Disable "LaTeX-insert-item" in favor of imenu
-  ("C-c C-j" . nil))
+  ;; :bind
+  ;; ;; Disable "LaTeX-insert-item" in favor of imenu
+  ;; ("C-c C-j" . nil)
+
+  )
 
 ;; prettify-symbol-mode is distracting while editing, and is buffer-local.
 (add-hook 'LaTeX-mode-hook

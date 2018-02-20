@@ -7,11 +7,11 @@
 
 (defvar dotemacs-theme)
 
+;; This is useful, but does not work well with in the terminal mode. Checking for (display-graphics-p) and using hooks
+;; do not seem to help. Furthermore, this is a performance bottleneck for large files.
 (use-package hl-line ; Highlight current line
   :ensure t
-  ;; This is useful, but does not work well with in the terminal mode.
-  ;; Checking for (display-graphics-p) and using hooks do not seem to help.
-  ;; :disabled t
+  :disabled t
   :commands hl-line-mode
   :config
   (setq hl-line-sticky-flag nil)
@@ -20,25 +20,21 @@
     (set-face-attribute 'hl-line nil
                         :background "old lace")))
 
-(use-package hl-line+ ; Highlight only when idle
-  :ensure t
-  :disabled t
-  :after hl-line
-  :config
-  (global-hl-line-mode -1)
-  (toggle-hl-line-when-idle 1))
-
-(use-package hilit-chg
-  :disabled t
-  :diminish highlight-changes-mode
-  :config (highlight-changes-mode 1))
+;; (use-package hl-line+ ; Highlight only when idle
+;;   :ensure t
+;;   :after hl-line
+;;   :config
+;;   (global-hl-line-mode -1)
+;;   (toggle-hl-line-when-idle 1))
 
 (use-package highlight-numbers
   :ensure t
+  :disabled t
   :hook (prog-mode . highlight-numbers-mode))
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
+  ;; :demand t
   :preface
   ;; http://www.wilfred.me.uk/.emacs.d/init.html
   (defun highlight-symbol-first ()
@@ -65,11 +61,11 @@
           (search-backward-regexp
            (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
            nil t)))))
-
+  ;; :init
+  ;; (add-hook 'prog-mode-hook #'highlight-symbol-mode)
+  ;; ;; Navigate occurrences of the symbol under point with M-n and M-p
+  ;; (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
   :config
-  (add-hook 'prog-mode-hook #'highlight-symbol-mode)
-  ;; Navigate occurrences of the symbol under point with M-n and M-p
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
   (setq highlight-symbol-idle-delay 0.1
         highlight-symbol-on-navigation-p t
         highlight-symbol-highlight-single-occurrence t)
@@ -90,9 +86,7 @@
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
-  ;; :demand t
-  :commands beacon-mode
-  :config (beacon-mode)
+  :init (beacon-mode)
   :diminish beacon-mode)
 
 (provide 'highlight-init)

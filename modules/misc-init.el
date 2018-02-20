@@ -13,10 +13,10 @@
    ("C-h k" . helpful-key)
    ("C-h f" . helpful-function)))
 
+;; M-x vlf <PATH-TO-FILE>
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
-  :config
-  (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
+  :config (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
   (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction

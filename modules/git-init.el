@@ -9,7 +9,7 @@
 
 (use-package magit
   :ensure t
-  :defer t
+  :bind ("C-x g" . magit-status)
   :config
   (setq magit-save-repository-buffers t)
   (setq magit-post-display-buffer-hook

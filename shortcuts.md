@@ -289,6 +289,7 @@ https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automat
 * `C-u S` - Stage all untracked and tracked files.
 * `g` - Refresh the current buffer (`magit-refresh`).
 * `G` - Refreshes all magit buffers (`magit-refresh-all`).
+* `k` - Discard changes in an item (`magit-discard-item`).
 
 ### Svn
 

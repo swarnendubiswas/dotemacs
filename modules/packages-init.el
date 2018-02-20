@@ -35,12 +35,6 @@
 
 (package-initialize)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Setup use-package: https://github.com/jwiegley/use-package                                       ;;
-;; :init always happens before package load, whether :config has been deferred or not. This implies ;;
-;; :init is never deferred.                                                                         ;;
-;; :load-path: if the path is relative, it is expanded within user-emacs-directory                  ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -73,10 +67,10 @@
         paradox-spinner-type 'random)
   (paradox-enable))
 
+;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (use-package cus-edit
   :defer 2
   :config
-  ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
   (setq custom-file dotemacs-emacs-custom-file)
   (when (file-exists-p custom-file)
     (load custom-file :noerror)))

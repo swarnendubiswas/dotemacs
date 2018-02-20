@@ -50,34 +50,30 @@
   ;; Blinking cursor can be distracting
   (blink-cursor-mode 0))
 
+;; Not the most useful information within Emacs
 (use-package time ; Display the time and date in the mode line
-  :defer t ; Not the most useful information within Emacs
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil
         display-time-default-load-average nil)
   (display-time))
 
+;; linum-mode can slow down Emacs for large files:
+;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
 ;; Display line numbers in the margin
 (or (use-package linum
-      ;; linum-mode can slow down Emacs for large files:
-      ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
       :disabled t
       :config (global-linum-mode 1))
 
     (use-package nlinum ; Might improve performance with jit font locking.
       :ensure t
-      :disabled t ;; Does not work with emacsclient, since the frame is created later. See Kaushal Modi's response.
-      :defer 1
+      :disabled t ;; Does not work with emacsclient, since the frame is created later.
       :config (global-nlinum-mode 1)))
 
 (use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
   :ensure t
   :disabled t
   :config (hlinum-activate))
-
-;; (when (version<= "26.0.50" emacs-version )
-;;   (global-display-line-numbers-mode 1))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -141,27 +137,20 @@
                                                           :background "deep sky blue"
                                                           :foreground "white"))))
 
-;; http://amitp.blogspot.com/2007/04/emacs-buffer-tabs.html
-;; https://zhangda.wordpress.com/2012/09/21/tabbar-mode-rocks-with-customization/
-;; https://gist.github.com/ShingoFukuyama/7245914
-;; http://stackoverflow.com/questions/18511113/emacs-tabbar-customisation-making-unsaved-changes-visible
-;; http://stackoverflow.com/questions/15735163/update-tabbar-when-nothing-to-save#
-;; https://github.com/tomekowal/dotfiles/blob/master/.emacs.d/my-tabbar.el
-;; https://github.com/davidswelt/aquamacs-emacs/blob/a07bd68f5dd575b3f3c1346f937c9fe46b78cfc0/aquamacs/src/site-lisp/tabbar/tabbar-window.el
 (use-package tabbar
   :ensure t
   :preface
-  (defun dotemacs--tabbar-modification-state-change ()
+  (defun sb/tabbar-modification-state-change ()
     (tabbar-set-template tabbar-current-tabset nil)
     (tabbar-display-update))
 
-  (defun dotemacs--tabbar-on-buffer-modification ()
+  (defun sb/tabbar-on-buffer-modification ()
     (set-buffer-modified-p t)
-    (dotemacs--tabbar-modification-state-change))
+    (sb/tabbar-modification-state-change))
 
-  (defun dotemacs--tabbar-on-buffer-revert ()
+  (defun sb/tabbar-on-buffer-revert ()
     (set-buffer-modified-p nil)
-    (dotemacs--tabbar-modification-state-change))
+    (sb/tabbar-modification-state-change))
   :init (tabbar-mode 1)
   :config
   (setq tabbar-use-images nil ; Speed up by not using images
@@ -170,9 +159,9 @@
         tabbar-separator '(0.3))
   (setq tabbar-separator '(1)) ;; set tabbar-separator size to 1 pixel
 
-  (add-hook 'after-save-hook #'dotemacs--tabbar-modification-state-change)
-  (add-hook 'first-change-hook #'dotemacs--tabbar-on-buffer-modification)
-  (add-hook 'after-revert-hook #'dotemacs--tabbar-on-buffer-revert)
+  (add-hook 'after-save-hook #'sb/tabbar-modification-state-change)
+  (add-hook 'first-change-hook #'sb/tabbar-on-buffer-modification)
+  (add-hook 'after-revert-hook #'sb/tabbar-on-buffer-revert)
 
   ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
   ;; crowded.

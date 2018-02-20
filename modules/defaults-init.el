@@ -32,6 +32,8 @@
       read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
+      ;; Make cursor the width of the character it is under i.e. full width of a TAB
+      x-stretch-cursor t
       auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save"))
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
@@ -103,9 +105,6 @@
     (setq select-enable-clipboard t)
   (setq x-select-enable-clipboard t))
 
-;; Make cursor the width of the character it is under i.e. full width of a TAB
-(setq x-stretch-cursor t)
-
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
 
@@ -121,25 +120,23 @@
         blink-matching-paren t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
-  (next-error-follow-minor-mode 1)
   (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
   :bind ("C-c d f" . auto-fill-mode))
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
+  ;; :demand t
   :diminish auto-revert-mode
+  :init (add-hook 'find-file-hook #'global-auto-revert-mode)
   :config
-  (setq-default auto-revert-interval 10 ; Default is 5 s.
+  (setq-default auto-revert-interval 15 ; Default is 5 s.
                 auto-revert-verbose nil
                 ;; Auto-refresh dired buffers.
-                global-auto-revert-non-file-buffers t)
-  (add-hook 'find-file-hook #'global-auto-revert-mode))
+                global-auto-revert-non-file-buffers t))
 
 (use-package delsel
   :config
   ;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
   (delete-selection-mode 1))
-
-(file-name-shadow-mode 1) ; Dim the ignored part of the file name in the minibuffer
 
 (use-package advice
   :config
@@ -183,7 +180,6 @@
   :config (minibuffer-depth-indicate-mode 1))
 
 (use-package uniquify
-  :defer t
   :config
   (setq uniquify-buffer-name-style 'forward
         uniquify-separator "/"
@@ -209,6 +205,7 @@
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
+  :demand t
   :diminish subword-mode
   :config (global-subword-mode 1))
 

@@ -26,6 +26,7 @@
         isearch-allow-scroll t)
   (use-package isearch+
     :ensure t
+    :disabled t
     :diminish isearch-mode)
   (use-package isearch-symbol-at-point
     :ensure t)
