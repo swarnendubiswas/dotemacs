@@ -89,10 +89,21 @@
   ("l" elpy-nav-indent-shift-left "left")
   ("r" elpy-nav-indent-shift-right "right"))
 
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (when (string-equal major-mode "python-mode")
+;;               (progn
+;;                 (pyimport-remove-unused)
+;;                 (elpy-format-code)))))
+
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (when (string-equal major-mode "python-mode")
+;;               (elpy-format-code))))
+
 (add-hook 'before-save-hook
           (lambda ()
-            (when (string-equal major-mode "python-mode")
-              (pyimport-remove-unused)
+            (when (string-equal major-mode "elpy-mode")
               (elpy-format-code))))
 
 (provide 'python-init)
