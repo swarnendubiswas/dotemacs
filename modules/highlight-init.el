@@ -37,7 +37,7 @@
   ;; :demand t
   :preface
   ;; http://www.wilfred.me.uk/.emacs.d/init.html
-  (defun highlight-symbol-first ()
+  (defun sb/highlight-symbol-first ()
     "Jump to the first location of symbol at point."
     (interactive)
     (push-mark)
@@ -50,7 +50,7 @@
            nil t))
         (beginning-of-thing 'symbol))))
 
-  (defun highlight-symbol-last ()
+  (defun sb/highlight-symbol-last ()
     "Jump to the last location of symbol at point."
     (interactive)
     (push-mark)
@@ -74,10 +74,7 @@
 (use-package fic-mode ; Highlight certain words
   :ensure t
   :diminish fic-mode
-  :init
-  (add-hook 'text-mode-hook #'fic-mode)
-  (add-hook 'prog-mode-hook #'fic-mode)
-  (add-hook 'nxml-mode-hook #'fic-mode)
+  :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config
   (add-to-list 'fic-highlighted-words '"XXX")
   (add-to-list 'fic-highlighted-words '"LATER")
