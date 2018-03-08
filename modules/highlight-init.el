@@ -9,10 +9,9 @@
 
 ;; This is useful, but does not work well with in the terminal mode. Checking for (display-graphics-p) and using hooks
 ;; do not seem to help. Furthermore, this is a performance bottleneck for large files.
-(use-package hl-line ; Highlight current line
+(use-package hl-line
   :ensure t
   :disabled t
-  :commands hl-line-mode
   :config
   (setq hl-line-sticky-flag nil)
   (global-hl-line-mode 1)
@@ -34,7 +33,6 @@
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
-  ;; :demand t
   :preface
   ;; http://www.wilfred.me.uk/.emacs.d/init.html
   (defun sb/highlight-symbol-first ()
@@ -79,7 +77,8 @@
   (add-to-list 'fic-highlighted-words '"XXX")
   (add-to-list 'fic-highlighted-words '"LATER")
   (add-to-list 'fic-highlighted-words '"IMP")
-  (add-to-list 'fic-highlighted-words '"NOTE"))
+  (add-to-list 'fic-highlighted-words '"NOTE")
+  (add-to-list 'fic-highlighted-words '"NOTES"))
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t

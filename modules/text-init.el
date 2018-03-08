@@ -40,16 +40,21 @@
         markdown-italic-underscore t
         markdown-enable-math t
         markdown-make-gfm-checkboxes-buttons t
-        markdown-command "pandoc -f markdown -s ")
-  (use-package markdown-mode+
-    :ensure t)
-  (use-package pandoc
-    :ensure t)
-  (use-package pandoc-mode
-    :ensure t
-    :diminish pandoc-mode
-    :hook (markdown-mode . pandoc-mode)
-    :config (add-hook 'markdown-mode-hook #'pandoc-mode)))
+        markdown-command "pandoc -f markdown -s "))
+
+(use-package markdown-mode+
+  :ensure t
+  :after markdown-mode)
+
+(use-package pandoc
+  :ensure t
+  :after markdown-mode)
+
+(use-package pandoc-mode
+  :ensure t
+  :diminish pandoc-mode
+  :after markdown-mode
+  :hook (markdown-mode . pandoc-mode))
 
 (use-package csv-mode
   :ensure t
@@ -59,7 +64,7 @@
   :ensure t
   :mode "\\.json\\'"
   :config
-  (add-hook 'json-mode-hook #'flycheck-mode)
+  ;; (add-hook 'json-mode-hook #'flycheck-mode)
   (add-hook 'json-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'json-mode-beautify t t))))

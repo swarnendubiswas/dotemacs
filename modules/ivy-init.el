@@ -51,7 +51,7 @@
   :config
   (setq ivy-use-virtual-buffers nil ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
         confirm-nonexistent-file-or-buffer t
-        ivy-virtual-abbreviate 'full
+        ivy-virtual-abbreviate 'abbreviate
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching

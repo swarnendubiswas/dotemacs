@@ -50,16 +50,18 @@
   :init (add-hook 'python-mode-hook #'sb/elpy-setup)
   :config
   (add-hook 'elpy-mode-hook #'flycheck-mode)
-  ;; http://www.wilfred.me.uk/.emacs.d/init.html
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
+  ;; ;; http://www.wilfred.me.uk/.emacs.d/init.html
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda ()
+  ;;             (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
 
   (use-package python-docstring
     :ensure t
     :diminish python-docstring-mode
-    :config
-    (add-hook 'python-mode-hook #'python-docstring-mode))
+    :hook (python-mode . python-docstring-mode))
+
+  (use-package pyimport
+    :ensure t)
   :bind (:map elpy-mode-map
               ("C-c c e" . python-nav-forward-defun)
               ("C-c c a" . python-nav-backward-defun)
@@ -89,21 +91,24 @@
   ("l" elpy-nav-indent-shift-left "left")
   ("r" elpy-nav-indent-shift-right "right"))
 
-;; (add-hook 'before-save-hook
-;;           (lambda ()
-;;             (when (string-equal major-mode "python-mode")
-;;               (progn
-;;                 (pyimport-remove-unused)
-;;                 (elpy-format-code)))))
+;; FIXME: One of the following three works.
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (string-equal major-mode "python-mode")
+              (progn
+                (pyimport-remove-unused)
+                (elpy-format-code)))))
 
-;; (add-hook 'before-save-hook
-;;           (lambda ()
-;;             (when (string-equal major-mode "python-mode")
-;;               (elpy-format-code))))
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (string-equal major-mode "python-mode")
+              (pyimport-remove-unused)
+              (elpy-format-code))))
 
 (add-hook 'before-save-hook
           (lambda ()
             (when (string-equal major-mode "elpy-mode")
+              (pyimport-remove-unused)
               (elpy-format-code))))
 
 (provide 'python-init)
