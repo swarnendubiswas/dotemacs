@@ -77,16 +77,16 @@
                  ".toc"))
     (add-to-list 'completion-ignored-extensions ext)))
 
-;; Activate utf8 mode
-(when (eq system-type 'windows-nt)
-  (setq locale-coding-system 'utf-8)
-  (set-language-environment 'utf-8)
-  (prefer-coding-system 'utf-8)
-  (set-input-method nil)
+;; ;; Activate utf8 mode
+;; (when (eq system-type 'windows-nt)
+;;   (setq locale-coding-system 'utf-8)
+;;   (set-language-environment 'utf-8)
+;;   (prefer-coding-system 'utf-8)
+;;   (set-input-method nil)
 
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-  (set-selection-coding-system 'utf-8))
+;;   (set-terminal-coding-system 'utf-8)
+;;   (set-keyboard-coding-system 'utf-8)
+;;   (set-selection-coding-system 'utf-8))
 
 (use-package files
   :config

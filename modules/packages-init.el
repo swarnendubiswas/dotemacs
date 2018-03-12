@@ -14,24 +14,24 @@
       ;; Avoid loading packages twice
       package-enable-at-startup nil)
 
-;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
+;; ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
+;; (when (< emacs-major-version 24)
+;;   ;; For important compatibility libraries like cl-lib
+;;   (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
 
-(add-to-list 'package-archives
-             '("org" . "http://orgmode.org/elpa/") t)
 ;; (add-to-list 'package-archives
-;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
+;;              '("org" . "http://orgmode.org/elpa/") t)
+;; ;; (add-to-list 'package-archives
+;; ;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "https://melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
 
-;; Marmalade repo often does not work reliably
-(when (bound-and-true-p dotemacs-use-marmalade-repo-p)
-  (add-to-list 'package-archives
-               '("marmalade" . "https://marmalade-repo.org/packages/") t))
+;; ;; Marmalade repo often does not work reliably
+;; (when (bound-and-true-p dotemacs-use-marmalade-repo-p)
+;;   (add-to-list 'package-archives
+;;                '("marmalade" . "https://marmalade-repo.org/packages/") t))
 
 (package-initialize)
 

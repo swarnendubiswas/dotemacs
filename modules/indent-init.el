@@ -16,7 +16,6 @@
 
 (use-package aggressive-indent
   :ensure t
-  ;; :init (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
   :hook (emacs-lisp-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode)
 

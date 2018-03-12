@@ -40,55 +40,54 @@
 ;; Now setup other modules
 
 (require 'defaults-init)
-(require 'appearance-init)
-(require 'mode-line-init)
+;; (require 'appearance-init)
+;; (require 'mode-line-init)
 
 ;; Configure power packages
-(require 'ibuffer-init)
+;; (require 'ibuffer-init)
 (require 'dired-init)
-(require 'search-init)
+;; (require 'search-init)
 (require 'recentf-init)
 (require 'company-init)
 (cond ((eq dotemacs-selection 'ido)  (require 'ido-init))
       ((eq dotemacs-selection 'ivy)  (require 'ivy-init)))
 
 ;; Configure the more useful extensions
-(require 'spell-init)
+;; (require 'spell-init)
 (require 'ace-modes-init)
 (require 'indent-init)
-(require 'parens-init)
-(require 'abbrev-init)
-(require 'kill-ring-init)
+;; (require 'parens-init)
+;; (require 'abbrev-init)
+;; (require 'kill-ring-init)
 
 ;; Setup helper packages
 (require 'projectile-init)
 (require 'misc-init)
 (require 'yasnippet-init)
 (require 'flycheck-init)
-(require 'rainbow-init)
-(require 'whitespace-init)
-(require 'highlight-init)
-(require 'tramp-init)
-(require 'imenu-init)
+;; (require 'whitespace-init)
+;; (require 'highlight-init)
+;; (require 'tramp-init)
+;; (require 'imenu-init)
 (require 'tags-init)
 
 ;; Configure individual major modes
-(require 'text-init)
+;; (require 'text-init)
 ;; (require 'latex-init)
-(require 'latex-new-init)
-(require 'org-init)
-(require 'prog-init)
-(require 'c_cpp-init)
-(require 'java-init)
+;; (require 'latex-new-init)
+;; (require 'org-init)
+;; (require 'prog-init)
+;; (require 'c_cpp-init)
+;; (require 'java-init)
 (require 'python-init)
-(require 'shell-script-init)
-(require 'shell-init)
-(require 'svn-init)
-(require 'git-init)
+;; (require 'shell-script-init)
+;; (require 'shell-init)
+;; (require 'svn-init)
+;; (require 'git-init)
 
 (require 'functions-init)
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
-(require 'server-init) ; Start the daemon/server
+;; (require 'server-init) ; Start the daemon/server
 
 ;; Mark safe variables
 

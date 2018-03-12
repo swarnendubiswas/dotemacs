@@ -1,11 +1,10 @@
 {
     "files.exclude": {
-        "elpa/": true,
+        "**/elpa/": true,
         "irony/": true,
         "auto-save-list": true,
         "eshell": true,
         "reference-cards": true,
-        "tmp/semanticdb": true,
         "session.*": true,
         ".session*": true,
         "ac-html-csswatcher": true,
@@ -15,7 +14,9 @@
         ".project": true,
         ".projectile": true,
         "network-security*": true,
-        "semanticdb": true
+        "semanticdb": true,
+        "**/tmp": true,
+        "**/dict": true
     },
     "search.exclude": {
         "**/node_modules": true,

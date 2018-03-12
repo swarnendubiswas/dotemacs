@@ -21,9 +21,8 @@
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
-  :demand t
   :diminish hungry-delete-mode
-  :config (global-hungry-delete-mode 1))
+  :init (global-hungry-delete-mode 1))
 
 (use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
   :ensure t
@@ -76,6 +75,7 @@
   ;; https://github.com/m2ym/popwin-el/issues/9
   :if (not (bound-and-true-p dotemacs-use-ecb))
   :demand t
+  :disabled t
   :config
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -120,10 +120,12 @@
 
 (use-package change-inner ; This might be useful for programming modes
   :ensure t
+  :disabled t
   :after expand-region)
 
 (use-package expand-line
   :ensure t
+  :disabled t
   :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package smart-mark ; Restore point with "C-g" after marking a region
@@ -175,6 +177,7 @@
 
 (use-package immortal-scratch
   :ensure t
+  :disabled t
   :config (immortal-scratch-mode 1))
 
 (use-package crux
@@ -197,6 +200,13 @@
   :bind*
   (([remap execute-extended-command] . amx)
    ("<f1>" . amx)))
+
+(use-package rainbow-delimiters
+  :ensure t
+  ;; :init
+  ;; (dolist (hook '(text-mode-hook prog-mode-hook))
+  ;;   (add-hook hook #'rainbow-delimiters-mode))
+  :hooks ((text-mode prog-mode) . rainbow-delimiters-mode))
 
 (provide 'misc-init)
 

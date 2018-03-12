@@ -12,7 +12,8 @@
   :commands (yas-expand yas-minor-mode)
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :init (yas-global-mode 1)
+  ;; :init (yas-global-mode 1)
+  :hooks ((LaTeX-mode prog-mode) . yas-minor-mode)
   :config
   (setq yas-triggers-in-field t
         yas-wrap-around-region t)

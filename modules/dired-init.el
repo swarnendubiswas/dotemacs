@@ -66,6 +66,7 @@
 
 (use-package diredfl
   :ensure t
+  :disabled t
   :after dired
   :config (diredfl-global-mode))
 
@@ -86,6 +87,7 @@
 
 (use-package dired-quick-sort
   :ensure t
+  :disabled t
   :after dired
   :config (dired-quick-sort-setup))
 
