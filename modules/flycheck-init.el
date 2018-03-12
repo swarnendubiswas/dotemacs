@@ -11,7 +11,7 @@
 (use-package flycheck
   :ensure t
   ;; :init (add-hook 'prog-mode-hook #'global-flycheck-mode)
-  :hooks (prog-mode . flycheck-mode)
+  :hook (prog-mode . flycheck-mode)
   :config
   ;; (setq-default flycheck-disabled-checkers '(tex-chktex tex-lacheck)) ; Leave out LaTeX
   (setq flycheck-emacs-lisp-load-path 'inherit
@@ -37,7 +37,7 @@
 (use-package flycheck-popup-tip ; Show error messages in popups
   :ensure t
   :after flycheck
-  :hooks (flycheck-mode . flycheck-popup-tip-mode)
+  :hook (flycheck-mode . flycheck-popup-tip-mode)
   ;; :init (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode)
   )
 

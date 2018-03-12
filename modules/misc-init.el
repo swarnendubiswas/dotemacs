@@ -206,7 +206,7 @@
   ;; :init
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
   ;;   (add-hook hook #'rainbow-delimiters-mode))
-  :hooks ((text-mode prog-mode) . rainbow-delimiters-mode))
+  :hook ((text-mode prog-mode) . rainbow-delimiters-mode))
 
 (provide 'misc-init)
 
