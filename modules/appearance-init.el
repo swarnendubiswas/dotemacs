@@ -9,13 +9,12 @@
 (defvar dotemacs-use-ecb)
 (defvar dotemacs-temp-directory)
 
-;; Better frame title
-(setq frame-title-format (list '(buffer-file-name "%f" "%b"))
-      indicate-empty-lines t)
+(setq frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
+      indicate-empty-lines t
+      custom-safe-themes t)
 
 ;; This is a buffer-local variable.
 (setq-default indicate-buffer-boundaries 'right)
-(setq custom-safe-themes t)
 
 (use-package tool-bar
   :if (fboundp 'tool-bar-mode)
@@ -25,6 +24,7 @@
 
 (use-package menu-bar
   :if (fboundp 'menu-bar-mode)
+  :disabled t
   :config
   ;; One can learn many shortcuts from the menu bar entries.
   (menu-bar-mode 1))
@@ -40,18 +40,19 @@
 
 (use-package frame
   :config
-  ;; Start with Emacs window maximized:
-  ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
-  ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  ;; ;; Start with Emacs window maximized:
+  ;; ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+  ;; ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
+  ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  ;; ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
+  ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
   ;; Blinking cursor can be distracting
   (blink-cursor-mode 0))
 
 ;; Not the most useful information within Emacs
 (use-package time ; Display the time and date in the mode line
+  :disabled t
   :config
   (setq display-time-day-and-date t
         display-time-24hr-format nil
@@ -133,12 +134,14 @@
                                          :config (load-theme 'tangotango t)))
 
       ((eq dotemacs-theme 'default) (progn
-                                      (set-face-attribute 'region nil
-                                                          :background "deep sky blue"
-                                                          :foreground "white"))))
+                                      ;; (set-face-attribute 'region nil
+                                      ;;                     :background "deep sky blue"
+                                      ;;                     :foreground "white")
+                                      )))
 
 (use-package tabbar
   :ensure t
+  :disabled t
   :preface
   (defun sb/tabbar-modification-state-change ()
     (tabbar-set-template tabbar-current-tabset nil)

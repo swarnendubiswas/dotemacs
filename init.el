@@ -40,7 +40,7 @@
 ;; Now setup other modules
 
 (require 'defaults-init)
-;; (require 'appearance-init)
+(require 'appearance-init)
 ;; (require 'mode-line-init)
 
 ;; Configure power packages
