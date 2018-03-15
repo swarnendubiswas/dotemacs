@@ -138,6 +138,7 @@
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
+  :disabled t
   :hook ((emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
   :diminish eldoc-mode)
 
