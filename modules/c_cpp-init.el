@@ -74,17 +74,19 @@
 (use-package company-c-headers
   :ensure t
   :after (company cc-mode)
-  :if (eq dotemacs-completion-in-buffer t)
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config
   (add-to-list 'company-backends 'company-c-headers)
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
     (dolist (paths '(
                      "/usr/include"
                      "/usr/include/boost"
-                     "/usr/local/include"
+                     "/usr/include/linux"
+                     "/usr/include/cuda"
                      "/usr/include/c++/4.8.5"
                      "/usr/include/c++/4.8.5/tr1"
                      "/usr/include/c++/4.8.5/x86_64-redhat-linux"
+                     "/usr/local/include"
                      "/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include"
                      ))
       (add-to-list 'company-c-headers-path-system paths))))
@@ -143,9 +145,9 @@
   :init
   (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
   (when (string-equal (system-name) "consensus.ices.utexas.edu")
-    (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm.install/bin/clang-format"))
+    (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm-6.0.0/llvm-6.0.0.install/bin/clang-format"))
   (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
-    (setq clang-format-executable "/usr/bin/clang-format-5.0")))
+    (setq clang-format-executable "/usr/bin/clang-format-6.0")))
 
 (add-hook 'before-save-hook
           (lambda ()
@@ -158,7 +160,7 @@
 
 (use-package opencl-mode
   :ensure t
-  :defer t)
+  :mode ("\\.cl\\'" . opencl-mode))
 
 (defun sb/company-cc-backends ()
   "Add backends for C/C++ completion in company mode."
@@ -167,19 +169,19 @@
         '((
            ;; C++ specific backends
            company-clang
-           company-rtags
+           ;; company-rtags
            company-irony
            company-c-headers
            company-irony-c-headers
+           company-semantic
+           company-gtags ; FIXME: Should we add this after gtags is loaded?
+
            ;; Generic backends
            company-files
            company-keywords
-           ;; company-dabbrev
-           ;; company-dabbrev-code
+           company-dabbrev
+           company-dabbrev-code
            company-capf
-
-           ;; company-semantic
-           ;; company-gtags
            ))))
 (add-hook 'c++-mode-hook #'sb/company-cc-backends)
 

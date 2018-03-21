@@ -141,7 +141,6 @@
 
 (use-package tabbar
   :ensure t
-  :disabled t
   :preface
   (defun sb/tabbar-modification-state-change ()
     (tabbar-set-template tabbar-current-tabset nil)
@@ -282,22 +281,22 @@
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
 
-;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
-(if (eq system-type 'windows-nt)
-    (set-face-attribute 'default nil
-                        :family "Consolas"
-                        :height 120)
-  (progn
-    (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
-                                                                     'default nil
-                                                                     ;;  :family "Dejavu Sans Mono"
-                                                                     :height 135))
-          ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
-                                                                        ;; :family "Dejavu Sans Mono"
-                                                                        :height 150))
-          (t (set-face-attribute 'default nil
-                                 :family "Dejavu Sans Mono"
-                                 :height 120)))))
+;; ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
+;; (if (eq system-type 'windows-nt)
+;;     (set-face-attribute 'default nil
+;;                         :family "Consolas"
+;;                         :height 120)
+;;   (progn
+;;     (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
+;;                                                                      'default nil
+;;                                                                      ;;  :family "Dejavu Sans Mono"
+;;                                                                      :height 135))
+;;           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
+;;                                                                         ;; :family "Dejavu Sans Mono"
+;;                                                                         :height 150))
+;;           (t (set-face-attribute 'default nil
+;;                                  :family "Dejavu Sans Mono"
+;;                                  :height 120)))))
 
 (use-package minimap
   :ensure t

@@ -94,7 +94,7 @@ This depends on the orientation of the display."
   "Column beyond which lines should not extend.")
 
 (defcustom dotemacs-use-whitespace-p
-  t
+  nil
   "Control whitespace module.
 Control whether the whitespace module should be enabled or
 disabled.  Sometimes we do not want to unnecessarily add

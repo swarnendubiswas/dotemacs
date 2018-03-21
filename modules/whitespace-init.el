@@ -25,6 +25,7 @@
 ;; clean
 (use-package whitespace-cleanup-mode
   :ensure t
+  :disabled t
   :diminish whitespace-cleanup-mode
   :init (add-hook 'prog-mode-hook #'global-whitespace-cleanup-mode))
 
