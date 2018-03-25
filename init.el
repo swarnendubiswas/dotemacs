@@ -72,7 +72,7 @@
 (require 'tags-init)
 
 ;; Configure individual major modes
-;; (require 'text-init)
+(require 'text-init)
 ;; (require 'latex-init)
 (require 'latex-new-init)
 ;; (require 'org-init)
@@ -83,7 +83,7 @@
 ;; (require 'shell-script-init)
 ;; (require 'shell-init)
 ;; (require 'svn-init)
-;; (require 'git-init)
+(require 'git-init)
 
 (require 'functions-init)
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules

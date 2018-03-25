@@ -1,6 +1,7 @@
 -/elpa
 -/backup
 -/tmp
+-/extras
 -/.projectile
 -/.gitignore
 -*.zip

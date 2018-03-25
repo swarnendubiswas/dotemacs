@@ -11,7 +11,7 @@
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
   :diminish writegood-mode
-  :init (add-hook 'text-mode-hook #'writegood-mode))
+  :hook (text-mode . writegood-mode))
 
 (use-package langtool
   :ensure t)
@@ -24,7 +24,8 @@
            company-files
            company-keywords
            company-capf
-           company-dict))))
+           company-dict
+           company-dabbrev))))
 (add-hook 'text-mode-hook #'sb/company-text-backends)
 
 (use-package markdown-mode
