@@ -10,8 +10,6 @@
 
 (defvar dotemacs-completion-in-buffer)
 
-(setenv "PYTHONPATH" "python3")
-
 (defun sb/python-setup ()
   "Helper function for configuring python mode."
   (setq-default python-indent-offset 4
@@ -35,7 +33,7 @@
                          elpy-module-sane-defaults)
           elpy-rpc-python-command "python3"
           elpy-rpc-backend "jedi"
-          elpy-syntax-check-command "flake8")
+          elpy-syntax-check-command "pylint")
     (use-package pyvenv
       :ensure t
       :config (pyvenv-mode 1))
