@@ -78,9 +78,10 @@
         '((;; Generic backends
            company-files
            company-keywords
+           company-capf
+           company-dabbrev
            company-dabbrev-code
            company-gtags
-           company-capf
            ;; Python specific backends
            company-jedi
            elpy-company-backend))))
