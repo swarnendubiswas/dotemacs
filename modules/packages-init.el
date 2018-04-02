@@ -13,7 +13,7 @@
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
       ;; Avoid loading packages twice
       package-enable-at-startup nil)
-(package-initialize)
+;; (package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)

@@ -108,15 +108,6 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Completion
 
-### Ido
-
-* `C-j` - Use the current input string verbatim (`ido-select-text`). Create a new buffer rather than switching to an existing buffer.
-* `//` - Go to the root directory (``).
-* `~/` - Go to the home directory (``).
-* `C-f` - Fall back to find file (without ido-mode) (``).
-* `C-d` - Enter Dired for this directory (``).
-* `M-p` and `M-n` (or `M-UP` and `M-DOWN`) - Change to previous/next directories from history (``).
-
 ### Ivy
 
 * `M-o` - Execute an available action (`ivy-dispatching-done`).

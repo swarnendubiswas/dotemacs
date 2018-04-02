@@ -28,8 +28,8 @@
                                   "/company-statistics-cache.el$"))
   (recentf-mode 1) ; This is needed in :init for the keybinding to work
   :config
-  (add-to-list 'recentf-used-hooks
-               '(dired-after-readin-hook recentf-track-opened-file))
+  ;; (add-to-list 'recentf-used-hooks
+  ;;              '(dired-after-readin-hook recentf-track-opened-file))
   (when (eq dotemacs-selection 'none)
     (bind-key "<f9>" #'recentf-open-files))
   (run-at-time nil (* 10 60) 'recentf-save-list))
@@ -39,7 +39,6 @@
   "Hide messages appearing in ORIG-FUN."
   (let ((inhibit-message t))
     (apply orig-fun args)))
-
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
 (provide 'recentf-init)

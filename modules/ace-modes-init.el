@@ -10,6 +10,7 @@
 
 (use-package ace-jump-buffer
   :ensure t
+  :disabled t
   :if (eq dotemacs-selection 'none)
   :preface
   ;; Leave out certain buffers based on file name patterns
@@ -78,7 +79,6 @@
         avy-style 'at))
 
 (use-package bookmark
-  :defer t
   :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
 
 (use-package bm

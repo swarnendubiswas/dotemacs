@@ -17,8 +17,7 @@
             (when (derived-mode-p 'magit-status-mode)
               (delete-other-windows))))
 
-  (cond ((eq dotemacs-selection 'ido)  (setq magit-completing-read-function 'magit-ido-completing-read))
-        ((eq dotemacs-selection 'ivy)  (setq magit-completing-read-function 'ivy-completing-read))))
+  (when (eq dotemacs-selection 'ivy)  (setq magit-completing-read-function 'ivy-completing-read)))
 
 (use-package magit-popup
   :after magit)

@@ -15,7 +15,7 @@
 
 (use-package browse-kill-ring
   :ensure t
-  :if (or (eq dotemacs-selection 'none) (eq dotemacs-selection 'ido))
+  :if (eq dotemacs-selection 'none)
   :commands browse-kill-ring
   :config
   (require 'popwin-browse-kill-ring)

@@ -87,12 +87,6 @@
   :after ag
   :config (add-hook 'ag-mode-hook #'wgrep-ag-setup))
 
-;; (use-package ido-occur
-;;   :ensure t
-;;   :if (eq dotemacs-selection 'ido)
-;;   :bind (("C-c s o" . ido-occur)
-;;          ("C-c s O" . ido-occur-at-point)))
-
 ;; (use-package ace-isearch
 ;;   :ensure t
 ;;   :ensure avy

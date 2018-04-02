@@ -14,7 +14,7 @@
 ;; http://tuhdo.github.io/c-ide.html
 (use-package ggtags
   :ensure t
-  :if (and (eq system-type 'gnu/linux) (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none)))
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'none))
   :diminish ggtags-mode
   :init
   (add-hook 'java-mode-hook #'ggtags-mode)

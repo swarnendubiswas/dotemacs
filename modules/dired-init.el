@@ -73,7 +73,7 @@
 (use-package dired-efap
   :ensure t
   :after dired
-  :commands dired-efap
+  ;; :commands dired-efap
   :config (setq dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
               ("r" . dired-efap )))
@@ -81,7 +81,7 @@
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
   :after dired
-  :commands dired-narrow
+  ;; :commands dired-narrow
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -93,6 +93,7 @@
 
 (use-package ecb
   :ensure t
+  :disabled t
   :if (bound-and-true-p dotemacs-use-ecb)
   :config
   (ecb-layout-define "swarna1" left nil

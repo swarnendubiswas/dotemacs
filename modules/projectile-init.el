@@ -23,8 +23,7 @@
         projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
         projectile-mode-line nil)
 
-  (cond ((eq dotemacs-selection 'ido)  (setq projectile-completion-system 'ido))
-        ((eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy)))
+  (when (eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy))
 
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
   (dolist (dirs '(".cache"
@@ -53,13 +52,7 @@
 
   ;; https://www.reddit.com/r/emacs/comments/320cvb/projectile_slows_tramp_mode_to_a_crawl_is_there_a/
   (defadvice projectile-project-root (around ignore-remote first activate)
-    (unless (file-remote-p default-directory) ad-do-it))
-
-  (when (or (eq dotemacs-selection 'ido) (eq dotemacs-selection 'none))
-    (bind-key "<f5>" #'projectile-switch-project)
-    (bind-key "<f6>" #'projectile-find-file)
-    (bind-key "<f7>" #'projectile-switch-to-buffer)
-    (bind-key "<f8>" #'projectile-ag)))
+    (unless (file-remote-p default-directory) ad-do-it)))
 
 (use-package counsel-projectile
   :ensure t

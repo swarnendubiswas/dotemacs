@@ -49,8 +49,7 @@
 ;; (require 'search-init)
 (require 'recentf-init)
 (require 'company-init)
-(cond ((eq dotemacs-selection 'ido)  (require 'ido-init))
-      ((eq dotemacs-selection 'ivy)  (require 'ivy-init)))
+(when (eq dotemacs-selection 'ivy)  (require 'ivy-init))
 
 ;; Configure the more useful extensions
 ;; (require 'spell-init)

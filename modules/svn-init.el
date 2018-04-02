@@ -13,8 +13,7 @@
         svn-status-hide-unknown nil
         svn-status-hide-unmodified t
         svn-status-display-full-path t
-        svn-status-auto-revert-buffers t
-        svn-status-use-ido-completion t))
+        svn-status-auto-revert-buffers t))
 
 (provide 'svn-init)
 

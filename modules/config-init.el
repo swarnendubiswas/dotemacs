@@ -42,18 +42,8 @@
   'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
-          (const :tag "ido" ido)
           (const :tag "ivy" ivy)
           (const :tag "none" none))
-  :group 'dotemacs)
-
-(defcustom dotemacs-ido-view-mode
-  'vertical
-  "Specify which view to use for ido."
-  :type '(radio
-          (const :tag "vertical" vertical)
-          (const :tag "grid" grid)
-          (const :tag "default" default))
   :group 'dotemacs)
 
 (defcustom dotemacs-theme

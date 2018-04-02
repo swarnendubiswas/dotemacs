@@ -29,8 +29,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 The following are customization options defined in `modules/config-init.el` that you could use to tweak the default setup. Check the module for more options.
 
 * `dotemacs-completion-in-buffer` - Enable `company` for auto-completion in buffer.
-* `dotemacs-selection` - Choose a selection and completion framework between `ido` or `ivy`. The default is `ivy`.
-* `dotemacs-ido-view-mode` - Choose how choices are displayed with `ido`. The options are `vertical`, `grid`, and `default`. This option only makes sense if `dotemacs-selection` is set to `ido`.
+* `dotemacs-selection` - Enable `ivy` as the selection and completion framework. 
 * `dotemacs-theme` - Set the desired theme from a bunch of themes like`leuven`, `professional`, and `eclipse`, or use the `default`.
 * `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.
 * `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.

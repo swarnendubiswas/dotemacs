@@ -19,9 +19,6 @@
     :ensure t)
   :bind ("C-c C-j" . imenu-anywhere))
 
-(when (eq dotemacs-selection 'ido)
-  (bind-key "C-c C-j" #'ido-imenu-anywhere))
-
 (use-package imenu-list
   :ensure t
   :after imenu
