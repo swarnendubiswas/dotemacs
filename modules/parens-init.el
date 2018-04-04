@@ -50,7 +50,6 @@
   :diminish smartparens-mode)
 
 (use-package elec-pair
-  :disabled t
   :config (electric-pair-mode 1))
 
 (provide 'parens-init)
