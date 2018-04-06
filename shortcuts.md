@@ -281,6 +281,7 @@ https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automat
 * `g` - Refresh the current buffer (`magit-refresh`).
 * `G` - Refreshes all magit buffers (`magit-refresh-all`).
 * `k` - Discard changes in an item (`magit-discard-item`).
+* `v` - Revert item (`magit-revert-item`).
 
 ### Svn
 

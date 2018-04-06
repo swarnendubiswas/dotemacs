@@ -207,6 +207,14 @@
   ;;   (add-hook hook #'rainbow-delimiters-mode))
   :hook ((text-mode prog-mode) . rainbow-delimiters-mode))
 
+(use-package ssh-config-mode
+  :ensure t
+  :mode ("/\\.ssh/config\\'" . ssh-config-mode)
+  :mode ("/sshd?_config\\'" . ssh-config-mode)
+  :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
+  :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
+  :config (add-hook 'ssh-config-mode-hook 'turn-on-font-lock))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

@@ -13,7 +13,6 @@
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
 ;; Open a file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
-  :defer t
   :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "sbiswas"
