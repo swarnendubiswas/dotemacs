@@ -37,7 +37,6 @@
 
 (use-package auctex-latexmk
   :ensure t
-  :defer t
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   (auctex-latexmk-setup)
@@ -47,18 +46,15 @@
 
 ;; Required by ac-math and company-math
 (use-package math-symbol-lists
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package company-auctex
   :ensure t
-  :defer t
   :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config (company-auctex-init))
 
 (use-package company-math
   :ensure t
-  :defer t
   :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config
   (add-to-list 'company-backends
@@ -67,7 +63,6 @@
 (use-package reftex
   :diminish reftex-mode
   :commands (reftex-citation)
-  :after auctex
   :hook (LaTeX-mode . reftex-mode)
   ;; :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
@@ -110,12 +105,13 @@
     :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
 (use-package parsebib
-  :ensure t
-  :defer t)
+  :ensure t)
+
+(use-package bibtex-utils
+  :ensure t)
 
 (use-package bibtex-completion
   :if (eq dotemacs-selection 'ivy)
-  :defer t
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t
@@ -129,7 +125,6 @@
 
 (use-package company-bibtex
   :ensure t
-  :defer t
   :if (bound-and-true-p dotemacs-completion-in-buffer)
   :init (add-to-list 'company-backends 'company-bibtex))
 

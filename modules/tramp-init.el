@@ -24,7 +24,7 @@
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         tramp-completion-reread-directory-timeout nil)
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  (add-to-list 'tramp-default-method-alist '("" "biswass" "ssh"))
+  (add-to-list 'tramp-default-method-alist '("" "biswas.38" "ssh"))
   (add-to-list 'tramp-default-method-alist '("" "sbiswas" "ssh"))
   (add-to-list 'tramp-default-method-alist
                '("\\`localhost\\'" "\\`root\\'" "su"))

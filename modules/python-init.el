@@ -91,24 +91,24 @@
   ("r" elpy-nav-indent-shift-right "right"))
 
 ;; FIXME: One of the following three works.
-(add-hook 'before-save-hook
-          (lambda ()
-            (when (string-equal major-mode "python-mode")
-              (progn
-                (pyimport-remove-unused)
-                (elpy-format-code)))))
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (when (string-equal major-mode "python-mode")
+;;               (progn
+;;                 (pyimport-remove-unused)
+;;                 (elpy-yapf-fix-code)))))
 
 (add-hook 'before-save-hook
           (lambda ()
             (when (string-equal major-mode "python-mode")
               (pyimport-remove-unused)
-              (elpy-format-code))))
+              (elpy-yapf-fix-code))))
 
-(add-hook 'before-save-hook
-          (lambda ()
-            (when (string-equal major-mode "elpy-mode")
-              (pyimport-remove-unused)
-              (elpy-format-code))))
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (when (string-equal major-mode "elpy-mode")
+;;               (pyimport-remove-unused)
+;;               (elpy-yapf-fix-code))))
 
 (provide 'python-init)
 

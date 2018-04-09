@@ -37,6 +37,6 @@ The following are customization options defined in `modules/config-init.el` that
 
 ## Dependencies
 
-* `aspell`, `gnu global`, `rtags`
+* `aspell`, `gnu global` or `rtags`
 
 Suggestions and pull requests are welcome.

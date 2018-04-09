@@ -44,7 +44,7 @@
 ;; (require 'mode-line-init)
 
 ;; Configure power packages
-;; (require 'ibuffer-init)
+(require 'ibuffer-init)
 (require 'dired-init)
 ;; (require 'search-init)
 (require 'recentf-init)
@@ -66,7 +66,7 @@
 (require 'flycheck-init)
 (require 'whitespace-init)
 ;; (require 'highlight-init)
-;; (require 'tramp-init)
+(require 'tramp-init)
 ;; (require 'imenu-init)
 (require 'tags-init)
 
