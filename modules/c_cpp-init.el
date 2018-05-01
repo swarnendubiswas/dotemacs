@@ -95,7 +95,6 @@
 (use-package irony
   :ensure t
   :diminish irony-mode
-  :defer t
   :init
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
@@ -120,12 +119,7 @@
     :config
     ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
     ;; http://tuhdo.github.io/c-ide.html
-    (setq company-backends (delete 'company-semantic company-backends))
-    (add-to-list 'company-backends '(company-irony-c-headers
-                                     company-irony
-                                     ;; company-gtags
-                                     company-yasnippet
-                                     company-clang)))
+    (setq company-backends (delete 'company-semantic company-backends)))
 
   (use-package flycheck-irony
     :ensure t
@@ -169,7 +163,6 @@
         '((
            ;; C++ specific backends
            company-clang
-           ;; company-rtags
            company-irony
            company-c-headers
            company-irony-c-headers
@@ -182,6 +175,7 @@
            company-dabbrev
            company-dabbrev-code
            company-capf
+           company-semantic
            ))))
 (add-hook 'c++-mode-hook #'sb/company-cc-backends)
 

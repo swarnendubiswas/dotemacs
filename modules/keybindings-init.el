@@ -44,10 +44,10 @@
  ("C-+" . #'text-scale-increase)
  ("C--" . #'text-scale-decrease))
 
-(bind-keys
- ("C-c d b" . sb/byte-compile-current-file)
- ("C-c d i" . sb/byte-compile-init-dir)
- ("C-c d n" . package-list-packages-no-fetch))
+;; (bind-keys
+;;  ("C-c d b" . sb/byte-compile-current-file)
+;;  ("C-c d i" . sb/byte-compile-init-dir)
+;;  ("C-c d n" . package-list-packages-no-fetch))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
