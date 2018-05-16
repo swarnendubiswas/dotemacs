@@ -42,11 +42,6 @@
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
-(use-package replace+
-  :disabled t
-  :load-path "extras"
-  :after replace)
-
 (use-package anzu
   :ensure t
   :after isearch
@@ -64,36 +59,15 @@
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :bind ("<f4>" . swiper)
   :config
   (setq swiper-use-visual-line t
-        swiper-action-recenter t))
-
-(use-package ag
-  :ensure t
-  :defer t
-  :config
-  (setq ag-reuse-buffers t
-        ag-reuse-window t
-        ag-highlight-search t))
+        swiper-action-recenter t)
+  (when (eq dotemacs-selection 'none)
+    (bind-key "<f4>" #'swiper)))
 
 (use-package wgrep
   :ensure t
-  :defer t
   :config (setq wgrep-auto-save-buffer t))
-
-(use-package wgrep-ag ; Edit the *ag* buffer with wgrep-change-to-wgrep-mode
-  :ensure t
-  :after ag
-  :config (add-hook 'ag-mode-hook #'wgrep-ag-setup))
-
-;; (use-package ace-isearch
-;;   :ensure t
-;;   :ensure avy
-;;   :ensure ace-jump-mode
-;;   :diminish ace-isearch-mode
-;;   :defer t
-;;   :config (global-ace-isearch-mode 1))
 
 (use-package ripgrep
   :ensure t

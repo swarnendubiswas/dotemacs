@@ -117,7 +117,10 @@
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking
-        blink-matching-paren t)
+        blink-matching-paren t
+        kill-ring-max 200
+        kill-do-not-save-duplicates t
+        set-mark-command-repeat-pop t)
   (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
   (column-number-mode 1)
   (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work

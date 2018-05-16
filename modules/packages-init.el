@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+;; FIXME: How to resolve the problem during a first run?
+
 (defvar dotemacs-emacs-custom-file)
 
 (setq load-prefer-newer t)

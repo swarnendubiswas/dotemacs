@@ -130,32 +130,28 @@
   (setq treemacs-follow-after-init t
         treemacs-width 35
         treemacs-indentation 2
-        treemacs-git-integration t
         treemacs-collapse-dirs 3
         treemacs-silent-refresh t
-        treemacs-change-root-without-asking t
         treemacs-sorting 'alphabetic-desc
         treemacs-show-hidden-files t
-        treemacs-never-persist nil
-        treemacs-is-never-other-window nil
+        treemacs-is-never-other-window t ; Prevents treemacs from being selected with `other-window`
         treemacs-goto-tag-strategy 'refetch-index
         treemacs-no-png-images nil
         treemacs-recenter-after-file-follow t
         treemacs-recenter-after-tag-follow  t
         treemacs-silent-filewatch t
-        treemacs-silent-refresh t)
-  (treemacs-follow-mode t)
+        treemacs-silent-refresh t
+        treemacs-tag-follow-delay 1
+        treemacs-tag-follow-cleanup t)
+  ;; (treemacs-follow-mode 1)
+  (treemacs-tag-follow-mode 1) ; Effectively overrides treemacs-follow-mode
   (treemacs-filewatch-mode t)
   (treemacs-git-mode 'extended)
-  :bind* ("C-j" . treemacs-toggle))
+  :bind* ("C-j" . treemacs))
 
-;; Delays loading of known projectile projects, not sure why!
 (use-package treemacs-projectile
   :ensure t
-  :disabled t
-  :defer t
-  :after treemacs
-  :config (setq treemacs-header-function #'treemacs-projectile-create-header))
+  :after treemacs)
 
 (provide 'dired-init)
 

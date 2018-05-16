@@ -289,10 +289,8 @@
   (progn
     (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
                                                                      'default nil
-                                                                     ;;  :family "Dejavu Sans Mono"
                                                                      :height 135))
           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
-                                                                        ;; :family "Dejavu Sans Mono"
                                                                         :height 160))
           (t (set-face-attribute 'default nil
                                  :family "Dejavu Sans Mono"
@@ -300,13 +298,12 @@
 
 (use-package minimap
   :ensure t
-  :disabled t
   :diminish minimap-mode
   :config
-  (setq minimap-window-location 'left
+  (setq minimap-window-location 'right
         minimap-minimum-width 10
         minimap-width-fraction 0.08
-        minimap-update-delay 0.4
+        minimap-update-delay 0.2
         minimap-automatically-delete-window nil)
   (add-to-list 'minimap-major-modes 'html-mode)
   (add-to-list 'minimap-major-modes 'text-mode)

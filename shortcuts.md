@@ -130,20 +130,6 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 Specify extra flags to the search commands with `C-u` (`universal-argument`) before the command.
 
-### Helm
-
-* `C-SPC` - Mark buffer (`helm-toggle-visible-mark`).
-* `M-a` - Select all buffers (``.)
-* `M-D` - Kill marked buffers and quit Helm (`helm-buffer-run-kill-buffers`).
-* `C-c d` - Kill marked buffers and keep Helm session (``).
-* `M-SPC` - Marks a candidate (``).
-* `C-h m` - Shows a general information buffer (including key bindings other than those shown in the modeline) (``).
-* `M-n` - Copies yanked symbol to minibuffer (``).
-* `C-w` - Appends word next to point to the minibuffer (``).
-* `C-c ?` - Pops a special info buffer of the current helm command (``).
-* `C-x b` -
-* `C-x C-b` -
-
 ## Org mode
 
 * `C-u C-c .` - Insert date and time (`org-time-stamp`).
@@ -204,7 +190,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-f` - Format the region/buffer (`json-reformat-region`).
 * `C-c C-p` - Display a path to the object at point (`json-mode-show-path`).
 
-## GGtags/Helm Gtags/Counsel Gtags
+## GGtags/Counsel Gtags
 
 See the requirements: [https://github.com/leoliu/ggtags][]
 

@@ -46,7 +46,7 @@
 ;; Configure power packages
 (require 'ibuffer-init)
 (require 'dired-init)
-;; (require 'search-init)
+(require 'search-init)
 (require 'recentf-init)
 (require 'company-init)
 (when (eq dotemacs-selection 'ivy)  (require 'ivy-init))
@@ -57,7 +57,6 @@
 (require 'indent-init)
 (require 'parens-init)
 ;; (require 'abbrev-init)
-;; (require 'kill-ring-init)
 
 ;; Setup helper packages
 (require 'projectile-init)
