@@ -56,7 +56,7 @@
 (require 'ace-modes-init)
 (require 'indent-init)
 (require 'parens-init)
-;; (require 'abbrev-init)
+(require 'abbrev-init)
 
 ;; Setup helper packages
 (require 'projectile-init)

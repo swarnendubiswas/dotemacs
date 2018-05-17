@@ -71,6 +71,7 @@
 
 (use-package fic-mode ; Highlight certain words
   :ensure t
+  :commands fic-mode
   :diminish fic-mode
   :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config

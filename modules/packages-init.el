@@ -17,6 +17,33 @@
       package-enable-at-startup nil)
 ;; (package-initialize)
 
+(defun sb/first-install ()
+  "Run this function the first time you want to setup Emacs on your system."
+  (interactive)
+  (when (< emacs-major-version 24)
+    ;; For important compatibility libraries like cl-lib
+    (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
+
+  (add-to-list 'package-archives
+               '("org" . "http://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives
+               '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives
+               '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
+
+  ;; Marmalade repo often does not work reliably
+  (when (bound-and-true-p dotemacs-use-marmalade-repo-p)
+    (add-to-list 'package-archives
+                 '("marmalade" . "https://marmalade-repo.org/packages/") t))
+  (package-refresh-contents)
+  (package-install 'use-package)
+  (eval-when-compile
+    (require 'use-package))
+  (setq use-package-always-ensure t
+        use-package-check-before-init t
+        use-package-always-defer t
+        use-package-verbose t))
+
 (unless (package-installed-p 'use-package)
   (add-to-list 'package-archives
                '("melpa" . "https://melpa.org/packages/") t)
@@ -25,8 +52,7 @@
 (setq use-package-enable-imenu-support t)
 (eval-when-compile
   (require 'use-package))
-(setq use-package-always-ensure nil
-      use-package-check-before-init t
+(setq use-package-check-before-init t
       use-package-always-defer t
       use-package-verbose t)
 ;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
@@ -52,8 +78,6 @@
 
     (add-to-list 'package-archives
                  '("org" . "http://orgmode.org/elpa/") t)
-    ;; (add-to-list 'package-archives
-    ;;              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
     (add-to-list 'package-archives
                  '("melpa" . "https://melpa.org/packages/") t)
     (add-to-list 'package-archives
