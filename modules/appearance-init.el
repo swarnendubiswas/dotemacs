@@ -298,6 +298,7 @@
 
 (use-package minimap
   :ensure t
+  :disabled t
   :diminish minimap-mode
   :config
   (setq minimap-window-location 'right

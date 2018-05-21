@@ -53,8 +53,7 @@
 (eval-when-compile
   (require 'use-package))
 (setq use-package-check-before-init t
-      use-package-always-defer t
-      use-package-verbose t)
+      use-package-verbose nil)
 ;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (defun package--save-selected-packages (&rest opt) nil)
 

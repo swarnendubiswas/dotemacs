@@ -60,6 +60,9 @@
 
   (use-package pyimport
     :ensure t)
+
+  (use-package py-isort
+    :ensure t)
   :bind (:map elpy-mode-map
               ("C-c c e" . python-nav-forward-defun)
               ("C-c c a" . python-nav-backward-defun)
@@ -101,7 +104,8 @@
 (add-hook 'before-save-hook
           (lambda ()
             (when (string-equal major-mode "python-mode")
-              (pyimport-remove-unused)
+              (py-isort-before-save)
+              ;; (pyimport-remove-unused) ; This can be irritating if you are yet to use the imports.
               (elpy-yapf-fix-code))))
 
 ;; (add-hook 'before-save-hook
