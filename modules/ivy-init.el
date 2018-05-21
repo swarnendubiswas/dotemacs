@@ -145,7 +145,6 @@
    ([remap describe-bindings] . counsel-descbinds)
    ;; counsel-M-x uses smex, I use amx
    ;; ([remap execute-extended-command] . counsel-M-x)
-   ;; ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
    ([remap load-theme] . counsel-load-theme)
@@ -209,13 +208,6 @@
     :ensure t
     :config (setq historian-save-file (concat dotemacs-temp-directory "historian")))
   (ivy-historian-mode 1))
-
-(use-package ivy-dired-history
-  :ensure t
-  :disabled t
-  :after ivy
-  :after savehist
-  :config (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
 
 (provide 'ivy-init)
 

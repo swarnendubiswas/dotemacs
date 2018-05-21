@@ -8,6 +8,7 @@
 (defvar dotemacs-window-split)
 (defvar dotemacs-temp-directory)
 (defvar select-enable-clipboard)
+(defvar dotemacs-extras-directory)
 
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
@@ -228,6 +229,16 @@
 
 (use-package warnings
   :config (add-to-list 'warning-suppress-types '(undo discard-info)))
+
+(use-package abbrev
+  :diminish abbrev-mode
+  :init
+  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
+  (dolist (hook '(text-mode-hook prog-mode-hook))
+    (add-hook hook #'abbrev-mode ))
+  :config
+  ;; Do not ask to save new abbrevs when quitting
+  (setq save-abbrevs 'silently))
 
 (provide 'defaults-init)
 
