@@ -134,10 +134,9 @@
                                          :config (load-theme 'tangotango t)))
 
       ((eq dotemacs-theme 'default) (progn
-                                      ;; (set-face-attribute 'region nil
-                                      ;;                     :background "deep sky blue"
-                                      ;;                     :foreground "white")
-                                      )))
+                                      (set-face-attribute 'region nil
+                                                          :background "light sky blue"
+                                                          :foreground "white"))))
 
 (use-package tabbar
   :ensure t
@@ -293,8 +292,8 @@
           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
                                                                         :height 160))
           (t (set-face-attribute 'default nil
-                                 :family "Dejavu Sans Mono"
-                                 :height 120)))))
+                                 ;; :family "Droid Sans Mono"
+                                 :height 110)))))
 
 (use-package minimap
   :ensure t
