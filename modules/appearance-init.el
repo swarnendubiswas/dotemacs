@@ -293,7 +293,7 @@
                                                                         :height 160))
           (t (set-face-attribute 'default nil
                                  ;; :family "Droid Sans Mono"
-                                 :height 110)))))
+                                 :height 120)))))
 
 (use-package minimap
   :ensure t

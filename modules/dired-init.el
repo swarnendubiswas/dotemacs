@@ -114,21 +114,12 @@
   (ecb-activate)
   (add-hook 'compilation-finish-functions (lambda (buf strg) (kill-buffer buf))))
 
-(use-package sr-speedbar
-  :ensure t
-  :disabled t
-  :config
-  (setq sr-speedbar-right-side nil
-        sr-speedbar-width 15
-        sr-speedbar-default-width 15
-        sr-speedbar-max-width 20))
-
 (use-package treemacs
   :ensure t
   :commands (treemacs treemacs-toggle)
   :config
   (setq treemacs-follow-after-init t
-        treemacs-width 35
+        treemacs-width 25
         treemacs-indentation 2
         treemacs-collapse-dirs 3
         treemacs-silent-refresh t

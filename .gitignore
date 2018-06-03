@@ -6,7 +6,7 @@ tramp
 ac-html-csswatcher
 eshell
 semanticdb
-
+.cache
 *.elc
 .session
 session.*
