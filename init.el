@@ -52,7 +52,7 @@
 (when (eq dotemacs-selection 'ivy)  (require 'ivy-init))
 
 ;; Configure the more useful extensions
-;; (require 'spell-init)
+(require 'spell-init)
 (require 'ace-modes-init)
 (require 'indent-init)
 (require 'parens-init)
@@ -63,9 +63,9 @@
 (require 'misc-init)
 (require 'yasnippet-init)
 (require 'whitespace-init)
-;; (require 'highlight-init)
+(require 'highlight-init)
 (require 'tramp-init)
-;; (require 'imenu-init)
+(require 'imenu-init)
 (require 'tags-init)
 
 ;; Configure individual major modes

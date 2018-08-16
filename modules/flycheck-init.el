@@ -20,6 +20,12 @@
         ;; Faster than the default
         flycheck-highlighting-mode 'lines)
 
+  (setq flycheck-python-pylint-executable "python3")
+
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq flycheck-checker 'python-pylint)))
+
   (add-hook 'c++-mode-hook
             (lambda ()
               (setq flycheck-clang-language-standard "c++11")))
