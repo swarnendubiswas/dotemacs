@@ -83,15 +83,6 @@ This depends on the orientation of the display."
 (defconst dotemacs-fill-column 120
   "Column beyond which lines should not extend.")
 
-(defcustom dotemacs-use-whitespace-p
-  nil
-  "Control whitespace module.
-Control whether the whitespace module should be enabled or
-disabled.  Sometimes we do not want to unnecessarily add
-differences due to whitespaces."
-  :type 'boolean
-  :group 'dotemacs)
-
 (defcustom dotemacs-use-ignoramus-p
   nil
   "Should the ignoramus package be used?
@@ -113,7 +104,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :type 'boolean
   :group 'dotemacs)
 
-(defcustom dotemacs-cc-helper
+(defcustom dotemacs-cc-tags
   'gtags
   "Choose whether to use gtags or rtags for C/C++ programming."
   :type '(radio

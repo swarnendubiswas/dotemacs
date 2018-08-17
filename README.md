@@ -33,7 +33,7 @@ The following are customization options defined in `modules/config-init.el` that
 * `dotemacs-theme` - Set the desired theme from a bunch of themes like`leuven`, `professional`, and `eclipse`, or use the `default`.
 * `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.
 * `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
-* `dotemacs-cc-helper` - Choose whether to use gtags or rtags for C/C++ programming.
+* `dotemacs-cc-tags` - Choose whether to use gtags or rtags for C/C++ programming.
 
 ## Dependencies
 

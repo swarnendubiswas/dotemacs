@@ -7,7 +7,7 @@
 
 (defvar dotemacs-selection)
 (defvar dotemacs-completion-in-buffer)
-(defvar dotemacs-cc-helper)
+(defvar dotemacs-cc-tags)
 
 ;; Front end to GNU Global, use `gtags -v -c`.
 ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
@@ -19,7 +19,7 @@
   :init
   (add-hook 'java-mode-hook #'ggtags-mode)
   (add-hook 'python-mode-hook #'ggtags-mode)
-  (when (eq dotemacs-cc-helper 'gtags)
+  (when (eq dotemacs-cc-tags 'gtags)
     (add-hook 'c-mode-common-hook
               (lambda ()
                 (when (derived-mode-p 'c-mode 'c++-mode)
@@ -51,7 +51,7 @@
   :init
   (add-hook 'java-mode-hook #'counsel-gtags-mode)
   (add-hook 'python-mode-hook #'counsel-gtags-mode)
-  (when (eq dotemacs-cc-helper 'gtags)
+  (when (eq dotemacs-cc-tags 'gtags)
     (add-hook 'c-mode-common-hook
               (lambda ()
                 (when (derived-mode-p 'c-mode 'c++-mode)
@@ -72,14 +72,14 @@
 ;; C-c r ] rtags-location-stack-forward Moves forward in location stack
 (use-package rtags
   :ensure t
-  :if (eq dotemacs-cc-helper 'rtags)
+  :if (eq dotemacs-cc-tags 'rtags)
   :commands rtags-mode
   :bind (:map c++-mode-map ; c-mode-base-map
               ("M-." . rtags-find-symbol-at-point)
               ("M-," . rtags-location-stack-back)
               ("C-c C-j" . rtags-imenu))
   :init
-  ;; (when (eq dotemacs-cc-helper 'rtags)
+  ;; (when (eq dotemacs-cc-tags 'rtags)
   ;;   (add-hook 'c-mode-common-hook
   ;;             (lambda ()
   ;;               (when (derived-mode-p 'c-mode 'c++-mode)
@@ -116,17 +116,12 @@
 
 (use-package company-rtags
   :ensure t
-  :if (eq dotemacs-cc-helper 'rtags)
+  :if (eq dotemacs-cc-tags 'rtags)
   :after (company rtags)
   :init
   (add-hook 'c-mode-common-hook
             (lambda ()
               (add-to-list 'company-backends 'company-rtags))))
-
-(use-package ivy-xref
-  :ensure t
-  :disabled t
-  :config (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (provide 'tags-init)
 

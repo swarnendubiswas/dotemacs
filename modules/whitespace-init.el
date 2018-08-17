@@ -5,6 +5,15 @@
 
 ;;; Code:
 
+(defcustom dotemacs-use-whitespace-p
+  nil
+  "Control whitespace module.
+Control whether the whitespace module should be enabled or
+disabled.  Sometimes we do not want to unnecessarily add
+differences due to whitespaces."
+  :type 'boolean
+  :group 'dotemacs)
+
 (defvar dotemacs-fill-column)
 
 ;; This is different from whitespace-cleanup since this is unconditional
