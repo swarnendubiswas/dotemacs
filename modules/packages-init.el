@@ -15,7 +15,7 @@
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
       ;; Avoid loading packages twice
       package-enable-at-startup nil)
-;; (package-initialize)
+(package-initialize)
 
 (defun sb/first-install ()
   "Run this function the first time you want to setup Emacs on your system."
@@ -86,7 +86,7 @@
     (when (bound-and-true-p dotemacs-use-marmalade-repo-p)
       (add-to-list 'package-archives
                    '("marmalade" . "https://marmalade-repo.org/packages/") t))
-    
+
     (paradox-upgrade-packages))
 
   (defun sb/list-packages ()
@@ -110,7 +110,7 @@
     (when (bound-and-true-p dotemacs-use-marmalade-repo-p)
       (add-to-list 'package-archives
                    '("marmalade" . "https://marmalade-repo.org/packages/") t))
-    
+
     (paradox-list-packages nil))
 
   :bind (("C-c d l" . sb/list-packages)

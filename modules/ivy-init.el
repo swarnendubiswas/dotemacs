@@ -194,11 +194,8 @@
   :ensure t
   :after ivy
   :config
-  (setq ivy-rich-switch-buffer-align-virtual-buffer t
-        ivy-rich-path-style 'relative
-        ivy-rich-switch-buffer-name-max-length 48
-        ivy-rich-switch-buffer-project-max-length 32)
-  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+  (setq ivy-rich-path-style 'relative)
+  (ivy-rich-mode 1))
 
 (use-package ivy-historian
   :ensure t
