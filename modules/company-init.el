@@ -91,6 +91,8 @@
 ;; Resize icons:
 ;; (create-image file-path 'imagemagick nil :ascent 'center :width width :height height)
 (use-package company-box
+  :ensure t
+  :disabled t
   :after company
   :diminish
   :hook (company-mode . company-box-mode))
