@@ -96,9 +96,10 @@
         backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
         auto-save-default t
         confirm-kill-emacs nil)
-  (when (and (>= emacs-major-version 26)
-             (>= emacs-minor-version 1))
-    (confirm-kill-processes nil)))
+  ;; (when (and (>= emacs-major-version 26)
+  ;;            (>= emacs-minor-version 1))
+  ;;   (confirm-kill-processes nil))
+  )
 
 ;; Enable use of system clipboard across Emacs and other applications.
 (if (and (>= emacs-major-version 25)
