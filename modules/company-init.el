@@ -88,8 +88,6 @@
   :after company
   :config (push 'company-elisp company-backends))
 
-;; Resize icons:
-;; (create-image file-path 'imagemagick nil :ascent 'center :width width :height height)
 (use-package company-box
   :ensure t
   :disabled t

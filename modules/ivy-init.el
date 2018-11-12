@@ -1,4 +1,3 @@
-
 ;;; ivy-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
@@ -193,6 +192,7 @@
 (use-package ivy-rich
   :ensure t
   :after ivy
+  :disabled t
   :config
   (setq ivy-rich-path-style 'relative)
   (ivy-rich-mode 1))
