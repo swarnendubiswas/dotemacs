@@ -70,7 +70,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Treemacs
 
-*
+* `C-j` - Initialize or toggle treemacs (`treemacs`).
 *
 
 ## Ibuffer

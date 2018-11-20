@@ -29,8 +29,7 @@
 ;; You may delete these explanatory comments.
 ;; (package-initialize)
 
-(setq user-full-name "Swarnendu Biswas"
-      user-mail-address "swarnendu_cse@yahoo.com")
+(setq user-full-name "Swarnendu Biswas")
 
 (add-to-list 'load-path (concat user-emacs-directory "modules/"))
 
@@ -41,7 +40,7 @@
 
 (require 'defaults-init)
 (require 'appearance-init)
-;; (require 'mode-line-init)
+(require 'mode-line-init)
 
 ;; Configure power packages
 (require 'ibuffer-init)
