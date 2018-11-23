@@ -5,6 +5,7 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
+(defvar dotemacs-selection)
 
 (use-package helpful
   :ensure t
@@ -192,6 +193,7 @@
 
 (use-package amx
   :ensure t
+  :disabled t
   :commands (amx amx-mode)
   :config
   (setq amx-save-file (concat dotemacs-temp-directory "amx-items"))
@@ -229,6 +231,12 @@
   (browse-kill-ring-default-keybindings)
   (use-package browse-kill-ring+
     :ensure t))
+
+(use-package super-save
+  :ensure t
+  :config
+  (add-to-list 'super-save-triggers 'ace-window)
+  (super-save-mode 1))
 
 (provide 'misc-init)
 

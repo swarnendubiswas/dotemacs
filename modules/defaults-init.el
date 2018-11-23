@@ -17,10 +17,9 @@
       initial-scratch-message nil
       create-lockfiles nil
       message-log-max 5000
-      line-number-display-limit 2000000
+      ;; line-number-display-limit 2000000
       ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
       x-underline-at-descent-line t ; Draw underline lower
-      completion-ignore-case t ; Ignore case when completing
       gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
       use-dialog-box nil
       use-file-dialog nil
@@ -29,8 +28,9 @@
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t
+      completion-ignore-case t ; Ignore case when completing
       ;; Ignore case when reading a file name completion
-      read-file-name-completion-ignore-case t
+      ;; read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
       ;; Make cursor the width of the character it is under i.e. full width of a TAB
@@ -46,11 +46,6 @@
               history-delete-duplicates t ; Delete duplicate (identical and old) elements in the minibuffer history
               ;; Disabling this is one way to speed up Emacs with buffers with long lines
               bidi-display-reordering nil)
-
-;; (when (>= emacs-major-version 24)
-;;   ;; This is effective to turn off "Writing .." messages, but then it would disable other useful information from eldoc
-;;   ;; and Flycheck.
-;;   (setq inhibit-message nil))
 
 (unless (bound-and-true-p dotemacs-use-ignoramus-p)
   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
@@ -119,7 +114,7 @@
         kill-whole-line t
         suggest-key-bindings t
         shift-select-mode t ; Use shift-select for marking
-        blink-matching-paren t
+        blink-matching-paren nil
         kill-ring-max 200
         kill-do-not-save-duplicates t
         set-mark-command-repeat-pop t)

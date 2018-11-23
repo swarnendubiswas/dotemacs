@@ -19,21 +19,23 @@
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :disabled t
   :init
   (smartparens-global-mode 1)
   (show-smartparens-global-mode 1)
   :config
   (require 'smartparens-config)
-  (setq sp-show-pair-from-inside t)
-  ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
-  (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
-                 (sp-local-tag "i" "\"<" "\">"))
+  (setq sp-show-pair-from-inside t
+        sp-autoskip-closing-pair 'always)
 
-  (sp-with-modes '(c++-mode)
-                 (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
-  (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
-                                                      ("* ||\n[i]" "RET")))
+  ;; ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
+  ;; (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
+  ;;                (sp-local-tag "i" "\"<" "\">"))
+
+  ;; (sp-with-modes '(c++-mode)
+  ;;                (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET"))))
+  ;; (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
+  ;; ("* ||\n[i]" "RET")))
+
   :bind (("C-M-a" . sp-beginning-of-sexp)
          ("C-M-e" . sp-end-of-sexp)
          ("C-M-u" . sp-up-sexp)

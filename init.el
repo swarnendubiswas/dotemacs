@@ -40,7 +40,7 @@
 
 (require 'defaults-init)
 (require 'appearance-init)
-(require 'mode-line-init)
+;; (require 'mode-line-init)
 
 ;; Configure power packages
 (require 'ibuffer-init)

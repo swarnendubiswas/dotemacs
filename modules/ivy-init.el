@@ -100,18 +100,18 @@
    ("M-y" . ivy-next-line))
   :diminish ivy-mode)
 
-(use-package smex
-  :ensure t
-  :if (eq dotemacs-selection 'ivy)
-  :config
-  (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
-        smex-auto-update t)
-  (smex-initialize))
+;; (use-package smex
+;;   :ensure t
+;;   :if (eq dotemacs-selection 'ivy)
+;;   :config
+;;   (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
+;;         smex-auto-update t)
+;;   (smex-initialize))
 
 (use-package counsel
   :ensure t
   :ensure ivy
-  :ensure smex
+  ;; :ensure smex
   :after ivy
   :demand t
   :preface

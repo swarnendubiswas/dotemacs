@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-;; FIXME: How to resolve the problem during a first run?
+;; FIXME: How to resolve the problem during a first run? Maybe use Prelude's function to help with this.
 
 (defvar dotemacs-emacs-custom-file)
 
@@ -49,7 +49,7 @@
                '("melpa" . "https://melpa.org/packages/") t)
   (package-refresh-contents)
   (package-install 'use-package))
-(setq use-package-enable-imenu-support t)
+;; (setq use-package-enable-imenu-support t)
 (eval-when-compile
   (require 'use-package))
 (setq use-package-check-before-init t
@@ -71,10 +71,6 @@
     "Add repositories and then check for updates."
     (interactive)
     ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
-    (when (< emacs-major-version 24)
-      ;; For important compatibility libraries like cl-lib
-      (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
-
     (add-to-list 'package-archives
                  '("org" . "http://orgmode.org/elpa/") t)
     (add-to-list 'package-archives
@@ -93,10 +89,6 @@
     "Add repositories and then list packages."
     (interactive)
     ;; elpa ("gnu" . "http://elpa.gnu.org/packages/") is already preconfigured
-    (when (< emacs-major-version 24)
-      ;; For important compatibility libraries like cl-lib
-      (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
-
     (add-to-list 'package-archives
                  '("org" . "http://orgmode.org/elpa/") t)
     ;; (add-to-list 'package-archives
@@ -119,7 +111,7 @@
   (use-package async
     :ensure t)
   (setq paradox-execute-asynchronously t
-        paradox-github-token t
+        ;; paradox-github-token t
         paradox-spinner-type 'random)
   (paradox-enable))
 
@@ -133,7 +125,6 @@
 
 (use-package exec-path-from-shell
   :ensure t
-  ;; :defer 2
   :config
   (setq exec-path-from-shell-check-startup-files nil)
   (when (memq window-system '(mac ns x))
