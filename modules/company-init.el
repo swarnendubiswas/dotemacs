@@ -21,7 +21,7 @@
   :config
   (setq company-global-modes t ; Turn on company-mode for all major modes
         company-show-numbers t ; Quick-access numbers for the first ten candidates
-        company-minimum-prefix-length 3
+        company-minimum-prefix-length 2
         company-idle-delay 0.1
         ;; Invert the navigation direction if the completion popup is displayed on top
         company-tooltip-flip-when-above nil

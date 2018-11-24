@@ -76,7 +76,6 @@
   ;; https://github.com/m2ym/popwin-el/issues/9
   :if (not (bound-and-true-p dotemacs-use-ecb))
   :demand t
-  :disabled t
   :config
   (popwin-mode 1)
   (defvar popwin:special-display-config-backup popwin:special-display-config)

@@ -10,8 +10,6 @@
 (use-package imenu
   :config
   (setq imenu-auto-rescan t)
-  (use-package imenu+
-    :ensure t)
   (use-package imenu-anywhere
     :ensure t)
   (use-package popup-imenu

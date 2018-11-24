@@ -78,13 +78,16 @@
                     "^\\*Ibuffer\\*$"
                     "company-statistics-cache.el"))
     (add-to-list 'ivy-ignore-buffers buffer))
-  (add-to-list 'ivy-sort-functions-alist
-               '(read-file-name-internal . eh-ivy-sort-file-function))
+
+  ;; (add-to-list 'ivy-sort-functions-alist
+  ;;              '(read-file-name-internal . eh-ivy-sort-file-function))
+
   ;; https://oremacs.com/2017/04/09/ivy-0.9.0/
-  (setq ivy-switch-buffer-faces-alist
-        '((emacs-lisp-mode . swiper-match-face-1)
-          (dired-mode . ivy-subdir)
-          (org-mode . org-level-4)))
+  ;; (setq ivy-switch-buffer-faces-alist
+  ;;       '((emacs-lisp-mode . swiper-match-face-1)
+  ;;         (dired-mode . ivy-subdir)
+  ;;         (org-mode . org-level-4)))
+
   (ivy-mode 1)
   :bind
   (("C-c r" . ivy-resume)

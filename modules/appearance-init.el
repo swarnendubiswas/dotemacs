@@ -182,7 +182,7 @@
                             )
         (set-face-attribute 'tabbar-selected nil
                             :inherit 'tabbar-default
-                            :height 1.1
+                            :height 1
                             ;; :bold t
                             ;; :underline nil
                             )
@@ -223,7 +223,7 @@
                           :inherit 'tabbar-default
                           :background "gray95"
                           :foreground "gray20"
-                          :height 1.1
+                          :height 1
                           :box '(:line-width 3 :color "grey95" :style nil))
       ;; (set-face-attribute 'tabbar-selected nil
       ;;                 :inherit 'tabbar-default
