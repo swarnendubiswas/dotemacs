@@ -10,6 +10,16 @@
 (defvar dotemacs-temp-directory)
 (defvar savehist-additional-variables)
 
+
+(use-package historian
+  :ensure t
+  :config (setq historian-save-file (concat dotemacs-temp-directory "historian"))
+  (historian-mode 1))
+
+(use-package ivy-historian
+  :ensure t
+  :config (ivy-historian-mode 1))
+
 (use-package ivy
   :ensure t
   :if (eq dotemacs-selection 'ivy)
@@ -103,18 +113,10 @@
    ("M-y" . ivy-next-line))
   :diminish ivy-mode)
 
-;; (use-package smex
-;;   :ensure t
-;;   :if (eq dotemacs-selection 'ivy)
-;;   :config
-;;   (setq smex-save-file (concat dotemacs-temp-directory "smex-items")
-;;         smex-auto-update t)
-;;   (smex-initialize))
 
 (use-package counsel
   :ensure t
   :ensure ivy
-  ;; :ensure smex
   :after ivy
   :demand t
   :preface
@@ -195,19 +197,10 @@
 (use-package ivy-rich
   :ensure t
   :after ivy
-  :disabled t
   :config
   (setq ivy-rich-path-style 'relative)
   (ivy-rich-mode 1))
 
-(use-package ivy-historian
-  :ensure t
-  :after ivy
-  :config
-  (use-package historian
-    :ensure t
-    :config (setq historian-save-file (concat dotemacs-temp-directory "historian")))
-  (ivy-historian-mode 1))
 
 (provide 'ivy-init)
 

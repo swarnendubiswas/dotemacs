@@ -17,6 +17,7 @@
 ;; M-x vlf <PATH-TO-FILE>
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
+  :disabled t
   :config (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
   (use-package vlf-setup))
 
@@ -47,7 +48,7 @@
 
 (use-package graphviz-dot-mode
   :ensure t
-  :mode "\\.dot\\'"
+  :mode ("\\.dot\\'" . graphviz-dot-mode)
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot
@@ -60,7 +61,8 @@
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package bug-hunter
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
 (use-package popup
@@ -85,7 +87,7 @@
   ;; Helm buffers include the "help" string
   (push '("*Help*" :noselect t) popwin:special-display-config)
 
-  (push '(dired-mode :position top) popwin:special-display-config)
+  ;; (push '(dired-mode :position top) popwin:special-display-config)
   (push '(compilation-mode :noselect t) popwin:special-display-config)
   (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
   (push '(svn-info-mode :noselect t) popwin:special-display-config)
@@ -130,10 +132,12 @@
 
 (use-package smart-mark ; Restore point with "C-g" after marking a region
   :ensure t
+  :disabled t
   :config (smart-mark-mode 1))
 
 (use-package ignoramus ; Ignore backups, build files, et al.
   :ensure t
+  :disabled t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
   :config
   (dolist (ext '(".cb"
@@ -233,6 +237,7 @@
 
 (use-package super-save
   :ensure t
+  :diminish super-save-mode
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))

@@ -157,7 +157,7 @@
   (setq tabbar-use-images nil ; Speed up by not using images
         tabbar-auto-scroll-flag t
         tabbar-background-color nil
-        tabbar-separator '(0.3))
+        tabbar-separator '(0.2))
   (setq tabbar-separator '(1)) ;; set tabbar-separator size to 1 pixel
 
   (add-hook 'after-save-hook #'sb/tabbar-modification-state-change)
@@ -202,7 +202,7 @@
     (progn
       (set-face-attribute 'tabbar-default nil
                           :inherit nil
-                          :height 1.0
+                          :height 0.9
                           :weight 'normal
                           :width 'normal
                           :slant 'normal
@@ -273,7 +273,7 @@
                           :foreground "dark green"
                           ;; :box '(:line-width 1 :color "black" :style sunken)
                           :box '(:style pressed-button)
-                          :height 1.1
+                          :height 1
                           :bold t
                           :underline nil)))
   :bind (:map tabbar-mode-map
@@ -290,6 +290,7 @@
                                                                      'default nil
                                                                      :height 135))
           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
+                                                                        :family "Fira Code"
                                                                         :height 160))
           (t (set-face-attribute 'default nil
                                  ;; :family "Droid Sans Mono"
