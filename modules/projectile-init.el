@@ -26,6 +26,7 @@
   (when (eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy))
 
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
+
   (dolist (dirs '(".cache"
                   ".dropbox"
                   ".git"
@@ -37,6 +38,7 @@
                   "__pycache__"
                   ".vscode"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
+
   (dolist (item '("GPATH"
                   "GRTAGS"
                   "GTAGS"
@@ -44,6 +46,7 @@
                   "TAGS"
                   ".tags"))
     (add-to-list 'projectile-globally-ignored-files item))
+
   (dolist (list '("\\.out$"
                   "\\.pdf$"
                   "\\.pyc$"

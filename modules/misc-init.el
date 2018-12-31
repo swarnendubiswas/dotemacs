@@ -137,6 +137,7 @@
 
 (use-package ignoramus ; Ignore backups, build files, et al.
   :ensure t
+  :disabled t
   :if (bound-and-true-p dotemacs-use-ignoramus-p)
   :config
   (dolist (ext '(".cb"
@@ -237,6 +238,7 @@
 
 (use-package super-save
   :ensure t
+  :diminish super-save-mode
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
