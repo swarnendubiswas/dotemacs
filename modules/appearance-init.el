@@ -200,22 +200,23 @@
         ;;                     :bold t)
         )
     (progn
-      (set-face-attribute 'tabbar-default nil
-                          :inherit nil
-                          :height 0.9
-                          :weight 'normal
-                          :width 'normal
-                          :slant 'normal
-                          :underline nil
-                          :strike-through nil
-                          :stipple nil
-                          :background "gray80"
-                          :foreground "black"
-                          ;; :box '(:line-width 2 :color "white" :style nil)
-                          :box nil
-                          ;; :family "Lucida Grande"
-                          ;;:family "helvetica"
-                          )
+      ;; (set-face-attribute 'tabbar-default nil
+      ;;                     :inherit nil
+      ;;                     :height 0.9
+      ;;                     :weight 'normal
+      ;;                     :width 'normal
+      ;;                     :slant 'normal
+      ;;                     :underline nil
+      ;;                     :strike-through nil
+      ;;                     :stipple nil
+      ;;                     :background "gray80"
+      ;;                     :foreground "black"
+      ;;                     ;; :box '(:line-width 2 :color "white" :style nil)
+      ;;                     :box nil
+      ;;                     ;; :family "Lucida Grande"
+      ;;                     ;;:family "helvetica"
+      ;;                     )
+
       ;; (set-face-attribute 'tabbar-default nil
       ;;                     :background "gray80")
 
@@ -223,8 +224,9 @@
                           :inherit 'tabbar-default
                           :background "gray95"
                           :foreground "gray20"
-                          :height 1
+                          :height 0.95
                           :box '(:line-width 3 :color "grey95" :style nil))
+
       ;; (set-face-attribute 'tabbar-selected nil
       ;;                 :inherit 'tabbar-default
       ;;                 :background "#f2f2f6"
@@ -234,48 +236,53 @@
       ;;                 :bold t
       ;;                 :underline nil)
 
-      (set-face-attribute 'tabbar-unselected nil
-                          :inherit 'tabbar-default
-                          :background "gray80"
-                          :box '(:line-width 3 :color "grey80" :style nil))
+      ;; (set-face-attribute 'tabbar-unselected nil
+      ;;                     :inherit 'tabbar-default
+      ;;                     :background "gray80"
+      ;;                     :box '(:line-width 3 :color "grey80" :style nil))
+
       ;; (set-face-attribute 'tabbar-unselected nil
       ;;                     :background "gray88"
       ;;                     :foreground "gray30"
       ;;                     :height 0.9)
 
-      (set-face-attribute 'tabbar-button nil
-                          :inherit 'tabbar-default
-                          :box nil)
+      ;; (set-face-attribute 'tabbar-button nil
+      ;;                     :inherit 'tabbar-default
+      ;;                     :box nil)
 
-      (set-face-attribute 'tabbar-separator nil
-                          :background "grey50"
-                          :foreground "grey50"
-                          :height 1.0)
+      ;; (set-face-attribute 'tabbar-separator nil
+      ;;                     :background "grey50"
+      ;;                     :foreground "grey50"
+      ;;                     :height 1.0)
+
       ;; (set-face-attribute 'tabbar-separator nil
       ;;                     :height 1.0)
 
-      (set-face-attribute 'tabbar-highlight nil
-                          :underline t
-                          :background "lemon chiffon")
+      ;; (set-face-attribute 'tabbar-highlight nil
+      ;;                     :underline t
+      ;;                     :background "lemon chiffon")
 
-      (set-face-attribute 'tabbar-button nil
-                          ;; :box '(:line-width 1 :color "gray72" :style released-button)
-                          )
+      ;; (set-face-attribute 'tabbar-button nil
+      ;;                     ;; :box '(:line-width 1 :color "gray72" :style released-button)
+      ;;                     )
 
-      (set-face-attribute 'tabbar-modified nil
-                          :background "gray88"
-                          :foreground "red"
-                          ;; :box '(:line-width 1 :color "black" :style sunken)
-                          )
+      ;; (set-face-attribute 'tabbar-modified nil
+      ;;                     :background "gray88"
+      ;;                     :foreground "red"
+      ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
+      ;;                     )
 
-      (set-face-attribute 'tabbar-selected-modified nil
-                          :background "#f2f2f6"
-                          :foreground "dark green"
-                          ;; :box '(:line-width 1 :color "black" :style sunken)
-                          :box '(:style pressed-button)
-                          :height 1
-                          :bold t
-                          :underline nil)))
+      ;; (set-face-attribute 'tabbar-selected-modified nil
+      ;;                     :background "#f2f2f6"
+      ;;                     :foreground "dark green"
+      ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
+      ;;                     :box '(:style pressed-button)
+      ;;                     :height 1
+      ;;                     :bold t
+      ;;                     :underline nil)
+
+      ))
+
   :bind (:map tabbar-mode-map
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
@@ -290,7 +297,7 @@
                                                                      'default nil
                                                                      :height 135))
           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
-                                                                        :family "Fira Code"
+                                                                        ;; :family "Fira Code"
                                                                         :height 160))
           (t (set-face-attribute 'default nil
                                  ;; :family "Droid Sans Mono"

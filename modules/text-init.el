@@ -13,8 +13,8 @@
   :diminish writegood-mode
   :hook (text-mode . writegood-mode))
 
-(use-package langtool
-  :ensure t)
+;; (use-package langtool
+;;   :ensure t)
 
 (defun sb/company-text-backends ()
   "Add backends for text completion in company mode."
