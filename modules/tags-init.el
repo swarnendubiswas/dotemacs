@@ -123,6 +123,10 @@
             (lambda ()
               (add-to-list 'company-backends 'company-rtags))))
 
+(use-package gxref
+  :ensure t
+  :config (add-to-list 'xref-backend-functions 'gxref-xref-backend))
+
 (provide 'tags-init)
 
 ;;; tags-init.el ends here

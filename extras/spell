@@ -1,4 +1,4 @@
-personal_ws-1.1 en 76 
+personal_ws-1.1 en 77 
 atomicity
 indices
 roundtrip
@@ -23,16 +23,16 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-blackbox
 vertices
+blackbox
 unscalable
 scalable
 programmability
 reconvergence
 virtualizing
 optimizations
-recalibration
 tradeoffs
+recalibration
 TODO
 programmatically
 liveness
@@ -60,6 +60,7 @@ runtime
 reimplement
 unobservable
 deterministically
+nondeterminism
 associativity
 interleavings
 Refactor

@@ -170,19 +170,16 @@
 (use-package parsebib
   :ensure t)
 
-(use-package bibtex-completion
-  :if (eq dotemacs-selection 'ivy)
-  :config
-  (setq bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t)
-  (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                         "~/iss-workspace/papers/approximate-bib/paper.bib")))
-
 (use-package ivy-bibtex
   :ensure t
   :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
+  :config
+  (setq bibtex-completion-cite-prompt-for-optional-arguments nil
+        bibtex-completion-cite-default-as-initial-input t)
+  (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
+                                         "~/iss-workspace/papers/approximate-bib/paper.bib"))
+  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
 
 (use-package company-bibtex
   :ensure t

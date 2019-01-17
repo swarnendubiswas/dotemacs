@@ -41,6 +41,7 @@
 
 (use-package flycheck-popup-tip ; Show error messages in popups
   :ensure t
+  :disabled t
   :after flycheck
   :hook (flycheck-mode . flycheck-popup-tip-mode))
 

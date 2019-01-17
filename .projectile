@@ -2,6 +2,7 @@
 -/backup
 -/tmp
 -/extras
+-/dict
 -/.projectile
 -/.gitignore
 -*.zip
