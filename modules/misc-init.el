@@ -195,17 +195,6 @@
   :ensure t
   :mode ("\\.list\\'" . apt-sources-list-mode))
 
-(use-package amx
-  :ensure t
-  :disabled t
-  :commands (amx amx-mode)
-  :config
-  (setq amx-save-file (concat dotemacs-temp-directory "amx-items"))
-  (amx-mode 1)
-  :bind*
-  (([remap execute-extended-command] . amx)
-   ("<f1>" . amx)))
-
 (use-package rainbow-delimiters
   :ensure t
   ;; :init

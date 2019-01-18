@@ -77,19 +77,16 @@
   :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config
   (add-to-list 'company-backends 'company-c-headers)
-  (when (string-equal (system-name) "consensus.ices.utexas.edu")
-    (dolist (paths '(
-                     "/usr/include"
-                     "/usr/include/boost"
-                     "/usr/include/linux"
-                     "/usr/include/cuda"
-                     "/usr/include/c++/4.8.5"
-                     "/usr/include/c++/4.8.5/tr1"
-                     "/usr/include/c++/4.8.5/x86_64-redhat-linux"
-                     "/usr/local/include"
-                     "/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include"
-                     ))
-      (add-to-list 'company-c-headers-path-system paths))))
+  (dolist (paths '(
+                   "/usr/include"
+                   "/usr/include/clang"
+                   "/usr/include/boost"
+                   "/usr/include/linux"
+                   "/usr/include/cuda"
+                   "/usr/include/c++/7"
+                   "/usr/include/c++/7/tr1"
+                   "/usr/local/include"))
+    (add-to-list 'company-c-headers-path-system paths)))
 
 ;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
 (use-package irony
@@ -137,11 +134,8 @@
   :ensure t
   :after cc-mode
   :init
-  (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 120}")
-  (when (string-equal (system-name) "consensus.ices.utexas.edu")
-    (setq clang-format-executable "/workspace/sbiswas/software/llvm/llvm-6.0.0/llvm-6.0.0.install/bin/clang-format"))
-  (when (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
-    (setq clang-format-executable "/usr/bin/clang-format-6.0")))
+  (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}")
+  (setq clang-format-executable "/usr/bin/clang-format-6.0"))
 
 (add-hook 'before-save-hook
           (lambda ()
