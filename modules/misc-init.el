@@ -5,7 +5,6 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-selection)
 
 (use-package helpful
   :ensure t
@@ -209,21 +208,6 @@
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
   :config (add-hook 'ssh-config-mode-hook 'turn-on-font-lock))
-
-(use-package browse-kill-ring
-  :ensure t
-  :if (eq dotemacs-selection 'none)
-  :commands browse-kill-ring
-  :config
-  (require 'popwin-browse-kill-ring)
-  (setq browse-kill-ring-highlight-current-entry t
-        browse-kill-ring-highlight-inserted-item t
-        browse-kill-ring-show-preview t
-        browse-kill-ring-display-duplicates t)
-  ;; Binds "M-y" to browse-kill-ring
-  (browse-kill-ring-default-keybindings)
-  (use-package browse-kill-ring+
-    :ensure t))
 
 (use-package super-save
   :ensure t

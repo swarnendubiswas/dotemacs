@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar dotemacs-mode-line-theme)
 (defvar dotemacs-theme)
 
@@ -57,9 +56,7 @@
   :ensure t
   :config
   (setq swiper-use-visual-line t
-        swiper-action-recenter t)
-  (when (eq dotemacs-selection 'none)
-    (bind-key "<f4>" #'swiper)))
+        swiper-action-recenter t))
 
 (use-package wgrep
   :ensure t

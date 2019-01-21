@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar dotemacs-temp-directory)
 (defvar dotemacs-completion-in-buffer)
 
@@ -77,7 +76,7 @@
         company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
 
-(when (and (eq dotemacs-selection 'ivy) (bound-and-true-p dotemacs-completion-in-buffer))
+(when (bound-and-true-p dotemacs-completion-in-buffer)
   (with-eval-after-load "counsel"
     (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
     (bind-key [remap completion-at-point] #'counsel-company company-mode-map)

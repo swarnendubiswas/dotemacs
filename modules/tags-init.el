@@ -5,41 +5,39 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-cc-tags)
 
-;; Front end to GNU Global, use `gtags -v -c`.
-;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
-;; http://tuhdo.github.io/c-ide.html
-(use-package ggtags
-  :ensure t
-  :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'none))
-  :diminish ggtags-mode
-  :init
-  (add-hook 'java-mode-hook #'ggtags-mode)
-  (add-hook 'python-mode-hook #'ggtags-mode)
-  (when (eq dotemacs-cc-tags 'gtags)
-    (add-hook 'c-mode-common-hook
-              (lambda ()
-                (when (derived-mode-p 'c-mode 'c++-mode)
-                  (ggtags-mode 1)))))
-  :config
-  (setq ggtags-navigation-mode-lighter nil
-        ggtags-oversize-limit (* 50 1024 1024)
-        ggtags-completing-read-function nil)
-  :bind (:map ggtags-mode-map
-              ("C-c g s" . ggtags-find-other-symbol)
-              ("C-c g h" . ggtags-view-tag-history)
-              ("C-c g r" . ggtags-find-reference)
-              ("C-c g c" . ggtags-create-tags)
-              ("C-c g u" . ggtags-update-tags)
-              ("M-." . ggtags-find-tag-dwim)
-              ("M-," . pop-tag-mark)))
+;; ;; Front end to GNU Global, use `gtags -v -c`.
+;; ;; https://github.com/redguardtoo/emacs.d/blob/master/lisp/init-gtags.el
+;; ;; http://tuhdo.github.io/c-ide.html
+;; (use-package ggtags
+;;   :ensure t
+;;   :diminish ggtags-mode
+;;   :init
+;;   (add-hook 'java-mode-hook #'ggtags-mode)
+;;   (add-hook 'python-mode-hook #'ggtags-mode)
+;;   (when (eq dotemacs-cc-tags 'gtags)
+;;     (add-hook 'c-mode-common-hook
+;;               (lambda ()
+;;                 (when (derived-mode-p 'c-mode 'c++-mode)
+;;                   (ggtags-mode 1)))))
+;;   :config
+;;   (setq ggtags-navigation-mode-lighter nil
+;;         ggtags-oversize-limit (* 50 1024 1024)
+;;         ggtags-completing-read-function nil)
+;;   :bind (:map ggtags-mode-map
+;;               ("C-c g s" . ggtags-find-other-symbol)
+;;               ("C-c g h" . ggtags-view-tag-history)
+;;               ("C-c g r" . ggtags-find-reference)
+;;               ("C-c g c" . ggtags-create-tags)
+;;               ("C-c g u" . ggtags-update-tags)
+;;               ("M-." . ggtags-find-tag-dwim)
+;;               ("M-," . pop-tag-mark)))
 
 (use-package counsel-gtags
   :ensure t
-  :if (and (eq system-type 'gnu/linux) (eq dotemacs-selection 'ivy))
+  :if (eq system-type 'gnu/linux)
   :diminish counsel-gtags-mode
   :commands (counsel-gtags-find-definition
              counsel-gtags-find-reference
@@ -91,14 +89,12 @@
         rtags-find-file-prefer-exact-match nil
         rtags-autostart-diagnostics t
         rtags-display-summary-as-tooltip t)
-  (when (eq dotemacs-selection 'ivy)
-    (setq rtags-display-result-backend 'ivy))
+  (setq rtags-display-result-backend 'ivy)
   (rtags-diagnostics))
 
 (use-package ivy-rtags
   :ensure t
-  :after (ivy rtags)
-  :if (eq dotemacs-selection 'ivy))
+  :after (ivy rtags))
 
 (use-package flycheck-rtags
   :ensure t

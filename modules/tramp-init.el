@@ -7,7 +7,6 @@
 
 (defvar tramp-persistency-file-name)
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-selection)
 
 ;; A few hacks are from https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
@@ -39,7 +38,6 @@
                                      tramp-file-name-regexp)))
 (use-package counsel-tramp
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
   :after tramp)
 
 (provide 'tramp-init)

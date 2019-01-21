@@ -6,7 +6,6 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-selection)
 
 ;; Adding directories to the list of recent files decreases the number of entries of recent files. Therefore, we use a
 ;; different command/keybinding to lookup recent directories.
@@ -30,8 +29,6 @@
   :config
   ;; (add-to-list 'recentf-used-hooks
   ;;              '(dired-after-readin-hook recentf-track-opened-file))
-  (when (eq dotemacs-selection 'none)
-    (bind-key "<f9>" #'recentf-open-files))
   (run-at-time nil (* 10 60) 'recentf-save-list))
 
 ;; Hide the "wrote to recentf" message, which can be irritating.

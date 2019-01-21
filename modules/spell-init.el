@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar dotemacs-extras-directory)
 
 (use-package ispell
@@ -79,16 +78,14 @@
    ("C-," . sb/flyspell-goto-previous-error)))
 
 (or
- (use-package flyspell-popup
-   :ensure t
-   :after flyspell
-   :bind ("C-;" . flyspell-popup-correct))
+ ;; (use-package flyspell-popup
+ ;;   :ensure t
+ ;;   :after flyspell
+ ;;   :bind ("C-;" . flyspell-popup-correct))
 
  (use-package flyspell-correct-ivy
    :ensure t
-   :disabled t
    ;; :after flyspell
-   :if (eq dotemacs-selection 'ivy)
    :bind ("C-;" . flyspell-correct-previous-word-generic)))
 
 (provide 'spell-init)

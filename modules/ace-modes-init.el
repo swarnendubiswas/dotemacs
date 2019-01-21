@@ -6,12 +6,10 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-selection)
 
 (use-package ace-jump-buffer
   :ensure t
   :disabled t
-  :if (eq dotemacs-selection 'none)
   :preface
   ;; Leave out certain buffers based on file name patterns
   ;; http://scottfrazersblog.blogspot.com/2010/01/emacs-filtered-buffer-switching.html

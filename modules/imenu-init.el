@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
-
 (use-package imenu
   :config
   (setq imenu-auto-rescan t)

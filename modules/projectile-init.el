@@ -6,7 +6,6 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-selection)
 
 (use-package projectile
   :ensure t
@@ -23,7 +22,7 @@
         projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
         projectile-mode-line nil)
 
-  (when (eq dotemacs-selection 'ivy)  (setq projectile-completion-system 'ivy))
+  (setq projectile-completion-system 'ivy)
 
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
 
@@ -61,7 +60,6 @@
 
 (use-package counsel-projectile
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
   :after (counsel projectile)
   :config (counsel-projectile-mode)
   :bind (("<f5>" . counsel-projectile-switch-project)

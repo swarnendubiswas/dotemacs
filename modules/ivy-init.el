@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar recentf-list)
 (defvar dotemacs-temp-directory)
 (defvar savehist-additional-variables)
@@ -22,7 +21,6 @@
 
 (use-package ivy
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
   :demand t
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
@@ -147,8 +145,8 @@
    ([remap describe-variable] . counsel-describe-variable)
    ([remap yank-pop] . counsel-yank-pop)
    ([remap describe-bindings] . counsel-descbinds)
-   ;; counsel-M-x uses smex, I use amx
-   ;; ([remap execute-extended-command] . counsel-M-x)
+   ([remap execute-extended-command] . counsel-M-x)
+   ("<f1>" . counsel-M-x)
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
    ([remap load-theme] . counsel-load-theme)
@@ -197,10 +195,9 @@
 (use-package ivy-rich
   :ensure t
   :after ivy
-  :config
+  :init
   (setq ivy-rich-path-style 'relative)
   (ivy-rich-mode 1))
-
 
 (provide 'ivy-init)
 

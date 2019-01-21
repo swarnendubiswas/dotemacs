@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar dotemacs-mode-line-theme)
 
 (use-package flycheck

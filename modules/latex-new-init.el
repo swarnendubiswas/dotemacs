@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
 (defvar dotemacs-completion-in-buffer)
 
 ;; NOTE: AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
@@ -111,7 +110,6 @@
   :ensure t)
 
 (use-package bibtex-completion
-  :if (eq dotemacs-selection 'ivy)
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-cite-default-as-initial-input t
@@ -119,7 +117,6 @@
 
 (use-package ivy-bibtex
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 

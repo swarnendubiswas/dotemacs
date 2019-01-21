@@ -172,7 +172,6 @@
 
 (use-package ivy-bibtex
   :ensure t
-  :if (eq dotemacs-selection 'ivy)
   :bind ("C-c l x" . ivy-bibtex)
   :config
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil

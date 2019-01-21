@@ -10,7 +10,6 @@
 (defvar spaceline-buffer-position-p)
 (defvar spaceline-projectile-root-p)
 (defvar dotemacs-mode-line-theme)
-(defvar dotemacs-selection)
 (defvar dotemacs-theme)
 
 (use-package simple
@@ -138,7 +137,6 @@
 
 (use-package nyan-mode
   :ensure t
-  :if (string-equal (system-name) "consensus.ices.utexas.edu")
   :disabled t
   :preface
   ;; https://github.com/cemerick/.emacs.d#nyan-mode

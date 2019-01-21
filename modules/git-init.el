@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-selection)
-
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
@@ -17,7 +15,7 @@
             (when (derived-mode-p 'magit-status-mode)
               (delete-other-windows))))
 
-  (when (eq dotemacs-selection 'ivy)  (setq magit-completing-read-function 'ivy-completing-read)))
+  (setq magit-completing-read-function 'ivy-completing-read))
 
 (use-package magit-popup
   :after magit)

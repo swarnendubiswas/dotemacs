@@ -38,14 +38,6 @@
   :type 'boolean
   :group 'dotemacs)
 
-(defcustom dotemacs-selection
-  'ivy
-  "Choose the framework to use for narrowing and selection."
-  :type '(radio
-          (const :tag "ivy" ivy)
-          (const :tag "none" none))
-  :group 'dotemacs)
-
 (defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."
