@@ -20,9 +20,17 @@
         projectile-require-project-root t ; Use projectile only in desired directories, too much noise otherwise
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
-        projectile-mode-line nil)
-
-  (setq projectile-completion-system 'ivy)
+        ;; projectile-mode-line nil
+        projectile-completion-system 'ivy
+        ;; The contents of .projectile are ignored when using the alien project indexing method
+        projectile-indexing-method 'hybrid
+        projectile-enable-idle-timer t ; Runs "regenerate ctags" by default
+        projectile-idle-timer-seconds 120
+        projectile-project-search-path '("/home/swarnendu/github/"
+                                         "/home/swarnendu/bitbucket/"
+                                         "/home/swarnendu/plass-workspace"
+                                         "/home/swarnendu/iss-workspace"
+                                         "/home/swarnendu/iitk-workspace"))
 
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
 
@@ -56,19 +64,18 @@
 
   ;; https://www.reddit.com/r/emacs/comments/320cvb/projectile_slows_tramp_mode_to_a_crawl_is_there_a/
   (defadvice projectile-project-root (around ignore-remote first activate)
-    (unless (file-remote-p default-directory) ad-do-it)))
+    (unless (file-remote-p default-directory) ad-do-it))
+
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (use-package counsel-projectile
   :ensure t
   :after (counsel projectile)
   :config (counsel-projectile-mode)
   :bind (("<f5>" . counsel-projectile-switch-project)
-         ("<f6>" . counsel-projectile-find-file)
-         ("<f7>" . counsel-projectile-switch-to-buffer)
+         ("<f6>" . counsel-projectile)
+         ;; ("<f7>" . counsel-projectile-switch-to-buffer)
          ("<f8>" . counsel-projectile-rg)))
-
-(use-package projectile-ripgrep
-  :ensure t)
 
 (provide 'projectile-init)
 
