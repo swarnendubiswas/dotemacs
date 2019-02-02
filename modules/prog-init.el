@@ -10,7 +10,7 @@
 (defvar dotemacs-mode-line-theme)
 
 (use-package semantic
-  :defer 5
+  ;; :defer 5
   :init
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   (add-hook 'prog-mode-hook #'semantic-mode)
@@ -23,18 +23,19 @@
   (global-semantic-highlight-func-mode 1))
 
 (use-package prog-mode
-  :defer t
   :config
   (when (>= emacs-major-version 25)
     (setq prettify-symbols-unprettify-at-point 'right-edge)
     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
 (use-package make-mode
-  :defer t
-  :init
-  (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
-  ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
-  (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
+  :mode (("\\Makefile\\'" . makefile-mode)
+         ("makefile\\.rules\\'" . makefile-gmake-mode))
+  ;; :init
+  ;; (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
+  ;; ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
+  ;; (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
+  )
 
 (use-package web-mode ; http://web-mode.org/
   :ensure t

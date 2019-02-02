@@ -41,7 +41,6 @@ differences due to whitespaces."
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :diminish ws-butler-mode
-  ;; :init (add-hook 'prog-mode #'ws-butler-global-mode)
   :hook (prog-mode . ws-butler-mode))
 
 (provide 'whitespace-init)

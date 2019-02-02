@@ -47,31 +47,31 @@
               ;; Disabling this is one way to speed up Emacs with buffers with long lines
               bidi-display-reordering nil)
 
-(unless (bound-and-true-p dotemacs-use-ignoramus-p)
-  ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
-  (dolist (ext '("auto/"
-                 "-autoloads.el"
-                 ".aux"
-                 ".bbl"
-                 ".blg"
-                 ".cb"
-                 ".cb2"
-                 ".dvi"
-                 ".elc"
-                 ".exe"
-                 ".fls"
-                 ".idx"
-                 ".lof"
-                 ".lot"
-                 ".o"
-                 ".out"
-                 ".pdf"
-                 "-pkg.el"
-                 ".pyc"
-                 ".rel"
-                 ".rip"
-                 ".toc"))
-    (add-to-list 'completion-ignored-extensions ext)))
+;; (unless (bound-and-true-p dotemacs-use-ignoramus-p)
+;;   ;; Avoid completing temporary files - http://endlessparentheses.com/improving-emacs-file-name-completion.html
+;;   (dolist (ext '("auto/"
+;;                  "-autoloads.el"
+;;                  ".aux"
+;;                  ".bbl"
+;;                  ".blg"
+;;                  ".cb"
+;;                  ".cb2"
+;;                  ".dvi"
+;;                  ".elc"
+;;                  ".exe"
+;;                  ".fls"
+;;                  ".idx"
+;;                  ".lof"
+;;                  ".lot"
+;;                  ".o"
+;;                  ".out"
+;;                  ".pdf"
+;;                  "-pkg.el"
+;;                  ".pyc"
+;;                  ".rel"
+;;                  ".rip"
+;;                  ".toc"))
+;;     (add-to-list 'completion-ignored-extensions ext)))
 
 ;; ;; Activate utf8 mode
 ;; (when (eq system-type 'windows-nt)
@@ -97,10 +97,11 @@
   )
 
 ;; Enable use of system clipboard across Emacs and other applications.
-(if (and (>= emacs-major-version 25)
-         (>= emacs-minor-version 1))
-    (setq select-enable-clipboard t)
-  (setq x-select-enable-clipboard t))
+;; (if (and (>= emacs-major-version 25)
+;;          (>= emacs-minor-version 1))
+;;     (setq select-enable-clipboard t)
+;;   (setq x-select-enable-clipboard t))
+(setq select-enable-clipboard t)
 
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
 (fset 'display-startup-echo-area-message #'ignore)
@@ -126,7 +127,9 @@
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
   ;; :demand t
   :diminish auto-revert-mode
-  :init (add-hook 'find-file-hook #'global-auto-revert-mode)
+  :init
+  (global-auto-revert-mode 1)
+  ;; (add-hook 'find-file-hook #'global-auto-revert-mode)
   :config
   (setq-default auto-revert-interval 15 ; Default is 5 s.
                 auto-revert-verbose nil
@@ -143,21 +146,22 @@
   ;; Turn off warnings due to functions being redefined
   (setq ad-redefinition-action 'accept))
 
-(when (<= emacs-major-version 24)
-  (progn
-    (advice-add 'capitalize-word :before #'goto-beginning-of-word)
-    (advice-add 'downcase-word :before #'goto-beginning-of-word)
-    (advice-add 'upcase-word :before #'goto-beginning-of-word)))
+;; (when (<= emacs-major-version 24)
+;;   (progn
+;;     (advice-add 'capitalize-word :before #'goto-beginning-of-word)
+;;     (advice-add 'downcase-word :before #'goto-beginning-of-word)
+;;     (advice-add 'upcase-word :before #'goto-beginning-of-word)))
 
 (use-package saveplace ; Remember cursor position in files
   :unless noninteractive
   :config
-  ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
-  (if (and (>= emacs-major-version 25)
-           (>= emacs-minor-version 1))
-      (save-place-mode 1)
-    (setq-default save-place t
-                  save-place-limit nil))
+  ;; ;; http://emacs.stackexchange.com/questions/12709/how-to-save-last-place-of-point-in-a-buffer
+  ;; (if (and (>= emacs-major-version 25)
+  ;;          (>= emacs-minor-version 1))
+  ;;     (save-place-mode 1)
+  ;;   (setq-default save-place t
+  ;;                 save-place-limit nil))
+  (save-place-mode 1)
   (setq save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package savehist ; Save minibuffer histories across sessions

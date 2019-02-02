@@ -13,9 +13,6 @@
   :diminish writegood-mode
   :hook (text-mode . writegood-mode))
 
-;; (use-package langtool
-;;   :ensure t)
-
 (defun sb/company-text-backends ()
   "Add backends for text completion in company mode."
   (make-local-variable 'company-backends)
@@ -41,6 +38,7 @@
         markdown-italic-underscore t
         markdown-enable-math t
         markdown-make-gfm-checkboxes-buttons t
+        markdown-list-indent-width 2
         markdown-command "pandoc -f markdown -s "))
 
 (use-package markdown-mode+

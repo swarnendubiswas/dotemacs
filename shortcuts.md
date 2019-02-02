@@ -145,7 +145,15 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 * `C-c p S` - Save all project buffers (`projectile-save-project-buffers`).
 * `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`).
 * `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
-* `<f8>` - Run an ag search in the project (`projectile-ag`).
+* `<f5>` - Switch project (`counsel-projectile-switch-project`).
+* `<f6>` - Find file (`counsel-projectile-find-file`).
+* `<f7>` - Switch to project buffer (`counsel-projectile-switch-to-buffer`).
+* `<f8>` - Run an ag search in the project (`counsel-projectile-rg`).
+* `C-c p s g` - Grep in project.
+* `C-c p v` - Run `vc-dir` on the project root.
+* `C-c p k` - Kill all project buffers.
+* `C-c p E` - Opens the root `dir-locals-file` of the project.
+* `C-c p C-h` - Show all projectile keybindings.
 
 ## LaTeX/AUCTeX
 
