@@ -16,9 +16,9 @@
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-display-errors-delay 0.5
         ;; Faster than the default
-        flycheck-highlighting-mode 'lines)
-
-  (setq flycheck-python-pylint-executable "python3")
+        flycheck-highlighting-mode 'lines
+        flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch)
+        flycheck-python-pylint-executable "python3")
 
   (add-hook 'python-mode-hook
             (lambda ()
@@ -27,6 +27,7 @@
   (add-hook 'c++-mode-hook
             (lambda ()
               (setq flycheck-clang-language-standard "c++11")))
+
   (when (eq dotemacs-mode-line-theme 'spaceline)
     (setq flycheck-mode-line nil)))
 
