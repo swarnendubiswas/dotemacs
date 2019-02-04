@@ -287,21 +287,32 @@
               ("M-<left>" . tabbar-backward-tab)
               ("M-<right>" . tabbar-forward-tab)))
 
-;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
-(if (eq system-type 'windows-nt)
-    (set-face-attribute 'default nil
-                        :family "Consolas"
-                        :height 120)
-  (progn
-    (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
-                                                                     'default nil
-                                                                     :height 135))
-          ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
-                                                                        ;; :family "Fira Code"
-                                                                        :height 160))
-          (t (set-face-attribute 'default nil
-                                 ;; :family "Droid Sans Mono"
-                                 :height 120)))))
+;; ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
+;; (if (eq system-type 'windows-nt)
+;;     (set-face-attribute 'default nil
+;;                         :family "Consolas"
+;;                         :height 120)
+;;   (progn
+;;     (cond ((string-equal (system-name) "consensus.ices.utexas.edu") (set-face-attribute
+;;                                                                      'default nil
+;;                                                                      :height 135))
+;;           ((string-equal (system-name) "swarnendu") (set-face-attribute 'default nil
+;;                                                                         ;; :family "Fira Code"
+;;                                                                         :height 160))
+;;           (t (set-face-attribute 'default nil
+;;                                  ;; :family "Droid Sans Mono"
+;;                                  :height 120)))))
+
+;; (set-default-font "monaco")
+;; (set-default-font "-apple-Monaco-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1")
+
+;; (set-default-font "hack")
+;; (set-frame-font "FiraCode")
+
+(set-default-font "DejaVu Sans Mono")
+(set-face-attribute 'default nil
+                    :family "DejaVu Sans Mono"
+                    :height 130)
 
 (use-package minimap
   :ensure t

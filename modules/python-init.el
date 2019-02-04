@@ -5,8 +5,7 @@
 
 ;;; Code:
 
-;; Install the following packages: sudo -H pip3 install --upgrade pip setuptools jedi rope importmagic yapf pyflakes
-;; flake8 autopep8 pep8 pylint flake8-docstring pydocstyle wheel isort
+;; Install the following packages: sudo -H pip3 install --upgrade pip setuptools jedi rope importmagic yapf pylint pydocstyle isort
 
 (defvar dotemacs-completion-in-buffer)
 

@@ -28,6 +28,8 @@
 
   )
 
+(setq font-latex-fontify-script nil)
+
 ;; prettify-symbol-mode is distracting while editing, and is buffer-local.
 (add-hook 'LaTeX-mode-hook
           (lambda ()

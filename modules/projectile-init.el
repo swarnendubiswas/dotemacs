@@ -51,7 +51,8 @@
                   "GTAGS"
                   "GSYMS"
                   "TAGS"
-                  ".tags"))
+                  ".tags"
+                  "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files item))
 
   (dolist (list '("\\.out$"
@@ -75,7 +76,7 @@
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
          ;; ("<f7>" . counsel-projectile-switch-to-buffer)
-         ("<f8>" . counsel-projectile-rg)))
+         ("<f7>" . counsel-projectile-rg)))
 
 (provide 'projectile-init)
 

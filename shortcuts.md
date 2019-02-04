@@ -147,8 +147,8 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 * `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
 * `<f5>` - Switch project (`counsel-projectile-switch-project`).
 * `<f6>` - Find file (`counsel-projectile-find-file`).
-* `<f7>` - Switch to project buffer (`counsel-projectile-switch-to-buffer`).
-* `<f8>` - Run an ag search in the project (`counsel-projectile-rg`).
+<!-- * `<f7>` - Switch to project buffer (`counsel-projectile-switch-to-buffer`). -->
+* `<f7>` - Run an ag search in the project (`counsel-projectile-rg`).
 * `C-c p s g` - Grep in project.
 * `C-c p v` - Run `vc-dir` on the project root.
 * `C-c p k` - Kill all project buffers.
