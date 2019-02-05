@@ -8,7 +8,6 @@
 (defvar dotemacs-completion-in-buffer)
 
 (use-package shell
-  :defer t
   :config
   (use-package comint
     :config

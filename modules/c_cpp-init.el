@@ -31,7 +31,6 @@
                                 (awk-mode . "awk")))
 
 (use-package cc-mode
-  :defer t
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
   :config

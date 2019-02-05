@@ -15,7 +15,7 @@
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   (add-hook 'prog-mode-hook #'semantic-mode)
   :config
-  (semantic-mode 1)
+  ;; (semantic-mode 1)
   (global-semanticdb-minor-mode 1)
   (global-semantic-idle-summary-mode 1)
   ;;https://emacs.stackexchange.com/questions/32268/can-semantic-and-company-coexist
@@ -30,12 +30,7 @@
 
 (use-package make-mode
   :mode (("\\Makefile\\'" . makefile-mode)
-         ("makefile\\.rules\\'" . makefile-gmake-mode))
-  ;; :init
-  ;; (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
-  ;; ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
-  ;; (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
-  )
+         ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 (use-package web-mode ; http://web-mode.org/
   :ensure t
@@ -104,7 +99,6 @@
                   (add-hook 'before-save-hook #'web-beautify-css-buffer t t))))))
 
 (use-package nxml-mode
-  :defer t
   :init (defalias 'xml-mode 'nxml-mode)
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t)
@@ -155,7 +149,6 @@
 
 (use-package ess
   :ensure t
-  :defer t
   :config
   (setq inferior-R-args "--quiet --no-restore-history --no-save"
         ess-indent-offset 4
