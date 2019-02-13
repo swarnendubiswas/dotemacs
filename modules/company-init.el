@@ -96,7 +96,7 @@
 
 (use-package company-prescient
   :ensure t
-  :after company
+  :after company prescient
   :config (company-prescient-mode 1))
 
 (provide 'company-init)

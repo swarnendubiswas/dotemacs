@@ -7,7 +7,7 @@ My Emacs customizations, all in one place. Many of the customizations included a
 I use Emacs as my primary editor. Other than text and elisp editing, I use Emacs for editing C/C++, LaTeX, and Python files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I think other IDEs such as Eclipse are way better for working with Java.
 
 * Python - I use Elpy and gtags (and its variants) for code completion
-* C/C++ - I use irony mode and rtags for code completion. Gtags should also work depending on preference.
+* C/C++ - I use irony mode and gtags for code completion. RTags should also work depending on preference.
 
 ## Installation
 

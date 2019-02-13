@@ -201,7 +201,7 @@
 
 (use-package ivy-prescient
   :ensure t
-  :after ivy
+  :after ivy prescient
   :config (ivy-prescient-mode 1))
 
 (provide 'ivy-init)

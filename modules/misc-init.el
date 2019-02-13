@@ -219,7 +219,9 @@
 
 (use-package prescient
   :ensure t
-  :config (prescient-persist-mode 1))
+  :config
+  (setq prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
+  (prescient-persist-mode 1))
 
 (provide 'misc-init)
 
