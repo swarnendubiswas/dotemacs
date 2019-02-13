@@ -48,7 +48,9 @@
   ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
   ;; Blinking cursor can be distracting
-  (blink-cursor-mode 0))
+  (blink-cursor-mode -1))
+
+(toggle-frame-maximized) ; Maximize Emacs on startup
 
 ;; Not the most useful information within Emacs
 (use-package time ; Display the time and date in the mode line
@@ -307,8 +309,8 @@
 ;; (set-default-font "-apple-Monaco-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1")
 
 ;; (set-default-font "hack")
+;; (set-frame-font "Hack 13" nil t)
 ;; (set-frame-font "FiraCode")
-
 (set-default-font "DejaVu Sans Mono")
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"

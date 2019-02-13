@@ -94,6 +94,11 @@
   :diminish
   :hook (company-mode . company-box-mode))
 
+(use-package company-prescient
+  :ensure t
+  :after company
+  :config (company-prescient-mode 1))
+
 (provide 'company-init)
 
 ;;; company-init.el ends here

@@ -7,7 +7,7 @@
 
 (defvar dotemacs-completion-in-buffer)
 
-;; NOTE: AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
+;; AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
 
 (use-package tex-site ; Initialize auctex
   :ensure auctex ; once installed, auctex overrides the tex package

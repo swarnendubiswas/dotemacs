@@ -76,6 +76,7 @@
   ;; popwin does not support ecb or neotree. Only direx seems to be supported. Too bad, would loved to have both popwin and ecb enabled.
   ;; https://github.com/m2ym/popwin-el/issues/9
   :if (not (bound-and-true-p dotemacs-use-ecb))
+  :disabled t
   :demand t
   :config
   (popwin-mode 1)
@@ -215,6 +216,10 @@
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
+
+(use-package prescient
+  :ensure t
+  :config (prescient-persist-mode 1))
 
 (provide 'misc-init)
 
