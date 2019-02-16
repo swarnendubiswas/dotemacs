@@ -46,8 +46,7 @@
 
 ;; (bind-keys
 ;;  ("C-c d b" . sb/byte-compile-current-file)
-;;  ("C-c d i" . sb/byte-compile-init-dir)
-;;  ("C-c d n" . package-list-packages-no-fetch))
+;;  ("C-c d i" . sb/byte-compile-init-dir))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t

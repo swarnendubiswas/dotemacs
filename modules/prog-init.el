@@ -10,7 +10,6 @@
 (defvar dotemacs-mode-line-theme)
 
 (use-package semantic
-  ;; :defer 5
   :init
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   (add-hook 'prog-mode-hook #'semantic-mode)
@@ -111,8 +110,8 @@
 (use-package which-func ; Show the name of the function in the modeline
   :after prog-mode
   :disabled t
-  ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :hook (c-mode-common . which-function-mode)
+  ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :config
   (which-function-mode 1)
   (when (eq dotemacs-mode-line-theme 'sml)

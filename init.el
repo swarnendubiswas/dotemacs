@@ -40,7 +40,7 @@
 
 (require 'defaults-init)
 (require 'appearance-init)
-;; (require 'mode-line-init)
+(require 'mode-line-init)
 
 ;; Configure power packages
 (require 'ibuffer-init)
@@ -72,18 +72,17 @@
 ;; (require 'latex-init)
 (require 'latex-new-init)
 ;; (require 'org-init)
-;; (require 'prog-init)
+(require 'prog-init)
 (require 'c_cpp-init)
 (require 'python-init)
 ;; (require 'java-init)
-;; (require 'shell-script-init)
+(require 'shell-script-init)
 ;; (require 'shell-init)
 ;; (require 'svn-init)
 (require 'git-init)
 
 (require 'functions-init)
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
-;; (require 'server-init) ; Start the daemon/server
 
 ;; Mark safe variables
 

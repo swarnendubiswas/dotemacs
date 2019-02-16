@@ -37,8 +37,8 @@
   :init
   (use-package eclimd
     :config (setq eclimd-autostart t))
-  (setq eclim-eclipse-dirs "/home/sbiswas/software/Eclipse/eclipse-oxygen-java/"
-        eclim-executable "/home/sbiswas/software/Eclipse/eclipse-oxygen-java/eclim")
+  (setq eclim-eclipse-dirs "/home/swarnendu/software/eclipse-java-2018-09-linux-gtk-x86_64/eclipse"
+        eclim-executable "/home/swarnendu/software/Eclipse/eclipse-oxygen-java/eclim")
   (setq eclim-auto-save t)
   (add-hook 'java-mode-hook #'eclim-mode)
   :config
