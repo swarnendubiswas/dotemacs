@@ -308,13 +308,13 @@
 ;; (set-default-font "monaco")
 ;; (set-default-font "-apple-Monaco-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1")
 
-;; (set-default-font "hack")
+;; (set-frame-font "hack" nil t)
 ;; (set-frame-font "Hack 13" nil t)
 ;; (set-frame-font "FiraCode")
-(set-default-font "DejaVu Sans Mono")
+(set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 130)
+                    :height 120)
 
 (use-package minimap
   :ensure t

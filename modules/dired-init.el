@@ -120,29 +120,47 @@
   :config
   (setq treemacs-follow-after-init t
         treemacs-width 25
-        treemacs-indentation 2
+        treemacs-position 'right
         treemacs-collapse-dirs 3
-        treemacs-silent-refresh t
-        treemacs-sorting 'alphabetic-desc
+        ;; treemacs-sorting 'alphabetic-desc
         treemacs-show-hidden-files t
-        treemacs-is-never-other-window t ; Prevents treemacs from being selected with `other-window`
+        treemacs-project-follow-cleanup t
+        ;; Prevents treemacs from being selected with `other-window`
+        treemacs-is-never-other-window nil
         treemacs-goto-tag-strategy 'refetch-index
-        treemacs-no-png-images nil
+        treemacs-no-png-images t
         treemacs-recenter-after-file-follow t
         treemacs-recenter-after-tag-follow  t
+        ;; Do not log messages
         treemacs-silent-filewatch t
         treemacs-silent-refresh t
         treemacs-tag-follow-delay 1
         treemacs-tag-follow-cleanup t)
-  ;; (treemacs-follow-mode 1)
-  (treemacs-tag-follow-mode 1) ; Effectively overrides treemacs-follow-mode
-  (treemacs-filewatch-mode t)
-  (treemacs-git-mode 'extended)
+  (treemacs-follow-mode 1)
+  (treemacs-filewatch-mode 1)
+  (treemacs-fringe-indicator-mode 1)
+  ;; (treemacs-tag-follow-mode 1) ; Effectively overrides treemacs-follow-mode
+  (treemacs-git-mode 'deferred)
+
+  ;; Decrease the font size
+  (set-face-attribute 'treemacs-directory-collapsed-face nil
+                      :height 0.8)
+  (set-face-attribute 'treemacs-directory-face nil
+                      :height 0.8)
+  (set-face-attribute 'treemacs-file-face nil
+                      :height 0.8)
+  (set-face-attribute 'treemacs-root-face nil
+                      :height 0.9)
+
   :bind* ("C-j" . treemacs))
 
 (use-package treemacs-projectile
   :ensure t
-  :after treemacs)
+  :after treemacs projectile)
+
+(use-package treemacs-magit
+  :ensure t
+  :after treemacs magit)
 
 (provide 'dired-init)
 
