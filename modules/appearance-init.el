@@ -331,6 +331,18 @@
   (add-to-list 'minimap-major-modes 'latex-mode)
   (minimap-mode 1))
 
+;; https://stackoverflow.com/questions/27845980/how-do-i-remove-newline-symbols-inside-emacs-vertical-border
+;; (setf (cdr (assq 'continuation fringe-indicator-alist))
+;;       ;; '(nil nil) ;; no continuation indicators
+;;       '(nil right-curly-arrow) ;; right indicator only
+;;       ;; '(left-curly-arrow nil) ;; left indicator only
+;;       ;; '(left-curly-arrow right-curly-arrow) ;; default
+;;       )
+
+;; https://stackoverflow.com/questions/3281581/how-to-word-wrap-in-emacs
+(global-visual-line-mode 1)
+(diminish 'visual-line-mode)
+
 (provide 'appearance-init)
 
 ;;; appearance-init.el ends here

@@ -51,8 +51,8 @@
 
 (use-package pandoc-mode
   :ensure t
-  :diminish pandoc-mode
   :after markdown-mode
+  :diminish pandoc-mode
   :hook (markdown-mode . pandoc-mode))
 
 (use-package csv-mode

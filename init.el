@@ -4,7 +4,7 @@
 ;;; Commentary:
 
 ;; Notes: To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the whole buffer
-;; Use C-M-x to evaluate the current top-level s-expression.  Use M-: to evaluate any Emacs Lisp expression and print the
+;; Use C-M-x to evaluate the current top-level s-expression. Use M-: to evaluate any Emacs Lisp expression and print the
 ;; result.
 
 ;; Init file should not ideally contain calls to "load" or "require", since they cause eager loading and are expensive,
@@ -22,12 +22,6 @@
 ;; #'(lambda (x) (* x x))
 
 ;; Personal modules for customizing Emacs initialization
-
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-;; (package-initialize)
 
 (setq user-full-name "Swarnendu Biswas")
 

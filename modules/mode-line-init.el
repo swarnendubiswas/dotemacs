@@ -13,7 +13,7 @@
 (defvar dotemacs-theme)
 
 (use-package simple
-  :config (size-indication-mode 1))
+  :config (size-indication-mode -1))
 
 (cond ((eq dotemacs-mode-line-theme 'powerline) (use-package powerline
                                                   :ensure t

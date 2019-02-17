@@ -95,13 +95,9 @@
   )
 
 ;; Enable use of system clipboard across Emacs and other applications.
-;; (if (and (>= emacs-major-version 25)
-;;          (>= emacs-minor-version 1))
-;;     (setq select-enable-clipboard t)
-;;   (setq x-select-enable-clipboard t))
 (setq select-enable-clipboard t)
 
-(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no".
+(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 (fset 'display-startup-echo-area-message #'ignore)
 
 (use-package simple
@@ -122,16 +118,16 @@
   (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
   :bind ("C-c d f" . auto-fill-mode))
 
-(use-package autorevert ; Auto-refresh all buffers, does not work for remote files.
+(use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   ;; :demand t
   :diminish auto-revert-mode
   :init
   (global-auto-revert-mode 1)
   ;; (add-hook 'find-file-hook #'global-auto-revert-mode)
   :config
-  (setq-default auto-revert-interval 15 ; Default is 5 s.
+  (setq-default auto-revert-interval 15 ; Default is 5 s
                 auto-revert-verbose nil
-                ;; Auto-refresh dired buffers.
+                ;; Auto-refresh dired buffers
                 global-auto-revert-non-file-buffers t))
 
 (use-package delsel

@@ -70,9 +70,9 @@
         ivy-format-function 'ivy-format-function-arrow
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
         ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
-                                ;;                         (swiper . ivy--regex-plus)
-                                ;;                         (counsel-rg . ivy--regex-plus)
-                                ;;                         (counsel-grep-or-swiper . ivy--regex-plus)
+                                (swiper . ivy--regex-plus)
+                                (counsel-rg . ivy--regex-plus)
+                                (counsel-grep-or-swiper . ivy--regex-plus)
                                 ;;                         (ivy-switch-buffer . ivy--regex-plus)
                                 (t . ivy--regex-fuzzy))
         ivy-flx-limit 200

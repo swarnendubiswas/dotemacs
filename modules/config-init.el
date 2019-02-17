@@ -72,7 +72,7 @@ This depends on the orientation of the display."
           (const :tag "horizontal" horizontal))
   :group 'dotemacs)
 
-(defconst dotemacs-fill-column 120
+(defconst dotemacs-fill-column 100
   "Column beyond which lines should not extend.")
 
 (defcustom dotemacs-use-ignoramus-p
