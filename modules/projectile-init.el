@@ -67,6 +67,12 @@
   (defadvice projectile-project-root (around ignore-remote first activate)
     (unless (file-remote-p default-directory) ad-do-it))
 
+  (add-hook 'projectile-after-switch-project-hook
+            (lambda ()
+              (unless (bound-and-true-p treemacs-mode)
+                (treemacs)
+                (other-window 1))))
+
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (use-package counsel-projectile
