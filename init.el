@@ -63,8 +63,7 @@
 
 ;; Configure individual major modes
 (require 'text-init)
-;; (require 'latex-init)
-(require 'latex-new-init)
+(require 'latex-init)
 ;; (require 'org-init)
 (require 'prog-init)
 (require 'c_cpp-init)

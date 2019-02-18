@@ -73,7 +73,7 @@
                                 (swiper . ivy--regex-plus)
                                 (counsel-rg . ivy--regex-plus)
                                 (counsel-grep-or-swiper . ivy--regex-plus)
-                                ;;                         (ivy-switch-buffer . ivy--regex-plus)
+                                (ivy-switch-buffer . ivy--regex-plus)
                                 (t . ivy--regex-fuzzy))
         ivy-flx-limit 200
         ivy-use-ignore-default 'always ; Always ignore buffers set in ivy-ignore-buffers

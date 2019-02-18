@@ -341,6 +341,7 @@
 
 ;; https://stackoverflow.com/questions/3281581/how-to-word-wrap-in-emacs
 (global-visual-line-mode 1)
+;; (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 (diminish 'visual-line-mode)
 
 (provide 'appearance-init)

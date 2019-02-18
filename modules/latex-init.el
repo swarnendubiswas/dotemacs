@@ -6,17 +6,17 @@
 ;;; Code:
 
 (defvar dotemacs-completion-in-buffer)
-(defvar dotemacs-selection)
-(defvar prettify-symbols-unprettify-at-point)
+
+;; AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
 
 (put 'TeX-narrow-to-group 'disabled nil)
 (put 'LaTeX-narrow-to-environment 'disabled nil)
 
 (use-package tex-site ; Initialize auctex
-  :ensure auctex
+  :ensure auctex ; once installed, auctex overrides the tex package
   :mode ("\\.tex\\'" . LaTeX-mode))
 
-(use-package tex-buf ; Requires tex and latex
+(use-package tex-mode
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -27,10 +27,7 @@
         TeX-save-query nil
         LaTeX-syntactic-comments t)
 
-  (setq-default TeX-master nil) ; Query for master file
-
-  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+  ;; (setq-default TeX-master nil) ; Query for master file
 
   ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
   (setq TeX-source-correlate-method 'synctex
@@ -39,28 +36,32 @@
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
   (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
-  (add-to-list 'TeX-command-list
-               '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
-                 (plain-tex-mode tex-mode TeX-mode LaTeX-mode TeX-latex-mode docTeX-mode)
-                 :help "Run PDFLaTeX"))
-  (add-to-list 'TeX-command-list
-               '("View" "%V" TeX-run-discard nil t))
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
 
-  ;; (when (>= emacs-major-version 25)
-  ;;   (setq prettify-symbols-unprettify-at-point 'right-edge)
-  ;;   (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode))
+  ;; (add-to-list 'TeX-command-list
+  ;;              '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
+  ;;                (plain-tex-mode tex-mode TeX-mode LaTeX-mode TeX-latex-mode docTeX-mode)
+  ;;                :help "Run PDFLaTeX"))
+  ;; (add-to-list 'TeX-command-list
+  ;;              '("View" "%V" TeX-run-discard nil t))
 
-  (unbind-key "C-c C-d" LaTeX-mode-map)
-  ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  (unbind-key "C-c ;" LaTeX-mode-map))
+  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
+  ;; ;; Unset "C-c ;" since we want to bind it to 'comment-line
+  ;; (unbind-key "C-c ;" LaTeX-mode-map)
 
-(use-package tex-mode
-  :diminish latex-electric-env-pair-mode
-  :init
-  (setq latex-run-command "latexmk")
-  (add-hook 'TeX-mode-hook
-            (lambda()
-              (latex-electric-env-pair-mode 1))))
+  ;; :bind
+  ;; ;; Disable "LaTeX-insert-item" in favor of imenu
+  ;; ("C-c C-j" . nil)
+
+  )
+
+(setq font-latex-fontify-script nil)
+
+;; prettify-symbol-mode is distracting while editing, and is buffer-local.
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (global-prettify-symbols-mode -1)
+            (prettify-symbols-mode -1)))
 
 (use-package auctex-latexmk
   :ensure t
@@ -71,9 +72,6 @@
             (lambda ()
               (setq TeX-command-default "LaTeXMk"))))
 
-(use-package math-symbol-lists
-  :ensure t)
-
 (use-package company-auctex
   :ensure t
   :if (bound-and-true-p dotemacs-completion-in-buffer)
@@ -81,31 +79,28 @@
 
 (use-package company-math
   :ensure t
+  :ensure math-symbol-lists ; Required by ac-math and company-math
   :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config
   (add-to-list 'company-backends
                '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
 
-;; ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
-;; (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
-;;   "This advice is meant to fix the issue where an extra blank
-;; line is naively added by `LaTeX-insert-item' when not already on
-;; an item line."
-;;   (check-item-entry))
+(use-package tex-smart-umlauts
+  :ensure t
+  :hook LaTeX-mode-hook)
 
-(use-package bibtex
-  :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
-  :defer t
-  :config
-  (setq bibtex-maintain-sorted-entries t)
-  (use-package bibtex-utils
-    :ensure t))
+(use-package tex-mode
+  :diminish latex-electric-env-pair-mode
+  :init
+  (setq latex-run-command "latexmk")
+  (add-hook 'TeX-mode-hook
+            (lambda()
+              (latex-electric-env-pair-mode 1))))
 
 (use-package reftex
   :diminish reftex-mode
   :commands (reftex-citation)
-  :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
-  :defer t
+  :hook (LaTeX-mode . reftex-mode)
   :config
   (setq reftex-plug-into-AUCTeX t
         reftex-insert-label-flags '(t t)
@@ -119,8 +114,6 @@
         reftex-toc-follow-mode t
         reftex-use-fonts t
         reftex-highlight-selection 'both)
-  (setq reftex-default-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                      "~/iss-workspace/papers/approximate-bib/paper.bib"))
   (use-package reftex-cite
     :preface
     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -147,6 +140,17 @@
                    (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
     :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
+(use-package parsebib
+  :ensure t)
+
+(use-package bibtex
+  :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+  :defer t
+  :config
+  (setq bibtex-maintain-sorted-entries t)
+  (use-package bibtex-utils
+    :ensure t))
+
 (use-package bib-cite
   :defer t
   :diminish bib-cite-minor-mode
@@ -163,34 +167,30 @@
         ("C-c l n" . bib-find-next)
         ("C-c l h" . bib-highlight-mouse)))
 
-(use-package tex-smart-umlauts
-  :ensure t
-  :hook LaTeX-mode-hook)
-
 (use-package parsebib
   :ensure t)
+
+(use-package bibtex-utils
+  :ensure t)
+
+(use-package bibtex-completion
+  :config
+  (setq bibtex-completion-cite-prompt-for-optional-arguments nil
+        bibtex-completion-cite-default-as-initial-input t
+        bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
 
 (use-package ivy-bibtex
   :ensure t
   :bind ("C-c l x" . ivy-bibtex)
-  :config
-  (setq bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t)
-  (setq bibtex-completion-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                         "~/iss-workspace/papers/approximate-bib/paper.bib"))
-  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-key))
+  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-bibtex
   :ensure t
   :if (bound-and-true-p dotemacs-completion-in-buffer)
-  :init
-  (add-to-list 'company-backends 'company-bibtex)
-  (setq company-bibtex-bibliography '("~/plass-workspace/bib/plass-formatted.bib"
-                                      "~/iss-workspace/approximate-bib/paper.bib")))
+  :init (add-to-list 'company-backends 'company-bibtex))
 
-;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
-;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-;; This hook works well for paper directories, but not with dissertation directories.
+;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
+;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 ;; (add-hook 'after-save-hook
 ;;           (lambda ()
 ;;             (when (string= major-mode "latex-mode")
@@ -198,12 +198,60 @@
 ;;               (revert-buffer :ignore-auto :noconfirm)
 ;;               (find-alternate-file (current-buffer)))))
 
+;; (add-hook 'after-save-hook
+;;           (lambda ()
+;;             (when (string= major-mode "latex-mode")
+;;               (let ((process (TeX-active-process))) (if process (delete-process process)))
+;;               (revert-buffer :ignore-auto :noconfirm)
+;;               (find-alternate-file (current-buffer))
+;;               (TeX-command-menu "LaTeXMk"))))
+
+;; (defun run-latexmk ()
+;;   (when (string= major-mode "latex-mode")
+;;     (let ((TeX-save-query nil)
+;;           (TeX-process-asynchronous t)
+;;           (master-file (TeX-master-file)))
+;;       (TeX-save-document "")
+;;       (TeX-run-TeX "LaTexmk"
+;;                    (TeX-command-expand "latexmk -pdf %t" 'TeX-master-file)
+;;                    master-file)
+;;       (if (plist-get TeX-error-report-switches (intern master-file))
+;;           (TeX-next-error t)
+;;         (minibuffer-message "LaTeXMk done")))))
+;; (add-hook 'after-save-hook #'run-latexmk)
+
 (add-hook 'LaTeX-mode-hook
           (lambda ()
-            (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
+            (local-set-key (kbd "C-x C-s") #'sb/save-buffer-and-run-latexmk)))
+
+;; ;; https://github.com/expez/.emacs.d/blob/master/lisp/init-latex.el
+;; (defadvice LaTeX-insert-item (after remove-whitespace-first-item activate)
+;;   "This advice is meant to fix the issue where an extra blank
+;; line is naively added by `LaTeX-insert-item' when not already on
+;; an item line."
+;;   (check-item-entry))
+
+(defun sb/company-LaTeX-backends ()
+  "Add backends for LaTeX completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((;; Generic backends
+           company-dabbrev
+           company-files
+           company-keywords
+           company-capf
+           company-dict
+           ;; company-gtags
+           ;; LaTeX specific backends
+           company-bibtex
+           company-auctex
+           company-math-symbols-latex
+           company-latex-commands
+           company-math-symbols-unicode))))
+(add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
 
 (require 'smartparens-latex)
 
 (provide 'latex-init)
 
-;;; latex-init.el ends here
+;;; latex-new-init.el ends here
