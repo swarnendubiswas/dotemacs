@@ -43,22 +43,17 @@
    ("\\.as[cp]x\\'" . web-mode)
    ("\\.erb\\'" . web-mode))
   :config
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-indent-style 2
-        ;; web-mode-style-padding 1
-        ;; web-mode-script-padding 1
-        ;; web-mode-block-padding 0
-        ;; web-mode-comment-style 2
+  (setq web-mode-markup-indent-offset 4
+        web-mode-css-indent-offset 4
+        web-mode-code-indent-offset 4
+        web-mode-indent-style 4
         web-mode-enable-auto-pairing t
         web-mode-enable-auto-closing t
         web-mode-enable-auto-quoting t
         web-mode-enable-css-colorization t
-        ;; web-mode-enable-comment-keywords t
-        ;; web-mode-enable-current-element-highlight t
-        ;; web-mode-enable-current-column-highlight t
-        )
+        web-mode-enable-block-face t
+        web-mode-enable-current-element-highlight t
+        web-mode-enable-current-column-highlight t)
 
   (use-package ac-html-angular ; Required by ac-html and company-web
     :ensure t
@@ -81,17 +76,22 @@
     (add-hook 'js2-mode-hook
               (lambda ()
                 (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
-
+  (with-eval-after-load "js"
+    (add-hook 'js-mode-hook
+              (lambda ()
+                (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
   (with-eval-after-load "json-mode"
     (add-hook 'json-mode-hook
               (lambda ()
                 (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
-
+  (with-eval-after-load "web-mode"
+    (add-hook 'web-mode-hook
+              (lambda ()
+                (add-hook 'before-save-hook #'web-beautify-html-buffer t t))))
   (with-eval-after-load "sgml-mode"
     (add-hook 'html-mode-hook
               (lambda ()
                 (add-hook 'before-save-hook #'web-beautify-html-buffer t t)))
-
     (with-eval-after-load "css-mode"
       (add-hook 'css-mode-hook
                 (lambda ()
