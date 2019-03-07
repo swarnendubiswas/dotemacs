@@ -69,12 +69,12 @@
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-format-function 'ivy-format-function-arrow
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
-        ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
-                                (swiper . ivy--regex-plus)
-                                (counsel-rg . ivy--regex-plus)
-                                (counsel-grep-or-swiper . ivy--regex-plus)
-                                (ivy-switch-buffer . ivy--regex-plus)
-                                (t . ivy--regex-fuzzy))
+        ;; ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
+        ;;                         (swiper . ivy--regex-plus)
+        ;;                         (counsel-rg . ivy--regex-plus)
+        ;;                         (counsel-grep-or-swiper . ivy--regex-plus)
+        ;;                         (ivy-switch-buffer . ivy--regex-plus)
+        ;;                         (t . ivy--regex-fuzzy))
         ivy-flx-limit 200
         ivy-use-ignore-default 'always ; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-selectable-prompt nil

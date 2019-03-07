@@ -53,21 +53,21 @@
         web-mode-enable-css-colorization t
         web-mode-enable-block-face t
         web-mode-enable-current-element-highlight t
-        web-mode-enable-current-column-highlight t)
+        web-mode-enable-current-column-highlight t))
 
-  (use-package ac-html-angular ; Required by ac-html and company-web
-    :ensure t
-    :config (ac-html-angular+))
+(use-package ac-html-angular ; Required by ac-html and company-web
+  :ensure t
+  :config (ac-html-angular+))
 
-  (use-package company-web
-    :ensure t
-    :if (bound-and-true-p dotemacs-completion-in-buffer)
-    :preface
-    (defun sb/company-web--setup ()
-      (setq-local company-backends
-                  (append '(company-web-html)
-                          company-backends)))
-    :config (add-hook 'web-mode-hook #'sb/company-web--setup)))
+(use-package company-web
+  :ensure t
+  :if (bound-and-true-p dotemacs-completion-in-buffer)
+  :preface
+  (defun sb/company-web--setup ()
+    (setq-local company-backends
+                (append '(company-web-html)
+                        company-backends)))
+  :config (add-hook 'web-mode-hook #'sb/company-web--setup))
 
 (use-package web-beautify
   :ensure t

@@ -83,10 +83,11 @@
  ;;   :after flyspell
  ;;   :bind ("C-;" . flyspell-popup-correct))
 
- (use-package flyspell-correct-ivy
+ (use-package flyspell-correct
    :ensure t
+   :ensure flyspell-correct-ivy
    ;; :after flyspell
-   :bind ("C-;" . flyspell-correct-previous-word-generic)))
+   :bind ("C-;" . flyspell-correct-wrapper)))
 
 (provide 'spell-init)
 
