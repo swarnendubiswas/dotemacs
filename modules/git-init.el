@@ -5,17 +5,21 @@
 
 ;;; Code:
 
+(defvar dotemacs-temp-directory)
+
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
   :config
-  (setq magit-save-repository-buffers t)
+  (setq transient-levels-file (concat dotemacs-temp-directory "transient/levels.el")
+        transient-values-file (concat dotemacs-temp-directory "transient/values.el")
+        transient-history-file (concat dotemacs-temp-directory "transient/history.el")
+        magit-save-repository-buffers t
+        magit-completing-read-function 'ivy-completing-read)
   (setq magit-post-display-buffer-hook
         #'(lambda ()
             (when (derived-mode-p 'magit-status-mode)
-              (delete-other-windows))))
-
-  (setq magit-completing-read-function 'ivy-completing-read))
+              (delete-other-windows)))))
 
 (use-package magit-popup
   :after magit)
