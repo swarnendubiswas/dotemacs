@@ -122,7 +122,8 @@
     :ensure irony
     :ensure flycheck
     :after flycheck
-    :commands flycheck-irony-setup)
+    :commands flycheck-irony-setup
+    :init (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
   (use-package irony-eldoc
     :ensure t
