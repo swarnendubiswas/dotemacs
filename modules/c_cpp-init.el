@@ -21,7 +21,6 @@
 
 ;; http://nilsdeppe.com/posts/emacs-c++-ide
 
-(defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-temp-directory)
 
 (setq-default c-default-style '((java-mode . "java")
@@ -73,7 +72,6 @@
 (use-package company-c-headers
   :ensure t
   :after (company cc-mode)
-  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config
   (add-to-list 'company-backends 'company-c-headers)
   (dolist (paths '(
@@ -107,7 +105,6 @@
   (use-package company-irony
     :ensure t
     :after company
-    :if (bound-and-true-p dotemacs-completion-in-buffer)
     :init
     (use-package company-irony-c-headers
       :ensure t

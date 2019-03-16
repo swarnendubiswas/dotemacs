@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-completion-in-buffer)
-
 (use-package shell
   :config
   (use-package comint
@@ -30,11 +28,10 @@
   (use-package readline-complete
     :ensure t
     :config
-    (when (bound-and-true-p dotemacs-completion-in-buffer)
-      (push 'company-readline company-backends)
-      (add-hook 'rlc-no-readline-hook
-                (lambda ()
-                  (company-mode -1)))))
+    (push 'company-readline company-backends)
+    (add-hook 'rlc-no-readline-hook
+              (lambda ()
+                (company-mode -1))))
 
   (use-package bash-completion
     :ensure t

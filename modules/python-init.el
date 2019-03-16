@@ -7,8 +7,6 @@
 
 ;; Install the following packages: sudo -H pip3 install --upgrade pip setuptools jedi rope importmagic yapf pylint pydocstyle isort
 
-(defvar dotemacs-completion-in-buffer)
-
 (defun sb/python-setup ()
   "Helper function for configuring python mode."
   (setq-default python-indent-offset 4
@@ -40,7 +38,6 @@
       :ensure t
       :ensure company
       :after company
-      :if (bound-and-true-p dotemacs-completion-in-buffer)
       :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
     (elpy-mode 1))
 

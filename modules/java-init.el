@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-extras-directory)
 
 (add-hook 'java-mode-hook
@@ -44,7 +43,6 @@
   :config
   (use-package company-emacs-eclim
     :ensure t
-    :if (bound-and-true-p dotemacs-completion-in-buffer)
     :config (company-emacs-eclim-setup)))
 
 (provide 'java-init)

@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-cc-tags)
 
 ;; ;; Front end to GNU Global, use `gtags -v -c`.

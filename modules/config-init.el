@@ -32,12 +32,6 @@
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-completion-in-buffer
-  t
-  "Use company for in-buffer completion."
-  :type 'boolean
-  :group 'dotemacs)
-
 (defcustom dotemacs-theme
   'default
   "Specify which Emacs theme to use."

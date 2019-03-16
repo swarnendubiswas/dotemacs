@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-completion-in-buffer)
-
 ;; AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
 
 (put 'TeX-narrow-to-group 'disabled nil)
@@ -74,13 +72,11 @@
 
 (use-package company-auctex
   :ensure t
-  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config (company-auctex-init))
 
 (use-package company-math
   :ensure t
   :ensure math-symbol-lists ; Required by ac-math and company-math
-  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :config
   (add-to-list 'company-backends
                '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
@@ -186,7 +182,6 @@
 
 (use-package company-bibtex
   :ensure t
-  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :init (add-to-list 'company-backends 'company-bibtex))
 
 ;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/

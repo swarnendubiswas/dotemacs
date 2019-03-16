@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-completion-in-buffer)
 (defvar dotemacs-temp-directory)
 (defvar dotemacs-mode-line-theme)
 
@@ -61,7 +60,6 @@
 
 (use-package company-web
   :ensure t
-  :if (bound-and-true-p dotemacs-completion-in-buffer)
   :preface
   (defun sb/company-web--setup ()
     (setq-local company-backends
@@ -101,11 +99,10 @@
   :init (defalias 'xml-mode 'nxml-mode)
   :config (setq nxml-slash-auto-complete-flag t
                 nxml-auto-insert-xml-declaration-flag t)
-  (when (bound-and-true-p dotemacs-completion-in-buffer)
-    (add-hook 'nxml-mode-hook
-              (lambda ()
-                (add-to-list (make-local-variable 'company-backends)
-                             'company-nxml)))))
+  (add-hook 'nxml-mode-hook
+            (lambda ()
+              (add-to-list (make-local-variable 'company-backends)
+                           'company-nxml))))
 
 (use-package which-func ; Show the name of the function in the modeline
   :after prog-mode

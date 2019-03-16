@@ -5,8 +5,6 @@
 
 ;;; Code:
 
-(defvar dotemacs-completion-in-buffer)
-
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
@@ -19,7 +17,6 @@
 
   (use-package company-shell
     :ensure t
-    :if (bound-and-true-p dotemacs-completion-in-buffer)
     :after company
     :config
     (setq company-shell-delete-duplicates t)

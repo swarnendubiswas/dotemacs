@@ -6,8 +6,6 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-completion-in-buffer)
-
 (use-package company
   :ensure t
   :diminish company-mode
@@ -76,12 +74,11 @@
         company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
 
-(when (bound-and-true-p dotemacs-completion-in-buffer)
-  (with-eval-after-load "counsel"
-    (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
-    (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
-    (bind-key "C-:" #'counsel-company company-mode-map)
-    (bind-key "C-:" #'counsel-company company-active-map)))
+(with-eval-after-load "counsel"
+  (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
+  (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
+  (bind-key "C-:" #'counsel-company company-mode-map)
+  (bind-key "C-:" #'counsel-company company-active-map))
 
 (use-package company-elisp
   :after company

@@ -52,16 +52,16 @@
 (use-package flycheck-popup-tip ; Show error messages in popups
   :ensure t
   :disabled t
-  :after flycheck
   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
 (use-package flycheck-pos-tip
   :ensure t
-  :config (flycheck-pos-tip-mode 1))
+  :disabled t
+  :hook (flycheck-mode . flycheck-pos-tip-mode))
 
 (use-package flycheck-inline
   :ensure t
-  :config (flycheck-inline-mode 1))
+  :hook (flycheck-mode . flycheck-inline-mode))
 
 (provide 'flycheck-init)
 
