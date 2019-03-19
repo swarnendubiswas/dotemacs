@@ -21,7 +21,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on a Ubuntu >=18.04 distribution.
 
-    sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy
+    sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pip python3-pip npm
     pip install --update proselint Sphinx pygments isort yapf jedi pylint rope --user
     sudo npm i -g elsint js-yaml less jsonlint
     sudo npm i -g stylelint --save-dev
