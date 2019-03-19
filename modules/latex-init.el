@@ -148,7 +148,7 @@
     :ensure t))
 
 (use-package bib-cite
-  :defer t
+  :disabled t
   :diminish bib-cite-minor-mode
   :init  (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
   :config (setq bib-cite-use-reftex-view-crossref t)
