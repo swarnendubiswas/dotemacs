@@ -47,7 +47,7 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
-(defcustom dotemacs-mode-line-theme
+(defcustom dotemacs-modeline-theme
   'spaceline
   "Specify the mode-line theme to use."
   :type '(radio

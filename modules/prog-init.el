@@ -6,7 +6,7 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
-(defvar dotemacs-mode-line-theme)
+(defvar dotemacs-modeline-theme)
 
 (use-package semantic
   :init
@@ -111,11 +111,11 @@
   ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :config
   (which-function-mode 1)
-  (when (eq dotemacs-mode-line-theme 'sml)
+  (when (eq dotemacs-modeline-theme 'sml)
     (set-face-attribute 'which-func nil
                         :foreground "black"
                         :weight 'light))
-  (when (or (eq dotemacs-mode-line-theme 'powerline) (eq dotemacs-mode-line-theme 'spaceline))
+  (when (or (eq dotemacs-modeline-theme 'powerline) (eq dotemacs-modeline-theme 'spaceline))
     (set-face-attribute 'which-func nil
                         ;; :foreground "white"
                         :weight 'light)))

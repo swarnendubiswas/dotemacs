@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-(defvar dotemacs-mode-line-theme)
+(defvar dotemacs-modeline-theme)
 
 ;; Install these packages to help with syntax checking:
 ;; sudo apt install libxml2-utils chktex shellcheck ruby-dev tidy
@@ -38,7 +38,7 @@
               (setq flycheck-clang-language-standard "c++11")
               (setq flycheck-gcc-language-standard "c++11")))
 
-  (when (eq dotemacs-mode-line-theme 'spaceline)
+  (when (eq dotemacs-modeline-theme 'spaceline)
     (setq flycheck-mode-line nil)))
 
 (use-package avy-flycheck

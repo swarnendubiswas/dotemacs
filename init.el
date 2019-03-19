@@ -21,6 +21,8 @@
 ;; (function (lambda (x) (* x x)))
 ;; #'(lambda (x) (* x x))
 
+(setq debug-on-error t)
+
 ;; Personal modules for customizing Emacs initialization
 
 (setq user-full-name "Swarnendu Biswas")
@@ -34,7 +36,7 @@
 
 (require 'defaults-init)
 (require 'appearance-init)
-(require 'mode-line-init)
+(require 'modeline-init)
 
 ;; Configure power packages
 (require 'ibuffer-init)

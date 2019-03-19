@@ -80,15 +80,15 @@
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
-                                     :config (load-theme 'leuven t)))
+                                     :init (load-theme 'leuven t)))
 
       ((eq dotemacs-theme 'professional) (use-package professional-theme
                                            :ensure t
-                                           :config (load-theme 'professional t)))
+                                           :init (load-theme 'professional t)))
 
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
-                                      :config
+                                      :init
                                       (load-theme 'eclipse t)
                                       (set-background-color "white")
                                       (set-face-attribute 'region nil
@@ -113,27 +113,27 @@
 
       ((eq dotemacs-theme 'spacemacs-light) (use-package spacemacs-common
                                               :ensure spacemacs-theme
-                                              :config
+                                              :init
                                               (load-theme 'spacemacs-light t)
                                               (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))))
 
       ((eq dotemacs-theme 'zenburn) (use-package zenburn
                                       :ensure t
-                                      :config (load-theme 'zenburn t)))
+                                      :init (load-theme 'zenburn t)))
 
       ((eq dotemacs-theme 'solarized-light) (use-package solarized-light-theme
                                               :ensure solarized-theme
-                                              :config
+                                              :init
                                               (load-theme 'solarized-light t)
                                               (setq solarized-distinct-fringe-background t)))
 
       ((eq dotemacs-theme 'solarized-dark) (use-package solarized-dark-theme
                                              :ensure solarized-theme
-                                             :config (load-theme 'solarized-dark t)))
+                                             :init (load-theme 'solarized-dark t)))
 
       ((eq dotemacs-theme 'tangotango) (use-package tangotango-theme
                                          :ensure t
-                                         :config (load-theme 'tangotango t)))
+                                         :init (load-theme 'tangotango t)))
 
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil

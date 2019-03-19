@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-(defvar dotemacs-mode-line-theme)
+(defvar dotemacs-modeline-theme)
 (defvar dotemacs-theme)
 
 (setq case-fold-search t) ; Make search ignore case
@@ -44,7 +44,7 @@
   :config
   (setq anzu-search-threshold 10000
         anzu-minimum-input-length 2)
-  (when (eq dotemacs-mode-line-theme 'spaceline)
+  (when (eq dotemacs-modeline-theme 'spaceline)
     (setq anzu-cons-mode-line-p nil))
   (unless (eq dotemacs-theme 'leuven)
     (set-face-attribute 'anzu-mode-line nil
