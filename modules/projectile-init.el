@@ -78,10 +78,13 @@
 (use-package counsel-projectile
   :ensure t
   :after (counsel projectile)
-  :config (counsel-projectile-mode)
+  :config
+  (counsel-projectile-mode)
+  ;; Sort projects from newest to oldest
+  (add-to-list 'ivy-sort-functions-alist
+               '(counsel-projectile-switch-project . file-newer-than-file-p))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
-         ;; ("<f7>" . counsel-projectile-switch-to-buffer)
          ("<f7>" . counsel-projectile-rg)))
 
 (provide 'projectile-init)

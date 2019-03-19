@@ -140,6 +140,9 @@
                                                           :background "light sky blue"
                                                           :foreground "white"))))
 
+;; https://gist.github.com/3demax/1264635/91ccb6c423effd811dbdb1412b70c15e95fa700d
+;; https://emacs.stackexchange.com/questions/984/what-is-the-right-way-to-install-tab-bar
+;; https://www.emacswiki.org/emacs/TabBarMode
 (use-package tabbar
   :ensure t
   :preface
@@ -158,9 +161,9 @@
   :config
   (setq tabbar-use-images nil ; Speed up by not using images
         tabbar-auto-scroll-flag t
-        tabbar-background-color nil
-        tabbar-separator '(0.2))
-  (setq tabbar-separator '(1)) ;; set tabbar-separator size to 1 pixel
+        ;; tabbar-background-color nil
+        ;; tabbar-separator '(0.2)
+        )
 
   (add-hook 'after-save-hook #'sb/tabbar-modification-state-change)
   (add-hook 'first-change-hook #'sb/tabbar-on-buffer-modification)
@@ -175,115 +178,115 @@
               (concat " * " (concat ad-return-value " "))
             (concat " " (concat ad-return-value " ")))))
 
-  (if (eq dotemacs-theme 'spacemacs-light)
-      (progn
-        (set-face-attribute 'tabbar-unselected nil
-                            :inherit 'tabbar-unselected
-                            ;; :background "gray90"
-                            ;; :height 0.9
-                            )
-        (set-face-attribute 'tabbar-selected nil
-                            :inherit 'tabbar-default
-                            :height 1
-                            ;; :bold t
-                            ;; :underline nil
-                            )
-        ;; (set-face-attribute 'tabbar-separator nil
-        ;;                     :inherit 'tabbar-separator
-        ;;                     :height 1.0)
-        ;; (set-face-attribute 'tabbar-modified nil
-        ;;                     :inherit 'tabbar-modified
-        ;;                     ;; :foreground "red"
-        ;;                     :height 0.9)
-        ;; (set-face-attribute 'tabbar-selected-modified nil
-        ;;                     :inherit 'tabbar-selected-modified
-        ;;                     ;; :foreground "dark green"
-        ;;                     :height 1.1
-        ;;                     :bold t)
-        )
-    (progn
-      ;; (set-face-attribute 'tabbar-default nil
-      ;;                     :inherit nil
-      ;;                     :height 0.9
-      ;;                     :weight 'normal
-      ;;                     :width 'normal
-      ;;                     :slant 'normal
-      ;;                     :underline nil
-      ;;                     :strike-through nil
-      ;;                     :stipple nil
-      ;;                     :background "gray80"
-      ;;                     :foreground "black"
-      ;;                     ;; :box '(:line-width 2 :color "white" :style nil)
-      ;;                     :box nil
-      ;;                     ;; :family "Lucida Grande"
-      ;;                     ;;:family "helvetica"
-      ;;                     )
+  ;; (if (eq dotemacs-theme 'spacemacs-light)
+  ;;     (progn
+  ;;       (set-face-attribute 'tabbar-unselected nil
+  ;;                           :inherit 'tabbar-unselected
+  ;;                           ;; :background "gray90"
+  ;;                           ;; :height 0.9
+  ;;                           )
+  ;;       (set-face-attribute 'tabbar-selected nil
+  ;;                           :inherit 'tabbar-default
+  ;;                           :height 1
+  ;;                           ;; :bold t
+  ;;                           ;; :underline nil
+  ;;                           )
+  ;;       ;; (set-face-attribute 'tabbar-separator nil
+  ;;       ;;                     :inherit 'tabbar-separator
+  ;;       ;;                     :height 1.0)
+  ;;       ;; (set-face-attribute 'tabbar-modified nil
+  ;;       ;;                     :inherit 'tabbar-modified
+  ;;       ;;                     ;; :foreground "red"
+  ;;       ;;                     :height 0.9)
+  ;;       ;; (set-face-attribute 'tabbar-selected-modified nil
+  ;;       ;;                     :inherit 'tabbar-selected-modified
+  ;;       ;;                     ;; :foreground "dark green"
+  ;;       ;;                     :height 1.1
+  ;;       ;;                     :bold t)
+  ;;       )
+  ;;   (progn
+  ;;     ;; (set-face-attribute 'tabbar-default nil
+  ;;     ;;                     :inherit nil
+  ;;     ;;                     :height 0.9
+  ;;     ;;                     :weight 'normal
+  ;;     ;;                     :width 'normal
+  ;;     ;;                     :slant 'normal
+  ;;     ;;                     :underline nil
+  ;;     ;;                     :strike-through nil
+  ;;     ;;                     :stipple nil
+  ;;     ;;                     :background "gray80"
+  ;;     ;;                     :foreground "black"
+  ;;     ;;                     ;; :box '(:line-width 2 :color "white" :style nil)
+  ;;     ;;                     :box nil
+  ;;     ;;                     ;; :family "Lucida Grande"
+  ;;     ;;                     ;;:family "helvetica"
+  ;;     ;;                     )
 
-      ;; (set-face-attribute 'tabbar-default nil
-      ;;                     :background "gray80")
+  ;;     ;; (set-face-attribute 'tabbar-default nil
+  ;;     ;;                     :background "gray80")
 
-      (set-face-attribute 'tabbar-selected nil
-                          :inherit 'tabbar-default
-                          :background "gray95"
-                          :foreground "gray20"
-                          :height 0.95
-                          :box '(:line-width 3 :color "grey95" :style nil))
+  ;;     (set-face-attribute 'tabbar-selected nil
+  ;;                         :inherit 'tabbar-default
+  ;;                         :background "gray95"
+  ;;                         :foreground "gray20"
+  ;;                         :height 0.95
+  ;;                         :box '(:line-width 3 :color "grey95" :style nil))
 
-      ;; (set-face-attribute 'tabbar-selected nil
-      ;;                 :inherit 'tabbar-default
-      ;;                 :background "#f2f2f6"
-      ;;                 :foreground "black"
-      ;;                 ;; :box '(:line-width 1 :color "black" :style pressed-button)
-      ;;                 :height 1.2
-      ;;                 :bold t
-      ;;                 :underline nil)
+  ;;     ;; (set-face-attribute 'tabbar-selected nil
+  ;;     ;;                 :inherit 'tabbar-default
+  ;;     ;;                 :background "#f2f2f6"
+  ;;     ;;                 :foreground "black"
+  ;;     ;;                 ;; :box '(:line-width 1 :color "black" :style pressed-button)
+  ;;     ;;                 :height 1.2
+  ;;     ;;                 :bold t
+  ;;     ;;                 :underline nil)
 
-      ;; (set-face-attribute 'tabbar-unselected nil
-      ;;                     :inherit 'tabbar-default
-      ;;                     :background "gray80"
-      ;;                     :box '(:line-width 3 :color "grey80" :style nil))
+  ;;     ;; (set-face-attribute 'tabbar-unselected nil
+  ;;     ;;                     :inherit 'tabbar-default
+  ;;     ;;                     :background "gray80"
+  ;;     ;;                     :box '(:line-width 3 :color "grey80" :style nil))
 
-      ;; (set-face-attribute 'tabbar-unselected nil
-      ;;                     :background "gray88"
-      ;;                     :foreground "gray30"
-      ;;                     :height 0.9)
+  ;;     ;; (set-face-attribute 'tabbar-unselected nil
+  ;;     ;;                     :background "gray88"
+  ;;     ;;                     :foreground "gray30"
+  ;;     ;;                     :height 0.9)
 
-      ;; (set-face-attribute 'tabbar-button nil
-      ;;                     :inherit 'tabbar-default
-      ;;                     :box nil)
+  ;;     ;; (set-face-attribute 'tabbar-button nil
+  ;;     ;;                     :inherit 'tabbar-default
+  ;;     ;;                     :box nil)
 
-      ;; (set-face-attribute 'tabbar-separator nil
-      ;;                     :background "grey50"
-      ;;                     :foreground "grey50"
-      ;;                     :height 1.0)
+  ;;     ;; (set-face-attribute 'tabbar-separator nil
+  ;;     ;;                     :background "grey50"
+  ;;     ;;                     :foreground "grey50"
+  ;;     ;;                     :height 1.0)
 
-      ;; (set-face-attribute 'tabbar-separator nil
-      ;;                     :height 1.0)
+  ;;     ;; (set-face-attribute 'tabbar-separator nil
+  ;;     ;;                     :height 1.0)
 
-      ;; (set-face-attribute 'tabbar-highlight nil
-      ;;                     :underline t
-      ;;                     :background "lemon chiffon")
+  ;;     ;; (set-face-attribute 'tabbar-highlight nil
+  ;;     ;;                     :underline t
+  ;;     ;;                     :background "lemon chiffon")
 
-      ;; (set-face-attribute 'tabbar-button nil
-      ;;                     ;; :box '(:line-width 1 :color "gray72" :style released-button)
-      ;;                     )
+  ;;     ;; (set-face-attribute 'tabbar-button nil
+  ;;     ;;                     ;; :box '(:line-width 1 :color "gray72" :style released-button)
+  ;;     ;;                     )
 
-      ;; (set-face-attribute 'tabbar-modified nil
-      ;;                     :background "gray88"
-      ;;                     :foreground "red"
-      ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
-      ;;                     )
+  ;;     ;; (set-face-attribute 'tabbar-modified nil
+  ;;     ;;                     :background "gray88"
+  ;;     ;;                     :foreground "red"
+  ;;     ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
+  ;;     ;;                     )
 
-      ;; (set-face-attribute 'tabbar-selected-modified nil
-      ;;                     :background "#f2f2f6"
-      ;;                     :foreground "dark green"
-      ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
-      ;;                     :box '(:style pressed-button)
-      ;;                     :height 1
-      ;;                     :bold t
-      ;;                     :underline nil)
+  ;;     ;; (set-face-attribute 'tabbar-selected-modified nil
+  ;;     ;;                     :background "#f2f2f6"
+  ;;     ;;                     :foreground "dark green"
+  ;;     ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
+  ;;     ;;                     :box '(:style pressed-button)
+  ;;     ;;                     :height 1
+  ;;     ;;                     :bold t
+  ;;     ;;                     :underline nil)
 
-      ))
+  ;;     ))
 
   :bind (:map tabbar-mode-map
               ("M-<left>" . tabbar-backward-tab)

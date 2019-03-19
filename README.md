@@ -2,12 +2,16 @@
 
 My Emacs customizations, all in one place. Many of the customizations included are collected from the Internet, and tailored according to my preferences.
 
+Suggestions and pull requests are welcome.
+
 ## Note
 
 I use Emacs as my primary editor. Other than text, Markdown, and Elisp editing, I use Emacs for editing C/C++, LaTeX, and Python files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I think other IDEs such as Eclipse are way better for working with Java.
 
 * Python - I use Elpy and Gtags (and its variants) for code completion
 * C/C++ - I use irony mode and Gtags for code completion. RTags should also work depending on preference.
+
+This setup is tested on a GNU/Linux platform.
 
 ## Installation
 
@@ -21,11 +25,14 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on a Ubuntu >=18.04 distribution.
 
-    sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pip python3-pip npm
-    pip install --update proselint Sphinx pygments isort yapf jedi pylint rope --user
-    sudo npm i -g elsint js-yaml less jsonlint
-    sudo npm i -g stylelint --save-dev
-    sudo gem install scss_lint mdl
+``` Bash
+sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm
+pip install --upgrade proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] --user
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin
+sudo npm i -g --unsafe-perm bash-language-server
+sudo npm i -g stylelint --save-dev
+sudo gem install scss_lint mdl
+```
 
 ## Directory structure
 
@@ -44,4 +51,17 @@ The following are customization options defined in `modules/config-init.el` that
 * `dotemacs-fill-column` - Column beyond which lines should not extend.
 * `dotemacs-cc-tags` - Choose whether to use Gtags or RTags for C/C++ programming.
 
-Suggestions and pull requests are welcome.
+## Browsing Source 
+
++ Python 
+
+    ``` Bash
+    find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
+    ```
+
++ C/C++
+
+    ``` Bash
+    find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
+    ```
+

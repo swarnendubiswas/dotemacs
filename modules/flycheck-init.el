@@ -7,13 +7,6 @@
 
 (defvar dotemacs-modeline-theme)
 
-;; Install these packages to help with syntax checking:
-;; sudo apt install libxml2-utils chktex shellcheck ruby-dev tidy
-;; pip install --update proselint pylint Sphinx --user
-;; sudo npm i -g elsint js-yaml less jsonlint
-;; sudo npm i -g stylelint --save-dev
-;; sudo gem install scss_lint mdl
-
 (use-package flycheck
   :ensure t
   ;; :hook (prog-mode . flycheck-mode)
