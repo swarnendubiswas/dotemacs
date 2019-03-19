@@ -75,6 +75,7 @@
 ;; (require 'shell-init)
 ;; (require 'svn-init)
 (require 'git-init)
+(require 'lsp-init)
 
 (require 'functions-init)
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
