@@ -6,6 +6,7 @@
 ;;; Code:
 
 (defvar dotemacs-fill-column)
+(defvar dotemacs-delete-trailing-whitespace-p)
 
 ;; This is different from whitespace-cleanup since this is unconditional
 (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)

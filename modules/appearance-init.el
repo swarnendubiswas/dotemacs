@@ -334,6 +334,8 @@
   (add-to-list 'minimap-major-modes 'latex-mode)
   (minimap-mode 1))
 
+;; SB: The newline symbols in the fringes are kind of ugly.
+
 ;; https://stackoverflow.com/questions/27845980/how-do-i-remove-newline-symbols-inside-emacs-vertical-border
 ;; (setf (cdr (assq 'continuation fringe-indicator-alist))
 ;;       ;; '(nil nil) ;; no continuation indicators

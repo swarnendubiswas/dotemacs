@@ -24,7 +24,7 @@ A few third-party executables and libraries are required to complement the setup
 ``` Bash
 sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm
 pip install --upgrade proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
 sudo gem install scss_lint mdl
@@ -48,17 +48,16 @@ The following are customization options defined in `modules/config-init.el` that
 * `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
 * `dotemacs-cc-tags` - Choose whether to use Gtags or RTags for C/C++ programming.
 
-## Browsing Source 
+## Browsing Source
 
-+ Python 
+* Python
 
-    ``` Bash
-    find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
-    ```
+``` Bash
+find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
+```
 
-+ C/C++
+* C/C++
 
-    ``` Bash
-    find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
-    ```
-
+``` Bash
+find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
+```
