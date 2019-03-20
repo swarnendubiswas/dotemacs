@@ -27,5 +27,10 @@
         "**/eshell": true,
         "**/reference-cards": true,
         "**/tmp": true
+    },
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#033240",
+        "titleBar.activeBackground": "#044659",
+        "titleBar.activeForeground": "#F5FCFF"
     }
 }

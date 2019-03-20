@@ -5,12 +5,10 @@
 
 ;;; Code:
 
-;; Install the following packages: sudo -H pip3 install --upgrade pip setuptools jedi rope importmagic yapf pylint pydocstyle isort
-
 (defun sb/python-setup ()
   "Helper function for configuring python mode."
   (setq-default python-indent-offset 4
-                python-indent-guess-indent-offset nil)
+                python-indent-guess-indent-offset t)
   (setq python-shell-completion-native-enable nil)
   (setq python-shell-interpreter "python3"
         python-shell-unbuffered nil))
@@ -30,7 +28,9 @@
                          elpy-module-sane-defaults)
           elpy-rpc-python-command "python3"
           elpy-rpc-backend "jedi"
-          elpy-syntax-check-command "pylint")
+          elpy-syntax-check-command "pylint"
+          python-check-command "pylint"
+          elpy-company-add-completion-from-shell t)
     (use-package pyvenv
       :ensure t
       :config (pyvenv-mode 1))
