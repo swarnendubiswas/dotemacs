@@ -48,7 +48,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'spaceline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)

@@ -156,11 +156,11 @@
 
 (use-package treemacs-projectile
   :ensure t
-  :after treemacs projectile)
+  :after (treemacs projectile))
 
 (use-package treemacs-magit
   :ensure t
-  :after treemacs magit)
+  :after (treemacs magit))
 
 (provide 'dired-init)
 

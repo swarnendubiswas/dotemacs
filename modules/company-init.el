@@ -6,6 +6,7 @@
 ;;; Code:
 
 (defvar dotemacs-temp-directory)
+
 (use-package company
   :ensure t
   :diminish company-mode
@@ -38,7 +39,7 @@
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
-              ("C-s" . sbquit-company-save-buffer)))
+              ("C-s" . sb/quit-company-save-buffer)))
 
 (use-package company-flx
   :ensure t
@@ -93,7 +94,7 @@
 
 (use-package company-prescient
   :ensure t
-  :after company prescient
+  :after (company prescient)
   :config (company-prescient-mode 1))
 
 (provide 'company-init)
