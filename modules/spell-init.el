@@ -9,8 +9,10 @@
 
 (use-package ispell
   :init
+  ;; Assumption is aspell is installed, see README.md.
   (setq-default ispell-program-name (executable-find "aspell"))
-  (setq ispell-dictionary "english"
+  (setq ispell-local-dictionary "en_US"
+        ispell-dictionary "english"
         ispell-personal-dictionary (concat dotemacs-extras-directory "spell")
         ;; Aspell speed: ultra | fast | normal | bad-spellers
         ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")
@@ -63,9 +65,14 @@
   (setq flyspell-sort-corrections nil
         flyspell-issue-message-flag nil)
 
-  ;; This is to turn on spell check in *scratch* buffer, which is in text-mode.
-  (dolist (hook '(text-mode-hook find-file-hooks))
+  ;; ;; This is to turn on spell check in *scratch* buffer, which is in text-mode.
+  ;; (dolist (hook '(text-mode-hook find-file-hooks))
+  ;;   (add-hook hook #'turn-on-flyspell))
+
+  (dolist (hook '(text-mode-hook))
     (add-hook hook #'turn-on-flyspell))
+
+  ;; Turn on flyspell-mode for comments and strings.
   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
   :diminish flyspell-mode

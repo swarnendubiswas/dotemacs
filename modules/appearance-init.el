@@ -29,8 +29,8 @@
   ;; One can learn many shortcuts from the menu bar entries.
   (menu-bar-mode 1))
 
-(use-package tooltip
-  :config (tooltip-mode -1))
+;; (use-package tooltip
+;;   :config (tooltip-mode -1))
 
 (use-package scroll-bar
   :if (fboundp 'scroll-bar-mode)
