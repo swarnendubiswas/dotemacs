@@ -48,7 +48,6 @@
 
 ;; Configure the more useful extensions
 (require 'spell-init)
-(require 'ace-modes-init)
 (require 'indent-init)
 (require 'parens-init)
 (require 'projectile-init)
@@ -73,8 +72,7 @@
 ;; (require 'java-init)
 (require 'shell-script-init)
 ;; (require 'shell-init)
-;; (require 'svn-init)
-(require 'git-init)
+(require 'vcs-init)
 (require 'lsp-init)
 
 (require 'functions-init)

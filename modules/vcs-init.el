@@ -1,7 +1,7 @@
-;;; git-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; vcs-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup git.
+;; Setup git and svn.
 
 ;;; Code:
 
@@ -45,6 +45,16 @@
 ;; (use-package magit-svn
 ;;   :defer t)
 
-(provide 'git-init)
+(use-package psvn
+  :ensure t
+  :bind ("C-c d s" . svn-status)
+  :config
+  (setq svn-status-verbose nil
+        svn-status-hide-unknown nil
+        svn-status-hide-unmodified t
+        svn-status-display-full-path t
+        svn-status-auto-revert-buffers t))
 
-;;; git-init.el ends here
+(provide 'vcs-init)
+
+;;; vcs-init.el ends here

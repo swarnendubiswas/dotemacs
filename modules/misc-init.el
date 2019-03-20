@@ -223,6 +223,38 @@
   (setq prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
   (prescient-persist-mode 1))
 
+(use-package ace-window
+  :ensure t
+  :bind ("C-c w" . ace-window)
+  :config
+  (setq aw-background nil)
+  (ace-window-display-mode 1))
+
+(use-package avy
+  :ensure t
+  :bind (("M-b" . avy-goto-word-1)
+         ("C-'" . avy-goto-char)
+         ("C-/" . avy-goto-line))
+  :config
+  ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one
+  ;; of the currently visible isearch candidates using avy.
+  (avy-setup-default)
+  (setq avy-background t
+        avy-highlight-first t
+        avy-all-windows nil
+        ;; Options pre is a bit distracting because of all the movement while highlighting selection
+        ;; keys. This causes the eyes to lose focus.
+        avy-style 'at))
+
+(use-package bookmark
+  :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
+
+(use-package bm
+  :ensure t
+  :bind (("C-<f1>" . bm-toggle)
+         ("C-<f2>" . bm-next)
+         ("C-<f3>" . bm-previous)))
+
 (provide 'misc-init)
 
 ;;; misc-init.el ends here

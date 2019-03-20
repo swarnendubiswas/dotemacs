@@ -7,13 +7,12 @@
 
 (use-package org
   :ensure t
-  :defer t
   :config
   (add-hook 'org-mode-hook #'visual-line-mode)
   (diminish 'visual-line-mode)
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
-  (setq org-src-fontify-natively t ; code block fontification using the major-mode of the code
+  (setq org-src-fontify-natively t ; Code block fontification using the major-mode of the code
         org-startup-indented t
         org-startup-truncated nil
         org-src-preserve-indentation t
@@ -25,8 +24,9 @@
         org-hide-leading-stars t
         org-hide-leading-stars-before-indent-mode t
         org-support-shift-select t ; use shift-select
-        ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines. See
-        ;; org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
+        ;; See org-speed-commands-default for a list of the keys and commands enabled at the
+        ;; beginning of headlines. See org-babel-describe-bindings will display a list of the code
+        ;; blocks commands and their related keys.
         org-use-speed-commands t
         org-src-strip-leading-and-trailing-blank-lines t
         ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
@@ -73,7 +73,6 @@
     :ensure t)
 
   (use-package org-footnote
-    :defer t
     :config
     (setq org-footnote-define-inline t
           org-footnote-auto-label 'random)))
