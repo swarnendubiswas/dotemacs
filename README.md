@@ -1,17 +1,13 @@
-# Emacs
+# GNU Emacs
 
-My Emacs customizations, all in one place. Many of the customizations included are collected from the Internet, and tailored according to my preferences.
+My GNU Emacs customizations, all in one place. Many of the customizations included are collected from the Internet, and tailored according to my preferences. This setup is tested on a GNU/Linux platform.
 
-Suggestions and pull requests are welcome.
-
-## Note
-
-I use Emacs as my primary editor. Other than text, Markdown, and Elisp editing, I use Emacs for editing C/C++, LaTeX, and Python files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I think other IDEs such as Eclipse are way better for working with Java.
+I use Emacs as my primary editor. Other than text, Markdown, and Elisp editing, I use Emacs for editing C/C++, LaTeX, and Python files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I think other IDEs such as Eclipse and Visual Studio Code are way better for working with Java.
 
 * Python - I use Elpy and Gtags (and its variants) for code completion
 * C/C++ - I use irony mode and Gtags for code completion. RTags should also work depending on preference.
 
-This setup is tested on a GNU/Linux platform.
+Suggestions and pull requests are welcome.
 
 ## Installation
 
@@ -49,6 +45,7 @@ The following are customization options defined in `modules/config-init.el` that
 * `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.
 * `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
 * `dotemacs-fill-column` - Column beyond which lines should not extend.
+* `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
 * `dotemacs-cc-tags` - Choose whether to use Gtags or RTags for C/C++ programming.
 
 ## Browsing Source 

@@ -5,33 +5,25 @@
 
 ;;; Code:
 
-(defcustom dotemacs-use-whitespace-p
-  nil
-  "Control whitespace module.
-Control whether the whitespace module should be enabled or
-disabled.  Sometimes we do not want to unnecessarily add
-differences due to whitespaces."
-  :type 'boolean
-  :group 'dotemacs)
-
 (defvar dotemacs-fill-column)
 
 ;; This is different from whitespace-cleanup since this is unconditional
-;; (add-hook 'before-save-hook #'delete-trailing-whitespace)
+(when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package whitespace
-  :if (bound-and-true-p dotemacs-use-whitespace-p)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :commands (whitespace-cleanup whitespace-mode)
-  :init (global-whitespace-mode 1)
+  :init (global-whitespace-mode)
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t
                 whitespace-style nil
                 whitespace-line-column dotemacs-fill-column))
 
-;; Calls whitespace-cleanup before saving the current buffer, but only if the whitespace in the buffer was initially
-;; clean
+
+;; Calls whitespace-cleanup before saving the current buffer, but only if the whitespace in the
+;; buffer was initially clean
 (use-package whitespace-cleanup-mode
   :ensure t
   :disabled t

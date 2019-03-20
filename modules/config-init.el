@@ -69,6 +69,14 @@ This depends on the orientation of the display."
 (defconst dotemacs-fill-column 100
   "Column beyond which lines should not extend.")
 
+(defcustom dotemacs-delete-trailing-whitespace-p
+  t
+  "Control trailing whitespaces.
+Control whether trailing whitespaces should be removed or
+not."
+  :type 'boolean
+  :group 'dotemacs)
+
 (defcustom dotemacs-use-ignoramus-p
   nil
   "Should the ignoramus package be used?
