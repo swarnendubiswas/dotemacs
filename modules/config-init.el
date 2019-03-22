@@ -59,8 +59,7 @@
 
 (defcustom dotemacs-window-split
   'vertical
-  "Specify the direction in which the windows should be split.
-This depends on the orientation of the display."
+  "Specify the direction in which the windows should be split. This depends on the orientation of the display."
   :type '(radio
           (const :tag "vertical" vertical)
           (const :tag "horizontal" horizontal))
@@ -105,6 +104,14 @@ If yes, then we disable some other packages, like popwin and which-key."
           (const :tag "gtags" gtags)
           (const :tag "rtags" rtags)
           (const :tag "none" none))
+  :group 'dotemacs)
+
+(defcustom dotemacs-delete-trailing-whitespace-p
+  t
+  "Delete trailing whitespace.
+Control whether the trailing whitespace should be deleted or not.  Sometimes we do not want to unnecessarily add
+differences due to whitespaces."
+  :type 'boolean
   :group 'dotemacs)
 
 (provide 'config-init)
