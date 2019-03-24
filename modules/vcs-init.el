@@ -24,16 +24,6 @@
 (use-package magit-popup
   :after magit)
 
-;; (use-package magit-commit
-;;   :config (use-package git-commit))
-
-;; (use-package magit-files
-;;   :config (global-magit-file-mode))
-
-;; (use-package gitconfig-mode
-;;   :ensure t
-;;   :defer t)
-
 ;; (use-package gitignore-mode
 ;;   :ensure t
 ;;   :defer t)
