@@ -51,11 +51,12 @@
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
   :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (version<= "24.4.0" emacs-version)))
+  :hook (after-init . which-key-mode)
   :config
-  (which-key-mode 1)
   (setq which-key-idle-delay 1.0
         which-key-popup-type 'side-window
-        which-key-side-window-location '(right bottom) ; Try to use the right, switch to use the bottom if there is no space
+        ;; Try to use the right, switch to use the bottom if there is no space
+        which-key-side-window-location '(right bottom)
         which-key-use-C-h-commands t)
   (which-key-setup-side-window-right-bottom)
   :diminish which-key-mode)

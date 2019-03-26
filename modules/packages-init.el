@@ -57,6 +57,7 @@
   (setq paradox-execute-asynchronously t
         ;; paradox-github-token t
         paradox-spinner-type 'random)
+  (defalias 'upgrade-packages 'paradox-upgrade-packages)
   (paradox-enable))
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/

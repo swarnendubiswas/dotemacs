@@ -15,7 +15,11 @@
         lsp-enable-completion-at-point t
         lsp-enable-xref t
         lsp-enable-indentation t
-        lsp-enable-on-type-formatting t))
+        lsp-enable-on-type-formatting t)
+
+  (use-package lsp-clients
+    :init
+    (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))))
 
 (use-package lsp-ui
   :ensure t
@@ -28,7 +32,8 @@
   :config
   (push 'company-lsp company-backends)
   (setq company-lsp-enable-snippet t
-        company-lsp-enable-recompletion t))
+        company-lsp-enable-recompletion t
+        company-lsp-cache-candidates 'auto))
 
 (use-package lsp-java
   :ensure t

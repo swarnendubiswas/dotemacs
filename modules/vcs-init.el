@@ -24,19 +24,20 @@
 (use-package magit-popup
   :after magit)
 
-;; (use-package gitignore-mode
-;;   :ensure t
-;;   :defer t)
+(use-package gitignore-mode
+  :ensure t)
 
-;; (use-package gitattributes-mode
-;;   :ensure t
-;;   :defer t)
+(use-package gitattributes-mode
+  :ensure t)
+
+(use-package gitconfig-mode
+  :ensure t)
 
 ;; (use-package magit-svn
 ;;   :defer t)
 
 (use-package psvn
-  :ensure t
+  :load-path "extras"
   :bind ("C-c d s" . svn-status)
   :config
   (setq svn-status-verbose nil

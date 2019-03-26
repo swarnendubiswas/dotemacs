@@ -73,19 +73,25 @@
                 (treemacs)
                 (other-window 1))))
 
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (bind-keys ("<f5>" . projectile-switch-project)
+             ("<f6>" . projectile-find-file)
+             ("<f7>" . projectile-ripgrep)))
 
 (use-package counsel-projectile
   :ensure t
+  :disabled t
   :after (counsel projectile)
+  :hook (after-init . counsel-projectile-mode)
   :config
-  (counsel-projectile-mode)
   ;; Sort projects from newest to oldest
   (add-to-list 'ivy-sort-functions-alist
                '(counsel-projectile-switch-project . file-newer-than-file-p))
-  :bind (("<f5>" . counsel-projectile-switch-project)
-         ("<f6>" . counsel-projectile)
-         ("<f7>" . counsel-projectile-rg)))
+  ;; :bind (("<f5>" . counsel-projectile-switch-project)
+  ;;        ("<f6>" . counsel-projectile)
+  ;;        ("<f7>" . counsel-projectile-rg))
+
+  (bind-keys ("<f5>" . counsel-projectile-switch-project)))
 
 (provide 'projectile-init)
 

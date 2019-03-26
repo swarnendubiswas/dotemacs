@@ -12,12 +12,14 @@
   :commands (yas-expand yas-minor-mode)
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :init (yas-global-mode 1)
-  :hook ((LaTeX-mode prog-mode) . yas-minor-mode)
+  ;; :init (yas-global-mode 1)
+  ;; :hook ((LaTeX-mode prog-mode) . yas-minor-mode)
+  :hook (after-init . yas-global-mode)
   :config
   (setq yas-triggers-in-field t
         yas-wrap-around-region t)
-  (unbind-key "<tab>" yas-minor-mode-map))
+  (unbind-key "<tab>" yas-minor-mode-map)
+  (use-package yasnippet-snippets))
 
 (provide 'yasnippet-init)
 

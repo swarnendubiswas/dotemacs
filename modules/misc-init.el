@@ -173,10 +173,12 @@
 
 (use-package persistent-scratch
   :ensure t
+  :hook (after-init . persistent-scratch-setup-default)
   :config
   (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
-  ;; Enable both autosave and restore on startup
-  (ignore-errors (persistent-scratch-setup-default)))
+  ;; ;; Enable both autosave and restore on startup
+  ;; (ignore-errors (persistent-scratch-setup-default))
+  )
 
 (use-package immortal-scratch
   :ensure t
@@ -225,10 +227,10 @@
 
 (use-package ace-window
   :ensure t
-  :bind ("C-c w" . ace-window)
-  :config
-  (setq aw-background nil)
-  (ace-window-display-mode 1))
+  :bind (("C-c w" . ace-window)
+         ([remap other-window] . ace-window))
+  :hook (after-init . ace-window-display-mode)
+  :config (setq aw-background nil))
 
 (use-package avy
   :ensure t
@@ -254,6 +256,8 @@
   :bind (("C-<f1>" . bm-toggle)
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
+
+(use-package amx)
 
 (provide 'misc-init)
 

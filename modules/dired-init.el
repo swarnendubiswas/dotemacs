@@ -120,6 +120,7 @@
   :config
   (setq treemacs-follow-after-init t
         treemacs-width 25
+        treemacs-indentation 1
         treemacs-position 'right
         treemacs-collapse-dirs 3
         ;; treemacs-sorting 'alphabetic-desc
@@ -128,7 +129,7 @@
         ;; Prevents treemacs from being selected with `other-window`
         treemacs-is-never-other-window nil
         treemacs-goto-tag-strategy 'refetch-index
-        treemacs-no-png-images t
+        treemacs-no-png-images nil
         treemacs-recenter-after-file-follow t
         treemacs-recenter-after-tag-follow  t
         ;; Do not log messages
@@ -160,7 +161,13 @@
 
 (use-package treemacs-magit
   :ensure t
-  :after (treemacs magit))
+  :after (treemacs magit)
+  :commands treemacs-magit--schedule-update
+  :hook ((magit-post-commit
+          git-commit-post-finish
+          magit-post-stage
+          magit-post-unstage)
+         . treemacs-magit--schedule-update))
 
 (provide 'dired-init)
 

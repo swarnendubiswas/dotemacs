@@ -60,7 +60,7 @@
 
 (use-package wgrep
   :ensure t
-  :config (setq wgrep-auto-save-buffer t))
+  :init (setq wgrep-auto-save-buffer t))
 
 (use-package ripgrep
   :ensure t

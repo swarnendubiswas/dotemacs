@@ -9,8 +9,8 @@
 
 (use-package flycheck
   :ensure t
-  ;; :hook (prog-mode . flycheck-mode)
-  :init (global-flycheck-mode 1)
+  :hook (after-init . flycheck-mode)
+  ;; :init (global-flycheck-mode 1)
   :config
   (setq flycheck-emacs-lisp-load-path 'inherit
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
@@ -20,7 +20,7 @@
         flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch)
         flycheck-pylintrc "/home/swarnendu/.config/pylintrc")
   (setq-local flycheck-python-pylint-executable "python3")
-  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8))
+  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
 
   (add-hook 'python-mode-hook
             (lambda ()

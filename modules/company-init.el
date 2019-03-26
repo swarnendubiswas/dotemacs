@@ -10,12 +10,14 @@
 (use-package company
   :ensure t
   :diminish company-mode
+  :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
     (company-abort)
     (save-buffer))
-  :init (global-company-mode 1)
+  ;; :init (global-company-mode 1)
+  :hook (after-init . global-company-mode)
   :config
   (setq company-global-modes t ; Turn on company-mode for all major modes
         company-show-numbers t ; Quick-access numbers for the first ten candidates
@@ -59,11 +61,10 @@
 (use-package company-quickhelp
   :ensure t
   :after company
-  :defer 2
+  :hook (global-company-mode . company-quickhelp-mode)
   :config
-  (setq company-quickhelp-delay 0.2
-        company-quickhelp-max-lines 60)
-  (company-quickhelp-mode 1))
+  (setq company-quickhelp-delay 0.5
+        company-quickhelp-max-lines 60))
 
 (use-package company-dict
   :ensure t
@@ -89,8 +90,14 @@
   :ensure t
   :disabled t
   :after company
-  :diminish
-  :hook (company-mode . company-box-mode))
+  :diminish company-box-mode
+  :hook (company-mode . company-box-mode)
+  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  :config
+  (setq company-box-backends-colors nil
+        company-box-show-single-candidate t
+        company-box-max-candidates 50)
+  )
 
 (use-package company-prescient
   :ensure t

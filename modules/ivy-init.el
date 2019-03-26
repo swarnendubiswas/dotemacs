@@ -96,7 +96,7 @@
   ;;         (dired-mode . ivy-subdir)
   ;;         (org-mode . org-level-4)))
 
-  (ivy-mode 1)
+  :hook (after-init . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
    ("C-'" . ivy-avy)
@@ -153,7 +153,7 @@
    ([remap load-library] . counsel-load-library)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap completion-at-point] . counsel-company)
-   ("<f9>" . sb/counsel-recentf)
+   ("<f9>" . counsel-recentf)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ("C-c s a" . counsel-ag)
    ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
@@ -189,7 +189,7 @@
                                          "\\|.rip$"
                                          "\\|.synctex.gz$"
                                          "\\|.toc$"))
-  (counsel-mode 1)
+  :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
 
 (use-package ivy-rich

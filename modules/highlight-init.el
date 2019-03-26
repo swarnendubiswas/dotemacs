@@ -7,14 +7,15 @@
 
 (defvar dotemacs-theme)
 
-;; This is useful, but does not work well with in the terminal mode. Checking for (display-graphics-p) and using hooks
-;; do not seem to help. Furthermore, this is a performance bottleneck for large files.
+;; This is useful, but does not work well with in the terminal mode. Checking for
+;; (display-graphics-p) and using hooks do not seem to help. Furthermore, this is a performance
+;; bottleneck for large files.
 (use-package hl-line
   :ensure t
   :disabled t
+  :hook (after-init . global-hl-line-mode)
   :config
   (setq hl-line-sticky-flag nil)
-  (global-hl-line-mode 1)
   (unless (eq dotemacs-theme 'solarized-dark)
     (set-face-attribute 'hl-line nil
                         :background "old lace")))
