@@ -115,7 +115,7 @@
 (use-package counsel
   :ensure t
   :ensure ivy
-  :after ivy
+  :after (ivy company)
   :demand t
   :preface
   (defun sb/counsel-recentf ()
@@ -194,7 +194,7 @@
 
 (use-package ivy-rich
   :ensure t
-  :after ivy
+  :after (ivy company)
   :init
   (setq ivy-rich-path-style 'relative)
   (ivy-rich-mode 1))

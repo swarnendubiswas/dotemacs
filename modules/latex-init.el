@@ -182,6 +182,7 @@
 
 (use-package company-bibtex
   :ensure t
+  :after company
   :init (add-to-list 'company-backends 'company-bibtex))
 
 ;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/

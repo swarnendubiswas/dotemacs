@@ -53,7 +53,6 @@
 (use-package company-statistics
   :ensure t
   :after company
-  :defer 2
   :config
   (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
   (company-statistics-mode 1))
@@ -69,7 +68,6 @@
 (use-package company-dict
   :ensure t
   :after company
-  :defer 2
   :config
   (setq company-dict-dir (concat user-emacs-directory "dict/")
         company-dict-enable-fuzzy t
@@ -85,19 +83,6 @@
 (use-package company-elisp
   :after company
   :config (push 'company-elisp company-backends))
-
-(use-package company-box
-  :ensure t
-  :disabled t
-  :after company
-  :diminish company-box-mode
-  :hook (company-mode . company-box-mode)
-  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-  :config
-  (setq company-box-backends-colors nil
-        company-box-show-single-candidate t
-        company-box-max-candidates 50)
-  )
 
 (use-package company-prescient
   :ensure t

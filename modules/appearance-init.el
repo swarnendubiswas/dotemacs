@@ -18,16 +18,11 @@
 
 (use-package tool-bar
   :if (fboundp 'tool-bar-mode)
-  :config
-  ;; Maximize the vertical space
-  (tool-bar-mode -1))
+  :config (tool-bar-mode -1))
 
 (use-package menu-bar
   :if (fboundp 'menu-bar-mode)
-  :disabled t
-  :config
-  ;; One can learn many shortcuts from the menu bar entries.
-  (menu-bar-mode 1))
+  :config (menu-bar-mode -1))
 
 ;; (use-package tooltip
 ;;   :config (tooltip-mode -1))
