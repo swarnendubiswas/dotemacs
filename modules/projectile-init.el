@@ -75,23 +75,22 @@
 
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (bind-keys ("<f5>" . projectile-switch-project)
-             ("<f6>" . projectile-find-file)
-             ("<f7>" . projectile-ripgrep)))
+             ("<f6>" . projectile-find-file)))
 
 (use-package counsel-projectile
   :ensure t
-  :disabled t
-  :after (counsel projectile)
-  :hook (after-init . counsel-projectile-mode)
-  :config
+  :after (ivy counsel projectile)
+  :hook (ivy-mode . counsel-projectile-mode)
+  :init
   ;; Sort projects from newest to oldest
   (add-to-list 'ivy-sort-functions-alist
                '(counsel-projectile-switch-project . file-newer-than-file-p))
-  ;; :bind (("<f5>" . counsel-projectile-switch-project)
-  ;;        ("<f6>" . counsel-projectile)
-  ;;        ("<f7>" . counsel-projectile-rg))
 
-  (bind-keys ("<f5>" . counsel-projectile-switch-project)))
+  ;; These methods seem too slow
+  ;; :bind (("<f5>" . counsel-projectile-switch-project)
+  ;;        ("<f6>" . counsel-projectile))
+
+  (bind-keys ("<f7>" . counsel-projectile-rg)))
 
 (provide 'projectile-init)
 

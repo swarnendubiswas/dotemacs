@@ -122,6 +122,9 @@
   :ensure t
   :config (add-to-list 'xref-backend-functions 'gxref-xref-backend))
 
+(use-package counsel-etags
+  :ensure t)
+
 (provide 'tags-init)
 
 ;;; tags-init.el ends here

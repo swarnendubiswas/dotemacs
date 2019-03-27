@@ -185,6 +185,10 @@
   (setq cmake-ide-flags-c++ (append '("-std=c++11")))
   (cmake-ide-setup))
 
+(use-package modern-cpp-font-lock
+  :ensure t
+  :hook (c++-mode . modern-c++-font-lock-mode))
+
 (provide 'c_cpp-init)
 
 ;;; c_cpp-init.el ends here

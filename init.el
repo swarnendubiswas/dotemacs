@@ -21,7 +21,7 @@
 ;; (function (lambda (x) (* x x)))
 ;; #'(lambda (x) (* x x))
 
-(setq debug-on-error nil)
+(setq debug-on-error t)
 
 ;; Personal modules for customizing Emacs initialization
 
