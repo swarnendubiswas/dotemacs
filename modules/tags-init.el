@@ -111,6 +111,7 @@
 
 (use-package company-rtags
   :ensure t
+  :disabled t
   :if (eq dotemacs-cc-tags 'rtags)
   :after (company rtags)
   :init

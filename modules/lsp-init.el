@@ -28,6 +28,7 @@
 
 (use-package company-lsp
   :ensure t
+  :disabled t
   :commands company-lsp
   :config
   (push 'company-lsp company-backends)

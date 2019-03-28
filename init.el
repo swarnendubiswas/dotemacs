@@ -21,7 +21,7 @@
 ;; (function (lambda (x) (* x x)))
 ;; #'(lambda (x) (* x x))
 
-(setq debug-on-error t)
+(setq debug-on-error nil)
 
 ;; Personal modules for customizing Emacs initialization
 
@@ -69,7 +69,7 @@
 (require 'c_cpp-init)
 (require 'python-init)
 ;; (require 'java-init)
-(require 'shell-script-init)
+;; (require 'shell-script-init)
 ;; (require 'shell-init)
 (require 'vcs-init)
 (require 'lsp-init)

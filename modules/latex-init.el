@@ -72,6 +72,7 @@
 
 (use-package company-auctex
   :ensure t
+  :after (company auctex)
   :config (company-auctex-init))
 
 (use-package company-math
@@ -239,8 +240,12 @@
            company-dict
            ;; company-gtags
            ;; LaTeX specific backends
+           company-auctex-labels
+           company-auctex-bibs
+           company-auctex-macros
+           company-auctex-symbols
+           company-auctex-environments
            company-bibtex
-           company-auctex
            company-math-symbols-latex
            company-latex-commands
            company-math-symbols-unicode))))

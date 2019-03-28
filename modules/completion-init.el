@@ -65,6 +65,7 @@
 
 (use-package company-dict
   :ensure t
+  :disabled t
   :after company
   :config
   (setq company-dict-dir (concat user-emacs-directory "dict/")
@@ -80,10 +81,12 @@
 
 (use-package company-elisp
   :after company
+  :disabled t
   :config (push 'company-elisp company-backends))
 
 (use-package company-prescient
   :ensure t
+  :disabled t
   :after (company prescient)
   :config (company-prescient-mode 1))
 
