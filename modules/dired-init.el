@@ -169,6 +169,11 @@
           magit-post-unstage)
          . treemacs-magit--schedule-update))
 
+(use-package treemacs-icons-dired
+  :ensure t
+  :after (treemacs dired)
+  :config (treemacs-icons-dired-mode))
+
 (provide 'dired-init)
 
 ;;; dired-init ends here
