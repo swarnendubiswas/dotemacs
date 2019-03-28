@@ -43,7 +43,7 @@
 (require 'dired-init)
 (require 'search-init)
 (require 'recentf-init)
-(require 'company-init)
+(require 'completion-init)
 (require 'ivy-init)
 
 ;; Configure the more useful extensions
@@ -55,7 +55,6 @@
 
 ;; Setup helper packages
 (require 'misc-init)
-(require 'yasnippet-init)
 (require 'whitespace-init)
 (require 'highlight-init)
 (require 'tramp-init)

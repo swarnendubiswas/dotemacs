@@ -68,6 +68,10 @@
   :after lsp
   :config (add-hook 'html-mode-hook #'lsp-html-enable))
 
+(use-package lsp-treemacs
+  :ensure t
+  :after (lsp treemacs))
+
 (provide 'lsp-init)
 
 ;;; lsp-init.el ends here

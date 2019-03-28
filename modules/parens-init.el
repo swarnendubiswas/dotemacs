@@ -36,13 +36,13 @@
   ;; (sp-local-pair 'c++-mode "/*" "*/" :post-handlers '((" | " "SPC")
   ;; ("* ||\n[i]" "RET")))
 
-  :bind (("C-M-a" . sp-beginning-of-sexp)
-         ("C-M-e" . sp-end-of-sexp)
-         ("C-M-u" . sp-up-sexp)
-         ("C-M-w" . sp-down-sexp)
+  :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+         ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+         ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+         ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
          ;; The following two are the more commonly required use cases.
-         ("C-M-f" . sp-forward-sexp)
-         ("C-M-b" . sp-backward-sexp)
+         ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+         ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-n" . sp-next-sexp)
          ("C-M-p" . sp-previous-sexp)
          ("C-S-b" . sp-backward-symbol)

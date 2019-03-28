@@ -8,9 +8,10 @@
 (defvar tramp-persistency-file-name)
 (defvar dotemacs-temp-directory)
 
-;; A few hacks are from https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
-;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port.
-;; Open a file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
+;; A few hacks are from
+;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
+;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port. Open a
+;; file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
   :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
@@ -25,6 +26,7 @@
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
   (add-to-list 'tramp-default-method-alist '("" "biswas.38" "ssh"))
   (add-to-list 'tramp-default-method-alist '("" "sbiswas" "ssh"))
+  (add-to-list 'tramp-default-method-alist '("" "swarnendu" "ssh"))
   (add-to-list 'tramp-default-method-alist
                '("\\`localhost\\'" "\\`root\\'" "su"))
 

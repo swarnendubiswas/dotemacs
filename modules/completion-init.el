@@ -1,7 +1,7 @@
-;;; company-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; completion-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Initialize company mode for auto completion.
+;; Initialize company and yasnippet for auto completion.
 
 ;;; Code:
 
@@ -46,16 +46,14 @@
 (use-package company-flx
   :ensure t
   :after company
-  :config
-  (setq company-flx-limit 20)
-  (company-flx-mode 1))
+  :hook (global-company-mode . company-flx-mode)
+  :config (setq company-flx-limit 20))
 
 (use-package company-statistics
   :ensure t
   :after company
-  :config
-  (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el"))
-  (company-statistics-mode 1))
+  :hook (global-company-mode . company-statistics-mode)
+  :init (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el")))
 
 (use-package company-quickhelp
   :ensure t
@@ -89,6 +87,20 @@
   :after (company prescient)
   :config (company-prescient-mode 1))
 
-(provide 'company-init)
+(use-package yasnippet
+  :ensure t
+  :commands (yas-expand yas-minor-mode)
+  :diminish yas-minor-mode
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  ;; :init (yas-global-mode 1)
+  ;; :hook ((LaTeX-mode prog-mode) . yas-minor-mode)
+  :hook (after-init . yas-global-mode)
+  :config
+  (setq yas-triggers-in-field t
+        yas-wrap-around-region t)
+  (unbind-key "<tab>" yas-minor-mode-map)
+  (use-package yasnippet-snippets))
 
-;;; company-init.el ends here
+(provide 'completion-init)
+
+;;; completion-init.el ends here
