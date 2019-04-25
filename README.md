@@ -23,7 +23,7 @@ A few third-party executables and libraries are required to complement the setup
 
 ``` Bash
 sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm
-pip install --upgrade proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic --user
+pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
