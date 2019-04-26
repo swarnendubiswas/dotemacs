@@ -33,7 +33,6 @@
 (require 'packages-init) ; Setup the package system
 
 ;; Now setup other modules
-
 (require 'defaults-init)
 (require 'appearance-init)
 (require 'modeline-init)
@@ -78,7 +77,6 @@
 (require 'keybindings-init) ; Generic keybindings, package-specific are usually in their own modules
 
 ;; Mark safe variables
-
 (put 'company-clang-arguments 'safe-local-variable 'listp)
 (put 'company-c-headers-path-user 'safe-local-variable 'listp)
 (put 'reftex-default-bibliography 'safe-local-variable 'listp)

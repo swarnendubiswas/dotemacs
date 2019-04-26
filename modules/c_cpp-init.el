@@ -132,7 +132,7 @@
   :after cc-mode
   :init
   (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}")
-  (setq clang-format-executable "/usr/bin/clang-format-6.0"))
+  (setq clang-format-executable "/usr/bin/clang-format-7"))
 
 (add-hook 'before-save-hook
           (lambda ()
@@ -180,7 +180,6 @@
 
 (use-package cmake-ide
   :ensure t
-  :defer t
   :config
   (setq cmake-ide-flags-c++ (append '("-std=c++11")))
   (cmake-ide-setup))
