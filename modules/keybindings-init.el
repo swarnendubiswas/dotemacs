@@ -40,10 +40,6 @@
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
 
-(bind-keys
- ("C-+" . #'text-scale-increase)
- ("C--" . #'text-scale-decrease))
-
 ;; (bind-keys
 ;;  ("C-c d b" . sb/byte-compile-current-file)
 ;;  ("C-c d i" . sb/byte-compile-init-dir))

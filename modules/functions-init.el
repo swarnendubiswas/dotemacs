@@ -81,14 +81,6 @@ Increase line spacing by two line height."
               (format-time-string "%d.%m.%Y")
             (format-time-string "%Y-%m-%d"))))
 
-;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-(defun sb/save-buffer-and-run-latexmk ()
-  "Save the current buffer and run LaTeXMk also."
-  (interactive)
-  (let ((process (TeX-active-process))) (if process (delete-process process)))
-  (let ((TeX-save-query nil)) (TeX-save-document ""))
-  (TeX-command-menu "LaTeXMk"))
-
 ;; http://zck.me/emacs-move-file
 (defun sb/move-file (new-location)
   "Write this file to NEW-LOCATION, and delete the old one."
