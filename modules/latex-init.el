@@ -12,9 +12,7 @@
 
 (use-package tex-site ; Initialize auctex
   :ensure auctex ; once installed, auctex overrides the tex package
-  :mode ("\\.tex\\'" . LaTeX-mode))
-
-(use-package tex-mode
+  :mode ("\\.tex\\'" . LaTeX-mode)
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-parse-self t ; Parse documents
@@ -23,18 +21,24 @@
         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
         TeX-auto-untabify t ; Remove all tabs before saving
         TeX-save-query nil
+        LaTeX-item-indent 0
         LaTeX-syntactic-comments t)
 
-  ;; (setq-default TeX-master nil) ; Query for master file
+  (setq-default TeX-master nil) ; Query for master file
 
   ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
   (setq TeX-source-correlate-method 'synctex
         TeX-source-correlate-mode t
         TeX-source-correlate-start-server 'ask)
   (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
-  (add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
-  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (TeX-source-correlate-mode)
+              (LaTeX-math-mode)
+              ;; prettify-symbol-mode is distracting while editing, and is buffer-local.
+              (global-prettify-symbols-mode -1)
+              (prettify-symbols-mode -1)))
 
   ;; (add-to-list 'TeX-command-list
   ;;              '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
@@ -42,6 +46,17 @@
   ;;                :help "Run PDFLaTeX"))
   ;; (add-to-list 'TeX-command-list
   ;;              '("View" "%V" TeX-run-discard nil t))
+
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+            #'TeX-revert-document-buffer)
+
+  ;; to use pdfview with auctex
+  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+
+  ;; to use pdfview with auctex
+  (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
+  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
 
   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; ;; Unset "C-c ;" since we want to bind it to 'comment-line
@@ -54,12 +69,6 @@
   )
 
 (setq font-latex-fontify-script nil)
-
-;; prettify-symbol-mode is distracting while editing, and is buffer-local.
-(add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (global-prettify-symbols-mode -1)
-            (prettify-symbols-mode -1)))
 
 (use-package auctex-latexmk
   :ensure t
@@ -110,6 +119,7 @@
         reftex-idle-time 0.5
         reftex-toc-follow-mode t
         reftex-use-fonts t
+        reftex-cite-prompt-optional-args t ; Prompt for empty optional arguments in cite
         reftex-highlight-selection 'both)
   (use-package reftex-cite
     :preface
@@ -184,7 +194,17 @@
 (use-package company-bibtex
   :ensure t
   :after company
-  :init (add-to-list 'company-backends 'company-bibtex))
+  :init
+  (require 'company-bibtex)
+  (add-to-list 'company-backends 'company-bibtex))
+
+(use-package pdf-tools
+  :ensure t
+  :mode ("\\.pdf\\'" . pdf-tools-install)
+  :bind ("C-c C-g" . pdf-sync-forward-search)
+  :config
+  (setq mouse-wheel-follow-mouse t)
+  (setq pdf-view-resize-factor 1.10))
 
 ;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
 ;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
@@ -217,6 +237,13 @@
 ;;         (minibuffer-message "LaTeXMk done")))))
 ;; (add-hook 'after-save-hook #'run-latexmk)
 
+;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+(defun sb/save-buffer-and-run-latexmk ()
+  "Save the current buffer and run LaTeXMk also."
+  (interactive)
+  (let ((process (TeX-active-process))) (if process (delete-process process)))
+  (let ((TeX-save-query nil)) (TeX-save-document ""))
+  (TeX-command-menu "LaTeXMk"))
 (add-hook 'LaTeX-mode-hook
           (lambda ()
             (local-set-key (kbd "C-x C-s") #'sb/save-buffer-and-run-latexmk)))
@@ -250,6 +277,7 @@
            company-latex-commands
            company-math-symbols-unicode))))
 (add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
+(add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
 
 (require 'smartparens-latex)
 

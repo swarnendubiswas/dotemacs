@@ -312,7 +312,7 @@
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 120)
+                    :height 130)
 
 (use-package minimap
   :ensure t

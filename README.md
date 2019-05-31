@@ -1,6 +1,6 @@
 # GNU Emacs
 
-My GNU Emacs customizations, all in one place. Many of the customizations included are collected from the Internet, and tailored according to my preferences. This setup is tested on a GNU/Linux platform.
+My GNU Emacs customizations, all in one place. Some of the included customizations are collected from the Internet, and tailored according to my preferences. This setup is tested on a GNU/Linux platform.
 
 I use GNU Emacs as my primary editor. Other than text, Markdown, and Elisp editing, I use GNU Emacs for editing C/C++, LaTeX, and Python files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I think other IDEs such as Eclipse and Visual Studio Code are way better for working with Java.
 
