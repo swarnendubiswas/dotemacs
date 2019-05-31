@@ -5,8 +5,9 @@ This file lists useful keyboard shortcuts that might be difficult to remember. T
 Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m (describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
 
 ## Emacs Window
- * `C-x C-+` - Increase font size by one step (`text-scale-adjust`).
- * `C-x C--` - Decrease font size by one step (`text-scale-adjust`).
+
+* `C-x C-+` - Increase font size by one step (`text-scale-adjust`).
+* `C-x C--` - Decrease font size by one step (`text-scale-adjust`).
 
 ## Text manipulation
 
