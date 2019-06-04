@@ -61,3 +61,24 @@ find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
 ``` Bash
 find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
 ```
+
+* Creating tags
+
++ GTags
+
+You can use `counsel-gtags`.
+
++ Seletively tag files
+
+``` Bash
+find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
+```
+
+
++ Universal CTags
+
+You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
+
+``` Bash
+find -name "*.cpp" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print | xargs ctags -ea
+```

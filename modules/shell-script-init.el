@@ -1,7 +1,7 @@
 ;;; shell-script-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Configure editing shell scripts.
+;; Configure editing of shell scripts.
 
 ;;; Code:
 
@@ -26,6 +26,19 @@
 (use-package fish-mode
   :ensure t
   :mode ("\\.fish$" . fish-mode))
+
+(use-package shfmt
+  :ensure nil
+  :load-path "extras/shfmt"
+  :ensure-system-package shfmt
+  :custom (shfmt-arguments "-i 4 -p -ci")
+  :hook (sh-mode . shfmt-enable-on-save))
+
+(use-package flycheck-shfmt
+  :ensure nil
+  :after flycheck
+  :load-path "extras/shfmt"
+  :config (flycheck-shfmt-setup))
 
 (defun sb/company-sh-backends ()
   "Add backends for C/C++ completion in company mode."

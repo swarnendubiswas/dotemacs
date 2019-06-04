@@ -75,6 +75,10 @@
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 
+(use-package use-package-ensure-system-package
+  :ensure t
+  :disabled t)
+
 (provide 'packages-init)
 
 ;;; packages-init.el ends here

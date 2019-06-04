@@ -19,8 +19,6 @@
 ;; user: When you want to define your own style
 
 
-;; http://nilsdeppe.com/posts/emacs-c++-ide
-
 (defvar dotemacs-temp-directory)
 
 (setq-default c-default-style '((java-mode . "java")
@@ -112,7 +110,8 @@
     :config
     ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
     ;; http://tuhdo.github.io/c-ide.html
-    (setq company-backends (delete 'company-semantic company-backends)))
+    (setq company-backends (delete 'company-semantic company-backends))
+    (add-to-list 'company-backends 'company-irony))
 
   (use-package flycheck-irony
     :ensure t
@@ -132,7 +131,7 @@
   :after cc-mode
   :init
   (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}")
-  (setq clang-format-executable "/usr/bin/clang-format-7"))
+  (setq clang-format-executable "/usr/bin/clang-format"))
 
 (add-hook 'before-save-hook
           (lambda ()
@@ -163,7 +162,7 @@
            ;; Generic backends
            company-files
            company-keywords
-           company-dabbrev
+           ;; company-dabbrev
            company-dabbrev-code
            company-capf
            company-semantic

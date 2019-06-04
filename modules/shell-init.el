@@ -1,7 +1,7 @@
 ;;; shell-init.el --- Part of Emacs initialization  -*- lexical-binding: t; no-byte-compile: nil; -*-
 
 ;;; Commentary:
-;; Setup shell, eshell, terminal emulation.  This module is not to configure editing of shell scripts.
+;; Setup shell, eshell, terminal emulation.  This module is *not* to configure editing of shell scripts.
 
 ;;; Code:
 
