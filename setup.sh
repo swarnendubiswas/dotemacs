@@ -18,7 +18,7 @@ rm -rf .emacs.d
 ln -s $HOME/github/dotemacs .emacs.d
 
 # Install distribution packages
-sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm clang-format
+sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm clang-format imagemagick
 
 # Install Python packages
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic --user
