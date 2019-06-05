@@ -12,15 +12,13 @@
 
 ;;; Code:
 
-;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html When defining a
-;; lambda expression that is to be used as an anonymous function, you can in principle use any
-;; method to construct the list. But typically you should use the lambda macro, or the function
-;; special form, or the #' read ;; syntax which is a short-hand for using function. Quoting a lambda
-;; form means the anonymous function is not ;; byte-compiled. The following forms are all
-;; equivalent:
-;; (lambda (x) (* x x))
-;; (function (lambda (x) (* x x)))
-;; #'(lambda (x) (* x x))
+;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html
+
+;; When defining a lambda expression that is to be used as an anonymous function, you can in
+;; principle use any method to construct the list. But typically you should use the lambda macro, or
+;; the function special form, or the #' read ;; syntax which is a short-hand for using function.
+;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
+;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
 (setq debug-on-error nil
       user-full-name "Swarnendu Biswas")
@@ -1034,6 +1032,14 @@ If yes, then we disable some other packages, like popwin and which-key."
                       :height 0.7)
   (set-face-attribute 'treemacs-root-face nil
                       :height 0.9)
+  (set-face-attribute 'treemacs-tags-face nil
+                      :height 0.8)
+  (set-face-attribute 'treemacs-git-ignored-face nil
+                      :height 0.8)
+  (set-face-attribute 'treemacs-git-untracked-face nil
+                      :height 0.8)
+
+
   (treemacs-resize-icons 16)
   :bind* ("C-j" . treemacs))
 
@@ -2100,6 +2106,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package window-purpose
   :ensure t
+  :disabled t
   :init (purpose-mode)
   :config
   ;; give help buffers the 'popup-frame purpose
@@ -2120,6 +2127,8 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :ensure ivy
   :ensure window-purpose
+  :after window-purpose
+  :disabled t
   :config (ivy-purpose-setup))
 
 (use-package sudo-edit ; Edit file with sudo
@@ -2966,6 +2975,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package elpy
   :ensure t
+  :ensure find-file-in-project
   :diminish elpy-mode
   :preface
   (defun sb/elpy-setup ()
@@ -3243,7 +3253,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :hook (prog-mode . lsp)
+  :hook ((prog-mode java-mode c++-mode python-mode) . lsp)
   :config
   (setq lsp-auto-guess-root t
         lsp-enable-snippet t
@@ -3263,7 +3273,6 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package company-lsp
   :ensure t
-  :disabled t
   :commands company-lsp
   :config
   (push 'company-lsp company-backends)
@@ -3298,16 +3307,12 @@ If yes, then we disable some other packages, like popwin and which-key."
   :config
   (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
   (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
-  (setq lsp-clangd-executable "/usr/bin/clangd-7"))
-
-(use-package lsp-html
-  :ensure t
-  :after lsp
-  :config (add-hook 'html-mode-hook #'lsp-html-enable))
+  (setq lsp-clangd-executable "/usr/bin/clangd"))
 
 (use-package lsp-treemacs
   :ensure t
-  :after (lsp treemacs))
+  :after (lsp treemacs)
+  :commands lsp-treemacs-errors-list)
 
 
 ;; ORG mode
