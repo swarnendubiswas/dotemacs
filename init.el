@@ -20,7 +20,7 @@
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
-(setq debug-on-error nil
+(setq debug-on-error t
       user-full-name "Swarnendu Biswas")
 
 
@@ -125,6 +125,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (setq load-prefer-newer t)
 
+(eval-when-compile
 (require 'package)
 (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
       ;; Avoid loading packages twice
@@ -137,6 +138,7 @@ If yes, then we disable some other packages, like popwin and which-key."
              '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
+)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -147,10 +149,12 @@ If yes, then we disable some other packages, like popwin and which-key."
 (setq use-package-check-before-init t
       use-package-always-ensure nil
       use-package-always-defer t
-      use-package-verbose t)
+      use-package-verbose t
+      ;; Set this to true once the configuration is stable
+      use-package-expand-minimally nil)
 
-;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
-(defun package--save-selected-packages (&rest opt) nil)
+;; ;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
+;; (defun package--save-selected-packages (&rest opt) nil)
 
 (use-package bind-key
   :ensure t
@@ -164,25 +168,25 @@ If yes, then we disable some other packages, like popwin and which-key."
   :bind (("C-c d l" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages))
   :config
-  (use-package async
-    :ensure t)
-  (setq paradox-execute-asynchronously t
-        paradox-spinner-type 'random)
-  (defalias 'upgrade-packages 'paradox-upgrade-packages)
+  ;; (use-package async
+  ;;   :ensure t)
+  ;; (setq paradox-execute-asynchronously t
+  ;;       paradox-spinner-type 'random)
+  ;; (defalias 'upgrade-packages 'paradox-upgrade-packages)
   (paradox-enable))
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (use-package cus-edit
-  :defer 2
-  :config
-  (setq custom-file dotemacs-emacs-custom-file)
-  (when (file-exists-p custom-file)
-    (load custom-file :noerror)))
+  :config (setq custom-file dotemacs-emacs-custom-file)
+  ;; (when (file-exists-p custom-file)
+  ;;   (load custom-file :noerror))
+
+  )
 
 (use-package exec-path-from-shell
   :ensure t
+  :custom (exec-path-from-shell-check-startup-files nil)
   :config
-  (setq exec-path-from-shell-check-startup-files nil)
   (when (memq window-system '(x))
     (exec-path-from-shell-initialize)))
 
@@ -191,7 +195,6 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 
 ;; Configure GNU Emacs defaults
-(defvar select-enable-clipboard)
 
 (setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
@@ -212,18 +215,32 @@ If yes, then we disable some other packages, like popwin and which-key."
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t
       completion-ignore-case t ; Ignore case when completing
-      ;; Ignore case when reading a file name completion
-      ;; read-file-name-completion-ignore-case t
+      read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
-      ;; Make cursor the width of the character it is under i.e. full width of a TAB
-      x-stretch-cursor t
+      x-stretch-cursor t ; Make cursor the width of the character it is under i.e. full width of a TAB
       auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save")
-      ;; Enable use of system clipboard across Emacs and other applications
-      select-enable-clipboard t)
+      select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
+      require-final-newline t ; Always end a file with a newline.
+      make-backup-files nil ; Stop making backup ~ files
+      backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
+      auto-save-default t
+      confirm-kill-emacs nil
+      idle-update-delay 2
+      ;; We need to paste something from another program, but sometimes we do real paste after some
+      ;; kill action, that will erase the clipboard, so we need to save it to kill ring. Paste it
+      ;; using "C-y M-y".
+      save-interprogram-paste-before-kill t
+      kill-whole-line t
+      suggest-key-bindings t
+      shift-select-mode t ; Use shift-select for marking
+      blink-matching-paren nil
+      kill-ring-max 200
+      kill-do-not-save-duplicates t
+      set-mark-command-repeat-pop t)
 
-(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode, default value is
-                                        ; fundamental-mode
+(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode,
+                                        ; default value is fundamental-mode
               sentence-end-double-space nil
               truncate-lines nil
               truncate-partial-width-windows nil
@@ -240,66 +257,41 @@ If yes, then we disable some other packages, like popwin and which-key."
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 
-(use-package files
-  :config
-  ;; (when (and (>= emacs-major-version 26)
-  ;;            (>= emacs-minor-version 1))
-  ;;   (confirm-kill-processes nil))
-  (setq require-final-newline t ; Always end a file with a newline.
-        make-backup-files nil ; Stop making backup ~ files
-        backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
-        auto-save-default t
-        confirm-kill-emacs nil))
-
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 (fset 'display-startup-echo-area-message #'ignore)
 
-(use-package simple
-  :config
-  (setq idle-update-delay 2
-        ;; We need to paste something from another program, but sometimes we do real paste after
-        ;; some kill action, that will erase the clipboard, so we need to save it to kill ring.
-        ;; Paste it using "C-y M-y".
-        save-interprogram-paste-before-kill t
-        kill-whole-line t
-        suggest-key-bindings t
-        shift-select-mode t ; Use shift-select for marking
-        blink-matching-paren nil
-        kill-ring-max 200
-        kill-do-not-save-duplicates t
-        set-mark-command-repeat-pop t)
-  (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
-  (column-number-mode 1)
-  (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
-  :bind ("C-c d f" . auto-fill-mode))
+(transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
+(column-number-mode 1)
+(diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
+(bind-key "C-c d f" #'auto-fill-mode)
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish auto-revert-mode
-  :init (global-auto-revert-mode 1)
+  :hook (after-init . global-auto-revert-mode)
   :config
-  (setq-default auto-revert-interval 15 ; Default is 5 s
-                auto-revert-verbose nil
-                ;; Auto-refresh dired buffers
-                global-auto-revert-non-file-buffers t))
+  (setq auto-revert-interval 15 ; Default is 5 s
+        auto-revert-verbose nil
+        ;; Auto-refresh dired buffers
+        global-auto-revert-non-file-buffers t))
 
+;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
-  :config
-  ;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
-  (delete-selection-mode 1))
+  :hook (after-init . delete-selection-mode))
 
-(use-package advice
-  :config
-  ;; Turn off warnings due to functions being redefined
-  (setq ad-redefinition-action 'accept))
+;; (use-package advice
+;;   :config
+;; Turn off warnings due to functions being redefined
+(setq ad-redefinition-action 'accept)
+;; )
 
 (use-package saveplace ; Remember cursor position in files
   :unless noninteractive
-  :config
-  (save-place-mode 1)
-  (setq save-place-file (concat dotemacs-temp-directory "places")))
+  :hook (after-init . save-place-mode)
+  :config (setq save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package savehist ; Save minibuffer histories across sessions
   :unless noninteractive
+  :hook (after-init . savehist-mode)
   :config
   (setq savehist-save-minibuffer-history t
         savehist-file (concat dotemacs-temp-directory "savehist")
@@ -309,13 +301,10 @@ If yes, then we disable some other packages, like popwin and which-key."
                                         extended-command-history
                                         file-name-history
                                         command-history)
-        savehist-autosave-interval 300)
-  (savehist-mode 1))
+        savehist-autosave-interval 300))
 
 (setq enable-recursive-minibuffers t)
-(use-package mb-depth
-  :if (bound-and-true-p enable-recursive-minibuffers)
-  :config (minibuffer-depth-indicate-mode 1))
+(minibuffer-depth-indicate-mode 1)
 
 (use-package uniquify
   :config
@@ -344,14 +333,14 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package subword
   :diminish subword-mode
-  :init (global-subword-mode 1))
+  :hook (after-init . global-subword-mode))
 
 ;; Set Emacs split to horizontal or vertical
 ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
 (if (eq dotemacs-window-split 'horizontal)
     (setq split-height-threshold nil
-          split-width-threshold 0)
-  (setq split-height-threshold 0
+          split-width-threshold 10)
+  (setq split-height-threshold 10
         split-width-threshold nil))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
@@ -360,16 +349,17 @@ If yes, then we disable some other packages, like popwin and which-key."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
-(use-package warnings
-  :config (add-to-list 'warning-suppress-types '(undo discard-info)))
+;; (use-package warnings
+;;   :config (add-to-list 'warning-suppress-types '(undo discard-info)))
 
 (use-package abbrev
   :diminish abbrev-mode
-  :init
-  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
-  (dolist (hook '(text-mode-hook prog-mode-hook))
-    (add-hook hook #'abbrev-mode ))
+  :hook ((text-mode prog-mode) . abbrev-mode)
+  ;; :init
+  ;; (dolist (hook '(text-mode-hook prog-mode-hook))
+  ;;   (add-hook hook #'abbrev-mode ))
   :config
+  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
   ;; Do not ask to save new abbrevs when quitting
   (setq save-abbrevs 'silently))
 
@@ -383,31 +373,40 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; This is a buffer-local variable.
 (setq-default indicate-buffer-boundaries 'right)
 
-(use-package tool-bar
-  :if (fboundp 'tool-bar-mode)
-  :config (tool-bar-mode -1))
+;; https://ladicle.com/post/config/#configuration
+(if window-system
+    (progn
+      (tool-bar-mode -1)
+      (menu-bar-mode -1)
+      (scroll-bar-mode -1)))
 
-(use-package menu-bar
-  :if (fboundp 'menu-bar-mode)
-  :config (menu-bar-mode -1))
+;; (use-package tool-bar
+;;   :if (fboundp 'tool-bar-mode)
+;;   :config (tool-bar-mode -1))
 
-(use-package scroll-bar
-  :if (fboundp 'scroll-bar-mode)
-  :config
-  ;; Maximize the space for displaying the buffer
-  (scroll-bar-mode -1))
+;; (use-package menu-bar
+;;   :if (fboundp 'menu-bar-mode)
+;;   :config (menu-bar-mode -1))
 
-(use-package frame
-  :config
-  ;; ;; Start with Emacs window maximized:
-  ;; ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
-  ;; ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
-  ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
-  ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; (use-package scroll-bar
+;;   :if (fboundp 'scroll-bar-mode)
+;;   :config
+;;   ;; Maximize the space for displaying the buffer
+;;   (scroll-bar-mode -1))
 
-  ;; Blinking cursor is distracting
-  (blink-cursor-mode -1))
+;; (use-package frame
+;;   :config
+;; ;; Start with Emacs window maximized:
+;; ;; http://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+;; ;; Only the frame that Emacs creates at startup, but will not touch any subsequent frames you create.
+;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+;; ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Blinking cursor is distracting
+(blink-cursor-mode -1)
+
+;; )
 
 (toggle-frame-maximized) ; Maximize Emacs on startup
 
@@ -420,22 +419,22 @@ If yes, then we disable some other packages, like popwin and which-key."
         display-time-default-load-average nil)
   (display-time))
 
-;; linum-mode can slow down Emacs for large files:
-;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
-;; Display line numbers in the margin
-(or (use-package linum
-      :disabled t
-      :config (global-linum-mode 1))
+;; ;; linum-mode can slow down Emacs for large files:
+;; ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
+;; ;; Display line numbers in the margin
+;; (or (use-package linum
+;;       :disabled t
+;;       :config (global-linum-mode 1))
 
-    (use-package nlinum ; Might improve performance with jit font locking.
-      :ensure t
-      :disabled t ;; Does not work with emacsclient, since the frame is created later.
-      :config (global-nlinum-mode 1)))
+;;     (use-package nlinum ; Might improve performance with jit font locking.
+;;       :ensure t
+;;       :disabled t ;; Does not work with emacsclient, since the frame is created later.
+;;       :config (global-nlinum-mode 1)))
 
-(use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
-  :ensure t
-  :disabled t
-  :config (hlinum-activate))
+;; (use-package hlinum ; Extension to linum-mode to highlight current line number in the margin
+;;   :ensure t
+;;   :disabled t
+;;   :config (hlinum-activate))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -675,18 +674,18 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package minimap
   :ensure t
-  :disabled t
   :diminish minimap-mode
+  :custom
+  (minimap-major-modes '(prog-mode))
   :config
   (setq minimap-window-location 'right
         minimap-minimum-width 10
         minimap-width-fraction 0.08
         minimap-update-delay 0.2
         minimap-automatically-delete-window nil)
-  (add-to-list 'minimap-major-modes 'html-mode)
-  (add-to-list 'minimap-major-modes 'text-mode)
   (add-to-list 'minimap-major-modes 'latex-mode)
-  (minimap-mode 1))
+  (minimap-mode 1)
+  :bind ("C-x m" . minimap-mode))
 
 ;; The newline wrap-around symbols in the fringes are ugly.
 
@@ -708,13 +707,12 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 ;; Configure GNU Emacs modeline
 
-(defvar spaceline-anzu-p)
-(defvar spaceline-hud-p)
-(defvar spaceline-buffer-position-p)
-(defvar spaceline-projectile-root-p)
+;; (defvar spaceline-anzu-p)
+;; (defvar spaceline-hud-p)
+;; (defvar spaceline-buffer-position-p)
+;; (defvar spaceline-projectile-root-p)
 
-(use-package simple
-  :config (size-indication-mode -1))
+(size-indication-mode -1)
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
@@ -889,12 +887,11 @@ If yes, then we disable some other packages, like popwin and which-key."
 
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
   ;; :bind ([remap list-buffers] . ibuffer)
-
   )
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
-  :after ibuffer
+  ;; :after ibuffer
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 
@@ -932,7 +929,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   (add-hook 'dired-mode-hook 'auto-revert-mode))
 
 (use-package dired-x
-  :commands dired-jump
+  ;; :commands dired-jump
   :config
   (setq dired-bind-jump t
         ;; Do not show messages when omitting files
@@ -948,7 +945,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package dired+
   :disabled t
-  :after dired
+  ;; :after dired
   :load-path "extras"
   :init
   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
@@ -961,14 +958,14 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package dired-efap
   :ensure t
-  :after dired
+  ;; :after dired
   :config (setq dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
               ("r" . dired-efap )))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
-  :after dired
+  ;; :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -1001,11 +998,11 @@ If yes, then we disable some other packages, like popwin and which-key."
   :config
   (setq treemacs-follow-after-init t
         treemacs-width 25
-        treemacs-indentation 1
+        treemacs-indentation 2
         treemacs-position 'right
         treemacs-collapse-dirs 3
         ;; treemacs-sorting 'alphabetic-desc
-        treemacs-show-hidden-files t
+        treemacs-show-hidden-files nil
         treemacs-project-follow-cleanup t
         ;; Prevents treemacs from being selected with `other-window`
         treemacs-is-never-other-window nil
@@ -1039,7 +1036,6 @@ If yes, then we disable some other packages, like popwin and which-key."
   (set-face-attribute 'treemacs-git-untracked-face nil
                       :height 0.8)
 
-
   (treemacs-resize-icons 16)
   :bind* ("C-j" . treemacs))
 
@@ -1057,23 +1053,25 @@ If yes, then we disable some other packages, like popwin and which-key."
           magit-post-unstage)
          . treemacs-magit--schedule-update))
 
-(use-package treemacs-icons-dired
-  :ensure t
-  :after (treemacs dired)
-  :config (treemacs-icons-dired-mode))
+(or
+ (use-package treemacs-icons-dired
+   :ensure t
+   :disabled t
+   :after (treemacs dired)
+   :config (treemacs-icons-dired-mode))
 
-(use-package all-the-icons-dired
-  :ensure t
-  :hook (dired-mode . all-the-icons-dired-mode))
+ (use-package all-the-icons-dired
+   :ensure t
+   :hook (dired-mode . all-the-icons-dired-mode))
+ )
 
+ ;; Configure search
 
-;; Configure search
-
-(setq case-fold-search t) ; Make search ignore case
+ (setq case-fold-search t) ; Make search ignore case
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
 (use-package isearch
-  :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
+  ;; :commands (isearch-forward isearch-forward-regexp isearch-repeat-forward)
   :preface
   ;; http://endlessparentheses.com/leave-the-cursor-at-start-of-match-after-isearch.html?source=rss
   (defun sb/isearch-exit-other-end ()
@@ -1091,7 +1089,8 @@ If yes, then we disable some other packages, like popwin and which-key."
          :map isearch-mode-map
          ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)
-         ("C-<return>" . sb/isearch-exit-other-end)))
+         ;; ("C-<return>" . sb/isearch-exit-other-end)
+         ))
 
 (use-package isearch-dabbrev
   :ensure t
@@ -1102,6 +1101,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :after isearch
   :diminish anzu-mode
+  :hook (after-init . global-anzu-mode)
   :config
   (setq anzu-search-threshold 10000
         anzu-minimum-input-length 2)
@@ -1110,8 +1110,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   (unless (eq dotemacs-theme 'leuven)
     (set-face-attribute 'anzu-mode-line nil
                         :foreground "blue"
-                        :weight 'light))
-  (global-anzu-mode 1))
+                        :weight 'light)))
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
@@ -1128,15 +1127,13 @@ If yes, then we disable some other packages, like popwin and which-key."
   :bind ("C-c s r" . ripgrep-regexp))
 
 
-;; Configure recent for faster lookup
-
 ;; Adding directories to the list of recent files decreases the number of entries of recent files.
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
 (use-package recentf
   :init
   (setq-default recentf-save-file (concat dotemacs-temp-directory "recentf") ; Set this first so that recentf can load content
                                         ; from this
-                recentf-max-menu-items 10 ; Show in recent menu
+                recentf-max-menu-items 10
                 recentf-max-saved-items 200
                 ;; Disable this so that recentf does not attempt to stat remote files:
                 ;; https://www.emacswiki.org/emacs/RecentFiles
@@ -1176,7 +1173,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package company
   :ensure t
   :diminish company-mode
-  :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
+  ;; :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
@@ -1186,7 +1183,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :config
   (setq company-global-modes t ; Turn on company-mode for all major modes
         company-show-numbers t ; Quick-access numbers for the first ten candidates
-        company-minimum-prefix-length 2
+        company-minimum-prefix-length 3
         company-idle-delay 0.1
         ;; Invert the navigation direction if the completion popup is displayed on top
         company-tooltip-flip-when-above nil
@@ -1196,23 +1193,35 @@ If yes, then we disable some other packages, like popwin and which-key."
         company-dabbrev-downcase nil ; Do not downcase the returned candidates
         company-dabbrev-ignore-case nil
         company-dabbrev-code-everywhere t ; Offer completions in comments and strings
-        company-dabbrev-other-buffers t
+        company-dabbrev-other-buffers t ; Search other buffers with the same mode
         company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes
-        company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-                            company-preview-frontend
-                            company-echo-metadata-frontend)
+        ;; company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+        ;;                     company-preview-frontend
+        ;;                     company-echo-metadata-frontend)
         ;; Allow typing keys that do not match any candidates
         company-require-match nil)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
-              ("C-s" . sb/quit-company-save-buffer)))
+              ;; ("C-s" . sb/quit-company-save-buffer)
+              ))
+
+;; https://github.com/sebastiencs/company-box/issues/38
+(use-package company-box
+  :hook (company-mode . company-box-mode)
+  :diminish
+  :config
+  (setq company-box-backends-colors nil
+        company-box-show-single-candidate t
+        company-box-max-candidates 50
+        company-box-icons-alist 'company-box-icons-all-the-icons))
 
 (use-package company-flx
   :ensure t
   :after company
   :hook (global-company-mode . company-flx-mode)
   :config (setq company-flx-limit 20))
+
 ;; Use prescient instead
 
 ;; (use-package company-statistics
@@ -1238,45 +1247,48 @@ If yes, then we disable some other packages, like popwin and which-key."
         company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
 
-(with-eval-after-load "counsel"
-  (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
-  (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
-  (bind-key "C-:" #'counsel-company company-mode-map)
-  (bind-key "C-:" #'counsel-company company-active-map))
+;; (with-eval-after-load "counsel"
+;; (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
+;; (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
+;; (bind-key "C-:" #'counsel-company company-mode-map)
+;; (bind-key "C-:" #'counsel-company company-active-map)
+;; )
 
 (use-package company-prescient
   :ensure t
   :after (company prescient)
-  :config (company-prescient-mode 1))
+  :hook (global-company-mode . company-prescient-mode))
 
 (use-package yasnippet
   :ensure t
-  :commands (yas-expand yas-minor-mode)
+  ;; :commands (yas-expand yas-minor-mode)
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   ;; :init (yas-global-mode 1)
   ;; :hook ((LaTeX-mode prog-mode) . yas-minor-mode)
   :hook (after-init . yas-global-mode)
+  :custom
+  (yas-snippet-dirs '("~/.emacs.d/snippets"))
+  (yas-triggers-in-field t)
+  (yas-wrap-around-region t)
   :config
-  (setq yas-triggers-in-field t
-        yas-wrap-around-region t)
   (unbind-key "<tab>" yas-minor-mode-map)
   (use-package yasnippet-snippets))
 
 
 ;; Configure ivy as the generic completion framework
 
-(defvar recentf-list)
-(defvar savehist-additional-variables)
+;; (defvar recentf-list)
+;; (defvar savehist-additional-variables)
 
-(use-package historian
-  :ensure t
-  :config (setq historian-save-file (concat dotemacs-temp-directory "historian"))
-  (historian-mode 1))
+;; (use-package historian
+;;   :ensure t
+;;   :config (setq historian-save-file (concat dotemacs-temp-directory "historian"))
+;;   (historian-mode 1))
 
-(use-package ivy-historian
-  :ensure t
-  :config (ivy-historian-mode 1))
+;; (use-package ivy-historian
+;;   :ensure t
+;;   :config (ivy-historian-mode 1))
 
 (use-package ivy
   :ensure t
@@ -1443,7 +1455,7 @@ If yes, then we disable some other packages, like popwin and which-key."
                                          "\\|.rip$"
                                          "\\|.synctex.gz$"
                                          "\\|.toc$"))
-  :hook (after-init . counsel-mode)
+  :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
 
 (use-package ivy-rich
@@ -1453,7 +1465,6 @@ If yes, then we disable some other packages, like popwin and which-key."
   :init
   (setq ivy-rich-path-style 'relative
         ivy-format-function #'ivy-format-function-line)
-
   (ivy-rich-mode 1))
 
 (use-package ivy-prescient
@@ -1471,19 +1482,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 ;; Configure automatic spell check
 
-(use-package ispell
-  :init
-  (setq-default ispell-program-name (executable-find "aspell"))
-  (setq ispell-local-dictionary "en_US"
-        ispell-dictionary "english"
-        ispell-personal-dictionary (concat dotemacs-extras-directory "spell")
-        ;; Aspell speed: ultra | fast | normal | bad-spellers
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US")
-        ;; Save a new word to personal dictionary without asking
-        ispell-silently-savep t))
-
 (use-package flyspell
-  :if (eq system-type 'gnu/linux)
+  :if (and (eq system-type 'gnu/linux) (executable-find "aspell"))
   :preface
   ;; Move point to previous error, based on code by hatschipuh at http://emacs.stackexchange.com/a/14912/2017
   ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
@@ -1524,19 +1524,32 @@ If yes, then we disable some other packages, like popwin and which-key."
               (message "No more miss-spelled word!")
               (setq arg 0))
           (forward-word)))))
-  :init
-  (setq flyspell-sort-corrections nil
-        flyspell-issue-message-flag nil)
+  :config
+  (setq-default ispell-program-name (executable-find "aspell"))
+  (setq ispell-local-dictionary "en_US"
+        ispell-dictionary "english"
+        ispell-personal-dictionary (concat dotemacs-extras-directory "spell")
+        ;; Aspell speed: ultra | fast | normal | bad-spellers
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together")
+        ;; Save a new word to personal dictionary without asking
+        ispell-silently-savep t)
+  :custom
+  (flyspell-sort-corrections nil)
+  (flyspell-issue-message-flag nil)
 
   ;; ;; This is to turn on spell check in *scratch* buffer, which is in text-mode.
   ;; (dolist (hook '(text-mode-hook find-file-hooks))
   ;;   (add-hook hook #'turn-on-flyspell))
 
-  (dolist (hook '(text-mode-hook))
-    (add-hook hook #'turn-on-flyspell))
+  ;; (dolist (hook '(text-mode-hook))
+  ;;   (add-hook hook #'turn-on-flyspell))
 
-  ;; Turn on flyspell-mode for comments and strings.
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  ;; ;; Turn on flyspell-mode for comments and strings.
+  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+
+  :hook ((prog-mode . flyspell-prog-mode)
+         (before-save-hook . flyspell-buffer)
+         ((text-mode find-file-hooks) . flyspell-mode))
 
   :diminish flyspell-mode
   :bind
@@ -1574,10 +1587,10 @@ If yes, then we disable some other packages, like popwin and which-key."
   :hook (emacs-lisp-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode)
 
-(use-package electric ; Intelligent indentation, on by default from Emacs 24.4
-  :config (electric-indent-mode 1))
+(use-package electric
+  :hook (prog-mode . electric-indent-mode))
 
-(use-package highlight-indentation ; TODO: Face color does not match well with leuven theme
+(use-package highlight-indentation
   :ensure t
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :init
@@ -1591,26 +1604,32 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; Configure highlighting of matching parentheses and braces
 
 (use-package paren
-  :config
-  (setq show-paren-delay 0
-        show-paren-style 'mixed ; Options: 'expression, 'parenthesis, 'mixed
-        show-paren-when-point-inside-paren t
-        show-paren-when-point-in-periphery t)
-  (show-paren-mode 1)
-  (when (fboundp 'show-paren-mode)
-    (make-variable-buffer-local 'show-paren-mode)))
+  :hook (after-init . show-paren-mode)
+  :custom
+  (show-paren-delay 0)
+  (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t)
+  ;; (when (fboundp 'show-paren-mode)
+  ;;   (make-variable-buffer-local 'show-paren-mode))
+  )
 
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :init
-  (smartparens-global-mode 1)
-  (show-smartparens-global-mode 1)
+  :hook (after-init . smartparens-global-mode)
+  ;; (show-smartparens-global-mode 1)
   :config
   (require 'smartparens-config)
   (setq sp-show-pair-from-inside t
         sp-autoskip-closing-pair 'always)
+
+  ;; TODO: Try these.
+  ;; (sp-pair "=" "=" :actions '(wrap))
+  ;; (sp-pair "+" "+" :actions '(wrap))
+  ;; (sp-pair "<" ">" :actions '(wrap))
+  ;; (sp-pair "$" "$" :actions '(wrap))
 
   ;; ;; https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
   ;; (sp-with-modes '(tex-mode plain-tex-mode latex-mode)
@@ -1637,7 +1656,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :diminish smartparens-mode)
 
 (use-package elec-pair
-  :config (electric-pair-mode 1))
+  :hook (after-init . electric-pair-mode))
 
 
 ;; Projectile
@@ -1647,8 +1666,8 @@ If yes, then we disable some other packages, like popwin and which-key."
   :init
   (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
-  (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   :config
+  (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   (setq projectile-enable-caching t
         projectile-file-exists-remote-cache-expire nil
         projectile-verbose nil
@@ -1711,13 +1730,15 @@ If yes, then we disable some other packages, like popwin and which-key."
                 (other-window 1))))
 
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (bind-keys ("<f5>" . projectile-switch-project)
-             ("<f6>" . projectile-find-file)))
+  ;; (bind-keys ("<f5>" . projectile-switch-project)
+  ;;            ("<f6>" . projectile-find-file))
+  ;; :bind ("<f5>" . projectile-switch-project)
+  )
 
 (use-package counsel-projectile
   :ensure t
-  :after (ivy counsel projectile)
-  :hook (ivy-mode . counsel-projectile-mode)
+  :after ivy
+  :hook (counsel-mode . counsel-projectile-mode)
   :init
   ;; Sort projects from newest to oldest
   (add-to-list 'ivy-sort-functions-alist
@@ -1727,8 +1748,11 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;; :bind (("<f5>" . counsel-projectile-switch-project)
   ;;        ("<f6>" . counsel-projectile))
 
-  (bind-keys ("<f7>" . counsel-projectile-rg)))
-
+  ;; (bind-keys ("<f7>" . counsel-projectile-rg))
+  :bind (("<f5>" . counsel-projectile-switch-project)
+         ("<f6>" . counsel-projectile)
+         ("<f7>" . counsel-projectile-rg))
+  )
 
 ;; Flycheck
 
@@ -1755,8 +1779,9 @@ If yes, then we disable some other packages, like popwin and which-key."
               (setq flycheck-clang-language-standard "c++11")
               (setq flycheck-gcc-language-standard "c++11")))
 
-  (when (eq dotemacs-modeline-theme 'spaceline)
-    (setq flycheck-mode-line nil)))
+  ;; (when (eq dotemacs-modeline-theme 'spaceline)
+  ;;   (setq flycheck-mode-line nil))
+  )
 
 (use-package avy-flycheck
   :ensure t
@@ -1766,19 +1791,20 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;; Binds avy-flycheck-goto-error to C-c ! g
   (avy-flycheck-setup))
 
-(use-package flycheck-popup-tip ; Show error messages in popups
-  :ensure t
-  :disabled t
-  :hook (flycheck-mode . flycheck-popup-tip-mode))
+(or
+ (use-package flycheck-popup-tip ; Show error messages in popups
+   :ensure t
+   :disabled t
+   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
-(use-package flycheck-pos-tip
-  :ensure t
-  :disabled t
-  :hook (flycheck-mode . flycheck-pos-tip-mode))
+ (use-package flycheck-pos-tip
+   :ensure t
+   :disabled t
+   :hook (flycheck-mode . flycheck-pos-tip-mode))
 
-(use-package flycheck-inline
-  :ensure t
-  :hook (flycheck-mode . flycheck-inline-mode))
+ (use-package flycheck-inline
+   :ensure t
+   :hook (flycheck-mode . flycheck-inline-mode)))
 
 
 ;; Whitespace
@@ -1789,8 +1815,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package whitespace
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :commands (whitespace-cleanup whitespace-mode)
-  :init (global-whitespace-mode)
+  ;; :commands (whitespace-cleanup whitespace-mode)
+  :hook (after-init . global-whitespace-mode)
   :config
   (setq-default show-trailing-whitespace nil
                 whitespace-auto-cleanup t
@@ -1859,10 +1885,15 @@ If yes, then we disable some other packages, like popwin and which-key."
           (search-backward-regexp
            (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
            nil t)))))
-  :init
-  (add-hook 'prog-mode-hook #'highlight-symbol-mode)
-  ;; Navigate occurrences of the symbol under point with M-n and M-p
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+
+  ;; :init
+  ;; (add-hook 'prog-mode-hook #'highlight-symbol-mode)
+  ;; ;; Navigate occurrences of the symbol under point with M-n and M-p
+  ;; (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+
+  :hook (prog-mode . highlight-symbol-mode)
+  :bind (("M-p" . highlight-symbol-prev)
+         ("M-n" . highlight-symbol-next))
   :config
   (setq highlight-symbol-idle-delay 0.5
         highlight-symbol-on-navigation-p t
@@ -1883,13 +1914,13 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
-  :init (beacon-mode)
+  :hook (after-init . beacon-mode)
   :diminish beacon-mode)
 
 
 ;; Tramp
 
-(defvar tramp-persistency-file-name)
+;; (defvar tramp-persistency-file-name)
 
 ;; Hacks are from
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
@@ -1913,6 +1944,9 @@ If yes, then we disable some other packages, like popwin and which-key."
   (add-to-list 'tramp-default-method-alist
                '("\\`localhost\\'" "\\`root\\'" "su"))
 
+  ;; If the shell of the server is not bash, then it is recommended to connect with bash
+  (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
+
   ;; Disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil))
@@ -1923,7 +1957,16 @@ If yes, then we disable some other packages, like popwin and which-key."
                                      tramp-file-name-regexp)))
 (use-package counsel-tramp
   :ensure t
-  :after tramp)
+  :after tramp
+  :config
+  (add-hook 'counsel-tramp-pre-command-hook
+            (lambda ()
+              (global-aggressive-indent-mode 0)
+              (projectile-mode 0)))
+  (add-hook 'counsel-tramp-quit-hook
+            (lambda ()
+              (global-aggressive-indent-mode 1)
+              (projectile-mode 1))))
 
 
 ;; Imenu
@@ -1939,9 +1982,10 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package imenu-list
   :ensure t
-  :after imenu
+  ;; :after imenu
   :config
-  (setq imenu-list-auto-resize nil)
+  (setq imenu-list-auto-resize nil
+        imenu-list-focus-after-activation t)
   (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
       (setq imenu-list-size 0.12)
     (setq imenu-list-size 0.10))
@@ -1963,14 +2007,16 @@ If yes, then we disable some other packages, like popwin and which-key."
              counsel-gtags-create-tags
              counsel-gtags-update-tags
              counsel-gtags-dwim)
-  :init
-  (add-hook 'java-mode-hook #'counsel-gtags-mode)
-  (add-hook 'python-mode-hook #'counsel-gtags-mode)
-  (when (eq dotemacs-tags 'gtags)
-    (add-hook 'c-mode-common-hook
-              (lambda ()
-                (when (derived-mode-p 'c-mode 'c++-mode)
-                  (counsel-gtags-mode 1)))))
+  ;; :init
+  ;; (add-hook 'java-mode-hook #'counsel-gtags-mode)
+  ;; (add-hook 'python-mode-hook #'counsel-gtags-mode)
+  ;; (when (eq dotemacs-tags 'gtags)
+  ;;   (add-hook 'c-mode-common-hook
+  ;;             (lambda ()
+  ;;               (when (derived-mode-p 'c-mode 'c++-mode)
+  ;;                 (counsel-gtags-mode 1)))))
+  :hook ((python-mode java-mode c-mode c++-mode) . counsel-gtags-mode)
+
   :config
   (setq counsel-gtags-ignore-case nil
         counsel-gtags-auto-update t)
@@ -1984,10 +2030,10 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package counsel-etags
   :ensure t
-  :bind(("M-." . counsel-etags-find-tag-at-point)
-        ;; ("M-t" . counsel-etags-grep-symbol-at-point)
-        ;; ("M-s" . counsel-etags-find-tag)
-        )
+  ;; :bind(("M-." . counsel-etags-find-tag-at-point)
+  ;;       ;; ("M-t" . counsel-etags-grep-symbol-at-point)
+  ;;       ;; ("M-s" . counsel-etags-find-tag)
+  ;;       )
   :config
   (add-to-list 'counsel-etags-ignore-directories '".vscode")
   (add-to-list 'counsel-etags-ignore-filenames '".clang-format")
@@ -2000,6 +2046,10 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 
 ;; Miscellaneous packages
+
+(use-package dashboard
+  :ensure t
+  :hook (after-init . dashboard-setup-startup-hook))
 
 (use-package helpful
   :ensure t
@@ -2017,7 +2067,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
   :diminish hungry-delete-mode
-  :init (global-hungry-delete-mode 1))
+  :hook (after-init . global-hungry-delete-mode ))
 
 (use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
   :ensure t
@@ -2037,27 +2087,29 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package jgraph-mode
   :ensure t
-  :mode ("\\.jgr\\'" . jgraph-mode))
+  ;; :mode ("\\.jgr\\'" . jgraph-mode)
+  :mode "\\.jgr\\'")
 
 (use-package graphviz-dot-mode
   :ensure t
-  :mode ("\\.dot\\'" . graphviz-dot-mode)
+  ;; :mode ("\\.dot\\'" . graphviz-dot-mode)
+  :mode "\\.dot\\'"
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot
   :ensure t
-  :mode ("\\.gp\\'" . gnuplot-mode)
+  ;; :mode ("\\.gp\\'" . gnuplot-mode)
+  :mode "\\.gp\\'"
   :interpreter ("gnuplot" . gnuplot-mode))
 
 (use-package goto-last-change
   :ensure t
   :bind ("C-x C-\\" . goto-last-change))
 
-;; ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
-;; (use-package popup
-;;   :ensure t
-;;   :disabled t
-;;   :config (setq popup-use-optimized-column-computation nil))
+;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
+(use-package popup
+  :ensure t
+  :config (setq popup-use-optimized-column-computation nil))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
@@ -2065,71 +2117,73 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   ;; popwin does not support ecb or neotree. Only direx seems to be supported. Too bad, would loved to have both popwin and ecb enabled.
   ;; https://github.com/m2ym/popwin-el/issues/9
-  :if (not (bound-and-true-p dotemacs-use-ecb))
-  :disabled t
-  :demand t
-  :config
-  (popwin-mode 1)
-  (defvar popwin:special-display-config-backup popwin:special-display-config)
-  (setq popwin:popup-window-height 20
-        popwin:close-popup-window-timer-interval 0.5)
+  ;; :if (not (bound-and-true-p dotemacs-use-ecb))
+  ;; :demand t
+  ;; :config (popwin-mode 1)
 
-  ;; Helm buffers include the "help" string
-  (push '("*Help*" :noselect t) popwin:special-display-config)
+  :hook (after-init . popwin-mode)
 
-  ;; (push '(dired-mode :position top) popwin:special-display-config)
-  (push '(compilation-mode :noselect t) popwin:special-display-config)
-  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
-  (push '(svn-info-mode :noselect t) popwin:special-display-config)
-  (push '(svn-status-mode) popwin:special-display-config)
-  (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
-  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-  (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
-  (push '("*undo-tree\*" :width 0.3 :position right) popwin:special-display-config)
-  (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
-  (push '("*Selection Ring:") popwin:special-display-config)
-  (push '("*ag search*" :noselect nil) popwin:special-display-config)
-  (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
-  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
-  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
-  (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
-  (push '("*xref*" :noselect nil) popwin:special-display-config)
-  (push '("*helpful\*" :noselect nil) popwin:special-display-config)
+  ;; (defvar popwin:special-display-config-backup popwin:special-display-config)
+  ;; (setq popwin:popup-window-height 20
+  ;;       popwin:close-popup-window-timer-interval 0.5)
 
-  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*")))
+  ;; ;; Helm buffers include the "help" string
+  ;; (push '("*Help*" :noselect t) popwin:special-display-config)
 
-(setq pop-up-frames t) ; allows emacs to popup new frames
+  ;; ;; (push '(dired-mode :position top) popwin:special-display-config)
+  ;; (push '(compilation-mode :noselect t) popwin:special-display-config)
+  ;; (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
+  ;; (push '(svn-info-mode :noselect t) popwin:special-display-config)
+  ;; (push '(svn-status-mode) popwin:special-display-config)
+  ;; (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
+  ;; (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
+  ;; (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
+  ;; (push '("*undo-tree\*" :width 0.3 :position right) popwin:special-display-config)
+  ;; (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
+  ;; (push '("*Selection Ring:") popwin:special-display-config)
+  ;; (push '("*ag search*" :noselect nil) popwin:special-display-config)
+  ;; (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
+  ;; (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
+  ;; (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
+  ;; (push '("*xref*" :noselect nil) popwin:special-display-config)
+  ;; (push '("*helpful\*" :noselect nil) popwin:special-display-config)
 
-(use-package window-purpose
-  :ensure t
-  :disabled t
-  :init (purpose-mode)
-  :config
-  ;; give help buffers the 'popup-frame purpose
-  (add-to-list 'purpose-user-mode-purposes
-               '(help-mode . popup-frame))
-  (purpose-compile-user-configuration)
-  ;; new rules for buffers with the 'popup-frame purpose
-  (add-to-list 'purpose-special-action-sequences
-               '(popup-frame
-                 purpose-display-reuse-window-buffer
-                 purpose-display-reuse-window-purpose
-                 purpose-display-pop-up-frame))
+  ;; (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+  ;; (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+  ;; (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+  ;; (add-to-list 'popwin:special-display-config '("*Apropos*"))
+  ;; (add-to-list 'popwin:special-display-config '("*Warnings*"))
 
-  (require 'window-purpose-x)
-  (purpose-x-magit-single-on))
+  )
 
-(use-package ivy-purpose
-  :ensure t
-  :ensure ivy
-  :ensure window-purpose
-  :after window-purpose
-  :disabled t
-  :config (ivy-purpose-setup))
+(setq pop-up-frames nil) ; allows emacs to popup new frames
+;; (use-package window-purpose
+;;   :ensure t
+;;   :disabled t
+;;   :init (purpose-mode)
+;;   :config
+;;   ;; give help buffers the 'popup-frame purpose
+;;   (add-to-list 'purpose-user-mode-purposes
+;;                '(help-mode . popup-frame))
+;;   (purpose-compile-user-configuration)
+;;   ;; new rules for buffers with the 'popup-frame purpose
+;;   (add-to-list 'purpose-special-action-sequences
+;;                '(popup-frame
+;;                  purpose-display-reuse-window-buffer
+;;                  purpose-display-reuse-window-purpose
+;;                  purpose-display-pop-up-frame))
+
+;;   (require 'window-purpose-x)
+;;   (purpose-x-magit-single-on))
+
+;; (use-package ivy-purpose
+;;   :ensure t
+;;   :ensure ivy
+;;   :ensure window-purpose
+;;   :after window-purpose
+;;   :disabled t
+;;   :config (ivy-purpose-setup))
 
 (use-package sudo-edit ; Edit file with sudo
   :ensure t
@@ -2194,7 +2248,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package apt-sources-list
   :ensure t
-  :mode ("\\.list\\'" . apt-sources-list-mode))
+  ;; :mode ("\\.list\\'" . apt-sources-list-mode))
+  :mode "\\.list\\'" )
 
 (use-package rainbow-delimiters
   :ensure t
@@ -2220,9 +2275,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package prescient
   :ensure t
-  :config
-  (setq prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
-  (prescient-persist-mode 1))
+  :config (setq prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
+  :hook (after-init . prescient-persist-mode))
 
 (use-package ace-window
   :ensure t
@@ -2257,7 +2311,9 @@ If yes, then we disable some other packages, like popwin and which-key."
          ("C-<f3>" . bm-previous)))
 
 (use-package amx
-  :ensure t)
+  :ensure t
+  :hook (after-init . amx-mode)
+  :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
 
 
 ;; Configure individual major modes
@@ -2268,8 +2324,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; TEXT EDITING ;;
 ;;;;;;;;;;;;;;;;;;
 
-;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also get run for all modes
-;; derived from a basic mode such as text-mode.
+;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also
+;; get run for all modes derived from a basic mode such as text-mode.
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
@@ -2286,7 +2342,8 @@ If yes, then we disable some other packages, like popwin and which-key."
            company-capf
            company-dict
            company-dabbrev))))
-(add-hook 'text-mode-hook #'sb/company-text-backends)
+;; (add-hook 'text-mode-hook #'sb/company-text-backends)
+
 
 ;;;;;;;;;;;;;;
 ;; MARKDOWN ;;
@@ -2294,12 +2351,12 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package markdown-mode
   :ensure t
-  :commands (markdown-mode gfm-mode)
+  ;; :commands (markdown-mode gfm-mode)
   :diminish gfm-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
-  :bind ("C-c C-d" . nil)
+  ;; :bind ("C-c C-d" . nil)
   :config
   (setq markdown-enable-wiki-links t
         markdown-italic-underscore t
@@ -2310,17 +2367,21 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package markdown-mode+
   :ensure t
-  :after markdown-mode)
+  ;; :after markdown-mode
+  )
 
-(use-package pandoc
-  :ensure t
-  :after markdown-mode)
+;; (use-package pandoc
+;;   :ensure t
+;;   ;; :after markdown-mode
+;;   )
 
 (use-package pandoc-mode
   :ensure t
-  :after markdown-mode
+  ;; :after markdown-mode
   :diminish pandoc-mode
+  :config (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
+
 
 ;;;;;;;;;
 ;; CSV ;;
@@ -2347,8 +2408,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 ;; AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
 
-(put 'TeX-narrow-to-group 'disabled nil)
-(put 'LaTeX-narrow-to-environment 'disabled nil)
+;; (put 'TeX-narrow-to-group 'disabled nil)
+;; (put 'LaTeX-narrow-to-environment 'disabled nil)
 
 (use-package tex-site ; Initialize auctex
   :ensure auctex ; once installed, auctex overrides the tex package
@@ -2421,19 +2482,22 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package company-auctex
   :ensure t
-  :after (company auctex)
+  ;; :after (company auctex)
   :config (company-auctex-init))
 
 (use-package company-math
   :ensure t
   :ensure math-symbol-lists ; Required by ac-math and company-math
-  :config
-  (add-to-list 'company-backends
-               '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
+  :preface
+  (defun company-math-setup ()
+    (setq-local company-backends
+                (append '((company-math-symbols-latex company-latex-commands company-math-symbols-unicode))
+                        company-backends)))
+  :config (add-hook 'TeX-mode-hook #'company-math-setup))
 
-(use-package tex-smart-umlauts
-  :ensure t
-  :hook LaTeX-mode-hook)
+;; (use-package tex-smart-umlauts
+;;   :ensure t
+;;   :hook (LaTeX-mode-hook . tex-smart-umlauts-mode))
 
 (use-package tex-mode
   :diminish latex-electric-env-pair-mode
@@ -2445,7 +2509,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package reftex
   :diminish reftex-mode
-  :commands (reftex-citation)
+  ;; :commands (reftex-citation)
   :hook (LaTeX-mode . reftex-mode)
   :config
   (setq reftex-plug-into-AUCTeX t
@@ -2487,16 +2551,15 @@ If yes, then we disable some other packages, like popwin and which-key."
                    (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
     :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
-(use-package parsebib
-  :ensure t)
+;; (use-package parsebib
+;;   :ensure t)
 
-(use-package bibtex
-  :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
-  :defer t
-  :config
-  (setq bibtex-maintain-sorted-entries t)
-  (use-package bibtex-utils
-    :ensure t))
+;; (use-package bibtex
+;;   :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+;;   :config
+;;   (setq bibtex-maintain-sorted-entries t)
+;;   (use-package bibtex-utils
+;;     :ensure t))
 
 (use-package bib-cite
   :disabled t
@@ -2514,29 +2577,20 @@ If yes, then we disable some other packages, like popwin and which-key."
         ("C-c l n" . bib-find-next)
         ("C-c l h" . bib-highlight-mouse)))
 
-(use-package parsebib
-  :ensure t)
-
-(use-package bibtex-utils
-  :ensure t)
-
-(use-package bibtex-completion
-  :config
-  (setq bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-cite-default-as-initial-input t
-        bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
-
 (use-package ivy-bibtex
   :ensure t
   :bind ("C-c l x" . ivy-bibtex)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+  :config
+  (use-package bibtex-completion
+    :config
+    (setq bibtex-completion-cite-prompt-for-optional-arguments nil
+          bibtex-completion-cite-default-as-initial-input t
+          bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
+  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-bibtex
   :ensure t
-  :after company
-  :init
-  (require 'company-bibtex)
-  (add-to-list 'company-backends 'company-bibtex))
+  :config (add-to-list 'company-backends 'company-bibtex))
 
 (use-package pdf-tools
   :ensure t
@@ -2616,8 +2670,8 @@ If yes, then we disable some other packages, like popwin and which-key."
            company-math-symbols-latex
            company-latex-commands
            company-math-symbols-unicode))))
-(add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
-(add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
+;; (add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
+;; (add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
 
 (require 'smartparens-latex)
 
@@ -2625,6 +2679,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; PROG mode
 
 (use-package semantic
+  :disabled t
   :init
   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
   (add-hook 'prog-mode-hook #'semantic-mode)
@@ -2636,11 +2691,13 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;; (global-semantic-idle-completions-mode 1)
   (global-semantic-highlight-func-mode 1))
 
-(use-package prog-mode
-  :config
-  (when (>= emacs-major-version 25)
-    (setq prettify-symbols-unprettify-at-point 'right-edge)
-    (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
+(global-prettify-symbols-mode 1)
+
+;; (use-package prog-mode
+;;   :config
+;;   (when (>= emacs-major-version 25)
+;;     (setq prettify-symbols-unprettify-at-point 'right-edge)
+;;     (add-hook 'LaTeX-mode-hook #'prettify-symbols-mode)))
 
 (use-package make-mode
   :mode (("\\Makefile\\'" . makefile-mode)
@@ -2726,7 +2783,6 @@ If yes, then we disable some other packages, like popwin and which-key."
   :hook (c-mode-common . which-function-mode)
   ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
   :config
-  (which-function-mode 1)
   (when (eq dotemacs-modeline-theme 'sml)
     (set-face-attribute 'which-func nil
                         :foreground "black"
@@ -2737,10 +2793,7 @@ If yes, then we disable some other packages, like popwin and which-key."
                         :weight 'light)))
 
 (use-package electric
-  :init
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (electric-layout-mode 1))))
+  :hook (prog-mode . electric-layout-mode))
 
 (use-package eldoc
   :after prog-mode
@@ -2757,7 +2810,9 @@ If yes, then we disable some other packages, like popwin and which-key."
   :config (eldoc-overlay-mode 1))
 
 (use-package octave
-  :mode ("\\.m\\'" . octave-mode))
+  ;; :mode ("\\.m\\'" . octave-mode)
+  :mode "\\.m\\'"
+  )
 
 (use-package ess
   :ensure t
@@ -2770,7 +2825,8 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package ini-mode
   :ensure t
-  :mode ("\\.ini\\'" . ini-mode))
+  ;; :mode ("\\.ini\\'" . ini-mode)
+  :mode "\\.ini\\'")
 
 (add-hook 'after-save-hook
           (lambda ()
@@ -2794,12 +2850,10 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; user: When you want to define your own style
 
 
-(defvar dotemacs-temp-directory)
-
 (setq-default c-default-style '((java-mode . "java")
+                                (c-mode . "k&r")
                                 (c++-mode . "stroustrup")
                                 (other . "gnu/linux")
-                                (c-mode . "k&r")
                                 (awk-mode . "awk")))
 
 (use-package cc-mode
@@ -2977,6 +3031,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :ensure find-file-in-project
   :diminish elpy-mode
+  :defer t
   :preface
   (defun sb/elpy-setup ()
     "Setup elpy and python configurations."
@@ -2992,17 +3047,13 @@ If yes, then we disable some other packages, like popwin and which-key."
           elpy-syntax-check-command "pylint"
           python-check-command "pylint"
           elpy-company-add-completion-from-shell t)
-    (use-package pyvenv
-      :ensure t
-      :config (pyvenv-mode 1))
-    (use-package company-jedi
-      :ensure t
-      :ensure company
-      :after company
-      :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
+
     (elpy-mode 1))
 
-  :init (add-hook 'python-mode-hook #'sb/elpy-setup)
+  :init
+  ;;  (add-hook 'python-mode-hook #'sb/elpy-setup)
+  (advice-add 'python-mode :before 'elpy-enable)
+
   :config
   (add-hook 'elpy-mode-hook #'flycheck-mode)
   ;; ;; http://www.wilfred.me.uk/.emacs.d/init.html
@@ -3010,16 +3061,6 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;;           (lambda ()
   ;;             (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
 
-  (use-package python-docstring
-    :ensure t
-    :diminish python-docstring-mode
-    :hook (python-mode . python-docstring-mode))
-
-  (use-package pyimport
-    :ensure t)
-
-  (use-package py-isort
-    :ensure t)
   :bind (:map elpy-mode-map
               ("C-c c e" . python-nav-forward-defun)
               ("C-c c a" . python-nav-backward-defun)
@@ -3028,6 +3069,27 @@ If yes, then we disable some other packages, like popwin and which-key."
               ("M-." . nil)
               ("C-c C-d" . nil)
               ("C-c C-r i" . nil)))
+
+(use-package python-docstring
+  :ensure t
+  :diminish python-docstring-mode
+  :hook (python-mode . python-docstring-mode))
+
+(use-package pyvenv
+  :ensure t
+  :config (pyvenv-mode 1))
+
+(use-package pyimport
+  :ensure t)
+
+(use-package py-isort
+  :ensure t)
+
+(use-package company-jedi
+  :ensure t
+  :ensure company
+  :after company
+  :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
 
 (defun sb/company-python-backends ()
   "Add backends for Python completion in company mode."
@@ -3121,7 +3183,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package fish-mode
   :ensure t
-  :mode ("\\.fish$" . fish-mode))
+  :mode "\\.fish\\'")
 
 (use-package shfmt
   :ensure nil
@@ -3234,6 +3296,10 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package gitconfig-mode
   :ensure t)
 
+(use-package git-gutter
+  :ensure t
+  :config (global-git-gutter-mode 1))
+
 ;; (use-package magit-svn
 ;;   :defer t)
 
@@ -3253,30 +3319,34 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package lsp-mode
   :ensure t
   :commands lsp
-  :hook ((prog-mode java-mode c++-mode python-mode) . lsp)
+  :hook ((java-mode c-mode c++-mode python-mode) . lsp)
   :config
+  (require 'lsp-clients)
   (setq lsp-auto-guess-root t
         lsp-enable-snippet t
+        lsp-document-sync-method 'incremental
+        lsp-prefer-flymake nil
         lsp-enable-completion-at-point t
         lsp-enable-xref t
         lsp-enable-indentation t
-        lsp-enable-on-type-formatting t)
-
-  (use-package lsp-clients
-    :init
-    (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))))
+        lsp-enable-on-type-formatting t))
 
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
-  :init (add-hook 'lsp-mode-hook #'lsp-ui-mode))
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-flycheck-enable t)
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-imenu-enable t))
 
 (use-package company-lsp
   :ensure t
-  :commands company-lsp
+  ;; :commands company-lsp
   :config
   (push 'company-lsp company-backends)
   (setq company-lsp-enable-snippet t
+        company-lsp-async t
         company-lsp-enable-recompletion t
         company-lsp-cache-candidates 'auto))
 
@@ -3320,9 +3390,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package org
   :ensure t
   :config
-  (add-hook 'org-mode-hook #'visual-line-mode)
-  (diminish 'visual-line-mode)
-  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+  ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
   (setq org-src-fontify-natively t ; Code block fontification using the major-mode of the code
         org-startup-indented t
@@ -3488,13 +3556,11 @@ Increase line spacing by two line height."
 ;; Generic keybindings, package-specific are usually in their own modules. Use `M-x describe-personal-keybindings` to see modifications.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key variants. With ;;
-;; bind-key, you do not need an explicit "(kbd ...)".                                                             ;;
-;; Other variants: (global-set-key (kbd "RET") 'newline-and-indent)                                               ;;
-;; (define-key global-map (kbd "RET") 'newline-and-indent)                                                        ;;
+;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key
+;; variants. With bind-key, you do not need an explicit "(kbd ...)". Other variants:
+;; (global-set-key (kbd "RET") 'newline-and-indent) (define-key global-map (kbd "RET")
+;; 'newline-and-indent)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defvar dotemacs-use-ecb)
 
 (bind-keys
  ("RET" . newline-and-indent)
@@ -3502,8 +3568,8 @@ Increase line spacing by two line height."
  ("C-c z" . repeat)
  ("C-z" . undo))
 
-;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the comment, NOT UNCOMMENTING
-;; but removing all commented text and the comment marker itself.
+;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
+;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
 (bind-keys*
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)
