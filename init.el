@@ -167,6 +167,8 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :bind (("C-c d l" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages))
+  :custom
+  (paradox-github-token t)
   :config
   ;; (use-package async
   ;;   :ensure t)
@@ -177,10 +179,11 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (use-package cus-edit
-  :config (setq custom-file dotemacs-emacs-custom-file)
+  :config
+  (setq custom-file dotemacs-emacs-custom-file)
+  ;; There seems to be not much benefit in loading the contents of the custom file
   ;; (when (file-exists-p custom-file)
   ;;   (load custom-file :noerror))
-
   )
 
 (use-package exec-path-from-shell
@@ -314,7 +317,10 @@ If yes, then we disable some other packages, like popwin and which-key."
         uniquify-after-kill-buffer-p t
         uniquify-strip-common-suffix t))
 
-(use-package hippie-exp ; Hippie expand is dabbrev expand on steroids
+(use-package hippie-exp
+  :init
+  (use-package hippie-exp-ext
+    :ensure t)
   :config
   ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
@@ -327,8 +333,6 @@ If yes, then we disable some other packages, like popwin and which-key."
                                            try-expand-line
                                            try-complete-lisp-symbol-partially
                                            try-complete-lisp-symbol))
-  (use-package hippie-exp-ext
-    :ensure t)
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
@@ -359,9 +363,9 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
   ;;   (add-hook hook #'abbrev-mode ))
   :config
-  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
-  ;; Do not ask to save new abbrevs when quitting
-  (setq save-abbrevs 'silently))
+  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs")
+        ;; Do not ask to save new abbrevs when quitting
+        save-abbrevs 'silently))
 
 
 ;; Configure GNU Emacs appearance
@@ -370,7 +374,6 @@ If yes, then we disable some other packages, like popwin and which-key."
       indicate-empty-lines t
       custom-safe-themes t)
 
-;; This is a buffer-local variable.
 (setq-default indicate-buffer-boundaries 'right)
 
 ;; https://ladicle.com/post/config/#configuration
@@ -515,7 +518,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   (defun sb/tabbar-on-buffer-revert ()
     (set-buffer-modified-p nil)
     (sb/tabbar-modification-state-change))
-  :init (tabbar-mode 1)
+  :hook (after-init . tabbar-mode)
   :config
   (setq tabbar-use-images nil ; Speed up by not using images
         tabbar-auto-scroll-flag t
@@ -527,8 +530,8 @@ If yes, then we disable some other packages, like popwin and which-key."
   (add-hook 'first-change-hook #'sb/tabbar-on-buffer-modification)
   (add-hook 'after-revert-hook #'sb/tabbar-on-buffer-revert)
 
-  ;; Add a buffer modification state indicator in the tab label, and place a space around the label to make it look less
-  ;; crowded.
+  ;; Add a buffer modification state indicator in the tab label, and place a space around the label
+  ;; to make it look less crowded.
   (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
     (setq ad-return-value
           (if (and (buffer-modified-p (tabbar-tab-value tab))
@@ -677,13 +680,13 @@ If yes, then we disable some other packages, like popwin and which-key."
   :diminish minimap-mode
   :custom
   (minimap-major-modes '(prog-mode))
+  (minimap-window-location 'right)
+  (minimap-minimum-width 10)
+  (minimap-width-fraction 0.08)
+  (minimap-update-delay 0.2)
+  (minimap-automatically-delete-window nil)
   :config
-  (setq minimap-window-location 'right
-        minimap-minimum-width 10
-        minimap-width-fraction 0.08
-        minimap-update-delay 0.2
-        minimap-automatically-delete-window nil)
-  (add-to-list 'minimap-major-modes 'latex-mode)
+  ;; (add-to-list 'minimap-major-modes 'latex-mode)
   (minimap-mode 1)
   :bind ("C-x m" . minimap-mode))
 
@@ -744,7 +747,8 @@ If yes, then we disable some other packages, like popwin and which-key."
                                            :config
                                            (setq sml/theme 'light
                                                  sml/no-confirm-load-theme t
-                                                 sml/mode-width 'full ; Everything after the minor-modes will be right-indented
+                                                 ;; Everything after the minor-modes will be right-indented
+                                                 sml/mode-width 'full
                                                  sml/shorten-modes t
                                                  sml/shorten-directory t)
                                            (sml/setup)))
@@ -858,14 +862,14 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; Configure ibuffer
 
 (use-package ibuffer
-  :commands ibuffer
+  ;; :commands ibuffer
   :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
   (setq ibuffer-expert t
         ibuffer-always-show-last-buffer nil
         ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
         ibuffer-use-header-line t
-        ibuffer-display-summary t
+        ;; ibuffer-display-summary t
         ;; Ignore case when searching
         ibuffer-case-fold-search t)
 
@@ -936,7 +940,6 @@ If yes, then we disable some other packages, like popwin and which-key."
         dired-omit-verbose nil)
   (unless (bound-and-true-p dotemacs-use-ignoramus-p)
     (add-hook 'dired-mode-hook #'dired-omit-mode))
-
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Make sure to remove \"Omit\" from the modeline."
@@ -958,14 +961,14 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package dired-efap
   :ensure t
-  ;; :after dired
+  :after dired
   :config (setq dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
               ("r" . dired-efap )))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
-  ;; :after dired
+  :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -1062,12 +1065,12 @@ If yes, then we disable some other packages, like popwin and which-key."
 
  (use-package all-the-icons-dired
    :ensure t
-   :hook (dired-mode . all-the-icons-dired-mode))
- )
+   :hook (dired-mode . all-the-icons-dired-mode)))
 
- ;; Configure search
 
- (setq case-fold-search t) ; Make search ignore case
+;; Configure search
+
+(setq case-fold-search t) ; Make search ignore case
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
 (use-package isearch
@@ -1122,42 +1125,42 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :init (setq wgrep-auto-save-buffer t))
 
-(use-package ripgrep
+(use-package deadgrep
   :ensure t
-  :bind ("C-c s r" . ripgrep-regexp))
+  :bind ("C-c s r" . deadgrep))
 
 
 ;; Adding directories to the list of recent files decreases the number of entries of recent files.
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
 (use-package recentf
-  :init
-  (setq-default recentf-save-file (concat dotemacs-temp-directory "recentf") ; Set this first so that recentf can load content
-                                        ; from this
-                recentf-max-menu-items 10
-                recentf-max-saved-items 200
-                ;; Disable this so that recentf does not attempt to stat remote files:
-                ;; https://www.emacswiki.org/emacs/RecentFiles
-                recentf-auto-cleanup 'never
-                recentf-menu-filter 'recentf-sort-descending
-                ;; Check regex with re-builder
-                recentf-exclude '("[/\\]\\.elpa/"
-                                  "[/\\]\\.ido\\.last\\'"
-                                  "[/\\]\\.git/"
-                                  ".*\\.gz\\'"
-                                  ".*-autoloads.el\\'"
-                                  "[/\\]archive-contents\\'"
-                                  "[/\\]\\.loaddefs\\.el\\'"
-                                  "url/cookies"
-                                  "[/\\]tmp/.*"
-                                  ".*/recentf\\'"
-                                  "~$"
-                                  "/.autosaves/"
-                                  ".*-loaddefs.el"
-                                  "/TAGS$"
-                                  "/ssh:"
-                                  "/sudo:"
-                                  "/company-statistics-cache.el$"))
-  (recentf-mode 1) ; This is needed in :init for the keybinding to work
+  :config
+  (setq recentf-max-menu-items 10
+        ;; Set this first so that recentf can load content from this
+        recentf-save-file (concat dotemacs-temp-directory "recentf")
+        recentf-max-saved-items 200
+        ;; Disable this so that recentf does not attempt to stat remote files:
+        ;; https://www.emacswiki.org/emacs/RecentFiles
+        recentf-auto-cleanup 'never
+        recentf-menu-filter 'recentf-sort-descending
+        ;; Check regex with re-builder
+        recentf-exclude '("[/\\]\\.elpa/"
+                          "[/\\]\\.ido\\.last\\'"
+                          "[/\\]\\.git/"
+                          ".*\\.gz\\'"
+                          ".*-autoloads.el\\'"
+                          "[/\\]archive-contents\\'"
+                          "[/\\]\\.loaddefs\\.el\\'"
+                          "url/cookies"
+                          "[/\\]tmp/.*"
+                          ".*/recentf\\'"
+                          "~$"
+                          "/.autosaves/"
+                          ".*-loaddefs.el"
+                          "/TAGS$"
+                          "/ssh:"
+                          "/sudo:"
+                          "/company-statistics-cache.el$"))
+  :hook (after-init . recentf-mode)
   :config (run-at-time nil (* 10 60) 'recentf-save-list))
 
 ;; Hide the "wrote to recentf" message, which can be irritating.
@@ -1277,9 +1280,6 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 
 ;; Configure ivy as the generic completion framework
-
-;; (defvar recentf-list)
-;; (defvar savehist-additional-variables)
 
 ;; (use-package historian
 ;;   :ensure t
@@ -2903,7 +2903,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   (add-to-list 'company-backends 'company-c-headers)
   (dolist (paths '(
                    "/usr/include"
-                   "/usr/include/clang"
+                   "/usr/include/clang/8"
                    "/usr/include/boost"
                    "/usr/include/linux"
                    "/usr/include/cuda"
@@ -3302,6 +3302,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package git-gutter
   :ensure t
+  :diminish
   :hook (after-init . global-git-gutter-mode))
 
 ;; (use-package magit-svn
