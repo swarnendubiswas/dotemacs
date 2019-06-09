@@ -2916,6 +2916,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package irony
   :ensure t
   :diminish irony-mode
+  :disabled t
   :init
   (add-hook 'c++-mode-hook #'irony-mode)
   (add-hook 'c-mode-hook #'irony-mode)
@@ -2946,12 +2947,14 @@ If yes, then we disable some other packages, like popwin and which-key."
     :ensure t
     :ensure irony
     :ensure flycheck
+    :disabled t
     :after flycheck
     :commands flycheck-irony-setup
     :init (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
   (use-package irony-eldoc
     :ensure t
+    :disabled t
     :commands irony-eldoc
     :init (add-hook 'irony-mode-hook #'irony-eldoc)))
 
@@ -3031,7 +3034,8 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :ensure find-file-in-project
   :diminish elpy-mode
-  :defer t
+  :disabled t
+  ;; :defer t
   :preface
   (defun sb/elpy-setup ()
     "Setup elpy and python configurations."
@@ -3089,7 +3093,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :ensure company
   :after company
-  :config (add-to-list 'company-backends '(company-jedi elpy-company-backend)))
+  :config (add-to-list 'company-backends company-jedi))
 
 (defun sb/company-python-backends ()
   "Add backends for Python completion in company mode."
@@ -3105,19 +3109,19 @@ If yes, then we disable some other packages, like popwin and which-key."
            ;; Python specific backends
            company-jedi
            elpy-company-backend))))
-(add-hook 'python-mode-hook #'sb/company-python-backends)
+;; (add-hook 'python-mode-hook #'sb/company-python-backends)
 
-(defhydra sb/hydra-python-indent (global-map "C-c c n")
-  "indent"
-  ("l" elpy-nav-indent-shift-left "left")
-  ("r" elpy-nav-indent-shift-right "right"))
+;; (defhydra sb/hydra-python-indent (global-map "C-c c n")
+;;   "indent"
+;;   ("l" elpy-nav-indent-shift-left "left")
+;;   ("r" elpy-nav-indent-shift-right "right"))
 
-(add-hook 'before-save-hook
-          (lambda ()
-            (when (string-equal major-mode "python-mode")
-              (py-isort-before-save)
-              ;; (pyimport-remove-unused) ; This can be irritating if you are yet to use the imports.
-              (elpy-yapf-fix-code))))
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (when (string-equal major-mode "python-mode")
+;;               (py-isort-before-save)
+;;               ;; (pyimport-remove-unused) ; This can be irritating if you are yet to use the imports.
+;;               (elpy-yapf-fix-code))))
 
 
 ;; Java mode
@@ -3298,7 +3302,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package git-gutter
   :ensure t
-  :config (global-git-gutter-mode 1))
+  :hook (after-init . global-git-gutter-mode))
 
 ;; (use-package magit-svn
 ;;   :defer t)
@@ -3329,7 +3333,14 @@ If yes, then we disable some other packages, like popwin and which-key."
         lsp-enable-completion-at-point t
         lsp-enable-xref t
         lsp-enable-indentation t
-        lsp-enable-on-type-formatting t))
+        lsp-enable-on-type-formatting t
+        lsp-pyls-configuration-sources ["pylint"]
+        lsp-pyls-plugins-pylint-enabled t
+        lsp-pyls-plugins-pydocstyle-enabled t
+        lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"]
+        lsp-pyls-plugins-pycodestyle-enabled nil
+        lsp-pyls-plugins-pycodestyle-max-line-length 100
+        lsp-pyls-plugins-pyflakes-enabled nil))
 
 (use-package lsp-ui
   :ensure t
@@ -3339,6 +3350,12 @@ If yes, then we disable some other packages, like popwin and which-key."
   (lsp-ui-flycheck-enable t)
   (lsp-ui-sideline-enable t)
   (lsp-ui-imenu-enable t))
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
 
 (use-package company-lsp
   :ensure t
@@ -3372,7 +3389,6 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package lsp-clangd
   :ensure t
-  :disabled t
   :after lsp
   :config
   (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
