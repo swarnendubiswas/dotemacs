@@ -126,19 +126,18 @@ If yes, then we disable some other packages, like popwin and which-key."
 (setq load-prefer-newer t)
 
 (eval-when-compile
-(require 'package)
-(setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
-      ;; Avoid loading packages twice
-      package-enable-at-startup nil)
-(package-initialize)
+  (require 'package)
+  (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
+        ;; Avoid loading packages twice
+        package-enable-at-startup nil)
+  (package-initialize)
 
-(add-to-list 'package-archives
-             '("org" . "http://orgmode.org/elpa/") t)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
-)
+  ;; (add-to-list 'package-archives
+  ;;              '("org" . "http://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives
+               '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives
+               '("elpy" . "https://jorgenschaefer.github.io/packages/") t))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -222,7 +221,8 @@ If yes, then we disable some other packages, like popwin and which-key."
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
       x-stretch-cursor t ; Make cursor the width of the character it is under i.e. full width of a TAB
-      auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save")
+      ;; auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save")
+      auto-save-list-file-prefix nil
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       require-final-newline t ; Always end a file with a newline.
       make-backup-files nil ; Stop making backup ~ files
@@ -998,9 +998,13 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package treemacs
   :ensure t
   :commands (treemacs treemacs-toggle)
+  :hook ((projectile-mode . treemacs-follow-mode)
+         (projectile-mode . treemacs-filewatch-mode)
+         (projectile-mode . treemacs-fringe-indicator-mode))
   :config
   (setq treemacs-follow-after-init t
         treemacs-width 25
+        treemacs-lock-width t
         treemacs-indentation 2
         treemacs-position 'right
         treemacs-collapse-dirs 3
@@ -1016,12 +1020,12 @@ If yes, then we disable some other packages, like popwin and which-key."
         treemacs-silent-filewatch t
         treemacs-silent-refresh t
         treemacs-tag-follow-delay 1
-        treemacs-tag-follow-cleanup t)
-  (treemacs-follow-mode 1)
-  (treemacs-filewatch-mode 1)
-  (treemacs-fringe-indicator-mode 1)
-  (treemacs-tag-follow-mode 1) ; Effectively overrides treemacs-follow-mode
-  (treemacs-git-mode 'deferred)
+        treemacs-tag-follow-cleanup t
+        treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
+
+  ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
+  ;; (treemacs-tag-follow-mode 1)
+  (treemacs-git-mode 'extended)
 
   ;; Decrease the font size
   (set-face-attribute 'treemacs-directory-collapsed-face nil
@@ -1049,12 +1053,13 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package treemacs-magit
   :ensure t
   :after (treemacs magit)
-  :commands treemacs-magit--schedule-update
-  :hook ((magit-post-commit
-          git-commit-post-finish
-          magit-post-stage
-          magit-post-unstage)
-         . treemacs-magit--schedule-update))
+  ;; :commands treemacs-magit--schedule-update
+  ;; :hook ((magit-post-commit
+  ;;         git-commit-post-finish
+  ;;         magit-post-stage
+  ;;         magit-post-unstage)
+  ;;        . treemacs-magit--schedule-update)
+  )
 
 (or
  (use-package treemacs-icons-dired
@@ -1211,6 +1216,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 ;; https://github.com/sebastiencs/company-box/issues/38
 (use-package company-box
+  :ensure t
   :hook (company-mode . company-box-mode)
   :diminish
   :config
@@ -2049,7 +2055,14 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package dashboard
   :ensure t
-  :hook (after-init . dashboard-setup-startup-hook))
+  :hook (after-init . dashboard-setup-startup-hook)
+  :custom
+  (dashboard-items '((projects . 10)
+                     (recents  . 10)
+                     (bookmarks . 5)))
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-set-init-info t))
 
 (use-package helpful
   :ensure t
@@ -2106,10 +2119,10 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :bind ("C-x C-\\" . goto-last-change))
 
-;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
-(use-package popup
-  :ensure t
-  :config (setq popup-use-optimized-column-computation nil))
+;; ;; http://stackoverflow.com/questions/13242165/emacs-auto-complete-popup-menu-broken
+;; (use-package popup
+;;   :ensure t
+;;   :config (setq popup-use-optimized-column-computation nil))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
@@ -2798,7 +2811,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package eldoc
   :after prog-mode
   :if (eq system-type 'gnu/linux)
-  :disabled t
+  ;; :disabled t
   :hook ((emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
   :diminish eldoc-mode)
 
@@ -3333,6 +3346,7 @@ If yes, then we disable some other packages, like popwin and which-key."
         lsp-prefer-flymake nil
         lsp-enable-completion-at-point t
         lsp-enable-xref t
+        lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1")
         lsp-enable-indentation t
         lsp-enable-on-type-formatting t
         lsp-pyls-configuration-sources ["pylint"]
@@ -3406,9 +3420,9 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package org
   :ensure t
+  :disabled t
   :config
   ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
-
   (setq org-src-fontify-natively t ; Code block fontification using the major-mode of the code
         org-startup-indented t
         org-startup-truncated nil
