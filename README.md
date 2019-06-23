@@ -19,7 +19,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on a Ubuntu >=18.04 distribution.
+A few third-party executables and libraries  to complement the setup. You can use the following instructions to install them on a Ubuntu >=18.04 distribution.
 
 ``` Bash
 sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm

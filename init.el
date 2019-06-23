@@ -78,13 +78,13 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
-(defcustom dotemacs-window-split
-  'vertical
-  "Specify the direction in which the windows should be split. This depends on the orientation of the display."
-  :type '(radio
-          (const :tag "vertical" vertical)
-          (const :tag "horizontal" horizontal))
-  :group 'dotemacs)
+;; (defcustom dotemacs-window-split
+;;   'vertical
+;;   "Specify the direction in which the windows should be split. This depends on the orientation of the display."
+;;   :type '(radio
+;;           (const :tag "vertical" vertical)
+;;           (const :tag "horizontal" horizontal))
+;;   :group 'dotemacs)
 
 (defconst dotemacs-fill-column 100
   "Column beyond which lines should not extend.")
@@ -97,20 +97,21 @@ differences due to whitespaces."
   :type 'boolean
   :group 'dotemacs)
 
-(defcustom dotemacs-use-ignoramus-p
-  nil
-  "Should the ignoramus package be used?
-The package controls ignoring boring file expressions."
-  :type 'boolean
-  :group 'dotemacs)
+;; (defcustom dotemacs-use-ignoramus-p
+;;   nil
+;;   "Should the ignoramus package be used?
+;; The package controls ignoring boring file expressions."
+;;   :type 'boolean
+;;   :group 'dotemacs)
 
-(defcustom dotemacs-use-ecb
-  nil
-  "Should the ECB package be activated?
-If yes, then we disable some other packages, like popwin and which-key."
-  :type 'boolean
-  :group 'dotemacs)
+;; (defcustom dotemacs-use-ecb
+;;   nil
+;;   "Should the ECB package be activated?
+;; If yes, then we disable some other packages, like popwin and which-key."
+;;   :type 'boolean
+;;   :group 'dotemacs)
 
+;; FIXME: Use this as a conditional
 (defcustom dotemacs-tags
   'gtags
   "Choose whether to use gtags or ctags."
@@ -127,7 +128,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (eval-when-compile
   (require 'package)
-  (setq package-user-dir (expand-file-name "~/.emacs.d/elpa/")
+  (setq package-user-dir (expand-file-name (concat user-emacs-directory "elpa"))
         ;; Avoid loading packages twice
         package-enable-at-startup nil)
   (package-initialize)
@@ -136,8 +137,9 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;;              '("org" . "http://orgmode.org/elpa/") t)
   (add-to-list 'package-archives
                '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-               '("elpy" . "https://jorgenschaefer.github.io/packages/") t))
+  ;; (add-to-list 'package-archives
+  ;;              '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
+  )
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -151,6 +153,9 @@ If yes, then we disable some other packages, like popwin and which-key."
       use-package-verbose t
       ;; Set this to true once the configuration is stable
       use-package-expand-minimally nil)
+
+(use-package use-package-ensure-system-package
+  :ensure t)
 
 ;; ;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 ;; (defun package--save-selected-packages (&rest opt) nil)
@@ -168,6 +173,7 @@ If yes, then we disable some other packages, like popwin and which-key."
          ("C-c d u" . paradox-upgrade-packages))
   :custom
   (paradox-github-token t)
+  (paradox-execute-asynchronously t)
   :config
   ;; (use-package async
   ;;   :ensure t)
@@ -192,9 +198,6 @@ If yes, then we disable some other packages, like popwin and which-key."
   (when (memq window-system '(x))
     (exec-path-from-shell-initialize)))
 
-(use-package use-package-ensure-system-package
-  :ensure t)
-
 
 ;; Configure GNU Emacs defaults
 
@@ -204,7 +207,7 @@ If yes, then we disable some other packages, like popwin and which-key."
       initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
       initial-scratch-message nil
       create-lockfiles nil
-      message-log-max 5000
+      message-log-max 500
       ;; line-number-display-limit 2000000
       ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
       x-underline-at-descent-line t ; Draw underline lower
@@ -229,7 +232,7 @@ If yes, then we disable some other packages, like popwin and which-key."
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
       auto-save-default t
       confirm-kill-emacs nil
-      idle-update-delay 2
+      ;; idle-update-delay 2
       ;; We need to paste something from another program, but sometimes we do real paste after some
       ;; kill action, that will erase the clipboard, so we need to save it to kill ring. Paste it
       ;; using "C-y M-y".
@@ -237,10 +240,11 @@ If yes, then we disable some other packages, like popwin and which-key."
       kill-whole-line t
       suggest-key-bindings t
       shift-select-mode t ; Use shift-select for marking
-      blink-matching-paren nil
-      kill-ring-max 200
+      blink-matching-paren t
+      kill-ring-max 20
       kill-do-not-save-duplicates t
-      set-mark-command-repeat-pop t)
+      set-mark-command-repeat-pop t
+      confirm-nonexistent-file-or-buffer t)
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode,
                                         ; default value is fundamental-mode
@@ -266,14 +270,12 @@ If yes, then we disable some other packages, like popwin and which-key."
 (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
 (column-number-mode 1)
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
-(bind-key "C-c d f" #'auto-fill-mode)
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish auto-revert-mode
   :hook (after-init . global-auto-revert-mode)
   :config
-  (setq auto-revert-interval 15 ; Default is 5 s
-        auto-revert-verbose nil
+  (setq auto-revert-verbose nil
         ;; Auto-refresh dired buffers
         global-auto-revert-non-file-buffers t))
 
@@ -339,13 +341,13 @@ If yes, then we disable some other packages, like popwin and which-key."
   :diminish subword-mode
   :hook (after-init . global-subword-mode))
 
-;; Set Emacs split to horizontal or vertical
-;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
-(if (eq dotemacs-window-split 'horizontal)
-    (setq split-height-threshold nil
-          split-width-threshold 10)
-  (setq split-height-threshold 10
-        split-width-threshold nil))
+;; ;; Set Emacs split to horizontal or vertical
+;; ;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
+;; (if (eq dotemacs-window-split 'horizontal)
+;;     (setq split-height-threshold nil
+;;           split-width-threshold 10)
+;;   (setq split-height-threshold 10
+;;         split-width-threshold nil))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)
@@ -675,6 +677,7 @@ If yes, then we disable some other packages, like popwin and which-key."
                     :family "DejaVu Sans Mono"
                     :height 130)
 
+;; FIXME: This is not working.
 (use-package minimap
   :ensure t
   :diminish minimap-mode
@@ -704,6 +707,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
 
+;; Install fonts with `M-x all-the-icons-install-fonts`
 (use-package all-the-icons
   :ensure t)
 
@@ -863,6 +867,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package ibuffer
   ;; :commands ibuffer
+  ;; :bind ([remap list-buffers] . ibuffer)
   :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
   (setq ibuffer-expert t
@@ -871,12 +876,9 @@ If yes, then we disable some other packages, like popwin and which-key."
         ibuffer-use-header-line t
         ;; ibuffer-display-summary t
         ;; Ignore case when searching
-        ibuffer-case-fold-search t)
-
-  (use-package ibuf-ext
-    :config (setq ibuffer-show-empty-filter-groups nil))
-
-  (setq ibuffer-formats
+        ibuffer-case-fold-search t
+        ibuffer-show-empty-filter-groups nil
+        ibuffer-formats
         '((mark modified read-only " "
                 (name 30 30 :left :elide)
                 " "
@@ -888,10 +890,7 @@ If yes, then we disable some other packages, like popwin and which-key."
           (mark " "
                 (name 16 -1)
                 " " filename)))
-
-  (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
-  ;; :bind ([remap list-buffers] . ibuffer)
-  )
+  (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
@@ -955,9 +954,8 @@ If yes, then we disable some other packages, like popwin and which-key."
   (setq-default diredp-hide-details-initially-flag nil
                 diredp-hide-details-propagate-flag nil)
   :config
-  (toggle-diredp-find-file-reuse-dir 1)
   ;;(diredp-toggle-find-file-reuse-dir 1)
-  )
+  (toggle-diredp-find-file-reuse-dir 1))
 
 (use-package dired-efap
   :ensure t
@@ -972,38 +970,41 @@ If yes, then we disable some other packages, like popwin and which-key."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package ecb
-  :ensure t
-  :disabled t
-  :if (bound-and-true-p dotemacs-use-ecb)
-  :config
-  (ecb-layout-define "swarnendu" left nil
-                     (ecb-split-ver 0.5 t)
-                     (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
-                     (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-                     (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
-                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-                     (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-                     )
-  (setq ecb-examples-bufferinfo-buffer-name nil
-        ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
-        ecb-tip-of-the-day nil
-        ecb-tree-buffer-style 'ascii-guides
-        ecb-show-sources-in-directories-buffer 'always
-        ecb-layout-name "swarna1"
-        ecb-compile-window-height nil)
-  (ecb-activate)
-  (add-hook 'compilation-finish-functions (lambda (buf strg) (kill-buffer buf))))
+;; (use-package ecb
+;;   :ensure t
+;;   :disabled t
+;;   :if (bound-and-true-p dotemacs-use-ecb)
+;;   :config
+;;   (ecb-layout-define "swarnendu" left nil
+;;                      (ecb-split-ver 0.5 t)
+;;                      (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
+;;                      (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+;;                      (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
+;;                      (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+;;                      (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
+;;                      )
+;;   (setq ecb-examples-bufferinfo-buffer-name nil
+;;         ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
+;;         ecb-tip-of-the-day nil
+;;         ecb-tree-buffer-style 'ascii-guides
+;;         ecb-show-sources-in-directories-buffer 'always
+;;         ecb-layout-name "swarna1"
+;;         ecb-compile-window-height nil)
+;;   (ecb-activate)
+;;   (add-hook 'compilation-finish-functions
+;;             (lambda (buf strg) (kill-buffer buf))))
 
 (use-package treemacs
   :ensure t
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-follow-mode)
          (projectile-mode . treemacs-filewatch-mode)
-         (projectile-mode . treemacs-fringe-indicator-mode))
+         ;; (projectile-mode . treemacs-fringe-indicator-mode)
+         )
+  :custom (treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
   :config
   (setq treemacs-follow-after-init t
-        treemacs-width 25
+        treemacs-width 20
         treemacs-lock-width t
         treemacs-indentation 2
         treemacs-position 'right
@@ -1020,8 +1021,7 @@ If yes, then we disable some other packages, like popwin and which-key."
         treemacs-silent-filewatch t
         treemacs-silent-refresh t
         treemacs-tag-follow-delay 1
-        treemacs-tag-follow-cleanup t
-        treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
+        treemacs-tag-follow-cleanup t)
 
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
@@ -1037,11 +1037,11 @@ If yes, then we disable some other packages, like popwin and which-key."
   (set-face-attribute 'treemacs-root-face nil
                       :height 0.9)
   (set-face-attribute 'treemacs-tags-face nil
-                      :height 0.8)
+                      :height 0.7)
   (set-face-attribute 'treemacs-git-ignored-face nil
-                      :height 0.8)
+                      :height 0.7)
   (set-face-attribute 'treemacs-git-untracked-face nil
-                      :height 0.8)
+                      :height 0.7)
 
   (treemacs-resize-icons 16)
   :bind* ("C-j" . treemacs))
@@ -1050,16 +1050,16 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :after (treemacs projectile))
 
-(use-package treemacs-magit
-  :ensure t
-  :after (treemacs magit)
-  ;; :commands treemacs-magit--schedule-update
-  ;; :hook ((magit-post-commit
-  ;;         git-commit-post-finish
-  ;;         magit-post-stage
-  ;;         magit-post-unstage)
-  ;;        . treemacs-magit--schedule-update)
-  )
+;; (use-package treemacs-magit
+;;   :ensure t
+;;   :after (treemacs magit)
+;;   ;; :commands treemacs-magit--schedule-update
+;;   ;; :hook ((magit-post-commit
+;;   ;;         git-commit-post-finish
+;;   ;;         magit-post-stage
+;;   ;;         magit-post-unstage)
+;;   ;;        . treemacs-magit--schedule-update)
+;;   )
 
 (or
  (use-package treemacs-icons-dired
@@ -1165,8 +1165,8 @@ If yes, then we disable some other packages, like popwin and which-key."
                           "/ssh:"
                           "/sudo:"
                           "/company-statistics-cache.el$"))
-  :hook (after-init . recentf-mode)
-  :config (run-at-time nil (* 10 60) 'recentf-save-list))
+  :config (run-at-time nil (* 10 60) 'recentf-save-list)
+  :hook (after-init . recentf-mode))
 
 ;; Hide the "wrote to recentf" message, which can be irritating.
 (defun sb/recentf-save-list (orig-fun &rest args)
@@ -1217,6 +1217,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 ;; https://github.com/sebastiencs/company-box/issues/38
 (use-package company-box
   :ensure t
+  :disabled t
   :hook (company-mode . company-box-mode)
   :diminish
   :config
@@ -1229,7 +1230,7 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :after company
   :hook (global-company-mode . company-flx-mode)
-  :config (setq company-flx-limit 20))
+  :custom (company-flx-limit 20))
 
 ;; Use prescient instead
 
@@ -1243,9 +1244,9 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :after company
   :hook (global-company-mode . company-quickhelp-mode)
-  :config
-  (setq company-quickhelp-delay 0.5
-        company-quickhelp-max-lines 60))
+  :custom
+  (company-quickhelp-delay 0.5)
+  (company-quickhelp-max-lines 60))
 
 (use-package company-dict
   :ensure t
@@ -1333,15 +1334,12 @@ If yes, then we disable some other packages, like popwin and which-key."
           ;; File is sorted by mtime
           (time-less-p y-mtime x-mtime)))))
   :config
-  (setq ivy-use-virtual-buffers nil ; Add recent files and bookmarks to ivy-switch-buffer completion candidates
-        confirm-nonexistent-file-or-buffer t
-        ivy-virtual-abbreviate 'abbreviate
+  (setq ivy-virtual-abbreviate 'abbreviate
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
         ivy-height 20 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
-        ivy-display-style 'fancy
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
         ;; ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
@@ -1350,7 +1348,7 @@ If yes, then we disable some other packages, like popwin and which-key."
         ;;                         (counsel-grep-or-swiper . ivy--regex-plus)
         ;;                         (ivy-switch-buffer . ivy--regex-plus)
         ;;                         (t . ivy--regex-fuzzy))
-        ivy-flx-limit 200
+        ivy-flx-limit 100
         ivy-use-ignore-default 'always ; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-selectable-prompt nil
         ivy-auto-select-single-candidate t)
@@ -1359,7 +1357,10 @@ If yes, then we disable some other packages, like popwin and which-key."
                     "^\\*.+Completions\\*$"
                     "^\\*Help\\*$"
                     "^\\*Ibuffer\\*$"
-                    "company-statistics-cache.el"))
+                    "company-statistics-cache.el"
+                    "^\\*lsp-log\\*$"
+                    "^\\*pyls\\*$"
+                    "^\\*pyls::stderr\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
 
   ;; (add-to-list 'ivy-sort-functions-alist
@@ -1388,7 +1389,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package counsel
   :ensure t
-  :after (ivy company)
+  :after company
   :preface
   (defun sb/counsel-recentf ()
     "Find a file on `recentf-list' and abbreviate the home directory."
@@ -1459,24 +1460,25 @@ If yes, then we disable some other packages, like popwin and which-key."
                                          "\\|.pyc$"
                                          "\\|.rel$"
                                          "\\|.rip$"
+                                         "\\|.synctex$"
                                          "\\|.synctex.gz$"
                                          "\\|.toc$"))
   :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
 
-(use-package ivy-rich
-  :ensure t
-  :disabled t ;; Try all-the-icons-ivy
-  :after (ivy company)
-  :init
-  (setq ivy-rich-path-style 'relative
-        ivy-format-function #'ivy-format-function-line)
-  (ivy-rich-mode 1))
+;; (use-package ivy-rich
+;;   :ensure t
+;;   :disabled t ;; Try all-the-icons-ivy
+;;   :after (ivy company)
+;;   :init
+;;   (setq ivy-rich-path-style 'relative
+;;         ivy-format-function #'ivy-format-function-line)
+;;   (ivy-rich-mode 1))
 
 (use-package ivy-prescient
   :ensure t
-  :after (ivy prescient)
-  :config (ivy-prescient-mode 1))
+  :after prescient
+  :hook (ivy-mode . ivy-prescient-mode))
 
 (use-package all-the-icons-ivy
   :ensure t
@@ -2004,6 +2006,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package counsel-gtags
   :ensure t
+  :disabled t
   :if (eq system-type 'gnu/linux)
   :diminish counsel-gtags-mode
   :commands (counsel-gtags-find-definition
@@ -2041,8 +2044,9 @@ If yes, then we disable some other packages, like popwin and which-key."
   ;;       ;; ("M-s" . counsel-etags-find-tag)
   ;;       )
   :config
-  (add-to-list 'counsel-etags-ignore-directories '".vscode")
-  (add-to-list 'counsel-etags-ignore-filenames '".clang-format")
+  (add-to-list 'counsel-etags-ignore-directories ".vscode")
+  (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
+  (add-to-list 'counsel-etags-ignore-filenames "*.json")
   ;; Don't ask before rereading the TAGS files if they have changed
   (setq tags-revert-without-query t)
   ;; Don't warn when TAGS files are large
@@ -2210,37 +2214,38 @@ If yes, then we disable some other packages, like popwin and which-key."
   :ensure t
   :bind ("M-i" . turn-on-expand-line-mode))
 
-(use-package ignoramus ; Ignore backups, build files, etc
-  :ensure t
-  :disabled t
-  :if (bound-and-true-p dotemacs-use-ignoramus-p)
-  :config
-  (dolist (ext '(".cb"
-                 ".cb2"
-                 ".dvi"
-                 ".fls"
-                 ".idx"
-                 ".o"
-                 ".out"
-                 ".pdf"
-                 "-pkg.el"
-                 ".rel"
-                 ".rip"
-                 ".toc"))
-    (add-to-list 'ignoramus-file-basename-endings ext))
-  (dolist (filenames '("GPATH"
-                       "GRTAGS"
-                       "GSYMS"
-                       "GTAGS"
-                       "TAGS"
-                       "__init__.py"))
-    (add-to-list 'ignoramus-file-basename-exact-names filenames))
-  (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
-  (dolist (dir '("\\`\\."
-                 "__pycache__"
-                 "auto"))
-    (add-to-list 'ignoramus-file-basename-exact-names dir))
-  (ignoramus-setup))
+;; (use-package ignoramus ; Ignore backups, build files, etc
+;;   :ensure t
+;;   :disabled t
+;;   :if (bound-and-true-p dotemacs-use-ignoramus-p)
+;;   :config
+;;   (require 'dired-x)
+;;   (dolist (ext '(".cb"
+;;                  ".cb2"
+;;                  ".dvi"
+;;                  ".fls"
+;;                  ".idx"
+;;                  ".o"
+;;                  ".out"
+;;                  ".pdf"
+;;                  "-pkg.el"
+;;                  ".rel"
+;;                  ".rip"
+;;                  ".toc"))
+;;     (add-to-list 'ignoramus-file-basename-endings ext))
+;;   (dolist (filenames '("GPATH"
+;;                        "GRTAGS"
+;;                        "GSYMS"
+;;                        "GTAGS"
+;;                        "TAGS"
+;;                        "__init__.py"))
+;;     (add-to-list 'ignoramus-file-basename-exact-names filenames))
+;;   (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
+;;   (dolist (dir '("\\`\\."
+;;                  "__pycache__"
+;;                  "auto"))
+;;     (add-to-list 'ignoramus-file-basename-exact-names dir))
+;;   (ignoramus-setup))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
@@ -3030,6 +3035,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package modern-cpp-font-lock
   :ensure t
+  :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
 
 
@@ -3288,6 +3294,7 @@ If yes, then we disable some other packages, like popwin and which-key."
 
 (use-package magit
   :ensure t
+  :disabled t
   :bind ("C-x g" . magit-status)
   :init
   (setq transient-levels-file (concat dotemacs-temp-directory "transient/levels.el")
@@ -3304,32 +3311,27 @@ If yes, then we disable some other packages, like popwin and which-key."
 (use-package magit-popup
   :after magit)
 
-(use-package gitignore-mode
-  :ensure t)
-
-(use-package gitattributes-mode
-  :ensure t)
-
-(use-package gitconfig-mode
-  :ensure t)
+(use-package git-modes
+  :after magit)
 
 (use-package git-gutter
   :ensure t
+  :after magit
   :diminish
   :hook (after-init . global-git-gutter-mode))
 
 ;; (use-package magit-svn
 ;;   :defer t)
 
-(use-package psvn
-  :load-path "extras"
-  :bind ("C-c d s" . svn-status)
-  :config
-  (setq svn-status-verbose nil
-        svn-status-hide-unknown nil
-        svn-status-hide-unmodified t
-        svn-status-display-full-path t
-        svn-status-auto-revert-buffers t))
+;; (use-package psvn
+;;   :load-path "extras"
+;;   :bind ("C-c d s" . svn-status)
+;;   :config
+;;   (setq svn-status-verbose nil
+;;         svn-status-hide-unknown nil
+;;         svn-status-hide-unmodified t
+;;         svn-status-display-full-path t
+;;         svn-status-auto-revert-buffers t))
 
 
 ;; LSP implementation for GNU Emacs
@@ -3622,6 +3624,8 @@ Increase line spacing by two line height."
 ;; (bind-keys
 ;;  ("C-c d b" . sb/byte-compile-current-file)
 ;;  ("C-c d i" . sb/byte-compile-init-dir))
+
+(bind-key "C-c d f" #'auto-fill-mode)
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
