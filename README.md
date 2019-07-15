@@ -22,7 +22,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 A few third-party executables and libraries  to complement the setup. You can use the following instructions to install them on a Ubuntu >=18.04 distribution.
 
 ``` Bash
-sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm
+sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck ripgrep the_silver_searcher
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin
@@ -53,32 +53,32 @@ The following are customization options defined in `modules/config-init.el` that
 
 * Python
 
-``` Bash
-find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
-```
+  ``` Bash
+  find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
+  ```
 
 * C/C++
 
-``` Bash
-find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
-```
+  ``` Bash
+  find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
+  ```
 
 * Creating tags
 
-+ GTags
+  * GTags
 
-You can use `counsel-gtags`.
+    You can use `counsel-gtags`.
 
-+ Seletively tag files
+    * Selectively tag files
 
-``` Bash
-find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
-```
+    ``` Bash
+    find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
+    ```
 
-+ Universal CTags
+  * Universal CTags
 
-You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
+    You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
 
-``` Bash
-find -name "*.cpp" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print | xargs ctags -ea
-```
+    ``` Bash
+    find -name "*.c" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print -or -name "*.py" -print | xargs ctags -ea --list-extras
+    ```

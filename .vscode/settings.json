@@ -1,7 +1,7 @@
 {
     "files.exclude": {
-        "**/elpa/": true,
-        "irony/": true,
+        "elpa": true,
+        "irony": true,
         "auto-save-list": true,
         "eshell": true,
         "reference-cards": true,
@@ -15,8 +15,10 @@
         ".projectile": true,
         "network-security*": true,
         "semanticdb": true,
-        "**/tmp": true,
-        "**/dict": true
+        "tmp": true,
+        "dict": true,
+        ".cache": true,
+        "transient": true
     },
     "search.exclude": {
         "**/node_modules": true,

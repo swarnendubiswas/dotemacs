@@ -20,7 +20,7 @@
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
-(setq debug-on-error t
+(setq debug-on-error nil
       user-full-name "Swarnendu Biswas")
 
 
@@ -54,7 +54,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'spacemacs-light
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -1299,40 +1299,40 @@ differences due to whitespaces."
 
 (use-package ivy
   :ensure t
-  :preface
-  ;; https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
-  (defun eh-ivy-return-recentf-index (dir)
-    (when (and (boundp 'recentf-list)
-               recentf-list)
-      (let ((files-list
-             (cl-subseq recentf-list
-                        0 (min (- (length recentf-list) 1) 20)))
-            (index 0))
-        (while files-list
-          (if (string-match-p dir (car files-list))
-              (setq files-list nil)
-            (setq index (+ index 1))
-            (setq files-list (cdr files-list))))
-        index)))
+  ;; :preface
+  ;; ;; https://github.com/abo-abo/swiper/wiki/Sort-files-by-mtime
+  ;; (defun eh-ivy-return-recentf-index (dir)
+  ;;   (when (and (boundp 'recentf-list)
+  ;;              recentf-list)
+  ;;     (let ((files-list
+  ;;            (cl-subseq recentf-list
+  ;;                       0 (min (- (length recentf-list) 1) 20)))
+  ;;           (index 0))
+  ;;       (while files-list
+  ;;         (if (string-match-p dir (car files-list))
+  ;;             (setq files-list nil)
+  ;;           (setq index (+ index 1))
+  ;;           (setq files-list (cdr files-list))))
+  ;;       index)))
 
-  (defun eh-ivy-sort-file-function (x y)
-    (let* ((x (concat ivy--directory x))
-           (y (concat ivy--directory y))
-           (x-mtime (nth 5 (file-attributes x)))
-           (y-mtime (nth 5 (file-attributes y))))
-      (if (file-directory-p x)
-          (if (file-directory-p y)
-              (let ((x-recentf-index (eh-ivy-return-recentf-index x))
-                    (y-recentf-index (eh-ivy-return-recentf-index y)))
-                (if (and x-recentf-index y-recentf-index)
-                    ;; Directories is sorted by `recentf-list' index
-                    (< x-recentf-index y-recentf-index)
-                  (string< x y)))
-            t)
-        (if (file-directory-p y)
-            nil
-          ;; File is sorted by mtime
-          (time-less-p y-mtime x-mtime)))))
+  ;; (defun eh-ivy-sort-file-function (x y)
+  ;;   (let* ((x (concat ivy--directory x))
+  ;;          (y (concat ivy--directory y))
+  ;;          (x-mtime (nth 5 (file-attributes x)))
+  ;;          (y-mtime (nth 5 (file-attributes y))))
+  ;;     (if (file-directory-p x)
+  ;;         (if (file-directory-p y)
+  ;;             (let ((x-recentf-index (eh-ivy-return-recentf-index x))
+  ;;                   (y-recentf-index (eh-ivy-return-recentf-index y)))
+  ;;               (if (and x-recentf-index y-recentf-index)
+  ;;                   ;; Directories is sorted by `recentf-list' index
+  ;;                   (< x-recentf-index y-recentf-index)
+  ;;                 (string< x y)))
+  ;;           t)
+  ;;       (if (file-directory-p y)
+  ;;           nil
+  ;;         ;; File is sorted by mtime
+  ;;         (time-less-p y-mtime x-mtime)))))
   :config
   (setq ivy-virtual-abbreviate 'abbreviate
         ivy-wrap t ; Useful to be able to wrap around boundary items
@@ -1462,7 +1462,14 @@ differences due to whitespaces."
                                          "\\|.rip$"
                                          "\\|.synctex$"
                                          "\\|.synctex.gz$"
-                                         "\\|.toc$"))
+                                         "\\|.tar.gz"
+                                         "\\|.toc$"
+                                         "TAGS"
+                                         "GPATH"
+                                         "GRTAGS"
+                                         "GTAGS"
+                                         "tramp"
+                                         ))
   :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
 
@@ -1714,16 +1721,22 @@ differences due to whitespaces."
                   "GTAGS"
                   "GSYMS"
                   "TAGS"
+                  ".dir-locals.el"
+                  ".projectile"
+                  ".project"
                   ".tags"
                   "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files item))
 
-  (dolist (list '("\\.out$"
-                  "\\.pdf$"
-                  "\\.pyc$"
-                  "\\.elc$"
-                  "\\.rel$"
-                  "\\.rip$"
+  (dolist (list '(".out"
+                  ".pdf"
+                  ".pyc"
+                  ".elc"
+                  ".rel"
+                  ".rip"
+                  ".tar.gz"
+                  ".bak"
+                  ".pt"
                   "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes list))
 
@@ -1731,11 +1744,11 @@ differences due to whitespaces."
   (defadvice projectile-project-root (around ignore-remote first activate)
     (unless (file-remote-p default-directory) ad-do-it))
 
-  (add-hook 'projectile-after-switch-project-hook
-            (lambda ()
-              (unless (bound-and-true-p treemacs-mode)
-                (treemacs)
-                (other-window 1))))
+  ;; (add-hook 'projectile-after-switch-project-hook
+  ;;           (lambda ()
+  ;;             (unless (bound-and-true-p treemacs-mode)
+  ;;               (treemacs)
+  ;;               (other-window 1))))
 
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;; (bind-keys ("<f5>" . projectile-switch-project)
@@ -1748,9 +1761,9 @@ differences due to whitespaces."
   :after ivy
   :hook (counsel-mode . counsel-projectile-mode)
   :init
-  ;; Sort projects from newest to oldest
-  (add-to-list 'ivy-sort-functions-alist
-               '(counsel-projectile-switch-project . file-newer-than-file-p))
+  ;; ;; Sort projects from newest to oldest
+  ;; (add-to-list 'ivy-sort-functions-alist
+  ;;              '(counsel-projectile-switch-project . file-newer-than-file-p))
 
   ;; These methods seem too slow
   ;; :bind (("<f5>" . counsel-projectile-switch-project)
@@ -2063,10 +2076,11 @@ differences due to whitespaces."
   :custom
   (dashboard-items '((projects . 10)
                      (recents  . 10)
-                     (bookmarks . 5)))
+                     (bookmarks . 0)))
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
-  (dashboard-set-init-info t))
+  (dashboard-set-init-info t)
+  (diminish 'page-break-lines-mode))
 
 (use-package helpful
   :ensure t
@@ -2078,7 +2092,8 @@ differences due to whitespaces."
 ;; M-x vlf <PATH-TO-FILE>
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
-  :config (setq large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
+  :config (setq large-file-warning-threshold (* 50 1024 1024) ; Warn when opening files bigger than 50MB
+                vlf-application 'dont-ask)
   (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
@@ -2612,8 +2627,9 @@ differences due to whitespaces."
 
 (use-package pdf-tools
   :ensure t
+  :commands pdf-sync-forward-search
   :mode ("\\.pdf\\'" . pdf-tools-install)
-  :bind ("C-c C-g" . pdf-sync-forward-search)
+  ;; :bind ("C-c C-g" . pdf-sync-forward-search)
   :config
   (setq mouse-wheel-follow-mouse t)
   (setq pdf-view-resize-factor 1.10))
@@ -3022,6 +3038,8 @@ differences due to whitespaces."
 (use-package cmake-mode
   :ensure t
   :mode ("CMakeLists.txt" "\\.cmake\\'")
+  ;; :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+  ;;        ("\\.cmake\\'" . cmake-mode))
   :config
   (use-package cmake-font-lock
     :ensure t
@@ -3156,32 +3174,32 @@ differences due to whitespaces."
 (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
   :ensure t)
 
-(use-package jdee
-  :ensure t
-  :config
-  (setq jdee-server-dir dotemacs-extras-directory
-        jdee-complete-function 'jdee-complete-minibuf)
-  (setq jdee-global-classpath '("/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar"
-                                "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar"
-                                "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jsse.jar"
-                                "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/charsets.jar"
-                                "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/resources.jar"
-                                "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/management.jar")))
+;; (use-package jdee
+;;   :ensure t
+;;   :config
+;;   (setq jdee-server-dir dotemacs-extras-directory
+;;         jdee-complete-function 'jdee-complete-minibuf)
+;;   (setq jdee-global-classpath '("/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar"
+;;                                 "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jce.jar"
+;;                                 "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/jsse.jar"
+;;                                 "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/charsets.jar"
+;;                                 "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/resources.jar"
+;;                                 "/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/management.jar")))
 
-(use-package eclim
-  :ensure t
-  :init
-  (use-package eclimd
-    :config (setq eclimd-autostart t
-                  eclimd-executable "/home/swarnendu/software/eclipse/eclimd"))
-  (setq eclim-eclipse-dirs "/home/swarnendu/software/eclipse/eclipse"
-        eclim-executable "/home/swarnendu/software/eclipse/plugins/org.eclim_2.8.0/bin/eclim")
-  (setq eclim-auto-save t)
-  (add-hook 'java-mode-hook #'eclim-mode)
-  :config
-  (use-package company-emacs-eclim
-    :ensure t
-    :config (company-emacs-eclim-setup)))
+;; (use-package eclim
+;;   :ensure t
+;;   :init
+;;   (use-package eclimd
+;;     :config (setq eclimd-autostart t
+;;                   eclimd-executable "/home/swarnendu/software/eclipse/eclimd"))
+;;   (setq eclim-eclipse-dirs "/home/swarnendu/software/eclipse/eclipse"
+;;         eclim-executable "/home/swarnendu/software/eclipse/plugins/org.eclim_2.8.0/bin/eclim")
+;;   (setq eclim-auto-save t)
+;;   (add-hook 'java-mode-hook #'eclim-mode)
+;;   :config
+;;   (use-package company-emacs-eclim
+;;     :ensure t
+;;     :config (company-emacs-eclim-setup)))
 
 
 ;; Shell script mode
@@ -3366,7 +3384,18 @@ differences due to whitespaces."
   :custom
   (lsp-ui-flycheck-enable t)
   (lsp-ui-sideline-enable t)
-  (lsp-ui-imenu-enable t))
+  (lsp-ui-imenu-enable t)
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-use-childframe t)
+  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-flycheck-enable t)
+  (lsp-ui-flycheck-list-position 'right)
+  (lsp-ui-flycheck-live-reporting t)
+  (lsp-ui-peek-enable t)
+  (lsp-ui-peek-list-width 60)
+  (lsp-ui-peek-peek-height 25))
 
 (add-hook 'python-mode-hook
           (lambda ()
@@ -3402,7 +3431,7 @@ differences due to whitespaces."
   :after lsp-java)
 
 (use-package lsp-java-treemacs
-  :after (treemacs))
+  :after treemacs)
 
 (use-package lsp-clangd
   :ensure t
@@ -3629,14 +3658,11 @@ Increase line spacing by two line height."
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (version<= "24.4.0" emacs-version)))
+  ;; :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (version<= "24.4.0" emacs-version)))
   :hook (after-init . which-key-mode)
   :config
-  (setq which-key-idle-delay 1.0
-        which-key-popup-type 'side-window
-        ;; Try to use the right, switch to use the bottom if there is no space
-        which-key-side-window-location '(right bottom)
-        which-key-use-C-h-commands t)
+  ;; Try to use the right, switch to use the bottom if there is no space
+  (setq which-key-side-window-location '(right bottom))
   (which-key-setup-side-window-right-bottom)
   :diminish which-key-mode)
 
