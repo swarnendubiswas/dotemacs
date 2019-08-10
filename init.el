@@ -244,7 +244,8 @@ differences due to whitespaces."
       kill-ring-max 20
       kill-do-not-save-duplicates t
       set-mark-command-repeat-pop t
-      confirm-nonexistent-file-or-buffer t)
+      confirm-nonexistent-file-or-buffer t
+      vc-handled-backends nil)
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode,
                                         ; default value is fundamental-mode
@@ -1363,6 +1364,11 @@ differences due to whitespaces."
                     "^\\*pyls::stderr\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
 
+  (setq ivy-sort-matches-functions-alist
+        '((t)
+          (ivy-switch-buffer . ivy-sort-function-buffer)
+          (counsel-find-file . ivy-sort-function-buffer)))
+
   ;; (add-to-list 'ivy-sort-functions-alist
   ;;              '(read-file-name-internal . eh-ivy-sort-file-function))
 
@@ -1484,6 +1490,7 @@ differences due to whitespaces."
 
 (use-package ivy-prescient
   :ensure t
+  :disabled t
   :after prescient
   :hook (ivy-mode . ivy-prescient-mode))
 
@@ -2308,7 +2315,8 @@ differences due to whitespaces."
 
 (use-package prescient
   :ensure t
-  :config (setq prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
+  :disabled t
+  :custom (prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
   :hook (after-init . prescient-persist-mode))
 
 (use-package ace-window
