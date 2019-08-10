@@ -184,8 +184,8 @@ differences due to whitespaces."
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (use-package cus-edit
-  :config
-  (setq custom-file dotemacs-emacs-custom-file)
+  :custom (custom-file dotemacs-emacs-custom-file)
+  ;; :config
   ;; There seems to be not much benefit in loading the contents of the custom file
   ;; (when (file-exists-p custom-file)
   ;;   (load custom-file :noerror))
@@ -273,7 +273,7 @@ differences due to whitespaces."
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
-  :diminish auto-revert-mode
+  :diminish ;auto-revert-mode
   :hook (after-init . global-auto-revert-mode)
   :config
   (setq auto-revert-verbose nil
@@ -298,44 +298,44 @@ differences due to whitespaces."
 (use-package savehist ; Save minibuffer histories across sessions
   :unless noninteractive
   :hook (after-init . savehist-mode)
-  :config
-  (setq savehist-save-minibuffer-history t
-        savehist-file (concat dotemacs-temp-directory "savehist")
-        savehist-additional-variables '(kill-ring
-                                        search-ring
-                                        regexp-search-ring
-                                        extended-command-history
-                                        file-name-history
-                                        command-history)
-        savehist-autosave-interval 300))
+  :custom
+  (savehist-save-minibuffer-history t)
+  (savehist-file (concat dotemacs-temp-directory "savehist"))
+  (savehist-additional-variables '(kill-ring
+                                   search-ring
+                                   regexp-search-ring
+                                   extended-command-history
+                                   file-name-history
+                                   command-history))
+  (savehist-autosave-interval 300))
 
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
 
 (use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward
-        uniquify-separator "/"
-        uniquify-ignore-buffers-re "^\\*"
-        uniquify-after-kill-buffer-p t
-        uniquify-strip-common-suffix t))
+  :custom
+  (uniquify-buffer-name-style 'forward)
+  (uniquify-separator "/")
+  (uniquify-ignore-buffers-re "^\\*")
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-strip-common-suffix t))
 
 (use-package hippie-exp
   :init
   (use-package hippie-exp-ext
     :ensure t)
-  :config
+  :custom
   ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                           try-expand-dabbrev-all-buffers
-                                           try-expand-dabbrev-from-kill
-                                           try-complete-file-name-partially
-                                           try-expand-all-abbrevs
-                                           try-complete-file-name
-                                           try-expand-list
-                                           try-expand-line
-                                           try-complete-lisp-symbol-partially
-                                           try-complete-lisp-symbol))
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-expand-all-abbrevs
+                                      try-complete-file-name
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
@@ -365,10 +365,10 @@ differences due to whitespaces."
   ;; :init
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
   ;;   (add-hook hook #'abbrev-mode ))
-  :config
-  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs")
-        ;; Do not ask to save new abbrevs when quitting
-        save-abbrevs 'silently))
+  :custom
+  (abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
+  ;; Do not ask to save new abbrevs when quitting
+  (save-abbrevs 'silently))
 
 
 ;; Configure GNU Emacs appearance
@@ -416,14 +416,14 @@ differences due to whitespaces."
 
 (toggle-frame-maximized) ; Maximize Emacs on startup
 
-;; Not the most useful information within Emacs
-(use-package time ; Display the time and date in the mode line
-  :disabled t
-  :config
-  (setq display-time-day-and-date t
-        display-time-24hr-format nil
-        display-time-default-load-average nil)
-  (display-time))
+;; ;; Not the most useful information within Emacs
+;; (use-package time ; Display the time and date in the mode line
+;;   :disabled t
+;;   :config
+;;   (setq display-time-day-and-date t
+;;         display-time-24hr-format nil
+;;         display-time-default-load-average nil)
+;;   (display-time))
 
 ;; ;; linum-mode can slow down Emacs for large files:
 ;; ;; http://blog.binchen.org/posts/turn-off-linum-mode-when-file-is-too-big.html
@@ -843,25 +843,25 @@ differences due to whitespaces."
 
       ((eq dotemacs-modeline-theme 'default) ))
 
-(use-package nyan-mode
-  :ensure t
-  :disabled t
-  :preface
-  ;; https://github.com/cemerick/.emacs.d#nyan-mode
-  (defun sb/toggle-nyan-mode (&optional frame)
-    "Enable/disable nyan mode."
-    (if (display-graphic-p frame)
-        (progn
-          (nyan-mode 1)
-          (nyan-start-animation)
-          (setq-default nyan-wavy-trail nil
-                        nyan-animate-nyancat t
-                        nyan-bar-length 16
-                        nyan-cat-face-number 5))
-      (nyan-mode -1)))
-  :config
-  (add-hook 'after-make-frame-functions 'sb/toggle-nyan-mode)
-  (add-hook 'after-init-hook 'sb/toggle-nyan-mode))
+;; (use-package nyan-mode
+;;   :ensure t
+;;   :disabled t
+;;   :preface
+;;   ;; https://github.com/cemerick/.emacs.d#nyan-mode
+;;   (defun sb/toggle-nyan-mode (&optional frame)
+;;     "Enable/disable nyan mode."
+;;     (if (display-graphic-p frame)
+;;         (progn
+;;           (nyan-mode 1)
+;;           (nyan-start-animation)
+;;           (setq-default nyan-wavy-trail nil
+;;                         nyan-animate-nyancat t
+;;                         nyan-bar-length 16
+;;                         nyan-cat-face-number 5))
+;;       (nyan-mode -1)))
+;;   :config
+;;   (add-hook 'after-make-frame-functions 'sb/toggle-nyan-mode)
+;;   (add-hook 'after-init-hook 'sb/toggle-nyan-mode))
 
 
 ;; Configure ibuffer
@@ -946,17 +946,17 @@ differences due to whitespaces."
     (diminish 'dired-omit-mode) dired-mode-map)
   :bind ("C-x C-j" . dired-jump))
 
-(use-package dired+
-  :disabled t
-  ;; :after dired
-  :load-path "extras"
-  :init
-  ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
-  (setq-default diredp-hide-details-initially-flag nil
-                diredp-hide-details-propagate-flag nil)
-  :config
-  ;;(diredp-toggle-find-file-reuse-dir 1)
-  (toggle-diredp-find-file-reuse-dir 1))
+;; (use-package dired+
+;;   :disabled t
+;;   ;; :after dired
+;;   :load-path "extras"
+;;   :init
+;;   ;; Set this flag before dired+ is loaded: http://irreal.org/blog/?p=3341
+;;   (setq-default diredp-hide-details-initially-flag nil
+;;                 diredp-hide-details-propagate-flag nil)
+;;   :config
+;;   ;;(diredp-toggle-find-file-reuse-dir 1)
+;;   (toggle-diredp-find-file-reuse-dir 1))
 
 (use-package dired-efap
   :ensure t
@@ -1063,11 +1063,11 @@ differences due to whitespaces."
 ;;   )
 
 (or
- (use-package treemacs-icons-dired
-   :ensure t
-   :disabled t
-   :after (treemacs dired)
-   :config (treemacs-icons-dired-mode))
+ ;; (use-package treemacs-icons-dired
+ ;;   :ensure t
+ ;;   :disabled t
+ ;;   :after (treemacs dired)
+ ;;   :config (treemacs-icons-dired-mode))
 
  (use-package all-the-icons-dired
    :ensure t
@@ -1215,17 +1215,17 @@ differences due to whitespaces."
               ;; ("C-s" . sb/quit-company-save-buffer)
               ))
 
-;; https://github.com/sebastiencs/company-box/issues/38
-(use-package company-box
-  :ensure t
-  :disabled t
-  :hook (company-mode . company-box-mode)
-  :diminish
-  :config
-  (setq company-box-backends-colors nil
-        company-box-show-single-candidate t
-        company-box-max-candidates 50
-        company-box-icons-alist 'company-box-icons-all-the-icons))
+;; ;; https://github.com/sebastiencs/company-box/issues/38
+;; (use-package company-box
+;;   :ensure t
+;;   :disabled t
+;;   :hook (company-mode . company-box-mode)
+;;   :diminish
+;;   :config
+;;   (setq company-box-backends-colors nil
+;;         company-box-show-single-candidate t
+;;         company-box-max-candidates 50
+;;         company-box-icons-alist 'company-box-icons-all-the-icons))
 
 (use-package company-flx
   :ensure t
@@ -1820,15 +1820,15 @@ differences due to whitespaces."
   (avy-flycheck-setup))
 
 (or
- (use-package flycheck-popup-tip ; Show error messages in popups
-   :ensure t
-   :disabled t
-   :hook (flycheck-mode . flycheck-popup-tip-mode))
+ ;; (use-package flycheck-popup-tip ; Show error messages in popups
+ ;;   :ensure t
+ ;;   :disabled t
+ ;;   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
- (use-package flycheck-pos-tip
-   :ensure t
-   :disabled t
-   :hook (flycheck-mode . flycheck-pos-tip-mode))
+ ;; (use-package flycheck-pos-tip
+ ;;   :ensure t
+ ;;   :disabled t
+ ;;   :hook (flycheck-mode . flycheck-pos-tip-mode))
 
  (use-package flycheck-inline
    :ensure t
@@ -1859,31 +1859,31 @@ differences due to whitespaces."
 
 ;; Highlight
 
-;; This is useful, but does not work well with in the terminal mode. Checking for
-;; (display-graphics-p) and using hooks do not seem to help. Furthermore, this is a performance
-;; bottleneck for large files.
-(use-package hl-line
-  :ensure t
-  :disabled t
-  :hook (after-init . global-hl-line-mode)
-  :config
-  (setq hl-line-sticky-flag nil)
-  (unless (eq dotemacs-theme 'solarized-dark)
-    (set-face-attribute 'hl-line nil
-                        :background "old lace")))
+;; ;; This is useful, but does not work well with in the terminal mode. Checking for
+;; ;; (display-graphics-p) and using hooks do not seem to help. Furthermore, this is a performance
+;; ;; bottleneck for large files.
+;; (use-package hl-line
+;;   :ensure t
+;;   :disabled t
+;;   :hook (after-init . global-hl-line-mode)
+;;   :config
+;;   (setq hl-line-sticky-flag nil)
+;;   (unless (eq dotemacs-theme 'solarized-dark)
+;;     (set-face-attribute 'hl-line nil
+;;                         :background "old lace")))
 
-(use-package hl-line+ ; Highlight only when idle
-  :ensure t
-  :disabled t
-  :after hl-line
-  :config
-  (global-hl-line-mode -1)
-  (toggle-hl-line-when-idle 1))
+;; (use-package hl-line+ ; Highlight only when idle
+;;   :ensure t
+;;   :disabled t
+;;   :after hl-line
+;;   :config
+;;   (global-hl-line-mode -1)
+;;   (toggle-hl-line-when-idle 1))
 
-(use-package highlight-numbers
-  :ensure t
-  :disabled t
-  :hook (prog-mode . highlight-numbers-mode))
+;; (use-package highlight-numbers
+;;   :ensure t
+;;   :disabled t
+;;   :hook (prog-mode . highlight-numbers-mode))
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
@@ -1925,7 +1925,7 @@ differences due to whitespaces."
   :config
   (setq highlight-symbol-idle-delay 0.5
         highlight-symbol-on-navigation-p t
-        highlight-symbol-highlight-single-occurrence t)
+        highlight-symbol-highlight-single-occurrence nil)
   :diminish highlight-symbol-mode)
 
 (use-package fic-mode ; Highlight certain words
@@ -1934,11 +1934,18 @@ differences due to whitespaces."
   :diminish fic-mode
   :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config
-  (add-to-list 'fic-highlighted-words '"XXX")
-  (add-to-list 'fic-highlighted-words '"LATER")
-  (add-to-list 'fic-highlighted-words '"IMP")
-  (add-to-list 'fic-highlighted-words '"NOTE")
-  (add-to-list 'fic-highlighted-words '"NOTES"))
+  (add-to-list 'fic-highlighted-words '("XXX"
+                                        "LATER"
+                                        "IMP"
+                                        "NOTE"
+                                        "NOTES"
+                                        "TODOs"
+                                        ))
+  ;; (add-to-list 'fic-highlighted-words ')
+  ;; (add-to-list 'fic-highlighted-words ')
+  ;; (add-to-list 'fic-highlighted-words ')
+  ;; (add-to-list 'fic-highlighted-words '"NOTES")
+  )
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
@@ -1947,8 +1954,6 @@ differences due to whitespaces."
 
 
 ;; Tramp
-
-;; (defvar tramp-persistency-file-name)
 
 ;; Hacks are from
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
@@ -1966,11 +1971,11 @@ differences due to whitespaces."
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         tramp-completion-reread-directory-timeout nil)
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  (add-to-list 'tramp-default-method-alist '("" "biswas.38" "ssh"))
-  (add-to-list 'tramp-default-method-alist '("" "sbiswas" "ssh"))
+  ;; (add-to-list 'tramp-default-method-alist '("" "biswas.38" "ssh"))
+  ;; (add-to-list 'tramp-default-method-alist '("" "sbiswas" "ssh"))
   (add-to-list 'tramp-default-method-alist '("" "swarnendu" "ssh"))
-  (add-to-list 'tramp-default-method-alist
-               '("\\`localhost\\'" "\\`root\\'" "su"))
+  ;; (add-to-list 'tramp-default-method-alist
+  ;;              '("\\`localhost\\'" "\\`root\\'" "su"))
 
   ;; If the shell of the server is not bash, then it is recommended to connect with bash
   (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
@@ -2008,18 +2013,18 @@ differences due to whitespaces."
     :ensure t)
   :bind ("C-c C-j" . imenu-anywhere))
 
-(use-package imenu-list
-  :ensure t
-  ;; :after imenu
-  :config
-  (setq imenu-list-auto-resize nil
-        imenu-list-focus-after-activation t)
-  (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
-      (setq imenu-list-size 0.12)
-    (setq imenu-list-size 0.10))
-  ;; (add-hook 'python-mode-hook #'imenu-list-minor-mode)
-  ;; (add-hook 'c-mode-common-hook #'imenu-list-minor-mode)
-  )
+;; (use-package imenu-list
+;;   :ensure t
+;;   ;; :after imenu
+;;   :config
+;;   (setq imenu-list-auto-resize nil
+;;         imenu-list-focus-after-activation t)
+;;   (if (string-equal (system-name) "sbiswas-Dell-System-XPS-L502X")
+;;       (setq imenu-list-size 0.12)
+;;     (setq imenu-list-size 0.10))
+;;   ;; (add-hook 'python-mode-hook #'imenu-list-minor-mode)
+;;   ;; (add-hook 'c-mode-common-hook #'imenu-list-minor-mode)
+;;   )
 
 
 ;; Tags
@@ -2057,6 +2062,9 @@ differences due to whitespaces."
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags)))
 
+;; Don't ask before rereading the TAGS files if they have changed
+(setq tags-revert-without-query t)
+
 (use-package counsel-etags
   :ensure t
   ;; :bind(("M-." . counsel-etags-find-tag-at-point)
@@ -2067,8 +2075,6 @@ differences due to whitespaces."
   (add-to-list 'counsel-etags-ignore-directories ".vscode")
   (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
   (add-to-list 'counsel-etags-ignore-filenames "*.json")
-  ;; Don't ask before rereading the TAGS files if they have changed
-  (setq tags-revert-without-query t)
   ;; Don't warn when TAGS files are large
   (setq large-file-warning-threshold nil)
   ;; How many seconds to wait before rerunning tags for auto-update
@@ -2080,21 +2086,24 @@ differences due to whitespaces."
 (use-package dashboard
   :ensure t
   :hook (after-init . dashboard-setup-startup-hook)
+  :config
+  (use-package page-break-lines
+    :ensure t
+    :diminish)
   :custom
   (dashboard-items '((projects . 10)
                      (recents  . 10)
                      (bookmarks . 0)))
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
-  (dashboard-set-init-info t)
-  (diminish 'page-break-lines-mode))
+  (dashboard-set-init-info t))
 
-(use-package helpful
-  :ensure t
-  :bind
-  (("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h f" . helpful-function)))
+;; (use-package helpful
+;;   :ensure t
+;;   :bind
+;;   (("C-h v" . helpful-variable)
+;;    ("C-h k" . helpful-key)
+;;    ("C-h f" . helpful-function)))
 
 ;; M-x vlf <PATH-TO-FILE>
 (use-package vlf ; Speed up Emacs for large files
@@ -2114,7 +2123,7 @@ differences due to whitespaces."
 
 (use-package duplicate-thing
   :ensure t
-  :bind* ("C-c C-d" . duplicate-thing))
+  :bind ("C-c C-d" . duplicate-thing))
 
 (use-package discover-my-major ; Discover key bindings and their meaning for the current Emacs major mode
   :ensure t
@@ -2196,7 +2205,8 @@ differences due to whitespaces."
 
   )
 
-(setq pop-up-frames nil) ; allows emacs to popup new frames
+(setq pop-up-frames nil) ; Don't allow Emacs to popup new frames
+
 ;; (use-package window-purpose
 ;;   :ensure t
 ;;   :disabled t
@@ -2271,7 +2281,7 @@ differences due to whitespaces."
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
-  :bind* ("C-." . iedit-mode))
+  :bind ("C-." . iedit-mode))
 
 (use-package persistent-scratch
   :ensure t
@@ -2288,8 +2298,7 @@ differences due to whitespaces."
 
 (use-package apt-sources-list
   :ensure t
-  ;; :mode ("\\.list\\'" . apt-sources-list-mode))
-  :mode "\\.list\\'" )
+  :mode ("\\.list\\'" . apt-sources-list-mode))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -2324,7 +2333,8 @@ differences due to whitespaces."
   :bind (("C-c w" . ace-window)
          ([remap other-window] . ace-window))
   :hook (after-init . ace-window-display-mode)
-  :config (setq aw-background nil))
+  ;; :config (setq aw-background nil)
+  )
 
 (use-package avy
   :ensure t
@@ -2338,7 +2348,7 @@ differences due to whitespaces."
   (setq avy-background t
         avy-highlight-first t
         avy-all-windows nil
-        ;; Options pre is a bit distracting because of all the movement while highlighting selection
+        ;; Option pre is a bit distracting because of all the movement while highlighting selection
         ;; keys. This causes the eyes to lose focus.
         avy-style 'at))
 
@@ -2361,10 +2371,6 @@ differences due to whitespaces."
 
 ;; Text mode
 
-;;;;;;;;;;;;;;;;;;
-;; TEXT EDITING ;;
-;;;;;;;;;;;;;;;;;;
-
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also
 ;; get run for all modes derived from a basic mode such as text-mode.
 
@@ -2384,11 +2390,6 @@ differences due to whitespaces."
            company-dict
            company-dabbrev))))
 ;; (add-hook 'text-mode-hook #'sb/company-text-backends)
-
-
-;;;;;;;;;;;;;;
-;; MARKDOWN ;;
-;;;;;;;;;;;;;;
 
 (use-package markdown-mode
   :ensure t
@@ -2422,11 +2423,6 @@ differences due to whitespaces."
   :diminish pandoc-mode
   :config (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
-
-
-;;;;;;;;;
-;; CSV ;;
-;;;;;;;;;
 
 (use-package csv-mode
   :ensure t
@@ -2602,21 +2598,21 @@ differences due to whitespaces."
 ;;   (use-package bibtex-utils
 ;;     :ensure t))
 
-(use-package bib-cite
-  :disabled t
-  :diminish bib-cite-minor-mode
-  :init  (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
-  :config (setq bib-cite-use-reftex-view-crossref t)
-  :bind
-  (:map bib-cite-minor-mode-map
-        ("C-c b" . nil) ; We use "C-c b" for comment-box
-        ("C-c l a" . bib-apropos)
-        ("C-c l b" . bib-make-bibliography)
-        ("C-c l d" . bib-display)
-        ("C-c l t" . bib-etags)
-        ("C-c l f" . bib-find)
-        ("C-c l n" . bib-find-next)
-        ("C-c l h" . bib-highlight-mouse)))
+;; (use-package bib-cite
+;;   :disabled t
+;;   :diminish bib-cite-minor-mode
+;;   :init  (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
+;;   :config (setq bib-cite-use-reftex-view-crossref t)
+;;   :bind
+;;   (:map bib-cite-minor-mode-map
+;;         ("C-c b" . nil) ; We use "C-c b" for comment-box
+;;         ("C-c l a" . bib-apropos)
+;;         ("C-c l b" . bib-make-bibliography)
+;;         ("C-c l d" . bib-display)
+;;         ("C-c l t" . bib-etags)
+;;         ("C-c l f" . bib-find)
+;;         ("C-c l n" . bib-find-next)
+;;         ("C-c l h" . bib-highlight-mouse)))
 
 (use-package ivy-bibtex
   :ensure t
@@ -2633,14 +2629,14 @@ differences due to whitespaces."
   :ensure t
   :config (add-to-list 'company-backends 'company-bibtex))
 
-(use-package pdf-tools
-  :ensure t
-  :commands pdf-sync-forward-search
-  :mode ("\\.pdf\\'" . pdf-tools-install)
-  ;; :bind ("C-c C-g" . pdf-sync-forward-search)
-  :config
-  (setq mouse-wheel-follow-mouse t)
-  (setq pdf-view-resize-factor 1.10))
+;; (use-package pdf-tools
+;;   :ensure t
+;;   :commands pdf-sync-forward-search
+;;   :mode ("\\.pdf\\'" . pdf-tools-install)
+;;   ;; :bind ("C-c C-g" . pdf-sync-forward-search)
+;;   :config
+;;   (setq mouse-wheel-follow-mouse t)
+;;   (setq pdf-view-resize-factor 1.10))
 
 ;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
 ;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
@@ -2691,27 +2687,27 @@ differences due to whitespaces."
 ;; an item line."
 ;;   (check-item-entry))
 
-(defun sb/company-LaTeX-backends ()
-  "Add backends for LaTeX completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((;; Generic backends
-           company-dabbrev
-           company-files
-           company-keywords
-           company-capf
-           company-dict
-           ;; company-gtags
-           ;; LaTeX specific backends
-           company-auctex-labels
-           company-auctex-bibs
-           company-auctex-macros
-           company-auctex-symbols
-           company-auctex-environments
-           company-bibtex
-           company-math-symbols-latex
-           company-latex-commands
-           company-math-symbols-unicode))))
+;; (defun sb/company-LaTeX-backends ()
+;;   "Add backends for LaTeX completion in company mode."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((;; Generic backends
+;;            company-dabbrev
+;;            company-files
+;;            company-keywords
+;;            company-capf
+;;            company-dict
+;;            ;; company-gtags
+;;            ;; LaTeX specific backends
+;;            company-auctex-labels
+;;            company-auctex-bibs
+;;            company-auctex-macros
+;;            company-auctex-symbols
+;;            company-auctex-environments
+;;            company-bibtex
+;;            company-math-symbols-latex
+;;            company-latex-commands
+;;            company-math-symbols-unicode))))
 ;; (add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
 ;; (add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
 
@@ -2720,18 +2716,18 @@ differences due to whitespaces."
 
 ;; PROG mode
 
-(use-package semantic
-  :disabled t
-  :init
-  (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
-  (add-hook 'prog-mode-hook #'semantic-mode)
-  :config
-  ;; (semantic-mode 1)
-  (global-semanticdb-minor-mode 1)
-  (global-semantic-idle-summary-mode 1)
-  ;;https://emacs.stackexchange.com/questions/32268/can-semantic-and-company-coexist
-  ;; (global-semantic-idle-completions-mode 1)
-  (global-semantic-highlight-func-mode 1))
+;; (use-package semantic
+;;   :disabled t
+;;   :init
+;;   (setq semanticdb-default-save-directory (concat dotemacs-temp-directory "semanticdb"))
+;;   (add-hook 'prog-mode-hook #'semantic-mode)
+;;   :config
+;;   ;; (semantic-mode 1)
+;;   (global-semanticdb-minor-mode 1)
+;;   (global-semantic-idle-summary-mode 1)
+;;   ;;https://emacs.stackexchange.com/questions/32268/can-semantic-and-company-coexist
+;;   ;; (global-semantic-idle-completions-mode 1)
+;;   (global-semantic-highlight-func-mode 1))
 
 (global-prettify-symbols-mode 1)
 
@@ -2819,20 +2815,21 @@ differences due to whitespaces."
               (add-to-list (make-local-variable 'company-backends)
                            'company-nxml))))
 
-(use-package which-func ; Show the name of the function in the modeline
-  :after prog-mode
-  :disabled t
-  :hook (c-mode-common . which-function-mode)
-  ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
-  :config
-  (when (eq dotemacs-modeline-theme 'sml)
-    (set-face-attribute 'which-func nil
-                        :foreground "black"
-                        :weight 'light))
-  (when (or (eq dotemacs-modeline-theme 'powerline) (eq dotemacs-modeline-theme 'spaceline))
-    (set-face-attribute 'which-func nil
-                        ;; :foreground "white"
-                        :weight 'light)))
+;; (use-package which-func ; Show the name of the function in the modeline
+;;   :after prog-mode
+;;   :disabled t
+;;   :hook (c-mode-common . which-function-mode)
+;;   ;; :init (setq which-func-modes '(java-mode c++-mode python-mode emacs-lisp-mode lisp-mode))
+;;   :config
+;;   ;; (when (eq dotemacs-modeline-theme 'sml)
+;;   ;;   (set-face-attribute 'which-func nil
+;;   ;;                       :foreground "black"
+;;   ;;                       :weight 'light))
+;;   ;; (when (or (eq dotemacs-modeline-theme 'powerline) (eq dotemacs-modeline-theme 'spaceline))
+;;   ;;   (set-face-attribute 'which-func nil
+;;   ;;                       ;; :foreground "white"
+;;   ;;                       :weight 'light))
+;;   )
 
 (use-package electric
   :hook (prog-mode . electric-layout-mode))
@@ -2844,26 +2841,26 @@ differences due to whitespaces."
   :hook ((emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
   :diminish eldoc-mode)
 
-(use-package eldoc-overlay
-  :ensure t
-  :after eldoc
-  :disabled t ; Too intrusive
-  :diminish eldoc-overlay-mode
-  :config (eldoc-overlay-mode 1))
+;; (use-package eldoc-overlay
+;;   :ensure t
+;;   :after eldoc
+;;   :disabled t ; Too intrusive
+;;   :diminish eldoc-overlay-mode
+;;   :config (eldoc-overlay-mode 1))
 
 (use-package octave
   ;; :mode ("\\.m\\'" . octave-mode)
   :mode "\\.m\\'"
   )
 
-(use-package ess
-  :ensure t
-  :config
-  (setq inferior-R-args "--quiet --no-restore-history --no-save"
-        ess-indent-offset 4
-        ess-indent-from-lhs 4)
-  (use-package ess-smart-underscore
-    :ensure t))
+;; (use-package ess
+;;   :ensure t
+;;   :config
+;;   (setq inferior-R-args "--quiet --no-restore-history --no-save"
+;;         ess-indent-offset 4
+;;         ess-indent-from-lhs 4)
+;;   (use-package ess-smart-underscore
+;;     :ensure t))
 
 (use-package ini-mode
   :ensure t
@@ -2921,22 +2918,22 @@ differences due to whitespaces."
   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
   (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
 
-(use-package function-args
-  :ensure t
-  :disabled t
-  :after cc-mode
-  :diminish function-args-mode
-  :config (fa-config-default)
-  :bind (:map function-args-mode-map
-              ("C-M-k" . nil)
-              ("C-M-j" . nil)
-              :map c++-mode-map
-              ("M-u" . nil)   ;; This overrides M-u
-              ("C-c c s" . fa-show)
-              ("C-c c b" . fa-jump)
-              ("C-c c c" . moo-complete)
-              ("C-c c l" . moo-jump-local)
-              ("C-c c d" . moo-jump-directory)))
+;; (use-package function-args
+;;   :ensure t
+;;   :disabled t
+;;   :after cc-mode
+;;   :diminish function-args-mode
+;;   :config (fa-config-default)
+;;   :bind (:map function-args-mode-map
+;;               ("C-M-k" . nil)
+;;               ("C-M-j" . nil)
+;;               :map c++-mode-map
+;;               ("M-u" . nil)   ;; This overrides M-u
+;;               ("C-c c s" . fa-show)
+;;               ("C-c c b" . fa-jump)
+;;               ("C-c c c" . moo-complete)
+;;               ("C-c c l" . moo-jump-local)
+;;               ("C-c c d" . moo-jump-directory)))
 
 (use-package company-c-headers
   :ensure t
@@ -2945,60 +2942,59 @@ differences due to whitespaces."
   (add-to-list 'company-backends 'company-c-headers)
   (dolist (paths '(
                    "/usr/include"
-                   "/usr/include/clang/8"
+                   "/usr/include/clang/6"
                    "/usr/include/boost"
                    "/usr/include/linux"
-                   "/usr/include/cuda"
                    "/usr/include/c++/7"
                    "/usr/include/c++/7/tr1"
                    "/usr/local/include"))
     (add-to-list 'company-c-headers-path-system paths)))
 
-;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
-(use-package irony
-  :ensure t
-  :diminish irony-mode
-  :disabled t
-  :init
-  (add-hook 'c++-mode-hook #'irony-mode)
-  (add-hook 'c-mode-hook #'irony-mode)
-  :config
-  (setq irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
-  (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
-  ;; Use compilation database first, clang_complete as fallback.
-  (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
-                                                  irony-cdb-clang-complete))
-  ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
-  (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async)
+;; ;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
+;; (use-package irony
+;;   :ensure t
+;;   :diminish irony-mode
+;;   :disabled t
+;;   :init
+;;   (add-hook 'c++-mode-hook #'irony-mode)
+;;   (add-hook 'c-mode-hook #'irony-mode)
+;;   :config
+;;   (setq irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
+;;   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
+;;   ;; Use compilation database first, clang_complete as fallback.
+;;   (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
+;;                                                   irony-cdb-clang-complete))
+;;   ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
+;;   (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
+;;   (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async)
 
-  (use-package company-irony
-    :ensure t
-    :after company
-    :init
-    (use-package company-irony-c-headers
-      :ensure t
-      :after irony)
-    :config
-    ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
-    ;; http://tuhdo.github.io/c-ide.html
-    (setq company-backends (delete 'company-semantic company-backends))
-    (add-to-list 'company-backends 'company-irony))
+;;   (use-package company-irony
+;;     :ensure t
+;;     :after company
+;;     :init
+;;     (use-package company-irony-c-headers
+;;       :ensure t
+;;       :after irony)
+;;     :config
+;;     ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
+;;     ;; http://tuhdo.github.io/c-ide.html
+;;     (setq company-backends (delete 'company-semantic company-backends))
+;;     (add-to-list 'company-backends 'company-irony))
 
-  (use-package flycheck-irony
-    :ensure t
-    :ensure irony
-    :ensure flycheck
-    :disabled t
-    :after flycheck
-    :commands flycheck-irony-setup
-    :init (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+;;   (use-package flycheck-irony
+;;     :ensure t
+;;     :ensure irony
+;;     :ensure flycheck
+;;     :disabled t
+;;     :after flycheck
+;;     :commands flycheck-irony-setup
+;;     :init (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
-  (use-package irony-eldoc
-    :ensure t
-    :disabled t
-    :commands irony-eldoc
-    :init (add-hook 'irony-mode-hook #'irony-eldoc)))
+;;   (use-package irony-eldoc
+;;     :ensure t
+;;     :disabled t
+;;     :commands irony-eldoc
+;;     :init (add-hook 'irony-mode-hook #'irony-eldoc)))
 
 (use-package clang-format
   :ensure t
@@ -3007,10 +3003,10 @@ differences due to whitespaces."
   (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}")
   (setq clang-format-executable "/usr/bin/clang-format"))
 
-(add-hook 'before-save-hook
-          (lambda ()
-            (when (string-equal major-mode "c++-mode")
-              (clang-format-buffer))))
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (when (string-equal major-mode "c++-mode")
+;;               (clang-format-buffer))))
 
 (use-package cuda-mode
   :ensure t
@@ -3020,28 +3016,28 @@ differences due to whitespaces."
   :ensure t
   :mode ("\\.cl\\'" . opencl-mode))
 
-(defun sb/company-cc-backends ()
-  "Add backends for C/C++ completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           ;; C++ specific backends
-           company-clang
-           company-irony
-           company-c-headers
-           company-irony-c-headers
-           company-semantic
-           company-gtags ; FIXME: Should we add this after gtags is loaded?
+;; (defun sb/company-cc-backends ()
+;;   "Add backends for C/C++ completion in company mode."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((
+;;            ;; C++ specific backends
+;;            company-clang
+;;            company-irony
+;;            company-c-headers
+;;            company-irony-c-headers
+;;            company-semantic
+;;            company-gtags ; FIXME: Should we add this after gtags is loaded?
 
-           ;; Generic backends
-           company-files
-           company-keywords
-           ;; company-dabbrev
-           company-dabbrev-code
-           company-capf
-           company-semantic
-           ))))
-(add-hook 'c++-mode-hook #'sb/company-cc-backends)
+;;            ;; Generic backends
+;;            company-files
+;;            company-keywords
+;;            ;; company-dabbrev
+;;            company-dabbrev-code
+;;            company-capf
+;;            company-semantic
+;;            ))))
+;; (add-hook 'c++-mode-hook #'sb/company-cc-backends)
 
 (use-package cmake-mode
   :ensure t
@@ -3053,11 +3049,11 @@ differences due to whitespaces."
     :ensure t
     :hook (cmake-mode . cmake-font-lock-activate)))
 
-(use-package cmake-ide
-  :ensure t
-  :config
-  (setq cmake-ide-flags-c++ (append '("-std=c++11")))
-  (cmake-ide-setup))
+;; (use-package cmake-ide
+;;   :ensure t
+;;   :config
+;;   (setq cmake-ide-flags-c++ (append '("-std=c++11")))
+;;   (cmake-ide-setup))
 
 (use-package modern-cpp-font-lock
   :ensure t
@@ -3067,93 +3063,93 @@ differences due to whitespaces."
 
 ;; Python mode
 
-(defun sb/python-setup ()
-  "Helper function for configuring python mode."
-  (setq-default python-indent-offset 4
-                python-indent-guess-indent-offset t)
-  (setq python-shell-completion-native-enable nil)
-  (setq python-shell-interpreter "python3"
-        python-shell-unbuffered nil))
+;; (defun sb/python-setup ()
+;;   "Helper function for configuring python mode."
+;;   (setq-default python-indent-offset 4
+;;                 python-indent-guess-indent-offset t)
+;;   (setq python-shell-completion-native-enable nil)
+;;   (setq python-shell-interpreter "python3"
+;;         python-shell-unbuffered nil))
 
-(use-package elpy
-  :ensure t
-  :ensure find-file-in-project
-  :diminish elpy-mode
-  :disabled t
-  ;; :defer t
-  :preface
-  (defun sb/elpy-setup ()
-    "Setup elpy and python configurations."
-    (sb/python-setup)
-    (setq elpy-modules '(elpy-module-company
-                         elpy-module-eldoc
-                         elpy-module-pyvenv
-                         elpy-module-highlight-indentation
-                         elpy-module-yasnippet
-                         elpy-module-sane-defaults)
-          elpy-rpc-python-command "python3"
-          elpy-rpc-backend "jedi"
-          elpy-syntax-check-command "pylint"
-          python-check-command "pylint"
-          elpy-company-add-completion-from-shell t)
+;; (use-package elpy
+;;   :ensure t
+;;   :ensure find-file-in-project
+;;   :diminish elpy-mode
+;;   :disabled t
+;;   ;; :defer t
+;;   :preface
+;;   (defun sb/elpy-setup ()
+;;     "Setup elpy and python configurations."
+;;     (sb/python-setup)
+;;     (setq elpy-modules '(elpy-module-company
+;;                          elpy-module-eldoc
+;;                          elpy-module-pyvenv
+;;                          elpy-module-highlight-indentation
+;;                          elpy-module-yasnippet
+;;                          elpy-module-sane-defaults)
+;;           elpy-rpc-python-command "python3"
+;;           elpy-rpc-backend "jedi"
+;;           elpy-syntax-check-command "pylint"
+;;           python-check-command "pylint"
+;;           elpy-company-add-completion-from-shell t)
 
-    (elpy-mode 1))
+;;     (elpy-mode 1))
 
-  :init
-  ;;  (add-hook 'python-mode-hook #'sb/elpy-setup)
-  (advice-add 'python-mode :before 'elpy-enable)
+;;   :init
+;;   ;;  (add-hook 'python-mode-hook #'sb/elpy-setup)
+;;   (advice-add 'python-mode :before 'elpy-enable)
 
-  :config
-  (add-hook 'elpy-mode-hook #'flycheck-mode)
-  ;; ;; http://www.wilfred.me.uk/.emacs.d/init.html
-  ;; (add-hook 'python-mode-hook
-  ;;           (lambda ()
-  ;;             (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
+;;   :config
+;;   (add-hook 'elpy-mode-hook #'flycheck-mode)
+;;   ;; ;; http://www.wilfred.me.uk/.emacs.d/init.html
+;;   ;; (add-hook 'python-mode-hook
+;;   ;;           (lambda ()
+;;   ;;             (add-to-list 'flycheck-disabled-checkers 'python-pylint)))
 
-  :bind (:map elpy-mode-map
-              ("C-c c e" . python-nav-forward-defun)
-              ("C-c c a" . python-nav-backward-defun)
-              ("M-<left>" . nil)
-              ("M-<right>" . nil)
-              ("M-." . nil)
-              ("C-c C-d" . nil)
-              ("C-c C-r i" . nil)))
+;;   :bind (:map elpy-mode-map
+;;               ("C-c c e" . python-nav-forward-defun)
+;;               ("C-c c a" . python-nav-backward-defun)
+;;               ("M-<left>" . nil)
+;;               ("M-<right>" . nil)
+;;               ("M-." . nil)
+;;               ("C-c C-d" . nil)
+;;               ("C-c C-r i" . nil)))
 
-(use-package python-docstring
-  :ensure t
-  :diminish python-docstring-mode
-  :hook (python-mode . python-docstring-mode))
+;; (use-package python-docstring
+;;   :ensure t
+;;   :diminish python-docstring-mode
+;;   :hook (python-mode . python-docstring-mode))
 
-(use-package pyvenv
-  :ensure t
-  :config (pyvenv-mode 1))
+;; (use-package pyvenv
+;;   :ensure t
+;;   :config (pyvenv-mode 1))
 
-(use-package pyimport
-  :ensure t)
+;; (use-package pyimport
+;;   :ensure t)
 
-(use-package py-isort
-  :ensure t)
+;; (use-package py-isort
+;;   :ensure t)
 
-(use-package company-jedi
-  :ensure t
-  :ensure company
-  :after company
-  :config (add-to-list 'company-backends company-jedi))
+;; (use-package company-jedi
+;;   :ensure t
+;;   :ensure company
+;;   :after company
+;;   :config (add-to-list 'company-backends company-jedi))
 
-(defun sb/company-python-backends ()
-  "Add backends for Python completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((;; Generic backends
-           company-files
-           company-keywords
-           company-capf
-           company-dabbrev
-           company-dabbrev-code
-           company-gtags
-           ;; Python specific backends
-           company-jedi
-           elpy-company-backend))))
+;; (defun sb/company-python-backends ()
+;;   "Add backends for Python completion in company mode."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((;; Generic backends
+;;            company-files
+;;            company-keywords
+;;            company-capf
+;;            company-dabbrev
+;;            company-dabbrev-code
+;;            company-gtags
+;;            ;; Python specific backends
+;;            company-jedi
+;;            elpy-company-backend))))
 ;; (add-hook 'python-mode-hook #'sb/company-python-backends)
 
 ;; (defhydra sb/hydra-python-indent (global-map "C-c c n")
@@ -3176,11 +3172,11 @@ differences due to whitespaces."
             (setq-default c-basic-offset 2
                           c-set-style "java")))
 
-(use-package ant
-  :ensure t)
+;; (use-package ant
+;;   :ensure t)
 
-(use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
-  :ensure t)
+;; (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
+;;   :ensure t)
 
 ;; (use-package jdee
 ;;   :ensure t
@@ -3218,7 +3214,6 @@ differences due to whitespaces."
   :config
   (setq sh-basic-offset 4
         sh-indent-comment t
-        sh-indentation 4
         sh-indent-after-continuation 'always)
   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
 
@@ -3263,52 +3258,51 @@ differences due to whitespaces."
 (add-hook 'sh-mode-hook 'sb/company-sh-backends)
 
 
-
 ;; Shell mode
 
-(use-package shell
-  :disabled t
-  :config
-  (use-package comint
-    :config
-    (setq comint-scroll-to-bottom-on-input t ; Always insert at the bottom
-          ;; No duplicates in command history
-          comint-input-ignoredups t))
+;; (use-package shell
+;;   :disabled t
+;;   :config
+;;   (use-package comint
+;;     :config
+;;     (setq comint-scroll-to-bottom-on-input t ; Always insert at the bottom
+;;           ;; No duplicates in command history
+;;           comint-input-ignoredups t))
 
-  (use-package shell-command
-    :ensure t
-    :config (shell-command-completion-mode 1))
+;;   (use-package shell-command
+;;     :ensure t
+;;     :config (shell-command-completion-mode 1))
 
-  ;; Set up shell (not eshell) mode:
-  ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
-  ;; https://stackoverflow.com/questions/37409085/how-to-define-a-default-shell-for-emacs
-  (setq-default explicit-shell-file-name "/bin/bash"
-                shell-file-name explicit-shell-file-name
-                explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
-                comint-process-echoes t)
-  (setenv "ESHELL" shell-file-name)
+;;   ;; Set up shell (not eshell) mode:
+;;   ;; https://github.com/monsanto/readline-complete.el/blob/master/readline-complete.el
+;;   ;; https://stackoverflow.com/questions/37409085/how-to-define-a-default-shell-for-emacs
+;;   (setq-default explicit-shell-file-name "/bin/bash"
+;;                 shell-file-name explicit-shell-file-name
+;;                 explicit-bash-args '("-c" "export EMACS=; stty echo; bash")
+;;                 comint-process-echoes t)
+;;   (setenv "ESHELL" shell-file-name)
 
-  (use-package readline-complete
-    :ensure t
-    :config
-    (push 'company-readline company-backends)
-    (add-hook 'rlc-no-readline-hook
-              (lambda ()
-                (company-mode -1))))
+;;   (use-package readline-complete
+;;     :ensure t
+;;     :config
+;;     (push 'company-readline company-backends)
+;;     (add-hook 'rlc-no-readline-hook
+;;               (lambda ()
+;;                 (company-mode -1))))
 
-  (use-package bash-completion
-    :ensure t
-    :config (bash-completion-setup))
+;;   (use-package bash-completion
+;;     :ensure t
+;;     :config (bash-completion-setup))
 
-  ;; http://www.joshstaiger.org/archives/2005/07/fixing_garbage.html
-  (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
-  (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
+;;   ;; http://www.joshstaiger.org/archives/2005/07/fixing_garbage.html
+;;   (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+;;   (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on))
 
-;; Avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating
-;; an inferior python process and aspell
-(add-hook 'comint-exec-hook
-          (lambda ()
-            (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
+;; ;; Avoid Emacs querying "active processes exist; kill them and exit anyway?", since we are creating
+;; ;; an inferior python process and aspell
+;; (add-hook 'comint-exec-hook
+;;           (lambda ()
+;;             (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)))
 
 (use-package fish-completion
   :ensure t
@@ -3320,7 +3314,6 @@ differences due to whitespaces."
 
 (use-package magit
   :ensure t
-  :disabled t
   :bind ("C-x g" . magit-status)
   :init
   (setq transient-levels-file (concat dotemacs-temp-directory "transient/levels.el")
@@ -3378,9 +3371,9 @@ differences due to whitespaces."
         lsp-enable-indentation t
         lsp-enable-on-type-formatting t
         lsp-pyls-configuration-sources ["pylint"]
-        lsp-pyls-plugins-pylint-enabled t
         lsp-pyls-plugins-pydocstyle-enabled t
         lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"]
+        lsp-pyls-plugins-pydocstyle-convention "pep257"
         lsp-pyls-plugins-pycodestyle-enabled nil
         lsp-pyls-plugins-pycodestyle-max-line-length 100
         lsp-pyls-plugins-pyflakes-enabled nil))
@@ -3410,6 +3403,13 @@ differences due to whitespaces."
             (add-hook 'before-save-hook
                       (lambda ()
                         (lsp-format-buffer)) nil t)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
+
 
 (use-package company-lsp
   :ensure t
@@ -3457,75 +3457,75 @@ differences due to whitespaces."
 
 ;; ORG mode
 
-(use-package org
-  :ensure t
-  :disabled t
-  :config
-  ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
-  (setq org-src-fontify-natively t ; Code block fontification using the major-mode of the code
-        org-startup-indented t
-        org-startup-truncated nil
-        org-src-preserve-indentation t
-        org-src-tabs-acts-natively t
-        org-src-window-setup 'current-window
-        org-fontify-done-headline t
-        org-fontify-whole-heading-line t
-        org-startup-folded 'showeverything ; options: nil
-        org-hide-leading-stars t
-        org-hide-leading-stars-before-indent-mode t
-        org-support-shift-select t ; use shift-select
-        ;; See org-speed-commands-default for a list of the keys and commands enabled at the
-        ;; beginning of headlines. See org-babel-describe-bindings will display a list of the code
-        ;; blocks commands and their related keys.
-        org-use-speed-commands t
-        org-src-strip-leading-and-trailing-blank-lines t
-        ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
-        org-pretty-entities t
-        ;; Render subscripts and superscripts in org buffers
-        org-pretty-entities-include-sub-superscripts t)
+;; (use-package org
+;;   :ensure t
+;;   :disabled t
+;;   :config
+;;   ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
+;;   (setq org-src-fontify-natively t ; Code block fontification using the major-mode of the code
+;;         org-startup-indented t
+;;         org-startup-truncated nil
+;;         org-src-preserve-indentation t
+;;         org-src-tabs-acts-natively t
+;;         org-src-window-setup 'current-window
+;;         org-fontify-done-headline t
+;;         org-fontify-whole-heading-line t
+;;         org-startup-folded 'showeverything ; options: nil
+;;         org-hide-leading-stars t
+;;         org-hide-leading-stars-before-indent-mode t
+;;         org-support-shift-select t ; use shift-select
+;;         ;; See org-speed-commands-default for a list of the keys and commands enabled at the
+;;         ;; beginning of headlines. See org-babel-describe-bindings will display a list of the code
+;;         ;; blocks commands and their related keys.
+;;         org-use-speed-commands t
+;;         org-src-strip-leading-and-trailing-blank-lines t
+;;         ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
+;;         org-pretty-entities t
+;;         ;; Render subscripts and superscripts in org buffers
+;;         org-pretty-entities-include-sub-superscripts t)
 
-  ;; Allow syntax highlighting for parts of a word
-  ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode
-  (setcar org-emphasis-regexp-components " \t('\"`{[:alpha:]=")
-  (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}=\\")
-  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+;;   ;; Allow syntax highlighting for parts of a word
+;;   ;; http://stackoverflow.com/questions/1218238/how-to-make-part-of-a-word-bold-in-org-mode
+;;   (setcar org-emphasis-regexp-components " \t('\"`{[:alpha:]=")
+;;   (setcar (nthcdr 1 org-emphasis-regexp-components) "[:alpha:]- \t.,:!?;'\")}=\\")
+;;   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
 
-  ;; Does not work for me
-  ;; disable including title if not explicitly specified, default was to use the buffer name
-  ;; (defadvice org-export-grab-title-from-buffer (around org-export-grab-title-from-buffer-disable activate))
+;;   ;; Does not work for me
+;;   ;; disable including title if not explicitly specified, default was to use the buffer name
+;;   ;; (defadvice org-export-grab-title-from-buffer (around org-export-grab-title-from-buffer-disable activate))
 
-  (require 'org-inlinetask)
+;;   (require 'org-inlinetask)
 
-  (add-hook 'org-mode-hook #'org-toggle-blocks)
-  (add-hook 'org-mode-hook #'which-function-mode)
+;;   (add-hook 'org-mode-hook #'org-toggle-blocks)
+;;   (add-hook 'org-mode-hook #'which-function-mode)
 
-  (use-package ox-latex
-    :config
-    ;; include the listings package
-    (add-to-list 'org-latex-packages-alist '("" "listings"))
-    ;; if you want colored source code then you need to include the color package
-    ;; (add-to-list 'org-latex-packages-alist '("" "color"))
-    ;; Add minted to the defaults packages to include when exporting.
-    ;; (add-to-list 'org-latex-packages-alist '("" "minted"))
-    ;; tell org to use listings, options: t, 'minted
-    (setq org-latex-listings 't
-          org-latex-table-caption-above nil))
+;;   (use-package ox-latex
+;;     :config
+;;     ;; include the listings package
+;;     (add-to-list 'org-latex-packages-alist '("" "listings"))
+;;     ;; if you want colored source code then you need to include the color package
+;;     ;; (add-to-list 'org-latex-packages-alist '("" "color"))
+;;     ;; Add minted to the defaults packages to include when exporting.
+;;     ;; (add-to-list 'org-latex-packages-alist '("" "minted"))
+;;     ;; tell org to use listings, options: t, 'minted
+;;     (setq org-latex-listings 't
+;;           org-latex-table-caption-above nil))
 
-  (use-package org-indent
-    :diminish org-indent-mode
-    :config (org-indent-mode 1))
+;;   (use-package org-indent
+;;     :diminish org-indent-mode
+;;     :config (org-indent-mode 1))
 
-  (use-package org-bullets
-    :ensure t
-    :init (add-hook 'org-mode-hook #'org-bullets-mode))
+;;   (use-package org-bullets
+;;     :ensure t
+;;     :init (add-hook 'org-mode-hook #'org-bullets-mode))
 
-  (use-package org-autolist
-    :ensure t)
+;;   (use-package org-autolist
+;;     :ensure t)
 
-  (use-package org-footnote
-    :config
-    (setq org-footnote-define-inline t
-          org-footnote-auto-label 'random)))
+;;   (use-package org-footnote
+;;     :config
+;;     (setq org-footnote-define-inline t
+;;           org-footnote-auto-label 'random)))
 
 
 ;; Function definitions
@@ -3627,9 +3627,8 @@ Increase line spacing by two line height."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key
-;; variants. With bind-key, you do not need an explicit "(kbd ...)". Other variants:
-;; (global-set-key (kbd "RET") 'newline-and-indent) (define-key global-map (kbd "RET")
-;; 'newline-and-indent)
+;; variants. With bind-key, you do not need an explicit "(kbd ...)". Other variants: (global-set-key
+;; (kbd "RET") 'newline-and-indent) (define-key global-map (kbd "RET") 'newline-and-indent)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (bind-keys
@@ -3668,10 +3667,7 @@ Increase line spacing by two line height."
   :ensure t
   ;; :if (and (not (bound-and-true-p dotemacs-use-ecb)) (and (version<= "24.4.0" emacs-version)))
   :hook (after-init . which-key-mode)
-  :config
-  ;; Try to use the right, switch to use the bottom if there is no space
-  (setq which-key-side-window-location '(right bottom))
-  (which-key-setup-side-window-right-bottom)
+  :config (which-key-setup-side-window-right-bottom)
   :diminish which-key-mode)
 
 
