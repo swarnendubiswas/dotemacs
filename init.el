@@ -184,8 +184,8 @@ differences due to whitespaces."
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (use-package cus-edit
-  :config
-  (setq custom-file dotemacs-emacs-custom-file)
+  :custom (custom-file dotemacs-emacs-custom-file)
+  ;; :config
   ;; There seems to be not much benefit in loading the contents of the custom file
   ;; (when (file-exists-p custom-file)
   ;;   (load custom-file :noerror))
@@ -244,7 +244,8 @@ differences due to whitespaces."
       kill-ring-max 20
       kill-do-not-save-duplicates t
       set-mark-command-repeat-pop t
-      confirm-nonexistent-file-or-buffer t)
+      confirm-nonexistent-file-or-buffer t
+      vc-handled-backends nil)
 
 (setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode,
                                         ; default value is fundamental-mode
@@ -272,7 +273,7 @@ differences due to whitespaces."
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
-  :diminish auto-revert-mode
+  :diminish ;auto-revert-mode
   :hook (after-init . global-auto-revert-mode)
   :config
   (setq auto-revert-verbose nil
@@ -297,44 +298,44 @@ differences due to whitespaces."
 (use-package savehist ; Save minibuffer histories across sessions
   :unless noninteractive
   :hook (after-init . savehist-mode)
-  :config
-  (setq savehist-save-minibuffer-history t
-        savehist-file (concat dotemacs-temp-directory "savehist")
-        savehist-additional-variables '(kill-ring
-                                        search-ring
-                                        regexp-search-ring
-                                        extended-command-history
-                                        file-name-history
-                                        command-history)
-        savehist-autosave-interval 300))
+  :custom
+  (savehist-save-minibuffer-history t)
+  (savehist-file (concat dotemacs-temp-directory "savehist"))
+  (savehist-additional-variables '(kill-ring
+                                   search-ring
+                                   regexp-search-ring
+                                   extended-command-history
+                                   file-name-history
+                                   command-history))
+  (savehist-autosave-interval 300))
 
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
 
 (use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward
-        uniquify-separator "/"
-        uniquify-ignore-buffers-re "^\\*"
-        uniquify-after-kill-buffer-p t
-        uniquify-strip-common-suffix t))
+  :custom
+  (uniquify-buffer-name-style 'forward)
+  (uniquify-separator "/")
+  (uniquify-ignore-buffers-re "^\\*")
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-strip-common-suffix t))
 
 (use-package hippie-exp
   :init
   (use-package hippie-exp-ext
     :ensure t)
-  :config
+  :custom
   ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                           try-expand-dabbrev-all-buffers
-                                           try-expand-dabbrev-from-kill
-                                           try-complete-file-name-partially
-                                           try-expand-all-abbrevs
-                                           try-complete-file-name
-                                           try-expand-list
-                                           try-expand-line
-                                           try-complete-lisp-symbol-partially
-                                           try-complete-lisp-symbol))
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-expand-all-abbrevs
+                                      try-complete-file-name
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
@@ -364,10 +365,10 @@ differences due to whitespaces."
   ;; :init
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
   ;;   (add-hook hook #'abbrev-mode ))
-  :config
-  (setq abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs")
-        ;; Do not ask to save new abbrevs when quitting
-        save-abbrevs 'silently))
+  :custom
+  (abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
+  ;; Do not ask to save new abbrevs when quitting
+  (save-abbrevs 'silently))
 
 
 ;; Configure GNU Emacs appearance
@@ -1363,6 +1364,11 @@ differences due to whitespaces."
                     "^\\*pyls::stderr\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
 
+  (setq ivy-sort-matches-functions-alist
+        '((t)
+          (ivy-switch-buffer . ivy-sort-function-buffer)
+          (counsel-find-file . ivy-sort-function-buffer)))
+
   ;; (add-to-list 'ivy-sort-functions-alist
   ;;              '(read-file-name-internal . eh-ivy-sort-file-function))
 
@@ -1484,6 +1490,7 @@ differences due to whitespaces."
 
 (use-package ivy-prescient
   :ensure t
+  :disabled t
   :after prescient
   :hook (ivy-mode . ivy-prescient-mode))
 
@@ -2199,7 +2206,7 @@ differences due to whitespaces."
 
   )
 
-(setq pop-up-frames nil) ; allows emacs to popup new frames
+(setq pop-up-frames nil) ; Don't allow Emacs to popup new frames
 
 ;; (use-package window-purpose
 ;;   :ensure t
@@ -2318,6 +2325,7 @@ differences due to whitespaces."
 
 (use-package prescient
   :ensure t
+  :disabled t
   :custom (prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
   :hook (after-init . prescient-persist-mode))
 
