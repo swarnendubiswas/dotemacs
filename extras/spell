@@ -1,8 +1,10 @@
-personal_ws-1.1 en 77 
+personal_ws-1.1 en 80 
 atomicity
 indices
 roundtrip
 anisotropic
+vectorization
+Vectorization
 probabilistically
 FIXME
 piecewise
@@ -23,8 +25,9 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-vertices
 blackbox
+vertices
+Parallelization
 unscalable
 scalable
 programmability
