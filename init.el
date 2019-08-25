@@ -125,6 +125,8 @@ differences due to whitespaces."
 ;; Setup the package system
 
 (setq load-prefer-newer t)
+;; https://www.reddit.com/r/emacs/comments/cdei4p/failed_to_download_gnu_archive_bad_request/
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 (eval-when-compile
   (require 'package)
@@ -1792,8 +1794,7 @@ differences due to whitespaces."
   (setq flycheck-emacs-lisp-load-path 'inherit
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-display-errors-delay 0.5
-        ;; Faster than the default
-        flycheck-highlighting-mode 'lines
+        flycheck-highlighting-mode 'lines ; Faster than the default
         flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch)
         flycheck-pylintrc "/home/swarnendu/.config/pylintrc")
   (setq-local flycheck-python-pylint-executable "python3")
@@ -1935,6 +1936,7 @@ differences due to whitespaces."
   :diminish fic-mode
   :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config
+  ;; FIXME: This is not working.
   (add-to-list 'fic-highlighted-words '("XXX"
                                         "LATER"
                                         "IMP"
@@ -2068,10 +2070,10 @@ differences due to whitespaces."
 
 (use-package counsel-etags
   :ensure t
-  ;; :bind(("M-." . counsel-etags-find-tag-at-point)
-  ;;       ;; ("M-t" . counsel-etags-grep-symbol-at-point)
-  ;;       ;; ("M-s" . counsel-etags-find-tag)
-  ;;       )
+  :bind(("M-." . counsel-etags-find-tag-at-point)
+        ;; ("M-t" . counsel-etags-grep-symbol-at-point)
+        ;; ("M-s" . counsel-etags-find-tag)
+        )
   :config
   (add-to-list 'counsel-etags-ignore-directories ".vscode")
   (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
@@ -2466,10 +2468,10 @@ differences due to whitespaces."
   (setq-default TeX-master nil) ; Query for master file
 
   ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
-  (setq TeX-source-correlate-method 'synctex
-        TeX-source-correlate-mode t
-        TeX-source-correlate-start-server 'ask)
-  (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
+  ;; (setq TeX-source-correlate-method 'synctex
+  ;;       TeX-source-correlate-mode t
+  ;;       TeX-source-correlate-start-server 'ask)
+  ;; (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
 
   (add-hook 'LaTeX-mode-hook
             (lambda ()
@@ -2997,12 +2999,12 @@ differences due to whitespaces."
 ;;     :commands irony-eldoc
 ;;     :init (add-hook 'irony-mode-hook #'irony-eldoc)))
 
-(use-package clang-format
-  :ensure t
-  :after cc-mode
-  :init
-  (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}")
-  (setq clang-format-executable "/usr/bin/clang-format"))
+;; (use-package clang-format
+;;   :ensure t
+;;   :after cc-mode
+;;   :init
+;;   (setq-default clang-format-style "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}")
+;;   (setq clang-format-executable "/usr/bin/clang-format"))
 
 ;; (add-hook 'before-save-hook
 ;;           (lambda ()
@@ -3358,8 +3360,8 @@ differences due to whitespaces."
 
 (use-package lsp-mode
   :ensure t
-  :commands lsp
-  :hook ((java-mode c-mode c++-mode python-mode) . lsp)
+  :commands (lsp lsp-deferred)
+  :hook ((java-mode c-mode c++-mode python-mode) . lsp-deferred)
   :config
   (require 'lsp-clients)
   (setq lsp-auto-guess-root t
@@ -3398,13 +3400,12 @@ differences due to whitespaces."
   (lsp-ui-peek-enable t)
   (lsp-ui-peek-list-width 60)
   (lsp-ui-peek-peek-height 25))
-
 (add-hook 'python-mode-hook
           (lambda ()
             (add-hook 'before-save-hook
                       (lambda ()
                         (lsp-format-buffer)) nil t)))
-
+;; FIXME: Why is this not working?
 (add-hook 'c++-mode-hook
           (lambda ()
             (add-hook 'before-save-hook
