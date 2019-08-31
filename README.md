@@ -51,34 +51,41 @@ The following are customization options defined in `modules/config-init.el` that
 
 ## Browsing Source
 
-* Python
+* GTags
 
-  ``` Bash
-  find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
-  ```
+You can use `counsel-gtags`.
 
-* C/C++
+``` Bash
+find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
+```
 
-  ``` Bash
-  find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
-  ```
+``` Bash
+find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
+```
 
-* Creating tags
+``` Bash
+find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
+```
 
-  * GTags
+* Universal CTags
 
-    You can use `counsel-gtags`.
+You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
 
-    * Selectively tag files
+Emacs will, by default, expect a tag file by the name "TAGS" in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature:
 
-    ``` Bash
-    find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
-    ```
+       M-x visit-tags-table <RET> FILE <RET>
+              Select the tag file, "FILE", to use.
 
-  * Universal CTags
+       M-. [TAG] <RET>
+              Find the first definition of TAG. The default tag is the identifier under the cursor.
 
-    You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
+       M-*    Pop back to where you previously invoked "M-.".
 
-    ``` Bash
-    find -name "*.c" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print -or -name "*.py" -print | xargs ctags -ea --list-extras
-    ```
+       C-u M-.
+              Find the next definition for the last tag.
+
+       For more commands, see the Tags topic in the Emacs info document.
+
+``` Bash
+find -name "*.c" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print -or -name "*.py" -print | xargs ctags -ea --list-extras
+```

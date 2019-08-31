@@ -124,9 +124,10 @@ differences due to whitespaces."
 
 ;; Setup the package system
 
-(setq load-prefer-newer t)
-;; https://www.reddit.com/r/emacs/comments/cdei4p/failed_to_download_gnu_archive_bad_request/
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(setq load-prefer-newer t
+      ;; https://www.reddit.com/r/emacs/comments/cdei4p/failed_to_download_gnu_archive_bad_request/
+      ;; gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"
+      )
 
 (eval-when-compile
   (require 'package)
@@ -275,7 +276,7 @@ differences due to whitespaces."
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
-  :diminish ;auto-revert-mode
+  :diminish
   :hook (after-init . global-auto-revert-mode)
   :config
   (setq auto-revert-verbose nil
@@ -286,16 +287,13 @@ differences due to whitespaces."
 (use-package delsel
   :hook (after-init . delete-selection-mode))
 
-;; (use-package advice
-;;   :config
 ;; Turn off warnings due to functions being redefined
 (setq ad-redefinition-action 'accept)
-;; )
 
 (use-package saveplace ; Remember cursor position in files
   :unless noninteractive
   :hook (after-init . save-place-mode)
-  :config (setq save-place-file (concat dotemacs-temp-directory "places")))
+  :custom (save-place-file (concat dotemacs-temp-directory "places")))
 
 (use-package savehist ; Save minibuffer histories across sessions
   :unless noninteractive
@@ -385,7 +383,7 @@ differences due to whitespaces."
 (if window-system
     (progn
       (tool-bar-mode -1)
-      (menu-bar-mode -1)
+      (menu-bar-mode 1)
       (scroll-bar-mode -1)))
 
 ;; (use-package tool-bar
@@ -410,11 +408,9 @@ differences due to whitespaces."
 ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 ;; ;; It will maximize all frames: both the first one and any others you create. Options: fullheight, fullboth
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-;; Blinking cursor is distracting
-(blink-cursor-mode -1)
-
 ;; )
+
+(blink-cursor-mode -1) ;; Blinking cursor is distracting
 
 (toggle-frame-maximized) ; Maximize Emacs on startup
 
@@ -714,13 +710,7 @@ differences due to whitespaces."
 (use-package all-the-icons
   :ensure t)
 
-
 ;; Configure GNU Emacs modeline
-
-;; (defvar spaceline-anzu-p)
-;; (defvar spaceline-hud-p)
-;; (defvar spaceline-buffer-position-p)
-;; (defvar spaceline-projectile-root-p)
 
 (size-indication-mode -1)
 
@@ -865,12 +855,9 @@ differences due to whitespaces."
 ;;   (add-hook 'after-make-frame-functions 'sb/toggle-nyan-mode)
 ;;   (add-hook 'after-init-hook 'sb/toggle-nyan-mode))
 
-
 ;; Configure ibuffer
 
 (use-package ibuffer
-  ;; :commands ibuffer
-  ;; :bind ([remap list-buffers] . ibuffer)
   :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
   (setq ibuffer-expert t
@@ -918,7 +905,6 @@ differences due to whitespaces."
     (interactive)
     (goto-char (point-max)) ; Faster than (end-of-buffer)
     (dired-next-line -1))
-
   :bind (:map dired-mode-map
               ("M-<home>" . dired-go-home)
               ("i" . find-file)
@@ -963,7 +949,7 @@ differences due to whitespaces."
 (use-package dired-efap
   :ensure t
   :after dired
-  :config (setq dired-efap-initial-filename-selection nil)
+  :custom (dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
               ("r" . dired-efap )))
 
@@ -1269,6 +1255,7 @@ differences due to whitespaces."
 
 (use-package company-prescient
   :ensure t
+  :disabled t
   :after (company prescient)
   :hook (global-company-mode . company-prescient-mode))
 
@@ -1341,7 +1328,7 @@ differences due to whitespaces."
         ivy-wrap t ; Useful to be able to wrap around boundary items
         ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
-        ivy-height 20 ; This seems a good number to see several options at a time without cluttering the view
+        ivy-height 30 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
@@ -1822,19 +1809,19 @@ differences due to whitespaces."
   (avy-flycheck-setup))
 
 (or
- ;; (use-package flycheck-popup-tip ; Show error messages in popups
- ;;   :ensure t
- ;;   :disabled t
- ;;   :hook (flycheck-mode . flycheck-popup-tip-mode))
+ (use-package flycheck-popup-tip ; Show error messages in popups
+   :ensure t
+   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
  ;; (use-package flycheck-pos-tip
  ;;   :ensure t
  ;;   :disabled t
  ;;   :hook (flycheck-mode . flycheck-pos-tip-mode))
 
- (use-package flycheck-inline
-   :ensure t
-   :hook (flycheck-mode . flycheck-inline-mode)))
+ ;; (use-package flycheck-inline
+ ;;   :ensure t
+ ;;   :hook (flycheck-mode . flycheck-inline-mode))
+ )
 
 
 ;; Whitespace
@@ -1936,19 +1923,14 @@ differences due to whitespaces."
   :diminish fic-mode
   :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config
-  ;; FIXME: This is not working.
-  (add-to-list 'fic-highlighted-words '("XXX"
-                                        "LATER"
-                                        "IMP"
-                                        "NOTE"
-                                        "NOTES"
-                                        "TODOs"
-                                        ))
-  ;; (add-to-list 'fic-highlighted-words ')
-  ;; (add-to-list 'fic-highlighted-words ')
-  ;; (add-to-list 'fic-highlighted-words ')
   ;; (add-to-list 'fic-highlighted-words '"NOTES")
-  )
+  (dolist (terms '("XXX"
+                   "LATER"
+                   "IMP"
+                   "NOTE"
+                   "NOTES"
+                   "TODOs"))
+    (add-to-list 'fic-highlighted-words terms)))
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
@@ -1966,7 +1948,7 @@ differences due to whitespaces."
   :config
   (setq tramp-default-method "ssh" ; ssh is faster than the default scp
         tramp-default-user "swarnendu"
-        tramp-default-host "172.27.15.105"
+        ;; tramp-default-host "172.27.15.105"
         ;; Auto-save to a local directory for better performance
         tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save")
         tramp-persistency-file-name (concat dotemacs-temp-directory "tramp")
