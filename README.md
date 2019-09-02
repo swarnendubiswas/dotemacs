@@ -22,13 +22,15 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 A few third-party executables and libraries  to complement the setup. You can use the following instructions to install them on a Ubuntu >=18.04 distribution.
 
 ``` Bash
-sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck ripgrep the_silver_searcher
+sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck ripgrep composer
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
 sudo gem install scss_lint mdl
+composer require jetbrains/phpstorm-stubs:dev-master
+composer require felixfbecker/language-server
 ```
 
 ## Directory structure
@@ -50,6 +52,8 @@ The following are customization options defined in `modules/config-init.el` that
 * `dotemacs-cc-tags` - Choose whether to use Gtags or RTags for C/C++ programming.
 
 ## Browsing Source
+
+The `lsp` mode in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode. 
 
 * GTags
 

@@ -54,7 +54,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'leuven
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -1325,10 +1325,10 @@ differences due to whitespaces."
   ;;         (time-less-p y-mtime x-mtime)))))
   :config
   (setq ivy-virtual-abbreviate 'abbreviate
-        ivy-wrap t ; Useful to be able to wrap around boundary items
-        ivy-action-wrap t
+        ;; ivy-wrap t ; Useful to be able to wrap around boundary items
+        ;; ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
-        ivy-height 30 ; This seems a good number to see several options at a time without cluttering the view
+        ;; ivy-height 30 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
@@ -1607,7 +1607,7 @@ differences due to whitespaces."
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :init
   (add-hook 'python-mode-hook #'highlight-indentation-mode)
-  (add-hook 'python-mode-hook #'highlight-indentation-current-column-mode)
+  ;; (add-hook 'python-mode-hook #'highlight-indentation-current-column-mode)
   :config
   (set-face-background 'highlight-indentation-face "WhiteSmoke")
   (set-face-background 'highlight-indentation-current-column-face "wheat"))
@@ -1675,6 +1675,7 @@ differences due to whitespaces."
 
 (use-package projectile
   :ensure t
+  :ensure ggtags
   :init
   (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
         projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
@@ -1697,6 +1698,7 @@ differences due to whitespaces."
                                          "/home/swarnendu/plass-workspace"
                                          "/home/swarnendu/iss-workspace"
                                          "/home/swarnendu/iitk-workspace"
+                                         "/home/swarnendu/iitkgp-workspace"
                                          "/home/swarnendu/prospar-workspace"))
 
   (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
@@ -1919,7 +1921,7 @@ differences due to whitespaces."
 
 (use-package fic-mode ; Highlight certain words
   :ensure t
-  :commands fic-mode
+  ;; :commands fic-mode
   :diminish fic-mode
   :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config
@@ -2052,6 +2054,7 @@ differences due to whitespaces."
 
 (use-package counsel-etags
   :ensure t
+  :disabled t
   :bind(("M-." . counsel-etags-find-tag-at-point)
         ;; ("M-t" . counsel-etags-grep-symbol-at-point)
         ;; ("M-s" . counsel-etags-find-tag)
@@ -2070,6 +2073,7 @@ differences due to whitespaces."
 
 (use-package dashboard
   :ensure t
+  :disabled t
   :hook (after-init . dashboard-setup-startup-hook)
   :config
   (use-package page-break-lines
@@ -2108,7 +2112,7 @@ differences due to whitespaces."
 
 (use-package duplicate-thing
   :ensure t
-  :bind ("C-c C-d" . duplicate-thing))
+  :bind* ("C-c C-d" . duplicate-thing))
 
 (use-package discover-my-major ; Discover key bindings and their meaning for the current Emacs major mode
   :ensure t
@@ -2271,8 +2275,8 @@ differences due to whitespaces."
 (use-package persistent-scratch
   :ensure t
   :hook (after-init . persistent-scratch-setup-default)
-  :config
-  (setq persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
+  :custom (persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
+  ;; :config
   ;; ;; Enable both autosave and restore on startup
   ;; (ignore-errors (persistent-scratch-setup-default))
   )
@@ -2338,7 +2342,7 @@ differences due to whitespaces."
         avy-style 'at))
 
 (use-package bookmark
-  :config (setq bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
+  :custom (bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
 
 (use-package bm
   :ensure t
@@ -2474,12 +2478,10 @@ differences due to whitespaces."
   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
             #'TeX-revert-document-buffer)
 
-  ;; to use pdfview with auctex
-  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
-
-  ;; to use pdfview with auctex
-  (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
-  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
+  ;; ;; to use pdfview with auctex
+  ;; (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+  ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
+  ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
 
   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; ;; Unset "C-c ;" since we want to bind it to 'comment-line
@@ -2602,17 +2604,23 @@ differences due to whitespaces."
 (use-package ivy-bibtex
   :ensure t
   :bind ("C-c l x" . ivy-bibtex)
-  :config
+  :init
   (use-package bibtex-completion
-    :config
-    (setq bibtex-completion-cite-prompt-for-optional-arguments nil
-          bibtex-completion-cite-default-as-initial-input t
-          bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
-  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+    :custom
+    ((bibtex-completion-cite-prompt-for-optional-arguments nil)
+     (bibtex-completion-cite-default-as-initial-input t)
+     (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}")))))
+  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-bibtex
   :ensure t
   :config (add-to-list 'company-backends 'company-bibtex))
+
+(use-package company-reftex
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-reftex-labels)
+  (add-to-list 'company-backends 'company-reftex-citations))
 
 ;; (use-package pdf-tools
 ;;   :ensure t
@@ -2714,7 +2722,7 @@ differences due to whitespaces."
 ;;   ;; (global-semantic-idle-completions-mode 1)
 ;;   (global-semantic-highlight-func-mode 1))
 
-(global-prettify-symbols-mode 1)
+(global-prettify-symbols-mode)
 
 ;; (use-package prog-mode
 ;;   :config
@@ -3342,8 +3350,9 @@ differences due to whitespaces."
 
 (use-package lsp-mode
   :ensure t
-  :commands (lsp lsp-deferred)
-  :hook ((java-mode c-mode c++-mode python-mode) . lsp-deferred)
+  :commands (lsp lsp-deferred lsp-format-buffer)
+  :hook (((java-mode c-mode c++-mode python-mode) . lsp-deferred)
+         (before-save . lsp-format-buffer))
   :config
   (require 'lsp-clients)
   (setq lsp-auto-guess-root t
@@ -3352,6 +3361,7 @@ differences due to whitespaces."
         lsp-prefer-flymake nil
         lsp-enable-completion-at-point t
         lsp-enable-xref t
+        lsp-enable-snippet t
         lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1")
         lsp-enable-indentation t
         lsp-enable-on-type-formatting t
@@ -3361,7 +3371,19 @@ differences due to whitespaces."
         lsp-pyls-plugins-pydocstyle-convention "pep257"
         lsp-pyls-plugins-pycodestyle-enabled nil
         lsp-pyls-plugins-pycodestyle-max-line-length 100
-        lsp-pyls-plugins-pyflakes-enabled nil))
+        lsp-pyls-plugins-pyflakes-enabled nil
+        lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error")
+        lsp-xml-server-command (quote ("java" "-jar" "/home/swarnendu/.emacs.d/org.eclipse.lsp4xml-uber.jar")))
+  :bind (("M-." . lsp-find-definition)
+         ("C-c l i" . lsp-goto-implementation)
+         ("C-c l t" . lsp-goto-type-definition)
+         ("C-c l r" . lsp-rename)
+         ("C-c l h" . lsp-symbol-highlight)
+         ("C-c l f" . lsp-format-buffer)
+         ("C-c l r" . lsp-find-references)
+         ("C-c l R" . lsp-find-definition)
+         )
+  )
 
 (use-package lsp-ui
   :ensure t
@@ -3369,38 +3391,42 @@ differences due to whitespaces."
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-flycheck-enable t)
-  (lsp-ui-sideline-enable t)
+  (lsp-ui-flycheck-list-position 'right)
+  (lsp-ui-flycheck-live-reporting t)
   (lsp-ui-imenu-enable t)
   (lsp-ui-doc-enable t)
+  (lsp-ui-doc-header t)
   (lsp-ui-doc-use-childframe t)
   (lsp-ui-doc-position 'top)
   (lsp-ui-doc-include-signature t)
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-flycheck-enable t)
-  (lsp-ui-flycheck-list-position 'right)
-  (lsp-ui-flycheck-live-reporting t)
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-symbol t)
   (lsp-ui-peek-enable t)
   (lsp-ui-peek-list-width 60)
   (lsp-ui-peek-peek-height 25))
-(add-hook 'python-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook
-                      (lambda ()
-                        (lsp-format-buffer)) nil t)))
-;; FIXME: Why is this not working?
-(add-hook 'c++-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook
-                      (lambda ()
-                        (lsp-format-buffer)) nil t)))
+
+;; (add-hook 'python-mode-hook
+;;           (lambda ()
+;;             (add-hook 'before-save-hook
+;;                       (lambda ()
+;;                         (lsp-format-buffer)) nil t)))
+;; ;; FIXME: Why is this not working?
+;; (add-hook 'c++-mode-hook
+;;           (lambda ()
+;;             (add-hook 'before-save-hook
+;;                       (lambda ()
+;;                         (lsp-format-buffer)) nil t)))
 
 (use-package company-lsp
   :ensure t
-  ;; :commands company-lsp
+  :commands company-lsp
   :config
   (push 'company-lsp company-backends)
   (setq company-lsp-enable-snippet t
         company-lsp-async t
+        company-lsp-filter-candidates t
         company-lsp-enable-recompletion t
         company-lsp-cache-candidates 'auto))
 
@@ -3421,9 +3447,6 @@ differences due to whitespaces."
 (use-package dap-java
   :after lsp-java)
 
-(use-package lsp-java-treemacs
-  :after treemacs)
-
 (use-package lsp-clangd
   :ensure t
   :after lsp
@@ -3437,6 +3460,8 @@ differences due to whitespaces."
   :after (lsp treemacs)
   :commands lsp-treemacs-errors-list)
 
+(use-package lsp-java-treemacs
+  :after treemacs)
 
 ;; ORG mode
 
