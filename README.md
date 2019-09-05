@@ -53,7 +53,7 @@ The following are customization options defined in `modules/config-init.el` that
 
 ## Browsing Source
 
-The `lsp` mode in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode. 
+The `lsp` mode in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode.
 
 * GTags
 
@@ -77,18 +77,12 @@ You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recurs
 
 Emacs will, by default, expect a tag file by the name "TAGS" in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature:
 
-       M-x visit-tags-table <RET> FILE <RET>
-              Select the tag file, "FILE", to use.
+* `M-x visit-tags-table <RET> FILE <RET>` - Select the tag file `FILE` to use.
+* `M-. [TAG] <RET>` - Find the first definition of `TAG`. The default tag is the identifier under the cursor.
+* `M-*` - Pop back to where you previously invoked `M-.`.
+* `C-u M-.` - Find the next definition for the last tag.
 
-       M-. [TAG] <RET>
-              Find the first definition of TAG. The default tag is the identifier under the cursor.
-
-       M-*    Pop back to where you previously invoked "M-.".
-
-       C-u M-.
-              Find the next definition for the last tag.
-
-       For more commands, see the Tags topic in the Emacs info document.
+For more commands, see the Tags topic in the Emacs info document.
 
 ``` Bash
 find -name "*.c" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print -or -name "*.py" -print | xargs ctags -ea --list-extras
