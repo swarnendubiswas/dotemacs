@@ -54,7 +54,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'leuven
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -214,7 +214,7 @@ differences due to whitespaces."
       ;; line-number-display-limit 2000000
       ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
       x-underline-at-descent-line t ; Draw underline lower
-      gc-cons-threshold (* 10 1024 1024) ; Increase gc threshold
+      gc-cons-threshold (* 100 1024 1024) ; Increase gc threshold
       use-dialog-box nil
       use-file-dialog nil
       delete-by-moving-to-trash t
@@ -887,6 +887,10 @@ differences due to whitespaces."
   ;; :after ibuffer
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
+(use-package ibuffer-vc
+  :ensure t
+  :after ibuffer)
+
 
 ;; Configure dired
 
@@ -1190,7 +1194,7 @@ differences due to whitespaces."
         company-dabbrev-downcase nil ; Do not downcase the returned candidates
         company-dabbrev-ignore-case nil
         company-dabbrev-code-everywhere t ; Offer completions in comments and strings
-        company-dabbrev-other-buffers t ; Search other buffers with the same mode
+        ;; company-dabbrev-other-buffers t ; Search other buffers with the same mode
         company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes
         ;; company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
         ;;                     company-preview-frontend
@@ -1253,12 +1257,6 @@ differences due to whitespaces."
 ;; (bind-key "C-:" #'counsel-company company-active-map)
 ;; )
 
-(use-package company-prescient
-  :ensure t
-  :disabled t
-  :after (company prescient)
-  :hook (global-company-mode . company-prescient-mode))
-
 (use-package yasnippet
   :ensure t
   ;; :commands (yas-expand yas-minor-mode)
@@ -1277,6 +1275,8 @@ differences due to whitespaces."
 
 
 ;; Configure ivy as the generic completion framework
+
+(setq completion-in-region-function #'ivy-completion-in-region)
 
 ;; (use-package historian
 ;;   :ensure t
@@ -1477,18 +1477,30 @@ differences due to whitespaces."
 ;;         ivy-format-function #'ivy-format-function-line)
 ;;   (ivy-rich-mode 1))
 
-(use-package ivy-prescient
-  :ensure t
-  :disabled t
-  :after prescient
-  :hook (ivy-mode . ivy-prescient-mode))
-
 (use-package all-the-icons-ivy
   :ensure t
   :after (all-the-icons ivy)
   :init (all-the-icons-ivy-setup)
   (setq all-the-icons-ivy-file-commands
         '(counsel-find-file counsel-file-jump counsel-dired-jump counsel-recentf counsel-find-library counsel-projectile-find-file counsel-projectile-find-dir)))
+
+(use-package prescient
+  :ensure t
+  ;; :disabled t
+  :custom (prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
+  :hook (after-init . prescient-persist-mode))
+
+(use-package company-prescient
+  :ensure t
+  ;; :disabled t
+  :after (company prescient)
+  :hook (global-company-mode . company-prescient-mode))
+
+(use-package ivy-prescient
+  :ensure t
+  ;; :disabled t
+  :after prescient
+  :hook (ivy-mode . ivy-prescient-mode))
 
 
 ;; Configure automatic spell check
@@ -1610,7 +1622,8 @@ differences due to whitespaces."
   ;; (add-hook 'python-mode-hook #'highlight-indentation-current-column-mode)
   :config
   (set-face-background 'highlight-indentation-face "WhiteSmoke")
-  (set-face-background 'highlight-indentation-current-column-face "wheat"))
+  ;; (set-face-background 'highlight-indentation-current-column-face "wheat")
+  )
 
 
 ;; Configure highlighting of matching parentheses and braces
@@ -1630,6 +1643,7 @@ differences due to whitespaces."
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
+  :disabled t
   :hook (after-init . smartparens-global-mode)
   ;; (show-smartparens-global-mode 1)
   :config
@@ -1668,6 +1682,7 @@ differences due to whitespaces."
   :diminish smartparens-mode)
 
 (use-package elec-pair
+  :disabled t
   :hook (after-init . electric-pair-mode))
 
 
@@ -1778,21 +1793,22 @@ differences due to whitespaces."
 
 (use-package flycheck
   :ensure t
-  :hook (after-init . flycheck-mode)
+  :disabled t
+  :hook (after-init . global-flycheck-mode)
   :config
   (setq flycheck-emacs-lisp-load-path 'inherit
-        flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        flycheck-display-errors-delay 0.5
+        ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         flycheck-highlighting-mode 'lines ; Faster than the default
-        flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch)
+        flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch mode-enabled)
+        flycheck-idle-change-delay 5
         flycheck-pylintrc "/home/swarnendu/.config/pylintrc")
+  (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
   (setq-local flycheck-python-pylint-executable "python3")
-  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
-
+  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc)
+                flycheck-markdown-markdownlint-cli-config "/home/swarnendu/.config/.markdownlint.json")
   (add-hook 'python-mode-hook
             (lambda ()
               (setq flycheck-checker 'python-pylint)))
-
   (add-hook 'c++-mode-hook
             (lambda ()
               (setq flycheck-clang-language-standard "c++11")
@@ -1936,6 +1952,7 @@ differences due to whitespaces."
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
+  :disabled t
   :hook (after-init . beacon-mode)
   :diminish beacon-mode)
 
@@ -1981,11 +1998,11 @@ differences due to whitespaces."
   :config
   (add-hook 'counsel-tramp-pre-command-hook
             (lambda ()
-              (global-aggressive-indent-mode 0)
-              (projectile-mode 0)))
+              (global-aggressive-indent-mode -1)
+              (projectile-mode -1)))
   (add-hook 'counsel-tramp-quit-hook
             (lambda ()
-              (global-aggressive-indent-mode 1)
+              (global-aggressive-indent-mode)
               (projectile-mode 1))))
 
 
@@ -2310,12 +2327,6 @@ differences due to whitespaces."
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
-
-(use-package prescient
-  :ensure t
-  :disabled t
-  :custom (prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
-  :hook (after-init . prescient-persist-mode))
 
 (use-package ace-window
   :ensure t
@@ -2828,10 +2839,11 @@ differences due to whitespaces."
   :hook (prog-mode . electric-layout-mode))
 
 (use-package eldoc
+  :disabled t
   :after prog-mode
   :if (eq system-type 'gnu/linux)
   ;; :disabled t
-  :hook ((emacs-lisp-mode lisp-interaction-mode ielm-mode python-mode) . eldoc-mode)
+  :hook ((emacs-lisp-mode lisp-interaction-mode python-mode) . eldoc-mode)
   :diminish eldoc-mode)
 
 ;; (use-package eldoc-overlay
@@ -2905,6 +2917,7 @@ differences due to whitespaces."
 
 (use-package c-eldoc
   :ensure t
+  :disabled t
   :after (eldoc cc-mode)
   :if (eq system-type 'gnu/linux)
   :init
@@ -3224,6 +3237,7 @@ differences due to whitespaces."
 
 (use-package shfmt
   :ensure nil
+  :ensure reformatter
   :load-path "extras/shfmt"
   :ensure-system-package shfmt
   :custom (shfmt-arguments "-i 4 -p -ci")
@@ -3231,6 +3245,7 @@ differences due to whitespaces."
 
 (use-package flycheck-shfmt
   :ensure nil
+  :ensure reformatter
   :after flycheck
   :load-path "extras/shfmt"
   :config (flycheck-shfmt-setup))
@@ -3351,7 +3366,7 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((java-mode c-mode c++-mode python-mode) . lsp-deferred)
+  :hook (((java-mode c-mode c++-mode python-mode html-mode javascript-mode) . lsp-deferred)
          (before-save . lsp-format-buffer))
   :config
   (require 'lsp-clients)
@@ -3365,7 +3380,8 @@ differences due to whitespaces."
         lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1")
         lsp-enable-indentation t
         lsp-enable-on-type-formatting t
-        lsp-pyls-configuration-sources ["pylint"]
+        lsp-imenu-sort-methods '(position)
+        lsp-pyls-configuration-sources ["pylint" "pydocstyle" "yapf"]
         lsp-pyls-plugins-pydocstyle-enabled t
         lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"]
         lsp-pyls-plugins-pydocstyle-convention "pep257"
@@ -3390,22 +3406,26 @@ differences due to whitespaces."
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
   :custom
-  (lsp-ui-flycheck-enable t)
+  (lsp-ui-flycheck-enable nil)
   (lsp-ui-flycheck-list-position 'right)
-  (lsp-ui-flycheck-live-reporting t)
+  (lsp-ui-flycheck-live-reporting nil)
   (lsp-ui-imenu-enable t)
-  (lsp-ui-doc-enable t)
-  (lsp-ui-doc-header t)
-  (lsp-ui-doc-use-childframe t)
-  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-header nil)
+  (lsp-ui-doc-use-childframe nil)
+  (lsp-ui-doc-position 'at-point)
   (lsp-ui-doc-include-signature t)
-  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-enable nil)
   (lsp-ui-sideline-show-hover t)
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-symbol t)
   (lsp-ui-peek-enable t)
   (lsp-ui-peek-list-width 60)
-  (lsp-ui-peek-peek-height 25))
+  (lsp-ui-peek-peek-height 25)
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  )
 
 ;; (add-hook 'python-mode-hook
 ;;           (lambda ()
@@ -3439,6 +3459,7 @@ differences due to whitespaces."
 
 (use-package dap-mode
   :ensure t
+  :disabled t
   :after lsp-mode
   :config
   (dap-mode t)
