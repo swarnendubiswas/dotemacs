@@ -2291,6 +2291,7 @@ differences due to whitespaces."
 
 (use-package persistent-scratch
   :ensure t
+  :disabled t
   :hook (after-init . persistent-scratch-setup-default)
   :custom (persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
   ;; :config
