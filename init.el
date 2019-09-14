@@ -196,6 +196,7 @@ differences due to whitespaces."
 
 (use-package exec-path-from-shell
   :ensure t
+  :disabled t
   :custom (exec-path-from-shell-check-startup-files nil)
   :config
   (when (memq window-system '(x))
@@ -210,10 +211,10 @@ differences due to whitespaces."
       initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
       initial-scratch-message nil
       create-lockfiles nil
-      message-log-max 500
+      ;; message-log-max 500
       ;; line-number-display-limit 2000000
       ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
-      x-underline-at-descent-line t ; Draw underline lower
+      ;; x-underline-at-descent-line t ; Draw underline lower
       gc-cons-threshold (* 100 1024 1024) ; Increase gc threshold
       use-dialog-box nil
       use-file-dialog nil
@@ -222,20 +223,22 @@ differences due to whitespaces."
       scroll-conservatively 1000 ; Never recenter the screen while scrolling
       scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
       scroll-preserve-screen-position t
-      completion-ignore-case t ; Ignore case when completing
+      ;; completion-ignore-case t ; Ignore case when completing
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
       x-stretch-cursor t ; Make cursor the width of the character it is under i.e. full width of a TAB
       ;; auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save")
-      auto-save-list-file-prefix nil
+      ;; auto-save-list-file-prefix nil
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       require-final-newline t ; Always end a file with a newline.
       make-backup-files nil ; Stop making backup ~ files
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
-      auto-save-default t
-      confirm-kill-emacs nil
+      auto-save-timeout 180 ; Seconds
+      auto-save-interval 600
+      ;; auto-save-default t
       ;; idle-update-delay 2
+      confirm-kill-emacs nil
       ;; We need to paste something from another program, but sometimes we do real paste after some
       ;; kill action, that will erase the clipboard, so we need to save it to kill ring. Paste it
       ;; using "C-y M-y".
@@ -1342,16 +1345,16 @@ differences due to whitespaces."
         ivy-use-ignore-default 'always ; Always ignore buffers set in ivy-ignore-buffers
         ivy-use-selectable-prompt nil
         ivy-auto-select-single-candidate t)
-  (dolist (buffer '("^\\*Backtrace\\*$"
-                    "^\\*Compile-Log\\*$"
-                    "^\\*.+Completions\\*$"
-                    "^\\*Help\\*$"
-                    "^\\*Ibuffer\\*$"
-                    "company-statistics-cache.el"
-                    "^\\*lsp-log\\*$"
-                    "^\\*pyls\\*$"
-                    "^\\*pyls::stderr\\*$"))
-    (add-to-list 'ivy-ignore-buffers buffer))
+  ;; (dolist (buffer '("^\\*Backtrace\\*$"
+  ;;                   "^\\*Compile-Log\\*$"
+  ;;                   "^\\*.+Completions\\*$"
+  ;;                   "^\\*Help\\*$"
+  ;;                   "^\\*Ibuffer\\*$"
+  ;;                   "company-statistics-cache.el"
+  ;;                   "^\\*lsp-log\\*$"
+  ;;                   "^\\*pyls\\*$"
+  ;;                   "^\\*pyls::stderr\\*$"))
+  ;;   (add-to-list 'ivy-ignore-buffers buffer))
 
   (setq ivy-sort-matches-functions-alist
         '((t)
@@ -1793,7 +1796,6 @@ differences due to whitespaces."
 
 (use-package flycheck
   :ensure t
-  :disabled t
   :hook (after-init . global-flycheck-mode)
   :config
   (setq flycheck-emacs-lisp-load-path 'inherit
@@ -2716,7 +2718,7 @@ differences due to whitespaces."
 ;; (add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
 ;; (add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
 
-(require 'smartparens-latex)
+;; (require 'smartparens-latex)
 
 
 ;; PROG mode
@@ -3361,6 +3363,16 @@ differences due to whitespaces."
 ;;         svn-status-display-full-path t
 ;;         svn-status-auto-revert-buffers t))
 
+;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
+(defun sb/enable-smerge-maybe ()
+  (when (and buffer-file-name (vc-backend buffer-file-name))
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^<<<<<<< " nil t)
+        (smerge-mode +1)))))
+
+(add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
+
 
 ;; LSP implementation for GNU Emacs
 
@@ -3391,6 +3403,17 @@ differences due to whitespaces."
         lsp-pyls-plugins-pyflakes-enabled nil
         lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error")
         lsp-xml-server-command (quote ("java" "-jar" "/home/swarnendu/.emacs.d/org.eclipse.lsp4xml-uber.jar")))
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
+                    :major-modes '(python-mode)
+                    :remote? t
+                    :server-id 'pyls))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
+                    :major-modes '(c++-mode)
+                    :remote? t
+                    :server-id 'clangd))
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -3398,9 +3421,7 @@ differences due to whitespaces."
          ("C-c l h" . lsp-symbol-highlight)
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)
-         ("C-c l R" . lsp-find-definition)
-         )
-  )
+         ("C-c l R" . lsp-find-definition)))
 
 (use-package lsp-ui
   :ensure t
@@ -3425,8 +3446,7 @@ differences due to whitespaces."
   (lsp-ui-peek-peek-height 25)
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  )
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
 ;; (add-hook 'python-mode-hook
 ;;           (lambda ()
