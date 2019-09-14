@@ -113,7 +113,7 @@ differences due to whitespaces."
 
 ;; FIXME: Use this as a conditional
 (defcustom dotemacs-tags
-  'gtags
+  'none
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "gtags" gtags)
@@ -510,6 +510,7 @@ differences due to whitespaces."
 ;; https://www.emacswiki.org/emacs/TabBarMode
 (use-package tabbar
   :ensure t
+  :disabled t
   :preface
   (defun sb/tabbar-modification-state-change ()
     (tabbar-set-template tabbar-current-tabset nil)
@@ -1685,7 +1686,6 @@ differences due to whitespaces."
   :diminish smartparens-mode)
 
 (use-package elec-pair
-  :disabled t
   :hook (after-init . electric-pair-mode))
 
 
@@ -2477,8 +2477,7 @@ differences due to whitespaces."
             (lambda ()
               (TeX-source-correlate-mode)
               (LaTeX-math-mode)
-              ;; prettify-symbol-mode is distracting while editing, and is buffer-local.
-              (global-prettify-symbols-mode -1)
+              ;; prettify-symbol-mode is distracting while editing, and is buffer-local
               (prettify-symbols-mode -1)))
 
   ;; (add-to-list 'TeX-command-list
@@ -2520,7 +2519,7 @@ differences due to whitespaces."
 
 (use-package company-auctex
   :ensure t
-  ;; :after (company auctex)
+  :after (company auctex)
   :config (company-auctex-init))
 
 (use-package company-math
@@ -2748,79 +2747,79 @@ differences due to whitespaces."
   :mode (("\\Makefile\\'" . makefile-mode)
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-(use-package web-mode ; http://web-mode.org/
-  :ensure t
-  :mode
-  (("\\.html?\\'" . web-mode)
-   ("\\.djhtml\\'" . web-mode)
-   ("\\.phtml\\'" . web-mode)
-   ("\\.hb\\.html\\'" . web-mode)
-   ("\\.tpl\\.php\\'" . web-mode)
-   ("\\.[agj]sp\\'" . web-mode)
-   ("\\.as[cp]x\\'" . web-mode)
-   ("\\.erb\\'" . web-mode))
-  :config
-  (setq web-mode-markup-indent-offset 4
-        web-mode-css-indent-offset 4
-        web-mode-code-indent-offset 4
-        web-mode-indent-style 4
-        web-mode-enable-auto-pairing t
-        web-mode-enable-auto-closing t
-        web-mode-enable-auto-quoting t
-        web-mode-enable-css-colorization t
-        web-mode-enable-block-face t
-        web-mode-enable-current-element-highlight t
-        web-mode-enable-current-column-highlight t))
+;; (use-package web-mode ; http://web-mode.org/
+;;   :ensure t
+;;   :mode
+;;   (("\\.html?\\'" . web-mode)
+;;    ("\\.djhtml\\'" . web-mode)
+;;    ("\\.phtml\\'" . web-mode)
+;;    ("\\.hb\\.html\\'" . web-mode)
+;;    ("\\.tpl\\.php\\'" . web-mode)
+;;    ("\\.[agj]sp\\'" . web-mode)
+;;    ("\\.as[cp]x\\'" . web-mode)
+;;    ("\\.erb\\'" . web-mode))
+;;   :config
+;;   (setq web-mode-markup-indent-offset 4
+;;         web-mode-css-indent-offset 4
+;;         web-mode-code-indent-offset 4
+;;         web-mode-indent-style 4
+;;         web-mode-enable-auto-pairing t
+;;         web-mode-enable-auto-closing t
+;;         web-mode-enable-auto-quoting t
+;;         web-mode-enable-css-colorization t
+;;         web-mode-enable-block-face t
+;;         web-mode-enable-current-element-highlight t
+;;         web-mode-enable-current-column-highlight t))
 
-(use-package ac-html-angular ; Required by ac-html and company-web
-  :ensure t
-  :config (ac-html-angular+))
+;; (use-package ac-html-angular ; Required by ac-html and company-web
+;;   :ensure t
+;;   :config (ac-html-angular+))
 
-(use-package company-web
-  :ensure t
-  :preface
-  (defun sb/company-web--setup ()
-    (setq-local company-backends
-                (append '(company-web-html)
-                        company-backends)))
-  :config (add-hook 'web-mode-hook #'sb/company-web--setup))
+;; (use-package company-web
+;;   :ensure t
+;;   :preface
+;;   (defun sb/company-web--setup ()
+;;     (setq-local company-backends
+;;                 (append '(company-web-html)
+;;                         company-backends)))
+;;   :config (add-hook 'web-mode-hook #'sb/company-web--setup))
 
-(use-package web-beautify
-  :ensure t
-  :init
-  (with-eval-after-load "js2-mode"
-    (add-hook 'js2-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
-  (with-eval-after-load "js"
-    (add-hook 'js-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
-  (with-eval-after-load "json-mode"
-    (add-hook 'json-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
-  (with-eval-after-load "web-mode"
-    (add-hook 'web-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook #'web-beautify-html-buffer t t))))
-  (with-eval-after-load "sgml-mode"
-    (add-hook 'html-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook #'web-beautify-html-buffer t t)))
-    (with-eval-after-load "css-mode"
-      (add-hook 'css-mode-hook
-                (lambda ()
-                  (add-hook 'before-save-hook #'web-beautify-css-buffer t t))))))
+;; (use-package web-beautify
+;;   :ensure t
+;;   :init
+;;   (with-eval-after-load "js2-mode"
+;;     (add-hook 'js2-mode-hook
+;;               (lambda ()
+;;                 (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
+;;   (with-eval-after-load "js"
+;;     (add-hook 'js-mode-hook
+;;               (lambda ()
+;;                 (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
+;;   (with-eval-after-load "json-mode"
+;;     (add-hook 'json-mode-hook
+;;               (lambda ()
+;;                 (add-hook 'before-save-hook #'web-beautify-js-buffer t t))))
+;;   (with-eval-after-load "web-mode"
+;;     (add-hook 'web-mode-hook
+;;               (lambda ()
+;;                 (add-hook 'before-save-hook #'web-beautify-html-buffer t t))))
+;;   (with-eval-after-load "sgml-mode"
+;;     (add-hook 'html-mode-hook
+;;               (lambda ()
+;;                 (add-hook 'before-save-hook #'web-beautify-html-buffer t t)))
+;;     (with-eval-after-load "css-mode"
+;;       (add-hook 'css-mode-hook
+;;                 (lambda ()
+;;                   (add-hook 'before-save-hook #'web-beautify-css-buffer t t))))))
 
-(use-package nxml-mode
-  :init (defalias 'xml-mode 'nxml-mode)
-  :config (setq nxml-slash-auto-complete-flag t
-                nxml-auto-insert-xml-declaration-flag t)
-  (add-hook 'nxml-mode-hook
-            (lambda ()
-              (add-to-list (make-local-variable 'company-backends)
-                           'company-nxml))))
+;; (use-package nxml-mode
+;;   :init (defalias 'xml-mode 'nxml-mode)
+;;   :config (setq nxml-slash-auto-complete-flag t
+;;                 nxml-auto-insert-xml-declaration-flag t)
+;;   (add-hook 'nxml-mode-hook
+;;             (lambda ()
+;;               (add-to-list (make-local-variable 'company-backends)
+;;                            'company-nxml))))
 
 ;; (use-package which-func ; Show the name of the function in the modeline
 ;;   :after prog-mode
@@ -3379,8 +3378,9 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((java-mode c-mode c++-mode python-mode html-mode javascript-mode) . lsp-deferred)
-         (before-save . lsp-format-buffer))
+  :hook (((java-mode c-mode c++-mode python-mode sh-mode html-mode javascript-mode) . lsp-deferred)
+         ;; (before-save . lsp-format-buffer)
+         )
   :config
   (require 'lsp-clients)
   (setq lsp-auto-guess-root t
@@ -3408,12 +3408,12 @@ differences due to whitespaces."
    (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
                     :major-modes '(python-mode)
                     :remote? t
-                    :server-id 'pyls))
+                    :server-id 'pyls-remote))
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
                     :major-modes '(c++-mode)
                     :remote? t
-                    :server-id 'clangd))
+                    :server-id 'clangd-remote))
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -3448,17 +3448,28 @@ differences due to whitespaces."
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
-;; (add-hook 'python-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda ()
-;;                         (lsp-format-buffer)) nil t)))
-;; ;; FIXME: Why is this not working?
-;; (add-hook 'c++-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda ()
-;;                         (lsp-format-buffer)) nil t)))
+(add-hook 'python-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
+
+(add-hook 'java-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda () (lsp-format-buffer))
+                      nil t)))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda () (lsp-format-buffer))
+                      nil t)))
+
 
 (use-package company-lsp
   :ensure t
@@ -3487,15 +3498,15 @@ differences due to whitespaces."
   (dap-ui-mode t))
 
 (use-package dap-java
-  :after lsp-java)
+  :after (dap lsp-java))
 
-(use-package lsp-clangd
-  :ensure t
-  :after lsp
-  :config
-  (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
-  (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
-  (setq lsp-clangd-executable "/usr/bin/clangd"))
+;; (use-package lsp-clangd
+;;   :ensure t
+;;   :after lsp
+;;   :config
+;;   (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
+;;   (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
+;;   (setq lsp-clangd-executable "/usr/bin/clangd"))
 
 (use-package lsp-treemacs
   :ensure t
