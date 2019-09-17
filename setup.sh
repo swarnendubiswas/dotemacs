@@ -20,6 +20,10 @@ ln -s $HOME/github/dotemacs .emacs.d
 # Install distribution packages
 sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm clang-format imagemagick
 
+# FIXME: Use LLVM/Clang 8 with Ubuntu 18.04
+# deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main
+# deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main
+
 # Install Python packages
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic --user
