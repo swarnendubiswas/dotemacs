@@ -6,7 +6,7 @@
 -/.projectile
 -/.gitignore
 -*.zip
--*.jar
+-/*.jar
 -*.pdf
 -/reference-cards
 -/snippets

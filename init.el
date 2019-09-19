@@ -678,7 +678,7 @@ differences due to whitespaces."
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 130)
+                    :height 140)
 
 ;; FIXME: This is not working.
 (use-package minimap
@@ -1488,23 +1488,23 @@ differences due to whitespaces."
   (setq all-the-icons-ivy-file-commands
         '(counsel-find-file counsel-file-jump counsel-dired-jump counsel-recentf counsel-find-library counsel-projectile-find-file counsel-projectile-find-dir)))
 
-(use-package prescient
-  :ensure t
-  ;; :disabled t
-  :custom (prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
-  :hook (after-init . prescient-persist-mode))
+;; (use-package prescient
+;;   :ensure t
+;;   ;; :disabled t
+;;   :custom (prescient-save-file (concat dotemacs-temp-directory "prescient-save.el"))
+;;   :hook (after-init . prescient-persist-mode))
 
-(use-package company-prescient
-  :ensure t
-  ;; :disabled t
-  :after (company prescient)
-  :hook (global-company-mode . company-prescient-mode))
+;; (use-package company-prescient
+;;   :ensure t
+;;   ;; :disabled t
+;;   :after (company prescient)
+;;   :hook (global-company-mode . company-prescient-mode))
 
-(use-package ivy-prescient
-  :ensure t
-  ;; :disabled t
-  :after prescient
-  :hook (ivy-mode . ivy-prescient-mode))
+;; (use-package ivy-prescient
+;;   :ensure t
+;;   ;; :disabled t
+;;   :after prescient
+;;   :hook (ivy-mode . ivy-prescient-mode))
 
 
 ;; Configure automatic spell check
@@ -1621,9 +1621,10 @@ differences due to whitespaces."
 (use-package highlight-indentation
   :ensure t
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-  :init
-  (add-hook 'python-mode-hook #'highlight-indentation-mode)
-  ;; (add-hook 'python-mode-hook #'highlight-indentation-current-column-mode)
+  :hook (python-mode . highlight-indentation-mode)
+  ;; :init
+  ;; (add-hook 'python-mode-hook #'highlight-indentation-mode)
+  ;; ;; (add-hook 'python-mode-hook #'highlight-indentation-current-column-mode)
   :config
   (set-face-background 'highlight-indentation-face "WhiteSmoke")
   ;; (set-face-background 'highlight-indentation-current-column-face "wheat")
@@ -1696,7 +1697,8 @@ differences due to whitespaces."
   :ensure ggtags
   :init
   (setq projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld")
-        projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
+        projectile-cache-file (concat dotemacs-temp-directory "projectile.cache")
+        projectile-mode-line nil)
   :config
   (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   (setq projectile-enable-caching t
@@ -1705,6 +1707,8 @@ differences due to whitespaces."
         projectile-require-project-root t ; Use projectile only in desired directories, too much noise otherwise
         projectile-find-dir-includes-top-level t
         projectile-switch-project-action 'projectile-find-file ; Use projectile-dired to view in dired
+        ;; projectile-mode-line '(:eval (format " Projectile[%s]"
+        ;;                                      (projectile-project-name)))
         ;; projectile-mode-line nil
         projectile-completion-system 'ivy
         ;; The contents of .projectile are ignored when using the alien project indexing method
@@ -1803,9 +1807,12 @@ differences due to whitespaces."
         flycheck-highlighting-mode 'lines ; Faster than the default
         flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch mode-enabled)
         flycheck-idle-change-delay 5
-        flycheck-pylintrc "/home/swarnendu/.config/pylintrc")
+        flycheck-python-pylint-executable "python3"
+        flycheck-pylintrc "/home/swarnendu/.config/pylintrc"
+        flycheck-python-flake8-executable "python3"
+        flycheck-python-pycompile-executable "python3")
   (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
-  (setq-local flycheck-python-pylint-executable "python3")
+
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc)
                 flycheck-markdown-markdownlint-cli-config "/home/swarnendu/.config/.markdownlint.json")
   (add-hook 'python-mode-hook
@@ -1931,10 +1938,10 @@ differences due to whitespaces."
   :hook (prog-mode . highlight-symbol-mode)
   :bind (("M-p" . highlight-symbol-prev)
          ("M-n" . highlight-symbol-next))
-  :config
-  (setq highlight-symbol-idle-delay 0.5
-        highlight-symbol-on-navigation-p t
-        highlight-symbol-highlight-single-occurrence nil)
+  :custom
+  (highlight-symbol-idle-delay 1)
+  (highlight-symbol-on-navigation-p t)
+  (highlight-symbol-highlight-single-occurrence nil)
   :diminish highlight-symbol-mode)
 
 (use-package fic-mode ; Highlight certain words
@@ -2382,16 +2389,16 @@ differences due to whitespaces."
   :diminish writegood-mode
   :hook (text-mode . writegood-mode))
 
-(defun sb/company-text-backends ()
-  "Add backends for text completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((;; Generic backends
-           company-files
-           company-keywords
-           company-capf
-           company-dict
-           company-dabbrev))))
+;; (defun sb/company-text-backends ()
+;;   "Add backends for text completion in company mode."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((;; Generic backends
+;;            company-files
+;;            company-keywords
+;;            company-capf
+;;            company-dict
+;;            company-dabbrev))))
 ;; (add-hook 'text-mode-hook #'sb/company-text-backends)
 
 (use-package markdown-mode
@@ -2448,79 +2455,79 @@ differences due to whitespaces."
 
 ;; AUCTeX's LaTeX mode is called LaTeX-mode, while latex-mode is the Emacs default.
 
-;; (put 'TeX-narrow-to-group 'disabled nil)
-;; (put 'LaTeX-narrow-to-environment 'disabled nil)
+;; ;; (put 'TeX-narrow-to-group 'disabled nil)
+;; ;; (put 'LaTeX-narrow-to-environment 'disabled nil)
 
-(use-package tex-site ; Initialize auctex
-  :ensure auctex ; once installed, auctex overrides the tex package
-  :mode ("\\.tex\\'" . LaTeX-mode)
-  :config
-  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
-        TeX-parse-self t ; Parse documents
-        TeX-clean-confirm nil
-        TeX-quote-after-quote nil ; Allow original LaTeX quotes
-        TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
-        TeX-auto-untabify t ; Remove all tabs before saving
-        TeX-save-query nil
-        LaTeX-item-indent 0
-        LaTeX-syntactic-comments t)
+;; (use-package tex-site ; Initialize auctex
+;;   :ensure auctex ; once installed, auctex overrides the tex package
+;;   :mode ("\\.tex\\'" . LaTeX-mode)
+;;   :config
+;;   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
+;;         TeX-parse-self t ; Parse documents
+;;         TeX-clean-confirm nil
+;;         TeX-quote-after-quote nil ; Allow original LaTeX quotes
+;;         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+;;         TeX-auto-untabify t ; Remove all tabs before saving
+;;         TeX-save-query nil
+;;         LaTeX-item-indent 0
+;;         LaTeX-syntactic-comments t)
 
-  (setq-default TeX-master nil) ; Query for master file
+;;   (setq-default TeX-master nil) ; Query for master file
 
-  ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
-  ;; (setq TeX-source-correlate-method 'synctex
-  ;;       TeX-source-correlate-mode t
-  ;;       TeX-source-correlate-start-server 'ask)
-  ;; (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
+;;   ;; Provide forward "C-c C-v" (TeX-view) and inverse (C-Mouse-1, Ctrl + "Left Click") search with SyncTeX
+;;   ;; (setq TeX-source-correlate-method 'synctex
+;;   ;;       TeX-source-correlate-mode t
+;;   ;;       TeX-source-correlate-start-server 'ask)
+;;   ;; (setq TeX-view-program-list '(("Evince" "evince --page-index=%(outpage) %o")))
 
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (TeX-source-correlate-mode)
-              (LaTeX-math-mode)
-              ;; prettify-symbol-mode is distracting while editing, and is buffer-local
-              (prettify-symbols-mode -1)))
+;;   (add-hook 'LaTeX-mode-hook
+;;             (lambda ()
+;;               (TeX-source-correlate-mode)
+;;               (LaTeX-math-mode)
+;;               ;; prettify-symbol-mode is distracting while editing, and is buffer-local
+;;               (prettify-symbols-mode -1)))
 
-  ;; (add-to-list 'TeX-command-list
-  ;;              '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
-  ;;                (plain-tex-mode tex-mode TeX-mode LaTeX-mode TeX-latex-mode docTeX-mode)
-  ;;                :help "Run PDFLaTeX"))
-  ;; (add-to-list 'TeX-command-list
-  ;;              '("View" "%V" TeX-run-discard nil t))
+;;   ;; (add-to-list 'TeX-command-list
+;;   ;;              '("PDFLaTeX" "%'pdflatex%(mode)%' %t" TeX-run-TeX nil t
+;;   ;;                (plain-tex-mode tex-mode TeX-mode LaTeX-mode TeX-latex-mode docTeX-mode)
+;;   ;;                :help "Run PDFLaTeX"))
+;;   ;; (add-to-list 'TeX-command-list
+;;   ;;              '("View" "%V" TeX-run-discard nil t))
 
-  ;; Update PDF buffers after successful LaTeX runs
-  (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-            #'TeX-revert-document-buffer)
+;;   ;; Update PDF buffers after successful LaTeX runs
+;;   (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
+;;             #'TeX-revert-document-buffer)
 
-  ;; ;; to use pdfview with auctex
-  ;; (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
-  ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
-  ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
+;;   ;; ;; to use pdfview with auctex
+;;   ;; (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+;;   ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
+;;   ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
 
-  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
-  ;; ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  ;; (unbind-key "C-c ;" LaTeX-mode-map)
+;;   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
+;;   ;; ;; Unset "C-c ;" since we want to bind it to 'comment-line
+;;   ;; (unbind-key "C-c ;" LaTeX-mode-map)
 
-  ;; :bind
-  ;; ;; Disable "LaTeX-insert-item" in favor of imenu
-  ;; ("C-c C-j" . nil)
+;;   ;; :bind
+;;   ;; ;; Disable "LaTeX-insert-item" in favor of imenu
+;;   ;; ("C-c C-j" . nil)
 
-  )
+;;   )
 
-(setq font-latex-fontify-script nil)
+;; (setq font-latex-fontify-script nil)
 
-(use-package auctex-latexmk
-  :ensure t
-  :config
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-  (auctex-latexmk-setup)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              (setq TeX-command-default "LaTeXMk"))))
+;; (use-package auctex-latexmk
+;;   :ensure t
+;;   :config
+;;   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+;;   (auctex-latexmk-setup)
+;;   (add-hook 'LaTeX-mode-hook
+;;             (lambda ()
+;;               (setq TeX-command-default "LaTeXMk"))))
 
-(use-package company-auctex
-  :ensure t
-  :after (company auctex)
-  :config (company-auctex-init))
+;; (use-package company-auctex
+;;   :ensure t
+;;   :after (company auctex)
+;;   :config (company-auctex-init))
 
 (use-package company-math
   :ensure t
@@ -2536,57 +2543,57 @@ differences due to whitespaces."
 ;;   :ensure t
 ;;   :hook (LaTeX-mode-hook . tex-smart-umlauts-mode))
 
-(use-package tex-mode
-  :diminish latex-electric-env-pair-mode
-  :init
-  (setq latex-run-command "latexmk")
-  (add-hook 'TeX-mode-hook
-            (lambda()
-              (latex-electric-env-pair-mode 1))))
+;; (use-package tex-mode
+;;   :diminish latex-electric-env-pair-mode
+;;   :init
+;;   (setq latex-run-command "latexmk")
+;;   (add-hook 'TeX-mode-hook
+;;             (lambda()
+;;               (latex-electric-env-pair-mode 1))))
 
-(use-package reftex
-  :diminish reftex-mode
-  ;; :commands (reftex-citation)
-  :hook (LaTeX-mode . reftex-mode)
-  :config
-  (setq reftex-plug-into-AUCTeX t
-        reftex-insert-label-flags '(t t)
-        reftex-cite-format 'abbrv
-        reftex-save-parse-info t
-        reftex-use-multiple-selection-buffers t
-        reftex-auto-update-selection-buffers t
-        reftex-enable-partial-scans t
-        reftex-allow-automatic-rescan t
-        reftex-idle-time 0.5
-        reftex-toc-follow-mode t
-        reftex-use-fonts t
-        reftex-cite-prompt-optional-args t ; Prompt for empty optional arguments in cite
-        reftex-highlight-selection 'both)
-  (use-package reftex-cite
-    :preface
-    ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-    (defun get-bibtex-keys (file)
-      (with-current-buffer (find-file-noselect file)
-        (mapcar 'car (bibtex-parse-keys))))
+;; (use-package reftex
+;;   :diminish reftex-mode
+;;   ;; :commands (reftex-citation)
+;;   :hook (LaTeX-mode . reftex-mode)
+;;   :config
+;;   (setq reftex-plug-into-AUCTeX t
+;;         reftex-insert-label-flags '(t t)
+;;         reftex-cite-format 'abbrv
+;;         reftex-save-parse-info t
+;;         reftex-use-multiple-selection-buffers t
+;;         reftex-auto-update-selection-buffers t
+;;         reftex-enable-partial-scans t
+;;         reftex-allow-automatic-rescan t
+;;         reftex-idle-time 0.5
+;;         reftex-toc-follow-mode t
+;;         reftex-use-fonts t
+;;         reftex-cite-prompt-optional-args t ; Prompt for empty optional arguments in cite
+;;         reftex-highlight-selection 'both)
+;;   (use-package reftex-cite
+;;     :preface
+;;     ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+;;     (defun get-bibtex-keys (file)
+;;       (with-current-buffer (find-file-noselect file)
+;;         (mapcar 'car (bibtex-parse-keys))))
 
-    (defun find-bibliography-file ()
-      "Try to find a bibliography file using RefTeX."
-      ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
-      (interactive)
-      (let ((bibfile-list nil))
-        (condition-case nil
-            (setq bibfile-list (reftex-get-bibfile-list))
-          (error (ignore-errors
-                   (setq bibfile-list (reftex-default-bibliography)))))
-        (if bibfile-list
-            (car bibfile-list) "")))
+;;     (defun find-bibliography-file ()
+;;       "Try to find a bibliography file using RefTeX."
+;;       ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
+;;       (interactive)
+;;       (let ((bibfile-list nil))
+;;         (condition-case nil
+;;             (setq bibfile-list (reftex-get-bibfile-list))
+;;           (error (ignore-errors
+;;                    (setq bibfile-list (reftex-default-bibliography)))))
+;;         (if bibfile-list
+;;             (car bibfile-list) "")))
 
-    (defun reftex-add-all-bibitems-from-bibtex ()
-      (interactive)
-      (mapc 'LaTeX-add-bibitems
-            (apply 'append
-                   (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
-    :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
+;;     (defun reftex-add-all-bibitems-from-bibtex ()
+;;       (interactive)
+;;       (mapc 'LaTeX-add-bibitems
+;;             (apply 'append
+;;                    (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+;;     :config (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex)))
 
 ;; (use-package parsebib
 ;;   :ensure t)
@@ -2841,11 +2848,9 @@ differences due to whitespaces."
   :hook (prog-mode . electric-layout-mode))
 
 (use-package eldoc
-  :disabled t
-  :after prog-mode
+  ;; :after prog-mode
   :if (eq system-type 'gnu/linux)
-  ;; :disabled t
-  :hook ((emacs-lisp-mode lisp-interaction-mode python-mode) . eldoc-mode)
+  ;; :hook ((emacs-lisp-mode lisp-interaction-mode python-mode) . eldoc-mode)
   :diminish eldoc-mode)
 
 ;; (use-package eldoc-overlay
@@ -2917,14 +2922,14 @@ differences due to whitespaces."
               ("C-c c e" . c-end-of-defun)
               ("M-q" . c-fill-paragraph)))
 
-(use-package c-eldoc
-  :ensure t
-  :disabled t
-  :after (eldoc cc-mode)
-  :if (eq system-type 'gnu/linux)
-  :init
-  (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
-  (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
+;; (use-package c-eldoc
+;;   :ensure t
+;;   :disabled t
+;;   :after (eldoc cc-mode)
+;;   :if (eq system-type 'gnu/linux)
+;;   :init
+;;   (add-hook 'c-mode-hook #'c-turn-on-eldoc-mode)
+;;   (add-hook 'c++-mode-hook #'c-turn-on-eldoc-mode))
 
 ;; (use-package function-args
 ;;   :ensure t
@@ -3177,7 +3182,7 @@ differences due to whitespaces."
 
 (add-hook 'java-mode-hook
           (lambda ()
-            (setq-default c-basic-offset 2
+            (setq-default c-basic-offset 4
                           c-set-style "java")))
 
 ;; (use-package ant
@@ -3252,20 +3257,20 @@ differences due to whitespaces."
   :load-path "extras/shfmt"
   :config (flycheck-shfmt-setup))
 
-(defun sb/company-sh-backends ()
-  "Add backends for C/C++ completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((;; Generic backends
-           company-files
-           company-keywords
-           company-capf
-           company-dabbrev
-           company-dabbrev-code
-           ;; Mode-specific
-           company-shell
-           company-fish-shell))))
-(add-hook 'sh-mode-hook 'sb/company-sh-backends)
+;; (defun sb/company-sh-backends ()
+;;   "Add backends for C/C++ completion in company mode."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((;; Generic backends
+;;            company-files
+;;            company-keywords
+;;            company-capf
+;;            company-dabbrev
+;;            company-dabbrev-code
+;;            ;; Mode-specific
+;;            company-shell
+;;            company-fish-shell))))
+;; (add-hook 'sh-mode-hook 'sb/company-sh-backends)
 
 
 ;; Shell mode
@@ -3378,7 +3383,7 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((java-mode c-mode c++-mode python-mode sh-mode html-mode javascript-mode) . lsp-deferred)
+  :hook (((c-mode c++-mode python-mode sh-mode html-mode javascript-mode LaTeX-mode) . lsp-deferred)
          ;; (before-save . lsp-format-buffer)
          )
   :config
@@ -3414,6 +3419,14 @@ differences due to whitespaces."
                     :major-modes '(c++-mode)
                     :remote? t
                     :server-id 'clangd-remote))
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "~/.luarocks/bin/digestif")
+                    :major-modes '(latex-mode plain-tex-mode)
+                    :server-id 'digestif))
+  (add-to-list 'lsp-language-id-configuration '(latex-mode . "latex"))
+  (add-to-list 'lsp-language-id-configuration '(plain-tex-mode . "plaintex"))
+
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -3458,7 +3471,6 @@ differences due to whitespaces."
             (add-hook 'before-save-hook
                       (lambda ()
                         (lsp-format-buffer)) nil t)))
-
 (add-hook 'java-mode-hook
           (lambda ()
             (add-hook 'before-save-hook
@@ -3480,12 +3492,15 @@ differences due to whitespaces."
         company-lsp-async t
         company-lsp-filter-candidates t
         company-lsp-enable-recompletion t
-        company-lsp-cache-candidates 'auto))
+        company-lsp-cache-candidates 'auto)
+  ;; FIXME: This is not working.
+  ;; (add-to-list 'company-lsp-filter-candidates '(digestif . nil))
+  )
 
 (use-package lsp-java
   :ensure t
-  :after lsp
-  :init
+  ;; :after lsp
+  :config
   (add-hook 'java-mode-hook 'lsp)
   (setq lsp-java-inhibit-message t))
 
