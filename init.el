@@ -20,7 +20,7 @@
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
-(setq debug-on-error nil
+(setq debug-on-error t
       user-full-name "Swarnendu Biswas")
 
 
@@ -111,15 +111,15 @@ differences due to whitespaces."
 ;;   :type 'boolean
 ;;   :group 'dotemacs)
 
-;; FIXME: Use this as a conditional
-(defcustom dotemacs-tags
-  'none
-  "Choose whether to use gtags or ctags."
-  :type '(radio
-          (const :tag "gtags" gtags)
-          (const :tag "ctags" ctags)
-          (const :tag "none" none))
-  :group 'dotemacs)
+;; ;; FIXME: Use this as a conditional. I now prefer LSP.
+;; (defcustom dotemacs-tags
+;;   'none
+;;   "Choose whether to use gtags or ctags."
+;;   :type '(radio
+;;           (const :tag "gtags" gtags)
+;;           (const :tag "ctags" ctags)
+;;           (const :tag "none" none))
+;;   :group 'dotemacs)
 
 
 ;; Setup the package system
@@ -136,10 +136,10 @@ differences due to whitespaces."
         package-enable-at-startup nil)
   (package-initialize)
 
-  ;; (add-to-list 'package-archives
-  ;;              '("org" . "http://orgmode.org/elpa/") t)
   (add-to-list 'package-archives
                '("melpa" . "https://melpa.org/packages/") t)
+  ;; (add-to-list 'package-archives
+  ;;              '("org" . "http://orgmode.org/elpa/") t)
   ;; (add-to-list 'package-archives
   ;;              '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
   )
@@ -177,13 +177,7 @@ differences due to whitespaces."
   :custom
   (paradox-github-token t)
   (paradox-execute-asynchronously t)
-  :config
-  ;; (use-package async
-  ;;   :ensure t)
-  ;; (setq paradox-execute-asynchronously t
-  ;;       paradox-spinner-type 'random)
-  ;; (defalias 'upgrade-packages 'paradox-upgrade-packages)
-  (paradox-enable))
+  :config (paradox-enable))
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
 (use-package cus-edit
@@ -1332,7 +1326,7 @@ differences due to whitespaces."
         ;; ivy-wrap t ; Useful to be able to wrap around boundary items
         ;; ivy-action-wrap t
         ivy-case-fold-search 'always ; Always ignore case while searching
-        ;; ivy-height 30 ; This seems a good number to see several options at a time without cluttering the view
+        ivy-height 20 ; This seems a good number to see several options at a time without cluttering the view
         ivy-fixed-height-minibuffer t ; It is distracting if the mini-buffer height keeps changing
         ivy-extra-directories nil ; Hide "." and ".."
         ivy-count-format "(%d/%d) " ; This is beneficial to identify wrap arounds
@@ -1947,6 +1941,8 @@ differences due to whitespaces."
 (use-package fic-mode ; Highlight certain words
   :ensure t
   ;; :commands fic-mode
+  ;; LATER: This is causing problems with html-mode. I am using hl-mode for now.
+  :disabled t
   :diminish fic-mode
   :hook ((text-mode prog-mode nxml-mode) . fic-mode)
   :config
@@ -1959,6 +1955,20 @@ differences due to whitespaces."
                    "TODOs"))
     (add-to-list 'fic-highlighted-words terms)))
 
+(use-package hl-todo
+  :ensure t
+  :config
+  (setq hl-todo-keyword-faces
+        '(("TODO" . hl-todo)
+          ("TODOs" . hl-todo)
+          ("NOTE" . hl-todo)
+          ("NOTES" . hl-todo)
+          ("XXX" . hl-todo)
+          ("LATER" . hl-todo)
+          ("IMP" . hl-todo)
+          ("FIXME" . hl-todo)))
+  (global-hl-todo-mode))
+
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
   :disabled t
@@ -1968,7 +1978,6 @@ differences due to whitespaces."
 
 ;; Tramp
 
-;; Hacks are from
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port. Open a
 ;; file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
@@ -2296,7 +2305,7 @@ differences due to whitespaces."
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
-  :bind ("C-." . iedit-mode))
+  :bind* ("C-." . iedit-mode))
 
 (use-package persistent-scratch
   :ensure t
@@ -3419,7 +3428,6 @@ differences due to whitespaces."
                     :major-modes '(c++-mode)
                     :remote? t
                     :server-id 'clangd-remote))
-
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-stdio-connection "~/.luarocks/bin/digestif")
                     :major-modes '(latex-mode plain-tex-mode)

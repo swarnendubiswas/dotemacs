@@ -27,15 +27,17 @@ sudo snap install shfmt
 sudo snap install universal-ctags
 sudo snap install ripgrep --classic
 sudo snap refresh
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.14.1 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache==1.2.1 --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.14.1 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache==1.2.1 --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.14.1 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache --user
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
 sudo npm update
 sudo gem install scss_lint
+sudo gem update
 composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
+composer update
 luarocks install --server=http://luarocks.org/dev digestif --local
 ```
 
