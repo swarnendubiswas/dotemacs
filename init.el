@@ -69,7 +69,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'spaceline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -104,22 +104,15 @@ differences due to whitespaces."
 ;;   :type 'boolean
 ;;   :group 'dotemacs)
 
-;; (defcustom dotemacs-use-ecb
-;;   nil
-;;   "Should the ECB package be activated?
-;; If yes, then we disable some other packages, like popwin and which-key."
-;;   :type 'boolean
-;;   :group 'dotemacs)
-
-;; ;; FIXME: Use this as a conditional. I now prefer LSP.
-;; (defcustom dotemacs-tags
-;;   'none
-;;   "Choose whether to use gtags or ctags."
-;;   :type '(radio
-;;           (const :tag "gtags" gtags)
-;;           (const :tag "ctags" ctags)
-;;           (const :tag "none" none))
-;;   :group 'dotemacs)
+;; FIXME: Use this as a conditional. I now prefer LSP.
+(defcustom dotemacs-tags
+  'none
+  "Choose whether to use gtags or ctags."
+  :type '(radio
+          (const :tag "gtags" gtags)
+          (const :tag "ctags" ctags)
+          (const :tag "none" none))
+  :group 'dotemacs)
 
 
 ;; Setup the package system
@@ -140,9 +133,9 @@ differences due to whitespaces."
                '("melpa" . "https://melpa.org/packages/") t)
   ;; (add-to-list 'package-archives
   ;;              '("org" . "http://orgmode.org/elpa/") t)
-  ;; (add-to-list 'package-archives
-  ;;              '("elpy" . "https://jorgenschaefer.github.io/packages/") t)
-  )
+  (unless (bound-and-true-p dotemacs-tags)
+    (add-to-list 'package-archives
+                 '("elpy" . "https://jorgenschaefer.github.io/packages/") t)))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -159,9 +152,6 @@ differences due to whitespaces."
 
 (use-package use-package-ensure-system-package
   :ensure t)
-
-;; ;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
-;; (defun package--save-selected-packages (&rest opt) nil)
 
 (use-package bind-key
   :ensure t
@@ -180,6 +170,10 @@ differences due to whitespaces."
   :config (paradox-enable))
 
 ;; www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
+;; https://www.reddit.com/r/emacs/comments/53zpv9/how_do_i_get_emacs_to_stop_adding_custom_fields/
+
+;; (defun package--save-selected-packages (&rest opt) nil)
+
 (use-package cus-edit
   :custom (custom-file dotemacs-emacs-custom-file)
   ;; :config
@@ -213,10 +207,10 @@ differences due to whitespaces."
       use-dialog-box nil
       use-file-dialog nil
       delete-by-moving-to-trash t
-      scroll-margin 0 ; Drag the point along while scrolling
-      scroll-conservatively 1000 ; Never recenter the screen while scrolling
-      scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
-      scroll-preserve-screen-position t
+      ;; scroll-margin 0 ; Drag the point along while scrolling
+      ;; scroll-conservatively 1000 ; Never recenter the screen while scrolling
+      ;; scroll-error-top-bottom t ; Move to begin/end of buffer before signalling an error
+      ;; scroll-preserve-screen-position t
       ;; completion-ignore-case t ; Ignore case when completing
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
@@ -254,7 +248,7 @@ differences due to whitespaces."
               truncate-partial-width-windows nil
               history-length 50
               history-delete-duplicates t ; Delete duplicate (identical and old) elements in the minibuffer history
-              ;; Disabling this is one way to speed up Emacs with buffers with long lines
+              ;; Disable this to speed up Emacs with buffers with long lines
               bidi-display-reordering nil)
 
 ;; Activate utf8 mode
@@ -383,20 +377,6 @@ differences due to whitespaces."
       (menu-bar-mode 1)
       (scroll-bar-mode -1)))
 
-;; (use-package tool-bar
-;;   :if (fboundp 'tool-bar-mode)
-;;   :config (tool-bar-mode -1))
-
-;; (use-package menu-bar
-;;   :if (fboundp 'menu-bar-mode)
-;;   :config (menu-bar-mode -1))
-
-;; (use-package scroll-bar
-;;   :if (fboundp 'scroll-bar-mode)
-;;   :config
-;;   ;; Maximize the space for displaying the buffer
-;;   (scroll-bar-mode -1))
-
 ;; (use-package frame
 ;;   :config
 ;; ;; Start with Emacs window maximized:
@@ -499,158 +479,158 @@ differences due to whitespaces."
                                                           :background "light sky blue"
                                                           :foreground "white"))))
 
-;; https://gist.github.com/3demax/1264635/91ccb6c423effd811dbdb1412b70c15e95fa700d
-;; https://emacs.stackexchange.com/questions/984/what-is-the-right-way-to-install-tab-bar
-;; https://www.emacswiki.org/emacs/TabBarMode
-(use-package tabbar
-  :ensure t
-  :disabled t
-  :preface
-  (defun sb/tabbar-modification-state-change ()
-    (tabbar-set-template tabbar-current-tabset nil)
-    (tabbar-display-update))
+;; ;; https://gist.github.com/3demax/1264635/91ccb6c423effd811dbdb1412b70c15e95fa700d
+;; ;; https://emacs.stackexchange.com/questions/984/what-is-the-right-way-to-install-tab-bar
+;; ;; https://www.emacswiki.org/emacs/TabBarMode
+;; (use-package tabbar
+;;   :ensure t
+;;   :disabled t
+;;   :preface
+;;   (defun sb/tabbar-modification-state-change ()
+;;     (tabbar-set-template tabbar-current-tabset nil)
+;;     (tabbar-display-update))
 
-  (defun sb/tabbar-on-buffer-modification ()
-    (set-buffer-modified-p t)
-    (sb/tabbar-modification-state-change))
+;;   (defun sb/tabbar-on-buffer-modification ()
+;;     (set-buffer-modified-p t)
+;;     (sb/tabbar-modification-state-change))
 
-  (defun sb/tabbar-on-buffer-revert ()
-    (set-buffer-modified-p nil)
-    (sb/tabbar-modification-state-change))
-  :hook (after-init . tabbar-mode)
-  :config
-  (setq tabbar-use-images nil ; Speed up by not using images
-        tabbar-auto-scroll-flag t
-        ;; tabbar-background-color nil
-        ;; tabbar-separator '(0.2)
-        )
+;;   (defun sb/tabbar-on-buffer-revert ()
+;;     (set-buffer-modified-p nil)
+;;     (sb/tabbar-modification-state-change))
+;;   :hook (after-init . tabbar-mode)
+;;   :config
+;;   (setq tabbar-use-images nil ; Speed up by not using images
+;;         tabbar-auto-scroll-flag t
+;;         ;; tabbar-background-color nil
+;;         ;; tabbar-separator '(0.2)
+;;         )
 
-  (add-hook 'after-save-hook #'sb/tabbar-modification-state-change)
-  (add-hook 'first-change-hook #'sb/tabbar-on-buffer-modification)
-  (add-hook 'after-revert-hook #'sb/tabbar-on-buffer-revert)
+;;   (add-hook 'after-save-hook #'sb/tabbar-modification-state-change)
+;;   (add-hook 'first-change-hook #'sb/tabbar-on-buffer-modification)
+;;   (add-hook 'after-revert-hook #'sb/tabbar-on-buffer-revert)
 
-  ;; Add a buffer modification state indicator in the tab label, and place a space around the label
-  ;; to make it look less crowded.
-  (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-    (setq ad-return-value
-          (if (and (buffer-modified-p (tabbar-tab-value tab))
-                   (buffer-file-name (tabbar-tab-value tab)))
-              (concat " * " (concat ad-return-value " "))
-            (concat " " (concat ad-return-value " ")))))
+;;   ;; Add a buffer modification state indicator in the tab label, and place a space around the label
+;;   ;; to make it look less crowded.
+;;   (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+;;     (setq ad-return-value
+;;           (if (and (buffer-modified-p (tabbar-tab-value tab))
+;;                    (buffer-file-name (tabbar-tab-value tab)))
+;;               (concat " * " (concat ad-return-value " "))
+;;             (concat " " (concat ad-return-value " ")))))
 
-  ;; (if (eq dotemacs-theme 'spacemacs-light)
-  ;;     (progn
-  ;;       (set-face-attribute 'tabbar-unselected nil
-  ;;                           :inherit 'tabbar-unselected
-  ;;                           ;; :background "gray90"
-  ;;                           ;; :height 0.9
-  ;;                           )
-  ;;       (set-face-attribute 'tabbar-selected nil
-  ;;                           :inherit 'tabbar-default
-  ;;                           :height 1
-  ;;                           ;; :bold t
-  ;;                           ;; :underline nil
-  ;;                           )
-  ;;       ;; (set-face-attribute 'tabbar-separator nil
-  ;;       ;;                     :inherit 'tabbar-separator
-  ;;       ;;                     :height 1.0)
-  ;;       ;; (set-face-attribute 'tabbar-modified nil
-  ;;       ;;                     :inherit 'tabbar-modified
-  ;;       ;;                     ;; :foreground "red"
-  ;;       ;;                     :height 0.9)
-  ;;       ;; (set-face-attribute 'tabbar-selected-modified nil
-  ;;       ;;                     :inherit 'tabbar-selected-modified
-  ;;       ;;                     ;; :foreground "dark green"
-  ;;       ;;                     :height 1.1
-  ;;       ;;                     :bold t)
-  ;;       )
-  ;;   (progn
-  ;;     ;; (set-face-attribute 'tabbar-default nil
-  ;;     ;;                     :inherit nil
-  ;;     ;;                     :height 0.9
-  ;;     ;;                     :weight 'normal
-  ;;     ;;                     :width 'normal
-  ;;     ;;                     :slant 'normal
-  ;;     ;;                     :underline nil
-  ;;     ;;                     :strike-through nil
-  ;;     ;;                     :stipple nil
-  ;;     ;;                     :background "gray80"
-  ;;     ;;                     :foreground "black"
-  ;;     ;;                     ;; :box '(:line-width 2 :color "white" :style nil)
-  ;;     ;;                     :box nil
-  ;;     ;;                     ;; :family "Lucida Grande"
-  ;;     ;;                     ;;:family "helvetica"
-  ;;     ;;                     )
+;;   ;; (if (eq dotemacs-theme 'spacemacs-light)
+;;   ;;     (progn
+;;   ;;       (set-face-attribute 'tabbar-unselected nil
+;;   ;;                           :inherit 'tabbar-unselected
+;;   ;;                           ;; :background "gray90"
+;;   ;;                           ;; :height 0.9
+;;   ;;                           )
+;;   ;;       (set-face-attribute 'tabbar-selected nil
+;;   ;;                           :inherit 'tabbar-default
+;;   ;;                           :height 1
+;;   ;;                           ;; :bold t
+;;   ;;                           ;; :underline nil
+;;   ;;                           )
+;;   ;;       ;; (set-face-attribute 'tabbar-separator nil
+;;   ;;       ;;                     :inherit 'tabbar-separator
+;;   ;;       ;;                     :height 1.0)
+;;   ;;       ;; (set-face-attribute 'tabbar-modified nil
+;;   ;;       ;;                     :inherit 'tabbar-modified
+;;   ;;       ;;                     ;; :foreground "red"
+;;   ;;       ;;                     :height 0.9)
+;;   ;;       ;; (set-face-attribute 'tabbar-selected-modified nil
+;;   ;;       ;;                     :inherit 'tabbar-selected-modified
+;;   ;;       ;;                     ;; :foreground "dark green"
+;;   ;;       ;;                     :height 1.1
+;;   ;;       ;;                     :bold t)
+;;   ;;       )
+;;   ;;   (progn
+;;   ;;     ;; (set-face-attribute 'tabbar-default nil
+;;   ;;     ;;                     :inherit nil
+;;   ;;     ;;                     :height 0.9
+;;   ;;     ;;                     :weight 'normal
+;;   ;;     ;;                     :width 'normal
+;;   ;;     ;;                     :slant 'normal
+;;   ;;     ;;                     :underline nil
+;;   ;;     ;;                     :strike-through nil
+;;   ;;     ;;                     :stipple nil
+;;   ;;     ;;                     :background "gray80"
+;;   ;;     ;;                     :foreground "black"
+;;   ;;     ;;                     ;; :box '(:line-width 2 :color "white" :style nil)
+;;   ;;     ;;                     :box nil
+;;   ;;     ;;                     ;; :family "Lucida Grande"
+;;   ;;     ;;                     ;;:family "helvetica"
+;;   ;;     ;;                     )
 
-  ;;     ;; (set-face-attribute 'tabbar-default nil
-  ;;     ;;                     :background "gray80")
+;;   ;;     ;; (set-face-attribute 'tabbar-default nil
+;;   ;;     ;;                     :background "gray80")
 
-  ;;     (set-face-attribute 'tabbar-selected nil
-  ;;                         :inherit 'tabbar-default
-  ;;                         :background "gray95"
-  ;;                         :foreground "gray20"
-  ;;                         :height 0.95
-  ;;                         :box '(:line-width 3 :color "grey95" :style nil))
+;;   ;;     (set-face-attribute 'tabbar-selected nil
+;;   ;;                         :inherit 'tabbar-default
+;;   ;;                         :background "gray95"
+;;   ;;                         :foreground "gray20"
+;;   ;;                         :height 0.95
+;;   ;;                         :box '(:line-width 3 :color "grey95" :style nil))
 
-  ;;     ;; (set-face-attribute 'tabbar-selected nil
-  ;;     ;;                 :inherit 'tabbar-default
-  ;;     ;;                 :background "#f2f2f6"
-  ;;     ;;                 :foreground "black"
-  ;;     ;;                 ;; :box '(:line-width 1 :color "black" :style pressed-button)
-  ;;     ;;                 :height 1.2
-  ;;     ;;                 :bold t
-  ;;     ;;                 :underline nil)
+;;   ;;     ;; (set-face-attribute 'tabbar-selected nil
+;;   ;;     ;;                 :inherit 'tabbar-default
+;;   ;;     ;;                 :background "#f2f2f6"
+;;   ;;     ;;                 :foreground "black"
+;;   ;;     ;;                 ;; :box '(:line-width 1 :color "black" :style pressed-button)
+;;   ;;     ;;                 :height 1.2
+;;   ;;     ;;                 :bold t
+;;   ;;     ;;                 :underline nil)
 
-  ;;     ;; (set-face-attribute 'tabbar-unselected nil
-  ;;     ;;                     :inherit 'tabbar-default
-  ;;     ;;                     :background "gray80"
-  ;;     ;;                     :box '(:line-width 3 :color "grey80" :style nil))
+;;   ;;     ;; (set-face-attribute 'tabbar-unselected nil
+;;   ;;     ;;                     :inherit 'tabbar-default
+;;   ;;     ;;                     :background "gray80"
+;;   ;;     ;;                     :box '(:line-width 3 :color "grey80" :style nil))
 
-  ;;     ;; (set-face-attribute 'tabbar-unselected nil
-  ;;     ;;                     :background "gray88"
-  ;;     ;;                     :foreground "gray30"
-  ;;     ;;                     :height 0.9)
+;;   ;;     ;; (set-face-attribute 'tabbar-unselected nil
+;;   ;;     ;;                     :background "gray88"
+;;   ;;     ;;                     :foreground "gray30"
+;;   ;;     ;;                     :height 0.9)
 
-  ;;     ;; (set-face-attribute 'tabbar-button nil
-  ;;     ;;                     :inherit 'tabbar-default
-  ;;     ;;                     :box nil)
+;;   ;;     ;; (set-face-attribute 'tabbar-button nil
+;;   ;;     ;;                     :inherit 'tabbar-default
+;;   ;;     ;;                     :box nil)
 
-  ;;     ;; (set-face-attribute 'tabbar-separator nil
-  ;;     ;;                     :background "grey50"
-  ;;     ;;                     :foreground "grey50"
-  ;;     ;;                     :height 1.0)
+;;   ;;     ;; (set-face-attribute 'tabbar-separator nil
+;;   ;;     ;;                     :background "grey50"
+;;   ;;     ;;                     :foreground "grey50"
+;;   ;;     ;;                     :height 1.0)
 
-  ;;     ;; (set-face-attribute 'tabbar-separator nil
-  ;;     ;;                     :height 1.0)
+;;   ;;     ;; (set-face-attribute 'tabbar-separator nil
+;;   ;;     ;;                     :height 1.0)
 
-  ;;     ;; (set-face-attribute 'tabbar-highlight nil
-  ;;     ;;                     :underline t
-  ;;     ;;                     :background "lemon chiffon")
+;;   ;;     ;; (set-face-attribute 'tabbar-highlight nil
+;;   ;;     ;;                     :underline t
+;;   ;;     ;;                     :background "lemon chiffon")
 
-  ;;     ;; (set-face-attribute 'tabbar-button nil
-  ;;     ;;                     ;; :box '(:line-width 1 :color "gray72" :style released-button)
-  ;;     ;;                     )
+;;   ;;     ;; (set-face-attribute 'tabbar-button nil
+;;   ;;     ;;                     ;; :box '(:line-width 1 :color "gray72" :style released-button)
+;;   ;;     ;;                     )
 
-  ;;     ;; (set-face-attribute 'tabbar-modified nil
-  ;;     ;;                     :background "gray88"
-  ;;     ;;                     :foreground "red"
-  ;;     ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
-  ;;     ;;                     )
+;;   ;;     ;; (set-face-attribute 'tabbar-modified nil
+;;   ;;     ;;                     :background "gray88"
+;;   ;;     ;;                     :foreground "red"
+;;   ;;     ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
+;;   ;;     ;;                     )
 
-  ;;     ;; (set-face-attribute 'tabbar-selected-modified nil
-  ;;     ;;                     :background "#f2f2f6"
-  ;;     ;;                     :foreground "dark green"
-  ;;     ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
-  ;;     ;;                     :box '(:style pressed-button)
-  ;;     ;;                     :height 1
-  ;;     ;;                     :bold t
-  ;;     ;;                     :underline nil)
+;;   ;;     ;; (set-face-attribute 'tabbar-selected-modified nil
+;;   ;;     ;;                     :background "#f2f2f6"
+;;   ;;     ;;                     :foreground "dark green"
+;;   ;;     ;;                     ;; :box '(:line-width 1 :color "black" :style sunken)
+;;   ;;     ;;                     :box '(:style pressed-button)
+;;   ;;     ;;                     :height 1
+;;   ;;     ;;                     :bold t
+;;   ;;     ;;                     :underline nil)
 
-  ;;     ))
+;;   ;;     ))
 
-  :bind (:map tabbar-mode-map
-              ("M-<left>" . tabbar-backward-tab)
-              ("M-<right>" . tabbar-forward-tab)))
+;;   :bind (:map tabbar-mode-map
+;;               ("M-<left>" . tabbar-backward-tab)
+;;               ("M-<right>" . tabbar-forward-tab)))
 
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 
@@ -677,6 +657,7 @@ differences due to whitespaces."
 ;; FIXME: This is not working.
 (use-package minimap
   :ensure t
+  :disabled t
   :diminish minimap-mode
   :custom
   (minimap-major-modes '(prog-mode))
@@ -691,7 +672,6 @@ differences due to whitespaces."
   :bind ("C-x m" . minimap-mode))
 
 ;; The newline wrap-around symbols in the fringes are ugly.
-
 ;; https://stackoverflow.com/questions/27845980/how-do-i-remove-newline-symbols-inside-emacs-vertical-border
 ;; (setf (cdr (assq 'continuation fringe-indicator-alist))
 ;;       ;; '(nil nil) ;; no continuation indicators
@@ -750,7 +730,7 @@ differences due to whitespaces."
 
       ((eq dotemacs-modeline-theme 'spaceline) (use-package spaceline
                                                  :ensure t
-                                                 :defer 5
+                                                 ;; :defer 5
                                                  :config
                                                  (require 'spaceline-config)
                                                  (setq powerline-height 20
@@ -961,30 +941,6 @@ differences due to whitespaces."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-;; (use-package ecb
-;;   :ensure t
-;;   :disabled t
-;;   :if (bound-and-true-p dotemacs-use-ecb)
-;;   :config
-;;   (ecb-layout-define "swarnendu" left nil
-;;                      (ecb-split-ver 0.5 t)
-;;                      (if (fboundp (quote ecb-set-sources-buffer)) (ecb-set-sources-buffer) (ecb-set-default-ecb-buffer))
-;;                      (dotimes (i 1) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-;;                      (if (fboundp (quote ecb-set-methods-buffer)) (ecb-set-methods-buffer) (ecb-set-default-ecb-buffer))
-;;                      (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-;;                      (dotimes (i 2) (other-window 1) (if (equal (selected-window) ecb-compile-window) (other-window 1)))
-;;                      )
-;;   (setq ecb-examples-bufferinfo-buffer-name nil
-;;         ecb-create-layout-file (concat dotemacs-temp-directory "ecb-user-layouts.el")
-;;         ecb-tip-of-the-day nil
-;;         ecb-tree-buffer-style 'ascii-guides
-;;         ecb-show-sources-in-directories-buffer 'always
-;;         ecb-layout-name "swarna1"
-;;         ecb-compile-window-height nil)
-;;   (ecb-activate)
-;;   (add-hook 'compilation-finish-functions
-;;             (lambda (buf strg) (kill-buffer buf))))
-
 (use-package treemacs
   :ensure t
   :commands (treemacs treemacs-toggle)
@@ -1159,7 +1115,7 @@ differences due to whitespaces."
   :config (run-at-time nil (* 10 60) 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
-;; Hide the "wrote to recentf" message, which can be irritating.
+;; Hide the "wrote to recentf" message which is irritating
 (defun sb/recentf-save-list (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
   (let ((inhibit-message t))
@@ -1189,11 +1145,11 @@ differences due to whitespaces."
         company-tooltip-align-annotations t
         company-tooltip-limit 20
         company-selection-wrap-around t
-        company-dabbrev-downcase nil ; Do not downcase the returned candidates
-        company-dabbrev-ignore-case nil
-        company-dabbrev-code-everywhere t ; Offer completions in comments and strings
+        ;; company-dabbrev-downcase nil ; Do not downcase the returned candidates
+        ;; company-dabbrev-ignore-case nil
+        ;; company-dabbrev-code-everywhere t ; Offer completions in comments and strings
         ;; company-dabbrev-other-buffers t ; Search other buffers with the same mode
-        company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes
+        ;; company-dabbrev-code-modes t ; Use company-dabbrev-code in all modes
         ;; company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
         ;;                     company-preview-frontend
         ;;                     company-echo-metadata-frontend)
@@ -1223,14 +1179,6 @@ differences due to whitespaces."
   :hook (global-company-mode . company-flx-mode)
   :custom (company-flx-limit 20))
 
-;; Use prescient instead
-
-;; (use-package company-statistics
-;;   :ensure t
-;;   :after company
-;;   :hook (global-company-mode . company-statistics-mode)
-;;   :init (setq company-statistics-file (concat dotemacs-temp-directory "company-statistics-cache.el")))
-
 (use-package company-quickhelp
   :ensure t
   :after company
@@ -1247,13 +1195,6 @@ differences due to whitespaces."
         company-dict-enable-fuzzy t
         company-dict-enable-yasnippet nil)
   (add-to-list 'company-backends 'company-dict))
-
-;; (with-eval-after-load "counsel"
-;; (bind-key [remap complete-symbol] #'counsel-company company-mode-map)
-;; (bind-key [remap completion-at-point] #'counsel-company company-mode-map)
-;; (bind-key "C-:" #'counsel-company company-mode-map)
-;; (bind-key "C-:" #'counsel-company company-active-map)
-;; )
 
 (use-package yasnippet
   :ensure t
@@ -1787,8 +1728,8 @@ differences due to whitespaces."
   ;; (bind-keys ("<f7>" . counsel-projectile-rg))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
-         ("<f7>" . counsel-projectile-rg))
-  )
+         ("<f7>" . counsel-projectile-rg)))
+
 
 ;; Flycheck
 
@@ -1957,7 +1898,7 @@ differences due to whitespaces."
 
 (use-package hl-todo
   :ensure t
-  :config
+  :init
   (setq hl-todo-keyword-faces
         '(("TODO" . hl-todo)
           ("TODOs" . hl-todo)
@@ -2106,21 +2047,21 @@ differences due to whitespaces."
 
 ;; Miscellaneous packages
 
-(use-package dashboard
-  :ensure t
-  :disabled t
-  :hook (after-init . dashboard-setup-startup-hook)
-  :config
-  (use-package page-break-lines
-    :ensure t
-    :diminish)
-  :custom
-  (dashboard-items '((projects . 10)
-                     (recents  . 10)
-                     (bookmarks . 0)))
-  (dashboard-set-heading-icons t)
-  (dashboard-set-file-icons t)
-  (dashboard-set-init-info t))
+;; (use-package dashboard
+;;   :ensure t
+;;   :disabled t
+;;   :hook (after-init . dashboard-setup-startup-hook)
+;;   :config
+;;   (use-package page-break-lines
+;;     :ensure t
+;;     :diminish)
+;;   :custom
+;;   (dashboard-items '((projects . 10)
+;;                      (recents  . 10)
+;;                      (bookmarks . 0)))
+;;   (dashboard-set-heading-icons t)
+;;   (dashboard-set-file-icons t)
+;;   (dashboard-set-init-info t))
 
 ;; (use-package helpful
 ;;   :ensure t
@@ -2159,18 +2100,15 @@ differences due to whitespaces."
 
 (use-package jgraph-mode
   :ensure t
-  ;; :mode ("\\.jgr\\'" . jgraph-mode)
   :mode "\\.jgr\\'")
 
 (use-package graphviz-dot-mode
   :ensure t
-  ;; :mode ("\\.dot\\'" . graphviz-dot-mode)
   :mode "\\.dot\\'"
   :config (setq graphviz-dot-indent-width 4))
 
 (use-package gnuplot
   :ensure t
-  ;; :mode ("\\.gp\\'" . gnuplot-mode)
   :mode "\\.gp\\'"
   :interpreter ("gnuplot" . gnuplot-mode))
 
