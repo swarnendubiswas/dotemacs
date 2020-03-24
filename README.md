@@ -22,14 +22,15 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 Unfortunately, quite a few third-party executables and libraries need to be installed to complement the setup. You can use the following instructions to install them on a Ubuntu 18.04 distribution.
 
 ``` Bash
-sudo apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer clang-format imagemagick lua5.3 liblua5.3-dev luarocks
+sudo apt install aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer clang-format imagemagick lua5.3 liblua5.3-dev luarocks
 sudo snap install shfmt
 sudo snap install universal-ctags
 sudo snap install ripgrep --classic
+sudo snap install shellcheck --edge
 sudo snap refresh
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.14.1 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
 sudo npm update
@@ -39,6 +40,7 @@ composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
 composer update
 luarocks install --server=http://luarocks.org/dev digestif --local
+cargo install -git https://github.com/latex-lsp/texlab.git
 ```
 
 I plan to automate the complete setup sometime in the future.
