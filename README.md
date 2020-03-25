@@ -40,7 +40,7 @@ composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
 composer update
 luarocks install --server=http://luarocks.org/dev digestif --local
-cargo install -git https://github.com/latex-lsp/texlab.git
+cargo install --git https://github.com/latex-lsp/texlab.git
 ```
 
 I plan to automate the complete setup sometime in the future.
@@ -99,3 +99,7 @@ For more commands, see the Tags topic in the Emacs info document.
 ``` Bash
 find -name "*.c" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print -or -name "*.py" -print | xargs ctags -ea --list-extras
 ```
+
+## TODO
+
+* Omit sub-directories/files with `counsel-find-file`.

@@ -164,7 +164,6 @@ differences due to whitespaces."
 
 (use-package exec-path-from-shell
   :ensure t
-  :disabled t
   :custom (exec-path-from-shell-check-startup-files nil)
   :config
   (when (memq window-system '(x))
@@ -905,6 +904,7 @@ differences due to whitespaces."
                                     "GRTAGS"
                                     "GTAGS"
                                     "tramp"
+                                    ".metadata"
                                     ))
   :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
@@ -1144,11 +1144,12 @@ differences due to whitespaces."
 (use-package flycheck
   :ensure t
   :hook (after-init . global-flycheck-mode)
+  :custom
+  (flycheck-emacs-lisp-load-path 'inherit)
+  (flycheck-highlighting-mode 'lines) ; Faster than the default
+  (flycheck-check-syntax-automatically '(save mode-enabled))
+  (flycheck-idle-change-delay 5)
   :config
-  (setq flycheck-emacs-lisp-load-path 'inherit
-        flycheck-highlighting-mode 'lines ; Faster than the default
-        flycheck-check-syntax-automatically '(save mode-enabled)
-        flycheck-idle-change-delay 5)
   (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   ;; Python
@@ -2025,12 +2026,12 @@ differences due to whitespaces."
   ;;                   :remote? t
   ;;                   :server-id 'clangd-remote))
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-stdio-connection "~/.luarocks/bin/digestif")
-  ;;                   :major-modes '(latex-mode plain-tex-mode)
-  ;;                   :server-id 'digestif))
-  ;; (add-to-list 'lsp-language-id-configuration '(latex-mode . "latex"))
-  ;; (add-to-list 'lsp-language-id-configuration '(plain-tex-mode . "plaintex"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "digestif")
+                    :major-modes '(latex-mode plain-tex-mode)
+                    :server-id 'digestif))
+  (add-to-list 'lsp-language-id-configuration '(latex-mode . "latex"))
+  (add-to-list 'lsp-language-id-configuration '(plain-tex-mode . "plaintex"))
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -2097,8 +2098,7 @@ differences due to whitespaces."
         company-lsp-enable-recompletion t
         company-lsp-cache-candidates 'auto)
   ;; FIXME: This is not working.
-  ;; (add-to-list 'company-lsp-filter-candidates '(digestif . nil))
-  )
+  (add-to-list 'company-lsp-filter-candidates '(digestif . nil)))
 
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
