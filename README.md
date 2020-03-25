@@ -11,7 +11,7 @@ Most of the included customizations are collected from the Internet. Suggestions
 
 ## Installation
 
-You might want to backup your contents if your `.emacs.d` directory is not empty. Then, use the following command to checkout the source:
+You might want to backup your contents if your `.emacs.d` directory is not empty. Then, use the following command to check out the source:
 
 ```Bash
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
@@ -28,8 +28,8 @@ sudo snap install universal-ctags
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 sudo snap refresh
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev

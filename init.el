@@ -56,14 +56,14 @@
   'default
   "Specify which Emacs theme to use."
   :type '(radio
+          (const :tag "eclipse" eclipse)
           (const :tag "leuven" leuven)
           (const :tag "professional" professional)
-          (const :tag "eclipse" eclipse)
-          (const :tag "spacemacs-light" spacemacs-light)
-          (const :tag "zenburn" zenburn)
           (const :tag "solarized-light" solarized-light)
+          (const :tag "spacemacs-light" spacemacs-light)
           (const :tag "solarized-dark" solarized-dark)
           (const :tag "tangotango" tangotango)
+          (const :tag "zenburn" zenburn)
           (const :tag "default" default))
   :group 'dotemacs)
 
@@ -96,20 +96,13 @@ differences due to whitespaces."
   :type 'boolean
   :group 'dotemacs)
 
-;; (defcustom dotemacs-use-ignoramus-p
-;;   nil
-;;   "Should the ignoramus package be used?
-;; The package controls ignoring boring file expressions."
-;;   :type 'boolean
-;;   :group 'dotemacs)
-
 ;; FIXME: Use this as a conditional. I now prefer LSP, but not all C/C++ projects use clang.
 (defcustom dotemacs-tags
   'none
   "Choose whether to use gtags or ctags."
   :type '(radio
-          (const :tag "gtags" gtags)
           (const :tag "ctags" ctags)
+          (const :tag "gtags" gtags)
           (const :tag "none" none))
   :group 'dotemacs)
 
@@ -168,7 +161,6 @@ differences due to whitespaces."
   :config
   (when (memq window-system '(x))
     (exec-path-from-shell-initialize)))
-
 
 ;; Configure GNU Emacs defaults
 
@@ -389,7 +381,7 @@ differences due to whitespaces."
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 120)
+                    :height 130)
 
 ;; https://stackoverflow.com/questions/3281581/how-to-word-wrap-in-emacs
 (global-visual-line-mode 1)
@@ -993,7 +985,7 @@ differences due to whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ("C-," . sb/flyspell-goto-previous-error)))
+("C-," . sb/flyspell-goto-previous-error)))
 
 (use-package flyspell-popup
   :ensure t
@@ -1066,16 +1058,16 @@ differences due to whitespaces."
   :ensure t
   :ensure ggtags
   :custom
-  (projectile-known-projects-file (concat dotemacs-temp-directory"projectile-known-projects.eld"))
   (projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
+  (projectile-completion-system 'ivy)
   (projectile-enable-caching nil)
   (projectile-file-exists-remote-cache-expire nil)
-  (projectile-verbose nil)
-  (projectile-require-project-root t) ; Use projectile only in desired directories, too much noise otherwise
   (projectile-find-dir-includes-top-level t)
+  (projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld"))
+  (projectile-mode-line-prefix "")
+  (projectile-require-project-root t) ; Use projectile only in desired directories, too much noise otherwise
   (projectile-switch-project-action 'projectile-find-file) ; Use projectile-dired to view in dired
-  (projectile-mode-line nil)
-  (projectile-completion-system 'ivy)
+  (projectile-verbose nil)
   ;; Contents of .projectile are ignored when using the alien project indexing method
   (projectile-indexing-method 'hybrid)
   (projectile-idle-timer-seconds 120)
@@ -1988,6 +1980,7 @@ differences due to whitespaces."
   :custom
   (lsp-auto-guess-root t)
   (lsp-before-save-edits t)
+  (lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error"))
   (lsp-document-sync-method 'incremental)
   (lsp-enable-snippet t)
   (lsp-enable-completion-at-point t)
@@ -2002,16 +1995,16 @@ differences due to whitespaces."
   (lsp-imenu-sort-methods 'position)
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf t)
-  (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
-  (lsp-imenu-sort-methods '(position))
   (lsp-pyls-configuration-sources ["pylint" "pydocstyle" "yapf"])
-  (lsp-pyls-plugins-pydocstyle-enabled t)
-  (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
-  (lsp-pyls-plugins-pydocstyle-convention "pep257")
+  (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length 100)
+  (lsp-pyls-plugins-pydocstyle-convention "pep257")
+  (lsp-pyls-plugins-pydocstyle-enabled t)
+  (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
   (lsp-pyls-plugins-pyflakes-enabled nil)
-  (lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error"))
+  (lsp-pyls-plugins-yapf-enabled t)
+  (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
   (lsp-xml-server-command (quote ("java" "-jar" "/home/swarnendu/.emacs.d/org.eclipse.lsp4xml-uber.jar")))
   :config
   ;; (lsp-register-client
@@ -2097,7 +2090,6 @@ differences due to whitespaces."
         company-lsp-filter-candidates t
         company-lsp-enable-recompletion t
         company-lsp-cache-candidates 'auto)
-  ;; FIXME: This is not working.
   (add-to-list 'company-lsp-filter-candidates '(digestif . nil)))
 
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
@@ -2107,6 +2099,9 @@ differences due to whitespaces."
   :config
   (add-hook 'java-mode-hook 'lsp)
   (setq lsp-java-inhibit-message t))
+
+(use-package lsp-python-ms
+  :load-path "extras")
 
 (use-package lsp-treemacs
   :ensure t
