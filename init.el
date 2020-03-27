@@ -615,23 +615,9 @@ differences due to whitespaces."
 ;;   ;;        . treemacs-magit--schedule-update)
 ;;   )
 
-(use-package all-the-icons-dired
   :ensure t
   :hook (dired-mode . all-the-icons-dired-mode))
 
-;; Configure search
-
-(setq case-fold-search t) ; Make search ignore case
-
-;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
-(use-package isearch
-  :custom
-  ( search-highlight t) ; Highlight incremental search
-  (isearch-allow-scroll t)
-  :config
-  (use-package isearch-symbol-at-point
-    :ensure t)
-  :bind (("C-s" . nil) ; isearch-forward-regexp
          ("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
          ("C-s" . nil) ; isearch-repeat-forward
@@ -2249,12 +2235,12 @@ Increase line spacing by two line height."
 
 ;; Mark safe variables
 
-(put 'company-clang-arguments 'safe-local-variable 'listp)
-(put 'company-c-headers-path-user 'safe-local-variable 'listp)
-(put 'reftex-default-bibliography 'safe-local-variable 'listp)
-(put 'company-bibtex-bibliography 'safe-local-variable 'listp)
-(put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
-(put 'flycheck-clang-include-path 'safe-local-variable 'listp)
-(put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
+;; (put 'company-clang-arguments 'safe-local-variable 'listp)
+;; (put 'company-c-headers-path-user 'safe-local-variable 'listp)
+;; (put 'reftex-default-bibliography 'safe-local-variable 'listp)
+;; (put 'company-bibtex-bibliography 'safe-local-variable 'listp)
+;; (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
+;; (put 'flycheck-clang-include-path 'safe-local-variable 'listp)
+;; (put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
 
 ;;; init.el ends here
