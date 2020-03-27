@@ -53,7 +53,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'spacemacs-light
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -126,12 +126,12 @@ differences due to whitespaces."
 (eval-when-compile
   (require 'use-package))
 
-(setq use-package-check-before-init t
+(setq use-package-always-defer t
       use-package-always-ensure nil
-      use-package-always-defer t
-      use-package-verbose t
+      use-package-check-before-init t
       ;; Set this to true once the configuration is stable
-      use-package-expand-minimally nil)
+      use-package-expand-minimally nil
+      use-package-verbose t)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -148,8 +148,8 @@ differences due to whitespaces."
   :bind (("C-c d l" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages))
   :custom
-  (paradox-github-token t)
   (paradox-execute-asynchronously t)
+  (paradox-github-token t)
   :config (paradox-enable))
 
 (use-package cus-edit
@@ -227,10 +227,9 @@ differences due to whitespaces."
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish
   :hook (after-init . global-auto-revert-mode)
-  :config
-  (setq auto-revert-verbose nil
-        ;; Auto-refresh dired buffers
-        global-auto-revert-non-file-buffers t))
+  :custom
+  (auto-revert-verbose nil)
+  (global-auto-revert-non-file-buffers t))
 
 ;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
 (use-package delsel
@@ -245,25 +244,25 @@ differences due to whitespaces."
   :unless noninteractive
   :hook (after-init . savehist-mode)
   :custom
-  (savehist-save-minibuffer-history t)
-  (savehist-file (concat dotemacs-temp-directory "savehist"))
   (savehist-additional-variables '(kill-ring
                                    search-ring
                                    regexp-search-ring
                                    extended-command-history
                                    file-name-history
                                    command-history))
-  (savehist-autosave-interval 300))
+  (savehist-autosave-interval 300)
+  (savehist-file (concat dotemacs-temp-directory "savehist"))
+  (savehist-save-minibuffer-history t))
 
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
 
 (use-package uniquify
   :custom
-  (uniquify-buffer-name-style 'forward)
-  (uniquify-separator "/")
-  (uniquify-ignore-buffers-re "^\\*")
   (uniquify-after-kill-buffer-p t)
+  (uniquify-buffer-name-style 'forward)
+  (uniquify-ignore-buffers-re "^\\*")
+  (uniquify-separator "/")
   (uniquify-strip-common-suffix t))
 
 (use-package hippie-exp
@@ -312,10 +311,10 @@ differences due to whitespaces."
 
 ;; Configure GNU Emacs appearance
 
-(setq frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
-      indicate-empty-lines t
-      custom-safe-themes t)
-(setq-default indicate-buffer-boundaries 'right)
+(setq custom-safe-themes t
+      frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
+      indicate-buffe-boundaries 'right
+      indicate-empty-lines t)
 
 ;; https://ladicle.com/post/config/#configuration
 (if window-system
@@ -457,7 +456,11 @@ differences due to whitespaces."
                                                                        :weight 'light)
                                                    (set-face-attribute 'mode-line-inactive nil
                                                                        :background "grey88"
-                                                                       :foreground "black"))))
+                                                                       :foreground "black"))
+                                                 (use-package spaceline-all-the-icons
+                                                   :ensure t
+                                                   :after spaceline
+                                                   :config (spaceline-all-the-icons))))
 
       ((eq dotemacs-modeline-theme 'default) ))
 
@@ -466,12 +469,12 @@ differences due to whitespaces."
 (use-package ibuffer
   :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
-  (setq ibuffer-expert t
-        ibuffer-always-show-last-buffer nil
+  (setq ibuffer-always-show-last-buffer nil
+        ibuffer-case-fold-search t ; Ignore case when searching
         ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
+        ibuffer-expert t
         ibuffer-use-header-line t
         ;; ibuffer-display-summary t
-        ibuffer-case-fold-search t ; Ignore case when searching
         ibuffer-show-empty-filter-groups nil
         ;; ibuffer-formats
         ;; '((mark modified read-only " "
@@ -490,7 +493,6 @@ differences due to whitespaces."
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
-  ;; :after ibuffer
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (use-package ibuffer-vc
@@ -528,7 +530,6 @@ differences due to whitespaces."
   (add-hook 'dired-mode-hook 'auto-revert-mode))
 
 (use-package dired-x
-  ;; :commands dired-jump
   :config
   (setq dired-bind-jump t
         ;; Do not show messages when omitting files
@@ -543,14 +544,12 @@ differences due to whitespaces."
 
 (use-package dired-efap
   :ensure t
-  :after dired
   :custom (dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
               ("r" . dired-efap )))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
-  :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -615,13 +614,25 @@ differences due to whitespaces."
 ;;   ;;        . treemacs-magit--schedule-update)
 ;;   )
 
+(use-package all-the-icons-dired
   :ensure t
   :hook (dired-mode . all-the-icons-dired-mode))
 
+(setq case-fold-search t) ; Make search ignore case
+
+;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
+(use-package isearch
+  :custom
+  (search-highlight t) ; Highlight incremental search
+  (isearch-allow-scroll t)
+  :bind (("C-s" . nil) ; isearch-forward-regexp
          ("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
          ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)))
+
+(use-package isearch-symbol-at-point
+  :ensure t)
 
 (use-package isearch-dabbrev
   :ensure t
@@ -647,7 +658,7 @@ differences due to whitespaces."
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
   :custom
-  ( swiper-use-visual-line t)
+  (swiper-use-visual-line t)
   (swiper-action-recenter t))
 
 (use-package wgrep
@@ -705,22 +716,21 @@ differences due to whitespaces."
   :diminish company-mode
   :hook (after-init . global-company-mode)
   :custom
-  (company-global-modes t) ; Turn on company-mode for all major modes
-  (company-show-numbers t) ; Quick-access numbers for the first ten candidates
-  (company-minimum-prefix-length 1)
   (company-idle-delay 0.0)
-  (company-tooltip-flip-when-above nil) ; Invert the navigation direction if the completion popup is displayed on top
-  (company-tooltip-align-annotations t)
-  (company-tooltip-limit 20)
-  (company-selection-wrap-around t)
+  (company-global-modes t) ; Turn on company-mode for all major modes
+  (company-minimum-prefix-length 1)
   (company-require-match nil) ; Allow typing keys that do not match any candidates
+  (company-selection-wrap-around t)
+  (company-show-numbers t) ; Quick-access numbers for the first ten candidates
+  (company-tooltip-align-annotations t)
+  (company-tooltip-flip-when-above nil) ; Invert the navigation direction if the completion popup is displayed on top
+  (company-tooltip-limit 20)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)))
 
 (use-package company-flx
   :ensure t
-  :after company
   :hook (global-company-mode . company-flx-mode)
   :custom (company-flx-limit 20))
 
@@ -756,22 +766,26 @@ differences due to whitespaces."
 (use-package ivy
   :ensure t
   :custom
-  (ivy-virtual-abbreviate 'abbreviate)
+  (ivy-auto-select-single-candidate t)
   (ivy-case-fold-search 'always) ; Always ignore case while searching
-  (ivy-height 20) ; This seems a good number to see several options at a time without cluttering the view
-  (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
-  (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-count-format "(%d/%d) ") ; This is beneficial to identify wrap around
+  (ivy-extra-directories nil) ; Hide "." and ".."
+  (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
+  (ivy-flx-limit 100)
+  (ivy-height 20) ; This seems a good number to see several options at a time without cluttering the view
   ;; ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
   ;;                         (swiper . ivy--regex-plus)
   ;;                         (counsel-rg . ivy--regex-plus)
   ;;                         (counsel-grep-or-swiper . ivy--regex-plus)
   ;;                         (ivy-switch-buffer . ivy--regex-plus)
   ;;                         (t . ivy--regex-fuzzy))
-  (  ivy-flx-limit 100)
+  (ivy-sort-matches-functions-alist
+   '((t)
+     (ivy-switch-buffer . ivy-sort-function-buffer)
+     (counsel-find-file . ivy-sort-function-buffer)))
   (ivy-use-ignore-default 'always) ; Always ignore buffers set in ivy-ignore-buffers
   (ivy-use-selectable-prompt nil)
-  (ivy-auto-select-single-candidate t)
+  (ivy-virtual-abbreviate 'abbreviate)
   :config
   ;; (dolist (buffer '("^\\*Backtrace\\*$"
   ;;                   "^\\*Compile-Log\\*$"
@@ -783,10 +797,6 @@ differences due to whitespaces."
   ;;                   "^\\*pyls\\*$"
   ;;                   "^\\*pyls::stderr\\*$"))
   ;;   (add-to-list 'ivy-ignore-buffers buffer))
-  (setq ivy-sort-matches-functions-alist
-        '((t)
-          (ivy-switch-buffer . ivy-sort-function-buffer)
-          (counsel-find-file . ivy-sort-function-buffer)))
   :hook (after-init . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
@@ -848,7 +858,7 @@ differences due to whitespaces."
    ("C-c C-m" . counsel-mark-ring)
    ("C-c C-j" . counsel-semantic-or-imenu))
   :custom
-  ( counsel-mode-override-describe-bindings t)
+  (counsel-mode-override-describe-bindings t)
   (counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
   (counsel-find-file-at-point nil)
   (counsel-yank-pop-separator "\n-----------------\n")
@@ -891,10 +901,9 @@ differences due to whitespaces."
   :ensure t
   :after (all-the-icons ivy)
   :init (all-the-icons-ivy-setup)
-  (setq all-the-icons-ivy-file-commands
-        '(counsel-find-file counsel-file-jump counsel-dired-jump counsel-recentf counsel-find-library counsel-projectile-find-file counsel-projectile-find-dir)))
-
-;; Configure automatic spell check
+  :custom
+  (all-the-icons-ivy-file-commands
+   '(counsel-find-file counsel-file-jump counsel-dired-jump counsel-recentf counsel-find-library counsel-projectile-find-file counsel-projectile-find-dir)))
 
 (use-package flyspell
   :if (and (eq system-type 'gnu/linux) (executable-find "aspell"))
@@ -971,14 +980,12 @@ differences due to whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-("C-," . sb/flyspell-goto-previous-error)))
+   ("C-," . sb/flyspell-goto-previous-error)))
 
 (use-package flyspell-popup
   :ensure t
   :after flyspell
   :bind ("C-;" . flyspell-popup-correct))
-
-;; Configure indentation
 
 (setq-default fill-column dotemacs-fill-column
               standard-indent 2
@@ -999,10 +1006,7 @@ differences due to whitespaces."
   :ensure t
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook (python-mode . highlight-indentation-mode)
-  :config
-  (set-face-background 'highlight-indentation-face "WhiteSmoke"))
-
-;; Configure highlighting of matching parentheses and braces
+  :config (set-face-background 'highlight-indentation-face "WhiteSmoke"))
 
 (use-package paren
   :hook (after-init . show-paren-mode)
@@ -1048,7 +1052,7 @@ differences due to whitespaces."
   (projectile-completion-system 'ivy)
   (projectile-enable-caching nil)
   (projectile-file-exists-remote-cache-expire nil)
-  (projectile-find-dir-includes-top-level t)
+  ;; (projectile-find-dir-includes-top-level t)
   (projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld"))
   (projectile-mode-line-prefix "")
   (projectile-require-project-root t) ; Use projectile only in desired directories, too much noise otherwise
@@ -1089,15 +1093,15 @@ differences due to whitespaces."
                   ".tags"
                   "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files item))
-  (dolist (list '(".out"
-                  ".pdf"
-                  ".pyc"
+  (dolist (list '(".bak"
                   ".elc"
+                  ".out"
+                  ".pdf"
+                  ".pt"
+                  ".pyc"
                   ".rel"
                   ".rip"
                   ".tar.gz"
-                  ".bak"
-                  ".pt"
                   "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes list))
   ;; ;; https://www.reddit.com/r/emacs/comments/320cvb/projectile_slows_tramp_mode_to_a_crawl_is_there_a/
@@ -1109,15 +1113,13 @@ differences due to whitespaces."
   :ensure t
   :after ivy
   :hook (counsel-mode . counsel-projectile-mode)
-  :init
+  ;; :init
   ;; ;; Sort projects from newest to oldest
   ;; (add-to-list 'ivy-sort-functions-alist
   ;;              '(counsel-projectile-switch-project . file-newer-than-file-p))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
          ("<f7>" . counsel-projectile-rg)))
-
-;; Flycheck
 
 (use-package flycheck
   :ensure t
@@ -1131,22 +1133,22 @@ differences due to whitespaces."
   (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   ;; Python
-  (setq-local flycheck-python-pylint-executable "python3" ; Use python3 to execute pylint
-              flycheck-checker "python-pylint"
-              flycheck-pylintrc "/home/swarnendu/.config/pylintrc")
   (add-hook 'python-mode-hook
             (lambda ()
-              (setq flycheck-checker 'python-pylint)))
+              (setq-local flycheck-checker "python-pylint"
+                          flycheck-python-pylint-executable "python3" ; Use python3 to execute pylint
+                          flycheck-pylintrc "/home/swarnendu/.config/pylintrc")))
   ;; C/C++
-  (setq-local flycheck-clang-args "")
-  (setq-local flycheck-clang-include-path "") ; Directories
-  (setq-local flycheck-clang-includes "") ; Files
-  (setq-local flycheck-clang-language-standard "c++11")
-  (setq-local flycheck-gcc-language-standard "c++11")
   (add-hook 'c++-mode-hook
             (lambda ()
-              (setq flycheck-clang-language-standard "c++11")
-              (setq flycheck-gcc-language-standard "c++11")))
+              (setq flycheck-clang-args ""
+                    flycheck-clang-include-path "" ; Directories
+                    flycheck-clang-includes "" ; Files
+                    flycheck-clang-language-standard "c++11"
+                    flycheck-gcc-args ""
+                    flycheck-gcc-include-path "" ; Directories
+                    flycheck-gcc-includes "" ; Files
+                    flycheck-gcc-language-standard "c++11")))
   ;; CUDA
   (setq-local flycheck-cuda-language-standard "c++11")
   (setq-local flycheck-cuda-includes "")
@@ -1184,18 +1186,16 @@ differences due to whitespaces."
 (use-package whitespace
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :hook (after-init . global-whitespace-mode)
-  :config
-  (setq-default show-trailing-whitespace nil
-                whitespace-auto-cleanup t
-                whitespace-style nil
-                whitespace-line-column dotemacs-fill-column))
+  :custom
+  (show-trailing-whitespace nil)
+  (whitespace-auto-cleanup t)
+  (whitespace-style nil)
+  (whitespace-line-column dotemacs-fill-column))
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :diminish ws-butler-mode
   :hook (prog-mode . ws-butler-mode))
-
-;; Highlight
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
@@ -1235,25 +1235,22 @@ differences due to whitespaces."
 
 (use-package hl-todo
   :ensure t
-  :init
-  (setq hl-todo-keyword-faces
-        '(("TODO" . hl-todo)
-          ("TODOs" . hl-todo)
-          ("NOTE" . hl-todo)
-          ("NOTES" . hl-todo)
-          ("XXX" . hl-todo)
-          ("LATER" . hl-todo)
-          ("IMP" . hl-todo)
-          ("FIXME" . hl-todo)))
-  (global-hl-todo-mode))
+  :custom
+  (hl-todo-keyword-faces '(("TODO" . hl-todo)
+                           ("TODOs" . hl-todo)
+                           ("NOTE" . hl-todo)
+                           ("NOTES" . hl-todo)
+                           ("XXX" . hl-todo)
+                           ("LATER" . hl-todo)
+                           ("IMP" . hl-todo)
+                           ("FIXME" . hl-todo)))
+  :config (global-hl-todo-mode))
 
 (use-package beacon ; Highlight cursor position in buffer after scrolling
   :ensure t
   :disabled t
   :hook (after-init . beacon-mode)
   :diminish beacon-mode)
-
-;; Tramp
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port. Open a
@@ -1308,23 +1305,20 @@ differences due to whitespaces."
     :ensure t)
   :bind ("C-c C-j" . imenu-anywhere))
 
-(use-package imenu-list
-  :ensure t
-  :disabled t
-  :after imenu
-  :custom
-  (imenu-list-auto-resize nil)
-  (imenu-list-focus-after-activation t)
-  (imenu-list-size 0.10)
-  :config
-  (add-hook 'python-mode-hook #'imenu-list-minor-mode)
-  (add-hook 'c-mode-common-hook #'imenu-list-minor-mode))
-
-;; Tags
+;; (use-package imenu-list
+;;   :ensure t
+;;   :disabled t
+;;   :after imenu
+;;   :custom
+;;   (imenu-list-auto-resize nil)
+;;   (imenu-list-focus-after-activation t)
+;;   (imenu-list-size 0.10)
+;;   :config
+;;   (add-hook 'python-mode-hook #'imenu-list-minor-mode)
+;;   (add-hook 'c-mode-common-hook #'imenu-list-minor-mode))
 
 (use-package counsel-gtags
   :ensure t
-  :disabled t
   :if (eq system-type 'gnu/linux)
   :diminish counsel-gtags-mode
   :commands (counsel-gtags-find-definition
@@ -1334,7 +1328,7 @@ differences due to whitespaces."
              counsel-gtags-create-tags
              counsel-gtags-update-tags
              counsel-gtags-dwim)
-  :hook ((python-mode java-mode c-mode c++-mode) . counsel-gtags-mode)
+  :hook ((c-mode c++-mode) . counsel-gtags-mode)
   :custom
   (counsel-gtags-ignore-case nil)
   (counsel-gtags-auto-update t)
@@ -1342,29 +1336,33 @@ differences due to whitespaces."
               ("M-." . counsel-gtags-dwim)
               ("M-," . counsel-gtags-go-backward)
               ("C-c g s" . counsel-gtags-find-symbol)
+              ("C-c g d" . counsel-gtags-find-definition)
               ("C-c g r" . counsel-gtags-find-reference)
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags)))
 
-;; Don't ask before rereading the TAGS files if they have changed
-(setq tags-revert-without-query t)
+(setq tags-revert-without-query t ; Don't ask before rereading the TAGS files if they have changed
+      large-file-warning-threshold nil) ; Don't warn when TAGS files are large
 
 (use-package counsel-etags
   :ensure t
-  :disabled t
   :bind(("M-." . counsel-etags-find-tag-at-point)
-        ;; ("M-t" . counsel-etags-grep-symbol-at-point)
-        ;; ("M-s" . counsel-etags-find-tag)
-        )
+        ("C-c g s" . counsel-etags-grep-symbol-at-point)
+        ("C-c g t" . counsel-etags-find-tag))
+  :init
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook
+                        'counsel-etags-virtual-update-tags 'append 'local)))
   :custom
-  (large-file-warning-threshold nil) ; Don't warn when TAGS files are large
   (counsel-etags-update-interval 180) ; How many seconds to wait before rerunning tags for auto-update
+  (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
   :config
   (add-to-list 'counsel-etags-ignore-directories ".vscode")
+  (add-to-list 'counsel-etags-ignore-directories "build")
   (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
-  (add-to-list 'counsel-etags-ignore-filenames "*.json"))
-
-;; Miscellaneous packages
+  (add-to-list 'counsel-etags-ignore-filenames "*.json")
+  (add-to-list 'counsel-etags-ignore-filenames "TAGS"))
 
 (use-package helpful
   :ensure t
@@ -2190,6 +2188,13 @@ Increase line spacing by two line height."
                (file-exists-p new-location)
                (not (string-equal old-location new-location)))
       (delete-file old-location))))
+
+;; https://www.emacswiki.org/emacs/BuildTags
+(defun sb/create-ctags (dir-name)
+  "Create tags file."
+  (interactive "Directory: ")
+  (shell-command
+   (format "%s -f TAGS -e -R %s" path-to-ctags (directory-file-name dir-name))))
 
 ;; Generic keybindings, package-specific are usually in their own modules. Use `M-x describe-personal-keybindings` to see modifications.
 

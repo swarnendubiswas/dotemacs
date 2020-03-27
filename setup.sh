@@ -5,8 +5,8 @@
 set -eux
 
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root!"
-   exit 1
+    echo "This script must be run as root!"
+    exit 1
 fi
 
 DISTRO=$(lsb_release -is)
@@ -84,28 +84,31 @@ fi
 echo "...Done"
 
 case "$DIST_VERSION" in
-    Ubuntu_16.04 )     add-apt-repository ppa:ubuntu-toolchain-r/test; apt-get update; apt install -y gcc-7 g++-7
-;;
-    * )
+    Ubuntu_16.04)
+        add-apt-repository ppa:ubuntu-toolchain-r/test
+        apt-get update
+        apt install -y gcc-7 g++-7
+        ;;
+    *)
         echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
         exit 2
+        ;;
 esac
-
-
 
 # apt install libstdc++7-dev
 
-# Check if LLVM 8 is installed
-LLVM_VERSION="-8"
+# Check if LLVM 9 is installed
+LLVM_VERSION="-9"
 
 case "$DIST_VERSION" in
-    Ubuntu_16.04 )    REPO_NAME="deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial$LLVM_VERSION  main" ;;
-    Ubuntu_18.04 )    REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
-    Ubuntu_18.10 )    REPO_NAME="deb http://apt.llvm.org/cosmic/   llvm-toolchain-cosmic$LLVM_VERSION  main" ;;
-    Ubuntu_19.04 )    REPO_NAME="deb http://apt.llvm.org/disco/    llvm-toolchain-disco$LLVM_VERSION   main" ;;
-    * )
+    Ubuntu_16.04) REPO_NAME="deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial$LLVM_VERSION  main" ;;
+    Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
+    Ubuntu_18.10) REPO_NAME="deb http://apt.llvm.org/cosmic/   llvm-toolchain-cosmic$LLVM_VERSION  main" ;;
+    Ubuntu_19.04) REPO_NAME="deb http://apt.llvm.org/disco/    llvm-toolchain-disco$LLVM_VERSION   main" ;;
+    *)
         echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
         exit 2
+        ;;
 esac
 
 REPO_NAME="deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic$LLVM_VERSION  main"
@@ -113,7 +116,7 @@ wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 add-apt-repository "${REPO_NAME}"
 apt-get update
 
-apt install clang$LLVM_VERSION lldb$LLVM_VERSION lld$LLVM_VERSION libllvm$LLVM_VERSION-ocaml-dev libllvm8 llvm$LLVM_VERSION llvm$LLVM_VERSION-dev llvm$LLVM_VERSION-doc llvm$LLVM_VERSION-examples llvm$LLVM_VERSION-runtime clang-tools$LLVM_VERSION clang-tidy$LLVM_VERSION clang$LLVM_VERSION-doc libclang-common$LLVM_VERSION-dev libclang$LLVM_VERSION-dev libclang1$LLVM_VERSION clang-format$LLVM_VERSION python-clang$LLVM_VERSION clangd$LLVM_VERSION  libfuzzer$LLVM_VERSION-dev lldb$LLVM_VERSION lld$LLVM_VERSION libc++$LLVM_VERSION-dev libc++abi$LLVM_VERSION-dev libomp$LLVM_VERSION-dev
+apt install clang$LLVM_VERSION lldb$LLVM_VERSION lld$LLVM_VERSION libllvm$LLVM_VERSION-ocaml-dev libllvm8 llvm$LLVM_VERSION llvm$LLVM_VERSION-dev llvm$LLVM_VERSION-doc llvm$LLVM_VERSION-examples llvm$LLVM_VERSION-runtime clang-tools$LLVM_VERSION clang-tidy$LLVM_VERSION clang$LLVM_VERSION-doc libclang-common$LLVM_VERSION-dev libclang$LLVM_VERSION-dev libclang1$LLVM_VERSION clang-format$LLVM_VERSION python-clang$LLVM_VERSION clangd$LLVM_VERSION libfuzzer$LLVM_VERSION-dev lldb$LLVM_VERSION lld$LLVM_VERSION libc++$LLVM_VERSION-dev libc++abi$LLVM_VERSION-dev libomp$LLVM_VERSION-dev
 
 apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks
 

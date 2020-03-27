@@ -28,8 +28,8 @@ sudo snap install universal-ctags
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 sudo snap refresh
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
@@ -65,27 +65,29 @@ The following are customization options defined in `init.el` that you could use 
 
 ## Browsing Source
 
-The `lsp` mode in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode.
+The `lsp` mode in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
 
 ### GTags
 
-You can use `counsel-gtags`.
+Use GNU Global with `counsel-gtags`.
+
+#### Examples
 
 ``` Bash
-find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
+find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
 ```
 
 ``` Bash
 find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
 ```
 
-``` Bash
-find . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.h" -o -iname "*.hpp" | gtags -v -f -
+```Bash
+find . -type f -iname "*.tex" | gtags -v -f -
 ```
 
 ### Universal CTags
 
-You can also use `counsel-etags` with Universal CTags. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
+Use Universal CTags with `counsel-etags`. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
 
 Emacs will, by default, expect a tag file by the name "TAGS" in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature:
 
@@ -96,10 +98,20 @@ Emacs will, by default, expect a tag file by the name "TAGS" in the current dire
 
 For more commands, see the Tags topic in the Emacs info document.
 
+#### Examples
+
 ``` Bash
-find -name "*.c" -print -or -name "*.h" -print -or -name "*.hpp" -print -or -name "*.cpp" -print -or -name "*.py" -print | xargs ctags -ea --list-extras
+find -L . -iname "*.c" -print -or -iname "*.h" -print -or -iname "*.hpp" -print -or -iname "*.cpp" -print -or -iname "*.cc" -or -iname "*.py" -print | ctags -eR --links -L -
 ```
+
+`find . -type f -iname "*.(py|cc|c|cpp|cxx|h|hpp|hxx)" | ctags -eR -L -`
+
+find . -type f -iname "*.cc" -exec ctags -eR {} \;
+
+find . -L -type f -iregex "*\.(cc|cpp)"
 
 ## TODO
 
-* Omit sub-directories/files with `counsel-find-file`.
+* Omit sub-directories/files with `counsel-find-file` and add to `.dir-locals.el`.
+* Use `xref` interface for both `ctags` and `gtags`.
+* Use RE in `find`, it follows Emacs RE.
