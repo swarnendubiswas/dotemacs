@@ -432,10 +432,9 @@ differences due to whitespaces."
 
       ((eq dotemacs-modeline-theme 'spaceline) (use-package spaceline
                                                  :ensure t
-                                                 :config
+                                                 :init
                                                  (require 'spaceline-config)
-                                                 (setq powerline-height 20
-                                                       powerline-default-separator 'slant
+                                                 (setq powerline-default-separator 'slant
                                                        spaceline-anzu-p t
                                                        spaceline-hud-p nil
                                                        spaceline-buffer-modified-p t
@@ -443,12 +442,11 @@ differences due to whitespaces."
                                                        spaceline-projectile-root-p t
                                                        spaceline-paradox-menu-p t)
                                                  (spaceline-emacs-theme)
-                                                 (spaceline-info-mode)
-                                                 (when (eq dotemacs-theme 'spacemacs-light)
-                                                   (set-face-attribute 'powerline-active1 nil
-                                                                       :background "gray22"
-                                                                       :foreground "white"
-                                                                       :weight 'light))
+                                                 ;; (when (eq dotemacs-theme 'spacemacs-light)
+                                                 ;;   (set-face-attribute 'powerline-active1 nil
+                                                 ;;                       :background "gray22"
+                                                 ;;                       :foreground "white"
+                                                 ;;                       :weight 'light))
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'powerline-active1 nil
                                                                        :background "gray22"
@@ -456,15 +454,9 @@ differences due to whitespaces."
                                                                        :weight 'light)
                                                    (set-face-attribute 'mode-line-inactive nil
                                                                        :background "grey88"
-                                                                       :foreground "black"))
-                                                 (use-package spaceline-all-the-icons
-                                                   :ensure t
-                                                   :after spaceline
-                                                   :config (spaceline-all-the-icons))))
+                                                                       :foreground "black"))))
 
       ((eq dotemacs-modeline-theme 'default) ))
-
-;; Configure ibuffer
 
 (use-package ibuffer
   :config
@@ -1350,7 +1342,7 @@ differences due to whitespaces."
         ("C-c g s" . counsel-etags-grep-symbol-at-point)
         ("C-c g t" . counsel-etags-find-tag))
   :init
-  (add-hook 'prog-mode-hook
+  (add-hook 'c++-mode-hook
             (lambda ()
               (add-hook 'after-save-hook
                         'counsel-etags-virtual-update-tags 'append 'local)))
