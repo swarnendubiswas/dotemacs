@@ -1844,6 +1844,14 @@ differences due to whitespaces."
 
 (setq python-shell-interpreter "python3")
 
+(use-package pyvenv
+  :ensure t
+  :diminish
+  :custom
+  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+  (pyvenv-tracking-ask-before-change t)
+  :config (pyvenv-mode 1))
+
 ;; (defun sb/company-python-backends ()
 ;;   "Add backends for Python completion in company mode."
 ;;   (make-local-variable 'company-backends)
@@ -2061,8 +2069,8 @@ differences due to whitespaces."
 
 (use-package lsp-origami
   :ensure t
-  :ensure origami 
-  :after origami 
+  :ensure origami
+  :after origami
   :hook (origami-mode . lsp-origami-mode))
 
 ;; (add-hook 'python-mode-hook
@@ -2109,6 +2117,7 @@ differences due to whitespaces."
   (setq lsp-java-inhibit-message t))
 
 (use-package lsp-python-ms
+  :disabled t
   :load-path "extras")
 
 (use-package lsp-treemacs

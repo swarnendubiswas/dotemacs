@@ -4,7 +4,6 @@ indices
 roundtrip
 anisotropic
 vectorization
-Vectorization
 probabilistically
 FIXME
 piecewise
@@ -25,9 +24,9 @@ underperforms
 pseudocode
 whitespaces
 perceptron
-blackbox
-vertices
 Parallelization
+vertices
+blackbox
 unscalable
 scalable
 programmability
@@ -45,6 +44,7 @@ whitespace
 transactional
 functionalities
 combinational
+misclassification
 recalibrates
 Swarnendu
 tunable
