@@ -1,11 +1,6 @@
 # GNU Emacs
 
-I use GNU Emacs as my primary editor on a GNU/Linux platform. This repository lists my GNU Emacs customizations, tailored according to my preferences and all in one place. This setup is tested **for** a GNU/Linux platform.
-
-<!-- Other than text, Markdown, and Elisp editing, I use GNU Emacs for editing C/C++, LaTeX, and Python files. The current setup should work fine for these major modes, but is not well-tuned for programming with Java. I think other IDEs such as Eclipse and Visual Studio Code are way better for working with Java. -->
-
-<!-- * Python - I use Elpy and Gtags (and its variants) for code completion
-* C/C++ - I use irony mode and Gtags for code completion. Ctags should also work depending on preference. -->
+I use GNU Emacs as my primary editor on a GNU/Linux platform. This repository lists my GNU Emacs customizations, tailored according to my preferences and all in one place. This setup should work for a GNU/Linux platform.
 
 Most of the included customizations are collected from the Internet. Suggestions and pull requests are welcome.
 
@@ -19,7 +14,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-A few third-party executable and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
+A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
 
 ``` Bash
 sudo apt install aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer clang-format imagemagick lua5.3 liblua5.3-dev luarocks
@@ -53,21 +48,21 @@ I plan to automate the complete setup sometime in the future.
 
 ## Directory structure
 
-* `extras` -- third-party packages (may not be available from the package archives)
-* `modules` -- Elisp modules containing personal customizations
-* `reference-cards` -- documentation and help files
-* `snippets` -- custom snippets
++ `extras` -- third-party packages (may not be available from the package archives)
++ `modules` -- Elisp modules containing personal customizations
++ `reference-cards` -- documentation and help files
++ `snippets` -- custom snippets
 
 ## Tweaking the default settings
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-* `dotemacs-theme` - Set the desired theme from a bunch of themes like`leuven`, `professional`, and `eclipse`, or use the `default`.
-* `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.
-* `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
-* `dotemacs-fill-column` - Column beyond which lines should not extend.
-* `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
-<!-- * `dotemacs-cc-tags` - Choose whether to use Gtags or RTags for C/C++ programming. -->
++ `dotemacs-theme` - Set the desired theme from a bunch of themes like`leuven`, `professional`, and `eclipse`, or use the `default`.
++ `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.
++ `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
++ `dotemacs-fill-column` - Column beyond which lines should not extend.
++ `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
++ `dotemacs-tags` - Choose whether to use Gtags or CTags for C/C++ programming. In general, we use LSP for supported languages and projects.
 
 ## Browsing Source
 
@@ -97,10 +92,10 @@ Use Universal CTags with `counsel-etags`. Use `ctags -eR` to recursively scan fo
 
 Emacs will, by default, expect a tag file by the name "TAGS" in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature:
 
-* `M-x visit-tags-table <RET> FILE <RET>` - Select the tag file `FILE` to use.
-* `M-. [TAG] <RET>` - Find the first definition of `TAG`. The default tag is the identifier under the cursor.
-* `M-*` - Pop back to where you previously invoked `M-.`.
-* `C-u M-.` - Find the next definition for the last tag.
++ `M-x visit-tags-table <RET> FILE <RET>` - Select the tag file `FILE` to use.
++ `M-. [TAG] <RET>` - Find the first definition of `TAG`. The default tag is the identifier under the cursor.
++ `M-*` - Pop back to where you previously invoked `M-.`.
++ `C-u M-.` - Find the next definition for the last tag.
 
 For more commands, see the Tags topic in the Emacs info document.
 
@@ -109,6 +104,7 @@ For more commands, see the Tags topic in the Emacs info document.
 ``` Bash
 find -L . -iname "*.c" -print -or -iname "*.h" -print -or -iname "*.hpp" -print -or -iname "*.cpp" -print -or -iname "*.cc" -or -iname "*.py" -print | ctags -eR --links -L -
 ```
+
 `find . -type f -iname "*.(py|cc|c|cpp|cxx|h|hpp|hxx)" | ctags -eR -L -`
 
 find . -type f -iname "*.cc" -exec ctags -eR {} \;
@@ -117,6 +113,6 @@ find . -L -type f -iregex "*\.(cc|cpp)"
 
 ## TODO
 
-* Omit sub-directories/files with `counsel-find-file` and add to `.dir-locals.el`.
-* Use `xref` interface for both `ctags` and `gtags`.
-* Use RE in `find`, it follows Emacs RE.
++ Omit sub-directories/files with `counsel-find-file` and add to `.dir-locals.el`.
++ Use `xref` interface for both `ctags` and `gtags`.
++ Use RE in `find`, it follows Emacs RE.

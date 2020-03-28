@@ -223,6 +223,34 @@ differences due to whitespaces."
 (column-number-mode 1)
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
 
+;; ;; Avoid completing temporary files
+;; ;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
+;; (dolist (ext '("auto"
+;;                "-autoloads.el"
+;;                ".aux"
+;;                ".bbl"
+;;                ".blg"
+;;                ".cb"
+;;                ".cb2"
+;;                ".dvi"
+;;                ".elc"
+;;                ".exe"
+;;                ".fls"
+;;                ".idx"
+;;                ".lof"
+;;                ".lot"
+;;                ".o"
+;;                ".out"
+;;                ".pdf"
+;;                "-pkg.el"
+;;                ".pyc"
+;;                ".rel"
+;;                ".rip"
+;;                ".toc"
+;;                "auto-save-list"
+;;                ))
+;;   (add-to-list 'completion-ignored-extensions ext))
+
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish
   :hook (after-init . global-auto-revert-mode)
@@ -312,7 +340,7 @@ differences due to whitespaces."
 
 (setq custom-safe-themes t
       frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
-      indicate-buffe-boundaries 'right
+      indicate-buffer-boundaries 'right
       indicate-empty-lines t)
 
 ;; https://ladicle.com/post/config/#configuration
@@ -491,8 +519,6 @@ differences due to whitespaces."
   :ensure t
   :after ibuffer)
 
-;; Configure dired
-
 (use-package dired
   :preface
   (defun dired-go-home ()
@@ -511,23 +537,23 @@ differences due to whitespaces."
               ("i" . find-file)
               ("M-<up>" . dired-jump-to-top)
               ("M-<down>" . dired-jump-to-bottom))
+  :custom
+  (dired-auto-revert-buffer t) ; Revert each dired buffer automatically when you "revisit" it
+  (dired-recursive-deletes 'always) ; Single prompt for all n directories
+  (dired-recursive-copies 'always)
+  (dired-listing-switches "-ABhl --si --group-directories-first") ; Check `ls' for additional options
+  (dired-ls-F-marks-symlinks t) ; -F marks links with @
+  (dired-dwim-target t)
   :config
-  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you "revisit" it
-        dired-recursive-deletes 'always ; Single prompt for all n directories
-        dired-recursive-copies 'always
-        dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
-        dired-ls-F-marks-symlinks t ; -F marks links with @
-        dired-dwim-target t)
   ;; Auto refresh dired when files change
   (add-hook 'dired-mode-hook 'auto-revert-mode))
 
 (use-package dired-x
+  :custom
+  (dired-bind-jump t)
+  (dired-omit-verbose nil) ; Do not show messages when omitting files
   :config
-  (setq dired-bind-jump t
-        ;; Do not show messages when omitting files
-        dired-omit-verbose nil)
-  (unless (bound-and-true-p dotemacs-use-ignoramus-p)
-    (add-hook 'dired-mode-hook #'dired-omit-mode))
+  (add-hook 'dired-mode-hook #'dired-omit-mode)
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Make sure to remove \"Omit\" from the modeline."
@@ -770,12 +796,12 @@ differences due to whitespaces."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
   (ivy-flx-limit 100)
   (ivy-height 20) ; This seems a good number to see several options at a time without cluttering the view
-  ;; ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
-  ;;                         (swiper . ivy--regex-plus)
-  ;;                         (counsel-rg . ivy--regex-plus)
-  ;;                         (counsel-grep-or-swiper . ivy--regex-plus)
-  ;;                         (ivy-switch-buffer . ivy--regex-plus)
-  ;;                         (t . ivy--regex-fuzzy))
+  (ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
+                          (swiper . ivy--regex-plus)
+                          (counsel-rg . ivy--regex-plus)
+                          (counsel-grep-or-swiper . ivy--regex-plus)
+                          (ivy-switch-buffer . ivy--regex-plus)
+                          (t . ivy--regex-fuzzy)))
   (ivy-sort-matches-functions-alist
    '((t)
      (ivy-switch-buffer . ivy-sort-function-buffer)
@@ -882,14 +908,15 @@ differences due to whitespaces."
                                     "\\|.rip$"
                                     "\\|.synctex$"
                                     "\\|.synctex.gz$"
-                                    "\\|.tar.gz"
+                                    "\\|.tar.gz$"
                                     "\\|.toc$"
-                                    "TAGS"
-                                    "GPATH"
-                                    "GRTAGS"
-                                    "GTAGS"
-                                    "tramp"
-                                    ".metadata"
+                                    "\\|TAGS"
+                                    "\\|GPATH"
+                                    "\\|GRTAGS"
+                                    "\\|GTAGS"
+                                    "\\|tramp"
+                                    "\\|.metadata"
+                                    "\\|.clangd"
                                     ))
   :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
@@ -1376,6 +1403,13 @@ differences due to whitespaces."
   (add-to-list 'counsel-etags-ignore-filenames "*.json")
   (add-to-list 'counsel-etags-ignore-filenames "TAGS"))
 
+(use-package ivy-xref
+  :ensure t
+  :after ivy
+  :custom
+  (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
+  (xref-show-definitions-function #'ivy-xref-show-defs))
+
 (use-package helpful
   :ensure t
   :bind
@@ -1386,9 +1420,10 @@ differences due to whitespaces."
 ;; M-x vlf <PATH-TO-FILE>
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
-  :config (setq large-file-warning-threshold (* 50 1024 1024) ; Warn when opening files bigger than 50MB
-                vlf-application 'dont-ask)
-  (use-package vlf-setup))
+  :custom
+  (large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
+  (vlf-application 'dont-ask)
+  :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
@@ -1418,7 +1453,7 @@ differences due to whitespaces."
 (use-package graphviz-dot-mode
   :ensure t
   :mode "\\.dot\\'"
-  :config (setq graphviz-dot-indent-width 4))
+  :custom (graphviz-dot-indent-width 4))
 
 (use-package gnuplot
   :ensure t
@@ -1588,13 +1623,13 @@ differences due to whitespaces."
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
   ;; :bind ("C-c C-d" . nil)
-  :config
-  (setq markdown-enable-wiki-links t
-        markdown-italic-underscore t
-        markdown-enable-math t
-        markdown-make-gfm-checkboxes-buttons t
-        markdown-list-indent-width 2
-        markdown-command "pandoc -f markdown -s "))
+  :custom
+  (markdown-enable-wiki-links t)
+  (markdown-italic-underscore t)
+  (markdown-enable-math t)
+  (markdown-make-gfm-checkboxes-buttons t)
+  (markdown-list-indent-width 2)
+  (markdown-command "pandoc -f markdown -s "))
 
 (use-package markdown-mode+
   :ensure t)
@@ -1724,10 +1759,11 @@ differences due to whitespaces."
 (use-package cc-mode
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
+  :custom
+  (c-set-style "cc-mode")
+  (c-basic-offset 2)
+  (c-auto-newline 1)
   :config
-  (setq c-set-style "cc-mode"
-        c-basic-offset 2
-        c-auto-newline 1)
   (c-toggle-electric-state 1)
   (c-toggle-syntactic-indentation 1)
   (unbind-key "C-M-a" c-mode-map)
@@ -2097,13 +2133,14 @@ differences due to whitespaces."
 (use-package company-lsp
   :ensure t
   :commands company-lsp
+  :custom
+  (company-lsp-enable-snippet t)
+  (company-lsp-async t)
+  (company-lsp-filter-candidates t)
+  (company-lsp-enable-recompletion t)
+  (company-lsp-cache-candidates 'auto)
   :config
   (push 'company-lsp company-backends)
-  (setq company-lsp-enable-snippet t
-        company-lsp-async t
-        company-lsp-filter-candidates t
-        company-lsp-enable-recompletion t
-        company-lsp-cache-candidates 'auto)
   (add-to-list 'company-lsp-filter-candidates '(digestif . nil)))
 
 (use-package lsp-ivy

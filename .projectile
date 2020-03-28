@@ -15,3 +15,5 @@
 -/.lsp*
 -/tramp
 -/TAGS
+-/dir-locals-examples
+-/extras
