@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Helper script to install GNU Emacs if not already present, install
+# Helper script to install GNU Emacs if not already present. It also sets up packages related to my setup.
 
 set -eux
 
@@ -13,12 +13,12 @@ DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
 DIST_VERSION="${DISTRO}_${VERSION}"
 
-cd $HOME
-
 GITHUB="$HOME/github"
 DOTEMACS="$GITHUB/dotemacs"
 DOTFILES="$GITHUB/dotfiles"
 EMACSD="$HOME/.emacs.d"
+
+cd $HOME
 
 if [ ! -d $GITHUB ]; then
     mkdir -p github
@@ -28,11 +28,21 @@ cd $GITHUB
 
 if [ -d $DOTEMACS ]; then
     cd $DOTEMACS
-    echo "Pulling dotemacs Github repository..."
+    echo "Pulling dotemacs repository from Github..."
     git pull
 else
     echo "Cloning dotemacs repository from Github..."
     git clone https://github.com/swarnendubiswas/dotemacs.git
+fi
+echo "...Done"
+
+if [ -d $DOTFILES ]; then
+    cd $DOTFILES
+    echo "Pulling dotfiles repository from Github..."
+    git pull
+else
+    echo "Cloning dotfiles repository from Github..."
+    git clone https://github.com/swarnendubiswas/dotfiles.git
 fi
 echo "...Done"
 
@@ -44,21 +54,19 @@ if [ -d $EMACSD ]; then
     fi
 fi
 
-cd $GITHUB
-
-if [ -d $DOTFILES ]; then
-    cd $DOTFILES
-    echo "Pulling dotfiles Github repository..."
-    git pull
+if [ ! -L ".markdownlint.json" ]; then
+    echo "Creating symlink for .markdownlint.json..."
+    ln -s "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
 else
-    echo "Cloning dotfiles repository from Github..."
-    git clone https://github.com/swarnendubiswas/dotfiles.git
+    echo "Overwriting symlink for .markdownlint.json..."
+    ln -nsf "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
 fi
 echo "...Done"
 
 if [ ! -d "$HOME/.config" ]; then
     mkdir -p "$HOME/.config"
 fi
+
 cd "$HOME/.config"
 
 if [ ! -L "pylintrc" ]; then
@@ -95,8 +103,6 @@ case "$DIST_VERSION" in
         ;;
 esac
 
-# apt install libstdc++7-dev
-
 # Check if LLVM 9 is installed
 LLVM_VERSION="-9"
 
@@ -105,13 +111,14 @@ case "$DIST_VERSION" in
     Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
     Ubuntu_18.10) REPO_NAME="deb http://apt.llvm.org/cosmic/   llvm-toolchain-cosmic$LLVM_VERSION  main" ;;
     Ubuntu_19.04) REPO_NAME="deb http://apt.llvm.org/disco/    llvm-toolchain-disco$LLVM_VERSION   main" ;;
+    Ubuntu_19.10) REPO_NAME="deb http://apt.llvm.org/eoan/     llvm-toolchain-eoan$LLVM_VERSION    main" ;;
     *)
         echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
         exit 2
         ;;
 esac
 
-REPO_NAME="deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic$LLVM_VERSION  main"
+# REPO_NAME="deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic$LLVM_VERSION  main"
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 add-apt-repository "${REPO_NAME}"
 apt-get update
@@ -123,19 +130,24 @@ apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-d
 snap install shfmt
 snap install universal-ctags
 snap install ripgrep --classic
+snap install shellcheck --edge
 snap refresh
 
-python2 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.14.1 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache==1.2.1 --user
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
 
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.14.1 pylint rope python-language-server[all] pycodestyle flake8 autopep8 importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache==1.2.1 --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 
-npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli
+npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
 npm i -g --unsafe-perm bash-language-server
 npm i -g stylelint --save-dev
 npm update
 
-gem install scss_lint mdl
+gem install scss_lint
+gem update
 
 composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
+composer update
+
 luarocks install --server=http://luarocks.org/dev digestif --local
+cargo install --git https://github.com/latex-lsp/texlab.git

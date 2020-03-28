@@ -96,9 +96,8 @@ differences due to whitespaces."
   :type 'boolean
   :group 'dotemacs)
 
-;; FIXME: Use this as a conditional. I now prefer LSP, but not all C/C++ projects use clang.
 (defcustom dotemacs-tags
-  'none
+  'ctags
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
@@ -467,6 +466,7 @@ differences due to whitespaces."
         ibuffer-expert t
         ibuffer-use-header-line t
         ;; ibuffer-display-summary t
+        ;; Don't show filter groups if there are no buffers in that group
         ibuffer-show-empty-filter-groups nil
         ;; ibuffer-formats
         ;; '((mark modified read-only " "
@@ -710,7 +710,7 @@ differences due to whitespaces."
   :custom
   (company-idle-delay 0.0)
   (company-global-modes t) ; Turn on company-mode for all major modes
-  (company-minimum-prefix-length 1)
+  (company-minimum-prefix-length 2)
   (company-require-match nil) ; Allow typing keys that do not match any candidates
   (company-selection-wrap-around t)
   (company-show-numbers t) ; Quick-access numbers for the first ten candidates
@@ -734,6 +734,11 @@ differences due to whitespaces."
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil)
   :config (add-to-list 'company-backends 'company-dict))
+
+(use-package company-ctags
+  :ensure t
+  :config (company-ctags-auto-setup)
+  :custom (company-ctags-fuzzy-match-p t))
 
 (use-package yasnippet
   :ensure t
@@ -889,6 +894,15 @@ differences due to whitespaces."
   :hook (ivy-mode . counsel-mode)
   :diminish counsel-mode)
 
+;; TODOO: counsel-find-file is not working
+(use-package ivy-rich
+  :ensure t
+  :after (ivy counsel)
+  :custom
+  (ivy-rich-path-style 'relative)
+  (ivy-format-function #'ivy-format-function-line)
+  :hook (ivy-mode . ivy-rich-mode))
+
 (use-package all-the-icons-ivy
   :ensure t
   :after (all-the-icons ivy)
@@ -1038,7 +1052,6 @@ differences due to whitespaces."
 
 (use-package projectile
   :ensure t
-  :ensure ggtags
   :custom
   (projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
   (projectile-completion-system 'ivy)
@@ -1052,22 +1065,26 @@ differences due to whitespaces."
   (projectile-verbose nil)
   ;; Contents of .projectile are ignored when using the alien project indexing method
   (projectile-indexing-method 'hybrid)
-  (projectile-idle-timer-seconds 120)
-  (projectile-project-search-path '("/home/swarnendu/github"
-                                    "/home/swarnendu/bitbucket"
-                                    "/home/swarnendu/plass-workspace"
-                                    "/home/swarnendu/iss-workspace"
-                                    "/home/swarnendu/iitk-workspace"
-                                    "/home/swarnendu/iitkgp-workspace"
-                                    "/home/swarnendu/prospar-workspace"))
   :config
   (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
-  (add-to-list 'projectile-ignored-projects `,(concat (getenv "HOME") "/")) ; Do not consider the home dir as a project
+  ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
+  (setq projectile-project-search-path (list
+                                        (concat `,(getenv "HOME") "/bitbucket")
+                                        (concat `,(getenv "HOME") "/github")
+                                        (concat `,(getenv "HOME") "/iitk-workspace")
+                                        (concat `,(getenv "HOME") "/iitkgp-workspace")
+                                        (concat `,(getenv "HOME") "/iss-workspace")
+                                        (concat `,(getenv "HOME") "/plass-workspace")
+                                        (concat `,(getenv "HOME") "/prospar-workspace")
+                                        ))
+  (add-to-list 'projectile-ignored-projects `,(concat `,(getenv "HOME") "/")) ; Do not consider the HOME as a project
   (dolist (dirs '(".cache"
                   ".dropbox"
                   ".git"
                   ".hg"
+                  ".metadata"
                   ".nx"
+                  ".recommenders"
                   ".svn"
                   ".vscode"
                   "__pycache__"
@@ -1129,7 +1146,7 @@ differences due to whitespaces."
             (lambda ()
               (setq-local flycheck-checker "python-pylint"
                           flycheck-python-pylint-executable "python3" ; Use python3 to execute pylint
-                          flycheck-pylintrc "/home/swarnendu/.config/pylintrc")))
+                          flycheck-pylintrc (concat `,(getenv "HOME") "/.config/pylintrc"))))
   ;; C/C++
   (add-hook 'c++-mode-hook
             (lambda ()
@@ -1148,7 +1165,7 @@ differences due to whitespaces."
   ;; Java
   ;; Markdown
   (setq-local flycheck-checker "markdown-markdownlint-cli")
-  (setq-default flycheck-markdown-markdownlint-cli-config "/home/swarnendu/.config/.markdownlint.json")
+  (setq-default flycheck-markdown-markdownlint-cli-config (concat `,(getenv "HOME") "/.config/.markdownlint.json"))
   ;; LaTeX
   (setq-local flycheck-chktexrc "")
   ;; Shell Script
@@ -1245,8 +1262,10 @@ differences due to whitespaces."
   :diminish beacon-mode)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
-;; /method:user@host#port:filename. Shortcut /ssh:: will connect to default user@host#port. Open a
-;; file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
+;; Edit remote file: /method:user@host#port:filename.
+;; Shortcut /ssh:: will connect to default user@host#port.
+;; Edit local file with sudo: C-x C-f /sudo::/etc/hosts
+;; Open a file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
   :custom
   (tramp-default-method "ssh") ; ssh is faster than the default scp
@@ -1311,7 +1330,7 @@ differences due to whitespaces."
 
 (use-package counsel-gtags
   :ensure t
-  :if (eq system-type 'gnu/linux)
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'gtags))
   :diminish counsel-gtags-mode
   :commands (counsel-gtags-find-definition
              counsel-gtags-find-reference
@@ -1338,6 +1357,7 @@ differences due to whitespaces."
 
 (use-package counsel-etags
   :ensure t
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'ctags))
   :bind(("M-." . counsel-etags-find-tag-at-point)
         ("C-c g s" . counsel-etags-grep-symbol-at-point)
         ("C-c g t" . counsel-etags-find-tag))
@@ -1476,6 +1496,9 @@ differences due to whitespaces."
   :ensure t
   :bind ("C-c i" . crux-ispell-word-then-abbrev))
 
+(use-package origami
+  :ensure t)
+
 (use-package apt-sources-list
   :ensure t
   :mode ("\\.list\\'" . apt-sources-list-mode))
@@ -1501,9 +1524,9 @@ differences due to whitespaces."
 
 (use-package ace-window
   :ensure t
+  ;; :hook (after-init . ace-window-display-mode)
   :bind (("C-c w" . ace-window)
-         ([remap other-window] . ace-window))
-  :hook (after-init . ace-window-display-mode))
+         ([remap other-window] . ace-window)))
 
 (use-package avy
   :ensure t
@@ -1819,6 +1842,8 @@ differences due to whitespaces."
 
 ;; Python mode
 
+(setq python-shell-interpreter "python3")
+
 ;; (defun sb/company-python-backends ()
 ;;   "Add backends for Python completion in company mode."
 ;;   (make-local-variable 'company-backends)
@@ -1955,33 +1980,33 @@ differences due to whitespaces."
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-auto-guess-root t)
-  (lsp-before-save-edits t)
   (lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error"))
-  (lsp-document-sync-method 'incremental)
-  (lsp-enable-snippet t)
-  (lsp-enable-completion-at-point t)
-  (lsp-enable-xref t)
-  (lsp-enable-snippet t)
-  (lsp-eldoc-render-all t)
-  (lsp-enable-indentation t)
-  (lsp-enable-on-type-formatting t)
-  (lsp-enable-semantic-highlighting t)
-  (lsp-enable-imenu t)
+  (lsp-enable-semantic-highlighting nil) ; Options: nil, immediate, deferred
+  (lsp-flycheck-live-reporting nil)
+  (lsp-html-format-wrap-line-length 100)
+  (lsp-html-format-indent-inner-html t)
   (lsp-idle-delay 0.5)
   (lsp-imenu-sort-methods 'position)
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf t)
   (lsp-pyls-configuration-sources ["pylint" "pydocstyle" "yapf"])
   (lsp-pyls-plugins-autopep8-enabled nil)
+  (lsp-pyls-plugins-mccabe-enabled nil)
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length 100)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
   (lsp-pyls-plugins-pydocstyle-enabled t)
   (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
   (lsp-pyls-plugins-pyflakes-enabled nil)
+  (lsp-pyls-plugins-pylint-enabled t)
+  (lsp-pyls-plugins-pylint-args
+   ["-p", "--style", (concat `,(getenv "HOME") "/.config/yapf/style")])
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
-  (lsp-xml-server-command (quote ("java" "-jar" "/home/swarnendu/.emacs.d/org.eclipse.lsp4xml-uber.jar")))
+  (lsp-xml-logs-client nil)
+  (lsp-xml-jar-file (expand-file-name
+                     (locate-user-emacs-file
+                      "org.eclipse.lemminx-0.11.1-uber.jar")))
   :config
   ;; (lsp-register-client
   ;;  (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
@@ -2015,25 +2040,30 @@ differences due to whitespaces."
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
   :custom
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-position 'at-point)
+  (lsp-ui-doc-use-childframe nil)
   (lsp-ui-flycheck-enable nil)
   (lsp-ui-flycheck-list-position 'right)
-  (lsp-ui-flycheck-live-reporting nil)
   (lsp-ui-imenu-enable t)
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-doc-header nil)
-  (lsp-ui-doc-use-childframe nil)
-  (lsp-ui-doc-position 'at-point)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-symbol t)
   (lsp-ui-peek-enable t)
   (lsp-ui-peek-list-width 60)
   (lsp-ui-peek-peek-height 25)
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-sideline-show-symbol t)
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+
+(use-package lsp-origami
+  :ensure t
+  :ensure origami 
+  :after origami 
+  :hook (origami-mode . lsp-origami-mode))
 
 ;; (add-hook 'python-mode-hook
 ;;           (lambda ()
@@ -2068,7 +2098,9 @@ differences due to whitespaces."
         company-lsp-cache-candidates 'auto)
   (add-to-list 'company-lsp-filter-candidates '(digestif . nil)))
 
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-ivy
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
 
 (use-package lsp-java
   :ensure t
@@ -2223,6 +2255,11 @@ Increase line spacing by two line height."
 (bind-key "C-x s" #'sb/switch-to-scratch)
 
 (bind-key "C-c d f" #'auto-fill-mode)
+
+(use-package default-text-scale
+  :ensure t
+  :bind (("C-M-=" . default-text-scale-increase)
+         ("C-M--" . default-text-scale-decrease)))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t

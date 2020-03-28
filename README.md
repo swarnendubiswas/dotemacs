@@ -19,7 +19,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-Unfortunately, quite a few third-party executables and libraries need to be installed to complement the setup. You can use the following instructions to install them on a Ubuntu 18.04 distribution.
+A few third-party executable and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
 
 ``` Bash
 sudo apt install aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer clang-format imagemagick lua5.3 liblua5.3-dev luarocks
@@ -29,7 +29,7 @@ sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 sudo snap refresh
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint cmake-language-server --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
 sudo npm i -g --unsafe-perm bash-language-server
 sudo npm i -g stylelint --save-dev
@@ -42,6 +42,12 @@ composer update
 luarocks install --server=http://luarocks.org/dev digestif --local
 cargo install --git https://github.com/latex-lsp/texlab.git
 ```
+
+The setup uses the following configuration files.
+
++ Markdownlint-cli - `$HOME/.markdownlint.json`
++ Pylint - `$HOME/.config/pylintrc`
++ YAPF - `$HOME/.config/yapf`
 
 I plan to automate the complete setup sometime in the future.
 
@@ -103,7 +109,6 @@ For more commands, see the Tags topic in the Emacs info document.
 ``` Bash
 find -L . -iname "*.c" -print -or -iname "*.h" -print -or -iname "*.hpp" -print -or -iname "*.cpp" -print -or -iname "*.cc" -or -iname "*.py" -print | ctags -eR --links -L -
 ```
-
 `find . -type f -iname "*.(py|cc|c|cpp|cxx|h|hpp|hxx)" | ctags -eR -L -`
 
 find . -type f -iname "*.cc" -exec ctags -eR {} \;
