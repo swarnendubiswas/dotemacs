@@ -462,7 +462,7 @@ differences due to whitespaces."
                                                  :init
                                                  (require 'spaceline-config)
                                                  (setq powerline-default-separator 'slant
-                                                       spaceline-anzu-p t
+                                                       ;; spaceline-anzu-p t
                                                        spaceline-hud-p nil
                                                        spaceline-buffer-modified-p t
                                                        spaceline-buffer-position-p t
@@ -659,6 +659,7 @@ differences due to whitespaces."
 
 (use-package anzu
   :ensure t
+  :disabled t
   :after isearch
   :diminish anzu-mode
   :hook (after-init . global-anzu-mode)
