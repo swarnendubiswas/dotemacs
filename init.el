@@ -2020,7 +2020,7 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((c-mode c++-mode python-mode sh-mode html-mode javascript-mode LaTeX-mode) . lsp-deferred)
+  :hook (((c-mode c++-mode python-mode sh-mode html-mode javascript-mode latex-mode plain-tex-mode) . lsp-deferred)
          ;; (before-save . lsp-format-buffer)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
@@ -2032,6 +2032,7 @@ differences due to whitespaces."
   (lsp-html-format-indent-inner-html t)
   (lsp-idle-delay 0.5)
   (lsp-imenu-sort-methods 'position)
+  (lsp-log-io t)
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf t)
   (lsp-pyls-configuration-sources ["pylint" "pydocstyle" "yapf"])
@@ -2053,24 +2054,46 @@ differences due to whitespaces."
                      (locate-user-emacs-file
                       "org.eclipse.lemminx-0.11.1-uber.jar")))
   :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
-  ;;                   :major-modes '(python-mode)
-  ;;                   :remote? t
-  ;;                   :server-id 'pyls-remote))
-
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
-  ;;                   :major-modes '(c++-mode)
-  ;;                   :remote? t
-  ;;                   :server-id 'clangd-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
+                    :major-modes '(python-mode)
+                    :remote? t
+                    :server-id 'pyls-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection "digestif")
-                    :major-modes '(latex-mode plain-tex-mode)
-                    :server-id 'digestif))
-  (add-to-list 'lsp-language-id-configuration '(latex-mode . "latex"))
-  (add-to-list 'lsp-language-id-configuration '(plain-tex-mode . "plaintex"))
+   (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
+                    :major-modes '(c++-mode)
+                    :remote? t
+                    :server-id 'clangd-remote))
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
+                    :major-modes '(sh-mode)
+                    :remote? t
+                    :server-id 'bash-lsp-remote))
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "intelephense")
+                    :major-modes '(php-mode)
+                    :remote? t
+                    :server-id 'intelephense-remote))
+
+  ;; (lsp-register-client
+  ;; (add-to-list 'lsp-language-id-configuration '(latex-mode . "latex"))
+  ;; (add-to-list 'lsp-language-id-configuration '(plain-tex-mode . "plaintex"))
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "~/.cargo/bin/texlab")
+                    :major-modes '(plain-tex-mode latex-mode)
+                    :remote? t
+                    :server-id 'texlab-remote))
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "cmake-language-server")
+                    :major-modes '(cmake-mode)
+                    :remote? t
+                    :server-id 'cmakels-remote))
+
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -2316,12 +2339,13 @@ Increase line spacing by two line height."
 
 ;; Mark safe variables
 
-;; (put 'company-clang-arguments 'safe-local-variable 'listp)
-;; (put 'company-c-headers-path-user 'safe-local-variable 'listp)
-;; (put 'reftex-default-bibliography 'safe-local-variable 'listp)
-;; (put 'company-bibtex-bibliography 'safe-local-variable 'listp)
-;; (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
-;; (put 'flycheck-clang-include-path 'safe-local-variable 'listp)
-;; (put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
+(put 'company-clang-arguments 'safe-local-variable 'listp)
+(put 'company-c-headers-path-user 'safe-local-variable 'listp)
+(put 'reftex-default-bibliography 'safe-local-variable 'listp)
+(put 'company-bibtex-bibliography 'safe-local-variable 'listp)
+(put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
+(put 'flycheck-clang-include-path 'safe-local-variable 'listp)
+(put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
+(put 'counsel-find-file-ignore-regexp 'safe-local-variable 'listp)
 
 ;;; init.el ends here

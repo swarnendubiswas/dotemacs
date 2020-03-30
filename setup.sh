@@ -125,7 +125,7 @@ apt-get update
 
 apt install clang$LLVM_VERSION lldb$LLVM_VERSION lld$LLVM_VERSION libllvm$LLVM_VERSION-ocaml-dev libllvm8 llvm$LLVM_VERSION llvm$LLVM_VERSION-dev llvm$LLVM_VERSION-doc llvm$LLVM_VERSION-examples llvm$LLVM_VERSION-runtime clang-tools$LLVM_VERSION clang-tidy$LLVM_VERSION clang$LLVM_VERSION-doc libclang-common$LLVM_VERSION-dev libclang$LLVM_VERSION-dev libclang1$LLVM_VERSION clang-format$LLVM_VERSION python-clang$LLVM_VERSION clangd$LLVM_VERSION libfuzzer$LLVM_VERSION-dev lldb$LLVM_VERSION lld$LLVM_VERSION libc++$LLVM_VERSION-dev libc++abi$LLVM_VERSION-dev libomp$LLVM_VERSION-dev
 
-apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks
+apt install aspell global exuberant-ctags libxml2-utils chktex shellcheck ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo
 
 snap install shfmt
 snap install universal-ctags
@@ -137,9 +137,7 @@ python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0
 
 python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 
-npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
-npm i -g --unsafe-perm bash-language-server
-npm i -g stylelint --save-dev
+npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint
 npm update
 
 gem install scss_lint

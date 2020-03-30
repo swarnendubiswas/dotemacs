@@ -17,7 +17,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
 
 ``` Bash
-sudo apt install aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer clang-format imagemagick lua5.3 liblua5.3-dev luarocks
+sudo apt install -y aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime
 sudo snap install shfmt
 sudo snap install universal-ctags
 sudo snap install ripgrep --classic
@@ -25,9 +25,7 @@ sudo snap install shellcheck --edge
 sudo snap refresh
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense
-sudo npm i -g --unsafe-perm bash-language-server
-sudo npm i -g stylelint --save-dev
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint
 sudo npm update
 sudo gem install scss_lint
 sudo gem update
