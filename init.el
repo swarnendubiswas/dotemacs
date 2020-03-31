@@ -105,9 +105,6 @@ differences due to whitespaces."
           (const :tag "none" none))
   :group 'dotemacs)
 
-
-;; Setup the package system
-
 (setq load-prefer-newer t)
 
 (eval-when-compile
@@ -128,9 +125,8 @@ differences due to whitespaces."
 (setq use-package-always-defer t
       use-package-always-ensure nil
       use-package-check-before-init t
-      ;; Set this to true once the configuration is stable
-      use-package-expand-minimally nil
-      use-package-verbose t)
+      use-package-expand-minimally t ; Set this to true once the configuration is stable
+      use-package-verbose nil)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -170,8 +166,7 @@ differences due to whitespaces."
       initial-scratch-message nil
       create-lockfiles nil
       ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
-      ;; x-underline-at-descent-line t ; Draw underline lower
-      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 100 MB
+      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       read-process-output-max (* 1024 1024) ; 1 MB
       use-dialog-box nil
       use-file-dialog nil
@@ -194,7 +189,7 @@ differences due to whitespaces."
       suggest-key-bindings t
       shift-select-mode t ; Use shift-select for marking
       blink-matching-paren t
-      kill-ring-max 20
+      kill-ring-max 10
       kill-do-not-save-duplicates t
       set-mark-command-repeat-pop t
       confirm-nonexistent-file-or-buffer t
@@ -336,8 +331,6 @@ differences due to whitespaces."
   ;; Do not ask to save new abbrevs when quitting
   (save-abbrevs 'silently))
 
-;; Configure GNU Emacs appearance
-
 (setq custom-safe-themes t
       frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
       indicate-buffer-boundaries 'right
@@ -378,7 +371,8 @@ differences due to whitespaces."
                                               :ensure spacemacs-theme
                                               :init
                                               (load-theme 'spacemacs-light t)
-                                              (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))))
+                                              ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
+                                              ))
 
       ((eq dotemacs-theme 'zenburn) (use-package zenburn
                                       :ensure t
@@ -416,8 +410,6 @@ differences due to whitespaces."
 ;; Install fonts with `M-x all-the-icons-install-fonts`
 (use-package all-the-icons
   :ensure t)
-
-;; Configure GNU Emacs modeline
 
 (size-indication-mode -1)
 
@@ -464,8 +456,8 @@ differences due to whitespaces."
                                                  (setq powerline-default-separator 'slant
                                                        ;; spaceline-anzu-p t
                                                        spaceline-hud-p nil
-                                                       spaceline-buffer-modified-p t
-                                                       spaceline-buffer-position-p t
+                                                       ;; spaceline-buffer-modified-p t
+                                                       ;; spaceline-buffer-position-p t
                                                        spaceline-projectile-root-p t
                                                        spaceline-paradox-menu-p t)
                                                  (spaceline-emacs-theme)
@@ -493,22 +485,8 @@ differences due to whitespaces."
         ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
         ibuffer-expert t
         ibuffer-use-header-line t
-        ;; ibuffer-display-summary t
         ;; Don't show filter groups if there are no buffers in that group
-        ibuffer-show-empty-filter-groups nil
-        ;; ibuffer-formats
-        ;; '((mark modified read-only " "
-        ;;         (name 30 30 :left :elide)
-        ;;         " "
-        ;;         (size 9 -1 :right)
-        ;;         " "
-        ;;         (mode 16 16 :left :elide)
-        ;;         " "
-        ;;         filename-and-process)
-        ;;   (mark " "
-        ;;         (name 16 -1)
-        ;;         " " filename))
-        )
+        ibuffer-show-empty-filter-groups nil)
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
@@ -564,7 +542,7 @@ differences due to whitespaces."
   :ensure t
   :custom (dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
-              ("r" . dired-efap )))
+              ("r" . dired-efap)))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
@@ -690,14 +668,13 @@ differences due to whitespaces."
 
 ;; Adding directories to the list of recent files decreases the number of entries of recent files.
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
+;; https://www.emacswiki.org/emacs/RecentFiles
 (use-package recentf
   :custom
   (recentf-max-menu-items 20)
-  ;; Set this first so that recentf can load content from this
   (recentf-save-file (concat dotemacs-temp-directory "recentf"))
   (recentf-max-saved-items 200)
-  ;; Disable this so that recentf does not attempt to stat remote files:
-  ;; https://www.emacswiki.org/emacs/RecentFiles
+  ;; Disable this so that recentf does not attempt to stat remote files
   (recentf-auto-cleanup 'never)
   (recentf-menu-filter 'recentf-sort-descending)
   ;; Check regex with re-builder
@@ -728,8 +705,6 @@ differences due to whitespaces."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
-;; Configure Company as the in-buffer autocompletion framework
-
 (use-package company
   :ensure t
   :diminish company-mode
@@ -755,7 +730,6 @@ differences due to whitespaces."
 
 (use-package company-dict
   :ensure t
-  :after company
   :custom
   (company-dict-dir (concat user-emacs-directory "dict/"))
   (company-dict-enable-fuzzy t)
@@ -769,11 +743,8 @@ differences due to whitespaces."
 
 (use-package yasnippet
   :ensure t
-  ;; :commands (yas-expand yas-minor-mode)
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  ;; :init (yas-global-mode 1)
-  ;; :hook ((LaTeX-mode prog-mode) . yas-minor-mode)
   :hook (after-init . yas-global-mode)
   :custom
   (yas-snippet-dirs '("~/.emacs.d/snippets"))
@@ -782,8 +753,6 @@ differences due to whitespaces."
   :config
   (unbind-key "<tab>" yas-minor-mode-map)
   (use-package yasnippet-snippets))
-
-;; Configure ivy as the generic completion framework
 
 (setq completion-in-region-function #'ivy-completion-in-region)
 
@@ -796,13 +765,12 @@ differences due to whitespaces."
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
   (ivy-flx-limit 100)
-  (ivy-height 20) ; This seems a good number to see several options at a time without cluttering the view
-  (ivy-re-builders-alist '((counsel-find-file . ivy--regex-fuzzy)
-                          (swiper . ivy--regex-plus)
-                          (counsel-rg . ivy--regex-plus)
-                          (counsel-grep-or-swiper . ivy--regex-plus)
-                          (ivy-switch-buffer . ivy--regex-plus)
-                          (t . ivy--regex-fuzzy)))
+  (ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
+                           (swiper . ivy--regex-ignore-order)
+                           (counsel-rg . ivy--regex-ignore-order)
+                           (counsel-grep-or-swiper . ivy--regex-ignore-order)
+                           (ivy-switch-buffer . ivy--regex-plus)
+                           (t . ivy--regex-fuzzy)))
   (ivy-sort-matches-functions-alist
    '((t)
      (ivy-switch-buffer . ivy-sort-function-buffer)
@@ -810,7 +778,10 @@ differences due to whitespaces."
   (ivy-use-ignore-default 'always) ; Always ignore buffers set in ivy-ignore-buffers
   (ivy-use-selectable-prompt nil)
   (ivy-virtual-abbreviate 'abbreviate)
-  :config
+  (ivy-height-alist '((t
+                       lambda (_caller)
+                       (/ (frame-height) 1))))
+  ;; :config
   ;; (dolist (buffer '("^\\*Backtrace\\*$"
   ;;                   "^\\*Compile-Log\\*$"
   ;;                   "^\\*.+Completions\\*$"
@@ -833,11 +804,10 @@ differences due to whitespaces."
    ("<left>" . ivy-previous-line)
    ("<right>" . ivy-next-line)
    ("M-y" . ivy-next-line))
-  :diminish ivy-mode)
+  :diminish)
 
 (use-package counsel
   :ensure t
-  :after company
   :preface
   (defun sb/counsel-recentf ()
     "Find a file on `recentf-list' and abbreviate the home directory."
@@ -920,12 +890,11 @@ differences due to whitespaces."
                                     "\\|.clangd"
                                     ))
   :hook (ivy-mode . counsel-mode)
-  :diminish counsel-mode)
+  :diminish)
 
 ;; TODOO: counsel-find-file is not working
 (use-package ivy-rich
   :ensure t
-  :after (ivy counsel)
   :custom
   (ivy-rich-path-style 'relative)
   (ivy-format-function #'ivy-format-function-line)
@@ -933,7 +902,6 @@ differences due to whitespaces."
 
 (use-package all-the-icons-ivy
   :ensure t
-  :after (all-the-icons ivy)
   :init (all-the-icons-ivy-setup)
   :custom
   (all-the-icons-ivy-file-commands
@@ -982,9 +950,8 @@ differences due to whitespaces."
               (message "No more miss-spelled word!")
               (setq arg 0))
           (forward-word)))))
-  :config
-  (setq-default ispell-program-name (executable-find "aspell"))
   :custom
+  (ispell-program-name (executable-find "aspell"))
   (ispell-local-dictionary "en_US")
   (ispell-dictionary "english")
   (ispell-personal-dictionary (concat dotemacs-extras-directory "spell"))
@@ -993,21 +960,10 @@ differences due to whitespaces."
   (ispell-silently-savep t) ; Save a new word to personal dictionary without asking
   (flyspell-sort-corrections nil)
   (flyspell-issue-message-flag nil)
-
-  ;; ;; This is to turn on spell check in *scratch* buffer, which is in text-mode.
-  ;; (dolist (hook '(text-mode-hook find-file-hooks))
-  ;;   (add-hook hook #'turn-on-flyspell))
-
-  ;; (dolist (hook '(text-mode-hook))
-  ;;   (add-hook hook #'turn-on-flyspell))
-
-  ;; ;; Turn on flyspell-mode for comments and strings.
-  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
   :hook ((prog-mode . flyspell-prog-mode)
          (before-save-hook . flyspell-buffer)
          ((text-mode find-file-hooks) . flyspell-mode))
-  :diminish flyspell-mode
+  :diminish
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
@@ -1018,7 +974,6 @@ differences due to whitespaces."
 
 (use-package flyspell-popup
   :ensure t
-  :after flyspell
   :bind ("C-;" . flyspell-popup-correct))
 
 (setq-default fill-column dotemacs-fill-column
@@ -1033,14 +988,16 @@ differences due to whitespaces."
   :hook (emacs-lisp-mode . aggressive-indent-mode)
   :diminish aggressive-indent-mode)
 
-(use-package electric
+(use-package electric ; This may interfere with lsp formatting
+  :disabled t
   :hook (prog-mode . electric-indent-mode))
 
 (use-package highlight-indentation
   :ensure t
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook (python-mode . highlight-indentation-mode)
-  :config (set-face-background 'highlight-indentation-face "WhiteSmoke"))
+  ;; :config (set-face-background 'highlight-indentation-face "WhiteSmoke")
+  )
 
 (use-package paren
   :hook (after-init . show-paren-mode)
@@ -1172,8 +1129,8 @@ differences due to whitespaces."
   ;; Python
   (add-hook 'python-mode-hook
             (lambda ()
-              (setq-local flycheck-checker "python-pylint"
-                          flycheck-python-pylint-executable "python3" ; Use python3 to execute pylint
+              (setq-local flycheck-checker 'python-pylint
+                          flycheck-python-pylint-executable "python3"
                           flycheck-pylintrc (concat `,(getenv "HOME") "/.config/pylintrc"))))
   ;; C/C++
   (add-hook 'c++-mode-hook
@@ -1192,12 +1149,12 @@ differences due to whitespaces."
   (setq-local flycheck-cuda-include-path "") ; Directories
   ;; Java
   ;; Markdown
-  (setq-local flycheck-checker "markdown-markdownlint-cli")
-  (setq-default flycheck-markdown-markdownlint-cli-config (concat `,(getenv "HOME") "/.config/.markdownlint.json"))
+  (setq-default flycheck-checker 'markdown-markdownlint-cli
+                flycheck-markdown-markdownlint-cli-config (concat `,(getenv "HOME") "/.config/.markdownlint.json"))
   ;; LaTeX
   (setq-local flycheck-chktexrc "")
   ;; Shell Script
-  (setq-local flycheck-checker "sh-shellcheck")
+  (setq-default flycheck-checker 'sh-shellcheck)
   ;; HTML
   ;; JSON
   )
@@ -1205,7 +1162,6 @@ differences due to whitespaces."
 (use-package avy-flycheck
   :ensure t
   :ensure avy
-  :after (avy flycheck)
   :config
   ;; Binds avy-flycheck-goto-error to C-c ! g
   (avy-flycheck-setup))
@@ -1213,8 +1169,6 @@ differences due to whitespaces."
 (use-package flycheck-popup-tip ; Show error messages in popups
   :ensure t
   :hook (flycheck-mode . flycheck-popup-tip-mode))
-
-;; Whitespace
 
 ;; This is different from whitespace-cleanup since this is unconditional
 (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
@@ -1231,7 +1185,7 @@ differences due to whitespaces."
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
-  :diminish ws-butler-mode
+  :diminish
   :hook (prog-mode . ws-butler-mode))
 
 (use-package highlight-symbol ; Highlight symbol under point
@@ -1268,7 +1222,7 @@ differences due to whitespaces."
   (highlight-symbol-idle-delay 1)
   (highlight-symbol-on-navigation-p t)
   (highlight-symbol-highlight-single-occurrence nil)
-  :diminish highlight-symbol-mode)
+  :diminish)
 
 (use-package hl-todo
   :ensure t
@@ -1287,7 +1241,7 @@ differences due to whitespaces."
   :ensure t
   :disabled t
   :hook (after-init . beacon-mode)
-  :diminish beacon-mode)
+  :diminish)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; Edit remote file: /method:user@host#port:filename.
@@ -1305,8 +1259,7 @@ differences due to whitespaces."
   (tramp-verbose 1) ; Default is 3
   (remote-file-name-inhibit-cache nil) ; Remote files are not updated outside of Tramp
   (tramp-completion-reread-directory-timeout nil)
-  ;; Disable version control. If you access remote files which are not under version control, a lot
-  ;; of check operations can be avoided by disabling VC.
+  ;; Disable version control
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
                                 tramp-file-name-regexp))
   :config
@@ -1317,14 +1270,12 @@ differences due to whitespaces."
 
   ;; If the shell of the server is not bash, then it is recommended to connect with bash
   (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
-
   ;; Disable backup
   (add-to-list 'backup-directory-alist
                (cons tramp-file-name-regexp nil)))
 
 (use-package counsel-tramp
   :ensure t
-  :after tramp
   :config
   (add-hook 'counsel-tramp-pre-command-hook
             (lambda ()
@@ -1406,7 +1357,6 @@ differences due to whitespaces."
 
 (use-package ivy-xref
   :ensure t
-  :after ivy
   :custom
   (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
   (xref-show-definitions-function #'ivy-xref-show-defs))
@@ -1428,7 +1378,7 @@ differences due to whitespaces."
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
-  :diminish hungry-delete-mode
+  :diminish
   :hook (after-init . global-hungry-delete-mode ))
 
 (use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
@@ -1551,9 +1501,10 @@ differences due to whitespaces."
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
   :config (add-hook 'ssh-config-mode-hook 'turn-on-font-lock))
 
-(use-package super-save
+(use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
-  :diminish super-save-mode
+  :diminish
+  :custom (super-save-auto-save-when-idle t)
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
@@ -1602,7 +1553,7 @@ differences due to whitespaces."
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
-  :diminish writegood-mode
+  :diminish
   :hook (text-mode . writegood-mode))
 
 ;; (defun sb/company-text-backends ()
@@ -1637,7 +1588,7 @@ differences due to whitespaces."
 
 (use-package pandoc-mode
   :ensure t
-  :diminish pandoc-mode
+  :diminish
   :config (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
@@ -1718,6 +1669,7 @@ differences due to whitespaces."
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 (use-package electric
+  :disabled t
   :hook (prog-mode . electric-layout-mode))
 
 (use-package eldoc
@@ -1775,12 +1727,11 @@ differences due to whitespaces."
 
 (use-package company-c-headers
   :ensure t
-  :after (company cc-mode)
   :config
   (add-to-list 'company-backends 'company-c-headers)
   (dolist (paths '(
                    "/usr/include"
-                   "/usr/include/clang/6"
+                   "/usr/include/clang/7"
                    "/usr/include/boost"
                    "/usr/include/linux"
                    "/usr/include/c++/7"
@@ -2021,20 +1972,21 @@ differences due to whitespaces."
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
   :hook (((c-mode c++-mode python-mode sh-mode html-mode javascript-mode latex-mode plain-tex-mode) . lsp-deferred)
-         ;; (before-save . lsp-format-buffer)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-auto-guess-root t)
   (lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error"))
+  (lsp-enable-file-watchers nil) ; Could be a directory-local variable
+  (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting nil) ; Options: nil, immediate, deferred
-  (lsp-flycheck-live-reporting nil)
+  (lsp-flycheck-live-reporting t)
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-indent-inner-html t)
   (lsp-idle-delay 0.5)
   (lsp-imenu-sort-methods 'position)
-  (lsp-log-io t)
+  (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
-  (lsp-prefer-capf t)
+  (lsp-prefer-capf nil)
   (lsp-pyls-configuration-sources ["pylint" "pydocstyle" "yapf"])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
@@ -2133,26 +2085,26 @@ differences due to whitespaces."
   :after origami
   :hook (origami-mode . lsp-origami-mode))
 
-;; (add-hook 'python-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda ()
-;;                         (lsp-format-buffer)) nil t)))
-;; (add-hook 'c++-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda ()
-;;                         (lsp-format-buffer)) nil t)))
-;; (add-hook 'java-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda () (lsp-format-buffer))
-;;                       nil t)))
-;; (add-hook 'sh-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda () (lsp-format-buffer))
-;;                       nil t)))
+(add-hook 'python-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
+(add-hook 'java-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda () (lsp-format-buffer))
+                      nil t)))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda () (lsp-format-buffer))
+                      nil t)))
 
 (use-package company-lsp
   :ensure t
@@ -2165,7 +2117,8 @@ differences due to whitespaces."
   (company-lsp-cache-candidates 'auto)
   :config
   (push 'company-lsp company-backends)
-  (add-to-list 'company-lsp-filter-candidates '(digestif . nil)))
+  ;; (add-to-list 'company-lsp-filter-candidates '(digestif . nil))
+  )
 
 (use-package lsp-ivy
   :ensure t
@@ -2284,6 +2237,7 @@ Increase line spacing by two line height."
       (delete-file old-location))))
 
 ;; https://www.emacswiki.org/emacs/BuildTags
+(setq path-to-ctags "/usr/local/bin/ctags")
 (defun sb/create-ctags (dir-name)
   "Create tags file."
   (interactive "Directory: ")
