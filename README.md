@@ -17,7 +17,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
 
 ``` Bash
-sudo apt install -y aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime
+sudo apt install -y aspell global exuberant-ctags libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime pandoc
 sudo snap install shfmt
 sudo snap install universal-ctags
 sudo snap install ripgrep --classic

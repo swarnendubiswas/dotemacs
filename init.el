@@ -125,8 +125,9 @@ differences due to whitespaces."
 (setq use-package-always-defer t
       use-package-always-ensure nil
       use-package-check-before-init t
-      use-package-expand-minimally t ; Set this to true once the configuration is stable
-      use-package-verbose nil)
+      use-package-verbose nil
+      ;; Use "M-x use-package-report" to see results
+      use-package-compute-statistics t)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -147,15 +148,21 @@ differences due to whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
+(use-package auto-package-update
+  :ensure t
+  :custom
+  (auto-package-update-delete-old-versions t)
+  (auto-package-update-hide-results t)
+  :config (auto-package-update-maybe))
+
 (use-package cus-edit
   :custom (custom-file dotemacs-emacs-custom-file))
 
 (use-package exec-path-from-shell
   :ensure t
+  :if (memq window-system '(x ns))
   :custom (exec-path-from-shell-check-startup-files nil)
-  :config
-  (when (memq window-system '(x))
-    (exec-path-from-shell-initialize)))
+  :config (exec-path-from-shell-initialize))
 
 ;; Configure GNU Emacs defaults
 
@@ -321,7 +328,7 @@ differences due to whitespaces."
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
 (use-package abbrev
-  :diminish abbrev-mode
+  :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
   ;; :init
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
@@ -705,6 +712,8 @@ differences due to whitespaces."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
+(setq popup-use-optimized-column-computation nil)
+
 (use-package company
   :ensure t
   :diminish company-mode
@@ -951,7 +960,6 @@ differences due to whitespaces."
               (setq arg 0))
           (forward-word)))))
   :custom
-  (ispell-program-name (executable-find "aspell"))
   (ispell-local-dictionary "en_US")
   (ispell-dictionary "english")
   (ispell-personal-dictionary (concat dotemacs-extras-directory "spell"))
@@ -1606,15 +1614,15 @@ differences due to whitespaces."
                         company-backends)))
   :config (add-hook 'TeX-mode-hook #'company-math-setup))
 
+(use-package bibtex-completion
+  :custom
+  (bibtex-completion-cite-prompt-for-optional-arguments nil)
+  (bibtex-completion-cite-default-as-initial-input t)
+  (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
+
 (use-package ivy-bibtex
   :ensure t
   :bind ("C-c l x" . ivy-bibtex)
-  :init
-  (use-package bibtex-completion
-    :custom
-    (bibtex-completion-cite-prompt-for-optional-arguments nil)
-    (bibtex-completion-cite-default-as-initial-input t)
-    (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-bibtex
@@ -2300,6 +2308,7 @@ Increase line spacing by two line height."
 (put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
 (put 'flycheck-clang-include-path 'safe-local-variable 'listp)
 (put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
-(put 'counsel-find-file-ignore-regexp 'safe-local-variable 'listp)
+(put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
+(put 'projectile-globally-ignored-directories 'safe-local-variable 'listp)
 
 ;;; init.el ends here
