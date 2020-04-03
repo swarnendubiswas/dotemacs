@@ -1,4 +1,5 @@
-((nil . ((eval . (setq projectile-enable-caching t))))
+(
+ (nil . ((projectile-enable-caching . t)))
  (c++-mode . ((flycheck-gcc-language-standard . "c++11")
               (flycheck-clang-language-standard . "c++11")
               (eval . (let ((clang-args '("-std=c++11"

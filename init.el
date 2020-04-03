@@ -1959,6 +1959,7 @@ differences due to whitespaces."
   (magit-save-repository-buffers t)
   (magit-completing-read-function 'ivy-completing-read)
   ;; (magit-display-buffer-function 'switch-to-buffer)
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   ;; (magit-post-display-buffer-hook #'(lambda ()
   ;;                                     (when (derived-mode-p 'magit-status-mode)
   ;;                                       (delete-other-windows))))
