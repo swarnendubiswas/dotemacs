@@ -1,4 +1,4 @@
-personal_ws-1.1 en 80 
+personal_ws-1.1 en 81 
 atomicity
 indices
 roundtrip
@@ -25,8 +25,8 @@ pseudocode
 whitespaces
 perceptron
 Parallelization
-vertices
 blackbox
+vertices
 unscalable
 scalable
 programmability
@@ -55,6 +55,7 @@ Kolkata
 serializability
 unoptimized
 dependences
+misclassify
 tradeoff
 multicore
 parallelizing

@@ -53,7 +53,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'spacemacs-light
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -68,7 +68,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'spaceline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -162,7 +162,7 @@ differences due to whitespaces."
   :ensure t
   :if (memq window-system '(x ns))
   :custom (exec-path-from-shell-check-startup-files nil)
-  :config (exec-path-from-shell-initialize))
+  :init (exec-path-from-shell-initialize))
 
 ;; Configure GNU Emacs defaults
 
@@ -422,7 +422,7 @@ differences due to whitespaces."
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
-                                                 :config
+                                                 :init
                                                  (setq powerline-display-mule-info nil
                                                        powerline-display-buffer-size t
                                                        powerline-display-hud nil
@@ -774,12 +774,13 @@ differences due to whitespaces."
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
   (ivy-flx-limit 100)
-  (ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
-                           (swiper . ivy--regex-ignore-order)
-                           (counsel-rg . ivy--regex-ignore-order)
-                           (counsel-grep-or-swiper . ivy--regex-ignore-order)
-                           (ivy-switch-buffer . ivy--regex-plus)
-                           (t . ivy--regex-fuzzy)))
+  ;; (ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
+  ;;                          (swiper . ivy--regex-ignore-order)
+  ;;                          (counsel-rg . ivy--regex-ignore-order)
+  ;;                          (counsel-grep-or-swiper . ivy--regex-ignore-order)
+  ;;                          (ivy-switch-buffer . ivy--regex-plus)
+  ;;                          (t . ivy--regex-fuzzy)))
+  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   (ivy-sort-matches-functions-alist
    '((t)
      (ivy-switch-buffer . ivy-sort-function-buffer)
@@ -878,6 +879,7 @@ differences due to whitespaces."
                                     "\\|.elc$"
                                     "\\|.fdb_latexmk$"
                                     "\\|.fls$"
+                                    "\\|.jar$"
                                     "\\|.lof$"
                                     "\\|.lot$"
                                     "\\|.o$"
@@ -890,13 +892,15 @@ differences due to whitespaces."
                                     "\\|.synctex.gz$"
                                     "\\|.tar.gz$"
                                     "\\|.toc$"
+                                    "\\|tags"
                                     "\\|TAGS"
                                     "\\|GPATH"
                                     "\\|GRTAGS"
                                     "\\|GTAGS"
                                     "\\|tramp"
-                                    "\\|.metadata"
                                     "\\|.clangd"
+                                    "\\|.metadata"
+                                    "\\|.recommenders"
                                     ))
   :hook (ivy-mode . counsel-mode)
   :diminish)
@@ -917,7 +921,7 @@ differences due to whitespaces."
    '(counsel-find-file counsel-file-jump counsel-dired-jump counsel-recentf counsel-find-library counsel-projectile-find-file counsel-projectile-find-dir)))
 
 (use-package flyspell
-  :if (and (eq system-type 'gnu/linux) (executable-find "aspell"))
+  :if (eq system-type 'gnu/linux)
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -1072,6 +1076,7 @@ differences due to whitespaces."
                                         ))
   (add-to-list 'projectile-ignored-projects `,(concat `,(getenv "HOME") "/")) ; Do not consider the HOME as a project
   (dolist (dirs '(".cache"
+                  ".clangd"
                   ".dropbox"
                   ".git"
                   ".hg"
@@ -1089,14 +1094,17 @@ differences due to whitespaces."
                   "GTAGS"
                   "GSYMS"
                   "TAGS"
+                  "tags"
                   ".dir-locals.el"
                   ".projectile"
                   ".project"
                   ".tags"
                   "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files item))
-  (dolist (list '(".bak"
+  (dolist (list '(".aux"
+                  ".bak"
                   ".elc"
+                  ".jar"
                   ".out"
                   ".pdf"
                   ".pt"
@@ -1564,6 +1572,9 @@ differences due to whitespaces."
   :diminish
   :hook (text-mode . writegood-mode))
 
+(use-package flycheck-grammarly
+  :ensure t)
+
 ;; (defun sb/company-text-backends ()
 ;;   "Add backends for text completion in company mode."
 ;;   (make-local-variable 'company-backends)
@@ -1597,7 +1608,7 @@ differences due to whitespaces."
 (use-package pandoc-mode
   :ensure t
   :diminish
-  :config (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
+  :config (add-hook 'pandoc-mode-hook #'pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
 (use-package csv-mode
@@ -1836,8 +1847,6 @@ differences due to whitespaces."
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
 
-;; Python mode
-
 (setq python-shell-interpreter "python3")
 
 (use-package pyvenv
@@ -1877,8 +1886,6 @@ differences due to whitespaces."
 (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
   :ensure t)
 
-;; Shell script mode
-
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
@@ -1903,7 +1910,6 @@ differences due to whitespaces."
   :mode "\\.fish\\'")
 
 (use-package shfmt
-  :ensure nil
   :ensure reformatter
   :load-path "extras/shfmt"
   :ensure-system-package shfmt
@@ -1911,7 +1917,6 @@ differences due to whitespaces."
   :hook (sh-mode . shfmt-enable-on-save))
 
 (use-package flycheck-shfmt
-  :ensure nil
   :ensure reformatter
   :after flycheck
   :load-path "extras/shfmt"
@@ -1937,8 +1942,6 @@ differences due to whitespaces."
 ;;            company-fish-shell))))
 ;; (add-hook 'sh-mode-hook 'sb/company-sh-backends)
 
-;; Setup VCS
-
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
@@ -1948,9 +1951,11 @@ differences due to whitespaces."
   (transient-history-file (concat dotemacs-temp-directory "transient/history.el"))
   (magit-save-repository-buffers t)
   (magit-completing-read-function 'ivy-completing-read)
-  ( magit-post-display-buffer-hook #'(lambda ()
-                                       (when (derived-mode-p 'magit-status-mode)
-                                         (delete-other-windows)))))
+  ;; (magit-display-buffer-function 'switch-to-buffer)
+  ;; (magit-post-display-buffer-hook #'(lambda ()
+  ;;                                     (when (derived-mode-p 'magit-status-mode)
+  ;;                                       (delete-other-windows))))
+  )
 
 (use-package magit-popup
   :after magit)
@@ -1973,17 +1978,13 @@ differences due to whitespaces."
         (smerge-mode +1)))))
 (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
 
-
-;; LSP implementation for GNU Emacs
-
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
   :hook (((c-mode c++-mode python-mode sh-mode html-mode javascript-mode latex-mode plain-tex-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
-  (lsp-auto-guess-root t)
-  (lsp-clients-clangd-args '("-j=2" "-background-index" "-log=error"))
+  (lsp-clients-clangd-args '("-j=4" "-background-index" "--clang-tidy" "-log=error"))
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting nil) ; Options: nil, immediate, deferred
@@ -2013,6 +2014,7 @@ differences due to whitespaces."
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
                       "org.eclipse.lemminx-0.11.1-uber.jar")))
+  (lsp-yaml-print-width 100)
   :config
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
@@ -2114,6 +2116,10 @@ differences due to whitespaces."
                       (lambda () (lsp-format-buffer))
                       nil t)))
 
+(use-package lsp-latex
+  :disabled t
+  :load-path "extras")
+
 (use-package company-lsp
   :ensure t
   :commands company-lsp
@@ -2123,10 +2129,7 @@ differences due to whitespaces."
   (company-lsp-filter-candidates t)
   (company-lsp-enable-recompletion t)
   (company-lsp-cache-candidates 'auto)
-  :config
-  (push 'company-lsp company-backends)
-  ;; (add-to-list 'company-lsp-filter-candidates '(digestif . nil))
-  )
+  :config (push 'company-lsp company-backends))
 
 (use-package lsp-ivy
   :ensure t

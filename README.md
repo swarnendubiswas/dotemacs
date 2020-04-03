@@ -99,7 +99,7 @@ For more commands, see the Tags topic in the Emacs info document.
 
 #### Examples
 
-``` Bash
+```Bash
 find -L . -iname "*.c" -print -or -iname "*.h" -print -or -iname "*.hpp" -print -or -iname "*.cpp" -print -or -iname "*.cc" -or -iname "*.py" -print | ctags -eR --links -L -
 ```
 
