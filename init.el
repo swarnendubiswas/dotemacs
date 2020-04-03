@@ -1063,6 +1063,13 @@ differences due to whitespaces."
   ;; Contents of .projectile are ignored when using the alien project indexing method
   (projectile-indexing-method 'hybrid)
   :config
+  (defun projectile-default-mode-line ()
+    "Report project name and type in the modeline."
+    (let ((project-name (projectile-project-name))
+	        (project-type (projectile-project-type)))
+      (format "%s[%s]"
+	            projectile-mode-line-prefix
+	            (or project-name "-"))))
   (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
   (setq projectile-project-search-path (list
@@ -2137,9 +2144,8 @@ differences due to whitespaces."
 
 (use-package lsp-java
   :ensure t
-  :config
-  (add-hook 'java-mode-hook 'lsp)
-  (setq lsp-java-inhibit-message t))
+  :hook (java-mode . lsp)
+  :custom (lsp-java-inhibit-message t))
 
 (use-package lsp-python-ms
   :disabled t
