@@ -35,12 +35,12 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-extras-directory (concat user-emacs-directory "extras/")
-  "Directory listing third-party packages and files."
+  "Path for third-party packages and files."
   :type 'string
   :group 'dotemacs)
 
 (defcustom dotemacs-modules-directory (concat user-emacs-directory "modules/")
-  "Directory containing setup files for customized configuration."
+  "Path containing setup files for customized configuration."
   :type 'string
   :group 'dotemacs)
 
@@ -113,8 +113,8 @@ differences due to whitespaces."
         ;; Avoid loading packages twice
         package-enable-at-startup nil)
   (package-initialize)
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/") t))
+  (add-to-list 'package-archives '("melpa"
+                                   . "https://melpa.org/packages/") t))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -125,9 +125,8 @@ differences due to whitespaces."
 (setq use-package-always-defer t
       use-package-always-ensure nil
       use-package-check-before-init t
-      use-package-verbose nil
-      ;; Use "M-x use-package-report" to see results
-      use-package-compute-statistics t)
+      use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+      use-package-verbose nil)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -166,13 +165,16 @@ differences due to whitespaces."
 
 ;; Configure GNU Emacs defaults
 
-(setq inhibit-default-init t ; Disable loading of "default.el" at startup, inhibits site default settings
-      inhibit-startup-screen t ; inhibit-splash-screen is an alias
+(setq inhibit-startup-screen t ; inhibit-splash-screen is an alias
+      ;; Disable loading of "default.el" at startup, inhibits site default settings
+      inhibit-default-init t
       inhibit-startup-echo-area-message t
-      initial-major-mode 'text-mode ; *scratch* is in Lisp interaction mode by default, use text mode instead
+      ;; *scratch* is in Lisp interaction mode by default, use text mode instead
+      initial-major-mode 'text-mode
       initial-scratch-message nil
       create-lockfiles nil
-      ring-bell-function 'ignore ; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
+      ;; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
+      ring-bell-function 'ignore
       gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       read-process-output-max (* 1024 1024) ; 1 MB
       use-dialog-box nil
@@ -182,7 +184,7 @@ differences due to whitespaces."
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
-      x-stretch-cursor t ; Make cursor the width of the character it is under i.e. full width of a TAB
+      x-stretch-cursor t ; Make cursor the width of the character it is under
       auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save")
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       require-final-newline t ; Always end a file with a newline.
@@ -224,34 +226,6 @@ differences due to whitespaces."
 (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
 (column-number-mode 1)
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
-
-;; ;; Avoid completing temporary files
-;; ;; http://endlessparentheses.com/improving-emacs-file-name-completion.html
-;; (dolist (ext '("auto"
-;;                "-autoloads.el"
-;;                ".aux"
-;;                ".bbl"
-;;                ".blg"
-;;                ".cb"
-;;                ".cb2"
-;;                ".dvi"
-;;                ".elc"
-;;                ".exe"
-;;                ".fls"
-;;                ".idx"
-;;                ".lof"
-;;                ".lot"
-;;                ".o"
-;;                ".out"
-;;                ".pdf"
-;;                "-pkg.el"
-;;                ".pyc"
-;;                ".rel"
-;;                ".rip"
-;;                ".toc"
-;;                "auto-save-list"
-;;                ))
-;;   (add-to-list 'completion-ignored-extensions ext))
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish
@@ -414,8 +388,7 @@ differences due to whitespaces."
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
 
-;; Install fonts with `M-x all-the-icons-install-fonts`
-(use-package all-the-icons
+(use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
   :ensure t)
 
 (size-indication-mode -1)
@@ -468,11 +441,6 @@ differences due to whitespaces."
                                                        spaceline-projectile-root-p t
                                                        spaceline-paradox-menu-p t)
                                                  (spaceline-emacs-theme)
-                                                 ;; (when (eq dotemacs-theme 'spacemacs-light)
-                                                 ;;   (set-face-attribute 'powerline-active1 nil
-                                                 ;;                       :background "gray22"
-                                                 ;;                       :foreground "white"
-                                                 ;;                       :weight 'light))
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'powerline-active1 nil
                                                                        :background "gray22"
@@ -491,9 +459,9 @@ differences due to whitespaces."
         ibuffer-case-fold-search t ; Ignore case when searching
         ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
         ibuffer-expert t
-        ibuffer-use-header-line t
         ;; Don't show filter groups if there are no buffers in that group
-        ibuffer-show-empty-filter-groups nil)
+        ibuffer-show-empty-filter-groups nil
+        ibuffer-use-header-line t)
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
@@ -526,7 +494,8 @@ differences due to whitespaces."
   (dired-auto-revert-buffer t) ; Revert each dired buffer automatically when you "revisit" it
   (dired-recursive-deletes 'always) ; Single prompt for all n directories
   (dired-recursive-copies 'always)
-  (dired-listing-switches "-ABhl --si --group-directories-first") ; Check `ls' for additional options
+  ;; Check `ls' for additional options
+  (dired-listing-switches "-ABhl --si --group-directories-first")
   (dired-ls-F-marks-symlinks t) ; -F marks links with @
   (dired-dwim-target t)
   :config
@@ -623,7 +592,8 @@ differences due to whitespaces."
 
 (setq case-fold-search t) ; Make search ignore case
 
-;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch candidates.
+;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
+;; candidates.
 (use-package isearch
   :custom
   (search-highlight t) ; Highlight incremental search
@@ -781,10 +751,10 @@ differences due to whitespaces."
   ;;                          (ivy-switch-buffer . ivy--regex-plus)
   ;;                          (t . ivy--regex-fuzzy)))
   (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-  (ivy-sort-matches-functions-alist
-   '((t)
-     (ivy-switch-buffer . ivy-sort-function-buffer)
-     (counsel-find-file . ivy-sort-function-buffer)))
+  ;; (ivy-sort-matches-functions-alist
+  ;;  '((t)
+  ;;    (ivy-switch-buffer . ivy-sort-function-buffer)
+  ;;    (counsel-find-file . ivy-sort-function-buffer)))
   (ivy-use-ignore-default 'always) ; Always ignore buffers set in ivy-ignore-buffers
   (ivy-use-selectable-prompt nil)
   (ivy-virtual-abbreviate 'abbreviate)
@@ -905,20 +875,18 @@ differences due to whitespaces."
   :hook (ivy-mode . counsel-mode)
   :diminish)
 
-;; TODOO: counsel-find-file is not working
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :init (all-the-icons-ivy-rich-mode 1)
+  :custom
+  (all-the-icons-ivy-rich-icon-size 0.8))
+
 (use-package ivy-rich
   :ensure t
   :custom
   (ivy-rich-path-style 'relative)
   (ivy-format-function #'ivy-format-function-line)
   :hook (ivy-mode . ivy-rich-mode))
-
-(use-package all-the-icons-ivy
-  :ensure t
-  :init (all-the-icons-ivy-setup)
-  :custom
-  (all-the-icons-ivy-file-commands
-   '(counsel-find-file counsel-file-jump counsel-dired-jump counsel-recentf counsel-find-library counsel-projectile-find-file counsel-projectile-find-dir)))
 
 (use-package flyspell
   :if (eq system-type 'gnu/linux)
@@ -1042,7 +1010,7 @@ differences due to whitespaces."
          ("C-S-f" . sp-forward-symbol)
          ;; (foo bar) -> foo bar
          ("C-M-k" . sp-splice-sexp))
-  :diminish smartparens-mode)
+  :diminish)
 
 (use-package elec-pair
   :hook (after-init . electric-pair-mode))
@@ -1057,7 +1025,8 @@ differences due to whitespaces."
   ;; (projectile-find-dir-includes-top-level t)
   (projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld"))
   (projectile-mode-line-prefix "")
-  (projectile-require-project-root t) ; Use projectile only in desired directories, too much noise otherwise
+  ;; Use projectile only in desired directories, too much noise otherwise
+  (projectile-require-project-root t)
   (projectile-switch-project-action 'projectile-find-file) ; Use projectile-dired to view in dired
   (projectile-verbose nil)
   ;; Contents of .projectile are ignored when using the alien project indexing method
@@ -1177,7 +1146,7 @@ differences due to whitespaces."
   ;; LaTeX
   (setq-local flycheck-chktexrc "")
   ;; Shell Script
-  (setq-default flycheck-checker 'sh-shellcheck)
+  (setq-local flycheck-checker 'sh-shellcheck)
   ;; HTML
   ;; JSON
   )
@@ -1259,12 +1228,6 @@ differences due to whitespaces."
                            ("IMP" . hl-todo)
                            ("FIXME" . hl-todo)))
   :config (global-hl-todo-mode))
-
-(use-package beacon ; Highlight cursor position in buffer after scrolling
-  :ensure t
-  :disabled t
-  :hook (after-init . beacon-mode)
-  :diminish)
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; Edit remote file: /method:user@host#port:filename.
@@ -1688,7 +1651,7 @@ differences due to whitespaces."
 ;; (add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
 ;; (add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
 
-(global-prettify-symbols-mode)
+(global-prettify-symbols-mode -1)
 
 (use-package make-mode
   :mode (("\\Makefile\\'" . makefile-mode)
@@ -1698,9 +1661,11 @@ differences due to whitespaces."
   :disabled t
   :hook (prog-mode . electric-layout-mode))
 
+;; https://emacs.stackexchange.com/questions/31414/how-to-globally-disable-eldoc
 (use-package eldoc
   :if (eq system-type 'gnu/linux)
-  :diminish eldoc-mode)
+  :diminish
+  :config (global-eldoc-mode -1))
 
 (use-package octave
   :mode "\\.m\\'")
@@ -1722,8 +1687,8 @@ differences due to whitespaces."
 ;; bsd: What BSD developers use, aka "Allman style" after Eric Allman.
 ;; whitesmith: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
 ;; stroustrup: What Stroustrup, the author of C++ used in his book
-;; ellemtel: Popular C++ coding standards as defined by "Programming in C++, Rules and Recommendations," Erik Nyquist
-;;  and Mats Henricson, Ellemtel
+;; ellemtel: Popular C++ coding standards as defined by "Programming in C++, Rules and
+;; Recommendations," Erik Nyquist and Mats Henricson, Ellemtel
 ;; linux: What the Linux developers use for kernel development
 ;; python: What Python developers use for extension modules
 ;; java: The default style for java-mode (see below)
@@ -1742,9 +1707,10 @@ differences due to whitespaces."
   (c-set-style "cc-mode")
   (c-basic-offset 2)
   (c-auto-newline 1)
+  (c-electric-flag nil)
   :config
-  (c-toggle-electric-state 1)
-  (c-toggle-syntactic-indentation 1)
+  (c-toggle-electric-state -1)
+  (c-toggle-syntactic-indentation -1)
   (unbind-key "C-M-a" c-mode-map)
   :bind (:map c-mode-base-map
               ("C-c c a" . c-beginning-of-defun)
@@ -2078,8 +2044,8 @@ differences due to whitespaces."
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
   :custom
-  (lsp-ui-doc-enable t)
-  (lsp-ui-doc-header t)
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-header nil)
   (lsp-ui-doc-include-signature t)
   (lsp-ui-doc-position 'at-point)
   (lsp-ui-doc-use-childframe nil)
@@ -2091,8 +2057,8 @@ differences due to whitespaces."
   (lsp-ui-peek-peek-height 25)
   (lsp-ui-sideline-enable nil)
   (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-sideline-show-symbol t)
+  (lsp-ui-sideline-show-hover nil)
+  (lsp-ui-sideline-show-symbol nil)
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
