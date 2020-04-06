@@ -1262,6 +1262,7 @@ differences due to whitespaces."
 
 (use-package counsel-tramp
   :ensure t
+  :bind ("C-c d t" . counsel-tramp)
   :config
   (add-hook 'counsel-tramp-pre-command-hook
             (lambda ()
@@ -1731,52 +1732,6 @@ differences due to whitespaces."
                    "/usr/local/include"))
     (add-to-list 'company-c-headers-path-system paths)))
 
-;; ;; Install irony-server on consensus: cmake -DLIBCLANG_INCLUDE_DIR=/workspace/sbiswas/software/llvm/clang+llvm-3.9.1-x86_64-linux-gnu-debian8/include -DLIBCLANG_LIBRARY=/usr/lib64/llvm/libclang.so -DCMAKE_INSTALL_PREFIX=/h2/sbiswas/.emacs.d/irony/ /h2/sbiswas/.emacs.d/elpa/irony-20170523.618/server && cmake --build . --use-stderr --config Release --target install
-;; (use-package irony
-;;   :ensure t
-;;   :diminish irony-mode
-;;   :disabled t
-;;   :init
-;;   (add-hook 'c++-mode-hook #'irony-mode)
-;;   (add-hook 'c-mode-hook #'irony-mode)
-;;   :config
-;;   (setq irony-server-install-prefix (concat dotemacs-temp-directory "irony"))
-;;   (add-hook 'irony-mode-hook #'irony-cdb-autosetup-compile-options)
-;;   ;; Use compilation database first, clang_complete as fallback.
-;;   (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
-;;                                                   irony-cdb-clang-complete))
-;;   ;; Replace the `completion-at-point' and `complete-symbol' bindings in irony-mode's buffers by irony-mode's function
-;;   (define-key irony-mode-map [remap completion-at-point] 'irony-completion-at-point-async)
-;;   (define-key irony-mode-map [remap complete-symbol] 'irony-completion-at-point-async)
-
-;;   (use-package company-irony
-;;     :ensure t
-;;     :after company
-;;     :init
-;;     (use-package company-irony-c-headers
-;;       :ensure t
-;;       :after irony)
-;;     :config
-;;     ;; http://emacs.stackexchange.com/questions/801/how-to-get-intelligent-auto-completion-in-c
-;;     ;; http://tuhdo.github.io/c-ide.html
-;;     (setq company-backends (delete 'company-semantic company-backends))
-;;     (add-to-list 'company-backends 'company-irony))
-
-;;   (use-package flycheck-irony
-;;     :ensure t
-;;     :ensure irony
-;;     :ensure flycheck
-;;     :disabled t
-;;     :after flycheck
-;;     :commands flycheck-irony-setup
-;;     :init (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-
-;;   (use-package irony-eldoc
-;;     :ensure t
-;;     :disabled t
-;;     :commands irony-eldoc
-;;     :init (add-hook 'irony-mode-hook #'irony-eldoc)))
-
 (use-package cuda-mode
   :ensure t
   :mode ("\\.cu\\'"	. c++-mode))
@@ -1846,8 +1801,6 @@ differences due to whitespaces."
 ;;            elpy-company-backend))))
 ;; (add-hook 'python-mode-hook #'sb/company-python-backends)
 
-;; Java mode
-
 (add-hook 'java-mode-hook
           (lambda ()
             (setq-default c-basic-offset 4
@@ -1872,11 +1825,9 @@ differences due to whitespaces."
 
 (use-package company-shell
   :ensure t
-  :after company
   :config
   (setq company-shell-delete-duplicates t)
-  (add-to-list 'company-backends 'company-shell)
-  (add-to-list 'company-backends 'company-fish-shell))
+  (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell)))
 
 (use-package fish-mode
   :ensure t
