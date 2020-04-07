@@ -1402,11 +1402,15 @@ differences due to whitespaces."
   :ensure t
   :bind ("C-x C-\\" . goto-last-change))
 
+(use-package posframe
+  :ensure t)
+
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :ensure t
   :hook (after-init . popwin-mode)
+  :config
   ;; (defvar popwin:special-display-config-backup popwin:special-display-config)
   ;; (setq popwin:popup-window-height 20
   ;;       popwin:close-popup-window-timer-interval 0.5)
@@ -1418,8 +1422,8 @@ differences due to whitespaces."
   ;; (push '(svn-info-mode :noselect t) popwin:special-display-config)
   ;; (push '(svn-status-mode) popwin:special-display-config)
   ;; (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
-  ;; (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-  ;; (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
+  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
+  (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   ;; (push '("*undo-tree\*" :width 0.3 :position right) popwin:special-display-config)
   ;; (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
   ;; (push '("*Selection Ring:") popwin:special-display-config)
@@ -1427,9 +1431,9 @@ differences due to whitespaces."
   ;; (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
   ;; (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
   ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
-  ;; (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
+  (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   ;; (push '("*xref*" :noselect nil) popwin:special-display-config)
-  ;; (push '("*helpful\*" :noselect nil) popwin:special-display-config)
+  (push '("*helpful\*" :noselect nil) popwin:special-display-config)
   ;; (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   ;; (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
   ;; (add-to-list 'popwin:special-display-config '("*Backtrace*"))
@@ -2004,6 +2008,13 @@ differences due to whitespaces."
 
 (use-package lsp-java-treemacs
   :after treemacs)
+
+(use-package bazel-mode
+  :ensure t)
+
+(use-package protobuf-mode
+  :ensure t
+  :mode "\\.proto$")
 
 ;; Function definitions
 
