@@ -1472,6 +1472,11 @@ differences due to whitespaces."
 (use-package origami
   :ensure t)
 
+(add-hook 'c++-mode-hook (lambda () (interactive)
+                           (origami-mode 1)
+                           (call-interactively
+                            'origami-close-all-nodes)) t)
+
 (use-package apt-sources-list
   :ensure t
   :mode ("\\.list\\'" . apt-sources-list-mode))
@@ -1488,6 +1493,11 @@ differences due to whitespaces."
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
   :config (add-hook 'ssh-config-mode-hook 'turn-on-font-lock))
 
+(use-package ace-window
+  :ensure t
+  :bind (("C-c w" . ace-window)
+         ([remap other-window] . ace-window)))
+
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
   :diminish
@@ -1495,12 +1505,6 @@ differences due to whitespaces."
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
-
-(use-package ace-window
-  :ensure t
-  ;; :hook (after-init . ace-window-display-mode)
-  :bind (("C-c w" . ace-window)
-         ([remap other-window] . ace-window)))
 
 (use-package avy
   :ensure t
@@ -1533,10 +1537,8 @@ differences due to whitespaces."
   :hook (after-init . amx-mode)
   :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
 
-;; Text mode
-
-;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined here will also
-;; get run for all modes derived from a basic mode such as text-mode.
+;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
+;; for all modes derived from a basic mode such as text-mode.
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
@@ -1545,18 +1547,6 @@ differences due to whitespaces."
 
 (use-package flycheck-grammarly
   :ensure t)
-
-;; (defun sb/company-text-backends ()
-;;   "Add backends for text completion in company mode."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((;; Generic backends
-;;            company-files
-;;            company-keywords
-;;            company-capf
-;;            company-dict
-;;            company-dabbrev))))
-;; (add-hook 'text-mode-hook #'sb/company-text-backends)
 
 (use-package markdown-mode
   :ensure t
@@ -1627,30 +1617,6 @@ differences due to whitespaces."
 (add-hook 'LaTeX-mode-hook
           (lambda ()
             (local-set-key (kbd "C-x C-s") #'sb/save-buffer-and-run-latexmk)))
-
-;; (defun sb/company-LaTeX-backends ()
-;;   "Add backends for LaTeX completion in company mode."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((;; Generic backends
-;;            company-dabbrev
-;;            company-files
-;;            company-keywords
-;;            company-capf
-;;            company-dict
-;;            ;; company-gtags
-;;            ;; LaTeX specific backends
-;;            company-auctex-labels
-;;            company-auctex-bibs
-;;            company-auctex-macros
-;;            company-auctex-symbols
-;;            company-auctex-environments
-;;            company-bibtex
-;;            company-math-symbols-latex
-;;            company-latex-commands
-;;            company-math-symbols-unicode))))
-;; (add-hook 'LaTeX-mode-hook #'sb/company-LaTeX-backends)
-;; (add-hook 'latex-mode-hook #'sb/company-LaTeX-backends)
 
 (global-prettify-symbols-mode -1)
 
@@ -1740,28 +1706,6 @@ differences due to whitespaces."
   :ensure t
   :mode ("\\.cl\\'" . opencl-mode))
 
-;; (defun sb/company-cc-backends ()
-;;   "Add backends for C/C++ completion in company mode."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((
-;;            ;; C++ specific backends
-;;            company-clang
-;;            company-irony
-;;            company-c-headers
-;;            company-irony-c-headers
-;;            company-semantic
-;;            company-gtags ; FIXME: Should we add this after gtags is loaded?
-;;            ;; Generic backends
-;;            company-files
-;;            company-keywords
-;;            ;; company-dabbrev
-;;            company-dabbrev-code
-;;            company-capf
-;;            company-semantic
-;;            ))))
-;; (add-hook 'c++-mode-hook #'sb/company-cc-backends)
-
 (use-package cmake-mode
   :ensure t
   :mode ("CMakeLists.txt" "\\.cmake\\'")
@@ -1785,22 +1729,6 @@ differences due to whitespaces."
   (pyvenv-tracking-ask-before-change t)
   :config (pyvenv-mode 1))
 
-;; (defun sb/company-python-backends ()
-;;   "Add backends for Python completion in company mode."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((;; Generic backends
-;;            company-files
-;;            company-keywords
-;;            company-capf
-;;            company-dabbrev
-;;            company-dabbrev-code
-;;            company-gtags
-;;            ;; Python specific backends
-;;            company-jedi
-;;            elpy-company-backend))))
-;; (add-hook 'python-mode-hook #'sb/company-python-backends)
-
 (add-hook 'java-mode-hook
           (lambda ()
             (setq-default c-basic-offset 4
@@ -1823,11 +1751,11 @@ differences due to whitespaces."
   ;; Was bound to sh-cd-here
   (unbind-key "C-c C-d" sh-mode-map))
 
-(use-package company-shell
-  :ensure t
-  :config
-  (setq company-shell-delete-duplicates t)
-  (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell)))
+;; (use-package company-shell
+;;   :ensure t
+;;   :config
+;;   (setq company-shell-delete-duplicates t)
+;;   (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell)))
 
 (use-package fish-mode
   :ensure t
