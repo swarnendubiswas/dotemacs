@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization  -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile: nil; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:
@@ -189,7 +189,7 @@ differences due to whitespaces."
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       require-final-newline t ; Always end a file with a newline.
       make-backup-files nil ; Stop making backup ~ files
-      backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes.
+      backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
       auto-save-timeout 180 ; Seconds
       auto-save-interval 600
       confirm-kill-emacs nil
@@ -268,9 +268,9 @@ differences due to whitespaces."
   (uniquify-separator "/")
   (uniquify-strip-common-suffix t))
 
+;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
 (use-package hippie-exp
   :custom
-  ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
   (hippie-expand-try-functions-list '(try-expand-dabbrev
                                       try-expand-dabbrev-all-buffers
                                       try-expand-dabbrev-from-kill
@@ -284,7 +284,7 @@ differences due to whitespaces."
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
-  :diminish subword-mode
+  :diminish
   :hook (after-init . global-subword-mode))
 
 ;; Set Emacs split to horizontal or vertical
@@ -686,7 +686,7 @@ differences due to whitespaces."
 
 (use-package company
   :ensure t
-  :diminish company-mode
+  :diminish
   :hook (after-init . global-company-mode)
   :custom
   (company-idle-delay 0.0)
@@ -966,11 +966,11 @@ differences due to whitespaces."
 (use-package aggressive-indent
   :ensure t
   :hook (emacs-lisp-mode . aggressive-indent-mode)
-  :diminish aggressive-indent-mode)
+  :diminish)
 
-(use-package electric ; This may interfere with lsp formatting
-  :disabled t
-  :hook (prog-mode . electric-indent-mode))
+;; This apparently interferes with lsp formatting where lsp is enabled.
+(use-package electric
+  :hook (emacs-lisp-mode . electric-indent-mode))
 
 (use-package highlight-indentation
   :ensure t
@@ -1151,12 +1151,11 @@ differences due to whitespaces."
   ;; JSON
   )
 
+;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
   :ensure t
   :ensure avy
-  :config
-  ;; Binds avy-flycheck-goto-error to C-c ! g
-  (avy-flycheck-setup))
+  :config (avy-flycheck-setup))
 
 (use-package flycheck-popup-tip ; Show error messages in popups
   :ensure t
@@ -1220,9 +1219,7 @@ differences due to whitespaces."
   :ensure t
   :custom
   (hl-todo-keyword-faces '(("TODO" . hl-todo)
-                           ("TODOs" . hl-todo)
                            ("NOTE" . hl-todo)
-                           ("NOTES" . hl-todo)
                            ("XXX" . hl-todo)
                            ("LATER" . hl-todo)
                            ("IMP" . hl-todo)
@@ -1281,18 +1278,6 @@ differences due to whitespaces."
   (use-package popup-imenu
     :ensure t)
   :bind ("C-c C-j" . imenu-anywhere))
-
-;; (use-package imenu-list
-;;   :ensure t
-;;   :disabled t
-;;   :after imenu
-;;   :custom
-;;   (imenu-list-auto-resize nil)
-;;   (imenu-list-focus-after-activation t)
-;;   (imenu-list-size 0.10)
-;;   :config
-;;   (add-hook 'python-mode-hook #'imenu-list-minor-mode)
-;;   (add-hook 'c-mode-common-hook #'imenu-list-minor-mode))
 
 (use-package counsel-gtags
   :ensure t
@@ -1476,10 +1461,10 @@ differences due to whitespaces."
 (use-package origami
   :ensure t)
 
-(add-hook 'c++-mode-hook (lambda () (interactive)
-                           (origami-mode 1)
-                           (call-interactively
-                            'origami-close-all-nodes)) t)
+;; (add-hook 'c++-mode-hook (lambda () (interactive)
+;;                            (origami-mode 1)
+;;                            (call-interactively
+;;                             'origami-close-all-nodes)) t)
 
 (use-package apt-sources-list
   :ensure t
@@ -1949,7 +1934,6 @@ differences due to whitespaces."
 (use-package lsp-origami
   :ensure t
   :ensure origami
-  :after origami
   :hook (origami-mode . lsp-origami-mode))
 
 (add-hook 'python-mode-hook

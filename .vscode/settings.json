@@ -18,17 +18,22 @@
         "tmp": true,
         "dict": true,
         ".cache": true,
-        "transient": true
+        "transient": true,
+        "tramp": true,
+        "workspace": true,
+        "eclipse.jdt.ls": true,
+        "**/*.jar": true
     },
     "search.exclude": {
         "**/node_modules": true,
         "**/bower_components": true,
-        "**/elpa/": true,
+        "elpa/": true,
         "**/irony/": true,
         "auto-save-list": true,
-        "**/eshell": true,
-        "**/reference-cards": true,
-        "**/tmp": true,
-        "**/extras": true
+        "eshell": true,
+        "reference-cards": true,
+        "tmp": true,
+        "extras": true,
+        "workspace": true
     }
 }

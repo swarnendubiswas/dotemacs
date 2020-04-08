@@ -171,12 +171,12 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 * `C-c ]` - Close LaTeX environment (`LaTeX-close-environment`).
 * `C-c C-o C-f` - Toggle folding mode (`TeX-fold-mode`).
 * `C-c C-f C-e` - Insert formatted text (`TeX-font`).
-  * `C-e` - Insert emphasized text.
-  * `C-b` - Insert bold text.
-  * `C-i` - Insert italicized text.
-  * `C-r` - Insert roman text.
-  * `C-t` - Insert typewriter text.
-  * `C-s` - Insert slanted text.
+    * `C-e` - Insert emphasized text.
+    * `C-b` - Insert bold text.
+    * `C-i` - Insert italicized text.
+    * `C-r` - Insert roman text.
+    * `C-t` - Insert typewriter text.
+    * `C-s` - Insert slanted text.
 * `C-c _` - Set master file (``).
 * `C-c ^` - Switch to master file (`TeX-home-buffer`).
 
@@ -199,7 +199,6 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-c v` - Export the file and view in a browser (``).
 * `C-c C-c m` - Compile the file and show in another buffer (``).
 
-
 ## JSON
 
 * `C-c C-f` - Format the region/buffer (`json-reformat-region`).
@@ -207,7 +206,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## GGtags/Counsel Gtags
 
-See the requirements: [https://github.com/leoliu/ggtags][]
+See the requirements: [<https://github.com/leoliu/ggtags][]>
 
 * `M-.` - Jump to tag underneath cursor (`find-tags`).
 * `M-*` - Pop back to where you previously invoked `M-.`.
@@ -264,7 +263,7 @@ Within the error list the following key bindings are available:
 
 Use `magit-status` to display information about the current Git repository, and `magit-dispatch-popup` to see help with keybindings.
 
-https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automatic-Refreshing-of-Magit-Buffers
+<https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automatic-Refreshing-of-Magit-Buffers>
 
 * `TAB` - Expand and collapse files.
 * `n` - Move to next section.
