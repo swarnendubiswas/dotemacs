@@ -1,6 +1,6 @@
 # Useful keyboard shortcuts
 
-This file lists useful keyboard shortcuts that might be difficult to remember. These keybindings are mostly from a default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am maintaining this for **my** ease of reference. Suggestions are welcome.
+This file lists useful keyboard shortcuts. Most keybindings are from a default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am maintaining this for **my** ease of reference. Suggestions are welcome.
 
 Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m (describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
 
@@ -171,12 +171,12 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 * `C-c ]` - Close LaTeX environment (`LaTeX-close-environment`).
 * `C-c C-o C-f` - Toggle folding mode (`TeX-fold-mode`).
 * `C-c C-f C-e` - Insert formatted text (`TeX-font`).
-    * `C-e` - Insert emphasized text.
-    * `C-b` - Insert bold text.
-    * `C-i` - Insert italicized text.
-    * `C-r` - Insert roman text.
-    * `C-t` - Insert typewriter text.
-    * `C-s` - Insert slanted text.
+  * `C-e` - Insert emphasized text.
+  * `C-b` - Insert bold text.
+  * `C-i` - Insert italicized text.
+  * `C-r` - Insert roman text.
+  * `C-t` - Insert typewriter text.
+  * `C-s` - Insert slanted text.
 * `C-c _` - Set master file (``).
 * `C-c ^` - Switch to master file (`TeX-home-buffer`).
 
@@ -204,9 +204,14 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 * `C-c C-f` - Format the region/buffer (`json-reformat-region`).
 * `C-c C-p` - Display a path to the object at point (`json-mode-show-path`).
 
-## GGtags/Counsel Gtags
+## Tags
 
-See the requirements: [<https://github.com/leoliu/ggtags][]>
+### XRef
+
+* `M-.` - Jump to tag underneath cursor (`xref-find-definitions`).
+* `M-*` - Pop back to where you previously invoked `M-.` (`xref-pop-marker-stacker`).
+
+### Counsel Gtags
 
 * `M-.` - Jump to tag underneath cursor (`find-tags`).
 * `M-*` - Pop back to where you previously invoked `M-.`.
@@ -214,6 +219,11 @@ See the requirements: [<https://github.com/leoliu/ggtags][]>
 * `C-c g u` - Update tags (``).
 * `C-c g s` - Find other symbol (``).
 * `C-c g r` - Find reference (``).
+
+### Counsel Etags
+
+* ``
+* ``
 
 ## Programming
 
@@ -257,6 +267,10 @@ Within the error list the following key bindings are available:
 * `g` -	Check the source buffer and update the error list (``).
 * `q` -	Quit the error list and hide its window (``).
 
+## LSP
+
+
+
 ## Version control systems
 
 ### Git with Magit
@@ -293,17 +307,17 @@ Use `magit-status` to display information about the current Git repository, and 
 * `=` - Run diff on the marked files or file at point (``).
 * `U` - Update files for currently examined repository (``).
 
-# Use Cases
+## Use Cases
 
-## [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
 
-## Search for the symbol at point
+### Search for the symbol at point
 
-### Isearch
+#### Isearch
 
 * `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
 
-### Swiper
+#### Swiper
 
 * `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).
 * `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).

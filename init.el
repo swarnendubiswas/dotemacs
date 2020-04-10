@@ -155,7 +155,10 @@ differences due to whitespaces."
   :config (auto-package-update-maybe))
 
 (use-package cus-edit
-  :custom (custom-file dotemacs-emacs-custom-file))
+  :custom (custom-file dotemacs-emacs-custom-file)
+  :config
+  (when (file-exists-p custom-file)
+    (load custom-file :noerror)))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -761,17 +764,20 @@ differences due to whitespaces."
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 1))))
-  ;; :config
-  ;; (dolist (buffer '("^\\*Backtrace\\*$"
-  ;;                   "^\\*Compile-Log\\*$"
-  ;;                   "^\\*.+Completions\\*$"
-  ;;                   "^\\*Help\\*$"
-  ;;                   "^\\*Ibuffer\\*$"
-  ;;                   "company-statistics-cache.el"
-  ;;                   "^\\*lsp-log\\*$"
-  ;;                   "^\\*pyls\\*$"
-  ;;                   "^\\*pyls::stderr\\*$"))
-  ;;   (add-to-list 'ivy-ignore-buffers buffer))
+  :config
+  (dolist (buffer '(
+                    ;; "^\\*Backtrace\\*$"
+                    ;; "^\\*Compile-Log\\*$"
+                    ;; "^\\*.+Completions\\*$"
+                    "^\\*Help\\*$"
+                    "^\\*Ibuffer\\*$"
+                    ;; "company-statistics-cache.el"
+                    ;; "^\\*lsp-log\\*$"
+                    ;; "^\\*pyls\\*$"
+                    ;; "^\\*pyls::stderr\\*$"
+                    "^\\*TAGS\\*$"
+                    ))
+    (add-to-list 'ivy-ignore-buffers buffer))
   :hook (after-init . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
@@ -1279,6 +1285,13 @@ differences due to whitespaces."
     :ensure t)
   :bind ("C-c C-j" . imenu-anywhere))
 
+(setq tags-revert-without-query t ; Don't ask before rereading the TAGS files if they have changed
+      ;; ; Warn when opening files bigger than 200MB, the size is chosen because of large TAGS files
+      large-file-warning-threshold (* 250 1024 1024)
+      tags-add-tables nil)
+
+(use-package xref)
+
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'gtags))
@@ -1303,15 +1316,14 @@ differences due to whitespaces."
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags)))
 
-(setq tags-revert-without-query t ; Don't ask before rereading the TAGS files if they have changed
-      large-file-warning-threshold nil) ; Don't warn when TAGS files are large
-
 (use-package counsel-etags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'ctags))
-  :bind(("M-." . counsel-etags-find-tag-at-point)
-        ("C-c g s" . counsel-etags-grep-symbol-at-point)
-        ("C-c g t" . counsel-etags-find-tag))
+  :bind(("C-c g t" . counsel-etags-find-tag-at-point)
+        ("C-c g s" . counsel-etags-find-symbol-at-point)
+        ("C-c g g" . counsel-etags-grep-symbol-at-point)
+        ("C-c g f" . counsel-etags-find-tag)
+        ("C-c g l" .  counsel-etags-list-tag))
   :init
   (add-hook 'c++-mode-hook
             (lambda ()
@@ -1321,11 +1333,15 @@ differences due to whitespaces."
   (counsel-etags-update-interval 180) ; How many seconds to wait before rerunning tags for auto-update
   (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
   :config
+  (setq imenu-create-index-function
+        'counsel-etags-imenu-default-create-index-function)
   (add-to-list 'counsel-etags-ignore-directories ".vscode")
   (add-to-list 'counsel-etags-ignore-directories "build")
   (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
   (add-to-list 'counsel-etags-ignore-filenames "*.json")
-  (add-to-list 'counsel-etags-ignore-filenames "TAGS"))
+  (add-to-list 'counsel-etags-ignore-filenames "*.html")
+  (add-to-list 'counsel-etags-ignore-filenames "*.xml")
+  )
 
 (use-package ivy-xref
   :ensure t
@@ -1344,7 +1360,6 @@ differences due to whitespaces."
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
   :custom
-  (large-file-warning-threshold (* 50 1024 1024)) ; Warn when opening files bigger than 50MB
   (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
 
@@ -1716,7 +1731,7 @@ differences due to whitespaces."
   :custom
   (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
   (pyvenv-tracking-ask-before-change t)
-  :config (pyvenv-mode 1))
+  :hook (python-mode . pyvenv-mode))
 
 (add-hook 'java-mode-hook
           (lambda ()
@@ -1848,8 +1863,8 @@ differences due to whitespaces."
   (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-enabled t)
-  (lsp-pyls-plugins-pylint-args
-   ["-p", "--style", (concat `,(getenv "HOME") "/.config/yapf/style")])
+  ;; (lsp-pyls-plugins-pylint-args
+  ;;  ["-p", "--style", (concat `,(getenv "HOME") "/.config/yapf/style")])
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
   (lsp-xml-logs-client nil)
@@ -2151,14 +2166,18 @@ Increase line spacing by two line height."
 
 ;; Mark safe variables
 
-(put 'company-clang-arguments 'safe-local-variable 'listp)
-(put 'company-c-headers-path-user 'safe-local-variable 'listp)
-(put 'reftex-default-bibliography 'safe-local-variable 'listp)
-(put 'company-bibtex-bibliography 'safe-local-variable 'listp)
-(put 'bibtex-completion-bibliography 'safe-local-variable 'listp)
-(put 'flycheck-clang-include-path 'safe-local-variable 'listp)
-(put 'flycheck-gcc-include-path 'safe-local-variable 'listp)
+(put 'company-clang-arguments 'safe-local-variable #'listp)
+(put 'company-c-headers-path-user 'safe-local-variable #'listp)
+(put 'reftex-default-bibliography 'safe-local-variable #'listp)
+(put 'company-bibtex-bibliography 'safe-local-variable #'listp)
+(put 'bibtex-completion-bibliography 'safe-local-variable #'listp)
+(put 'flycheck-clang-include-path 'safe-local-variable #'listp)
+(put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
-(put 'projectile-globally-ignored-directories 'safe-local-variable 'listp)
+(put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
+(put 'counsel-etags-project-root 'safe-local-variable #'stringp)
+(put 'projectile-project-root 'safe-local-variable #'stringp)
+(put 'tags-table-list 'safe-local-variable #'listp)
+(put 'pyvenv-activate 'safe-local-variable #'stringp)
 
 ;;; init.el ends here
