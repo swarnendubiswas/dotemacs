@@ -29,3 +29,4 @@ transient
 eclipse.jdt.ls
 workspace
 request
+flycheck_init.el

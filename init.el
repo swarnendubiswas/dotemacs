@@ -775,7 +775,7 @@ differences due to whitespaces."
                     ;; "^\\*lsp-log\\*$"
                     ;; "^\\*pyls\\*$"
                     ;; "^\\*pyls::stderr\\*$"
-                    "^\\*TAGS\\*$"
+                    "TAGS"
                     ))
     (add-to-list 'ivy-ignore-buffers buffer))
   :hook (after-init . ivy-mode)
@@ -1117,12 +1117,12 @@ differences due to whitespaces."
   :ensure t
   :hook (after-init . global-flycheck-mode)
   :custom
+  ;; (flycheck-check-syntax-automatically '(save mode-enabled))
   (flycheck-emacs-lisp-load-path 'inherit)
-  (flycheck-highlighting-mode 'lines) ; Faster than the default
-  (flycheck-check-syntax-automatically '(save mode-enabled))
-  (flycheck-idle-change-delay 5)
+  ;; (flycheck-highlighting-mode 'lines) ; Faster than the default
+  ;; (flycheck-idle-change-delay 5)
   :config
-  (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
+  ;; (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   ;; Python
   (add-hook 'python-mode-hook
@@ -1130,29 +1130,34 @@ differences due to whitespaces."
               (setq-local flycheck-checker 'python-pylint
                           flycheck-python-pylint-executable "python3"
                           flycheck-pylintrc (concat `,(getenv "HOME") "/.config/pylintrc"))))
-  ;; C/C++
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (setq flycheck-clang-args ""
-                    flycheck-clang-include-path "" ; Directories
-                    flycheck-clang-includes "" ; Files
-                    flycheck-clang-language-standard "c++11"
-                    flycheck-gcc-args ""
-                    flycheck-gcc-include-path "" ; Directories
-                    flycheck-gcc-includes "" ; Files
-                    flycheck-gcc-language-standard "c++11")))
-  ;; CUDA
-  (setq-local flycheck-cuda-language-standard "c++11")
-  (setq-local flycheck-cuda-includes "")
-  (setq-local flycheck-cuda-include-path "") ; Directories
+  ;; ;; C/C++
+  ;; (add-hook 'c++-mode-hook
+  ;;           (lambda ()
+  ;;             (setq flycheck-clang-args ""
+  ;;                   flycheck-clang-include-path "" ; Directories
+  ;;                   flycheck-clang-includes "" ; Files
+  ;;                   flycheck-clang-language-standard "c++11"
+  ;;                   flycheck-gcc-args ""
+  ;;                   flycheck-gcc-include-path "" ; Directories
+  ;;                   flycheck-gcc-includes "" ; Files
+  ;;                   flycheck-gcc-language-standard "c++11")))
+  ;; ;; CUDA
+  ;; (setq-local flycheck-cuda-language-standard "c++11")
+  ;; (setq-local flycheck-cuda-includes "")
+  ;; (setq-local flycheck-cuda-include-path "") ; Directories
   ;; Java
   ;; Markdown
-  (setq-default flycheck-checker 'markdown-markdownlint-cli
-                flycheck-markdown-markdownlint-cli-config (concat `,(getenv "HOME") "/.config/.markdownlint.json"))
+  (add-hook 'markdown-mode-hook
+            (lambda ()
+              (setq-local flycheck-checker 'markdown-markdownlint-cli
+                          flycheck-markdown-markdownlint-cli-config (concat
+                                                                     `,(getenv "HOME") "/.config/.markdownlint.json"))))
   ;; LaTeX
   (setq-local flycheck-chktexrc "")
   ;; Shell Script
-  (setq-local flycheck-checker 'sh-shellcheck)
+  (add-hook 'sh-mode-hook
+            (lambda ()
+              (setq-local flycheck-checker 'sh-shellcheck)))
   ;; HTML
   ;; JSON
   )
@@ -1429,7 +1434,7 @@ differences due to whitespaces."
   ;; (push '("*Selection Ring:") popwin:special-display-config)
   ;; (push '("*ag search*" :noselect nil) popwin:special-display-config)
   ;; (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
-  ;; (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
   ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   ;; (push '("*xref*" :noselect nil) popwin:special-display-config)
@@ -1645,12 +1650,20 @@ differences due to whitespaces."
   :ensure t
   :mode "\\.ini\\'")
 
-(add-hook 'after-save-hook
-          (lambda ()
-            (when (or (string-equal major-mode "lisp-mode") (string-equal major-mode "emacs-lisp-mode"))
-              (check-parens))))
+;; (add-hook 'after-save-hook
+;;           (lambda ()
+;;             (when (or (string-equal major-mode "lisp-mode") (string-equal major-mode "emacs-lisp-mode"))
+;;               (check-parens))))
 
-;; C/C++ mode
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (when buffer-file-name
+              (add-hook 'after-save-hook 'check-parens nil t))))
+
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (when buffer-file-name
+              (add-hook 'after-save-hook 'check-parens nil t))))
 
 ;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
 ;; gnu: The default style for GNU projects

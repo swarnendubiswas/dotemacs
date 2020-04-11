@@ -269,7 +269,8 @@ Within the error list the following key bindings are available:
 
 ## LSP
 
-
+* ``
+* ``
 
 ## Version control systems
 

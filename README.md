@@ -114,4 +114,3 @@ find . -L -type f -iregex "*\.(cc|cpp)"
 + Omit sub-directories/files with `counsel-find-file` and add to `.dir-locals.el`.
 + Use `xref` interface for both `ctags` and `gtags`.
 + Use RE in `find`, it follows Emacs RE.
-+ Flycheck is disabled in markdown mode. Inline errors are not highlighted, only the summary is shown.
