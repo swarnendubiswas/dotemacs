@@ -692,6 +692,7 @@ differences due to whitespaces."
   :diminish
   :hook (after-init . global-company-mode)
   :custom
+  (company-dabbrev-downcase nil) ; Do not downcase returned candidates
   (company-idle-delay 0.0)
   (company-global-modes t) ; Turn on company-mode for all major modes
   (company-minimum-prefix-length 2)
@@ -1026,7 +1027,7 @@ differences due to whitespaces."
   :custom
   (projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
   (projectile-completion-system 'ivy)
-  (projectile-enable-caching nil)
+  (projectile-enable-caching t)
   (projectile-file-exists-remote-cache-expire nil)
   ;; (projectile-find-dir-includes-top-level t)
   (projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld"))
@@ -1035,8 +1036,8 @@ differences due to whitespaces."
   (projectile-require-project-root t)
   (projectile-switch-project-action 'projectile-find-file) ; Use projectile-dired to view in dired
   (projectile-verbose nil)
-  ;; Contents of .projectile are ignored when using the alien project indexing method
-  (projectile-indexing-method 'hybrid)
+  ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
+  (projectile-indexing-method 'native)
   :config
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
@@ -1295,12 +1296,23 @@ differences due to whitespaces."
       large-file-warning-threshold (* 250 1024 1024)
       tags-add-tables nil)
 
-(use-package xref)
+;; (use-package xref
+;;   :commands xref-etags-mode
+;;   :hook (prog-mode . xref-etags-mode)
+;;   :bind (("M-'" . xref-find-definitions)
+;;          ("C-M-." . xref-find-apropos)
+;;          ("M-," . xref-pop-marker-stack)))
+
+;; (use-package ivy-xref
+;;   :ensure t
+;;   :custom
+;;   (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
+;;   (xref-show-definitions-function #'ivy-xref-show-defs))
 
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'gtags))
-  :diminish counsel-gtags-mode
+  :diminish
   :commands (counsel-gtags-find-definition
              counsel-gtags-find-reference
              counsel-gtags-find-symbol
@@ -1324,7 +1336,8 @@ differences due to whitespaces."
 (use-package counsel-etags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'ctags))
-  :bind(("C-c g t" . counsel-etags-find-tag-at-point)
+  :bind(("M-'" . counsel-etags-find-tag-at-point)
+        ("C-c g t" . counsel-etags-find-tag-at-point)
         ("C-c g s" . counsel-etags-find-symbol-at-point)
         ("C-c g g" . counsel-etags-grep-symbol-at-point)
         ("C-c g f" . counsel-etags-find-tag)
@@ -1336,10 +1349,10 @@ differences due to whitespaces."
                         'counsel-etags-virtual-update-tags 'append 'local)))
   :custom
   (counsel-etags-update-interval 180) ; How many seconds to wait before rerunning tags for auto-update
-  (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
+  ;; (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
   :config
-  (setq imenu-create-index-function
-        'counsel-etags-imenu-default-create-index-function)
+  ;; (setq imenu-create-index-function
+  ;;       'counsel-etags-imenu-default-create-index-function)
   (add-to-list 'counsel-etags-ignore-directories ".vscode")
   (add-to-list 'counsel-etags-ignore-directories "build")
   (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
@@ -1347,12 +1360,6 @@ differences due to whitespaces."
   (add-to-list 'counsel-etags-ignore-filenames "*.html")
   (add-to-list 'counsel-etags-ignore-filenames "*.xml")
   )
-
-(use-package ivy-xref
-  :ensure t
-  :custom
-  (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
-  (xref-show-definitions-function #'ivy-xref-show-defs))
 
 (use-package helpful
   :ensure t
@@ -1955,9 +1962,10 @@ differences due to whitespaces."
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-symbol nil)
-  :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+  ;; :config
+  ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  )
 
 (use-package lsp-origami
   :ensure t
