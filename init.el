@@ -1028,20 +1028,18 @@ differences due to whitespaces."
   (projectile-completion-system 'ivy)
   (projectile-enable-caching t)
   (projectile-file-exists-remote-cache-expire nil)
-  ;; (projectile-find-dir-includes-top-level t)
+  ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
+  (projectile-indexing-method 'alien)
   (projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld"))
   (projectile-mode-line-prefix "")
   ;; Use projectile only in desired directories, too much noise otherwise
   (projectile-require-project-root t)
   (projectile-switch-project-action 'projectile-find-file) ; Use projectile-dired to view in dired
   (projectile-verbose nil)
-  ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
-  (projectile-indexing-method 'alien)
   :config
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
-    (let ((project-name (projectile-project-name))
-	        (project-type (projectile-project-type)))
+    (let ((project-name (projectile-project-name)))
       (format "%s[%s]"
 	            projectile-mode-line-prefix
 	            (or project-name "-"))))
