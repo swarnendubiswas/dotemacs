@@ -86,9 +86,9 @@ find . -type f -iname "*.tex" | gtags -v -f -
 
 ### Universal CTags
 
-Use Universal CTags with `counsel-etags`. Use `ctags -eR` to recursively scan for files (R) and use Emacs-compatible syntax (-e).
+Use Universal CTags with `counsel-etags`. Use `ctags -eR` to recursively scan for files (`R`) and use Emacs-compatible syntax (`e`). You can use `--list-excludes` and `--list-languages` to check which patterns are excluded from processing and which languages are supported.
 
-Emacs will, by default, expect a tag file by the name "TAGS" in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature:
+Emacs will, by default, expect a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature:
 
 + `M-x visit-tags-table <RET> FILE <RET>` - Select the tag file `FILE` to use.
 + `M-. [TAG] <RET>` - Find the first definition of `TAG`. The default tag is the identifier under the cursor.
@@ -109,8 +109,9 @@ find . -type f -iname "*.cc" -exec ctags -eR {} \;
 
 find . -L -type f -iregex "*\.(cc|cpp)"
 
++ TensorFlow - `ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt`
+
 ## TODO
 
-+ Omit sub-directories/files with `counsel-find-file` and add to `.dir-locals.el`.
 + Use `xref` interface for both `ctags` and `gtags`.
 + Use RE in `find`, it follows Emacs RE.

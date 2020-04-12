@@ -324,7 +324,7 @@ differences due to whitespaces."
 (if window-system
     (progn
       (tool-bar-mode -1)
-      (menu-bar-mode 1)
+      (menu-bar-mode -1)
       (scroll-bar-mode -1)))
 
 (blink-cursor-mode -1) ; Blinking cursor is distracting
@@ -776,7 +776,6 @@ differences due to whitespaces."
                     ;; "^\\*lsp-log\\*$"
                     ;; "^\\*pyls\\*$"
                     ;; "^\\*pyls::stderr\\*$"
-                    "TAGS"
                     ))
     (add-to-list 'ivy-ignore-buffers buffer))
   :hook (after-init . ivy-mode)
@@ -1037,7 +1036,7 @@ differences due to whitespaces."
   (projectile-switch-project-action 'projectile-find-file) ; Use projectile-dired to view in dired
   (projectile-verbose nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
-  (projectile-indexing-method 'native)
+  (projectile-indexing-method 'alien)
   :config
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
@@ -1890,8 +1889,7 @@ differences due to whitespaces."
   (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-enabled t)
-  ;; (lsp-pyls-plugins-pylint-args
-  ;;  ["-p", "--style", (concat `,(getenv "HOME") "/.config/yapf/style")])
+  (lsp-pyls-plugins-pylint-args "-j 2")
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
   (lsp-xml-logs-client nil)
