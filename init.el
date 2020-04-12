@@ -1283,8 +1283,11 @@ differences due to whitespaces."
               (projectile-mode 1))))
 
 (use-package imenu
+  :custom
+  (imenu-auto-rescan t)
+  (imenu-max-items 500)
+  (imenu-max-item-length 100)
   :config
-  (setq imenu-auto-rescan t)
   (use-package imenu-anywhere
     :ensure t)
   (use-package popup-imenu
@@ -1869,7 +1872,7 @@ differences due to whitespaces."
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-indent-inner-html t)
   (lsp-idle-delay 0.5)
-  (lsp-imenu-sort-methods 'position)
+  (lsp-imenu-sort-methods '(position))
   (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf nil)
@@ -1946,22 +1949,22 @@ differences due to whitespaces."
   :ensure t
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-doc-header nil)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-position 'at-point)
-  (lsp-ui-doc-use-childframe nil)
-  (lsp-ui-flycheck-enable nil)
-  (lsp-ui-flycheck-list-position 'right)
-  (lsp-ui-imenu-enable t)
-  (lsp-ui-peek-enable t)
-  (lsp-ui-peek-list-width 60)
-  (lsp-ui-peek-peek-height 25)
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-hover nil)
-  (lsp-ui-sideline-show-symbol nil)
+  ;; :custom
+  ;; (lsp-ui-doc-enable nil)
+  ;; (lsp-ui-doc-header nil)
+  ;; (lsp-ui-doc-include-signature t)
+  ;; (lsp-ui-doc-position 'at-point)
+  ;; (lsp-ui-doc-use-childframe nil)
+  ;; (lsp-ui-flycheck-enable nil)
+  ;; (lsp-ui-flycheck-list-position 'right)
+  ;; (lsp-ui-imenu-enable t)
+  ;; (lsp-ui-peek-enable t)
+  ;; (lsp-ui-peek-list-width 60)
+  ;; (lsp-ui-peek-peek-height 25)
+  ;; (lsp-ui-sideline-enable nil)
+  ;; (lsp-ui-sideline-ignore-duplicate t)
+  ;; (lsp-ui-sideline-show-hover t)
+  ;; (lsp-ui-sideline-show-symbol nil)
   ;; :config
   ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
