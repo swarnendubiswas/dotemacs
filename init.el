@@ -1567,6 +1567,10 @@ differences due to whitespaces."
 (use-package flycheck-grammarly
   :ensure t)
 
+(use-package logview
+  :ensure t
+  :custom (logview-cache-filename (concat dotemacs-temp-directory "logview-cache.extmap")))
+
 (use-package markdown-mode
   :ensure t
   :diminish gfm-mode
@@ -1861,7 +1865,7 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((c-mode c++-mode python-mode sh-mode html-mode javascript-mode latex-mode plain-tex-mode) . lsp-deferred)
+  :hook (((python-mode sh-mode html-mode javascript-mode latex-mode plain-tex-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-clients-clangd-args '("-j=4" "-background-index" "--clang-tidy" "-log=error"))
@@ -2192,15 +2196,15 @@ Increase line spacing by two line height."
 
 (put 'company-clang-arguments 'safe-local-variable #'listp)
 (put 'company-c-headers-path-user 'safe-local-variable #'listp)
+(put 'flycheck-clang-include-path 'safe-local-variable #'listp)
+(put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'company-bibtex-bibliography 'safe-local-variable #'listp)
 (put 'bibtex-completion-bibliography 'safe-local-variable #'listp)
-(put 'flycheck-clang-include-path 'safe-local-variable #'listp)
-(put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
-(put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
-(put 'counsel-etags-project-root 'safe-local-variable #'stringp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
+(put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
+(put 'counsel-etags-project-root 'safe-local-variable #'stringp)
 (put 'tags-table-list 'safe-local-variable #'listp)
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
 
