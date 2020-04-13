@@ -21,9 +21,8 @@
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
 (setq debug-on-error nil
+      load-prefer-newer t
       user-full-name "Swarnendu Biswas")
-
-;; Setup configuration variables
 
 (defgroup dotemacs nil
   "Custom configuration for dotemacs."
@@ -105,8 +104,6 @@ differences due to whitespaces."
           (const :tag "none" none))
   :group 'dotemacs)
 
-(setq load-prefer-newer t)
-
 (eval-when-compile
   (require 'package)
   (setq package-user-dir (expand-file-name (concat user-emacs-directory "elpa"))
@@ -147,13 +144,6 @@ differences due to whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
-(use-package auto-package-update
-  :ensure t
-  :custom
-  (auto-package-update-delete-old-versions t)
-  (auto-package-update-hide-results t)
-  :config (auto-package-update-maybe))
-
 (use-package cus-edit
   :custom (custom-file dotemacs-emacs-custom-file)
   :config
@@ -165,8 +155,6 @@ differences due to whitespaces."
   :if (memq window-system '(x ns))
   :custom (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
-
-;; Configure GNU Emacs defaults
 
 (setq inhibit-startup-screen t ; inhibit-splash-screen is an alias
       ;; Disable loading of "default.el" at startup, inhibits site default settings
@@ -320,7 +308,6 @@ differences due to whitespaces."
       indicate-buffer-boundaries 'right
       indicate-empty-lines t)
 
-;; https://ladicle.com/post/config/#configuration
 (if window-system
     (progn
       (tool-bar-mode -1)
@@ -461,19 +448,19 @@ differences due to whitespaces."
   (setq ibuffer-always-show-last-buffer nil
         ibuffer-case-fold-search t ; Ignore case when searching
         ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
+        ibuffer-display-summary nil
         ibuffer-expert t
-        ;; Don't show filter groups if there are no buffers in that group
-        ibuffer-show-empty-filter-groups nil
         ibuffer-use-header-line t)
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
+
+;; Don't show filter groups if there are no buffers in that group
+(use-package ibuf-ext
+  :load-path "extras"
+  :custom (ibuffer-show-empty-filter-groups nil))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
-
-(use-package ibuffer-vc
-  :ensure t
-  :after ibuffer)
 
 (use-package dired
   :preface
@@ -1053,6 +1040,7 @@ differences due to whitespaces."
                                         (concat `,(getenv "HOME") "/iss-workspace")
                                         (concat `,(getenv "HOME") "/plass-workspace")
                                         (concat `,(getenv "HOME") "/prospar-workspace")
+                                        (concat `,(getenv "HOME") "/research")
                                         ))
   (add-to-list 'projectile-ignored-projects `,(concat `,(getenv "HOME") "/")) ; Do not consider the HOME as a project
   (dolist (dirs '(".cache"
@@ -1596,6 +1584,10 @@ differences due to whitespaces."
   :ensure t
   :mode "\\.csv\\'")
 
+(use-package boogie-friends
+  :ensure t
+  :mode ("\\.smt\\'" . z3-smt2-mode))
+
 (use-package company-math
   :ensure t
   :ensure math-symbol-lists ; Required by ac-math and company-math
@@ -1757,6 +1749,9 @@ differences due to whitespaces."
   (pyvenv-tracking-ask-before-change t)
   :hook (python-mode . pyvenv-mode))
 
+(use-package ein
+  :ensure t)
+
 (add-hook 'java-mode-hook
           (lambda ()
             (setq-default c-basic-offset 4
@@ -1887,7 +1882,7 @@ differences due to whitespaces."
   (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-enabled t)
-  (lsp-pyls-plugins-pylint-args "-j 2")
+  (lsp-pyls-plugins-pylint-args ["-j 2"])
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
   (lsp-xml-logs-client nil)
