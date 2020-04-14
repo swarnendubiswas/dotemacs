@@ -672,8 +672,6 @@ differences due to whitespaces."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
-(setq popup-use-optimized-column-computation nil)
-
 (use-package company
   :ensure t
   :diminish
@@ -724,6 +722,11 @@ differences due to whitespaces."
   (unbind-key "<tab>" yas-minor-mode-map)
   (use-package yasnippet-snippets))
 
+(use-package amx
+  :ensure t
+  :hook (after-init . amx-mode)
+  :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
+
 (setq completion-in-region-function #'ivy-completion-in-region)
 
 (use-package ivy
@@ -734,7 +737,6 @@ differences due to whitespaces."
   (ivy-count-format "(%d/%d) ") ; This is beneficial to identify wrap around
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
-  (ivy-flx-limit 100)
   ;; (ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
   ;;                          (swiper . ivy--regex-ignore-order)
   ;;                          (counsel-rg . ivy--regex-ignore-order)
@@ -747,7 +749,6 @@ differences due to whitespaces."
   ;;    (ivy-switch-buffer . ivy-sort-function-buffer)
   ;;    (counsel-find-file . ivy-sort-function-buffer)))
   (ivy-use-ignore-default 'always) ; Always ignore buffers set in ivy-ignore-buffers
-  (ivy-use-selectable-prompt nil)
   (ivy-virtual-abbreviate 'abbreviate)
   (ivy-height-alist '((t
                        lambda (_caller)
@@ -781,6 +782,7 @@ differences due to whitespaces."
 
 (use-package counsel
   :ensure t
+  :ensure amx
   :preface
   (defun sb/counsel-recentf ()
     "Find a file on `recentf-list' and abbreviate the home directory."
@@ -871,8 +873,7 @@ differences due to whitespaces."
 (use-package all-the-icons-ivy-rich
   :ensure t
   :init (all-the-icons-ivy-rich-mode 1)
-  :custom
-  (all-the-icons-ivy-rich-icon-size 0.8))
+  :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
   :ensure t
@@ -956,14 +957,15 @@ differences due to whitespaces."
               ;; Spaces instead of tabs by default
               indent-tabs-mode nil)
 
+;; Claims to be better than electric-indent-mode
 (use-package aggressive-indent
   :ensure t
-  :hook (emacs-lisp-mode . aggressive-indent-mode)
+  :hook (prog-mode . global-aggressive-indent-mode)
   :diminish)
 
-;; This apparently interferes with lsp formatting where lsp is enabled.
-(use-package electric
-  :hook (emacs-lisp-mode . electric-indent-mode))
+;; ;; This apparently interferes with lsp formatting where lsp is enabled.
+;; (use-package electric
+;;   :hook (emacs-lisp-mode . electric-indent-mode))
 
 (use-package highlight-indentation
   :ensure t
@@ -1364,6 +1366,10 @@ differences due to whitespaces."
   :ensure t
   :bind ("C-x C-\\" . goto-last-change))
 
+(use-package popup
+  :ensure t
+  :custom (popup-use-optimized-column-computation nil))
+
 (use-package posframe
   :ensure t)
 
@@ -1497,11 +1503,6 @@ differences due to whitespaces."
   :bind (("C-<f1>" . bm-toggle)
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
-
-;; (use-package amx
-;;   :ensure t
-;;   :hook (after-init . amx-mode)
-;;   :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.
