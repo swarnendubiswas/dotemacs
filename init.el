@@ -1102,15 +1102,9 @@ differences due to whitespaces."
 (use-package flycheck
   :ensure t
   :hook (after-init . global-flycheck-mode)
-  :custom
-  ;; (flycheck-check-syntax-automatically '(save mode-enabled))
-  (flycheck-emacs-lisp-load-path 'inherit)
-  ;; (flycheck-highlighting-mode 'lines) ; Faster than the default
-  ;; (flycheck-idle-change-delay 5)
+  :custom (flycheck-emacs-lisp-load-path 'inherit)
   :config
-  ;; (defalias 'show-error-at-point-soon 'flycheck-show-error-at-point)
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
-  ;; Python
   (add-hook 'python-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'python-pylint
@@ -1131,22 +1125,14 @@ differences due to whitespaces."
   ;; (setq-local flycheck-cuda-language-standard "c++11")
   ;; (setq-local flycheck-cuda-includes "")
   ;; (setq-local flycheck-cuda-include-path "") ; Directories
-  ;; Java
-  ;; Markdown
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
                           flycheck-markdown-markdownlint-cli-config (concat
                                                                      `,(getenv "HOME") "/.config/.markdownlint.json"))))
-  ;; LaTeX
-  (setq-local flycheck-chktexrc "")
-  ;; Shell Script
   (add-hook 'sh-mode-hook
             (lambda ()
-              (setq-local flycheck-checker 'sh-shellcheck)))
-  ;; HTML
-  ;; JSON
-  )
+              (setq-local flycheck-checker 'sh-shellcheck))))
 
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
@@ -1296,30 +1282,6 @@ differences due to whitespaces."
 ;;   :custom
 ;;   (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
 ;;   (xref-show-definitions-function #'ivy-xref-show-defs))
-
-(use-package counsel-gtags
-  :ensure t
-  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'gtags))
-  :diminish
-  :commands (counsel-gtags-find-definition
-             counsel-gtags-find-reference
-             counsel-gtags-find-symbol
-             counsel-gtags-find-file
-             counsel-gtags-create-tags
-             counsel-gtags-update-tags
-             counsel-gtags-dwim)
-  :hook ((c-mode c++-mode) . counsel-gtags-mode)
-  :custom
-  (counsel-gtags-ignore-case nil)
-  (counsel-gtags-auto-update t)
-  :bind (:map counsel-gtags-mode-map
-              ("M-." . counsel-gtags-dwim)
-              ("M-," . counsel-gtags-go-backward)
-              ("C-c g s" . counsel-gtags-find-symbol)
-              ("C-c g d" . counsel-gtags-find-definition)
-              ("C-c g r" . counsel-gtags-find-reference)
-              ("C-c g c" . counsel-gtags-create-tags)
-              ("C-c g u" . counsel-gtags-update-tags)))
 
 (use-package counsel-etags
   :ensure t
@@ -1536,10 +1498,10 @@ differences due to whitespaces."
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
 
-(use-package amx
-  :ensure t
-  :hook (after-init . amx-mode)
-  :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
+;; (use-package amx
+;;   :ensure t
+;;   :hook (after-init . amx-mode)
+;;   :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.
