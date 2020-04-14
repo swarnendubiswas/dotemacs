@@ -602,23 +602,6 @@ differences due to whitespaces."
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
-(use-package anzu
-  :ensure t
-  :disabled t
-  :after isearch
-  :diminish anzu-mode
-  :hook (after-init . global-anzu-mode)
-  :custom
-  (anzu-search-threshold 10000)
-  (anzu-minimum-input-length 2)
-  :config
-  (when (eq dotemacs-modeline-theme 'spaceline)
-    (setq anzu-cons-mode-line-p nil))
-  (unless (eq dotemacs-theme 'leuven)
-    (set-face-attribute 'anzu-mode-line nil
-                        :foreground "blue"
-                        :weight 'light)))
-
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
   :custom
@@ -627,11 +610,12 @@ differences due to whitespaces."
 
 (use-package wgrep
   :ensure t
-  :init (setq wgrep-auto-save-buffer t))
+  :custom (wgrep-auto-save-buffer t))
 
 (use-package deadgrep
   :ensure t
-  :bind ("C-c s r" . deadgrep))
+  :bind (("C-c s d" . deadgrep)
+         ("<f8>" . deadgrep)))
 
 ;; Adding directories to the list of recent files decreases the number of entries of recent files.
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
@@ -820,7 +804,6 @@ differences due to whitespaces."
    ([remap completion-at-point] . counsel-company)
    ("<f9>" . counsel-recentf)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
-   ("C-c s a" . counsel-ag)
    ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
    ("C-c s r" . counsel-rg)
    ("<f4>" . counsel-grep-or-swiper)
@@ -986,7 +969,6 @@ differences due to whitespaces."
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :disabled t
   :hook (after-init . smartparens-global-mode)
   :config
   (require 'smartparens-config)

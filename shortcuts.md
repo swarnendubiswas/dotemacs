@@ -310,9 +310,24 @@ Use `magit-status` to display information about the current Git repository, and 
 
 ## Use Cases
 
-### [Find and replace text in several files in a directory](http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open)
+### Find and replace text in several files in a directory
+
++ Run `M-x rgrep` to find the string.
++ Run `M-x wgrep` or use `C-s C-p`.
++ Edit the rgrep results, you can use iedit-mode.
++ Use `C-x C-s` to commit wgrep.
++ Use `C-x s !` to save the changed files.
+
+<http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open>
 
 ### Search for the symbol at point
+
++ `isearch` - Traditional incremental forward search for regular expression with `C-f`.
++ `counsel-grep-or-swiper` - Use `swiper` (with overview of lines) for small buffers and `counsel-grep` for large files with `<f4>`.
++ `rgrep` - Recursively grep for REGEXP in FILES in directory tree rooted at DIR.
++ `deadgrep` - Start a ripgrep search for SEARCH-TERM (`<f8>`).
++ `counsel-rg` - Grep for a string in the current directory using rg (`C-c s r`).
++ `counsel-projectile-rg` - Perform incremental search in the current project with rg (`<f7>`).
 
 #### Isearch
 
