@@ -751,7 +751,7 @@ differences due to whitespaces."
   (ivy-virtual-abbreviate 'abbreviate)
   (ivy-height-alist '((t
                        lambda (_caller)
-                       (/ (frame-height) 1))))
+                       (/ (frame-height) 2))))
   :config
   (dolist (buffer '(
                     ;; "^\\*Backtrace\\*$"
@@ -1872,14 +1872,13 @@ differences due to whitespaces."
   (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf nil)
-  (lsp-pyls-configuration-sources ["pylint" "pydocstyle" "yapf"])
+  (lsp-pyls-configuration-sources ["pylint" "yapf"])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length 100)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
-  (lsp-pyls-plugins-pydocstyle-enabled t)
-  (lsp-pyls-plugins-pydocstyle-ignore ["D101","D103","D213"])
+  (lsp-pyls-plugins-pydocstyle-ignore ["D100", "D101","D103","D213"])
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-enabled t)
   (lsp-pyls-plugins-pylint-args ["-j 2"])
