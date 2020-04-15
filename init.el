@@ -120,10 +120,9 @@ differences due to whitespaces."
   (require 'use-package))
 
 (setq use-package-always-defer t
-      use-package-always-ensure nil
-      use-package-check-before-init t
       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-      use-package-verbose nil)
+      ;; Disable after testing
+      use-package-verbose t) 
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -194,14 +193,12 @@ differences due to whitespaces."
       set-mark-command-repeat-pop t
       confirm-nonexistent-file-or-buffer t
       ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
-      vc-handled-backends nil)
-
-(setq-default major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
-              sentence-end-double-space nil
-              truncate-lines nil
-              truncate-partial-width-windows nil
-              history-length 50
-              history-delete-duplicates t)
+      vc-handled-backends nil
+      major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
+      sentence-end-double-space nil
+      truncate-lines nil
+      truncate-partial-width-windows nil
+      history-delete-duplicates t)
 
 ;; Activate utf8 mode
 (setq locale-coding-system 'utf-8)
@@ -622,9 +619,8 @@ differences due to whitespaces."
 ;; https://www.emacswiki.org/emacs/RecentFiles
 (use-package recentf
   :custom
-  (recentf-max-menu-items 20)
   (recentf-save-file (concat dotemacs-temp-directory "recentf"))
-  (recentf-max-saved-items 200)
+  (recentf-max-saved-items 50)
   ;; Disable this so that recentf does not attempt to stat remote files
   (recentf-auto-cleanup 'never)
   (recentf-menu-filter 'recentf-sort-descending)
@@ -665,20 +661,15 @@ differences due to whitespaces."
   (company-idle-delay 0.0)
   (company-global-modes t) ; Turn on company-mode for all major modes
   (company-minimum-prefix-length 2)
-  (company-require-match nil) ; Allow typing keys that do not match any candidates
   (company-selection-wrap-around t)
-  (company-show-numbers t) ; Quick-access numbers for the first ten candidates
-  (company-tooltip-align-annotations t)
-  (company-tooltip-flip-when-above nil) ; Invert the navigation direction if the completion popup is displayed on top
-  (company-tooltip-limit 20)
+  (company-show-numbers t)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)))
 
 (use-package company-flx
   :ensure t
-  :hook (global-company-mode . company-flx-mode)
-  :custom (company-flx-limit 20))
+  :hook (global-company-mode . company-flx-mode))
 
 (use-package company-dict
   :ensure t
@@ -691,7 +682,9 @@ differences due to whitespaces."
 (use-package company-ctags
   :ensure t
   :config (company-ctags-auto-setup)
-  :custom (company-ctags-fuzzy-match-p t))
+  :custom
+  (company-ctags-fuzzy-match-p t)
+  (company-ctags-everywhere t))
 
 (use-package yasnippet
   :ensure t
@@ -699,7 +692,7 @@ differences due to whitespaces."
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
   :custom
-  (yas-snippet-dirs '("~/.emacs.d/snippets"))
+  (yas-snippet-dirs (list (expand-file-name (concat user-emacs-directory "snippets"))))
   (yas-triggers-in-field t)
   (yas-wrap-around-region t)
   :config
@@ -710,8 +703,6 @@ differences due to whitespaces."
   :ensure t
   :hook (after-init . amx-mode)
   :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
-
-(setq completion-in-region-function #'ivy-completion-in-region)
 
 (use-package ivy
   :ensure t
@@ -737,6 +728,7 @@ differences due to whitespaces."
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
+  (completion-in-region-function #'ivy-completion-in-region)
   :config
   (dolist (buffer '(
                     ;; "^\\*Backtrace\\*$"
@@ -1690,9 +1682,9 @@ differences due to whitespaces."
 (use-package pyvenv
   :ensure t
   :diminish
-  :custom
-  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
-  (pyvenv-tracking-ask-before-change t)
+  :custom (pyvenv-mode-line-indicator
+           '(pyvenv-virtual-env-name ("[venv:"
+                                      pyvenv-virtual-env-name "]")))
   :hook (python-mode . pyvenv-mode))
 
 (use-package ein
@@ -1877,6 +1869,27 @@ differences due to whitespaces."
                     :remote? t
                     :server-id 'cmakels-remote))
 
+  (use-package lsp-pyls
+    :config
+    (add-hook 'python-mode-hook
+              (lambda ()
+                (add-hook 'before-save-hook
+                          (lambda ()
+                            (lsp-format-buffer)) nil t))))
+
+
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        (lambda ()
+                          (lsp-format-buffer)) nil t)))
+
+  (add-hook 'sh-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        (lambda () (lsp-format-buffer))
+                        nil t)))
+
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -1916,40 +1929,10 @@ differences due to whitespaces."
   :ensure origami
   :hook (origami-mode . lsp-origami-mode))
 
-(add-hook 'python-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook
-                      (lambda ()
-                        (lsp-format-buffer)) nil t)))
-(add-hook 'c++-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook
-                      (lambda ()
-                        (lsp-format-buffer)) nil t)))
-(add-hook 'java-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook
-                      (lambda () (lsp-format-buffer))
-                      nil t)))
-(add-hook 'sh-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook
-                      (lambda () (lsp-format-buffer))
-                      nil t)))
-
-(use-package lsp-latex
-  :disabled t
-  :load-path "extras")
-
 (use-package company-lsp
   :ensure t
   :commands company-lsp
-  :custom
-  (company-lsp-enable-snippet t)
-  (company-lsp-async t)
-  (company-lsp-filter-candidates t)
-  (company-lsp-enable-recompletion t)
-  (company-lsp-cache-candidates 'auto)
+  :custom (company-lsp-cache-candidates 'auto)
   :config (push 'company-lsp company-backends))
 
 (use-package lsp-ivy
@@ -1959,7 +1942,12 @@ differences due to whitespaces."
 (use-package lsp-java
   :ensure t
   :hook (java-mode . lsp)
-  :custom (lsp-java-inhibit-message t))
+  :custom (lsp-java-inhibit-message t)
+  :config (add-hook 'java-mode-hook
+                    (lambda ()
+                      (add-hook 'before-save-hook
+                                (lambda () (lsp-format-buffer))
+                                nil t))))
 
 (use-package lsp-python-ms
   :disabled t
