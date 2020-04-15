@@ -285,9 +285,14 @@ Use `magit-status` to display information about the current Git repository, and 
 * `p` - Move to previous section.
 * `M-n` - Move to next sibling section.
 * `M-p` - Move to previous sibling section.
-* `s` - Stage item.
-* `u` - Unstage item.
-* `c` - Commit menu.
+* `s` - Stage item (`magit-stage`).
+* `S` - Stage all changed files (`magit-stage-modified`).
+* `u` - Unstage item (`magit-unstage`).
+* `U` - Unstage all items (`magit-unstage-all`).
+* `c` - Commit menu (`magit-commit`).
+  * `c` - Create a new commit on HEAD (`magit-commit-create`).
+* `C-c C-c` - Finish current editing session (`with-editor-finish`).
+* `C-c C-k` - Cancel current editing session (`with-editor-cancel`).
 * `l` - Log menu.
 * `M-S` - Show all sections.
 * `M-H` - Hide all sections.

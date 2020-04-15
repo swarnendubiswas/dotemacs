@@ -1143,6 +1143,7 @@ differences due to whitespaces."
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
+  :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
   :diminish
   :hook (prog-mode . ws-butler-mode))
 
@@ -1191,7 +1192,7 @@ differences due to whitespaces."
                            ("LATER" . hl-todo)
                            ("IMP" . hl-todo)
                            ("FIXME" . hl-todo)))
-  :config (global-hl-todo-mode))
+  :hook (after-init . global-hl-todo-mode))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; Edit remote file: /method:user@host#port:filename.
@@ -1214,7 +1215,7 @@ differences due to whitespaces."
                                 tramp-file-name-regexp))
   :config
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  (add-to-list 'tramp-default-method-alist '("" "swarnendu" "ssh"))
+  ;; (add-to-list 'tramp-default-method-alist '("" "swarnendu" "ssh"))
   ;; (add-to-list 'tramp-default-method-alist
   ;;              '("\\`localhost\\'" "\\`root\\'" "su"))
 
@@ -1227,15 +1228,16 @@ differences due to whitespaces."
 (use-package counsel-tramp
   :ensure t
   :bind ("C-c d t" . counsel-tramp)
-  :config
-  (add-hook 'counsel-tramp-pre-command-hook
-            (lambda ()
-              (global-aggressive-indent-mode -1)
-              (projectile-mode -1)))
-  (add-hook 'counsel-tramp-quit-hook
-            (lambda ()
-              (global-aggressive-indent-mode 1)
-              (projectile-mode 1))))
+  ;; :config
+  ;; (add-hook 'counsel-tramp-pre-command-hook
+  ;;           (lambda ()
+  ;;             (global-aggressive-indent-mode -1)
+  ;;             (projectile-mode -1)))
+  ;; (add-hook 'counsel-tramp-quit-hook
+  ;;           (lambda ()
+  ;;             (global-aggressive-indent-mode 1)
+  ;;             (projectile-mode 1)))
+  )
 
 (use-package imenu
   :custom
@@ -1305,8 +1307,7 @@ differences due to whitespaces."
 ;; M-x vlf <PATH-TO-FILE>
 (use-package vlf ; Speed up Emacs for large files
   :ensure t
-  :custom
-  (vlf-application 'dont-ask)
+  :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
@@ -1817,9 +1818,10 @@ differences due to whitespaces."
   (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf nil)
-  (lsp-pyls-configuration-sources ["pylint" "yapf"])
+  ;; (lsp-pyls-configuration-sources ["pylint" "yapf"])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
+  (lsp-pyls-plugins-preload-modules ["numpy"])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length 100)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
