@@ -64,7 +64,7 @@ The following are customization options defined in `init.el` that you could use 
 
 ## Browsing Source
 
-The `lsp` mode in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
+Support for `LSP` protocol in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
 
 ### GTags
 
@@ -99,30 +99,26 @@ For more commands, see the Tags topic in the Emacs info document.
 
 #### Examples
 
-```Bash
-find -L . -iname "*.c" -print -or -iname "*.h" -print -or -iname "*.hpp" -print -or -iname "*.cpp" -print -or -iname "*.cc" -or -iname "*.py" -print | ctags -eR --links -L -
-```
-
-`find . -type f -iname "*.(py|cc|c|cpp|cxx|h|hpp|hxx)" | ctags -eR -L -`
-
-find . -type f -iname "*.cc" -exec ctags -eR {} \;
-
-find . -L -type f -iregex "*\.(cc|cpp)"
-
 + TensorFlow - `ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt`
 
 + C/C++ projects - `ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=doc --exclude=PTRacer-solver`
 
 + `ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/'`
 
-+ `ctags -eR --exclude=@.ctagsignore .`
++ `ctags -eR --exclude=@.ctagsignore .` with the following in `.ctagsignore`
 
-with the following in .ctagsignore:
 dir1
 dir2
 dir3
 
 + `ctags -eR --languages=Python`
+
+### Using GNU Global with Universal CTags support
+
+GNU Global has better database search support while Ctags supports many languages. It is possible to build Global with Ctags support.
+
++ https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support
++ https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556
 
 ## TODO
 

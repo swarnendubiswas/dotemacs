@@ -30,3 +30,6 @@ eclipse.jdt.ls
 workspace
 request
 flycheck_init.el
+GPATH
+GTAGS
+GRTAGS

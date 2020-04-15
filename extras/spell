@@ -1,4 +1,4 @@
-personal_ws-1.1 en 81 
+personal_ws-1.1 en 82 
 atomicity
 indices
 roundtrip
@@ -6,6 +6,7 @@ anisotropic
 vectorization
 probabilistically
 FIXME
+requestor
 piecewise
 Keshav
 partitioner
@@ -25,8 +26,8 @@ pseudocode
 whitespaces
 perceptron
 Parallelization
-blackbox
 vertices
+blackbox
 unscalable
 scalable
 programmability

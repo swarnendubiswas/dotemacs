@@ -20,7 +20,7 @@
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
-(setq debug-on-error nil
+(setq debug-on-error t
       load-prefer-newer t
       user-full-name "Swarnendu Biswas")
 
@@ -95,13 +95,25 @@ differences due to whitespaces."
   :type 'boolean
   :group 'dotemacs)
 
-(defcustom dotemacs-tags
-  'ctags
+(defcustom dotemacs-tags-scheme
+  'gtags
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
           (const :tag "gtags" gtags)
           (const :tag "none" none))
+  :group 'dotemacs)
+
+(defcustom dotemacs-ctags-path
+  "/usr/local/bin/ctags"
+  "Absolute path to Universal CTags executable."
+  :type 'string
+  :group 'dotemacs)
+
+(defcustom dotemacs-gtags-path
+  "/usr/local/bin/gtags"
+  "Absolute path to GNU Global executable."
+  :type 'string
   :group 'dotemacs)
 
 (eval-when-compile
@@ -122,7 +134,7 @@ differences due to whitespaces."
 (setq use-package-always-defer t
       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
       ;; Disable after testing
-      use-package-verbose t) 
+      use-package-verbose t)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -164,7 +176,7 @@ differences due to whitespaces."
       initial-scratch-message nil
       create-lockfiles nil
       ;; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
-      ring-bell-function 'ignore
+      ;; ring-bell-function 'ignore
       gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       read-process-output-max (* 1024 1024) ; 1 MB
       use-dialog-box nil
@@ -514,6 +526,7 @@ differences due to whitespaces."
 
 (use-package treemacs
   :ensure t
+  :disabled t
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-follow-mode)
          (projectile-mode . treemacs-filewatch-mode)
@@ -1261,9 +1274,33 @@ differences due to whitespaces."
 ;;   (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
 ;;   (xref-show-definitions-function #'ivy-xref-show-defs))
 
+(use-package counsel-gtags
+  :ensure t
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
+  :diminish
+  ;; :commands (counsel-gtags-find-definition
+  ;;            counsel-gtags-find-reference
+  ;;            counsel-gtags-find-symbol
+  ;;            counsel-gtags-find-file
+  ;;            counsel-gtags-create-tags
+  ;;            counsel-gtags-update-tags
+  ;;            counsel-gtags-dwim)
+  :hook ((c-mode c++-mode) . counsel-gtags-mode)
+  :custom
+  (counsel-gtags-ignore-case nil)
+  (counsel-gtags-auto-update t)
+  :bind (:map counsel-gtags-mode-map
+              ("M-'" . counsel-gtags-dwim)
+              ("M-," . counsel-gtags-go-backward)
+              ("C-c g s" . counsel-gtags-find-symbol)
+              ("C-c g d" . counsel-gtags-find-definition)
+              ("C-c g r" . counsel-gtags-find-reference)
+              ("C-c g c" . counsel-gtags-create-tags)
+              ("C-c g u" . counsel-gtags-update-tags)))
+
 (use-package counsel-etags
   :ensure t
-  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags 'ctags))
+  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
   :bind(("M-'" . counsel-etags-find-tag-at-point)
         ("C-c g t" . counsel-etags-find-tag-at-point)
         ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -1931,6 +1968,7 @@ differences due to whitespaces."
 
 (use-package company-lsp
   :ensure t
+  :disabled t
   :commands company-lsp
   :custom (company-lsp-cache-candidates 'auto)
   :config (push 'company-lsp company-backends))
@@ -2063,12 +2101,17 @@ Increase line spacing by two line height."
       (delete-file old-location))))
 
 ;; https://www.emacswiki.org/emacs/BuildTags
-(setq path-to-ctags "/usr/local/bin/ctags")
 (defun sb/create-ctags (dir-name)
-  "Create tags file."
+  "Create tags file with ctags."
   (interactive "Directory: ")
   (shell-command
-   (format "%s -f TAGS -e -R %s" path-to-ctags (directory-file-name dir-name))))
+   (format "%s -f TAGS -e -R %s" dotemacs-ctags-path (directory-file-name dir-name))))
+
+(defun sb/create-gtags (dir-name)
+  "Create tags file with gtags."
+  (interactive "Directory: ")
+  (shell-command
+   (format "%s %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
 ;; Generic keybindings, package-specific are usually in their own modules. Use `M-x describe-personal-keybindings` to see modifications.
 
@@ -2084,6 +2127,15 @@ Increase line spacing by two line height."
  ("C-c z" . repeat)
  ("C-z" . undo))
 
+(bind-keys
+ ("<f10>" . other-window) ; Switch to the other buffer
+ ("<f11>" . delete-other-windows)
+ ("C-x k" . kill-this-buffer)
+ ("<f12>" . sb/kill-other-buffers)
+ ("M-<left>" . previous-buffer)
+ ("M-<right>" . next-buffer)
+ ("C-c d f" . #'auto-fill-mode))
+
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
 (bind-keys*
@@ -2092,19 +2144,11 @@ Increase line spacing by two line height."
  ("C-c ;" . sb/comment-line)
  ("C-c b" . comment-box))
 
-(bind-keys
- ("<f10>" . other-window) ; Switch to the other buffer
- ("<f11>" . delete-other-windows)
- ("C-x k" . kill-this-buffer)
- ("<f12>" . sb/kill-other-buffers))
-
 (bind-keys*
  ("C-s" . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
-
-(bind-key "C-c d f" #'auto-fill-mode)
 
 (use-package default-text-scale
   :ensure t
@@ -2115,12 +2159,11 @@ Increase line spacing by two line height."
   :ensure t
   :hook (after-init . which-key-mode)
   :config (which-key-setup-side-window-right-bottom)
-  :diminish which-key-mode)
+  :diminish)
 
 ;; Mark safe variables
 
 (put 'company-clang-arguments 'safe-local-variable #'listp)
-(put 'company-c-headers-path-user 'safe-local-variable #'listp)
 (put 'flycheck-clang-include-path 'safe-local-variable #'listp)
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
@@ -2132,5 +2175,6 @@ Increase line spacing by two line height."
 (put 'counsel-etags-project-root 'safe-local-variable #'stringp)
 (put 'tags-table-list 'safe-local-variable #'listp)
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
+(put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
 
 ;;; init.el ends here
