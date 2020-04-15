@@ -452,14 +452,15 @@ differences due to whitespaces."
       ((eq dotemacs-modeline-theme 'default) ))
 
 (use-package ibuffer
+  :custom
+  ;; (ibuffer-always-show-last-buffer nil)
+  (ibuffer-case-fold-search t) ; Ignore case when searching
+  (ibuffer-default-sorting-mode 'alphabetic) ; Options: major-mode
+  (ibuffer-display-summary nil)
+  (ibuffer-expert t)
+  (ibuffer-use-header-line t)
   :config
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
-  (setq ibuffer-always-show-last-buffer nil
-        ibuffer-case-fold-search t ; Ignore case when searching
-        ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
-        ibuffer-display-summary nil
-        ibuffer-expert t
-        ibuffer-use-header-line t)
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
 
 ;; Don't show filter groups if there are no buffers in that group
@@ -499,7 +500,7 @@ differences due to whitespaces."
   (dired-dwim-target t)
   :config
   ;; Auto refresh dired when files change
-  (add-hook 'dired-mode-hook 'auto-revert-mode))
+  (add-hook 'dired-mode-hook #'auto-revert-mode))
 
 (use-package dired-x
   :custom
@@ -524,56 +525,56 @@ differences due to whitespaces."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package treemacs
-  :ensure t
-  :disabled t
-  :commands (treemacs treemacs-toggle)
-  :hook ((projectile-mode . treemacs-follow-mode)
-         (projectile-mode . treemacs-filewatch-mode)
-         ;; (projectile-mode . treemacs-fringe-indicator-mode)
-         )
-  :custom (treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
-  :config
-  (setq treemacs-follow-after-init t
-        treemacs-width 20
-        treemacs-lock-width t
-        treemacs-indentation 2
-        treemacs-position 'right
-        treemacs-collapse-dirs 3
-        ;; treemacs-sorting 'alphabetic-desc
-        treemacs-show-hidden-files nil
-        treemacs-project-follow-cleanup t
-        ;; Prevents treemacs from being selected with `other-window`
-        treemacs-is-never-other-window nil
-        treemacs-goto-tag-strategy 'refetch-index
-        treemacs-recenter-after-file-follow t
-        treemacs-recenter-after-tag-follow  t
-        treemacs-silent-filewatch t
-        treemacs-silent-refresh t
-        treemacs-tag-follow-delay 1
-        treemacs-tag-follow-cleanup t)
-  (treemacs-git-mode 'extended)
-  ;; Decrease the font size
-  (set-face-attribute 'treemacs-directory-collapsed-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-directory-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-file-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-root-face nil
-                      :height 0.9)
-  (set-face-attribute 'treemacs-tags-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-git-ignored-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-git-untracked-face nil
-                      :height 0.7)
-  (treemacs-resize-icons 16)
-  :bind* ("C-j" . treemacs))
+;; (use-package treemacs
+;;   :ensure t
+;;   :disabled t
+;;   :commands (treemacs treemacs-toggle)
+;;   :hook ((projectile-mode . treemacs-follow-mode)
+;;          (projectile-mode . treemacs-filewatch-mode)
+;;          ;; (projectile-mode . treemacs-fringe-indicator-mode)
+;;          )
+;;   :custom (treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
+;;   :config
+;;   (setq treemacs-follow-after-init t
+;;         treemacs-width 20
+;;         treemacs-lock-width t
+;;         treemacs-indentation 2
+;;         treemacs-position 'right
+;;         treemacs-collapse-dirs 3
+;;         ;; treemacs-sorting 'alphabetic-desc
+;;         treemacs-show-hidden-files nil
+;;         treemacs-project-follow-cleanup t
+;;         ;; Prevents treemacs from being selected with `other-window`
+;;         treemacs-is-never-other-window nil
+;;         treemacs-goto-tag-strategy 'refetch-index
+;;         treemacs-recenter-after-file-follow t
+;;         treemacs-recenter-after-tag-follow  t
+;;         treemacs-silent-filewatch t
+;;         treemacs-silent-refresh t
+;;         treemacs-tag-follow-delay 1
+;;         treemacs-tag-follow-cleanup t)
+;;   (treemacs-git-mode 'extended)
+;;   ;; Decrease the font size
+;;   (set-face-attribute 'treemacs-directory-collapsed-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-directory-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-file-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-root-face nil
+;;                       :height 0.9)
+;;   (set-face-attribute 'treemacs-tags-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-git-ignored-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-git-untracked-face nil
+;;                       :height 0.7)
+;;   (treemacs-resize-icons 16)
+;;   :bind* ("C-j" . treemacs))
 
-(use-package treemacs-projectile
-  :ensure t
-  :after (treemacs projectile))
+;; (use-package treemacs-projectile
+;;   :ensure t
+;;   :after (treemacs projectile))
 
 ;; (use-package treemacs-magit
 ;;   :ensure t
@@ -678,7 +679,13 @@ differences due to whitespaces."
   (company-show-numbers t)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)))
+              ("C-p" . company-select-previous))
+  :config 
+  (use-package company-ispell
+    :custom
+    (company-ispell-available t)
+    (company-ispell-dictionary (concat dotemacs-extras-directory "wordlist"))
+    :config (add-to-list 'company-backends 'company-ispell)))
 
 (use-package company-flx
   :ensure t
@@ -699,18 +706,18 @@ differences due to whitespaces."
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
 
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (after-init . yas-global-mode)
-  :custom
-  (yas-snippet-dirs (list (expand-file-name (concat user-emacs-directory "snippets"))))
-  (yas-triggers-in-field t)
-  (yas-wrap-around-region t)
-  :config
-  (unbind-key "<tab>" yas-minor-mode-map)
-  (use-package yasnippet-snippets))
+;; (use-package yasnippet
+;;   :ensure t
+;;   :diminish yas-minor-mode
+;;   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+;;   :hook (after-init . yas-global-mode)
+;;   :custom
+;;   (yas-snippet-dirs (list (expand-file-name (concat user-emacs-directory "snippets"))))
+;;   (yas-triggers-in-field t)
+;;   (yas-wrap-around-region t)
+;;   :config
+;;   (unbind-key "<tab>" yas-minor-mode-map)
+;;   (use-package yasnippet-snippets))
 
 (use-package amx
   :ensure t
@@ -809,16 +816,16 @@ differences due to whitespaces."
    ([remap completion-at-point] . counsel-company)
    ("<f9>" . counsel-recentf)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
-   ("C-c s g" . counsel-git-grep) ; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+   ("C-c s g" . counsel-git-grep)
    ("C-c s r" . counsel-rg)
    ("<f4>" . counsel-grep-or-swiper)
    ("C-c C-m" . counsel-mark-ring)
    ("C-c C-j" . counsel-semantic-or-imenu))
   :custom
   (counsel-mode-override-describe-bindings t)
-  (counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
-  (counsel-find-file-at-point nil)
-  (counsel-yank-pop-separator "\n-----------------\n")
+  ;; (counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
+  (counsel-yank-pop-separator "\n-------------------------\n")
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                     "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
@@ -865,9 +872,7 @@ differences due to whitespaces."
 
 (use-package ivy-rich
   :ensure t
-  :custom
-  (ivy-rich-path-style 'relative)
-  (ivy-format-function #'ivy-format-function-line)
+  :custom (ivy-format-function #'ivy-format-function-line)
   :hook (ivy-mode . ivy-rich-mode))
 
 (use-package flyspell
@@ -915,7 +920,7 @@ differences due to whitespaces."
           (forward-word)))))
   :custom
   (ispell-local-dictionary "en_US")
-  (ispell-dictionary "english")
+  (ispell-dictionary "en_US")
   (ispell-personal-dictionary (concat dotemacs-extras-directory "spell"))
   ;; Aspell speed: ultra | fast | normal | bad-spellers
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
@@ -2134,7 +2139,10 @@ Increase line spacing by two line height."
  ("<f12>" . sb/kill-other-buffers)
  ("M-<left>" . previous-buffer)
  ("M-<right>" . next-buffer)
- ("C-c d f" . #'auto-fill-mode))
+ ("C-c d f" . #'auto-fill-mode)
+ ("M-c" . capitalize-dwim)
+ ("M-u" . upcase-dwim)
+ ("M-c" . downcase-dwim))
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
