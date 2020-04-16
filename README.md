@@ -84,6 +84,8 @@ find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -v -f -
 find . -type f -iname "*.tex" | gtags -v -f -
 ```
 
++ TensorFlow - `find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -`
+
 ### Universal CTags
 
 Use Universal CTags with `counsel-etags`. Use `ctags -eR` to recursively scan for files (`R`) and use Emacs-compatible syntax (`e`). You can use `--list-excludes` and `--list-languages` to check which patterns are excluded from processing and which languages are supported.

@@ -500,7 +500,7 @@ differences due to whitespaces."
   ;; Check `ls' for additional options
   (dired-listing-switches "-ABhl --si --group-directories-first")
   (dired-ls-F-marks-symlinks t) ; -F marks links with @
-  (dired-dwim-target t)
+  (dired-dwim-target t) ; Guess a default target directory for copy, rename, etc.
   :config
   ;; Auto refresh dired when files change
   (add-hook 'dired-mode-hook #'auto-revert-mode))
@@ -1286,7 +1286,12 @@ differences due to whitespaces."
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
   :diminish
-  :hook ((prog-mode latex-mode) . counsel-gtags-mode)
+  ;; :init
+  ;; (add-hook 'c-mode-common-hook
+  ;;           (lambda ()
+  ;;             (when (derived-mode-p 'c-mode 'c++-mode)
+  ;;               (counsel-gtags-mode 1))))
+  :hook ((prog-mode protobuf-mode latex-mode) . counsel-gtags-mode)
   :custom
   (counsel-gtags-ignore-case nil)
   (counsel-gtags-auto-update t)
@@ -2134,7 +2139,7 @@ Increase line spacing by two line height."
  ("C-c d f" . #'auto-fill-mode)
  ("M-c" . capitalize-dwim)
  ("M-u" . upcase-dwim)
- ("M-c" . downcase-dwim))
+ ("M-l" . downcase-dwim))
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
