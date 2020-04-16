@@ -23,8 +23,8 @@ sudo snap install universal-ctags
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 sudo snap refresh
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server importmagic pyls-isort setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint
 sudo npm update
 sudo gem install scss_lint
@@ -119,8 +119,8 @@ dir3
 
 GNU Global has better database search support while Ctags supports many languages. It is possible to build Global with Ctags support.
 
-+ https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support
-+ https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556
++ <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
++ <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
 
 ## TODO
 
