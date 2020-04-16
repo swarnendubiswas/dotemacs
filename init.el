@@ -77,11 +77,13 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-window-split
-  'vertical ; Direction of the divider, Emacs calls this horizontal
+  'vertical
   "Specify the direction in which the windows should be split. This depends on the orientation of the display."
   :type '(radio
-          (const :tag "vertical" vertical)
-          (const :tag "horizontal" horizontal))
+          ;; Split the selected window into two windows, one above the other
+          (const :tag "vertical" vertical) ; split-window-below
+          ;; Split the selected window into two side-by-side windows
+          (const :tag "horizontal" horizontal)) ; split-window-right
   :group 'dotemacs)
 
 (defconst dotemacs-fill-column 100
@@ -287,12 +289,13 @@ differences due to whitespaces."
   :diminish
   :hook (after-init . global-subword-mode))
 
-;; Set Emacs split to horizontal or vertical
-;; http://stackoverflow.com/questions/2081577/setting-emacs-split-to-horizontal
 ;; https://www.emacswiki.org/emacs/HorizontalSplitting
-(if (eq dotemacs-window-split 'vertical) ; Direction of the divider is vertical
-    (setq split-width-threshold 999)
-  (setq split-width-threshold 0))
+;; vertical - Split the selected window into two windows, one above the other (split-window-below)
+;; horizontal - Split the selected window into two side-by-side windows (split-window-right)
+(cond ((eq dotemacs-window-split 'vertical) (setq split-width-threshold nil
+                                                  split-height-threshold 0))
+      ((eq dotemacs-window-split 'horizontal) (setq split-height-threshold nil
+                                                    split-width-threshold 0)))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)
@@ -680,7 +683,7 @@ differences due to whitespaces."
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous))
-  :config 
+  :config
   (use-package company-ispell
     :custom
     (company-ispell-available t)
@@ -1065,6 +1068,7 @@ differences due to whitespaces."
     (add-to-list 'projectile-globally-ignored-files item))
   (dolist (list '(".aux"
                   ".bak"
+                  ".blg"
                   ".elc"
                   ".jar"
                   ".out"
@@ -1212,7 +1216,7 @@ differences due to whitespaces."
 (use-package tramp
   :custom
   (tramp-default-method "ssh") ; ssh is faster than the default scp
-  (tramp-default-user "swarnendu")
+  (tramp-default-user user-login-name)
   (tramp-default-host "172.27.15.105")
   ;; Auto-save to a local directory for better performance
   (tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save"))
@@ -1232,8 +1236,7 @@ differences due to whitespaces."
   ;; If the shell of the server is not bash, then it is recommended to connect with bash
   (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
   ;; Disable backup
-  (add-to-list 'backup-directory-alist
-               (cons tramp-file-name-regexp nil)))
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
 
 (use-package counsel-tramp
   :ensure t
@@ -1283,14 +1286,7 @@ differences due to whitespaces."
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
   :diminish
-  ;; :commands (counsel-gtags-find-definition
-  ;;            counsel-gtags-find-reference
-  ;;            counsel-gtags-find-symbol
-  ;;            counsel-gtags-find-file
-  ;;            counsel-gtags-create-tags
-  ;;            counsel-gtags-update-tags
-  ;;            counsel-gtags-dwim)
-  :hook ((c-mode c++-mode) . counsel-gtags-mode)
+  :hook ((prog-mode latex-mode) . counsel-gtags-mode)
   :custom
   (counsel-gtags-ignore-case nil)
   (counsel-gtags-auto-update t)
@@ -1306,12 +1302,12 @@ differences due to whitespaces."
 (use-package counsel-etags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
-  :bind(("M-'" . counsel-etags-find-tag-at-point)
-        ("C-c g t" . counsel-etags-find-tag-at-point)
-        ("C-c g s" . counsel-etags-find-symbol-at-point)
-        ("C-c g g" . counsel-etags-grep-symbol-at-point)
-        ("C-c g f" . counsel-etags-find-tag)
-        ("C-c g l" .  counsel-etags-list-tag))
+  :bind (("M-'" . counsel-etags-find-tag-at-point)
+         ("C-c g t" . counsel-etags-find-tag-at-point)
+         ("C-c g s" . counsel-etags-find-symbol-at-point)
+         ("C-c g g" . counsel-etags-grep-symbol-at-point)
+         ("C-c g f" . counsel-etags-find-tag)
+         ("C-c g l" .  counsel-etags-list-tag))
   :init
   (add-hook 'c++-mode-hook
             (lambda ()
@@ -1321,25 +1317,27 @@ differences due to whitespaces."
   (counsel-etags-update-interval 180) ; How many seconds to wait before rerunning tags for auto-update
   ;; (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
   :config
-  ;; (setq imenu-create-index-function
-  ;;       'counsel-etags-imenu-default-create-index-function)
   (add-to-list 'counsel-etags-ignore-directories ".vscode")
   (add-to-list 'counsel-etags-ignore-directories "build")
   (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
   (add-to-list 'counsel-etags-ignore-filenames "*.json")
   (add-to-list 'counsel-etags-ignore-filenames "*.html")
-  (add-to-list 'counsel-etags-ignore-filenames "*.xml")
-  )
+  (add-to-list 'counsel-etags-ignore-filenames "*.xml"))
+
+(use-package dumb-jump
+  :ensure t
+  :custom
+  (dumb-jump-selector 'ivy)
+  (dumb-jump-prefer-searcher 'rg))
 
 (use-package helpful
   :ensure t
-  :bind
-  (("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h f" . helpful-function)))
+  :bind (("C-h v" . helpful-variable)
+         ("C-h k" . helpful-key)
+         ("C-h f" . helpful-function)))
 
-;; M-x vlf <PATH-TO-FILE>
-(use-package vlf ; Speed up Emacs for large files
+;; Speed up Emacs for large files: M-x vlf <PATH-TO-FILE>
+(use-package vlf
   :ensure t
   :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
@@ -1404,16 +1402,11 @@ differences due to whitespaces."
   ;; ;; (push '(dired-mode :position top) popwin:special-display-config)
   ;; (push '(compilation-mode :noselect t) popwin:special-display-config)
   ;; (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
-  ;; (push '(svn-info-mode :noselect t) popwin:special-display-config)
-  ;; (push '(svn-status-mode) popwin:special-display-config)
-  ;; (push '("^\*svn-.+\*$" :regexp t) popwin:special-display-config)
   (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   ;; (push '("*undo-tree\*" :width 0.3 :position right) popwin:special-display-config)
   ;; (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
   ;; (push '("*Selection Ring:") popwin:special-display-config)
-  ;; (push '("*ag search*" :noselect nil) popwin:special-display-config)
-  ;; (push '("*ggtags-global*" :stick t :noselect nil :height 30) popwin:special-display-config)
   (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
   ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
@@ -1480,11 +1473,11 @@ differences due to whitespaces."
   :mode ("/sshd?_config\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
-  :config (add-hook 'ssh-config-mode-hook 'turn-on-font-lock))
+  :config (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
 
 (use-package ace-window
   :ensure t
-  :bind (("C-c w" . ace-window)
+  :bind (("<f10>" . ace-window)
          ([remap other-window] . ace-window)))
 
 (use-package super-save ; Save buffers when Emacs loses focus
@@ -2133,7 +2126,6 @@ Increase line spacing by two line height."
  ("C-z" . undo))
 
 (bind-keys
- ("<f10>" . other-window) ; Switch to the other buffer
  ("<f11>" . delete-other-windows)
  ("C-x k" . kill-this-buffer)
  ("<f12>" . sb/kill-other-buffers)
