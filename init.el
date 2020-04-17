@@ -471,7 +471,7 @@ differences due to whitespaces."
                     :height 125)
 (set-face-attribute 'mode-line nil
                     :family "DejaVu Sans Mono for Powerline"
-                    :height 50)
+                    :height 100)
 
 (use-package ibuffer
   :custom
@@ -1820,12 +1820,7 @@ differences due to whitespaces."
   (transient-history-file (concat dotemacs-temp-directory "transient/history.el"))
   (magit-save-repository-buffers t)
   (magit-completing-read-function 'ivy-completing-read)
-  ;; (magit-display-buffer-function 'switch-to-buffer)
-  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  ;; (magit-post-display-buffer-hook #'(lambda ()
-  ;;                                     (when (derived-mode-p 'magit-status-mode)
-  ;;                                       (delete-other-windows))))
-  )
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
 
 ;; (use-package magit-popup)
 
@@ -1867,7 +1862,6 @@ differences due to whitespaces."
   (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf nil)
-  ;; (lsp-pyls-configuration-sources ["pylint" "yapf"])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
   (lsp-pyls-plugins-preload-modules ["numpy"])
