@@ -60,7 +60,7 @@ The following are customization options defined in `init.el` that you could use 
 + `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
 + `dotemacs-fill-column` - Column beyond which lines should not extend.
 + `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
-+ `dotemacs-tags` - Choose whether to use Gtags or CTags for C/C++ programming. In general, we use LSP for supported languages and projects.
++ `dotemacs-tags-scheme` - Choose whether to use Gtags or CTags for C/C++ programming. In general, we use LSP for supported languages and projects.
 
 ## Browsing Source
 
@@ -73,7 +73,7 @@ Use GNU Global with `counsel-gtags`.
 #### Examples
 
 ``` Bash
-find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -v -f -
+find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -cv --gtagslabel=new-ctags -f -
 ```
 
 ``` Bash

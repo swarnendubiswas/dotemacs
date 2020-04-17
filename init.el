@@ -90,7 +90,7 @@
   "Column beyond which lines should not extend.")
 
 (defcustom dotemacs-delete-trailing-whitespace-p
-  t
+  nil
   "Delete trailing whitespace.
 Control whether the trailing whitespace should be deleted or not.  Sometimes we do not want to unnecessarily add
 differences due to whitespaces."
@@ -928,7 +928,6 @@ differences due to whitespaces."
   ;; Aspell speed: ultra | fast | normal | bad-spellers
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
   (ispell-silently-savep t) ; Save a new word to personal dictionary without asking
-  (flyspell-sort-corrections nil)
   (flyspell-issue-message-flag nil)
   :hook ((prog-mode . flyspell-prog-mode)
          (before-save-hook . flyspell-buffer)
@@ -1191,10 +1190,7 @@ differences due to whitespaces."
   :hook (prog-mode . highlight-symbol-mode)
   :bind (("M-p" . highlight-symbol-prev)
          ("M-n" . highlight-symbol-next))
-  :custom
-  (highlight-symbol-idle-delay 1)
-  (highlight-symbol-on-navigation-p t)
-  (highlight-symbol-highlight-single-occurrence nil)
+  :custom (highlight-symbol-on-navigation-p t)
   :diminish)
 
 (use-package hl-todo
@@ -1318,16 +1314,13 @@ differences due to whitespaces."
             (lambda ()
               (add-hook 'after-save-hook
                         'counsel-etags-virtual-update-tags 'append 'local)))
-  :custom
-  (counsel-etags-update-interval 180) ; How many seconds to wait before rerunning tags for auto-update
+  ;; :custom
   ;; (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
   :config
-  (add-to-list 'counsel-etags-ignore-directories ".vscode")
-  (add-to-list 'counsel-etags-ignore-directories "build")
-  (add-to-list 'counsel-etags-ignore-filenames ".clang-format")
-  (add-to-list 'counsel-etags-ignore-filenames "*.json")
-  (add-to-list 'counsel-etags-ignore-filenames "*.html")
-  (add-to-list 'counsel-etags-ignore-filenames "*.xml"))
+  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders"))
+    (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
+  (dolist (ignore-files '(".clang-format" "*.json" "*.html" "*.xml"))
+    (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package dumb-jump
   :ensure t
