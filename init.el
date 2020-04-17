@@ -20,7 +20,7 @@
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
-(setq debug-on-error nil
+(setq debug-on-error t
       load-prefer-newer t
       user-full-name "Swarnendu Biswas")
 
@@ -709,18 +709,18 @@ differences due to whitespaces."
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
 
-;; (use-package yasnippet
-;;   :ensure t
-;;   :diminish yas-minor-mode
-;;   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-;;   :hook (after-init . yas-global-mode)
-;;   :custom
-;;   (yas-snippet-dirs (list (expand-file-name (concat user-emacs-directory "snippets"))))
-;;   (yas-triggers-in-field t)
-;;   (yas-wrap-around-region t)
-;;   :config
-;;   (unbind-key "<tab>" yas-minor-mode-map)
-;;   (use-package yasnippet-snippets))
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  :hook (after-init . yas-global-mode)
+  :custom
+  (yas-snippet-dirs (list (expand-file-name (concat user-emacs-directory "snippets"))))
+  (yas-triggers-in-field t)
+  (yas-wrap-around-region t)
+  :config
+  (unbind-key "<tab>" yas-minor-mode-map)
+  (use-package yasnippet-snippets))
 
 (use-package amx
   :ensure t
@@ -730,7 +730,6 @@ differences due to whitespaces."
 (use-package ivy
   :ensure t
   :custom
-  (ivy-auto-select-single-candidate t)
   (ivy-case-fold-search 'always) ; Always ignore case while searching
   (ivy-count-format "(%d/%d) ") ; This is beneficial to identify wrap around
   (ivy-extra-directories nil) ; Hide "." and ".."
@@ -746,7 +745,6 @@ differences due to whitespaces."
   ;;  '((t)
   ;;    (ivy-switch-buffer . ivy-sort-function-buffer)
   ;;    (counsel-find-file . ivy-sort-function-buffer)))
-  (ivy-use-ignore-default 'always) ; Always ignore buffers set in ivy-ignore-buffers
   (ivy-virtual-abbreviate 'abbreviate)
   (ivy-height-alist '((t
                        lambda (_caller)
