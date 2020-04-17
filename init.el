@@ -768,10 +768,10 @@ differences due to whitespaces."
   :hook (after-init . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
-   ("C-'" . ivy-avy)
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
+   ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
    ("C-j" . ivy-immediate-done) ; View the current directory
    ("<left>" . ivy-previous-line)
@@ -1002,8 +1002,8 @@ differences due to whitespaces."
          ("C-M-k" . sp-splice-sexp))
   :diminish)
 
-(use-package elec-pair
-  :hook (after-init . electric-pair-mode))
+;; (use-package elec-pair
+;;   :hook (after-init . electric-pair-mode))
 
 (use-package projectile
   :ensure t
@@ -1880,7 +1880,6 @@ differences due to whitespaces."
                     :major-modes '(c++-mode)
                     :remote? t
                     :server-id 'clangd-remote))
-
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
                     :major-modes '(sh-mode)
@@ -1916,14 +1915,11 @@ differences due to whitespaces."
                 (add-hook 'before-save-hook
                           (lambda ()
                             (lsp-format-buffer)) nil t))))
-
-
   (add-hook 'c++-mode-hook
             (lambda ()
               (add-hook 'before-save-hook
                         (lambda ()
                           (lsp-format-buffer)) nil t)))
-
   (add-hook 'sh-mode-hook
             (lambda ()
               (add-hook 'before-save-hook
