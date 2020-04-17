@@ -20,7 +20,7 @@
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
-(setq debug-on-error t
+(setq debug-on-error nil
       load-prefer-newer t
       user-full-name "Swarnendu Biswas")
 
@@ -1804,15 +1804,12 @@ differences due to whitespaces."
   ;;                                       (delete-other-windows))))
   )
 
-(use-package magit-popup
-  :after magit)
+(use-package magit-popup)
 
-(use-package git-modes
-  :after magit)
+(use-package git-modes)
 
 (use-package git-gutter
   :ensure t
-  :after magit
   :diminish
   :hook (after-init . global-git-gutter-mode))
 
@@ -1828,7 +1825,7 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((python-mode sh-mode html-mode javascript-mode latex-mode plain-tex-mode) . lsp-deferred)
+  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode plain-tex-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-clients-clangd-args '("-j=4" "-background-index" "--clang-tidy" "-log=error"))
