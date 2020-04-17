@@ -67,12 +67,13 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'airline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
           (const :tag "smart-mode-line" sml)
           (const :tag "spaceline" spaceline)
+          (const :tag "airline" airline)
           (const :tag "default" default))
   :group 'dotemacs)
 
@@ -384,7 +385,7 @@ differences due to whitespaces."
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 130)
+                    :height 120)
 
 ;; https://stackoverflow.com/questions/3281581/how-to-word-wrap-in-emacs
 (global-visual-line-mode 1)
@@ -398,19 +399,21 @@ differences due to whitespaces."
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
                                                  :init
-                                                 (setq powerline-display-mule-info nil
-                                                       powerline-display-buffer-size t
-                                                       powerline-display-hud nil
-                                                       powerline-gui-use-vcs-glyph t
-                                                       powerline-default-separator 'slant)
                                                  (powerline-default-theme)
-                                                 (set-face-attribute 'powerline-active1 nil
-                                                                     :background "gray22"
-                                                                     :foreground "white"
-                                                                     :weight 'light)
-                                                 (set-face-attribute 'powerline-active2 nil
-                                                                     :background "grey88"
-                                                                     :foreground "black")
+                                                 ;; (setq powerline-display-mule-info nil
+                                                 ;;       powerline-display-buffer-size t
+                                                 ;;       powerline-display-hud nil
+                                                 ;;       powerline-gui-use-vcs-glyph t
+                                                 ;;       powerline-default-separator 'slant
+                                                 ;;       powerline-text-scale-factor 0.5
+                                                 ;;       powerline-height 16)
+                                                 ;; (set-face-attribute 'powerline-active1 nil
+                                                 ;;                     :background "gray22"
+                                                 ;;                     :foreground "white"
+                                                 ;;                     :weight 'light)
+                                                 ;; (set-face-attribute 'powerline-active2 nil
+                                                 ;;                     :background "grey88"
+                                                 ;;                     :foreground "black")
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'mode-line nil
                                                                        :background "grey88"
@@ -422,7 +425,7 @@ differences due to whitespaces."
 
       ((eq dotemacs-modeline-theme 'sml) (use-package smart-mode-line
                                            :ensure t
-                                           :config
+                                           :init
                                            (setq sml/theme 'light
                                                  sml/no-confirm-load-theme t
                                                  ;; Everything after the minor-modes will be right-indented
@@ -435,13 +438,18 @@ differences due to whitespaces."
                                                  :ensure t
                                                  :init
                                                  (require 'spaceline-config)
-                                                 (setq powerline-default-separator 'slant
-                                                       ;; spaceline-anzu-p t
-                                                       spaceline-hud-p nil
-                                                       ;; spaceline-buffer-modified-p t
-                                                       ;; spaceline-buffer-position-p t
-                                                       spaceline-projectile-root-p t
-                                                       spaceline-paradox-menu-p t)
+                                                 ;; (setq powerline-default-separator 'slant
+                                                 (setq powerline-image-apple-rgb t
+                                                       ns-use-srgb-colorspace nil
+                                                       powerline-height 24
+                                                       ;; powerline-default-separator 'utf-8
+                                                       )
+                                                 ;;       ;; spaceline-anzu-p t
+                                                 ;;       spaceline-hud-p nil
+                                                 ;;       ;; spaceline-buffer-modified-p t
+                                                 ;;       ;; spaceline-buffer-position-p t
+                                                 ;;       spaceline-projectile-root-p t
+                                                 ;;       spaceline-paradox-menu-p t)
                                                  (spaceline-emacs-theme)
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'powerline-active1 nil
@@ -452,6 +460,14 @@ differences due to whitespaces."
                                                                        :background "grey88"
                                                                        :foreground "black"))))
 
+      ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
+                                               :ensure t
+                                               :init
+                                               (require 'airline-themes)
+                                               (load-theme 'airline-hybridline t)
+                                               (setq airline-hide-eyebrowse-on-inactive-buffers t
+                                                     powerline-height 24)
+                                               ))
       ((eq dotemacs-modeline-theme 'default) ))
 
 (use-package ibuffer
