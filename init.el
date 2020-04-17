@@ -67,7 +67,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'airline
+  'powerline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -381,12 +381,6 @@ differences due to whitespaces."
                                                           :background "light sky blue"
                                                           :foreground "white"))))
 
-;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
-(set-frame-font "DejaVu Sans Mono" nil t)
-(set-face-attribute 'default nil
-                    :family "DejaVu Sans Mono"
-                    :height 120)
-
 ;; https://stackoverflow.com/questions/3281581/how-to-word-wrap-in-emacs
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
@@ -398,22 +392,20 @@ differences due to whitespaces."
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
-                                                 :init
+                                                 :demand t
+                                                 :config
                                                  (powerline-default-theme)
-                                                 ;; (setq powerline-display-mule-info nil
-                                                 ;;       powerline-display-buffer-size t
-                                                 ;;       powerline-display-hud nil
-                                                 ;;       powerline-gui-use-vcs-glyph t
-                                                 ;;       powerline-default-separator 'slant
-                                                 ;;       powerline-text-scale-factor 0.5
-                                                 ;;       powerline-height 16)
-                                                 ;; (set-face-attribute 'powerline-active1 nil
-                                                 ;;                     :background "gray22"
-                                                 ;;                     :foreground "white"
-                                                 ;;                     :weight 'light)
-                                                 ;; (set-face-attribute 'powerline-active2 nil
-                                                 ;;                     :background "grey88"
-                                                 ;;                     :foreground "black")
+                                                 (setq powerline-display-mule-info nil
+                                                       powerline-display-buffer-size t
+                                                       powerline-display-hud nil
+                                                       powerline-gui-use-vcs-glyph t)
+                                                 (set-face-attribute 'powerline-inactive1 nil
+                                                                     :background "gray40"
+                                                                     :foreground "white"
+                                                                     :weight 'light)
+                                                 (set-face-attribute 'powerline-inactive2 nil
+                                                                     :background "grey50"
+                                                                     :foreground "white")
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'mode-line nil
                                                                        :background "grey88"
@@ -438,12 +430,12 @@ differences due to whitespaces."
                                                  :ensure t
                                                  :init
                                                  (require 'spaceline-config)
-                                                 ;; (setq powerline-default-separator 'slant
-                                                 (setq powerline-image-apple-rgb t
-                                                       ns-use-srgb-colorspace nil
-                                                       powerline-height 24
-                                                       ;; powerline-default-separator 'utf-8
-                                                       )
+                                                 ;; ;; (setq powerline-default-separator 'slant
+                                                 ;; (setq powerline-image-apple-rgb t
+                                                 ;;       ns-use-srgb-colorspace nil
+                                                 ;;       powerline-height 24
+                                                 ;;       ;; powerline-default-separator 'utf-8
+                                                 ;;       )
                                                  ;;       ;; spaceline-anzu-p t
                                                  ;;       spaceline-hud-p nil
                                                  ;;       ;; spaceline-buffer-modified-p t
@@ -464,11 +456,22 @@ differences due to whitespaces."
                                                :ensure t
                                                :init
                                                (require 'airline-themes)
-                                               (load-theme 'airline-hybridline t)
+                                               (load-theme 'airline-laederon t)
                                                (setq airline-hide-eyebrowse-on-inactive-buffers t
-                                                     powerline-height 24)
+                                                     airline-eshell-colors nil
+                                                     ;; powerline-height 24
+                                                     )
                                                ))
       ((eq dotemacs-modeline-theme 'default) ))
+
+;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
+(set-frame-font "DejaVu Sans Mono" nil t)
+(set-face-attribute 'default nil
+                    :family "DejaVu Sans Mono"
+                    :height 125)
+(set-face-attribute 'mode-line nil
+                    :family "DejaVu Sans Mono for Powerline"
+                    :height 50)
 
 (use-package ibuffer
   :custom
@@ -685,6 +688,7 @@ differences due to whitespaces."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
+;; Use "M-x company-diag" to see the backend used
 (use-package company
   :ensure t
   :diminish
@@ -777,6 +781,7 @@ differences due to whitespaces."
                     ;; "^\\*lsp-log\\*$"
                     ;; "^\\*pyls\\*$"
                     ;; "^\\*pyls::stderr\\*$"
+                    "TAGS"
                     ))
     (add-to-list 'ivy-ignore-buffers buffer))
   :hook (after-init . ivy-mode)
@@ -1042,16 +1047,16 @@ differences due to whitespaces."
 	            (or project-name "-"))))
   (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
   ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
-  (setq projectile-project-search-path (list
-                                        (concat `,(getenv "HOME") "/bitbucket")
-                                        (concat `,(getenv "HOME") "/github")
-                                        (concat `,(getenv "HOME") "/iitk-workspace")
-                                        (concat `,(getenv "HOME") "/iitkgp-workspace")
-                                        (concat `,(getenv "HOME") "/iss-workspace")
-                                        (concat `,(getenv "HOME") "/plass-workspace")
-                                        (concat `,(getenv "HOME") "/prospar-workspace")
-                                        (concat `,(getenv "HOME") "/research")
-                                        ))
+  ;; (setq projectile-project-search-path (list
+  ;;                                       (concat `,(getenv "HOME") "/bitbucket")
+  ;;                                       (concat `,(getenv "HOME") "/github")
+  ;;                                       (concat `,(getenv "HOME") "/iitk-workspace")
+  ;;                                       (concat `,(getenv "HOME") "/iitkgp-workspace")
+  ;;                                       (concat `,(getenv "HOME") "/iss-workspace")
+  ;;                                       (concat `,(getenv "HOME") "/plass-workspace")
+  ;;                                       (concat `,(getenv "HOME") "/prospar-workspace")
+  ;;                                       (concat `,(getenv "HOME") "/research")
+  ;;                                       ))
   (add-to-list 'projectile-ignored-projects `,(concat `,(getenv "HOME") "/")) ; Do not consider the HOME as a project
   (dolist (dirs '(".cache"
                   ".clangd"
@@ -1079,11 +1084,14 @@ differences due to whitespaces."
                   ".tags"
                   "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files item))
-  (dolist (list '(".aux"
+  (dolist (list '(".a"
+                  ".aux"
                   ".bak"
                   ".blg"
+                  ".class"
                   ".elc"
                   ".jar"
+                  ".o"
                   ".out"
                   ".pdf"
                   ".pt"
@@ -1165,7 +1173,7 @@ differences due to whitespaces."
   :custom
   (show-trailing-whitespace nil)
   (whitespace-auto-cleanup t)
-  (whitespace-style nil)
+  (whitespace-style '(face tabs trailing))
   (whitespace-line-column dotemacs-fill-column))
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -1567,7 +1575,7 @@ differences due to whitespaces."
 
 (use-package csv-mode
   :ensure t
-  :mode "\\.csv\\'")
+  :mode "\\.[Cc][Ss][Vv]\\'")
 
 (use-package boogie-friends
   :ensure t
@@ -1752,7 +1760,8 @@ differences due to whitespaces."
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
   :custom
-  (sh-basic-offset 4)
+  (sh-basic-offset 2)
+  (sh-indentation 2)
   (sh-indent-comment t)
   (sh-indent-after-continuation 'always)
   :config
@@ -1818,9 +1827,12 @@ differences due to whitespaces."
   ;;                                       (delete-other-windows))))
   )
 
-(use-package magit-popup)
+;; (use-package magit-popup)
 
-(use-package git-modes)
+;; (use-package git-modes)
+
+(use-package gitignore-mode
+  :ensure t)
 
 (use-package git-gutter
   :ensure t
@@ -1851,6 +1863,7 @@ differences due to whitespaces."
   (lsp-html-format-indent-inner-html t)
   (lsp-idle-delay 0.5)
   (lsp-imenu-sort-methods '(position))
+  (lsp-keep-workspace-alive nil)
   (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf nil)
