@@ -72,7 +72,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'powerline
+  'spaceline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -199,7 +199,7 @@ differences due to whitespaces."
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
       x-stretch-cursor t ; Make cursor the width of the character it is under
-      auto-save-list-file-prefix (concat dotemacs-temp-directory "auto-save")
+      auto-save-list-file-prefix (expand-file-name (concat dotemacs-temp-directory "auto-save"))
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       require-final-newline t ; Always end a file with a newline.
       make-backup-files nil ; Stop making backup ~ files
@@ -253,7 +253,7 @@ differences due to whitespaces."
 (use-package saveplace ; Remember cursor position in files
   :unless noninteractive
   :hook (after-init . save-place-mode)
-  :custom (save-place-file (concat dotemacs-temp-directory "places")))
+  :custom (save-place-file (expand-file-name (concat dotemacs-temp-directory "places"))))
 
 (use-package savehist ; Save minibuffer histories across sessions
   :unless noninteractive
@@ -266,7 +266,7 @@ differences due to whitespaces."
                                    file-name-history
                                    command-history))
   (savehist-autosave-interval 300)
-  (savehist-file (concat dotemacs-temp-directory "savehist"))
+  (savehist-file (expand-file-name (concat dotemacs-temp-directory "savehist")))
   (savehist-save-minibuffer-history t))
 
 (setq enable-recursive-minibuffers t)
@@ -321,7 +321,7 @@ differences due to whitespaces."
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
   ;;   (add-hook hook #'abbrev-mode ))
   :custom
-  (abbrev-file-name (concat dotemacs-extras-directory "abbrev_defs"))
+  (abbrev-file-name (expand-file-name (concat dotemacs-extras-directory "abbrev_defs")))
   ;; Do not ask to save new abbrevs when quitting
   (save-abbrevs 'silently))
 
@@ -439,18 +439,15 @@ differences due to whitespaces."
                                                  :ensure t
                                                  :init
                                                  (require 'spaceline-config)
-                                                 ;; ;; (setq powerline-default-separator 'slant
-                                                 ;; (setq powerline-image-apple-rgb t
-                                                 ;;       ns-use-srgb-colorspace nil
-                                                 ;;       powerline-height 24
-                                                 ;;       ;; powerline-default-separator 'utf-8
-                                                 ;;       )
-                                                 ;;       ;; spaceline-anzu-p t
-                                                 ;;       spaceline-hud-p nil
-                                                 ;;       ;; spaceline-buffer-modified-p t
-                                                 ;;       ;; spaceline-buffer-position-p t
-                                                 ;;       spaceline-projectile-root-p t
-                                                 ;;       spaceline-paradox-menu-p t)
+                                                 (setq spaceline-hud-p nil
+                                                       spaceline-selection-info-p nil
+                                                       spaceline-version-control-p t
+                                                       spaceline-input-method-p nil
+                                                       spaceline-persp-name-p nil
+                                                       ;; powerline-image-apple-rgb t
+                                                       ;; ns-use-srgb-colorspace nil
+                                                       ;; powerline-height 24
+                                                       )
                                                  (spaceline-emacs-theme)
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'powerline-active1 nil
@@ -664,7 +661,7 @@ differences due to whitespaces."
 ;; https://www.emacswiki.org/emacs/RecentFiles
 (use-package recentf
   :custom
-  (recentf-save-file (concat dotemacs-temp-directory "recentf"))
+  (recentf-save-file (expand-file-name (concat dotemacs-temp-directory "recentf")))
   (recentf-max-saved-items 50)
   ;; Disable this so that recentf does not attempt to stat remote files
   (recentf-auto-cleanup 'never)
@@ -716,8 +713,8 @@ differences due to whitespaces."
   (use-package company-ispell
     :custom
     (company-ispell-available t)
-    (company-ispell-dictionary (concat dotemacs-extras-directory "wordlist"))
-    :config (add-to-list 'company-backends 'company-ispell)))
+    (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))
+    :init (add-to-list 'company-backends 'company-ispell)))
 
 (use-package company-flx
   :ensure t
@@ -726,7 +723,7 @@ differences due to whitespaces."
 (use-package company-dict
   :ensure t
   :custom
-  (company-dict-dir (concat user-emacs-directory "dict/"))
+  (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil)
   :config (add-to-list 'company-backends 'company-dict))
@@ -754,7 +751,7 @@ differences due to whitespaces."
 (use-package amx
   :ensure t
   :hook (after-init . amx-mode)
-  :custom (amx-save-file (concat dotemacs-temp-directory "amx-items")))
+  :custom (amx-save-file (expand-file-name (concat dotemacs-temp-directory "amx-items"))))
 
 (use-package ivy
   :ensure t
@@ -952,7 +949,7 @@ differences due to whitespaces."
   :custom
   (ispell-local-dictionary "en_US")
   (ispell-dictionary "en_US")
-  (ispell-personal-dictionary (concat dotemacs-extras-directory "spell"))
+  (ispell-personal-dictionary (expand-file-name (concat dotemacs-extras-directory "spell")))
   ;; Aspell speed: ultra | fast | normal | bad-spellers
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
   (ispell-silently-savep t) ; Save a new word to personal dictionary without asking
@@ -1035,13 +1032,13 @@ differences due to whitespaces."
 (use-package projectile
   :ensure t
   :custom
-  (projectile-cache-file (concat dotemacs-temp-directory "projectile.cache"))
+  (projectile-cache-file (expand-file-name (concat dotemacs-temp-directory "projectile.cache")))
   (projectile-completion-system 'ivy)
   (projectile-enable-caching t)
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
   (projectile-indexing-method 'alien)
-  (projectile-known-projects-file (concat dotemacs-temp-directory "projectile-known-projects.eld"))
+  (projectile-known-projects-file (expand-file-name (concat dotemacs-temp-directory "projectile-known-projects.eld")))
   (projectile-mode-line-prefix "")
   ;; Use projectile only in desired directories, too much noise otherwise
   (projectile-require-project-root t)
@@ -1132,6 +1129,8 @@ differences due to whitespaces."
   :hook (after-init . global-flycheck-mode)
   :custom (flycheck-emacs-lisp-load-path 'inherit)
   :config
+  (when (eq dotemacs-modeline-theme 'spaceline)
+    (setq flycheck-mode-line nil))
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'python-mode-hook
             (lambda ()
@@ -1156,8 +1155,7 @@ differences due to whitespaces."
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
-                          flycheck-markdown-markdownlint-cli-config (concat
-                                                                     `,(getenv "HOME") "/.config/.markdownlint.json"))))
+                          flycheck-markdown-markdownlint-cli-config (concat dotemacs-user-home  "/.markdownlint.json"))))
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck))))
@@ -1245,9 +1243,9 @@ differences due to whitespaces."
   (tramp-default-user user-login-name)
   (tramp-default-host "172.27.15.105")
   ;; Auto-save to a local directory for better performance
-  (tramp-auto-save-directory (concat dotemacs-temp-directory "tramp-auto-save"))
-  (tramp-persistency-file-name (concat dotemacs-temp-directory "tramp"))
-  (tramp-verbose 1) ; Default is 3
+  (tramp-auto-save-directory (expand-file-name (concat dotemacs-temp-directory "tramp-auto-save")))
+  (tramp-persistency-file-name (expand-file-name (concat dotemacs-temp-directory "tramp")))
+  (tramp-verbose 10) ; Default is 3
   (remote-file-name-inhibit-cache nil) ; Remote files are not updated outside of Tramp
   (tramp-completion-reread-directory-timeout nil)
   ;; Disable version control
@@ -1255,28 +1253,30 @@ differences due to whitespaces."
                                 tramp-file-name-regexp))
   :config
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  ;; (add-to-list 'tramp-default-method-alist '("" "swarnendu" "ssh"))
+  (add-to-list 'tramp-default-method-alist '("172.27.15.105" "swarnendu" "ssh"))
   ;; (add-to-list 'tramp-default-method-alist
   ;;              '("\\`localhost\\'" "\\`root\\'" "su"))
 
   ;; If the shell of the server is not bash, then it is recommended to connect with bash
   (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
   ;; Disable backup
-  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
+  ;; (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
+  )
 
 (use-package counsel-tramp
   :ensure t
   :bind ("C-c d t" . counsel-tramp)
-  ;; :config
-  ;; (add-hook 'counsel-tramp-pre-command-hook
-  ;;           (lambda ()
-  ;;             (global-aggressive-indent-mode -1)
-  ;;             (projectile-mode -1)))
-  ;; (add-hook 'counsel-tramp-quit-hook
-  ;;           (lambda ()
-  ;;             (global-aggressive-indent-mode 1)
-  ;;             (projectile-mode 1)))
-  )
+  :config
+  (add-hook 'counsel-tramp-pre-command-hook
+            (lambda ()
+              (global-aggressive-indent-mode -1)
+              (projectile-mode -1)
+              (counsel-projectile-mode -1)))
+  (add-hook 'counsel-tramp-quit-hook
+            (lambda ()
+              (global-aggressive-indent-mode 1)
+              (projectile-mode 1)
+              (counsel-projectile-mode 1))))
 
 (use-package imenu
   :custom
@@ -1338,7 +1338,8 @@ differences due to whitespaces."
          ("C-c g s" . counsel-etags-find-symbol-at-point)
          ("C-c g g" . counsel-etags-grep-symbol-at-point)
          ("C-c g f" . counsel-etags-find-tag)
-         ("C-c g l" .  counsel-etags-list-tag))
+         ("C-c g l" .  counsel-etags-list-tag)
+         ("C-c g c" . counsel-etags-scan-code))
   :init
   (add-hook 'c++-mode-hook
             (lambda ()
@@ -1364,7 +1365,7 @@ differences due to whitespaces."
          ("C-h k" . helpful-key)
          ("C-h f" . helpful-function)))
 
-;; Speed up Emacs for large files: M-x vlf <PATH-TO-FILE>
+;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 (use-package vlf
   :ensure t
   :custom (vlf-application 'dont-ask)
@@ -1375,7 +1376,7 @@ differences due to whitespaces."
   :diminish
   :hook (after-init . global-hungry-delete-mode ))
 
-(use-package move-text ; Move text with M-<up> and M-<down> like Eclipse
+(use-package move-text ; Move lines with "M-<up>" and "M-<down>"
   :ensure t
   :init (move-text-default-bindings))
 
@@ -1467,13 +1468,11 @@ differences due to whitespaces."
 
 (use-package persistent-scratch
   :ensure t
-  :disabled t
   :hook (after-init . persistent-scratch-setup-default)
-  :custom (persistent-scratch-save-file (concat dotemacs-temp-directory "persistent-scratch"))
-  ;; :config
-  ;; ;; Enable both autosave and restore on startup
-  ;; (ignore-errors (persistent-scratch-setup-default))
-  )
+  :custom (persistent-scratch-save-file (expand-file-name (concat dotemacs-temp-directory "persistent-scratch")))
+  :config
+  ;; Enable both autosave and restore on startup
+  (ignore-errors (persistent-scratch-setup-default)))
 
 (use-package crux
   :ensure t
@@ -1511,7 +1510,9 @@ differences due to whitespaces."
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
   :diminish
-  :custom (super-save-auto-save-when-idle t)
+  :custom
+  (super-save-auto-save-when-idle t)
+  (super-save-remote-files nil)
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
@@ -1534,7 +1535,7 @@ differences due to whitespaces."
   (avy-setup-default))
 
 (use-package bookmark
-  :custom (bookmark-default-file (concat dotemacs-temp-directory "bookmarks")))
+  :custom (bookmark-default-file (expand-file-name (concat dotemacs-temp-directory "bookmarks"))))
 
 (use-package bm
   :ensure t
@@ -1555,7 +1556,7 @@ differences due to whitespaces."
 
 (use-package logview
   :ensure t
-  :custom (logview-cache-filename (concat dotemacs-temp-directory "logview-cache.extmap")))
+  :custom (logview-cache-filename (expand-file-name (concat dotemacs-temp-directory "logview-cache.extmap"))))
 
 (use-package markdown-mode
   :ensure t
@@ -1578,12 +1579,12 @@ differences due to whitespaces."
 (use-package pandoc-mode
   :ensure t
   :diminish
-  :config (add-hook 'pandoc-mode-hook #'pandoc-load-default-settings)
+  :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
 (use-package csv-mode
   :ensure t
-  :mode "\\.[Cc][Ss][Vv]\\'")
+  :mode "\\.csv\\'")
 
 (use-package boogie-friends
   :ensure t
@@ -1823,9 +1824,9 @@ differences due to whitespaces."
   :ensure t
   :bind ("C-x g" . magit-status)
   :custom
-  (transient-levels-file (concat dotemacs-temp-directory "transient/levels.el"))
-  (transient-values-file (concat dotemacs-temp-directory "transient/values.el"))
-  (transient-history-file (concat dotemacs-temp-directory "transient/history.el"))
+  (transient-levels-file (expand-file-name (concat dotemacs-temp-directory "transient/levels.el")))
+  (transient-values-file (expand-file-name (concat dotemacs-temp-directory "transient/values.el")))
+  (transient-history-file (expand-file-name (concat dotemacs-temp-directory "transient/history.el")))
   (magit-save-repository-buffers t)
   (magit-completing-read-function 'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
@@ -1860,15 +1861,12 @@ differences due to whitespaces."
   (lsp-clients-clangd-args '("-j=4" "-background-index" "--clang-tidy" "-log=error"))
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-on-type-formatting nil)
-  (lsp-enable-semantic-highlighting nil) ; Options: nil, immediate, deferred
   (lsp-flycheck-live-reporting t)
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-indent-inner-html t)
-  (lsp-idle-delay 0.5)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io t) ; Disable after a bit of testing
-  (lsp-prefer-flymake nil)
+  (lsp-log-io nil) ; Disable after a bit of testing
   (lsp-prefer-capf nil)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
@@ -1882,7 +1880,7 @@ differences due to whitespaces."
   (lsp-pyls-plugins-pylint-enabled t)
   (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
   (lsp-pyls-plugins-yapf-enabled t)
-  (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
+  (lsp-session-file (expand-file-name (concat dotemacs-temp-directory ".lsp-session-v1")))
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
