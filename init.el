@@ -3,14 +3,12 @@
 
 ;;; Commentary:
 
-;; Notes: To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of
-;; evaluating the whole buffer Use C-M-x to evaluate the current top-level s-expression. Use M-: to
-;; evaluate any Emacs Lisp expression and print the result.
+;; To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the
+;; whole buffer Use C-M-x to evaluate the current top-level s-expression. Use M-: to evaluate any
+;; Emacs Lisp expression and print the result.
 
 ;; Init file should not ideally contain calls to "load" or "require", since they cause eager loading
 ;; and are expensive, a cheaper alternative is to use "autoload".
-
-;;; Code:
 
 ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html
 
@@ -19,6 +17,13 @@
 ;; the function special form, or the #' read ;; syntax which is a short-hand for using function.
 ;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
 ;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
+
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
+
+;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
+;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
+
+;;; Code:
 
 (setq debug-on-error t
       load-prefer-newer t
@@ -1935,11 +1940,12 @@ differences due to whitespaces."
               (add-hook 'before-save-hook
                         (lambda ()
                           (lsp-format-buffer)) nil t)))
-  (add-hook 'sh-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook
-                        (lambda () (lsp-format-buffer))
-                        nil t)))
+  ;; FIXME: Does the bash server not support formatting?
+  ;; (add-hook 'sh-mode-hook
+  ;;           (lambda ()
+  ;;             (add-hook 'before-save-hook
+  ;;                       (lambda () (lsp-format-buffer))
+  ;;                       nil t)))
 
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)

@@ -17,7 +17,9 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
 
 ``` Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime pandoc fd-find fonts-powerline
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime pandoc fonts-powerline libncurses5-dev
+wget https://github.com/sharkdp/fd/releases/download/v8.0.0/fd_8.0.0_amd64.deb
+sudo dpkg -i fd_8.0.0_amd64.deb
 sudo snap install shfmt
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
@@ -47,9 +49,9 @@ cd universal-ctags
 wget http://tamacom.com/global/global-6.6.4.tar.gz
 tar -xzvf global-6.6.4.tar.gz
 cd global-6.6.4
-
 ./configure --with-universal-ctags=/usr/local/bin/ctags; make; sudo make install;
-export GTAGSCONF=/usr/local/share/gtags/gtags.conf; export GTAGSLABEL=new-ctags;
+echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >> $HOME/.bashrc 
+echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
 ```
 
 The setup uses the following configuration files.
