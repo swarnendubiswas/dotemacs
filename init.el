@@ -119,6 +119,10 @@ differences due to whitespaces."
   :type 'string
   :group 'dotemacs)
 
+(defconst dotemacs-user-home
+  (getenv "HOME")
+  "User HOME directory.")
+
 (eval-when-compile
   (require 'package)
   (setq package-user-dir (expand-file-name (concat user-emacs-directory "elpa"))
@@ -1057,7 +1061,7 @@ differences due to whitespaces."
   ;;                                       (concat `,(getenv "HOME") "/prospar-workspace")
   ;;                                       (concat `,(getenv "HOME") "/research")
   ;;                                       ))
-  (add-to-list 'projectile-ignored-projects `,(concat `,(getenv "HOME") "/")) ; Do not consider the HOME as a project
+  (add-to-list 'projectile-ignored-projects (concat dotemacs-user-home "/")) ; Do not consider the HOME as a project
   (dolist (dirs '(".cache"
                   ".clangd"
                   ".dropbox"
@@ -1128,7 +1132,7 @@ differences due to whitespaces."
             (lambda ()
               (setq-local flycheck-checker 'python-pylint
                           flycheck-python-pylint-executable "python3"
-                          flycheck-pylintrc (concat `,(getenv "HOME") "/.config/pylintrc"))))
+                          flycheck-pylintrc (concat dotemacs-user-home "/.config/pylintrc"))))
   ;; ;; C/C++
   ;; (add-hook 'c++-mode-hook
   ;;           (lambda ()
@@ -1169,7 +1173,6 @@ differences due to whitespaces."
 
 (use-package whitespace
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :hook (after-init . global-whitespace-mode)
   :custom
   (show-trailing-whitespace nil)
   (whitespace-auto-cleanup t)
@@ -1862,16 +1865,17 @@ differences due to whitespaces."
   (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-flymake nil)
   (lsp-prefer-capf nil)
+  (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
   (lsp-pyls-plugins-preload-modules ["numpy"])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length 100)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
-  (lsp-pyls-plugins-pydocstyle-ignore ["D100", "D101","D103","D213"])
+  (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-enabled t)
-  (lsp-pyls-plugins-pylint-args ["-j 2"])
+  (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (concat dotemacs-temp-directory ".lsp-session-v1"))
   (lsp-xml-logs-client nil)
