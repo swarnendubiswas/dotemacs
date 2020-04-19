@@ -240,8 +240,9 @@ differences due to whitespaces."
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
-  :diminish
-  :hook (after-init . global-auto-revert-mode)
+  :diminish auto-revert-mode
+  :hook ((after-init . global-auto-revert-mode)
+         (dired-mode . auto-revert-mode)) ; Auto refresh dired when files change
   :custom
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t))
@@ -527,15 +528,13 @@ differences due to whitespaces."
               ("M-<down>" . dired-jump-to-bottom))
   :custom
   (dired-auto-revert-buffer t) ; Revert each dired buffer automatically when you "revisit" it
-  (dired-recursive-deletes 'always) ; Single prompt for all n directories
-  (dired-recursive-copies 'always)
+  (dired-dwim-target t) ; Guess a default target directory for copy, rename, etc.
   ;; Check `ls' for additional options
   (dired-listing-switches "-ABhl --si --group-directories-first")
   (dired-ls-F-marks-symlinks t) ; -F marks links with @
-  (dired-dwim-target t) ; Guess a default target directory for copy, rename, etc.
-  :config
-  ;; Auto refresh dired when files change
-  (add-hook 'dired-mode-hook #'auto-revert-mode))
+  ;; Single prompt for all n directories
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'always))
 
 (use-package dired-x
   :custom
@@ -552,7 +551,9 @@ differences due to whitespaces."
 (use-package dired+ ; Do not create multiple dired buffers
   :load-path "extras"
   :after dired
-  :init (setq diredp-hide-details-initially-flag nil)
+  :init
+  (setq diredp-hide-details-initially-flag nil
+        diredp-hide-details-propagate-flag nil)
   :config (diredp-toggle-find-file-reuse-dir 1))
 
 (use-package dired-efap
@@ -630,6 +631,7 @@ differences due to whitespaces."
 
 (use-package all-the-icons-dired
   :ensure t
+  :diminish
   :hook (dired-mode . all-the-icons-dired-mode))
 
 (setq case-fold-search t) ; Make search ignore case
@@ -1485,7 +1487,7 @@ differences due to whitespaces."
 
 (use-package crux
   :ensure t
-  :bind ("C-c i" . crux-ispell-word-then-abbrev))
+  :bind ("C-c d i" . crux-ispell-word-then-abbrev))
 
 (use-package origami
   :ensure t)
@@ -1617,7 +1619,7 @@ differences due to whitespaces."
 
 (use-package ivy-bibtex
   :ensure t
-  :bind ("C-c l x" . ivy-bibtex)
+  :bind ("C-c x b" . ivy-bibtex)
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-bibtex
@@ -1639,7 +1641,10 @@ differences due to whitespaces."
   (TeX-command-menu "LaTeXMk"))
 (add-hook 'LaTeX-mode-hook
           (lambda ()
-            (local-set-key (kbd "C-x C-s") #'sb/save-buffer-and-run-latexmk)))
+            (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
+(add-hook 'latex-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
 
 (global-prettify-symbols-mode -1)
 
@@ -2160,7 +2165,7 @@ Increase line spacing by two line height."
  ("<f12>" . sb/kill-other-buffers)
  ("M-<left>" . previous-buffer)
  ("M-<right>" . next-buffer)
- ("C-c d f" . #'auto-fill-mode)
+ ("C-c d f" . auto-fill-mode)
  ("M-c" . capitalize-dwim)
  ("M-u" . upcase-dwim)
  ("M-l" . downcase-dwim))
