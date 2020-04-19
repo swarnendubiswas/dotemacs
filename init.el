@@ -439,6 +439,7 @@ differences due to whitespaces."
                                                  :ensure t
                                                  :init
                                                  (require 'spaceline-config)
+                                                 (spaceline-emacs-theme)
                                                  (setq spaceline-hud-p nil
                                                        spaceline-selection-info-p nil
                                                        spaceline-version-control-p t
@@ -448,7 +449,13 @@ differences due to whitespaces."
                                                        ;; ns-use-srgb-colorspace nil
                                                        ;; powerline-height 24
                                                        )
-                                                 (spaceline-emacs-theme)
+                                                 (set-face-attribute 'powerline-inactive1 nil
+                                                                     :background "gray40"
+                                                                     :foreground "white"
+                                                                     :weight 'light)
+                                                 (set-face-attribute 'powerline-inactive2 nil
+                                                                     :background "grey50"
+                                                                     :foreground "white")
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'powerline-active1 nil
                                                                        :background "gray22"
@@ -541,6 +548,12 @@ differences due to whitespaces."
     "Make sure to remove \"Omit\" from the modeline."
     (diminish 'dired-omit-mode) dired-mode-map)
   :bind ("C-x C-j" . dired-jump))
+
+(use-package dired+ ; Do not create multiple dired buffers
+  :load-path "extras"
+  :after dired
+  :init (setq diredp-hide-details-initially-flag nil)
+  :config (diredp-toggle-find-file-reuse-dir 1))
 
 (use-package dired-efap
   :ensure t
@@ -663,11 +676,12 @@ differences due to whitespaces."
   :custom
   (recentf-save-file (expand-file-name (concat dotemacs-temp-directory "recentf")))
   (recentf-max-saved-items 50)
-  ;; Disable this so that recentf does not attempt to stat remote files
-  (recentf-auto-cleanup 'never)
+  (recentf-auto-cleanup 'never) ; Do not stat remote files
   (recentf-menu-filter 'recentf-sort-descending)
   ;; Check regex with re-builder
-  (recentf-exclude '("[/\\]\\.elpa/"
+  (recentf-exclude '(
+                     "[/\\]\\.elpa/"
+                     "[/\\]elpa/"
                      "[/\\]\\.ido\\.last\\'"
                      "[/\\]\\.git/"
                      ".*\\.gz\\'"
@@ -681,9 +695,9 @@ differences due to whitespaces."
                      "/.autosaves/"
                      ".*-loaddefs.el"
                      "/TAGS$"
-                     "/ssh:"
                      "/sudo:"
-                     "/company-statistics-cache.el$"))
+                     "/company-statistics-cache.el$"
+                     ))
   :config (run-at-time nil (* 10 60) 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
@@ -1245,7 +1259,7 @@ differences due to whitespaces."
   ;; Auto-save to a local directory for better performance
   (tramp-auto-save-directory (expand-file-name (concat dotemacs-temp-directory "tramp-auto-save")))
   (tramp-persistency-file-name (expand-file-name (concat dotemacs-temp-directory "tramp")))
-  (tramp-verbose 10) ; Default is 3
+  (tramp-verbose 1) ; Default is 3
   (remote-file-name-inhibit-cache nil) ; Remote files are not updated outside of Tramp
   (tramp-completion-reread-directory-timeout nil)
   ;; Disable version control
@@ -1254,14 +1268,9 @@ differences due to whitespaces."
   :config
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
   (add-to-list 'tramp-default-method-alist '("172.27.15.105" "swarnendu" "ssh"))
-  ;; (add-to-list 'tramp-default-method-alist
-  ;;              '("\\`localhost\\'" "\\`root\\'" "su"))
-
-  ;; If the shell of the server is not bash, then it is recommended to connect with bash
-  (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
+  (setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
   ;; Disable backup
-  ;; (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
-  )
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
 
 (use-package counsel-tramp
   :ensure t
