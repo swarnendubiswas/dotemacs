@@ -72,7 +72,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'spaceline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -104,7 +104,7 @@ differences due to whitespaces."
   :group 'dotemacs)
 
 (defcustom dotemacs-tags-scheme
-  'gtags
+  'ctags
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
@@ -483,7 +483,7 @@ differences due to whitespaces."
                     :family "DejaVu Sans Mono"
                     :height 125)
 (set-face-attribute 'mode-line nil
-                    :family "DejaVu Sans Mono for Powerline"
+                    :family "DejaVu Sans Mono"
                     :height 100)
 
 (use-package ibuffer
@@ -666,8 +666,7 @@ differences due to whitespaces."
   (use-package company-ispell
     :custom
     (company-ispell-available t)
-    (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))
-    :init (add-to-list 'company-backends 'company-ispell)))
+    (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))))
 
 (use-package company-flx
   :ensure t
@@ -1810,6 +1809,7 @@ differences due to whitespaces."
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-clients-clangd-args '("-j=4" "-background-index" "--clang-tidy" "-log=error"))
+  (lsp-eldoc-enable-hover nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-on-type-formatting nil)
   (lsp-flycheck-live-reporting t)
@@ -1817,7 +1817,7 @@ differences due to whitespaces."
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io nil) ; Disable after a bit of testing
+  (lsp-log-io t) ; Disable after a bit of testing
   (lsp-prefer-capf nil)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
@@ -1909,22 +1909,10 @@ differences due to whitespaces."
   :ensure t
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
-  ;; :custom
-  ;; (lsp-ui-doc-enable nil)
-  ;; (lsp-ui-doc-header nil)
-  ;; (lsp-ui-doc-include-signature t)
-  ;; (lsp-ui-doc-position 'at-point)
-  ;; (lsp-ui-doc-use-childframe nil)
-  ;; (lsp-ui-flycheck-enable nil)
+  :custom
+  (lsp-ui-doc-enable nil)
   ;; (lsp-ui-flycheck-list-position 'right)
-  ;; (lsp-ui-imenu-enable t)
-  ;; (lsp-ui-peek-enable t)
-  ;; (lsp-ui-peek-list-width 60)
-  ;; (lsp-ui-peek-peek-height 25)
-  ;; (lsp-ui-sideline-enable nil)
-  ;; (lsp-ui-sideline-ignore-duplicate t)
-  ;; (lsp-ui-sideline-show-hover t)
-  ;; (lsp-ui-sideline-show-symbol nil)
+  (lsp-ui-sideline-enable nil)
   ;; :config
   ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
@@ -1958,7 +1946,10 @@ differences due to whitespaces."
 
 (use-package lsp-python-ms
   :disabled t
-  :load-path "extras")
+  :load-path "extras"
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp-deferred))))
 
 (use-package lsp-treemacs
   :ensure t
