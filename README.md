@@ -50,7 +50,7 @@ wget http://tamacom.com/global/global-6.6.4.tar.gz
 tar -xzvf global-6.6.4.tar.gz
 cd global-6.6.4
 ./configure --with-universal-ctags=/usr/local/bin/ctags; make; sudo make install;
-echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >> $HOME/.bashrc 
+echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >> $HOME/.bashrc
 echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
 ```
 
@@ -78,7 +78,7 @@ The following are customization options defined in `init.el` that you could use 
 + `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
 + `dotemacs-fill-column` - Column beyond which lines should not extend.
 + `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
-+ `dotemacs-tags-scheme` - Choose whether to use Gtags or CTags for C/C++ programming. In general, we use LSP for supported languages and projects.
++ `dotemacs-tags-scheme` - Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects.
 
 ## Browsing Source Code
 
@@ -86,7 +86,7 @@ Support for `LSP` protocol in GNU Emacs means you mostly will not need to create
 
 ### GNU Global
 
-Use GNU Global with `counsel-gtags`.
+Use GNU Global with `counsel-gtags`: `gtags -cv --gtagslabel=new-ctags`
 
 > **C/C++**
 
@@ -168,7 +168,7 @@ dir3
 ctags -eR --languages=Python
 ```
 
-### Use GNU Global with Universal CTags support
+### Use GNU Global with Universal Ctags support
 
 GNU Global has better database search support while Universal Ctags supports more languages. It is possible to build Global with support for Universal Ctags.
 
@@ -177,5 +177,6 @@ GNU Global has better database search support while Universal Ctags supports mor
 
 ## TODO
 
++ Enable/disable LSP per project through directory variables.
 + Use `xref` interface for both `ctags` and `gtags`.
 + Use RE in `find`, it follows Emacs RE.

@@ -391,7 +391,6 @@ differences due to whitespaces."
                                                           :background "light sky blue"
                                                           :foreground "white"))))
 
-;; https://stackoverflow.com/questions/3281581/how-to-word-wrap-in-emacs
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
 
@@ -529,7 +528,7 @@ differences due to whitespaces."
   :custom
   (dired-auto-revert-buffer t) ; Revert each dired buffer automatically when you "revisit" it
   (dired-dwim-target t) ; Guess a default target directory for copy, rename, etc.
-  ;; Check `ls' for additional options
+  ;; Check "ls" for additional options
   (dired-listing-switches "-ABhl --si --group-directories-first")
   (dired-ls-F-marks-symlinks t) ; -F marks links with @
   ;; Single prompt for all n directories
@@ -566,68 +565,6 @@ differences due to whitespaces."
   :ensure t
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
-
-;; (use-package treemacs
-;;   :ensure t
-;;   :disabled t
-;;   :commands (treemacs treemacs-toggle)
-;;   :hook ((projectile-mode . treemacs-follow-mode)
-;;          (projectile-mode . treemacs-filewatch-mode)
-;;          ;; (projectile-mode . treemacs-fringe-indicator-mode)
-;;          )
-;;   :custom (treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
-;;   :config
-;;   (setq treemacs-follow-after-init t
-;;         treemacs-width 20
-;;         treemacs-lock-width t
-;;         treemacs-indentation 2
-;;         treemacs-position 'right
-;;         treemacs-collapse-dirs 3
-;;         ;; treemacs-sorting 'alphabetic-desc
-;;         treemacs-show-hidden-files nil
-;;         treemacs-project-follow-cleanup t
-;;         ;; Prevents treemacs from being selected with `other-window`
-;;         treemacs-is-never-other-window nil
-;;         treemacs-goto-tag-strategy 'refetch-index
-;;         treemacs-recenter-after-file-follow t
-;;         treemacs-recenter-after-tag-follow  t
-;;         treemacs-silent-filewatch t
-;;         treemacs-silent-refresh t
-;;         treemacs-tag-follow-delay 1
-;;         treemacs-tag-follow-cleanup t)
-;;   (treemacs-git-mode 'extended)
-;;   ;; Decrease the font size
-;;   (set-face-attribute 'treemacs-directory-collapsed-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-directory-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-file-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-root-face nil
-;;                       :height 0.9)
-;;   (set-face-attribute 'treemacs-tags-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-git-ignored-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-git-untracked-face nil
-;;                       :height 0.7)
-;;   (treemacs-resize-icons 16)
-;;   :bind* ("C-j" . treemacs))
-
-;; (use-package treemacs-projectile
-;;   :ensure t
-;;   :after (treemacs projectile))
-
-;; (use-package treemacs-magit
-;;   :ensure t
-;;   :after (treemacs magit)
-;;   ;; :commands treemacs-magit--schedule-update
-;;   ;; :hook ((magit-post-commit
-;;   ;;         git-commit-post-finish
-;;   ;;         magit-post-stage
-;;   ;;         magit-post-unstage)
-;;   ;;        . treemacs-magit--schedule-update)
-;;   )
 
 (use-package all-the-icons-dired
   :ensure t
