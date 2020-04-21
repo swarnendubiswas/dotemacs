@@ -678,13 +678,14 @@ differences due to whitespaces."
   :ensure t
   :hook (global-company-mode . company-flx-mode))
 
-(use-package company-dict
-  :ensure t
-  :custom
-  (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
-  (company-dict-enable-fuzzy t)
-  (company-dict-enable-yasnippet nil)
-  :init (add-to-list 'company-backends 'company-dict))
+;; (use-package company-dict
+;;   :ensure t
+;;   :demand t
+;;   :custom
+;;   (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
+;;   (company-dict-enable-fuzzy t)
+;;   (company-dict-enable-yasnippet nil)
+;;   :config (add-to-list 'company-backends 'company-dict))
 
 (use-package company-ctags
   :ensure t
@@ -919,7 +920,7 @@ differences due to whitespaces."
 ;; Claims to be better than electric-indent-mode
 (use-package aggressive-indent
   :ensure t
-  :hook (prog-mode . global-aggressive-indent-mode)
+  :hook ((lisp-mode emacs-lisp-mode) . global-aggressive-indent-mode)
   :diminish)
 
 ;; ;; This apparently interferes with lsp formatting where lsp is enabled.
@@ -1589,11 +1590,14 @@ differences due to whitespaces."
   :custom
   (c-set-style "cc-mode")
   (c-basic-offset 2)
-  (c-auto-newline 1)
-  (c-electric-flag nil)
   :config
-  (c-toggle-electric-state -1)
-  (c-toggle-syntactic-indentation -1)
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (setq-local c-electric-flag nil
+                          c-electric-indent nil
+                          c-syntactic-indentation nil
+                          c-enable-auto-newline nil
+                          c-auto-newline nil)))
   (unbind-key "C-M-a" c-mode-map)
   :bind (:map c-mode-base-map
               ("C-c c a" . c-beginning-of-defun)
@@ -1755,6 +1759,7 @@ differences due to whitespaces."
   (lsp-clients-clangd-args '("-j=2" "-background-index" "--clang-tidy" "-log=error"))
   (lsp-eldoc-enable-hover nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
+  (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
   (lsp-flycheck-live-reporting t)
   (lsp-html-format-wrap-line-length 100)
