@@ -663,10 +663,16 @@ differences due to whitespaces."
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous))
   :config
-  (use-package company-ispell
-    :custom
-    (company-ispell-available t)
-    (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))))
+  ;; http://blog.binchen.org/posts/emacs-auto-completion-for-non-programmers.html
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (use-package company-ispell
+                :init
+                (make-local-variable 'company-backends)
+                (add-to-list 'company-backends 'company-ispell)
+                :custom
+                (company-ispell-available t)
+                (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))))))
 
 (use-package company-flx
   :ensure t
@@ -678,11 +684,11 @@ differences due to whitespaces."
   (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil)
-  :config (add-to-list 'company-backends 'company-dict))
+  :init (add-to-list 'company-backends 'company-dict))
 
 (use-package company-ctags
   :ensure t
-  :config (company-ctags-auto-setup)
+  :init (add-hook 'prog-mode-hook #'company-ctags-auto-setup)
   :custom
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
@@ -712,17 +718,7 @@ differences due to whitespaces."
   (ivy-count-format "(%d/%d) ") ; This is beneficial to identify wrap around
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
-  ;; (ivy-re-builders-alist '((counsel-find-file . ivy--regex-ignore-order)
-  ;;                          (swiper . ivy--regex-ignore-order)
-  ;;                          (counsel-rg . ivy--regex-ignore-order)
-  ;;                          (counsel-grep-or-swiper . ivy--regex-ignore-order)
-  ;;                          (ivy-switch-buffer . ivy--regex-plus)
-  ;;                          (t . ivy--regex-fuzzy)))
   (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-  ;; (ivy-sort-matches-functions-alist
-  ;;  '((t)
-  ;;    (ivy-switch-buffer . ivy-sort-function-buffer)
-  ;;    (counsel-find-file . ivy-sort-function-buffer)))
   (ivy-virtual-abbreviate 'abbreviate)
   (ivy-height-alist '((t
                        lambda (_caller)
@@ -760,15 +756,6 @@ differences due to whitespaces."
   :ensure t
   :ensure amx
   :preface
-  (defun sb/counsel-recentf ()
-    "Find a file on `recentf-list' and abbreviate the home directory."
-    (interactive)
-    (ivy-read "Recentf: " (mapcar #'abbreviate-file-name recentf-list)
-              :action
-              (lambda (f)
-                (with-ivy-window
-                  (find-file f)))
-              :caller 'counsel-recentf))
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun sb/counsel-goto-recent-directory ()
     "Open recent directories with dired."
@@ -903,7 +890,7 @@ differences due to whitespaces."
   (ispell-dictionary "en_US")
   (ispell-personal-dictionary (expand-file-name (concat dotemacs-extras-directory "spell")))
   ;; Aspell speed: ultra | fast | normal | bad-spellers
-  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
+  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-silently-savep t) ; Save a new word to personal dictionary without asking
   (flyspell-issue-message-flag nil)
   :hook ((prog-mode . flyspell-prog-mode)
@@ -1059,19 +1046,12 @@ differences due to whitespaces."
                   ".tar.gz"
                   "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes list))
-  ;; ;; https://www.reddit.com/r/emacs/comments/320cvb/projectile_slows_tramp_mode_to_a_crawl_is_there_a/
-  ;; (defadvice projectile-project-root (around ignore-remote first activate)
-  ;;   (unless (file-remote-p default-directory) ad-do-it))
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (use-package counsel-projectile
   :ensure t
   :after ivy
   :hook (counsel-mode . counsel-projectile-mode)
-  ;; :init
-  ;; ;; Sort projects from newest to oldest
-  ;; (add-to-list 'ivy-sort-functions-alist
-  ;;              '(counsel-projectile-switch-project . file-newer-than-file-p))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
          ("<f7>" . counsel-projectile-rg)))
@@ -1142,31 +1122,6 @@ differences due to whitespaces."
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
-  :preface
-  ;; http://www.wilfred.me.uk/.emacs.d/init.html
-  (defun sb/highlight-symbol-first ()
-    "Jump to the first location of symbol at point."
-    (interactive)
-    (push-mark)
-    (eval
-     `(progn
-        (goto-char (point-min))
-        (let ((case-fold-search nil))
-          (search-forward-regexp
-           (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
-           nil t))
-        (beginning-of-thing 'symbol))))
-  (defun sb/highlight-symbol-last ()
-    "Jump to the last location of symbol at point."
-    (interactive)
-    (push-mark)
-    (eval
-     `(progn
-        (goto-char (point-max))
-        (let ((case-fold-search nil))
-          (search-backward-regexp
-           (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
-           nil t)))))
   :hook (prog-mode . highlight-symbol-mode)
   :bind (("M-p" . highlight-symbol-prev)
          ("M-n" . highlight-symbol-next))
@@ -1292,8 +1247,6 @@ differences due to whitespaces."
             (lambda ()
               (add-hook 'after-save-hook
                         'counsel-etags-virtual-update-tags 'append 'local)))
-  ;; :custom
-  ;; (imenu-create-index-function 'counsel-etags-imenu-default-create-index-function)
   :config
   (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
@@ -1373,7 +1326,6 @@ differences due to whitespaces."
   ;; (defvar popwin:special-display-config-backup popwin:special-display-config)
   ;; (setq popwin:popup-window-height 20
   ;;       popwin:close-popup-window-timer-interval 0.5)
-  ;; ;; Helm buffers include the "help" string
   ;; (push '("*Help*" :noselect t) popwin:special-display-config)
   ;; ;; (push '(dired-mode :position top) popwin:special-display-config)
   ;; (push '(compilation-mode :noselect t) popwin:special-display-config)
@@ -1424,14 +1376,6 @@ differences due to whitespaces."
 (use-package crux
   :ensure t
   :bind ("C-c d i" . crux-ispell-word-then-abbrev))
-
-(use-package origami
-  :ensure t)
-
-;; (add-hook 'c++-mode-hook (lambda () (interactive)
-;;                            (origami-mode 1)
-;;                            (call-interactively
-;;                             'origami-close-all-nodes)) t)
 
 (use-package apt-sources-list
   :ensure t
@@ -1805,10 +1749,10 @@ differences due to whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred lsp-format-buffer)
-  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode plain-tex-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
+  :hook (((c-mode c++-mode cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode plain-tex-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
-  (lsp-clients-clangd-args '("-j=4" "-background-index" "--clang-tidy" "-log=error"))
+  (lsp-clients-clangd-args '("-j=2" "-background-index" "--clang-tidy" "-log=error"))
   (lsp-eldoc-enable-hover nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-on-type-formatting nil)
@@ -1861,12 +1805,8 @@ differences due to whitespaces."
                     :remote? t
                     :server-id 'intelephense-remote))
 
-  ;; (lsp-register-client
-  ;; (add-to-list 'lsp-language-id-configuration '(latex-mode . "latex"))
-  ;; (add-to-list 'lsp-language-id-configuration '(plain-tex-mode . "plaintex"))
-
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "~/.cargo/bin/texlab")
+   (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
                     :major-modes '(plain-tex-mode latex-mode)
                     :remote? t
                     :server-id 'texlab-remote))
@@ -1918,17 +1858,13 @@ differences due to whitespaces."
   ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   )
 
+(use-package origami
+  :ensure t)
+
 (use-package lsp-origami
   :ensure t
   :ensure origami
   :hook (origami-mode . lsp-origami-mode))
-
-(use-package company-lsp
-  :ensure t
-  :disabled t
-  :commands company-lsp
-  :custom (company-lsp-cache-candidates 'auto)
-  :config (push 'company-lsp company-backends))
 
 (use-package lsp-ivy
   :ensure t
@@ -1950,14 +1886,6 @@ differences due to whitespaces."
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp-deferred))))
-
-(use-package lsp-treemacs
-  :ensure t
-  :after (lsp treemacs)
-  :commands lsp-treemacs-errors-list)
-
-(use-package lsp-java-treemacs
-  :after treemacs)
 
 (use-package bazel-mode
   :ensure t)

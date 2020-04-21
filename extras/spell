@@ -1,6 +1,7 @@
-personal_ws-1.1 en 85 
+personal_ws-1.1 en 86 
 atomicity
 indices
+activations
 Modularity
 roundtrip
 anisotropic
@@ -27,8 +28,8 @@ pseudocode
 whitespaces
 perceptron
 Parallelization
-blackbox
 vertices
+blackbox
 unscalable
 scalable
 programmability
