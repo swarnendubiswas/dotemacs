@@ -687,12 +687,12 @@ differences due to whitespaces."
 ;;   (company-dict-enable-yasnippet nil)
 ;;   :config (add-to-list 'company-backends 'company-dict))
 
-(use-package company-ctags
-  :ensure t
-  :init (add-hook 'prog-mode-hook #'company-ctags-auto-setup)
-  :custom
-  (company-ctags-fuzzy-match-p t)
-  (company-ctags-everywhere t))
+;; (use-package company-ctags
+;;   :ensure t
+;;   :init (add-hook 'prog-mode-hook #'company-ctags-auto-setup)
+;;   :custom
+;;   (company-ctags-fuzzy-match-p t)
+;;   (company-ctags-everywhere t))
 
 (use-package yasnippet
   :ensure t
@@ -1185,13 +1185,7 @@ differences due to whitespaces."
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
-  (imenu-max-item-length 100)
-  :config
-  (use-package imenu-anywhere
-    :ensure t)
-  (use-package popup-imenu
-    :ensure t)
-  :bind ("C-c C-j" . imenu-anywhere))
+  (imenu-max-item-length 100))
 
 (setq tags-revert-without-query t ; Don't ask before rereading the TAGS files if they have changed
       ;; ; Warn when opening files bigger than 200MB, the size is chosen because of large TAGS files
@@ -1752,7 +1746,6 @@ differences due to whitespaces."
 
 (use-package lsp-mode
   :ensure t
-  :commands (lsp lsp-deferred lsp-format-buffer)
   :hook (((c-mode c++-mode cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode plain-tex-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
@@ -1829,11 +1822,7 @@ differences due to whitespaces."
                 (add-hook 'before-save-hook
                           (lambda ()
                             (lsp-format-buffer)) nil t))))
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook
-                        (lambda ()
-                          (lsp-format-buffer)) nil t)))
+
   ;; FIXME: Does the bash server not support formatting?
   ;; (add-hook 'sh-mode-hook
   ;;           (lambda ()
@@ -1849,6 +1838,13 @@ differences due to whitespaces."
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)
          ("C-c l R" . lsp-find-definition)))
+
+;; FIXME: Why moving this to lsp::config does not work?
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
 
 (use-package lsp-ui
   :ensure t

@@ -1,5 +1,3 @@
-;; -*- enable-local-variables: all; enable-local-eval: t -*-
-
 (
  (nil . ((eval . (setq-local counsel-etags-project-root (projectile-project-root)
                              tags-table-files (list (projectile-project-root)))
