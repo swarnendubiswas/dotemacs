@@ -57,7 +57,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'doom-themes
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -68,17 +68,19 @@
           (const :tag "solarized-dark" solarized-dark)
           (const :tag "tangotango" tangotango)
           (const :tag "zenburn" zenburn)
+          (const :tag "doom-themes" doom-themes)
           (const :tag "default" default))
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
           (const :tag "smart-mode-line" sml)
           (const :tag "spaceline" spaceline)
           (const :tag "airline" airline)
+          (const :tag "doom-modeline" doom-modeline)
           (const :tag "default" default))
   :group 'dotemacs)
 
@@ -247,7 +249,7 @@ differences due to whitespaces."
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t))
 
-;; Typing with the mark active will overwrite the marked region, pending-delete-mode is an alias
+;; Typing with the mark active will overwrite the marked region
 (use-package delsel
   :hook (after-init . delete-selection-mode))
 
@@ -328,7 +330,6 @@ differences due to whitespaces."
 
 (setq custom-safe-themes t
       frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
-      indicate-buffer-boundaries 'right
       indicate-empty-lines t)
 
 (if window-system
@@ -336,7 +337,7 @@ differences due to whitespaces."
       (tool-bar-mode -1)
       (menu-bar-mode -1)
       (scroll-bar-mode -1)))
-
+(tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
 (toggle-frame-maximized) ; Maximize Emacs on startup
 
@@ -386,6 +387,10 @@ differences due to whitespaces."
                                          :ensure t
                                          :init (load-theme 'tangotango t)))
 
+      ((eq dotemacs-theme 'doom-themes) (use-package doom-themes
+                                          :ensure t
+                                          :init (load-theme 'doom-vibrant t)))
+
       ((eq dotemacs-theme 'default) (progn
                                       (set-face-attribute 'region nil
                                                           :background "light sky blue"
@@ -393,11 +398,10 @@ differences due to whitespaces."
 
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
+(size-indication-mode -1)
 
 (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
   :ensure t)
-
-(size-indication-mode -1)
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
@@ -429,7 +433,6 @@ differences due to whitespaces."
                                            :init
                                            (setq sml/theme 'light
                                                  sml/no-confirm-load-theme t
-                                                 ;; Everything after the minor-modes will be right-indented
                                                  sml/mode-width 'full
                                                  sml/shorten-modes t
                                                  sml/shorten-directory t)
@@ -445,8 +448,6 @@ differences due to whitespaces."
                                                        spaceline-version-control-p t
                                                        spaceline-input-method-p nil
                                                        spaceline-persp-name-p nil
-                                                       ;; powerline-image-apple-rgb t
-                                                       ;; ns-use-srgb-colorspace nil
                                                        ;; powerline-height 24
                                                        )
                                                  (set-face-attribute 'powerline-inactive1 nil
@@ -469,26 +470,33 @@ differences due to whitespaces."
                                                :ensure t
                                                :init
                                                (require 'airline-themes)
-                                               (load-theme 'airline-laederon t)
+                                               (load-theme 'airline-cool t)
                                                (setq airline-hide-eyebrowse-on-inactive-buffers t
-                                                     airline-eshell-colors nil
-                                                     ;; powerline-height 24
-                                                     )
-                                               ))
+                                                     airline-eshell-colors nil)))
+
+      ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
+                                                     :ensure t
+                                                     :init (doom-modeline-mode 1)
+                                                     :custom
+                                                     (doom-modeline-buffer-encoding nil)
+                                                     (doom-modeline-height 22)
+                                                     (doom-modeline-gnus nil)
+                                                     (doom-modeline-minor-modes t)
+                                                     (doom-modeline-indent-info t)))
+
       ((eq dotemacs-modeline-theme 'default) ))
 
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil
                     :family "DejaVu Sans Mono"
-                    :height 125)
+                    :height 130)
 (set-face-attribute 'mode-line nil
                     :family "DejaVu Sans Mono"
                     :height 100)
 
 (use-package ibuffer
   :custom
-  ;; (ibuffer-always-show-last-buffer nil)
   (ibuffer-case-fold-search t) ; Ignore case when searching
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: major-mode
   (ibuffer-display-summary nil)
@@ -610,7 +618,6 @@ differences due to whitespaces."
 
 ;; Adding directories to the list of recent files decreases the number of entries of recent files.
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
-;; https://www.emacswiki.org/emacs/RecentFiles
 (use-package recentf
   :custom
   (recentf-save-file (expand-file-name (concat dotemacs-temp-directory "recentf")))
@@ -655,7 +662,7 @@ differences due to whitespaces."
   :custom
   (company-dabbrev-downcase nil) ; Do not downcase returned candidates
   (company-idle-delay 0.0)
-  (company-global-modes t) ; Turn on company-mode for all major modes
+  ;; (company-global-modes t) ; Turn on company-mode for all major modes
   (company-minimum-prefix-length 2)
   (company-selection-wrap-around t)
   (company-show-numbers t)
@@ -664,15 +671,16 @@ differences due to whitespaces."
               ("C-p" . company-select-previous))
   :config
   ;; http://blog.binchen.org/posts/emacs-auto-completion-for-non-programmers.html
-  (add-hook 'text-mode-hook
-            (lambda ()
-              (use-package company-ispell
-                :init
-                (make-local-variable 'company-backends)
-                (add-to-list 'company-backends 'company-ispell)
-                :custom
-                (company-ispell-available t)
-                (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))))))
+  ;; (add-hook 'text-mode-hook
+  ;;           (lambda ()
+  ;;             (use-package company-ispell
+  ;;               :init
+  ;;               (make-local-variable 'company-backends)
+  ;;               (add-to-list 'company-backends 'company-ispell)
+  ;;               :custom
+  ;;               (company-ispell-available t)
+  ;;               (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist"))))))
+  )
 
 (use-package company-flx
   :ensure t
@@ -724,6 +732,7 @@ differences due to whitespaces."
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
+  (ivy-wrap t)
   (completion-in-region-function #'ivy-completion-in-region)
   :config
   (dolist (buffer '(
@@ -765,7 +774,6 @@ differences due to whitespaces."
     (let ((collection
            (delete-dups
             (append (mapcar 'file-name-directory recentf-list)
-                    ;; fasd history
                     (if (executable-find "fasd")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
@@ -792,7 +800,6 @@ differences due to whitespaces."
    ("C-c C-j" . counsel-semantic-or-imenu))
   :custom
   (counsel-mode-override-describe-bindings t)
-  ;; (counsel-grep-swiper-limit 1000000) ; Number of characters in the buffer
   (counsel-yank-pop-separator "\n-------------------------\n")
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
@@ -911,16 +918,15 @@ differences due to whitespaces."
   :bind ("C-;" . flyspell-popup-correct))
 
 (setq-default fill-column dotemacs-fill-column
+              indent-tabs-mode nil ; Spaces instead of tabs by default
               standard-indent 2
-              tab-width 2
               tab-always-indent 'complete
-              ;; Spaces instead of tabs by default
-              indent-tabs-mode nil)
+              tab-width 2)
 
 ;; Claims to be better than electric-indent-mode
 (use-package aggressive-indent
   :ensure t
-  :hook ((lisp-mode emacs-lisp-mode) . global-aggressive-indent-mode)
+  :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
   :diminish)
 
 ;; ;; This apparently interferes with lsp formatting where lsp is enabled.
@@ -930,9 +936,7 @@ differences due to whitespaces."
 (use-package highlight-indentation
   :ensure t
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-  :hook (python-mode . highlight-indentation-mode)
-  ;; :config (set-face-background 'highlight-indentation-face "WhiteSmoke")
-  )
+  :hook (python-mode . highlight-indentation-mode))
 
 (use-package paren
   :hook (after-init . show-paren-mode)
@@ -955,7 +959,6 @@ differences due to whitespaces."
          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
          ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-         ;; The following two are the more commonly required use cases.
          ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
          ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-n" . sp-next-sexp)
@@ -991,7 +994,7 @@ differences due to whitespaces."
       (format "%s[%s]"
 	            projectile-mode-line-prefix
 	            (or project-name "-"))))
-  (projectile-mode 1) ; Otherwise keybindings not bound explicitly with bind* will not be respected
+  (projectile-mode 1)
   ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
   ;; (setq projectile-project-search-path (list
   ;;                                       (concat `,(getenv "HOME") "/bitbucket")
@@ -1004,54 +1007,19 @@ differences due to whitespaces."
   ;;                                       (concat `,(getenv "HOME") "/research")
   ;;                                       ))
   (add-to-list 'projectile-ignored-projects (concat dotemacs-user-home "/")) ; Do not consider the HOME as a project
-  (dolist (dirs '(".cache"
-                  ".clangd"
-                  ".dropbox"
-                  ".git"
-                  ".hg"
-                  ".metadata"
-                  ".nx"
-                  ".recommenders"
-                  ".svn"
-                  ".vscode"
-                  "__pycache__"
-                  "auto"
-                  "elpa"))
+  (dolist (dirs '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
+                  ".vscode" "__pycache__" "auto" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
-  (dolist (item '("GPATH"
-                  "GRTAGS"
-                  "GTAGS"
-                  "GSYMS"
-                  "TAGS"
-                  "tags"
-                  ".dir-locals.el"
-                  ".projectile"
-                  ".project"
-                  ".tags"
-                  "__init__.py"))
-    (add-to-list 'projectile-globally-ignored-files item))
-  (dolist (list '(".a"
-                  ".aux"
-                  ".bak"
-                  ".blg"
-                  ".class"
-                  ".elc"
-                  ".jar"
-                  ".o"
-                  ".out"
-                  ".pdf"
-                  ".pt"
-                  ".pyc"
-                  ".rel"
-                  ".rip"
-                  ".tar.gz"
-                  "~$"))
-    (add-to-list 'projectile-globally-ignored-file-suffixes list))
+  (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS"  "TAGS" "tags" ".dir-locals.el" ".projectile"
+                   ".project" ".tags" "__init__.py"))
+    (add-to-list 'projectile-globally-ignored-files items))
+  (dolist (exts '(".a" ".aux" ".bak" ".blg" ".class" ".elc" ".jar" ".o" ".out" ".pdf" ".pt" ".pyc"
+                  ".rel" ".rip" ".tar.gz" "~$"))
+    (add-to-list 'projectile-globally-ignored-file-suffixes exts))
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (use-package counsel-projectile
   :ensure t
-  :after ivy
   :hook (counsel-mode . counsel-projectile-mode)
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
@@ -1070,21 +1038,6 @@ differences due to whitespaces."
               (setq-local flycheck-checker 'python-pylint
                           flycheck-python-pylint-executable "python3"
                           flycheck-pylintrc (concat dotemacs-user-home "/.config/pylintrc"))))
-  ;; ;; C/C++
-  ;; (add-hook 'c++-mode-hook
-  ;;           (lambda ()
-  ;;             (setq flycheck-clang-args ""
-  ;;                   flycheck-clang-include-path "" ; Directories
-  ;;                   flycheck-clang-includes "" ; Files
-  ;;                   flycheck-clang-language-standard "c++11"
-  ;;                   flycheck-gcc-args ""
-  ;;                   flycheck-gcc-include-path "" ; Directories
-  ;;                   flycheck-gcc-includes "" ; Files
-  ;;                   flycheck-gcc-language-standard "c++11")))
-  ;; ;; CUDA
-  ;; (setq-local flycheck-cuda-language-standard "c++11")
-  ;; (setq-local flycheck-cuda-includes "")
-  ;; (setq-local flycheck-cuda-include-path "") ; Directories
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
@@ -1096,7 +1049,6 @@ differences due to whitespaces."
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
   :ensure t
-  :ensure avy
   :config (avy-flycheck-setup))
 
 (use-package flycheck-popup-tip ; Show error messages in popups
@@ -1172,12 +1124,12 @@ differences due to whitespaces."
   :config
   (add-hook 'counsel-tramp-pre-command-hook
             (lambda ()
-              (global-aggressive-indent-mode -1)
+              ;; (global-aggressive-indent-mode -1)
               (projectile-mode -1)
               (counsel-projectile-mode -1)))
   (add-hook 'counsel-tramp-quit-hook
             (lambda ()
-              (global-aggressive-indent-mode 1)
+              ;; (global-aggressive-indent-mode 1)
               (projectile-mode 1)
               (counsel-projectile-mode 1))))
 
@@ -1237,12 +1189,11 @@ differences due to whitespaces."
          ("C-c g f" . counsel-etags-find-tag)
          ("C-c g l" .  counsel-etags-list-tag)
          ("C-c g c" . counsel-etags-scan-code))
-  :init
+  :config
   (add-hook 'c++-mode-hook
             (lambda ()
               (add-hook 'after-save-hook
                         'counsel-etags-virtual-update-tags 'append 'local)))
-  :config
   (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
   (dolist (ignore-files '(".clang-format" "*.json" "*.html" "*.xml"))
@@ -1412,8 +1363,6 @@ differences due to whitespaces."
   (avy-background t)
   (avy-highlight-first t)
   (avy-all-windows nil)
-  ;; Option pre is a bit distracting because of all the movement while highlighting selection keys.
-  ;; This causes the eyes to lose focus.
   (avy-style 'at)
   :config
   ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one
@@ -1442,7 +1391,9 @@ differences due to whitespaces."
 
 (use-package logview
   :ensure t
-  :custom (logview-cache-filename (expand-file-name (concat dotemacs-temp-directory "logview-cache.extmap"))))
+  :custom (logview-cache-filename (expand-file-name
+                                   (concat
+                                    dotemacs-temp-directory "logview-cache.extmap"))))
 
 (use-package markdown-mode
   :ensure t
@@ -1486,40 +1437,43 @@ differences due to whitespaces."
                         company-backends)))
   :config (add-hook 'TeX-mode-hook #'company-math-setup))
 
-(use-package bibtex-completion
-  :custom
-  (bibtex-completion-cite-prompt-for-optional-arguments nil)
-  (bibtex-completion-cite-default-as-initial-input t)
-  (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
-
 (use-package ivy-bibtex
   :ensure t
   :bind ("C-c x b" . ivy-bibtex)
+  :config
+  (use-package bibtex-completion
+    :custom
+    (bibtex-completion-cite-prompt-for-optional-arguments nil)
+    (bibtex-completion-cite-default-as-initial-input t)
+    (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
-(use-package company-bibtex
-  :ensure t
-  :config (add-to-list 'company-backends 'company-bibtex))
+(add-hook 'latex-mode
+          (lambda()
+            (make-local-variable 'company-backends)
+            (use-package company-bibtex
+              :ensure t
+              :init (add-to-list 'company-backends 'company-bibtex))
+            (use-package company-reftex
+              :ensure t
+              :init
+              (add-to-list 'company-backends 'company-reftex-labels)
+              (add-to-list 'company-backends 'company-reftex-citations))))
 
-(use-package company-reftex
-  :ensure t
-  :config
-  (add-to-list 'company-backends 'company-reftex-labels)
-  (add-to-list 'company-backends 'company-reftex-citations))
-
-;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-(defun sb/save-buffer-and-run-latexmk ()
-  "Save the current buffer and run LaTeXMk also."
-  (interactive)
-  (let ((process (TeX-active-process))) (if process (delete-process process)))
-  (let ((TeX-save-query nil)) (TeX-save-document ""))
-  (TeX-command-menu "LaTeXMk"))
-(add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
-(add-hook 'latex-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
+;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+;; (defun sb/save-buffer-and-run-latexmk ()
+;;   "Save the current buffer and run LaTeXMk also."
+;;   (interactive)
+;;   (require 'tex-buf)
+;;   (let ((process (TeX-active-process))) (if process (delete-process process)))
+;;   (let ((TeX-save-query nil)) (TeX-save-document ""))
+;;   (TeX-command-menu "LaTeXMk"))
+;; (add-hook 'LaTeX-mode-hook
+;;           (lambda ()
+;;             (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
+;; (add-hook 'latex-mode-hook
+;;           (lambda ()
+;;             (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
 
 (global-prettify-symbols-mode -1)
 
@@ -1578,6 +1532,8 @@ differences due to whitespaces."
                                 (other . "gnu/linux")
                                 (awk-mode . "awk")))
 
+;;  Call this in c-mode-common-hook:
+;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
 (use-package cc-mode
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
@@ -1589,6 +1545,7 @@ differences due to whitespaces."
             (lambda ()
               (setq-local c-electric-flag nil
                           c-electric-indent nil
+                          c-electric-brace nil
                           c-syntactic-indentation nil
                           c-enable-auto-newline nil
                           c-auto-newline nil)))
@@ -1760,7 +1717,7 @@ differences due to whitespaces."
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
   (lsp-log-io t) ; Disable after a bit of testing
-  (lsp-prefer-capf nil)
+  (lsp-prefer-capf t)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
@@ -1815,14 +1772,6 @@ differences due to whitespaces."
                     :remote? t
                     :server-id 'cmakels-remote))
 
-  (use-package lsp-pyls
-    :config
-    (add-hook 'python-mode-hook
-              (lambda ()
-                (add-hook 'before-save-hook
-                          (lambda ()
-                            (lsp-format-buffer)) nil t))))
-
   ;; FIXME: Does the bash server not support formatting?
   ;; (add-hook 'sh-mode-hook
   ;;           (lambda ()
@@ -1840,6 +1789,11 @@ differences due to whitespaces."
          ("C-c l R" . lsp-find-definition)))
 
 ;; FIXME: Why moving this to lsp::config does not work?
+(add-hook 'python-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook
+                      (lambda ()
+                        (lsp-format-buffer)) nil t)))
 (add-hook 'c++-mode-hook
           (lambda ()
             (add-hook 'before-save-hook
@@ -1848,11 +1802,9 @@ differences due to whitespaces."
 
 (use-package lsp-ui
   :ensure t
-  :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil)
-  ;; (lsp-ui-flycheck-list-position 'right)
   (lsp-ui-sideline-enable nil)
   ;; :config
   ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
@@ -1878,8 +1830,8 @@ differences due to whitespaces."
   :config (add-hook 'java-mode-hook
                     (lambda ()
                       (add-hook 'before-save-hook
-                                (lambda () (lsp-format-buffer))
-                                nil t))))
+                                (lambda ()
+                                  (lsp-format-buffer)) nil t))))
 
 (use-package lsp-python-ms
   :disabled t
@@ -1994,21 +1946,19 @@ Increase line spacing by two line height."
   "Create tags file with ctags."
   (interactive "Directory: ")
   (shell-command
-   (format "%s -f TAGS -e -R %s" dotemacs-ctags-path (directory-file-name dir-name))))
+   (format "%s -f TAGS -eR %s" dotemacs-ctags-path (directory-file-name dir-name))))
 
 (defun sb/create-gtags (dir-name)
   "Create tags file with gtags."
   (interactive "Directory: ")
   (shell-command
-   (format "%s %s" dotemacs-gtags-path (directory-file-name dir-name))))
+   (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
 ;; Generic keybindings, package-specific are usually in their own modules. Use `M-x describe-personal-keybindings` to see modifications.
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key
 ;; variants. With bind-key, you do not need an explicit "(kbd ...)". Other variants: (global-set-key
 ;; (kbd "RET") 'newline-and-indent) (define-key global-map (kbd "RET") 'newline-and-indent)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (bind-keys
  ("RET" . newline-and-indent)

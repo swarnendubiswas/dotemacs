@@ -1,7 +1,7 @@
-personal_ws-1.1 en 86 
+personal_ws-1.1 en 87 
 atomicity
-indices
 activations
+indices
 Modularity
 roundtrip
 anisotropic
@@ -28,8 +28,8 @@ pseudocode
 whitespaces
 perceptron
 Parallelization
-vertices
 blackbox
+vertices
 unscalable
 scalable
 programmability
@@ -85,3 +85,4 @@ unintuitive
 customizations
 observability
 Kharagpur
+preprocessing
