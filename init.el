@@ -405,9 +405,7 @@ differences due to whitespaces."
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
-                                                 :demand t
-                                                 :config
-                                                 (powerline-default-theme)
+                                                 :init
                                                  (setq powerline-display-mule-info nil
                                                        powerline-display-buffer-size t
                                                        powerline-display-hud nil
@@ -426,7 +424,8 @@ differences due to whitespaces."
                                                    (set-face-attribute 'mode-line-buffer-id nil
                                                                        :weight 'bold
                                                                        :foreground "black"
-                                                                       :background "gray88"))))
+                                                                       :background "gray88")
+                                                   (powerline-default-theme))))
 
       ((eq dotemacs-modeline-theme 'sml) (use-package smart-mode-line
                                            :ensure t
@@ -442,14 +441,11 @@ differences due to whitespaces."
                                                  :ensure t
                                                  :init
                                                  (require 'spaceline-config)
-                                                 (spaceline-emacs-theme)
                                                  (setq spaceline-hud-p nil
                                                        spaceline-selection-info-p nil
                                                        spaceline-version-control-p t
                                                        spaceline-input-method-p nil
-                                                       spaceline-persp-name-p nil
-                                                       ;; powerline-height 24
-                                                       )
+                                                       spaceline-persp-name-p nil)
                                                  (set-face-attribute 'powerline-inactive1 nil
                                                                      :background "gray40"
                                                                      :foreground "white"
@@ -464,15 +460,16 @@ differences due to whitespaces."
                                                                        :weight 'light)
                                                    (set-face-attribute 'mode-line-inactive nil
                                                                        :background "grey88"
-                                                                       :foreground "black"))))
+                                                                       :foreground "black"))
+                                                 (spaceline-emacs-theme)))
 
       ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
                                                :ensure t
                                                :init
                                                (require 'airline-themes)
-                                               (load-theme 'airline-cool t)
                                                (setq airline-hide-eyebrowse-on-inactive-buffers t
-                                                     airline-eshell-colors nil)))
+                                                     airline-eshell-colors nil)
+                                               (load-theme 'airline-cool t)))
 
       ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
                                                      :ensure t
@@ -488,12 +485,8 @@ differences due to whitespaces."
 
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (set-frame-font "DejaVu Sans Mono" nil t)
-(set-face-attribute 'default nil
-                    :family "DejaVu Sans Mono"
-                    :height 130)
-(set-face-attribute 'mode-line nil
-                    :family "DejaVu Sans Mono"
-                    :height 100)
+(set-face-attribute 'default nil :height 120)
+(set-face-attribute 'mode-line nil :height 100)
 
 (use-package ibuffer
   :custom
