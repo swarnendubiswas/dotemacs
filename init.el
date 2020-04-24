@@ -664,21 +664,96 @@ whitespaces."
   :ensure t
   :hook (global-company-mode . company-flx-mode))
 
-;; (use-package company-dict
-;;   :ensure t
-;;   :demand t
-;;   :custom
-;;   (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
-;;   (company-dict-enable-fuzzy t)
-;;   (company-dict-enable-yasnippet nil)
-;;   :config (add-to-list 'company-backends 'company-dict))
+(use-package company-dict
+  :ensure t
+  :custom
+  (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
+  (company-dict-enable-fuzzy t)
+  (company-dict-enable-yasnippet nil))
 
-;; (use-package company-ctags
-;;   :ensure t
-;;   :init (add-hook 'prog-mode-hook #'company-ctags-auto-setup)
-;;   :custom
-;;   (company-ctags-fuzzy-match-p t)
-;;   (company-ctags-everywhere t))
+(use-package company-ctags
+  :ensure t
+  :custom
+  (company-ctags-fuzzy-match-p t)
+  (company-ctags-everywhere t))
+
+(use-package company-shell
+  :ensure t
+  :custom (company-shell-delete-duplicates t))
+
+(use-package company-math
+  :ensure t
+  :ensure math-symbol-lists)
+
+(use-package company-bibtex
+  :ensure t
+  :demand t)
+
+(use-package company-reftex
+  :ensure t
+  :demand t)
+
+(use-package company-c-headers
+  :ensure t
+  :demand t 
+  :config
+  (dolist (paths '(
+                   "/usr/include/clang/7"
+                   "/usr/include/boost"
+                   "/usr/include/linux"
+                   "/usr/include/c++/7"
+                   "/usr/include/c++/7/tr1"
+                   ))
+    (add-to-list 'company-c-headers-path-system paths)))
+
+(dolist (hook '(text-mode-hook markdown-mode-hook))
+  (add-hook hook
+            (lambda ()
+              (make-local-variable 'company-backends)
+              (setq-local company-backends '(company-capf
+                                             company-dabbrev
+                                             company-abbrev
+                                             company-ispell)))))
+(dolist (tex-hooks '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+  (add-hook 'latex-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends) '(
+                                                             company-capf
+                                                             (company-dabbrev
+                                                              company-ispell)
+                                                             ;; (company-bibtex
+                                                             ;;  company-reftex-labels
+                                                             ;;  company-reftex-citations
+                                                             ;;  company-math-symbols-latex
+                                                             ;;  company-latex-commands
+                                                             ;;  company-math-symbols-Unicode)
+                                                             ;; (company-dabbrev
+                                                             ;;  company-capf
+                                                             ;;  company-abbrev
+                                                             ;;  company-ispell)
+
+                                                             )))))
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (make-local-variable 'company-backends)
+            (setq-local company-backends '(company-capf
+                                           company-dabbrev
+                                           company-dabbrev-code
+                                           company-ctags
+                                           company-yasnippet
+                                           company-files
+                                           company-keywords))))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (make-local-variable 'company-backends)
+            (setq-local company-backends '(company-capf
+                                           company-dabbrev
+                                           company-dabbrev-code
+                                           company-shell
+                                           company-shell-env
+                                           company-fish-shell
+                                           company-ctags
+                                           company-keywords))))
 
 (use-package yasnippet
   :ensure t
@@ -1405,16 +1480,6 @@ whitespaces."
   :ensure t
   :mode ("\\.smt\\'" . z3-smt2-mode))
 
-(use-package company-math
-  :ensure t
-  :ensure math-symbol-lists ; Required by ac-math and company-math
-  :preface
-  (defun company-math-setup ()
-    (setq-local company-backends
-                (append '((company-math-symbols-latex company-latex-commands company-math-symbols-unicode))
-                        company-backends)))
-  :config (add-hook 'TeX-mode-hook #'company-math-setup))
-
 (use-package ivy-bibtex
   :ensure t
   :bind ("C-c x b" . ivy-bibtex)
@@ -1425,18 +1490,6 @@ whitespaces."
     (bibtex-completion-cite-default-as-initial-input t)
     (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
-
-(add-hook 'latex-mode
-          (lambda()
-            (make-local-variable 'company-backends)
-            (use-package company-bibtex
-              :ensure t
-              :init (add-to-list 'company-backends 'company-bibtex))
-            (use-package company-reftex
-              :ensure t
-              :init
-              (add-to-list 'company-backends 'company-reftex-labels)
-              (add-to-list 'company-backends 'company-reftex-citations))))
 
 ;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 ;; (defun sb/save-buffer-and-run-latexmk ()
@@ -1533,20 +1586,6 @@ whitespaces."
               ("C-c c e" . c-end-of-defun)
               ("M-q" . c-fill-paragraph)))
 
-(use-package company-c-headers
-  :ensure t
-  :config
-  (add-to-list 'company-backends 'company-c-headers)
-  (dolist (paths '(
-                   "/usr/include"
-                   "/usr/include/clang/7"
-                   "/usr/include/boost"
-                   "/usr/include/linux"
-                   "/usr/include/c++/7"
-                   "/usr/include/c++/7/tr1"
-                   "/usr/local/include"))
-    (add-to-list 'company-c-headers-path-system paths)))
-
 (use-package cuda-mode
   :ensure t
   :mode ("\\.cu\\'"	. c++-mode))
@@ -1603,12 +1642,6 @@ whitespaces."
   :config
   ;; Was bound to sh-cd-here
   (unbind-key "C-c C-d" sh-mode-map))
-
-;; (use-package company-shell
-;;   :ensure t
-;;   :config
-;;   (setq company-shell-delete-duplicates t)
-;;   (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell)))
 
 (use-package fish-mode
   :ensure t
