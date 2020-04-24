@@ -650,6 +650,7 @@
     ("inteh" "in the" nil :count 0)
     ("interum" "interim" nil :count 0)
     ("inthe" "in the" nil :count 0)
+    ("introdcution" "introduction" nil :count 0)
     ("inturn" "in turn" nil :count 0)
     ("invitaion" "invitation" nil :count 0)
     ("invlaid" "invalid" nil :count 2)

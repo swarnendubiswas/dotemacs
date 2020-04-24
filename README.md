@@ -14,7 +14,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-A few third-party executables and libraries are required to complement the setup. You can use the following instructions to install them on an Ubuntu 18.04 distribution.
+You can use the following instructions to install a few third-party applications. These should work on an Ubuntu 18.04 distribution.
 
 ``` Bash
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime pandoc fonts-powerline libncurses5-dev fasd
@@ -154,11 +154,10 @@ ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/
 ctags -eR --exclude=@.ctagsignore .
 ```
 
-Example `.ctagsignore` file
-
-```
-dir1  
-dir2  
+```bash
+$ cat .ctagsignore
+dir1
+dir2
 dir3
 ```
 
