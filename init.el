@@ -710,12 +710,12 @@ whitespaces."
   (add-hook hook
             (lambda ()
               (make-local-variable 'company-backends)
-              (setq-local company-backends '(company-capf
-                                             company-dabbrev
-                                             company-abbrev
-                                             company-ispell)))))
+              (setq company-backends '(company-capf
+                                       company-dabbrev
+                                       company-abbrev
+                                       company-ispell)))))
 (dolist (tex-hooks '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-  (add-hook 'latex-mode-hook
+  (add-hook 'tex-hooks
             (lambda ()
               (set (make-local-variable 'company-backends) '(
                                                              company-capf
@@ -736,24 +736,24 @@ whitespaces."
 (add-hook 'prog-mode-hook
           (lambda ()
             (make-local-variable 'company-backends)
-            (setq-local company-backends '(company-capf
-                                           company-dabbrev
-                                           company-dabbrev-code
-                                           company-ctags
-                                           company-yasnippet
-                                           company-files
-                                           company-keywords))))
+            (setq company-backends '(company-capf
+                                     company-dabbrev
+                                     company-dabbrev-code
+                                     company-ctags
+                                     company-yasnippet
+                                     company-files
+                                     company-keywords))))
 (add-hook 'sh-mode-hook
           (lambda ()
             (make-local-variable 'company-backends)
-            (setq-local company-backends '(company-capf
-                                           company-dabbrev
-                                           company-dabbrev-code
-                                           company-shell
-                                           company-shell-env
-                                           company-fish-shell
-                                           company-ctags
-                                           company-keywords))))
+            (setq company-backends '(company-capf
+                                     company-dabbrev
+                                     company-dabbrev-code
+                                     company-shell
+                                     company-shell-env
+                                     company-fish-shell
+                                     company-ctags
+                                     company-keywords))))
 
 (use-package yasnippet
   :ensure t
