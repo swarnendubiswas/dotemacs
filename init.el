@@ -1691,7 +1691,6 @@ whitespaces."
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
-  (lsp-flycheck-live-reporting t)
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
@@ -1707,7 +1706,6 @@ whitespaces."
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
   (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
   (lsp-pyls-plugins-pyflakes-enabled nil)
-  (lsp-pyls-plugins-pylint-enabled t)
   (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (expand-file-name (concat dotemacs-temp-directory ".lsp-session-v1")))
