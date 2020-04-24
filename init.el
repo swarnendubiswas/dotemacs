@@ -86,11 +86,12 @@
 
 (defcustom dotemacs-window-split
   'vertical
-  "Specify the direction in which the windows should be split. This depends on the orientation of the display."
+  "Specify the direction in which the windows should be split.
+This depends on the orientation of the display."
   :type '(radio
-          ;; Split the selected window into two windows, one above the other
+          ;; Split into two windows one above the other
           (const :tag "vertical" vertical) ; split-window-below
-          ;; Split the selected window into two side-by-side windows
+          ;; Split into two side-by-side windows
           (const :tag "horizontal" horizontal)) ; split-window-right
   :group 'dotemacs)
 
@@ -100,8 +101,9 @@
 (defcustom dotemacs-delete-trailing-whitespace-p
   nil
   "Delete trailing whitespace.
-Control whether the trailing whitespace should be deleted or not.  Sometimes we do not want to unnecessarily add
-differences due to whitespaces."
+Control whether the trailing whitespace should be deleted or not.
+Sometimes we do not want to unnecessarily add differences due to
+whitespaces."
   :type 'boolean
   :group 'dotemacs)
 
@@ -116,7 +118,7 @@ differences due to whitespaces."
 
 (defcustom dotemacs-ctags-path
   "/usr/local/bin/ctags"
-  "Absolute path to Universal CTags executable."
+  "Absolute path to Universal Ctags executable."
   :type 'string
   :group 'dotemacs)
 
@@ -136,8 +138,7 @@ differences due to whitespaces."
         ;; Avoid loading packages twice
         package-enable-at-startup nil)
   (package-initialize)
-  (add-to-list 'package-archives '("melpa"
-                                   . "https://melpa.org/packages/") t))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -196,7 +197,7 @@ differences due to whitespaces."
       use-dialog-box nil
       use-file-dialog nil
       delete-by-moving-to-trash t
-      ;; completion-ignore-case t ; Ignore case when completing
+      completion-ignore-case t ; Ignore case when completing
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-buffer-completion-ignore-case t
       switch-to-buffer-preserve-window-point t
@@ -206,15 +207,11 @@ differences due to whitespaces."
       require-final-newline t ; Always end a file with a newline.
       make-backup-files nil ; Stop making backup ~ files
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
-      auto-save-timeout 180 ; Seconds
-      auto-save-interval 600
       confirm-kill-emacs nil
       save-interprogram-paste-before-kill t
       kill-whole-line t
       suggest-key-bindings t
       shift-select-mode t ; Use shift-select for marking
-      blink-matching-paren t
-      kill-ring-max 10
       kill-do-not-save-duplicates t
       set-mark-command-repeat-pop t
       confirm-nonexistent-file-or-buffer t
@@ -650,30 +647,18 @@ differences due to whitespaces."
 ;; Use "M-x company-diag" to see the backend used
 (use-package company
   :ensure t
-  :diminish
   :hook (after-init . global-company-mode)
   :custom
   (company-dabbrev-downcase nil) ; Do not downcase returned candidates
   (company-idle-delay 0.0)
-  ;; (company-global-modes t) ; Turn on company-mode for all major modes
+  (company-ispell-available t)
+  (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))
   (company-minimum-prefix-length 2)
   (company-selection-wrap-around t)
   (company-show-numbers t)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
-              ("C-p" . company-select-previous))
-  :config
-  ;; http://blog.binchen.org/posts/emacs-auto-completion-for-non-programmers.html
-  ;; (add-hook 'text-mode-hook
-  ;;           (lambda ()
-  ;;             (use-package company-ispell
-  ;;               :init
-  ;;               (make-local-variable 'company-backends)
-  ;;               (add-to-list 'company-backends 'company-ispell)
-  ;;               :custom
-  ;;               (company-ispell-available t)
-  ;;               (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist"))))))
-  )
+              ("C-p" . company-select-previous)))
 
 (use-package company-flx
   :ensure t
@@ -1629,12 +1614,14 @@ differences due to whitespaces."
   :ensure t
   :mode "\\.fish\\'")
 
+;; https://github.com/amake/shfmt.el
+;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
   :ensure reformatter
   :load-path "extras/shfmt"
   :ensure-system-package shfmt
   :custom (shfmt-arguments "-i 4 -p -ci")
-  :hook (sh-mode . shfmt-enable-on-save))
+  :hook (sh-mode . shfmt-on-save-mode))
 
 (use-package flycheck-shfmt
   :ensure reformatter
@@ -1947,7 +1934,8 @@ Increase line spacing by two line height."
   (shell-command
    (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
-;; Generic keybindings, package-specific are usually in their own modules. Use `M-x describe-personal-keybindings` to see modifications.
+;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
+;; available bindings in a buffer. Use `M-x describe-personal-keybindings` to see modifications.
 
 ;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key
 ;; variants. With bind-key, you do not need an explicit "(kbd ...)". Other variants: (global-set-key
