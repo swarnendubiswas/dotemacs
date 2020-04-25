@@ -1085,6 +1085,10 @@ whitespaces."
 (use-package counsel-projectile
   :ensure t
   :hook (counsel-mode . counsel-projectile-mode)
+  ;; :config
+  ;; ;; Sort projects from newest to oldest
+  ;; (add-to-list 'ivy-sort-functions-alist
+  ;;              '(counsel-projectile-switch-project . file-newer-than-file-p))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
          ("<f7>" . counsel-projectile-rg)))
