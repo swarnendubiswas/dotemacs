@@ -1,5 +1,3 @@
-;; -*- enable-local-variables: all; enable-local-eval: t -*-
-
 ;;; Directory Local Variables
 ;;; For more information see (info "(emacs) Directory Variables")
 

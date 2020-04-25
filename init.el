@@ -23,6 +23,9 @@
 ;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
 ;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
 
+;; A local variable specification takes the following form:
+;; -*- mode: MODENAME; VAR: VALUE; ... -*-
+
 ;;; Code:
 
 (setq debug-on-error t
@@ -195,11 +198,12 @@ whitespaces."
       gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       history-delete-duplicates t
       ;; Disable loading of "default.el" at startup, inhibits site default settings
+      inhibit-compacting-font-caches t
       inhibit-default-init t
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead
-      initial-major-mode 'text-mode
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
+      initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
@@ -1090,7 +1094,7 @@ whitespaces."
   :hook (after-init . global-flycheck-mode)
   :custom (flycheck-emacs-lisp-load-path 'inherit)
   :config
-  (when (eq dotemacs-modeline-theme 'spaceline)
+  (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'python-mode-hook
@@ -1100,8 +1104,10 @@ whitespaces."
                           flycheck-pylintrc (concat dotemacs-user-home "/.config/pylintrc"))))
   (add-hook 'markdown-mode-hook
             (lambda ()
-              (setq-local flycheck-checker 'markdown-markdownlint-cli
-                          flycheck-markdown-markdownlint-cli-config (concat dotemacs-user-home  "/.markdownlint.json"))))
+              (setq-local flycheck-checker
+                          'markdown-markdownlint-cli
+                          flycheck-markdown-markdownlint-cli-config (concat dotemacs-user-home
+                                                                            "/.markdownlint.json"))))
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck))))
@@ -1115,10 +1121,6 @@ whitespaces."
   :ensure t
   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
-;; This is different from whitespace-cleanup since this is unconditional
-(when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
-  (add-hook 'before-save-hook #'delete-trailing-whitespace))
-
 (use-package whitespace
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :custom
@@ -1126,6 +1128,10 @@ whitespaces."
   (whitespace-auto-cleanup t)
   (whitespace-style '(face tabs trailing))
   (whitespace-line-column dotemacs-fill-column))
+
+;; This is different from whitespace-cleanup since this is unconditional
+(when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
@@ -1152,11 +1158,10 @@ whitespaces."
                            ("FIXME" . hl-todo)))
   :hook (after-init . global-hl-todo-mode))
 
-;; https://www.gnu.org/software/emacs/manual/html_node/tramp/Frequently-Asked-Questions.html
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
 ;; Edit local file with sudo: C-x C-f /sudo::/etc/hosts
-;; Open a file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
+;; Open a remote file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
   :custom
   (tramp-default-method "ssh") ; ssh is faster than the default scp
@@ -1519,9 +1524,9 @@ whitespaces."
   :mode (("\\Makefile\\'" . makefile-mode)
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-(use-package electric
-  :disabled t
-  :hook (prog-mode . electric-layout-mode))
+;; (use-package electric
+;;   :disabled t
+;;   :hook (prog-mode . electric-layout-mode))
 
 ;; https://emacs.stackexchange.com/questions/31414/how-to-globally-disable-eldoc
 (use-package eldoc
@@ -1644,6 +1649,7 @@ whitespaces."
   :ensure reformatter
   :load-path "extras/shfmt"
   :ensure-system-package shfmt
+  :diminish shfmt-on-save-mode
   :custom (shfmt-arguments "-i 4 -p -ci")
   :hook (sh-mode . shfmt-on-save-mode))
 
@@ -1688,7 +1694,7 @@ whitespaces."
 
 (use-package lsp-mode
   :ensure t
-  :hook (((c-mode c++-mode cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode plain-tex-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
+  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode less-mode less-css-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-clients-clangd-args '("-j=2" "-background-index" "--clang-tidy" "-log=error"))
@@ -1696,6 +1702,7 @@ whitespaces."
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
+  (lsp-enable-snippet nil)
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
