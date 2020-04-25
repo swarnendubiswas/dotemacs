@@ -182,61 +182,66 @@ whitespaces."
   :custom (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
-(setq inhibit-startup-screen t ; inhibit-splash-screen is an alias
+(setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
+      auto-save-list-file-prefix (expand-file-name (concat dotemacs-temp-directory "auto-save"))
+      backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
+      case-fold-search t
+      completion-ignore-case t ; Ignore case when completing
+      confirm-kill-emacs nil
+      confirm-nonexistent-file-or-buffer t
+      create-lockfiles nil
+      delete-by-moving-to-trash t
+      enable-recursive-minibuffers t
+      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
+      history-delete-duplicates t
       ;; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-default-init t
-      inhibit-startup-echo-area-message t
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead
       initial-major-mode 'text-mode
+      inhibit-startup-echo-area-message t
+      inhibit-startup-screen t ; inhibit-splash-screen is an alias
       initial-scratch-message nil
-      create-lockfiles nil
+      kill-do-not-save-duplicates t
+      kill-whole-line t
+      major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
+      make-backup-files nil ; Stop making backup ~ files
+      read-buffer-completion-ignore-case t
+      read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
+      read-process-output-max (* 1024 1024) ; 1 MB
+      require-final-newline t ; Always end a file with a newline.
       ;; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
       ;; ring-bell-function 'ignore
-      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
-      read-process-output-max (* 1024 1024) ; 1 MB
-      use-dialog-box nil
-      use-file-dialog nil
-      delete-by-moving-to-trash t
-      completion-ignore-case t ; Ignore case when completing
-      read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
-      read-buffer-completion-ignore-case t
-      switch-to-buffer-preserve-window-point t
-      x-stretch-cursor t ; Make cursor the width of the character it is under
-      auto-save-list-file-prefix (expand-file-name (concat dotemacs-temp-directory "auto-save"))
-      select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
-      require-final-newline t ; Always end a file with a newline.
-      make-backup-files nil ; Stop making backup ~ files
-      backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
-      confirm-kill-emacs nil
       save-interprogram-paste-before-kill t
-      kill-whole-line t
-      suggest-key-bindings t
-      shift-select-mode t ; Use shift-select for marking
-      kill-do-not-save-duplicates t
-      set-mark-command-repeat-pop t
-      confirm-nonexistent-file-or-buffer t
-      ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
-      vc-handled-backends nil
-      major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
+      select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       sentence-end-double-space nil
+      set-mark-command-repeat-pop t
+      shift-select-mode t ; Use shift-select for marking
+      suggest-key-bindings t
+      switch-to-buffer-preserve-window-point t
       truncate-lines nil
       truncate-partial-width-windows nil
-      history-delete-duplicates t)
+      use-dialog-box nil
+      use-file-dialog nil
+      vc-handled-backends nil
+      ;; Make cursor the width of the character it is under
+      x-stretch-cursor t)
+
 
 ;; Activate utf8 mode
 (setq locale-coding-system 'utf-8)
-(set-language-environment 'utf-8)
 (prefer-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
+(set-language-environment 'utf-8)
 (set-selection-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
 
-(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 (fset 'display-startup-echo-area-message #'ignore)
+(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
-(transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
 (column-number-mode 1)
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
+(minibuffer-depth-indicate-mode 1)
+(transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish auto-revert-mode
@@ -269,9 +274,6 @@ whitespaces."
   (savehist-file (expand-file-name (concat dotemacs-temp-directory "savehist")))
   (savehist-save-minibuffer-history t))
 
-(setq enable-recursive-minibuffers t)
-(minibuffer-depth-indicate-mode 1)
-
 (use-package uniquify
   :custom
   (uniquify-after-kill-buffer-p t)
@@ -299,7 +301,6 @@ whitespaces."
   :diminish
   :hook (after-init . global-subword-mode))
 
-;; https://www.emacswiki.org/emacs/HorizontalSplitting
 ;; vertical - Split the selected window into two windows, one above the other (split-window-below)
 ;; horizontal - Split the selected window into two side-by-side windows (split-window-right)
 (cond ((eq dotemacs-window-split 'vertical) (setq split-width-threshold nil
@@ -322,7 +323,6 @@ whitespaces."
   ;;   (add-hook hook #'abbrev-mode ))
   :custom
   (abbrev-file-name (expand-file-name (concat dotemacs-extras-directory "abbrev_defs")))
-  ;; Do not ask to save new abbrevs when quitting
   (save-abbrevs 'silently))
 
 (setq custom-safe-themes t
@@ -337,6 +337,9 @@ whitespaces."
 (tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
 (toggle-frame-maximized) ; Maximize Emacs on startup
+(global-visual-line-mode 1)
+(diminish 'visual-line-mode)
+(size-indication-mode -1)
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -392,13 +395,6 @@ whitespaces."
                                       (set-face-attribute 'region nil
                                                           :background "light sky blue"
                                                           :foreground "white"))))
-
-(global-visual-line-mode 1)
-(diminish 'visual-line-mode)
-(size-indication-mode -1)
-
-(use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
-  :ensure t)
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
@@ -564,12 +560,17 @@ whitespaces."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
+(use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
+  :ensure t)
+
+(use-package all-the-icons-ibuffer
+  :ensure t
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+
 (use-package all-the-icons-dired
   :ensure t
   :diminish
   :hook (dired-mode . all-the-icons-dired-mode))
-
-(setq case-fold-search t) ; Make search ignore case
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
 ;; candidates.
@@ -615,26 +616,20 @@ whitespaces."
   (recentf-auto-cleanup 'never) ; Do not stat remote files
   (recentf-menu-filter 'recentf-sort-descending)
   ;; Check regex with re-builder
-  (recentf-exclude '(
-                     "[/\\]\\.elpa/"
-                     "[/\\]elpa/"
-                     "[/\\]\\.ido\\.last\\'"
+  (recentf-exclude '("[/\\]elpa/"
                      "[/\\]\\.git/"
                      ".*\\.gz\\'"
                      ".*-autoloads.el\\'"
                      "[/\\]archive-contents\\'"
                      "[/\\]\\.loaddefs\\.el\\'"
-                     "url/cookies"
                      "[/\\]tmp/.*"
                      ".*/recentf\\'"
                      "~$"
                      "/.autosaves/"
                      ".*-loaddefs.el"
                      "/TAGS$"
-                     "/sudo:"
-                     "/company-statistics-cache.el$"
-                     ))
-  :config (run-at-time nil (* 10 60) 'recentf-save-list)
+                     "/sudo:"))
+  :config (run-at-time nil 300 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
 ;; Hide the "wrote to recentf" message which is irritating
@@ -677,22 +672,6 @@ whitespaces."
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
 
-(use-package company-shell
-  :ensure t
-  :custom (company-shell-delete-duplicates t))
-
-(use-package company-math
-  :ensure t
-  :ensure math-symbol-lists)
-
-(use-package company-bibtex
-  :ensure t
-  :demand t)
-
-(use-package company-reftex
-  :ensure t
-  :demand t)
-
 (use-package company-c-headers
   :ensure t
   :demand t 
@@ -714,25 +693,35 @@ whitespaces."
                                        company-dabbrev
                                        company-abbrev
                                        company-ispell)))))
+
 (dolist (tex-hooks '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
   (add-hook 'tex-hooks
             (lambda ()
-              (set (make-local-variable 'company-backends) '(
-                                                             company-capf
-                                                             (company-dabbrev
-                                                              company-ispell)
-                                                             ;; (company-bibtex
-                                                             ;;  company-reftex-labels
-                                                             ;;  company-reftex-citations
-                                                             ;;  company-math-symbols-latex
-                                                             ;;  company-latex-commands
-                                                             ;;  company-math-symbols-Unicode)
-                                                             ;; (company-dabbrev
-                                                             ;;  company-capf
-                                                             ;;  company-abbrev
-                                                             ;;  company-ispell)
+              (progn
+                (use-package company-bibtex
+                  :ensure t
+                  :demand t)
 
-                                                             )))))
+                (use-package company-math
+                  :ensure t
+                  :ensure math-symbol-lists)
+
+                (use-package company-reftex
+                  :ensure t
+                  :demand t)
+
+                (set (make-local-variable 'company-backends) '((company-capf
+                                                                company-bibtex
+                                                                company-reftex-labels
+                                                                company-reftex-citations
+                                                                company-math-symbols-latex
+                                                                company-latex-commands
+                                                                company-math-symbols-Unicode
+                                                                company-dabbrev
+                                                                company-capf
+                                                                company-abbrev
+                                                                company-ispell)))))))
+
 (add-hook 'prog-mode-hook
           (lambda ()
             (make-local-variable 'company-backends)
@@ -743,17 +732,23 @@ whitespaces."
                                      company-yasnippet
                                      company-files
                                      company-keywords))))
+
 (add-hook 'sh-mode-hook
           (lambda ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-capf
-                                     company-dabbrev
-                                     company-dabbrev-code
-                                     company-shell
-                                     company-shell-env
-                                     company-fish-shell
-                                     company-ctags
-                                     company-keywords))))
+            (progn
+              (use-package company-shell
+                :ensure t
+                :custom (company-shell-delete-duplicates t))
+
+              (make-local-variable 'company-backends)
+              (setq company-backends '(company-capf
+                                       company-dabbrev
+                                       company-dabbrev-code
+                                       company-shell
+                                       company-shell-env
+                                       company-fish-shell
+                                       company-ctags
+                                       company-keywords)))))
 
 (use-package yasnippet
   :ensure t
@@ -893,6 +888,18 @@ whitespaces."
   :hook (ivy-mode . counsel-mode)
   :diminish)
 
+(use-package prescient
+  :ensure t
+  :hook (counsel-mode . prescient-persist-mode))
+
+(use-package ivy-prescient
+  :ensure t
+  :init (ivy-prescient-mode 1))
+
+(use-package company-prescient
+  :ensure t
+  :init (company-prescient-mode 1))
+
 (use-package all-the-icons-ivy-rich
   :ensure t
   :init (all-the-icons-ivy-rich-mode 1)
@@ -999,6 +1006,9 @@ whitespaces."
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
+;; (use-package elec-pair
+;;   :hook (after-init . electric-pair-mode))
+
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
@@ -1021,9 +1031,6 @@ whitespaces."
          ;; (foo bar) -> foo bar
          ("C-M-k" . sp-splice-sexp))
   :diminish)
-
-;; (use-package elec-pair
-;;   :hook (after-init . electric-pair-mode))
 
 (use-package projectile
   :ensure t
@@ -1049,16 +1056,16 @@ whitespaces."
 	            (or project-name "-"))))
   (projectile-mode 1)
   ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
-  ;; (setq projectile-project-search-path (list
-  ;;                                       (concat `,(getenv "HOME") "/bitbucket")
-  ;;                                       (concat `,(getenv "HOME") "/github")
-  ;;                                       (concat `,(getenv "HOME") "/iitk-workspace")
-  ;;                                       (concat `,(getenv "HOME") "/iitkgp-workspace")
-  ;;                                       (concat `,(getenv "HOME") "/iss-workspace")
-  ;;                                       (concat `,(getenv "HOME") "/plass-workspace")
-  ;;                                       (concat `,(getenv "HOME") "/prospar-workspace")
-  ;;                                       (concat `,(getenv "HOME") "/research")
-  ;;                                       ))
+  (setq projectile-project-search-path (list
+                                        (concat `,(getenv "HOME") "/bitbucket")
+                                        (concat `,(getenv "HOME") "/github")
+                                        (concat `,(getenv "HOME") "/iitk-workspace")
+                                        (concat `,(getenv "HOME") "/iitkgp-workspace")
+                                        (concat `,(getenv "HOME") "/iss-workspace")
+                                        (concat `,(getenv "HOME") "/plass-workspace")
+                                        (concat `,(getenv "HOME") "/prospar-workspace")
+                                        (concat `,(getenv "HOME") "/research")
+                                        ))
   (add-to-list 'projectile-ignored-projects (concat dotemacs-user-home "/")) ; Do not consider the HOME as a project
   (dolist (dirs '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
                   ".vscode" "__pycache__" "auto" "elpa"))
@@ -1534,31 +1541,15 @@ whitespaces."
 ;;             (when (or (string-equal major-mode "lisp-mode") (string-equal major-mode "emacs-lisp-mode"))
 ;;               (check-parens))))
 
-(add-hook 'lisp-mode-hook
-          (lambda ()
-            (when buffer-file-name
-              (add-hook 'after-save-hook 'check-parens nil t))))
-
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (when buffer-file-name
-              (add-hook 'after-save-hook 'check-parens nil t))))
+(dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
+  (add-hook hooks
+            (lambda ()
+              (when buffer-file-name
+                (add-hook 'after-save-hook #'check-parens nil t)))))
 
 ;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
-;; gnu: The default style for GNU projects
-;; k&r: What Kernighan and Ritchie, the authors of C used in their book
-;; bsd: What BSD developers use, aka "Allman style" after Eric Allman.
-;; whitesmith: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
-;; stroustrup: What Stroustrup, the author of C++ used in his book
-;; ellemtel: Popular C++ coding standards as defined by "Programming in C++, Rules and
-;; Recommendations," Erik Nyquist and Mats Henricson, Ellemtel
-;; linux: What the Linux developers use for kernel development
-;; python: What Python developers use for extension modules
-;; java: The default style for java-mode (see below)
-;; user: When you want to define your own style
-
 (setq-default c-default-style '((java-mode . "java")
-                                (c-mode . "k&r")
+                                (c-mode . "stroustrup")
                                 (c++-mode . "stroustrup")
                                 (other . "gnu/linux")
                                 (awk-mode . "awk")))
@@ -1607,7 +1598,7 @@ whitespaces."
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
 
-(setq python-shell-interpreter "python3")
+;; (setq python-shell-interpreter "python3")
 
 (use-package pyvenv
   :ensure t
@@ -1667,21 +1658,6 @@ whitespaces."
   :if (when (executable-find "fish"))
   :config (global-fish-completion-mode))
 
-;; (defun sb/company-sh-backends ()
-;;   "Add backends for C/C++ completion in company mode."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((;; Generic backends
-;;            company-files
-;;            company-keywords
-;;            company-capf
-;;            company-dabbrev
-;;            company-dabbrev-code
-;;            ;; Mode-specific
-;;            company-shell
-;;            company-fish-shell))))
-;; (add-hook 'sh-mode-hook 'sb/company-sh-backends)
-
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status)
@@ -1692,10 +1668,6 @@ whitespaces."
   (magit-save-repository-buffers t)
   (magit-completing-read-function 'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
-
-;; (use-package magit-popup)
-
-;; (use-package git-modes)
 
 (use-package gitignore-mode
   :ensure t)
@@ -1753,7 +1725,6 @@ whitespaces."
                     :major-modes '(python-mode)
                     :remote? t
                     :server-id 'pyls-remote))
-
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
                     :major-modes '(c++-mode)
@@ -1764,32 +1735,21 @@ whitespaces."
                     :major-modes '(sh-mode)
                     :remote? t
                     :server-id 'bash-lsp-remote))
-
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "intelephense")
                     :major-modes '(php-mode)
                     :remote? t
                     :server-id 'intelephense-remote))
-
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
                     :major-modes '(plain-tex-mode latex-mode)
                     :remote? t
                     :server-id 'texlab-remote))
-
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "cmake-language-server")
                     :major-modes '(cmake-mode)
                     :remote? t
                     :server-id 'cmakels-remote))
-
-  ;; FIXME: Does the bash server not support formatting?
-  ;; (add-hook 'sh-mode-hook
-  ;;           (lambda ()
-  ;;             (add-hook 'before-save-hook
-  ;;                       (lambda () (lsp-format-buffer))
-  ;;                       nil t)))
-
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -1810,6 +1770,13 @@ whitespaces."
             (add-hook 'before-save-hook
                       (lambda ()
                         (lsp-format-buffer)) nil t)))
+;; FIXME: Does the bash server not support formatting?
+;; (add-hook 'sh-mode-hook
+;;           (lambda ()
+;;             (add-hook 'before-save-hook
+;;                       (lambda () (lsp-format-buffer))
+;;                       nil t)))
+
 
 (use-package lsp-ui
   :ensure t
