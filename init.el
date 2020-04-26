@@ -60,7 +60,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'leuven
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -76,7 +76,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'sml
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -196,6 +196,7 @@ whitespaces."
       delete-by-moving-to-trash t
       enable-recursive-minibuffers t
       gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
+      gc-cons-percentage 0.5
       history-delete-duplicates t
       ;; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-compacting-font-caches t
@@ -689,53 +690,32 @@ whitespaces."
                    ))
     (add-to-list 'company-c-headers-path-system paths)))
 
-;; (dolist (hook '(text-mode-hook markdown-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (make-local-variable 'company-backends)
-;;               (setq company-backends '(company-capf
-;;                                        company-dabbrev
-;;                                        company-abbrev
-;;                                        company-ispell)))))
+(dolist (hook '(text-mode-hook markdown-mode-hook))
+  (add-hook hook
+            (lambda ()
+              (make-local-variable 'company-backends)
+              (setq company-backends '(company-dabbrev
+                                       company-ispell)))))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
   (add-hook hook
             (lambda ()
-              (progn
-                ;; (use-package company-bibtex
-                ;;   :ensure t
-                ;;   :demand t)
+              (use-package company-bibtex
+                :ensure t
+                :demand t)
 
-                ;; (use-package company-math
-                ;;   :ensure t
-                ;;   :ensure math-symbol-lists)
-
-                ;; (use-package company-reftex
-                ;;   :ensure t
-                ;;   :demand t)
-
-                (set (make-local-variable 'company-backends) '((company-capf
-                                                                :with company-ispell
-                                                                ;; company-bibtex
-                                                                ;; company-reftex-labels
-                                                                ;; company-reftex-citations
-                                                                ;; company-math-symbols-latex
-                                                                ;; company-latex-commands
-                                                                ;; company-math-symbols-Unicode
-                                                                company-dabbrev :separate
-                                                                )))))))
-
+              (set (make-local-variable 'company-backends) '((company-capf
+                                                              :with company-bibtex
+                                                              company-dabbrev :separate
+                                                              ))))))
 (add-hook 'prog-mode-hook
           (lambda ()
             (make-local-variable 'company-backends)
             (setq company-backends '(company-capf
-                                     company-dabbrev
                                      company-dabbrev-code
                                      company-ctags
-                                     company-yasnippet
-                                     company-files
-                                     company-keywords))))
-
+                                     company-keywords
+                                     company-dabbrev))))
 (add-hook 'sh-mode-hook
           (lambda ()
             (progn
@@ -1096,7 +1076,10 @@ whitespaces."
 (use-package flycheck
   :ensure t
   :hook (after-init . global-flycheck-mode)
-  :custom (flycheck-emacs-lisp-load-path 'inherit)
+  :custom
+  (flycheck-emacs-lisp-load-path 'inherit)
+  (flycheck-highlighting-mode 'lines)
+  (flycheck-check-syntax-automatically '((save new-line mode-enabled)))
   :config
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
@@ -1698,11 +1681,16 @@ whitespaces."
 
 (use-package lsp-mode
   :ensure t
-  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode less-mode less-css-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode yaml-mode) . lsp-deferred)
-         (lsp-mode . lsp-enable-which-key-integration))
+  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode yaml-mode) . lsp-deferred)
+         (lsp-mode . lsp-enable-which-key-integration)
+         (lsp-mode . lsp-diagnostics-modeline-mode))
+  ;; :hook (prog-mode . (lambda ()
+  ;;                      (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
+  ;;                        (lsp-deferred))))
   :custom
   (lsp-clients-clangd-args '("-j=2" "-background-index" "--clang-tidy" "-log=error"))
   (lsp-eldoc-enable-hover nil)
+  (lsp-eldoc-hook nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
@@ -1725,12 +1713,14 @@ whitespaces."
   (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (expand-file-name (concat dotemacs-temp-directory ".lsp-session-v1")))
+  (lsp-signature-render-document nil)
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
                       "org.eclipse.lemminx-0.11.1-uber.jar")))
   (lsp-yaml-print-width 100)
   :config
+  (advice-add #'lsp--auto-configure :override #'ignore)
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
                     :major-modes '(python-mode)
@@ -1815,7 +1805,9 @@ whitespaces."
 (use-package lsp-java
   :ensure t
   :hook (java-mode . lsp)
-  :custom (lsp-java-inhibit-message t)
+  :custom
+  (lsp-java-inhibit-message t)
+  (lsp-java-save-actions-organize-imports t)
   :config (add-hook 'java-mode-hook
                     (lambda ()
                       (add-hook 'before-save-hook

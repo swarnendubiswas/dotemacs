@@ -474,6 +474,7 @@
     ("exchagnes" "exchanges" nil :count 0)
     ("excitment" "excitement" nil :count 0)
     ("execption" "exception" nil :count 1)
+    ("executiosn" "executions" nil :count 0)
     ("executoins" "executions" nil :count 1)
     ("exhcange" "exchange" nil :count 0)
     ("exhcanges" "exchanges" nil :count 0)
