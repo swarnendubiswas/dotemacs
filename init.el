@@ -893,7 +893,8 @@ whitespaces."
 
 (use-package prescient
   :ensure t
-  :hook (counsel-mode . prescient-persist-mode))
+  :hook (counsel-mode . prescient-persist-mode)
+  :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
 
 (use-package ivy-prescient
   :ensure t
