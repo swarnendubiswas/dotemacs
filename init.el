@@ -60,7 +60,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'doom-themes
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -482,7 +482,7 @@ whitespaces."
 
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (set-frame-font "DejaVu Sans Mono" nil t)
-(set-face-attribute 'default nil :height 120)
+(set-face-attribute 'default nil :height 130)
 (set-face-attribute 'mode-line nil :height 100)
 
 (use-package ibuffer
@@ -689,42 +689,41 @@ whitespaces."
                    ))
     (add-to-list 'company-c-headers-path-system paths)))
 
-(dolist (hook '(text-mode-hook markdown-mode-hook))
+;; (dolist (hook '(text-mode-hook markdown-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (make-local-variable 'company-backends)
+;;               (setq company-backends '(company-capf
+;;                                        company-dabbrev
+;;                                        company-abbrev
+;;                                        company-ispell)))))
+
+(dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
   (add-hook hook
             (lambda ()
-              (make-local-variable 'company-backends)
-              (setq company-backends '(company-capf
-                                       company-dabbrev
-                                       company-abbrev
-                                       company-ispell)))))
-
-(dolist (tex-hooks '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-  (add-hook 'tex-hooks
-            (lambda ()
               (progn
-                (use-package company-bibtex
-                  :ensure t
-                  :demand t)
+                ;; (use-package company-bibtex
+                ;;   :ensure t
+                ;;   :demand t)
 
-                (use-package company-math
-                  :ensure t
-                  :ensure math-symbol-lists)
+                ;; (use-package company-math
+                ;;   :ensure t
+                ;;   :ensure math-symbol-lists)
 
-                (use-package company-reftex
-                  :ensure t
-                  :demand t)
+                ;; (use-package company-reftex
+                ;;   :ensure t
+                ;;   :demand t)
 
                 (set (make-local-variable 'company-backends) '((company-capf
-                                                                company-bibtex
-                                                                company-reftex-labels
-                                                                company-reftex-citations
-                                                                company-math-symbols-latex
-                                                                company-latex-commands
-                                                                company-math-symbols-Unicode
-                                                                company-dabbrev
-                                                                company-capf
-                                                                company-abbrev
-                                                                company-ispell)))))))
+                                                                :with company-ispell
+                                                                ;; company-bibtex
+                                                                ;; company-reftex-labels
+                                                                ;; company-reftex-citations
+                                                                ;; company-math-symbols-latex
+                                                                ;; company-latex-commands
+                                                                ;; company-math-symbols-Unicode
+                                                                company-dabbrev :separate
+                                                                )))))))
 
 (add-hook 'prog-mode-hook
           (lambda ()

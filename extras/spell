@@ -1,4 +1,4 @@
-personal_ws-1.1 en 87 
+personal_ws-1.1 en 88 
 atomicity
 activations
 indices
@@ -28,8 +28,8 @@ pseudocode
 whitespaces
 perceptron
 Parallelization
-blackbox
 vertices
+blackbox
 unscalable
 scalable
 programmability
@@ -62,6 +62,7 @@ misclassify
 tradeoff
 multicore
 resubmission
+recomputation
 parallelizing
 runtimes
 invalidations
