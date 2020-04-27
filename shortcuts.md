@@ -210,6 +210,11 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 * `M-.` - Jump to tag underneath cursor (`xref-find-definitions`).
 * `M-*` - Pop back to where you previously invoked `M-.` (`xref-pop-marker-stacker`).
+* `M-?` - Find references to the identifier at point (`xref-find-references`).
+* `C-M-.` - Find all meaningful symbols that match PATTERN (`xref-find-apropos`).
+* `C-o` - Display the source of xref at point in the appropriate window (`xref-show-location-at-point`).
+* `<tab>` - Quit *xref* buffer, then jump to xref on current line (`xref-quit-and-goto-xref`).
+* `r` - Perform interactive replacement of FROM with TO in all displayed xrefs (`xref-query-replace-in-results`).
 
 ### Counsel Gtags
 

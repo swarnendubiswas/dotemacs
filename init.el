@@ -137,7 +137,7 @@ whitespaces."
 
 (eval-when-compile
   (require 'package)
-  (setq package-user-dir (expand-file-name (concat user-emacs-directory "elpa"))
+  (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
         ;; Avoid loading packages twice
         package-enable-at-startup nil)
   (package-initialize)
@@ -186,7 +186,7 @@ whitespaces."
   :init (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
-      auto-save-list-file-prefix (expand-file-name (concat dotemacs-temp-directory "auto-save"))
+      auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
       case-fold-search t
       completion-ignore-case t ; Ignore case when completing
@@ -263,7 +263,7 @@ whitespaces."
 (use-package saveplace ; Remember cursor position in files
   :unless noninteractive
   :hook (after-init . save-place-mode)
-  :custom (save-place-file (expand-file-name (concat dotemacs-temp-directory "places"))))
+  :custom (save-place-file (expand-file-name "places" dotemacs-temp-directory)))
 
 (use-package savehist ; Save minibuffer histories across sessions
   :unless noninteractive
@@ -276,7 +276,7 @@ whitespaces."
                                    file-name-history
                                    command-history))
   (savehist-autosave-interval 300)
-  (savehist-file (expand-file-name (concat dotemacs-temp-directory "savehist")))
+  (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
 
 (use-package uniquify
@@ -327,7 +327,7 @@ whitespaces."
   ;; (dolist (hook '(text-mode-hook prog-mode-hook))
   ;;   (add-hook hook #'abbrev-mode ))
   :custom
-  (abbrev-file-name (expand-file-name (concat dotemacs-extras-directory "abbrev_defs")))
+  (abbrev-file-name (expand-file-name "abbrev_defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
 
 (setq custom-safe-themes t
@@ -616,7 +616,7 @@ whitespaces."
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
 (use-package recentf
   :custom
-  (recentf-save-file (expand-file-name (concat dotemacs-temp-directory "recentf")))
+  (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
   (recentf-max-saved-items 50)
   (recentf-auto-cleanup 'never) ; Do not stat remote files
   (recentf-menu-filter 'recentf-sort-descending)
@@ -652,7 +652,7 @@ whitespaces."
   (company-dabbrev-downcase nil) ; Do not downcase returned candidates
   (company-idle-delay 0.0)
   (company-ispell-available t)
-  (company-ispell-dictionary (expand-file-name (concat dotemacs-extras-directory "wordlist")))
+  (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 2)
   (company-selection-wrap-around t)
   (company-show-numbers t)
@@ -667,7 +667,7 @@ whitespaces."
 (use-package company-dict
   :ensure t
   :custom
-  (company-dict-dir (expand-file-name (concat user-emacs-directory "dict/")))
+  (company-dict-dir (expand-file-name "dict" user-emacs-directory))
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil))
 
@@ -713,7 +713,7 @@ whitespaces."
             (make-local-variable 'company-backends)
             (setq company-backends '(company-capf
                                      company-dabbrev-code
-                                     company-ctags
+                                     ;; company-ctags
                                      company-keywords
                                      company-dabbrev))))
 (add-hook 'sh-mode-hook
@@ -725,12 +725,11 @@ whitespaces."
 
               (make-local-variable 'company-backends)
               (setq company-backends '(company-capf
-                                       company-dabbrev
+                                       (company-shell
+                                        company-shell-env
+                                        company-fish-shell)
                                        company-dabbrev-code
-                                       company-shell
-                                       company-shell-env
-                                       company-fish-shell
-                                       company-ctags
+                                       company-dabbrev
                                        company-keywords)))))
 
 (use-package yasnippet
@@ -739,7 +738,7 @@ whitespaces."
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
   :custom
-  (yas-snippet-dirs (list (expand-file-name (concat user-emacs-directory "snippets"))))
+  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   (yas-triggers-in-field t)
   (yas-wrap-around-region t)
   :config
@@ -749,7 +748,7 @@ whitespaces."
 (use-package amx
   :ensure t
   :hook (after-init . amx-mode)
-  :custom (amx-save-file (expand-file-name (concat dotemacs-temp-directory "amx-items"))))
+  :custom (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory)))
 
 (use-package ivy
   :ensure t
@@ -830,8 +829,6 @@ whitespaces."
    ("C-c C-m" . counsel-mark-ring)
    ("C-c C-j" . counsel-semantic-or-imenu))
   :custom
-  (counsel-mode-override-describe-bindings t)
-  (counsel-yank-pop-separator "\n-------------------------\n")
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                     "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
@@ -854,6 +851,7 @@ whitespaces."
                                     "\\|.pyc$"
                                     "\\|.rel$"
                                     "\\|.rip$"
+                                    "\\|.so$"
                                     "\\|.synctex$"
                                     "\\|.synctex.gz$"
                                     "\\|.tar.gz$"
@@ -868,6 +866,8 @@ whitespaces."
                                     "\\|.metadata"
                                     "\\|.recommenders"
                                     ))
+  (counsel-mode-override-describe-bindings t)
+  (counsel-yank-pop-separator "\n-------------------------\n")
   :hook (ivy-mode . counsel-mode)
   :diminish)
 
@@ -940,7 +940,7 @@ whitespaces."
   :custom
   (ispell-local-dictionary "en_US")
   (ispell-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name (concat dotemacs-extras-directory "spell")))
+  (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
   ;; Aspell speed: ultra | fast | normal | bad-spellers
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-silently-savep t) ; Save a new word to personal dictionary without asking
@@ -959,7 +959,9 @@ whitespaces."
 
 (use-package flyspell-popup
   :ensure t
-  :bind ("C-;" . flyspell-popup-correct))
+  :hook (text-mode . flyspell-popup-auto-correct-mode)
+  :bind ("C-;" . flyspell-popup-correct)
+  :custom (flyspell-popup-correct-delay 0.2))
 
 (setq-default fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs by default
@@ -971,6 +973,7 @@ whitespaces."
 (use-package aggressive-indent
   :ensure t
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
+  :custom (aggressive-indent-dont-electric-modes t)
   :diminish)
 
 ;; ;; This apparently interferes with lsp formatting where lsp is enabled.
@@ -1000,18 +1003,17 @@ whitespaces."
   :hook (after-init . smartparens-global-mode)
   :config
   (require 'smartparens-config)
-  (setq sp-show-pair-from-inside t
-        sp-autoskip-closing-pair 'always)
+  (setq sp-show-pair-from-inside t)
   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
          ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
          ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-n" . sp-next-sexp)
-         ("C-M-p" . sp-previous-sexp)
-         ("C-S-b" . sp-backward-symbol)
-         ("C-S-f" . sp-forward-symbol)
+         ("C-M-n" . sp-next-sexp) ; ((fo|o) (bar)) -> ((foo) |(bar))"
+         ("C-M-p" . sp-previous-sexp) ; (foo (b|ar baz)) -> (foo| (bar baz))"
+         ("C-S-b" . sp-backward-symbol) ; foo bar| baz -> foo |bar baz
+         ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
          ;; (foo bar) -> foo bar
          ("C-M-k" . sp-splice-sexp))
   :diminish)
@@ -1019,17 +1021,17 @@ whitespaces."
 (use-package projectile
   :ensure t
   :custom
-  (projectile-cache-file (expand-file-name (concat dotemacs-temp-directory "projectile.cache")))
+  (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
   (projectile-enable-caching t)
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
-  (projectile-indexing-method 'alien)
-  (projectile-known-projects-file (expand-file-name (concat dotemacs-temp-directory "projectile-known-projects.eld")))
+  (projectile-indexing-method 'hybrid)
+  (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld" dotemacs-temp-directory))
   (projectile-mode-line-prefix "")
   ;; Use projectile only in desired directories, too much noise otherwise
   (projectile-require-project-root t)
-  (projectile-switch-project-action 'projectile-find-file) ; Use projectile-dired to view in dired
+  (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
   :config
   (defun projectile-default-mode-line ()
@@ -1042,15 +1044,22 @@ whitespaces."
   ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
   (setq projectile-project-search-path (list
                                         (concat `,(getenv "HOME") "/bitbucket")
-                                        (concat `,(getenv "HOME") "/github")
-                                        (concat `,(getenv "HOME") "/iitk-workspace")
-                                        (concat `,(getenv "HOME") "/iitkgp-workspace")
-                                        (concat `,(getenv "HOME") "/iss-workspace")
-                                        (concat `,(getenv "HOME") "/plass-workspace")
-                                        (concat `,(getenv "HOME") "/prospar-workspace")
-                                        (concat `,(getenv "HOME") "/research")
+                                        (expand-file-name "github" dotemacs-user-home)
+                                        (expand-file-name "iitk-workspace" dotemacs-user-home)
+                                        (expand-file-name "iitkgp-workspace" dotemacs-user-home)
+                                        (expand-file-name "iss-workspace" dotemacs-user-home)
+                                        (expand-file-name "plass-workspace" dotemacs-user-home)
+                                        (expand-file-name "prospar-workspace" dotemacs-user-home)
+                                        (expand-file-name "research" dotemacs-user-home)
                                         ))
-  (add-to-list 'projectile-ignored-projects (concat dotemacs-user-home "/")) ; Do not consider the HOME as a project
+  (dolist (prjs (list
+                 (expand-file-name dotemacs-user-home) ; Do not consider the HOME as a project
+                 (expand-file-name "bitbucket/.metadata" dotemacs-user-home)
+                 (expand-file-name "github/.metadata" dotemacs-user-home)
+                 (expand-file-name "iitk-workspace/.metadata" dotemacs-user-home)
+                 (expand-file-name "plass-workspace/.metadata" dotemacs-user-home)
+                 ))
+    (add-to-list 'projectile-ignored-projects prjs))
   (dolist (dirs '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
                   ".vscode" "__pycache__" "auto" "elpa"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
@@ -1079,7 +1088,6 @@ whitespaces."
   :custom
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-highlighting-mode 'lines)
-  (flycheck-check-syntax-automatically '((save new-line mode-enabled)))
   :config
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
@@ -1102,6 +1110,7 @@ whitespaces."
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
   :ensure t
+  :after flycheck
   :config (avy-flycheck-setup))
 
 (use-package flycheck-popup-tip ; Show error messages in popups
@@ -1155,8 +1164,8 @@ whitespaces."
   (tramp-default-user user-login-name)
   (tramp-default-host "172.27.15.105")
   ;; Auto-save to a local directory for better performance
-  (tramp-auto-save-directory (expand-file-name (concat dotemacs-temp-directory "tramp-auto-save")))
-  (tramp-persistency-file-name (expand-file-name (concat dotemacs-temp-directory "tramp")))
+  (tramp-auto-save-directory (expand-file-name "tramp-auto-save" dotemacs-temp-directory))
+  (tramp-persistency-file-name (expand-file-name "tramp" dotemacs-temp-directory))
   (tramp-verbose 1) ; Default is 3
   (remote-file-name-inhibit-cache nil) ; Remote files are not updated outside of Tramp
   (tramp-completion-reread-directory-timeout nil)
@@ -1192,22 +1201,25 @@ whitespaces."
   (imenu-max-item-length 100))
 
 (setq tags-revert-without-query t ; Don't ask before rereading the TAGS files if they have changed
-      ;; ; Warn when opening files bigger than 200MB, the size is chosen because of large TAGS files
+      ;; Warn when opening files bigger than 200MB, the size is chosen because of large TAGS files
       large-file-warning-threshold (* 250 1024 1024)
       tags-add-tables nil)
 
-;; (use-package xref
-;;   :commands xref-etags-mode
-;;   :hook (prog-mode . xref-etags-mode)
-;;   :bind (("M-'" . xref-find-definitions)
-;;          ("C-M-." . xref-find-apropos)
-;;          ("M-," . xref-pop-marker-stack)))
+(use-package xref
+  :bind (("M-'" . xref-find-definitions)
+         ("M-?" . xref-find-references)
+         ("C-M-." . xref-find-apropos)
+         ("M-," . xref-pop-marker-stack)
+         :map xref--xref-buffer-mode-map
+         ("C-o" . xref-show-location-at-point)
+         ("<tab>" . xref-quit-and-goto-xref)
+         ("r" . xref-query-replace-in-results)))
 
-;; (use-package ivy-xref
-;;   :ensure t
-;;   :custom
-;;   (xref-show-xrefs-function       #'ivy-xref-show-xrefs)
-;;   (xref-show-definitions-function #'ivy-xref-show-defs))
+(use-package ivy-xref
+  :ensure t
+  :custom
+  (xref-show-xrefs-function 'ivy-xref-show-xrefs)
+  (xref-show-definitions-function 'ivy-xref-show-defs))
 
 (use-package counsel-gtags
   :ensure t
@@ -1234,15 +1246,16 @@ whitespaces."
 (use-package counsel-etags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
-  :bind (("M-'" . counsel-etags-find-tag-at-point)
-         ("C-c g t" . counsel-etags-find-tag-at-point)
-         ("C-c g s" . counsel-etags-find-symbol-at-point)
-         ("C-c g g" . counsel-etags-grep-symbol-at-point)
+  :bind (
+         ;; ("M-'" . counsel-etags-find-tag-at-point)
+         ;; ("C-c g t" . counsel-etags-find-tag-at-point)
+         ;; ("C-c g s" . counsel-etags-find-symbol-at-point)
+         ;; ("C-c g g" . counsel-etags-grep-symbol-at-point)
          ("C-c g f" . counsel-etags-find-tag)
          ("C-c g l" .  counsel-etags-list-tag)
          ("C-c g c" . counsel-etags-scan-code))
   :config
-  (add-hook 'c++-mode-hook
+  (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'after-save-hook
                         'counsel-etags-virtual-update-tags 'append 'local)))
@@ -1366,10 +1379,9 @@ whitespaces."
 (use-package persistent-scratch
   :ensure t
   :hook (after-init . persistent-scratch-setup-default)
-  :custom (persistent-scratch-save-file (expand-file-name (concat dotemacs-temp-directory "persistent-scratch")))
-  :config
-  ;; Enable both autosave and restore on startup
-  (ignore-errors (persistent-scratch-setup-default)))
+  :custom (persistent-scratch-save-file (expand-file-name
+                                         (concat
+                                          dotemacs-temp-directory "persistent-scratch"))))
 
 (use-package crux
   :ensure t
@@ -1381,7 +1393,7 @@ whitespaces."
 
 (use-package rainbow-delimiters
   :ensure t
-  :hook ((text-mode prog-mode) . rainbow-delimiters-mode))
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package ssh-config-mode
   :ensure t
@@ -1399,9 +1411,7 @@ whitespaces."
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
   :diminish
-  :custom
-  (super-save-auto-save-when-idle t)
-  (super-save-remote-files nil)
+  :custom (super-save-remote-files nil)
   :config
   (add-to-list 'super-save-triggers 'ace-window)
   (super-save-mode 1))
@@ -1414,7 +1424,6 @@ whitespaces."
   :custom
   (avy-background t)
   (avy-highlight-first t)
-  (avy-all-windows nil)
   (avy-style 'at)
   :config
   ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one
@@ -1422,7 +1431,7 @@ whitespaces."
   (avy-setup-default))
 
 (use-package bookmark
-  :custom (bookmark-default-file (expand-file-name (concat dotemacs-temp-directory "bookmarks"))))
+  :custom (bookmark-default-file (expand-file-name "bookmarks" dotemacs-temp-directory)))
 
 (use-package bm
   :ensure t
@@ -1455,7 +1464,8 @@ whitespaces."
          ("\\.md\\'" . markdown-mode))
   ;; :bind ("C-c C-d" . nil)
   :custom
-  (markdown-enable-wiki-links t)
+  ;; (markdown-enable-wiki-links t)
+  (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-italic-underscore t)
   (markdown-enable-math t)
   (markdown-make-gfm-checkboxes-buttons t)
@@ -1633,6 +1643,7 @@ whitespaces."
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
+  :disabled t
   :ensure reformatter
   :load-path "extras/shfmt"
   :ensure-system-package shfmt
@@ -1655,9 +1666,9 @@ whitespaces."
   :ensure t
   :bind ("C-x g" . magit-status)
   :custom
-  (transient-levels-file (expand-file-name (concat dotemacs-temp-directory "transient/levels.el")))
-  (transient-values-file (expand-file-name (concat dotemacs-temp-directory "transient/values.el")))
-  (transient-history-file (expand-file-name (concat dotemacs-temp-directory "transient/history.el")))
+  (transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory))
+  (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory))
+  (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
   (magit-save-repository-buffers t)
   (magit-completing-read-function 'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
@@ -1712,7 +1723,7 @@ whitespaces."
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
   (lsp-pyls-plugins-yapf-enabled t)
-  (lsp-session-file (expand-file-name (concat dotemacs-temp-directory ".lsp-session-v1")))
+  (lsp-session-file (expand-file-name ".lsp-session-v1" dotemacs-temp-directory))
   (lsp-signature-render-document nil)
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name
@@ -1778,7 +1789,6 @@ whitespaces."
 ;;                       (lambda () (lsp-format-buffer))
 ;;                       nil t)))
 
-
 (use-package lsp-ui
   :ensure t
   :hook (lsp-mode . lsp-ui-mode)
@@ -1820,6 +1830,10 @@ whitespaces."
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp-deferred))))
+
+;; (use-package lsp-latex
+;;   :ensure t
+;;   :hook ((latex-mode tex-mode) . lsp))
 
 (use-package bazel-mode
   :ensure t)
