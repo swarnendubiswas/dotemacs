@@ -956,6 +956,7 @@
     ("reult" "result" nil :count 0)
     ("reveiw" "review" nil :count 0)
     ("reveiwing" "reviewing" nil :count 0)
+    ("rleated" "related" nil :count 0)
     ("rquire" "require" nil :count 1)
     ("rumers" "rumors" nil :count 0)
     ("runnning" "running" nil :count 0)

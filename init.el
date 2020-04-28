@@ -14,11 +14,12 @@
 
 ;; When defining a lambda expression that is to be used as an anonymous function, you can in
 ;; principle use any method to construct the list. But typically you should use the lambda macro, or
-;; the function special form, or the #' read ;; syntax which is a short-hand for using function.
-;; Quoting a lambda form means the anonymous function is not ;; byte-compiled. The following forms
-;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
+;; the function special form, or the #' read syntax which is a short-hand for using function.
+;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
+;; all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
+;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
 
 ;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
 ;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
@@ -60,7 +61,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'leuven
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -76,7 +77,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'sml
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -247,6 +248,7 @@ whitespaces."
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
 (minibuffer-depth-indicate-mode 1)
 (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
+(global-prettify-symbols-mode -1)
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish auto-revert-mode
@@ -256,8 +258,7 @@ whitespaces."
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t))
 
-;; Typing with the mark active will overwrite the marked region
-(use-package delsel
+(use-package delsel ; Typing with the mark active will overwrite the marked region
   :hook (after-init . delete-selection-mode))
 
 (use-package saveplace ; Remember cursor position in files
@@ -323,15 +324,12 @@ whitespaces."
 (use-package abbrev
   :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
-  ;; :init
-  ;; (dolist (hook '(text-mode-hook prog-mode-hook))
-  ;;   (add-hook hook #'abbrev-mode ))
   :custom
   (abbrev-file-name (expand-file-name "abbrev_defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
 
 (setq custom-safe-themes t
-      frame-title-format (list '(buffer-file-name "%f" "%b")) ; Better frame title
+      frame-title-format (list '(buffer-file-name "%f" "%b"))
       indicate-empty-lines t)
 
 (if window-system
@@ -484,7 +482,7 @@ whitespaces."
 ;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil :height 130)
-(set-face-attribute 'mode-line nil :height 100)
+(set-face-attribute 'mode-line nil :height 110)
 
 (use-package ibuffer
   :custom
@@ -497,14 +495,13 @@ whitespaces."
   (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
 
-;; Don't show filter groups if there are no buffers in that group
-(use-package ibuf-ext
+(use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
   :load-path "extras"
   :custom (ibuffer-show-empty-filter-groups nil))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
-  :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
+  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 (use-package dired
   :preface
@@ -580,9 +577,7 @@ whitespaces."
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
 ;; candidates.
 (use-package isearch
-  :custom
-  (search-highlight t) ; Highlight incremental search
-  (isearch-allow-scroll t)
+  :custom (search-highlight t) ; Highlight incremental search
   :bind (("C-s" . nil) ; isearch-forward-regexp
          ("C-f" . isearch-forward-regexp)
          :map isearch-mode-map
@@ -677,18 +672,18 @@ whitespaces."
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
 
-(use-package company-c-headers
-  :ensure t
-  :demand t 
-  :config
-  (dolist (paths '(
-                   "/usr/include/clang/7"
-                   "/usr/include/boost"
-                   "/usr/include/linux"
-                   "/usr/include/c++/7"
-                   "/usr/include/c++/7/tr1"
-                   ))
-    (add-to-list 'company-c-headers-path-system paths)))
+;; (use-package company-c-headers
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   (dolist (paths '(
+;;                    "/usr/include/clang/7"
+;;                    "/usr/include/boost"
+;;                    "/usr/include/linux"
+;;                    "/usr/include/c++/7"
+;;                    "/usr/include/c++/7/tr1"
+;;                    ))
+;;     (add-to-list 'company-c-headers-path-system paths)))
 
 (dolist (hook '(text-mode-hook markdown-mode-hook))
   (add-hook hook
@@ -712,9 +707,10 @@ whitespaces."
           (lambda ()
             (make-local-variable 'company-backends)
             (setq company-backends '(company-capf
-                                     company-dabbrev-code
-                                     ;; company-ctags
-                                     company-keywords
+                                     (company-dabbrev-code
+                                      ;; company-ctags
+                                      company-clang
+                                      company-keywords)
                                      company-dabbrev))))
 (add-hook 'sh-mode-hook
           (lambda ()
@@ -1041,7 +1037,6 @@ whitespaces."
 	            projectile-mode-line-prefix
 	            (or project-name "-"))))
   (projectile-mode 1)
-  ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
   (setq projectile-project-search-path (list
                                         (concat `,(getenv "HOME") "/bitbucket")
                                         (expand-file-name "github" dotemacs-user-home)
@@ -1121,8 +1116,6 @@ whitespaces."
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :custom
   (show-trailing-whitespace nil)
-  (whitespace-auto-cleanup t)
-  (whitespace-style '(face tabs trailing))
   (whitespace-line-column dotemacs-fill-column))
 
 ;; This is different from whitespace-cleanup since this is unconditional
@@ -1309,8 +1302,7 @@ whitespaces."
 
 (use-package graphviz-dot-mode
   :ensure t
-  :mode "\\.dot\\'"
-  :custom (graphviz-dot-indent-width 4))
+  :mode "\\.dot\\'")
 
 (use-package gnuplot
   :ensure t
@@ -1323,7 +1315,8 @@ whitespaces."
 
 (use-package popup
   :ensure t
-  :custom (popup-use-optimized-column-computation nil))
+  ;; :custom (popup-use-optimized-column-computation nil)
+  )
 
 (use-package posframe
   :ensure t)
@@ -1514,8 +1507,6 @@ whitespaces."
 ;; (add-hook 'latex-mode-hook
 ;;           (lambda ()
 ;;             (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
-
-(global-prettify-symbols-mode -1)
 
 (use-package make-mode
   :mode (("\\Makefile\\'" . makefile-mode)
