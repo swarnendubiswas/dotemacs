@@ -199,8 +199,8 @@ whitespaces."
       gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       gc-cons-percentage 0.5
       history-delete-duplicates t
-      ;; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-compacting-font-caches t
+      ;; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-default-init t
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead
       inhibit-startup-echo-area-message t
@@ -215,8 +215,6 @@ whitespaces."
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-process-output-max (* 1024 1024) ; 1 MB
       require-final-newline t ; Always end a file with a newline.
-      ;; Turn off alarms completely: https://www.emacswiki.org/emacs/AlarmBell
-      ;; ring-bell-function 'ignore
       save-interprogram-paste-before-kill t
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       sentence-end-double-space nil
@@ -486,7 +484,6 @@ whitespaces."
 
 (use-package ibuffer
   :custom
-  (ibuffer-case-fold-search t) ; Ignore case when searching
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: major-mode
   (ibuffer-display-summary nil)
   (ibuffer-expert t)
@@ -1248,10 +1245,12 @@ whitespaces."
          ("C-c g l" .  counsel-etags-list-tag)
          ("C-c g c" . counsel-etags-scan-code))
   :config
+  (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
   (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'after-save-hook
-                        'counsel-etags-virtual-update-tags 'append 'local)))
+                        #'counsel-etags-virtual-update-tags 'append
+                        'local)))
   (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
   (dolist (ignore-files '(".clang-format" "*.json" "*.html" "*.xml"))
@@ -1269,8 +1268,7 @@ whitespaces."
          ("C-h k" . helpful-key)
          ("C-h f" . helpful-function)))
 
-;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-(use-package vlf
+(use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
   :ensure t
   :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
@@ -1313,14 +1311,6 @@ whitespaces."
   :ensure t
   :bind ("C-x C-\\" . goto-last-change))
 
-(use-package popup
-  :ensure t
-  ;; :custom (popup-use-optimized-column-computation nil)
-  )
-
-(use-package posframe
-  :ensure t)
-
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
@@ -1353,9 +1343,9 @@ whitespaces."
 
 (setq pop-up-frames nil) ; Don't allow Emacs to popup new frames
 
-(use-package sudo-edit ; Edit file with sudo
-  :ensure t
-  :bind ("M-s e" . sudo-edit))
+;; (use-package sudo-edit ; Edit file with sudo
+;;   :ensure t
+;;   :bind ("M-s e" . sudo-edit))
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
@@ -1378,7 +1368,9 @@ whitespaces."
 
 (use-package crux
   :ensure t
-  :bind ("C-c d i" . crux-ispell-word-then-abbrev))
+  :bind (("C-c d i" . crux-ispell-word-then-abbrev)
+         ("C-c d s" .  crux-sudo-edit)
+         ("<f12>" . crux-kill-other-buffers)))
 
 (use-package apt-sources-list
   :ensure t
@@ -1405,9 +1397,8 @@ whitespaces."
   :ensure t
   :diminish
   :custom (super-save-remote-files nil)
-  :config
-  (add-to-list 'super-save-triggers 'ace-window)
-  (super-save-mode 1))
+  :hook (after-init . super-save-mode)
+  :config (add-to-list 'super-save-triggers 'ace-window))
 
 (use-package avy
   :ensure t
@@ -1590,8 +1581,6 @@ whitespaces."
   :ensure t
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
-
-;; (setq python-shell-interpreter "python3")
 
 (use-package pyvenv
   :ensure t
@@ -1956,7 +1945,6 @@ Increase line spacing by two line height."
 (bind-keys
  ("<f11>" . delete-other-windows)
  ("C-x k" . kill-this-buffer)
- ("<f12>" . sb/kill-other-buffers)
  ("M-<left>" . previous-buffer)
  ("M-<right>" . next-buffer)
  ("C-c d f" . auto-fill-mode)
