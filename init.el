@@ -1669,6 +1669,12 @@ whitespaces."
         (smerge-mode +1)))))
 (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
 
+(use-package yaml-mode
+  :ensure t)
+
+(use-package php-mode
+  :ensure t)
+
 (use-package lsp-mode
   :ensure t
   :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode yaml-mode) . lsp-deferred)

@@ -11,11 +11,11 @@ Swarnendu
 analytics
 probabilistically
 vectorization
+verifier
 optimizations
 atomicity
 roundtrip
 parallelization
-Parallelization
 hardcoded
 interleavings
 unaccessed
