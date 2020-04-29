@@ -1,4 +1,4 @@
-personal_ws-1.1 en 99 
+personal_ws-1.1 en 101 
 runtime
 reimplementation
 deoptimized
@@ -6,6 +6,7 @@ deterministically
 serializable
 unscalable
 whitespace
+invariants
 Swarnendu
 analytics
 probabilistically
@@ -13,8 +14,8 @@ vectorization
 optimizations
 atomicity
 roundtrip
-Parallelization
 parallelization
+Parallelization
 hardcoded
 interleavings
 unaccessed
@@ -63,6 +64,7 @@ indices
 translational
 tradeoff
 parallelizing
+mispredictions
 Keshav
 TODO
 tunable
@@ -72,8 +74,8 @@ KinectFusion
 requestor
 tradeoffs
 outliers
-invalidations
 revalidate
+invalidations
 whitespaces
 underperforms
 Biswas

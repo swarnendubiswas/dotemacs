@@ -952,7 +952,6 @@ whitespaces."
 
 (use-package flyspell-popup
   :ensure t
-  :hook (text-mode . flyspell-popup-auto-correct-mode)
   :bind ("C-;" . flyspell-popup-correct)
   :custom (flyspell-popup-correct-delay 0.2))
 
@@ -1742,6 +1741,11 @@ whitespaces."
                     :major-modes '(cmake-mode)
                     :remote? t
                     :server-id 'cmakels-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection '("typescript-language-server" "--stdio"))
+                    :major-modes '(js-mode)
+                    :remote? t
+                    :server-id 'typescript-remote))
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
