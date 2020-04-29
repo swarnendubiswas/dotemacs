@@ -56,9 +56,9 @@ echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
 
 The setup uses the following configuration files.
 
-+ Markdownlint-cli - `$HOME/.markdownlint.json`
-+ Pylint - `$HOME/.config/pylintrc`
-+ YAPF - `$HOME/.config/yapf`
++ Markdownlint-cli - `ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;`
++ Pylint - `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;`
++ YAPF - `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;`
 
 I plan to automate the complete setup sometime in the future.
 
