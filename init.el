@@ -147,11 +147,13 @@ whitespaces."
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+(setq use-package-enable-imenu-support t)
 (eval-when-compile
   (require 'use-package))
 
 (setq use-package-always-defer t
       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+      use-package-expand-minimally t
       ;; Disable after testing
       use-package-verbose t)
 
@@ -270,6 +272,8 @@ whitespaces."
   :hook (after-init . savehist-mode)
   :custom
   (savehist-additional-variables '(kill-ring
+                                   global-mark-ring
+                                   mark-ring
                                    search-ring
                                    regexp-search-ring
                                    extended-command-history
@@ -652,7 +656,8 @@ whitespaces."
   (company-show-numbers t)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)))
+              ("C-p" . company-select-previous)
+              ("<tab>" . company-complete-common-or-cycle)))
 
 (use-package company-flx
   :ensure t
@@ -805,26 +810,29 @@ whitespaces."
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
   :bind
-  (([remap describe-function] . counsel-describe-function)
-   ([remap describe-variable] . counsel-describe-variable)
-   ([remap yank-pop] . counsel-yank-pop)
-   ([remap describe-bindings] . counsel-descbinds)
-   ([remap execute-extended-command] . counsel-M-x)
+  (([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
+   ([remap completion-at-point] . counsel-company)
+   ([remap describe-bindings] . counsel-descbinds)
+   ([remap describe-function] . counsel-describe-function)
+   ([remap describe-variable] . counsel-describe-variable)
+   ([remap dired] . counsel-dired)
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
-   ([remap load-theme] . counsel-load-theme)
-   ([remap load-library] . counsel-load-library)
-   ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
-   ([remap completion-at-point] . counsel-company)
-   ("<f9>" . counsel-recentf)
-   ("C-<f9>" . sb/counsel-goto-recent-directory)
    ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
    ("C-c s g" . counsel-git-grep)
-   ("C-c s r" . counsel-rg)
+   ("C-<f9>" . sb/counsel-goto-recent-directory)
+   ([remap swiper] . counsel-grep-or-swiper)
    ("<f4>" . counsel-grep-or-swiper)
+   ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
+   ([remap load-library] . counsel-load-library)
+   ([remap load-theme] . counsel-load-theme)
+   ([remap recentf-open-files] . counsel-recentf)
+   ("<f9>" . counsel-recentf)
+   ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
-   ("C-c C-j" . counsel-semantic-or-imenu))
+   ("C-c C-j" . counsel-semantic-or-imenu)
+   ([remap yank-pop] . counsel-yank-pop))
   :custom
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
@@ -883,12 +891,16 @@ whitespaces."
 
 (use-package all-the-icons-ivy-rich
   :ensure t
-  :init (all-the-icons-ivy-rich-mode 1)
+  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
+;; TODO: DO we need to load this after counsel-projectile?
+;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
 (use-package ivy-rich
   :ensure t
-  :custom (ivy-format-function #'ivy-format-function-line)
+  :custom
+  (ivy-format-function #'ivy-format-function-line)
+  (ivy-rich-parse-remote-buffer nil)
   :hook (ivy-mode . ivy-rich-mode))
 
 (use-package flyspell
@@ -963,9 +975,10 @@ whitespaces."
               indent-tabs-mode nil ; Spaces instead of tabs by default
               standard-indent 2
               tab-always-indent 'complete
-              tab-width 2)
+              tab-width 4)
 
 ;; Claims to be better than electric-indent-mode
+;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
 (use-package aggressive-indent
   :ensure t
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
@@ -1083,6 +1096,8 @@ whitespaces."
   :custom
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-highlighting-mode 'lines)
+  (flycheck-idle-change-delay 2)
+  (flycheck-indication-mode nil)
   :config
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
@@ -1198,22 +1213,8 @@ whitespaces."
       large-file-warning-threshold (* 250 1024 1024)
       tags-add-tables nil)
 
-(use-package xref
-  :bind (("M-'" . xref-find-definitions)
-         ("M-?" . xref-find-references)
-         ("C-M-." . xref-find-apropos)
-         ("M-," . xref-pop-marker-stack)
-         :map xref--xref-buffer-mode-map
-         ("C-o" . xref-show-location-at-point)
-         ("<tab>" . xref-quit-and-goto-xref)
-         ("r" . xref-query-replace-in-results)))
-
-(use-package ivy-xref
-  :ensure t
-  :custom
-  (xref-show-xrefs-function 'ivy-xref-show-xrefs)
-  (xref-show-definitions-function 'ivy-xref-show-defs))
-
+;; Xref does not seem to have a maintained backend for Gtags
+;; https://www.emacswiki.org/emacs/GnuGlobal
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
@@ -1230,20 +1231,36 @@ whitespaces."
   :bind (:map counsel-gtags-mode-map
               ("M-'" . counsel-gtags-dwim)
               ("M-," . counsel-gtags-go-backward)
+              ("M-?" . counsel-gtags-find-reference)
               ("C-c g s" . counsel-gtags-find-symbol)
               ("C-c g d" . counsel-gtags-find-definition)
-              ("C-c g r" . counsel-gtags-find-reference)
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags)))
+
+(use-package xref
+  :if (eq dotemacs-tags-scheme 'ctags)
+  :bind (("M-'" . xref-find-definitions)
+         ("M-?" . xref-find-references)
+         ("C-M-." . xref-find-apropos)
+         ("M-," . xref-pop-marker-stack)
+         :map xref--xref-buffer-mode-map
+         ("C-o" . xref-show-location-at-point)
+         ("<tab>" . xref-quit-and-goto-xref)
+         ("r" . xref-query-replace-in-results)))
+
+;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
+(use-package ivy-xref
+  :ensure t
+  :if (eq dotemacs-tags-scheme 'ctags)
+  :init
+  (when (boundp 'xref-show-definitions-function)
+    (setq xref-show-definitions-function #'ivy-xref-show-defs))
+  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
-  :bind (
-         ;; ("M-'" . counsel-etags-find-tag-at-point)
-         ;; ("C-c g t" . counsel-etags-find-tag-at-point)
-         ;; ("C-c g s" . counsel-etags-find-symbol-at-point)
-         ;; ("C-c g g" . counsel-etags-grep-symbol-at-point)
+  :bind (("C-c g s" . counsel-etags-find-symbol-at-point)
          ("C-c g f" . counsel-etags-find-tag)
          ("C-c g l" .  counsel-etags-list-tag)
          ("C-c g c" . counsel-etags-scan-code))
@@ -1322,16 +1339,12 @@ whitespaces."
   :hook (after-init . popwin-mode)
   :config
   ;; (defvar popwin:special-display-config-backup popwin:special-display-config)
-  ;; (setq popwin:popup-window-height 20
-  ;;       popwin:close-popup-window-timer-interval 0.5)
   ;; (push '("*Help*" :noselect t) popwin:special-display-config)
   ;; ;; (push '(dired-mode :position top) popwin:special-display-config)
   ;; (push '(compilation-mode :noselect t) popwin:special-display-config)
   ;; (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
   (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
-  ;; (push '("*undo-tree\*" :width 0.3 :position right) popwin:special-display-config)
-  ;; (push '("*Kill Ring*" :noselect nil) popwin:special-display-config)
   ;; (push '("*Selection Ring:") popwin:special-display-config)
   (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
   ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
@@ -1390,7 +1403,7 @@ whitespaces."
   :mode ("/sshd?_config\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
-  :config (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
+  :hook (ssh-config-mode . #'turn-on-font-lock))
 
 (use-package ace-window
   :ensure t
@@ -1622,7 +1635,9 @@ whitespaces."
 
 (use-package fish-mode
   :ensure t
-  :mode "\\.fish\\'")
+  :mode "\\.fish\\'"
+  :hook (fish.mode . (lambda ()
+                       (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
@@ -1769,8 +1784,7 @@ whitespaces."
          ("C-c l r" . lsp-rename)
          ("C-c l h" . lsp-symbol-highlight)
          ("C-c l f" . lsp-format-buffer)
-         ("C-c l r" . lsp-find-references)
-         ("C-c l R" . lsp-find-definition)))
+         ("C-c l r" . lsp-find-references)))
 
 ;; FIXME: Why moving this to lsp::config does not work?
 (add-hook 'python-mode-hook
@@ -1811,7 +1825,8 @@ whitespaces."
 
 (use-package lsp-ivy
   :ensure t
-  :commands lsp-ivy-workspace-symbol)
+  :commands lsp-ivy-workspace-symbol
+  :bind ("C-c l s" . lsp-ivy-global-workspace-symbol))
 
 (use-package lsp-java
   :ensure t
