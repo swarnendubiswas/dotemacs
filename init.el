@@ -630,8 +630,7 @@ whitespaces."
                      "~$"
                      "/.autosaves/"
                      ".*-loaddefs.el"
-                     "/TAGS$"
-                     "/sudo:"))
+                     "/TAGS$"))
   :config (run-at-time nil 300 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
@@ -733,26 +732,11 @@ whitespaces."
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
   (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-  (ivy-virtual-abbreviate 'abbreviate)
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
   (ivy-wrap t)
   (completion-in-region-function #'ivy-completion-in-region)
-  :config
-  ;; (dolist (buffer '(
-  ;;                   ;; "^\\*Backtrace\\*$"
-  ;;                   ;; "^\\*Compile-Log\\*$"
-  ;;                   ;; "^\\*.+Completions\\*$"
-  ;;                   ;; "^\\*Help\\*$"
-  ;;                   ;; "^\\*Ibuffer\\*$"
-  ;;                   ;; "company-statistics-cache.el"
-  ;;                   ;; "^\\*lsp-log\\*$"
-  ;;                   ;; "^\\*pyls\\*$"
-  ;;                   ;; "^\\*pyls::stderr\\*$"
-  ;;                   ;; "TAGS"
-  ;;                   ))
-  ;;   (add-to-list 'ivy-ignore-buffers buffer))
   :hook (after-init . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
@@ -970,7 +954,6 @@ whitespaces."
 (use-package paren
   :hook (after-init . show-paren-mode)
   :custom
-  (show-paren-delay 0)
   (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
@@ -1373,7 +1356,7 @@ whitespaces."
   :mode ("/sshd?_config\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
-  :hook (ssh-config-mode . #'turn-on-font-lock))
+  :config (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
 
 (use-package ace-window
   :ensure t
@@ -1435,9 +1418,7 @@ whitespaces."
          ("\\.md\\'" . markdown-mode))
   ;; :bind ("C-c C-d" . nil)
   :custom
-  ;; (markdown-enable-wiki-links t)
   (mardown-indent-on-enter 'indent-and-new-item)
-  (markdown-italic-underscore t)
   (markdown-enable-math t)
   (markdown-make-gfm-checkboxes-buttons t)
   (markdown-list-indent-width 2)
@@ -1506,11 +1487,6 @@ whitespaces."
 (use-package ini-mode
   :ensure t
   :mode "\\.ini\\'")
-
-;; (add-hook 'after-save-hook
-;;           (lambda ()
-;;             (when (or (string-equal major-mode "lisp-mode") (string-equal major-mode "emacs-lisp-mode"))
-;;               (check-parens))))
 
 (dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
   (add-hook hooks
@@ -1767,23 +1743,13 @@ whitespaces."
             (add-hook 'before-save-hook
                       (lambda ()
                         (lsp-format-buffer)) nil t)))
-;; FIXME: Does the bash server not support formatting?
-;; (add-hook 'sh-mode-hook
-;;           (lambda ()
-;;             (add-hook 'before-save-hook
-;;                       (lambda () (lsp-format-buffer))
-;;                       nil t)))
 
 (use-package lsp-ui
   :ensure t
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil)
-  (lsp-ui-sideline-enable nil)
-  ;; :config
-  ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  ;; (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  )
+  (lsp-ui-sideline-enable nil))
 
 (use-package origami
   :ensure t)
@@ -1835,13 +1801,6 @@ whitespaces."
   "Save all modified buffers without prompting."
   (interactive)
   (save-some-buffers t))
-
-(defun sb/kill-other-buffers ()
-  "Kill all buffers but the current one. Don't mess with special buffers."
-  (interactive)
-  (dolist (buffer (buffer-list))
-    (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
-      (kill-buffer buffer))))
 
 ;; http://endlessparentheses.com/implementing-comment-line.html
 (defun sb/comment-line (n)
