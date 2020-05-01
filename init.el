@@ -47,11 +47,6 @@
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-modules-directory (concat user-emacs-directory "modules/")
-  "Path containing setup files for customized configuration."
-  :type 'string
-  :group 'dotemacs)
-
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
@@ -116,7 +111,7 @@ whitespaces."
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
-          (const :tag "gtags" gtags)
+          ;; (const :tag "gtags" gtags)
           (const :tag "none" none))
   :group 'dotemacs)
 
@@ -126,11 +121,11 @@ whitespaces."
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-gtags-path
-  "/usr/local/bin/gtags"
-  "Absolute path to GNU Global executable."
-  :type 'string
-  :group 'dotemacs)
+;; (defcustom dotemacs-gtags-path
+;;   "/usr/local/bin/gtags"
+;;   "Absolute path to GNU Global executable."
+;;   :type 'string
+;;   :group 'dotemacs)
 
 (defconst dotemacs-user-home
   (getenv "HOME")
@@ -153,9 +148,7 @@ whitespaces."
 
 (setq use-package-always-defer t
       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-      use-package-expand-minimally t
-      ;; Disable after testing
-      use-package-verbose t)
+      use-package-expand-minimally t)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -233,8 +226,6 @@ whitespaces."
       ;; Make cursor the width of the character it is under
       x-stretch-cursor t)
 
-
-;; Activate utf8 mode
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
@@ -482,7 +473,7 @@ whitespaces."
 
       ((eq dotemacs-modeline-theme 'default) ))
 
-;; Set font face independent of the color theme, value is in 1/10pt, so 100 will give you 10pt.
+;; Value is in 1/10pt, so 100 will give you 10pt
 (set-frame-font "DejaVu Sans Mono" nil t)
 (set-face-attribute 'default nil :height 130)
 (set-face-attribute 'mode-line nil :height 110)
@@ -491,15 +482,14 @@ whitespaces."
   :custom
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: major-mode
   (ibuffer-display-summary nil)
-  (ibuffer-expert t)
   (ibuffer-use-header-line t)
   :config
-  (defalias 'list-buffers 'ibuffer) ; Turn on ibuffer by default
-  (add-hook 'ibuffer-hook #'ibuffer-auto-mode))
+  (defalias 'list-buffers 'ibuffer))
 
 (use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
   :load-path "extras"
-  :custom (ibuffer-show-empty-filter-groups nil))
+  :custom (ibuffer-show-empty-filter-groups nil)
+  :hook (ibuffer . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :ensure t
@@ -509,7 +499,7 @@ whitespaces."
   :preface
   (defun dired-go-home ()
     (interactive)
-    (dired "~/"))
+    (dired dotemacs-user-home))
   (defun dired-jump-to-top ()
     (interactive)
     (goto-char (point-min)) ; Faster than (beginning-of-buffer)
@@ -601,14 +591,13 @@ whitespaces."
   (swiper-use-visual-line t)
   (swiper-action-recenter t))
 
-(use-package wgrep
+(use-package wgrep ; Writable grep
   :ensure t
   :custom (wgrep-auto-save-buffer t))
 
 (use-package deadgrep
   :ensure t
-  :bind (("C-c s d" . deadgrep)
-         ("<f8>" . deadgrep)))
+  :bind ("<f8>" . deadgrep))
 
 ;; Adding directories to the list of recent files decreases the number of entries of recent files.
 ;; Therefore, we use a different command/keybinding to lookup recent directories.
@@ -634,7 +623,7 @@ whitespaces."
   :config (run-at-time nil 300 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
-;; Hide the "wrote to recentf" message which is irritating
+;; Hide the "Wrote to recentf" message which is irritating
 (defun sb/recentf-save-list (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
   (let ((inhibit-message t))
@@ -667,7 +656,8 @@ whitespaces."
             (lambda ()
               (make-local-variable 'company-backends)
               (setq company-backends '(company-dabbrev
-                                       company-ispell)))))
+                                       company-ispell
+                                       company-files)))))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
   (add-hook hook
@@ -678,8 +668,7 @@ whitespaces."
 
               (set (make-local-variable 'company-backends) '((company-capf
                                                               :with company-bibtex
-                                                              company-dabbrev :separate
-                                                              ))))))
+                                                              company-dabbrev :separate))))))
 (add-hook 'prog-mode-hook
           (lambda ()
             (make-local-variable 'company-backends)
@@ -687,7 +676,8 @@ whitespaces."
                                      (company-dabbrev-code
                                       company-clang
                                       company-keywords)
-                                     company-dabbrev))))
+                                     company-dabbrev
+                                     company-files))))
 (add-hook 'sh-mode-hook
           (lambda ()
             (progn
@@ -702,6 +692,7 @@ whitespaces."
                                         company-fish-shell)
                                        company-dabbrev-code
                                        company-dabbrev
+                                       company-files
                                        company-keywords)))))
 
 (use-package yasnippet
@@ -731,13 +722,14 @@ whitespaces."
   (ivy-count-format "(%d/%d) ") ; This is beneficial to identify wrap around
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
-  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
+  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   (ivy-wrap t)
   (completion-in-region-function #'ivy-completion-in-region)
   :hook (after-init . ivy-mode)
+  :config (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   :bind
   (("C-c r" . ivy-resume)
    ([remap switch-to-buffer] . ivy-switch-buffer)
@@ -754,6 +746,7 @@ whitespaces."
 (use-package counsel
   :ensure t
   :ensure amx
+  :ensure-system-package fasd
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun sb/counsel-goto-recent-directory ()
@@ -1681,7 +1674,8 @@ whitespaces."
   (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (expand-file-name ".lsp-session-v1" dotemacs-temp-directory))
-  (lsp-signature-render-document nil)
+  (lsp-signature-auto-activate nil)
+  (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
