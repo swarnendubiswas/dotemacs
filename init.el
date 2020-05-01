@@ -663,32 +663,6 @@ whitespaces."
   :ensure t
   :hook (global-company-mode . company-flx-mode))
 
-(use-package company-dict
-  :ensure t
-  :custom
-  (company-dict-dir (expand-file-name "dict" user-emacs-directory))
-  (company-dict-enable-fuzzy t)
-  (company-dict-enable-yasnippet nil))
-
-(use-package company-ctags
-  :ensure t
-  :custom
-  (company-ctags-fuzzy-match-p t)
-  (company-ctags-everywhere t))
-
-;; (use-package company-c-headers
-;;   :ensure t
-;;   :demand t
-;;   :config
-;;   (dolist (paths '(
-;;                    "/usr/include/clang/7"
-;;                    "/usr/include/boost"
-;;                    "/usr/include/linux"
-;;                    "/usr/include/c++/7"
-;;                    "/usr/include/c++/7/tr1"
-;;                    ))
-;;     (add-to-list 'company-c-headers-path-system paths)))
-
 (dolist (hook '(text-mode-hook markdown-mode-hook))
   (add-hook hook
             (lambda ()
@@ -712,7 +686,6 @@ whitespaces."
             (make-local-variable 'company-backends)
             (setq company-backends '(company-capf
                                      (company-dabbrev-code
-                                      ;; company-ctags
                                       company-clang
                                       company-keywords)
                                      company-dabbrev))))
@@ -767,19 +740,19 @@ whitespaces."
   (ivy-wrap t)
   (completion-in-region-function #'ivy-completion-in-region)
   :config
-  (dolist (buffer '(
-                    ;; "^\\*Backtrace\\*$"
-                    ;; "^\\*Compile-Log\\*$"
-                    ;; "^\\*.+Completions\\*$"
-                    "^\\*Help\\*$"
-                    "^\\*Ibuffer\\*$"
-                    ;; "company-statistics-cache.el"
-                    ;; "^\\*lsp-log\\*$"
-                    ;; "^\\*pyls\\*$"
-                    ;; "^\\*pyls::stderr\\*$"
-                    "TAGS"
-                    ))
-    (add-to-list 'ivy-ignore-buffers buffer))
+  ;; (dolist (buffer '(
+  ;;                   ;; "^\\*Backtrace\\*$"
+  ;;                   ;; "^\\*Compile-Log\\*$"
+  ;;                   ;; "^\\*.+Completions\\*$"
+  ;;                   ;; "^\\*Help\\*$"
+  ;;                   ;; "^\\*Ibuffer\\*$"
+  ;;                   ;; "company-statistics-cache.el"
+  ;;                   ;; "^\\*lsp-log\\*$"
+  ;;                   ;; "^\\*pyls\\*$"
+  ;;                   ;; "^\\*pyls::stderr\\*$"
+  ;;                   ;; "TAGS"
+  ;;                   ))
+  ;;   (add-to-list 'ivy-ignore-buffers buffer))
   :hook (after-init . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
@@ -883,11 +856,11 @@ whitespaces."
 
 (use-package ivy-prescient
   :ensure t
-  :init (ivy-prescient-mode 1))
+  :hook (counsel-mode . ivy-prescient-mode))
 
 (use-package company-prescient
   :ensure t
-  :init (company-prescient-mode 1))
+  :hook (company-mode . company-prescient-mode))
 
 (use-package all-the-icons-ivy-rich
   :ensure t
@@ -1082,10 +1055,6 @@ whitespaces."
 (use-package counsel-projectile
   :ensure t
   :hook (counsel-mode . counsel-projectile-mode)
-  ;; :config
-  ;; ;; Sort projects from newest to oldest
-  ;; (add-to-list 'ivy-sort-functions-alist
-  ;;              '(counsel-projectile-switch-project . file-newer-than-file-p))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile)
          ("<f7>" . counsel-projectile-rg)))
@@ -1336,6 +1305,7 @@ whitespaces."
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :ensure t
+  :disabled t
   :hook (after-init . popwin-mode)
   :config
   ;; (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -1346,7 +1316,7 @@ whitespaces."
   (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
   ;; (push '("*Selection Ring:") popwin:special-display-config)
-  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  ;; (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
   ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   ;; (push '("*xref*" :noselect nil) popwin:special-display-config)

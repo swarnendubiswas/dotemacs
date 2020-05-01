@@ -1,4 +1,4 @@
-personal_ws-1.1 en 101 
+personal_ws-1.1 en 103 
 runtime
 reimplementation
 deoptimized
@@ -32,6 +32,7 @@ programmatically
 activations
 unintuitive
 misclassify
+quantization
 Jikes
 Kharagpur
 unordered
@@ -63,6 +64,7 @@ optimality
 indices
 translational
 tradeoff
+misclassifications
 parallelizing
 mispredictions
 Keshav
