@@ -29,12 +29,12 @@
 
 ;;; Code:
 
-(setq debug-on-error t
+(setq debug-on-error nil
       load-prefer-newer t
       user-full-name "Swarnendu Biswas")
 
 (defgroup dotemacs nil
-  "Custom configuration for dotemacs."
+  "Personal configuration for dotemacs."
   :group 'local)
 
 (defcustom dotemacs-temp-directory (concat user-emacs-directory "tmp/")
@@ -192,8 +192,8 @@ whitespaces."
       create-lockfiles nil
       delete-by-moving-to-trash t
       enable-recursive-minibuffers t
-      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       gc-cons-percentage 0.5
+      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
       history-delete-duplicates t
       inhibit-compacting-font-caches t
       ;; Disable loading of "default.el" at startup, inhibits site default settings
@@ -222,9 +222,7 @@ whitespaces."
       truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends nil
-      ;; Make cursor the width of the character it is under
-      x-stretch-cursor t)
+      vc-handled-backends nil)
 
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
@@ -238,9 +236,9 @@ whitespaces."
 
 (column-number-mode 1)
 (diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
+(global-prettify-symbols-mode -1)
 (minibuffer-depth-indicate-mode 1)
 (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
-(global-prettify-symbols-mode -1)
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish auto-revert-mode
@@ -483,8 +481,7 @@ whitespaces."
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: major-mode
   (ibuffer-display-summary nil)
   (ibuffer-use-header-line t)
-  :config
-  (defalias 'list-buffers 'ibuffer))
+  :config (defalias 'list-buffers 'ibuffer))
 
 (use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
   :load-path "extras"
@@ -527,8 +524,8 @@ whitespaces."
   :custom
   (dired-bind-jump t)
   (dired-omit-verbose nil) ; Do not show messages when omitting files
+  :hook (dired-mode . dired-omit-mode)
   :config
-  (add-hook 'dired-mode-hook #'dired-omit-mode)
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Make sure to remove \"Omit\" from the modeline."
@@ -700,10 +697,7 @@ whitespaces."
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
-  :custom
-  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-  (yas-triggers-in-field t)
-  (yas-wrap-around-region t)
+  :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config
   (unbind-key "<tab>" yas-minor-mode-map)
   (use-package yasnippet-snippets))
@@ -900,7 +894,6 @@ whitespaces."
   (ispell-local-dictionary "en_US")
   (ispell-dictionary "en_US")
   (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
-  ;; Aspell speed: ultra | fast | normal | bad-spellers
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-silently-savep t) ; Save a new word to personal dictionary without asking
   (flyspell-issue-message-flag nil)
@@ -919,13 +912,18 @@ whitespaces."
 (use-package flyspell-popup
   :ensure t
   :bind ("C-;" . flyspell-popup-correct)
-  :custom (flyspell-popup-correct-delay 0.2))
+  :custom (flyspell-popup-correct-delay 0.5))
 
 (setq-default fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs by default
               standard-indent 2
               tab-always-indent 'complete
               tab-width 4)
+
+(use-package highlight-indentation
+  :ensure t
+  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :hook (python-mode . highlight-indentation-mode))
 
 ;; Claims to be better than electric-indent-mode
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
@@ -939,10 +937,8 @@ whitespaces."
 ;; (use-package electric
 ;;   :hook (emacs-lisp-mode . electric-indent-mode))
 
-(use-package highlight-indentation
-  :ensure t
-  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-  :hook (python-mode . highlight-indentation-mode))
+;; (use-package elec-pair
+;;   :hook (after-init . electric-pair-mode))
 
 (use-package paren
   :hook (after-init . show-paren-mode)
@@ -950,9 +946,6 @@ whitespaces."
   (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
-
-;; (use-package elec-pair
-;;   :hook (after-init . electric-pair-mode))
 
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 ;; https://ebzzry.github.io/emacs-pairs.html
@@ -996,8 +989,8 @@ whitespaces."
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
       (format "%s[%s]"
-	            projectile-mode-line-prefix
-	            (or project-name "-"))))
+              projectile-mode-line-prefix
+              (or project-name "-"))))
   (projectile-mode 1)
   (setq projectile-project-search-path (list
                                         (concat `,(getenv "HOME") "/bitbucket")
@@ -1193,7 +1186,6 @@ whitespaces."
          ("<tab>" . xref-quit-and-goto-xref)
          ("r" . xref-query-replace-in-results)))
 
-;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 (use-package ivy-xref
   :ensure t
   :if (eq dotemacs-tags-scheme 'ctags)
@@ -1306,10 +1298,6 @@ whitespaces."
 
 (setq pop-up-frames nil) ; Don't allow Emacs to popup new frames
 
-;; (use-package sudo-edit ; Edit file with sudo
-;;   :ensure t
-;;   :bind ("M-s e" . sudo-edit))
-
 (use-package expand-region ; Expand region by semantic units
   :ensure t
   :bind ("C-=" . er/expand-region))
@@ -1353,8 +1341,8 @@ whitespaces."
 
 (use-package ace-window
   :ensure t
-  :bind (("<f10>" . ace-window)
-         ([remap other-window] . ace-window)))
+  :bind (([remap other-window] . ace-window)
+         ("<f10>" . ace-window)))
 
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
