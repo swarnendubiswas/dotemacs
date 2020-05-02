@@ -121,11 +121,11 @@ whitespaces."
   :type 'string
   :group 'dotemacs)
 
-;; (defcustom dotemacs-gtags-path
-;;   "/usr/local/bin/gtags"
-;;   "Absolute path to GNU Global executable."
-;;   :type 'string
-;;   :group 'dotemacs)
+(defcustom dotemacs-gtags-path
+  "/usr/local/bin/gtags"
+  "Absolute path to GNU Global executable."
+  :type 'string
+  :group 'dotemacs)
 
 (defconst dotemacs-user-home
   (getenv "HOME")
@@ -723,7 +723,11 @@ whitespaces."
   (ivy-wrap t)
   (completion-in-region-function #'ivy-completion-in-region)
   :hook (after-init . ivy-mode)
-  :config (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
+  :config
+  (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
+  :config
+  (dolist (buffer '("TAGS"))
+    (add-to-list 'ivy-ignore-buffers buffer))
   :bind
   (("C-c r" . ivy-resume)
    ([remap switch-to-buffer] . ivy-switch-buffer)
@@ -731,10 +735,8 @@ whitespaces."
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
-   ("C-j" . ivy-immediate-done) ; View the current directory
    ("<left>" . ivy-previous-line)
-   ("<right>" . ivy-next-line)
-   ("M-y" . ivy-next-line))
+   ("<right>" . ivy-next-line))
   :diminish)
 
 (use-package counsel
@@ -1024,8 +1026,9 @@ whitespaces."
 (use-package counsel-projectile
   :ensure t
   :hook (counsel-mode . counsel-projectile-mode)
+  :custom (projectile-switch-project-action 'counsel-projectile-find-file)
   :bind (("<f5>" . counsel-projectile-switch-project)
-         ("<f6>" . counsel-projectile)
+         ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-rg)))
 
 (use-package flycheck
@@ -1157,15 +1160,14 @@ whitespaces."
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
   :diminish
+  :ensure-system-package global
   ;; :init
   ;; (add-hook 'c-mode-common-hook
   ;;           (lambda ()
   ;;             (when (derived-mode-p 'c-mode 'c++-mode)
   ;;               (counsel-gtags-mode 1))))
   :hook ((prog-mode protobuf-mode latex-mode) . counsel-gtags-mode)
-  :custom
-  (counsel-gtags-ignore-case nil)
-  (counsel-gtags-auto-update t)
+  :custom (counsel-gtags-auto-update t)
   :bind (:map counsel-gtags-mode-map
               ("M-'" . counsel-gtags-dwim)
               ("M-," . counsel-gtags-go-backward)
@@ -1224,7 +1226,10 @@ whitespaces."
   :bind (("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)
          ("C-h f" . helpful-function)
-         ("C-h p" . helpful-at-point)))
+         ("C-h c" . helpful-command)
+         ("C-h p" . helpful-at-point)
+         :map helpful-mode-map
+         ("q" . helpful-kill-buffers)))
 
 (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
   :ensure t
@@ -1394,6 +1399,7 @@ whitespaces."
 (use-package markdown-mode
   :ensure t
   :diminish gfm-mode
+  :ensure-system-package pandoc
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
