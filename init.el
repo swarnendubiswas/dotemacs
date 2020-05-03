@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'zenburn
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -364,7 +364,7 @@ whitespaces."
                                               ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
                                               ))
 
-      ((eq dotemacs-theme 'zenburn) (use-package zenburn
+      ((eq dotemacs-theme 'zenburn) (use-package zenburn-theme
                                       :ensure t
                                       :init (load-theme 'zenburn t)))
 
@@ -601,7 +601,6 @@ whitespaces."
 (use-package recentf
   :custom
   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
-  (recentf-max-saved-items 50)
   (recentf-auto-cleanup 'never) ; Do not stat remote files
   (recentf-menu-filter 'recentf-sort-descending)
   ;; Check regex with re-builder
@@ -725,6 +724,7 @@ whitespaces."
   :hook (after-init . ivy-mode)
   :config
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
+  (defalias 'occur 'ivy-occur)
   :config
   (dolist (buffer '("TAGS"))
     (add-to-list 'ivy-ignore-buffers buffer))
@@ -789,6 +789,7 @@ whitespaces."
                                     "\\|.blg$"
                                     "\\|.cb$"
                                     "\\|.cb2$"
+                                    "\\|.docx$"
                                     "\\|.dvi$"
                                     "\\|.elc$"
                                     "\\|.fdb_latexmk$"
@@ -799,6 +800,7 @@ whitespaces."
                                     "\\|.o$"
                                     "\\|.out$"
                                     "\\|.pdf$"
+                                    "\\|.pptx$"
                                     "\\|.pyc$"
                                     "\\|.rel$"
                                     "\\|.rip$"
@@ -807,6 +809,7 @@ whitespaces."
                                     "\\|.synctex.gz$"
                                     "\\|.tar.gz$"
                                     "\\|.toc$"
+                                    "\\|.xlsx$"
                                     "\\|tags"
                                     "\\|TAGS"
                                     "\\|GPATH"
@@ -820,6 +823,14 @@ whitespaces."
   (counsel-mode-override-describe-bindings t)
   (counsel-yank-pop-separator "\n-------------------------\n")
   :hook (ivy-mode . counsel-mode)
+  :config
+  (defalias 'flycheck-list-errors 'counsel-flycheck)
+  (defalias 'load-library 'counsel-load-library)
+  (defalias 'load-theme 'counsel-load-theme)
+  (defalias 'package-install 'counsel-package)
+  (defalias 'package-delete 'counsel-package)
+  (defalias 'recentf 'counsel-recentf)
+  (defalias 'tramp 'counsel-tramp)
   :diminish)
 
 (use-package prescient
@@ -990,7 +1001,7 @@ whitespaces."
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
-      (format "%s[%s]"
+      (format "%s [%s]"
               projectile-mode-line-prefix
               (or project-name "-"))))
   (projectile-mode 1)
@@ -1378,6 +1389,10 @@ whitespaces."
   :bind (("C-<f1>" . bm-toggle)
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
+
+(use-package esup
+  :ensure t
+  :commands (esup))
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.

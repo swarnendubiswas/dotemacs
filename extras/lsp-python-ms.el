@@ -36,8 +36,7 @@
 (require 'find-file-in-project nil 'noerror)
 
 ;; Forward declare functions
-(declare-function ffip-get-project-root-directory 'ffip)
-(declare-function lsp-client-on-notification 'lsp-mode)
+(declare-function ffip-get-project-root-directory "ext:find-file-in-project")
 
 ;; Forward declare variable
 (defvar lsp-render-markdown-markup-content)
@@ -212,7 +211,7 @@ here."
                                 (format "powershell -noprofile -noninteractive \
 -nologo -ex bypass Expand-Archive -path '%s' -dest '%s'" temp-file install-dir))
                                (t (user-error "Unable to extract '%s' to '%s'! \
-Please extact manually." temp-file install-dir)))))
+Please extract manually." temp-file install-dir)))))
 
       (lsp--info "Downloading Microsoft Python Language Server...")
 
@@ -369,15 +368,6 @@ directory"
 WORKSPACE is just used for logging and _PARAMS is unused."
   (lsp--info "Microsoft Python language server started"))
 
-(defun lsp-python-ms--client-initialized (client)
-  "Callback to register and configure client after it's initialized.
-
-After CLIENT is initialized, this function is called to configure
-other handlers. "
-  (lsp-client-on-notification client "python/languageServerStarted"
-                              #'lsp-python-ms--language-server-started-callback)
-  (lsp-client-on-notification client "telemetry/event" #'ignore))
-
 ;; this gets called when we do lsp-describe-thing-at-point
 ;; see lsp-methods.el. As always, remove Microsoft's unwanted entities :(
 (setq lsp-render-markdown-markup-content #'lsp-python-ms--filter-nbsp)
@@ -399,19 +389,19 @@ other handlers. "
 
 (defun lsp-python-ms--begin-progress-callback (workspace &rest _)
   (with-lsp-workspace workspace
-    (--each (lsp--workspace-buffers workspace)
-      (when (buffer-live-p it)
-        (with-current-buffer it
-          (lsp--spinner-start)))))
+                      (--each (lsp--workspace-buffers workspace)
+                        (when (buffer-live-p it)
+                          (with-current-buffer it
+                            (lsp--spinner-start)))))
   (lsp--info "Microsoft Python language server is analyzing..."))
 
 (defun lsp-python-ms--end-progress-callback (workspace &rest _)
   (with-lsp-workspace workspace
-    (--each (lsp--workspace-buffers workspace)
-      (when (buffer-live-p it)
-        (with-current-buffer it
-          (lsp--spinner-stop))))
-    (lsp--info "Microsoft Python language server is analyzing...done")))
+                      (--each (lsp--workspace-buffers workspace)
+                        (when (buffer-live-p it)
+                          (with-current-buffer it
+                            (lsp--spinner-stop))))
+                      (lsp--info "Microsoft Python language server is analyzing...done")))
 
 (lsp-register-custom-settings
  `(("python.analysis.cachingLevel" lsp-python-ms-cache)
@@ -439,7 +429,7 @@ other handlers. "
                                  ("python/endProgress" 'lsp-python-ms--end-progress-callback))
   :initialized-fn (lambda (workspace)
                     (with-lsp-workspace workspace
-                      (lsp--set-configuration (lsp-configuration-section "python"))))
+                                        (lsp--set-configuration (lsp-configuration-section "python"))))
   :download-server-fn #'lsp-python-ms--install-server))
 
 (provide 'lsp-python-ms)
