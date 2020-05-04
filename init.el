@@ -1209,6 +1209,7 @@ whitespaces."
 
 (use-package counsel-etags
   :ensure t
+  :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
   :bind (("C-c g s" . counsel-etags-find-symbol-at-point)
          ("C-c g f" . counsel-etags-find-tag)
@@ -1592,8 +1593,8 @@ whitespaces."
 (use-package shfmt
   :disabled t
   :ensure reformatter
+  :ensure-system-package (shfmt . "snap install shfmt")
   :load-path "extras/shfmt"
-  :ensure-system-package shfmt
   :diminish shfmt-on-save-mode
   :custom (shfmt-arguments "-i 4 -p -ci")
   :hook (sh-mode . shfmt-on-save-mode))
@@ -1654,9 +1655,6 @@ whitespaces."
   :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-diagnostics-modeline-mode))
-  ;; :hook (prog-mode . (lambda ()
-  ;;                      (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
-  ;;                        (lsp-deferred))))
   :custom
   (lsp-clients-clangd-args '("-j=2" "-background-index" "--clang-tidy" "-log=error"))
   (lsp-eldoc-enable-hover nil)
@@ -1753,14 +1751,6 @@ whitespaces."
   :custom
   (lsp-ui-doc-enable nil)
   (lsp-ui-sideline-enable nil))
-
-(use-package origami
-  :ensure t)
-
-(use-package lsp-origami
-  :ensure t
-  :ensure origami
-  :hook (origami-mode . lsp-origami-mode))
 
 (use-package lsp-ivy
   :ensure t

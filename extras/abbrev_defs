@@ -674,6 +674,7 @@
     ("isnt" "isn't" nil :count 0)
     ("isoaltion" "isolation" nil :count 1)
     ("isthe" "is the" nil :count 0)
+    ("iteratiion" "iteration" nil :count 0)
     ("itis" "it is" nil :count 0)
     ("ititial" "initial" nil :count 0)
     ("itll" "it'll" nil :count 0)

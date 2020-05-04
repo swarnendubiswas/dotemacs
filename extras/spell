@@ -1,4 +1,4 @@
-personal_ws-1.1 en 103 
+personal_ws-1.1 en 105 
 runtime
 reimplementation
 deoptimized
@@ -31,8 +31,8 @@ observability
 programmatically
 activations
 unintuitive
-misclassify
 quantization
+misclassify
 Jikes
 Kharagpur
 unordered
@@ -97,6 +97,8 @@ associativity
 serializability
 partitioner
 nondeterminism
+affine
+Affine
 recalibration
 Kolkata
 unoptimized

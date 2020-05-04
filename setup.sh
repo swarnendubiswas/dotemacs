@@ -18,7 +18,7 @@ DOTEMACS="$GITHUB/dotemacs"
 DOTFILES="$GITHUB/dotfiles"
 EMACSD="$HOME/.emacs.d"
 
-cd $HOME
+cd "$HOME"
 
 if [ ! -d $GITHUB ]; then
     mkdir -p github
@@ -46,11 +46,11 @@ else
 fi
 echo "...Done"
 
-cd $HOME
+cd "$HOME"
 
-if [ -d $EMACSD ]; then
-    if [ ! -L $EMACSD ]; then
-        ln -s $DOTEMACS $EMACSD
+if [ -d "$EMACSD" ]; then
+    if [ ! -L "$EMACSD" ]; then
+        ln -s "$DOTEMACS" "$EMACSD"
     fi
 fi
 
