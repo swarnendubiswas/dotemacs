@@ -1105,13 +1105,6 @@ whitespaces."
 
 (use-package hl-todo
   :ensure t
-  :custom
-  (hl-todo-keyword-faces '(("TODO" . hl-todo)
-                           ("NOTE" . hl-todo)
-                           ("XXX" . hl-todo)
-                           ("LATER" . hl-todo)
-                           ("IMP" . hl-todo)
-                           ("FIXME" . hl-todo)))
   :hook (after-init . global-hl-todo-mode))
 
 ;; Edit remote file: /method:user@host#port:filename.
@@ -1121,8 +1114,6 @@ whitespaces."
 (use-package tramp
   :custom
   (tramp-default-method "ssh") ; ssh is faster than the default scp
-  (tramp-default-user user-login-name)
-  (tramp-default-host "172.27.15.105")
   ;; Auto-save to a local directory for better performance
   (tramp-auto-save-directory (expand-file-name "tramp-auto-save" dotemacs-temp-directory))
   (tramp-persistency-file-name (expand-file-name "tramp" dotemacs-temp-directory))
@@ -1139,6 +1130,7 @@ whitespaces."
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
 
+;; FIXME: Does not pick up other usernames.
 (use-package counsel-tramp
   :ensure t
   :bind ("C-c d t" . counsel-tramp)
@@ -1160,8 +1152,7 @@ whitespaces."
   (imenu-max-items 500)
   (imenu-max-item-length 100))
 
-(setq tags-revert-without-query t ; Don't ask before rereading the TAGS files if they have changed
-      ;; Warn when opening files bigger than 200MB, the size is chosen because of large TAGS files
+(setq tags-revert-without-query t
       large-file-warning-threshold (* 250 1024 1024)
       tags-add-tables nil)
 
@@ -1290,28 +1281,25 @@ whitespaces."
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :ensure t
-  :disabled t
   :hook (after-init . popwin-mode)
   :config
-  ;; (defvar popwin:special-display-config-backup popwin:special-display-config)
-  ;; (push '("*Help*" :noselect t) popwin:special-display-config)
-  ;; ;; (push '(dired-mode :position top) popwin:special-display-config)
-  ;; (push '(compilation-mode :noselect t) popwin:special-display-config)
-  ;; (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
+  (defvar popwin:special-display-config-backup popwin:special-display-config)
+  (push '("*Help*" :noselect t) popwin:special-display-config)
+  (push '(compilation-mode :noselect t) popwin:special-display-config)
+  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
   (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
   (push '("*Paradox Report*" :regexp t :noselect t) popwin:special-display-config)
-  ;; (push '("*Selection Ring:") popwin:special-display-config)
-  ;; (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
-  ;; (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
+  (push '("*Selection Ring:") popwin:special-display-config)
+  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
-  ;; (push '("*xref*" :noselect nil) popwin:special-display-config)
+  (push '("*xref*" :noselect nil) popwin:special-display-config)
   (push '("*helpful\*" :noselect nil) popwin:special-display-config)
-  ;; (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  ;; (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  ;; (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  ;; (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  ;; (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  )
+  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+  (add-to-list 'popwin:special-display-config '("*Apropos*"))
+  (add-to-list 'popwin:special-display-config '("*Warnings*")))
 
 (setq pop-up-frames nil) ; Don't allow Emacs to popup new frames
 

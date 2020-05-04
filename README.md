@@ -177,5 +177,6 @@ GNU Global has better database search support while Universal Ctags supports mor
 ## TODO
 
 + Enable/disable LSP per project through directory variables.
-+ Use `xref` interface for both `ctags` and `gtags`.
 + Use RE in `find`, it follows Emacs RE.
++ Flyspell seems slow to load
+ 
