@@ -1207,6 +1207,7 @@
     ("werre" "were" nil :count 0)
     ("wethee" "whether" nil :count 0)
     ("whcih" "which" nil :count 0)
+    ("whenver" "whenever" nil :count 0)
     ("wherre" "where" nil :count 0)
     ("whic" "which" nil :count 2)
     ("whihc" "which" nil :count 0)

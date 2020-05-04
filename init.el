@@ -193,7 +193,7 @@ whitespaces."
       delete-by-moving-to-trash t
       enable-recursive-minibuffers t
       gc-cons-percentage 0.5
-      gc-cons-threshold (* 200 1024 1024) ; Increase gc threshold to 200 MB
+      gc-cons-threshold (* 50 1024 1024)
       history-delete-duplicates t
       inhibit-compacting-font-caches t
       ;; Disable loading of "default.el" at startup, inhibits site default settings
@@ -223,6 +223,12 @@ whitespaces."
       use-dialog-box nil
       use-file-dialog nil
       vc-handled-backends nil)
+
+;; Reset `gc-cons-threshold' to its default value otherwise there can be large pause times whenever
+;; GC eventually happens
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold 800000)))
 
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
@@ -1005,16 +1011,17 @@ whitespaces."
               projectile-mode-line-prefix
               (or project-name "-"))))
   (projectile-mode 1)
-  (setq projectile-project-search-path (list
-                                        (concat `,(getenv "HOME") "/bitbucket")
-                                        (expand-file-name "github" dotemacs-user-home)
-                                        (expand-file-name "iitk-workspace" dotemacs-user-home)
-                                        (expand-file-name "iitkgp-workspace" dotemacs-user-home)
-                                        (expand-file-name "iss-workspace" dotemacs-user-home)
-                                        (expand-file-name "plass-workspace" dotemacs-user-home)
-                                        (expand-file-name "prospar-workspace" dotemacs-user-home)
-                                        (expand-file-name "research" dotemacs-user-home)
-                                        ))
+  ;; Avoid search when projectile-mode is enabled.
+  ;; (setq projectile-project-search-path (list
+  ;;                                       (concat `,(getenv "HOME") "/bitbucket")
+  ;;                                       (expand-file-name "github" dotemacs-user-home)
+  ;;                                       (expand-file-name "iitk-workspace" dotemacs-user-home)
+  ;;                                       (expand-file-name "iitkgp-workspace" dotemacs-user-home)
+  ;;                                       (expand-file-name "iss-workspace" dotemacs-user-home)
+  ;;                                       (expand-file-name "plass-workspace" dotemacs-user-home)
+  ;;                                       (expand-file-name "prospar-workspace" dotemacs-user-home)
+  ;;                                       (expand-file-name "research" dotemacs-user-home)
+  ;;                                       ))
   (dolist (prjs (list
                  (expand-file-name dotemacs-user-home) ; Do not consider the HOME as a project
                  (expand-file-name "bitbucket/.metadata" dotemacs-user-home)
