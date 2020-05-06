@@ -147,7 +147,7 @@ whitespaces."
   (require 'use-package))
 
 (setq use-package-always-defer t
-      use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+      use-package-compute-statistics nil ; Use "M-x use-package-report" to see results
       use-package-expand-minimally t)
 
 (use-package use-package-ensure-system-package
@@ -193,7 +193,7 @@ whitespaces."
       delete-by-moving-to-trash t
       enable-recursive-minibuffers t
       gc-cons-percentage 0.5
-      gc-cons-threshold (* 50 1024 1024)
+      gc-cons-threshold (* 200 1024 1024)
       history-delete-duplicates t
       inhibit-compacting-font-caches t
       ;; Disable loading of "default.el" at startup, inhibits site default settings
@@ -224,11 +224,11 @@ whitespaces."
       use-file-dialog nil
       vc-handled-backends nil)
 
-;; Reset `gc-cons-threshold' to its default value otherwise there can be large pause times whenever
-;; GC eventually happens
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold 800000)))
+;; ;; Reset `gc-cons-threshold' to its default value otherwise there can be large pause times whenever
+;; ;; GC eventually happens
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (setq gc-cons-threshold 800000)))
 
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
@@ -1647,6 +1647,7 @@ whitespaces."
 
 (use-package lsp-mode
   :ensure t
+  :commands (lsp lsp-deferred)
   :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-diagnostics-modeline-mode))
