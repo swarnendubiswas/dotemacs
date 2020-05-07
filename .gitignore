@@ -35,3 +35,4 @@ flycheck_init.el
 GPATH
 GTAGS
 GRTAGS
+.lsp-session-v1

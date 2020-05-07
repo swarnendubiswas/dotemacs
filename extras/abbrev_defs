@@ -872,6 +872,7 @@
     ("postition" "position" nil :count 0)
     ("potentialy" "potentially" nil :count 0)
     ("potetnial" "potential" nil :count 1)
+    ("preditive" "predictive" nil :count 0)
     ("preesnt" "present" nil :count 1)
     ("prefure" "prefer" nil :count 0)
     ("pregnent" "pregnant" nil :count 0)
