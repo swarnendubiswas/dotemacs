@@ -185,6 +185,7 @@ whitespaces."
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
       auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
+      blink-matching-paren nil
       case-fold-search t
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
@@ -266,14 +267,10 @@ whitespaces."
   :unless noninteractive
   :hook (after-init . savehist-mode)
   :custom
-  (savehist-additional-variables '(kill-ring
-                                   global-mark-ring
-                                   mark-ring
-                                   search-ring
+  (savehist-additional-variables '(search-ring
                                    regexp-search-ring
                                    extended-command-history
-                                   file-name-history
-                                   command-history))
+                                   file-name-history))
   (savehist-autosave-interval 300)
   (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
@@ -433,6 +430,7 @@ whitespaces."
 
       ((eq dotemacs-modeline-theme 'spaceline) (use-package spaceline
                                                  :ensure t
+                                                 :defines (spaceline-hud-p spaceline-selection-info-p spaceline-version-control-p spaceline-input-method-p spaceline-persp-name-p)
                                                  :init
                                                  (require 'spaceline-config)
                                                  (setq spaceline-hud-p nil
@@ -959,21 +957,28 @@ whitespaces."
 ;; (use-package elec-pair
 ;;   :hook (after-init . electric-pair-mode))
 
-(use-package paren
-  :hook (after-init . show-paren-mode)
-  :custom
-  (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
-  (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t))
+;; (use-package paren
+;;   :hook (after-init . show-paren-mode)
+;;   :custom
+;;   (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
+;;   (show-paren-when-point-inside-paren t)
+;;   (show-paren-when-point-in-periphery t))
 
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 ;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
-  :hook (after-init . smartparens-global-mode)
+  :hook ((after-init . smartparens-global-mode)
+         (after-init . show-smartparens-global-mode))
+  :custom
+  (sp-show-pair-from-inside t)
+  (sp-autoskip-closing-pair 'always)
   :config
   (require 'smartparens-config)
-  (setq sp-show-pair-from-inside t)
+  (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (require 'smartparens-latex))))
   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
@@ -1316,6 +1321,7 @@ whitespaces."
 
 (use-package expand-line
   :ensure t
+  :defines expand-line-mode
   :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -1412,8 +1418,8 @@ whitespaces."
   :diminish gfm-mode
   :ensure-system-package pandoc
   :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.markdown\\'" . markdown-mode)
-         ("\\.md\\'" . markdown-mode))
+         ("\\.markdown\\'" . gfm-mode)
+         ("\\.md\\'" . gfm-mode))
   ;; :bind ("C-c C-d" . nil)
   :custom
   (mardown-indent-on-enter 'indent-and-new-item)

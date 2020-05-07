@@ -1,6 +1,7 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|PTRacer-solver\\|new_algo\\|newfasttrack\\|spd3-lib\\|tbb-lib\\|tdebug-llvm")
+         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|PTRacer-solver\\|new_algo\\|newfasttrack\\|spd3-lib\\|tbb-lib\\|tdebug-llvm")
+         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "/build" "built"))
          (eval . (setq-local counsel-etags-project-root (projectile-project-root)
                              tags-table-files (list (projectile-project-root))))
          ))
@@ -17,6 +18,7 @@
  (c++-mode . (
               (flycheck-gcc-language-standard . "c++11")
               (flycheck-clang-language-standard . "c++11")
+              (eval add-hook 'hack-local-variables-hook (lambda () (when (string= major-mode 'c++-mode) (lsp))))
               (eval . (let (
                             (clang-args (list
                                          "-std=c++11"

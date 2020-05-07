@@ -56,29 +56,34 @@ echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
 
 The setup uses the following configuration files.
 
-+ Markdownlint-cli - `ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;`
-+ Pylint - `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;`
-+ YAPF - `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;`
+| Tool/Checker       | Setup                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| `markdownlint-cli` | `ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;` |
+| `pylint`           | `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;`              |
+| `yapf`             | `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;`                      |
 
 I plan to automate the complete setup sometime in the future.
 
 ## Directory structure
 
-+ `extras` -- third-party packages (may not be available from the package archives)
-+ `modules` -- Elisp modules containing personal customizations
-+ `reference-cards` -- documentation and help files
-+ `snippets` -- custom snippets
+| Directory         | Purpose                                                               |
+| ----------------- | --------------------------------------------------------------------- |
+| `extras`          | third-party packages (may not be available from the package archives) |
+| `reference-cards` | documentation and help files                                          |
+| `snippets`        | custom snippets                                                       |
 
 ## Tweaking the default settings
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-+ `dotemacs-theme` - Set the desired theme from a bunch of themes like`leuven`, `professional`, and `eclipse`, or use the `default`.
-+ `dotemacs-modeline-theme` - Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.
-+ `dotemacs-window-split` - Specify the direction in which the windows should be split. This depends on the orientation of the display.
-+ `dotemacs-fill-column` - Column beyond which lines should not extend.
-+ `dotemacs-delete-trailing-whitespace-p` - Control whether trailing whitespace should be deleted or not.
-+ `dotemacs-tags-scheme` - Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects.
+| Customization variable                  | Documentation                                                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `dotemacs-theme`                        | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`.          |
+| `dotemacs-modeline-theme`               | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.                            |
+| `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.              |
+| `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                             |
+| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                            |
+| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects. |
 
 ## Browsing Source Code
 
@@ -161,7 +166,7 @@ dir2
 dir3
 ```
 
-> **Parse Python**
+> **Parse only Python files**
 
 ```Bash
 ctags -eR --languages=Python
@@ -176,7 +181,5 @@ GNU Global has better database search support while Universal Ctags supports mor
 
 ## TODO
 
-+ Enable/disable LSP per project through directory variables.
 + Use RE in `find`, it follows Emacs RE.
-+ Flyspell seems slow to load
- 
++ Global does not show definitions and references in some cases, not sure why
