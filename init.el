@@ -668,7 +668,8 @@ whitespaces."
 
               (set (make-local-variable 'company-backends) '((company-capf
                                                               :with company-bibtex
-                                                              company-dabbrev :separate))))))
+                                                              company-dabbrev :separate
+                                                              company-files))))))
 (add-hook 'prog-mode-hook
           (lambda ()
             (make-local-variable 'company-backends)
@@ -768,6 +769,7 @@ whitespaces."
    ([remap describe-variable] . counsel-describe-variable)
    ([remap dired] . counsel-dired)
    ([remap find-file] . counsel-find-file)
+   ([remap flycheck-list-errors] . counsel-flycheck)
    ("<f2>" . counsel-find-file)
    ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
    ("C-c s g" . counsel-git-grep)
@@ -827,14 +829,7 @@ whitespaces."
   (counsel-mode-override-describe-bindings t)
   (counsel-yank-pop-separator "\n-------------------------\n")
   :hook (ivy-mode . counsel-mode)
-  :config
-  (defalias 'flycheck-list-errors 'counsel-flycheck)
-  (defalias 'load-library 'counsel-load-library)
-  (defalias 'load-theme 'counsel-load-theme)
-  (defalias 'package-install 'counsel-package)
-  (defalias 'package-delete 'counsel-package)
-  (defalias 'recentf 'counsel-recentf)
-  (defalias 'tramp 'counsel-tramp)
+  :config (defalias 'flycheck-list-errors 'counsel-flycheck)
   :diminish)
 
 (use-package prescient
@@ -949,20 +944,6 @@ whitespaces."
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
   :custom (aggressive-indent-dont-electric-modes t)
   :diminish)
-
-;; ;; This apparently interferes with lsp formatting where lsp is enabled.
-;; (use-package electric
-;;   :hook (emacs-lisp-mode . electric-indent-mode))
-
-;; (use-package elec-pair
-;;   :hook (after-init . electric-pair-mode))
-
-;; (use-package paren
-;;   :hook (after-init . show-paren-mode)
-;;   :custom
-;;   (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
-;;   (show-paren-when-point-inside-paren t)
-;;   (show-paren-when-point-in-periphery t))
 
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 ;; https://ebzzry.github.io/emacs-pairs.html
@@ -1147,6 +1128,7 @@ whitespaces."
   :ensure t
   :bind ("C-c d t" . counsel-tramp)
   :config
+  (defalias 'tramp 'counsel-tramp)
   (add-hook 'counsel-tramp-pre-command-hook
             (lambda ()
               ;; (global-aggressive-indent-mode -1)
@@ -1193,6 +1175,7 @@ whitespaces."
 
 (use-package xref
   :if (eq dotemacs-tags-scheme 'ctags)
+  :config (xref-etags-mode)
   :bind (("M-'" . xref-find-definitions)
          ("M-?" . xref-find-references)
          ("C-M-." . xref-find-apropos)
@@ -1214,7 +1197,8 @@ whitespaces."
   :ensure t
   :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
-  :bind (("C-c g s" . counsel-etags-find-symbol-at-point)
+  :bind (("M-]" . counsel-etags-find-tag-at-point)
+         ("C-c g s" . counsel-etags-find-symbol-at-point)
          ("C-c g f" . counsel-etags-find-tag)
          ("C-c g l" .  counsel-etags-list-tag)
          ("C-c g c" . counsel-etags-scan-code))
@@ -1599,13 +1583,12 @@ whitespaces."
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
-  :disabled t
   :ensure reformatter
   :ensure-system-package (shfmt . "snap install shfmt")
   :load-path "extras/shfmt"
   :diminish shfmt-on-save-mode
-  :custom (shfmt-arguments "-i 4 -p -ci")
-  :hook (sh-mode . shfmt-on-save-mode))
+  ;; :hook (sh-mode . shfmt-on-save-mode)
+  :custom (shfmt-arguments "-i 4 -p -ci"))
 
 (use-package flycheck-shfmt
   :ensure reformatter

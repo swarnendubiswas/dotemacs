@@ -9,18 +9,18 @@
               (flycheck-clang-language-standard . "c++11")
               (eval . (let ((clang-args (list
                                          "-std=c++11"
-                                         "-I/usr/include"
-                                         "-I/usr/include/boost"
-                                         "-I/usr/include/linux"
+                                         ;; "-I/usr/include"
+                                         ;; "-I/usr/include/boost"
+                                         ;; "-I/usr/include/linux"
                                          "-I/home/swarnendu/prospar-workspace/abseil-cpp"
                                          "-I/home/swarnendu/prospar-workspace/protobuf/src"
                                          (concat "-I" (expand-file-name (projectile-project-root)))
                                          ))
                             (include-path
                              (list
-                              "/usr/include"
-                              "/usr/include/boost"
-                              "/usr/include/linux"
+                              ;; "/usr/include"
+                              ;; "/usr/include/boost"
+                              ;; "/usr/include/linux"
                               "/home/swarnendu/prospar-workspace/abseil-cpp"
                               "/home/swarnendu/prospar-workspace/protobuf/src"
                               (expand-file-name (projectile-project-root))
