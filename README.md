@@ -16,7 +16,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 You can use the following instructions to install a few third-party applications. These should work on an Ubuntu 18.04 distribution.
 
-``` Bash
+```Bash
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime pandoc fonts-powerline libncurses5-dev fasd
 wget https://github.com/sharkdp/fd/releases/download/v8.0.0/fd_8.0.0_amd64.deb
 sudo dpkg -i fd_8.0.0_amd64.deb
@@ -26,7 +26,7 @@ sudo snap install shellcheck --edge
 sudo snap refresh
 python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier
 sudo npm update
 sudo gem install scss_lint
 sudo gem update
@@ -76,14 +76,14 @@ I plan to automate the complete setup sometime in the future.
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-| Customization variable                  | Documentation                                                                                                            |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `dotemacs-theme`                        | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`.          |
-| `dotemacs-modeline-theme`               | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.                            |
-| `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.              |
-| `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                             |
-| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                            |
-| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects. |
+| Customization variable                  | Documentation                                                                                                              |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `dotemacs-theme`                        | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
+| `dotemacs-modeline-theme`               | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.                              |
+| `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.                |
+| `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                               |
+| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                              |
+| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects.   |
 
 ## Browsing Source Code
 
@@ -95,13 +95,13 @@ Use GNU Global with `counsel-gtags`: `gtags -cv --gtagslabel=new-ctags`
 
 > **C/C++**
 
-``` Bash
+```Bash
 find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -cv --gtagslabel=new-ctags -f -
 ```
 
 > **Python**
 
-``` Bash
+```Bash
 find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
 ```
 
@@ -121,17 +121,17 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 
 Use Universal Ctags with `counsel-etags`.
 
-+ `-R` - recursively scan for files
-+ `-e` - use Emacs-compatible syntax
-+ `--list-excludes` - check which patterns are excluded from processing
-+ `--list-languages` - list supported languages
+- `-R` - recursively scan for files
+- `-e` - use Emacs-compatible syntax
+- `--list-excludes` - check which patterns are excluded from processing
+- `--list-languages` - list supported languages
 
-By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following  commands  exercise the tag indexing feature.
+By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 
-+ `M-x visit-tags-table <RET> FILE <RET>` - Select the tag file `FILE` to use.
-+ `M-. [TAG] <RET>` - Find the first definition of `TAG`. The default tag is the identifier under the cursor.
-+ `M-*` - Pop back to where you previously invoked `M-.`.
-+ `C-u M-.` - Find the next definition for the last tag.
+- `M-x visit-tags-table <RET> FILE <RET>` - Select the tag file `FILE` to use.
+- `M-. [TAG] <RET>` - Find the first definition of `TAG`. The default tag is the identifier under the cursor.
+- `M-*` - Pop back to where you previously invoked `M-.`.
+- `C-u M-.` - Find the next definition for the last tag.
 
 For more commands, see the Tags topic in the Emacs info document.
 
@@ -176,10 +176,10 @@ ctags -eR --languages=Python
 
 GNU Global has better database search support while Universal Ctags supports more languages. It is possible to build Global with support for Universal Ctags.
 
-+ <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
-+ <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
+- <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
+- <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
 
 ## TODO
 
-+ Use RE in `find`, it follows Emacs RE.
-+ Global does not show definitions and references in some cases, not sure why
+- Use RE in `find`, it follows Emacs RE.
+- Global does not show definitions and references in some cases, not sure why

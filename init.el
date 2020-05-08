@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'zenburn
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -136,7 +136,7 @@ whitespaces."
   (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
         ;; Avoid loading packages twice
         package-enable-at-startup nil)
-  (package-initialize)
+  (package-initialize t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
 (unless (package-installed-p 'use-package)
@@ -1421,6 +1421,7 @@ whitespaces."
          ("\\.markdown\\'" . gfm-mode)
          ("\\.md\\'" . gfm-mode))
   ;; :bind ("C-c C-d" . nil)
+  :init (setq-default markdown-hide-markup t)
   :custom
   (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-enable-math t)
@@ -1436,6 +1437,12 @@ whitespaces."
   :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
+
+(use-package prettier-js
+  :ensure t
+  :init
+  (dolist (hook '(markdown-mode gfm-mode))
+    (add-hook hook #'prettier-js-mode)))
 
 (use-package csv-mode
   :ensure t
@@ -1498,12 +1505,12 @@ whitespaces."
               (when buffer-file-name
                 (add-hook 'after-save-hook #'check-parens nil t)))))
 
-;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
-(setq-default c-default-style '((java-mode . "java")
-                                (c-mode . "stroustrup")
-                                (c++-mode . "stroustrup")
-                                (other . "gnu/linux")
-                                (awk-mode . "awk")))
+;; ;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
+;; (setq-default c-default-style '((java-mode . "java")
+;;                                 (c-mode . "stroustrup")
+;;                                 (c++-mode . "stroustrup")
+;;                                 (other . "gnu/linux")
+;;                                 (awk-mode . "awk")))
 
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
