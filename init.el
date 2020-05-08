@@ -1658,10 +1658,38 @@ whitespaces."
 (use-package php-mode
   :ensure t)
 
+(use-package web-mode
+  :ensure t
+  :mode
+  (("\\.html?\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.phtml\\'" . web-mode)
+   ("\\.hb\\.html\\'" . web-mode)
+   ("\\.tpl\\.php\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode))
+  :config
+  (setq web-mode-markup-indent-offset 4
+        web-mode-css-indent-offset 4
+        web-mode-code-indent-offset 4
+        web-mode-indent-style 4
+        web-mode-enable-auto-pairing t
+        web-mode-enable-auto-closing t
+        web-mode-enable-auto-quoting t
+        web-mode-enable-css-colorization t
+        web-mode-enable-block-face t
+        web-mode-enable-current-element-highlight t
+        web-mode-enable-current-column-highlight t))
+
+(use-package mlir-mode
+  :load-path "extras"
+  :mode ("\\.mlir\\'"))
+
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
-  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode yaml-mode) . lsp-deferred)
+  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-diagnostics-modeline-mode))
   :custom
