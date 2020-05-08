@@ -14,4 +14,5 @@
  (sh-mode . ((eval ignore-errors (require 'shfmt))
              (mode . shfmt-on-save)
              ))
+ ;; (gfm-mode . ((mode . prettier-js)))
  )

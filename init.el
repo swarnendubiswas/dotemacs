@@ -1425,8 +1425,9 @@ whitespaces."
 (use-package prettier-js
   :ensure t
   :init
-  (dolist (hook '(markdown-mode gfm-mode))
-    (add-hook hook #'prettier-js-mode)))
+  (dolist (hook '(markdown-mode-hook gfm-mode-hook))
+    (add-hook hook #'prettier-js-mode))
+  :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
 
 (use-package csv-mode
   :ensure t

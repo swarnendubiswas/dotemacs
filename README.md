@@ -59,6 +59,7 @@ The setup uses the following configuration files.
 | Tool/Checker       | Setup                                                                                   |
 | ------------------ | --------------------------------------------------------------------------------------- |
 | `markdownlint-cli` | `ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;` |
+| `prettier`         | `ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc`                         |
 | `pylint`           | `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;`              |
 | `yapf`             | `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;`                      |
 
@@ -181,5 +182,6 @@ GNU Global has better database search support while Universal Ctags supports mor
 
 ## TODO
 
+- Use custom major modes for files by names
 - Use RE in `find`, it follows Emacs RE.
 - Global does not show definitions and references in some cases, not sure why
