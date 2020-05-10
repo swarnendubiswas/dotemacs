@@ -183,5 +183,5 @@ GNU Global has better database search support while Universal Ctags supports mor
 ## TODO
 
 - Use custom major modes for files by names
-- Use RE in `find`, it follows Emacs RE.
 - Global does not show definitions and references in some cases, not sure why
+- Use RE in `find`, it follows Emacs RE.

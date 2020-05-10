@@ -1,4 +1,5 @@
 {
+    "editor.formatOnSave": true,
     "files.exclude": {
         "elpa": true,
         "irony": true,
