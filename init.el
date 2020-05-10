@@ -223,7 +223,7 @@ whitespaces."
       truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends nil)
+      vc-handled-backends '(Git))
 
 ;; ;; Reset `gc-cons-threshold' to its default value otherwise there can be large pause times whenever
 ;; ;; GC eventually happens
@@ -1402,16 +1402,16 @@ whitespaces."
   :diminish gfm-mode
   :ensure-system-package pandoc
   :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.markdown\\'" . gfm-mode)
-         ("\\.md\\'" . gfm-mode))
+         ("\\.markdown\\'" . markdown-mode)
+         ("\\.md\\'" . markdown-mode))
   ;; :bind ("C-c C-d" . nil)
   :init (setq-default markdown-hide-markup t)
   :custom
-  (mardown-indent-on-enter 'indent-and-new-item)
+  ;; (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-enable-math t)
-  (markdown-make-gfm-checkboxes-buttons t)
+  (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-command "pandoc -f markdown -s "))
+  (markdown-command '("pandoc" "-f markdown" "-t pdf" "-s")))
 
 (use-package markdown-mode+
   :ensure t)
