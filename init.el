@@ -208,6 +208,8 @@ whitespaces."
       kill-whole-line t
       major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup ~ files
+      pop-up-frames nil
+      pop-up-windows nil
       read-buffer-completion-ignore-case t
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-process-output-max (* 1024 1024) ; 1 MB
@@ -309,6 +311,8 @@ whitespaces."
                                                   split-height-threshold 0))
       ((eq dotemacs-window-split 'horizontal) (setq split-height-threshold nil
                                                     split-width-threshold 0)))
+(setq split-height-threshold (* (window-height) 10)
+      split-width-threshold (* (window-width) 10))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)
@@ -339,6 +343,8 @@ whitespaces."
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
 (size-indication-mode -1)
+
+(set-frame-parameter nil 'unsplittable t)
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -1184,15 +1190,14 @@ whitespaces."
          :map xref--xref-buffer-mode-map
          ("C-o" . xref-show-location-at-point)
          ("<tab>" . xref-quit-and-goto-xref)
-         ("r" . xref-query-replace-in-results)))
-
-(use-package ivy-xref
-  :ensure t
-  :if (eq dotemacs-tags-scheme 'ctags)
-  :init
-  (when (boundp 'xref-show-definitions-function)
-    (setq xref-show-definitions-function #'ivy-xref-show-defs))
-  (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
+         ("r" . xref-query-replace-in-results))
+  :config
+  (use-package ivy-xref
+    :ensure t
+    :demand t
+    :init
+    (setq xref-show-definitions-function #'ivy-xref-show-defs
+          xref-show-xrefs-function #'ivy-xref-show-xrefs)))
 
 (use-package counsel-etags
   :ensure t
@@ -1297,8 +1302,6 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*")))
-
-(setq pop-up-frames nil) ; Don't allow Emacs to popup new frames
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t

@@ -16,8 +16,6 @@
         ".projectile": true,
         "network-security*": true,
         "semanticdb": true,
-        "tmp": true,
-        "dict": true,
         ".cache": true,
         "transient": true,
         "tramp": true,
@@ -34,7 +32,6 @@
         "eshell": true,
         "reference-cards": true,
         "tmp": true,
-        "extras": true,
         "workspace": true
     }
 }
