@@ -1148,7 +1148,7 @@ whitespaces."
   (imenu-max-item-length 100))
 
 (setq tags-revert-without-query t
-      large-file-warning-threshold (* 250 1024 1024)
+      large-file-warning-threshold (* 500 1024 1024)
       tags-add-tables nil)
 
 ;; Xref does not seem to have a maintained backend for Gtags
