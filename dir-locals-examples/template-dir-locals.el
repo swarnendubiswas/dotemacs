@@ -17,6 +17,7 @@
                                 (locate-dominating-file buffer-file-name
                                                         ".dir-locals.el"))))
          (eval . (cider-register-cljs-repl-type 'my-cljs-repl "(code-that-switches-to-the-cljs-repl)"))
+         (eval . (flycheck-mode 0))
          ))
 
  (sh-mode . (
