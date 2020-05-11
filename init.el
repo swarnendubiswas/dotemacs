@@ -212,6 +212,7 @@ whitespaces."
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-process-output-max (* 1024 1024) ; 1 MB
       require-final-newline t ; Always end a file with a newline.
+      ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       sentence-end-double-space nil
@@ -223,7 +224,7 @@ whitespaces."
       truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends '(Git))
+      vc-handled-backends nil)
 
 ;; ;; Reset `gc-cons-threshold' to its default value otherwise there can be large pause times whenever
 ;; ;; GC eventually happens
