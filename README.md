@@ -17,7 +17,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 You can use the following instructions to install a few third-party applications. These should work on an Ubuntu 18.04 distribution.
 
 ```Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip npm cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-9 clangd-9 clang-{format,tidy,tools}-9 clang-9-doc clang-9-examples llvm-9 lld-9 lldb-9 llvm-9-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.0.0/fd_8.0.0_amd64.deb
 sudo dpkg -i fd_8.0.0_amd64.deb
 sudo snap install shfmt
@@ -56,12 +56,12 @@ echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
 
 The setup uses the following configuration files.
 
-| Tool/Checker       | Setup                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------- |
+| Tool/Checker | Setup |
+| --- | --- |
 | `markdownlint-cli` | `ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;` |
-| `prettier`         | `ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc`                         |
-| `pylint`           | `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;`              |
-| `yapf`             | `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;`                      |
+| `prettier` | `ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc` |
+| `pylint` | `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;` |
+| `yapf` | `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;` |
 
 I plan to automate the complete setup sometime in the future.
 
@@ -77,14 +77,14 @@ I plan to automate the complete setup sometime in the future.
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-| Customization variable                  | Documentation                                                                                                              |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `dotemacs-theme`                        | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
-| `dotemacs-modeline-theme`               | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.                              |
-| `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.                |
-| `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                               |
-| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                              |
-| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects.   |
+| Customization variable | Documentation |
+| --- | --- |
+| `dotemacs-theme` | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
+| `dotemacs-modeline-theme` | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`. |
+| `dotemacs-window-split` | Specify the direction in which the windows should be split. This depends on the orientation of the display. |
+| `dotemacs-fill-column` | Column beyond which lines should not extend. |
+| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not. |
+| `dotemacs-tags-scheme` | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects. |
 
 ## Browsing Source Code
 
@@ -183,5 +183,3 @@ GNU Global has better database search support while Universal Ctags supports mor
 ## TODO
 
 - Use custom major modes for files by names
-- Global does not show definitions and references in some cases, not sure why
-- Use RE in `find`, it follows Emacs RE.

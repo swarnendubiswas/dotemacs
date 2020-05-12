@@ -339,12 +339,12 @@ whitespaces."
       (scroll-bar-mode -1)))
 (tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
-(toggle-frame-maximized) ; Maximize Emacs on startup
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
 (size-indication-mode -1)
-
+(toggle-frame-maximized) ; Maximize Emacs on startup
 (set-frame-parameter nil 'unsplittable t)
+(fringe-mode '(0 . 0))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -397,6 +397,9 @@ whitespaces."
                                           :init (load-theme 'doom-vibrant t)))
 
       ((eq dotemacs-theme 'default) (progn
+                                      (setq frame-background-mode 'light)
+                                      (set-background-color "#ffffff")
+                                      (set-foreground-color "#666666")
                                       (set-face-attribute 'region nil
                                                           :background "light sky blue"
                                                           :foreground "white"))))
@@ -480,10 +483,11 @@ whitespaces."
                                                      (doom-modeline-minor-modes t)
                                                      (doom-modeline-indent-info t)))
 
-      ((eq dotemacs-modeline-theme 'default) ))
+      ((eq dotemacs-modeline-theme 'default)))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
-(set-frame-font "DejaVu Sans Mono" nil t)
+;; (set-frame-font "DejaVu Sans Mono" nil t)
+(set-frame-font "Roboto Mono 14")
 (set-face-attribute 'default nil :height 130)
 (set-face-attribute 'mode-line nil :height 110)
 
@@ -1409,11 +1413,12 @@ whitespaces."
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
   ;; :bind ("C-c C-d" . nil)
-  :init (setq-default markdown-hide-markup t)
+  ;; Hiding markup makes it difficult to be consistent while editing
+  ;; :init (setq-default markdown-hide-markup t)
   :custom
   ;; (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-enable-math t)
-  (markdown-make-gfm-checkboxes-buttons nil)
+  ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
   (markdown-command '("pandoc" "-f markdown" "-t pdf" "-s")))
 
@@ -1648,27 +1653,24 @@ whitespaces."
 
 (use-package web-mode
   :ensure t
-  :mode
-  (("\\.html?\\'" . web-mode)
-   ("\\.djhtml\\'" . web-mode)
-   ("\\.phtml\\'" . web-mode)
-   ("\\.hb\\.html\\'" . web-mode)
-   ("\\.tpl\\.php\\'" . web-mode)
-   ("\\.[agj]sp\\'" . web-mode)
-   ("\\.as[cp]x\\'" . web-mode)
-   ("\\.erb\\'" . web-mode))
-  :config
-  (setq web-mode-markup-indent-offset 4
-        web-mode-css-indent-offset 4
-        web-mode-code-indent-offset 4
-        web-mode-indent-style 4
-        web-mode-enable-auto-pairing t
-        web-mode-enable-auto-closing t
-        web-mode-enable-auto-quoting t
-        web-mode-enable-css-colorization t
-        web-mode-enable-block-face t
-        web-mode-enable-current-element-highlight t
-        web-mode-enable-current-column-highlight t))
+  ;; :mode
+  ;; (("\\.html?\\'" . web-mode)
+  ;;  ("\\.djhtml\\'" . web-mode)
+  ;;  ("\\.phtml\\'" . web-mode)
+  ;;  ("\\.hb\\.html\\'" . web-mode)
+  ;;  ("\\.tpl\\.php\\'" . web-mode)
+  ;;  ("\\.[agj]sp\\'" . web-mode)
+  ;;  ("\\.as[cp]x\\'" . web-mode)
+  ;;  ("\\.erb\\'" . web-mode))
+  ;; :custom
+  ;;(web-mode-enable-auto-pairing t)
+  ;; (web-mode-enable-auto-closing t)
+  ;; (web-mode-enable-auto-quoting t)
+  ;; (web-mode-enable-css-colorization t)
+  ;; (web-mode-enable-block-face t)
+  ;; (web-mode-enable-current-element-highlight t)
+  ;; (web-mode-enable-current-column-highlight t)
+  )
 
 (use-package mlir-mode
   :load-path "extras"
