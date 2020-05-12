@@ -504,7 +504,7 @@ whitespaces."
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
-(set-frame-font "Roboto Mono 14")
+(set-frame-font "Roboto Mono")
 (set-face-attribute 'default nil :height 130)
 (set-face-attribute 'mode-line nil :height 110)
 
