@@ -142,7 +142,8 @@ whitespaces."
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-(setq use-package-enable-imenu-support t)
+(defvar use-package-enable-imenu-support) ; Silence assignment to free variable warning
+(setq use-package-enable-imenu-support t) ; Need to set before loading use-package
 (eval-when-compile
   (require 'use-package))
 
@@ -191,8 +192,10 @@ whitespaces."
       confirm-kill-emacs nil
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
+      custom-safe-themes t
       delete-by-moving-to-trash t
       enable-recursive-minibuffers t
+      frame-title-format (list '(buffer-file-name "%f" "%b"))
       gc-cons-percentage 0.5
       gc-cons-threshold (* 200 1024 1024)
       history-delete-duplicates t
@@ -228,8 +231,16 @@ whitespaces."
       use-file-dialog nil
       vc-handled-backends nil)
 
-;; ;; Reset `gc-cons-threshold' to its default value otherwise there can be large pause times whenever
-;; ;; GC eventually happens
+(setq-default fill-column dotemacs-fill-column
+              indent-tabs-mode nil ; Spaces instead of tabs by default
+              indicate-empty-lines t
+              standard-indent 2
+              tab-always-indent 'complete
+              tab-width 4)
+
+;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
+;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
+;; permanently.
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (setq gc-cons-threshold 800000)))
@@ -245,8 +256,8 @@ whitespaces."
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
 (column-number-mode 1)
-(diminish 'auto-fill-function) ; This is not a library/file, so eval-after-load does not work
-(global-prettify-symbols-mode -1)
+(diminish 'auto-fill-function) ; Not a library/file, so eval-after-load does not work
+(global-prettify-symbols-mode -1) ; Makes it difficult to edit the buffer
 (minibuffer-depth-indicate-mode 1)
 (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
 
@@ -327,10 +338,6 @@ whitespaces."
   :custom
   (abbrev-file-name (expand-file-name "abbrev_defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
-
-(setq custom-safe-themes t
-      frame-title-format (list '(buffer-file-name "%f" "%b"))
-      indicate-empty-lines t)
 
 (if window-system
     (progn
@@ -861,7 +868,6 @@ whitespaces."
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
-;; TODO: DO we need to load this after counsel-projectile?
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
 (use-package ivy-rich
   :ensure t
@@ -936,12 +942,6 @@ whitespaces."
   :ensure t
   :bind ("C-;" . flyspell-popup-correct)
   :custom (flyspell-popup-correct-delay 0.5))
-
-(setq-default fill-column dotemacs-fill-column
-              indent-tabs-mode nil ; Spaces instead of tabs by default
-              standard-indent 2
-              tab-always-indent 'complete
-              tab-width 4)
 
 (use-package highlight-indentation
   :ensure t
@@ -1476,10 +1476,6 @@ whitespaces."
   :mode (("\\Makefile\\'" . makefile-mode)
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-;; (use-package electric
-;;   :disabled t
-;;   :hook (prog-mode . electric-layout-mode))
-
 ;; https://emacs.stackexchange.com/questions/31414/how-to-globally-disable-eldoc
 (use-package eldoc
   :if (eq system-type 'gnu/linux)
@@ -1515,6 +1511,7 @@ whitespaces."
   (c-set-style "cc-mode")
   (c-basic-offset 2)
   :config
+  ;; Disable electric indentation and on-type formatting
   (add-hook 'c++-mode-hook
             (lambda ()
               (setq-local c-electric-flag nil
@@ -1575,14 +1572,12 @@ whitespaces."
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
+  :config (unbind-key "C-c C-d" sh-mode-map) ;; Was bound to sh-cd-here
   :custom
   (sh-basic-offset 2)
   (sh-indentation 2)
   (sh-indent-comment t)
-  (sh-indent-after-continuation 'always)
-  :config
-  ;; Was bound to sh-cd-here
-  (unbind-key "C-c C-d" sh-mode-map))
+  (sh-indent-after-continuation 'always))
 
 (use-package fish-mode
   :ensure t
