@@ -500,7 +500,7 @@ whitespaces."
 
 (use-package ibuffer
   :custom
-  (ibuffer-default-sorting-mode 'alphabetic) ; Options: major-mode
+  (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-display-summary nil)
   (ibuffer-use-header-line t)
   :config (defalias 'list-buffers 'ibuffer))
@@ -544,14 +544,13 @@ whitespaces."
 
 (use-package dired-x
   :custom
-  (dired-bind-jump t)
   (dired-omit-verbose nil) ; Do not show messages when omitting files
   :hook (dired-mode . dired-omit-mode)
-  :config
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Make sure to remove \"Omit\" from the modeline."
-    (diminish 'dired-omit-mode) dired-mode-map)
+  ;; :config
+  ;; ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  ;; (defadvice dired-omit-startup (after diminish-dired-omit activate)
+  ;;   "Make sure to remove \"Omit\" from the modeline."
+  ;;   (diminish 'dired-omit-mode) dired-mode-map)
   :bind ("C-x C-j" . dired-jump))
 
 (use-package dired+ ; Do not create multiple dired buffers
@@ -606,9 +605,7 @@ whitespaces."
 
 (use-package swiper ; Performs poorly if there are a large number of matches
   :ensure t
-  :custom
-  (swiper-use-visual-line t)
-  (swiper-action-recenter t))
+  :custom (swiper-action-recenter t))
 
 (use-package wgrep ; Writable grep
   :ensure t
@@ -648,18 +645,18 @@ whitespaces."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
-;; Use "M-x company-diag" to see the backend used
+;; Use "M-x company-diag" or the modeline status to see the backend used
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
   :custom
   (company-dabbrev-downcase nil) ; Do not downcase returned candidates
-  (company-idle-delay 0.0)
+  (company-idle-delay 0.0) ; Recommended by lsp
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
-  (company-minimum-prefix-length 2)
+  (company-minimum-prefix-length 2) ; Small words are faster to type
   (company-selection-wrap-around t)
-  (company-show-numbers t)
+  (company-show-numbers t) ; Helps speed up completion
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
@@ -738,6 +735,7 @@ whitespaces."
   (ivy-count-format "(%d/%d) ") ; This is beneficial to identify wrap around
   (ivy-extra-directories nil) ; Hide "." and ".."
   (ivy-fixed-height-minibuffer t) ; It is distracting if the mini-buffer height keeps changing
+  ;; Make the height of the minibuffer proportionate to the screen
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
@@ -749,7 +747,7 @@ whitespaces."
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   (defalias 'occur 'ivy-occur)
   :config
-  (dolist (buffer '("TAGS"))
+  (dolist (buffer '("TAGS" "magit-process"))
     (add-to-list 'ivy-ignore-buffers buffer))
   :bind
   (("C-c r" . ivy-resume)
@@ -1198,7 +1196,7 @@ whitespaces."
   :config
   (use-package ivy-xref
     :ensure t
-    :demand t
+    :demand t ; Load once xref is invoked
     :init
     (setq xref-show-definitions-function #'ivy-xref-show-defs
           xref-show-xrefs-function #'ivy-xref-show-xrefs)))
@@ -1313,7 +1311,6 @@ whitespaces."
 
 (use-package expand-line
   :ensure t
-  :defines expand-line-mode
   :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -1330,7 +1327,7 @@ whitespaces."
 (use-package crux
   :ensure t
   :bind (("C-c d i" . crux-ispell-word-then-abbrev)
-         ("C-c d s" .  crux-sudo-edit)
+         ("C-c d s" . crux-sudo-edit)
          ("<f12>" . crux-kill-other-buffers)))
 
 (use-package apt-sources-list
@@ -1357,7 +1354,7 @@ whitespaces."
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
   :diminish
-  :custom (super-save-remote-files nil)
+  :custom (super-save-remote-files nil) ; Ignore remote files
   :hook (after-init . super-save-mode)
   :config (add-to-list 'super-save-triggers 'ace-window))
 
@@ -1367,7 +1364,7 @@ whitespaces."
          ("C-'" . avy-goto-char)
          ("C-/" . avy-goto-line))
   :custom
-  (avy-background t)
+  ;; (avy-background t)
   (avy-highlight-first t)
   (avy-style 'at)
   :config
@@ -1420,10 +1417,11 @@ whitespaces."
   (markdown-enable-math t)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-command '("pandoc" "-f markdown" "-t pdf" "-s")))
-
-(use-package markdown-mode+
-  :ensure t)
+  (markdown-command '("pandoc" "-f markdown" "-t pdf" "-s"))
+  :config
+  (use-package markdown-mode+
+    :ensure t
+    :demand t))
 
 (use-package pandoc-mode
   :ensure t
