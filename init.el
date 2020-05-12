@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'monokai
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -68,11 +68,12 @@
           (const :tag "tangotango" tangotango)
           (const :tag "zenburn" zenburn)
           (const :tag "doom-themes" doom-themes)
+          (const :tag "monokai" monokai)
           (const :tag "default" default))
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -401,7 +402,16 @@ whitespaces."
 
       ((eq dotemacs-theme 'doom-themes) (use-package doom-themes
                                           :ensure t
-                                          :init (load-theme 'doom-vibrant t)))
+                                          :init (load-theme 'doom-monokai-classic t)
+                                          :config
+                                          (set-face-attribute 'font-lock-comment-face nil
+                                                              ;; :foreground "#cccccc"
+                                                              ;; :foreground "#b2b2b2"
+                                                              :foreground "#999999")))
+
+      ((eq dotemacs-theme 'monokai) (use-package monokai-theme
+                                      :ensure t
+                                      :init (load-theme 'monokai t)))
 
       ((eq dotemacs-theme 'default) (progn
                                       (setq frame-background-mode 'light)
