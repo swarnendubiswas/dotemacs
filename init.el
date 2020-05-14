@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'monokai
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -150,7 +150,8 @@ whitespaces."
 
 (setq use-package-always-defer t
       use-package-compute-statistics nil ; Use "M-x use-package-report" to see results
-      use-package-expand-minimally t)
+      ;; Avoid printing error and warning code, use if the configuration is known to work
+      use-package-expand-minimally nil)
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -181,26 +182,30 @@ whitespaces."
 (use-package exec-path-from-shell
   :ensure t
   :if (memq window-system '(x ns))
-  :custom (exec-path-from-shell-check-startup-files nil)
+  ;; :custom (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
+      auto-mode-case-fold nil ; Disable a second case insensitive pass
       auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
-      blink-matching-paren nil
-      case-fold-search t
+      blink-matching-paren nil ; Distracting
+      case-fold-search t ; Searches and matches should ignore case
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
       custom-safe-themes t
-      delete-by-moving-to-trash t
+      delete-by-moving-to-trash t ; Use system trash to deal with mistakes
       enable-recursive-minibuffers t
+      find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b"))
-      gc-cons-percentage 0.5
+      gc-cons-percentage 0.5 ; Portion of heap used for allocation
+      ;; GC may happen after this many bytes are allocated since GC
       gc-cons-threshold (* 200 1024 1024)
       history-delete-duplicates t
-      inhibit-compacting-font-caches t
+      indicate-buffer-boundaries nil
+      inhibit-compacting-font-caches t ; Do not compact font caches during GC
       ;; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-default-init t
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead
@@ -212,9 +217,11 @@ whitespaces."
       kill-whole-line t
       major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup ~ files
-      pop-up-frames nil
+      mouse-drag-copy-region t
+      mouse-yank-at-point t ; Yank at point instead of at click
+      pop-up-frames nil ; Avoid making separate frames
       pop-up-windows nil
-      read-buffer-completion-ignore-case t
+      read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-process-output-max (* 1024 1024) ; 1 MB
       require-final-newline t ; Always end a file with a newline.
@@ -230,7 +237,10 @@ whitespaces."
       truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends nil)
+      vc-handled-backends nil
+      visible-bell nil
+      ;; Do not use system tooltips
+      x-gtk-use-system-tooltips nil)
 
 (setq-default fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs by default
@@ -238,6 +248,10 @@ whitespaces."
               standard-indent 2
               tab-always-indent 'complete
               tab-width 4)
+
+;; Doom Emacs: Disable bidirectional text rendering for a modest performance boost
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -268,6 +282,7 @@ whitespaces."
          (dired-mode . auto-revert-mode)) ; Auto refresh dired when files change
   :custom
   (auto-revert-verbose nil)
+  ;; Enable auto revert on other buffers like dired
   (global-auto-revert-non-file-buffers t))
 
 (use-package delsel ; Typing with the mark active will overwrite the marked region
@@ -282,7 +297,8 @@ whitespaces."
   :unless noninteractive
   :hook (after-init . savehist-mode)
   :custom
-  (savehist-additional-variables '(search-ring
+  (savehist-additional-variables '(kill-ring
+                                   search-ring
                                    regexp-search-ring
                                    extended-command-history
                                    file-name-history))
@@ -495,8 +511,8 @@ whitespaces."
                                                      :init (doom-modeline-mode 1)
                                                      :custom
                                                      (doom-modeline-buffer-encoding nil)
-                                                     (doom-modeline-height 22)
-                                                     (doom-modeline-gnus nil)
+                                                     ;; (doom-modeline-height 22)
+                                                     ;; (doom-modeline-gnus nil)
                                                      (doom-modeline-minor-modes t)
                                                      (doom-modeline-indent-info t)))
 
@@ -645,7 +661,7 @@ whitespaces."
                      "/.autosaves/"
                      ".*-loaddefs.el"
                      "/TAGS$"))
-  :config (run-at-time nil 300 'recentf-save-list)
+  :config (run-at-time nil 300 'recentf-save-list) ; Save every 300 s
   :hook (after-init . recentf-mode))
 
 ;; Hide the "Wrote to recentf" message which is irritating
@@ -666,7 +682,7 @@ whitespaces."
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 2) ; Small words are faster to type
   (company-selection-wrap-around t)
-  (company-show-numbers t) ; Helps speed up completion
+  (company-show-numbers t) ; Speed up completion
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
@@ -1190,7 +1206,13 @@ whitespaces."
               ("C-c g s" . counsel-gtags-find-symbol)
               ("C-c g d" . counsel-gtags-find-definition)
               ("C-c g c" . counsel-gtags-create-tags)
-              ("C-c g u" . counsel-gtags-update-tags)))
+              ("C-c g u" . counsel-gtags-update-tags))
+  :config
+  (use-package global-tags
+    :ensure t
+    :if (eq dotemacs-tags-scheme 'gtags)
+    :demand t
+    :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend)))
 
 (use-package xref
   :if (eq dotemacs-tags-scheme 'ctags)
@@ -1207,7 +1229,7 @@ whitespaces."
   (use-package ivy-xref
     :ensure t
     :demand t ; Load once xref is invoked
-    :init
+    :config
     (setq xref-show-definitions-function #'ivy-xref-show-defs
           xref-show-xrefs-function #'ivy-xref-show-xrefs)))
 
@@ -1503,13 +1525,6 @@ whitespaces."
               (when buffer-file-name
                 (add-hook 'after-save-hook #'check-parens nil t)))))
 
-;; ;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
-;; (setq-default c-default-style '((java-mode . "java")
-;;                                 (c-mode . "stroustrup")
-;;                                 (c++-mode . "stroustrup")
-;;                                 (other . "gnu/linux")
-;;                                 (awk-mode . "awk")))
-
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
 (use-package cc-mode
@@ -1583,8 +1598,7 @@ whitespaces."
   :config (unbind-key "C-c C-d" sh-mode-map) ;; Was bound to sh-cd-here
   :custom
   (sh-basic-offset 2)
-  (sh-indentation 2)
-  (sh-indent-comment t)
+  (sh-indent-comment t) ; Indent comments as a regular line
   (sh-indent-after-continuation 'always))
 
 (use-package fish-mode
@@ -1618,12 +1632,13 @@ whitespaces."
   :ensure t
   :bind ("C-x g" . magit-status)
   :custom
+  (magit-completing-read-function 'ivy-completing-read)
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (magit-save-repository-buffers t)
+  (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
   (transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory))
   (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory))
-  (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
-  (magit-save-repository-buffers t)
-  (magit-completing-read-function 'ivy-completing-read)
-  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
+  )
 
 (use-package gitignore-mode
   :ensure t)
@@ -1756,6 +1771,7 @@ whitespaces."
                     :remote? t
                     :server-id 'typescript-remote))
   :bind (("M-." . lsp-find-definition)
+         ;; ("M-," . pop-tag-mark)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
          ("C-c l r" . lsp-rename)

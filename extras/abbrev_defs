@@ -851,6 +851,7 @@
     ("perfomrance" "performance" nil :count 1)
     ("performace" "performance" nil :count 3)
     ("performence" "performance" nil :count 0)
+    ("perfromance" "performance" nil :count 0)
     ("perhasp" "perhaps" nil :count 0)
     ("perhpas" "perhaps" nil :count 0)
     ("permanant" "permanent" nil :count 0)
