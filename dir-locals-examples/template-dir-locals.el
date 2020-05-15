@@ -20,6 +20,13 @@
          (eval . (flycheck-mode 0))
          ))
 
+ (nil
+  (eval
+   (lambda ()
+     (when (string= (file-name-nondirectory buffer-file-name)
+                    "wordlist")
+       (text-mode)))))
+
  (sh-mode . (
              (eval ignore-errors (require 'shfmt))
              (mode . shfmt-on-save)

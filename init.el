@@ -1697,11 +1697,11 @@ whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
-  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
+  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode nxml-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-diagnostics-modeline-mode))
   :custom
-  (lsp-clients-clangd-args '("-j=2" "-background-index" "--clang-tidy" "-log=error"))
+  (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--log=error" "--pretty"))
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
