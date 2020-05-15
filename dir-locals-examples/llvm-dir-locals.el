@@ -1,7 +1,7 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|PTRacer-solver\\|new_algo\\|newfasttrack\\|spd3-lib\\|tbb-lib\\|tdebug-llvm")
-         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "/build" "built"))
+         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.o$\\|.out$\\|.tar.gz$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.clangd\\|.recommenders\\|PTRacer-solver\\|tbb-lib\\|tdebug-llvm")
+         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "build" "built"))
          (eval . (setq-local counsel-etags-project-root (projectile-project-root)
                              tags-table-files (list (projectile-project-root))))
          ))
@@ -24,6 +24,7 @@
                                          "-std=c++11"
                                          (concat "-I" (expand-file-name "tdebug-llvm/llvm/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "tdebug-llvm/clang/include" (projectile-project-root)))
+                                         (concat "-I" (expand-file-name "tbb-lib/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "tdebug-lib/include" (projectile-project-root)))
                                          (concat "-I"(expand-file-name "spd3-lib/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "fasttrack/include" (projectile-project-root)))
@@ -33,6 +34,7 @@
                             (include-path (list
                                            (expand-file-name "tdebug-llvm/llvm/include" (projectile-project-root))
                                            (expand-file-name "tdebug-llvm/clang/include" (projectile-project-root))
+                                           (expand-file-name "tbb-lib/include" (projectile-project-root))
                                            (expand-file-name "tdebug-lib/include" (projectile-project-root))
                                            (expand-file-name "spd3-lib/include" (projectile-project-root))
                                            (expand-file-name "fasttrack/include" (projectile-project-root))
