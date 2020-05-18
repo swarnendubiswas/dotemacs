@@ -37,7 +37,7 @@ luarocks install --server=http://luarocks.org/dev digestif --local
 cargo install --git https://github.com/latex-lsp/texlab.git
 ```
 
-The setup also requires Universal Ctags and GNU Global.
+The setup also requires Universal Ctags (for `ctags`) and GNU Global (for `gtags`).
 
 ```Bash
 git clone git@github.com:universal-ctags/ctags.git universal-ctags
@@ -56,12 +56,29 @@ echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
 
 The setup uses the following configuration files.
 
-| Tool/Checker | Setup |
-| --- | --- |
-| `markdownlint-cli` | `ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;` |
-| `prettier` | `ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc` |
-| `pylint` | `ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;` |
-| `yapf` | `ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;` |
+> `markdownlint-cli`
+
+```Bash
+ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;
+```
+
+> `prettier`
+
+```bash
+ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc
+```
+
+> `pylint`
+
+```bash
+ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;
+```
+
+> `yapf`
+
+```bash
+ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;
+```
 
 I plan to automate the complete setup sometime in the future.
 
@@ -77,18 +94,18 @@ I plan to automate the complete setup sometime in the future.
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-| Customization variable | Documentation |
-| --- | --- |
-| `dotemacs-theme` | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
-| `dotemacs-modeline-theme` | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`. |
-| `dotemacs-window-split` | Specify the direction in which the windows should be split. This depends on the orientation of the display. |
-| `dotemacs-fill-column` | Column beyond which lines should not extend. |
-| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not. |
-| `dotemacs-tags-scheme` | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects. |
+| Custom variable                         | Documentation                                                                                                              |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `dotemacs-theme`                        | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
+| `dotemacs-modeline-theme`               | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.                              |
+| `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.                |
+| `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                               |
+| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                              |
+| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects.   |
 
 ## Browsing Source Code
 
-Support for `LSP` protocol in GNU Emacs means you mostly will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
+Support for `LSP` protocol in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
 
 ### GNU Global
 

@@ -306,13 +306,14 @@ whitespaces."
   (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
 
-(use-package uniquify
-  :custom
-  (uniquify-after-kill-buffer-p t)
-  (uniquify-buffer-name-style 'forward)
-  (uniquify-ignore-buffers-re "^\\*")
-  (uniquify-separator "/")
-  (uniquify-strip-common-suffix t))
+;; (use-package uniquify
+;; :custom
+;; (uniquify-after-kill-buffer-p t)
+;; (uniquify-buffer-name-style 'forward)
+;; (uniquify-ignore-buffers-re "^\\*")
+;; (uniquify-separator "/")
+;; (uniquify-strip-common-suffix t)
+;; )
 
 ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
 (use-package hippie-exp
@@ -696,9 +697,10 @@ whitespaces."
   (add-hook hook
             (lambda ()
               (make-local-variable 'company-backends)
-              (setq company-backends '(company-dabbrev
-                                       company-ispell
-                                       company-files)))))
+              (setq company-backends '(company-capf
+                                       company-files
+                                       company-dabbrev
+                                       company-ispell)))))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
   (add-hook hook
@@ -1449,7 +1451,7 @@ whitespaces."
   (markdown-enable-math t)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-command '("pandoc" "-f markdown" "-t pdf" "-s"))
+  (markdown-command "pandoc -f markdown -s")
   :config
   (use-package markdown-mode+
     :ensure t
@@ -1637,8 +1639,7 @@ whitespaces."
   (magit-save-repository-buffers t)
   (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
   (transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory))
-  (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory))
-  )
+  (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory)))
 
 (use-package gitignore-mode
   :ensure t)
@@ -1681,7 +1682,7 @@ whitespaces."
   ;;  ("\\.as[cp]x\\'" . web-mode)
   ;;  ("\\.erb\\'" . web-mode))
   ;; :custom
-  ;;(web-mode-enable-auto-pairing t)
+  ;; (web-mode-enable-auto-pairing t)
   ;; (web-mode-enable-auto-closing t)
   ;; (web-mode-enable-auto-quoting t)
   ;; (web-mode-enable-css-colorization t)
@@ -1716,6 +1717,7 @@ whitespaces."
   (lsp-prefer-capf t)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
+  (lsp-pyls-plugins-jedi-completion-fuzzy t)
   (lsp-pyls-plugins-mccabe-enabled nil)
   (lsp-pyls-plugins-preload-modules ["numpy"])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
@@ -1800,7 +1802,8 @@ whitespaces."
 
 (use-package lsp-ivy
   :ensure t
-  :commands lsp-ivy-workspace-symbol
+  :after lsp
+  :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol)
   :bind ("C-c l s" . lsp-ivy-global-workspace-symbol))
 
 (use-package lsp-java
