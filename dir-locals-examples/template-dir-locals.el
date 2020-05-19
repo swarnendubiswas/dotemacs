@@ -2,7 +2,9 @@
  (nil . (
          (counsel-find-file-ignore-regexp
           . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
+         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "build" "built"))
          (projectile-project-compilation-cmd . "cd bin && cmake .. && cmake --build . && cd Debug && .\\shiolink.exe")
+         (projectile-project-compilation-cmd . latexmk)
          (projectile-project-run-cmd . "cd bin\\Debug && .\\shiolink.exe && E:\\nanika\\ssp.exe")
          (show-trailing-whitespace . t)
          (eval . (progn BODY))
@@ -27,6 +29,10 @@
                     "wordlist")
        (text-mode)))))
 
+ (emacs-lisp-mode . (
+                     (no-byte-compile . t)
+                     ))
+
  (sh-mode . (
              (eval ignore-errors (require 'shfmt))
              (mode . shfmt-on-save)
@@ -50,7 +56,7 @@
                                          (concat "-I" (expand-file-name "tdebug-llvm/llvm/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "tdebug-llvm/clang/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "tdebug-lib/include" (projectile-project-root)))
-                                         (concat "-I"(expand-file-name "spd3-lib/include" (projectile-project-root)))
+                                         (concat "-I" (expand-file-name "spd3-lib/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "fasttrack/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "newfasttrack/include" (projectile-project-root)))
                                          (concat "-I" (expand-file-name "new_algo/include" (projectile-project-root)))
@@ -71,4 +77,13 @@
                                     flycheck-clang-include-path include-path)
                         ))
               ))
+
+ (latex-mode . (
+                (TeX-master . "/home/swarnendu/plass-workspace/arc-paper/paper.tex")
+                (reftex-default-bibliography . ("/home/swarnendu/plass-workspace/bib/plass.bib"))
+                (company-bibtex-bibliography . ("/home/swarnendu/plass-workspace/bib/plass.bib"))
+                (bibtex-completion-bibliography . ("/home/swarnendu/plass-workspace/bib/plass.bib"))
+                (eval . (add-hook 'before-save-hook #'sb/save-buffer-and-run-latexmk)))
+             )
+
  )

@@ -350,6 +350,15 @@ whitespaces."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
+;; http://coldnew.github.io/coldnew-emacs/
+(use-package noflet
+  :ensure t
+  :demand t
+  :config
+  (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+    "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+    (noflet ((process-list ())) ad-do-it)))
+
 (use-package abbrev
   :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
@@ -1436,6 +1445,14 @@ whitespaces."
                                    (concat
                                     dotemacs-temp-directory "logview-cache.extmap"))))
 
+(use-package bison-mode
+  :ensure t
+  :mode ("\\.y\\'" "\\.l\\'" "\\.jison\\'"))
+
+(use-package js2-mode
+  :ensure t
+  :mode "\\.js\\'")
+
 (use-package markdown-mode
   :ensure t
   :diminish gfm-mode
@@ -1514,8 +1531,8 @@ whitespaces."
   :diminish
   :config (global-eldoc-mode -1))
 
-(use-package octave
-  :mode "\\.m\\'")
+(use-package matlab-mode
+  :ensure t)
 
 (use-package ini-mode
   :ensure t
@@ -1983,6 +2000,11 @@ Increase line spacing by two line height."
   :hook (after-init . which-key-mode)
   :config (which-key-setup-side-window-right-bottom)
   :diminish)
+
+;; Only start server mode if I'm not root
+;; (unless (string-equal "root" (getenv "USER"))
+;;   (require 'server)
+;;   (unless (server-running-p) (server-start)))
 
 ;; Mark safe variables
 
