@@ -4,7 +4,6 @@
     "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
     "files.exclude": {
-        "elpa": true,
         "irony": true,
         "auto-save-list": true,
         "eshell": true,

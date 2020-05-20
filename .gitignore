@@ -9,6 +9,7 @@ semanticdb
 .cache
 eclipse.jdt.ls
 var
+.log
 
 *.elc
 .session

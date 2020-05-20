@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(setq debug-on-error t
+(setq debug-on-error nil
       load-prefer-newer t
       user-full-name "Swarnendu Biswas")
 
@@ -73,7 +73,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -525,6 +525,11 @@ whitespaces."
                                                      (doom-modeline-indent-info t)))
 
       ((eq dotemacs-modeline-theme 'default)))
+
+(use-package awesome-tray
+  :if (eq dotemacs-modeline-theme 'default)
+  :load-path "extras"
+  :init (awesome-tray-mode 1))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
