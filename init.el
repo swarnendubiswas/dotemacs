@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(setq debug-on-error nil
+(setq debug-on-error t
       load-prefer-newer t
       user-full-name "Swarnendu Biswas")
 
@@ -521,8 +521,6 @@ whitespaces."
                                                      :init (doom-modeline-mode 1)
                                                      :custom
                                                      (doom-modeline-buffer-encoding nil)
-                                                     ;; (doom-modeline-height 22)
-                                                     ;; (doom-modeline-gnus nil)
                                                      (doom-modeline-minor-modes t)
                                                      (doom-modeline-indent-info t)))
 
@@ -651,8 +649,7 @@ whitespaces."
   :ensure t
   :bind ("<f8>" . deadgrep))
 
-;; Adding directories to the list of recent files decreases the number of entries of recent files.
-;; Therefore, we use a different command/keybinding to lookup recent directories.
+;; We use a different command/keybinding to lookup recent directories.
 (use-package recentf
   :custom
   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
@@ -1086,9 +1083,7 @@ whitespaces."
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-emacs-lisp-load-path 'inherit)
-  (flycheck-highlighting-mode 'lines)
-  (flycheck-idle-change-delay 2)
-  (flycheck-indication-mode nil)
+  (flycheck-indication-mode 'left-margin)
   :config
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
