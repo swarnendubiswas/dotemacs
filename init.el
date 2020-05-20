@@ -529,7 +529,8 @@ whitespaces."
 (use-package awesome-tray
   :if (eq dotemacs-modeline-theme 'default)
   :load-path "extras"
-  :init (awesome-tray-mode 1))
+  :hook (after-init . awesome-tray-mode)
+  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git" "date")))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
