@@ -182,7 +182,7 @@ whitespaces."
 (use-package exec-path-from-shell
   :ensure t
   :if (memq window-system '(x ns))
-  ;; :custom (exec-path-from-shell-check-startup-files nil)
+  :custom (exec-path-from-shell-check-startup-files nil) ; Ignore definition check
   :init (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
@@ -530,7 +530,7 @@ whitespaces."
   :if (eq dotemacs-modeline-theme 'default)
   :load-path "extras"
   :hook (after-init . awesome-tray-mode)
-  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git" "date")))
+  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git")))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
@@ -1539,6 +1539,10 @@ whitespaces."
   :ensure t
   :mode "\\.ini\\'")
 
+(use-package json-mode
+  :ensure t
+  :mode "\\.json\\'")
+
 (dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
   (add-hook hooks
             (lambda ()
@@ -1848,7 +1852,10 @@ whitespaces."
 ;;   :hook ((latex-mode tex-mode) . lsp))
 
 (use-package bazel-mode
-  :ensure t)
+  :ensure t
+  :mode (("\\.bzl$" . bazel-mode)
+         ("\\BUILD\\'" . bazel-mode)
+         ("\\.bazelrc\\'" . bazelrc-mode)))
 
 (use-package protobuf-mode
   :ensure t
