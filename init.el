@@ -1628,6 +1628,7 @@ whitespaces."
 (use-package fish-mode
   :ensure t
   :mode "\\.fish\\'"
+  :interpreter "fish"
   :hook (fish.mode . (lambda ()
                        (add-hook 'before-save-hook #'fish_indent-before-save))))
 
@@ -1661,7 +1662,8 @@ whitespaces."
   (magit-save-repository-buffers t)
   (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
   (transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory))
-  (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory)))
+  (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory))
+  (magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide) (unpushed . show))))
 
 (use-package gitignore-mode
   :ensure t)
