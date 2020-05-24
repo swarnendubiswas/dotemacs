@@ -143,7 +143,7 @@ whitespaces."
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-(defvar use-package-enable-imenu-support) ; Silence assignment to free variable warning
+(defvar use-package-enable-imenu-support) ; Silence "assignment to free variable" warning
 (setq use-package-enable-imenu-support t) ; Need to set before loading use-package
 (eval-when-compile
   (require 'use-package))
@@ -253,7 +253,7 @@ whitespaces."
 (setq-default bidi-display-reordering 'left-to-right
               bidi-paragraph-direction 'left-to-right)
 
-;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
+;; Ideally, we would have reset 'gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
 ;; permanently.
 ;; (add-hook 'emacs-startup-hook
@@ -705,51 +705,53 @@ whitespaces."
   :ensure t
   :hook (global-company-mode . company-flx-mode))
 
-(dolist (hook '(text-mode-hook markdown-mode-hook))
-  (add-hook hook
-            (lambda ()
-              (make-local-variable 'company-backends)
-              (setq company-backends '(company-capf
-                                       company-files
-                                       company-dabbrev
-                                       company-ispell)))))
+;; (dolist (hook '(text-mode-hook markdown-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (make-local-variable 'company-backends)
+;;               (setq company-backends '(company-capf
+;;                                        company-files
+;;                                        company-dabbrev
+;;                                        company-ispell)))))
 
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-  (add-hook hook
-            (lambda ()
-              (use-package company-bibtex
-                :ensure t
-                :demand t)
+;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (use-package company-bibtex
+;;                 :ensure t
+;;                 :demand t)
 
-              (set (make-local-variable 'company-backends) '((company-capf
-                                                              :with company-bibtex
-                                                              company-dabbrev :separate
-                                                              company-files))))))
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-capf
-                                     (company-dabbrev-code
-                                      company-clang
-                                      company-keywords)
-                                     company-dabbrev
-                                     company-files))))
-(add-hook 'sh-mode-hook
-          (lambda ()
-            (progn
-              (use-package company-shell
-                :ensure t
-                :custom (company-shell-delete-duplicates t))
+;;               (set (make-local-variable 'company-backends) '((company-capf
+;;                                                               :with company-bibtex
+;;                                                               company-dabbrev :separate
+;;                                                               company-files))))))
 
-              (make-local-variable 'company-backends)
-              (setq company-backends '(company-capf
-                                       (company-shell
-                                        company-shell-env
-                                        company-fish-shell)
-                                       company-dabbrev-code
-                                       company-dabbrev
-                                       company-files
-                                       company-keywords)))))
+;; (add-hook 'prog-mode-hook
+;;           (lambda ()
+;;             (make-local-variable 'company-backends)
+;;             (setq company-backends '(company-capf
+;;                                      (company-dabbrev-code
+;;                                       company-clang
+;;                                       company-keywords)
+;;                                      company-dabbrev
+;;                                      company-files))))
+
+;; (add-hook 'sh-mode-hook
+;;           (lambda ()
+;;             (progn
+;;               (use-package company-shell
+;;                 :ensure t
+;;                 :custom (company-shell-delete-duplicates t))
+
+;;               (make-local-variable 'company-backends)
+;;               (setq company-backends '(company-capf
+;;                                        (company-shell
+;;                                         company-shell-env
+;;                                         company-fish-shell)
+;;                                        company-dabbrev-code
+;;                                        company-dabbrev
+;;                                        company-files
+;;                                        company-keywords)))))
 
 (use-package yasnippet
   :ensure t
@@ -909,6 +911,7 @@ whitespaces."
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
 (use-package ivy-rich
   :ensure t
+  :disabled t
   :custom
   (ivy-format-function #'ivy-format-function-line)
   (ivy-rich-parse-remote-buffer nil)
@@ -995,9 +998,9 @@ whitespaces."
   :diminish)
 
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
-;; https://ebzzry.github.io/emacs-pairs.html
 (use-package smartparens
   :ensure t
+  :disabled t ;; FIXME: Seems to introduce performance issue
   :hook ((after-init . smartparens-global-mode)
          (after-init . show-smartparens-global-mode))
   :custom
@@ -1488,6 +1491,11 @@ whitespaces."
     (add-hook hook #'prettier-js-mode))
   :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
 
+(use-package grip-mode
+  :ensure t
+  :bind (:map markdown-mode-command-map
+              ("g" . grip-mode)))
+
 (use-package csv-mode
   :ensure t
   :mode "\\.csv\\'")
@@ -1663,6 +1671,7 @@ whitespaces."
   (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
   (transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory))
   (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory))
+  ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide) (unpushed . show))))
 
 (use-package gitignore-mode
@@ -1677,6 +1686,8 @@ whitespaces."
 (use-package git-gutter
   :ensure t
   :diminish
+  :bind (("C-x p" . git-gutter:previous-hunk)
+         ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode))
 
 ;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
@@ -1732,7 +1743,7 @@ whitespaces."
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
-  (lsp-enable-snippet nil)
+  (lsp-enable-snippet t) ; Autocomplete parentheses
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))

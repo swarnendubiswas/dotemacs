@@ -20,14 +20,14 @@ EMACSD="$HOME/.emacs.d"
 
 cd "$HOME"
 
-if [ ! -d $GITHUB ]; then
+if [ ! -d "$GITHUB" ]; then
     mkdir -p github
 fi
 
-cd $GITHUB
+cd "$GITHUB"
 
-if [ -d $DOTEMACS ]; then
-    cd $DOTEMACS
+if [ -d "$DOTEMACS" ]; then
+    cd "$DOTEMACS"
     echo "Pulling dotemacs repository from Github..."
     git pull
 else
@@ -36,8 +36,8 @@ else
 fi
 echo "...Done"
 
-if [ -d $DOTFILES ]; then
-    cd $DOTFILES
+if [ -d "$DOTFILES" ]; then
+    cd "$DOTFILES"
     echo "Pulling dotfiles repository from Github..."
     git pull
 else
@@ -103,8 +103,8 @@ case "$DIST_VERSION" in
         ;;
 esac
 
-# Check if LLVM 9 is installed
-LLVM_VERSION="-9"
+# Check if LLVM 10 is installed
+LLVM_VERSION="-10"
 
 case "$DIST_VERSION" in
     Ubuntu_16.04) REPO_NAME="deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial$LLVM_VERSION  main" ;;
@@ -133,9 +133,9 @@ snap install ripgrep --classic
 snap install shellcheck --edge
 snap refresh
 
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
+python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server importmagic pyls-isort pydocstyle setuptools configparser==3.8.1 backports-functools_lru_cache yamllint --user
 
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server[all] importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi==0.15.2 pylint python-language-server importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 
 npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint
 npm update
@@ -147,5 +147,4 @@ composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
 composer update
 
-luarocks install --server=http://luarocks.org/dev digestif --local
 cargo install --git https://github.com/latex-lsp/texlab.git

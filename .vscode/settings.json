@@ -7,7 +7,6 @@
         "irony": true,
         "auto-save-list": true,
         "eshell": true,
-        "reference-cards": true,
         "session.*": true,
         ".session*": true,
         "ac-html-csswatcher": true,
@@ -23,7 +22,8 @@
         "tramp": true,
         "workspace": true,
         "eclipse.jdt.ls": true,
-        "**/*.jar": true
+        "**/*.jar": true,
+        ".log": true
     },
     "search.exclude": {
         "**/node_modules": true,
