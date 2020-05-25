@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'monokai
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -73,7 +73,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -690,10 +690,12 @@ whitespaces."
   :hook (after-init . global-company-mode)
   :custom
   (company-dabbrev-downcase nil) ; Do not downcase returned candidates
+  (company-dabbrev-ignore-case nil)
   (company-idle-delay 0.0) ; Recommended by lsp
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 2) ; Small words are faster to type
+  (company-require-match nil)
   (company-selection-wrap-around t)
   (company-show-numbers t) ; Speed up completion
   :bind (:map company-active-map
@@ -705,63 +707,74 @@ whitespaces."
   :ensure t
   :hook (global-company-mode . company-flx-mode))
 
-;; (dolist (hook '(text-mode-hook markdown-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (make-local-variable 'company-backends)
-;;               (setq company-backends '(company-capf
-;;                                        company-files
-;;                                        company-dabbrev
-;;                                        company-ispell)))))
-
-;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (use-package company-bibtex
-;;                 :ensure t
-;;                 :demand t)
-
-;;               (set (make-local-variable 'company-backends) '((company-capf
-;;                                                               :with company-bibtex
-;;                                                               company-dabbrev :separate
-;;                                                               company-files))))))
-
-;; (add-hook 'prog-mode-hook
-;;           (lambda ()
-;;             (make-local-variable 'company-backends)
-;;             (setq company-backends '(company-capf
-;;                                      (company-dabbrev-code
-;;                                       company-clang
-;;                                       company-keywords)
-;;                                      company-dabbrev
-;;                                      company-files))))
-
-;; (add-hook 'sh-mode-hook
-;;           (lambda ()
-;;             (progn
-;;               (use-package company-shell
-;;                 :ensure t
-;;                 :custom (company-shell-delete-duplicates t))
-
-;;               (make-local-variable 'company-backends)
-;;               (setq company-backends '(company-capf
-;;                                        (company-shell
-;;                                         company-shell-env
-;;                                         company-fish-shell)
-;;                                        company-dabbrev-code
-;;                                        company-dabbrev
-;;                                        company-files
-;;                                        company-keywords)))))
-
-(use-package yasnippet
+(use-package company-box
   :ensure t
-  :diminish yas-minor-mode
-  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (after-init . yas-global-mode)
-  :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-  :config
-  (unbind-key "<tab>" yas-minor-mode-map)
-  (use-package yasnippet-snippets))
+  :diminish
+  :defines company-box-icons-all-the-icons
+  :hook (global-company-mode . company-box-mode)
+  :custom
+  ;; (company-box-backends-colors nil)
+  (company-box-show-single-candidate t)
+  (company-box-max-candidates 50)
+  (company-box-doc-delay 0.2))
+
+  ;; (dolist (hook '(text-mode-hook markdown-mode-hook))
+  ;;   (add-hook hook
+  ;;             (lambda ()
+  ;;               (make-local-variable 'company-backends)
+  ;;               (setq company-backends '(company-capf
+  ;;                                        company-files
+  ;;                                        company-dabbrev
+  ;;                                        company-ispell)))))
+
+  ;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+  ;;   (add-hook hook
+  ;;             (lambda ()
+  ;;               (use-package company-bibtex
+  ;;                 :ensure t
+  ;;                 :demand t)
+
+  ;;               (set (make-local-variable 'company-backends) '((company-capf
+  ;;                                                               :with company-bibtex
+  ;;                                                               company-dabbrev :separate
+  ;;                                                               company-files))))))
+
+  ;; (add-hook 'prog-mode-hook
+  ;;           (lambda ()
+  ;;             (make-local-variable 'company-backends)
+  ;;             (setq company-backends '(company-capf
+  ;;                                      (company-dabbrev-code
+  ;;                                       company-clang
+  ;;                                       company-keywords)
+  ;;                                      company-dabbrev
+  ;;                                      company-files))))
+
+  ;; (add-hook 'sh-mode-hook
+  ;;           (lambda ()
+  ;;             (progn
+  ;;               (use-package company-shell
+  ;;                 :ensure t
+  ;;                 :custom (company-shell-delete-duplicates t))
+
+  ;;               (make-local-variable 'company-backends)
+  ;;               (setq company-backends '(company-capf
+  ;;                                        (company-shell
+  ;;                                         company-shell-env
+  ;;                                         company-fish-shell)
+  ;;                                        company-dabbrev-code
+  ;;                                        company-dabbrev
+  ;;                                        company-files
+  ;;                                        company-keywords)))))
+
+  (use-package yasnippet
+    :ensure t
+    :diminish yas-minor-mode
+    :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+    :hook (after-init . yas-global-mode)
+    :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+    :config
+    (unbind-key "<tab>" yas-minor-mode-map)
+    (use-package yasnippet-snippets))
 
 (use-package amx
   :ensure t
@@ -997,10 +1010,21 @@ whitespaces."
   :custom (aggressive-indent-dont-electric-modes t)
   :diminish)
 
+(electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+
+(use-package paren
+  :hook (after-init . show-paren-mode)
+  :custom
+  (show-paren-delay 0)
+  (show-paren-style 'mixed) ; Options: 'expression, 'parenthesis, 'mixed
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t))
+
+;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 (use-package smartparens
   :ensure t
-  :disabled t ;; FIXME: Seems to introduce performance issue
+  :disabled t
   :hook ((after-init . smartparens-global-mode)
          (after-init . show-smartparens-global-mode))
   :custom
@@ -1401,7 +1425,9 @@ whitespaces."
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
   :diminish
-  :custom (super-save-remote-files nil) ; Ignore remote files
+  :custom
+  (super-save-remote-files nil) ; Ignore remote files
+  (super-save-auto-save-when-idle t)
   :hook (after-init . super-save-mode)
   :config (add-to-list 'super-save-triggers 'ace-window))
 
@@ -1985,9 +2011,7 @@ Increase line spacing by two line height."
  ("RET" . newline-and-indent)
  ("C-l" . goto-line)
  ("C-c z" . repeat)
- ("C-z" . undo))
-
-(bind-keys
+ ("C-z" . undo)
  ("<f11>" . delete-other-windows)
  ("C-x k" . kill-this-buffer)
  ("M-<left>" . previous-buffer)
@@ -2003,18 +2027,16 @@ Increase line spacing by two line height."
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)
  ("C-c ;" . sb/comment-line)
- ("C-c b" . comment-box))
-
-(bind-keys*
+ ("C-c b" . comment-box)
  ("C-s" . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
 
 (use-package default-text-scale
-  :ensure t
-  :bind (("C-M-=" . default-text-scale-increase)
-         ("C-M--" . default-text-scale-decrease)))
+:ensure t
+:bind (("C-M-+" . default-text-scale-increase)
+       ("C-M--" . default-text-scale-decrease)))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
