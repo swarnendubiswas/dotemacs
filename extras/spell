@@ -5,6 +5,7 @@ deoptimized
 deterministically
 serializable
 unscalable
+Prafulla
 whitespace
 invariants
 Swarnendu
@@ -98,7 +99,6 @@ serializability
 partitioner
 nondeterminism
 affine
-Affine
 recalibration
 Kolkata
 unoptimized

@@ -193,6 +193,7 @@ whitespaces."
       case-fold-search t ; Searches and matches should ignore case
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
+      confirm-kill-processes nil ;; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
       custom-safe-themes t
@@ -350,14 +351,14 @@ whitespaces."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
-;; http://coldnew.github.io/coldnew-emacs/
-(use-package noflet
-  :ensure t
-  :demand t
-  :config
-  (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-    "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-    (noflet ((process-list ())) ad-do-it)))
+;; ;; http://coldnew.github.io/coldnew-emacs/
+;; (use-package noflet
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+;;     "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+;;     (noflet ((process-list ())) ad-do-it)))
 
 (use-package abbrev
   :diminish
@@ -924,7 +925,6 @@ whitespaces."
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
 (use-package ivy-rich
   :ensure t
-  :disabled t
   :custom
   (ivy-format-function #'ivy-format-function-line)
   (ivy-rich-parse-remote-buffer nil)
