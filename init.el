@@ -522,8 +522,8 @@ whitespaces."
                                                      :init (doom-modeline-mode 1)
                                                      :custom
                                                      (doom-modeline-buffer-encoding nil)
-                                                     (doom-modeline-minor-modes t)
-                                                     (doom-modeline-indent-info t)))
+                                                     (doom-modeline-indent-info t)
+                                                     (doom-modeline-minor-modes t)))
 
       ((eq dotemacs-modeline-theme 'default)))
 
@@ -1457,6 +1457,9 @@ whitespaces."
 (use-package esup
   :ensure t
   :commands (esup))
+
+(use-package explain-pause-mode
+  :load-path "extras")
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.
