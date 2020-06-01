@@ -56,7 +56,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'monokai
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -532,6 +532,14 @@ whitespaces."
   :load-path "extras"
   :hook (after-init . awesome-tray-mode)
   :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git")))
+
+(use-package theme-changer
+  :ensure t
+  :custom
+  (calendar-location-name "Kolkata, India")
+  (calendar-latitude 26.45)
+  (calendar-longitude 80.33)
+  :config (change-theme 'default 'doom-themes))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)

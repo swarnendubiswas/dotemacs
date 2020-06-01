@@ -100,7 +100,7 @@ The following are customization options defined in `init.el` that you could use 
 | `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.                |
 | `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                               |
 | `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                              |
-| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use LSP for supported languages and projects.   |
+| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use `lsp-mode` for supported languages and projects.   |
 
 ## Browsing Source Code
 
