@@ -470,5 +470,3 @@ your own key as shown under ACTIVATION.
 
 [2] Keybinding affected by org-support-shift-select and also
  org-replace-disputed-keys.
-
-
