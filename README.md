@@ -102,6 +102,8 @@ The following are customization options defined in `init.el` that you could use 
 | `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                                   |
 | `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use `lsp-mode` for supported languages and projects. |
 
+Please check `init.el` for other options.
+
 ## Browsing Source Code
 
 Support for `LSP` protocol in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
@@ -138,17 +140,17 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 
 Use Universal Ctags with `counsel-etags`.
 
-- `-R` -- recursively scan for files
-- `-e` -- use Emacs-compatible syntax
-- `--list-excludes` -- check which patterns are excluded from processing
-- `--list-languages` -- list supported languages
++ `-R` -- recursively scan for files
++ `-e` -- use Emacs-compatible syntax
++ `--list-excludes` -- check which patterns are excluded from processing
++ `--list-languages` -- list supported languages
 
 By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 
-- `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use.
-- `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is the identifier under the cursor.
-- `M-*` -- Pop back to where you previously invoked `M-.`.
-- `C-u M-.` -- Find the next definition for the last tag.
++ `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use.
++ `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is the identifier under the cursor.
++ `M-*` -- Pop back to where you previously invoked `M-.`.
++ `C-u M-.` -- Find the next definition for the last tag.
 
 For more commands, see the Tags topic in the Emacs info document.
 
@@ -193,9 +195,9 @@ ctags -eR --languages=Python
 
 GNU Global has better database search support while Universal Ctags supports more languages. It is possible to build Global with support for Universal Ctags.
 
-- <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
-- <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
++ <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
++ <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
 
 ## TODO
 
-- Use custom major modes for files by names
++ Use custom major modes for files by names
