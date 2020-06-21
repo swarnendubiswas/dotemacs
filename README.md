@@ -201,3 +201,4 @@ GNU Global has better database search support while Universal Ctags supports mor
 ## TODO
 
 + Use custom major modes for files by names
++ Check if a Markdown formatter other than Prettier is available

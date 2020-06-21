@@ -1770,7 +1770,7 @@ whitespaces."
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
-  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode nxml-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
+  :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode less-mode less-css-mode nxml-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-diagnostics-modeline-mode))
   :custom
@@ -1831,7 +1831,7 @@ whitespaces."
                     :server-id 'intelephense-remote))
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
-                    :major-modes '(plain-tex-mode latex-mode)
+                    :major-modes '(plain-tex-mode tex-mode latex-mode)
                     :remote? t
                     :server-id 'texlab-remote))
   (lsp-register-client
@@ -1897,9 +1897,9 @@ whitespaces."
                          (require 'lsp-python-ms)
                          (lsp-deferred))))
 
-;; (use-package lsp-latex
-;;   :ensure t
-;;   :hook ((latex-mode tex-mode) . lsp))
+(use-package lsp-latex
+  :ensure t
+  :hook ((latex-mode plain-tex-mode tex-mode) . lsp))
 
 (use-package bazel-mode
   :ensure t
