@@ -727,63 +727,63 @@ whitespaces."
   (company-box-max-candidates 50)
   (company-box-doc-delay 0.2))
 
-  ;; (dolist (hook '(text-mode-hook markdown-mode-hook))
-  ;;   (add-hook hook
-  ;;             (lambda ()
-  ;;               (make-local-variable 'company-backends)
-  ;;               (setq company-backends '(company-capf
-  ;;                                        company-files
-  ;;                                        company-dabbrev
-  ;;                                        company-ispell)))))
+;; (dolist (hook '(text-mode-hook markdown-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (make-local-variable 'company-backends)
+;;               (setq company-backends '(company-capf
+;;                                        company-files
+;;                                        company-dabbrev
+;;                                        company-ispell)))))
 
-  ;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-  ;;   (add-hook hook
-  ;;             (lambda ()
-  ;;               (use-package company-bibtex
-  ;;                 :ensure t
-  ;;                 :demand t)
+;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (use-package company-bibtex
+;;                 :ensure t
+;;                 :demand t)
 
-  ;;               (set (make-local-variable 'company-backends) '((company-capf
-  ;;                                                               :with company-bibtex
-  ;;                                                               company-dabbrev :separate
-  ;;                                                               company-files))))))
+;;               (set (make-local-variable 'company-backends) '((company-capf
+;;                                                               :with company-bibtex
+;;                                                               company-dabbrev :separate
+;;                                                               company-files))))))
 
-  ;; (add-hook 'prog-mode-hook
-  ;;           (lambda ()
-  ;;             (make-local-variable 'company-backends)
-  ;;             (setq company-backends '(company-capf
-  ;;                                      (company-dabbrev-code
-  ;;                                       company-clang
-  ;;                                       company-keywords)
-  ;;                                      company-dabbrev
-  ;;                                      company-files))))
+;; (add-hook 'prog-mode-hook
+;;           (lambda ()
+;;             (make-local-variable 'company-backends)
+;;             (setq company-backends '(company-capf
+;;                                      (company-dabbrev-code
+;;                                       company-clang
+;;                                       company-keywords)
+;;                                      company-dabbrev
+;;                                      company-files))))
 
-  ;; (add-hook 'sh-mode-hook
-  ;;           (lambda ()
-  ;;             (progn
-  ;;               (use-package company-shell
-  ;;                 :ensure t
-  ;;                 :custom (company-shell-delete-duplicates t))
+;; (add-hook 'sh-mode-hook
+;;           (lambda ()
+;;             (progn
+;;               (use-package company-shell
+;;                 :ensure t
+;;                 :custom (company-shell-delete-duplicates t))
 
-  ;;               (make-local-variable 'company-backends)
-  ;;               (setq company-backends '(company-capf
-  ;;                                        (company-shell
-  ;;                                         company-shell-env
-  ;;                                         company-fish-shell)
-  ;;                                        company-dabbrev-code
-  ;;                                        company-dabbrev
-  ;;                                        company-files
-  ;;                                        company-keywords)))))
+;;               (make-local-variable 'company-backends)
+;;               (setq company-backends '(company-capf
+;;                                        (company-shell
+;;                                         company-shell-env
+;;                                         company-fish-shell)
+;;                                        company-dabbrev-code
+;;                                        company-dabbrev
+;;                                        company-files
+;;                                        company-keywords)))))
 
-  (use-package yasnippet
-    :ensure t
-    :diminish yas-minor-mode
-    :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-    :hook (after-init . yas-global-mode)
-    :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-    :config
-    (unbind-key "<tab>" yas-minor-mode-map)
-    (use-package yasnippet-snippets))
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  :hook (after-init . yas-global-mode)
+  :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  :config
+  (unbind-key "<tab>" yas-minor-mode-map)
+  (use-package yasnippet-snippets))
 
 (use-package amx
   :ensure t
@@ -1523,6 +1523,7 @@ whitespaces."
 
 (use-package prettier-js
   :ensure t
+  :disabled t ;; Seems like there are bugs/inconsistencies in indenting lists
   :init
   (dolist (hook '(markdown-mode-hook gfm-mode-hook))
     (add-hook hook #'prettier-js-mode))
