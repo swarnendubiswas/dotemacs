@@ -621,6 +621,62 @@ whitespaces."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
+(use-package treemacs
+  :ensure t
+  :commands (treemacs treemacs-toggle)
+  :hook ((projectile-mode . treemacs-follow-mode)
+         (projectile-mode . treemacs-filewatch-mode)
+         ;; (projectile-mode . treemacs-fringe-indicator-mode)
+         )
+  :custom (treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
+  :config
+  (setq treemacs-follow-after-init t
+        treemacs-width 20
+        treemacs-lock-width t
+        treemacs-indentation 2
+        treemacs-position 'right
+        treemacs-collapse-dirs 3
+        ;; treemacs-sorting 'alphabetic-desc
+        treemacs-show-hidden-files nil
+        treemacs-project-follow-cleanup t
+        ;; Prevents treemacs from being selected with `other-window`
+        treemacs-is-never-other-window nil
+        treemacs-goto-tag-strategy 'refetch-index
+        treemacs-recenter-after-file-follow t
+        treemacs-recenter-after-tag-follow  t
+        ;; Do not log messages
+        treemacs-silent-filewatch t
+        treemacs-silent-refresh t
+        treemacs-tag-follow-delay 1
+        treemacs-tag-follow-cleanup t)
+
+  ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
+  ;; (treemacs-tag-follow-mode 1)
+  (treemacs-git-mode 'extended)
+
+  ;; Decrease the font size
+  (set-face-attribute 'treemacs-directory-collapsed-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-directory-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-file-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-root-face nil
+                      :height 0.9)
+  (set-face-attribute 'treemacs-tags-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-git-ignored-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-git-untracked-face nil
+                      :height 0.7)
+
+  (treemacs-resize-icons 16)
+  :bind* ("C-j" . treemacs))
+
+(use-package treemacs-projectile
+  :ensure t
+  :after (treemacs projectile))
+
 (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
   :ensure t)
 

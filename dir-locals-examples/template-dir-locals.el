@@ -43,8 +43,9 @@
                  (lsp-pyls-plugins-pylint-enabled . t)
                  (lsp-pyls-plugins-yapf-enabled . t)
                  (lsp-python-ms-extra-paths . ["/home/swarnendu/prospar-workspace/data-race-framework/src"])
-                 (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/2019-sharwari")
-                 ))
+                 (python-shell-exec-path . "/usr/bin/python3")
+                 (python-shell-interpreter . "/usr/bin/python3")
+                 (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/2019-sharwari")))
 
  (c++-mode . (
               (flycheck-gcc-language-standard . "c++11")
