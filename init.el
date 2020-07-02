@@ -533,13 +533,17 @@ whitespaces."
   :hook (after-init . awesome-tray-mode)
   :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git")))
 
-(use-package theme-changer
+(use-package auto-dim-other-buffers
   :ensure t
-  :custom
-  (calendar-location-name "Kolkata, India")
-  (calendar-latitude 26.45)
-  (calendar-longitude 80.33)
-  :config (change-theme 'default 'doom-themes))
+  :hook (after-init . auto-dim-other-buffers-mode))
+
+;; (use-package theme-changer
+;;   :ensure t
+;;   :custom
+;;   (calendar-location-name "Kolkata, India")
+;;   (calendar-latitude 26.45)
+;;   (calendar-longitude 80.33)
+;;   :config (change-theme 'default 'doom-themes))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
@@ -1486,6 +1490,7 @@ whitespaces."
   :bind (([remap other-window] . ace-window)
          ("<f10>" . ace-window)))
 
+;; This causes additional saves which leads to auto-formatters being invoked more frequently
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
   :diminish
@@ -1544,7 +1549,7 @@ whitespaces."
 
 (use-package bison-mode
   :ensure t
-  :mode ("\\.y\\'" "\\.l\\'" "\\.jison\\'"))
+  :mode ("\\.y\\'" "\\.l\\'" "\\.bison\\'"))
 
 (use-package js2-mode
   :ensure t
@@ -1558,7 +1563,7 @@ whitespaces."
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
   ;; :bind ("C-c C-d" . nil)
-  ;; Hiding markup makes it difficult to be consistent while editing
+  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; :init (setq-default markdown-hide-markup t)
   :custom
   ;; (mardown-indent-on-enter 'indent-and-new-item)
@@ -1628,7 +1633,6 @@ whitespaces."
   :mode (("\\Makefile\\'" . makefile-mode)
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-;; https://emacs.stackexchange.com/questions/31414/how-to-globally-disable-eldoc
 (use-package eldoc
   :if (eq system-type 'gnu/linux)
   :diminish
@@ -1685,6 +1689,7 @@ whitespaces."
 
 (use-package cmake-mode
   :ensure t
+  ;; FIXME: Is this syntax correct?
   :mode ("CMakeLists.txt" "\\.cmake\\'")
   :config
   (use-package cmake-font-lock
@@ -1715,7 +1720,7 @@ whitespaces."
 (use-package ant
   :ensure t)
 
-(use-package autodisass-java-bytecode ; Can disassemble .class files from within jars as well
+(use-package autodisass-java-bytecode ; Can disassemble .class files from within jars
   :ensure t)
 
 (use-package sh-script ; Shell script mode
@@ -1819,10 +1824,6 @@ whitespaces."
   ;; (web-mode-enable-current-element-highlight t)
   ;; (web-mode-enable-current-column-highlight t)
   )
-
-(use-package mlir-mode
-  :load-path "extras"
-  :mode ("\\.mlir\\'"))
 
 (use-package lsp-mode
   :ensure t
@@ -1957,6 +1958,10 @@ whitespaces."
 (use-package lsp-latex
   :ensure t
   :hook ((latex-mode plain-tex-mode tex-mode) . lsp))
+
+(use-package mlir-mode
+  :load-path "extras"
+  :mode ("\\.mlir\\'"))
 
 (use-package bazel-mode
   :ensure t
