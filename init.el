@@ -712,7 +712,7 @@ whitespaces."
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
-(use-package swiper ; Performs poorly if there are a large number of matches
+(use-package swiper
   :ensure t
   :custom (swiper-action-recenter t))
 
@@ -778,6 +778,7 @@ whitespaces."
 
 (use-package company-box
   :ensure t
+  :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
@@ -1141,7 +1142,7 @@ whitespaces."
               projectile-mode-line-prefix
               (or project-name "-"))))
   (projectile-mode 1)
-  ;; Avoid search when projectile-mode is enabled.
+  ;; Avoid search when projectile-mode is enabled for faster startup
   ;; (setq projectile-project-search-path (list
   ;;                                       (concat `,(getenv "HOME") "/bitbucket")
   ;;                                       (expand-file-name "github" dotemacs-user-home)
@@ -1292,8 +1293,6 @@ whitespaces."
       large-file-warning-threshold (* 500 1024 1024)
       tags-add-tables nil)
 
-;; Xref does not seem to have a maintained backend for Gtags
-;; https://www.emacswiki.org/emacs/GnuGlobal
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
@@ -1315,7 +1314,7 @@ whitespaces."
               ("C-c g c" . counsel-gtags-create-tags)
               ("C-c g u" . counsel-gtags-update-tags))
   :config
-  (use-package global-tags
+  (use-package global-tags ; Make xref and gtags work together
     :ensure t
     :if (eq dotemacs-tags-scheme 'gtags)
     :demand t
