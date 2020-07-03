@@ -548,7 +548,7 @@ whitespaces."
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 (set-frame-font "Roboto Mono")
-(set-face-attribute 'default nil :height 130)
+(set-face-attribute 'default nil :height 140)
 (set-face-attribute 'mode-line nil :height 110)
 
 (use-package ibuffer
@@ -1124,7 +1124,7 @@ whitespaces."
   :custom
   (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
-  (projectile-enable-caching t)
+  ;; (projectile-enable-caching t) ; Problematic since I often create new files
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
   (projectile-indexing-method 'hybrid)
@@ -1924,6 +1924,7 @@ whitespaces."
 
 (use-package lsp-ui
   :ensure t
+  :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil)
@@ -2116,10 +2117,10 @@ Increase line spacing by two line height."
   :config (which-key-setup-side-window-right-bottom)
   :diminish)
 
-;; Only start server mode if I'm not root
-;; (unless (string-equal "root" (getenv "USER"))
-;;   (require 'server)
-;;   (unless (server-running-p) (server-start)))
+;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
+;; (use-package server
+;;   :if (not (string-equal "root" (getenv "USER"))) ; Only start server mode if not root
+;;   :config (unless (server-running-p) (server-start)))
 
 ;; Mark safe variables
 

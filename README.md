@@ -198,6 +198,47 @@ GNU Global has better database search support while Universal Ctags supports mor
 + <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
 + <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
 
+## Server Support
+
+Enable server support either through `init.el` or as a `systemd` service.
+
+### Systemd service
+
+Create a file `$HOME/.config/systemd/user/emacs.service` with the following content.
+
+```config
+[Unit]
+Description=Emacs Daemon
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/emacs --daemon
+ExecStop=/usr/bin/emacsclient --eval "(progn (setq kill-emacs-hook 'nil) (kill-emacs))"
+Restart=always
+
+[Install]
+WantedBy=default.target
+```
+
++ Enable the unit to be started at login: `systemctl --user enable emacs.service`
++ Start the service for the current session: `systemctl --user start emacs.service`
+
+Create a `emacsclient.desktop` file in `$HOME/.local/share/applications/` with the following content.
+
+```config
+[Desktop Entry]
+Name=Emacsclient
+GenericName=Text Editor
+Comment=Edit text
+MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
+Exec=emacsclient -c
+Icon=emacs
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;Utility;
+StartupWMClass=Emacs
+```
+
 ## TODO
 
 + Use custom major modes for files by names
