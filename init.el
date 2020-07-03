@@ -202,7 +202,7 @@ whitespaces."
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b"))
       gc-cons-percentage 0.5 ; Portion of heap used for allocation
-      ;; GC may happen after this many bytes are allocated since GC
+      ;; GC may happen after this many bytes are allocated since last GC
       gc-cons-threshold (* 200 1024 1024)
       history-delete-duplicates t
       indicate-buffer-boundaries nil
@@ -248,10 +248,9 @@ whitespaces."
               indicate-empty-lines t
               standard-indent 2
               tab-always-indent 'complete
-              tab-width 4)
-
-;; Doom Emacs: Disable bidirectional text rendering for a modest performance boost
-(setq-default bidi-display-reordering 'left-to-right
+              tab-width 4
+              ;; Doom Emacs: Disable bidirectional text rendering for a modest performance boost
+              bidi-display-reordering 'left-to-right
               bidi-paragraph-direction 'left-to-right)
 
 ;; Ideally, we would have reset 'gc-cons-threshold' to its default value otherwise there can be
@@ -313,8 +312,7 @@ whitespaces."
 ;; (uniquify-buffer-name-style 'forward)
 ;; (uniquify-ignore-buffers-re "^\\*")
 ;; (uniquify-separator "/")
-;; (uniquify-strip-common-suffix t)
-;; )
+;; (uniquify-strip-common-suffix t))
 
 ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
 (use-package hippie-exp
@@ -351,27 +349,28 @@ whitespaces."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
-;; ;; http://coldnew.github.io/coldnew-emacs/
-;; (use-package noflet
-;;   :ensure t
-;;   :demand t
-;;   :config
-;;   (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-;;     "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-;;     (noflet ((process-list ())) ad-do-it)))
-
 (use-package abbrev
   :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
   :custom
-  (abbrev-file-name (expand-file-name "abbrev_defs" dotemacs-extras-directory))
+  (abbrev-file-name (expand-file-name "abbrev-defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
 
-(if window-system
-    (progn
-      (tool-bar-mode -1)
-      (menu-bar-mode -1)
-      (scroll-bar-mode -1)))
+(when (display-graphic-p) ; window-system is deprecated
+  (progn
+    (tool-bar-mode -1)
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1)))
+
+;; (add-hook 'after-make-frame-functions
+;;           (lambda ()
+;;             (when (display-graphic-p)
+;;               (tool-bar-mode -1))))
+
+;; (tool-bar-mode -1)
+;; (menu-bar-mode -1)
+;; (scroll-bar-mode -1)
+
 (tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
 (global-visual-line-mode 1)
@@ -536,14 +535,6 @@ whitespaces."
 (use-package auto-dim-other-buffers
   :ensure t
   :hook (after-init . auto-dim-other-buffers-mode))
-
-;; (use-package theme-changer
-;;   :ensure t
-;;   :custom
-;;   (calendar-location-name "Kolkata, India")
-;;   (calendar-latitude 26.45)
-;;   (calendar-longitude 80.33)
-;;   :config (change-theme 'default 'doom-themes))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
