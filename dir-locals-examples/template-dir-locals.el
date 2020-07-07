@@ -88,4 +88,6 @@
                 (eval . (add-hook 'before-save-hook #'sb/save-buffer-and-run-latexmk)))
              )
 
+ ((markdown-mode . ((eval . (prettier-mode t)))))
+
  )

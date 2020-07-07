@@ -228,7 +228,7 @@ whitespaces."
       require-final-newline t ; Always end a file with a newline.
       ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
-      select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
+      select-enable-clipboard nil ; Enable use of system clipboard across Emacs and other applications
       sentence-end-double-space nil
       set-mark-command-repeat-pop t
       shift-select-mode t ; Use shift-select for marking
@@ -1579,6 +1579,11 @@ whitespaces."
   (dolist (hook '(markdown-mode-hook gfm-mode-hook))
     (add-hook hook #'prettier-js-mode))
   :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
+
+;; https://github.com/jscheid/prettier.el
+(use-package prettier
+  :ensure t
+  :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package grip-mode
   :ensure t

@@ -194,6 +194,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `C-c -` - Insert a horizontal rule (``).
 - `C-c C-c v` - Export the file and view in a browser (``).
 - `C-c C-c m` - Compile the file and show in another buffer (``).
+- `C-c C-j` - Insert a list (`markdown-insert-list-item`).
 
 ## JSON
 

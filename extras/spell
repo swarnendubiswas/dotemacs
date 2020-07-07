@@ -1,4 +1,4 @@
-personal_ws-1.1 en 105 
+personal_ws-1.1 en 106 
 runtime
 reimplementation
 deoptimized
@@ -71,6 +71,7 @@ mispredictions
 Keshav
 TODO
 tunable
+latencies
 perceptron
 resubmission
 KinectFusion
