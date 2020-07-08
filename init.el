@@ -2069,6 +2069,16 @@ Increase line spacing by two line height."
   (shell-command
    (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
+;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
+(defun sb/counsel-all-files-recursively (dir-name)
+  "List all files recursively."
+  (interactive "Directory: ")
+  (let* ((cands (split-string
+                 (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
+    (ivy-read "File: " cands
+              :action #'find-file
+              :caller 'sb/counsel-all-files-recursively)))
+
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
 ;; available bindings in a buffer. Use `M-x describe-personal-keybindings` to see modifications.
 
@@ -2101,11 +2111,12 @@ Increase line spacing by two line height."
  ("C-S-s" . sb/save-all-buffers))
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
+(bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
 (use-package default-text-scale
-:ensure t
-:bind (("C-M-+" . default-text-scale-increase)
-       ("C-M--" . default-text-scale-decrease)))
+  :ensure t
+  :bind (("C-M-+" . default-text-scale-increase)
+         ("C-M--" . default-text-scale-decrease)))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
