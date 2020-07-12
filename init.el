@@ -140,6 +140,9 @@ whitespaces."
   (package-initialize t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
+(eval-after-load 'gnutls
+  '(add-to-list 'gnutls-trustfiles "/etc/ssl/cert.pem"))
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -221,14 +224,14 @@ whitespaces."
       mouse-drag-copy-region t
       mouse-yank-at-point t ; Yank at point instead of at click
       pop-up-frames nil ; Avoid making separate frames
-      pop-up-windows nil
+      ;; pop-up-windows nil ; Disallow creating new windows
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name completion
       read-process-output-max (* 1024 1024) ; 1 MB
       require-final-newline t ; Always end a file with a newline.
       ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
-      select-enable-clipboard nil ; Enable use of system clipboard across Emacs and other applications
+      select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       sentence-end-double-space nil
       set-mark-command-repeat-pop t
       shift-select-mode t ; Use shift-select for marking
@@ -900,10 +903,11 @@ whitespaces."
    ([remap describe-function] . counsel-describe-function)
    ([remap describe-variable] . counsel-describe-variable)
    ([remap dired] . counsel-dired)
+   ("C-x f" . counsel-file-jump) ; Jump to a file below the current directory
    ([remap find-file] . counsel-find-file)
-   ([remap flycheck-list-errors] . counsel-flycheck)
    ("<f2>" . counsel-find-file)
-   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer.
+   ([remap flycheck-list-errors] . counsel-flycheck)
+   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ([remap swiper] . counsel-grep-or-swiper)
@@ -1112,7 +1116,9 @@ whitespaces."
 
 (use-package projectile
   :ensure t
+  :ensure-system-package fd
   :custom
+  (projectile-auto-discover nil)
   (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
   ;; (projectile-enable-caching t) ; Problematic since I often create new files
@@ -1123,7 +1129,7 @@ whitespaces."
   (projectile-mode-line-prefix "")
   ;; Use projectile only in desired directories, too much noise otherwise
   (projectile-require-project-root t)
-  (projectile-sort-order 'recently-active)
+  ;; (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
   :config
   (defun projectile-default-mode-line ()
@@ -1953,7 +1959,9 @@ whitespaces."
 
 (use-package lsp-latex
   :ensure t
-  :hook ((latex-mode plain-tex-mode tex-mode) . lsp))
+  :hook ((latex-mode plain-tex-mode tex-mode) . lsp)
+  :custom (lsp-latex-build-on-save t))
+
 
 (use-package mlir-mode
   :load-path "extras"

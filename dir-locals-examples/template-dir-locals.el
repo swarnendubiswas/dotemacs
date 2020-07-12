@@ -6,6 +6,9 @@
          (projectile-project-compilation-cmd . "cd bin && cmake .. && cmake --build . && cd Debug && .\\shiolink.exe")
          (projectile-project-compilation-cmd . latexmk)
          (projectile-project-run-cmd . "cd bin\\Debug && .\\shiolink.exe && E:\\nanika\\ssp.exe")
+         (projectile-enable-caching . t) ; Enable caching
+         (projectile-globally-ignored-files . ("MyBinaryFile")) ; Ignore file
+         (projectile-project-name . "your-project-name-here")
          (show-trailing-whitespace . t)
          (eval . (progn BODY))
          (eval . (setq projectile-project-root
@@ -20,6 +23,10 @@
                                                         ".dir-locals.el"))))
          (eval . (cider-register-cljs-repl-type 'my-cljs-repl "(code-that-switches-to-the-cljs-repl)"))
          (eval . (flycheck-mode 0))
+         (eval . (progn
+                   (defun my-project-specific-function ()
+                     ;; ...
+                     )))
          ))
 
  (nil
@@ -46,6 +53,8 @@
                  (python-shell-exec-path . "/usr/bin/python3")
                  (python-shell-interpreter . "/usr/bin/python3")
                  (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/2019-sharwari")))
+
+ (c-mode . ((c-file-style . "BSD")))
 
  (c++-mode . (
               (flycheck-gcc-language-standard . "c++11")
