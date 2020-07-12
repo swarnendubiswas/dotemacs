@@ -140,8 +140,8 @@ whitespaces."
   (package-initialize t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
-(eval-after-load 'gnutls
-  '(add-to-list 'gnutls-trustfiles "/etc/ssl/cert.pem"))
+;; (eval-after-load 'gnutls
+;;   '(add-to-list 'gnutls-trustfiles "/etc/ssl/cert.pem"))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -342,8 +342,9 @@ whitespaces."
                                                   split-height-threshold 0))
       ((eq dotemacs-window-split 'horizontal) (setq split-height-threshold nil
                                                     split-width-threshold 0)))
-(setq split-height-threshold (* (window-height) 10)
-      split-width-threshold (* (window-width) 10))
+;; Magit is creating new frames
+;; (setq split-height-threshold (* (window-height) 10)
+;;       split-width-threshold (* (window-width) 10))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun my-auto-save-wrapper (save-fn &rest args)
@@ -2147,10 +2148,29 @@ Increase line spacing by two line height."
 (put 'flycheck-clang-include-path 'safe-local-variable #'listp)
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
+(put 'projectile-default-file 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'tags-table-list 'safe-local-variable #'listp)
+
+(defun open-local-file-projectile (directory)
+  "Helm action function, open projectile file within DIRECTORY
+specify by the keyword projectile-default-file define in `dir-locals-file'"
+  (let ((default-file (f-join directory (nth 1
+                                             (car (-tree-map (lambda (node)
+                                                               (when (eq (car node) 'projectile-default-file)
+                                                                 (format "%s" (cdr node))))
+                                                             (dir-locals-get-class-variables (dir-locals-read-from-dir directory))))))))
+    (if (f-exists? default-file)
+        (counsel-find-file default-file)
+      (message "The file %s doesn't exist in the select project" default-file)
+      )
+    )
+  )
+
+(with-eval-after-load "counsel-projectile"
+  (add-to-list 'counsel-projectile-action '("d" open-local-file-projectile "open default file") t))
 
 ;;; init.el ends here

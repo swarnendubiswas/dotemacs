@@ -24,8 +24,8 @@ sudo snap install shfmt
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 sudo snap refresh
-python -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint grip --user
-python3 -m pip install --upgrade pip proselint Sphinx pygments isort yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server grip --user
+python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint grip --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server grip --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint
 sudo npm update
 sudo gem install scss_lint
@@ -244,3 +244,4 @@ StartupWMClass=Emacs
 + Use custom major modes for files by names
 + Check if a Markdown formatter other than Prettier is available
 + Sort files alphabetically with counsel and projectile.
++ Magit Diff is opening in a new frame
