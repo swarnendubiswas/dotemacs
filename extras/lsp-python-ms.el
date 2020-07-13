@@ -2,7 +2,7 @@
 
 ;; Author: Charl Botha
 ;; Maintainer: Andrew Christianson, Vincent Zhang
-;; Version: 0.6.0
+;; Version: 0.7.0
 ;; Package-Requires: ((emacs "25.1") (cl-lib "0.6.1") (lsp-mode "6.0"))
 ;; Homepage: https://github.com/andrew-christianson/lsp-python-ms
 ;; Keywords: languages tools
@@ -61,7 +61,7 @@
 ;; If this is nil, the language server will write cache files in a directory
 ;; sibling to the root of every project you visit")
 
-(defcustom lsp-python-ms-extra-paths '()
+(defcustom lsp-python-ms-extra-paths []
   "A list of additional paths to search for python packages.
 
 This should be a list of paths corresponding to additional python
@@ -69,7 +69,7 @@ library directories you want to search for completions.  Paths
 should be as they are (or would appear) in sys.path.  Paths will
 be prepended to the search path, and so will shadow duplicate
 names in search paths returned by the interpreter."
-  :type '(repeat directory)
+  :type 'lsp-string-vector
   :group 'lsp-python-ms)
 (make-variable-buffer-local 'lsp-python-ms-extra-paths)
 
@@ -91,9 +91,22 @@ set as `python3' to let ms-pyls use python 3 environments."
   :type '(file :must-match t)
   :group 'lsp-python-ms)
 
+(defcustom lsp-python-ms-auto-install-server t
+  "Install Microsoft Python Language Server automatically."
+  :type 'boolean
+  :group 'lsp-python-ms)
+
 (defcustom lsp-python-ms-nupkg-channel "stable"
   "The channel of nupkg for the Microsoft Python Language Server:
 stable, beta or daily."
+  :type 'string
+  :group 'lsp-python-ms)
+
+(defcustom lsp-python-ms-completion-add-brackets "true"
+  "Whether to add brackets after completion of functions."
+  :type '(choice
+          (const "true")
+          (const "false"))
   :type 'string
   :group 'lsp-python-ms)
 
@@ -154,7 +167,7 @@ stable, beta or daily."
                  "Warning"))
 
 (defcustom lsp-python-ms-extra-major-modes '()
-  "A list of additional major modes in which to activate.
+    "A list of additional major modes in which to activate.
 
 In addition to the python-mode, you may wish the Microsoft Python
 Language Server to activate in other major modes. If so, list them
@@ -305,7 +318,7 @@ or projectile, or just return `default-directory'."
    (t default-directory)))
 
 ;; I based most of this on the vs.code implementation:
-;; https://github.com/Microsoft/vscode-python/blob/master/src/client/activation/languageServer/languageServer.ts#L219
+;; https://github.com/microsoft/vscode-python/blob/master/src/client/activation/languageServer/analysisOptions.ts
 ;; (it still took quite a while to get right, but here we are!)
 (defun lsp-python-ms--extra-init-params (&optional workspace)
   "Return form describing parameters for language server.
@@ -318,7 +331,7 @@ directory"
     (when lsp-python-ms-parse-dot-env-enabled
       (lsp-python-ms--parse-dot-env workspace-root))
     (cl-destructuring-bind (pyver pysyspath pyintpath)
-        (lsp-python-ms--get-python-ver-and-syspath workspace-root)
+      (lsp-python-ms--get-python-ver-and-syspath workspace-root)
       `(:interpreter
         (:properties (
                       :InterpreterPath ,pyintpath
@@ -327,13 +340,11 @@ directory"
         ;; preferredFormat "markdown" or "plaintext"
         ;; experiment to find what works best -- over here mostly plaintext
         :displayOptions (:preferredFormat "markdown"
-                                          :trimDocumentationLines :json-false
-                                          :maxDocumentationLineLength 0
-                                          :trimDocumentationText :json-false
-                                          :maxDocumentationTextLength 0)
-        :searchPaths ,(if lsp-python-ms-extra-paths
-                          (vconcat lsp-python-ms-extra-paths nil)
-                        pysyspath)
+                         :trimDocumentationLines :json-false
+                         :maxDocumentationLineLength 0
+                         :trimDocumentationText :json-false
+                         :maxDocumentationTextLength 0)
+        :searchPaths ,(vconcat lsp-python-ms-extra-paths pysyspath)
         :analysisUpdates t
         :asyncStartup t
         :logLevel ,lsp-python-ms-log-level
@@ -366,7 +377,7 @@ directory"
   "Handle the python/languageServerStarted message.
 
 WORKSPACE is just used for logging and _PARAMS is unused."
-  (lsp--info "Microsoft Python language server started"))
+   (lsp--info "Microsoft Python language server started"))
 
 ;; this gets called when we do lsp-describe-thing-at-point
 ;; see lsp-methods.el. As always, remove Microsoft's unwanted entities :(
@@ -389,27 +400,29 @@ WORKSPACE is just used for logging and _PARAMS is unused."
 
 (defun lsp-python-ms--begin-progress-callback (workspace &rest _)
   (with-lsp-workspace workspace
-                      (--each (lsp--workspace-buffers workspace)
-                        (when (buffer-live-p it)
-                          (with-current-buffer it
-                            (lsp--spinner-start)))))
+    (--each (lsp--workspace-buffers workspace)
+      (when (buffer-live-p it)
+        (with-current-buffer it
+          (lsp--spinner-start)))))
   (lsp--info "Microsoft Python language server is analyzing..."))
 
 (defun lsp-python-ms--end-progress-callback (workspace &rest _)
   (with-lsp-workspace workspace
-                      (--each (lsp--workspace-buffers workspace)
-                        (when (buffer-live-p it)
-                          (with-current-buffer it
-                            (lsp--spinner-stop))))
-                      (lsp--info "Microsoft Python language server is analyzing...done")))
+    (--each (lsp--workspace-buffers workspace)
+      (when (buffer-live-p it)
+        (with-current-buffer it
+          (lsp--spinner-stop))))
+    (lsp--info "Microsoft Python language server is analyzing...done")))
 
 (lsp-register-custom-settings
- `(("python.analysis.cachingLevel" lsp-python-ms-cache)
+ `(("python.autoComplete.addBrackets" lsp-python-ms-completion-add-brackets)
+   ("python.analysis.cachingLevel" lsp-python-ms-cache)
    ("python.analysis.errors" lsp-python-ms-errors)
    ("python.analysis.warnings" lsp-python-ms-warnings)
    ("python.analysis.information" lsp-python-ms-information)
    ("python.analysis.disabled" lsp-python-ms-disabled)
-   ("python.analysis.autoSearchPaths" ,(<= (length lsp-python-ms-extra-paths) 0) t)))
+   ("python.analysis.autoSearchPaths" (lambda () (<= (length lsp-python-ms-extra-paths) 0)) t)
+   ("python.autoComplete.extraPaths" lsp-python-ms-extra-paths)))
 
 (dolist (mode lsp-python-ms-extra-major-modes)
   (add-to-list 'lsp-language-id-configuration `(,mode . "python")))
@@ -420,7 +433,7 @@ WORKSPACE is just used for logging and _PARAMS is unused."
                                         (lambda () (f-exists? lsp-python-ms-executable)))
   :major-modes (append '(python-mode) lsp-python-ms-extra-major-modes)
   :server-id 'mspyls
-  :priority -2
+  :priority 1
   :initialization-options 'lsp-python-ms--extra-init-params
   :notification-handlers (lsp-ht ("python/languageServerStarted" 'lsp-python-ms--language-server-started-callback)
                                  ("telemetry/event" 'ignore)
@@ -429,8 +442,10 @@ WORKSPACE is just used for logging and _PARAMS is unused."
                                  ("python/endProgress" 'lsp-python-ms--end-progress-callback))
   :initialized-fn (lambda (workspace)
                     (with-lsp-workspace workspace
-                                        (lsp--set-configuration (lsp-configuration-section "python"))))
-  :download-server-fn #'lsp-python-ms--install-server))
+                      (lsp--set-configuration (lsp-configuration-section "python"))))
+  :download-server-fn (lambda (client callback error-callback update?)
+                        (when lsp-python-ms-auto-install-server
+                          (lsp-python-ms--install-server client callback error-callback update?)))))
 
 (provide 'lsp-python-ms)
 

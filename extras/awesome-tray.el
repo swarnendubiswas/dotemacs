@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-10-07 07:30:16
-;; Version: 4.1
-;; Last-Updated: 2020-05-06 16:29:33
+;; Version: 4.2
+;; Last-Updated: 2020-06-18 21:02:39
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/awesome-tray.el
 ;; Keywords:
@@ -74,6 +74,9 @@
 ;;
 
 ;;; Change log:
+;;
+;; 2020/06/18
+;;      * Shorter date info.
 ;;
 ;; 2020/05/06
 ;;      * Just show origin message if got any error, easy to debug.
@@ -252,6 +255,10 @@ their first character.
 
 These goes before those shown in their full names."
   :type 'integer
+  :group 'awesome-tray)
+
+(defface awesome-tray-default-face '((t :inherit default))
+  "Face for string constant ouside modules."
   :group 'awesome-tray)
 
 (defface awesome-tray-module-git-face
@@ -470,10 +477,13 @@ These goes before those shown in their full names."
 (defun awesome-tray-get-module-info (module-name)
   (let* ((func (ignore-errors (cadr (assoc module-name awesome-tray-module-alist))))
          (face (ignore-errors (cddr (assoc module-name awesome-tray-module-alist))))
-         (info (ignore-errors (propertize (funcall func) 'face face))))
-    (if info
-        info
-      (propertize "" 'face face))))
+         (raw-info (ignore-errors (funcall func)))
+         (info (ignore-errors (if face (propertize raw-info 'face face) raw-info))))
+    (if func
+        (if info
+            info
+          (propertize "" 'face face))
+      (propertize module-name 'face 'awesome-tray-default-face))))
 
 (defun awesome-tray-module-git-info ()
   (if (executable-find "git")
@@ -529,7 +539,7 @@ These goes before those shown in their full names."
           ))
 
 (defun awesome-tray-module-date-info ()
-  (format-time-string "%Y-%m-%d %H:%M %A"))
+  (format-time-string "%m-%d %H:%M %a"))
 
 (defun awesome-tray-module-last-command-info ()
   (format "%s" last-command))

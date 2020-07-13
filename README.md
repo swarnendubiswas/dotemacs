@@ -140,17 +140,17 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 
 Use Universal Ctags with `counsel-etags`.
 
-+ `-R` -- recursively scan for files
-+ `-e` -- use Emacs-compatible syntax
-+ `--list-excludes` -- check which patterns are excluded from processing
-+ `--list-languages` -- list supported languages
+- `-R` -- recursively scan for files
+- `-e` -- use Emacs-compatible syntax
+- `--list-excludes` -- check which patterns are excluded from processing
+- `--list-languages` -- list supported languages
 
 By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 
-+ `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use.
-+ `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is the identifier under the cursor.
-+ `M-*` -- Pop back to where you previously invoked `M-.`.
-+ `C-u M-.` -- Find the next definition for the last tag.
+- `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use.
+- `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is the identifier under the cursor.
+- `M-*` -- Pop back to where you previously invoked `M-.`.
+- `C-u M-.` -- Find the next definition for the last tag.
 
 For more commands, see the Tags topic in the Emacs info document.
 
@@ -195,8 +195,8 @@ ctags -eR --languages=Python
 
 GNU Global has better database search support while Universal Ctags supports more languages. It is possible to build Global with support for Universal Ctags.
 
-+ <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
-+ <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
+- <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
+- <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
 
 ## Server Support
 
@@ -220,8 +220,8 @@ Restart=always
 WantedBy=default.target
 ```
 
-+ Enable the unit to be started at login: `systemctl --user enable emacs.service`
-+ Start the service for the current session: `systemctl --user start emacs.service`
+- Enable the unit to be started at login: `systemctl --user enable emacs.service`
+- Start the service for the current session: `systemctl --user start emacs.service`
 
 Create a `emacsclient.desktop` file in `$HOME/.local/share/applications/` with the following content.
 
@@ -241,7 +241,7 @@ StartupWMClass=Emacs
 
 ## TODO
 
-+ Use custom major modes for files by names
-+ Check if a Markdown formatter other than Prettier is available
-+ Sort files alphabetically with counsel and projectile.
-+ Magit Diff is opening in a new frame
+- Use custom major modes for files by names
+- Check if a Markdown formatter other than Prettier is available
+- Sort files alphabetically with counsel and projectile.
+- Magit Diff is opening in a new frame

@@ -1587,9 +1587,9 @@ whitespaces."
     (add-hook hook #'prettier-js-mode))
   :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
 
-;; https://github.com/jscheid/prettier.el
 (use-package prettier
   :ensure t
+  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package grip-mode
