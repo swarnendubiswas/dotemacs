@@ -184,7 +184,7 @@ whitespaces."
 
 (use-package exec-path-from-shell
   :ensure t
-  :if (memq window-system '(x ns))
+  :if (or (daemonp) (memq window-system '(x ns)))
   :custom (exec-path-from-shell-check-startup-files nil) ; Ignore definition check
   :init (exec-path-from-shell-initialize))
 
@@ -362,18 +362,18 @@ whitespaces."
 
 (when (display-graphic-p) ; window-system is deprecated
   (progn
-    (tool-bar-mode -1)
     (menu-bar-mode -1)
-    (scroll-bar-mode -1)))
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1)))
 
 ;; (add-hook 'after-make-frame-functions
 ;;           (lambda ()
 ;;             (when (display-graphic-p)
 ;;               (tool-bar-mode -1))))
 
-;; (tool-bar-mode -1)
 ;; (menu-bar-mode -1)
 ;; (scroll-bar-mode -1)
+;; (tool-bar-mode -1)
 
 (tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
@@ -525,6 +525,7 @@ whitespaces."
                                                      :init (doom-modeline-mode 1)
                                                      :custom
                                                      (doom-modeline-buffer-encoding nil)
+                                                     (doom-modeline-height 1)
                                                      (doom-modeline-indent-info t)
                                                      (doom-modeline-minor-modes t)))
 
@@ -542,9 +543,20 @@ whitespaces."
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
-(set-frame-font "Roboto Mono")
+;; (set-frame-font "Roboto Mono")
 (set-face-attribute 'default nil :height 140)
-(set-face-attribute 'mode-line nil :height 110)
+;; https://github.com/seagle0128/doom-modeline/issues/187
+(set-face-attribute 'mode-line nil :height 100)
+(set-face-attribute 'mode-line-inactive nil :height 100)
+
+(use-package circadian
+  :ensure t
+  :custom
+  (calendar-latitude 26.50)
+  (calendar-longitude 80.23)
+  (circadian-themes '((:sunrise . doom-molokai)
+                      (:sunset  . doom-peacock)))
+  (circadian-setup))
 
 (use-package ibuffer
   :custom
@@ -676,6 +688,15 @@ whitespaces."
   :ensure t
   :after (treemacs projectile))
 
+(use-package treemacs-icons-dired
+  :after treemacs
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+
 (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
   :ensure t)
 
@@ -783,26 +804,25 @@ whitespaces."
   (company-box-max-candidates 50)
   (company-box-doc-delay 0.2))
 
-;; (dolist (hook '(text-mode-hook markdown-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (make-local-variable 'company-backends)
-;;               (setq company-backends '(company-capf
-;;                                        company-files
-;;                                        company-dabbrev
-;;                                        company-ispell)))))
+(dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook))
+  (add-hook hook
+            (lambda ()
+              (make-local-variable 'company-backends)
+              (setq company-backends '(:separate company-capf
+                                                 company-files
+                                                 company-dabbrev
+                                                 company-ispell)))))
 
-;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (use-package company-bibtex
-;;                 :ensure t
-;;                 :demand t)
-
-;;               (set (make-local-variable 'company-backends) '((company-capf
-;;                                                               :with company-bibtex
-;;                                                               company-dabbrev :separate
-;;                                                               company-files))))))
+(dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+  (add-hook hook
+            (lambda ()
+              (use-package company-bibtex
+                :ensure t
+                :demand t)
+              (set (make-local-variable 'company-backends) '((company-capf
+                                                              :with company-bibtex
+                                                              company-dabbrev :separate
+                                                              company-files))))))
 
 ;; (add-hook 'prog-mode-hook
 ;;           (lambda ()
@@ -1565,27 +1585,31 @@ whitespaces."
   :custom
   ;; (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-enable-math t)
+  ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
+  (markdown-fontify-code-blocks-natively t)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-command "pandoc -f markdown -s")
+  (markdown-command "pandoc -f markdown -t pdf -s")
   :config
   (use-package markdown-mode+
     :ensure t
-    :demand t))
-
-(use-package pandoc-mode
-  :ensure t
-  :diminish
-  :config (pandoc-load-default-settings)
-  :hook (markdown-mode . pandoc-mode))
+    :demand t)
+  (use-package pandoc-mode
+    :ensure t
+    ;; :diminish
+    :config (pandoc-load-default-settings)
+    :hook (markdown-mode . pandoc-mode)))
 
 (use-package prettier-js
   :ensure t
-  :disabled t ;; Seems like there are bugs/inconsistencies in indenting lists
+  :disabled t ; Seems like there are bugs/inconsistencies in indenting lists
   :init
   (dolist (hook '(markdown-mode-hook gfm-mode-hook))
     (add-hook hook #'prettier-js-mode))
   :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
+
+(use-package add-node-modules-path
+  :ensure t)
 
 (use-package prettier
   :ensure t

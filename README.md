@@ -17,7 +17,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 You can use the following instructions to install a few third-party applications. These should work on an Ubuntu 18.04 distribution.
 
 ```Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf
 wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
 sudo dpkg -i fd_8.1.1_amd64.deb
 sudo snap install shfmt
@@ -26,7 +26,7 @@ sudo snap install shellcheck --edge
 sudo snap refresh
 python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint grip --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server grip --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint
+sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver
 sudo npm update
 sudo gem install scss_lint
 sudo gem update

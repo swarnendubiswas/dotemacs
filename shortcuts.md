@@ -354,7 +354,11 @@ Use `magit-status` to display information about the current Git repository, and 
 - `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).
 - [An example of excluding \*.el from the files searched by ag](https://github.com/abo-abo/swiper/pull/774)
 
+### Search in the current folder
+
+- `<f8>` - Search for word in the current directory (`deadgrep`)
+
 ### List all files
 
-- `C-x j` - List all files in given directory (`sb/counsel-all-files-recursively)
+- `C-x j` - List all files in given directory (`sb/counsel-all-files-recursively`)
 - `C-x f` - Jump to a file below the current directory (`counsel-file-jump`)
