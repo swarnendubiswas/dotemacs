@@ -246,7 +246,8 @@ whitespaces."
       ;; Do not use system tooltips
       x-gtk-use-system-tooltips nil)
 
-(setq-default fill-column dotemacs-fill-column
+(setq-default compilation-scroll-output t
+              fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs by default
               indicate-empty-lines t
               standard-indent 2
@@ -279,8 +280,16 @@ whitespaces."
 (minibuffer-depth-indicate-mode 1)
 (transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
 
+;; Do not disable narrowing commands
+(put 'narrow-to-region 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-defun 'disabled nil)
+;; Do not disable case-change functions
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
-  :diminish auto-revert-mode
+  ;; :diminish auto-revert-mode
   :hook ((after-init . global-auto-revert-mode)
          (dired-mode . auto-revert-mode)) ; Auto refresh dired when files change
   :custom
@@ -309,13 +318,13 @@ whitespaces."
   (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
 
-;; (use-package uniquify
-;; :custom
-;; (uniquify-after-kill-buffer-p t)
-;; (uniquify-buffer-name-style 'forward)
-;; (uniquify-ignore-buffers-re "^\\*")
-;; (uniquify-separator "/")
-;; (uniquify-strip-common-suffix t))
+(use-package uniquify
+  :custom
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-buffer-name-style 'forward)
+  (uniquify-ignore-buffers-re "^\\*")
+  (uniquify-separator "/")
+  (uniquify-strip-common-suffix t))
 
 ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
 (use-package hippie-exp
@@ -354,26 +363,24 @@ whitespaces."
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
 (use-package abbrev
-  :diminish
+  ;; :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
 
-(when (display-graphic-p) ; window-system is deprecated
-  (progn
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)))
+;; (when (display-graphic-p) ; window-system is deprecated
+;;   (progn
+;;     (menu-bar-mode -1)
+;;     (scroll-bar-mode -1)
+;;     (tool-bar-mode -1)))
 
-;; (add-hook 'after-make-frame-functions
-;;           (lambda ()
-;;             (when (display-graphic-p)
-;;               (tool-bar-mode -1))))
-
-;; (menu-bar-mode -1)
-;; (scroll-bar-mode -1)
-;; (tool-bar-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 
 (tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
@@ -623,12 +630,14 @@ whitespaces."
 
 (use-package dired-efap
   :ensure t
+  :after dired
   :custom (dired-efap-initial-filename-selection nil)
   :bind (:map dired-mode-map
               ("r" . dired-efap)))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
+  :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -732,6 +741,9 @@ whitespaces."
   :ensure t
   :custom (swiper-action-recenter t))
 
+(setq-default grep-highlight-matches t
+              grep-scroll-output t)
+
 (use-package wgrep ; Writable grep
   :ensure t
   :custom (wgrep-auto-save-buffer t))
@@ -783,19 +795,30 @@ whitespaces."
   (company-require-match nil)
   (company-selection-wrap-around t)
   (company-show-numbers t) ; Speed up completion
+  :config
+  (dolist (backend '(company-eclim company-semantic))
+    (delq backend company-backends))
   :bind (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
-              ("<tab>" . company-complete-common-or-cycle)))
+              ("<tab>" . company-complete-common-or-cycle)
+              ("M-/" . company-other-backend)))
 
 (use-package company-flx
   :ensure t
   :hook (global-company-mode . company-flx-mode))
 
+(use-package company-quickhelp
+  :ensure t
+  :hook (global-company-mode . company-quickhelp-mode)
+  :custom
+  (company-quickhelp-delay 0.5)
+  (company-quickhelp-max-lines 60))
+
 (use-package company-box
   :ensure t
   :disabled t
-  :diminish
+  ;; :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
   :custom
@@ -1254,12 +1277,16 @@ whitespaces."
   :hook (prog-mode . highlight-symbol-mode)
   :bind (("M-p" . highlight-symbol-prev)
          ("M-n" . highlight-symbol-next))
-  :custom (highlight-symbol-on-navigation-p t)
-  :diminish)
+  ;; :diminish
+  :custom (highlight-symbol-on-navigation-p t))
 
 (use-package hl-todo
   :ensure t
   :hook (after-init . global-hl-todo-mode))
+
+(use-package highlight-escape-sequences
+  :ensure t
+  :hook (after-init . hes-mode))
 
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -1473,6 +1500,10 @@ whitespaces."
   :ensure t
   :bind* ("C-." . iedit-mode))
 
+(use-package immortal-scratch
+  :ensure t
+  :hook (after-init . immortal-scratch-mode))
+
 (use-package persistent-scratch
   :ensure t
   :hook (after-init . persistent-scratch-setup-default)
@@ -1589,27 +1620,35 @@ whitespaces."
   (markdown-fontify-code-blocks-natively t)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-command "pandoc -f markdown -t pdf -s")
   :config
   (use-package markdown-mode+
     :ensure t
     :demand t)
-  (use-package pandoc-mode
-    :ensure t
-    ;; :diminish
-    :config (pandoc-load-default-settings)
-    :hook (markdown-mode . pandoc-mode)))
+  (with-eval-after-load 'whitespace-cleanup-mode
+    (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)))
 
-(use-package prettier-js
+;; Use `pandoc-convert-to-pdf' to export markdown file to pdf.
+(use-package pandoc-mode
   :ensure t
-  :disabled t ; Seems like there are bugs/inconsistencies in indenting lists
-  :init
-  (dolist (hook '(markdown-mode-hook gfm-mode-hook))
-    (add-hook hook #'prettier-js-mode))
-  :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
+  ;; :diminish
+  :config (pandoc-load-default-settings)
+  :hook (markdown-mode . pandoc-mode))
+
+  (use-package prettier-js
+    :ensure t
+    :disabled t ; Seems like there are bugs/inconsistencies in indenting lists
+    :init
+    (dolist (hook '(markdown-mode-hook gfm-mode-hook))
+      (add-hook hook #'prettier-js-mode))
+    :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
 
 (use-package add-node-modules-path
-  :ensure t)
+  :ensure t
+  :init
+  (with-eval-after-load 'typescript-mode
+    (add-hook 'typescript-mode-hook 'add-node-modules-path))
+  (with-eval-after-load 'js2-mode
+    (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
 (use-package prettier
   :ensure t
@@ -1623,7 +1662,8 @@ whitespaces."
 
 (use-package csv-mode
   :ensure t
-  :mode "\\.csv\\'")
+  :mode "\\.csv\\'"
+  :custom (csv-separators '("," ";" "|" " ")))
 
 (use-package boogie-friends
   :ensure t
@@ -1724,12 +1764,18 @@ whitespaces."
 
 (use-package modern-cpp-font-lock
   :ensure t
-  :diminish modern-c++-font-lock-mode
+  ;; :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
+
+(setq python-shell-interpreter "python3"
+      auto-mode-alist
+      (append '(("SConstruct\\'" . python-mode)
+                ("SConscript\\'" . python-mode))
+              auto-mode-alist))
 
 (use-package pyvenv
   :ensure t
-  :diminish
+  ;; :diminish
   :custom (pyvenv-mode-line-indicator
            '(pyvenv-virtual-env-name ("[venv:"
                                       pyvenv-virtual-env-name "]")))
@@ -1810,10 +1856,16 @@ whitespaces."
 
 (use-package git-gutter
   :ensure t
-  :diminish
+  ;; :diminish
   :bind (("C-x p" . git-gutter:previous-hunk)
          ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode))
+
+(use-package diff-hl
+  :ensure t
+  :init
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (add-hook 'after-init-hook 'global-diff-hl-mode))
 
 ;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
 (defun sb/enable-smerge-maybe ()
@@ -1851,12 +1903,35 @@ whitespaces."
   ;; (web-mode-enable-current-column-highlight t)
   )
 
+(use-package rainbow-mode
+  :ensure t
+  :hook ((css-mode html-mode sass-mode) . rainbow-mode))
+
+(use-package css-eldoc
+  :ensure t
+  :init (add-hook 'css-mode-hook 'turn-on-css-eldoc))
+
+(fset 'xml-mode 'nxml-mode)
+
+(use-package company-php
+  :ensure t
+  :init
+  (with-eval-after-load 'company
+    (add-to-list 'company-backends 'company-ac-php-backend)))
+
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
+  ;; https://justin.abrah.ms/dotfiles/emacs.html
+  ;; :ensure-system-package
+  ;; ((typescript-language-server . "npm install -g typescript-language-server")
+  ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
+  ;;  (yaml-language-server . "npm install -g yaml-language-server")
+  ;;  (tsc . "npm install -g typescript"))
   :hook (((cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode less-mode less-css-mode nxml-mode php-mode python-mode sass-mode scss-mode sh-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-mode . lsp-diagnostics-modeline-mode))
+         (lsp-managed-mode . lsp-diagnostics-modeline-mode)
+         (lsp-mode . lsp-headerline-breadcrumb-mode))
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--log=error" "--pretty"))
   (lsp-eldoc-enable-hover nil)
@@ -1869,7 +1944,7 @@ whitespaces."
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io t) ; Disable after a bit of testing
+  (lsp-log-io nil)
   (lsp-prefer-capf t)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
@@ -1889,7 +1964,7 @@ whitespaces."
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
-                      "org.eclipse.lemminx-0.11.1-uber.jar")))
+                      "org.eclipse.lemminx-0.13.1-uber.jar")))
   (lsp-yaml-print-width 100)
   :config
   (advice-add #'lsp--auto-configure :override #'ignore)
