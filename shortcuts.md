@@ -22,6 +22,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `M-/` - Try to expand text before point (`hippie-expand`).
 - `C-M-\` - Indent all the lines in the region (`indent-region`).
 - `M-q` - Fill paragraph at or after point (`fill-paragraph`).
+- `M-d` - Kill the immediately next word (``).
+- `M-- M-d` - Kill the immediately previous word (``).
 
 ## Marking
 

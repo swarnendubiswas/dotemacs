@@ -12,6 +12,8 @@
 
 ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html
 
+;; Only an interactive function can be invoked with "M-x" or a key binding.
+
 ;; When defining a lambda expression that is to be used as an anonymous function, you can in
 ;; principle use any method to construct the list. But typically you should use the lambda macro, or
 ;; the function special form, or the #' read syntax which is a short-hand for using function.
@@ -196,7 +198,7 @@ whitespaces."
       case-fold-search t ; Searches and matches should ignore case
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
-      confirm-kill-processes nil ;; Prevent "Active processes exist" when you quit Emacs
+      confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
       custom-safe-themes t
@@ -342,7 +344,7 @@ whitespaces."
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
-  :diminish
+  ;; :diminish
   :hook (after-init . global-subword-mode))
 
 ;; vertical - Split the selected window into two windows, one above the other (split-window-below)
@@ -716,7 +718,7 @@ whitespaces."
 
 (use-package all-the-icons-dired
   :ensure t
-  :diminish
+  ;; :diminish
   :hook (dired-mode . all-the-icons-dired-mode))
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
@@ -876,7 +878,7 @@ whitespaces."
 
 (use-package yasnippet
   :ensure t
-  :diminish yas-minor-mode
+  ;; :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -913,6 +915,7 @@ whitespaces."
   (dolist (buffer '("TAGS" "magit-process"))
     (add-to-list 'ivy-ignore-buffers buffer))
   :bind
+  ;; :diminish
   (("C-c r" . ivy-resume)
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
@@ -920,8 +923,7 @@ whitespaces."
    ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
    ("<left>" . ivy-previous-line)
-   ("<right>" . ivy-next-line))
-  :diminish)
+   ("<right>" . ivy-next-line)))
 
 (use-package counsel
   :ensure t
@@ -1008,9 +1010,9 @@ whitespaces."
                                     ))
   (counsel-mode-override-describe-bindings t)
   (counsel-yank-pop-separator "\n-------------------------\n")
+  ;; :diminish
   :hook (ivy-mode . counsel-mode)
-  :config (defalias 'flycheck-list-errors 'counsel-flycheck)
-  :diminish)
+  :config (defalias 'flycheck-list-errors 'counsel-flycheck))
 
 (use-package prescient
   :ensure t
@@ -1091,14 +1093,15 @@ whitespaces."
   :hook ((prog-mode . flyspell-prog-mode)
          (before-save-hook . flyspell-buffer)
          ((text-mode find-file-hooks) . flyspell-mode))
-  :diminish
+  ;; :diminish
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ("C-," . sb/flyspell-goto-previous-error)))
+   ;; ("C-," . sb/flyspell-goto-previous-error)
+   ("C-," . flyspell-auto-correct-previous-word)))
 
 (use-package flyspell-popup
   :ensure t
@@ -1107,16 +1110,16 @@ whitespaces."
 
 (use-package highlight-indentation
   :ensure t
-  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  ;; :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook (python-mode . highlight-indentation-mode))
 
 ;; Claims to be better than electric-indent-mode
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
 (use-package aggressive-indent
   :ensure t
+  ;; :diminish
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
-  :custom (aggressive-indent-dont-electric-modes t)
-  :diminish)
+  :custom (aggressive-indent-dont-electric-modes t))
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
@@ -1144,6 +1147,7 @@ whitespaces."
     (add-hook hook
               (lambda ()
                 (require 'smartparens-latex))))
+  ;; :diminish
   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
@@ -1155,8 +1159,7 @@ whitespaces."
          ("C-S-b" . sp-backward-symbol) ; foo bar| baz -> foo |bar baz
          ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
          ;; (foo bar) -> foo bar
-         ("C-M-k" . sp-splice-sexp))
-  :diminish)
+         ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
   :ensure t
@@ -1257,7 +1260,7 @@ whitespaces."
   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
 (use-package whitespace
-  :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :custom
   (show-trailing-whitespace nil)
   (whitespace-line-column dotemacs-fill-column))
@@ -1269,7 +1272,7 @@ whitespaces."
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
   :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
-  :diminish
+  ;; :diminish
   :hook (prog-mode . ws-butler-mode))
 
 (use-package highlight-symbol ; Highlight symbol under point
@@ -1306,27 +1309,28 @@ whitespaces."
                                 tramp-file-name-regexp))
   :config
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  (add-to-list 'tramp-default-method-alist '("172.27.15.105" "swarnendu" "ssh"))
+  (add-to-list 'tramp-default-method-alist '("swarnendu6.cse.iitk.ac.in" "swarnendu" "ssh"))
   (setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
 
-;; FIXME: Does not pick up other usernames.
+;; Does not pick up other usernames
 (use-package counsel-tramp
   :ensure t
   :bind ("C-c d t" . counsel-tramp)
   :config
   (defalias 'tramp 'counsel-tramp)
-  (add-hook 'counsel-tramp-pre-command-hook
-            (lambda ()
-              ;; (global-aggressive-indent-mode -1)
-              (projectile-mode -1)
-              (counsel-projectile-mode -1)))
-  (add-hook 'counsel-tramp-quit-hook
-            (lambda ()
-              ;; (global-aggressive-indent-mode 1)
-              (projectile-mode 1)
-              (counsel-projectile-mode 1))))
+  ;; (add-hook 'counsel-tramp-pre-command-hook
+  ;;           (lambda ()
+  ;;             ;; (global-aggressive-indent-mode -1)
+  ;;             (projectile-mode -1)
+  ;;             (counsel-projectile-mode -1)))
+  ;; (add-hook 'counsel-tramp-quit-hook
+  ;;           (lambda ()
+  ;;             ;; (global-aggressive-indent-mode 1)
+  ;;             (projectile-mode 1)
+  ;;             (counsel-projectile-mode 1)))
+  )
 
 (use-package imenu
   :custom
@@ -1341,7 +1345,7 @@ whitespaces."
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
-  :diminish
+  ;; :diminish
   :ensure-system-package global
   ;; :init
   ;; (add-hook 'c-mode-common-hook
@@ -1428,7 +1432,7 @@ whitespaces."
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
-  :diminish
+  ;; :diminish
   :hook (after-init . global-hungry-delete-mode ))
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
@@ -1481,12 +1485,17 @@ whitespaces."
   (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   (push '("*xref*" :noselect nil) popwin:special-display-config)
-  (push '("*helpful\*" :noselect nil) popwin:special-display-config)
+  (push '(helpful-mode :noselect t) popwin:special-display-config)
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*")))
+  (add-to-list 'popwin:special-display-config '("*Warnings*"))
+  (add-to-list 'popwin:special-display-config '("*prettier errors*")))
+
+;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
+;; (add-to-list 'display-buffer-alist
+;;              '("*Help*" display-buffer-same-window))
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
@@ -1541,7 +1550,7 @@ whitespaces."
 ;; This causes additional saves which leads to auto-formatters being invoked more frequently
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
-  :diminish
+  ;; :diminish
   :custom
   (super-save-remote-files nil) ; Ignore remote files
   (super-save-auto-save-when-idle t)
@@ -1583,7 +1592,7 @@ whitespaces."
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
-  :diminish
+  ;; :diminish
   :hook (text-mode . writegood-mode))
 
 (use-package flycheck-grammarly
@@ -1605,12 +1614,12 @@ whitespaces."
 
 (use-package markdown-mode
   :ensure t
-  :diminish gfm-mode
+  ;; :diminish gfm-mode
   :ensure-system-package pandoc
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
-  ;; :bind ("C-c C-d" . nil)
+  :bind ("C-c C-j" . nil)
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; :init (setq-default markdown-hide-markup t)
   :custom
@@ -1701,7 +1710,7 @@ whitespaces."
 
 (use-package eldoc
   :if (eq system-type 'gnu/linux)
-  :diminish
+  ;; :diminish
   :config (global-eldoc-mode -1))
 
 (use-package matlab-mode
@@ -1817,7 +1826,7 @@ whitespaces."
   :ensure reformatter
   :ensure-system-package (shfmt . "snap install shfmt")
   :load-path "extras/shfmt"
-  :diminish shfmt-on-save-mode
+  ;; :diminish shfmt-on-save-mode
   ;; :hook (sh-mode . shfmt-on-save-mode)
   :custom (shfmt-arguments "-i 4 -p -ci"))
 
@@ -1954,6 +1963,7 @@ whitespaces."
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length 100)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
+  (lsp-pyls-plugins-pydocstyle-enabled nil)
   (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
   (lsp-pyls-plugins-pyflakes-enabled nil)
   (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
@@ -2229,8 +2239,8 @@ Increase line spacing by two line height."
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
   :hook (after-init . which-key-mode)
-  :config (which-key-setup-side-window-right-bottom)
-  :diminish)
+  ;; :diminish
+  :config (which-key-setup-side-window-right-bottom))
 
 ;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 ;; (use-package server
@@ -2248,6 +2258,7 @@ Increase line spacing by two line height."
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
 (put 'projectile-default-file 'safe-local-variable #'stringp)
+(put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
 (put 'pyvenv-activate 'safe-local-variable #'stringp)

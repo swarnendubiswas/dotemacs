@@ -5,7 +5,7 @@
          (projectile-project-compilation-cmd . "cd bin && cmake .. && cmake --build . && cd Debug && .\\shiolink.exe")
          (projectile-project-compilation-cmd . latexmk)
          (projectile-project-run-cmd . "cd bin\\Debug && .\\shiolink.exe && E:\\nanika\\ssp.exe")
-         (projectile-enable-caching . t) ; Enable caching
+         (projectile-enable-caching . t)
          (projectile-globally-ignored-files . ("MyBinaryFile")) ; Ignore file
          (projectile-project-name . "your-project-name-here")
          (show-trailing-whitespace . t)
