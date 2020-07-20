@@ -173,7 +173,7 @@ whitespaces."
           use-package-verbose t)
   (setq use-package-always-defer t
         use-package-compute-statistics nil ; Use "M-x use-package-report" to see results
-        ;; Avoid printing error and warning code, use if the configuration is known to work
+        ;; Avoid printing error and warning code if the configuration is known to work
         use-package-expand-minimally t
         use-package-verbose nil))
 
@@ -209,6 +209,10 @@ whitespaces."
   :custom (exec-path-from-shell-check-startup-files nil) ; Ignore definition check
   :init (exec-path-from-shell-initialize))
 
+(use-package gcmh
+  :ensure t
+  :hook (after-init . gcmh-mode))
+
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
       apropos-do-all t
       auto-mode-case-fold nil ; Disable a second case insensitive pass
@@ -226,9 +230,9 @@ whitespaces."
       enable-recursive-minibuffers t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b"))
-      gc-cons-percentage 0.5 ; Portion of heap used for allocation
-      ;; GC may happen after this many bytes are allocated since last GC
-      gc-cons-threshold (* 200 1024 1024)
+      ;; gc-cons-percentage 0.5 ; Portion of heap used for allocation
+      ;; ;; GC may happen after this many bytes are allocated since last GC
+      ;; gc-cons-threshold (* 200 1024 1024)
       help-window-select t
       history-delete-duplicates t
       ;; Emacs "updates" its ui more often than it needs to, so we slow it down
@@ -290,10 +294,6 @@ whitespaces."
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (setq gc-cons-threshold 800000)))
-
-(use-package gcmh
-  :ensure t
-  :hook (after-init . gcmh-mode))
 
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
@@ -469,7 +469,9 @@ whitespaces."
 
       ((eq dotemacs-theme 'doom-themes) (use-package doom-themes
                                           :ensure t
-                                          :init (load-theme 'doom-monokai-classic t)
+                                          :init
+                                          ;; (load-theme 'doom-monokai-classic t)
+                                          (load-theme 'doom-molokai t)
                                           :config
                                           (set-face-attribute 'font-lock-comment-face nil
                                                               ;; :foreground "#cccccc"
@@ -1052,7 +1054,12 @@ whitespaces."
 
 (use-package ivy-prescient
   :ensure t
-  :hook (counsel-mode . ivy-prescient-mode))
+  :hook (counsel-mode . ivy-prescient-mode)
+  :custom (ivy-prescient-enable-sorting nil))
+
+;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
+(with-eval-after-load 'ivy
+  (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
 (use-package company-prescient
   :ensure t
@@ -1442,9 +1449,8 @@ whitespaces."
 
 (use-package dumb-jump
   :ensure t
-  :custom
-  (dumb-jump-selector 'ivy)
-  (dumb-jump-prefer-searcher 'rg))
+  :custom (dumb-jump-prefer-searcher 'rg)
+  :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package helpful
   :ensure t
@@ -1594,7 +1600,7 @@ whitespaces."
          ("C-'" . avy-goto-char)
          ("C-/" . avy-goto-line))
   :custom
-  ;; (avy-background t)
+  (avy-background t)
   (avy-highlight-first t)
   (avy-style 'at)
   :config
@@ -1626,8 +1632,17 @@ whitespaces."
   ;; :diminish
   :hook (text-mode . writegood-mode))
 
-(use-package flycheck-grammarly
+(use-package langtool
   :ensure t)
+
+(use-package flycheck-grammarly
+  :ensure t
+  :init
+  (dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook latex-mode-hook))
+    (add-hook hook
+              (lambda()
+                (require 'flycheck-grammarly)))))
+
 
 (use-package logview
   :ensure t
@@ -1674,7 +1689,7 @@ whitespaces."
   (with-eval-after-load 'whitespace-cleanup-mode
     (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)))
 
-;; Use `pandoc-convert-to-pdf' to export markdown file to pdf.
+;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
   :ensure t
   ;; :diminish
@@ -1712,6 +1727,17 @@ whitespaces."
   :mode "\\.csv\\'"
   :custom (csv-separators '("," ";" "|" " ")))
 
+(use-package doxymacs
+  :ensure t
+  :disabled t
+  :commands (doxymacs-mode doxymacs-font-lock)
+  :config
+  (doxymacs-mode 1)
+  (doxymacs-font-lock))
+
+(use-package highlight-doxygen
+  :ensure t)
+
 (use-package boogie-friends
   :ensure t
   :mode ("\\.smt\\'" . z3-smt2-mode))
@@ -1724,8 +1750,11 @@ whitespaces."
     :custom
     (bibtex-completion-cite-prompt-for-optional-arguments nil)
     (bibtex-completion-cite-default-as-initial-input t)
-    (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:10}"))))
+    (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=type=:10}"))))
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+
+(use-package company-auctex
+  :after (company latex))
 
 ;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 ;; (defun sb/save-buffer-and-run-latexmk ()
@@ -1749,7 +1778,7 @@ whitespaces."
 (use-package eldoc
   :if (eq system-type 'gnu/linux)
   ;; :diminish
-  :config (global-eldoc-mode -1))
+  :config (global-eldoc-mode 1))
 
 (use-package matlab-mode
   :ensure t)
@@ -1802,11 +1831,11 @@ whitespaces."
 
 (use-package cmake-mode
   :ensure t
-  :mode ("CMakeLists.txt" "\\.cmake\\'")
-  :config
-  (use-package cmake-font-lock
-    :ensure t
-    :hook (cmake-mode . cmake-font-lock-activate)))
+  :mode ("CMakeLists.txt" "\\.cmake\\'"))
+
+(use-package cmake-font-lock
+  :ensure t
+  :hook (cmake-mode . cmake-font-lock-activate))
 
 (use-package modern-cpp-font-lock
   :ensure t
@@ -1814,10 +1843,9 @@ whitespaces."
   :hook (c++-mode . modern-c++-font-lock-mode))
 
 (setq python-shell-interpreter "python3"
-      auto-mode-alist
-      (append '(("SConstruct\\'" . python-mode)
-                ("SConscript\\'" . python-mode))
-              auto-mode-alist))
+      auto-mode-alist (append '(("SConstruct\\'" . python-mode)
+                                ("SConscript\\'" . python-mode))
+                              auto-mode-alist))
 
 (use-package pyvenv
   :ensure t
@@ -1857,6 +1885,11 @@ whitespaces."
   :hook (fish.mode . (lambda ()
                        (add-hook 'before-save-hook #'fish_indent-before-save))))
 
+(use-package fish-completion
+  :ensure t
+  :if (when (executable-find "fish"))
+  :config (global-fish-completion-mode))
+
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
@@ -1872,11 +1905,6 @@ whitespaces."
   :after flycheck
   :load-path "extras/shfmt"
   :config (flycheck-shfmt-setup))
-
-(use-package fish-completion
-  :ensure t
-  :if (when (executable-find "fish"))
-  :config (global-fish-completion-mode))
 
 (use-package magit
   :ensure t
@@ -2092,11 +2120,12 @@ whitespaces."
   :custom
   (lsp-java-inhibit-message t)
   (lsp-java-save-actions-organize-imports t)
-  :config (add-hook 'java-mode-hook
-                    (lambda ()
-                      (add-hook 'before-save-hook
-                                (lambda ()
-                                  (lsp-format-buffer)) nil t))))
+  :config
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        (lambda ()
+                          (lsp-format-buffer)) nil t))))
 
 (use-package lsp-python-ms
   :disabled t
@@ -2281,7 +2310,7 @@ Increase line spacing by two line height."
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
   :hook (after-init . which-key-mode)
-  ;; :diminish
+  :diminish
   :config (which-key-setup-side-window-right-bottom))
 
 ;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
@@ -2296,6 +2325,7 @@ Increase line spacing by two line height."
 (put 'company-clang-arguments 'safe-local-variable #'listp)
 (put 'counsel-etags-project-root 'safe-local-variable #'stringp)
 (put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
+(put 'flycheck-checker 'safe-local-variable #'listp)
 (put 'flycheck-clang-include-path 'safe-local-variable #'listp)
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)

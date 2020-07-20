@@ -36,7 +36,13 @@ composer update
 cargo install --git https://github.com/latex-lsp/texlab.git
 ```
 
-The setup also requires Universal Ctags (for `ctags`) and GNU Global (for `gtags`).
+Add the following definitions to `$HOME/.bashrc`.
+
+```Bash
+echo "NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
+```
+
+The setup supports using both Universal Ctags (or `ctags`) and GNU Global (or `gtags`).
 
 ```Bash
 git clone git@github.com:universal-ctags/ctags.git universal-ctags

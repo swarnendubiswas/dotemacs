@@ -20,7 +20,7 @@
                        `(format "cd %s && make"
                                 (locate-dominating-file buffer-file-name
                                                         ".dir-locals.el"))))
-         (eval . (flycheck-mode 0))
+         (eval . (flycheck-mode 0)) ; Enable/disable a minor mode
          (eval . (progn
                    (defun my-project-specific-function ()
                      ;; ...
@@ -31,6 +31,10 @@
                    (add-to-list
                     (make-local-variable 'grep-find-ignored-directories)
                     "blur")))
+         ;; https://emacs.stackexchange.com/questions/42463/load-package-in-dir-locals
+         (eval . (use-package smart-tabs
+                   :ensure t
+                   :config ()))
          ))
 
  (nil
@@ -56,14 +60,21 @@
                  (lsp-python-ms-extra-paths . ["/home/swarnendu/prospar-workspace/data-race-framework/src"])
                  (python-shell-exec-path . "/usr/bin/python3")
                  (python-shell-interpreter . "/usr/bin/python3")
-                 (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/2019-sharwari")))
+                 (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/2019-sharwari")
+                 ))
 
- (c-mode . ((c-file-style . "BSD")))
+ (diff-mode . ((mode . whitespace)))
+
+ (c-mode . (
+            (c-file-style . "BSD")
+            (subdirs . nil) ; Apply C mode settings only to the current directory
+            ))
 
  (c++-mode . (
               (flycheck-gcc-language-standard . "c++11")
               (flycheck-clang-language-standard . "c++11")
               (eval add-hook 'hack-local-variables-hook (lambda () (when (string= major-mode 'c++-mode) (lsp))))
+              ;; https://stackoverflow.com/questions/33063008/define-new-variable-in-dir-locals-el
               (eval . (let (
                             (clang-args (list
                                          "-std=c++11"
@@ -104,3 +115,8 @@
  ((markdown-mode . ((eval . (prettier-mode t)))))
 
  )
+
+(eval-after-load 'flycheck
+  '(progn
+     (setq flycheck-disabled-checkers '(javascript-jshint))
+     (setq flycheck-checkers '(javascript-eslint))))
