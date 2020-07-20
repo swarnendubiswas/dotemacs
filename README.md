@@ -39,7 +39,9 @@ cargo install --git https://github.com/latex-lsp/texlab.git
 Add the following definitions to `$HOME/.bashrc`.
 
 ```Bash
-echo "NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
+echo "export TERM=xterm-256color # Improve Emacs colors in the terminal" >> $HOME/.bashrc
+echo "export ALTERNATE_EDITOR=emacs EDITOR=emacs VISUAL=emacs" >> $HOME/.bashrc
+echo "export NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
 ```
 
 The setup supports using both Universal Ctags (or `ctags`) and GNU Global (or `gtags`).

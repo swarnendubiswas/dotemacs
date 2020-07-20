@@ -929,6 +929,7 @@ whitespaces."
 (use-package ivy
   :ensure t
   :custom
+  (completion-in-region-function #'ivy-completion-in-region)
   (ivy-case-fold-search 'always "Always ignore case while searching")
   (ivy-count-format "(%d/%d) " "Help identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
@@ -939,7 +940,6 @@ whitespaces."
                        (/ (frame-height) 2))))
   (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
   (ivy-wrap t)
-  (completion-in-region-function #'ivy-completion-in-region)
   :hook (after-init . ivy-mode)
   :config
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
@@ -948,7 +948,7 @@ whitespaces."
   (dolist (buffer '("TAGS" "magit-process"))
     (add-to-list 'ivy-ignore-buffers buffer))
   :bind
-  ;; :diminish
+  :diminish
   (("C-c r" . ivy-resume)
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
@@ -1279,13 +1279,21 @@ whitespaces."
                           flycheck-pylintrc (concat dotemacs-user-home "/.config/pylintrc"))))
   (add-hook 'markdown-mode-hook
             (lambda ()
-              (setq-local flycheck-checker
-                          'markdown-markdownlint-cli
+              (setq-local flycheck-checker 'markdown-markdownlint-cli
                           flycheck-markdown-markdownlint-cli-config (concat dotemacs-user-home
                                                                             "/.markdownlint.json"))))
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck))))
+
+(use-package flycheck-grammarly
+  :ensure t
+  :after flycheck
+  :init
+  (add-hook 'text-mode-hook
+            (lambda()
+              (setq-local flycheck-checker 'grammarly-checker)))
+  :custom (flycheck-grammarly-check-time 2.5))
 
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
@@ -1335,11 +1343,11 @@ whitespaces."
 ;; Open a remote file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
   :custom
-  (tramp-default-method "ssh") ; ssh is faster than the default scp
+  (tramp-default-method "ssh" "ssh is faster than the default scp")
   ;; Auto-save to a local directory for better performance
   (tramp-auto-save-directory (expand-file-name "tramp-auto-save" dotemacs-temp-directory))
   (tramp-persistency-file-name (expand-file-name "tramp" dotemacs-temp-directory))
-  (tramp-verbose 1) ; Default is 3
+  (tramp-verbose 1)
   (remote-file-name-inhibit-cache nil) ; Remote files are not updated outside of Tramp
   (tramp-completion-reread-directory-timeout nil)
   ;; Disable version control
@@ -1622,7 +1630,8 @@ whitespaces."
   :commands (esup))
 
 (use-package explain-pause-mode
-  :load-path "extras")
+  :load-path "extras"
+  :hook (after-init . explain-pause-mode))
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.
@@ -1634,15 +1643,6 @@ whitespaces."
 
 (use-package langtool
   :ensure t)
-
-(use-package flycheck-grammarly
-  :ensure t
-  :init
-  (dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook latex-mode-hook))
-    (add-hook hook
-              (lambda()
-                (require 'flycheck-grammarly)))))
-
 
 (use-package logview
   :ensure t

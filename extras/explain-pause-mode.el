@@ -3033,6 +3033,26 @@ comparisions still work."
         original-sentinel
       (apply orig args))))
 
+(defun explain-pause--wrap-set-process-plist (args)
+  "Advise set-process-plist so that command-frame information is preserved.
+
+Explain-pause-mode sets several values in the plist, which must be preserved if
+the plist is reset by user code."
+  (when (car args)
+    (let* ((proc (car args))
+           (new-plist (cadr args))
+           (existing-plist (process-plist proc)))
+      (cl-loop
+       for key in '(explain-pause-original-sentinel
+                    explain-pause-original-filter
+                    explain-pause-process-frame)
+       do
+       ;; only replace the key if it isn't already being set
+       (unless (plist-get new-plist key)
+         (plist-put new-plist key
+                    (plist-get existing-plist key))))))
+  args)
+
 (defconst explain-pause--timer-frame-max-depth 64
   "The maximum depth a record chain for a timer can get.")
 
@@ -3154,7 +3174,8 @@ callback."
 
 (defconst explain-pause--native-called-hooks
   '(post-command-hook pre-command-hook delayed-warnings-hook
-                      echo-area-clear-hook post-gc-hook))
+                      echo-area-clear-hook post-gc-hook
+                      disabled-command-function))
 
 (defsubst explain-pause--generate-hook-wrapper (hook-func hook-list)
   "Generate a lambda wrapper for advice to wrap the function HOOK-FUNC so it
@@ -3190,7 +3211,7 @@ of HOOK-FUNC, so we can refer to the symbol if possible."
       (apply hook-func args)
 
     (explain-pause--pause-call-unpause
-     (format "wrap hook %s for %s" hook-func hook-list)
+     (format "wrap hook (named wrapper) %s for %s" hook-func hook-list)
      ;; it would be nice to avoid this let but in hooks people make them
      ;; re-entrant and just call them randomly. be defensive.
      (let ((parent
@@ -3207,6 +3228,13 @@ of HOOK-FUNC, so we can refer to the symbol if possible."
         hook-func))
      (apply hook-func args))))
 
+;; seq-contains deprecated emacs >27
+(defalias 'explain-pause--seq-contains
+  (eval-when-compile
+    (if (fboundp 'seq-contains-p)
+        'seq-contains-p
+      'seq-contains)))
+
 (defsubst explain-pause--advice-add-hook (hook-func hook-list)
   "Add a hook-wrapper advice for HOOK-FUNC for type HOOK-LIST, naming the
 lambda advice so we can reference it later."
@@ -3220,21 +3248,31 @@ lambda advice so we can reference it later."
    (t
     ;; ok, whatever it is, wrap it normally and hope for the best.
     ;; it must be "funcall"-able or run-hook will have failed anyway.
-    (if (and (listp hook-func)
-             (listp (nth 3 hook-func))
-             ;; TODO perhaps we could do some fancy pcase stuff here.
-             (equal (nth 1 (nth 3 hook-func)) '(function explain-pause--lambda-hook-wrapper)))
+    (cond
+     ((and (listp hook-func)
+           (listp (nth 3 hook-func))
+           ;; TODO perhaps we could do some fancy pcase stuff here.
+           (equal (nth 1 (nth 3 hook-func))
+                  '(function explain-pause--lambda-hook-wrapper)))
         ;; we did it already
-        hook-func
+      hook-func)
+     ((and (byte-code-function-p hook-func)
+           (equal (aref hook-func 1) "\xc2\xc3\xc0\xc1\x4\x24\x87")
+           (explain-pause--seq-contains (aref hook-func 2)
+                                        'explain-pause--lambda-hook-wrapper))
+      ;; we did it already, bytecompiled
+      hook-func)
+     (t
       (lambda (&rest args)
-        (apply #'explain-pause--lambda-hook-wrapper hook-func hook-list args))))))
+        (apply #'explain-pause--lambda-hook-wrapper hook-func hook-list args)))))))
 
 (defun explain-pause--wrap-add-hook (args)
   "Advise add-hook to advise the hook itself to add a frame when called from
 native code outside command loop."
   (let ((hook-list (nth 0 args))
         (hook-func (nth 1 args)))
-    (when (and (seq-contains explain-pause--native-called-hooks hook-list)
+    (when (and (explain-pause--seq-contains
+                explain-pause--native-called-hooks hook-list)
                (functionp hook-func))
       (setf (nth 1 args)
             (explain-pause--advice-add-hook hook-func hook-list))))
@@ -3245,7 +3283,8 @@ native code outside command loop."
 can be found and removed normally."
   (let ((hook-list (nth 0 args))
         (hook-func (nth 1 args)))
-    (when (and (seq-contains explain-pause--native-called-hooks hook-list)
+    (when (and (explain-pause--seq-contains
+                explain-pause--native-called-hooks hook-list)
                (functionp hook-func)
                (not (symbolp hook-func)))
       (setf (nth 1 args)
@@ -3254,12 +3293,17 @@ can be found and removed normally."
 
 (defun explain-pause--wrap-existing-hooks-in-list (hook-kind hook-list)
   "Wrap existing hooks in HOOK-LIST with WRAP-FUNC."
-  (cl-loop
-   for hook in-ref hook-list
-   do
-   (when (functionp hook)
-     (setf hook
-           (explain-pause--advice-add-hook hook hook-kind)))))
+  (cond
+   ((listp hook-list)
+    (cl-loop
+     for hook in-ref hook-list
+     do
+     (when (functionp hook)
+       (setf hook
+             (explain-pause--advice-add-hook hook hook-kind))))
+    hook-list)
+   (t
+    (explain-pause--advice-add-hook hook-list hook-kind))))
 
 (defun explain-pause--wrap-existing-hooks ()
   "Wrap existing hooks in hook lists that are called from native code outside
@@ -3327,7 +3371,8 @@ command loop, for both the default value and all buffer local values."
            read-function
            read-variable
            completing-read))
-        (install-attempt 0))
+        (install-attempt 0)
+        (is-installed nil))
 
     (defun explain-pause-mode--install-hooks ()
       "Actually install hooks for `explain-pause-mode'."
@@ -3358,6 +3403,8 @@ command loop, for both the default value and all buffer local values."
 
       (advice-add 'process-filter :around #'explain-pause--wrap-get-process-filter)
       (advice-add 'process-sentinel :around #'explain-pause--wrap-get-process-sentinel)
+      (advice-add 'set-process-plist :filter-args
+                  #'explain-pause--wrap-set-process-plist)
 
       (dolist (callback-func callback-family)
         (advice-add (car callback-func) :filter-args (cdr callback-func)))
@@ -3386,8 +3433,10 @@ command loop, for both the default value and all buffer local values."
 
     (defun explain-pause-mode--try-enable-hooks ()
       "Attempt to install `explain-pause-mode' hooks."
-      (setq install-attempt 0)
-      (explain-pause-mode--enable-hooks))
+      (unless is-installed
+        (setq is-installed t)
+        (setq install-attempt 0)
+        (explain-pause-mode--enable-hooks)))
 
     (defun explain-pause-mode--enable-hooks ()
       "Install hooks for `explain-pause-mode' if it is being run at the top of the
@@ -3399,6 +3448,7 @@ timers, etc. Otherwise, try again."
               (progn
                 (message "Unable to install `explain-pause-mode'. please report a bug to \
 github.com/lastquestion/explain-pause-mode")
+                (setq is-installed nil)
                 (setq explain-pause-mode nil))
             (let ((top-of-loop t))
               ;; do not install if we are not top of loop
@@ -3432,6 +3482,7 @@ github.com/lastquestion/explain-pause-mode")
 
     (defun explain-pause-mode--disable-hooks ()
       "Disable hooks installed by `explain-pause-mode--install-hooks'."
+      (setq is-installed nil)
       (advice-remove 'file-notify-add-watch
                      #'explain-pause--wrap-file-notify-add-watch)
 
@@ -3443,7 +3494,7 @@ github.com/lastquestion/explain-pause-mode")
 
       (advice-remove 'process-filter #'explain-pause--wrap-get-process-filter)
       (advice-remove 'process-sentinel #'explain-pause--wrap-get-process-sentinel)
-
+      (advice-remove 'set-process-plist #'explain-pause--wrap-set-process-plist)
       (dolist (process-func make-process-family)
         (advice-remove process-func
                        #'explain-pause--wrap-make-process))
