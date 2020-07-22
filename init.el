@@ -923,8 +923,8 @@ whitespaces."
   :ensure t
   :hook (after-init . amx-mode)
   :custom
-  (amx-history-length 20)
-  (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory)))
+  (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
+  (amx-show-key-bindings nil "Try to speed up amx"))
 
 (use-package ivy
   :ensure t
@@ -947,8 +947,8 @@ whitespaces."
   :config
   (dolist (buffer '("TAGS" "magit-process"))
     (add-to-list 'ivy-ignore-buffers buffer))
-  :bind
   :diminish
+  :bind
   (("C-c r" . ivy-resume)
    ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
@@ -1043,7 +1043,7 @@ whitespaces."
                                     ))
   (counsel-mode-override-describe-bindings t)
   (counsel-yank-pop-separator "\n-------------------------\n")
-  ;; :diminish
+  :diminish
   :hook (ivy-mode . counsel-mode)
   :config (defalias 'flycheck-list-errors 'counsel-flycheck))
 
@@ -1262,6 +1262,10 @@ whitespaces."
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-rg)))
 
+(use-package flycheck-grammarly
+  :ensure t
+  :demand t)
+
 (use-package flycheck
   :ensure t
   :hook (after-init . global-flycheck-mode)
@@ -1272,28 +1276,24 @@ whitespaces."
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
+  (add-hook 'text-mode-hook
+            (lambda()
+              (flycheck-add-next-checker 'grammarly-checker 'proselint)))
   (add-hook 'python-mode-hook
             (lambda ()
+              (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
               (setq-local flycheck-checker 'python-pylint
-                          flycheck-python-pylint-executable "python3"
                           flycheck-pylintrc (concat dotemacs-user-home "/.config/pylintrc"))))
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
                           flycheck-markdown-markdownlint-cli-config (concat dotemacs-user-home
-                                                                            "/.markdownlint.json"))))
+                                                                            "/.markdownlint.json"))
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)))
   (add-hook 'sh-mode-hook
             (lambda ()
-              (setq-local flycheck-checker 'sh-shellcheck))))
-
-(use-package flycheck-grammarly
-  :ensure t
-  :after flycheck
-  :init
-  (add-hook 'text-mode-hook
-            (lambda()
-              (setq-local flycheck-checker 'grammarly-checker)))
-  :custom (flycheck-grammarly-check-time 2.5))
+              (setq-local flycheck-checker 'sh-shellcheck)
+              (flycheck-add-next-checker 'sh-shell 'sh-bash))))
 
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
@@ -1527,6 +1527,7 @@ whitespaces."
   (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
   (push '("*Selection Ring:") popwin:special-display-config)
   (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
   (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   (push '("*xref*" :noselect nil) popwin:special-display-config)
