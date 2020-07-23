@@ -38,12 +38,12 @@
   "Personal configuration for dotemacs."
   :group 'local)
 
-(defcustom dotemacs-temp-directory (concat user-emacs-directory "tmp/")
+(defcustom dotemacs-temp-directory (expand-file-name "tmp" user-emacs-directory)
   "Storage location for various configuration files."
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-extras-directory (concat user-emacs-directory "extras/")
+(defcustom dotemacs-extras-directory (expand-file-name "extras" user-emacs-directory)
   "Path for third-party packages and files."
   :type 'string
   :group 'dotemacs)
@@ -51,7 +51,7 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
-(defcustom dotemacs-emacs-custom-file (concat dotemacs-temp-directory "custom.el")
+(defcustom dotemacs-emacs-custom-file (expand-file-name "custom.el" dotemacs-temp-directory)
   "File to write Emacs customizations."
   :type 'string
   :group 'dotemacs)
@@ -576,7 +576,19 @@ whitespaces."
   :if (eq dotemacs-modeline-theme 'default)
   :load-path "extras"
   :hook (after-init . awesome-tray-mode)
-  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git")))
+  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
+  :custom-face
+  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  ;; (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  ;; (awesome-tray-module-battery-face ((t (:foreground "#008080" :weight bold :height 0.8))))
+  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
+  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
+  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight bold :height 0.8))))
+  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (use-package auto-dim-other-buffers
   :ensure t
@@ -585,19 +597,19 @@ whitespaces."
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 ;; (set-frame-font "Roboto Mono")
-(set-face-attribute 'default nil :height 140)
-;; https://github.com/seagle0128/doom-modeline/issues/187
+(set-face-attribute 'default nil :height 130)
 (set-face-attribute 'mode-line nil :height 100)
 (set-face-attribute 'mode-line-inactive nil :height 100)
 
 (use-package circadian
   :ensure t
+  :disabled t
   :custom
   (calendar-latitude 26.50)
   (calendar-longitude 80.23)
   (circadian-themes '((:sunrise . doom-molokai)
                       (:sunset  . doom-peacock)))
-  (circadian-setup))
+  :init (circadian-setup))
 
 (use-package ibuffer
   :custom
@@ -676,28 +688,26 @@ whitespaces."
          (projectile-mode . treemacs-filewatch-mode)
          ;; (projectile-mode . treemacs-fringe-indicator-mode)
          )
-  :custom (treemacs-persist-file (concat dotemacs-temp-directory "treemacs-persist"))
+  :custom
+  (treemacs-collapse-dirs 3)
+  (treemacs-follow-after-init t)
+  (treemacs-goto-tag-strategy 'refetch-index)
+  (treemacs-indentation 2)
+  (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
+  (treemacs-lock-width t)
+  (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
+  (treemacs-position 'right)
+  (treemacs-project-follow-cleanup t)
+  (treemacs-recenter-after-file-follow t)
+  (treemacs-recenter-after-tag-follow  t)
+  (treemacs-show-hidden-files nil)
+  (treemacs-silent-filewatch t)
+  (treemacs-silent-refresh t)
+  ;; (treemacs-sorting 'alphabetic-desc)
+  (treemacs-tag-follow-cleanup t)
+  (treemacs-tag-follow-delay 1)
+  (treemacs-width 20)
   :config
-  (setq treemacs-follow-after-init t
-        treemacs-width 20
-        treemacs-lock-width t
-        treemacs-indentation 2
-        treemacs-position 'right
-        treemacs-collapse-dirs 3
-        ;; treemacs-sorting 'alphabetic-desc
-        treemacs-show-hidden-files nil
-        treemacs-project-follow-cleanup t
-        ;; Prevents treemacs from being selected with `other-window`
-        treemacs-is-never-other-window nil
-        treemacs-goto-tag-strategy 'refetch-index
-        treemacs-recenter-after-file-follow t
-        treemacs-recenter-after-tag-follow  t
-        ;; Do not log messages
-        treemacs-silent-filewatch t
-        treemacs-silent-refresh t
-        treemacs-tag-follow-delay 1
-        treemacs-tag-follow-cleanup t)
-
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
@@ -1564,9 +1574,7 @@ whitespaces."
 (use-package persistent-scratch
   :ensure t
   :hook (after-init . persistent-scratch-setup-default)
-  :custom (persistent-scratch-save-file (expand-file-name
-                                         (concat
-                                          dotemacs-temp-directory "persistent-scratch"))))
+  :custom (persistent-scratch-save-file (expand-file-name "persistent-scratch" dotemacs-temp-directory)))
 
 (use-package crux
   :ensure t
@@ -1705,7 +1713,7 @@ whitespaces."
   :init
   (dolist (hook '(markdown-mode-hook gfm-mode-hook))
     (add-hook hook #'prettier-js-mode))
-  :custom (prettier-js-args (list "--config" (concat dotemacs-user-home "/.prettierrc"))))
+  :custom (prettier-js-args (list "--config" (expand-file-name ".prettierrc" dotemacs-user-home))))
 
 (use-package add-node-modules-path
   :ensure t
