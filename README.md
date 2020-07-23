@@ -252,5 +252,3 @@ StartupWMClass=Emacs
 - Use custom major modes for files by names
 - Check if a Markdown formatter other than Prettier is available
 - Sort files alphabetically with counsel and projectile.
-- Cannot find prettier on CSEIITK machine
-- Does flycheck not work over ssh? No.

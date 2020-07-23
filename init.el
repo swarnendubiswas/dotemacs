@@ -74,7 +74,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -216,7 +216,9 @@ whitespaces."
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
       apropos-do-all t
       auto-mode-case-fold nil ; Disable a second case insensitive pass
+      auto-save-interval 600
       auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
+      auto-save-timeout 180
       backup-inhibited t ; Disable backup for a per-file basis, not to be used by major modes
       blink-matching-paren nil ; Distracting
       case-fold-search t ; Searches and matches should ignore case
@@ -344,7 +346,7 @@ whitespaces."
                                    regexp-search-ring
                                    extended-command-history
                                    file-name-history))
-  (savehist-autosave-interval 300)
+  (savehist-autosave-interval 600)
   (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
 
