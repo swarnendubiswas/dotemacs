@@ -57,7 +57,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -70,11 +70,12 @@
           (const :tag "zenburn" zenburn)
           (const :tag "doom-themes" doom-themes)
           (const :tag "monokai" monokai)
+          (const :tag "modus-operandi" modus-operandi)
           (const :tag "default" default))
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -197,11 +198,9 @@ whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
-(use-package cus-edit
-  :custom (custom-file dotemacs-emacs-custom-file)
-  :config
-  (when (file-exists-p custom-file)
-    (load custom-file :noerror)))
+(setq custom-file dotemacs-emacs-custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -483,6 +482,10 @@ whitespaces."
       ((eq dotemacs-theme 'monokai) (use-package monokai-theme
                                       :ensure t
                                       :init (load-theme 'monokai t)))
+
+      ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
+                                             :ensure t
+                                             :init (load-theme 'modus-operandi t)))
 
       ((eq dotemacs-theme 'default) (progn
                                       (setq frame-background-mode 'light)
@@ -1290,17 +1293,17 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              (flycheck-add-next-checker 'grammarly-checker 'proselint)))
+              (flycheck-add-next-checker 'grammarly-checker 'textlint)))
   (add-hook 'python-mode-hook
             (lambda ()
               (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
               (setq-local flycheck-checker 'python-pylint
-                          flycheck-pylintrc (concat dotemacs-user-home "/.config/pylintrc"))))
+                          flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home))))
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
-                          flycheck-markdown-markdownlint-cli-config (concat dotemacs-user-home
-                                                                            "/.markdownlint.json"))
+                          flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                                                      dotemacs-user-home))
               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)))
   (add-hook 'sh-mode-hook
             (lambda ()
