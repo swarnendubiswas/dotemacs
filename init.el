@@ -1025,17 +1025,22 @@ whitespaces."
                                     "\\|.blg$"
                                     "\\|.cb$"
                                     "\\|.cb2$"
+                                    "\\|.doc$"
                                     "\\|.docx$"
                                     "\\|.dvi$"
                                     "\\|.elc$"
                                     "\\|.fdb_latexmk$"
                                     "\\|.fls$"
                                     "\\|.jar$"
+                                    "\\|.jpeg$"
+                                    "\\|.jpg$"
                                     "\\|.lof$"
                                     "\\|.lot$"
                                     "\\|.o$"
                                     "\\|.out$"
                                     "\\|.pdf$"
+                                    "\\|.png$"
+                                    "\\|.ppt$"
                                     "\\|.pptx$"
                                     "\\|.pyc$"
                                     "\\|.rel$"
@@ -1045,6 +1050,7 @@ whitespaces."
                                     "\\|.synctex.gz$"
                                     "\\|.tar.gz$"
                                     "\\|.toc$"
+                                    "\\|.xls$"
                                     "\\|.xlsx$"
                                     "\\|tags"
                                     "\\|TAGS"
@@ -1070,7 +1076,7 @@ whitespaces."
 (use-package ivy-prescient
   :ensure t
   :hook (counsel-mode . ivy-prescient-mode)
-  :custom (ivy-prescient-enable-sorting nil))
+  :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 (with-eval-after-load 'ivy
@@ -1221,24 +1227,33 @@ whitespaces."
   (projectile-auto-discover nil)
   (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
-  ;; (projectile-enable-caching t) ; Problematic since I often create new files
+  (projectile-enable-caching nil "Problematic if you create new files often")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
   (projectile-indexing-method 'hybrid)
   (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld" dotemacs-temp-directory))
   (projectile-mode-line-prefix "")
-  ;; Use projectile only in desired directories, too much noise otherwise
-  (projectile-require-project-root t)
-  ;; (projectile-sort-order 'recently-active)
+  (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
   (projectile-verbose nil)
   :config
-  (defun projectile-default-mode-line ()
-    "Report project name and type in the modeline."
-    (let ((project-name (projectile-project-name)))
-      (format "%s [%s]"
-              projectile-mode-line-prefix
-              (or project-name "-"))))
+  ;; (defun projectile-default-mode-line ()
+  ;;   "Report project name and type in the modeline."
+  ;;   (let ((project-name (projectile-project-name)))
+  ;;     (format " %s [%s] "
+  ;;             projectile-mode-line-prefix
+  ;;             (or project-name "-"))))
   (projectile-mode 1)
+  ;; (defadvice projectile-project-root (around ignore-remote first activate)
+  ;;   (unless (file-remote-p default-directory) ad-do-it))
+  ;; (defadvice projectile-on (around exlude-tramp activate)
+  ;;   "This should disable projectile when visiting a remote file"
+  ;;   (unless  (--any? (and it (file-remote-p it))
+  ;;                    (list
+  ;;                     (buffer-file-name)
+  ;;                     list-buffers-directory
+  ;;                     default-directory
+  ;;                     dired-directory))
+  ;; ad-do-it))
   ;; Avoid search when projectile-mode is enabled for faster startup
   ;; (setq projectile-project-search-path (list
   ;;                                       (concat `,(getenv "HOME") "/bitbucket")
@@ -1251,7 +1266,7 @@ whitespaces."
   ;;                                       (expand-file-name "research" dotemacs-user-home)
   ;;                                       ))
   (dolist (prjs (list
-                 (expand-file-name dotemacs-user-home) ; Do not consider the HOME as a project
+                 (expand-file-name dotemacs-user-home) ; Do not consider $HOME as a project
                  (expand-file-name "bitbucket/.metadata" dotemacs-user-home)
                  (expand-file-name "github/.metadata" dotemacs-user-home)
                  (expand-file-name "iitk-workspace/.metadata" dotemacs-user-home)
@@ -1264,8 +1279,8 @@ whitespaces."
   (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS"  "TAGS" "tags" ".dir-locals.el" ".projectile"
                    ".project" ".tags" "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files items))
-  (dolist (exts '(".a" ".aux" ".bak" ".blg" ".class" ".elc" ".jar" ".o" ".out" ".pdf" ".pt" ".pyc"
-                  ".rel" ".rip" ".tar.gz" "~$"))
+  (dolist (exts
+           '(".a" ".aux" ".bak" ".blg" ".class" ".doc" ".docx" ".elc" ".jar" ".jpeg" ".jgp" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".tar.gz" ".tar.xz" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
@@ -1552,7 +1567,8 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '("*prettier errors*")))
+  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+  (add-to-list 'popwin:special-display-config '("*explain-pause-top*")))
 
 ;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
 ;; (add-to-list 'display-buffer-alist
