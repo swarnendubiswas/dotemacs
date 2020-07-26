@@ -419,7 +419,7 @@ whitespaces."
 (diminish 'visual-line-mode)
 (size-indication-mode -1)
 (toggle-frame-maximized) ; Maximize Emacs on startup
-(set-frame-parameter nil 'unsplittable t)
+;; (set-frame-parameter nil 'unsplittable t)
 (fringe-mode '(0 . 0))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
@@ -882,9 +882,7 @@ whitespaces."
               (make-local-variable 'company-backends)
               (setq company-backends '((company-capf
                                         company-dabbrev
-                                        company-files :separate
-                                        ;; company-ispell
-                                        ))))))
+                                        company-files :separate))))))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
   (add-hook hook
@@ -894,35 +892,34 @@ whitespaces."
                 :demand t)
               (set (make-local-variable 'company-backends) '((company-capf
                                                               :with company-bibtex
-                                                              company-dabbrev :separate
-                                                              company-files))))))
+                                                              company-dabbrev
+                                                              company-files :separate))))))
 
-;; (add-hook 'prog-mode-hook
-;;           (lambda ()
-;;             (make-local-variable 'company-backends)
-;;             (setq company-backends '(company-capf
-;;                                      (company-dabbrev-code
-;;                                       company-clang
-;;                                       company-keywords)
-;;                                      company-dabbrev
-;;                                      company-files))))
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (make-local-variable 'company-backends)
+            (setq company-backends '(company-capf
+                                     (company-dabbrev-code
+                                      company-clang
+                                      company-keywords)
+                                     company-dabbrev
+                                     company-files))))
 
-;; (add-hook 'sh-mode-hook
-;;           (lambda ()
-;;             (progn
-;;               (use-package company-shell
-;;                 :ensure t
-;;                 :custom (company-shell-delete-duplicates t))
-
-;;               (make-local-variable 'company-backends)
-;;               (setq company-backends '(company-capf
-;;                                        (company-shell
-;;                                         company-shell-env
-;;                                         company-fish-shell)
-;;                                        company-dabbrev-code
-;;                                        company-dabbrev
-;;                                        company-files
-;;                                        company-keywords)))))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (use-package company-shell
+              :ensure t
+              :demand t
+              :custom (company-shell-delete-duplicates t))
+            (make-local-variable 'company-backends)
+            (setq company-backends '(company-capf
+                                     (company-shell
+                                      company-shell-env
+                                      company-fish-shell)
+                                     company-dabbrev-code
+                                     company-dabbrev
+                                     company-files
+                                     company-keywords))))
 
 (use-package yasnippet
   :ensure t
@@ -943,6 +940,19 @@ whitespaces."
 
 (use-package ivy
   :ensure t
+  ;; :custom-face
+  ;; (ivy-action ((t (:inherit font-lock-builtin-face :height 1.0))))
+  ;; (ivy-completions-annotations ((t (:inherit completions-annotations :height 1.0))))
+  ;; (ivy-current-match ((t (:extend t :background "#1a4b77" :foreground "white" :height 1.0))))
+  ;; (ivy-cursor ((t (:background "black" :foreground "white" :height 1.0))))
+  ;; (ivy-highlight-face ((t (:inherit highlight :height 1.0))))
+  ;; (ivy-minibuffer-match-face-1 ((t (:background "#d3d3d3" :height 1.0))))
+  ;; (ivy-minibuffer-match-face-2 ((t (:background "#e99ce8" :weight bold :height 1.0))))
+  ;; (ivy-minibuffer-match-face-3 ((t (:background "#bbbbff" :weight bold :height 1.0))))
+  ;; (ivy-minibuffer-match-face-4 ((t (:background "#ffbbff" :weight bold :height 1.0))))
+  ;; (ivy-minibuffer-match-highlight ((t (:inherit highlight :height 1.0))))
+  ;; (ivy-modified-buffer ((t (:inherit default :height 1.0))))
+  ;; (ivy-prompt-match ((t (:inherit ivy-current-match :height 1.0))))
   :custom
   (completion-in-region-function #'ivy-completion-in-region)
   (ivy-case-fold-search 'always "Always ignore case while searching")
@@ -1308,6 +1318,8 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
+              (setq-local flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                                                     dotemacs-user-home))
               (flycheck-add-next-checker 'grammarly-checker 'textlint)))
   (add-hook 'python-mode-hook
             (lambda ()
