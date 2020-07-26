@@ -27,6 +27,8 @@ sudo snap refresh
 python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint grip --user
 python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server grip --user
 sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver
+sudo npm i -g textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-spellchecker textlint-rule-sentence-length
+sudo npm i -g @textlint-rule/textlint-rule-no-invalid-control-character @textlint-rule/textlint-rule-no-unmatched-pair @textlint-rule/textlint-rule-proselint
 sudo npm update
 sudo gem install scss_lint
 sudo gem update
@@ -250,5 +252,4 @@ StartupWMClass=Emacs
 ## TODO
 
 - Use custom major modes for files by names
-- Check if a Markdown formatter other than Prettier is available
-- Sort files alphabetically with counsel and projectile.
+- Sort files alphabetically with counsel and projectile (use `ivy-sort-functions-alist`).
