@@ -1246,15 +1246,17 @@ whitespaces."
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
   (projectile-verbose nil)
   :config
-  ;; (defun projectile-default-mode-line ()
-  ;;   "Report project name and type in the modeline."
-  ;;   (let ((project-name (projectile-project-name)))
-  ;;     (format " %s [%s] "
-  ;;             projectile-mode-line-prefix
-  ;;             (or project-name "-"))))
+  (defun projectile-default-mode-line ()
+    "Report project name and type in the modeline."
+    (let ((project-name (projectile-project-name)))
+      (format " %s [%s] "
+              projectile-mode-line-prefix
+              (or project-name "-"))))
   (projectile-mode 1)
+
   ;; (defadvice projectile-project-root (around ignore-remote first activate)
   ;;   (unless (file-remote-p default-directory) ad-do-it))
+
   ;; (defadvice projectile-on (around exlude-tramp activate)
   ;;   "This should disable projectile when visiting a remote file"
   ;;   (unless  (--any? (and it (file-remote-p it))
@@ -1264,6 +1266,7 @@ whitespaces."
   ;;                     default-directory
   ;;                     dired-directory))
   ;; ad-do-it))
+
   ;; Avoid search when projectile-mode is enabled for faster startup
   ;; (setq projectile-project-search-path (list
   ;;                                       (concat `,(getenv "HOME") "/bitbucket")
@@ -1275,6 +1278,7 @@ whitespaces."
   ;;                                       (expand-file-name "prospar-workspace" dotemacs-user-home)
   ;;                                       (expand-file-name "research" dotemacs-user-home)
   ;;                                       ))
+
   (dolist (prjs (list
                  (expand-file-name dotemacs-user-home) ; Do not consider $HOME as a project
                  (expand-file-name "bitbucket/.metadata" dotemacs-user-home)
@@ -1318,8 +1322,10 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              (setq-local flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                                                     dotemacs-user-home))
+              (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
+                                                                     dotemacs-user-home)
+                          flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
+                                                                         dotemacs-user-home))
               (flycheck-add-next-checker 'grammarly-checker 'textlint)))
   (add-hook 'python-mode-hook
             (lambda ()
@@ -1335,7 +1341,7 @@ whitespaces."
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck)
-              (flycheck-add-next-checker 'sh-shell 'sh-bash))))
+              (flycheck-add-next-checker 'sh-shellcheck 'sh-bash))))
 
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
@@ -1673,6 +1679,8 @@ whitespaces."
 
 (use-package explain-pause-mode
   :load-path "extras"
+  :disabled t
+  ;; :diminish
   :hook (after-init . explain-pause-mode))
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
@@ -1831,7 +1839,8 @@ whitespaces."
 
 (use-package json-mode
   :ensure t
-  :mode "\\.json\\'")
+  :mode "\\.json\\'"
+  :hook ((json-mode jsonc-mode) . lsp))
 
 (dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
   (add-hook hooks
@@ -1873,7 +1882,8 @@ whitespaces."
 
 (use-package cmake-mode
   :ensure t
-  :mode ("CMakeLists.txt" "\\.cmake\\'"))
+  :mode ("CMakeLists.txt" "\\.cmake\\'")
+  :hook (cmake-mode . lsp))
 
 (use-package cmake-font-lock
   :ensure t
@@ -1884,10 +1894,16 @@ whitespaces."
   ;; :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
 
-(setq python-shell-interpreter "python3"
-      auto-mode-alist (append '(("SConstruct\\'" . python-mode)
-                                ("SConscript\\'" . python-mode))
-                              auto-mode-alist))
+(use-package python
+  :hook (python-mode . lsp)
+  :init
+  ;; Disable readline based native completion
+  (setq python-shell-completion-native-enable nil)
+  :config
+  (setq python-shell-interpreter "python3"
+        auto-mode-alist (append '(("SConstruct\\'" . python-mode)
+                                  ("SConscript\\'" . python-mode))
+                                auto-mode-alist)))
 
 (use-package pyvenv
   :ensure t
@@ -1915,6 +1931,7 @@ whitespaces."
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
   :config (unbind-key "C-c C-d" sh-mode-map) ;; Was bound to sh-cd-here
+  :hook (sh-mode . lsp)
   :custom
   (sh-basic-offset 2)
   (sh-indent-comment t) ; Indent comments as a regular line
@@ -1992,10 +2009,12 @@ whitespaces."
 (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
 
 (use-package yaml-mode
-  :ensure t)
+  :ensure t
+  :hook (yaml-mode . lsp))
 
 (use-package php-mode
-  :ensure t)
+  :ensure t
+  :hook (php-mode . lsp))
 
 (use-package web-mode
   :ensure t
@@ -2026,7 +2045,9 @@ whitespaces."
   :ensure t
   :init (add-hook 'css-mode-hook 'turn-on-css-eldoc))
 
-(fset 'xml-mode 'nxml-mode)
+(use-package nxml-mode
+  :hook (nxml-model . lsp)
+  :init (fset 'xml-mode 'nxml-mode))
 
 (use-package company-php
   :ensure t
@@ -2043,12 +2064,14 @@ whitespaces."
   ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
-  :hook (((bibtex-mode cmake-mode css-mode html-mode javascript-mode js-mode js2-mode json-mode jsonc-mode latex-mode less-mode less-css-mode nxml-mode php-mode plain-tex-mode python-mode sass-mode scss-mode sh-mode tex-mode typescript-mode web-mode yaml-mode) . lsp-deferred)
+  :hook (((bibtex-mode css-mode html-mode javascript-mode js-mode js2-mode latex-mode less-mode less-css-mode plain-tex-mode sass-mode scss-mode tex-mode typescript-mode web-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-managed-mode . lsp-diagnostics-modeline-mode)
+         (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          (lsp-mode . lsp-headerline-breadcrumb-mode))
   :custom
-  (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--log=error" "--pretty"))
+  (lsp-clients-clangd-args
+   '("-j=2" "--background-index" "--clang-tidy" "--fallback-style=LLVM"
+     "--log=error" "--pretty"))
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable

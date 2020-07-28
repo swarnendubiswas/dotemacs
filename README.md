@@ -16,6 +16,8 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 You can use the following instructions to install a few third-party applications. These should work on an Ubuntu 18.04 distribution.
 
+#### Ubuntu Packages
+
 ```Bash
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf
 wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
@@ -24,18 +26,40 @@ sudo snap install shfmt
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 sudo snap refresh
+```
+
+#### Python Packages
+
+```Bash
 python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint grip --user
+```
+
+```Bash
 python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser backports-functools_lru_cache yamllint cmake-language-server grip --user
-sudo npm i -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver
-sudo npm i -g textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-spellchecker textlint-rule-sentence-length
-sudo npm i -g @textlint-rule/textlint-rule-no-invalid-control-character @textlint-rule/textlint-rule-no-unmatched-pair @textlint-rule/textlint-rule-proselint
-sudo npm update
+```
+
+```Bash
 sudo gem install scss_lint
 sudo gem update
 composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
 composer update
 cargo install --git https://github.com/latex-lsp/texlab.git
+```
+
+#### Node Packages
+
+```Bash
+cd $HOME/tmp; mkdir emacs-node-workspace; cd ;
+npm install --save-dev npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver
+npm update
+```
+
+Install `textlint` separately so that the installation can be shared by other editors.
+
+```Bash
+cd $HOME/tmp; mkdir textlint-workspace; cd ;
+npm install --save-dev textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-sentence-length textlint-plugin-latex textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint
 ```
 
 Add the following definitions to `$HOME/.bashrc`.
