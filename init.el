@@ -141,9 +141,9 @@ whitespaces."
   "User HOME directory.")
 
 ;; From Doom Emacs
-(defconst EMACS27+   (> emacs-major-version 26))
-(defconst EMACS28+   (> emacs-major-version 27))
-(defconst IS-LINUX   (eq system-type 'gnu/linux))
+(defconst dotemacs-emacs27+ (> emacs-major-version 26))
+(defconst dotemacs-emacs28+ (> emacs-major-version 27))
+(defconst dotemacs-is-linux (eq system-type 'gnu/linux))
 
 (eval-when-compile
   (require 'package)
@@ -210,10 +210,10 @@ whitespaces."
 
 (use-package gcmh
   :ensure t
+  :diminish
   :hook (after-init . gcmh-mode))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
-      apropos-do-all t
       auto-mode-case-fold nil ; Disable a second case insensitive pass
       auto-save-interval 600
       auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
@@ -373,7 +373,7 @@ whitespaces."
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
-  ;; :diminish
+  :diminish
   :hook (after-init . global-subword-mode))
 
 ;; vertical - Split the selected window into two windows, one above the other (split-window-below)
@@ -576,7 +576,7 @@ whitespaces."
       ((eq dotemacs-modeline-theme 'default)))
 
 (use-package awesome-tray
-  :if (eq dotemacs-modeline-theme 'default)
+  :if (and nil (eq dotemacs-modeline-theme 'default))
   :load-path "extras"
   :hook (after-init . awesome-tray-mode)
   :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
@@ -1110,7 +1110,7 @@ whitespaces."
   :hook (ivy-mode . ivy-rich-mode))
 
 (use-package flyspell
-  :if (eq system-type 'gnu/linux)
+  :if dotemacs-is-linux
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -1301,14 +1301,20 @@ whitespaces."
 (use-package counsel-projectile
   :ensure t
   :hook (counsel-mode . counsel-projectile-mode)
-  :custom (projectile-switch-project-action 'counsel-projectile-find-file)
+  :custom
+  (counsel-projectile-remove-current-buffer t)
+  (counsel-projectile-sort-projects t)
+  (counsel-projectile-sort-files t)
+  (counsel-projectile-sort-directories t)
+  (counsel-projectile-sort-buffers t)
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-rg)))
 
 (use-package flycheck-grammarly
   :ensure t
-  :demand t)
+  :hook (text-mode . (lambda ()
+                       (require 'flycheck-grammarly))))
 
 (use-package flycheck
   :ensure t
@@ -1326,12 +1332,14 @@ whitespaces."
                                                                      dotemacs-user-home)
                           flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
                                                                          dotemacs-user-home))
-              (flycheck-add-next-checker 'grammarly-checker 'textlint)))
+              ;; (flycheck-add-next-checker 'grammarly-checker 'textlint)
+              ))
   (add-hook 'python-mode-hook
             (lambda ()
-              (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
+              ;; (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
               (setq-local flycheck-checker 'python-pylint
-                          flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home))))
+                          flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home)
+                          flycheck-python-pylint-executable "python3")))
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
@@ -1354,6 +1362,7 @@ whitespaces."
   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
 (use-package whitespace
+  :commands (whitespace-mode global-whitespace-mode)
   ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :custom
   (show-trailing-whitespace nil)
@@ -1363,8 +1372,12 @@ whitespaces."
 (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
+(use-package whitespace-cleanup-mode
+  :ensure t)
+
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
+  :disabled t
   :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
   ;; :diminish
   :hook (prog-mode . ws-butler-mode))
@@ -1525,7 +1538,7 @@ whitespaces."
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
-  ;; :diminish
+  :diminish
   :hook (after-init . global-hungry-delete-mode ))
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
@@ -1713,7 +1726,8 @@ whitespaces."
 
 (use-package js2-mode
   :ensure t
-  :mode "\\.js\\'")
+  :mode "\\.js\\'"
+  :hook (js2-mode . lsp))
 
 (use-package markdown-mode
   :ensure t
@@ -1800,7 +1814,8 @@ whitespaces."
     :custom
     (bibtex-completion-cite-prompt-for-optional-arguments nil)
     (bibtex-completion-cite-default-as-initial-input t)
-    (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=type=:10}"))))
+    ;; (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=type=:10}")))
+    (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:10} ${=type=:10}"))))
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package company-auctex
@@ -1826,7 +1841,7 @@ whitespaces."
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 (use-package eldoc
-  :if (eq system-type 'gnu/linux)
+  :if dotemacs-is-linux
   ;; :diminish
   :config (global-eldoc-mode 1))
 
@@ -1840,7 +1855,12 @@ whitespaces."
 (use-package json-mode
   :ensure t
   :mode "\\.json\\'"
-  :hook ((json-mode jsonc-mode) . lsp))
+  :hook ((json-mode jsonc-mode) . lsp)
+  :config
+  (add-hook 'json-mode-hook
+            (lambda ()
+              (make-local-variable 'js-indent-level)
+              (setq js-indent-level 2))))
 
 (dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
   (add-hook hooks
@@ -1860,12 +1880,12 @@ whitespaces."
   ;; Disable electric indentation and on-type formatting
   (add-hook 'c++-mode-hook
             (lambda ()
-              (setq-local c-electric-flag nil
-                          c-electric-indent nil
+              (setq-local c-auto-newline nil
                           c-electric-brace nil
-                          c-syntactic-indentation nil
+                          c-electric-flag nil
+                          c-electric-indent nil
                           c-enable-auto-newline nil
-                          c-auto-newline nil)))
+                          c-syntactic-indentation nil)))
   (unbind-key "C-M-a" c-mode-map)
   :bind (:map c-mode-base-map
               ("C-c c a" . c-beginning-of-defun)
@@ -2027,6 +2047,7 @@ whitespaces."
   ;;  ("\\.[agj]sp\\'" . web-mode)
   ;;  ("\\.as[cp]x\\'" . web-mode)
   ;;  ("\\.erb\\'" . web-mode))
+  :hook (web-mode . lsp)
   ;; :custom
   ;; (web-mode-enable-auto-pairing t)
   ;; (web-mode-enable-auto-closing t)
@@ -2064,21 +2085,24 @@ whitespaces."
   ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
-  :hook (((bibtex-mode css-mode html-mode javascript-mode js-mode js2-mode latex-mode less-mode less-css-mode plain-tex-mode sass-mode scss-mode tex-mode typescript-mode web-mode) . lsp-deferred)
+  :hook (((bibtex-mode css-mode html-mode javascript-mode js-mode latex-mode less-mode less-css-mode sass-mode scss-mode tex-mode typescript-mode) . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-managed-mode . lsp-modeline-diagnostics-mode)
-         (lsp-mode . lsp-headerline-breadcrumb-mode))
+         ;; (lsp-managed-mode . lsp-modeline-diagnostics-mode)
+         ;; (lsp-mode . lsp-headerline-breadcrumb-mode)
+         )
   :custom
   (lsp-clients-clangd-args
    '("-j=2" "--background-index" "--clang-tidy" "--fallback-style=LLVM"
      "--log=error" "--pretty"))
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
+  (lsp-enable-dap-auto-configure nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-snippet t) ; Autocomplete parentheses
   (lsp-html-format-wrap-line-length 100)
+  (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
@@ -2095,9 +2119,11 @@ whitespaces."
   (lsp-pyls-plugins-pydocstyle-enabled nil)
   (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
   (lsp-pyls-plugins-pyflakes-enabled nil)
-  (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile=" dotemacs-user-home "/.config/pylintrc"))))
+  (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile="
+                                                              (expand-file-name ".config/pylintrc"
+                                                                                dotemacs-user-home)))))
   (lsp-pyls-plugins-yapf-enabled t)
-  (lsp-session-file (expand-file-name ".lsp-session-v1" dotemacs-temp-directory))
+  (lsp-session-file (expand-file-name "lsp-session-v1" dotemacs-temp-directory))
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
@@ -2127,11 +2153,6 @@ whitespaces."
                     :major-modes '(php-mode)
                     :remote? t
                     :server-id 'intelephense-remote))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
-                    :major-modes '(plain-tex-mode tex-mode latex-mode)
-                    :remote? t
-                    :server-id 'texlab-remote))
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "cmake-language-server")
                     :major-modes '(cmake-mode)
@@ -2195,6 +2216,7 @@ whitespaces."
 (use-package lsp-python-ms
   :disabled t
   :load-path "extras"
+  :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp-deferred))))
@@ -2402,7 +2424,7 @@ Increase line spacing by two line height."
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'tags-table-list 'safe-local-variable #'listp)
 
-(defun open-local-file-projectile (directory)
+(defun sb/open-local-file-projectile (directory)
   "Helm action function, open projectile file within DIRECTORY
 specify by the keyword projectile-default-file define in `dir-locals-file'"
   (let ((default-file (f-join directory (nth 1
@@ -2418,6 +2440,13 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
   )
 
 (with-eval-after-load "counsel-projectile"
-  (add-to-list 'counsel-projectile-action '("d" open-local-file-projectile "open default file") t))
+  (add-to-list 'counsel-projectile-action '("d" sb/open-local-file-projectile "open default file") t))
+
+;; (let (
+;;       (default-file (format "%s" (cdr (car (cdr (cdr (car (dir-locals-get-class-variables (dir-locals-read-from-dir "/home/swarnendu/prospar-workspace/dl-optimizations-draft")))))))))
+;;       )
+;;   (if (f-exists? default-file)
+;;       (counsel-find-file default-file))
+;;   )
 
 ;;; init.el ends here

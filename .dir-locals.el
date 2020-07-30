@@ -6,6 +6,7 @@
          ;; (eval . (setq-local counsel-etags-project-root (projectile-project-root)
          ;;                     tags-table-list (list (projectile-project-root))))
          ;; (eval . (add-hook 'before-save-hook #'delete-trailing-whitespace))
+         (mode . whitespace-cleanup-mode)
          ))
  (emacs-lisp-mode . ((no-byte-compile . t)))
  (sh-mode . (
