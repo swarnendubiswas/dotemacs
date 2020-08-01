@@ -75,7 +75,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -153,11 +153,8 @@ whitespaces."
   (package-initialize t)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
-;; (eval-after-load 'gnutls
-;;   '(add-to-list 'gnutls-trustfiles "/etc/ssl/cert.pem"))
-
-;; package.el has no business modifying the user's init.el
-(advice-add #'package--ensure-init-file :override #'ignore)
+;; ;; package.el has no business modifying the user's init.el
+;; (advice-add #'package--ensure-init-file :override #'ignore)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -328,16 +325,11 @@ whitespaces."
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t "Enable auto revert on other buffers like dired"))
 
-(use-package delsel ; Typing with the mark active will overwrite the marked region
-  :hook (after-init . delete-selection-mode))
-
 (use-package saveplace ; Remember cursor position in files
-  ;; :unless noninteractive
   :hook (after-init . save-place-mode)
   :custom (save-place-file (expand-file-name "places" dotemacs-temp-directory)))
 
 (use-package savehist ; Save minibuffer histories across sessions
-  :unless noninteractive
   :hook (after-init . savehist-mode)
   :custom
   (savehist-additional-variables '(kill-ring
@@ -394,7 +386,7 @@ whitespaces."
 (advice-add 'do-auto-save :around #'my-auto-save-wrapper)
 
 (use-package abbrev
-  ;; :diminish
+  :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" dotemacs-extras-directory))
@@ -413,22 +405,19 @@ whitespaces."
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
-(tooltip-mode -1)
 (blink-cursor-mode -1) ; Blinking cursor is distracting
+(delete-selection-mode 1) ; Typing with the mark active will overwrite the marked region
+(fringe-mode '(0 . 0))
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
 (size-indication-mode -1)
+(tooltip-mode -1)
 (toggle-frame-maximized) ; Maximize Emacs on startup
 ;; (set-frame-parameter nil 'unsplittable t)
-(fringe-mode '(0 . 0))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
                                      :init (load-theme 'leuven t)))
-
-      ((eq dotemacs-theme 'professional) (use-package professional-theme
-                                           :ensure t
-                                           :init (load-theme 'professional t)))
 
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
                                       :ensure t
@@ -463,10 +452,6 @@ whitespaces."
       ((eq dotemacs-theme 'solarized-dark) (use-package solarized-dark-theme
                                              :ensure solarized-theme
                                              :init (load-theme 'solarized-dark t)))
-
-      ((eq dotemacs-theme 'tangotango) (use-package tangotango-theme
-                                         :ensure t
-                                         :init (load-theme 'tangotango t)))
 
       ((eq dotemacs-theme 'doom-themes) (use-package doom-themes
                                           :ensure t
@@ -582,8 +567,7 @@ whitespaces."
   :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
   :custom-face
   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  ;; (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  ;; (awesome-tray-module-battery-face ((t (:foreground "#008080" :weight bold :height 0.8))))
+  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
   (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
@@ -595,6 +579,7 @@ whitespaces."
 
 (use-package auto-dim-other-buffers
   :ensure t
+  :disabled t
   :hook (after-init . auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -686,6 +671,7 @@ whitespaces."
 
 (use-package treemacs
   :ensure t
+  :disabled t
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-follow-mode)
          (projectile-mode . treemacs-filewatch-mode)
@@ -757,7 +743,7 @@ whitespaces."
 
 (use-package all-the-icons-dired
   :ensure t
-  ;; :diminish
+  :diminish
   :hook (dired-mode . all-the-icons-dired-mode))
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
@@ -793,9 +779,11 @@ whitespaces."
   :ensure t
   :bind ("<f8>" . deadgrep))
 
-;; We use a different command/keybinding to lookup recent directories.
+;; FIXME: Ignore remote files.
 (use-package recentf
   :custom
+  ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+  (recentf-keep '(file-remote-p file-readable-p))
   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
   (recentf-auto-cleanup 'never) ; Do not stat remote files
   (recentf-menu-filter 'recentf-sort-descending)
@@ -808,6 +796,7 @@ whitespaces."
                      "[/\\]\\.loaddefs\\.el\\'"
                      "[/\\]tmp/.*"
                      ".*/recentf\\'"
+                     "/ssh:"
                      "~$"
                      "/.autosaves/"
                      ".*-loaddefs.el"
@@ -829,8 +818,8 @@ whitespaces."
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil)
-  (company-idle-delay 0.0 "Recommended by lsp")
-  (company-ispell-available t)
+  (company-idle-delay 0.1 "Recommended by lsp")
+  ;; (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 3 "Small words are faster to type")
   (company-require-match nil)
@@ -855,10 +844,7 @@ whitespaces."
 
 (use-package company-quickhelp
   :ensure t
-  :hook (global-company-mode . company-quickhelp-mode)
-  :custom
-  (company-quickhelp-delay 0.5)
-  (company-quickhelp-max-lines 60))
+  :hook (global-company-mode . company-quickhelp-mode))
 
 (use-package company-box
   :ensure t
@@ -876,54 +862,54 @@ whitespaces."
   :after company
   :config (push 'company-elisp company-backends))
 
-(dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook))
-  (add-hook hook
-            (lambda ()
-              (make-local-variable 'company-backends)
-              (setq company-backends '((company-capf
-                                        company-dabbrev
-                                        company-files :separate))))))
+;; (dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (make-local-variable 'company-backends)
+;;               (setq company-backends '((company-capf
+;;                                         company-dabbrev
+;;                                         company-files :separate))))))
 
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-  (add-hook hook
-            (lambda ()
-              (use-package company-bibtex
-                :ensure t
-                :demand t)
-              (set (make-local-variable 'company-backends) '((company-capf
-                                                              :with company-bibtex
-                                                              company-dabbrev
-                                                              company-files :separate))))))
+;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (use-package company-bibtex
+;;                 :ensure t
+;;                 :demand t)
+;;               (set (make-local-variable 'company-backends) '((company-capf
+;;                                                               :with company-bibtex
+;;                                                               company-dabbrev
+;;                                                               company-files :separate))))))
 
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-capf
-                                     (company-dabbrev-code
-                                      company-clang
-                                      company-keywords)
-                                     company-dabbrev
-                                     company-files))))
+;; (add-hook 'prog-mode-hook
+;;           (lambda ()
+;;             (make-local-variable 'company-backends)
+;;             (setq company-backends '(company-capf
+;;                                      (company-dabbrev-code
+;;                                       company-clang
+;;                                       company-keywords)
+;;                                      company-dabbrev
+;;                                      company-files))))
 
-(add-hook 'sh-mode-hook
-          (lambda ()
-            (use-package company-shell
-              :ensure t
-              :demand t
-              :custom (company-shell-delete-duplicates t))
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-capf
-                                     (company-shell
-                                      company-shell-env
-                                      company-fish-shell)
-                                     company-dabbrev-code
-                                     company-dabbrev
-                                     company-files
-                                     company-keywords))))
+;; (add-hook 'sh-mode-hook
+;;           (lambda ()
+;;             (use-package company-shell
+;;               :ensure t
+;;               :demand t
+;;               :custom (company-shell-delete-duplicates t))
+;;             (make-local-variable 'company-backends)
+;;             (setq company-backends '(company-capf
+;;                                      (company-shell
+;;                                       company-shell-env
+;;                                       company-fish-shell)
+;;                                      company-dabbrev-code
+;;                                      company-dabbrev
+;;                                      company-files
+;;                                      company-keywords))))
 
 (use-package yasnippet
   :ensure t
-  ;; :diminish yas-minor-mode
+  :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -986,7 +972,7 @@ whitespaces."
 (use-package counsel
   :ensure t
   :ensure amx
-  :ensure-system-package fasd
+  ;; :ensure-system-package fasd
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun sb/counsel-goto-recent-directory ()
@@ -1011,7 +997,6 @@ whitespaces."
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
    ([remap flycheck-list-errors] . counsel-flycheck)
-   ;; Shows only the first 200 results, use "C-c C-o" to save all the matches to a buffer
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ([remap swiper] . counsel-grep-or-swiper)
@@ -1080,11 +1065,13 @@ whitespaces."
 
 (use-package prescient
   :ensure t
+  :disabled t
   :hook (counsel-mode . prescient-persist-mode)
   :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
 
 (use-package ivy-prescient
   :ensure t
+  :disabled t
   :hook (counsel-mode . ivy-prescient-mode)
   :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
 
@@ -1094,16 +1081,19 @@ whitespaces."
 
 (use-package company-prescient
   :ensure t
+  :disabled t
   :hook (company-mode . company-prescient-mode))
 
 (use-package all-the-icons-ivy-rich
   :ensure t
+  :disabled t
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
 (use-package ivy-rich
   :ensure t
+  :disabled t
   :custom
   (ivy-format-function #'ivy-format-function-line)
   (ivy-rich-parse-remote-buffer nil)
@@ -1179,14 +1169,14 @@ whitespaces."
 
 (use-package highlight-indentation
   :ensure t
-  ;; :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook (python-mode . highlight-indentation-mode))
 
 ;; Claims to be better than electric-indent-mode
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
 (use-package aggressive-indent
   :ensure t
-  ;; :diminish
+  :diminish
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
   :custom (aggressive-indent-dont-electric-modes t))
 
@@ -1232,7 +1222,7 @@ whitespaces."
 
 (use-package projectile
   :ensure t
-  :ensure-system-package fd
+  ;; :ensure-system-package fd
   :custom
   (projectile-auto-discover nil)
   (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
@@ -1254,18 +1244,18 @@ whitespaces."
               (or project-name "-"))))
   (projectile-mode 1)
 
-  ;; (defadvice projectile-project-root (around ignore-remote first activate)
-  ;;   (unless (file-remote-p default-directory) ad-do-it))
+  (defadvice projectile-project-root (around ignore-remote first activate)
+    (unless (file-remote-p default-directory) ad-do-it))
 
-  ;; (defadvice projectile-on (around exlude-tramp activate)
-  ;;   "This should disable projectile when visiting a remote file"
-  ;;   (unless  (--any? (and it (file-remote-p it))
-  ;;                    (list
-  ;;                     (buffer-file-name)
-  ;;                     list-buffers-directory
-  ;;                     default-directory
-  ;;                     dired-directory))
-  ;; ad-do-it))
+  (defadvice projectile-on (around exlude-tramp activate)
+    "This should disable projectile when visiting a remote file"
+    (unless  (--any? (and it (file-remote-p it))
+                     (list
+                      (buffer-file-name)
+                      list-buffers-directory
+                      default-directory
+                      dired-directory))
+      ad-do-it))
 
   ;; Avoid search when projectile-mode is enabled for faster startup
   ;; (setq projectile-project-search-path (list
@@ -1313,8 +1303,10 @@ whitespaces."
 
 (use-package flycheck-grammarly
   :ensure t
-  :hook (text-mode . (lambda ()
-                       (require 'flycheck-grammarly))))
+  :hook
+  (text-mode . (lambda ()
+                 (require 'flycheck-grammarly)))
+  :custom (flycheck-grammarly-check-time 2))
 
 (use-package flycheck
   :ensure t
@@ -1332,6 +1324,7 @@ whitespaces."
                                                                      dotemacs-user-home)
                           flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
                                                                          dotemacs-user-home))
+              ;; FIXME: textlint is not working correctly
               ;; (flycheck-add-next-checker 'grammarly-checker 'textlint)
               ))
   (add-hook 'python-mode-hook
@@ -1354,6 +1347,7 @@ whitespaces."
 ;; Binds avy-flycheck-goto-error to C-c ! g
 (use-package avy-flycheck
   :ensure t
+  :disabled t
   :after flycheck
   :config (avy-flycheck-setup))
 
@@ -1373,7 +1367,8 @@ whitespaces."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package whitespace-cleanup-mode
-  :ensure t)
+  :ensure t
+  :diminish)
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
   :ensure t
@@ -1387,7 +1382,7 @@ whitespaces."
   :hook (prog-mode . highlight-symbol-mode)
   :bind (("M-p" . highlight-symbol-prev)
          ("M-n" . highlight-symbol-next))
-  ;; :diminish
+  :diminish
   :custom (highlight-symbol-on-navigation-p t))
 
 (use-package hl-todo
@@ -1396,6 +1391,7 @@ whitespaces."
 
 (use-package highlight-escape-sequences
   :ensure t
+  :disabled t
   :hook (after-init . hes-mode))
 
 ;; Edit remote file: /method:user@host#port:filename.
@@ -1427,17 +1423,16 @@ whitespaces."
   :bind ("C-c d t" . counsel-tramp)
   :config
   (defalias 'tramp 'counsel-tramp)
-  ;; (add-hook 'counsel-tramp-pre-command-hook
-  ;;           (lambda ()
-  ;;             ;; (global-aggressive-indent-mode -1)
-  ;;             (projectile-mode -1)
-  ;;             (counsel-projectile-mode -1)))
-  ;; (add-hook 'counsel-tramp-quit-hook
-  ;;           (lambda ()
-  ;;             ;; (global-aggressive-indent-mode 1)
-  ;;             (projectile-mode 1)
-  ;;             (counsel-projectile-mode 1)))
-  )
+  (add-hook 'counsel-tramp-pre-command-hook
+            (lambda ()
+              (global-aggressive-indent-mode -1)
+              (projectile-mode -1)
+              (counsel-projectile-mode -1)))
+  (add-hook 'counsel-tramp-quit-hook
+            (lambda ()
+              (global-aggressive-indent-mode 1)
+              (projectile-mode 1)
+              (counsel-projectile-mode 1))))
 
 (use-package imenu
   :custom
@@ -1445,9 +1440,11 @@ whitespaces."
   (imenu-max-items 500)
   (imenu-max-item-length 100))
 
-(setq tags-revert-without-query t
-      large-file-warning-threshold (* 500 1024 1024)
-      tags-add-tables nil)
+(setq large-file-warning-threshold (* 500 1024 1024)
+      tags-add-tables nil
+      tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
+      ;; Don't ask before rereading the TAGS files if they have changed
+      tags-revert-without-query t)
 
 (use-package counsel-gtags
   :ensure t
@@ -1497,7 +1494,7 @@ whitespaces."
 
 (use-package counsel-etags
   :ensure t
-  :ensure-system-package (ctags . "snap install universal-ctags")
+  ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
   :bind (("M-]" . counsel-etags-find-tag-at-point)
          ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -1656,6 +1653,7 @@ whitespaces."
 ;; This causes additional saves which leads to auto-formatters being invoked more frequently
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
+  :disabled t
   ;; :diminish
   :custom
   (super-save-remote-files nil "Ignore remote files")
@@ -1701,7 +1699,7 @@ whitespaces."
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
-  ;; :diminish
+  :diminish
   :hook (text-mode . writegood-mode))
 
 (use-package langtool
@@ -1842,7 +1840,7 @@ whitespaces."
 
 (use-package eldoc
   :if dotemacs-is-linux
-  ;; :diminish
+  :diminish
   :config (global-eldoc-mode 1))
 
 (use-package matlab-mode
@@ -1902,7 +1900,7 @@ whitespaces."
 
 (use-package cmake-mode
   :ensure t
-  :mode ("CMakeLists.txt" "\\.cmake\\'")
+  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
   :hook (cmake-mode . lsp))
 
 (use-package cmake-font-lock
@@ -1911,7 +1909,7 @@ whitespaces."
 
 (use-package modern-cpp-font-lock
   :ensure t
-  ;; :diminish modern-c++-font-lock-mode
+  :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
 
 (use-package python
@@ -1927,7 +1925,7 @@ whitespaces."
 
 (use-package pyvenv
   :ensure t
-  ;; :diminish
+  :diminish
   :custom (pyvenv-mode-line-indicator
            '(pyvenv-virtual-env-name ("[venv:"
                                       pyvenv-virtual-env-name "]")))
@@ -2009,24 +2007,27 @@ whitespaces."
 
 (use-package git-gutter
   :ensure t
-  ;; :diminish
+  :diminish
   :bind (("C-x p" . git-gutter:previous-hunk)
          ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode))
 
+;; git-gutter seems to provide similar features
 (use-package diff-hl
   :ensure t
-  :hook ((magit-post-refresh . diff-hl-magit-post-refresh)
-         (after-init . global-diff-hl-mode)))
+  :disabled t
+  :hook ((after-init . global-diff-hl-mode)
+         (magit-pre-refresh . diff-hl-magit-pre-refresh)
+         (magit-post-refresh . diff-hl-magit-post-refresh)))
 
-;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
-(defun sb/enable-smerge-maybe ()
-  (when (and buffer-file-name (vc-backend buffer-file-name))
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^<<<<<<< " nil t)
-        (smerge-mode +1)))))
-(add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
+;; ;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
+;; (defun sb/enable-smerge-maybe ()
+;;   (when (and buffer-file-name (vc-backend buffer-file-name))
+;;     (save-excursion
+;;       (goto-char (point-min))
+;;       (when (re-search-forward "^<<<<<<< " nil t)
+;;         (smerge-mode +1)))))
+;; (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
 
 (use-package yaml-mode
   :ensure t
@@ -2094,6 +2095,7 @@ whitespaces."
   (lsp-clients-clangd-args
    '("-j=2" "--background-index" "--clang-tidy" "--fallback-style=LLVM"
      "--log=error" "--pretty"))
+  (lsp-completion-provider :capf)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
   (lsp-enable-dap-auto-configure nil)
@@ -2107,7 +2109,6 @@ whitespaces."
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
   (lsp-log-io nil)
-  (lsp-prefer-capf t)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-jedi-completion-fuzzy t)
@@ -2132,7 +2133,7 @@ whitespaces."
                       "org.eclipse.lemminx-0.13.1-uber.jar")))
   (lsp-yaml-print-width 100)
   :config
-  (advice-add #'lsp--auto-configure :override #'ignore)
+  ;; (advice-add #'lsp--auto-configure :override #'ignore)
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
                     :major-modes '(python-mode)
@@ -2335,7 +2336,7 @@ Increase line spacing by two line height."
 ;; https://www.emacswiki.org/emacs/BuildTags
 (defun sb/create-ctags (dir-name)
   "Create tags file with ctags."
-  (interactive "Directory: ")
+  (interactive "DDirectory: ")
   (shell-command
    (format "%s -f TAGS -eR %s" dotemacs-ctags-path (directory-file-name dir-name))))
 
@@ -2348,7 +2349,7 @@ Increase line spacing by two line height."
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
   "List all files recursively."
-  (interactive "Directory: ")
+  (interactive "DDirectory: ")
   (let* ((cands (split-string
                  (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
     (ivy-read "File: " cands

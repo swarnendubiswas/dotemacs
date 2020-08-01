@@ -675,6 +675,7 @@
     ("inthe" "in the" nil :count 0)
     ("introdcution" "introduction" nil :count 0)
     ("inturn" "in turn" nil :count 0)
+    ("inviestigate" "investigate" nil :count 0)
     ("invitaion" "invitation" nil :count 0)
     ("invlaid" "invalid" nil :count 2)
     ("invlaidation" "invalidation" nil :count 1)

@@ -189,14 +189,14 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## Markdown
 
-- `C-c C-s e` - Make region or word italic (emphasis) (``).
-- `C-c C-s s` - Make region or word bold or strong (``).
-- `C-c C-s s` - Insert or start blockquote (``).
-- `C-c C-s p` - Insert pre-formatted code blocks (``).
-- `C-c -` - Insert a horizontal rule (``).
-- `C-c C-c v` - Export the file and view in a browser (``).
-- `C-c C-c m` - Compile the file and show in another buffer (``).
-- `C-c C-j` - Insert a list (`markdown-insert-list-item`).
+- `C-c C-s e` - Make region or word italic (emphasis) (``)
+- `C-c C-s s` - Make region or word bold or strong (``)
+- `C-c C-s s` - Insert or start blockquote (``)
+- `C-c C-s p` - Insert pre-formatted code blocks (``)
+- `C-c -` - Insert a horizontal rule (``)
+- `C-c C-c v` - Export the file and view in a browser (``)
+- `C-c C-c m` - Compile the file and show in another buffer (``)
+- `C-c C-j` - Insert a list (`markdown-insert-list-item`)
 
 ## JSON
 
@@ -255,6 +255,11 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
 - `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`).
 - `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`).
+
+### Python
+
+- `C-c <` - Indent left (`python-indent-shift-left`).
+- `C-c >` - Indent right (`python-indent-shift-right`).
 
 ### C/C++
 
