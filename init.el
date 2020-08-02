@@ -1152,7 +1152,7 @@ whitespaces."
   :hook ((prog-mode . flyspell-prog-mode)
          (before-save-hook . flyspell-buffer)
          ((text-mode find-file-hooks) . flyspell-mode))
-  ;; :diminish
+  :diminish
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
@@ -1703,13 +1703,15 @@ whitespaces."
   :hook (text-mode . writegood-mode))
 
 (use-package langtool
-  :ensure t)
+  :ensure t
+  :hook (text-mode . (lambda()
+                       (require 'langtool)))
+  :custom (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
+                                                        dotemacs-user-home)))
 
 (use-package logview
   :ensure t
-  :custom (logview-cache-filename (expand-file-name
-                                   (concat
-                                    dotemacs-temp-directory "logview-cache.extmap"))))
+  :custom (logview-cache-filename (expand-file-name "logview-cache.extmap" dotemacs-temp-directory)))
 
 (use-package bison-mode
   :ensure t
@@ -2220,6 +2222,12 @@ whitespaces."
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
+                         (lsp-deferred))))
+
+(use-package lsp-pyright
+  :load-path "extras"
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
                          (lsp-deferred))))
 
 (use-package lsp-latex
