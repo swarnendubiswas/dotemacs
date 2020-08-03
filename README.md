@@ -51,6 +51,7 @@ cargo install --git https://github.com/latex-lsp/texlab.git
 
 ```Bash
 cd $HOME/tmp; mkdir emacs-node-workspace; cd ;
+npm init --yes
 npm install --save-dev npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver
 npm update
 ```
@@ -59,6 +60,7 @@ Install `textlint` separately so that the installation can be shared by other ed
 
 ```Bash
 cd $HOME/tmp; mkdir textlint-workspace; cd ;
+npm init --yes
 npm install --save-dev textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-sentence-length textlint-plugin-latex textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint
 ```
 
