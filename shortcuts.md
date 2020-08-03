@@ -6,153 +6,154 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Emacs Window
 
-- `C-x C-+` - Increase font size by one step (`text-scale-adjust`).
-- `C-x C--` - Decrease font size by one step (`text-scale-adjust`).
+- `C-x C-+` - Increase font size by one step (`text-scale-adjust`)
+- `C-x C--` - Decrease font size by one step (`text-scale-adjust`)
 
-## Text manipulation
+## Text Manipulation
 
-- `M-l` - Convert following word to lower case (`downcase-word`).
-- `M-c` - Capitalize the following word (`capitalize-word`).
-- `M-u` - Convert following word to upper case (`upcase-word`).
-- `C-t` - Transpose two characters (`transpose-chars`).
-- `C-x r t` - Prepend the selected region with characters (`string-rectangle`).
-- `M-k` - Kill forward to the end of the sentence (`kill-sentence`).
-- `M-t` - Transpose words (`transpose-words` or `subword-transpose`).
-- `M-;` - Invoke comment-dwim (`comment-dwim`).
-- `M-/` - Try to expand text before point (`hippie-expand`).
-- `C-M-\` - Indent all the lines in the region (`indent-region`).
-- `M-q` - Fill paragraph at or after point (`fill-paragraph`).
-- `M-d` - Kill the immediately next word (``).
-- `M-- M-d` - Kill the immediately previous word (``).
+- `M-l` - Convert following word to lower case (`downcase-word`)
+- `M-c` - Capitalize the following word (`capitalize-word`)
+- `M-u` - Convert following word to upper case (`upcase-word`)
+- `C-t` - Transpose two characters (`transpose-chars`)
+- `C-x r t` - Prepend the selected region with characters (`string-rectangle`)
+- `M-k` - Kill forward to the end of the sentence (`kill-sentence`)
+- `M-t` - Transpose words (`transpose-words` or `subword-transpose`)
+- `M-;` - Invoke comment-dwim (`comment-dwim`)
+- `M-/` - Try to expand text before point (`hippie-expand`)
+- `C-M-\` - Indent all the lines in the region (`indent-region`)
+- `M-q` - Fill paragraph at or after point (`fill-paragraph`)
+- `M-d` - Kill the immediately next word (``)
+- `M-- M-d` - Kill the immediately previous word (``)
 
 ## Marking
 
-- `C-M-h` - Mark function body (`c-mark-function`).
-- `C-x h` - Mark whole buffer (`mark-whole-buffer`).
-- `M-h` - Put region around current paragraph (`mark-paragraph`).
-- `M-@` - Mark the current word (`mark-word` or `subword-mark`).
-- `C-M-h` - Select whole function definition (`mark-defun`).
-- `C-M-@` - Set mark after end of following balanced expression (`mark-sexp`).
-- `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`).
-- `C-x C-p` - Move point to the beginning of the current page, and set mark at the end (`mark-page`).
-- `C-c C-m` - Jump to a visited position in the current buffer (`counsel-mark-ring`).
+- `C-M-h` - Mark function body (`c-mark-function`)
+- `C-x h` - Mark whole buffer (`mark-whole-buffer`)
+- `M-h` - Put region around current paragraph (`mark-paragraph`)
+- `M-@` - Mark the current word (`mark-word` or `subword-mark`)
+- `C-M-h` - Select whole function definition (`mark-defun`)
+- `C-M-@` - Set mark after end of following balanced expression (`mark-sexp`)
+- `C-M-SPC` - Put the mark at the end of the sexp (`mark-sexp`)
+- `C-x C-p` - Move point to the beginning of the current page, and set mark at the end (`mark-page`)
+- `C-c C-m` - Jump to a visited position in the current buffer (`counsel-mark-ring`)
 - `C-x C-@` - Jump to the buffer and position of the latest entry in the global mark ring (`pop-global-mark`)
 
 ## Key motion
 
-- `C-M-n` - Move forward over a parenthetical group (`forward-list`).
-- `C-M-p` - Move backward over a parenthetical group (`backward-list`).
-- `C-M-u` - Move up in parenthesis structure (`backward-up-list`).
-- `C-M-d` - Move down in parenthesis structure (`down-list`).
-- `C-M-f` - Move forward over a balanced expression (`forward-sexp`).
-- `C-M-b` - Move backward over a balanced expression (`backward-sexp`).
-- `C-M-k` - Kill balanced expression forward (`kill-sexp`).
-
-- `C-M-a` - Goto the start of a function (`beginning-of-defun`).
-- `C-M-e` - Goto the end of a function (`end-of-defun`).
-- `M-a` - Move back to the beginning of the sentence (`backward-sentence`).
-- `M-e` - Move forward to the end of the sentence (`forward-sentence`).
-- `M-{` - Move back to the previous paragraph beginning (`backward-paragraph`).
-- `M-}` - Move forward to the next paragraph end (`markdown-forward-paragraph`).
+- `C-M-n` - Move forward over a parenthetical group (`forward-list`)
+- `C-M-p` - Move backward over a parenthetical group (`backward-list`)
+- `C-M-u` - Move up in parenthesis structure (`backward-up-list`)
+- `C-M-d` - Move down in parenthesis structure (`down-list`)
+- `C-M-f` - Move forward over a balanced expression (`forward-sexp`)
+- `C-M-b` - Move backward over a balanced expression (`backward-sexp`)
+- `C-M-k` - Kill balanced expression forward (`kill-sexp`)
+- `C-M-a` - Goto the start of a function (`beginning-of-defun`)
+- `C-M-e` - Goto the end of a function (`end-of-defun`)
+- `M-a` - Move back to the beginning of the sentence (`backward-sentence`)
+- `M-e` - Move forward to the end of the sentence (`forward-sentence`)
+- `M-{` - Move back to the previous paragraph beginning (`backward-paragraph`)
+- `M-}` - Move forward to the next paragraph end (`markdown-forward-paragraph`)
 
 ## Dired
 
-- `C-x d` - Show dired buffer (`dired`).
-- `g` - Update the entire contents (`revert-buffer`).
-- `l` - Update the specified files (`dired-do-redisplay`).
-- `k` - Delete the specified file lines (`dired-do-kill-lines`).
-- `s` - Toggle between alphabetical and date/time order (`dired-sort-toggle-or-edit`).
-- `C` - Copy the specified files (`dired-do-copy`).
-- `D` - Delete the specified files (`dired-do-delete`).
-- `R` - Rename the specified files (`dired-do-rename`).
-- `r` - Rename the specified file (`dired-efap`).
-- `i` - Find file (`counsel-find-file`).
-- `/` - Filter files (`dired-narrow`).
-- `M-<home>` - Go to HOME directory (`dired-go-home`).
-- `M-<up>` - Go to the first file/directory (`dired-jump-to-top`).
-- `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`).
-- `q` - Kill dired buffer (`quit-window`).
-- `C-u q` - Kill dired buffer (``).
-- `C-x C-j` - Open dired with cursor right on the file you are editing (`dired-jump`).
+- `C-x d` - Show dired buffer (`dired`)
+- `+` - Create a new directory (`dired-create-directory`)
+- `g` - Update the entire contents (`revert-buffer`)
+- `l` - Update the specified files (`dired-do-redisplay`)
+- `k` - Delete the specified file lines (`dired-do-kill-lines`)
+- `s` - Toggle between alphabetical and date/time order (`dired-sort-toggle-or-edit`)
+- `C` - Copy the specified files (`dired-do-copy`)
+- `D` - Delete the specified files (`dired-do-delete`)
+- `R` - Rename the specified files (`dired-do-rename`)
+- `r` - Rename the specified file (`dired-efap`)
+- `i` - Find file (`counsel-find-file`)
+- `/` - Filter files (`dired-narrow`)
+- `M-<home>` - Go to HOME directory (`dired-go-home`)
+- `M-<up>` - Go to the first file/directory (`dired-jump-to-top`)
+- `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`)
+- `q` - Kill dired buffer (`quit-window`)
+- `C-u q` - Kill dired buffer (``)
+- `C-x C-j` - Open dired with cursor right on the file you are editing (`dired-jump`)
 
 ## Treemacs
 
-- `C-j` - Initialize or toggle treemacs (`treemacs`).
+- `C-j` - Initialize or toggle treemacs (`treemacs`)
 - `n/p` - Navigate between same-level nodes.
 - `u` - Go to parent folder.
 
 ## Ibuffer
 
-- `S` - Save file (`ibuffer-do-save`).
-- `R` - Rename file (`ibuffer-do-rename-uniquely`).
-- `m` - Mark file (`ibuffer-mark-forward`).
-- `u` - Unmark file (`ibuffer-unmark-forward`).
+- `S` - Save file (`ibuffer-do-save`)
+- `R` - Rename file (`ibuffer-do-rename-uniquely`)
+- `m` - Mark file (`ibuffer-mark-forward`)
+- `u` - Unmark file (`ibuffer-unmark-forward`)
 
 ## Search
 
-- `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`.
+- `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`
 
 ### Ag
 
-- `<f8>` - Run an ag search in the project (`projectile-ag`).
-- `<return>` - Visit the file (``).
-- `n` and `p` - Move between results (``).
-- `g` - Run the search again (``).
-- `q` - Close the buffer (``).
-- `k` - Kill the buffer (``).
+- `<f8>` - Run an ag search in the project (`projectile-ag`)
+- `<return>` - Visit the file (``)
+- `n` and `p` - Move between results (``)
+- `g` - Run the search again (``)
+- `q` - Close the buffer (``)
+- `k` - Kill the buffer (``)
 - `C-c C-p` -
 - `C-x C-s` -
-- `C-h m` - Show all the keybindings available inside a results buffer (``).
+- `C-h m` - Show all the keybindings available inside a results buffer (``)
 
 ### Ripgrep
 
 ### Swiper
 
-- `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`).
+- `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`)
 
 ## Ivy
 
-- `M-o` - Execute an available action (`ivy-dispatching-done`).
-- `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`).
-- `C-n` - Selects the next candidate (`ivy-next-line`).
-- `C-p` - Selects the previous candidate (`ivy-previous-line`).
-- `M-<` - Selects the first candidate (`ivy-beginning-of-buffer`).
-- `M->` - Selects the last candidate (`ivy-end-of-buffer`).
-- `C-v` - Scrolls up by ivy-height lines (`ivy-scroll-up-command`).
-- `M-v` - Scrolls down by ivy-height lines (`ivy-scroll-down-command`).
-- `//` - Switch to the root directory (`self-insert-command`).
-- `~` - Switch to the home directory (`self-insert-command`).
-- `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`).
-- `C-m` - Calls the default action and exits minibuffer (`ivy-done`).
-- `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`).
+- `M-o` - Execute an available action (`ivy-dispatching-done`)
+- `C-o` - Shows a Hydra menu in the minibuffer (`hydra-ivy/body`)
+- `C-n` - Selects the next candidate (`ivy-next-line`)
+- `C-p` - Selects the previous candidate (`ivy-previous-line`)
+- `M-<` - Selects the first candidate (`ivy-beginning-of-buffer`)
+- `M->` - Selects the last candidate (`ivy-end-of-buffer`)
+- `C-v` - Scrolls up by ivy-height lines (`ivy-scroll-up-command`)
+- `M-v` - Scrolls down by ivy-height lines (`ivy-scroll-down-command`)
+- `//` - Switch to the root directory (`self-insert-command`)
+- `~` - Switch to the home directory (`self-insert-command`)
+- `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`)
+- `C-m` - Calls the default action and exits minibuffer (`ivy-done`)
+- `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`)
 - `C-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when copying/renaming files with names that match existing files.
-- `C-'` - Use `avy` to select candidates (`ivy-avy`).
-- `C-c r` - Resume the last ivy completion session (`ivy-resume`).
-- `C-M-a` - Invoke one of the available actions (`ivy-read-action`).
+- `C-'` - Use `avy` to select candidates (`ivy-avy`)
+- `C-c r` - Resume the last ivy completion session (`ivy-resume`)
+- `C-M-a` - Invoke one of the available actions (`ivy-read-action`)
+- `C-x C-q` - Change  (ivy-wgrep-change-to-wgrep-mode) in ivy-occur buffer 
 
 Specify extra flags to the search commands with `C-u` (`universal-argument`) before the command.
 
 ## Org mode
 
-- `C-u C-c .` - Insert date and time (`org-time-stamp`).
-- `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`).
-- `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`).
+- `C-u C-c .` - Insert date and time (`org-time-stamp`)
+- `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`)
+- `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`)
 
 ## Projectile
 
-- `C-c p f` - Display a list of all files in the project (`projectile-find-file`).
-- `C-c p g` - Jump to a project's files using completion based on context (`projectile-find-file-dwim`).
-- `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`).
-- `C-c p b` - List buffers local to current project (`projectile-switch-to-buffer`).
-- `C-c p e` - Jump to recently visited files in project (`projectile-recentf`).
-- `C-c p r` - Simple refactoring with text replace in current project (`projectile-replace`).
-- `C-c p S` - Save all project buffers (`projectile-save-project-buffers`).
-- `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`).
-- `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`).
-- `<f5>` - Switch project (`counsel-projectile-switch-project`).
-- `<f6>` - Find file (`counsel-projectile-find-file`).
+- `C-c p f` - Display a list of all files in the project (`projectile-find-file`)
+- `C-c p g` - Jump to a project's files using completion based on context (`projectile-find-file-dwim`)
+- `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`)
+- `C-c p b` - List buffers local to current project (`projectile-switch-to-buffer`)
+- `C-c p e` - Jump to recently visited files in project (`projectile-recentf`)
+- `C-c p r` - Simple refactoring with text replace in current project (`projectile-replace`)
+- `C-c p S` - Save all project buffers (`projectile-save-project-buffers`)
+- `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`)
+- `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`)
+- `<f5>` - Switch project (`counsel-projectile-switch-project`)
+- `<f6>` - Find file (`counsel-projectile-find-file`)
 <!-- * `<f7>` - Switch to project buffer (`counsel-projectile-switch-to-buffer`). -->
-- `<f7>` - Run an ag search in the project (`counsel-projectile-rg`).
+- `<f7>` - Run an ag search in the project (`counsel-projectile-rg`)
 - `C-c p s g` - Grep in project.
 - `C-c p v` - Run `vc-dir` on the project root.
 - `C-c p k` - Kill all project buffers.
@@ -161,7 +162,7 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 
 ## LaTeX/AUCTeX
 
-- `C-c @ C-n` - Move to next heading (at any level) (`outline-next-visible-heading`).
+- `C-c @ C-n` - Move to next heading (at any level) (`outline-next-visible-heading`)
 - `C-c @ C-p` - Move to previous heading (at any level) (`outline-previous-visible-heading`).
 - `C-c @ C-f` - Move Forward to next heading at the same level (`outline-forward-same-level`).
 - `C-c @ C-b` - Move Backward to previous heading at the same level (`outline-backward-same-level`).
@@ -340,25 +341,26 @@ Use `magit-status` to display information about the current Git repository, and 
 - Use `C-x C-s` to commit wgrep.
 - Use `C-x s !` to save the changed files.
 
-<http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open>
+- <http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open>
+- <https://emacsbliss.com/post/emacs-search-replace/>
 
 ### Search for the symbol at point
 
 - `isearch` - Traditional incremental forward search for regular expression with `C-f`.
 - `counsel-grep-or-swiper` - Use `swiper` (with overview of lines) for small buffers and `counsel-grep` for large files with `<f4>`.
 - `rgrep` - Recursively grep for REGEXP in FILES in directory tree rooted at DIR.
-- `deadgrep` - Start a ripgrep search for SEARCH-TERM (`<f8>`).
-- `counsel-rg` - Grep for a string in the current directory using rg (`C-c s r`).
-- `counsel-projectile-rg` - Perform incremental search in the current project with rg (`<f7>`).
+- `deadgrep` - Start a ripgrep search for SEARCH-TERM (`<f8>`)
+- `counsel-rg` - Grep for a string in the current directory using rg (`C-c s r`)
+- `counsel-projectile-rg` - Perform incremental search in the current project with rg (`<f7>`)
 
 #### Isearch
 
-- `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`).
+- `C-f C-w` - Search for the word from the current cursor position, keep hitting `C-w` to add subsequent words to the search (`isearch-forward-regexp`)
 
 #### Swiper
 
-- `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`).
-- `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`).
+- `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`)
+- `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`)
 - [An example of excluding \*.el from the files searched by ag](https://github.com/abo-abo/swiper/pull/774)
 
 ### Search in the current folder

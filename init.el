@@ -1057,7 +1057,12 @@ whitespaces."
   (counsel-yank-pop-separator "\n-------------------------\n")
   :diminish
   :hook (ivy-mode . counsel-mode)
-  :config (defalias 'flycheck-list-errors 'counsel-flycheck))
+  :config
+  (defalias 'flycheck-list-errors 'counsel-flycheck)
+  ;; (defalias 'load-library 'counsel-load-library)
+  (defalias 'load-theme 'counsel-load-theme)
+  (defalias 'switch-buffer 'counsel-switch-buffer)
+  (defalias 'yank-pop 'counsel-yank-pop))
 
 (use-package prescient
   :ensure t
@@ -1278,7 +1283,7 @@ whitespaces."
                    ".project" ".tags" "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files items))
   (dolist (exts
-           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jgp" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
+           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
@@ -1738,8 +1743,9 @@ whitespaces."
   (use-package markdown-mode+
     :ensure t
     :demand t)
-  (with-eval-after-load 'whitespace-cleanup-mode
-    (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)))
+  ;; (with-eval-after-load 'whitespace-cleanup-mode
+  ;;   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
+    )
 
 ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
