@@ -301,6 +301,7 @@
     ("configuraion" "configuration" nil :count 1)
     ("confirmmation" "confirmation" nil :count 0)
     ("coninue" "continue" nil :count 0)
+    ("conirmed" "confirmed" nil :count 0)
     ("conjuntion" "conjunction" nil :count 0)
     ("consderable" "considerable" nil :count 1)
     ("consdering" "considering" nil :count 1)

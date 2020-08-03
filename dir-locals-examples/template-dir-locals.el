@@ -122,3 +122,18 @@
   '(progn
      (setq flycheck-disabled-checkers '(javascript-jshint))
      (setq flycheck-checkers '(javascript-eslint))))
+
+
+(
+ ("src/"
+  (nil . (
+          (fill-column . 80)
+          (eval add-hook 'after-save-hook '(lambda () (compile "make -kC .."))  nil t)
+          ))
+  )
+ ("wwwroot/"
+  (nil . (
+          (auto-revert-mode . 1)
+          ))
+  )
+ )

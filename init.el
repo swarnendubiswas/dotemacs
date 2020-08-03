@@ -734,15 +734,18 @@ whitespaces."
   :ensure t)
 
 (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 (use-package all-the-icons-ibuffer
   :ensure t
+  :disabled t
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :ensure t
+  :disabled t
   :diminish
   :hook (dired-mode . all-the-icons-dired-mode))
 
@@ -818,7 +821,7 @@ whitespaces."
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil)
-  (company-idle-delay 0.1 "Recommended by lsp")
+  (company-idle-delay 0.0 "Recommended by lsp")
   ;; (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 3 "Small words are faster to type")
@@ -873,12 +876,12 @@ whitespaces."
 ;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
 ;;   (add-hook hook
 ;;             (lambda ()
-;;               (use-package company-bibtex
-;;                 :ensure t
-;;                 :demand t)
+;;               ;; (use-package company-bibtex
+;;               ;;   :ensure t
+;;               ;;   :demand t)
 ;;               (set (make-local-variable 'company-backends) '((company-capf
-;;                                                               :with company-bibtex
-;;                                                               company-dabbrev
+;;                                                               ;; :with company-bibtex
+;;                                                               :with company-dabbrev
 ;;                                                               company-files :separate))))))
 
 ;; (add-hook 'prog-mode-hook
@@ -961,8 +964,6 @@ whitespaces."
   :diminish
   :bind
   (("C-c r" . ivy-resume)
-   ([remap switch-to-buffer] . ivy-switch-buffer)
-   ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
@@ -1009,6 +1010,8 @@ whitespaces."
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
    ("C-c C-j" . counsel-semantic-or-imenu)
+   ([remap switch-to-buffer] . counsel-switch-buffer)
+   ("<f3>" . counsel-switch-buffer)
    ([remap yank-pop] . counsel-yank-pop))
   :custom
   (counsel-find-file-ignore-regexp (concat
@@ -1305,8 +1308,7 @@ whitespaces."
   :ensure t
   :hook
   (text-mode . (lambda ()
-                 (require 'flycheck-grammarly)))
-  :custom (flycheck-grammarly-check-time 2))
+                 (require 'flycheck-grammarly))))
 
 (use-package flycheck
   :ensure t
@@ -1320,10 +1322,10 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
-                                                                     dotemacs-user-home)
-                          flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
-                                                                         dotemacs-user-home))
+              ;; (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
+              ;;                                                        dotemacs-user-home)
+              ;;             flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
+              ;;                                                            dotemacs-user-home))
               ;; FIXME: textlint is not working correctly
               ;; (flycheck-add-next-checker 'grammarly-checker 'textlint)
               ))
@@ -1339,17 +1341,13 @@ whitespaces."
                           flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                                       dotemacs-user-home))
               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)))
+  ;; (add-hook 'latex-mode-hook
+  ;;           (lambda ()
+  ;;             (flycheck-add-next-checker 'lsp 'grammarly-checker)))
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck)
               (flycheck-add-next-checker 'sh-shellcheck 'sh-bash))))
-
-;; Binds avy-flycheck-goto-error to C-c ! g
-(use-package avy-flycheck
-  :ensure t
-  :disabled t
-  :after flycheck
-  :config (avy-flycheck-setup))
 
 (use-package flycheck-popup-tip ; Show error messages in popups
   :ensure t
@@ -1768,18 +1766,18 @@ whitespaces."
     (add-hook hook #'prettier-js-mode))
   :custom (prettier-js-args (list "--config" (expand-file-name ".prettierrc" dotemacs-user-home))))
 
-(use-package add-node-modules-path
-  :ensure t
-  :init
-  (with-eval-after-load 'typescript-mode
-    (add-hook 'typescript-mode-hook 'add-node-modules-path))
-  (with-eval-after-load 'js2-mode
-    (add-hook 'js2-mode-hook 'add-node-modules-path)))
+;; (use-package add-node-modules-path
+;;   :ensure t
+;;   :init
+;;   (with-eval-after-load 'typescript-mode
+;;     (add-hook 'typescript-mode-hook 'add-node-modules-path))
+;;   (with-eval-after-load 'js2-mode
+;;     (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
-(use-package prettier
-  :ensure t
-  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-  :hook ((markdown-mode gfm-mode) . prettier-mode))
+;; (use-package prettier
+;;   :ensure t
+;;   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+;;   :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package grip-mode
   :ensure t
@@ -1814,7 +1812,6 @@ whitespaces."
     :custom
     (bibtex-completion-cite-prompt-for-optional-arguments nil)
     (bibtex-completion-cite-default-as-initial-input t)
-    ;; (bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${year:4} ${=type=:10}")))
     (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:10} ${=type=:10}"))))
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
@@ -2092,7 +2089,7 @@ whitespaces."
          (lsp-mode . lsp-enable-which-key-integration)
          ;; (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          ;; (lsp-mode . lsp-headerline-breadcrumb-mode)
-         )
+         (lsp-mode . lsp-modeline-code-actions-mode))
   :custom
   (lsp-clients-clangd-args
    '("-j=2" "--background-index" "--clang-tidy" "--fallback-style=LLVM"
@@ -2111,6 +2108,7 @@ whitespaces."
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
   (lsp-log-io nil)
+  (lsp-modeline-diagnostics-scope :project)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
   (lsp-pyls-plugins-jedi-completion-fuzzy t)
@@ -2232,13 +2230,13 @@ whitespaces."
 
 (use-package lsp-latex
   :ensure t
-  :init
-  (with-eval-after-load 'tex-mode
-    (require 'lsp-latex))
+  :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
+                                               (require 'lsp-latex)))
   :custom
+  (lsp-latex-bibtex-formatting-line-length 100)
+  ;; (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-build-on-save t)
-  (lsp-latex-lint-on-save t)
-  (lsp-latex-bibtex-formatting-formatter "latexindent"))
+  (lsp-latex-lint-on-save t))
 
 (use-package mlir-mode
   :load-path "extras"
