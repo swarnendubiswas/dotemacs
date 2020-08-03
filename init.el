@@ -31,8 +31,7 @@
 
 ;;; Code:
 
-(setq load-prefer-newer t
-      user-full-name "Swarnendu Biswas")
+(setq user-full-name "Swarnendu Biswas")
 
 (defgroup dotemacs nil
   "Personal configuration for dotemacs."
@@ -62,20 +61,19 @@
   :type '(radio
           (const :tag "eclipse" eclipse)
           (const :tag "leuven" leuven)
-          (const :tag "professional" professional)
           (const :tag "solarized-light" solarized-light)
           (const :tag "spacemacs-light" spacemacs-light)
           (const :tag "solarized-dark" solarized-dark)
           (const :tag "tangotango" tangotango)
           (const :tag "zenburn" zenburn)
-          (const :tag "doom-themes" doom-themes)
+          (const :tag "doom-molokai" doom-molokai)
           (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "default" default))
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -211,6 +209,7 @@ whitespaces."
   :hook (after-init . gcmh-mode))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
+      apropos-do-all t
       auto-mode-case-fold nil ; Disable a second case insensitive pass
       auto-save-interval 600
       auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
@@ -247,6 +246,7 @@ whitespaces."
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
+      load-prefer-newer t
       major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup ~ files
       mouse-drag-copy-region t
@@ -349,7 +349,6 @@ whitespaces."
   (uniquify-separator "/")
   (uniquify-strip-common-suffix t))
 
-;; https://github.com/bbatsov/prelude/blob/master/core/prelude-editor.el
 (use-package hippie-exp
   :custom
   (hippie-expand-try-functions-list '(try-expand-dabbrev
@@ -453,11 +452,9 @@ whitespaces."
                                              :ensure solarized-theme
                                              :init (load-theme 'solarized-dark t)))
 
-      ((eq dotemacs-theme 'doom-themes) (use-package doom-themes
+      ((eq dotemacs-theme 'doom-molokai) (use-package doom-themes
                                           :ensure t
-                                          :init
-                                          ;; (load-theme 'doom-monokai-classic t)
-                                          (load-theme 'doom-molokai t)
+                                          :init (load-theme 'doom-molokai t)
                                           :config
                                           (set-face-attribute 'font-lock-comment-face nil
                                                               ;; :foreground "#cccccc"
@@ -487,13 +484,13 @@ whitespaces."
                                                        powerline-display-buffer-size t
                                                        powerline-display-hud nil
                                                        powerline-gui-use-vcs-glyph t)
-                                                 (set-face-attribute 'powerline-inactive1 nil
-                                                                     :background "gray40"
-                                                                     :foreground "white"
-                                                                     :weight 'light)
-                                                 (set-face-attribute 'powerline-inactive2 nil
-                                                                     :background "grey50"
-                                                                     :foreground "white")
+                                                 ;; (set-face-attribute 'powerline-inactive1 nil
+                                                 ;;                     :background "gray40"
+                                                 ;;                     :foreground "white"
+                                                 ;;                     :weight 'light)
+                                                 ;; (set-face-attribute 'powerline-inactive2 nil
+                                                 ;;                     :background "grey50"
+                                                 ;;                     :foreground "white")
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'mode-line nil
                                                                        :background "grey88"
@@ -579,7 +576,6 @@ whitespaces."
 
 (use-package auto-dim-other-buffers
   :ensure t
-  :disabled t
   :hook (after-init . auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -734,18 +730,15 @@ whitespaces."
   :ensure t)
 
 (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
-  :ensure t
-  :disabled t)
+  :ensure t)
 
 (use-package all-the-icons-ibuffer
   :ensure t
-  :disabled t
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :ensure t
-  :disabled t
   :diminish
   :hook (dired-mode . all-the-icons-dired-mode))
 
@@ -852,7 +845,7 @@ whitespaces."
 (use-package company-box
   :ensure t
   :disabled t
-  ;; :diminish
+  :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
   :custom
@@ -1089,14 +1082,12 @@ whitespaces."
 
 (use-package all-the-icons-ivy-rich
   :ensure t
-  :disabled t
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
 (use-package ivy-rich
   :ensure t
-  :disabled t
   :custom
   (ivy-format-function #'ivy-format-function-line)
   (ivy-rich-parse-remote-buffer nil)
@@ -1287,7 +1278,7 @@ whitespaces."
                    ".project" ".tags" "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files items))
   (dolist (exts
-           '(".a" ".aux" ".bak" ".blg" ".class" ".doc" ".docx" ".elc" ".jar" ".jpeg" ".jgp" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".tar.gz" ".tar.xz" ".xls" ".xlsx" "~$"))
+           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jgp" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
@@ -1386,11 +1377,6 @@ whitespaces."
 (use-package hl-todo
   :ensure t
   :hook (after-init . global-hl-todo-mode))
-
-(use-package highlight-escape-sequences
-  :ensure t
-  :disabled t
-  :hook (after-init . hes-mode))
 
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -1534,7 +1520,10 @@ whitespaces."
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
   :diminish
-  :hook (after-init . global-hungry-delete-mode ))
+  :hook (after-init . global-hungry-delete-mode )
+  :config
+  (with-eval-after-load 'ivy
+    (unbind-key "backspace" ivy-occur-grep-mode-map)))
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
   :ensure t
@@ -1594,7 +1583,8 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '("*Apropos*"))
   (add-to-list 'popwin:special-display-config '("*Warnings*"))
   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-  (add-to-list 'popwin:special-display-config '("*explain-pause-top*")))
+  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode)))
 
 ;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
 ;; (add-to-list 'display-buffer-alist
@@ -1766,18 +1756,18 @@ whitespaces."
     (add-hook hook #'prettier-js-mode))
   :custom (prettier-js-args (list "--config" (expand-file-name ".prettierrc" dotemacs-user-home))))
 
-;; (use-package add-node-modules-path
-;;   :ensure t
-;;   :init
-;;   (with-eval-after-load 'typescript-mode
-;;     (add-hook 'typescript-mode-hook 'add-node-modules-path))
-;;   (with-eval-after-load 'js2-mode
-;;     (add-hook 'js2-mode-hook 'add-node-modules-path)))
+(use-package add-node-modules-path
+  :ensure t
+  :init
+  (with-eval-after-load 'typescript-mode
+    (add-hook 'typescript-mode-hook 'add-node-modules-path))
+  (with-eval-after-load 'js2-mode
+    (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
-;; (use-package prettier
-;;   :ensure t
-;;   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-;;   :hook ((markdown-mode gfm-mode) . prettier-mode))
+(use-package prettier
+  :ensure t
+  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+  :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package grip-mode
   :ensure t
