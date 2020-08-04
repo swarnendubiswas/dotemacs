@@ -73,7 +73,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -453,13 +453,13 @@ whitespaces."
                                              :init (load-theme 'solarized-dark t)))
 
       ((eq dotemacs-theme 'doom-molokai) (use-package doom-themes
-                                          :ensure t
-                                          :init (load-theme 'doom-molokai t)
-                                          :config
-                                          (set-face-attribute 'font-lock-comment-face nil
-                                                              ;; :foreground "#cccccc"
-                                                              ;; :foreground "#b2b2b2"
-                                                              :foreground "#999999")))
+                                           :ensure t
+                                           :init (load-theme 'doom-molokai t)
+                                           :config
+                                           (set-face-attribute 'font-lock-comment-face nil
+                                                               ;; :foreground "#cccccc"
+                                                               ;; :foreground "#b2b2b2"
+                                                               :foreground "#999999")))
 
       ((eq dotemacs-theme 'monokai) (use-package monokai-theme
                                       :ensure t
@@ -1222,14 +1222,16 @@ whitespaces."
 (use-package projectile
   :ensure t
   ;; :ensure-system-package fd
+  :bind-keymap ("C-c p" . projectile-command-map)
   :custom
   (projectile-auto-discover nil)
   (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
+  (projectile-dynamic-mode-line nil)
   (projectile-enable-caching nil "Problematic if you create new files often")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
-  (projectile-indexing-method 'hybrid)
+  (projectile-indexing-method 'alien)
   (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld" dotemacs-temp-directory))
   (projectile-mode-line-prefix "")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
@@ -1285,7 +1287,8 @@ whitespaces."
   (dolist (exts
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+  ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  )
 
 (use-package counsel-projectile
   :ensure t
@@ -1733,7 +1736,7 @@ whitespaces."
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; :init (setq-default markdown-hide-markup t)
   :custom
-  ;; (mardown-indent-on-enter 'indent-and-new-item)
+  (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-enable-math t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
   (markdown-fontify-code-blocks-natively t)
@@ -1745,12 +1748,12 @@ whitespaces."
     :demand t)
   ;; (with-eval-after-load 'whitespace-cleanup-mode
   ;;   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
-    )
+  )
 
 ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
   :ensure t
-  ;; :diminish
+  :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
@@ -2015,14 +2018,7 @@ whitespaces."
          (magit-pre-refresh . diff-hl-magit-pre-refresh)
          (magit-post-refresh . diff-hl-magit-post-refresh)))
 
-;; ;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
-;; (defun sb/enable-smerge-maybe ()
-;;   (when (and buffer-file-name (vc-backend buffer-file-name))
-;;     (save-excursion
-;;       (goto-char (point-min))
-;;       (when (re-search-forward "^<<<<<<< " nil t)
-;;         (smerge-mode +1)))))
-;; (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
+(setq smerge-command-prefix "\C-c v")
 
 (use-package yaml-mode
   :ensure t
@@ -2419,7 +2415,7 @@ Increase line spacing by two line height."
 (put 'flycheck-clang-include-path 'safe-local-variable #'listp)
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
-(put 'projectile-default-file 'safe-local-variable #'stringp)
+(put 'dotemacs-projectile-default-file 'safe-local-variable #'stringp)
 (put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
@@ -2432,7 +2428,7 @@ Increase line spacing by two line height."
 specify by the keyword projectile-default-file define in `dir-locals-file'"
   (let ((default-file (f-join directory (nth 1
                                              (car (-tree-map (lambda (node)
-                                                               (when (eq (car node) 'projectile-default-file)
+                                                               (when (eq (car node) 'dotemacs-projectile-default-file)
                                                                  (format "%s" (cdr node))))
                                                              (dir-locals-get-class-variables (dir-locals-read-from-dir directory))))))))
     (if (f-exists? default-file)
@@ -2445,11 +2441,41 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
 (with-eval-after-load "counsel-projectile"
   (add-to-list 'counsel-projectile-action '("d" sb/open-local-file-projectile "open default file") t))
 
-;; (let (
-;;       (default-file (format "%s" (cdr (car (cdr (cdr (car (dir-locals-get-class-variables (dir-locals-read-from-dir "/home/swarnendu/prospar-workspace/dl-optimizations-draft")))))))))
-;;       )
-;;   (if (f-exists? default-file)
-;;       (counsel-find-file default-file))
-;;   )
+(defun sb/open-project-default-file1 (filepath)
+  (let ((liststring (with-temp-buffer
+                      (insert-file-contents filepath)
+                      (split-string (buffer-string) "\n"))))
+    (mapcar (lambda (str)
+              (when (cl-search "dotemacs-projectile-default-file" str)
+                (let ((x (substring str (+ 13 (length "dotemacs-projectile-default-file")) (length str))))
+                  (let ((default-file (expand-file-name (substring x 1 -2) (projectile-project-root))))
+                    (when (f-exists? default-file)
+                      (let ((new-buffer (get-buffer-create default-file)))
+                        (switch-to-buffer new-buffer)
+                        (insert-file-contents default-file)
+                        )
+                      )))))
+            liststring)))
+;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
+
+(defun sb/open-project-default-file2 ()
+  (interactive)
+  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir (projectile-project-root)))))
+    (mapcar (lambda (node)
+              (when (eq (car node) nil)
+                (let ((nillist (cdr node)))
+                  (mapcar (lambda (elem)
+                            (when (eq (car elem) 'dotemacs-projectile-default-file)
+                              (let ((default-file (expand-file-name (cdr elem) (projectile-project-root))))
+                                (when (f-exists? default-file)
+                                  (let ((new-buffer (get-buffer-create default-file)))
+                                    (switch-to-buffer new-buffer)
+                                    (insert-file-contents default-file))))))
+                          nillist)
+                  )
+                )
+              )
+            mylist)))
+;; (sb/open-project-default-file2)
 
 ;;; init.el ends here

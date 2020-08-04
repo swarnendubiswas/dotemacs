@@ -61,7 +61,7 @@ Install `textlint` separately so that the installation can be shared by other ed
 ```Bash
 cd $HOME/tmp; mkdir textlint-workspace; cd ;
 npm init --yes
-npm install --save-dev textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-sentence-length textlint-plugin-latex textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint
+npm install --save-dev textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-sentence-length textlint-plugin-latex textlint-plugin-latex2e textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint
 ```
 
 Add the following definitions to `$HOME/.bashrc`.
@@ -106,13 +106,13 @@ ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc
 > `pylint`
 
 ```bash
-ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc;
+ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc
 ```
 
 > `yapf`
 
 ```bash
-ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf;
+ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf
 ```
 
 I plan to automate the complete setup sometime in the future.
