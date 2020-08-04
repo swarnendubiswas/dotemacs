@@ -995,6 +995,7 @@ whitespaces."
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ([remap swiper] . counsel-grep-or-swiper)
    ("<f4>" . counsel-grep-or-swiper)
+   ("C-x C-b" . counsel-ibuffer)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap load-library] . counsel-load-library)
    ([remap load-theme] . counsel-load-theme)
@@ -1244,19 +1245,6 @@ whitespaces."
               projectile-mode-line-prefix
               (or project-name "-"))))
   (projectile-mode 1)
-
-  (defadvice projectile-project-root (around ignore-remote first activate)
-    (unless (file-remote-p default-directory) ad-do-it))
-
-  (defadvice projectile-on (around exlude-tramp activate)
-    "This should disable projectile when visiting a remote file"
-    (unless  (--any? (and it (file-remote-p it))
-                     (list
-                      (buffer-file-name)
-                      list-buffers-directory
-                      default-directory
-                      dired-directory))
-      ad-do-it))
 
   ;; Avoid search when projectile-mode is enabled for faster startup
   ;; (setq projectile-project-search-path (list
@@ -2052,11 +2040,8 @@ whitespaces."
 
 (use-package rainbow-mode
   :ensure t
+  :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
-
-(use-package css-eldoc
-  :ensure t
-  :init (add-hook 'css-mode-hook 'turn-on-css-eldoc))
 
 (use-package nxml-mode
   :hook (nxml-model . lsp)

@@ -101,6 +101,10 @@
                                     flycheck-gcc-include-path include-path
                                     flycheck-clang-include-path include-path)
                         ))
+              (lsp-clients-clangd-args . ("--compile-commands-dir=build"
+                                          "--pch-storage=memory"
+                                          "--background-index"
+                                          "-j=4"))
               ))
 
  (latex-mode . (
