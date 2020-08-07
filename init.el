@@ -820,7 +820,7 @@ whitespaces."
   (company-minimum-prefix-length 3 "Small words are faster to type")
   (company-require-match nil)
   (company-selection-wrap-around t)
-  (company-show-numbers t "Speed up completion")
+  (company-show-numbers 'left "Speed up completion")
   :config
   (dolist (backend '(company-eclim company-semantic company-bbdb company-xcode company-oddmuse))
     (delq backend company-backends))
@@ -853,10 +853,6 @@ whitespaces."
   (company-box-show-single-candidate t)
   (company-box-max-candidates 50)
   (company-box-doc-delay 0.2))
-
-(use-package company-elisp
-  :after company
-  :config (push 'company-elisp company-backends))
 
 ;; (dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook))
 ;;   (add-hook hook
@@ -1003,10 +999,10 @@ whitespaces."
    ("<f9>" . counsel-recentf)
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
-   ("C-c C-j" . counsel-semantic-or-imenu)
    ([remap switch-to-buffer] . counsel-switch-buffer)
    ("<f3>" . counsel-switch-buffer)
    ([remap yank-pop] . counsel-yank-pop))
+  :bind* ("C-c C-j" . counsel-semantic-or-imenu)
   :custom
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
@@ -1695,7 +1691,9 @@ whitespaces."
 
 (use-package logview
   :ensure t
-  :custom (logview-cache-filename (expand-file-name "logview-cache.extmap" dotemacs-temp-directory)))
+  :custom
+  (logview-cache-filename (expand-file-name "logview-cache.extmap"
+                                            dotemacs-temp-directory)))
 
 (use-package bison-mode
   :ensure t
@@ -1763,6 +1761,7 @@ whitespaces."
 
 (use-package prettier
   :ensure t
+  :diminish
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   :hook ((markdown-mode gfm-mode) . prettier-mode))
 
@@ -1945,8 +1944,9 @@ whitespaces."
   :ensure t
   :mode "\\.fish\\'"
   :interpreter "fish"
-  :hook (fish.mode . (lambda ()
-                       (add-hook 'before-save-hook #'fish_indent-before-save))))
+  :hook
+  (fish.mode . (lambda ()
+                 (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package fish-completion
   :ensure t
@@ -2157,7 +2157,7 @@ whitespaces."
 
 ;; FIXME: Why moving this to lsp::config does not work?
 (with-eval-after-load 'lsp-mode
-  (dolist (hook '(bibtex-mode c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
+  (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
     (add-hook hook
               (lambda ()
                 (add-hook 'before-save-hook
