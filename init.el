@@ -293,12 +293,12 @@ whitespaces."
 ;;           (lambda ()
 ;;             (setq gc-cons-threshold 800000)))
 
-(setq locale-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-language-environment 'utf-8)
-(set-selection-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
+;; (setq locale-coding-system 'utf-8)
+;; (prefer-coding-system 'utf-8)
+;; (set-keyboard-coding-system 'utf-8)
+;; (set-language-environment 'utf-8)
+;; (set-selection-coding-system 'utf-8)
+;; (set-terminal-coding-system 'utf-8)
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -817,7 +817,7 @@ whitespaces."
   (company-idle-delay 0.0 "Recommended by lsp")
   ;; (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
-  (company-minimum-prefix-length 3 "Small words are faster to type")
+  (company-minimum-prefix-length 2 "Small words are faster to type")
   (company-require-match nil)
   (company-selection-wrap-around t)
   (company-show-numbers 'left "Speed up completion")
@@ -1305,19 +1305,20 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              ;; (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
-              ;;                                                        dotemacs-user-home)
-              ;;             flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
-              ;;                                                            dotemacs-user-home))
-              ;; FIXME: textlint is not working correctly
-              ;; (flycheck-add-next-checker 'grammarly-checker 'textlint)
-              ))
+              (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
+                                                                     dotemacs-user-home)
+                          flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
+                                                                         dotemacs-user-home))
+              (flycheck-add-next-checker 'grammarly-checker 'textlint)))
   (add-hook 'python-mode-hook
             (lambda ()
               ;; (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
               (setq-local flycheck-checker 'python-pylint
                           flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home)
-                          flycheck-python-pylint-executable "python3")))
+                          flycheck-python-pylint-executable "python3"))
+            ;; (with-eval-after-load 'lsp-mode
+            ;;   (flycheck-add-next-checker 'lsp 'python-pylint))
+            )
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
@@ -2062,15 +2063,15 @@ whitespaces."
   ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
-  :hook (((bibtex-mode css-mode html-mode javascript-mode js-mode latex-mode less-mode less-css-mode sass-mode scss-mode tex-mode typescript-mode) . lsp-deferred)
-         (lsp-mode . lsp-enable-which-key-integration)
+  :hook (((bibtex-mode c++-mode css-mode html-mode javascript-mode js-mode latex-mode less-mode less-css-mode sass-mode scss-mode tex-mode typescript-mode) . lsp-deferred)
+         ;; (lsp-mode . lsp-enable-which-key-integration)
          ;; (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          ;; (lsp-mode . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode))
   :custom
   (lsp-clients-clangd-args
    '("-j=2" "--background-index" "--clang-tidy" "--fallback-style=LLVM"
-     "--log=error" "--pretty"))
+     "--log=error"))
   (lsp-completion-provider :capf)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
@@ -2380,6 +2381,7 @@ Increase line spacing by two line height."
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
+  :disabled t ; I do not use it enough
   :hook (after-init . which-key-mode)
   :diminish
   :config (which-key-setup-side-window-right-bottom))
