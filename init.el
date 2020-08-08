@@ -318,7 +318,7 @@ whitespaces."
 (put 'downcase-region 'disabled nil)
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
-  ;; :diminish auto-revert-mode
+  :diminish auto-revert-mode
   :hook ((after-init . global-auto-revert-mode)
          (dired-mode . auto-revert-mode)) ; Auto refresh dired when files change
   :custom
@@ -1077,17 +1077,16 @@ whitespaces."
 
 (use-package ivy-posframe
   :ensure t
+  :diminish
   :hook (ivy-mode . ivy-posframe-mode))
 
 (use-package prescient
   :ensure t
-  :disabled t
   :hook (counsel-mode . prescient-persist-mode)
   :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
 
 (use-package ivy-prescient
   :ensure t
-  :disabled t
   :hook (counsel-mode . ivy-prescient-mode)
   :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
 
@@ -1097,7 +1096,6 @@ whitespaces."
 
 (use-package company-prescient
   :ensure t
-  :disabled t
   :hook (company-mode . company-prescient-mode))
 
 (use-package all-the-icons-ivy-rich

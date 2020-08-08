@@ -3,8 +3,8 @@
 ;; Author: Charl Botha
 ;; Maintainer: Andrew Christianson, Vincent Zhang
 ;; Version: 0.7.0
-;; Package-Requires: ((emacs "26.1") (cl-lib "0.6.1") (lsp-mode "6.0") (conda "0.4"))
-;; Homepage: https://github.com/andrew-christianson/lsp-python-ms
+;; Package-Requires: ((emacs "25.1") (lsp-mode "6.0"))
+;; Homepage: https://github.com/emacs-lsp/lsp-python-ms
 ;; Keywords: languages tools
 
 
@@ -30,15 +30,19 @@
 
 ;;; Code:
 (require 'cl-lib)
-(require 'lsp-mode)
-(require 'json)
-(require 'projectile nil 'noerror)
+(require 'conda nil 'noerror)
 (require 'find-file-in-project nil 'noerror)
+(require 'json)
+(require 'lsp-mode)
+(require 'projectile nil 'noerror)
+
 
 ;; Forward declare functions
+(declare-function conda-env-name-to-dir "ext:conda")
 (declare-function ffip-get-project-root-directory "ext:find-file-in-project")
 
 ;; Forward declare variable
+(defvar conda-env-executables-dir)
 (defvar lsp-render-markdown-markup-content)
 
 ;; Group declaration
@@ -72,18 +76,9 @@ the python on the head of PATH
   :type 'boolean
   :group 'lsp-python-ms)
 
-(defcustom lsp-python-ms-pyright-server-cmd '("pyright-langserver" "--stdio")
-  "command specification for pyright langauge server."
-  :type 'list
-  :group 'lsp-python-ms)
-
-(defcustom lsp-python-ms-use-pyright nil
-  "Use pyright as language server, or as add-on."
-  :type '(radio
-          (const :tag "Off" nil)
-          (const :tag "On" t)
-          (const :tag "Addon" 'addon))
-  :options '(t 'addon)
+(defcustom lsp-python-ms-python-executable nil
+  "Path to specify the Python executable for the Microsoft Python Language Server."
+  :type '(file :must-match t)
   :group 'lsp-python-ms)
 
 (defcustom lsp-python-ms-extra-paths []
@@ -127,12 +122,9 @@ stable, beta or daily."
   :type 'string
   :group 'lsp-python-ms)
 
-(defcustom lsp-python-ms-completion-add-brackets "true"
+(defcustom lsp-python-ms-completion-add-brackets t
   "Whether to add brackets after completion of functions."
-  :type '(choice
-          (const "true")
-          (const "false"))
-  :type 'string
+  :type 'boolean
   :group 'lsp-python-ms)
 
 ;; See https://github.com/microsoft/python-language-server/blob/master/src/Analysis/Ast/Impl/Definitions/AnalysisOptions.cs
@@ -249,7 +241,7 @@ here."
                                 (format "powershell -noprofile -noninteractive \
 -nologo -ex bypass Expand-Archive -path '%s' -dest '%s'" temp-file install-dir))
                                (t (user-error "Unable to extract '%s' to '%s'! \
-Please extract manually." temp-file install-dir)))))
+Please check unzip, powershell or extract manually." temp-file install-dir)))))
 
       (lsp--info "Downloading Microsoft Python Language Server...")
 
@@ -299,51 +291,58 @@ After stopping or killing the process, retry to update."
 
 (defun lsp-python-ms--venv-python (dir)
   "is a directory a virtualenv"
-  (when-let* ((python? (f-expand "bin/python" dir))
-              (python3? (f-expand "bin/python3" dir))
-              (python (cond ((f-executable? python?) python?)
-                            ((f-executable? python3?) python3?)
-                            (t nil)))
-              (not-system (not
-                           (string-equal
-                            (f-parent (f-parent (f-parent python)))
-                            (expand-file-name "~")))))
-    (and not-system python)))
+  (let*
+      ((python? (and t (f-expand "bin/python" dir)))
+       (python3? (and python? (f-expand "bin/python3" dir)))
+       (python (and python3?
+                    (cond ((f-executable? python?) python?)
+                          ((f-executable? python3?) python3?)
+                          (t nil))))
+       (not-system
+        (and python
+             (not (string-equal (f-parent (f-parent (f-parent python)))
+                                (expand-file-name "~"))))))
+    (if not-system
+        (and not-system python))))
 
 (defun lsp-python-ms--dominating-venv-python (&optional dir)
   "Look for directories that look like venvs"
   (let* ((path (or dir default-directory))
          (dominating-venv (locate-dominating-file path #'lsp-python-ms--venv-dir)))
-    (if dominating-venv (lsp-python-ms--venv-python (lsp-python-ms--venv-dir dominating-venv)))))
+    (when dominating-venv
+      (lsp-python-ms--venv-python (lsp-python-ms--venv-dir dominating-venv)))))
 
 (defun lsp-python-ms--dominating-conda-python (&optional dir)
   "locate dominating conda environment"
-  (when-let* ((path (or dir default-directory))
-              (yamls '("environment.yml"
-                       "environment.yaml"
-                       "env.yml"
-                       "env.yaml"
-                       "dev-environment.yml"
-                       "dev-environment.yaml"))
-              (dominating-yaml (seq-map
-                                (lambda (file) (if (locate-dominating-file path file)
-                                                   (expand-file-name file (locate-dominating-file path file))))
-                                yamls))
-              (dominating-yaml-file (car (seq-filter (lambda (file) file) dominating-yaml)))
-              (dominating-conda-name (or (bound-and-true-p conda-env-current-name)
-                                         (conda--get-name-from-env-yml dominating-yaml-file)))
-              (dominating-conda-python (expand-file-name
-                                        (file-name-nondirectory lsp-python-ms-python-executable-cmd)
-                                        (expand-file-name
-                                         conda-env-executables-dir
-                                         (conda-env-name-to-dir dominating-conda-name)))))
-    dominating-conda-python))
+  (let* ((path (or dir default-directory))
+         (yamls (and path
+                     '("environment.yml" "environment.yaml"
+                       "env.yml" "env.yaml" "dev-environment.yml"
+                       "dev-environment.yaml")))
+         (dominating-yaml (and yamls
+                               (seq-map (lambda (file)
+                                          (when (locate-dominating-file path file)
+                                            (expand-file-name file
+                                                              (locate-dominating-file path file))))
+                                        yamls)))
+         (dominating-yaml-file (and dominating-yaml
+                                    (car (seq-filter
+                                          (lambda (file) file) dominating-yaml))))
+         (dominating-conda-name (and dominating-yaml-file
+                                     (fboundp 'conda--get-name-from-env-yml)
+                                     (or (bound-and-true-p conda-env-current-name)
+                                         (conda--get-name-from-env-yml dominating-yaml-file)))))
+    (when dominating-conda-name
+      (expand-file-name
+       (file-name-nondirectory lsp-python-ms-python-executable-cmd)
+       (expand-file-name conda-env-executables-dir
+                         (conda-env-name-to-dir dominating-conda-name))))))
 
 (defun lsp-python-ms--dominating-pyenv-python (&optional dir)
   "locate dominating pyenv-managed python"
   (let ((dir (or dir default-directory)))
-    (and (locate-dominating-file dir ".python-version")
-         (string-trim (shell-command-to-string "pyenv which python")))))
+    (when (locate-dominating-file dir ".python-version")
+      (string-trim (shell-command-to-string "pyenv which python")))))
 
 (defun lsp-python-ms--valid-python (path)
   (and path (f-executable? path) path))
@@ -357,13 +356,13 @@ After stopping or killing the process, retry to update."
     ;; pythons by preference: local pyenv version, local conda version
 
     (if lsp-python-ms-guess-env
-      (cond
-       ( (lsp-python-ms--valid-python venv-python) )
-       ( (lsp-python-ms--valid-python pyenv-python) )
-       ( (lsp-python-ms--valid-python conda-python) )
-       ( (lsp-python-ms--valid-python sys-python) ))
-      (cond
-       ((lsp-python-ms--valid-python sys-python))))))
+        (cond ((lsp-python-ms--valid-python lsp-python-ms-python-executable))
+	          ((lsp-python-ms--valid-python venv-python))
+              ((lsp-python-ms--valid-python pyenv-python))
+              ((lsp-python-ms--valid-python conda-python))
+              ((lsp-python-ms--valid-python sys-python)))
+      (cond ((lsp-python-ms--valid-python sys-python))))))
+
 ;; it's crucial that we send the correct Python version to MS PYLS,
 ;; else it returns no docs in many cases furthermore, we send the
 ;; current Python's (can be virtualenv) sys.path as searchPaths
@@ -372,25 +371,29 @@ After stopping or killing the process, retry to update."
 
 The WORKSPACE-ROOT will be prepended to the list of python search
 paths and then the entire list will be json-encoded."
-  (when-let* ((python (lsp-python-ms-locate-python))
-              (workspace-root (or workspace-root "."))
-              (default-directory workspace-root)
-              (init "from __future__ import print_function; import sys; \
-sys.path = list(filter(lambda p: p != '', sys.path)); import json;")
-              (ver "v=(\"%s.%s\" % (sys.version_info[0], sys.version_info[1]));")
-              (sp (concat "sys.path.insert(0, '" workspace-root "'); p=sys.path;"))
-              (ex "e=sys.executable;")
-              (val "print(json.dumps({\"version\":v,\"paths\":p,\"executable\":e}))"))
-    (with-temp-buffer
-      (call-process python nil t nil "-c" (concat init ver sp ex val))
-      (let* ((json-array-type 'vector)
-             (json-key-type 'string)
-             (json-object-type 'hash-table)
-             (json-string (buffer-string))
-             (json-hash (json-read-from-string json-string)))
-        (list (gethash "version" json-hash)
-              (gethash "paths" json-hash)
-              (gethash "executable" json-hash))))))
+  (let*
+      ((python (and t (lsp-python-ms-locate-python)))
+       (workspace-root (and python (or workspace-root ".")))
+       (default-directory (and workspace-root workspace-root))
+       (init (and default-directory
+                  "from __future__ import print_function; import sys; sys.path = list(filter(lambda p: p != '', sys.path)); import json;"))
+       (ver (and init "v=(\"%s.%s\" % (sys.version_info[0], sys.version_info[1]));"))
+       (sp (and ver (concat "sys.path.insert(0, '" workspace-root "'); p=sys.path;")))
+       (ex (and sp "e=sys.executable;"))
+       (val (and ex "print(json.dumps({\"version\":v,\"paths\":p,\"executable\":e}))")))
+    (when val
+      (with-temp-buffer
+        (call-process python nil t nil "-c"
+                      (concat init ver sp ex val))
+        (let* ((json-array-type 'vector)
+               (json-key-type 'string)
+               (json-object-type 'hash-table)
+               (json-string (buffer-string))
+               (json-hash (json-read-from-string json-string)))
+          (list
+           (gethash "version" json-hash)
+           (gethash "paths" json-hash)
+           (gethash "executable" json-hash)))))))
 
 (defun lsp-python-ms--workspace-root ()
   "Get the path of the root of the current workspace.
@@ -503,130 +506,38 @@ WORKSPACE is just used for logging and _PARAMS is unused."
           (lsp--spinner-stop))))
     (lsp--info "Microsoft Python language server is analyzing...done")))
 
+(lsp-register-custom-settings
+ `(("python.autoComplete.addBrackets" lsp-python-ms-completion-add-brackets t)
+   ("python.analysis.cachingLevel" lsp-python-ms-cache)
+   ("python.analysis.errors" lsp-python-ms-errors)
+   ("python.analysis.warnings" lsp-python-ms-warnings)
+   ("python.analysis.information" lsp-python-ms-information)
+   ("python.analysis.disabled" lsp-python-ms-disabled)
+   ("python.analysis.autoSearchPaths" (lambda () (<= (length lsp-python-ms-extra-paths) 0)) t)
+   ("python.autoComplete.extraPaths" lsp-python-ms-extra-paths)))
+
 (dolist (mode lsp-python-ms-extra-major-modes)
   (add-to-list 'lsp-language-id-configuration `(,mode . "python")))
 
-
-;; pyright we should be able to pass this to the language server as a
-;; configuration change; but pyright doesn't seem to support that as
-;; of this writing. Instead, it queries the _client_ configuration for
-;; these parameters...
-;;
-;; So, we pick the right files out of the hashtable and had those back to the language server
-
-(defun lsp-python-ms-pyright--make-venv-ht (&optional workspace)
-  (let* ((workspace-root (or (when workspace (lsp--workspace-root workspace))
-                             (lsp-python-ms--workspace-root)))
-         (python (lsp-python-ms-locate-python workspace-root))
-         (python-bin (directory-file-name (file-name-directory python)))
-         (python-env-dir (directory-file-name (file-name-directory python-bin)))
-         (python-env (file-name-nondirectory python-env-dir))
-         (ht (ht-create))
-         (pht (ht-create)) ; {pyright: pht}
-         (pyht (ht-create))  ; {python: ptht}
-         (pyaht (ht-create))) ; {python : {analysos: pyaht}}
-    (if (string-match "env" python)
-        (progn
-          (ht-set pyht "venvPath" python-env-dir)
-          (ht-set pht "venv" python-env)))
-    (cl-destructuring-bind (pyver pysyspath pyintpath)
-        (lsp-python-ms--get-python-ver-and-syspath workspace-root)
-      (ht-set pyaht "extraPaths" pysyspath)
-      (ht-set pyht "pythonPath" pyintpath)
-      (ht-set pyaht "logLevel" "trace")
-      (ht-set pht "useLibraryCodeForTypes" t)
-
-      (ht-set ht "python" pyht)
-      (ht-set pyht "analysis" pyaht)
-      (ht-set ht "pyright" pht)
-      ht)))
-(defun lsp-python-ms-pyright--get-local-python-syspath ()
-  (ht-get (ht-get (ht-get (lsp-python-ms-pyright--make-venv-ht) "python") "analysis") "extraPaths"))
-(defun lsp-python-ms-pyright--get-local-python-intpath ()
-  (ht-get (ht-get (lsp-python-ms-pyright--make-venv-ht) "python") "pythonPath"))
-(defun lsp-python-ms-pyright--get-local-python-venvdir ()
-    (ht-get (ht-get (lsp-python-ms-pyright--make-venv-ht) "python") "venvPath"))
-(defun lsp-python-ms-pyright--get-local-python-venv ()
-  (ht-get (ht-get (lsp-python-ms-pyright--make-venv-ht) "pyright") "venv"))
-
-(lsp-register-custom-settings
- `(
-   ;; pyright appears to look for extraPaths in a slightly different
-   ;; section than the main language server.
-   ("python.autoComplete.extraPaths" lsp-python-ms-extra-paths)
-   ("python.analysis.extraPaths" lsp-python-ms-pyright--get-local-python-syspath)
-
-   ("pyright.useLibraryCodeForTypes" t t)
-   ("python.analysis.autoSearchPaths"
-    (lambda () (or (not (not lsp-python-ms-use-pyright))
-                   (<= (length lsp-python-ms-extra-paths) 0))) t)
-   ("python.analysis.autoSearchPaths" t t)
-   ("python.analysis.cachingLevel" lsp-python-ms-cache)
-   ("python.analysis.disabled" lsp-python-ms-disabled)
-   ("python.analysis.errors" lsp-python-ms-errors)
-   ("python.analysis.information" lsp-python-ms-information)
-   ("python.analysis.logLevel" lsp-python-ms-log-level)
-   ("python.analysis.warnings" lsp-python-ms-warnings)
-   ("python.autoComplete.addBrackets" lsp-python-ms-completion-add-brackets)
-   ("python.pythonPath" lsp-python-ms-pyright--get-local-python-intpath)
-   ("python.venv" lsp-python-ms-pyright--get-local-python-venv)
-   ("python.venvPath" lsp-python-ms-pyright--get-local-python-venvdir))
- )
-
-(defun lsp-python-ms--activate-p (filename &optional _)
-  "Should pyright be activated?"
-  (and (or (not lsp-python-ms-use-pyright) (eq lsp-python-ms-use-pyright 'addon))
-       (not (not (eval `(derived-mode-p 'python-mode ,@lsp-python-ms-extra-major-modes))))))
-
-(defun lsp-python-ms--pyright-activate-p (filename &optional _)
-  "Should pyright be activated?"
-  (and lsp-python-ms-use-pyright
-       (not (not (eval `(derived-mode-p 'python-mode ,@lsp-python-ms-extra-major-modes))))))
-
-
-;;;###autoload
-(defun lsp-python-ms-register-clients ()
-  "Register LSP clients"
-
-  (lsp-register-client
-   (make-lsp-client
-    :activation-fn 'lsp-python-ms--activate-p
-    :new-connection (lsp-stdio-connection (lambda () lsp-python-ms-executable)
-                                          (lambda () (f-exists? lsp-python-ms-executable)))
-    :server-id 'mspyls
-    :priority 1
-    :initialization-options 'lsp-python-ms--extra-init-params
-    :notification-handlers (lsp-ht ("python/languageServerStarted" 'lsp-python-ms--language-server-started-callback)
-                                   ("telemetry/event" 'ignore)
-                                   ("python/reportProgress" 'lsp-python-ms--report-progress-callback)
-                                   ("python/beginProgress" 'lsp-python-ms--begin-progress-callback)
-                                   ("python/endProgress" 'lsp-python-ms--end-progress-callback))
-    :initialized-fn (lambda (workspace)
-                      (with-lsp-workspace workspace
-                        (lsp--set-configuration (lsp-configuration-section "python"))))
-    :download-server-fn (lambda (client callback error-callback update?)
-                          (when lsp-python-ms-auto-install-server
-                            (lsp-python-ms--install-server client callback error-callback update?)))))
-  (lsp-register-client
-   (eval `(make-lsp-client
-           :activation-fn 'lsp-python-ms--pyright-activate-p
-           :new-connection (lsp-stdio-connection
-                            (lambda () lsp-python-ms-pyright-server-cmd)
-                            (lambda ()
-                              (and (cl-first lsp-python-ms-pyright-server-cmd)
-                                   (executable-find (cl-first lsp-python-ms-pyright-server-cmd)))))
-           :server-id 'mspyright
-           :multi-root t
-           :add-on? ,(eq lsp-python-ms-use-pyright 'addon)
-           :priority 1
-           :initialized-fn (lambda (workspace)
-                             (with-lsp-workspace workspace
-                               (lsp--set-configuration (lsp-configuration-section "python"))))
-           :notification-handlers (lsp-ht ("pyright/beginProgress" 'ignore)
-                                          ("pyright/reportProgress" 'ignore)
-                                          ("pyright/endProgress" 'ignore))))))
-
-
+(lsp-register-client
+ (make-lsp-client
+  :new-connection (lsp-stdio-connection (lambda () lsp-python-ms-executable)
+                                        (lambda () (f-exists? lsp-python-ms-executable)))
+  :major-modes (append '(python-mode) lsp-python-ms-extra-major-modes)
+  :server-id 'mspyls
+  :priority 1
+  :initialization-options 'lsp-python-ms--extra-init-params
+  :notification-handlers (lsp-ht ("python/languageServerStarted" 'lsp-python-ms--language-server-started-callback)
+                                 ("telemetry/event" 'ignore)
+                                 ("python/reportProgress" 'lsp-python-ms--report-progress-callback)
+                                 ("python/beginProgress" 'lsp-python-ms--begin-progress-callback)
+                                 ("python/endProgress" 'lsp-python-ms--end-progress-callback))
+  :initialized-fn (lambda (workspace)
+                    (with-lsp-workspace workspace
+                      (lsp--set-configuration (lsp-configuration-section "python"))))
+  :download-server-fn (lambda (client callback error-callback update?)
+                        (when lsp-python-ms-auto-install-server
+                          (lsp-python-ms--install-server client callback error-callback update?)))))
 
 (provide 'lsp-python-ms)
 
