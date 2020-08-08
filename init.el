@@ -960,6 +960,8 @@ whitespaces."
   :diminish
   :bind
   (("C-c r" . ivy-resume)
+   ([remap switch-to-buffer] . counsel-switch-buffer)
+   ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
@@ -1006,8 +1008,8 @@ whitespaces."
    ("<f9>" . counsel-recentf)
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
-   ([remap switch-to-buffer] . counsel-switch-buffer)
-   ("<f3>" . counsel-switch-buffer)
+   ;; ([remap switch-to-buffer] . counsel-switch-buffer)
+   ;; ("<f3>" . counsel-switch-buffer)
    ([remap yank-pop] . counsel-yank-pop))
   :bind* ("C-c C-j" . counsel-semantic-or-imenu)
   :custom
@@ -1067,6 +1069,10 @@ whitespaces."
   (defalias 'load-theme 'counsel-load-theme)
   (defalias 'switch-buffer 'counsel-switch-buffer)
   (defalias 'yank-pop 'counsel-yank-pop))
+
+(use-package ivy-posframe
+  :ensure t
+  :hook (ivy-mode . ivy-posframe-mode))
 
 (use-package prescient
   :ensure t
