@@ -638,10 +638,10 @@ whitespaces."
   (dired-recursive-deletes 'always "Single prompt for all n directories"))
 
 (use-package dired-x
-  :custom
-  (dired-omit-verbose nil "Do not show messages when omitting files")
+  :custom (dired-omit-verbose nil "Do not show messages when omitting files")
   :hook (dired-mode . dired-omit-mode)
   ;; :hook (dired-mode . dired-hide-details-mode)
+  :diminish dired-omit-mode
   :bind ("C-x C-j" . dired-jump))
 
 (use-package dired+ ; Do not create multiple dired buffers
@@ -664,6 +664,11 @@ whitespaces."
   :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
+
+(use-package dired-rsync
+  :ensure t
+  :bind (:map dired-mode-map
+              ("C-c C-r" . dired-rsync)))
 
 (use-package treemacs
   :ensure t
