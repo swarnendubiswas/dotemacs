@@ -21,6 +21,7 @@
                                 (locate-dominating-file buffer-file-name
                                                         ".dir-locals.el"))))
          (eval . (flycheck-mode 0)) ; Enable/disable a minor mode
+         (flycheck-disabled-checkes . '(emacs-lisp-checkdoc))
          (eval . (progn
                    (defun my-project-specific-function ()
                      ;; ...

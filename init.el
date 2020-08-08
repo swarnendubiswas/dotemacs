@@ -811,6 +811,7 @@ whitespaces."
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
+  :diminish
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil)
@@ -833,6 +834,12 @@ whitespaces."
               ("C-p" . company-select-previous)
               ("<tab>" . company-complete-common-or-cycle)
               ("M-/" . company-other-backend)))
+
+(use-package company-posframe
+  :ensure t
+  :after company
+  :diminish
+  :hook (global-company-mode . company-posframe-mode))
 
 (use-package company-flx
   :ensure t
@@ -1333,9 +1340,16 @@ whitespaces."
               (setq-local flycheck-checker 'sh-shellcheck)
               (flycheck-add-next-checker 'sh-shellcheck 'sh-bash))))
 
-(use-package flycheck-popup-tip ; Show error messages in popups
-  :ensure t
-  :hook (flycheck-mode . flycheck-popup-tip-mode))
+(or (use-package flycheck-popup-tip ; Show error messages in popups
+      :ensure t
+      :disabled t
+      :hook (flycheck-mode . flycheck-popup-tip-mode))
+
+    (use-package flycheck-posframe
+      :ensure t
+      :after flycheck
+      :hook (flycheck-mode . flycheck-posframe-mode)
+      :config (flycheck-posframe-configure-pretty-defaults)))
 
 (use-package whitespace
   :commands (whitespace-mode global-whitespace-mode)
@@ -2065,8 +2079,8 @@ whitespaces."
   ;;  (tsc . "npm install -g typescript"))
   :hook (((bibtex-mode c++-mode css-mode html-mode javascript-mode js-mode latex-mode less-mode less-css-mode sass-mode scss-mode tex-mode typescript-mode) . lsp-deferred)
          ;; (lsp-mode . lsp-enable-which-key-integration)
-         ;; (lsp-managed-mode . lsp-modeline-diagnostics-mode)
-         ;; (lsp-mode . lsp-headerline-breadcrumb-mode)
+         (lsp-managed-mode . lsp-modeline-diagnostics-mode)
+         ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode))
   :custom
   (lsp-clients-clangd-args
@@ -2111,7 +2125,6 @@ whitespaces."
                       "org.eclipse.lemminx-0.13.1-uber.jar")))
   (lsp-yaml-print-width 100)
   :config
-  ;; (advice-add #'lsp--auto-configure :override #'ignore)
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
                     :major-modes '(python-mode)
@@ -2171,13 +2184,18 @@ whitespaces."
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil)
-  (lsp-ui-sideline-enable nil))
+  (lsp-ui-sideline-enable nil)
+  :bind (:map lsp-ui-mode-map
+              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+              ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
 (use-package lsp-ivy
   :ensure t
   :after lsp
   :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol)
-  :bind ("C-c l s" . lsp-ivy-global-workspace-symbol))
+  :bind
+  (("C-c l g" . lsp-ivy-global-workspace-symbol)
+   ("C-c l w" . lsp-ivy-workspace-symbol)))
 
 (use-package lsp-java
   :ensure t
@@ -2212,7 +2230,7 @@ whitespaces."
                                                (require 'lsp-latex)))
   :custom
   (lsp-latex-bibtex-formatting-line-length 100)
-  ;; (lsp-latex-bibtex-formatting-formatter "latexindent")
+  (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
 
@@ -2425,9 +2443,6 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
     )
   )
 
-(with-eval-after-load "counsel-projectile"
-  (add-to-list 'counsel-projectile-action '("d" sb/open-local-file-projectile "open default file") t))
-
 (defun sb/open-project-default-file1 (filepath)
   (let ((liststring (with-temp-buffer
                       (insert-file-contents filepath)
@@ -2464,5 +2479,8 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
               )
             mylist)))
 ;; (sb/open-project-default-file2)
+
+(with-eval-after-load "counsel-projectile"
+  (add-to-list 'counsel-projectile-action '("d" sb/open-project-default-file2 "open default file") t))
 
 ;;; init.el ends here
