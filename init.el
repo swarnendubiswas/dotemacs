@@ -37,12 +37,14 @@
   "Personal configuration for dotemacs."
   :group 'local)
 
-(defcustom dotemacs-temp-directory (expand-file-name "tmp" user-emacs-directory)
+(defcustom dotemacs-temp-directory (expand-file-name "tmp"
+                                                     user-emacs-directory)
   "Storage location for various configuration files."
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-extras-directory (expand-file-name "extras" user-emacs-directory)
+(defcustom dotemacs-extras-directory (expand-file-name "extras"
+                                                       user-emacs-directory)
   "Path for third-party packages and files."
   :type 'string
   :group 'dotemacs)
@@ -50,7 +52,8 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
-(defcustom dotemacs-emacs-custom-file (expand-file-name "custom.el" dotemacs-temp-directory)
+(defcustom dotemacs-emacs-custom-file (expand-file-name "custom.el"
+                                                        dotemacs-temp-directory)
   "File to write Emacs customizations."
   :type 'string
   :group 'dotemacs)
@@ -299,6 +302,22 @@ whitespaces."
 ;; (set-language-environment 'utf-8)
 ;; (set-selection-coding-system 'utf-8)
 ;; (set-terminal-coding-system 'utf-8)
+
+;; Scrolling: from Doom Emacs
+(setq hscroll-margin 2
+      hscroll-step 1
+      ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N
+      ;; lines past window edges (where N is the settings of `scroll-conservatively'). This is
+      ;; especially slow in larger files during large-scale scrolling commands. If kept over 100,
+      ;; the window is never automatically recentered.
+      scroll-conservatively 101
+      scroll-margin 0
+      scroll-preserve-screen-position t
+      ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines.
+      auto-window-vscroll nil
+      ;; mouse
+      mouse-wheel-scroll-amount '(5 ((shift) . 2))
+      mouse-wheel-progressive-speed nil)  ; don't accelerate scrolling
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -933,19 +952,6 @@ whitespaces."
 
 (use-package ivy
   :ensure t
-  ;; :custom-face
-  ;; (ivy-action ((t (:inherit font-lock-builtin-face :height 1.0))))
-  ;; (ivy-completions-annotations ((t (:inherit completions-annotations :height 1.0))))
-  ;; (ivy-current-match ((t (:extend t :background "#1a4b77" :foreground "white" :height 1.0))))
-  ;; (ivy-cursor ((t (:background "black" :foreground "white" :height 1.0))))
-  ;; (ivy-highlight-face ((t (:inherit highlight :height 1.0))))
-  ;; (ivy-minibuffer-match-face-1 ((t (:background "#d3d3d3" :height 1.0))))
-  ;; (ivy-minibuffer-match-face-2 ((t (:background "#e99ce8" :weight bold :height 1.0))))
-  ;; (ivy-minibuffer-match-face-3 ((t (:background "#bbbbff" :weight bold :height 1.0))))
-  ;; (ivy-minibuffer-match-face-4 ((t (:background "#ffbbff" :weight bold :height 1.0))))
-  ;; (ivy-minibuffer-match-highlight ((t (:inherit highlight :height 1.0))))
-  ;; (ivy-modified-buffer ((t (:inherit default :height 1.0))))
-  ;; (ivy-prompt-match ((t (:inherit ivy-current-match :height 1.0))))
   :custom
   (completion-in-region-function #'ivy-completion-in-region)
   (ivy-case-fold-search 'always "Always ignore case while searching")
@@ -1293,6 +1299,7 @@ whitespaces."
   ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   )
 
+;; FIXME: counsel-projectile is not working
 (use-package counsel-projectile
   :ensure t
   :hook (counsel-mode . counsel-projectile-mode)
@@ -1634,7 +1641,8 @@ whitespaces."
 (use-package persistent-scratch
   :ensure t
   :hook (after-init . persistent-scratch-setup-default)
-  :custom (persistent-scratch-save-file (expand-file-name "persistent-scratch" dotemacs-temp-directory)))
+  :custom (persistent-scratch-save-file (expand-file-name "persistent-scratch"
+                                                          dotemacs-temp-directory)))
 
 (use-package crux
   :ensure t
@@ -1689,7 +1697,9 @@ whitespaces."
   (avy-setup-default))
 
 (use-package bookmark
-  :custom (bookmark-default-file (expand-file-name "bookmarks" dotemacs-temp-directory)))
+  :custom
+  (bookmark-default-file (expand-file-name "bookmarks"
+                                           dotemacs-temp-directory)))
 
 (use-package bm
   :ensure t
@@ -1719,8 +1729,9 @@ whitespaces."
   :ensure t
   :hook (text-mode . (lambda()
                        (require 'langtool)))
-  :custom (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
-                                                        dotemacs-user-home)))
+  :custom
+  (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
+                                                dotemacs-user-home)))
 
 (use-package logview
   :ensure t
@@ -1782,7 +1793,9 @@ whitespaces."
   :init
   (dolist (hook '(markdown-mode-hook gfm-mode-hook))
     (add-hook hook #'prettier-js-mode))
-  :custom (prettier-js-args (list "--config" (expand-file-name ".prettierrc" dotemacs-user-home))))
+  :custom
+  (prettier-js-args (list "--config" (expand-file-name ".prettierrc"
+                                                       dotemacs-user-home))))
 
 (use-package add-node-modules-path
   :ensure t
@@ -1932,9 +1945,7 @@ whitespaces."
 
 (use-package python
   :hook (python-mode . lsp)
-  :init
-  ;; Disable readline based native completion
-  (setq python-shell-completion-native-enable nil)
+  :init (setq python-shell-completion-native-enable nil)  ; Disable readline based native completion
   :config
   (setq python-shell-interpreter "python3"
         auto-mode-alist (append '(("SConstruct\\'" . python-mode)
@@ -2009,9 +2020,12 @@ whitespaces."
   (magit-completing-read-function 'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (magit-save-repository-buffers t)
-  (transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory))
-  (transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory))
-  (transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory))
+  (transient-history-file (expand-file-name "transient/history.el"
+                                            dotemacs-temp-directory))
+  (transient-levels-file (expand-file-name "transient/levels.el"
+                                           dotemacs-temp-directory))
+  (transient-values-file (expand-file-name "transient/values.el"
+                                           dotemacs-temp-directory))
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide) (unpushed . show))))
 
@@ -2030,14 +2044,6 @@ whitespaces."
   :bind (("C-x p" . git-gutter:previous-hunk)
          ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode))
-
-;; git-gutter seems to provide similar features
-(use-package diff-hl
-  :ensure t
-  :disabled t
-  :hook ((after-init . global-diff-hl-mode)
-         (magit-pre-refresh . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh)))
 
 (setq smerge-command-prefix "\C-c v")
 
@@ -2101,9 +2107,8 @@ whitespaces."
          ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode))
   :custom
-  (lsp-clients-clangd-args
-   '("-j=2" "--background-index" "--clang-tidy" "--fallback-style=LLVM"
-     "--log=error"))
+  (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy"
+                             "--fallback-style=LLVM" "--log=error"))
   (lsp-completion-provider :capf)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
