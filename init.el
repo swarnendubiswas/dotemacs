@@ -641,8 +641,12 @@ whitespaces."
   :custom (dired-omit-verbose nil "Do not show messages when omitting files")
   :hook (dired-mode . dired-omit-mode)
   ;; :hook (dired-mode . dired-hide-details-mode)
-  :diminish dired-omit-mode
-  :bind ("C-x C-j" . dired-jump))
+  :bind ("C-x C-j" . dired-jump)
+  :config
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Make sure to remove \"Omit\" from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map))
 
 (use-package dired+ ; Do not create multiple dired buffers
   :load-path "extras"
@@ -780,7 +784,6 @@ whitespaces."
   :ensure t
   :bind ("<f8>" . deadgrep))
 
-;; FIXME: Ignore remote files.
 (use-package recentf
   :custom
   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
@@ -1301,7 +1304,13 @@ whitespaces."
   (counsel-projectile-sort-buffers t)
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
-         ("<f7>" . counsel-projectile-rg)))
+         ("<f7>" . counsel-projectile-rg)
+         ([remap projectile-ag] . counsel-projectile-ag)
+         ([remap projectile-find-dir] . counsel-projectile-find-dir)
+         ([remap projectile-find-file] . counsel-projectile-find-file)
+         ([remap projectile-grep] . counsel-projectile-grep)
+         ([remap projectile-switch-project] . counsel-projectile-switch-project)
+         ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)))
 
 (use-package flycheck-grammarly
   :ensure t
@@ -2102,6 +2111,7 @@ whitespaces."
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
+  (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-end-with-newline t)
@@ -2408,10 +2418,13 @@ Increase line spacing by two line height."
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  :disabled t ; I do not use it enough
   :hook (after-init . which-key-mode)
   :diminish
-  :config (which-key-setup-side-window-right-bottom))
+  :config
+  (which-key-setup-side-window-right-bottom)
+  (use-package which-key-posframe
+    :ensure t
+    :hook (which-key-mode . which-key-posframe-mode)))
 
 ;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 ;; (use-package server

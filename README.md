@@ -142,7 +142,7 @@ Please check `init.el` for other options.
 
 ## Browsing Source Code
 
-Support for `LSP` protocol in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are currently not yet supported by the `lsp` mode or you cannot create a compilation database.
+Support for `LSP` protocol in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by the `lsp` mode or you cannot create a compilation database.
 
 ### GNU Global
 
@@ -278,4 +278,4 @@ StartupWMClass=Emacs
 ## TODO
 
 - Use custom major modes for files by names
-- Sort files alphabetically with counsel and projectile (use `ivy-sort-functions-alist`).
+- Sort files alphabetically with counsel and projectile (use `ivy-sort-functions-alist`)
