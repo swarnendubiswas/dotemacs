@@ -1,5 +1,4 @@
 #name: use-package
-#key: use-package
 #key: pkg
 # --
 (use-package MODULE$0)

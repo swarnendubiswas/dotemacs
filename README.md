@@ -14,7 +14,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-You can use the following instructions to install a few third-party applications. These should work on an Ubuntu 18.04 distribution.
+You can use the following instructions to install third-party applications. These should work on an Ubuntu 18.04 distribution.
 
 #### Ubuntu Packages
 

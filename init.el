@@ -1199,7 +1199,9 @@ whitespaces."
   :ensure t
   :diminish
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
-  :custom (aggressive-indent-dont-electric-modes t))
+  :custom
+  (aggressive-indent-comments-too t)
+  (aggressive-indent-dont-electric-modes t))
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
@@ -1329,6 +1331,7 @@ whitespaces."
   :ensure t
   :hook (after-init . global-flycheck-mode)
   :custom
+  (flycheck-display-errors-delay 0)
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-indication-mode 'left-margin)
   :config
@@ -1337,10 +1340,11 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
-                                                                     dotemacs-user-home)
-                          flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
-                                                                         dotemacs-user-home))
+              (setq-local
+               flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
+                                                          dotemacs-user-home)
+               flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
+                                                              dotemacs-user-home))
               (flycheck-add-next-checker 'grammarly-checker 'textlint)))
   (add-hook 'python-mode-hook
             (lambda ()
@@ -1363,7 +1367,10 @@ whitespaces."
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck)
-              (flycheck-add-next-checker 'sh-shellcheck 'sh-bash))))
+              (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+  ;; Workaround for eslint loading slow
+  ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
+  (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t)))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
@@ -1374,6 +1381,7 @@ whitespaces."
       :ensure t
       :after flycheck
       :hook (flycheck-mode . flycheck-posframe-mode)
+      :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults)))
 
 (use-package whitespace
@@ -1439,16 +1447,17 @@ whitespaces."
   :bind ("C-c d t" . counsel-tramp)
   :config
   (defalias 'tramp 'counsel-tramp)
-  (add-hook 'counsel-tramp-pre-command-hook
-            (lambda ()
-              (global-aggressive-indent-mode -1)
-              (projectile-mode -1)
-              (counsel-projectile-mode -1)))
-  (add-hook 'counsel-tramp-quit-hook
-            (lambda ()
-              (global-aggressive-indent-mode 1)
-              (projectile-mode 1)
-              (counsel-projectile-mode 1))))
+  ;; (add-hook 'counsel-tramp-pre-command-hook
+  ;;           (lambda ()
+  ;;             (global-aggressive-indent-mode -1)
+  ;;             (projectile-mode -1)
+  ;;             (counsel-projectile-mode -1)))
+  ;; (add-hook 'counsel-tramp-quit-hook
+  ;;           (lambda ()
+  ;;             (global-aggressive-indent-mode 1)
+  ;;             (projectile-mode 1)
+  ;;             (counsel-projectile-mode 1)))
+  )
 
 (use-package imenu
   :custom
@@ -1951,6 +1960,9 @@ whitespaces."
         auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
                                 auto-mode-alist)))
+
+(setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
+                              auto-mode-alist))
 
 (use-package pyvenv
   :ensure t
