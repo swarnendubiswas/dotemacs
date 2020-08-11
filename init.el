@@ -866,6 +866,7 @@ whitespaces."
   :ensure t
   :after company
   :diminish
+  :disabled t
   :hook (global-company-mode . company-posframe-mode))
 
 (use-package company-flx
@@ -878,12 +879,11 @@ whitespaces."
 
 (use-package company-box
   :ensure t
-  :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
   :custom
-  ;; (company-box-backends-colors nil)
+  (company-box-backends-colors nil)
   (company-box-show-single-candidate t)
   (company-box-max-candidates 50)
   (company-box-doc-delay 0.2))
@@ -1087,6 +1087,7 @@ whitespaces."
 (use-package ivy-posframe
   :ensure t
   :diminish
+  :disabled t
   :hook (ivy-mode . ivy-posframe-mode))
 
 (use-package prescient
@@ -2196,6 +2197,13 @@ whitespaces."
                     :major-modes '(tex-mode latex-mode bibtex-mode)
                     :remote? t
                     :server-id 'texlab-remote))
+
+  (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (add-hook 'before-save-hook
+                          (lambda ()
+                            (lsp-format-buffer)) nil t))))
   :bind (("M-." . lsp-find-definition)
          ;; ("M-," . pop-tag-mark)
          ("C-c l i" . lsp-goto-implementation)
@@ -2205,14 +2213,15 @@ whitespaces."
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)))
 
-;; FIXME: Why moving this to lsp::config does not work?
-(with-eval-after-load 'lsp-mode
-  (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
-    (add-hook hook
-              (lambda ()
-                (add-hook 'before-save-hook
-                          (lambda ()
-                            (lsp-format-buffer)) nil t)))))
+;; ;; FIXME: Why moving this to lsp::config does not work?
+;; (with-eval-after-load 'lsp-mode
+;;   (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
+;;     (add-hook hook
+;;               (lambda ()
+;;                 (add-hook 'before-save-hook
+;;                           (lambda ()
+;;                             (lsp-format-buffer)) nil t)))))
+
 
 (use-package lsp-ui
   :ensure t

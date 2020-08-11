@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# Helper script to install GNU Emacs if not already present. It also sets up packages related to my setup.
+# Helper script to install GNU Emacs if not already present. It also sets up packages related to my
+# setup.
 
 set -eux
 
 if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root!"
-    exit 1
+  echo "This script must be run as root!"
+  exit 1
 fi
 
 DISTRO=$(lsb_release -is)
@@ -21,101 +22,100 @@ EMACSD="$HOME/.emacs.d"
 cd "$HOME"
 
 if [ ! -d "$GITHUB" ]; then
-    mkdir -p github
+  mkdir -p github
 fi
 
 cd "$GITHUB"
 
 if [ -d "$DOTEMACS" ]; then
-    cd "$DOTEMACS"
-    echo "Pulling dotemacs repository from Github..."
-    git pull
+  cd "$DOTEMACS"
+  echo "Pulling dotemacs repository from Github..."
+  git pull
 else
-    echo "Cloning dotemacs repository from Github..."
-    git clone https://github.com/swarnendubiswas/dotemacs.git
+  echo "Cloning dotemacs repository from Github..."
+  git clone https://github.com/swarnendubiswas/dotemacs.git
 fi
 echo "...Done"
 
 if [ -d "$DOTFILES" ]; then
-    cd "$DOTFILES"
-    echo "Pulling dotfiles repository from Github..."
-    git pull
+  cd "$DOTFILES"
+  echo "Pulling dotfiles repository from Github..."
+  git pull
 else
-    echo "Cloning dotfiles repository from Github..."
-    git clone https://github.com/swarnendubiswas/dotfiles.git
+  echo "Cloning dotfiles repository from Github..."
+  git clone https://github.com/swarnendubiswas/dotfiles.git
 fi
 echo "...Done"
 
 cd "$HOME"
 
 if [ -d "$EMACSD" ]; then
-    if [ ! -L "$EMACSD" ]; then
-        ln -s "$DOTEMACS" "$EMACSD"
-    fi
+  if [ ! -L "$EMACSD" ]; then
+    ln -s "$DOTEMACS" "$EMACSD"
+  fi
 fi
 
 if [ ! -L ".markdownlint.json" ]; then
-    echo "Creating symlink for .markdownlint.json..."
-    ln -s "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
+  echo "Creating symlink for .markdownlint.json..."
+  ln -s "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
 else
-    echo "Overwriting symlink for .markdownlint.json..."
-    ln -nsf "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
+  echo "Overwriting symlink for .markdownlint.json..."
+  ln -nsf "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
 fi
 echo "...Done"
 
 if [ ! -d "$HOME/.config" ]; then
-    mkdir -p "$HOME/.config"
+  mkdir -p "$HOME/.config"
 fi
 
 cd "$HOME/.config"
 
 if [ ! -L "pylintrc" ]; then
-    echo "Creating symlink for pylintrc..."
-    ln -s "$DOTFILES/dotconfig/pylintrc" .
+  echo "Creating symlink for pylintrc..."
+  ln -s "$DOTFILES/dotconfig/pylintrc" .
 else
-    echo "Overwriting symlink for pylintrc..."
-    ln -nsf "$DOTFILES/dotconfig/pylintrc" .
+  echo "Overwriting symlink for pylintrc..."
+  ln -nsf "$DOTFILES/dotconfig/pylintrc" .
 fi
 echo "...Done"
 
 if [ -d "yapf" ]; then
-    if [ ! -L "yapf" ]; then
-        echo "$HOME/.config/yapf present and is not a symlink!"
-    else
-        echo "Overwriting symlink for yapf..."
-        ln -nsf "$DOTFILES/dotconfig/yapf" .
-    fi
-else
-    echo "Creating symlink for yapf..."
+  if [ ! -L "yapf" ]; then
+    echo "$HOME/.config/yapf present and is not a symlink!"
+  else
+    echo "Overwriting symlink for yapf..."
     ln -nsf "$DOTFILES/dotconfig/yapf" .
+  fi
+else
+  echo "Creating symlink for yapf..."
+  ln -nsf "$DOTFILES/dotconfig/yapf" .
 fi
 echo "...Done"
 
 case "$DIST_VERSION" in
-    Ubuntu_16.04)
-        add-apt-repository ppa:ubuntu-toolchain-r/test
-        apt-get update
-        apt install -y gcc-7 g++-7
-        ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+  Ubuntu_16.04)
+    add-apt-repository ppa:ubuntu-toolchain-r/test
+    apt-get update
+    apt install -y gcc-7 g++-7
+    ;;
+  *)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
 
 # Check if LLVM 10 is installed
 LLVM_VERSION="-10"
 
 case "$DIST_VERSION" in
-    Ubuntu_16.04) REPO_NAME="deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial$LLVM_VERSION  main" ;;
-    Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
-    Ubuntu_18.10) REPO_NAME="deb http://apt.llvm.org/cosmic/   llvm-toolchain-cosmic$LLVM_VERSION  main" ;;
-    Ubuntu_19.04) REPO_NAME="deb http://apt.llvm.org/disco/    llvm-toolchain-disco$LLVM_VERSION   main" ;;
-    Ubuntu_19.10) REPO_NAME="deb http://apt.llvm.org/eoan/     llvm-toolchain-eoan$LLVM_VERSION    main" ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+  Ubuntu_16.04) REPO_NAME="deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial$LLVM_VERSION  main" ;;
+  Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
+  Ubuntu_19.04) REPO_NAME="deb http://apt.llvm.org/disco/    llvm-toolchain-disco$LLVM_VERSION   main" ;;
+  Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal$LLVM_VERSION    main" ;;
+  *)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
 
 # REPO_NAME="deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic$LLVM_VERSION  main"
