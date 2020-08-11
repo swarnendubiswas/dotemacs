@@ -2406,6 +2406,37 @@ Increase line spacing by two line height."
               :action #'find-file
               :caller 'sb/counsel-all-files-recursively)))
 
+;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
+(defcustom sb/skippable-buffers
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*prettier (local)*" "*Packages*")
+  "Buffer names ignored by `sb/next-buffer' and `sb/previous-buffer'."
+  :type '(repeat string))
+
+(defun sb/change-buffer (change-buffer)
+  "Call CHANGE-BUFFER until current buffer is not in `sb/skippable-buffers'."
+  (let ((initial (current-buffer)))
+    (funcall change-buffer)
+    (let ((first-change (current-buffer)))
+      (catch 'loop
+        (while (member (buffer-name) sb/skippable-buffers)
+          (funcall change-buffer)
+          (when (eq (current-buffer) first-change)
+            (switch-to-buffer initial)
+            (throw 'loop t)))))))
+
+(defun sb/next-buffer ()
+  "Variant of `next-buffer' that skips `sb/skippable-buffers'."
+  (interactive)
+  (sb/change-buffer 'next-buffer))
+
+(defun sb/previous-buffer ()
+  "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
+  (interactive)
+  (sb/change-buffer 'previous-buffer))
+
+(global-set-key [remap next-buffer] 'sb/next-buffer)
+(global-set-key [remap previous-buffer] 'sb/previous-buffer)
+
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
 ;; available bindings in a buffer. Use `M-x describe-personal-keybindings` to see modifications.
 
