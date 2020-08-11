@@ -43,3 +43,5 @@
 - "Emacs is to man what maternity is to a woman. From a philosophical and doctrinal viewpoint, I do not believe in perpetual peace."
 
 - "Give me six hours to finish a task and I will spend the first four making sure I have tweaked my emacs config to handle the task."
+
+- "There are no bad Emacs configurations, only poor applications of them."

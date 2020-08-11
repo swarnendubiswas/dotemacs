@@ -146,6 +146,10 @@ whitespaces."
 (defconst dotemacs-emacs28+ (> emacs-major-version 27))
 (defconst dotemacs-is-linux (eq system-type 'gnu/linux))
 
+;; Silence free variable warnings
+(defvar apropos-do-all)
+(defvar tags-revert-without-query)
+
 (eval-when-compile
   (require 'package)
   (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
@@ -846,11 +850,11 @@ whitespaces."
   ;; (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 2 "Small words are faster to type")
-  (company-require-match nil)
+  (company-require-match nil "Allow input string that do not match candidates")
   (company-selection-wrap-around t)
   (company-show-numbers 'left "Speed up completion")
   :config
-  (dolist (backend '(company-eclim company-semantic company-bbdb company-xcode company-oddmuse))
+  (dolist (backend '(company-semantic company-bbdb company-oddmuse))
     (delq backend company-backends))
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
@@ -2256,15 +2260,14 @@ whitespaces."
                           (lsp-format-buffer)) nil t))))
 
 (use-package lsp-python-ms
-  :disabled t
-  :load-path "extras"
+  :ensure t
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp-deferred))))
 
 (use-package lsp-pyright
-  :load-path "extras"
+  :ensure t
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
                          (lsp-deferred))))
