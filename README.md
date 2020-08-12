@@ -278,4 +278,4 @@ StartupWMClass=Emacs
 ## TODO
 
 - Use custom major modes for files by names
-- Sort files alphabetically with counsel and projectile (use `ivy-sort-functions-alist`)
+- Open a default file in a `projectile` project

@@ -330,7 +330,8 @@ whitespaces."
 (diminish 'auto-fill-function) ; Not a library/file, so eval-after-load does not work
 (global-prettify-symbols-mode -1) ; Makes it difficult to edit the buffer
 (minibuffer-depth-indicate-mode 1)
-(transient-mark-mode 1) ; Enable visual feedback on selections, default since v23
+;; Enable visual feedback on selections, mark follows the point
+(transient-mark-mode 1)
 
 ;; Do not disable narrowing commands
 (put 'narrow-to-region 'disabled nil)
@@ -697,6 +698,10 @@ whitespaces."
   :bind (:map dired-mode-map
               ("C-c C-r" . dired-rsync)))
 
+(use-package async
+  :ensure t
+  :config (dired-async-mode))
+
 (use-package treemacs
   :ensure t
   :disabled t
@@ -870,7 +875,6 @@ whitespaces."
   :ensure t
   :after company
   :diminish
-  :disabled t
   :hook (global-company-mode . company-posframe-mode))
 
 (use-package company-flx
@@ -1643,6 +1647,21 @@ whitespaces."
 (use-package expand-line
   :ensure t
   :bind ("M-i" . turn-on-expand-line-mode))
+
+(use-package undo-tree
+  :ensure t
+  :defines undo-tree-map
+  :custom
+  (undo-tree-mode-lighter "")
+  (undo-tree-visualizer-timestamps t)
+  (undo-tree-visualizer-relative-timestamps t)
+  (undo-tree-auto-save-history nil)
+  (undo-tree-visualizer-diff t)
+  :config
+  (global-undo-tree-mode 1)
+  (unbind-key "C-/" undo-tree-map)
+  :diminish
+  :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
