@@ -56,7 +56,7 @@ npm install --save-dev npm eslint js-yaml less jsonlint bash-language-server vsc
 npm update
 ```
 
-Install `textlint` separately so that the installation can be shared by other editors.
+Install `textlint` separately so that the installation is shared by other editors.
 
 ```Bash
 cd $HOME/tmp; mkdir textlint-workspace; cd ;
@@ -229,7 +229,7 @@ ctags -eR --languages=Python
 
 ### Use GNU Global with Universal Ctags support
 
-GNU Global has better database search support while Universal Ctags supports more languages. It is possible to build Global with support for Universal Ctags.
+GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
 
 - <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
 - <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>

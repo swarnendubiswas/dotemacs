@@ -1316,10 +1316,10 @@ whitespaces."
   :hook (counsel-mode . counsel-projectile-mode)
   :custom
   (counsel-projectile-remove-current-buffer t)
-  (counsel-projectile-sort-projects t)
-  (counsel-projectile-sort-files t)
-  (counsel-projectile-sort-directories t)
   (counsel-projectile-sort-buffers t)
+  (counsel-projectile-sort-directories t)
+  (counsel-projectile-sort-files t)
+  (counsel-projectile-sort-projects t)
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-rg)
@@ -1349,11 +1349,10 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              (setq-local
-               flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
-                                                          dotemacs-user-home)
-               flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
-                                                              dotemacs-user-home))
+              (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
+                                                                     dotemacs-user-home)
+                          flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
+                                                                         dotemacs-user-home))
               (flycheck-add-next-checker 'grammarly-checker 'textlint)))
   (add-hook 'python-mode-hook
             (lambda ()
