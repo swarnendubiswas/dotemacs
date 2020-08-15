@@ -146,9 +146,10 @@ whitespaces."
 (defconst dotemacs-emacs28+ (> emacs-major-version 27))
 (defconst dotemacs-is-linux (eq system-type 'gnu/linux))
 
-;; Silence free variable warnings
+;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
 (defvar tags-revert-without-query)
+(defvar use-package-enable-imenu-support)
 
 (eval-when-compile
   (require 'package)
@@ -164,7 +165,6 @@ whitespaces."
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-(defvar use-package-enable-imenu-support) ; Silence "assignment to free variable" warning
 (setq use-package-enable-imenu-support t) ; Need to set before loading use-package
 (eval-when-compile
   (require 'use-package))
@@ -2219,7 +2219,6 @@ whitespaces."
                     :major-modes '(tex-mode latex-mode bibtex-mode)
                     :remote? t
                     :server-id 'texlab-remote))
-
   (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
     (add-hook hook
               (lambda ()
