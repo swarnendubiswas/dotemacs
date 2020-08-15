@@ -491,7 +491,10 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
                                              :ensure t
-                                             :init (load-theme 'modus-operandi t)))
+                                             :init (load-theme 'modus-operandi t)
+                                             :custom
+                                             (modus-operandi-theme-proportional-fonts t)
+                                             (modus-operandi-theme-scale-headings t)))
 
       ((eq dotemacs-theme 'default) (progn
                                       (setq frame-background-mode 'light)
@@ -1868,35 +1871,6 @@ whitespaces."
   :ensure t
   :mode ("\\.smt\\'" . z3-smt2-mode))
 
-(use-package ivy-bibtex
-  :ensure t
-  :bind ("C-c x b" . ivy-bibtex)
-  :config
-  (use-package bibtex-completion
-    :custom
-    (bibtex-completion-cite-prompt-for-optional-arguments nil)
-    (bibtex-completion-cite-default-as-initial-input t)
-    (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:10} ${=type=:10}"))))
-  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
-
-(use-package company-auctex
-  :after (company latex))
-
-;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-;; (defun sb/save-buffer-and-run-latexmk ()
-;;   "Save the current buffer and run LaTeXMk also."
-;;   (interactive)
-;;   (require 'tex-buf)
-;;   (let ((process (TeX-active-process))) (if process (delete-process process)))
-;;   (let ((TeX-save-query nil)) (TeX-save-document ""))
-;;   (TeX-command-menu "LaTeXMk"))
-;; (add-hook 'LaTeX-mode-hook
-;;           (lambda ()
-;;             (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
-;; (add-hook 'latex-mode-hook
-;;           (lambda ()
-;;             (local-set-key (kbd "C-c x c") #'sb/save-buffer-and-run-latexmk)))
-
 (use-package make-mode
   :mode (("\\Makefile\\'" . makefile-mode)
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
@@ -2136,7 +2110,7 @@ whitespaces."
   ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
-  :hook (((bibtex-mode c++-mode css-mode html-mode javascript-mode js-mode latex-mode less-mode less-css-mode sass-mode scss-mode tex-mode typescript-mode) . lsp-deferred)
+  :hook (((c++-mode css-mode html-mode javascript-mode js-mode less-mode less-css-mode sass-mode scss-mode typescript-mode) . lsp-deferred)
          ;; (lsp-mode . lsp-enable-which-key-integration)
          (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
@@ -2214,12 +2188,12 @@ whitespaces."
                     :major-modes '(js-mode)
                     :remote? t
                     :server-id 'typescript-remote))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
-                    :major-modes '(tex-mode latex-mode bibtex-mode)
-                    :remote? t
-                    :server-id 'texlab-remote))
-  (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
+  ;;                   :major-modes '(tex-mode latex-mode bibtex-mode)
+  ;;                   :remote? t
+  ;;                   :server-id 'texlab-remote))
+  (dolist (hook '(c++-mode-hook python-mode-hook))
     (add-hook hook
               (lambda ()
                 (add-hook 'before-save-hook
@@ -2289,15 +2263,25 @@ whitespaces."
                          (require 'lsp-pyright)
                          (lsp-deferred))))
 
+;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue
+;; to use AucTeX support
 (use-package lsp-latex
   :ensure t
+  :after lsp
+  :disabled t
   :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
+                                               (lsp-deferred)
                                                (require 'lsp-latex)))
   :custom
   (lsp-latex-bibtex-formatting-line-length 100)
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
+
+(use-package latex-init
+  :load-path "extras"
+  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                          (require 'latex-init))))
 
 (use-package mlir-mode
   :load-path "extras"
@@ -2569,9 +2553,10 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
                             (when (eq (car elem) 'dotemacs-projectile-default-file)
                               (let ((default-file (expand-file-name (cdr elem) (projectile-project-root))))
                                 (when (f-exists? default-file)
-                                  (let ((new-buffer (get-buffer-create default-file)))
-                                    (switch-to-buffer new-buffer)
-                                    (insert-file-contents default-file))))))
+                                  ;; (let ((new-buffer (get-buffer-create default-file)))
+                                  ;;   (switch-to-buffer new-buffer)
+                                  ;;   (insert-file-contents default-file))
+                                  (find-file default-file)))))
                           nillist)
                   )
                 )
