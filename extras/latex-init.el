@@ -23,6 +23,7 @@
       ;; don't start the emacs server when correlating sources
       TeX-source-correlate-start-server nil
       TeX-syntactic-comment t
+      LaTeX-item-indent 0 ; Two spaces + Extra indentation
       LaTeX-syntactic-comments t
       ;; Don't insert line-break at inline math
       LaTeX-fill-break-at-separators nil)
@@ -113,25 +114,7 @@
 ;; (with-eval-after-load 'reftex
 ;;     (reftex-add-all-bibitems-from-bibtex))
 
-;; (use-package reftex
-;;   :diminish
-;;   ;; :commands (reftex-citation)
-;;   ;; :hook (LaTeX-mode . reftex-mode)
-;;   :config
-;;   (setq reftex-plug-into-AUCTeX t
-;;         reftex-insert-label-flags '(t t)
-;;         reftex-cite-format 'abbrv
-;;         reftex-save-parse-info t
-;;         reftex-use-multiple-selection-buffers t
-;;         reftex-auto-update-selection-buffers t
-;;         reftex-enable-partial-scans t
-;;         reftex-allow-automatic-rescan t
-;;         reftex-idle-time 0.5
-;;         reftex-toc-follow-mode t
-;;         reftex-use-fonts t
-;;         reftex-use-external-file-finders t
-;;         reftex-highlight-selection 'both)
-;;   :config (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
 
 (setq bibtex-align-at-equal-sign t)
 
@@ -188,48 +171,9 @@
         ("C-c l n" . bib-find-next)
         ("C-c l h" . bib-highlight-mouse)))
 
-;; (use-package tex-smart-umlauts
-;;   :ensure t
-;;   :init (add-hook 'LaTeX-mode-hook #'tex-smart-umlauts-mode))
-
 (use-package company-bibtex
   :ensure t
   :init (add-to-list 'company-backends 'company-bibtex))
-
-;; ;; https://rtime.felk.cvut.cz/~sojka/blog/compile-on-save/
-;; ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-;; (add-hook 'after-save-hook
-;;           (lambda ()
-;;             (when (string= major-mode "latex-mode")
-;;               (TeX-command-menu "LaTeXMk")
-;;               (revert-buffer :ignore-auto :noconfirm)
-;;               (find-alternate-file (current-buffer)))))
-
-;; (add-hook 'after-save-hook
-;;           (lambda ()
-;;             (when (string= major-mode "latex-mode")
-;;               (let ((process (TeX-active-process))) (if process (delete-process process)))
-;;               (revert-buffer :ignore-auto :noconfirm)
-;;               (find-alternate-file (current-buffer))
-;;               (TeX-command-menu "LaTeXMk"))))
-
-;; (defun run-latexmk ()
-;;   (when (string= major-mode "latex-mode")
-;;     (let ((TeX-save-query nil)
-;;           (TeX-process-asynchronous t)
-;;           (master-file (TeX-master-file)))
-;;       (TeX-save-document "")
-;;       (TeX-run-TeX "LaTexmk"
-;;                    (TeX-command-expand "latexmk -pdf %t" 'TeX-master-file)
-;;                    master-file)
-;;       (if (plist-get TeX-error-report-switches (intern master-file))
-;;           (TeX-next-error t)
-;;         (minibuffer-message "LaTeXMk done")))))
-;; (add-hook 'after-save-hook #'run-latexmk)
-
-;; (add-hook 'LaTeX-mode-hook
-;;           (lambda ()
-;;             (local-set-key (kbd "C-x C-s") #'dotemacs-save-buffer-and-run-latexmk)))
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (defun sb/save-buffer-and-run-latexmk ()
@@ -240,10 +184,15 @@
   (let ((TeX-save-query nil)) (TeX-save-document ""))
   (TeX-command-menu "LaTeXMk"))
 
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook))
+(dolist (hook '(LaTeX-mode-hook latex-mode-hook))
   (add-hook hook
             (lambda ()
-              (local-set-key (kbd "C-x C-s") #'sb/save-buffer-and-run-latexmk))))
+              (add-hook 'after-save-hook
+                        (lambda ()
+                          (sb/save-buffer-and-run-latexmk)) nil t))))
+
+(bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
+(bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
 
 (provide 'latex-init)
 

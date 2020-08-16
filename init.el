@@ -169,7 +169,7 @@ whitespaces."
 (eval-when-compile
   (require 'use-package))
 
-(if (bound-and-true-p dotemacs-deubg-init-file)
+(if (bound-and-true-p dotemacs-debug-init-file)
     (setq debug-on-error t
           use-package-compute-statistics t
           use-package-expand-minimally nil
@@ -511,13 +511,6 @@ whitespaces."
                                                        powerline-display-buffer-size t
                                                        powerline-display-hud nil
                                                        powerline-gui-use-vcs-glyph t)
-                                                 ;; (set-face-attribute 'powerline-inactive1 nil
-                                                 ;;                     :background "gray40"
-                                                 ;;                     :foreground "white"
-                                                 ;;                     :weight 'light)
-                                                 ;; (set-face-attribute 'powerline-inactive2 nil
-                                                 ;;                     :background "grey50"
-                                                 ;;                     :foreground "white")
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'mode-line nil
                                                                        :background "grey88"
@@ -548,21 +541,6 @@ whitespaces."
                                                        spaceline-version-control-p t
                                                        spaceline-input-method-p nil
                                                        spaceline-persp-name-p nil)
-                                                 (set-face-attribute 'powerline-inactive1 nil
-                                                                     :background "gray40"
-                                                                     :foreground "white"
-                                                                     :weight 'light)
-                                                 (set-face-attribute 'powerline-inactive2 nil
-                                                                     :background "grey50"
-                                                                     :foreground "white")
-                                                 (when (eq dotemacs-theme 'leuven)
-                                                   (set-face-attribute 'powerline-active1 nil
-                                                                       :background "gray22"
-                                                                       :foreground "white"
-                                                                       :weight 'light)
-                                                   (set-face-attribute 'mode-line-inactive nil
-                                                                       :background "grey88"
-                                                                       :foreground "black"))
                                                  (spaceline-emacs-theme)))
 
       ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
@@ -707,10 +685,9 @@ whitespaces."
 
 (use-package treemacs
   :ensure t
-  :disabled t
   :commands (treemacs treemacs-toggle)
-  :hook ((projectile-mode . treemacs-follow-mode)
-         (projectile-mode . treemacs-filewatch-mode)
+  :hook ((projectile-mode . treemacs-filewatch-mode)
+         (projectile-mode . treemacs-follow-mode)
          ;; (projectile-mode . treemacs-fringe-indicator-mode)
          )
   :custom
@@ -736,7 +713,6 @@ whitespaces."
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
-
   ;; Decrease the font size
   (set-face-attribute 'treemacs-directory-collapsed-face nil
                       :height 0.7)
@@ -752,7 +728,6 @@ whitespaces."
                       :height 0.7)
   (set-face-attribute 'treemacs-git-untracked-face nil
                       :height 0.7)
-
   (treemacs-resize-icons 16)
   :bind* ("C-j" . treemacs))
 
@@ -855,7 +830,6 @@ whitespaces."
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil)
   (company-idle-delay 0.0 "Recommended by lsp")
-  ;; (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
   (company-minimum-prefix-length 2 "Small words are faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
@@ -895,9 +869,9 @@ whitespaces."
   :hook (global-company-mode . company-box-mode)
   :custom
   (company-box-backends-colors nil)
-  (company-box-show-single-candidate t)
+  (company-box-doc-delay 0)
   (company-box-max-candidates 50)
-  (company-box-doc-delay 0.2))
+  (company-box-show-single-candidate t))
 
 (use-package yasnippet
   :ensure t
@@ -905,9 +879,7 @@ whitespaces."
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-  :config
-  (unbind-key "<tab>" yas-minor-mode-map)
-  (use-package yasnippet-snippets))
+  :config (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package amx
   :ensure t
@@ -935,7 +907,8 @@ whitespaces."
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   (defalias 'occur 'ivy-occur)
   :config
-  (dolist (buffer '("TAGS" "magit-process"))
+  (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*"
+                    "*flycheck-posframe-buffer*"))
     (add-to-list 'ivy-ignore-buffers buffer))
   :diminish
   :bind
@@ -988,6 +961,7 @@ whitespaces."
    ("<f9>" . counsel-recentf)
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
+   ;; Having the preview can make switching buffers slow
    ;; ([remap switch-to-buffer] . counsel-switch-buffer)
    ;; ("<f3>" . counsel-switch-buffer)
    ([remap yank-pop] . counsel-yank-pop))
@@ -1002,6 +976,7 @@ whitespaces."
                                     "\\|.blg$"
                                     "\\|.cb$"
                                     "\\|.cb2$"
+                                    "\\|.djvu$"
                                     "\\|.doc$"
                                     "\\|.docx$"
                                     "\\|.dvi$"
@@ -1026,6 +1001,7 @@ whitespaces."
                                     "\\|.synctex$"
                                     "\\|.synctex.gz$"
                                     "\\|.tar.gz$"
+                                    "\\|.tar.xz$"
                                     "\\|.toc$"
                                     "\\|.xls$"
                                     "\\|.xlsx$"
@@ -1131,10 +1107,10 @@ whitespaces."
               (setq arg 0))
           (forward-word)))))
   :custom
-  (ispell-local-dictionary "en_US")
   (ispell-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
+  (ispell-local-dictionary "en_US")
+  (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
   (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   (flyspell-issue-message-flag nil)
   :hook ((prog-mode . flyspell-prog-mode)
@@ -1147,13 +1123,19 @@ whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ;; ("C-," . sb/flyspell-goto-previous-error)
-   ("C-," . flyspell-auto-correct-previous-word)))
+   ;; ("C-," . flyspell-auto-correct-previous-word)
+   ("C-," . sb/flyspell-goto-previous-error)))
 
-(use-package flyspell-popup
-  :ensure t
-  :bind ("C-;" . flyspell-popup-correct)
-  :custom (flyspell-popup-correct-delay 0.5))
+(or (use-package flyspell-popup
+      :ensure t
+      :disabled t
+      :bind ("C-;" . flyspell-popup-correct)
+      :custom (flyspell-popup-correct-delay 0.5))
+
+    (use-package flyspell-correct-ivy
+      :ensure flyspell-correct
+      :init (setq flyspell-correct-interface #'flyspell-correct-ivy)
+      :bind ("C-;" . flyspell-correct-wrapper)))
 
 (use-package highlight-indentation
   :ensure t
@@ -1185,6 +1167,7 @@ whitespaces."
 (use-package smartparens
   :ensure t
   :disabled t
+  :diminish
   :hook ((after-init . smartparens-global-mode)
          (after-init . show-smartparens-global-mode))
   :custom
@@ -1196,7 +1179,6 @@ whitespaces."
     (add-hook hook
               (lambda ()
                 (require 'smartparens-latex))))
-  ;; :diminish
   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
@@ -1265,9 +1247,7 @@ whitespaces."
     (add-to-list 'projectile-globally-ignored-files items))
   (dolist (exts
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
-    (add-to-list 'projectile-globally-ignored-file-suffixes exts))
-  ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  )
+    (add-to-list 'projectile-globally-ignored-file-suffixes exts)))
 
 ;; FIXME: counsel-projectile is not working
 (use-package counsel-projectile
@@ -1441,7 +1421,7 @@ whitespaces."
 (use-package counsel-gtags
   :ensure t
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
-  ;; :diminish
+  :diminish
   :ensure-system-package global
   ;; :init
   ;; (add-hook 'c-mode-common-hook
@@ -1594,10 +1574,6 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode)))
 
-;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-;; (add-to-list 'display-buffer-alist
-;;              '("*Help*" display-buffer-same-window))
-
 (use-package expand-region ; Expand region by semantic units
   :ensure t
   :bind ("C-=" . er/expand-region))
@@ -1632,8 +1608,9 @@ whitespaces."
 (use-package persistent-scratch
   :ensure t
   :hook (after-init . persistent-scratch-setup-default)
-  :custom (persistent-scratch-save-file (expand-file-name "persistent-scratch"
-                                                          dotemacs-temp-directory)))
+  :custom
+  (persistent-scratch-save-file (expand-file-name "persistent-scratch"
+                                                  dotemacs-temp-directory)))
 
 (use-package crux
   :ensure t
@@ -1665,8 +1642,7 @@ whitespaces."
 ;; This causes additional saves which leads to auto-formatters being invoked more frequently
 (use-package super-save ; Save buffers when Emacs loses focus
   :ensure t
-  :disabled t
-  ;; :diminish
+  :diminish
   :custom
   (super-save-remote-files nil "Ignore remote files")
   (super-save-auto-save-when-idle t)
@@ -1749,7 +1725,7 @@ whitespaces."
 (use-package markdown-mode
   :ensure t
   ;; :diminish gfm-mode
-  :ensure-system-package pandoc
+  ;; :ensure-system-package pandoc
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
