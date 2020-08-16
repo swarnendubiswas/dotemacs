@@ -64,8 +64,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `s` - Toggle between alphabetical and date/time order (`dired-sort-toggle-or-edit`)
 - `C` - Copy the specified files (`dired-do-copy`)
 - `D` - Delete the specified files (`dired-do-delete`)
-- `R` - Rename the specified files (`dired-do-rename`)
-- `r` - Rename the specified file (`dired-efap`)
+- `R` - Move/Rename the specified files (`dired-do-rename`)
+- `r` - Rename the specified file at point (`dired-efap`)
 - `i` - Find file (`counsel-find-file`)
 - `/` - Filter files (`dired-narrow`)
 - `M-<home>` - Go to HOME directory (`dired-go-home`)
@@ -110,6 +110,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 - `X M-n` - Search for the symbol at point in the current file, where `X` is the shortcut to invoke `swiper` (`swiper` `thing-at-point`)
 
+### Wgrep
+
+-
+
 ## Ivy
 
 - `M-o` - Execute an available action (`ivy-dispatching-done`)
@@ -125,11 +129,11 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `C-c C-o` - Save current completion session to a new read-only buffer and exits completion (`ivy-occur`)
 - `C-m` - Calls the default action and exits minibuffer (`ivy-done`)
 - `C-j` - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as `ivy-done` (`ivy-alt-done`)
-- `C-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when copying/renaming files with names that match existing files.
+- `C-j` - Exits with the current input instead of the current candidate (`ivy-immediate-done`). This is useful when copying/renaming files with names that match existing files
 - `C-'` - Use `avy` to select candidates (`ivy-avy`)
 - `C-c r` - Resume the last ivy completion session (`ivy-resume`)
 - `C-M-a` - Invoke one of the available actions (`ivy-read-action`)
-- `C-x C-q` - Change  (ivy-wgrep-change-to-wgrep-mode) in ivy-occur buffer 
+- `C-x C-q` - Change (ivy-wgrep-change-to-wgrep-mode) in ivy-occur buffer
 
 Specify extra flags to the search commands with `C-u` (`universal-argument`) before the command.
 
@@ -152,39 +156,38 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 - `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`)
 - `<f5>` - Switch project (`counsel-projectile-switch-project`)
 - `<f6>` - Find file (`counsel-projectile-find-file`)
-<!-- * `<f7>` - Switch to project buffer (`counsel-projectile-switch-to-buffer`). -->
 - `<f7>` - Run an ag search in the project (`counsel-projectile-rg`)
-- `C-c p s g` - Grep in project.
-- `C-c p v` - Run `vc-dir` on the project root.
-- `C-c p k` - Kill all project buffers.
-- `C-c p E` - Opens the root `dir-locals-file` of the project.
-- `C-c p C-h` - Show all projectile keybindings.
+- `C-c p s g` - Grep in project
+- `C-c p v` - Run `vc-dir` on the project root
+- `C-c p k` - Kill all project buffers
+- `C-c p E` - Opens the root `dir-locals-file` of the project
+- `C-c p C-h` - Show all projectile keybindings
 
 ## LaTeX/AUCTeX
 
 - `C-c @ C-n` - Move to next heading (at any level) (`outline-next-visible-heading`)
-- `C-c @ C-p` - Move to previous heading (at any level) (`outline-previous-visible-heading`).
-- `C-c @ C-f` - Move Forward to next heading at the same level (`outline-forward-same-level`).
-- `C-c @ C-b` - Move Backward to previous heading at the same level (`outline-backward-same-level`).
-- `C-c C-e` - Make LaTeX environment (\begin{...}-\end{...} pair) (`LaTeX-environment`).
-- `C-c ]` - Close LaTeX environment (`LaTeX-close-environment`).
-- `C-c C-o C-f` - Toggle folding mode (`TeX-fold-mode`).
-- `C-c C-f C-e` - Insert formatted text (`TeX-font`).
-  - `C-e` - Insert emphasized text.
-  - `C-b` - Insert bold text.
-  - `C-i` - Insert italicized text.
-  - `C-r` - Insert roman text.
-  - `C-t` - Insert typewriter text.
-  - `C-s` - Insert slanted text.
-- `C-c _` - Set master file (``).
-- `C-c ^` - Switch to master file (`TeX-home-buffer`).
+- `C-c @ C-p` - Move to previous heading (at any level) (`outline-previous-visible-heading`)
+- `C-c @ C-f` - Move Forward to next heading at the same level (`outline-forward-same-level`)
+- `C-c @ C-b` - Move Backward to previous heading at the same level (`outline-backward-same-level`)
+- `C-c C-e` - Make LaTeX environment (\begin{...}-\end{...} pair) (`LaTeX-environment`)
+- `C-c ]` - Close LaTeX environment (`LaTeX-close-environment`)
+- `C-c C-o C-f` - Toggle folding mode (`TeX-fold-mode`)
+- `C-c C-f C-e` - Insert formatted text (`TeX-font`)
+  - `C-e` - Insert emphasized text (``)
+  - `C-b` - Insert bold text (``)
+  - `C-i` - Insert italicized text (``)
+  - `C-r` - Insert roman text (``)
+  - `C-t` - Insert typewriter text (``)
+  - `C-s` - Insert slanted text (``)
+- `C-c _` - Set master file (``)
+- `C-c ^` - Switch to master file (`TeX-home-buffer`)
 
 ### Reftex
 
-- `C-c (` - Create a label (`reftex-label`).
-- `C-c )` - Look up a reference (`reftex-reference`).
-- `C-c [` - Look up a bibliography reference (`reftex-citation`).
-- `C-c =` - Look up the TOC (`reftex-toc`).
+- `C-c (` - Create a label (`reftex-label`)
+- `C-c )` - Look up a reference (`reftex-reference`)
+- `C-c [` - Look up a bibliography reference (`reftex-citation`)
+- `C-c =` - Look up the TOC (`reftex-toc`)
 
 To enforce reparsing, call any of the commands described above with a raw `C-u` prefix, or press the `r` key in the label selection buffer, the table of contents buffer, or the index buffer.
 
@@ -201,35 +204,35 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## JSON
 
-- `C-c C-f` - Format the region/buffer (`json-reformat-region`).
-- `C-c C-p` - Display a path to the object at point (`json-mode-show-path`).
+- `C-c C-f` - Format the region/buffer (`json-reformat-region`)
+- `C-c C-p` - Display a path to the object at point (`json-mode-show-path`)
 
 ## Web mode
 
-- `C-c C-n` - Jump to opening/closing blocks/tags (``).
-- `C-c C-f` - Fold code for code blocks (``).
-- `C-c C-i` - Indent entire buffer (``).
+- `C-c C-n` - Jump to opening/closing blocks/tags (``)
+- `C-c C-f` - Fold code for code blocks (``)
+- `C-c C-i` - Indent entire buffer (``)
 
 ## Tags
 
 ### XRef
 
-- `M-.` - Jump to tag underneath cursor (`xref-find-definitions`).
-- `M-*` - Pop back to where you previously invoked `M-.` (`xref-pop-marker-stacker`).
-- `M-?` - Find references to the identifier at point (`xref-find-references`).
-- `C-M-.` - Find all meaningful symbols that match PATTERN (`xref-find-apropos`).
-- `C-o` - Display the source of xref at point in the appropriate window (`xref-show-location-at-point`).
-- `<tab>` - Quit _xref_ buffer, then jump to xref on current line (`xref-quit-and-goto-xref`).
-- `r` - Perform interactive replacement of FROM with TO in all displayed xrefs (`xref-query-replace-in-results`).
+- `M-.` - Jump to tag underneath cursor (`xref-find-definitions`)
+- `M-*` - Pop back to where you previously invoked `M-.` (`xref-pop-marker-stacker`)
+- `M-?` - Find references to the identifier at point (`xref-find-references`)
+- `C-M-.` - Find all meaningful symbols that match PATTERN (`xref-find-apropos`)
+- `C-o` - Display the source of xref at point in the appropriate window (`xref-show-location-at-point`)
+- `<tab>` - Quit _xref_ buffer, then jump to xref on current line (`xref-quit-and-goto-xref`)
+- `r` - Perform interactive replacement of FROM with TO in all displayed xrefs (`xref-query-replace-in-results`)
 
 ### Counsel Gtags
 
-- `M-.` - Jump to tag underneath cursor (`find-tags`).
-- `M-*` - Pop back to where you previously invoked `M-.`.
-- `C-c g c` - Create tags (``).
-- `C-c g u` - Update tags (``).
-- `C-c g s` - Find other symbol (``).
-- `C-c g r` - Find reference (``).
+- `M-.` - Jump to tag underneath cursor (`find-tags`)
+- `M-*` - Pop back to where you previously invoked `M-.` ()
+- `C-c g c` - Create tags (``)
+- `C-c g u` - Update tags (``)
+- `C-c g s` - Find other symbol (``)
+- `C-c g r` - Find reference (``)
 
 ### Counsel Etags
 
@@ -238,50 +241,50 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## Programming
 
-- `C-M-a` - Jump backward to the beginning of the current function (`c-beginning-of-defun`).
-- `C-M-e` - Jump forward to the end of the current function (`c-end-of-defun`).
-- `C-M-h` - Mark the current function (`c-mark-function`).
-- `C-M-k` - Jump to a tag in the current file (`moo-jump-local`).
-- `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`).
-- `C-M-i` - Complete symbol at point (`complete-symbol`).
+- `C-M-a` - Jump backward to the beginning of the current function (`c-beginning-of-defun`)
+- `C-M-e` - Jump forward to the end of the current function (`c-end-of-defun`)
+- `C-M-h` - Mark the current function (`c-mark-function`)
+- `C-M-k` - Jump to a tag in the current file (`moo-jump-local`)
+- `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`)
+- `C-M-i` - Complete symbol at point (`complete-symbol`)
 
 ### Python and Elpy
 
-- `C-c C-d` - Get object or function docs (`elpy-doc`).
+- `C-c C-d` - Get object or function docs (`elpy-doc`)
 - `M-<left>` - (`elpy-nav-indent-shift-left`)
 - `M-<right>` -
 - `M-e` - Jump to the next block (`python-nav-forward-block`)
 - `M-a` - Jump to the previous block (`python-nav-backward-block`)
-- `C-c C-o` - Overview of the definitions in the current file.
-- `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`).
-- `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`).
-- `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`).
+- `C-c C-o` - Overview of the definitions in the current file
+- `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`)
+- `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`)
+- `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`)
 
 ### Python
 
-- `C-c <` - Indent left (`python-indent-shift-left`).
-- `C-c >` - Indent right (`python-indent-shift-right`).
+- `C-c <` - Indent left (`python-indent-shift-left`)
+- `C-c >` - Indent right (`python-indent-shift-right`)
 
 ### C/C++
 
 #### RTags
 
-- `M-.` - Jump to tag underneath cursor (``).
-- `M-,` - Pop stack location (``).
+- `M-.` - Jump to tag underneath cursor (``)
+- `M-,` - Pop stack location (``)
 
 ## Flycheck
 
 Within the error list the following key bindings are available:
 
-- `RET` - Go to the current error in the source buffer (``).
-- `n` - Jump to the next error (``).
-- `p` - Jump to the previous error (``).
-- `e` - Explain the error (``).
-- `f` - Filter the error list by level (``).
-- `F` - Remove the filter (``).
-- `S` - Sort the error list by the column at point (``).
-- `g` - Check the source buffer and update the error list (``).
-- `q` - Quit the error list and hide its window (``).
+- `RET` - Go to the current error in the source buffer (``)
+- `n` - Jump to the next error (``)
+- `p` - Jump to the previous error (``)
+- `e` - Explain the error (``)
+- `f` - Filter the error list by level (``)
+- `F` - Remove the filter (``)
+- `S` - Sort the error list by the column at point (``)
+- `g` - Check the source buffer and update the error list (``)
+- `q` - Quit the error list and hide its window (``)
 
 ## LSP
 
@@ -296,59 +299,59 @@ Use `magit-status` to display information about the current Git repository, and 
 
 <https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automatic-Refreshing-of-Magit-Buffers>
 
-- `TAB` - Expand and collapse files.
-- `n` - Move to next section.
-- `p` - Move to previous section.
-- `M-n` - Move to next sibling section.
-- `M-p` - Move to previous sibling section.
-- `s` - Stage item (`magit-stage`).
-- `S` - Stage all changed files (`magit-stage-modified`).
-- `u` - Unstage item (`magit-unstage`).
-- `U` - Unstage all items (`magit-unstage-all`).
-- `c` - Commit menu (`magit-commit`).
-  - `c` - Create a new commit on HEAD (`magit-commit-create`).
-- `C-c C-c` - Finish current editing session (`with-editor-finish`).
-- `C-c C-k` - Cancel current editing session (`with-editor-cancel`).
-- `l` - Log menu.
-- `M-S` - Show all sections.
-- `M-H` - Hide all sections.
-- `k` - Delete file(s).
-- `C-u S` - Stage all untracked and tracked files.
-- `g` - Refresh the current buffer (`magit-refresh`).
-- `G` - Refreshes all magit buffers (`magit-refresh-all`).
-- `k` - Discard changes in an item (`magit-discard-item`).
-- `v` - Revert item (`magit-revert-item`).
-- `F` - Pull (`magit-pull`).
-- `f` - Fetch (`magit-fetch`).
+- `TAB` - Expand and collapse files
+- `n` - Move to next section
+- `p` - Move to previous section
+- `M-n` - Move to next sibling section
+- `M-p` - Move to previous sibling section
+- `s` - Stage item (`magit-stage`)
+- `S` - Stage all changed files (`magit-stage-modified`)
+- `u` - Unstage item (`magit-unstage`)
+- `U` - Unstage all items (`magit-unstage-all`)
+- `c` - Commit menu (`magit-commit`)
+  - `c` - Create a new commit on HEAD (`magit-commit-create`)
+- `C-c C-c` - Finish current editing session (`with-editor-finish`)
+- `C-c C-k` - Cancel current editing session (`with-editor-cancel`)
+- `l` - Log menu
+- `M-S` - Show all sections
+- `M-H` - Hide all sections
+- `k` - Delete file(s)
+- `C-u S` - Stage all untracked and tracked files
+- `g` - Refresh the current buffer (`magit-refresh`)
+- `G` - Refreshes all magit buffers (`magit-refresh-all`)
+- `k` - Discard changes in an item (`magit-discard-item`)
+- `v` - Revert item (`magit-revert-item`)
+- `F` - Pull (`magit-pull`)
+- `f` - Fetch (`magit-fetch`)
 
 ### Svn
 
-- `g` - Refresh status of files (``).
-- `m` - Mark file at point (``).
-- `u` - Unmark file at point (``).
-- `c` - Commit marked files or file at point (``).
-- `l` - Display log for marked files or file at point (``).
-- `=` - Run diff on the marked files or file at point (``).
-- `U` - Update files for currently examined repository (``).
+- `g` - Refresh status of files (``)
+- `m` - Mark file at point (``)
+- `u` - Unmark file at point (``)
+- `c` - Commit marked files or file at point (``)
+- `l` - Display log for marked files or file at point (``)
+- `=` - Run diff on the marked files or file at point (``)
+- `U` - Update files for currently examined repository (``)
 
 ## Use Cases
 
 ### Find and replace text in several files in a directory
 
-- Run `M-x rgrep` to find the string.
-- Run `M-x wgrep` or use `C-s C-p`.
-- Edit the rgrep results, you can use iedit-mode.
-- Use `C-x C-s` to commit wgrep.
-- Use `C-x s !` to save the changed files.
+- Run `M-x rgrep` to find the string
+- Run `M-x wgrep` or use `C-s C-p`
+- Edit the rgrep results, you can use `iedit-mode`
+- Use `C-x C-s` to commit wgrep
+- Use `C-x s !` to save the changed files
 
 - <http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open>
 - <https://emacsbliss.com/post/emacs-search-replace/>
 
 ### Search for the symbol at point
 
-- `isearch` - Traditional incremental forward search for regular expression with `C-f`.
-- `counsel-grep-or-swiper` - Use `swiper` (with overview of lines) for small buffers and `counsel-grep` for large files with `<f4>`.
-- `rgrep` - Recursively grep for REGEXP in FILES in directory tree rooted at DIR.
+- `isearch` - Traditional incremental forward search for regular expression with `C-f`
+- `counsel-grep-or-swiper` - Use `swiper` (with overview of lines) for small buffers and `counsel-grep` for large files with `<f4>`
+- `rgrep` - Recursively grep for REGEXP in FILES in directory tree rooted at DIR
 - `deadgrep` - Start a ripgrep search for SEARCH-TERM (`<f8>`)
 - `counsel-rg` - Grep for a string in the current directory using rg (`C-c s r`)
 - `counsel-projectile-rg` - Perform incremental search in the current project with rg (`<f7>`)

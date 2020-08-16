@@ -1215,15 +1215,16 @@ whitespaces."
   ;; :ensure-system-package fd
   :bind-keymap ("C-c p" . projectile-command-map)
   :custom
-  (projectile-auto-discover nil)
+  (projectile-auto-discover nil "Do not discover projects")
   (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
-  (projectile-dynamic-mode-line nil)
+  ;; (projectile-dynamic-mode-line nil "")
   (projectile-enable-caching nil "Problematic if you create new files often")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
   (projectile-indexing-method 'alien)
-  (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld" dotemacs-temp-directory))
+  (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
+                                                    dotemacs-temp-directory))
   (projectile-mode-line-prefix "")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
   (projectile-verbose nil)
@@ -2028,15 +2029,15 @@ whitespaces."
 
 (use-package web-mode
   :ensure t
-  ;; :mode
-  ;; (("\\.html?\\'" . web-mode)
-  ;;  ("\\.djhtml\\'" . web-mode)
-  ;;  ("\\.phtml\\'" . web-mode)
-  ;;  ("\\.hb\\.html\\'" . web-mode)
-  ;;  ("\\.tpl\\.php\\'" . web-mode)
-  ;;  ("\\.[agj]sp\\'" . web-mode)
-  ;;  ("\\.as[cp]x\\'" . web-mode)
-  ;;  ("\\.erb\\'" . web-mode))
+  :mode
+  (("\\.html?\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.phtml\\'" . web-mode)
+   ("\\.hb\\.html\\'" . web-mode)
+   ("\\.tpl\\.php\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode))
   :hook (web-mode . lsp)
   ;; :custom
   ;; (web-mode-enable-auto-pairing t)

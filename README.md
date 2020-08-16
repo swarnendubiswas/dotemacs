@@ -1,6 +1,6 @@
 # GNU Emacs
 
-I use GNU Emacs as my primary editor on a GNU/Linux platform. This repository lists my customizations tailored according to my preferences. This setup should work for a GNU/Linux platform.
+I use GNU Emacs as my primary editor on a GNU/Linux platform. This repository lists my preferred customizations. The setup should work on a GNU/Linux platform.
 
 Most of the included customizations are from the Internet. Suggestions and pull requests are welcome.
 
@@ -14,14 +14,27 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-You can use the following instructions to install third-party applications. These should work on an Ubuntu 18.04 distribution.
+You can use the following instructions to install third-party applications. Add LLVM 10 sources based on your distribution.
 
-#### Ubuntu Packages
+#### Ubuntu 18.04 Packages
 
 ```Bash
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf
 wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
 sudo dpkg -i fd_8.1.1_amd64.deb
+```
+
+#### Ubuntu 20.04 Packages
+
+```Bash
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf
+wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
+sudo dpkg -i fd_8.1.1_amd64.deb
+```
+
+#### Snap Packages
+
+```Bash
 sudo snap install shfmt
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
@@ -279,3 +292,4 @@ StartupWMClass=Emacs
 
 - Use custom major modes for files by names
 - Open a default file in a `projectile` project
+- Emacs hangs sometimes when working with `text-mode` or `markdown-mode`. My guess is this has to do with either `flycheck-grammarly` or `prettier`.
