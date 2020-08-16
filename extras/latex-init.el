@@ -11,18 +11,32 @@
   :mode ("\\.tex\\'" . LaTeX-mode))
 
 (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
-      TeX-parse-self t ; Parse documents
-      TeX-clean-confirm nil
-      TeX-quote-after-quote nil ; Allow original LaTeX quotes
-      TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
       TeX-auto-untabify t ; Remove all tabs before saving
+      TeX-clean-confirm nil
+      TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+      TeX-parse-self t ; Parse documents
+      TeX-PDF-mode t ;; use pdflatex
+      TeX-quote-after-quote nil ; Allow original LaTeX quotes
       TeX-save-query nil
-      LaTeX-syntactic-comments t)
+      TeX-source-correlate-method 'synctex
+      TeX-source-correlate-mode t
+      ;; don't start the emacs server when correlating sources
+      TeX-source-correlate-start-server nil
+      TeX-syntactic-comment t
+      LaTeX-syntactic-comments t
+      ;; Don't insert line-break at inline math
+      LaTeX-fill-break-at-separators nil)
+
+(add-hook 'LaTeX-mode-hook 'TeX-fold-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+(add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+(add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
 
 (setq-default TeX-master nil) ; Query for master file
 
-(add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+;; Enable rainbow mode after applying styles to the buffer
+(add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
 
 ;; Disable "LaTeX-insert-item" in favor of imenu
 (unbind-key "C-c C-d" LaTeX-mode-map)
@@ -32,86 +46,89 @@
 (use-package auctex-latexmk
   :ensure t
   :custom
-  (auctex-latexmk-inherit-TeX-PDF-mode t)
-  (TeX-command-default "LaTeXMk")
+  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the -pdf flag when TeX-PDF-mode is active")
+  (TeX-command-default "LatexMk")
   :config (auctex-latexmk-setup)
-  :hook (LaTeX-mode-hook . (lambda()
-                             (require 'auctex-latexmk))))
+  :hook (LaTeX-mode . (lambda()
+                        (require 'auctex-latexmk))))
 
 (use-package math-symbol-lists ; Required by ac-math and company-math
   :ensure t)
 
 (use-package company-auctex
   :ensure t
-  :config (company-auctex-init))
+  :init (company-auctex-init))
 
-;; (use-package company-math
-;;   :ensure t
-;;   :disabled t
-;;   :init
-;;   (add-to-list 'company-backends
-;;                '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
-
-;; (use-package bibtex
-;;   :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
-;;   :defer t
-;;   :config
-;;   (setq bibtex-maintain-sorted-entries t)
-;;   (use-package bibtex-utils
-;;     :ensure t))
-
-(use-package reftex
-  :diminish
-  :commands (reftex-citation)
+(use-package company-math
+  :ensure t
+  :after company
   :init
-  (setq reftex-plug-into-AUCTeX t
-        reftex-insert-label-flags '(t t)
-        reftex-cite-format 'abbrv
-        reftex-save-parse-info t
-        reftex-use-multiple-selection-buffers t
-        reftex-auto-update-selection-buffers t
-        reftex-enable-partial-scans t
-        reftex-allow-automatic-rescan t
-        reftex-idle-time 0.5
-        reftex-toc-follow-mode t
-        reftex-use-fonts t
-        reftex-use-external-file-finders t
-        reftex-highlight-selection 'both)
-  ;; (add-hook 'LaTeX-mode-hook #'reftex-mode)
-  (add-hook 'latex-mode-hook #'reftex-mode)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; AUCTeX LaTeX mode
-  (add-hook 'latex-mode-hook 'turn-on-reftex)   ; Emacs latex mode
+  (add-to-list 'company-backends
+               '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
 
-  )
+(use-package company-reftex
+  :ensure t
+  :after company
+  :init
+  (add-to-list 'company-backends '(company-reftex-labels company-reftex-citations)))
 
-(use-package reftex-cite
-  :preface
-  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-  (defun get-bibtex-keys (file)
-    (with-current-buffer (find-file-noselect file)
-      (mapcar 'car (bibtex-parse-keys))))
-  (defun find-bibliography-file ()
-    "Try to find a bibliography file using RefTeX."
-    ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
-    (interactive)
-    (let ((bibfile-list nil))
-      (condition-case nil
-          (setq bibfile-list (reftex-get-bibfile-list))
-        (error (ignore-errors
-                 (setq bibfile-list (reftex-default-bibliography)))))
-      (if bibfile-list
-          (car bibfile-list) "")))
-  (defun reftex-add-all-bibitems-from-bibtex ()
-    (interactive)
-    (mapc 'LaTeX-add-bibitems
-          (apply 'append
-                 (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
-  :init (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex))
+(use-package bibtex
+  :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+  :config
+  (setq bibtex-maintain-sorted-entries t)
+  (use-package bibtex-utils
+    :ensure t))
+
+;; (use-package reftex
+;;   :diminish
+;;   ;; :commands (reftex-citation)
+;;   ;; :hook (LaTeX-mode . reftex-mode)
+;;   :config
+;;   (setq reftex-plug-into-AUCTeX t
+;;         reftex-insert-label-flags '(t t)
+;;         reftex-cite-format 'abbrv
+;;         reftex-save-parse-info t
+;;         reftex-use-multiple-selection-buffers t
+;;         reftex-auto-update-selection-buffers t
+;;         reftex-enable-partial-scans t
+;;         reftex-allow-automatic-rescan t
+;;         reftex-idle-time 0.5
+;;         reftex-toc-follow-mode t
+;;         reftex-use-fonts t
+;;         reftex-use-external-file-finders t
+;;         reftex-highlight-selection 'both)
+;;   :config (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+
+(setq bibtex-align-at-equal-sign t)
+
+;; (use-package reftex-cite
+;;   :preface
+;;   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+;;   (defun get-bibtex-keys (file)
+;;     (with-current-buffer (find-file-noselect file)
+;;       (mapcar 'car (bibtex-parse-keys))))
+;;   (defun find-bibliography-file ()
+;;     "Try to find a bibliography file using RefTeX."
+;;     ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
+;;     (interactive)
+;;     (let ((bibfile-list nil))
+;;       (condition-case nil
+;;           (setq bibfile-list (reftex-get-bibfile-list))
+;;         (error (ignore-errors
+;;                  (setq bibfile-list (reftex-default-bibliography)))))
+;;       (if bibfile-list
+;;           (car bibfile-list) "")))
+;;   (defun reftex-add-all-bibitems-from-bibtex ()
+;;     (interactive)
+;;     (mapc 'LaTeX-add-bibitems
+;;           (apply 'append
+;;                  (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+;;   :init (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex))
 
 (use-package bib-cite
-  :defer t
   :diminish bib-cite-minor-mode
-  :init  (add-hook 'LaTeX-mode-hook #'bib-cite-minor-mode)
+  :init  (add-hook 'LaTeX-mode-hook (lambda ()
+                                      (bib-cite-minor-mode 1)))
   :config (setq bib-cite-use-reftex-view-crossref t)
   :bind
   (:map bib-cite-minor-mode-map

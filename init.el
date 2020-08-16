@@ -899,51 +899,6 @@ whitespaces."
   (company-box-max-candidates 50)
   (company-box-doc-delay 0.2))
 
-;; (dolist (hook '(text-mode-hook markdown-mode-hook gfm-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (make-local-variable 'company-backends)
-;;               (setq company-backends '((company-capf
-;;                                         company-dabbrev
-;;                                         company-files :separate))))))
-
-;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               ;; (use-package company-bibtex
-;;               ;;   :ensure t
-;;               ;;   :demand t)
-;;               (set (make-local-variable 'company-backends) '((company-capf
-;;                                                               ;; :with company-bibtex
-;;                                                               :with company-dabbrev
-;;                                                               company-files :separate))))))
-
-;; (add-hook 'prog-mode-hook
-;;           (lambda ()
-;;             (make-local-variable 'company-backends)
-;;             (setq company-backends '(company-capf
-;;                                      (company-dabbrev-code
-;;                                       company-clang
-;;                                       company-keywords)
-;;                                      company-dabbrev
-;;                                      company-files))))
-
-;; (add-hook 'sh-mode-hook
-;;           (lambda ()
-;;             (use-package company-shell
-;;               :ensure t
-;;               :demand t
-;;               :custom (company-shell-delete-duplicates t))
-;;             (make-local-variable 'company-backends)
-;;             (setq company-backends '(company-capf
-;;                                      (company-shell
-;;                                       company-shell-env
-;;                                       company-fish-shell)
-;;                                      company-dabbrev-code
-;;                                      company-dabbrev
-;;                                      company-files
-;;                                      company-keywords))))
-
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
@@ -2006,6 +1961,13 @@ whitespaces."
   :if (when (executable-find "fish"))
   :config (global-fish-completion-mode))
 
+(use-package company-shell
+  :ensure t
+  :after company
+  :custom (company-shell-delete-duplictes t)
+  :init (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell)))
+
+
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
@@ -2188,11 +2150,12 @@ whitespaces."
                     :major-modes '(js-mode)
                     :remote? t
                     :server-id 'typescript-remote))
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
-  ;;                   :major-modes '(tex-mode latex-mode bibtex-mode)
-  ;;                   :remote? t
-  ;;                   :server-id 'texlab-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
+                    :major-modes '(tex-mode latex-mode bibtex-mode)
+                    :remote? t
+                    :server-id 'texlab-remote))
+  ;; FIXME: Does this work inside :config?
   (dolist (hook '(c++-mode-hook python-mode-hook))
     (add-hook hook
               (lambda ()
@@ -2210,7 +2173,7 @@ whitespaces."
 
 ;; ;; FIXME: Why moving this to lsp::config does not work?
 ;; (with-eval-after-load 'lsp-mode
-;;   (dolist (hook '(bibtex-mode-hook c++-mode-hook latex-mode-hook python-mode-hook tex-mode-hook))
+;;   (dolist (hook '(c++-mode-hook python-mode-hook))
 ;;     (add-hook hook
 ;;               (lambda ()
 ;;                 (add-hook 'before-save-hook
@@ -2265,23 +2228,23 @@ whitespaces."
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue
 ;; to use AucTeX support
-(use-package lsp-latex
-  :ensure t
-  :after lsp
-  :disabled t
-  :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
-                                               (lsp-deferred)
-                                               (require 'lsp-latex)))
-  :custom
-  (lsp-latex-bibtex-formatting-line-length 100)
-  (lsp-latex-bibtex-formatting-formatter "latexindent")
-  (lsp-latex-build-on-save t)
-  (lsp-latex-lint-on-save t))
+(or (use-package lsp-latex
+      :ensure t
+      :after lsp
+      :disabled t
+      :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
+                                                   (lsp-deferred)
+                                                   (require 'lsp-latex)))
+      :custom
+      (lsp-latex-bibtex-formatting-line-length 100)
+      (lsp-latex-bibtex-formatting-formatter "latexindent")
+      (lsp-latex-build-on-save t)
+      (lsp-latex-lint-on-save t))
 
-(use-package latex-init
-  :load-path "extras"
-  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                          (require 'latex-init))))
+    (use-package latex-init
+      :load-path "extras"
+      :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                              (require 'latex-init)))))
 
 (use-package mlir-mode
   :load-path "extras"
@@ -2521,10 +2484,7 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
                                                              (dir-locals-get-class-variables (dir-locals-read-from-dir directory))))))))
     (if (f-exists? default-file)
         (counsel-find-file default-file)
-      (message "The file %s doesn't exist in the select project" default-file)
-      )
-    )
-  )
+      (message "The file %s doesn't exist in the select project" default-file))))
 
 (defun sb/open-project-default-file1 (filepath)
   (let ((liststring (with-temp-buffer
@@ -2537,9 +2497,7 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
                     (when (f-exists? default-file)
                       (let ((new-buffer (get-buffer-create default-file)))
                         (switch-to-buffer new-buffer)
-                        (insert-file-contents default-file)
-                        )
-                      )))))
+                        (insert-file-contents default-file)))))))
             liststring)))
 ;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
 
