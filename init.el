@@ -289,9 +289,11 @@ whitespaces."
               standard-indent 2
               tab-always-indent 'complete
               tab-width 4
-              ;; Doom Emacs: Disable bidirectional text rendering for a modest performance boost
+              ;; Check https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
               bidi-display-reordering 'left-to-right
-              bidi-paragraph-direction 'left-to-right)
+              bidi-inhibit-bpa t
+              ;; bidi-paragraph-direction 'left-to-right
+              )
 
 ;; Ideally, we would have reset 'gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -437,6 +439,7 @@ whitespaces."
 (tooltip-mode -1)
 (toggle-frame-maximized) ; Maximize Emacs on startup
 ;; (set-frame-parameter nil 'unsplittable t)
+(global-so-long-mode 1)
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -678,6 +681,10 @@ whitespaces."
   :ensure t
   :bind (:map dired-mode-map
               ("C-c C-r" . dired-rsync)))
+
+(use-package dired-posframe
+  :ensure t
+  :hook (dired-mode . dired-posframe-mode))
 
 (use-package async
   :ensure t
@@ -2192,6 +2199,7 @@ whitespaces."
 
 (use-package lsp-python-ms
   :ensure t
+  :disabled t
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
