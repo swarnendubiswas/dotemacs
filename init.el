@@ -132,7 +132,7 @@ whitespaces."
   :group 'dotemacs)
 
 (defcustom dotemacs-debug-init-file
-  nil
+  t
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -180,8 +180,8 @@ whitespaces."
         use-package-expand-minimally t
         use-package-verbose nil))
 
-(use-package use-package-ensure-system-package
-  :ensure t)
+;; (use-package use-package-ensure-system-package
+;;   :ensure t)
 
 (use-package bind-key
   :ensure t
@@ -235,7 +235,8 @@ whitespaces."
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b"))
       ;; gc-cons-percentage 0.5 ; Portion of heap used for allocation
-      ;; ;; GC may happen after this many bytes are allocated since last GC
+      ;; GC may happen after this many bytes are allocated since last GC
+      ;; If you experience freezing, decrease this. If you experience stuttering, increase this.
       ;; gc-cons-threshold (* 200 1024 1024)
       help-window-select t
       history-delete-duplicates t
@@ -565,22 +566,22 @@ whitespaces."
 
       ((eq dotemacs-modeline-theme 'default)))
 
-(use-package awesome-tray
-  :if (and nil (eq dotemacs-modeline-theme 'default))
-  :load-path "extras"
-  :hook (after-init . awesome-tray-mode)
-  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
-  :custom-face
-  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
-  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight bold :height 0.8))))
-  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
-  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+;; (use-package awesome-tray
+;;   :if (and nil (eq dotemacs-modeline-theme 'default))
+;;   :load-path "extras"
+;;   :hook (after-init . awesome-tray-mode)
+;;   :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
+;;   :custom-face
+;;   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+;;   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
+;;   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+;;   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
+;;   (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
+;;   (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight bold :height 0.8))))
+;;   (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
+;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (use-package auto-dim-other-buffers
   :ensure t
@@ -593,15 +594,15 @@ whitespaces."
 (set-face-attribute 'mode-line nil :height 100)
 (set-face-attribute 'mode-line-inactive nil :height 100)
 
-(use-package circadian
-  :ensure t
-  :disabled t
-  :custom
-  (calendar-latitude 26.50)
-  (calendar-longitude 80.23)
-  (circadian-themes '((:sunrise . doom-molokai)
-                      (:sunset  . doom-peacock)))
-  :init (circadian-setup))
+;; (use-package circadian
+;;   :ensure t
+;;   :disabled t
+;;   :custom
+;;   (calendar-latitude 26.50)
+;;   (calendar-longitude 80.23)
+;;   (circadian-themes '((:sunrise . doom-molokai)
+;;                       (:sunset  . doom-peacock)))
+;;   :init (circadian-setup))
 
 (use-package ibuffer
   :custom
@@ -686,83 +687,87 @@ whitespaces."
   :ensure t
   :hook (dired-mode . dired-posframe-mode))
 
-(use-package async
+(use-package diredfl
   :ensure t
-  :config (dired-async-mode))
+  :hook (dired-mode . diredfl-mode))
 
-(use-package treemacs
-  :ensure t
-  :commands (treemacs treemacs-toggle)
-  :hook ((projectile-mode . treemacs-filewatch-mode)
-         (projectile-mode . treemacs-follow-mode)
-         ;; (projectile-mode . treemacs-fringe-indicator-mode)
-         )
-  :custom
-  (treemacs-collapse-dirs 3)
-  (treemacs-follow-after-init t)
-  (treemacs-goto-tag-strategy 'refetch-index)
-  (treemacs-indentation 2)
-  (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
-  (treemacs-lock-width t)
-  (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
-  (treemacs-position 'right)
-  (treemacs-project-follow-cleanup t)
-  (treemacs-recenter-after-file-follow t)
-  (treemacs-recenter-after-tag-follow  t)
-  (treemacs-show-hidden-files nil)
-  (treemacs-silent-filewatch t)
-  (treemacs-silent-refresh t)
-  ;; (treemacs-sorting 'alphabetic-desc)
-  (treemacs-tag-follow-cleanup t)
-  (treemacs-tag-follow-delay 1)
-  (treemacs-width 20)
-  :config
-  ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
-  ;; (treemacs-tag-follow-mode 1)
-  (treemacs-git-mode 'extended)
-  ;; Decrease the font size
-  (set-face-attribute 'treemacs-directory-collapsed-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-directory-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-file-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-root-face nil
-                      :height 0.9)
-  (set-face-attribute 'treemacs-tags-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-git-ignored-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-git-untracked-face nil
-                      :height 0.7)
-  (treemacs-resize-icons 16)
-  :bind* ("C-j" . treemacs))
+;; (use-package async
+;;   :ensure t
+;;   :config (dired-async-mode))
 
-(use-package treemacs-projectile
-  :ensure t
-  :after (treemacs projectile))
+;; (use-package treemacs
+;;   :ensure t
+;;   :commands (treemacs treemacs-toggle)
+;;   :hook ((projectile-mode . treemacs-filewatch-mode)
+;;          (projectile-mode . treemacs-follow-mode)
+;;          ;; (projectile-mode . treemacs-fringe-indicator-mode)
+;;          )
+;;   :custom
+;;   (treemacs-collapse-dirs 3)
+;;   (treemacs-follow-after-init t)
+;;   (treemacs-goto-tag-strategy 'refetch-index)
+;;   (treemacs-indentation 2)
+;;   (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
+;;   (treemacs-lock-width t)
+;;   (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
+;;   (treemacs-position 'right)
+;;   (treemacs-project-follow-cleanup t)
+;;   (treemacs-recenter-after-file-follow t)
+;;   (treemacs-recenter-after-tag-follow  t)
+;;   (treemacs-show-hidden-files nil)
+;;   (treemacs-silent-filewatch t)
+;;   (treemacs-silent-refresh t)
+;;   ;; (treemacs-sorting 'alphabetic-desc)
+;;   (treemacs-tag-follow-cleanup t)
+;;   (treemacs-tag-follow-delay 1)
+;;   (treemacs-width 20)
+;;   :config
+;;   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
+;;   ;; (treemacs-tag-follow-mode 1)
+;;   (treemacs-git-mode 'extended)
+;;   ;; Decrease the font size
+;;   (set-face-attribute 'treemacs-directory-collapsed-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-directory-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-file-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-root-face nil
+;;                       :height 0.9)
+;;   (set-face-attribute 'treemacs-tags-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-git-ignored-face nil
+;;                       :height 0.7)
+;;   (set-face-attribute 'treemacs-git-untracked-face nil
+;;                       :height 0.7)
+;;   (treemacs-resize-icons 16)
+;;   :bind* ("C-j" . treemacs))
 
-(use-package treemacs-icons-dired
-  :after treemacs
-  :ensure t
-  :config (treemacs-icons-dired-mode))
+;; (use-package treemacs-projectile
+;;   :ensure t
+;;   :after (treemacs projectile))
 
-(use-package treemacs-magit
-  :after treemacs magit
-  :ensure t)
+;; (use-package treemacs-icons-dired
+;;   :after treemacs
+;;   :ensure t
+;;   :config (treemacs-icons-dired-mode))
 
-(use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
-  :ensure t)
+;; (use-package treemacs-magit
+;;   :after treemacs magit
+;;   :ensure t)
 
-(use-package all-the-icons-ibuffer
-  :ensure t
-  :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-  :custom (all-the-icons-ibuffer-icon-size 0.8))
+;; (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
+;;   :ensure t)
 
-(use-package all-the-icons-dired
-  :ensure t
-  :diminish
-  :hook (dired-mode . all-the-icons-dired-mode))
+;; (use-package all-the-icons-ibuffer
+;;   :ensure t
+;;   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
+;;   :custom (all-the-icons-ibuffer-icon-size 0.8))
+
+;; (use-package all-the-icons-dired
+;;   :ensure t
+;;   :diminish
+;;   :hook (dired-mode . all-the-icons-dired-mode))
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
 ;; candidates.
@@ -774,8 +779,8 @@ whitespaces."
          ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)))
 
-(use-package isearch-symbol-at-point
-  :ensure t)
+;; (use-package isearch-symbol-at-point
+;;   :ensure t)
 
 (use-package isearch-dabbrev
   :ensure t
@@ -786,8 +791,10 @@ whitespaces."
   :ensure t
   :custom (swiper-action-recenter t))
 
-(setq-default grep-highlight-matches t
-              grep-scroll-output t)
+(with-eval-after-load 'grep
+  (setq-default grep-highlight-matches t
+                grep-scroll-output t
+                grep-command"grep -irHn "))
 
 (use-package wgrep ; Writable grep
   :ensure t
@@ -842,6 +849,7 @@ whitespaces."
   (company-require-match nil "Allow input string that do not match candidates")
   (company-selection-wrap-around t)
   (company-show-numbers 'left "Speed up completion")
+  (company-tooltip-align-annotations t)
   :config
   (dolist (backend '(company-semantic company-bbdb company-oddmuse))
     (delq backend company-backends))
@@ -861,39 +869,47 @@ whitespaces."
   :diminish
   :hook (global-company-mode . company-posframe-mode))
 
-(use-package company-flx
-  :ensure t
-  :hook (global-company-mode . company-flx-mode))
+;; This seems unmaintained and only works for elisp-mode
+;; (use-package company-flx
+;;   :ensure t
+;;   :disabled t
+;;   :hook (global-company-mode . company-flx-mode))
 
-(use-package company-quickhelp
-  :ensure t
-  :hook (global-company-mode . company-quickhelp-mode))
+;; (use-package company-fuzzy
+;;   :ensure t
+;;   :after company
+;;   :diminish
+;;   :init (global-company-fuzzy-mode 1))
 
-(use-package company-box
-  :ensure t
-  :diminish
-  :defines company-box-icons-all-the-icons
-  :hook (global-company-mode . company-box-mode)
-  :custom
-  (company-box-backends-colors nil)
-  (company-box-doc-delay 0)
-  (company-box-max-candidates 50)
-  (company-box-show-single-candidate t))
+;; (use-package company-quickhelp
+;;   :ensure t
+;;   :hook (global-company-mode . company-quickhelp-mode))
 
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (after-init . yas-global-mode)
-  :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-  :config (unbind-key "<tab>" yas-minor-mode-map))
+;; (use-package company-box
+;;   :ensure t
+;;   :diminish
+;;   :defines company-box-icons-all-the-icons
+;;   :hook (global-company-mode . company-box-mode)
+;;   :custom
+;;   (company-box-backends-colors nil)
+;;   (company-box-doc-delay 0)
+;;   (company-box-max-candidates 50)
+;;   (company-box-show-single-candidate t))
 
-(use-package amx
-  :ensure t
-  :hook (after-init . amx-mode)
-  :custom
-  (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
-  (amx-show-key-bindings nil "Try to speed up amx"))
+;; (use-package yasnippet
+;;   :ensure t
+;;   :diminish yas-minor-mode
+;;   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+;;   :hook (after-init . yas-global-mode)
+;;   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+;;   :config (unbind-key "<tab>" yas-minor-mode-map))
+
+;; (use-package amx
+;;   :ensure t
+;;   :hook (after-init . amx-mode)
+;;   :custom
+;;   (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
+;;   (amx-show-key-bindings nil "Try to speed up amx"))
 
 (use-package ivy
   :ensure t
@@ -1039,36 +1055,44 @@ whitespaces."
   :disabled t
   :hook (ivy-mode . ivy-posframe-mode))
 
-(use-package prescient
-  :ensure t
-  :hook (counsel-mode . prescient-persist-mode)
-  :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
+;; (use-package prescient
+;;   :ensure t
+;;   :hook (counsel-mode . prescient-persist-mode)
+;;   :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
 
-(use-package ivy-prescient
-  :ensure t
-  :hook (counsel-mode . ivy-prescient-mode)
-  :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
+;; (use-package ivy-prescient
+;;   :ensure t
+;;   :hook (counsel-mode . ivy-prescient-mode)
+;;   :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 (with-eval-after-load 'ivy
   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
-(use-package company-prescient
-  :ensure t
-  :hook (company-mode . company-prescient-mode))
+;; (use-package orderless
+;;   :ensure t
+;;   :disabled t
+;;   :init (icomplete-mode) ; optional but recommended!
+;;   :custom
+;;   (completion-styles '(orderless))
+;;   (ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-(use-package all-the-icons-ivy-rich
-  :ensure t
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-  :custom (all-the-icons-ivy-rich-icon-size 0.8))
+;; (use-package company-prescient
+;;   :ensure t
+;;   :hook (company-mode . company-prescient-mode))
 
-;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
-(use-package ivy-rich
-  :ensure t
-  :custom
-  (ivy-format-function #'ivy-format-function-line)
-  (ivy-rich-parse-remote-buffer nil)
-  :hook (ivy-mode . ivy-rich-mode))
+;; (use-package all-the-icons-ivy-rich
+;;   :ensure t
+;;   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
+;;   :custom (all-the-icons-ivy-rich-icon-size 0.8))
+
+;; ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el#L449
+;; (use-package ivy-rich
+;;   :ensure t
+;;   :custom
+;;   (ivy-format-function #'ivy-format-function-line)
+;;   (ivy-rich-parse-remote-buffer nil)
+;;   :hook (ivy-mode . ivy-rich-mode))
 
 (use-package flyspell
   :if dotemacs-is-linux
@@ -1247,7 +1271,7 @@ whitespaces."
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
   (dolist (dirs '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
-                  ".vscode" "__pycache__" "auto" "elpa"))
+                  ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS"  "TAGS" "tags" ".dir-locals.el" ".projectile"
                    ".project" ".tags" "__init__.py"))
@@ -1276,11 +1300,11 @@ whitespaces."
          ([remap projectile-switch-project] . counsel-projectile-switch-project)
          ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)))
 
-(use-package flycheck-grammarly
-  :ensure t
-  :hook
-  (text-mode . (lambda ()
-                 (require 'flycheck-grammarly))))
+;; (use-package flycheck-grammarly
+;;   :ensure t
+;;   :hook
+;;   (text-mode . (lambda ()
+;;                  (require 'flycheck-grammarly))))
 
 (use-package flycheck
   :ensure t
@@ -1299,7 +1323,8 @@ whitespaces."
                                                                      dotemacs-user-home)
                           flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
                                                                          dotemacs-user-home))
-              (flycheck-add-next-checker 'grammarly-checker 'textlint)))
+              ;; (flycheck-add-next-checker 'grammarly-checker 'textlint)
+              ))
   (add-hook 'python-mode-hook
             (lambda ()
               ;; (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
@@ -1314,7 +1339,8 @@ whitespaces."
               (setq-local flycheck-checker 'markdown-markdownlint-cli
                           flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                                       dotemacs-user-home))
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)))
+              ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)
+              ))
   ;; (add-hook 'latex-mode-hook
   ;;           (lambda ()
   ;;             (flycheck-add-next-checker 'lsp 'grammarly-checker)))
@@ -1338,27 +1364,27 @@ whitespaces."
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults)))
 
-(use-package whitespace
-  :commands (whitespace-mode global-whitespace-mode)
-  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :custom
-  (show-trailing-whitespace nil)
-  (whitespace-line-column dotemacs-fill-column))
+;; (use-package whitespace
+;;   :commands (whitespace-mode global-whitespace-mode)
+;;   ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+;;   :custom
+;;   (show-trailing-whitespace nil)
+;;   (whitespace-line-column dotemacs-fill-column))
 
-;; This is different from whitespace-cleanup since this is unconditional
-(when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
-  (add-hook 'before-save-hook #'delete-trailing-whitespace))
+;; ;; This is different from whitespace-cleanup since this is unconditional
+;; (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
+;;   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-(use-package whitespace-cleanup-mode
-  :ensure t
-  :diminish)
+;; (use-package whitespace-cleanup-mode
+;;   :ensure t
+;;   :diminish)
 
-(use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-  :ensure t
-  :disabled t
-  :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
-  ;; :diminish
-  :hook (prog-mode . ws-butler-mode))
+;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+;;   :ensure t
+;;   :disabled t
+;;   :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
+;;   ;; :diminish
+;;   :hook (prog-mode . ws-butler-mode))
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
@@ -1370,7 +1396,8 @@ whitespaces."
 
 (use-package hl-todo
   :ensure t
-  :hook (after-init . global-hl-todo-mode))
+  :hook (after-init . global-hl-todo-mode)
+  :custom (hl-todo-highlight-punctuation ":"))
 
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -1492,25 +1519,25 @@ whitespaces."
   (dolist (ignore-files '(".clang-format" "*.json" "*.html" "*.xml"))
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
-(use-package dumb-jump
-  :ensure t
-  :custom (dumb-jump-prefer-searcher 'rg)
-  :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
+;; (use-package dumb-jump
+;;   :ensure t
+;;   :custom (dumb-jump-prefer-searcher 'rg)
+;;   :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(use-package helpful
-  :ensure t
-  :bind (("C-h v" . helpful-variable)
-         ("C-h k" . helpful-key)
-         ("C-h f" . helpful-function)
-         ("C-h c" . helpful-command)
-         ("C-h p" . helpful-at-point)
-         :map helpful-mode-map
-         ("q" . helpful-kill-buffers)))
+;; (use-package helpful
+;;   :ensure t
+;;   :bind (("C-h v" . helpful-variable)
+;;          ("C-h k" . helpful-key)
+;;          ("C-h f" . helpful-function)
+;;          ("C-h c" . helpful-command)
+;;          ("C-h p" . helpful-at-point)
+;;          :map helpful-mode-map
+;;          ("q" . helpful-kill-buffers)))
 
-(use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-  :ensure t
-  :custom (vlf-application 'dont-ask)
-  :config (use-package vlf-setup))
+;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+;;   :ensure t
+;;   :custom (vlf-application 'dont-ask)
+;;   :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase 'all' consecutive white space characters in a given direction
   :ensure t
@@ -1585,24 +1612,24 @@ whitespaces."
   :ensure t
   :bind ("C-=" . er/expand-region))
 
-(use-package expand-line
-  :ensure t
-  :bind ("M-i" . turn-on-expand-line-mode))
+;; (use-package expand-line
+;;   :ensure t
+;;   :bind ("M-i" . turn-on-expand-line-mode))
 
-(use-package undo-tree
-  :ensure t
-  :defines undo-tree-map
-  :custom
-  (undo-tree-mode-lighter "")
-  (undo-tree-visualizer-timestamps t)
-  (undo-tree-visualizer-relative-timestamps t)
-  (undo-tree-auto-save-history nil)
-  (undo-tree-visualizer-diff t)
-  :config
-  (global-undo-tree-mode 1)
-  (unbind-key "C-/" undo-tree-map)
-  :diminish
-  :bind ("C-x u" . undo-tree-visualize))
+;; (use-package undo-tree
+;;   :ensure t
+;;   :defines undo-tree-map
+;;   :custom
+;;   (undo-tree-mode-lighter "")
+;;   (undo-tree-visualizer-timestamps t)
+;;   (undo-tree-visualizer-relative-timestamps t)
+;;   (undo-tree-auto-save-history nil)
+;;   (undo-tree-visualizer-diff t)
+;;   :config
+;;   (global-undo-tree-mode 1)
+;;   (unbind-key "C-/" undo-tree-map)
+;;   :diminish
+;;   :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
@@ -1646,15 +1673,15 @@ whitespaces."
   :bind (([remap other-window] . ace-window)
          ("<f10>" . ace-window)))
 
-;; This causes additional saves which leads to auto-formatters being invoked more frequently
-(use-package super-save ; Save buffers when Emacs loses focus
-  :ensure t
-  :diminish
-  :custom
-  (super-save-remote-files nil "Ignore remote files")
-  (super-save-auto-save-when-idle t)
-  :hook (after-init . super-save-mode)
-  :config (add-to-list 'super-save-triggers 'ace-window))
+;; ;; This causes additional saves which leads to auto-formatters being invoked more frequently
+;; (use-package super-save ; Save buffers when Emacs loses focus
+;;   :ensure t
+;;   :diminish
+;;   :custom
+;;   (super-save-remote-files nil "Ignore remote files")
+;;   (super-save-auto-save-when-idle t)
+;;   :hook (after-init . super-save-mode)
+;;   :config (add-to-list 'super-save-triggers 'ace-window))
 
 (use-package avy
   :ensure t
@@ -1681,15 +1708,15 @@ whitespaces."
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
 
-(use-package esup
-  :ensure t
-  :commands (esup))
+;; (use-package esup
+;;   :ensure t
+;;   :commands (esup))
 
-(use-package explain-pause-mode
-  :load-path "extras"
-  :disabled t
-  ;; :diminish
-  :hook (after-init . explain-pause-mode))
+;; (use-package explain-pause-mode
+;;   :load-path "extras"
+;;   ;; :diminish
+;;   ;; :hook (after-init . explain-pause-mode)
+;;   )
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.
@@ -1699,19 +1726,19 @@ whitespaces."
   :diminish
   :hook (text-mode . writegood-mode))
 
-(use-package langtool
-  :ensure t
-  :hook (text-mode . (lambda()
-                       (require 'langtool)))
-  :custom
-  (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
-                                                dotemacs-user-home)))
+;; (use-package langtool
+;;   :ensure t
+;;   :hook (text-mode . (lambda()
+;;                        (require 'langtool)))
+;;   :custom
+;;   (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
+;;                                                 dotemacs-user-home)))
 
-(use-package logview
-  :ensure t
-  :custom
-  (logview-cache-filename (expand-file-name "logview-cache.extmap"
-                                            dotemacs-temp-directory)))
+;; (use-package logview
+;;   :ensure t
+;;   :custom
+;;   (logview-cache-filename (expand-file-name "logview-cache.extmap"
+;;                                             dotemacs-temp-directory)))
 
 (use-package bison-mode
   :ensure t
@@ -1721,8 +1748,8 @@ whitespaces."
   :load-path "extras"
   :mode "\\.ll\\'")
 
-(use-package autodisass-llvm-bitcode
-  :ensure t)
+;; (use-package autodisass-llvm-bitcode
+;;   :ensure t)
 
 (use-package js2-mode
   :ensure t
@@ -1761,29 +1788,30 @@ whitespaces."
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
-(use-package prettier-js
-  :ensure t
-  :disabled t ; Seems like there are bugs/inconsistencies in indenting lists
-  :init
-  (dolist (hook '(markdown-mode-hook gfm-mode-hook))
-    (add-hook hook #'prettier-js-mode))
-  :custom
-  (prettier-js-args (list "--config" (expand-file-name ".prettierrc"
-                                                       dotemacs-user-home))))
+;; (use-package prettier-js
+;;   :ensure t
+;;   :disabled t ; Seems like there are bugs/inconsistencies in indenting lists
+;;   :init
+;;   (dolist (hook '(markdown-mode-hook gfm-mode-hook))
+;;     (add-hook hook #'prettier-js-mode))
+;;   :custom
+;;   (prettier-js-args (list "--config" (expand-file-name ".prettierrc"
+;;                                                        dotemacs-user-home))))
 
-(use-package add-node-modules-path
-  :ensure t
-  :init
-  (with-eval-after-load 'typescript-mode
-    (add-hook 'typescript-mode-hook 'add-node-modules-path))
-  (with-eval-after-load 'js2-mode
-    (add-hook 'js2-mode-hook 'add-node-modules-path)))
+;; (use-package add-node-modules-path
+;;   :ensure t
+;;   :init
+;;   (with-eval-after-load 'typescript-mode
+;;     (add-hook 'typescript-mode-hook 'add-node-modules-path))
+;;   (with-eval-after-load 'js2-mode
+;;     (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
-(use-package prettier
-  :ensure t
-  :diminish
-  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-  :hook ((markdown-mode gfm-mode) . prettier-mode))
+;; (use-package prettier
+;;   :ensure t
+;;   :diminish
+;;   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+;;   ;; :hook ((markdown-mode gfm-mode) . prettier-mode)
+;;   )
 
 (use-package grip-mode
   :ensure t
@@ -1795,16 +1823,16 @@ whitespaces."
   :mode "\\.csv\\'"
   :custom (csv-separators '("," ";" "|" " ")))
 
-(use-package doxymacs
-  :ensure t
-  :disabled t
-  :commands (doxymacs-mode doxymacs-font-lock)
-  :config
-  (doxymacs-mode 1)
-  (doxymacs-font-lock))
+;; (use-package doxymacs
+;;   :ensure t
+;;   :disabled t
+;;   :commands (doxymacs-mode doxymacs-font-lock)
+;;   :config
+;;   (doxymacs-mode 1)
+;;   (doxymacs-font-lock))
 
-(use-package highlight-doxygen
-  :ensure t)
+;; (use-package highlight-doxygen
+;;   :ensure t)
 
 (use-package boogie-friends
   :ensure t
@@ -1819,8 +1847,10 @@ whitespaces."
   :diminish
   :config (global-eldoc-mode 1))
 
+;; Cannot load with use-package, do we need a :mode?
 (use-package matlab-mode
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 (use-package ini-mode
   :ensure t
@@ -1908,19 +1938,19 @@ whitespaces."
                                       pyvenv-virtual-env-name "]")))
   :hook (python-mode . pyvenv-mode))
 
-(use-package ein
-  :ensure t)
+;; (use-package ein
+;;   :ensure t)
 
 (add-hook 'java-mode-hook
           (lambda ()
             (setq-default c-basic-offset 4
                           c-set-style "java")))
 
-(use-package ant
-  :ensure t)
+;; (use-package ant
+;;   :ensure t)
 
-(use-package autodisass-java-bytecode ; Can disassemble .class files from within jars
-  :ensure t)
+;; (use-package autodisass-java-bytecode ; Can disassemble .class files from within jars
+;;   :ensure t)
 
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
@@ -2041,11 +2071,11 @@ whitespaces."
   :hook (nxml-model . lsp)
   :init (fset 'xml-mode 'nxml-mode))
 
-(use-package company-php
-  :ensure t
-  :init
-  (with-eval-after-load 'company
-    (add-to-list 'company-backends 'company-ac-php-backend)))
+;; (use-package company-php
+;;   :ensure t
+;;   :init
+;;   (with-eval-after-load 'php-mode
+;;     (add-to-list 'company-backends 'company-ac-php-backend)))
 
 (use-package lsp-mode
   :ensure t
@@ -2072,7 +2102,7 @@ whitespaces."
   (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
-  (lsp-enable-snippet t) ; Autocomplete parentheses
+  ;; (lsp-enable-snippet t) ; Autocomplete parentheses
   (lsp-html-format-wrap-line-length 100)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2211,8 +2241,8 @@ whitespaces."
                          (require 'lsp-pyright)
                          (lsp-deferred))))
 
-;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue
-;; to use AucTeX support
+;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
+;; support
 (or (use-package lsp-latex
       :ensure t
       :after lsp

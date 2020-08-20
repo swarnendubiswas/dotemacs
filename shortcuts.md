@@ -22,8 +22,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `M-/` - Try to expand text before point (`hippie-expand`)
 - `C-M-\` - Indent all the lines in the region (`indent-region`)
 - `M-q` - Fill paragraph at or after point (`fill-paragraph`)
-- `M-d` - Kill the immediately next word (``)
-- `M-- M-d` - Kill the immediately previous word (``)
+- `M-d` - Kill the next word (`kill-word`)
+- `M-- M-d` - Kill the previous word (`negative-argument kill-word`)
 
 ## Marking
 
@@ -72,14 +72,14 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `M-<up>` - Go to the first file/directory (`dired-jump-to-top`)
 - `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`)
 - `q` - Kill dired buffer (`quit-window`)
-- `C-u q` - Kill dired buffer (``)
+- `C-u q` - Kill dired buffer (`universal-argument quit-window`)
 - `C-x C-j` - Open dired with cursor right on the file you are editing (`dired-jump`)
 
 ## Treemacs
 
 - `C-j` - Initialize or toggle treemacs (`treemacs`)
-- `n/p` - Navigate between same-level nodes.
-- `u` - Go to parent folder.
+- `n/p` - Navigate between same-level nodes (``)
+- `u` - Go to parent folder (``)
 
 ## Ibuffer
 
@@ -91,18 +91,6 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 ## Search
 
 - `M-s o` - List all lines in current buffer matching regex (`list-matching-lines`), alias of `occur`
-
-### Ag
-
-- `<f8>` - Run an ag search in the project (`projectile-ag`)
-- `<return>` - Visit the file (``)
-- `n` and `p` - Move between results (``)
-- `g` - Run the search again (``)
-- `q` - Close the buffer (``)
-- `k` - Kill the buffer (``)
-- `C-c C-p` -
-- `C-x C-s` -
-- `C-h m` - Show all the keybindings available inside a results buffer (``)
 
 ### Ripgrep
 
@@ -146,7 +134,7 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 ## Projectile
 
 - `C-c p f` - Display a list of all files in the project (`projectile-find-file`)
-- `C-c p g` - Jump to a project's files using completion based on context (`projectile-find-file-dwim`)
+- `C-c p g` - Jump to files using completion based on context (`projectile-find-file-dwim`)
 - `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`)
 - `C-c p b` - List buffers local to current project (`projectile-switch-to-buffer`)
 - `C-c p e` - Jump to recently visited files in project (`projectile-recentf`)
@@ -157,11 +145,11 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 - `<f5>` - Switch project (`counsel-projectile-switch-project`)
 - `<f6>` - Find file (`counsel-projectile-find-file`)
 - `<f7>` - Run an ag search in the project (`counsel-projectile-rg`)
-- `C-c p s g` - Grep in project
-- `C-c p v` - Run `vc-dir` on the project root
-- `C-c p k` - Kill all project buffers
+- `C-c p s g` - Grep in project (`counsel-projectile-grep`)
+- `C-c p v` - Run `vc-dir` on the project root (`projectile-vc`)
+- `C-c p k` - Kill all project buffers (`projectile-kill-buffers`)
 - `C-c p E` - Opens the root `dir-locals-file` of the project
-- `C-c p C-h` - Show all projectile keybindings
+- `C-c p C-h` - Show all projectile keybindings (``)
 
 ## LaTeX/AUCTeX
 
@@ -193,7 +181,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## Markdown
 
-- `C-c C-s e` - Make region or word italic (emphasis) (``)
+- `C-c C-s e` - Make region or word italic (emphasis) (`markdown-insert-italic`)
 - `C-c C-s s` - Make region or word bold or strong (``)
 - `C-c C-s s` - Insert or start blockquote (``)
 - `C-c C-s p` - Insert pre-formatted code blocks (``)
@@ -365,6 +353,9 @@ Use `magit-status` to display information about the current Git repository, and 
 - `C-f M-j` - Search for the word from the current cursor position (`swiper` `ivy-yank-word`)
 - `C-f M-n` - Search for the complete word from under the current cursor (`swiper` `ivy-next-history-element`)
 - [An example of excluding \*.el from the files searched by ag](https://github.com/abo-abo/swiper/pull/774)
+- `C-s` - Bring up the last search
+- `M-p` - Iterate backward through the search history
+- `M-n` - Iterate backward through the search history
 
 ### Search in the current folder
 

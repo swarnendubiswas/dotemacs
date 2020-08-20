@@ -1064,6 +1064,7 @@
     ("smaler" "smaller" nil :count 1)
     ("smoe" "some" nil :count 0)
     ("soem" "some" nil :count 1)
+    ("softwware" "software" nil :count 0)
     ("sohw" "show" nil :count 0)
     ("soical" "social" nil :count 0)
     ("somehting" "something" nil :count 0)
