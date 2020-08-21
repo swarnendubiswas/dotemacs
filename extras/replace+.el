@@ -154,14 +154,14 @@
 ;; 2016/05/08 dadams
 ;;     query-replace-read-from: Use query-replace-compile-replacement, like vanilla.  Thx to Tino Calancha.
 ;; 2015/07/23 dadams
-;;     replace-regexp: Typo: FROM -> REGEXP.  Thx to Tino Calancha. 
+;;     replace-regexp: Typo: FROM -> REGEXP.  Thx to Tino Calancha.
 ;; 2014/04/16 dadams
 ;;     query-replace-regexp, replace-string, replace-regexp: Got the emacs24.4+ version test backwards.
 ;; 2014/04/15 dadams
 ;;     query-replace(-read-args|-w-options|-regexp), replace-(string|regexp):
 ;;       Update version test for Emacs 24.4 pretest - use version<.
 ;; 2014/01/30 dadams
-;;     query-replace, interactive spec: Swapped return lists - it is Emacs 24.4+ that has 6 args. 
+;;     query-replace, interactive spec: Swapped return lists - it is Emacs 24.4+ that has 6 args.
 ;;     defadvices: Removed extra nil before interactive spec.
 ;; 2014/01/13 dadams
 ;;     query-replace-read-(from|to): Define for Emacs 20-21 also.

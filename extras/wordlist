@@ -496,6 +496,7 @@ coastal
 coating
 cocktail
 cognitive
+coherence
 collapse
 colleague
 collect
@@ -554,6 +555,7 @@ composer
 composition
 compound
 comprehensive
+compression
 compute
 computed
 computer
@@ -601,6 +603,7 @@ consideration
 consist
 Consistency
 consistent
+consisting
 consists
 console
 constant
@@ -625,6 +628,7 @@ contents
 contest
 contests
 context
+contiguous
 contingent
 continue
 continued
@@ -651,6 +655,7 @@ cooling
 cooperation
 copying
 cordless
+cornucopia
 corporate
 corporation
 correct
@@ -823,6 +828,7 @@ directed
 direction
 directly
 director
+directory
 disability
 disable
 disabled
@@ -841,6 +847,7 @@ discuss
 discussion
 disease
 diseases
+disjoint
 dismiss
 disorder
 dispatch
@@ -858,6 +865,8 @@ distinguish
 distribute
 distribution
 district
+disturbance
+disturbances
 diverse
 diversity
 divided
@@ -892,6 +901,7 @@ dropped
 durable
 duration
 dynamic
+dynamically
 dynamics
 earlier
 earliest
@@ -1236,6 +1246,7 @@ grammar
 grandfather
 grandmother
 granted
+granularity
 graphic
 graphics
 grateful
@@ -1293,6 +1304,7 @@ heterogeneous
 Heterogeneous
 hierarchical
 Hierarchical
+hierarchies
 hierarchy
 highest
 highland
@@ -1378,6 +1390,7 @@ includes
 including
 incoming
 incomplete
+inconsistencies
 incorporate
 increase
 increased
@@ -1443,6 +1456,7 @@ intensity
 intention
 interact
 interaction
+interchangeable
 interest
 interested
 interesting
@@ -1463,6 +1477,7 @@ intimate
 introduce
 introduction
 invalid
+invalidation
 invalidations
 invasion
 investigate
@@ -1476,6 +1491,7 @@ involve
 involved
 involvement
 involves
+irrespective
 islands
 isolated
 jackets
@@ -1902,8 +1918,10 @@ periodic
 periods
 permanent
 permission
+permissions
 permits
 personal
+personalities
 personality
 personally
 personnel
@@ -1924,6 +1942,7 @@ physician
 picking
 picture
 pictures
+piggyback
 pioneer
 pipeline
 pirates
@@ -2042,6 +2061,8 @@ procedure
 proceed
 proceeds
 process
+processor
+procrastinating
 produce
 produced
 producer
@@ -2236,12 +2257,14 @@ repeated
 repeatedly
 replace
 replaced
+replacement
 replica
 replied
 replies
 reported
 reporter
 reports
+repository
 represent
 representation
 representative
@@ -2599,7 +2622,7 @@ survival
 survive
 survivor
 suspect
-suspicion 
+suspicion
 suspicious
 sustain
 swimming
@@ -2726,6 +2749,7 @@ transactional
 transfer
 transform
 transformation
+transient
 transit
 transition
 translate
@@ -2803,6 +2827,7 @@ variation
 variety
 various
 varying
+vectorization
 vegetable
 vehicle
 vehicles
@@ -2908,21 +2933,9 @@ written
 yesterday
 younger
 yourself
-necessitate
-satisfactorily
-proportionate
-corresponding
-contingent
-processor
-irrespective
-hierarchies
-contiguous
-consisting
-interchangeable
-procrastinating
-inconsistencies
-vectorization
+greedily
+destination
 
 # Local Variables:
-# mode: text
-# End:
+#mode: text
+# End

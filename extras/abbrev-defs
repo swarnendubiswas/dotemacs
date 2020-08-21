@@ -1304,4 +1304,3 @@
     ("finally" "finally" c-electric-continued-statement :count 0)
     ("while" "while" c-electric-continued-statement :count 0)
    ))
-

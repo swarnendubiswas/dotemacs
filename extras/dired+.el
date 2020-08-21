@@ -237,7 +237,7 @@
 ;;  names have prefix `diredp-image-'.  And see options
 ;;  `diredp-image-preview-in-tooltip' and
 ;;  `diredp-auto-focus-frame-for-thumbnail-tooltip-flag'.
-;;    
+;;
 ;;
 ;;  Inserted Subdirs, Multiple Dired Buffers, Files from Anywhere,...
 ;;  -----------------------------------------------------------------
@@ -414,7 +414,7 @@
 ;;  want to customize the option to set the value to `nil', and then
 ;;  bind the commands to some other keys, which your terminal
 ;;  supports.
-;;  
+;;
 ;;  The problematic keys used by Dired+ include these:
 ;;
 ;;    `M-M'   (aka `M-S-m')   - `diredp-chmod-this-file'
@@ -938,7 +938,7 @@
 ;;       diredp-list-(marked|files), diredp-yank-files, diredp-describe-marked-autofiles, plus all functions with
 ;;       "recursive" in their name except diredp-get-confirmation-recursive.
 ;;       Added optional arg DETAILS.
-;;     diredp-get-(subdirs|files), diredp-y-or-n-files-p, diredp-list-(marked|files), diredp-yank-files, 
+;;     diredp-get-(subdirs|files), diredp-y-or-n-files-p, diredp-list-(marked|files), diredp-yank-files,
 ;;       diredp-describe-marked-autofiles:
 ;;         Added optional arg DETAILS.
 ;;     diredp-list-files: Use dired-list-file, to optionally show details.
@@ -1134,7 +1134,7 @@
 ;;       Non-positive prefix arg means DELIMITED.
 ;; 2016/08/08 dadams
 ;;     diredp-menu-bar-mark-menu:
-;;       Added: dired-mark-files-containing-regexp, dired-mark-sexp, image-dired-mark-tagged-files, 
+;;       Added: dired-mark-files-containing-regexp, dired-mark-sexp, image-dired-mark-tagged-files,
 ;; 2016/05/28 dadams
 ;;     diredp-mark-files-regexp-recursive: Use nil for dired-get-filename LOCALP arg.
 ;;     dired-mark-files-regexp: Corrected doc string: absolute filename matching by default.
@@ -1339,7 +1339,7 @@
 ;;            image-dired-dired-toggle-marked-thumbs, diredp-list-marked.
 ;;     Soft-require image-dired.el and image-file.el.
 ;;     diredp-image-dired-create-thumb: Define unconditionally.
-;;     image-dired-dired-insert-marked-thumbs, diredp-image-dired-comment-file, 
+;;     image-dired-dired-insert-marked-thumbs, diredp-image-dired-comment-file,
 ;;       diredp-image-dired-tag-file, diredp-image-dired-delete-tag,
 ;;       diredp-image-dired-display-thumb, diredp-image-dired-copy-with-exif-name,
 ;;       diredp-image-dired-edit-comment-and-tags, diredp-do-display-images:
@@ -1392,7 +1392,7 @@
 ;;     Replace bindings for dired-hide-subdir with diredp-hide-subdir-nomove.
 ;;     Bind dired-hide-subdir to M-$ (not $).
 ;; 2014/02/02 dadams
-;;     dired-goto-file: Redefine only for Emacs < 24. 
+;;     dired-goto-file: Redefine only for Emacs < 24.
 ;; 2014/01/15 dadams
 ;;     Bind diredp-toggle-find-file-reuse-dir to C-M-R (aka C-M-S-r).
 ;; 2014/01/05 dadams
@@ -1469,7 +1469,7 @@
 ;;     Add frame-fitting to dired-hide-details-mode-hook.
 ;;     dired-mouse-find-file(-other-window): Error msg if click off a file name.
 ;; 2013/07/12 dadams
-;;     Added: diredp-wrap-around-flag, diredp-(next|previous)-(subdir|(dir)line). 
+;;     Added: diredp-wrap-around-flag, diredp-(next|previous)-(subdir|(dir)line).
 ;;     Renamed dired-up-directory to diredp-up-directory.
 ;;     Replaced vanilla commands by these new commands everywhere.
 ;; 2013/07/11 dadams
@@ -2140,7 +2140,7 @@ Don't forget to mention your Emacs and library versions."))
   :link '(url-link :tag "Description"
           "https://www.emacswiki.org/emacs/DiredPlus")
   :link '(emacs-commentary-link :tag "Commentary" "dired+"))
- 
+
 ;;; Variables
 
 ;; `dired-do-toggle' was renamed to `dired-toggle-marks' after Emacs 20.
@@ -2427,7 +2427,7 @@ Initialized to the value of option `diredp-hide-details-initially-flag'.")
 ;;;     "Regular expression to match up to the file name in a directory listing.
 ;;; The default value is designed to recognize dates and times
 ;;; regardless of the language."))
- 
+
 ;;; Macros
 
 
@@ -2589,7 +2589,7 @@ If DISTINGUISH-ONE-MARKED is non-nil, then return (t FILENAME) instead
     `(with-output-to-temp-buffer ,buffer ,@body)))
 
 (put 'diredp-with-help-window 'common-lisp-indent-function '(4 &body))
- 
+
 ;;; Utility functions
 
 ;; Same as `imenup-delete-if-not'.
@@ -2709,7 +2709,7 @@ Uses the `derived-mode-parent' property of the symbol to trace backwards."
 
 (defun diredp-ensure-bookmark+ ()
   (unless (require 'bookmark+ nil t) (error "This command requires library `bookmark+.el'")))
- 
+
 
 (unless (fboundp 'dired-nondirectory-p) ; Emacs 20, 21.
   (defun dired-nondirectory-p (file)
@@ -2932,7 +2932,7 @@ current subdir, else use current subdir of this Dired buffer."
 ;; 1. Added behavior for non-positive prefix arg:
 ;;    * Construct a cons DIRNAME arg.
 ;;    * Read a Dired buffer name (not a directory) for its car.
-;;    * If READ-EXTRA-FILES-P is non-nil then read any number of file and dir names, to be included as its cdr. 
+;;    * If READ-EXTRA-FILES-P is non-nil then read any number of file and dir names, to be included as its cdr.
 ;;    * If chosen Dired buffer exists and is an ordinary listing then start out with its `directory-files'.
 ;;
 ;; 2. If you use Icicles then this is a multi-command - see doc for `dired' defadvice.
@@ -3689,7 +3689,7 @@ Non-nil optional arg ECHOP means also echo the result."
                             (setq result  (eval-expression sexp))))
         (error (setq failure  err))))
     (diredp-report-file-result file result failure echop)))
- 
+
 ;;; Face Definitions
 
 (defface diredp-autofile-name
@@ -4047,7 +4047,7 @@ This means file names that match regexp `diredp-omit-files-regexp'.
   (setq font-lock-mode  nil)
   (font-lock-mode))
 (add-hook 'dired-after-readin-hook 'diredp-refontify-buffer)
- 
+
 ;;; Function Definitions
 
 ;;; $$$$$$$$
@@ -4278,7 +4278,7 @@ ARG is as for `diredp-dired-recent-dirs'."
     (if (and arg  (atom arg))
         (diredp-read-include/exclude 'Dir recent-dirs (not (natnump (prefix-numeric-value arg))))
       recent-dirs)))
-         
+
 ;;;###autoload
 (defun diredp-do-add-to-recentf (&optional arg) ; Not bound by default
   "Add all marked (or next ARG) files to list of recently used files.
@@ -6495,7 +6495,7 @@ When called from Lisp, DETAILS is passed to `diredp-get-subdirs'."
                  (and (not (diredp-looking-at-p dired-re-dot))
                       (not (eolp))
                       (let ((fname  (dired-get-filename nil t)))
-                                  
+
                         (and fname
                              (file-readable-p fname)
                              (not (file-directory-p fname))
@@ -6940,9 +6940,9 @@ When called from Lisp:
  * If ARG is `(4)' then invoke the function, or eval the sexp, while
    visiting each file.
  * Optional arg DETAILS is passed to `diredp-get-files'."
-  (interactive 
+  (interactive
    (let ((use-no-args-p  (and (consp current-prefix-arg)  (< (car current-prefix-arg) 16))))
-     (diredp-get-confirmation-recursive) 
+     (diredp-get-confirmation-recursive)
      (list (if use-no-args-p
                (diredp-read-expression "Function or sexp: ")
              (read (completing-read "Function: " obarray 'functionp nil nil
@@ -9856,7 +9856,7 @@ Otherwise, just move to the buffer limit."
                  (when (and (boundp 'shift-select-mode)  shift-select-mode) (handle-shift-selection)) ; Emacs 23+
                  (list narg)))          ; Equivalent to "^p"
   (diredp-next-line (- (or arg  1))))
-  
+
 ;;;###autoload
 (defun diredp-next-dirline (arg &optional opoint) ; Bound to `>'
   "Goto ARGth next directory file line.
@@ -10108,7 +10108,7 @@ Return buffer position on success, else nil."
                   search-string)
               (setq search-string  (replace-regexp-in-string "\^m" "\\^m" base nil t)
                     search-string  (replace-regexp-in-string "\\\\" "\\\\" search-string nil t))
-            
+
               ;; Escape whitespace.  Sexp added by Emacs 24:
               (when (and (dired-switches-escape-p dired-actual-switches)
                          (diredp-string-match-p "[ \t\n]" search-string))
@@ -11855,7 +11855,7 @@ General Here
 "
     "  \\[diredp-marked-other-window]\t\t- Open Dired on marked files here
   \\[diredp-dired-inserted-subdirs]\t\t- Dired separately each subdir inserted here
-"    
+"
     (and (featurep 'bookmark+)
          "  \\[diredp-highlight-autofiles-mode]\t- Toggle autofile highlighting
 
@@ -12324,7 +12324,7 @@ This is used by `dired-visit-(next|previous)'."
 With numeric prefix arg N, move down N-1 lines first.
 
 After moving N lines, skip any lines with file names that match either
-`diredp-visit-ignore-extensions' or `diredp-visit-ignore-regexps'. 
+`diredp-visit-ignore-extensions' or `diredp-visit-ignore-regexps'.
 
 Kill the last buffer visited by a `dired-visit-*' command."
   (interactive "p")
@@ -12339,7 +12339,7 @@ Kill the last buffer visited by a `dired-visit-*' command."
 With numeric prefix arg N, move up N-1 lines first.
 
 After moving N lines, skip any lines with file names that match either
-`diredp-visit-ignore-extensions' or `diredp-visit-ignore-regexps'. 
+`diredp-visit-ignore-extensions' or `diredp-visit-ignore-regexps'.
 
 Kill the last buffer visited by a `dired-visit-*' command."
   (interactive "p")
@@ -12374,7 +12374,7 @@ windows there, then delete its window (toggle : show/hide the file)."
     (if shown
         (when (= 2 (count-windows 'NOMINI)) (delete-window fwin))
       (set-window-buffer fwin (find-file-noselect file)))))
- 
+
 ;;; Key Bindings.
 
 

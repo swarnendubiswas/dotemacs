@@ -98,8 +98,10 @@ This depends on the orientation of the display."
           (const :tag "horizontal" horizontal)) ; split-window-right
   :group 'dotemacs)
 
-(defconst dotemacs-fill-column 100
-  "Column beyond which lines should not extend.")
+(defconst dotemacs-fill-column 80
+  "Column beyond which lines should not extend."
+  :type 'number
+  :group 'dotemacs)
 
 (defcustom dotemacs-delete-trailing-whitespace-p
   nil
@@ -125,11 +127,11 @@ whitespaces."
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-gtags-path
-  "/usr/local/bin/gtags"
-  "Absolute path to GNU Global executable."
-  :type 'string
-  :group 'dotemacs)
+;; (defcustom dotemacs-gtags-path
+;;   "/usr/local/bin/gtags"
+;;   "Absolute path to GNU Global executable."
+;;   :type 'string
+;;   :group 'dotemacs)
 
 (defcustom dotemacs-debug-init-file
   t
@@ -156,7 +158,8 @@ whitespaces."
   (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
         ;; Avoid loading packages twice
         package-enable-at-startup nil)
-  (package-initialize t)
+  (when (< emacs-major-version 27)
+    (package-initialize t))
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
 ;; ;; package.el has no business modifying the user's init.el
@@ -216,7 +219,7 @@ whitespaces."
   :hook (after-init . gcmh-mode))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
-      apropos-do-all t
+      ;; apropos-do-all t
       auto-mode-case-fold nil ; Disable a second case insensitive pass
       auto-save-interval 600
       auto-save-list-file-prefix (expand-file-name "auto-save" dotemacs-temp-directory)
@@ -231,14 +234,14 @@ whitespaces."
       create-lockfiles nil
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      enable-recursive-minibuffers t
+      ;; enable-recursive-minibuffers t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b"))
       ;; gc-cons-percentage 0.5 ; Portion of heap used for allocation
       ;; GC may happen after this many bytes are allocated since last GC
       ;; If you experience freezing, decrease this. If you experience stuttering, increase this.
       ;; gc-cons-threshold (* 200 1024 1024)
-      help-window-select t
+      ;; help-window-select t
       history-delete-duplicates t
       ;; Emacs "updates" its ui more often than it needs to, so we slow it down
       ;; slightly from 0.5s
@@ -250,15 +253,15 @@ whitespaces."
       ;; *scratch* is in Lisp interaction mode by default, use text mode instead
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; inhibit-splash-screen is an alias
-      initial-major-mode 'text-mode
+      ;; initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
       load-prefer-newer t
       major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup ~ files
-      mouse-drag-copy-region t
-      mouse-yank-at-point t ; Yank at point instead of at click
+      ;; mouse-drag-copy-region t
+      ;; mouse-yank-at-point t ; Yank at point instead of at click
       pop-up-frames nil ; Avoid making separate frames
       ;; pop-up-windows nil ; Disallow creating new windows
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
@@ -269,26 +272,27 @@ whitespaces."
       save-interprogram-paste-before-kill t
       select-enable-clipboard t ; Enable use of system clipboard across Emacs and other applications
       sentence-end-double-space nil
-      set-mark-command-repeat-pop t
-      shift-select-mode t ; Use shift-select for marking
+      ;; set-mark-command-repeat-pop t
+      ;; shift-select-mode t ; Use shift-select for marking
       suggest-key-bindings t
-      switch-to-buffer-preserve-window-point t
+      ;; switch-to-buffer-preserve-window-point t
       truncate-lines nil
-      truncate-partial-width-windows nil
+      ;; truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends nil
+      ;; vc-handled-backends nil
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       ;; Underline looks a bit better when drawn lower
-      x-underline-at-descent-line t)
+      ;; x-underline-at-descent-line t
+      )
 
 (setq-default compilation-scroll-output t
               fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs by default
               indicate-empty-lines nil
               standard-indent 2
-              tab-always-indent 'complete
+              ;; tab-always-indent 'complete
               tab-width 4
               ;; Check https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
               bidi-display-reordering 'left-to-right
@@ -337,12 +341,12 @@ whitespaces."
 (transient-mark-mode 1)
 
 ;; Do not disable narrowing commands
-(put 'narrow-to-region 'disabled nil)
-(put 'narrow-to-page 'disabled nil)
-(put 'narrow-to-defun 'disabled nil)
+;; (put 'narrow-to-region 'disabled nil)
+;; (put 'narrow-to-page 'disabled nil)
+;; (put 'narrow-to-defun 'disabled nil)
 ;; Do not disable case-change functions
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+;; (put 'upcase-region 'disabled nil)
+;; (put 'downcase-region 'disabled nil)
 
 (use-package autorevert ; Auto-refresh all buffers, does not work for remote files
   :diminish auto-revert-mode
@@ -354,16 +358,18 @@ whitespaces."
 
 (use-package saveplace ; Remember cursor position in files
   :hook (after-init . save-place-mode)
-  :custom (save-place-file (expand-file-name "places" dotemacs-temp-directory)))
+  :custom
+  (save-place-file (expand-file-name "places"
+                                     dotemacs-temp-directory)))
 
 (use-package savehist ; Save minibuffer histories across sessions
   :hook (after-init . savehist-mode)
   :custom
-  (savehist-additional-variables '(kill-ring
-                                   search-ring
-                                   regexp-search-ring
+  (savehist-additional-variables '(
                                    extended-command-history
-                                   file-name-history))
+                                   kill-ring
+                                   search-ring
+                                   ))
   (savehist-autosave-interval 600)
   (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
@@ -608,8 +614,7 @@ whitespaces."
   :custom
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-display-summary nil)
-  (ibuffer-use-header-line t)
-  :config (defalias 'list-buffers 'ibuffer))
+  (ibuffer-use-header-line t))
 
 (use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
   :load-path "extras"
@@ -621,6 +626,7 @@ whitespaces."
   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 (use-package dired
+  :functions dired-next-line
   :preface
   (defun dired-go-home ()
     (interactive)
@@ -649,16 +655,18 @@ whitespaces."
 (use-package dired-x
   :custom (dired-omit-verbose nil "Do not show messages when omitting files")
   :hook (dired-mode . dired-omit-mode)
-  ;; :hook (dired-mode . dired-hide-details-mode)
   :bind ("C-x C-j" . dired-jump)
-  :config
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Make sure to remove \"Omit\" from the modeline."
-    (diminish 'dired-omit-mode) dired-mode-map))
+  :diminish dired-omit-mode
+  ;; :config
+  ;; ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  ;; (defadvice dired-omit-startup (after diminish-dired-omit activate)
+  ;;   "Make sure to remove \"Omit\" from the modeline."
+  ;;   (diminish 'dired-omit-mode) dired-mode-map)
+  )
 
 (use-package dired+ ; Do not create multiple dired buffers
   :load-path "extras"
+  :functions diredp-toggle-find-file-reuse-dir
   :after dired-x
   :init
   (setq diredp-hide-details-initially-flag nil
@@ -678,16 +686,17 @@ whitespaces."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package dired-rsync
-  :ensure t
-  :bind (:map dired-mode-map
-              ("C-c C-r" . dired-rsync)))
+;; (use-package dired-rsync
+;;   :ensure t
+;;   :bind (:map dired-mode-map
+;;               ("C-c C-r" . dired-rsync)))
 
-(use-package dired-posframe
-  :ensure t
-  :hook (dired-mode . dired-posframe-mode))
+;; (use-package dired-posframe
+;;   :ensure t
+;;   :hook (dired-mode . dired-posframe-mode)
+;;   :diminish)
 
-(use-package diredfl
+(use-package diredfl ; Colored modes
   :ensure t
   :hook (dired-mode . diredfl-mode))
 
@@ -779,17 +788,18 @@ whitespaces."
          ("C-s" . nil) ; isearch-repeat-forward
          ("C-f" . isearch-repeat-forward)))
 
-;; (use-package isearch-symbol-at-point
-;;   :ensure t)
+(use-package isearch-symbol-at-point
+  :ensure t
+  :after isearch)
 
 (use-package isearch-dabbrev
   :ensure t
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
-(use-package swiper
-  :ensure t
-  :custom (swiper-action-recenter t))
+;; (use-package swiper
+;;   :ensure t
+;;   :custom (swiper-action-recenter t))
 
 (with-eval-after-load 'grep
   (setq-default grep-highlight-matches t
@@ -839,12 +849,14 @@ whitespaces."
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
-  :diminish
+  ;; :diminish
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil)
   (company-idle-delay 0.0 "Recommended by lsp")
-  (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
+  (company-ispell-available t)
+  (company-ispell-dictionary (expand-file-name "wordlist"
+                                               dotemacs-extras-directory))
   (company-minimum-prefix-length 2 "Small words are faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
   (company-selection-wrap-around t)
@@ -853,6 +865,8 @@ whitespaces."
   :config
   (dolist (backend '(company-semantic company-bbdb company-oddmuse))
     (delq backend company-backends))
+  (add-to-list 'company-backends 'company-ispell)
+  ;; Ignore numbers from company-dabbrev
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
                          (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
@@ -865,6 +879,7 @@ whitespaces."
 
 (use-package company-posframe
   :ensure t
+  :disabled t ; The width of the frame popup is often not enough
   :after company
   :diminish
   :hook (global-company-mode . company-posframe-mode))
@@ -875,11 +890,11 @@ whitespaces."
 ;;   :disabled t
 ;;   :hook (global-company-mode . company-flx-mode))
 
-;; (use-package company-fuzzy
-;;   :ensure t
-;;   :after company
-;;   :diminish
-;;   :init (global-company-fuzzy-mode 1))
+(use-package company-fuzzy
+  :ensure t
+  :after company
+  :diminish
+  :init (global-company-fuzzy-mode 1))
 
 ;; (use-package company-quickhelp
 ;;   :ensure t
@@ -895,6 +910,18 @@ whitespaces."
 ;;   (company-box-doc-delay 0)
 ;;   (company-box-max-candidates 50)
 ;;   (company-box-show-single-candidate t))
+
+(use-package company-tabnine
+  :ensure t
+  :after company
+  :config (add-to-list 'company-backends #'company-tabnine))
+
+(with-eval-after-load 'company-mode
+  (dolist (hook '(text-mode-hook markdown-mode-hook latex-mode-hook LaTeX-mode-hook org-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (make-local-variable 'company-backends)
+                (add-to-list 'company-backends 'company-ispell)))))
 
 ;; (use-package yasnippet
 ;;   :ensure t
@@ -913,6 +940,7 @@ whitespaces."
 
 (use-package ivy
   :ensure t
+  :functions ivy-completion-in-region
   :custom
   (completion-in-region-function #'ivy-completion-in-region)
   (ivy-case-fold-search 'always "Always ignore case while searching")
@@ -1044,7 +1072,8 @@ whitespaces."
   :hook (ivy-mode . counsel-mode)
   :config
   (defalias 'flycheck-list-errors 'counsel-flycheck)
-  ;; (defalias 'load-library 'counsel-load-library)
+  (defalias 'list-buffers 'counsel-ibuffer)
+  (defalias 'load-library 'counsel-load-library)
   (defalias 'load-theme 'counsel-load-theme)
   (defalias 'switch-buffer 'counsel-switch-buffer)
   (defalias 'yank-pop 'counsel-yank-pop))
@@ -1096,6 +1125,7 @@ whitespaces."
 
 (use-package flyspell
   :if dotemacs-is-linux
+  :functions flyspell-overlay-p
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -1165,6 +1195,7 @@ whitespaces."
 
     (use-package flyspell-correct-ivy
       :ensure flyspell-correct
+      :functions flyspell-correct-ivy
       :init (setq flyspell-correct-interface #'flyspell-correct-ivy)
       :bind ("C-;" . flyspell-correct-wrapper)))
 
@@ -1225,6 +1256,7 @@ whitespaces."
 
 (use-package projectile
   :ensure t
+  :functions (projectile-project-name projectile-project-root)
   ;; :ensure-system-package fd
   :bind-keymap ("C-c p" . projectile-command-map)
   :custom
@@ -1308,6 +1340,7 @@ whitespaces."
 
 (use-package flycheck
   :ensure t
+  :functions flycheck-add-next-checker
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-display-errors-delay 0)
@@ -1375,9 +1408,9 @@ whitespaces."
 ;; (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
 ;;   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-;; (use-package whitespace-cleanup-mode
-;;   :ensure t
-;;   :diminish)
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :diminish)
 
 ;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 ;;   :ensure t
@@ -1452,32 +1485,33 @@ whitespaces."
       ;; Don't ask before rereading the TAGS files if they have changed
       tags-revert-without-query t)
 
-(use-package counsel-gtags
-  :ensure t
-  :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
-  :diminish
-  :ensure-system-package global
-  ;; :init
-  ;; (add-hook 'c-mode-common-hook
-  ;;           (lambda ()
-  ;;             (when (derived-mode-p 'c-mode 'c++-mode)
-  ;;               (counsel-gtags-mode 1))))
-  :hook ((prog-mode protobuf-mode latex-mode) . counsel-gtags-mode)
-  :custom (counsel-gtags-auto-update t)
-  :bind (:map counsel-gtags-mode-map
-              ("M-'" . counsel-gtags-dwim)
-              ("M-," . counsel-gtags-go-backward)
-              ("M-?" . counsel-gtags-find-reference)
-              ("C-c g s" . counsel-gtags-find-symbol)
-              ("C-c g d" . counsel-gtags-find-definition)
-              ("C-c g c" . counsel-gtags-create-tags)
-              ("C-c g u" . counsel-gtags-update-tags))
-  :config
-  (use-package global-tags ; Make xref and gtags work together
-    :ensure t
-    :if (eq dotemacs-tags-scheme 'gtags)
-    :demand t
-    :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend)))
+;; ;; FIXME: Remove support for gtags
+;; (use-package counsel-gtags
+;;   :ensure t
+;;   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
+;;   :diminish
+;;   ;; :ensure-system-package global
+;;   ;; :init
+;;   ;; (add-hook 'c-mode-common-hook
+;;   ;;           (lambda ()
+;;   ;;             (when (derived-mode-p 'c-mode 'c++-mode)
+;;   ;;               (counsel-gtags-mode 1))))
+;;   :hook ((prog-mode protobuf-mode latex-mode) . counsel-gtags-mode)
+;;   :custom (counsel-gtags-auto-update t)
+;;   :bind (:map counsel-gtags-mode-map
+;;               ("M-'" . counsel-gtags-dwim)
+;;               ("M-," . counsel-gtags-go-backward)
+;;               ("M-?" . counsel-gtags-find-reference)
+;;               ("C-c g s" . counsel-gtags-find-symbol)
+;;               ("C-c g d" . counsel-gtags-find-definition)
+;;               ("C-c g c" . counsel-gtags-create-tags)
+;;               ("C-c g u" . counsel-gtags-update-tags))
+;;   :config
+;;   (use-package global-tags ; Make xref and gtags work together
+;;     :ensure t
+;;     :if (eq dotemacs-tags-scheme 'gtags)
+;;     :demand t
+;;     :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend)))
 
 (use-package xref
   :if (eq dotemacs-tags-scheme 'ctags)
@@ -1606,11 +1640,12 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '("*Warnings*"))
   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode)))
+  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+  (add-to-list 'popwin:special-display-config '(deadgrep-mode)))
 
-(use-package expand-region ; Expand region by semantic units
-  :ensure t
-  :bind ("C-=" . er/expand-region))
+               (use-package expand-region ; Expand region by semantic units
+                 :ensure t
+                 :bind ("C-=" . er/expand-region))
 
 ;; (use-package expand-line
 ;;   :ensure t
@@ -1784,6 +1819,7 @@ whitespaces."
 ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
   :ensure t
+  :functions (pandoc-load-default-settings)
   :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
@@ -1798,20 +1834,20 @@ whitespaces."
 ;;   (prettier-js-args (list "--config" (expand-file-name ".prettierrc"
 ;;                                                        dotemacs-user-home))))
 
-;; (use-package add-node-modules-path
-;;   :ensure t
-;;   :init
-;;   (with-eval-after-load 'typescript-mode
-;;     (add-hook 'typescript-mode-hook 'add-node-modules-path))
-;;   (with-eval-after-load 'js2-mode
-;;     (add-hook 'js2-mode-hook 'add-node-modules-path)))
+(use-package add-node-modules-path
+  :ensure t
+  :init
+  (with-eval-after-load 'typescript-mode
+    (add-hook 'typescript-mode-hook 'add-node-modules-path))
+  (with-eval-after-load 'js2-mode
+    (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
-;; (use-package prettier
-;;   :ensure t
-;;   :diminish
-;;   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-;;   ;; :hook ((markdown-mode gfm-mode) . prettier-mode)
-;;   )
+(use-package prettier
+  :ensure t
+  :diminish
+  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+  ;; :hook ((markdown-mode gfm-mode) . prettier-mode)
+  )
 
 (use-package grip-mode
   :ensure t
@@ -1975,18 +2011,19 @@ whitespaces."
   :if (when (executable-find "fish"))
   :config (global-fish-completion-mode))
 
-(use-package company-shell
-  :ensure t
-  :after company
-  :custom (company-shell-delete-duplictes t)
-  :init (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell)))
+(with-eval-after-load 'sh-mode
+  (use-package company-shell
+    :ensure t
+    :after company
+    :custom (company-shell-delete-duplictes t)
+    :init (add-to-list 'company-backends '(company-shell company-shell-env company-fish-shell))))
 
 
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
   :ensure reformatter
-  :ensure-system-package (shfmt . "snap install shfmt")
+  ;; :ensure-system-package (shfmt . "snap install shfmt")
   :load-path "extras/shfmt"
   ;; :diminish shfmt-on-save-mode
   ;; :hook (sh-mode . shfmt-on-save-mode)
@@ -1994,12 +2031,14 @@ whitespaces."
 
 (use-package flycheck-shfmt
   :ensure reformatter
+  :functions flycheck-shfmt-setup
   :after flycheck
   :load-path "extras/shfmt"
   :config (flycheck-shfmt-setup))
 
 (use-package magit
   :ensure t
+  :functions magit-display-buffer-fullframe-status-v1
   :bind ("C-x g" . magit-status)
   :custom
   (magit-completing-read-function 'ivy-completing-read)
@@ -2079,6 +2118,7 @@ whitespaces."
 
 (use-package lsp-mode
   :ensure t
+  :functions (lsp-register-client lsp-tramp-connection make-lsp-client lsp-format-buffer)
   :commands (lsp lsp-deferred)
   ;; https://justin.abrah.ms/dotfiles/emacs.html
   ;; :ensure-system-package
@@ -2227,19 +2267,20 @@ whitespaces."
                         (lambda ()
                           (lsp-format-buffer)) nil t))))
 
-(use-package lsp-python-ms
-  :ensure t
-  :disabled t
-  :init (setq lsp-python-ms-auto-install-server t)
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-python-ms)
-                         (lsp-deferred))))
+(with-eval-after-load 'python-mode
+  (use-package lsp-python-ms
+    :ensure t
+    :disabled t
+    :init (setq lsp-python-ms-auto-install-server t)
+    :hook (python-mode . (lambda ()
+                           (require 'lsp-python-ms)
+                           (lsp-deferred))))
 
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp-deferred))))
+  (use-package lsp-pyright
+    :ensure t
+    :hook (python-mode . (lambda ()
+                           (require 'lsp-pyright)
+                           (lsp-deferred)))))
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
@@ -2369,11 +2410,11 @@ Increase line spacing by two line height."
   (shell-command
    (format "%s -f TAGS -eR %s" dotemacs-ctags-path (directory-file-name dir-name))))
 
-(defun sb/create-gtags (dir-name)
-  "Create tags file with gtags."
-  (interactive "Directory: ")
-  (shell-command
-   (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
+;; (defun sb/create-gtags (dir-name)
+;;   "Create tags file with gtags."
+;;   (interactive "Directory: ")
+;;   (shell-command
+;;    (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
@@ -2530,10 +2571,7 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
                                   ;;   (switch-to-buffer new-buffer)
                                   ;;   (insert-file-contents default-file))
                                   (find-file default-file)))))
-                          nillist)
-                  )
-                )
-              )
+                          nillist))))
             mylist)))
 ;; (sb/open-project-default-file2)
 
