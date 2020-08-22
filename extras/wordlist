@@ -153,6 +153,7 @@ appoint
 appointment
 appreciate
 approach
+approaches
 appropriate
 approval
 approve
@@ -602,6 +603,7 @@ considerable
 consideration
 consist
 Consistency
+consistency
 consistent
 consisting
 consists
@@ -2573,6 +2575,7 @@ subject
 subjects
 sublime
 subsequent
+sequential
 substance
 substantial
 suburban
@@ -2854,6 +2857,7 @@ violation
 violence
 violent
 virtual
+virtualization
 virtually
 visible
 visited
@@ -2935,7 +2939,11 @@ younger
 yourself
 greedily
 destination
+poorest
+simulation
+multiplexing
+meaningful
 
 # Local Variables:
-#mode: text
-# End
+# mode: text
+# End:

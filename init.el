@@ -98,7 +98,7 @@ This depends on the orientation of the display."
           (const :tag "horizontal" horizontal)) ; split-window-right
   :group 'dotemacs)
 
-(defconst dotemacs-fill-column 80
+(defcustom dotemacs-fill-column 80
   "Column beyond which lines should not extend."
   :type 'number
   :group 'dotemacs)
@@ -162,7 +162,7 @@ whitespaces."
     (package-initialize t))
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
-;; ;; package.el has no business modifying the user's init.el
+;; package.el has no business modifying the user's init.el
 ;; (advice-add #'package--ensure-init-file :override #'ignore)
 
 (unless (package-installed-p 'use-package)
@@ -207,11 +207,11 @@ whitespaces."
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
 
-(use-package exec-path-from-shell
-  :ensure t
-  :if (or (daemonp) (memq window-system '(x ns)))
-  :custom (exec-path-from-shell-check-startup-files nil) ; Ignore definition check
-  :init (exec-path-from-shell-initialize))
+;; (use-package exec-path-from-shell
+;;   :ensure t
+;;   :if (or (daemonp) (memq window-system '(x ns)))
+;;   :custom (exec-path-from-shell-check-startup-files nil) ; Ignore definition check
+;;   :init (exec-path-from-shell-initialize))
 
 (use-package gcmh
   :ensure t
@@ -336,7 +336,7 @@ whitespaces."
 (column-number-mode 1)
 (diminish 'auto-fill-function) ; Not a library/file, so eval-after-load does not work
 (global-prettify-symbols-mode -1) ; Makes it difficult to edit the buffer
-(minibuffer-depth-indicate-mode 1)
+;; (minibuffer-depth-indicate-mode 1)
 ;; Enable visual feedback on selections, mark follows the point
 (transient-mark-mode 1)
 
@@ -610,20 +610,20 @@ whitespaces."
 ;;                       (:sunset  . doom-peacock)))
 ;;   :init (circadian-setup))
 
-(use-package ibuffer
-  :custom
-  (ibuffer-default-sorting-mode 'alphabetic)
-  (ibuffer-display-summary nil)
-  (ibuffer-use-header-line t))
+;; (use-package ibuffer
+;;   :custom
+;;   (ibuffer-default-sorting-mode 'alphabetic)
+;;   (ibuffer-display-summary nil)
+;;   (ibuffer-use-header-line t))
 
-(use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
-  :load-path "extras"
-  :custom (ibuffer-show-empty-filter-groups nil)
-  :hook (ibuffer . ibuffer-auto-mode))
+;; (use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
+;;   :load-path "extras"
+;;   :custom (ibuffer-show-empty-filter-groups nil)
+;;   :hook (ibuffer . ibuffer-auto-mode))
 
-(use-package ibuffer-projectile ; Group buffers by projectile project
-  :ensure t
-  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+;; (use-package ibuffer-projectile ; Group buffers by projectile project
+;;   :ensure t
+;;   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 (use-package dired
   :functions dired-next-line
@@ -850,6 +850,11 @@ whitespaces."
   :ensure t
   :hook (after-init . global-company-mode)
   ;; :diminish
+  :preface
+  (defun sb/quit-company-save-buffer ()
+    "Quit company popup and save the buffer."
+    (company-abort)
+    (save-buffer))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil)
@@ -863,7 +868,7 @@ whitespaces."
   (company-show-numbers 'left "Speed up completion")
   (company-tooltip-align-annotations t)
   :config
-  (dolist (backend '(company-semantic company-bbdb company-oddmuse))
+  (dolist (backend '(company-semantic company-bbdb company-oddmuse company-cmake))
     (delq backend company-backends))
   (add-to-list 'company-backends 'company-ispell)
   ;; Ignore numbers from company-dabbrev
@@ -875,14 +880,15 @@ whitespaces."
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
               ("<tab>" . company-complete-common-or-cycle)
-              ("M-/" . company-other-backend)))
+              ("M-/" . company-other-backend)
+              ("C-s" . sb/quit-company-save-buffer)))
 
-(use-package company-posframe
-  :ensure t
-  :disabled t ; The width of the frame popup is often not enough
-  :after company
-  :diminish
-  :hook (global-company-mode . company-posframe-mode))
+;; (use-package company-posframe
+;;   :ensure t
+;;   :disabled t ; The width of the frame popup is often not enough
+;;   :after company
+;;   :diminish
+;;   :hook (global-company-mode . company-posframe-mode))
 
 ;; This seems unmaintained and only works for elisp-mode
 ;; (use-package company-flx
@@ -890,15 +896,9 @@ whitespaces."
 ;;   :disabled t
 ;;   :hook (global-company-mode . company-flx-mode))
 
-(use-package company-fuzzy
-  :ensure t
-  :after company
-  :diminish
-  :init (global-company-fuzzy-mode 1))
-
-;; (use-package company-quickhelp
-;;   :ensure t
-;;   :hook (global-company-mode . company-quickhelp-mode))
+;; ;; (use-package company-quickhelp
+;; ;;   :ensure t
+;; ;;   :hook (global-company-mode . company-quickhelp-mode))
 
 ;; (use-package company-box
 ;;   :ensure t
@@ -911,10 +911,29 @@ whitespaces."
 ;;   (company-box-max-candidates 50)
 ;;   (company-box-show-single-candidate t))
 
+(use-package company-dict
+  :ensure t
+  :custom
+  (company-dict-dir (expand-file-name "dict" user-emacs-directory))
+  (company-dict-enable-fuzzy t)
+  (company-dict-enable-yasnippet nil))
+
+(use-package company-ctags
+  :ensure t
+  :custom
+  (company-ctags-fuzzy-match-p t)
+  (company-ctags-everywhere t))
+
 (use-package company-tabnine
   :ensure t
   :after company
   :config (add-to-list 'company-backends #'company-tabnine))
+
+(use-package company-fuzzy
+  :ensure t
+  :after company
+  :diminish
+  :init (global-company-fuzzy-mode 1))
 
 (with-eval-after-load 'company-mode
   (dolist (hook '(text-mode-hook markdown-mode-hook latex-mode-hook LaTeX-mode-hook org-mode-hook))
@@ -958,8 +977,9 @@ whitespaces."
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   (defalias 'occur 'ivy-occur)
   :config
-  (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*"
-                    "*flycheck-posframe-buffer*"))
+  (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*" "^\\*Help\\*$"
+                    "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+                    "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
   :diminish
   :bind
@@ -1078,21 +1098,21 @@ whitespaces."
   (defalias 'switch-buffer 'counsel-switch-buffer)
   (defalias 'yank-pop 'counsel-yank-pop))
 
-(use-package ivy-posframe
+;; (use-package ivy-posframe
+;;   :ensure t
+;;   :diminish
+;;   :disabled t
+;;   :hook (ivy-mode . ivy-posframe-mode))
+
+(use-package prescient
   :ensure t
-  :diminish
-  :disabled t
-  :hook (ivy-mode . ivy-posframe-mode))
+  :hook (counsel-mode . prescient-persist-mode)
+  :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
 
-;; (use-package prescient
-;;   :ensure t
-;;   :hook (counsel-mode . prescient-persist-mode)
-;;   :custom (prescient-save-file (expand-file-name "prescient-save.el" dotemacs-temp-directory)))
-
-;; (use-package ivy-prescient
-;;   :ensure t
-;;   :hook (counsel-mode . ivy-prescient-mode)
-;;   :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
+(use-package ivy-prescient
+  :ensure t
+  :hook (counsel-mode . ivy-prescient-mode)
+  :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 (with-eval-after-load 'ivy
@@ -1106,9 +1126,9 @@ whitespaces."
 ;;   (completion-styles '(orderless))
 ;;   (ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-;; (use-package company-prescient
-;;   :ensure t
-;;   :hook (company-mode . company-prescient-mode))
+(use-package company-prescient
+  :ensure t
+  :hook (company-mode . company-prescient-mode))
 
 ;; (use-package all-the-icons-ivy-rich
 ;;   :ensure t
@@ -1226,33 +1246,33 @@ whitespaces."
 
 ;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
-(use-package smartparens
-  :ensure t
-  :disabled t
-  :diminish
-  :hook ((after-init . smartparens-global-mode)
-         (after-init . show-smartparens-global-mode))
-  :custom
-  (sp-show-pair-from-inside t)
-  (sp-autoskip-closing-pair 'always)
-  :config
-  (require 'smartparens-config)
-  (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-    (add-hook hook
-              (lambda ()
-                (require 'smartparens-latex))))
-  :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-         ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-         ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-         ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-n" . sp-next-sexp) ; ((fo|o) (bar)) -> ((foo) |(bar))"
-         ("C-M-p" . sp-previous-sexp) ; (foo (b|ar baz)) -> (foo| (bar baz))"
-         ("C-S-b" . sp-backward-symbol) ; foo bar| baz -> foo |bar baz
-         ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
-         ;; (foo bar) -> foo bar
-         ("C-M-k" . sp-splice-sexp)))
+;; (use-package smartparens
+;;   :ensure t
+;;   :disabled t
+;;   :diminish
+;;   :hook ((after-init . smartparens-global-mode)
+;;          (after-init . show-smartparens-global-mode))
+;;   :custom
+;;   (sp-show-pair-from-inside t)
+;;   (sp-autoskip-closing-pair 'always)
+;;   :config
+;;   (require 'smartparens-config)
+;;   (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
+;;     (add-hook hook
+;;               (lambda ()
+;;                 (require 'smartparens-latex))))
+;;   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+;;          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+;;          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+;;          ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
+;;          ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+;;          ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+;;          ("C-M-n" . sp-next-sexp) ; ((fo|o) (bar)) -> ((foo) |(bar))"
+;;          ("C-M-p" . sp-previous-sexp) ; (foo (b|ar baz)) -> (foo| (bar baz))"
+;;          ("C-S-b" . sp-backward-symbol) ; foo bar| baz -> foo |bar baz
+;;          ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
+;;          ;; (foo bar) -> foo bar
+;;          ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
   :ensure t
@@ -1485,7 +1505,7 @@ whitespaces."
       ;; Don't ask before rereading the TAGS files if they have changed
       tags-revert-without-query t)
 
-;; ;; FIXME: Remove support for gtags
+;; FIXME: Remove support for gtags
 ;; (use-package counsel-gtags
 ;;   :ensure t
 ;;   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
@@ -1513,24 +1533,24 @@ whitespaces."
 ;;     :demand t
 ;;     :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend)))
 
-(use-package xref
-  :if (eq dotemacs-tags-scheme 'ctags)
-  :config (xref-etags-mode)
-  :bind (("M-'" . xref-find-definitions)
-         ("M-?" . xref-find-references)
-         ("C-M-." . xref-find-apropos)
-         ("M-," . xref-pop-marker-stack)
-         :map xref--xref-buffer-mode-map
-         ("C-o" . xref-show-location-at-point)
-         ("<tab>" . xref-quit-and-goto-xref)
-         ("r" . xref-query-replace-in-results))
-  :config
-  (use-package ivy-xref
-    :ensure t
-    :demand t ; Load once xref is invoked
-    :config
-    (setq xref-show-definitions-function #'ivy-xref-show-defs
-          xref-show-xrefs-function #'ivy-xref-show-xrefs)))
+;; (use-package xref
+;;   :if (eq dotemacs-tags-scheme 'ctags)
+;;   :config (xref-etags-mode)
+;;   :bind (("M-'" . xref-find-definitions)
+;;          ("M-?" . xref-find-references)
+;;          ("C-M-." . xref-find-apropos)
+;;          ("M-," . xref-pop-marker-stack)
+;;          :map xref--xref-buffer-mode-map
+;;          ("C-o" . xref-show-location-at-point)
+;;          ("<tab>" . xref-quit-and-goto-xref)
+;;          ("r" . xref-query-replace-in-results))
+;;   :config
+;;   (use-package ivy-xref
+;;     :ensure t
+;;     :demand t ; Load once xref is invoked
+;;     :config
+;;     (setq xref-show-definitions-function #'ivy-xref-show-defs
+;;           xref-show-xrefs-function #'ivy-xref-show-xrefs)))
 
 (use-package counsel-etags
   :ensure t
@@ -1643,13 +1663,21 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
   (add-to-list 'popwin:special-display-config '(deadgrep-mode)))
 
-               (use-package expand-region ; Expand region by semantic units
-                 :ensure t
-                 :bind ("C-=" . er/expand-region))
+;; (use-package sudo-edit ; Edit file with sudo
+;;   :ensure t
+;;   :bind ("M-s e" . sudo-edit))
+
+(use-package expand-region ; Expand region by semantic units
+  :ensure t
+  :bind ("C-=" . er/expand-region))
 
 ;; (use-package expand-line
 ;;   :ensure t
 ;;   :bind ("M-i" . turn-on-expand-line-mode))
+
+(use-package smart-mark ; Restore point with "C-g" after marking a region
+  :ensure t
+  :config (smart-mark-mode 1))
 
 ;; (use-package undo-tree
 ;;   :ensure t
@@ -1708,7 +1736,7 @@ whitespaces."
   :bind (([remap other-window] . ace-window)
          ("<f10>" . ace-window)))
 
-;; ;; This causes additional saves which leads to auto-formatters being invoked more frequently
+;; This causes additional saves which leads to auto-formatters being invoked more frequently
 ;; (use-package super-save ; Save buffers when Emacs loses focus
 ;;   :ensure t
 ;;   :diminish
@@ -1747,14 +1775,22 @@ whitespaces."
 ;;   :ensure t
 ;;   :commands (esup))
 
-;; (use-package explain-pause-mode
-;;   :load-path "extras"
-;;   ;; :diminish
-;;   ;; :hook (after-init . explain-pause-mode)
-;;   )
+(use-package bug-hunter
+  :ensure t)
+
+(use-package explain-pause-mode
+  :load-path "extras"
+  ;; :diminish
+  ;; :hook (after-init . explain-pause-mode)
+  )
 
 ;; text-mode is a basic mode for LaTeX-mode and org-mode, and so any hooks defined will also get run
 ;; for all modes derived from a basic mode such as text-mode.
+
+;; https://www.emacswiki.org/emacs/AutoFillMode
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
+;; Enable auto fill for all major modes
+;; (setq-default auto-fill-function 'do-auto-fill)
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :ensure t
@@ -1816,13 +1852,13 @@ whitespaces."
   ;;   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
   )
 
-;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
-(use-package pandoc-mode
-  :ensure t
-  :functions (pandoc-load-default-settings)
-  :diminish
-  :config (pandoc-load-default-settings)
-  :hook (markdown-mode . pandoc-mode))
+;; ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
+;; (use-package pandoc-mode
+;;   :ensure t
+;;   :functions (pandoc-load-default-settings)
+;;   :diminish
+;;   :config (pandoc-load-default-settings)
+;;   :hook (markdown-mode . pandoc-mode))
 
 ;; (use-package prettier-js
 ;;   :ensure t
@@ -1834,20 +1870,20 @@ whitespaces."
 ;;   (prettier-js-args (list "--config" (expand-file-name ".prettierrc"
 ;;                                                        dotemacs-user-home))))
 
-(use-package add-node-modules-path
-  :ensure t
-  :init
-  (with-eval-after-load 'typescript-mode
-    (add-hook 'typescript-mode-hook 'add-node-modules-path))
-  (with-eval-after-load 'js2-mode
-    (add-hook 'js2-mode-hook 'add-node-modules-path)))
+;; (use-package add-node-modules-path
+;;   :ensure t
+;;   :init
+;;   (with-eval-after-load 'typescript-mode
+;;     (add-hook 'typescript-mode-hook 'add-node-modules-path))
+;;   (with-eval-after-load 'js2-mode
+;;     (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
-(use-package prettier
-  :ensure t
-  :diminish
-  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-  ;; :hook ((markdown-mode gfm-mode) . prettier-mode)
-  )
+;; (use-package prettier
+;;   :ensure t
+;;   :diminish
+;;   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+;;   ;; :hook ((markdown-mode gfm-mode) . prettier-mode)
+;;   )
 
 (use-package grip-mode
   :ensure t
@@ -1876,6 +1912,7 @@ whitespaces."
 
 (use-package make-mode
   :mode (("\\Makefile\\'" . makefile-mode)
+         ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 (use-package eldoc
@@ -1884,9 +1921,22 @@ whitespaces."
   :config (global-eldoc-mode 1))
 
 ;; Cannot load with use-package, do we need a :mode?
-(use-package matlab-mode
-  :ensure t
-  :disabled t)
+;; (use-package matlab-mode
+;;   :ensure t
+;;   :disabled t)
+
+;; (use-package ess
+;;   :ensure t
+;;   :custom
+;;   (inferior-R-args "--quiet --no-restore-history --no-save")
+;;   (ess-indent-offset 4)
+;;   (ess-indent-from-lhs 4)
+;;   :config
+;;   (use-package ess-smart-underscore
+;;     :ensure t))
+
+(use-package octave
+  :mode "\\.m\\'")
 
 (use-package ini-mode
   :ensure t
@@ -1943,7 +1993,8 @@ whitespaces."
 (use-package cmake-mode
   :ensure t
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
-  :hook (cmake-mode . lsp))
+  :hook (cmake-mode . lsp)
+  :config (add-to-list 'company-backends 'company-cmake))
 
 (use-package cmake-font-lock
   :ensure t
@@ -1956,9 +2007,13 @@ whitespaces."
 
 (use-package python
   :hook (python-mode . lsp)
-  :init (setq python-shell-completion-native-enable nil)  ; Disable readline based native completion
+  :init
+  (setq python-shell-completion-native-enable nil)  ; Disable readline based native completion
+  (setenv "PYTHONPATH" "python3")
   :config
-  (setq python-shell-interpreter "python3"
+  (setq python-indent-offset 4
+        python-indent-guess-indent-offset nil
+        python-shell-interpreter "python3"
         auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
                                 auto-mode-alist)))
@@ -2107,8 +2162,11 @@ whitespaces."
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
 (use-package nxml-mode
-  :hook (nxml-model . lsp)
-  :init (fset 'xml-mode 'nxml-mode))
+  :hook (nxml-mode . lsp)
+  :init (fset 'xml-mode 'nxml-mode)
+  :custom
+  (nxml-slash-auto-complete-flag t)
+  (nxml-auto-insert-xml-declaration-flag t))
 
 ;; (use-package company-php
 ;;   :ensure t
@@ -2234,7 +2292,6 @@ whitespaces."
 ;;                           (lambda ()
 ;;                             (lsp-format-buffer)) nil t)))))
 
-
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
@@ -2245,6 +2302,14 @@ whitespaces."
   :bind (:map lsp-ui-mode-map
               ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
               ([remap xref-find-references] . lsp-ui-peek-find-references)))
+
+(use-package origami
+  :ensure t)
+
+(use-package lsp-origami
+  :ensure t
+  :ensure origami
+  :hook (origami-mode . lsp-origami-mode))
 
 (use-package lsp-ivy
   :ensure t
@@ -2315,6 +2380,56 @@ whitespaces."
 (use-package protobuf-mode
   :ensure t
   :mode "\\.proto$")
+
+(defun sb/company-text-backends ()
+  "Add backends for text completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-dabbrev ;
+           company-ispell ; Uses an English dictionary
+           company-tabnine ; Use DL models
+           ))))
+(add-hook 'text-mode-hook #'sb/company-text-backends)
+
+(defun sb/company-prog-backends ()
+  "Add backends for text completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-capf
+           company-tabnine
+           company-dabbrev-code
+           ))))
+(add-hook 'prog-mode-hook #'sb/company-prog-backends)
+
+(defun sb/company-sh-backends ()
+  "Add backends for shell script completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-capf
+           company-tabnine
+           company-shell
+           company-shell-env
+           company-fish-shell
+           company-dabbrev-code
+           ))))
+(add-hook 'sh-mode-hook #'sb/company-sh-backends)
+
+(defun sb/company-latex-backends ()
+  "Add backends for latex completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-capf
+           company-tabnine
+           company-bibtex
+           company-dabbrev
+
+           ))))
+(dolist (hook '(latex-mode-hook LaTeX-mode-hook))
+  (add-hook hook #'sb/company-latex-backends))
 
 ;; Function definitions
 
@@ -2575,7 +2690,7 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
             mylist)))
 ;; (sb/open-project-default-file2)
 
-(with-eval-after-load "counsel-projectile"
-  (add-to-list 'counsel-projectile-action '("d" sb/open-project-default-file2 "open default file") t))
+;; (with-eval-after-load "counsel-projectile"
+;;   (add-to-list 'counsel-projectile-action '("d" sb/open-project-default-file2 "open default file") t))
 
-;;; init.el ends here
+;; ;;; init.el ends here
