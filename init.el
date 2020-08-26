@@ -152,6 +152,7 @@ whitespaces."
 (defvar apropos-do-all)
 (defvar tags-revert-without-query)
 (defvar use-package-enable-imenu-support)
+(defvar expand-line-mode)
 
 (eval-when-compile
   (require 'package)
@@ -329,6 +330,14 @@ whitespaces."
       ;; mouse
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       mouse-wheel-progressive-speed nil)  ; don't accelerate scrolling
+
+;; Activate utf8 mode
+(setq locale-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -1698,6 +1707,12 @@ whitespaces."
   :ensure t
   :bind* ("C-." . iedit-mode))
 
+(use-package session
+  :ensure t
+  :init
+  (setq session-save-file (expand-file-name "session" dotemacs-temp-directory))
+  (add-hook 'after-init-hook #'session-initialize))
+
 (use-package immortal-scratch
   :ensure t
   :hook (after-init . immortal-scratch-mode))
@@ -1746,6 +1761,8 @@ whitespaces."
 ;;   :hook (after-init . super-save-mode)
 ;;   :config (add-to-list 'super-save-triggers 'ace-window))
 
+;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one of
+;; the currently visible isearch candidates using avy.
 (use-package avy
   :ensure t
   :bind (("M-b" . avy-goto-word-1)
@@ -1755,10 +1772,7 @@ whitespaces."
   (avy-background t)
   (avy-highlight-first t)
   (avy-style 'at)
-  :config
-  ;; It will bind, for example, avy-isearch to C-' in isearch-mode-map, so that you can select one
-  ;; of the currently visible isearch candidates using avy.
-  (avy-setup-default))
+  :config (avy-setup-default))
 
 (use-package bookmark
   :custom

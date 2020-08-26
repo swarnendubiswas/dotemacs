@@ -1,4 +1,4 @@
-personal_ws-1.1 en 122 
+personal_ws-1.1 en 126 
 Anupam
 Biswas
 CSE
@@ -23,6 +23,7 @@ Sunidhi
 Swarnendu
 TODO
 Vipin
+XGBoost
 accuracies
 activations
 affine
@@ -34,6 +35,8 @@ associativity
 atomicity
 backend
 blackbox
+centroid
+centroids
 combinational
 covariance
 customizations
@@ -76,6 +79,7 @@ programmability
 programmatically
 pseudocode
 quantization
+recalibrate
 recalibrates
 recalibration
 recomputation
