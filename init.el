@@ -29,6 +29,13 @@
 ;; A local variable specification takes the following form:
 ;; -*- mode: MODENAME; VAR: VALUE; ... -*-
 
+;; Hooks in the :hook section, run in reverse order. Example:
+;; (use-package package-name
+;;   :hook
+;;   (x-mode . last)
+;;   (x-mode . second)
+;;   (x-mode . first))
+
 ;;; Code:
 
 (setq user-full-name "Swarnendu Biswas")
@@ -214,11 +221,6 @@ whitespaces."
 ;;   :custom (exec-path-from-shell-check-startup-files nil) ; Ignore definition check
 ;;   :init (exec-path-from-shell-initialize))
 
-(use-package gcmh
-  :ensure t
-  :diminish
-  :hook (after-init . gcmh-mode))
-
 (setq ad-redefinition-action 'accept ; Turn off warnings due to functions being redefined
       ;; apropos-do-all t
       auto-mode-case-fold nil ; Disable a second case insensitive pass
@@ -239,9 +241,7 @@ whitespaces."
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b"))
       ;; gc-cons-percentage 0.5 ; Portion of heap used for allocation
-      ;; GC may happen after this many bytes are allocated since last GC
-      ;; If you experience freezing, decrease this. If you experience stuttering, increase this.
-      ;; gc-cons-threshold (* 200 1024 1024)
+      gc-cons-threshold most-positive-fixnum ; Defer GC during startup
       ;; help-window-select t
       history-delete-duplicates t
       ;; Emacs "updates" its ui more often than it needs to, so we slow it down
@@ -301,12 +301,33 @@ whitespaces."
               ;; bidi-paragraph-direction 'left-to-right
               )
 
+;; GC may happen after this many bytes are allocated since last GC
+;; If you experience freezing, decrease this. If you experience stuttering, increase this.(defconst 50mb 52428800)
+(defconst dotemacs-50mb (* 50 1000 1000))
+(defconst dotemacs-100mb (* 100 1000 1000))
+(defconst dotemacs-200mb (* 200 1000 1000))
+
 ;; Ideally, we would have reset 'gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
 ;; permanently.
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (setq gc-cons-threshold 800000)))
+
+(defun sb/defer-garbage-collection ()
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun sb/restore-garbage-collection ()
+  (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-100mb))))
+
+(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
+(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
+
+(use-package gcmh
+  :ensure t
+  :diminish
+  :hook (after-init . gcmh-mode))
 
 ;; (setq locale-coding-system 'utf-8)
 ;; (prefer-coding-system 'utf-8)
@@ -439,20 +460,31 @@ whitespaces."
 ;;     (scroll-bar-mode -1)
 ;;     (tool-bar-mode -1)))
 
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(when (fboundp 'menu-bar-mode)
-  (menu-bar-mode -1))
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode -1))
+;; (when (fboundp 'tool-bar-mode)
+;;   (tool-bar-mode -1))
+;; (when (fboundp 'menu-bar-mode)
+;;   (menu-bar-mode -1))
+;; (when (fboundp 'scroll-bar-mode)
+;;   (scroll-bar-mode -1))
 
-(blink-cursor-mode -1) ; Blinking cursor is distracting
+(dolist (mode '(
+                tool-bar-mode
+                menu-bar-mode
+                scroll-bar-mode
+                blink-cursor-mode
+                size-indication-mode
+                tooltip-mode
+                ))
+  (when (fboundp mode)
+    (funcall mode -1)))
+
+;; (blink-cursor-mode -1) ; Blinking cursor is distracting
 (delete-selection-mode 1) ; Typing with the mark active will overwrite the marked region
 (fringe-mode '(0 . 0))
 (global-visual-line-mode 1)
 (diminish 'visual-line-mode)
-(size-indication-mode -1)
-(tooltip-mode -1)
+;; (size-indication-mode -1)
+;; (tooltip-mode -1)
 (toggle-frame-maximized) ; Maximize Emacs on startup
 ;; (set-frame-parameter nil 'unsplittable t)
 (global-so-long-mode 1)
@@ -787,6 +819,37 @@ whitespaces."
 ;;   :diminish
 ;;   :hook (dired-mode . all-the-icons-dired-mode))
 
+(use-package org
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+
+  (setq org-src-fontify-natively t ; code block fontification using the major-mode of the code
+        org-startup-indented t
+        org-startup-truncated nil
+        org-src-preserve-indentation t
+        org-src-tabs-acts-natively t
+        org-src-window-setup 'current-window
+        org-fontify-done-headline t
+        org-fontify-whole-heading-line t
+        org-startup-folded 'showeverything ; options: nil
+        org-hide-leading-stars t
+        org-hide-leading-stars-before-indent-mode t
+        org-support-shift-select t ; use shift-select
+        ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines. See
+        ;; org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
+        org-use-speed-commands t
+        org-src-strip-leading-and-trailing-blank-lines t
+        ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
+        org-pretty-entities t
+        ;; Render subscripts and superscripts in org buffers
+        org-pretty-entities-include-sub-superscripts t))
+
+(use-package org-bullets
+  :ensure t
+  :init (add-hook 'org-mode-hook #'org-bullets-mode))
+
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
 ;; candidates.
 (use-package isearch
@@ -805,6 +868,21 @@ whitespaces."
   :ensure t
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
+
+(use-package anzu
+  :ensure t
+  :diminish anzu-mode
+  :after isearch
+  :config
+  (setq anzu-search-threshold 10000
+        anzu-minimum-input-length 2)
+  (when (eq dotemacs-modeline-theme 'spaceline)
+    (setq anzu-cons-mode-line-p nil))
+  (unless (eq dotemacs-theme 'leuven)
+    (set-face-attribute 'anzu-mode-line nil
+                        :foreground "blue"
+                        :weight 'light))
+  (global-anzu-mode 1))
 
 ;; (use-package swiper
 ;;   :ensure t
@@ -1381,10 +1459,11 @@ whitespaces."
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
   (add-hook 'text-mode-hook
             (lambda()
-              (setq-local flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
-                                                                     dotemacs-user-home)
-                          flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
-                                                                         dotemacs-user-home))
+              (setq-local
+               flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
+                                                          dotemacs-user-home)
+               flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
+                                                              dotemacs-user-home))
               ;; (flycheck-add-next-checker 'grammarly-checker 'textlint)
               ))
   (add-hook 'python-mode-hook
@@ -1587,15 +1666,19 @@ whitespaces."
 ;;   :custom (dumb-jump-prefer-searcher 'rg)
 ;;   :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
-;; (use-package helpful
-;;   :ensure t
-;;   :bind (("C-h v" . helpful-variable)
-;;          ("C-h k" . helpful-key)
-;;          ("C-h f" . helpful-function)
-;;          ("C-h c" . helpful-command)
-;;          ("C-h p" . helpful-at-point)
-;;          :map helpful-mode-map
-;;          ("q" . helpful-kill-buffers)))
+(use-package helpful
+  :ensure t
+  :bind (
+         ([remap describe-variable] . helpful-variable)
+         ("C-h v" . helpful-variable)
+         ([remap describe-key] . helpful-variable)
+         ("C-h k" . helpful-key)
+         ([remap describe-function] . helpful-variable)
+         ("C-h f" . helpful-function)
+         ("C-h c" . helpful-command)
+         ("C-h p" . helpful-at-point)
+         :map helpful-mode-map
+         ("q" . helpful-kill-buffers)))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :ensure t
@@ -1857,6 +1940,7 @@ whitespaces."
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
   (markdown-fontify-code-blocks-natively t)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
+  (markdown-header-scaling t)
   (markdown-list-indent-width 2)
   :config
   (use-package markdown-mode+
@@ -2327,7 +2411,7 @@ whitespaces."
 
 (use-package lsp-ivy
   :ensure t
-  :after lsp
+  :after lsp-mode
   :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol)
   :bind
   (("C-c l g" . lsp-ivy-global-workspace-symbol)
@@ -2346,20 +2430,35 @@ whitespaces."
                         (lambda ()
                           (lsp-format-buffer)) nil t))))
 
-(with-eval-after-load 'python-mode
-  (use-package lsp-python-ms
-    :ensure t
-    :disabled t
-    :init (setq lsp-python-ms-auto-install-server t)
-    :hook (python-mode . (lambda ()
-                           (require 'lsp-python-ms)
-                           (lsp-deferred))))
+(use-package lsp-python-ms
+  :ensure t
+  :disabled t
+  :after 'python-mode
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp-deferred))))
 
-  (use-package lsp-pyright
-    :ensure t
-    :hook (python-mode . (lambda ()
-                           (require 'lsp-pyright)
-                           (lsp-deferred)))))
+(use-package lsp-pyright
+  :ensure t
+  :after lsp-mode
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp-deferred)))
+  :config
+  (add-to-list 'lsp-disabled-clients 'pyls)
+  (add-to-list 'lsp-enabled-clients 'pyright))
+
+(use-package lsp-jedi
+  :ensure t
+  :after lsp-mode
+  :disabled t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-jedi)
+                         (lsp-deferred)))
+  :config
+  (add-to-list 'lsp-disabled-clients 'pyls)
+  (add-to-list 'lsp-enabled-clients 'jedi))
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
@@ -2403,6 +2502,8 @@ whitespaces."
            company-dabbrev ;
            company-ispell ; Uses an English dictionary
            company-tabnine ; Use DL models
+           company-dict
+           company-yasnippet
            ))))
 (add-hook 'text-mode-hook #'sb/company-text-backends)
 
@@ -2414,8 +2515,22 @@ whitespaces."
            company-capf
            company-tabnine
            company-dabbrev-code
+           company-yasnippet
            ))))
 (add-hook 'prog-mode-hook #'sb/company-prog-backends)
+
+(defun sb/company-c-mode-backends ()
+  "Add backends for C/C++ completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-capf
+           company-tabnine
+           company-dabbrev-code
+           company-clang
+           company-yasnippet
+           ))))
+(add-hook 'c-mode-common-hook #'sb/company-prog-backends)
 
 (defun sb/company-sh-backends ()
   "Add backends for shell script completion in company mode."
@@ -2428,6 +2543,7 @@ whitespaces."
            company-shell-env
            company-fish-shell
            company-dabbrev-code
+           company-yasnippet
            ))))
 (add-hook 'sh-mode-hook #'sb/company-sh-backends)
 
@@ -2440,7 +2556,12 @@ whitespaces."
            company-tabnine
            company-bibtex
            company-dabbrev
-
+           (company-math-symbols-latex
+            company-latex-commands
+            company-math-symbols-unicode)
+           (company-reftex-labels
+            company-reftex-citations)
+           company-yasnippet
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-backends))

@@ -48,7 +48,7 @@ python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint p
 ```
 
 ```Bash
-python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip jedi-language-server --user
 ```
 
 ```Bash
@@ -63,18 +63,29 @@ cargo install --git https://github.com/latex-lsp/texlab.git
 #### Node Packages
 
 ```Bash
-cd $HOME/tmp; mkdir emacs-node-workspace; cd ;
+cd $HOME/tmp; cd ;
 npm init --yes
-npm install --save-dev npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver
+sudo npm install -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright
 npm update
 ```
 
 Install `textlint` separately so that the installation is shared by other editors.
 
 ```Bash
-cd $HOME/tmp; mkdir textlint-workspace; cd ;
-npm init --yes
-npm install --save-dev textlint textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-plugin-json textlint-plugin-html textlint-rule-sentence-length textlint-plugin-latex textlint-plugin-latex2e textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint
+cd $HOME/tmp; mkdir textlint-workspace; cd textlint-workspace;
+```
+
+```Bash
+npm init --yes; npm install textlint
+```
+
+```Bash
+npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words  textlint-rule-sentence-length textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint textlint-rule-terminology textlint-filter-rule-comments textlint-rule-unexpanded-acronym textlint-rule-abbr-within-parentheses
+```
+
+```Bash
+npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst
+textlint-plugin-json textlint-plugin-html
 ```
 
 Add the following definitions to `$HOME/.bashrc`.
@@ -196,10 +207,11 @@ Use Universal Ctags with `counsel-etags`.
 
 By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 
-- `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use.
-- `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is the identifier under the cursor.
-- `M-*` -- Pop back to where you previously invoked `M-.`.
-- `C-u M-.` -- Find the next definition for the last tag.
+- `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use
+- `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is
+  the identifier under the cursor
+- `M-*` -- Pop back to where you invoked `M-.`
+- `C-u M-.` -- Find the next definition for the last tag
 
 For more commands, see the Tags topic in the Emacs info document.
 
@@ -251,7 +263,7 @@ GNU Global has better database search support while Universal Ctags supports mor
 
 Enable server support either through `init.el` or as a `systemd` service.
 
-### Systemd service
+### systemd service
 
 Create a file `$HOME/.config/systemd/user/emacs.service` with the following content.
 
@@ -290,6 +302,6 @@ StartupWMClass=Emacs
 
 ## TODO
 
-- Use custom major modes for files by names
+- Use custom major modes for files by names without using file-local variables
 - Open a default file in a `projectile` project
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`. My guess is this has to do with either `flycheck-grammarly` or `prettier`.
