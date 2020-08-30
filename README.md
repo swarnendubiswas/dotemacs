@@ -51,6 +51,8 @@ python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint p
 python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip jedi-language-server --user
 ```
 
+#### Other Packages
+
 ```Bash
 sudo gem install scss_lint
 sudo gem update
@@ -58,6 +60,7 @@ composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
 composer update
 cargo install --git https://github.com/latex-lsp/texlab.git
+sudo cpanm Perl::LanguageServer
 ```
 
 #### Node Packages
@@ -143,24 +146,24 @@ I plan to automate the complete setup sometime in the future.
 
 ## Directory structure
 
-| Directory         | Purpose                                                               |
-| ----------------- | --------------------------------------------------------------------- |
-| `extras`          | third-party packages (may not be available from the package archives) |
-| `reference-cards` | documentation and help files                                          |
-| `snippets`        | custom snippets                                                       |
+| Directory | Purpose |
+| --- | --- |
+| `extras` | third-party packages (may not be available from the package archives) |
+| `reference-cards` | documentation and help files |
+| `snippets` | custom snippets |
 
 ## Tweaking the default settings
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-| Custom variable                         | Documentation                                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `dotemacs-theme`                        | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`.      |
-| `dotemacs-modeline-theme`               | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`.                                   |
-| `dotemacs-window-split`                 | Specify the direction in which the windows should be split. This depends on the orientation of the display.                     |
-| `dotemacs-fill-column`                  | Column beyond which lines should not extend.                                                                                    |
-| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not.                                                                   |
-| `dotemacs-tags-scheme`                  | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use `lsp-mode` for supported languages and projects. |
+| Custom variable | Documentation |
+| --- | --- |
+| `dotemacs-theme` | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
+| `dotemacs-modeline-theme` | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`. |
+| `dotemacs-window-split` | Specify the direction in which the windows should be split. This depends on the orientation of the display. |
+| `dotemacs-fill-column` | Column beyond which lines should not extend. |
+| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not. |
+| `dotemacs-tags-scheme` | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use `lsp-mode` for supported languages and projects. |
 
 Please check `init.el` for other options.
 
@@ -208,8 +211,7 @@ Use Universal Ctags with `counsel-etags`.
 By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 
 - `M-x visit-tags-table <RET> FILE <RET>` -- Select the tag file `FILE` to use
-- `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is
-  the identifier under the cursor
+- `M-. [TAG] <RET>` -- Find the first definition of `TAG`. The default tag is the identifier under the cursor
 - `M-*` -- Pop back to where you invoked `M-.`
 - `C-u M-.` -- Find the next definition for the last tag
 

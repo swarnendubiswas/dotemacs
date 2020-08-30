@@ -104,6 +104,7 @@
     ("amke" "make" nil :count 0)
     ("amkes" "makes" nil :count 0)
     ("analsis" "analysis" nil :count 1)
+    ("analsysi" "analysis" nil :count 0)
     ("analsysis" "analysis" nil :count 0)
     ("analyis" "analysis" nil :count 1)
     ("analysses" "analyses" nil :count 1)
@@ -1304,3 +1305,4 @@
     ("finally" "finally" c-electric-continued-statement :count 0)
     ("while" "while" c-electric-continued-statement :count 0)
    ))
+
