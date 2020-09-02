@@ -762,11 +762,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package dired-efap
   :ensure t
-  ;; :commands dired-efap
-  ;; :after dired
+  :after dired
   :custom (dired-efap-initial-filename-selection nil)
-  :bind (:map dired-mode-map
-              ("r" . dired-efap)))
+  :bind* (:map dired-mode-map
+               ("r" . dired-efap)))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
@@ -1988,6 +1987,9 @@ SAVE-FN with non-nil ARGS."
 ;;   (logview-cache-filename (expand-file-name "logview-cache.extmap"
 ;;                                             dotemacs-temp-directory)))
 
+(use-package antlr-mode
+  :mode "\\.g4\\'")
+
 (use-package bison-mode
   :ensure t
   :mode ("\\.y\\'" "\\.l\\'" "\\.bison\\'"))
@@ -2542,6 +2544,8 @@ SAVE-FN with non-nil ARGS."
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
                          (lsp-deferred)))
+  ;; :custom
+  ;; (lsp-pyright-python-executable-cmd . "python3")
   :config
   (dolist (ls '(pyls mspyls jedi))
     (add-to-list 'lsp-disabled-clients ls))

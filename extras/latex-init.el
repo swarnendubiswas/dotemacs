@@ -55,7 +55,8 @@
 
   (use-package company-auctex
     :ensure t
-    :init (company-auctex-init))
+    :demand t
+    :config (company-auctex-init))
 
   (use-package math-symbol-lists ; Required by ac-math and company-math
     :ensure t)

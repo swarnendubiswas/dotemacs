@@ -87,8 +87,7 @@ npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction 
 ```
 
 ```Bash
-npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst
-textlint-plugin-json textlint-plugin-html
+npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst textlint-plugin-json textlint-plugin-html
 ```
 
 Add the following definitions to `$HOME/.bashrc`.
