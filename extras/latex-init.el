@@ -32,7 +32,7 @@
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   ;; (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   ;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-  (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+  ;; (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
 
   (setq-default TeX-master nil) ; Query for master file
 
@@ -63,9 +63,10 @@
   (use-package company-math
     :ensure t
     :after company
-    :init
-    (add-to-list 'company-backends
-                 '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode)))
+    ;; :init
+    ;; (add-to-list 'company-backends
+    ;;              '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))
+    )
 
   (use-package company-reftex
     :ensure t

@@ -156,7 +156,7 @@ whitespaces."
   "User HOME directory.")
 
 (defcustom dotemacs-python-langserver
-  'pyls
+  'mspyls
   "Choose the Python Language Server implementation."
   :type '(radio
           (const :tag "pyls" pyls)
@@ -187,7 +187,9 @@ whitespaces."
         package-enable-at-startup nil)
   (when (< emacs-major-version 27)
     (package-initialize t))
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  ;; (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -872,10 +874,12 @@ SAVE-FN with non-nil ARGS."
 
 (use-package org
   :ensure t
+  :defer t
   :config
   (add-hook 'org-mode-hook #'visual-line-mode)
   ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
+  (diminish 'org-indent-mode)
   (setq org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-startup-indented t
         org-startup-truncated nil
@@ -899,6 +903,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package org-bullets
   :ensure t
+  :after org-mode
   :init (add-hook 'org-mode-hook #'org-bullets-mode))
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
@@ -992,6 +997,7 @@ SAVE-FN with non-nil ARGS."
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
+    (interactive)
     (company-abort)
     (save-buffer))
   :custom
@@ -1068,7 +1074,8 @@ SAVE-FN with non-nil ARGS."
 ;; Deep Local mode is computationally expensive
 (use-package company-tabnine
   :ensure t
-  :after company)
+  :after company
+  :disabled t)
 
 ;; (use-package company-fuzzy
 ;;   :ensure t
@@ -1084,13 +1091,13 @@ SAVE-FN with non-nil ARGS."
                 (make-local-variable 'company-backends)
                 (add-to-list 'company-backends 'company-ispell)))))
 
-;; (use-package yasnippet
-;;   :ensure t
-;;   :diminish yas-minor-mode
-;;   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-;;   :hook (after-init . yas-global-mode)
-;;   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-;;   :config (unbind-key "<tab>" yas-minor-mode-map))
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  :hook (after-init . yas-global-mode)
+  :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  :config (unbind-key "<tab>" yas-minor-mode-map))
 
 ;; (use-package amx
 ;;   :ensure t
@@ -1551,14 +1558,14 @@ SAVE-FN with non-nil ARGS."
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t)))
 
-;; ;; This seems to introduce freezes
-;; (use-package flycheck-grammarly
-;;   :ensure t
-;;   :after flycheck
-;;   :hook
-;;   (text-mode . (lambda ()
-;;                  ;; (require 'flycheck-grammarly)
-;;                  (flycheck-add-next-checker 'grammarly-checker 'textlint))))
+;; This seems to introduce freezes
+(use-package flycheck-grammarly
+  :ensure t
+  :after flycheck
+  :hook
+  (text-mode . (lambda ()
+                 ;; (require 'flycheck-grammarly)
+                 (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
@@ -2168,11 +2175,11 @@ SAVE-FN with non-nil ARGS."
   (when (eq dotemacs-python-langserver 'pyls)
     (add-hook 'python-mode-hook #'lsp))
   :config
-  ;; This is not required since pyls is the default client
-  ;; (with-eval-after-load 'lsp-mode
-  ;;   (dolist (ls '(pyright mspyls jedi))
-  ;;     (add-to-list 'lsp-disabled-clients ls))
-  ;;   (add-to-list 'lsp-enabled-clients 'pyls))
+  ;; Is this required since pyls is the default client?
+  (with-eval-after-load 'lsp-mode
+    (dolist (ls '(pyright mspyls jedi))
+      (add-to-list 'lsp-disabled-clients ls))
+    (add-to-list 'lsp-enabled-clients 'pyls))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
         python-shell-interpreter "python3"
@@ -2186,7 +2193,23 @@ SAVE-FN with non-nil ARGS."
   :custom (pyvenv-mode-line-indicator
            '(pyvenv-virtual-env-name ("[venv:"
                                       pyvenv-virtual-env-name "]")))
-  :hook (python-mode . pyvenv-mode))
+  :hook (python-mode . pyvenv-mode)
+  :config
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat
+                                                pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
+
+(use-package py-isort
+  :ensure t
+  :after python
+  :init
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'py-isort-before-save))))
 
 ;; (use-package ein
 ;;   :ensure t)
@@ -2368,7 +2391,7 @@ SAVE-FN with non-nil ARGS."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  ;; (lsp-enabled-clients '(pyls pyright mspyls jedi clangd ts-ls eslint json-ls cmakels html-ls texlab jdtls bash-ls))
+  (lsp-enabled-clients '(pyls pyright mspyls jedi clangd ts-ls eslint json-ls cmakels html-ls texlab jdtls bash-ls))
   (lsp-html-format-wrap-line-length 80)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2502,6 +2525,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package lsp-python-ms
   :ensure t
+  :after python-mode
   :if (eq dotemacs-python-langserver 'mspyls)
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
@@ -2514,7 +2538,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package lsp-pyright
   :ensure t
-  :if (eq dotemacs-python-langserver 'pyright)
+  :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
                          (lsp-deferred)))
@@ -2537,7 +2561,8 @@ SAVE-FN with non-nil ARGS."
 ;; Make sure to install virtualenv through pip, and not the distribution package
 ;; manager. Run "jedi:install-sever"
 (use-package company-jedi
-  :ensure t)
+  :ensure t
+  :after python-mode)
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
@@ -2681,11 +2706,11 @@ SAVE-FN with non-nil ARGS."
            ;; company-tabnine
            company-bibtex
            company-dabbrev
-           (company-math-symbols-latex
-            company-latex-commands
-            company-math-symbols-unicode)
-           (company-reftex-labels
-            company-reftex-citations)
+           company-math-symbols-latex
+           company-latex-commands
+           company-math-symbols-unicode
+           company-reftex-labels
+           company-reftex-citations
            company-yasnippet
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
