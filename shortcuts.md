@@ -181,6 +181,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## Markdown
 
+- `M-Ret` - Insert new list item (`markdown-insert-list-item`)
 - `C-c C-s e` - Make region or word italic (emphasis) (`markdown-insert-italic`)
 - `C-c C-s s` - Make region or word bold or strong (``)
 - `C-c C-s s` - Insert or start blockquote (``)

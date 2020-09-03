@@ -33,7 +33,8 @@
   ;; (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   ;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
   ;; (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
-
+  (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  
   (setq-default TeX-master nil) ; Query for master file
 
   ;; Enable rainbow mode after applying styles to the buffer

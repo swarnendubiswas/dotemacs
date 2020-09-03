@@ -243,83 +243,84 @@ whitespaces."
 ;;   (exec-path-from-shell-check-startup-files nil)
 ;;   :init (exec-path-from-shell-initialize))
 
-(setq ad-redefinition-action 'accept ;; Turn off warnings due to functions being redefined
-      ;; apropos-do-all t
-      ;; Disable a second case insensitive pass
-      auto-mode-case-fold nil
-      auto-save-interval 600
-      auto-save-list-file-prefix (expand-file-name "auto-save"
-                                                   dotemacs-temp-directory)
-      auto-save-timeout 180
-      backup-inhibited t ; Disable backup for a per-file basis
-      blink-matching-paren nil ; Distracting
-      case-fold-search t ; Searches and matches should ignore case
-      completion-ignore-case t ; Ignore case when completing
-      confirm-kill-emacs nil
-      ;; Prevent "Active processes exist" when you quit Emacs
-      confirm-kill-processes nil
-      confirm-nonexistent-file-or-buffer t
-      create-lockfiles nil
-      ;; Use system trash to deal with mistakes
-      custom-safe-themes t delete-by-moving-to-trash t
-      ;; enable-recursive-minibuffers t
-      find-file-visit-truename t ; Show true name, useful in case of symlinks
-      ;; Avoid resizing the (GUI) frame when your newly set font is larger (or
-      ;; smaller) than the system default
-      frame-inhibit-implied-resize t
-      frame-title-format (list '(buffer-file-name "%f" "%b"))
-      ;; gc-cons-percentage 0.6 ; Portion of heap used for allocation
-      gc-cons-threshold most-positive-fixnum ; Defer GC during startup
-      ;; help-window-select t
-      history-delete-duplicates t
-      ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we
-      ;; slow it down slightly from 0.5s
-      idle-update-delay 1.0
-      indicate-buffer-boundaries nil
-      inhibit-compacting-font-caches t ; Do not compact font caches during GC
-      ;; Disable loading of "default.el" at startup, inhibits site default
-      ;; settings
-      inhibit-default-init t
-      ;; *scratch* is in Lisp interaction mode by default, use text mode instead
-      inhibit-startup-echo-area-message t
-      inhibit-startup-screen t ; inhibit-splash-screen is an alias
-      initial-major-mode 'fundamental-mode ; 'text-mode is more expensive
-      initial-scratch-message nil
-      kill-do-not-save-duplicates t
-      kill-whole-line t
-      load-prefer-newer t
-      ;; Major mode to use for files that do no specify a major mode
-      ;; major-mode 'text-mode
-      make-backup-files nil ; Stop making backup ~ files
-      ;; mouse-drag-copy-region t
-      ;; mouse-yank-at-point t ; Yank at point instead of at click
-      pop-up-frames nil ; Avoid making separate frames
-      ;; pop-up-windows nil ; Disallow creating new windows
-      ;; Ignore case when reading a buffer name
-      read-buffer-completion-ignore-case t
-      ;; Ignore case when reading a file name completion
-      read-file-name-completion-ignore-case t
-      read-process-output-max (* 1024 1024) ; 1 MB
-      require-final-newline t ; Always end a file with a newline.
-      ring-bell-function 'ignore ; Disable beeping sound
-      save-interprogram-paste-before-kill t
-      ;; Enable use of system clipboard across Emacs and other applications
-      select-enable-clipboard t
-      sentence-end-double-space nil
-      ;; set-mark-command-repeat-pop t
-      ;; shift-select-mode t ; Use shift-select for marking
-      suggest-key-bindings t
-      ;; switch-to-buffer-preserve-window-point t
-      truncate-lines nil
-      ;; truncate-partial-width-windows nil
-      use-dialog-box nil
-      use-file-dialog nil
-      ;; vc-handled-backends nil
-      visible-bell nil
-      x-gtk-use-system-tooltips nil ; Do not use system tooltips
-      ;; Underline looks a bit better when drawn lower
-      ;; x-underline-at-descent-line t
-      )
+(setq-default ad-redefinition-action 'accept ;; Turn off warnings due to redefinitions
+              ;; apropos-do-all t
+              ;; Disable a second case insensitive pass
+              auto-mode-case-fold nil
+              auto-save-interval 600
+              auto-save-list-file-prefix (expand-file-name "auto-save"
+                                                           dotemacs-temp-directory)
+              auto-save-timeout 180
+              backup-inhibited t ; Disable backup for a per-file basis
+              blink-matching-paren nil ; Distracting
+              case-fold-search t ; Searches and matches should ignore case
+              completion-ignore-case t ; Ignore case when completing
+              confirm-kill-emacs nil
+              ;; Prevent "Active processes exist" when you quit Emacs
+              confirm-kill-processes nil
+              confirm-nonexistent-file-or-buffer t
+              create-lockfiles nil
+              cursor-in-non-selected-windows t ; Hide the cursor in inactive windows
+              ;; Use system trash to deal with mistakes
+              custom-safe-themes t delete-by-moving-to-trash t
+              ;; enable-recursive-minibuffers t
+              find-file-visit-truename t ; Show true name, useful in case of symlinks
+              ;; Avoid resizing the (GUI) frame when your newly set font is larger (or
+              ;; smaller) than the system default
+              frame-inhibit-implied-resize t
+              frame-title-format (list '(buffer-file-name "%f" "%b"))
+              ;; gc-cons-percentage 0.6 ; Portion of heap used for allocation
+              gc-cons-threshold most-positive-fixnum ; Defer GC during startup
+              ;; help-window-select t
+              history-delete-duplicates t
+              ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we
+              ;; slow it down slightly from 0.5s
+              idle-update-delay 1.0
+              indicate-buffer-boundaries nil
+              inhibit-compacting-font-caches t ; Do not compact font caches during GC
+              ;; Disable loading of "default.el" at startup, inhibits site default
+              ;; settings
+              inhibit-default-init t
+              ;; *scratch* is in Lisp interaction mode by default, use text mode instead
+              inhibit-startup-echo-area-message t
+              inhibit-startup-screen t ; inhibit-splash-screen is an alias
+              initial-major-mode 'fundamental-mode ; 'text-mode is more expensive
+              initial-scratch-message nil
+              kill-do-not-save-duplicates t
+              kill-whole-line t
+              load-prefer-newer t
+              ;; Major mode to use for files that do no specify a major mode
+              ;; major-mode 'text-mode
+              make-backup-files nil ; Stop making backup ~ files
+              ;; mouse-drag-copy-region t
+              ;; mouse-yank-at-point t ; Yank at point instead of at click
+              pop-up-frames nil ; Avoid making separate frames
+              ;; pop-up-windows nil ; Disallow creating new windows
+              ;; Ignore case when reading a buffer name
+              read-buffer-completion-ignore-case t
+              ;; Ignore case when reading a file name completion
+              read-file-name-completion-ignore-case t
+              read-process-output-max (* 1024 1024) ; 1 MB
+              require-final-newline t ; Always end a file with a newline.
+              ring-bell-function 'ignore ; Disable beeping sound
+              save-interprogram-paste-before-kill t
+              ;; Enable use of system clipboard across Emacs and other applications
+              select-enable-clipboard t
+              sentence-end-double-space nil
+              ;; set-mark-command-repeat-pop t
+              ;; shift-select-mode t ; Use shift-select for marking
+              suggest-key-bindings t
+              ;; switch-to-buffer-preserve-window-point t
+              truncate-lines nil
+              ;; truncate-partial-width-windows nil
+              use-dialog-box nil
+              use-file-dialog nil
+              ;; vc-handled-backends nil
+              visible-bell nil
+              x-gtk-use-system-tooltips nil ; Do not use system tooltips
+              ;; Underline looks a bit better when drawn lower
+              ;; x-underline-at-descent-line t
+              )
 
 (setq-default compilation-scroll-output t
               fill-column dotemacs-fill-column
@@ -853,7 +854,8 @@ SAVE-FN with non-nil ARGS."
 ;;   :ensure t)
 
 ;; (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
-;;   :ensure t)
+;;   :ensure t
+;;   :if (display-graphic-p))
 
 ;; (use-package all-the-icons-ibuffer
 ;;   :ensure t
@@ -903,7 +905,7 @@ SAVE-FN with non-nil ARGS."
 (use-package org-bullets
   :ensure t
   :after org-mode
-  :init (add-hook 'org-mode-hook #'org-bullets-mode))
+  :hook (org-mode . org-bullets-mode))
 
 ;; Use "C-'" in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
 ;; candidates.
@@ -927,10 +929,11 @@ SAVE-FN with non-nil ARGS."
 (use-package anzu
   :ensure t
   :diminish anzu-mode
-  :after (isearch)
+  :after isearch
+  :custom
+  (anzu-search-threshold 10000)
+  (anzu-minimum-input-length 2)
   :config
-  (setq anzu-search-threshold 10000
-        anzu-minimum-input-length 2)
   (when (eq dotemacs-modeline-theme 'spaceline)
     (setq anzu-cons-mode-line-p nil))
   (unless (eq dotemacs-theme 'leuven)
@@ -1015,7 +1018,6 @@ SAVE-FN with non-nil ARGS."
   :config
   (dolist (backend '(company-semantic company-bbdb company-oddmuse company-cmake))
     (delq backend company-backends))
-  (add-to-list 'company-backends 'company-ispell)
   ;; Ignore numbers from company-dabbrev
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
@@ -1058,6 +1060,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-dict
   :ensure t
+  :disabled t
   :custom
   (company-dict-dir (expand-file-name "dict" user-emacs-directory))
   (company-dict-enable-fuzzy t)
@@ -1065,6 +1068,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-ctags
   :ensure t
+  :disabled t
   :custom
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
@@ -1344,7 +1348,9 @@ SAVE-FN with non-nil ARGS."
   (ispell-local-dictionary "en_US")
   (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
   (ispell-silently-savep t "Save a new word to personal dictionary without asking")
+  (flyspell-abbrev-p t)
   (flyspell-issue-message-flag nil)
+  (flyspell-issue-welcome-flag nil)
   :hook ((prog-mode . flyspell-prog-mode)
          (before-save-hook . flyspell-buffer)
          ((text-mode find-file-hooks) . flyspell-mode))
@@ -1369,8 +1375,26 @@ SAVE-FN with non-nil ARGS."
       :ensure flyspell-correct
       :disabled t
       :functions flyspell-correct-ivy
-      :init (setq flyspell-correct-interface #'flyspell-correct-ivy)
+      :custom (flyspell-correct-interface #'flyspell-correct-ivy)
       :bind ("C-;" . flyspell-correct-wrapper)))
+
+(defhydra hydra-spelling (:color blue)
+  "
+  ^
+  ^Spelling^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^───────
+  _q_ quit            _<_ previous        _c_ correction
+  ^^                  _>_ next            _d_ dictionary
+  ^^                  _f_ check           _m_ mode
+  ^^                  ^^                  ^^
+  "
+  ("q" nil)
+  ("<" flyspell-correct-previous :color pink)
+  (">" flyspell-correct-next :color pink)
+  ("c" ispell)
+  ("d" ispell-change-dictionary)
+  ("f" flyspell-buffer)
+  ("m" flyspell-mode))
 
 (use-package highlight-indentation
   :ensure t
@@ -1494,6 +1518,7 @@ SAVE-FN with non-nil ARGS."
 ;; FIXME: counsel-projectile is not working
 (use-package counsel-projectile
   :ensure t
+  :after counsel
   :hook (counsel-mode . counsel-projectile-mode)
   :custom
   (counsel-projectile-remove-current-buffer t)
@@ -1576,6 +1601,29 @@ SAVE-FN with non-nil ARGS."
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults)))
+
+(defhydra hydra-flycheck (:color blue)
+  "
+  ^
+  ^Flycheck^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^─────
+  _q_ quit            _<_ previous        _?_ describe
+  _M_ manual          _>_ next            _d_ disable
+  _v_ verify setup    _f_ check           _m_ mode
+  ^^                  _l_ list            _s_ select
+  ^^                  ^^                  ^^
+  "
+  ("q" nil)
+  ("<" flycheck-previous-error :color pink)
+  (">" flycheck-next-error :color pink)
+  ("?" flycheck-describe-checker)
+  ("M" flycheck-manual)
+  ("d" flycheck-disable-checker)
+  ("f" flycheck-buffer)
+  ("l" flycheck-list-errors)
+  ("m" flycheck-mode)
+  ("s" flycheck-select-checker)
+  ("v" flycheck-verify-setup))
 
 ;; (use-package whitespace
 ;;   :commands (whitespace-mode global-whitespace-mode)
@@ -1973,13 +2021,15 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :hook (text-mode . writegood-mode))
 
-;; (use-package langtool
-;;   :ensure t
-;;   :hook (text-mode . (lambda()
-;;                        (require 'langtool)))
-;;   :custom
-;;   (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
-;;                                                 dotemacs-user-home)))
+(use-package langtool
+  :ensure t
+  :after text-mode
+  :hook (text-mode . (lambda()
+                       (require 'langtool)))
+  :custom
+  (langtool-default-language "en")
+  (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
+                                                dotemacs-user-home)))
 
 ;; (use-package logview
 ;;   :ensure t
@@ -2167,6 +2217,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package cmake-font-lock
   :ensure t
+  :after cmake-mode
   :hook (cmake-mode . cmake-font-lock-activate))
 
 (use-package python
@@ -2176,6 +2227,9 @@ SAVE-FN with non-nil ARGS."
   (setenv "PYTHONPATH" "python3")
   (when (eq dotemacs-python-langserver 'pyls)
     (add-hook 'python-mode-hook #'lsp))
+  :bind
+  (("M-[" . python-nav-backward-block)
+   ("M-]" . python-nav-forward-block))
   :config
   ;; Is this required since pyls is the default client?
   (with-eval-after-load 'lsp-mode
@@ -2591,7 +2645,13 @@ SAVE-FN with non-nil ARGS."
 (use-package js2-mode
   :ensure t
   :mode "\\.js\\'"
-  :hook (js2-mode . lsp))
+  :hook ((js2-mode . lsp)
+         (js2-mode . js2-imenu-extras-mode))
+  :custom (js-indent-level 2))
+
+(use-package xref-js2
+  :ensure t
+  :after js2-mode)
 
 (use-package json-mode
   :ensure t
@@ -2602,6 +2662,14 @@ SAVE-FN with non-nil ARGS."
             (lambda ()
               (make-local-variable 'js-indent-level)
               (setq js-indent-level 2))))
+
+(use-package less-css-mode
+  :ensure t
+  :mode "\\.less\\'")
+
+(use-package scss-mode
+  :ensure t
+  :mode "\\.scss\\'")
 
 (use-package mlir-mode
   :load-path "extras"
@@ -2628,7 +2696,11 @@ SAVE-FN with non-nil ARGS."
            ;; company-tabnine
            ;; company-yasnippet
            ))))
-(add-hook 'text-mode-hook #'sb/company-text-mode)
+
+(with-eval-after-load 'company-mode
+  (dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
+    (add-hook hook (lambda ()
+                     (#'sb/company-text-mode)))))
 
 (defun sb/company-prog-mode ()
   "Add backends for program completion in company mode."
@@ -2642,7 +2714,8 @@ SAVE-FN with non-nil ARGS."
            ;; company-tabnine
            company-dabbrev-code
            ))))
-(add-hook 'prog-mode-hook #'sb/company-prog-mode)
+(with-eval-after-load 'company-mode
+  (add-hook 'prog-mode-hook #'sb/company-prog-mode))
 
 (defun sb/company-c-mode ()
   "Add backends for C/C++ completion in company mode."
@@ -2657,7 +2730,8 @@ SAVE-FN with non-nil ARGS."
            company-dabbrev-code
            company-clang
            ))))
-(add-hook 'c-mode-common-hook #'sb/company-c-mode)
+(with-eval-after-load 'company-mode
+  (add-hook 'c-mode-common-hook #'sb/company-c-mode))
 
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
@@ -2673,7 +2747,8 @@ SAVE-FN with non-nil ARGS."
            company-dabbrev-code
            company-yasnippet
            ))))
-(add-hook 'sh-mode-hook #'sb/company-sh-mode)
+(with-eval-after-load 'company-mode
+  (add-hook 'sh-mode-hook #'sb/company-sh-mode))
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp."
@@ -2685,6 +2760,8 @@ SAVE-FN with non-nil ARGS."
           company-dabbrev-code
           company-files)
          company-capf)))
+(with-eval-after-load 'company-mode
+  (add-hook 'emacs-lisp-mode-hook #'sb/company-sh-mode))
 
 (defun sb/company-python-mode ()
   "Add backends for Python completion in company mode."
@@ -2699,7 +2776,8 @@ SAVE-FN with non-nil ARGS."
            ;; company-tabnine
            company-dabbrev-code
            ))))
-(add-hook 'prog-mode-hook #'sb/company-python-mode)
+(with-eval-after-load 'company-mode
+  (add-hook 'prog-mode-hook #'sb/company-python-mode))
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
@@ -2710,6 +2788,7 @@ SAVE-FN with non-nil ARGS."
            ;; company-tabnine
            company-bibtex
            company-dabbrev
+           company-ispell
            company-math-symbols-latex
            company-latex-commands
            company-math-symbols-unicode
@@ -2717,8 +2796,9 @@ SAVE-FN with non-nil ARGS."
            company-reftex-citations
            company-yasnippet
            ))))
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook))
-  (add-hook hook #'sb/company-latex-mode))
+(with-eval-after-load 'company-mode
+  (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook hook #'sb/company-latex-mode)))
 
 ;; Function definitions
 
