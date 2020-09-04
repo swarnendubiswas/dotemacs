@@ -156,7 +156,7 @@ whitespaces."
   "User HOME directory.")
 
 (defcustom dotemacs-python-langserver
-  'mspyls
+  'pyls
   "Choose the Python Language Server implementation."
   :type '(radio
           (const :tag "pyls" pyls)
@@ -2233,10 +2233,10 @@ SAVE-FN with non-nil ARGS."
               ("M-]" . python-nav-forward-block))
   :config
   ;; Is this required since pyls is the default client?
-  ;; (with-eval-after-load 'lsp-mode
-  ;;   (dolist (ls '(pyright mspyls jedi))
-  ;;     (add-to-list 'lsp-disabled-clients ls))
-  ;;   (add-to-list 'lsp-enabled-clients 'pyls))
+  (with-eval-after-load 'lsp-mode
+    (dolist (ls '(pyright mspyls jedi))
+      (add-to-list 'lsp-disabled-clients ls))
+    (add-to-list 'lsp-enabled-clients 'pyls))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
         python-shell-interpreter "python3"
@@ -2448,7 +2448,15 @@ SAVE-FN with non-nil ARGS."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  ;; (lsp-enabled-clients '(pyls pyright mspyls jedi clangd ts-ls eslint json-ls cmakels html-ls texlab jdtls bash-ls))
+  (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
+                              mspyls mspyls-remote jedi
+                              jedils-remote clangd clangd-remote
+                              ts-ls eslint json-ls jsonls-remote
+                              cmakels cmakels-remote html-ls
+                              htmlls-remote texlab texlab-remote
+                              jdtls bash-ls bashls-remote
+                              typescript-remote cssls-remote
+                              intelephense-remote))
   (lsp-html-format-wrap-line-length 80)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2520,7 +2528,7 @@ SAVE-FN with non-nil ARGS."
                                      '("bash-language-server" "start"))
                     :major-modes '(sh-mode)
                     :remote? t
-                    :server-id 'bash-lsp-remote))
+                    :server-id 'bashls-remote))
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection "intelephense")
