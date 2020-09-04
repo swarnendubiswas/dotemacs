@@ -1,4 +1,4 @@
-personal_ws-1.1 en 129 
+personal_ws-1.1 en 130 
 runtime
 centroids
 reimplementation
@@ -29,8 +29,8 @@ Pretrained
 precimonious
 reimplement
 FIXME
-piecewise
 virtualized
+piecewise
 scalable
 untracked
 reproducability
@@ -40,9 +40,9 @@ Migrator
 observability
 programmatically
 activations
+unintuitive
 quantization
 misclassify
-unintuitive
 CSE
 Mainak
 Jikes
@@ -60,18 +60,19 @@ misclassification
 whitebox
 multithreaded
 metadata
+SIMD
 Refactor
 centroid
 Sanket
-amongst
 unserializable
+amongst
 recomputation
-Modularity
 uninstrumented
+Modularity
 reconvergence
 customizations
-recalibrate
 multicore
+recalibrate
 reorderings
 covariance
 analytical
@@ -79,8 +80,8 @@ runtimes
 locksteps
 optimality
 indices
-tradeoff
 translational
+tradeoff
 misclassifications
 reimplementing
 parallelizing

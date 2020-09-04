@@ -2138,10 +2138,11 @@ SAVE-FN with non-nil ARGS."
          ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
+;; Varying minibuffer height to show the documentation is distracting
 (use-package eldoc
   :if dotemacs-is-linux
   :diminish
-  :config (global-eldoc-mode 1))
+  :config (global-eldoc-mode -1))
 
 ;; Cannot load with use-package, do we need a :mode?
 ;; (use-package matlab-mode
@@ -2227,15 +2228,15 @@ SAVE-FN with non-nil ARGS."
   (setenv "PYTHONPATH" "python3")
   (when (eq dotemacs-python-langserver 'pyls)
     (add-hook 'python-mode-hook #'lsp))
-  :bind
-  (("M-[" . python-nav-backward-block)
-   ("M-]" . python-nav-forward-block))
+  :bind (:map python-mode-map
+              ("M-[" . python-nav-backward-block)
+              ("M-]" . python-nav-forward-block))
   :config
   ;; Is this required since pyls is the default client?
-  (with-eval-after-load 'lsp-mode
-    (dolist (ls '(pyright mspyls jedi))
-      (add-to-list 'lsp-disabled-clients ls))
-    (add-to-list 'lsp-enabled-clients 'pyls))
+  ;; (with-eval-after-load 'lsp-mode
+  ;;   (dolist (ls '(pyright mspyls jedi))
+  ;;     (add-to-list 'lsp-disabled-clients ls))
+  ;;   (add-to-list 'lsp-enabled-clients 'pyls))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
         python-shell-interpreter "python3"
@@ -2562,12 +2563,12 @@ SAVE-FN with non-nil ARGS."
                     :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
                     :remote? t
                     :server-id 'htmlls-remote))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     (cons lsp-xml-server-command lsp-xml-server-vmargs))
-                    :major-modes '(xml-mode nxml-mode)
-                    :remote? t
-                    :server-id 'xmlls-remote))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client :new-connection (lsp-tramp-connection
+  ;;                                    (cons lsp-xml-server-command lsp-xml-server-vmargs))
+  ;;                   :major-modes '(xml-mode nxml-mode)
+  ;;                   :remote? t
+  ;;                   :server-id 'xmlls-remote))
   ;; FIXME: Does this work inside :config?
   (dolist (hook '(c++-mode-hook python-mode-hook))
     (add-hook hook
@@ -2635,7 +2636,6 @@ SAVE-FN with non-nil ARGS."
 
 (use-package lsp-python-ms
   :ensure t
-  :after python-mode
   :if (eq dotemacs-python-langserver 'mspyls)
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
