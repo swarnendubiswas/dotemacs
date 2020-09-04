@@ -1243,7 +1243,7 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :hook (ivy-mode . counsel-mode)
   :config
-  (defalias 'flycheck-list-errors 'counsel-flycheck)
+  ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
   (defalias 'list-buffers 'counsel-ibuffer)
   ;; (defalias 'load-library 'counsel-load-library)
   (defalias 'load-theme 'counsel-load-theme)
@@ -2447,13 +2447,13 @@ SAVE-FN with non-nil ARGS."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  (lsp-enabled-clients '(pyls pyright mspyls jedi clangd ts-ls eslint json-ls cmakels html-ls texlab jdtls bash-ls))
+  ;; (lsp-enabled-clients '(pyls pyright mspyls jedi clangd ts-ls eslint json-ls cmakels html-ls texlab jdtls bash-ls))
   (lsp-html-format-wrap-line-length 80)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io nil)
+  (lsp-log-io t)
   (lsp-modeline-diagnostics-scope :project)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
@@ -2479,41 +2479,95 @@ SAVE-FN with non-nil ARGS."
                       "org.eclipse.lemminx-0.13.1-uber.jar")))
   (lsp-yaml-print-width 80)
   :config
+  (cond ((eq dotemacs-python-langserver
+             'pyls) (lsp-register-client
+             (make-lsp-client
+              :new-connection (lsp-tramp-connection "pyls")
+              :major-modes '(python-mode)
+              :remote? t
+              :server-id 'pyls-remote)))
+        ((eq dotemacs-python-langserver
+             'mspyls) (lsp-register-client
+             (make-lsp-client :new-connection (lsp-tramp-connection "mspyls")
+                              :major-modes '(python-mode)
+                              :remote? t
+                              :server-id 'mspyls-remote)))
+        ((eq dotemacs-python-langserver
+             'pyright) (lsp-register-client
+             (make-lsp-client :new-connection
+                              (lsp-tramp-connection
+                               (lambda ()
+                                 (cons "pyright-langserver"
+                                       lsp-pyright-langserver-command-args)))
+                              :major-modes '(python-mode)
+                              :remote? t
+                              :server-id 'pyright-remote)))
+        ((eq dotemacs-python-langserver
+             'jedi) (lsp-register-client
+             (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
+                              :major-modes '(python-mode)
+                              :remote? t
+                              :server-id 'jedils-remote))))
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
-                    :major-modes '(python-mode)
-                    :remote? t
-                    :server-id 'pyls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "clangd")
+    :major-modes '(c-mode c++-mode)
+    :remote? t
+    :server-id 'clangd-remote))
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "clangd")
-                    :major-modes '(c++-mode)
-                    :remote? t
-                    :server-id 'clangd-remote))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("bash-language-server" "start"))
                     :major-modes '(sh-mode)
                     :remote? t
                     :server-id 'bash-lsp-remote))
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "intelephense")
-                    :major-modes '(php-mode)
-                    :remote? t
-                    :server-id 'intelephense-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "intelephense")
+    :major-modes '(php-mode)
+    :remote? t
+    :server-id 'intelephense-remote))
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "cmake-language-server")
-                    :major-modes '(cmake-mode)
-                    :remote? t
-                    :server-id 'cmakels-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "cmake-language-server")
+    :major-modes '(cmake-mode)
+    :remote? t
+    :server-id 'cmakels-remote))
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection '("typescript-language-server" "--stdio"))
-                    :major-modes '(js-mode)
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("typescript-language-server" "--stdio"))
+                    :major-modes '(js-mode typescript-mode)
                     :remote? t
                     :server-id 'typescript-remote))
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection "texlab")
-                    :major-modes '(tex-mode latex-mode bibtex-mode)
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "texlab")
+    :major-modes '(tex-mode latex-mode bibtex-mode)
+    :remote? t
+    :server-id 'texlab-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("vscode-json-languageserver" "--stdio"))
+                    :major-modes '(json-mode jsonc-mode)
                     :remote? t
-                    :server-id 'texlab-remote))
+                    :server-id 'jsonls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("css-languageserver" "--stdio"))
+                    :major-modes '(css-mode less-mode sass-mode scss-mode)
+                    :remote? t
+                    :server-id 'cssls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("html-languageserver" "--stdio"))
+                    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
+                    :remote? t
+                    :server-id 'htmlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     (cons lsp-xml-server-command lsp-xml-server-vmargs))
+                    :major-modes '(xml-mode nxml-mode)
+                    :remote? t
+                    :server-id 'xmlls-remote))
   ;; FIXME: Does this work inside :config?
   (dolist (hook '(c++-mode-hook python-mode-hook))
     (add-hook hook
