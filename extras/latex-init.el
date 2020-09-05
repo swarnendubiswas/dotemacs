@@ -58,24 +58,7 @@
     :ensure t
     :demand t
     :config (company-auctex-init))
-
-  (use-package math-symbol-lists ; Required by ac-math and company-math
-    :ensure t)
-
-  (use-package company-math
-    :ensure t
-    :after company
-    ;; :init
-    ;; (add-to-list 'company-backends
-    ;;              '(company-math-symbols-latex company-latex-commands company-math-symbols-unicode))
-    )
-
-  (use-package company-reftex
-    :ensure t
-    :after company
-    :init
-    (add-to-list 'company-backends '(company-reftex-labels company-reftex-citations)))
-
+  
   (use-package ivy-bibtex
     :ensure t
     :bind ("C-c x b" . ivy-bibtex)
@@ -191,14 +174,7 @@
                 (add-hook 'after-save-hook
                           (lambda ()
                             (sb/save-buffer-and-run-latexmk)) nil t))))
-
-  (use-package company-bibtex
-    :ensure t
-    :init
-    (add-to-list 'company-backends 'company-bibtex)
-    ;; (add-to-list 'company-fuzzy--no-prefix-backends 'company-bibtex)
-    )
-
+  
   ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
   ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
   )

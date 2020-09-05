@@ -1,5 +1,4 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile:
-;;; nil; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile: nil; -*-
 ;; Swarnendu Biswas
 
 ;;; Commentary:
@@ -247,10 +246,8 @@ whitespaces."
               ;; apropos-do-all t
               ;; Disable a second case insensitive pass
               auto-mode-case-fold nil
-              auto-save-interval 600
               auto-save-list-file-prefix (expand-file-name "auto-save"
                                                            dotemacs-temp-directory)
-              auto-save-timeout 180
               backup-inhibited t ; Disable backup for a per-file basis
               blink-matching-paren nil ; Distracting
               case-fold-search t ; Searches and matches should ignore case
@@ -284,7 +281,8 @@ whitespaces."
               ;; *scratch* is in Lisp interaction mode by default, use text mode instead
               inhibit-startup-echo-area-message t
               inhibit-startup-screen t ; inhibit-splash-screen is an alias
-              initial-major-mode 'fundamental-mode ; 'text-mode is more expensive
+              ;; text-mode is more expensive, but I use scratch for composing emails
+              initial-major-mode 'text-mode
               initial-scratch-message nil
               kill-do-not-save-duplicates t
               kill-whole-line t
@@ -427,7 +425,6 @@ whitespaces."
                                    kill-ring
                                    search-ring
                                    ))
-  (savehist-autosave-interval 600)
   (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
 
@@ -517,7 +514,7 @@ SAVE-FN with non-nil ARGS."
                 ;; Typing with the mark active will overwrite the marked region
                 delete-selection-mode
                 global-visual-line-mode
-                global-so-long-mode
+                ;; global-so-long-mode ; This puts the buffer in read-only mode
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
                 ))
@@ -981,7 +978,7 @@ SAVE-FN with non-nil ARGS."
   (recentf-max-saved-items 50)
   (recentf-menu-filter 'recentf-sort-descending)
   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
-  :config (run-at-time nil 300 'recentf-save-list) ; Save every 300 s
+  :config (run-at-time nil 180 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
 ;; Hide the "Wrote to recentf" message which is irritating
@@ -992,6 +989,8 @@ SAVE-FN with non-nil ARGS."
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used
+;; Try "M-x company-complete-common" when there are no completions
+;; https://emacs.stackexchange.com/questions/3813/what-is-the-hook-used-by-company-mode-to-perform-autocompletion
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
@@ -1043,20 +1042,18 @@ SAVE-FN with non-nil ARGS."
 ;;   :disabled t
 ;;   :hook (global-company-mode . company-flx-mode))
 
-;; ;; (use-package company-quickhelp
-;; ;;   :ensure t
-;; ;;   :hook (global-company-mode . company-quickhelp-mode))
-
-;; (use-package company-box
+;; (use-package company-quickhelp
 ;;   :ensure t
-;;   :diminish
-;;   :defines company-box-icons-all-the-icons
-;;   :hook (global-company-mode . company-box-mode)
-;;   :custom
-;;   (company-box-backends-colors nil)
-;;   (company-box-doc-delay 0)
-;;   (company-box-max-candidates 50)
-;;   (company-box-show-single-candidate t))
+;;   :hook (global-company-mode . company-quickhelp-mode))
+
+(use-package company-box
+  :ensure t
+  :diminish
+  :defines company-box-icons-all-the-icons
+  :hook (global-company-mode . company-box-mode)
+  :custom
+  ;; (company-box-backends-colors nil)
+  (company-box-doc-delay 0))
 
 (use-package company-dict
   :ensure t
@@ -1102,12 +1099,13 @@ SAVE-FN with non-nil ARGS."
   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config (unbind-key "<tab>" yas-minor-mode-map))
 
-;; (use-package amx
-;;   :ensure t
-;;   :hook (after-init . amx-mode)
-;;   :custom
-;;   (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
-;;   (amx-show-key-bindings nil "Try to speed up amx"))
+(use-package amx
+  :ensure t
+  :hook (after-init . amx-mode)
+  :custom
+  (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
+  ;; (amx-show-key-bindings nil "Try to speed up amx")
+  )
 
 (use-package ivy
   :ensure t
@@ -1265,7 +1263,10 @@ SAVE-FN with non-nil ARGS."
 (use-package ivy-prescient
   :ensure t
   :hook (counsel-mode . ivy-prescient-mode)
-  :custom (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic"))
+  :custom
+  ;; (ivy-prescient-enable-sorting nil "Disable unintuitive sorting logic")
+  (ivy-prescient-sort-function '(not swiper swiper-isearch
+                                     counsel-grep flyspell-correct-ivy ivy-switch-buffer)))
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 (with-eval-after-load 'ivy
@@ -1411,7 +1412,7 @@ SAVE-FN with non-nil ARGS."
   (aggressive-indent-comments-too t)
   (aggressive-indent-dont-electric-modes t))
 
-(electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+;; (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
 (use-package paren
   :hook (after-init . show-paren-mode)
@@ -1423,33 +1424,32 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
-;; (use-package smartparens
-;;   :ensure t
-;;   :disabled t
-;;   :diminish
-;;   :hook ((after-init . smartparens-global-mode)
-;;          (after-init . show-smartparens-global-mode))
-;;   :custom
-;;   (sp-show-pair-from-inside t)
-;;   (sp-autoskip-closing-pair 'always)
-;;   :config
-;;   (require 'smartparens-config)
-;;   (dolist (hook '(latex-mode-hook LaTeX-mode-hook plain-tex-mode-hook))
-;;     (add-hook hook
-;;               (lambda ()
-;;                 (require 'smartparens-latex))))
-;;   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-;;          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-;;          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-;;          ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-;;          ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-;;          ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-;;          ("C-M-n" . sp-next-sexp) ; ((fo|o) (bar)) -> ((foo) |(bar))"
-;;          ("C-M-p" . sp-previous-sexp) ; (foo (b|ar baz)) -> (foo| (bar baz))"
-;;          ("C-S-b" . sp-backward-symbol) ; foo bar| baz -> foo |bar baz
-;;          ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
-;;          ;; (foo bar) -> foo bar
-;;          ("C-M-k" . sp-splice-sexp)))
+(use-package smartparens-config
+  :ensure smartparens
+  :diminish smartparens-mode
+  :hook ((after-init . smartparens-global-mode)
+         (after-init . show-smartparens-global-mode)
+         ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
+                                                (require 'smartparens-latex))))
+  :config
+  (diminish 'smartparens-mode)
+  (diminish 'smartparens-global-mode)
+  (diminish 'show-smartparens-global-mode)
+  :custom
+  (sp-show-pair-from-inside t)
+  (sp-autoskip-closing-pair 'always)
+  :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+         ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+         ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+         ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
+         ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+         ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+         ("C-M-n" . sp-next-sexp) ; ((fo|o) (bar)) -> ((foo) |(bar))"
+         ("C-M-p" . sp-previous-sexp) ; (foo (b|ar baz)) -> (foo| (bar baz))"
+         ("C-S-b" . sp-backward-symbol) ; foo bar| baz -> foo |bar baz
+         ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
+         ;; (foo bar) -> foo bar
+         ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
   :ensure t
@@ -2138,7 +2138,7 @@ SAVE-FN with non-nil ARGS."
          ;; Add makefile.rules to makefile-gmake-mode for Intel Pin
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-;; Varying minibuffer height to show the documentation is distracting
+;; The variable-height minibuffer and extra eldoc buffers are distracting
 (use-package eldoc
   :if dotemacs-is-linux
   :diminish
@@ -2309,14 +2309,6 @@ SAVE-FN with non-nil ARGS."
   :if (when (executable-find "fish"))
   :config (global-fish-completion-mode))
 
-(with-eval-after-load 'sh-mode
-  (use-package company-shell
-    :ensure t
-    :after company
-    ;; :init (add-to-list 'company-backends '(company-shell
-    ;;                                        company-shell-env company-fish-shell))
-    :custom (company-shell-delete-duplictes t)))
-
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package flycheck-shfmt
@@ -2349,8 +2341,8 @@ SAVE-FN with non-nil ARGS."
   (transient-values-file (expand-file-name "transient/values.el"
                                            dotemacs-temp-directory))
   ;; https://irreal.org/blog/?p=8877
-  (magit-section-initial-visibility-alist '((stashes . hide)
-                                            (untracked . hide)
+  (magit-section-initial-visibility-alist '((stashes . show)
+                                            (untracked . show)
                                             (unpushed . show))))
 
 (use-package gitignore-mode
@@ -2439,7 +2431,7 @@ SAVE-FN with non-nil ARGS."
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy"
                              "--fallback-style=LLVM" "--log=error"))
-  (lsp-completion-provider :capf)
+  (lsp-completion-provider :none)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
   (lsp-enable-dap-auto-configure nil)
@@ -2451,12 +2443,16 @@ SAVE-FN with non-nil ARGS."
   (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
                               mspyls mspyls-remote jedi
                               jedils-remote clangd clangd-remote
-                              ts-ls eslint json-ls jsonls-remote
-                              cmakels cmakels-remote html-ls
-                              htmlls-remote texlab texlab-remote
-                              jdtls bash-ls bashls-remote
-                              typescript-remote cssls-remote
-                              intelephense-remote))
+                              jsts-ls flow-ls ts-ls eslint
+                              json-ls jsonls-remote cmakels
+                              cmakels-remote html-ls
+                              htmlls-remote angular-ls texlab
+                              texlab-remote jdtls bash-ls
+                              bashls-remote typescript-remote
+                              css-ls cssls-remote
+                              intelephense-remote
+                              perl-language-server xmlls yamlls
+                              php-ls))
   (lsp-html-format-wrap-line-length 80)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2678,12 +2674,6 @@ SAVE-FN with non-nil ARGS."
     (add-to-list 'lsp-disabled-clients ls))
   (add-to-list 'lsp-enabled-clients 'jedi))
 
-;; Make sure to install virtualenv through pip, and not the distribution package
-;; manager. Run "jedi:install-sever"
-(use-package company-jedi
-  :ensure t
-  :after python-mode)
-
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
 (or (use-package lsp-latex
@@ -2749,20 +2739,19 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-dabbrev ;
-           ;; company-dict
-           company-ispell ; Uses an English dictionary
-           ;; company-tabnine
-           ;; company-yasnippet
-           ))))
-
-(with-eval-after-load 'company-mode
-  (dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
-    (add-hook hook (lambda ()
-                     (#'sb/company-text-mode)))))
+  (set (make-local-variable 'company-backends)
+       '(
+         company-capf
+         company-files
+         company-ispell ; Uses an English dictionary
+         company-dabbrev
+         ;; company-dict
+         ;; company-tabnine
+         ;; company-yasnippet
+         )))
+(dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
+  (add-hook hook (lambda ()
+                   (sb/company-text-mode))))
 
 (defun sb/company-prog-mode ()
   "Add backends for program completion in company mode."
@@ -2770,14 +2759,14 @@ SAVE-FN with non-nil ARGS."
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
+          company-capf ; Disabled LSP mode's capf autoconfiguration
+          :with
           company-yasnippet
-          (
-           ;; company-capf ; LSP mode autoconfigures capf
-           ;; company-tabnine
-           company-dabbrev-code
-           ))))
-(with-eval-after-load 'company-mode
-  (add-hook 'prog-mode-hook #'sb/company-prog-mode))
+          ;; company-tabnine
+          company-dabbrev-code
+          company-dabbrev
+          )))
+(add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 (defun sb/company-c-mode ()
   "Add backends for C/C++ completion in company mode."
@@ -2785,82 +2774,99 @@ SAVE-FN with non-nil ARGS."
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
-          company-yasnippet
-          (
-           ;; company-capf ; LSP mode autoconfigures capf
-           ;; company-tabnine
-           company-dabbrev-code
-           company-clang
-           ))))
-(with-eval-after-load 'company-mode
-  (add-hook 'c-mode-common-hook #'sb/company-c-mode))
+          company-capf ; Disabled LSP mode's capf autoconfiguration
+          :with company-yasnippet
+          ;; company-tabnine
+          company-dabbrev-code
+          company-clang
+          company-dabbrev
+          )))
+(add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
+  (use-package company-shell
+    :ensure t
+    :custom (company-shell-delete-duplictes t))
   (setq company-minimum-prefix-length 1)
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           ;; company-capf ; LSP mode autoconfigures capf
+           company-capf ; LSP mode autoconfigures capf
+           :with
            ;; company-tabnine
-           company-shell
-           company-shell-env
-           company-fish-shell
-           company-dabbrev-code
+           (company-shell
+            company-shell-env
+            company-fish-shell)
            company-yasnippet
+           company-dabbrev-code
+           company-dabbrev
            ))))
-(with-eval-after-load 'company-mode
-  (add-hook 'sh-mode-hook #'sb/company-sh-mode))
+(add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp."
   (setq company-minimum-prefix-length 1)
   (set (make-local-variable 'company-backends)
-       '((company-yasnippet
-          :with
+       '((
           company-elisp
+          :with
+          company-yasnippet
+          company-capf
           company-dabbrev-code
-          company-files)
-         company-capf)))
-(with-eval-after-load 'company-mode
-  (add-hook 'emacs-lisp-mode-hook #'sb/company-sh-mode))
+          company-files
+          company-dabbrev
+          ))))
+(add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
 (defun sb/company-python-mode ()
   "Add backends for Python completion in company mode."
+  ;; Make sure to install virtualenv through pip, and not the distribution package
+  ;; manager. Run "jedi:install-sever"
+  (use-package company-jedi
+    :ensure t
+    :after python-mode)
   (setq company-minimum-prefix-length 1)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
+          company-capf ; LSP mode autoconfigures capf
+          :with
           company-yasnippet
-          (
-           ;; company-capf ; LSP mode autoconfigures capf
-           company-jedi
-           ;; company-tabnine
-           company-dabbrev-code
-           ))))
-(with-eval-after-load 'company-mode
-  (add-hook 'prog-mode-hook #'sb/company-python-mode))
+          company-jedi
+          ;; company-tabnine
+          company-dabbrev-code
+          company-dabbrev
+          )))
+(add-hook 'python-mode-hook #'sb/company-python-mode)
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
+  (use-package math-symbol-lists ; Required by ac-math and company-math
+    :ensure t)
+  (use-package company-math
+    :ensure t)
+  (use-package company-reftex
+    :ensure t)
+  (use-package company-bibtex
+    :ensure t)
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
            company-capf
            ;; company-tabnine
            company-bibtex
-           company-dabbrev
            company-ispell
-           company-math-symbols-latex
-           company-latex-commands
-           company-math-symbols-unicode
-           company-reftex-labels
-           company-reftex-citations
+           (company-math-symbols-latex
+            company-latex-commands
+            company-math-symbols-Unicode)
+           (company-reftex-labels
+            company-reftex-citations)
            company-yasnippet
+           company-dabbrev
            ))))
-(with-eval-after-load 'company-mode
-  (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook hook #'sb/company-latex-mode)))
+(dolist (hook '(latex-mode-hook LaTeX-mode-hook))
+  (add-hook hook #'sb/company-latex-mode))
 
 ;; Function definitions
 
