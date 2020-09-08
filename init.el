@@ -70,7 +70,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'modus-operandi
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -87,7 +87,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -588,12 +588,13 @@ SAVE-FN with non-nil ARGS."
                                              (modus-operandi-theme-scale-headings t)))
 
       ((eq dotemacs-theme 'default) (progn
-                                      (setq frame-background-mode 'light)
-                                      (set-background-color "#ffffff")
-                                      (set-foreground-color "#666666")
-                                      (set-face-attribute 'region nil
-                                                          :background "light sky blue"
-                                                          :foreground "white"))))
+                                      ;; (setq frame-background-mode 'light)
+                                      ;; (set-background-color "#ffffff")
+                                      ;; (set-foreground-color "#666666")
+                                      ;; (set-face-attribute 'region nil
+                                      ;;                     :background "light sky blue"
+                                      ;;                     :foreground "white")
+                                      )))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
@@ -876,7 +877,6 @@ SAVE-FN with non-nil ARGS."
   :config
   (add-hook 'org-mode-hook #'visual-line-mode)
   ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
-
   (diminish 'org-indent-mode)
   (setq org-src-fontify-natively t ; code block fontification using the major-mode of the code
         org-startup-indented t
@@ -897,7 +897,9 @@ SAVE-FN with non-nil ARGS."
         ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
         org-pretty-entities t
         ;; Render subscripts and superscripts in org buffers
-        org-pretty-entities-include-sub-superscripts t))
+        org-pretty-entities-include-sub-superscripts t)
+  (unbind-key "M-<up>" org-mode-map)
+  (unbind-key "M-<down>" org-mode-map))
 
 (use-package org-bullets
   :ensure t
@@ -1046,8 +1048,10 @@ SAVE-FN with non-nil ARGS."
 ;;   :ensure t
 ;;   :hook (global-company-mode . company-quickhelp-mode))
 
+;; SB: I am not sure this package is very useful
 (use-package company-box
   :ensure t
+  :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
@@ -1169,7 +1173,7 @@ SAVE-FN with non-nil ARGS."
    ("C-x f" . counsel-file-jump) ; Jump to a file below the current directory
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
-   ([remap flycheck-list-errors] . counsel-flycheck)
+   ;; ([remap flycheck-list-errors] . counsel-flycheck)
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ([remap swiper] . counsel-grep-or-swiper)
@@ -1246,13 +1250,14 @@ SAVE-FN with non-nil ARGS."
   ;; (defalias 'load-library 'counsel-load-library)
   (defalias 'load-theme 'counsel-load-theme)
   (defalias 'switch-buffer 'counsel-switch-buffer)
-  (defalias 'yank-pop 'counsel-yank-pop))
+  ;; (defalias 'yank-pop 'counsel-yank-pop)
+  )
 
-;; (use-package ivy-posframe
-;;   :ensure t
-;;   :diminish
-;;   :disabled t
-;;   :hook (ivy-mode . ivy-posframe-mode))
+(use-package ivy-posframe
+  :ensure t
+  :diminish
+  :disabled t
+  :hook (ivy-mode . ivy-posframe-mode))
 
 (use-package prescient
   :ensure t
@@ -1591,6 +1596,8 @@ SAVE-FN with non-nil ARGS."
                  ;; (require 'flycheck-grammarly)
                  (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
+;; These can block important screen space, hence I prefer to show the error
+;; message in the minibuffer.
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
       :disabled t
@@ -1598,6 +1605,7 @@ SAVE-FN with non-nil ARGS."
 
     (use-package flycheck-posframe
       :ensure t
+      :disabled t
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults)))
