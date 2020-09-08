@@ -63,8 +63,9 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
-(defcustom dotemacs-emacs-custom-file (expand-file-name "custom.el"
-                                                        dotemacs-temp-directory)
+(defcustom
+  dotemacs-emacs-custom-file (expand-file-name "custom.el"
+                                               dotemacs-temp-directory)
   "File to write Emacs customizations."
   :type 'string
   :group 'dotemacs)
@@ -178,6 +179,9 @@ whitespaces."
 (defvar org-src-tabs-acts-natively)
 (defvar org-hide-leading-stars-before-indent-mode)
 (defvar org-src-strip-leading-and-trailing-blank-lines)
+(defvar lsp-enabled-clients)
+(defvar lsp-disabled-clients)
+(defvar lsp-pyright-langserver-command-args)
 
 (eval-when-compile
   (require 'package)
@@ -336,7 +340,6 @@ whitespaces."
 ;; GC may happen after this many bytes are allocated since last GC If you
 ;; experience freezing, decrease this. If you experience stuttering, increase
 ;; this.
-(defconst 50mb 52428800)
 (defconst dotemacs-50mb (* 50 1000 1000))
 (defconst dotemacs-100mb (* 100 1000 1000))
 (defconst dotemacs-200mb (* 200 1000 1000))
@@ -790,68 +793,71 @@ SAVE-FN with non-nil ARGS."
 ;;   :ensure t
 ;;   :config (dired-async-mode))
 
-;; (use-package treemacs
-;;   :ensure t
-;;   :commands (treemacs treemacs-toggle)
-;;   :hook ((projectile-mode . treemacs-filewatch-mode)
-;;          (projectile-mode . treemacs-follow-mode)
-;;          ;; (projectile-mode . treemacs-fringe-indicator-mode)
-;;          )
-;;   :custom
-;;   (treemacs-collapse-dirs 3)
-;;   (treemacs-follow-after-init t)
-;;   (treemacs-goto-tag-strategy 'refetch-index)
-;;   (treemacs-indentation 2)
-;;   (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
-;;   (treemacs-lock-width t)
-;;   (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
-;;   (treemacs-position 'right)
-;;   (treemacs-project-follow-cleanup t)
-;;   (treemacs-recenter-after-file-follow t)
-;;   (treemacs-recenter-after-tag-follow  t)
-;;   (treemacs-show-hidden-files nil)
-;;   (treemacs-silent-filewatch t)
-;;   (treemacs-silent-refresh t)
-;;   ;; (treemacs-sorting 'alphabetic-desc)
-;;   (treemacs-tag-follow-cleanup t)
-;;   (treemacs-tag-follow-delay 1)
-;;   (treemacs-width 20)
-;;   :config
-;;   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
-;;   ;; (treemacs-tag-follow-mode 1)
-;;   (treemacs-git-mode 'extended)
-;;   ;; Decrease the font size
-;;   (set-face-attribute 'treemacs-directory-collapsed-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-directory-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-file-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-root-face nil
-;;                       :height 0.9)
-;;   (set-face-attribute 'treemacs-tags-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-git-ignored-face nil
-;;                       :height 0.7)
-;;   (set-face-attribute 'treemacs-git-untracked-face nil
-;;                       :height 0.7)
-;;   (treemacs-resize-icons 16)
-;;   :bind* ("C-j" . treemacs))
+(use-package treemacs
+  :ensure t
+  :commands (treemacs treemacs-toggle)
+  :hook ((projectile-mode . treemacs-filewatch-mode)
+         (projectile-mode . treemacs-follow-mode)
+         ;; (projectile-mode . treemacs-fringe-indicator-mode)
+         )
+  :custom
+  (treemacs-collapse-dirs 3)
+  (treemacs-follow-after-init t)
+  (treemacs-goto-tag-strategy 'refetch-index)
+  (treemacs-indentation 2)
+  (treemacs-is-never-other-window nil "Prevents treemacs from
+  being selected with `other-window`")
+  (treemacs-lock-width t)
+  (treemacs-persist-file (expand-file-name "treemacs-persist"
+                                           dotemacs-temp-directory))
+  (treemacs-position 'right)
+  (treemacs-project-follow-cleanup t)
+  (treemacs-recenter-after-file-follow t)
+  (treemacs-recenter-after-tag-follow  t)
+  (treemacs-show-hidden-files nil)
+  (treemacs-silent-filewatch t)
+  (treemacs-silent-refresh t)
+  ;; (treemacs-sorting 'alphabetic-desc)
+  (treemacs-tag-follow-cleanup t)
+  (treemacs-tag-follow-delay 1)
+  (treemacs-width 24)
+  :config
+  ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
+  ;; (treemacs-tag-follow-mode 1)
+  (treemacs-git-mode 'extended)
+  ;; Decrease the font size
+  (set-face-attribute 'treemacs-directory-collapsed-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-directory-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-file-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-root-face nil
+                      :height 0.9)
+  (set-face-attribute 'treemacs-tags-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-git-ignored-face nil
+                      :height 0.7)
+  (set-face-attribute 'treemacs-git-untracked-face nil
+                      :height 0.7)
+  (treemacs-resize-icons 16)
+  :bind* ("C-j" . treemacs))
 
-;; (use-package treemacs-projectile
-;;   :ensure t
-;;   :after (treemacs projectile))
+(use-package treemacs-projectile
+  :ensure t
+  :after (treemacs projectile))
 
-;; (use-package treemacs-icons-dired
-;;   :after treemacs
-;;   :ensure t
-;;   :config (treemacs-icons-dired-mode))
+(use-package treemacs-icons-dired
+  :after treemacs
+  :ensure t
+  :config (treemacs-icons-dired-mode))
 
-;; (use-package treemacs-magit
-;;   :after treemacs magit
-;;   :ensure t)
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
 
-;; (use-package all-the-icons ; Install fonts with `M-x all-the-icons-install-fonts`
+;; Install fonts with `M-x all-the-icons-install-fonts`
+;; (use-package all-the-icons
 ;;   :ensure t
 ;;   :if (display-graphic-p))
 
@@ -878,26 +884,29 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'org-mode-hook #'visual-line-mode)
   ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
   (diminish 'org-indent-mode)
-  (setq org-src-fontify-natively t ; code block fontification using the major-mode of the code
-        org-startup-indented t
-        org-startup-truncated nil
-        org-src-preserve-indentation t
-        org-src-tabs-acts-natively t
-        org-src-window-setup 'current-window
-        org-fontify-done-headline t
-        org-fontify-whole-heading-line t
-        org-startup-folded 'showeverything ; options: nil
-        org-hide-leading-stars t
-        org-hide-leading-stars-before-indent-mode t
-        org-support-shift-select t ; use shift-select
-        ;; See org-speed-commands-default for a list of the keys and commands enabled at the beginning of headlines. See
-        ;; org-babel-describe-bindings will display a list of the code blocks commands and their related keys.
-        org-use-speed-commands t
-        org-src-strip-leading-and-trailing-blank-lines t
-        ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
-        org-pretty-entities t
-        ;; Render subscripts and superscripts in org buffers
-        org-pretty-entities-include-sub-superscripts t)
+  (setq
+   ;; Code block fontification using the major-mode of the code
+   org-src-fontify-natively t
+   org-startup-indented t
+   org-startup-truncated nil
+   org-src-preserve-indentation t
+   org-src-tabs-acts-natively t
+   org-src-window-setup 'current-window
+   org-fontify-done-headline t
+   org-fontify-whole-heading-line t
+   org-startup-folded 'showeverything ; options: nil
+   org-hide-leading-stars t
+   org-hide-leading-stars-before-indent-mode t
+   org-support-shift-select t ; use shift-select
+   ;; See org-speed-commands-default for a list of the keys and commands enabled
+   ;; at the beginning of headlines. See org-babel-describe-bindings will
+   ;; display a list of the code blocks commands and their related keys.
+   org-use-speed-commands t
+   org-src-strip-leading-and-trailing-blank-lines t
+   ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
+   org-pretty-entities t
+   ;; Render subscripts and superscripts in org buffers
+   org-pretty-entities-include-sub-superscripts t)
   (unbind-key "M-<up>" org-mode-map)
   (unbind-key "M-<down>" org-mode-map))
 
@@ -1436,10 +1445,6 @@ SAVE-FN with non-nil ARGS."
          (after-init . show-smartparens-global-mode)
          ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
                                                 (require 'smartparens-latex))))
-  :config
-  (diminish 'smartparens-mode)
-  (diminish 'smartparens-global-mode)
-  (diminish 'show-smartparens-global-mode)
   :custom
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
@@ -1455,6 +1460,10 @@ SAVE-FN with non-nil ARGS."
          ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
          ;; (foo bar) -> foo bar
          ("C-M-k" . sp-splice-sexp)))
+
+(diminish 'smartparens-mode)
+(diminish 'smartparens-global-mode)
+(diminish 'show-smartparens-global-mode)
 
 (use-package projectile
   :ensure t
@@ -2031,6 +2040,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package langtool
   :ensure t
+  :disabled t
   :after text-mode
   :hook (text-mode . (lambda()
                        (require 'langtool)))
@@ -2039,11 +2049,11 @@ SAVE-FN with non-nil ARGS."
   (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
                                                 dotemacs-user-home)))
 
-;; (use-package logview
-;;   :ensure t
-;;   :custom
-;;   (logview-cache-filename (expand-file-name "logview-cache.extmap"
-;;                                             dotemacs-temp-directory)))
+(use-package logview
+  :ensure t
+  :custom
+  (logview-cache-filename (expand-file-name "logview-cache.extmap"
+                                            dotemacs-temp-directory)))
 
 (use-package antlr-mode
   :mode "\\.g4\\'")
@@ -2437,8 +2447,9 @@ SAVE-FN with non-nil ARGS."
          ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode))
   :custom
-  (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy"
-                             "--fallback-style=LLVM" "--log=error"))
+  (lsp-clients-clangd-args
+   '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
+     "--fallback-style=LLVM" "--log=error"))
   (lsp-completion-provider :none)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
@@ -2479,9 +2490,11 @@ SAVE-FN with non-nil ARGS."
   (lsp-pyls-plugins-pydocstyle-enabled nil)
   (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
   (lsp-pyls-plugins-pyflakes-enabled nil)
-  (lsp-pyls-plugins-pylint-args (vconcat (list "-j 2" (concat "--rcfile="
-                                                              (expand-file-name ".config/pylintrc"
-                                                                                dotemacs-user-home)))))
+  (lsp-pyls-plugins-pylint-args (vconcat
+                                 (list "-j 2"
+                                       (concat "--rcfile="
+                                               (expand-file-name ".config/pylintrc"
+                                                                 dotemacs-user-home)))))
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (expand-file-name "lsp-session-v1" dotemacs-temp-directory))
   (lsp-signature-auto-activate nil)
@@ -2491,7 +2504,24 @@ SAVE-FN with non-nil ARGS."
                      (locate-user-emacs-file
                       "org.eclipse.lemminx-0.13.1-uber.jar")))
   (lsp-yaml-print-width 80)
+  :custom-face
+  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
+                                               font-lock-doc-face
+                                               :weight
+                                               bold
+                                               :height
+                                               0.9))))
+  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit
+                                              font-lock-string-face
+                                              :height 0.9))))
+  (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit
+                                                      font-lock-string-face
+                                                      :weight
+                                                      bold
+                                                      :height
+                                                      0.9))))
   :config
+  ;; Support lsp over tramp
   (cond ((eq dotemacs-python-langserver
              'pyls) (lsp-register-client
              (make-lsp-client
@@ -2581,13 +2611,6 @@ SAVE-FN with non-nil ARGS."
   ;;                   :major-modes '(xml-mode nxml-mode)
   ;;                   :remote? t
   ;;                   :server-id 'xmlls-remote))
-  ;; FIXME: Does this work inside :config?
-  (dolist (hook '(c++-mode-hook python-mode-hook))
-    (add-hook hook
-              (lambda ()
-                (add-hook 'before-save-hook
-                          (lambda ()
-                            (lsp-format-buffer)) nil t))))
   :bind (("M-." . lsp-find-definition)
          ;; ("M-," . pop-tag-mark)
          ("C-c l i" . lsp-goto-implementation)
@@ -2597,14 +2620,13 @@ SAVE-FN with non-nil ARGS."
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)))
 
-;; ;; FIXME: Why moving this to lsp::config does not work?
-;; (with-eval-after-load 'lsp-mode
-;;   (dolist (hook '(c++-mode-hook python-mode-hook))
-;;     (add-hook hook
-;;               (lambda ()
-;;                 (add-hook 'before-save-hook
-;;                           (lambda ()
-;;                             (lsp-format-buffer)) nil t)))))
+(with-eval-after-load 'lsp-mode
+  (dolist (hook '(c++-mode-hook python-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (add-hook 'before-save-hook
+                          (lambda ()
+                            (lsp-format-buffer)) nil t)))))
 
 (use-package lsp-ui
   :ensure t
@@ -2745,6 +2767,11 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :mode "\\.proto$")
 
+(use-package clang-format+
+  :ensure t
+  :ensure clang-format
+  :hook (mlir-mode . clang-format+-mode))
+
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (set (make-local-variable 'company-backends)
@@ -2768,10 +2795,10 @@ SAVE-FN with non-nil ARGS."
   (setq company-backends
         '(
           company-capf ; Disabled LSP mode's capf autoconfiguration
-          :with
           company-yasnippet
           ;; company-tabnine
           company-dabbrev-code
+          company-files
           company-dabbrev
           )))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
@@ -2783,9 +2810,10 @@ SAVE-FN with non-nil ARGS."
   (setq company-backends
         '(
           company-capf ; Disabled LSP mode's capf autoconfiguration
-          :with company-yasnippet
+          company-yasnippet
           ;; company-tabnine
           company-dabbrev-code
+          company-files
           company-clang
           company-dabbrev
           )))
@@ -2801,24 +2829,23 @@ SAVE-FN with non-nil ARGS."
   (setq company-backends
         '((
            company-capf ; LSP mode autoconfigures capf
-           :with
            ;; company-tabnine
-           (company-shell
-            company-shell-env
-            company-fish-shell)
+           company-shell
+           company-shell-env
+           company-fish-shell
            company-yasnippet
+           company-files
            company-dabbrev-code
            company-dabbrev
            ))))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
 (defun sb/company-elisp-mode ()
-  "Set up company for elisp."
+  "Set up company for elisp mode."
   (setq company-minimum-prefix-length 1)
   (set (make-local-variable 'company-backends)
        '((
           company-elisp
-          :with
           company-yasnippet
           company-capf
           company-dabbrev-code
@@ -2838,11 +2865,11 @@ SAVE-FN with non-nil ARGS."
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
-          company-capf ; LSP mode autoconfigures capf
-          :with
+          company-capf
           company-yasnippet
           company-jedi
           ;; company-tabnine
+          company-files
           company-dabbrev-code
           company-dabbrev
           )))
@@ -2871,6 +2898,7 @@ SAVE-FN with non-nil ARGS."
            (company-reftex-labels
             company-reftex-citations)
            company-yasnippet
+           company-files
            company-dabbrev
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
@@ -3139,4 +3167,4 @@ specify by the keyword projectile-default-file define in `dir-locals-file'"
 ;; (with-eval-after-load "counsel-projectile"
 ;;   (add-to-list 'counsel-projectile-action '("d" sb/open-project-default-file2 "open default file") t))
 
-;; ;;; init.el ends here
+;;; init.el ends here

@@ -264,6 +264,7 @@
     ("comittee" "committee" nil :count 0)
     ("commadn" "command" nil :count 0)
     ("comming" "coming" nil :count 0)
+    ("commited" "committed" nil :count 0)
     ("commitee" "committee" nil :count 0)
     ("commiting" "committing" nil :count 1)
     ("committe" "committee" nil :count 1)
@@ -422,6 +423,7 @@
     ("directy" "directly" nil :count 1)
     ("disatisfied" "dissatisfied" nil :count 0)
     ("discoverd" "discovered" nil :count 0)
+    ("discussio" "discussion" nil :count 0)
     ("disign" "design" nil :count 0)
     ("dispaly" "display" nil :count 0)
     ("dissonent" "dissonant" nil :count 0)
@@ -1305,5 +1307,11 @@
     ("else" "else" c-electric-continued-statement :count 0)
     ("finally" "finally" c-electric-continued-statement :count 0)
     ("while" "while" c-electric-continued-statement :count 0)
+   ))
+
+(define-abbrev-table 'text-mode-abbrev-table
+  '(
+    ("polydedral" "polyhedral" nil :count 0)
+    ("vidoes" "videos" nil :count 0)
    ))
 
