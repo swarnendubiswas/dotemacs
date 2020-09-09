@@ -1559,16 +1559,16 @@ SAVE-FN with non-nil ARGS."
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-indication-mode 'left-margin)
   :config
-  (when (or (eq dotemacs-modeline-theme 'spaceline) (eq dotemacs-modeline-theme 'doom-modeline))
+  (when (or (eq dotemacs-modeline-theme 'spaceline) (eq
+                                                     dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
-  (add-hook 'text-mode-hook
-            (lambda()
-              (setq-local
-               flycheck-textlint-config (expand-file-name "tmp/textlint-workspace/textlintrc.json"
-                                                          dotemacs-user-home)
-               flycheck-textlint-executable (expand-file-name "tmp/textlint-workspace/node_modules/.bin/textlint"
-                                                              dotemacs-user-home))))
+  (setq flycheck-textlint-config (expand-file-name
+                                  "tmp/textlint-workspace/textlintrc.json"
+                                  dotemacs-user-home)
+        flycheck-textlint-executable (expand-file-name
+                                      "tmp/textlint-workspace/node_modules/.bin/textlint"
+                                      dotemacs-user-home))
   (add-hook 'python-mode-hook
             (lambda ()
               ;; (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
@@ -1581,8 +1581,9 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
-                          flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                                                      dotemacs-user-home))
+                          flycheck-markdown-markdownlint-cli-config (expand-file-name
+                                                                     ".markdownlint.json"
+                                                                     dotemacs-user-home))
               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)
               ))
   ;; (add-hook 'latex-mode-hook
@@ -2892,11 +2893,11 @@ SAVE-FN with non-nil ARGS."
            ;; company-tabnine
            company-bibtex
            company-ispell
-           (company-math-symbols-latex
-            company-latex-commands
-            company-math-symbols-Unicode)
-           (company-reftex-labels
-            company-reftex-citations)
+           company-math-symbols-latex
+           company-latex-commands
+           company-math-symbols-Unicode
+           company-reftex-labels
+           company-reftex-citations
            company-yasnippet
            company-files
            company-dabbrev

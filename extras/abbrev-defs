@@ -1311,6 +1311,7 @@
 
 (define-abbrev-table 'text-mode-abbrev-table
   '(
+    ("expsoing" "Exposing" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("vidoes" "videos" nil :count 0)
    ))
