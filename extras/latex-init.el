@@ -10,13 +10,18 @@
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
 
+(defvar font-latex-fontify-sectioning)
+(defvar TeX-syntactic-comment)
+
 (with-eval-after-load 'tex-mode
-  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
+  (setq bibtex-align-at-equal-sign t
+        font-latex-fontify-sectioning 1.0
+        TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
         TeX-auto-untabify t ; Remove all tabs before saving
         TeX-clean-confirm nil
         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
         TeX-parse-self t ; Parse documents
-        TeX-PDF-mode t ;; use pdflatex
+        TeX-PDF-mode t ;; Use pdflatex
         TeX-quote-after-quote nil ; Allow original LaTeX quotes
         TeX-save-query nil
         TeX-source-correlate-method 'synctex
@@ -102,8 +107,6 @@
   ;;     (reftex-add-all-bibitems-from-bibtex))
 
   ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
-
-  (setq bibtex-align-at-equal-sign t)
 
   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
   (use-package reftex-cite

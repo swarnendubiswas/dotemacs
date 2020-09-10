@@ -88,7 +88,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -594,9 +594,11 @@ SAVE-FN with non-nil ARGS."
                                       ;; (setq frame-background-mode 'light)
                                       ;; (set-background-color "#ffffff")
                                       ;; (set-foreground-color "#666666")
-                                      ;; (set-face-attribute 'region nil
-                                      ;;                     :background "light sky blue"
-                                      ;;                     :foreground "white")
+                                      (set-face-attribute 'region nil
+                                                          ;; :background "light sky blue"
+                                                          :background "gainsboro"
+                                                          ;; :foreground "white"
+                                                          )
                                       )))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
@@ -685,7 +687,8 @@ SAVE-FN with non-nil ARGS."
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 ;; (set-frame-font "Roboto Mono")
-(set-face-attribute 'default nil :height 140)
+(cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute 'default nil :height 135))
+      ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
 (set-face-attribute 'mode-line nil :height 100)
 (set-face-attribute 'mode-line-inactive nil :height 100)
 
@@ -795,6 +798,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs
   :ensure t
+  :disabled t
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-filewatch-mode)
          (projectile-mode . treemacs-follow-mode)
@@ -1440,6 +1444,7 @@ SAVE-FN with non-nil ARGS."
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
+  :disabled t
   :diminish smartparens-mode
   :hook ((after-init . smartparens-global-mode)
          (after-init . show-smartparens-global-mode)
@@ -1728,6 +1733,15 @@ SAVE-FN with non-nil ARGS."
   (imenu-auto-rescan t)
   (imenu-max-items 500)
   (imenu-max-item-length 100))
+
+(use-package imenu+
+  :load-path "extras")
+
+(use-package imenu-anywhere
+  :ensure t)
+
+(use-package popup-imenu
+  :ensure t)
 
 (setq large-file-warning-threshold (* 500 1024 1024)
       tags-add-tables nil
@@ -2895,7 +2909,7 @@ SAVE-FN with non-nil ARGS."
            company-ispell
            company-math-symbols-latex
            company-latex-commands
-           company-math-symbols-Unicode
+           company-math-symbols-unicode
            company-reftex-labels
            company-reftex-citations
            company-yasnippet

@@ -612,7 +612,7 @@
     ("howerver" "however" nil :count 0)
     ("hsa" "has" nil :count 1)
     ("hsi" "his" nil :count 0)
-    ("hte" "the" nil :count 6)
+    ("hte" "the" nil :count 7)
     ("htere" "there" nil :count 0)
     ("htese" "these" nil :count 0)
     ("htey" "they" nil :count 0)
@@ -624,7 +624,7 @@
     ("httpL" "http: class=" string :count 0)
     ("hvae" "have" nil :count 0)
     ("hvaing" "having" nil :count 0)
-    ("hve" "have" nil :count 0)
+    ("hve" "have" nil :count 1)
     ("hwich" "which" nil :count 0)
     ("idae" "idea" nil :count 0)
     ("idaes" "ideas" nil :count 0)
@@ -1311,6 +1311,7 @@
 
 (define-abbrev-table 'text-mode-abbrev-table
   '(
+    ("atend" "Attend" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("vidoes" "videos" nil :count 0)
