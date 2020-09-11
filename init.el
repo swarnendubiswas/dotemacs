@@ -63,9 +63,8 @@
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
 
-(defcustom
-  dotemacs-emacs-custom-file (expand-file-name "custom.el"
-                                               dotemacs-temp-directory)
+(defcustom dotemacs-custom-file (expand-file-name "custom.el"
+                                                  dotemacs-temp-directory)
   "File to write Emacs customizations."
   :type 'string
   :group 'dotemacs)
@@ -129,7 +128,7 @@ whitespaces."
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
-          ;; (const :tag "gtags" gtags)
+          (const :tag "gtags" gtags)
           (const :tag "none" none))
   :group 'dotemacs)
 
@@ -139,14 +138,14 @@ whitespaces."
   :type 'string
   :group 'dotemacs)
 
-;; (defcustom dotemacs-gtags-path
-;;   "/usr/local/bin/gtags"
-;;   "Absolute path to GNU Global executable."
-;;   :type 'string
-;;   :group 'dotemacs)
+(defcustom dotemacs-gtags-path
+  "/usr/local/bin/gtags"
+  "Absolute path to GNU Global executable."
+  :type 'string
+  :group 'dotemacs)
 
 (defcustom dotemacs-debug-init-file
-  t
+  nil
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -191,13 +190,15 @@ whitespaces."
   (when (< emacs-major-version 27)
     (package-initialize t))
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  ;; (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  ;; (add-to-list 'package-archives '("melpa-stable"
+  ;;                                  . "http://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-(setq use-package-enable-imenu-support t) ; Need to set before loading use-package
+;; Need to set before loading use-package
+(setq use-package-enable-imenu-support t)
 (eval-when-compile
   (require 'use-package))
 
@@ -234,24 +235,24 @@ whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
-(setq custom-file dotemacs-emacs-custom-file)
+(setq custom-file dotemacs-custom-file)
 (when (file-exists-p custom-file)
   (load custom-file 'noerror))
 
-;; (use-package exec-path-from-shell
-;;   :ensure t
-;;   :if (or (daemonp) (memq window-system '(x ns)))
-;;   :custom
-;;   ;; Ignore definition check
-;;   (exec-path-from-shell-check-startup-files nil)
-;;   :init (exec-path-from-shell-initialize))
+(use-package exec-path-from-shell
+  :ensure t
+  :if (or (daemonp) (memq window-system '(x ns)))
+  :custom
+  ;; Ignore definition check
+  (exec-path-from-shell-check-startup-files nil)
+  :init (exec-path-from-shell-initialize))
 
 (setq-default ad-redefinition-action 'accept ;; Turn off warnings due to redefinitions
               ;; apropos-do-all t
-              ;; Disable a second case insensitive pass
               auto-mode-case-fold nil
-              auto-save-list-file-prefix (expand-file-name "auto-save"
-                                                           dotemacs-temp-directory)
+              auto-save-list-file-prefix (expand-file-name
+                                          "auto-save"
+                                          dotemacs-temp-directory)
               backup-inhibited t ; Disable backup for a per-file basis
               blink-matching-paren nil ; Distracting
               case-fold-search t ; Searches and matches should ignore case
@@ -330,9 +331,10 @@ whitespaces."
               indicate-empty-lines nil
               standard-indent 2
               ;; tab-always-indent 'complete
-              tab-width 4
-              ;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
-              bidi-display-reordering 'left-to-right
+              tab-width 4)
+
+;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
+(setq-default bidi-display-reordering 'left-to-right
               bidi-inhibit-bpa t
               ;; bidi-paragraph-direction 'left-to-right
               )
@@ -355,7 +357,7 @@ whitespaces."
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun sb/restore-garbage-collection ()
-  (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-100mb))))
+  (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-200mb))))
 
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
@@ -388,9 +390,9 @@ whitespaces."
       ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll'
       ;; for tall lines.
       auto-window-vscroll nil
-      ;; mouse
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
-      mouse-wheel-progressive-speed nil) ; Do not accelerate scrolling
+      ;; Do not accelerate scrolling
+      mouse-wheel-progressive-speed nil)
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -1003,6 +1005,12 @@ SAVE-FN with non-nil ARGS."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
+;; FIXME: Hide "starting look process" messages
+(defun sb/lookup-words (orig-fun &rest args)
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
+(advice-add 'lookup-words :around #'sb/lookup-words)
+
 ;; Use "M-x company-diag" or the modeline status to see the backend used
 ;; Try "M-x company-complete-common" when there are no completions
 ;; https://emacs.stackexchange.com/questions/3813/what-is-the-hook-used-by-company-mode-to-perform-autocompletion
@@ -1444,7 +1452,6 @@ SAVE-FN with non-nil ARGS."
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  :disabled t
   :diminish smartparens-mode
   :hook ((after-init . smartparens-global-mode)
          (after-init . show-smartparens-global-mode)
@@ -1608,7 +1615,7 @@ SAVE-FN with non-nil ARGS."
   :after flycheck
   :hook
   (text-mode . (lambda ()
-                 ;; (require 'flycheck-grammarly)
+                 (require 'flycheck-grammarly)
                  (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
 ;; These can block important screen space, hence I prefer to show the error
@@ -1708,7 +1715,9 @@ SAVE-FN with non-nil ARGS."
                '("swarnendu6.cse.iitk.ac.in" "swarnendu" "ssh"))
   (setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
   ;; Disable backup
-  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
+  ;; Include this directory in $PATH on remote
+  (add-to-list 'tramp-remote-path "~/.local/bin"))
 
 ;; NOTE: Does not pick up other usernames
 (use-package counsel-tramp
@@ -1734,14 +1743,15 @@ SAVE-FN with non-nil ARGS."
   (imenu-max-items 500)
   (imenu-max-item-length 100))
 
-(use-package imenu+
-  :load-path "extras")
+(with-eval-after-load 'imenu
+  (use-package imenu+
+    :load-path "extras")
 
-(use-package imenu-anywhere
-  :ensure t)
+  (use-package imenu-anywhere
+    :ensure t)
 
-(use-package popup-imenu
-  :ensure t)
+  (use-package popup-imenu
+    :ensure t))
 
 (setq large-file-warning-threshold (* 500 1024 1024)
       tags-add-tables nil
@@ -2319,6 +2329,8 @@ SAVE-FN with non-nil ARGS."
 ;; (use-package autodisass-java-bytecode
 ;;   :ensure t)
 
+(setq-default shell-dirtrack-mode nil)
+
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
@@ -2344,20 +2356,21 @@ SAVE-FN with non-nil ARGS."
 
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
-(use-package flycheck-shfmt
-  :ensure reformatter
-  :functions flycheck-shfmt-setup
-  :after flycheck
-  :load-path "extras/shfmt"
-  :config
-  (use-package shfmt
+(with-eval-after-load 'sh-script-mode
+  (use-package flycheck-shfmt
     :ensure reformatter
-    ;; :ensure-system-package (shfmt . "snap install shfmt")
+    :functions flycheck-shfmt-setup
+    :after flycheck
     :load-path "extras/shfmt"
-    ;; :diminish shfmt-on-save-mode
-    ;; :hook (sh-mode . shfmt-on-save-mode)
-    :custom (shfmt-arguments "-i 4 -p -ci"))
-  (flycheck-shfmt-setup))
+    :config
+    (use-package shfmt
+      :ensure reformatter
+      ;; :ensure-system-package (shfmt . "snap install shfmt")
+      :load-path "extras/shfmt"
+      ;; :diminish shfmt-on-save-mode
+      ;; :hook (sh-mode . shfmt-on-save-mode)
+      :custom (shfmt-arguments "-i 4 -p -ci"))
+    (flycheck-shfmt-setup)))
 
 (use-package magit
   :ensure t
@@ -2986,7 +2999,7 @@ Increase line spacing by two line height."
   (interactive "P")
   (insert (if arg
               (format-time-string "%d.%m.%Y")
-            (format-time-string "%Y-%m-%d"))))
+            (format-time-string "%\"Mmmm\" %d, %Y"))))
 
 ;; http://zck.me/emacs-move-file
 (defun sb/move-file (new-location)
