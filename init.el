@@ -366,7 +366,8 @@ whitespaces."
 (use-package gcmh
   :ensure t
   :diminish
-  :hook (after-init . gcmh-mode))
+  :hook ((after-init . gcmh-mode)
+         (focus-out-hook . gcmh-idle-garbage-collect)))
 
 ;; Activate utf8 mode
 (setq locale-coding-system 'utf-8)
@@ -518,7 +519,7 @@ SAVE-FN with non-nil ARGS."
                 column-number-mode
                 ;; Typing with the mark active will overwrite the marked region
                 delete-selection-mode
-                global-visual-line-mode
+                global-visual-line-mode ; Wrap lines
                 ;; global-so-long-mode ; This puts the buffer in read-only mode
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
@@ -992,7 +993,7 @@ SAVE-FN with non-nil ARGS."
                      "/TAGS$"))
   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
   ;; (recentf-keep '(file-remote-p file-readable-p))
-  (recentf-max-saved-items 50)
+  (recentf-max-saved-items 500)
   (recentf-menu-filter 'recentf-sort-descending)
   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
   :config (run-at-time nil 180 'recentf-save-list)
@@ -1145,7 +1146,10 @@ SAVE-FN with non-nil ARGS."
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
-  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+  (ivy-re-builders-alist '(
+                           (amx-completing-read-ivy . ivy--regex-fuzzy)
+                           (t . ivy--regex-ignore-order)
+                           ))
   (ivy-wrap t)
   :hook (after-init . ivy-mode)
   :config
@@ -1438,7 +1442,7 @@ SAVE-FN with non-nil ARGS."
   (aggressive-indent-comments-too t)
   (aggressive-indent-dont-electric-modes t))
 
-;; (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+(electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
 (use-package paren
   :hook (after-init . show-paren-mode)
@@ -1452,14 +1456,22 @@ SAVE-FN with non-nil ARGS."
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  :diminish smartparens-mode
-  :hook ((after-init . smartparens-global-mode)
-         (after-init . show-smartparens-global-mode)
+  :disabled t
+  :diminish (smartparens-mode show-smartparens-mode)
+  :hook ((after-init . smartparens-mode)
+         (after-init . show-smartparens-mode)
          ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
                                                 (require 'smartparens-latex))))
   :custom
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
+  :config
+  ;; Do not insert a parenthesis pair when the point is at the beginning of a
+  ;; word
+  ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
+  ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
+  ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
+  ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
   :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
          ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
          ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
@@ -1472,10 +1484,6 @@ SAVE-FN with non-nil ARGS."
          ("C-S-f" . sp-forward-symbol) ; |foo bar baz -> foo| bar baz
          ;; (foo bar) -> foo bar
          ("C-M-k" . sp-splice-sexp)))
-
-(diminish 'smartparens-mode)
-(diminish 'smartparens-global-mode)
-(diminish 'show-smartparens-global-mode)
 
 (use-package projectile
   :ensure t
@@ -2407,6 +2415,7 @@ SAVE-FN with non-nil ARGS."
          ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode))
 
+;; FIXME: What is the purpose?
 (setq smerge-command-prefix "\C-c v")
 
 (use-package yaml-mode
@@ -2443,13 +2452,6 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
-(use-package nxml-mode
-  :hook (nxml-mode . lsp)
-  :init (fset 'xml-mode 'nxml-mode)
-  :custom
-  (nxml-slash-auto-complete-flag t)
-  (nxml-auto-insert-xml-declaration-flag t))
-
 ;; (use-package company-php
 ;;   :ensure t
 ;;   :init
@@ -2468,7 +2470,7 @@ SAVE-FN with non-nil ARGS."
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
   :hook (((cperl-mode css-mode javascript-mode js-mode less-mode
-                      less-css-mode perl-mode sass-mode scss-mode typescript-mode) .
+                      less-css-mode perl-mode sass-mode scss-mode sgml-mode typescript-mode) .
                       lsp-deferred)
          ;; (lsp-mode . lsp-enable-which-key-integration)
          (lsp-managed-mode . lsp-modeline-diagnostics-mode)
@@ -2633,6 +2635,7 @@ SAVE-FN with non-nil ARGS."
                     :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
                     :remote? t
                     :server-id 'htmlls-remote))
+  ;; FIXME: Get lsp to work for xml remote
   ;; (lsp-register-client
   ;;  (make-lsp-client :new-connection (lsp-tramp-connection
   ;;                                    (cons lsp-xml-server-command lsp-xml-server-vmargs))
@@ -2731,6 +2734,16 @@ SAVE-FN with non-nil ARGS."
   (dolist (ls '(pyls mspyls pyright))
     (add-to-list 'lsp-disabled-clients ls))
   (add-to-list 'lsp-enabled-clients 'jedi))
+
+(use-package nxml-mode
+  :hook (nxml-mode . lsp)
+  ;; :init (fset 'xml-mode 'nxml-mode)
+  :custom
+  (nxml-slash-auto-complete-flag t)
+  (nxml-auto-insert-xml-declaration-flag t))
+
+(setq auto-mode-alist (append '((".classpath\\'" . xml-mode))
+                              auto-mode-alist))
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support

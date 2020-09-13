@@ -33,6 +33,11 @@
     ("`va" "\\value" nil :count 0)
    ))
 
+(define-abbrev-table 'c++-mode-abbrev-table
+  '(
+    ("initalization" "Initialization" nil :count 0)
+   ))
+
 (define-abbrev-table 'global-abbrev-table
   '(
     ("abbout" "about" nil :count 0)
@@ -466,6 +471,7 @@
     ("embarass" "embarrass" nil :count 0)
     ("emigre" "emigre" nil :count 0)
     ("enahancements" "enhancements" nil :count 0)
+    ("encurage" "encourage" nil :count 0)
     ("enegery" "energy" nil :count 1)
     ("energitic" "energetic" nil :count 0)
     ("enforece" "enforce" nil :count 1)
@@ -530,6 +536,7 @@
     ("firts" "first" nil :count 0)
     ("fixit" "fix it" nil :count 0)
     ("focussed" "focused" nil :count 2)
+    ("focusses" "focuses" nil :count 0)
     ("follwo" "follow" nil :count 0)
     ("follwoing" "following" nil :count 0)
     ("foloowing" "following" nil :count 0)
@@ -612,7 +619,7 @@
     ("howerver" "however" nil :count 0)
     ("hsa" "has" nil :count 1)
     ("hsi" "his" nil :count 0)
-    ("hte" "the" nil :count 7)
+    ("hte" "the" nil :count 8)
     ("htere" "there" nil :count 0)
     ("htese" "these" nil :count 0)
     ("htey" "they" nil :count 0)
@@ -756,6 +763,7 @@
     ("mechanims" "mechanism" nil :count 3)
     ("memeber" "member" nil :count 0)
     ("memmory" "memory" nil :count 1)
+    ("memoryies" "memories" nil :count 0)
     ("memroy" "memory" nil :count 2)
     ("merchent" "merchant" nil :count 0)
     ("mesage" "message" nil :count 0)
@@ -1125,6 +1133,7 @@
     ("suspicous" "suspicious" nil :count 0)
     ("swiming" "swimming" nil :count 0)
     ("synchornization" "synchronization" nil :count 0)
+    ("sysem" "system" nil :count 0)
     ("syserr" "System.err.println();" nil :count 0)
     ("sysout" "System.out.println();" nil :count 0)
     ("systme" "system" nil :count 1)
@@ -1200,6 +1209,7 @@
     ("traditionalyl" "traditionally" nil :count 0)
     ("trafic" "traffic" nil :count 0)
     ("transfered" "transferred" nil :count 0)
+    ("transformaton" "transformation" nil :count 0)
     ("truely" "truly" nil :count 0)
     ("truley" "truly" nil :count 0)
     ("tryed" "tried" nil :count 0)
