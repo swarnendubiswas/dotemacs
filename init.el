@@ -456,8 +456,10 @@ whitespaces."
                                       try-complete-lisp-symbol))
   :bind ("M-/" . hippie-expand))
 
+;; This does not seem to be very useful anymore
 (use-package subword
   :diminish
+  :disabled t
   :hook (after-init . global-subword-mode))
 
 ;; vertical - Split the selected window into two windows, one above the other
