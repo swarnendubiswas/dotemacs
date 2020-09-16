@@ -312,7 +312,7 @@ whitespaces."
               sentence-end-double-space nil
               ;; set-mark-command-repeat-pop t
               ;; shift-select-mode t ; Use shift-select for marking
-              suggest-key-bindings t
+              ;; suggest-key-bindings t
               ;; switch-to-buffer-preserve-window-point t
               truncate-lines nil
               ;; truncate-partial-width-windows nil
@@ -344,6 +344,7 @@ whitespaces."
 ;; this.
 (defconst dotemacs-50mb (* 50 1000 1000))
 (defconst dotemacs-100mb (* 100 1000 1000))
+(defconst dotemacs-128mb (* 128 1000 1000))
 (defconst dotemacs-200mb (* 200 1000 1000))
 
 ;; Ideally, we would have reset 'gc-cons-threshold' to its default value
@@ -357,7 +358,8 @@ whitespaces."
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun sb/restore-garbage-collection ()
-  (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-200mb))))
+  ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
+  (setq gc-cons-threshold dotemacs-128mb))
 
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
@@ -1377,10 +1379,13 @@ SAVE-FN with non-nil ARGS."
           (forward-word)))))
   :custom
   (ispell-dictionary "en_US")
-  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
+  (ispell-extra-args
+   '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
-  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
+  (ispell-personal-dictionary (expand-file-name "spell"
+                                                dotemacs-extras-directory))
+  (ispell-silently-savep t
+                         "Save a new word to personal dictionary without asking")
   (flyspell-abbrev-p t)
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
@@ -1948,6 +1953,10 @@ SAVE-FN with non-nil ARGS."
 (use-package smart-mark ; Restore point with "C-g" after marking a region
   :ensure t
   :config (smart-mark-mode 1))
+
+(use-package whole-line-or-region
+  :ensure t
+  :config (whole-line-or-region-global-mode 1))
 
 ;; (use-package undo-tree
 ;;   :ensure t
@@ -2653,13 +2662,12 @@ SAVE-FN with non-nil ARGS."
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)))
 
-(with-eval-after-load 'lsp-mode
-  (dolist (hook '(c++-mode-hook python-mode-hook))
-    (add-hook hook
-              (lambda ()
-                (add-hook 'before-save-hook
-                          (lambda ()
-                            (lsp-format-buffer)) nil t)))))
+(dolist (hook '(c++-mode-hook python-mode-hook))
+  (add-hook hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        (lambda ()
+                          (lsp-format-buffer)) nil t))))
 
 (use-package lsp-ui
   :ensure t
@@ -3084,6 +3092,12 @@ Increase line spacing by two line height."
   "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
+
+;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
+(defun sb/reinstall-package (package)
+  (unload-feature package)
+  (package-reinstall package)
+  (require package))
 
 (global-set-key [remap next-buffer] 'sb/next-buffer)
 (global-set-key [remap previous-buffer] 'sb/previous-buffer)
