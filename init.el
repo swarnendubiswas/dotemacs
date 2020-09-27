@@ -70,7 +70,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -190,8 +190,6 @@ whitespaces."
   (when (< emacs-major-version 27)
     (package-initialize t))
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  ;; (add-to-list 'package-archives '("melpa-stable"
-  ;;                                  . "http://stable.melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
 (unless (package-installed-p 'use-package)
@@ -266,13 +264,14 @@ whitespaces."
               ;; Use system trash to deal with mistakes
               custom-safe-themes t delete-by-moving-to-trash t
               ;; enable-recursive-minibuffers t
+              enable-remote-dir-locals t
               find-file-visit-truename t ; Show true name, useful in case of symlinks
               ;; Avoid resizing the (GUI) frame when your newly set font is larger (or
               ;; smaller) than the system default
               frame-inhibit-implied-resize t
               frame-title-format (list '(buffer-file-name "%f" "%b"))
               ;; gc-cons-percentage 0.6 ; Portion of heap used for allocation
-              gc-cons-threshold most-positive-fixnum ; Defer GC during startup
+              ;; gc-cons-threshold most-positive-fixnum ; Defer GC during startup
               ;; help-window-select t
               history-delete-duplicates t
               ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we
@@ -361,15 +360,15 @@ whitespaces."
   ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
   (setq gc-cons-threshold dotemacs-128mb))
 
-(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
-(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
+;; (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+;; (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
+;; (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
-(use-package gcmh
-  :ensure t
-  :diminish
-  :hook ((after-init . gcmh-mode)
-         (focus-out-hook . gcmh-idle-garbage-collect)))
+;; (use-package gcmh
+;;   :ensure t
+;;   :diminish
+;;   :hook ((after-init . gcmh-mode)
+;;          (focus-out-hook . gcmh-idle-garbage-collect)))
 
 ;; Activate utf8 mode
 (setq locale-coding-system 'utf-8)
@@ -505,8 +504,7 @@ SAVE-FN with non-nil ARGS."
 ;;   (scroll-bar-mode -1))
 
 (dolist (mode '(
-                ;; Blinking cursor is distracting
-                blink-cursor-mode
+                blink-cursor-mode ; Blinking cursor is distracting
                 ;; Makes it difficult to edit the buffer
                 global-prettify-symbols-mode
                 menu-bar-mode
@@ -805,7 +803,6 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs
   :ensure t
-  :disabled t
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-filewatch-mode)
          (projectile-mode . treemacs-follow-mode)
@@ -1057,12 +1054,14 @@ SAVE-FN with non-nil ARGS."
               ("M-/" . company-other-backend)
               ("C-s" . sb/quit-company-save-buffer)))
 
-;; (use-package company-posframe
-;;   :ensure t
-;;   :disabled t ; The width of the frame popup is often not enough
-;;   :after company
-;;   :diminish
-;;   :hook (global-company-mode . company-posframe-mode))
+;; Should not have unaligned rendering issues with variable :height
+;; https://github.com/company-mode/company-mode/issues/1010
+(use-package company-posframe
+  :ensure t
+  ;; :disabled t ; The width of the frame popup is often not enough
+  :after company
+  :diminish
+  :hook (global-company-mode . company-posframe-mode))
 
 ;; This seems unmaintained and only works for elisp-mode
 ;; (use-package company-flx
@@ -1327,6 +1326,7 @@ SAVE-FN with non-nil ARGS."
 ;;   :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
+  :disabled t
   :ensure t
   :custom
   (ivy-format-function #'ivy-format-function-line)

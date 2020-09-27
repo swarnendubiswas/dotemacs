@@ -35,5 +35,6 @@
         "reference-cards": true,
         "tmp": true,
         "workspace": true
-    }
+    },
+    "git.enabled": true
 }
