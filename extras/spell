@@ -1,4 +1,4 @@
-personal_ws-1.1 en 134 
+personal_ws-1.1 en 137 
 Anupam
 Biswas
 CSE
@@ -50,16 +50,19 @@ deoptimization
 deoptimized
 dependences
 deterministically
+enqueue
 functionalities
 hardcoded
 indices
 interleavings
 invalidations
 invariants
+irreflexive
 latencies
 liveness
 locksteps
 metadata
+midsem
 misclassification
 misclassifications
 misclassify

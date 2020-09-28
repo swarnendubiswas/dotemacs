@@ -641,6 +641,7 @@
     ("idae" "idea" nil :count 0)
     ("idaes" "ideas" nil :count 0)
     ("idealogies" "ideologies" nil :count 0)
+    ("identfied" "identified" nil :count 0)
     ("identifiy" "identify" nil :count 0)
     ("identofy" "identify" nil :count 0)
     ("ihs" "his" nil :count 0)

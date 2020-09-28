@@ -70,7 +70,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'modus-operandi
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -270,8 +270,6 @@ whitespaces."
               ;; smaller) than the system default
               frame-inhibit-implied-resize t
               frame-title-format (list '(buffer-file-name "%f" "%b"))
-              ;; gc-cons-percentage 0.6 ; Portion of heap used for allocation
-              ;; gc-cons-threshold most-positive-fixnum ; Defer GC during startup
               ;; help-window-select t
               history-delete-duplicates t
               ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we
@@ -338,9 +336,15 @@ whitespaces."
               ;; bidi-paragraph-direction 'left-to-right
               )
 
+;; Change gc parameters
+(setq  gc-cons-percentage 0.6 ; Portion of heap used for allocation
+       ;; Defer GC during startup
+       gc-cons-threshold most-positive-fixnum)
+
 ;; GC may happen after this many bytes are allocated since last GC If you
 ;; experience freezing, decrease this. If you experience stuttering, increase
 ;; this.
+(defconst dotemacs-1mb (* 1 1000 1000))
 (defconst dotemacs-50mb (* 50 1000 1000))
 (defconst dotemacs-100mb (* 100 1000 1000))
 (defconst dotemacs-128mb (* 128 1000 1000))
@@ -360,9 +364,9 @@ whitespaces."
   ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
   (setq gc-cons-threshold dotemacs-128mb))
 
-;; (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
-;; (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-;; (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
+(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
+(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
 ;; (use-package gcmh
 ;;   :ensure t
