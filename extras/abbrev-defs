@@ -1330,6 +1330,7 @@
 (define-abbrev-table 'text-mode-abbrev-table
   '(
     ("atend" "Attend" nil :count 0)
+    ("deepnds" "depends" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("vidoes" "videos" nil :count 0)

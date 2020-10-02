@@ -368,6 +368,7 @@ whitespaces."
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
+;; LSP mode generates lots of objects, which causes a problem with gcmh mode.
 ;; (use-package gcmh
 ;;   :ensure t
 ;;   :diminish
@@ -1324,18 +1325,18 @@ SAVE-FN with non-nil ARGS."
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before ivy-rich-mode for better performance
-;; (use-package all-the-icons-ivy-rich
-;;   :ensure t
-;;   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-;;   :custom (all-the-icons-ivy-rich-icon-size 0.8))
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
+  :custom (all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
-  :disabled t
   :ensure t
+  :after(counsel projectile)
   :custom
   (ivy-format-function #'ivy-format-function-line)
   (ivy-rich-parse-remote-buffer nil)
-  :hook (ivy-mode . ivy-rich-mode))
+  :config (ivy-rich-mode 1))
 
 (use-package flyspell
   :if dotemacs-is-linux
