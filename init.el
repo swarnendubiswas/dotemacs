@@ -308,7 +308,8 @@ whitespaces."
               select-enable-clipboard t
               sentence-end-double-space nil
               ;; set-mark-command-repeat-pop t
-              ;; shift-select-mode t ; Use shift-select for marking
+              ;; Do not use shift-select for marking, use it for windmove
+              shift-select-mode nil
               ;; suggest-key-bindings t
               ;; switch-to-buffer-preserve-window-point t
               truncate-lines nil
@@ -541,6 +542,9 @@ SAVE-FN with non-nil ARGS."
 (fringe-mode '(0 . 0))
 (toggle-frame-maximized) ; Maximize Emacs on startup
 ;; (set-frame-parameter nil 'unsplittable t)
+;; Make use of wider screens
+(when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+  (split-window-right))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -2027,6 +2031,12 @@ SAVE-FN with non-nil ARGS."
   :bind (([remap other-window] . ace-window)
          ("<f10>" . ace-window)))
 
+(use-package windmove
+  :config (windmove-default-keybindings)
+  :custom
+  ;; wrap around at edges
+  (windmove-wrap-around t))
+
 ;; This causes additional saves which leads to auto-formatters being invoked
 ;; more frequently
 (use-package super-save ; Save buffers when Emacs loses focus
@@ -2131,6 +2141,7 @@ SAVE-FN with non-nil ARGS."
   ;; :init (setq-default markdown-hide-markup t)
   :custom
   (mardown-indent-on-enter 'indent-and-new-item)
+  (markdown-split-window-direction 'vertical)
   (markdown-enable-math t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
   (markdown-fontify-code-blocks-natively t)
