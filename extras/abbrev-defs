@@ -1327,6 +1327,11 @@
     ("while" "while" c-electric-continued-statement :count 0)
    ))
 
+(define-abbrev-table 'markdown-mode-abbrev-table
+  '(
+    ("sequenes" "sequence" nil :count 0)
+   ))
+
 (define-abbrev-table 'text-mode-abbrev-table
   '(
     ("atend" "Attend" nil :count 0)

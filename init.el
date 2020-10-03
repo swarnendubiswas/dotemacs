@@ -70,7 +70,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'default
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -87,7 +87,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -531,6 +531,7 @@ SAVE-FN with non-nil ARGS."
                 ;; global-so-long-mode ; This puts the buffer in read-only mode
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
+                global-hl-line-mode
                 ))
   (when (fboundp mode)
     (funcall mode 1)))
@@ -716,20 +717,22 @@ SAVE-FN with non-nil ARGS."
 ;;                       (:sunset  . doom-peacock)))
 ;;   :init (circadian-setup))
 
-;; (use-package ibuffer
-;;   :custom
-;;   (ibuffer-default-sorting-mode 'alphabetic)
-;;   (ibuffer-display-summary nil)
-;;   (ibuffer-use-header-line t))
+(use-package ibuffer
+  :custom
+  (ibuffer-default-sorting-mode 'alphabetic)
+  (ibuffer-display-summary nil)
+  (ibuffer-use-header-line t))
 
-;; (use-package ibuf-ext ; Don't show filter groups if there are no buffers in that group
-;;   :load-path "extras"
-;;   :custom (ibuffer-show-empty-filter-groups nil)
-;;   :hook (ibuffer . ibuffer-auto-mode))
+(use-package ibuf-ext
+  :load-path "extras"
+  :custom
+  ;; Do not show filter groups if there are no buffers in that group
+  (ibuffer-show-empty-filter-groups nil)
+  :hook (ibuffer . ibuffer-auto-mode))
 
-;; (use-package ibuffer-projectile ; Group buffers by projectile project
-;;   :ensure t
-;;   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+(use-package ibuffer-projectile ; Group buffers by projectile project
+  :ensure t
+  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 (use-package dired
   :functions dired-next-line
@@ -1063,6 +1066,17 @@ SAVE-FN with non-nil ARGS."
               ("M-/" . company-other-backend)
               ("C-s" . sb/quit-company-save-buffer)))
 
+;; Silence "Starting 'look' process..." message
+(defun sb/ispell-lookup-words (old-fun &rest args)
+  (let ((inhibit-message t))
+    (apply old-fun args)))
+(advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
+
+(defun sb/ispell-init-process (old-fun &rest args)
+  (let ((inhibit-message t))
+    (apply old-fun args)))
+(advice-add 'ispell-init-process :around #'sb/ispell-init-process)
+
 ;; Should not have unaligned rendering issues with variable :height
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
@@ -1085,7 +1099,6 @@ SAVE-FN with non-nil ARGS."
 ;; SB: I am not sure this package is very useful
 (use-package company-box
   :ensure t
-  :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
@@ -1115,19 +1128,11 @@ SAVE-FN with non-nil ARGS."
   :after company
   :disabled t)
 
-;; (use-package company-fuzzy
-;;   :ensure t
-;;   :after company
-;;   :diminish
-;;   :init (global-company-fuzzy-mode 1))
-
-(with-eval-after-load 'company-mode
-  (dolist (hook '(text-mode-hook markdown-mode-hook
-                                 latex-mode-hook LaTeX-mode-hook org-mode-hook))
-    (add-hook hook
-              (lambda ()
-                (make-local-variable 'company-backends)
-                (add-to-list 'company-backends 'company-ispell)))))
+(use-package company-fuzzy
+  :ensure t
+  :after company
+  :diminish
+  :init (global-company-fuzzy-mode 1))
 
 (use-package yasnippet
   :ensure t
@@ -1175,7 +1180,7 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :bind
   (("C-c r" . ivy-resume)
-   ([remap switch-to-buffer] . counsel-switch-buffer)
+   ;; ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
@@ -1315,13 +1320,19 @@ SAVE-FN with non-nil ARGS."
   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf .
                                                            file-newer-than-file-p)))
 
-;; (use-package orderless
-;;   :ensure t
-;;   :disabled t
-;;   :init (icomplete-mode) ; optional but recommended!
-;;   :custom
-;;   (completion-styles '(orderless))
-;;   (ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+(use-package orderless
+  :ensure t
+  :after ivy
+  :preface
+  (defun sb/just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
+  :init (icomplete-mode) ; optional but recommended!
+  :custom
+  (completion-styles '(orderless))
+  (orderless-component-separator "[ &]")
+  (ivy-re-builders-alist '((t .  orderless-ivy-re-builder)))
+  :config (advice-add 'company-capf--candidates :around #'just-one-face))
 
 (use-package company-prescient
   :ensure t
@@ -2140,13 +2151,14 @@ SAVE-FN with non-nil ARGS."
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; :init (setq-default markdown-hide-markup t)
   :custom
+  (markdown-enable-math t)
   (mardown-indent-on-enter 'indent-and-new-item)
   (markdown-split-window-direction 'vertical)
-  (markdown-enable-math t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
   (markdown-fontify-code-blocks-natively t)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
+  (markdown-command "pandoc -s --mathjax")
   :config
   (use-package markdown-mode+
     :ensure t)
@@ -2161,6 +2173,11 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
+
+(use-package grip-mode
+  :ensure t
+  :bind (:map markdown-mode-command-map
+              ("g" . grip-mode)))
 
 ;; (use-package prettier-js
 ;;   :ensure t
@@ -2185,11 +2202,6 @@ SAVE-FN with non-nil ARGS."
   ;; :diminish
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   :hook ((markdown-mode gfm-mode) . prettier-mode))
-
-(use-package grip-mode
-  :ensure t
-  :bind (:map markdown-mode-command-map
-              ("g" . grip-mode)))
 
 (use-package csv-mode
   :ensure t
@@ -2280,9 +2292,15 @@ SAVE-FN with non-nil ARGS."
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-mode))
 
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
+
 (use-package cuda-mode
   :ensure t
-  :mode ("\\.cu\\'"	. c++-mode))
+  :mode (("\\.cu\\'"	. cuda-mode)
+         ("\\.cuh\\'"	. cuda-mode)))
 
 (use-package opencl-mode
   :ensure t
@@ -2357,10 +2375,10 @@ SAVE-FN with non-nil ARGS."
             (setq-default c-basic-offset 4
                           c-set-style "java")))
 
-;; (use-package ant
-;;   :ensure t)
+(use-package ant
+  :ensure t)
 
-;; ;; Can disassemble .class files from within jars
+;; Can disassemble .class files from within jars
 ;; (use-package autodisass-java-bytecode
 ;;   :ensure t)
 
@@ -2369,7 +2387,7 @@ SAVE-FN with non-nil ARGS."
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
-  :config (unbind-key "C-c C-d" sh-mode-map) ;; Was bound to sh-cd-here
+  :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
   :hook (sh-mode . lsp)
   :custom
   (sh-basic-offset 2)
@@ -2381,31 +2399,27 @@ SAVE-FN with non-nil ARGS."
   :mode "\\.fish\\'"
   :interpreter "fish"
   :hook
-  (fish.mode . (lambda ()
+  (fish-mode . (lambda ()
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
-
-(use-package fish-completion
-  :ensure t
-  :if (when (executable-find "fish"))
-  :config (global-fish-completion-mode))
 
 ;; https://github.com/amake/shfmt.el
 ;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
-(with-eval-after-load 'sh-script-mode
-  (use-package flycheck-shfmt
-    :ensure reformatter
-    :functions flycheck-shfmt-setup
-    :after flycheck
-    :load-path "extras/shfmt"
-    :config
-    (use-package shfmt
-      :ensure reformatter
-      ;; :ensure-system-package (shfmt . "snap install shfmt")
-      :load-path "extras/shfmt"
-      ;; :diminish shfmt-on-save-mode
-      ;; :hook (sh-mode . shfmt-on-save-mode)
-      :custom (shfmt-arguments "-i 4 -p -ci"))
-    (flycheck-shfmt-setup)))
+(use-package shfmt
+  :ensure reformatter
+  ;; :ensure-system-package (shfmt . "snap install shfmt")
+  :load-path "extras/shfmt"
+  ;; :diminish shfmt-on-save-mode
+  :hook (sh-mode . shfmt-on-save-mode)
+  :custom (shfmt-arguments "-i 4 -p -ci"))
+
+;; (with-eval-after-load 'sh-script-mode
+(use-package flycheck-shfmt
+  :ensure reformatter
+  :functions flycheck-shfmt-setup
+  :after flycheck
+  :load-path "extras/shfmt"
+  :config (flycheck-shfmt-setup))
+;; )
 
 (use-package magit
   :ensure t
@@ -2427,13 +2441,23 @@ SAVE-FN with non-nil ARGS."
                                             (unpushed . show))))
 
 (use-package gitignore-mode
-  :ensure t)
+  :ensure t
+  :mode (("/\\.gitignore\\'"        . gitignore-mode)
+         ("/\\.git/info/exclude\\'" . gitignore-mode)
+         ("/git/ignore\\'"          . gitignore-mode)))
 
 (use-package gitattributes-mode
-  :ensure t)
+  :ensure t
+  :mode (("/\\.gitattributes\\'"       . gitattributes-mode)
+         ("/\\.git/info/attributes\\'" . gitattributes-mode)
+         ("/git/attributes\\'"         . gitattributes-mode)))
 
 (use-package gitconfig-mode
-  :ensure t)
+  :ensure t
+  :mode (("/\\.gitconfig\\'"  . gitconfig-mode)
+         ("/\\.git/config\\'" . gitconfig-mode)
+         ("/git/config\\'"    . gitconfig-mode)
+         ("/\\.gitmodules\\'" . gitconfig-mode)))
 
 (use-package git-gutter
   :ensure t
@@ -2452,6 +2476,10 @@ SAVE-FN with non-nil ARGS."
 (use-package php-mode
   :ensure t
   :hook (php-mode . lsp))
+
+(use-package batch-mode
+  :mode (("\\.bat\\'" . batch-mode)
+         ("\\.cmd\\'" . batch-mode)))
 
 (use-package web-mode
   :ensure t
@@ -2796,7 +2824,9 @@ SAVE-FN with non-nil ARGS."
   :mode "\\.js\\'"
   :hook ((js2-mode . lsp)
          (js2-mode . js2-imenu-extras-mode))
-  :custom (js-indent-level 2))
+  :custom
+  (js2-basic-offset 2)
+  (js-indent-level 2))
 
 (use-package xref-js2
   :ensure t
@@ -2819,6 +2849,10 @@ SAVE-FN with non-nil ARGS."
 (use-package scss-mode
   :ensure t
   :mode "\\.scss\\'")
+
+(use-package sass-mode
+  :ensure t
+  :mode "\\.sass\\'")
 
 (use-package mlir-mode
   :load-path "extras"
@@ -2857,7 +2891,7 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-prog-mode ()
   "Add backends for program completion in company mode."
-  (setq company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 1)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
@@ -2872,7 +2906,7 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-c-mode ()
   "Add backends for C/C++ completion in company mode."
-  (setq company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 1)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
@@ -2891,7 +2925,7 @@ SAVE-FN with non-nil ARGS."
   (use-package company-shell
     :ensure t
     :custom (company-shell-delete-duplictes t))
-  (setq company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 1)
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
@@ -2909,7 +2943,7 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp mode."
-  (setq company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 1)
   (set (make-local-variable 'company-backends)
        '((
           company-elisp
@@ -2928,7 +2962,7 @@ SAVE-FN with non-nil ARGS."
   (use-package company-jedi
     :ensure t
     :after python-mode)
-  (setq company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 1)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(

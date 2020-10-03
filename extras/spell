@@ -1,4 +1,4 @@
-personal_ws-1.1 en 138 
+personal_ws-1.1 en 139 
 Anupam
 Biswas
 CSE
@@ -57,6 +57,7 @@ indices
 interleavings
 invalidations
 invariants
+invertible
 irreflexive
 latencies
 liveness
