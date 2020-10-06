@@ -1030,7 +1030,6 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :functions company-abort
   :hook (after-init . global-company-mode)
-  ;; :diminish
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
@@ -1049,7 +1048,6 @@ SAVE-FN with non-nil ARGS."
   (company-selection-wrap-around t)
   (company-show-numbers 'left "Speed up completion")
   (company-tooltip-align-annotations t)
-  (company-transformers '(company-sort-by-backend-importance))
   :config
   (dolist (backend '(company-semantic company-bbdb company-oddmuse company-cmake))
     (delq backend company-backends))
@@ -1076,26 +1074,25 @@ SAVE-FN with non-nil ARGS."
     (apply old-fun args)))
 (advice-add 'ispell-init-process :around #'sb/ispell-init-process)
 
-;; Should not have unaligned rendering issues with variable :height
+;; Should not have unaligned rendering issues with variable :height. However, the width of the frame
+;; popup is often not enough
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
   :ensure t
-  ;; :disabled t ; The width of the frame popup is often not enough
   :after company
   :diminish
   :hook (global-company-mode . company-posframe-mode))
 
 ;; This seems unmaintained and only works for elisp-mode
-;; (use-package company-flx
-;;   :ensure t
-;;   :disabled t
-;;   :hook (global-company-mode . company-flx-mode))
+(use-package company-flx
+  :ensure t
+  :disabled t
+  :hook (global-company-mode . company-flx-mode))
 
-;; (use-package company-quickhelp
-;;   :ensure t
-;;   :hook (global-company-mode . company-quickhelp-mode))
+(use-package company-quickhelp
+  :ensure t
+  :hook (global-company-mode . company-quickhelp-mode))
 
-;; SB: I am not sure this package is very useful
 (use-package company-box
   :ensure t
   :diminish
