@@ -1329,6 +1329,8 @@
 
 (define-abbrev-table 'markdown-mode-abbrev-table
   '(
+    ("conrol" "control" nil :count 0)
+    ("proessing" "processing" nil :count 0)
     ("sequenes" "sequence" nil :count 0)
    ))
 

@@ -3,32 +3,28 @@
 
 ;;; Commentary:
 
-;; To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e",
-;; instead of evaluating the whole buffer Use C-M-x to evaluate the current
-;; top-level s-expression. Use M-: to evaluate any Emacs Lisp expression and
-;; print the result.
+;; To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the
+;; whole buffer Use C-M-x to evaluate the current top-level s-expression. Use M-: to evaluate any
+;; Emacs Lisp expression and print the result.
 
-;; Init file should not ideally contain calls to "load" or "require", since they
-;; cause eager loading and are expensive, a cheaper alternative is to use
-;; "autoload".
+;; Init file should not ideally contain calls to "load" or "require", since they cause eager loading
+;; and are expensive, a cheaper alternative is to use "autoload".
 
 ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Anonymous-Functions.html
 
 ;; Only an interactive function can be invoked with "M-x" or a key binding.
 
-;; When defining a lambda expression that is to be used as an anonymous
-;; function, you can in principle use any method to construct the list. But
-;; typically you should use the lambda macro, or the function special form, or
-;; the #' read syntax which is a short-hand for using function. Quoting a lambda
-;; form means the anonymous function is not byte-compiled. The following forms
-;; are all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x)))
-;; #'(lambda (x) (* x x))
+;; When defining a lambda expression that is to be used as an anonymous function, you can in
+;; principle use any method to construct the list. But typically you should use the lambda macro, or
+;; the function special form, or the #' read syntax which is a short-hand for using function.
+;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
+;; all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
 ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
 
-;; Backquote constructs allow you to quote a list, but selectively evaluate
-;; elements of that list. `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
+;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
+;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
 
 ;; A local variable specification takes the following form:
 ;; -*- mode: MODENAME; VAR: VALUE; ... -*-
@@ -109,7 +105,7 @@ This depends on the orientation of the display."
           (const :tag "horizontal" horizontal)) ; split-window-right
   :group 'dotemacs)
 
-(defcustom dotemacs-fill-column 80
+(defcustom dotemacs-fill-column 100
   "Column beyond which lines should not extend."
   :type 'number
   :group 'dotemacs)
@@ -400,7 +396,8 @@ whitespaces."
       auto-window-vscroll nil
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
-      mouse-wheel-progressive-speed nil)
+      mouse-wheel-progressive-speed nil
+      mouse-avoidance-mode 'banish)
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -815,6 +812,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs
   :ensure t
+  :functions treemacs-git-mode
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-filewatch-mode)
          (projectile-mode . treemacs-follow-mode)
@@ -1030,6 +1028,7 @@ SAVE-FN with non-nil ARGS."
 ;; https://emacs.stackexchange.com/questions/3813/what-is-the-hook-used-by-company-mode-to-perform-autocompletion
 (use-package company
   :ensure t
+  :functions company-abort
   :hook (after-init . global-company-mode)
   ;; :diminish
   :preface
@@ -1323,16 +1322,16 @@ SAVE-FN with non-nil ARGS."
 (use-package orderless
   :ensure t
   :after ivy
+  :functions sb/just-one-face
   :preface
   (defun sb/just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
-  :init (icomplete-mode) ; optional but recommended!
   :custom
   (completion-styles '(orderless))
   (orderless-component-separator "[ &]")
   (ivy-re-builders-alist '((t .  orderless-ivy-re-builder)))
-  :config (advice-add 'company-capf--candidates :around #'just-one-face))
+  :config (advice-add 'company-capf--candidates :around #'sb/just-one-face))
 
 (use-package company-prescient
   :ensure t
@@ -1348,6 +1347,7 @@ SAVE-FN with non-nil ARGS."
 (use-package ivy-rich
   :ensure t
   :after(counsel projectile)
+  :functions ivy-format-function-line
   :custom
   (ivy-format-function #'ivy-format-function-line)
   (ivy-rich-parse-remote-buffer nil)
@@ -1653,8 +1653,8 @@ SAVE-FN with non-nil ARGS."
                  (require 'flycheck-grammarly)
                  (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
-;; These can block important screen space, hence I prefer to show the error
-;; message in the minibuffer.
+;; These can block screen space, hence I prefer to show the error message in the
+;; minibuffer.
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
       :disabled t
@@ -1665,7 +1665,11 @@ SAVE-FN with non-nil ARGS."
       :disabled t
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
-      :config (flycheck-posframe-configure-pretty-defaults)))
+      :config (flycheck-posframe-configure-pretty-defaults))
+
+    (use-package flycheck-inline
+      :ensure t
+      :hook (flycheck-mode . flycheck-inline-mode)))
 
 (defhydra hydra-flycheck (:color blue)
   "
@@ -1703,7 +1707,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package whitespace-cleanup-mode
   :ensure t
-  :diminish)
+  :diminish
+  :hook (after-init . global-whitespace-cleanup-mode)
+  :config (add-to-list 'whitespace-cleanup-mode-ignore-modes
+                       'markdown-mode))
 
 ;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 ;;   :ensure t
@@ -2161,10 +2168,7 @@ SAVE-FN with non-nil ARGS."
   (markdown-command "pandoc -s --mathjax")
   :config
   (use-package markdown-mode+
-    :ensure t)
-  ;; (with-eval-after-load 'whitespace-cleanup-mode
-  ;;   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
-  )
+    :ensure t))
 
 ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
@@ -2468,6 +2472,13 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: What is the purpose?
 (setq smerge-command-prefix "\C-c v")
+
+(use-package diff-hl
+  :ensure t
+  :hook (after-init . global-diff-hl-mode)
+  :config
+  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
 (use-package yaml-mode
   :ensure t
@@ -2804,7 +2815,6 @@ SAVE-FN with non-nil ARGS."
 (or (use-package lsp-latex
       :ensure t
       :after lsp
-      :disabled t
       :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
                                                    (lsp-deferred)
                                                    (require 'lsp-latex)))
@@ -2815,6 +2825,7 @@ SAVE-FN with non-nil ARGS."
       (lsp-latex-lint-on-save t))
 
     (use-package latex-init
+      :disabled t
       :load-path "extras"
       :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
                                                               (require 'latex-init)))))
@@ -2900,7 +2911,7 @@ SAVE-FN with non-nil ARGS."
           ;; company-tabnine
           company-dabbrev-code
           company-files
-          company-dabbrev
+          ;; company-dabbrev
           )))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
@@ -2916,7 +2927,7 @@ SAVE-FN with non-nil ARGS."
           company-dabbrev-code
           company-files
           company-clang
-          company-dabbrev
+          ;; company-dabbrev
           )))
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
@@ -2937,7 +2948,7 @@ SAVE-FN with non-nil ARGS."
            company-yasnippet
            company-files
            company-dabbrev-code
-           company-dabbrev
+           ;; company-dabbrev
            ))))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
@@ -2951,7 +2962,7 @@ SAVE-FN with non-nil ARGS."
           company-capf
           company-dabbrev-code
           company-files
-          company-dabbrev
+          ;; company-dabbrev
           ))))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
@@ -2972,7 +2983,7 @@ SAVE-FN with non-nil ARGS."
           ;; company-tabnine
           company-files
           company-dabbrev-code
-          company-dabbrev
+          ;; company-dabbrev
           )))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 

@@ -2474,6 +2474,7 @@ generalization
 generally
 generate
 generation
+generator
 generic
 generous
 generously
@@ -6289,3 +6290,7 @@ yourself
 youth
 zero
 zone
+
+;; Local Variables:
+;; mode: text
+;; End:
