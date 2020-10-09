@@ -541,8 +541,8 @@ SAVE-FN with non-nil ARGS."
 (toggle-frame-maximized) ; Maximize Emacs on startup
 ;; (set-frame-parameter nil 'unsplittable t)
 ;; Make use of wider screens
-(when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (split-window-right))
+;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+;;   (split-window-right))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -718,7 +718,8 @@ SAVE-FN with non-nil ARGS."
   :custom
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-display-summary nil)
-  (ibuffer-use-header-line t))
+  (ibuffer-use-header-line t)
+  :config (defalias 'list-buffers 'ibuffer))
 
 (use-package ibuf-ext
   :load-path "extras"
@@ -875,14 +876,14 @@ SAVE-FN with non-nil ARGS."
   :ensure t)
 
 ;; Install fonts with `M-x all-the-icons-install-fonts`
-;; (use-package all-the-icons
-;;   :ensure t
-;;   :if (display-graphic-p))
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
 
-;; (use-package all-the-icons-ibuffer
-;;   :ensure t
-;;   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-;;   :custom (all-the-icons-ibuffer-icon-size 0.8))
+(use-package all-the-icons-ibuffer
+  :ensure t
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
+  :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 ;; (add-hook 'dired-mode-hook
 ;;           (lambda ()
@@ -890,10 +891,10 @@ SAVE-FN with non-nil ARGS."
 ;;             (unless (file-remote-p default-directory)
 ;;               (all-the-icons-dired-mode))))
 
-;; (use-package all-the-icons-dired
-;;   :ensure t
-;;   :diminish
-;;   :hook (dired-mode . all-the-icons-dired-mode))
+(use-package all-the-icons-dired
+  :ensure t
+  :diminish
+  :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package org
   :ensure t
@@ -1176,7 +1177,6 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :bind
   (("C-c r" . ivy-resume)
-   ;; ([remap switch-to-buffer] . ivy-switch-buffer)
    ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
@@ -1216,7 +1216,6 @@ SAVE-FN with non-nil ARGS."
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ([remap swiper] . counsel-grep-or-swiper)
    ("<f4>" . counsel-grep-or-swiper)
-   ("C-x C-b" . counsel-ibuffer)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap load-library] . counsel-load-library)
    ([remap load-theme] . counsel-load-theme)
@@ -1225,7 +1224,6 @@ SAVE-FN with non-nil ARGS."
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
    ;; Having the preview can make switching buffers slow
-   ;; ([remap switch-to-buffer] . counsel-switch-buffer)
    ;; ("<f3>" . counsel-switch-buffer)
    ([remap yank-pop] . counsel-yank-pop))
   :bind* ("C-c C-j" . counsel-semantic-or-imenu)
@@ -1284,10 +1282,8 @@ SAVE-FN with non-nil ARGS."
   :hook (ivy-mode . counsel-mode)
   :config
   ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
-  (defalias 'list-buffers 'counsel-ibuffer)
   ;; (defalias 'load-library 'counsel-load-library)
   (defalias 'load-theme 'counsel-load-theme)
-  (defalias 'switch-buffer 'counsel-switch-buffer)
   ;; (defalias 'yank-pop 'counsel-yank-pop)
   )
 

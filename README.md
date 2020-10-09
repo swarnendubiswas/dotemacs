@@ -259,7 +259,7 @@ GNU Global has better database search support while Universal Ctags supports mor
 
 - <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
 - <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
-- <https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html
+- <https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html>
 
 ## Server Support
 

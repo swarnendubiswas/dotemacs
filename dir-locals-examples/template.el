@@ -1,6 +1,8 @@
 (
  (nil . (
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
+         (compile-command . "make")
+         (compile-command . "gradle compileTestJava")
          (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "build" "built"))
          (lsp-enabled-clients . (pyls msplys pyright jedi))
          (projectile-project-compilation-cmd . "cd bin && cmake .. && cmake --build . && cd Debug && .\\shiolink.exe")
@@ -48,6 +50,7 @@
 
  (emacs-lisp-mode . (
                      (no-byte-compile . t)
+                     (show-trailing-whitespace . t)
                      ))
 
  (sh-mode . (
@@ -71,6 +74,7 @@
 
  (c-mode . (
             (c-file-style . "BSD")
+            (c-basic-offset . 2)
             (subdirs . nil) ; Apply C mode settings only to the current directory
             ))
 
@@ -124,6 +128,14 @@
                    (eval . (prettier-mode t))
                    ))
 
+ (nxml-mode . (
+               (nxml-child-indent . 2)
+               ))
+
+ (shell-mode . (
+                (sh-basic-offset . 2)
+                (sh-indentation . 2)
+                ))
  )
 
 (eval-after-load 'flycheck

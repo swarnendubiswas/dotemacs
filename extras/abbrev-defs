@@ -393,6 +393,7 @@
     ("desisions" "decisions" nil :count 0)
     ("desriable" "desirable" nil :count 1)
     ("detente" "detente" nil :count 0)
+    ("deterioted" "deteriorated" nil :count 0)
     ("determin" "determine" nil :count 0)
     ("determins" "determine" nil :count 0)
     ("develeoprs" "developers" nil :count 0)
@@ -1337,6 +1338,7 @@
 (define-abbrev-table 'text-mode-abbrev-table
   '(
     ("atend" "Attend" nil :count 0)
+    ("beging" "being" nil :count 0)
     ("deepnds" "depends" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
