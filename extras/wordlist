@@ -51,6 +51,7 @@ account
 accounts
 accumulate
 accumulation
+accuracies
 accuracy
 accurate
 accurately
@@ -91,6 +92,8 @@ adapted
 adapter
 adapters
 adaptive
+adaptively
+adaptivity
 addition
 additional
 additions
@@ -131,6 +134,7 @@ advertising
 advice
 advise
 advised
+advisee
 adviser
 advisor
 advisors
@@ -143,6 +147,7 @@ affect
 affected
 affection
 affects
+affine
 afford
 afraid
 African
@@ -191,6 +196,8 @@ alliance
 allied
 allocate
 allocation
+allocator
+allocators
 allow
 allowed
 allowing
@@ -240,13 +247,13 @@ amused
 amusing
 analogous
 analogy
-analyze
 analysis
 analyst
 analysts
 analytic
 analytical
 analytically
+analytics
 analyze
 analyzed
 analyzes
@@ -259,6 +266,7 @@ angry
 animal
 animals
 animated
+anisotropic
 ankle
 anniversary
 annotation
@@ -392,6 +400,8 @@ assignment
 assist
 assistance
 assistant
+assistantship
+Assistantship
 assisted
 assists
 associate
@@ -450,6 +460,7 @@ authority
 authors
 authorship
 auto
+Automata
 automate
 automatic
 automatically
@@ -476,6 +487,7 @@ awkwardly
 baby
 bachelor
 back
+backend
 background
 backing
 backpack
@@ -492,6 +504,7 @@ balloon
 band
 bandage
 bandwidth
+Bandyopadhyay
 bank
 banking
 banners
@@ -557,6 +570,8 @@ belongs
 below
 belt
 bench
+benchmarked
+benchmarking
 benchmarks
 bend
 beneath
@@ -564,6 +579,7 @@ beneficial
 beneficiary
 benefit
 benefits
+Bengaluru
 bent
 beside
 besides
@@ -586,6 +602,7 @@ billion
 binary
 bind
 binding
+biodata
 biological
 biology
 bird
@@ -596,6 +613,7 @@ Biswas
 bite
 bitter
 bitterly
+bitwise
 bizarre
 black
 blackbox
@@ -885,6 +903,7 @@ check
 checked
 checking
 checkout
+checkpointing
 cheek
 cheerful
 cheerfully
@@ -1026,6 +1045,7 @@ colored
 column
 columns
 combination
+combinational
 combine
 combined
 combines
@@ -1094,6 +1114,7 @@ complexity
 complicate
 complicated
 component
+composable
 compose
 composed
 composer
@@ -1283,6 +1304,7 @@ convincing
 convincingly
 convolution
 convolutional
+Convolutional
 cook
 cookbook
 cooker
@@ -1352,6 +1374,9 @@ courses
 court
 courtesy
 cousin
+covariance
+Covariance
+covariances
 cover
 coverage
 covered
@@ -1423,12 +1448,15 @@ curved
 custody
 custom
 customer
+customizations
 customs
 cutting
+cybersecurity
 cycle
 cyclic
 cycling
 cylinder
+Dagstuhl
 daily
 damage
 damaged
@@ -1442,9 +1470,13 @@ dangerous
 dare
 dark
 darkness
+DARPA
 data
 database
+dataflow
+Dataflow
 dataset
+datasets
 date
 daughter
 dead
@@ -1560,6 +1592,7 @@ depressing
 depression
 depth
 deputy
+deregistration
 deregulation
 derivation
 derivative
@@ -1601,6 +1634,7 @@ detector
 determination
 determine
 determined
+deterministically
 develop
 developing
 development
@@ -1615,6 +1649,7 @@ devoted
 devotion
 diabetes
 diagnosis
+diagonalized
 diagram
 dialogue
 diameter
@@ -1679,6 +1714,8 @@ discrete
 discretely
 discretion
 discretionary
+discretize
+discretized
 discriminate
 discrimination
 discuss
@@ -1814,6 +1851,8 @@ dull
 dump
 durable
 duration
+durations
+Durgapur
 during
 dust
 duty
@@ -1897,6 +1936,7 @@ eleventh
 eligible
 eliminate
 elimination
+Elisp
 elite
 else
 elsewhere
@@ -1941,6 +1981,7 @@ enables
 enabling
 enclosed
 encoding
+encodings
 encounter
 encourage
 encouragement
@@ -2082,6 +2123,7 @@ exam
 examination
 examine
 examined
+examinees
 examines
 example
 examples
@@ -2103,6 +2145,7 @@ exclusionary
 exclusive
 exclusively
 excuse
+executables
 execute
 executed
 execution
@@ -2162,6 +2205,7 @@ expressions
 extend
 extended
 extends
+extensibility
 extension
 extensive
 extent
@@ -2314,7 +2358,6 @@ flashers
 flashing
 flat
 flavor
-flavor
 flee
 flesh
 flexibility
@@ -2370,6 +2413,7 @@ formally
 format
 formation
 formats
+formatter
 former
 formerly
 forming
@@ -2401,6 +2445,7 @@ free
 freedom
 freely
 freeze
+freezed
 freight
 French
 frequency
@@ -2423,11 +2468,13 @@ frontier
 frozen
 fruit
 frustration
+fudging
 fuel
 full
 fully
 function
 functional
+functionalities
 functionality
 functionally
 fund
@@ -2461,6 +2508,7 @@ gateway
 gather
 gathered
 Gaussian
+Gaussians
 gaze
 gazette
 gear
@@ -2522,6 +2570,7 @@ goodbye
 goods
 Google
 gorgeous
+goto
 gourmet
 govern
 government
@@ -2616,6 +2665,7 @@ harmful
 harmless
 harmony
 harvest
+Haswell
 hate
 hatred
 have
@@ -2702,6 +2752,7 @@ homeless
 homepage
 hometown
 homework
+homeworks
 homogeneous
 honest
 honestly
@@ -2746,6 +2797,7 @@ hurt
 husband
 hygiene
 hyperthreading
+hypervisor
 hypothesis
 hypothesize
 hypothetical
@@ -2761,7 +2813,7 @@ identify
 identity
 ideological
 ideology
-i.e.
+IEEE
 ignorance
 ignorant
 ignore
@@ -2791,12 +2843,14 @@ immigrate
 immigration
 immoral
 impact
+impactful
 impacts
 impaired
 impatient
 imperial
 implement
 implementation
+implementors
 implicate
 implication
 implicit
@@ -2822,6 +2876,7 @@ impressive
 improve
 improved
 improvement
+impunctual
 inability
 inaccessible
 inaccuracy
@@ -2867,6 +2922,8 @@ increasing
 increasingly
 incredible
 increment
+Incrementer
+incrementing
 incurred
 indeed
 indefinite
@@ -2907,6 +2964,7 @@ inevitable
 inevitably
 infant
 infants
+infeasible
 infect
 infected
 infection
@@ -2974,6 +3032,8 @@ install
 installation
 instance
 instant
+instantiation
+instantiations
 instead
 institute
 institution
@@ -3016,6 +3076,7 @@ interaction
 interactive
 interactively
 interchangeable
+intercollege
 interest
 interested
 interesting
@@ -3044,6 +3105,7 @@ intimate
 into
 intrinsic
 intrinsically
+intrinsics
 introduce
 introduced
 introduction
@@ -3061,6 +3123,7 @@ invent
 invention
 inversion
 invert
+invertible
 invest
 investigate
 investigation
@@ -3104,10 +3167,12 @@ item
 iterate
 iteration
 iterations
+iteratively
 itself
 jacket
 jackets
 jail
+jamming 
 January
 Japanese
 java
@@ -3128,6 +3193,7 @@ journalist
 journals
 journey
 json
+JSON
 judge
 judgment
 judicial
@@ -3147,6 +3213,8 @@ justification
 justified
 justify
 juvenile
+Kalman
+Kalyanpur
 karaoke
 keen
 keep
@@ -3155,6 +3223,7 @@ kernel
 keyboard
 keyword
 keywords
+Kharagpur
 kick
 kill
 killer
@@ -3181,6 +3250,7 @@ know
 knowing
 knowledge
 known
+Kolkata
 label
 labeled
 labor
@@ -3202,6 +3272,7 @@ largest
 last
 lasting
 late
+latencies
 later
 latest
 LaTeX
@@ -3233,6 +3304,7 @@ learn
 learned
 learners
 learning
+learnt
 leasing
 least
 leather
@@ -3268,7 +3340,9 @@ letters
 letting
 level
 levy
+lexemes
 lexicographic
+lexicographically
 liberal
 liberalism
 liberalization
@@ -3301,6 +3375,11 @@ limited
 limiting
 line
 linear
+linearizability
+linearizable
+linearization
+linearized
+linearizing
 link
 linkage
 linking
@@ -3329,6 +3408,7 @@ located
 location
 locator
 lock
+lockdown
 locking
 lodging
 logging
@@ -3343,6 +3423,7 @@ long-term
 look
 looking
 lookups
+loop
 loose
 loosely
 lord
@@ -3453,6 +3534,7 @@ mayor
 meal
 mean
 meaning
+meaningful
 means
 meant
 meanwhile
@@ -3531,6 +3613,7 @@ mind
 mine
 mineral
 minerals
+minibatch
 minimal
 minimalist
 minimally
@@ -3547,8 +3630,12 @@ miracle
 mirror
 mirrors
 misc.
+misclassification
+misconfiguration
 misinterpret
 misinterpretation
+misprediction
+mispredictions
 miss
 missile
 missing
@@ -3575,6 +3662,7 @@ modification
 modified
 modify
 modular
+modularity
 module
 modules
 moisture
@@ -3587,6 +3675,7 @@ money
 monitor
 monitoring
 monitors
+monotonicity
 monster
 monsters
 month
@@ -3623,11 +3712,18 @@ movie
 moving
 Mrs.
 much
+multicore
 multidimensional
+multilayer
 multilevel
 multiple
 multiplier
 multiply
+multisocket
+multithreaded
+multithreading
+Multiversioned
+multiversioning
 murder
 muscle
 muscles
@@ -3638,6 +3734,7 @@ musical
 musician
 Muslim
 must
+mutex
 mutual
 mutually
 myself
@@ -3691,6 +3788,8 @@ nested
 network
 networks
 neural
+neuromorphic
+Neuromorphic
 neuroscience
 neutral
 neutrality
@@ -3719,12 +3818,17 @@ noise
 noisily
 noisy
 nomination
+nominee
+nonblocking
 nonconformist
 nonconformity
+nondeterminism
 nondeterministic
 none
 nonetheless
+nonintuitive
 nonsense
+nonzeros
 norm
 normal
 normality
@@ -3760,6 +3864,7 @@ numerous
 nurse
 nursery
 nursing
+Nvidia
 obesity
 obey
 object
@@ -3767,6 +3872,7 @@ objective
 objectively
 objects
 obligation
+observability
 observation
 observe
 observed
@@ -3793,6 +3899,7 @@ octants
 October
 oddly
 odds
+odometry
 offend
 offense
 offensive
@@ -3882,6 +3989,7 @@ outdoor
 outdoors
 outer
 outlets
+outliers
 outline
 outlined
 outlook
@@ -3895,6 +4003,9 @@ over
 overall
 overcome
 overestimate
+overfit
+overfitted
+overfitting
 overhead
 overlap
 overlapping
@@ -3936,16 +4047,23 @@ paragraph
 paragraphing
 parallel
 parallelism
+parallelizable
 parallelization
+parallelize
+parallelized
 parallelizes
 parallelizing
+parallelly
 parameter
+parameterized
 parent
 parental
 parents
+pareto
 park
 parking
 parliament
+parsers
 part
 partial
 participant
@@ -3957,6 +4075,7 @@ particular
 particularly
 parties
 partition
+partitioner
 partitioning
 partly
 partner
@@ -3978,6 +4097,7 @@ patch
 patches
 patents
 path
+pathologies
 patience
 patient
 patients
@@ -4008,6 +4128,7 @@ perceive
 percent
 percentage
 perception
+perceptron
 perfect
 perfectly
 perform
@@ -4027,6 +4148,7 @@ permission
 permissions
 permit
 permits
+permutable
 persist
 persistence
 persistent
@@ -4072,6 +4194,7 @@ picking
 picture
 pictures
 piece
+piecewise
 piggyback
 pile
 pill
@@ -4209,6 +4332,8 @@ precious
 precise
 precisely
 precision
+precisions
+precompute
 predict
 predictability
 predictable
@@ -4232,6 +4357,7 @@ prepaid
 preparation
 prepare
 prepared
+prepend
 preprocessing
 prescribed
 prescription
@@ -4251,6 +4377,7 @@ presume
 presumption
 presumptuous
 pretend
+pretrain
 pretty
 prevent
 preview
@@ -4289,6 +4416,7 @@ privately
 privatizable
 prize
 probabilistic
+probabilistically
 probability
 probable
 probably
@@ -4359,6 +4487,7 @@ proposal
 propose
 proposed
 prosecutor
+PROSPAR
 prospect
 prospective
 protect
@@ -4379,6 +4508,7 @@ providing
 province
 provision
 provisioning
+pseudocode
 psychological
 psychologically
 psychologist
@@ -4420,9 +4550,11 @@ qualitatively
 quality
 quantify
 quantity
+quantization
 quantum
 quarter
 quarterback
+quarterly
 quarters
 queen
 queries
@@ -4449,6 +4581,9 @@ rain
 rainbow
 raise
 raising
+Rajasthan
+ramped
+ramping
 random
 randomly
 range
@@ -4471,7 +4606,9 @@ rationalism
 rationality
 rationalization
 rationalize
+reaccessed
 reach
+reachability
 reached
 reaches
 reaching
@@ -4490,6 +4627,7 @@ reading
 readings
 readjust
 readjustment
+README
 ready
 real
 realistic
@@ -4508,6 +4646,8 @@ reassessment
 reassign
 rebates
 rebound
+recalibrate
+recalibration
 recall
 receipt
 receive
@@ -4522,11 +4662,15 @@ recipe
 recipes
 reckon
 recognition
+recognitions
 recognize
 recommend
 recommendation
+recomputation
+reconfigurable
 reconstruct
 reconstruction
+reconvergence
 record
 recorded
 recorder
@@ -4543,6 +4687,7 @@ redefine
 redhead
 redistribute
 redistribution
+redistributions
 redraft
 reduce
 reduced
@@ -4551,6 +4696,7 @@ reducing
 reduction
 redundancy
 redundant
+reenable
 refer
 reference
 referral
@@ -4587,6 +4733,8 @@ register
 registration
 registry
 regression
+regressor
+regressors
 regret
 regular
 regularization
@@ -4595,6 +4743,11 @@ regulate
 regulation
 regulator
 regulatory
+reimplement
+reimplementation
+reimplementations
+reimplemented
+reimplementing
 reinforce
 reinforcement
 reinterpret
@@ -4688,9 +4841,14 @@ representative
 represented
 reprint
 reprints
+reproducability
 reproduce
+reproducibility
+reproducible
+reprofiling
 republic
 Republican
+repurpose
 reputation
 request
 requests
@@ -4698,6 +4856,8 @@ require
 required
 requirement
 requires
+rescaled
+rescaling
 reschedule
 rescue
 research
@@ -4724,6 +4884,7 @@ resourceful
 resources
 respect
 respected
+respectful
 respective
 respectively
 respond
@@ -4747,6 +4908,7 @@ restrictive
 restrictively
 restructure
 restructuring
+resubmission
 result
 resulted
 results
@@ -4778,6 +4940,7 @@ revelation
 revenge
 revenue
 revenues
+reverify
 reversal
 reverse
 reversible
@@ -4850,6 +5013,7 @@ rumor
 runner
 running
 runtime
+runtimes
 rural
 rush
 Russian
@@ -5002,6 +5166,7 @@ sequence
 sequential
 sequentially
 serializability
+Serializability
 serializable
 series
 serious
@@ -5253,6 +5418,7 @@ spice
 spicy
 spider
 spin
+spinlock
 spirit
 spirits
 spiritual
@@ -5331,6 +5497,7 @@ stiffly
 still
 sting
 stir
+stochastical
 stock
 stomach
 stone
@@ -5399,11 +5566,15 @@ style
 styling
 stylish
 stylized
+subblocks
+subcategory
+subexpression
 subject
 subjects
 sublime
 submission
 submit
+suboptimal
 subordinate
 subordination
 subscript
@@ -5441,6 +5612,7 @@ sufficient
 sufficiently
 sugar
 suggest
+suggested
 suggestion
 suggests
 suicide
@@ -5448,6 +5620,7 @@ suit
 suitable
 suitcase
 suited
+summarization
 summarize
 summary
 summation
@@ -5457,6 +5630,7 @@ Sunday
 sunrise
 sunshine
 super
+superblock
 superior
 supermarket
 supervise
@@ -5509,6 +5683,7 @@ sustainability
 sustainable
 sustenance
 swallow
+swarnendu
 Swarnendu
 swear
 swearing
@@ -5586,6 +5761,7 @@ technique
 techniques
 technological
 technology
+technopreneurs
 teen
 teenage
 teenager
@@ -5709,9 +5885,11 @@ tidy
 tight
 tightly
 till
+Tilottama
 time
 timeline
 timestamp
+timestep
 timetable
 tiny
 tire
@@ -5724,6 +5902,7 @@ today
 toddler
 together
 toilet
+tokenized
 tomato
 tomatoes
 tomorrow
@@ -5734,6 +5913,7 @@ tonne
 tool
 toolbar
 toolbox
+toolchain
 toolkit
 tooth
 topic
@@ -5763,6 +5943,8 @@ tracker
 tracking
 tractor
 trade
+tradeoff
+tradeoffs
 trading
 tradition
 traditional
@@ -5842,6 +6024,7 @@ tsunami
 tube
 Tuesday
 tuition
+tunable
 tune
 tunnel
 turn
@@ -5887,11 +6070,14 @@ uncertain
 uncharted
 uncle
 uncomfortable
+Uncomment
+uncommented
 uncommunicative
 unconfined
 unconscious
 unconstitutional
 unconstrained
+uncontended
 uncontrolled
 uncontroversial
 unconventional
@@ -5907,6 +6093,7 @@ underlie
 underlying
 underneath
 understand
+understandable
 understanding
 undertake
 undertaking
@@ -5938,8 +6125,10 @@ unimportant
 uninjured
 uninstrumented
 unintelligent
+unintuitive
 uninvolved
 union
+uniprocessor
 unique
 uniquely
 unit
@@ -5956,19 +6145,26 @@ unless
 unlicensed
 unlike
 unlikely
+unlinking
 unload
 unlucky
+unmark
 unmodified
 unmotivated
 unnecessary
+unobservable
 unobtainable
+unoptimized
+unordered
 unparalleled
 unpleasant
 unprecedented
 unpredictability
 unpredictable
 unprincipled
+unprotected
 unpublished
+unrealizable
 unreasonable
 unregulated
 unreliable
@@ -5976,25 +6172,34 @@ unresolved
 unresponsive
 unrestrained
 unrestricted
+unroll
+unrolling
 unscalable
 unscheduled
+unserializable
+unsets
 unsigned
 unspecified
 unstable
+Unstage
 unsteady
 unstressed
 unstructured
 unsuccessful
 unsustainable
+unsynchronized
 untidy
 until
 untitled
+untracked
 unusably
 unusual
 unusually
+unutilized
 unwilling
 unwillingly
 upcoming
+updatable
 update
 updated
 updates
@@ -6035,6 +6240,7 @@ valuable
 value
 vampire
 vanilla
+variabilities
 variability
 variable
 variables
@@ -6050,7 +6256,9 @@ varying
 vast
 vector
 vectorization
+Vectorization
 vectorize
+vectorized
 vegetable
 vehicle
 vehicles
@@ -6060,6 +6268,7 @@ venture
 ventures
 verification
 verified
+verifier
 verify
 version
 versions
@@ -6088,6 +6297,8 @@ violence
 violent
 violently
 virtual
+virtualize
+virtualizing
 virtually
 virtue
 virus
@@ -6171,6 +6382,7 @@ weekends
 weekly
 weigh
 weight
+weightage
 weighted
 weights
 welcome
@@ -6195,6 +6407,8 @@ while
 whisper
 whistle
 white
+whitebox
+whitelist
 whitespace
 whoever
 whole
@@ -6230,6 +6444,7 @@ wishing
 wishlist
 with
 withdraw
+withdrawn
 within
 without
 witness
@@ -6247,6 +6462,7 @@ workflow
 working
 workout
 works
+worksharing
 workshop
 world
 worried
@@ -6287,25 +6503,6 @@ yourself
 youth
 zero
 zone
-subcategory
-unprotected
-reproducible
-withdrawn
-Rajasthan
-suggested
-understandable
-respectful
-unprotected
-fudging
-meaningful
-unroll
-unrolling
-loop
-nominee
-quarterly
-deregistration
-jamming 
-loop
 
 ;; Local Variables:
 ;; mode: text

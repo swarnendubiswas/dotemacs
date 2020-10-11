@@ -202,6 +202,7 @@ whitespaces."
 
 ;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
+(defvar c-electric-indent)
 (defvar tags-revert-without-query)
 (defvar use-package-enable-imenu-support)
 (defvar expand-line-mode)
