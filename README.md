@@ -240,7 +240,7 @@ ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/
 ctags -eR --exclude=@.ctagsignore .
 ```
 
-```bash
+```Bash
 $ cat .ctagsignore
 dir1
 dir2
@@ -345,3 +345,4 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`. My guess is this has to do with either `flycheck-grammarly` or `prettier`.
 - Make `tramp` open specific remote directory for a given remote host
 - Remove `Starting "look" process...` echo message for `company-ispell`
+- `cmake-language-server` does not work on one Linux machine over `tramp` but works with another

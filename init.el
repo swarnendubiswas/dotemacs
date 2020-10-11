@@ -38,6 +38,39 @@
 
 ;;; Code:
 
+;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
+;; decrease this. If you experience stuttering, increase this.
+(defconst dotemacs-1mb (* 1 1000 1000))
+(defconst dotemacs-4mb (* 4 1000 1000))
+(defconst dotemacs-50mb (* 50 1000 1000))
+(defconst dotemacs-64mb (* 64 1000 1000))
+(defconst dotemacs-100mb (* 100 1000 1000))
+(defconst dotemacs-128mb (* 128 1000 1000))
+(defconst dotemacs-200mb (* 200 1000 1000))
+(defconst dotemacs-500mb (* 500 1000 1000))
+
+;; Change parameters to defer GC during startup
+;; (setq gc-cons-percentage 0.6) ; Portion of heap used for allocation
+;; (setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold dotemacs-200mb)
+
+;; Ideally, we would have reset 'gc-cons-threshold' to its default value
+;; otherwise there can be large pause times whenever GC eventually happens. But
+;; lsp suggests increasing the limit permanently.
+
+(defun sb/defer-garbage-collection ()
+  (setq gc-cons-threshold dotemacs-64mb))
+
+(defun sb/restore-garbage-collection ()
+  ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
+  (setq gc-cons-threshold dotemacs-4mb))
+
+;; Restore to a reasonable value after startup
+(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+
+;; (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
+;; (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
+
 (setq user-full-name "Swarnendu Biswas")
 
 (defgroup dotemacs nil
@@ -82,8 +115,9 @@
           (const :tag "default" default))
   :group 'dotemacs)
 
+;; Doom is nice but it takes CPU cycles
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -209,8 +243,8 @@ whitespaces."
         use-package-expand-minimally t
         use-package-verbose nil))
 
-;; (use-package use-package-ensure-system-package
-;;   :ensure t)
+(use-package use-package-ensure-system-package
+  :ensure t)
 
 (use-package bind-key
   :ensure t
@@ -218,6 +252,10 @@ whitespaces."
 
 (use-package diminish
   :ensure t)
+
+(setq custom-file dotemacs-custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
 
 (use-package paradox
   :ensure t
@@ -229,10 +267,6 @@ whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
-(setq custom-file dotemacs-custom-file)
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror))
-
 (use-package exec-path-from-shell
   :ensure t
   :if (or (daemonp) (memq window-system '(x ns)))
@@ -241,12 +275,11 @@ whitespaces."
   (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
-(setq-default ad-redefinition-action 'accept ;; Turn off warnings due to redefinitions
+(setq-default ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
               ;; apropos-do-all t
               auto-mode-case-fold nil
-              auto-save-list-file-prefix (expand-file-name
-                                          "auto-save"
-                                          dotemacs-temp-directory)
+              auto-save-list-file-prefix (expand-file-name "auto-save"
+                                                           dotemacs-temp-directory)
               backup-inhibited t ; Disable backup for a per-file basis
               blink-matching-paren nil ; Distracting
               case-fold-search t ; Searches and matches should ignore case
@@ -332,38 +365,6 @@ whitespaces."
               bidi-inhibit-bpa t
               ;; bidi-paragraph-direction 'left-to-right
               )
-
-;; Change gc parameters
-(setq  gc-cons-percentage 0.6 ; Portion of heap used for allocation
-       ;; Defer GC during startup
-       gc-cons-threshold most-positive-fixnum)
-
-;; GC may happen after this many bytes are allocated since last GC If you
-;; experience freezing, decrease this. If you experience stuttering, increase
-;; this.
-(defconst dotemacs-1mb (* 1 1000 1000))
-(defconst dotemacs-50mb (* 50 1000 1000))
-(defconst dotemacs-100mb (* 100 1000 1000))
-(defconst dotemacs-128mb (* 128 1000 1000))
-(defconst dotemacs-200mb (* 200 1000 1000))
-
-;; Ideally, we would have reset 'gc-cons-threshold' to its default value
-;; otherwise there can be large pause times whenever GC eventually happens. But
-;; lsp suggests increasing the limit permanently.
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (setq gc-cons-threshold 800000)))
-
-(defun sb/defer-garbage-collection ()
-  (setq gc-cons-threshold most-positive-fixnum))
-
-(defun sb/restore-garbage-collection ()
-  ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
-  (setq gc-cons-threshold dotemacs-128mb))
-
-(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
-(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
 ;; LSP mode generates lots of objects, which causes a problem with gcmh mode.
 ;; (use-package gcmh
@@ -460,16 +461,14 @@ whitespaces."
                                       try-complete-lisp-symbol))
   :bind ("M-/" . hippie-expand))
 
-;; This does not seem to be very useful anymore
 (use-package subword
   :diminish
   :disabled t
   :hook (after-init . global-subword-mode))
 
-;; vertical - Split the selected window into two windows, one above the other
-;; (split-window-below)
-;; horizontal - Split the selected window into two side-by-side windows
-;; (split-window-right)
+;; vertical - Split the selected window into two windows (e.g., "split-window-below"), one above the
+;; other
+;; horizontal - Split the selected window into two side-by-side windows (e.g., "split-window-right")
 (cond ((eq dotemacs-window-split 'vertical) (setq split-width-threshold nil
                                                   split-height-threshold 0))
       ((eq dotemacs-window-split 'horizontal) (setq split-height-threshold nil
@@ -493,7 +492,7 @@ SAVE-FN with non-nil ARGS."
   (abbrev-file-name (expand-file-name "abbrev-defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
 
-;; (when (display-graphic-p) ; window-system is deprecated
+;; (when (display-graphic-p) ; "window-system" is deprecated
 ;;   (progn
 ;;     (menu-bar-mode -1)
 ;;     (scroll-bar-mode -1)
@@ -506,10 +505,10 @@ SAVE-FN with non-nil ARGS."
 ;; (when (fboundp 'scroll-bar-mode)
 ;;   (scroll-bar-mode -1))
 
+;; Disable the following modes
 (dolist (mode '(
                 blink-cursor-mode ; Blinking cursor is distracting
-                ;; Makes it difficult to edit the buffer
-                global-prettify-symbols-mode
+                global-prettify-symbols-mode ; Makes it difficult to edit the buffer
                 menu-bar-mode
                 minibuffer-depth-indicate-mode
                 scroll-bar-mode
@@ -520,6 +519,7 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode -1)))
 
+;; Enable the following modes
 (dolist (mode '(
                 column-number-mode
                 ;; Typing with the mark active will overwrite the marked region
@@ -533,13 +533,16 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode 1)))
 
-;; Not a library/file, so eval-after-load does not work
+;; Not a library/file, so "eval-after-load" does not work
 (diminish 'auto-fill-function)
 (diminish 'visual-line-mode)
 
 (fringe-mode '(0 . 0))
-(toggle-frame-maximized) ; Maximize Emacs on startup
-;; (set-frame-parameter nil 'unsplittable t)
+
+;; SB: Maximize Emacs on startup. I am not sure which one is faster
+;; (toggle-frame-maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 ;; Make use of wider screens
 ;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
 ;;   (split-window-right))
@@ -565,7 +568,8 @@ SAVE-FN with non-nil ARGS."
                                               :ensure spacemacs-theme
                                               :init
                                               (load-theme 'spacemacs-light t)
-                                              ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
+                                              ;; (add-to-list 'default-frame-alist
+                                              ;;              '(background-color . "#fbf8ef"))
                                               ))
 
       ((eq dotemacs-theme 'zenburn) (use-package zenburn-theme
@@ -599,6 +603,7 @@ SAVE-FN with non-nil ARGS."
                                              :ensure t
                                              :init (load-theme 'modus-operandi t)
                                              :custom
+                                             (modus-operandi-theme-mode-line '3d)
                                              (modus-operandi-theme-proportional-fonts t)
                                              (modus-operandi-theme-scale-headings t)))
 
@@ -607,10 +612,7 @@ SAVE-FN with non-nil ARGS."
                                       ;; (set-background-color "#ffffff")
                                       ;; (set-foreground-color "#666666")
                                       (set-face-attribute 'region nil
-                                                          ;; :background "light sky blue"
-                                                          :background "gainsboro"
-                                                          ;; :foreground "white"
-                                                          )
+                                                          :background "gainsboro")
                                       )))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
@@ -699,8 +701,10 @@ SAVE-FN with non-nil ARGS."
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 ;; (set-frame-font "Roboto Mono")
-(cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute 'default nil :height 135))
-      ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
+(cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute
+                                                          'default nil :height 135))
+      ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute
+                                                        'default nil :height 140)))
 (set-face-attribute 'mode-line nil :height 100)
 (set-face-attribute 'mode-line-inactive nil :height 100)
 
@@ -763,21 +767,20 @@ SAVE-FN with non-nil ARGS."
   :custom (dired-omit-verbose nil "Do not show messages when omitting files")
   :hook (dired-mode . dired-omit-mode)
   :bind ("C-x C-j" . dired-jump)
-  :diminish dired-omit-mode
-  ;; :config
-  ;; ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  ;; (defadvice dired-omit-startup (after diminish-dired-omit activate)
-  ;;   "Make sure to remove \"Omit\" from the modeline."
-  ;;   (diminish 'dired-omit-mode) dired-mode-map)
-  )
+  ;; :diminish dired-omit-mode ; This does not work
+  :config
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Remove \"Omit\" from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map))
 
 (use-package dired+ ; Do not create multiple dired buffers
   :load-path "extras"
-  :functions diredp-toggle-find-file-reuse-dir
   :after dired-x
-  :init
-  (setq diredp-hide-details-initially-flag nil
-        diredp-hide-details-propagate-flag nil)
+  :functions diredp-toggle-find-file-reuse-dir
+  :custom
+  (diredp-hide-details-initially-flag nil)
+  (diredp-hide-details-propagate-flag nil)
   :config (diredp-toggle-find-file-reuse-dir 1))
 
 (use-package dired-efap
@@ -813,6 +816,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs
   :ensure t
+  :disabled t
   :functions treemacs-git-mode
   :commands (treemacs treemacs-toggle)
   :hook ((projectile-mode . treemacs-filewatch-mode)
@@ -824,11 +828,9 @@ SAVE-FN with non-nil ARGS."
   (treemacs-follow-after-init t)
   (treemacs-goto-tag-strategy 'refetch-index)
   (treemacs-indentation 2)
-  (treemacs-is-never-other-window nil "Prevents treemacs from
-  being selected with `other-window`")
+  (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
   (treemacs-lock-width t)
-  (treemacs-persist-file (expand-file-name "treemacs-persist"
-                                           dotemacs-temp-directory))
+  (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
   (treemacs-position 'right)
   (treemacs-project-follow-cleanup t)
   (treemacs-recenter-after-file-follow t)
@@ -844,7 +846,6 @@ SAVE-FN with non-nil ARGS."
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
-  ;; Decrease the font size
   (set-face-attribute 'treemacs-directory-collapsed-face nil
                       :height 0.7)
   (set-face-attribute 'treemacs-directory-face nil
@@ -899,33 +900,33 @@ SAVE-FN with non-nil ARGS."
 (use-package org
   :ensure t
   :defer t
+  :hook ((org-mode . visual-line-mode)
+         ;; (org-mode . turn-on-auto-fill)
+         )
+  :diminish org-indent-mode
+  :custom
+  (org-src-fontify-natively t "Code block fontification using the major-mode of the code")
+  (org-startup-indented t)
+  (org-startup-truncated nil)
+  (org-src-preserve-indentation t)
+  (org-src-tabs-acts-natively t)
+  (org-src-window-setup 'current-window)
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-startup-folded 'showeverything)
+  (org-hide-leading-stars t)
+  (org-hide-leading-stars-before-indent-mode t)
+  (org-support-shift-select t)
+  ;; See org-speed-commands-default for a list of the keys and commands enabled
+  ;; at the beginning of headlines. See org-babel-describe-bindings will
+  ;; display a list of the code blocks commands and their related keys.
+  (org-use-speed-commands t)
+  (org-src-strip-leading-and-trailing-blank-lines t)
+  ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
+  (org-pretty-entities t)
+  ;; Render subscripts and superscripts in org buffers
+  (org-pretty-entities-include-sub-superscripts t)
   :config
-  (add-hook 'org-mode-hook #'visual-line-mode)
-  ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
-  (diminish 'org-indent-mode)
-  (setq
-   ;; Code block fontification using the major-mode of the code
-   org-src-fontify-natively t
-   org-startup-indented t
-   org-startup-truncated nil
-   org-src-preserve-indentation t
-   org-src-tabs-acts-natively t
-   org-src-window-setup 'current-window
-   org-fontify-done-headline t
-   org-fontify-whole-heading-line t
-   org-startup-folded 'showeverything ; options: nil
-   org-hide-leading-stars t
-   org-hide-leading-stars-before-indent-mode t
-   org-support-shift-select t ; use shift-select
-   ;; See org-speed-commands-default for a list of the keys and commands enabled
-   ;; at the beginning of headlines. See org-babel-describe-bindings will
-   ;; display a list of the code blocks commands and their related keys.
-   org-use-speed-commands t
-   org-src-strip-leading-and-trailing-blank-lines t
-   ;; Display entities like \tilde, \alpha, etc in UTF-8 characters
-   org-pretty-entities t
-   ;; Render subscripts and superscripts in org buffers
-   org-pretty-entities-include-sub-superscripts t)
   (unbind-key "M-<up>" org-mode-map)
   (unbind-key "M-<down>" org-mode-map))
 
@@ -1018,12 +1019,6 @@ SAVE-FN with non-nil ARGS."
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
 
-;; FIXME: Hide "starting look process" messages
-(defun sb/lookup-words (orig-fun &rest args)
-  (let ((inhibit-message t))
-    (apply orig-fun args)))
-(advice-add 'lookup-words :around #'sb/lookup-words)
-
 ;; Use "M-x company-diag" or the modeline status to see the backend used
 ;; Try "M-x company-complete-common" when there are no completions
 ;; https://emacs.stackexchange.com/questions/3813/what-is-the-hook-used-by-company-mode-to-perform-autocompletion
@@ -1052,7 +1047,7 @@ SAVE-FN with non-nil ARGS."
   :config
   (dolist (backend '(company-semantic company-bbdb company-oddmuse company-cmake))
     (delq backend company-backends))
-  ;; Ignore numbers from company-dabbrev
+  ;; Ignore numbers from "company-dabbrev"
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
                          (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
@@ -1064,19 +1059,24 @@ SAVE-FN with non-nil ARGS."
               ("M-/" . company-other-backend)
               ("C-s" . sb/quit-company-save-buffer)))
 
-;; Silence "Starting 'look' process..." message
-(defun sb/ispell-lookup-words (old-fun &rest args)
-  (let ((inhibit-message t))
-    (apply old-fun args)))
-(advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
+;; ;; Silence "Starting 'look' process..." message
+;; (defun sb/ispell-lookup-words (old-fun &rest args)
+;;   (let ((inhibit-message t))
+;;     (apply old-fun args)))
+;; (advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
 
-(defun sb/ispell-init-process (old-fun &rest args)
-  (let ((inhibit-message t))
-    (apply old-fun args)))
-(advice-add 'ispell-init-process :around #'sb/ispell-init-process)
+;; (defun sb/ispell-init-process (old-fun &rest args)
+;;   (let ((inhibit-message t))
+;;     (apply old-fun args)))
+;; (advice-add 'ispell-init-process :around #'sb/ispell-init-process)
 
-;; Should not have unaligned rendering issues with variable :height. However, the width of the frame
-;; popup is often not enough
+;; (defun sb/lookup-words (orig-fun &rest args)
+;;   (let ((inhibit-message t))
+;;     (apply orig-fun args)))
+;; (advice-add 'lookup-words :around #'sb/lookup-words)
+
+;; Posframes do not have unaligned rendering issues with variable :height unlike an overlay.
+;; However, the width of the frame popup is often not enough.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
   :ensure t
@@ -1084,11 +1084,11 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :hook (global-company-mode . company-posframe-mode))
 
-;; This seems unmaintained and only works for elisp-mode
-(use-package company-flx
-  :ensure t
-  :disabled t
-  :hook (global-company-mode . company-flx-mode))
+;; ;; The package seems unmaintained and only works for elisp-mode
+;; (use-package company-flx
+;;   :ensure t
+;;   :disabled t
+;;   :hook (global-company-mode . company-flx-mode))
 
 (use-package company-quickhelp
   :ensure t
@@ -1128,11 +1128,13 @@ SAVE-FN with non-nil ARGS."
 (use-package company-fuzzy
   :ensure t
   :after company
+  :disabled t
   :diminish
   :init (global-company-fuzzy-mode 1))
 
 (use-package yasnippet
   :ensure t
+  :defer 2
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
@@ -1142,10 +1144,7 @@ SAVE-FN with non-nil ARGS."
 (use-package amx
   :ensure t
   :hook (after-init . amx-mode)
-  :custom
-  (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
-  ;; (amx-show-key-bindings nil "Try to speed up amx")
-  )
+  :custom (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory)))
 
 (use-package ivy
   :ensure t
@@ -1161,8 +1160,9 @@ SAVE-FN with non-nil ARGS."
                        lambda (_caller)
                        (/ (frame-height) 2))))
   (ivy-re-builders-alist '(
-                           (amx-completing-read-ivy . ivy--regex-fuzzy)
-                           (t . ivy--regex-ignore-order)
+                           ;; (amx-completing-read-ivy . ivy--regex-fuzzy)
+                           (t . ivy--regex-fuzzy)
+                           ;; (t . ivy--regex-ignore-order)
                            ))
   (ivy-wrap t)
   :hook (after-init . ivy-mode)
@@ -1203,7 +1203,7 @@ SAVE-FN with non-nil ARGS."
   :bind
   (([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
-   ([remap completion-at-point] . counsel-company)
+   ;; ([remap completion-at-point] . counsel-company)
    ([remap describe-bindings] . counsel-descbinds)
    ([remap describe-function] . counsel-describe-function)
    ([remap describe-variable] . counsel-describe-variable)
@@ -1211,6 +1211,7 @@ SAVE-FN with non-nil ARGS."
    ("C-x f" . counsel-file-jump) ; Jump to a file below the current directory
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
+   ;; "counsel-flycheck" shows fewer information
    ;; ([remap flycheck-list-errors] . counsel-flycheck)
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
@@ -1309,13 +1310,12 @@ SAVE-FN with non-nil ARGS."
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 (with-eval-after-load 'ivy
-  (add-to-list 'ivy-sort-functions-alist '(counsel-recentf .
-                                                           file-newer-than-file-p)))
+  (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
 (use-package orderless
   :ensure t
   :after ivy
-  :functions sb/just-one-face
+  :disabled t
   :preface
   (defun sb/just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
@@ -1339,7 +1339,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ivy-rich
   :ensure t
-  :after(counsel projectile)
+  :after (counsel projectile)
   :functions ivy-format-function-line
   :custom
   (ivy-format-function #'ivy-format-function-line)
@@ -1397,8 +1397,7 @@ SAVE-FN with non-nil ARGS."
   (ispell-local-dictionary "en_US")
   (ispell-personal-dictionary (expand-file-name "spell"
                                                 dotemacs-extras-directory))
-  (ispell-silently-savep t
-                         "Save a new word to personal dictionary without asking")
+  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   (flyspell-abbrev-p t)
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
@@ -1592,6 +1591,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package flycheck
   :ensure t
+  :defer 2
   :functions flycheck-add-next-checker
   :hook (after-init . global-flycheck-mode)
   :custom
@@ -1637,7 +1637,6 @@ SAVE-FN with non-nil ARGS."
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t)))
 
-;; This seems to introduce freezes
 (use-package flycheck-grammarly
   :ensure t
   :after flycheck
@@ -1646,8 +1645,6 @@ SAVE-FN with non-nil ARGS."
                  (require 'flycheck-grammarly)
                  (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
-;; These can block screen space, hence I prefer to show the error message in the
-;; minibuffer.
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
       :disabled t
@@ -1730,6 +1727,7 @@ SAVE-FN with non-nil ARGS."
 ;; Edit local file with sudo: C-x C-f /sudo::/etc/hosts
 ;; Open a remote file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
+  :defer 2
   :custom
   (tramp-default-method "ssh" "ssh is faster than the default scp")
   ;; Auto-save to a local directory for better performance
@@ -1752,7 +1750,7 @@ SAVE-FN with non-nil ARGS."
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include this directory in $PATH on remote
-  (add-to-list 'tramp-remote-path "~/.local/bin"))
+  (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME"))))
 
 ;; NOTE: Does not pick up other usernames
 (use-package counsel-tramp
@@ -1773,26 +1771,24 @@ SAVE-FN with non-nil ARGS."
   )
 
 (use-package imenu
+  :defer 2
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
-  (imenu-max-item-length 100))
-
-(with-eval-after-load 'imenu
+  (imenu-max-item-length 100)
+  :config
   (use-package imenu+
     :load-path "extras")
-
   (use-package imenu-anywhere
     :ensure t)
-
   (use-package popup-imenu
     :ensure t))
 
-(setq large-file-warning-threshold (* 500 1024 1024)
-      tags-add-tables nil
-      tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
-      ;; Don't ask before rereading the TAGS files if they have changed
-      tags-revert-without-query t)
+(setq-default large-file-warning-threshold (* 500 1024 1024)
+              tags-add-tables nil
+              tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
+              ;; Don't ask before rereading the TAGS files if they have changed
+              tags-revert-without-query t)
 
 ;; FIXME: Remove support for gtags. It is less maintained than counsel-etags.
 ;; (use-package counsel-gtags
@@ -1966,9 +1962,9 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :bind ("C-=" . er/expand-region))
 
-;; (use-package expand-line
-;;   :ensure t
-;;   :bind ("M-i" . turn-on-expand-line-mode))
+(use-package expand-line
+  :ensure t
+  :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package smart-mark ; Restore point with "C-g" after marking a region
   :ensure t
@@ -1976,6 +1972,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package whole-line-or-region
   :ensure t
+  :diminish
   :config (whole-line-or-region-global-mode 1))
 
 ;; (use-package undo-tree
@@ -2086,6 +2083,15 @@ SAVE-FN with non-nil ARGS."
 ;; (use-package esup
 ;;   :ensure t
 ;;   :commands (esup))
+
+;; https://blog.d46.us/advanced-emacs-startup/
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
 
 (use-package bug-hunter
   :ensure t)
@@ -2262,6 +2268,7 @@ SAVE-FN with non-nil ARGS."
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
 (use-package cc-mode
+  :defines (c-electric-brace c-enable-auto-newline)
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
   :hook (c++-mode . lsp)
@@ -2307,7 +2314,8 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
   :hook (cmake-mode . lsp)
-  :config (add-to-list 'company-backends 'company-cmake))
+  ;; :config (add-to-list 'company-backends 'company-cmake)
+  )
 
 (use-package cmake-font-lock
   :ensure t
@@ -2658,6 +2666,7 @@ SAVE-FN with non-nil ARGS."
     :major-modes '(php-mode)
     :remote? t
     :server-id 'intelephense-remote))
+  ;; FIXME: This is not working on a few machines.
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection "cmake-language-server")
@@ -2710,13 +2719,6 @@ SAVE-FN with non-nil ARGS."
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)))
 
-(dolist (hook '(c++-mode-hook python-mode-hook))
-  (add-hook hook
-            (lambda ()
-              (add-hook 'before-save-hook
-                        (lambda ()
-                          (lsp-format-buffer)) nil t))))
-
 (use-package lsp-ui
   :ensure t
   :commands lsp-ui-mode
@@ -2728,13 +2730,12 @@ SAVE-FN with non-nil ARGS."
               ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
               ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
-;; (use-package origami
-;;   :ensure t)
+(use-package origami
+  :ensure t)
 
-;; (use-package lsp-origami
-;;   :ensure t
-;;   :ensure origami
-;;   :hook (origami-mode . lsp-origami-mode))
+(use-package lsp-origami
+  :ensure t
+  :hook (origami-mode . lsp-origami-mode))
 
 (use-package lsp-ivy
   :ensure t
@@ -2749,9 +2750,10 @@ SAVE-FN with non-nil ARGS."
   :hook (java-mode . lsp)
   :custom
   (lsp-java-inhibit-message t)
-  (lsp-java-save-actions-organize-imports t)
-  :config
-  (add-hook 'java-mode-hook
+  (lsp-java-save-actions-organize-imports t))
+
+(dolist (hook '(c++-mode-hook python-mode-hook java-mode-hook))
+  (add-hook hook
             (lambda ()
               (add-hook 'before-save-hook
                         (lambda ()
@@ -2805,23 +2807,22 @@ SAVE-FN with non-nil ARGS."
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
-(or (use-package lsp-latex
-      :ensure t
-      :after lsp
-      :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
-                                                   (lsp-deferred)
-                                                   (require 'lsp-latex)))
-      :custom
-      (lsp-latex-bibtex-formatting-line-length 80)
-      (lsp-latex-bibtex-formatting-formatter "latexindent")
-      (lsp-latex-build-on-save t)
-      (lsp-latex-lint-on-save t))
+(use-package lsp-latex
+  :ensure t
+  :after lsp
+  :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
+                                               (require 'lsp-latex)
+                                               (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatting-line-length 100)
+  (lsp-latex-bibtex-formatting-formatter "latexindent")
+  (lsp-latex-build-on-save t)
+  (lsp-latex-lint-on-save t))
 
-    (use-package latex-init
-      :disabled t
-      :load-path "extras"
-      :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                              (require 'latex-init)))))
+(use-package latex-init
+  :load-path "extras"
+  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                          (require 'latex-init))))
 
 (use-package js2-mode
   :ensure t
@@ -2887,7 +2888,7 @@ SAVE-FN with non-nil ARGS."
          company-dabbrev
          ;; company-dict
          ;; company-tabnine
-         ;; company-yasnippet
+         company-yasnippet
          )))
 (dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
   (add-hook hook (lambda ()
@@ -2900,11 +2901,12 @@ SAVE-FN with non-nil ARGS."
   (setq company-backends
         '(
           company-capf ; Disabled LSP mode's capf autoconfiguration
-          company-yasnippet
           ;; company-tabnine
-          company-dabbrev-code
+          (company-dabbrev-code
+           company-keywords)
+          company-yasnippet
           company-files
-          ;; company-dabbrev
+          company-dabbrev
           )))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
@@ -2915,9 +2917,10 @@ SAVE-FN with non-nil ARGS."
   (setq company-backends
         '(
           company-capf ; Disabled LSP mode's capf autoconfiguration
-          company-yasnippet
           ;; company-tabnine
           company-dabbrev-code
+          company-keywords
+          company-yasnippet
           company-files
           company-clang
           ;; company-dabbrev
@@ -2952,9 +2955,9 @@ SAVE-FN with non-nil ARGS."
        '((
           company-elisp
           company-yasnippet
+          company-files
           company-capf
           company-dabbrev-code
-          company-files
           ;; company-dabbrev
           ))))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
@@ -2971,8 +2974,9 @@ SAVE-FN with non-nil ARGS."
   (setq company-backends
         '(
           company-capf
-          company-yasnippet
           company-jedi
+          company-keywords
+          company-yasnippet
           ;; company-tabnine
           company-files
           company-dabbrev-code
@@ -2996,14 +3000,14 @@ SAVE-FN with non-nil ARGS."
            company-capf
            ;; company-tabnine
            company-bibtex
-           company-ispell
            company-math-symbols-latex
            company-latex-commands
            company-math-symbols-unicode
            company-reftex-labels
            company-reftex-citations
-           company-yasnippet
            company-files
+           company-yasnippet
+           company-ispell
            company-dabbrev
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
@@ -3103,11 +3107,11 @@ Increase line spacing by two line height."
   (shell-command
    (format "%s -f TAGS -eR %s" dotemacs-ctags-path (directory-file-name dir-name))))
 
-;; (defun sb/create-gtags (dir-name)
-;;   "Create tags file with gtags."
-;;   (interactive "Directory: ")
-;;   (shell-command
-;;    (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
+(defun sb/create-gtags (dir-name)
+  "Create tags file with gtags."
+  (interactive "Directory: ")
+  (shell-command
+   (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
@@ -3121,8 +3125,8 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*")
-  "Buffer names ignored by `sb/next-buffer' and `sb/previous-buffer'."
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*")
+  "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
 (defun sb/change-buffer (change-buffer)
@@ -3197,6 +3201,7 @@ Increase line spacing by two line height."
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
+  :defer 2
   :hook (after-init . which-key-mode)
   :diminish
   :config
