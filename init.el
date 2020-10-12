@@ -1061,10 +1061,10 @@ SAVE-FN with non-nil ARGS."
               ("C-s" . sb/quit-company-save-buffer)))
 
 ;; ;; Silence "Starting 'look' process..." message
-;; (defun sb/ispell-lookup-words (old-fun &rest args)
-;;   (let ((inhibit-message t))
-;;     (apply old-fun args)))
-;; (advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
+(defun sb/ispell-lookup-words (old-fun &rest args)
+  (let ((inhibit-message t))
+    (apply old-fun args)))
+(advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
 
 ;; (defun sb/ispell-init-process (old-fun &rest args)
 ;;   (let ((inhibit-message t))
@@ -1097,6 +1097,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-box
   :ensure t
+  :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode)
@@ -2089,10 +2090,7 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'emacs-startup-hook
           (lambda ()
             (message "Emacs ready in %s with %d garbage collections."
-                     (format "%.2f seconds"
-                             (float-time
-                              (time-subtract after-init-time before-init-time)))
-                     gcs-done)))
+                     (emacs-init-time) gcs-done)))
 
 (use-package bug-hunter
   :ensure t)
@@ -2477,7 +2475,8 @@ SAVE-FN with non-nil ARGS."
 
 (use-package diff-hl
   :ensure t
-  :hook (after-init . global-diff-hl-mode)
+  :hook ((after-init . global-diff-hl-mode)
+         (dired-mode . diff-hl-dired-mode))
   :config
   (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
@@ -2889,7 +2888,7 @@ SAVE-FN with non-nil ARGS."
          company-dabbrev
          ;; company-dict
          ;; company-tabnine
-         company-yasnippet
+         company-yasnippet ; Works everywhere
          )))
 (dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
   (add-hook hook (lambda ()
@@ -2923,7 +2922,8 @@ SAVE-FN with non-nil ARGS."
           company-keywords
           company-yasnippet
           company-files
-          company-clang
+          ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+          ;; company-clang ; This can be slow
           ;; company-dabbrev
           )))
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
