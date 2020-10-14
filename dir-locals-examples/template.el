@@ -3,13 +3,13 @@
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
          (compile-command . "make")
          (compile-command . "gradle compileTestJava")
-         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "build" "built"))
          (lsp-enabled-clients . (pyls msplys pyright jedi))
+         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "build" "built"))
+         (projectile-enable-caching . t)
+         (projectile-globally-ignored-files . ("MyBinaryFile")) ; Ignore file
          (projectile-project-compilation-cmd . "cd bin && cmake .. && cmake --build . && cd Debug && .\\shiolink.exe")
          (projectile-project-compilation-cmd . latexmk)
          (projectile-project-run-cmd . "cd bin\\Debug && .\\shiolink.exe && E:\\nanika\\ssp.exe")
-         (projectile-enable-caching . t)
-         (projectile-globally-ignored-files . ("MyBinaryFile")) ; Ignore file
          (projectile-project-name . "your-project-name-here")
          (show-trailing-whitespace . t)
          (eval . (progn BODY))
@@ -125,6 +125,10 @@
                 ))
 
  (markdown-mode . (
+                   ;; https://emacs.stackexchange.com/questions/41855/dir-locals-not-working
+                   (mode . wc) ; if wc is a major mode
+                   (eval . (wc-mode)) ; if wc is a major mode
+                   (eval . (wc-mode 1)) ; if wc is a minor mode
                    (eval . (prettier-mode t))
                    ))
 

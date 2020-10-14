@@ -257,6 +257,7 @@ analytics
 analyze
 analyzed
 analyzes
+analyzing
 anatomy
 ancient
 anger
@@ -268,6 +269,7 @@ animals
 animated
 anisotropic
 ankle
+annealing
 anniversary
 annotation
 announce
@@ -1448,6 +1450,7 @@ curved
 custody
 custom
 customer
+customization
 customizations
 customs
 cutting
@@ -2109,6 +2112,7 @@ everything
 everywhere
 evidence
 evident
+evidential
 evidently
 evil
 evolution
@@ -4392,6 +4396,8 @@ primacy
 primarily
 primary
 prime
+primitive
+primitives
 prince
 princess
 principal
@@ -4559,6 +4565,7 @@ quarters
 queen
 queries
 question
+questions
 quick
 quickly
 quiet
@@ -5165,6 +5172,7 @@ September
 sequence
 sequential
 sequentially
+serial
 serializability
 Serializability
 serializable
@@ -5634,6 +5642,7 @@ superblock
 superior
 supermarket
 supervise
+supervised
 supervisor
 supervisory
 supplement
@@ -5713,6 +5722,7 @@ symptom
 symptoms
 synchronization
 synchronized
+synchronous
 syndrome
 synopsis
 syntax
@@ -5781,6 +5791,7 @@ tennis
 tense
 tensely
 tension
+tensor
 tent
 tenth
 term
@@ -6503,7 +6514,7 @@ yourself
 youth
 zero
 zone
-synchronous
+supervised
 
 ;; Local Variables:
 ;; mode: text

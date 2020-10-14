@@ -276,90 +276,93 @@ whitespaces."
   (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
-(setq-default ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
-              ;; apropos-do-all t
-              auto-mode-case-fold nil
-              auto-save-list-file-prefix (expand-file-name "auto-save"
-                                                           dotemacs-temp-directory)
-              backup-inhibited t ; Disable backup for a per-file basis
-              blink-matching-paren nil ; Distracting
-              case-fold-search t ; Searches and matches should ignore case
-              completion-ignore-case t ; Ignore case when completing
-              confirm-kill-emacs nil
-              ;; Prevent "Active processes exist" when you quit Emacs
-              confirm-kill-processes nil
-              confirm-nonexistent-file-or-buffer t
-              create-lockfiles nil
-              cursor-in-non-selected-windows t ; Hide the cursor in inactive windows
-              ;; Use system trash to deal with mistakes
-              custom-safe-themes t delete-by-moving-to-trash t
-              ;; enable-recursive-minibuffers t
-              enable-remote-dir-locals t
-              find-file-visit-truename t ; Show true name, useful in case of symlinks
-              ;; Avoid resizing the (GUI) frame when your newly set font is larger (or
-              ;; smaller) than the system default
-              frame-inhibit-implied-resize t
-              frame-title-format (list '(buffer-file-name "%f" "%b"))
-              ;; help-window-select t
-              history-delete-duplicates t
-              ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we
-              ;; slow it down slightly from 0.5s
-              idle-update-delay 1.0
-              indicate-buffer-boundaries nil
-              inhibit-compacting-font-caches t ; Do not compact font caches during GC
-              ;; Disable loading of "default.el" at startup, inhibits site default
-              ;; settings
-              inhibit-default-init t
-              ;; *scratch* is in Lisp interaction mode by default, use text mode instead
-              inhibit-startup-echo-area-message t
-              inhibit-startup-screen t ; inhibit-splash-screen is an alias
-              ;; text-mode is more expensive, but I use scratch for composing emails
-              initial-major-mode 'text-mode
-              initial-scratch-message nil
-              kill-do-not-save-duplicates t
-              kill-whole-line t
-              load-prefer-newer t
-              ;; Major mode to use for files that do no specify a major mode
-              ;; major-mode 'text-mode
-              make-backup-files nil ; Stop making backup ~ files
-              ;; mouse-drag-copy-region t
-              ;; mouse-yank-at-point t ; Yank at point instead of at click
-              pop-up-frames nil ; Avoid making separate frames
-              ;; pop-up-windows nil ; Disallow creating new windows
-              ;; Ignore case when reading a buffer name
-              read-buffer-completion-ignore-case t
-              ;; Ignore case when reading a file name completion
-              read-file-name-completion-ignore-case t
-              read-process-output-max (* 1024 1024) ; 1 MB
-              require-final-newline t ; Always end a file with a newline.
-              ring-bell-function 'ignore ; Disable beeping sound
-              save-interprogram-paste-before-kill t
-              ;; Enable use of system clipboard across Emacs and other applications
-              select-enable-clipboard t
-              sentence-end-double-space nil
-              ;; set-mark-command-repeat-pop t
-              ;; Do not use shift-select for marking, use it for windmove
-              shift-select-mode nil
-              ;; suggest-key-bindings t
-              ;; switch-to-buffer-preserve-window-point t
-              truncate-lines nil
-              ;; truncate-partial-width-windows nil
-              use-dialog-box nil
-              use-file-dialog nil
-              ;; vc-handled-backends nil
-              visible-bell nil
-              x-gtk-use-system-tooltips nil ; Do not use system tooltips
-              ;; Underline looks a bit better when drawn lower
-              ;; x-underline-at-descent-line t
-              )
+(setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
+      ;; apropos-do-all t
+      auto-mode-case-fold nil
+      auto-save-list-file-prefix (expand-file-name "auto-save"
+                                                   dotemacs-temp-directory)
+      backup-inhibited t ; Disable backup for a per-file basis
+      blink-matching-paren nil ; Distracting
+      case-fold-search t ; Searches and matches should ignore case
+      completion-ignore-case t ; Ignore case when completing
+      confirm-kill-emacs nil
+      ;; Prevent "Active processes exist" when you quit Emacs
+      confirm-kill-processes nil
+      confirm-nonexistent-file-or-buffer t
+      create-lockfiles nil
+      cursor-in-non-selected-windows t ; Hide the cursor in inactive windows
+      ;; Use system trash to deal with mistakes
+      custom-safe-themes t delete-by-moving-to-trash t
+      ;; enable-recursive-minibuffers t
+      enable-remote-dir-locals t
+      find-file-visit-truename t ; Show true name, useful in case of symlinks
+      ;; Avoid resizing the (GUI) frame when your newly set font is larger (or
+      ;; smaller) than the system default
+      frame-inhibit-implied-resize t
+      frame-title-format (list '(buffer-file-name "%f" "%b"))
+      ;; help-window-select t
+      history-delete-duplicates t
+      ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we
+      ;; slow it down slightly from 0.5s
+      idle-update-delay 1.0
+      indicate-buffer-boundaries nil
+      inhibit-compacting-font-caches t ; Do not compact font caches during GC
+      ;; Disable loading of "default.el" at startup, inhibits site default
+      ;; settings
+      inhibit-default-init t
+      ;; *scratch* is in Lisp interaction mode by default, use text mode instead
+      inhibit-startup-echo-area-message t
+      inhibit-startup-screen t ; inhibit-splash-screen is an alias
+      ;; text-mode is more expensive, but I use scratch for composing emails
+      initial-major-mode 'text-mode
+      initial-scratch-message nil
+      kill-do-not-save-duplicates t
+      kill-whole-line t
+      load-prefer-newer t
+      ;; Major mode to use for files that do no specify a major mode
+      ;; major-mode 'text-mode
+      make-backup-files nil ; Stop making backup ~ files
+      ;; mouse-drag-copy-region t
+      ;; mouse-yank-at-point t ; Yank at point instead of at click
+      pop-up-frames nil ; Avoid making separate frames
+      ;; pop-up-windows nil ; Disallow creating new windows
+      ;; Ignore case when reading a buffer name
+      read-buffer-completion-ignore-case t
+      ;; Ignore case when reading a file name completion
+      read-file-name-completion-ignore-case t
+      read-process-output-max (* 1024 1024) ; 1 MB
+      require-final-newline t ; Always end a file with a newline.
+      ring-bell-function 'ignore ; Disable beeping sound
+      save-interprogram-paste-before-kill t
+      ;; Enable use of system clipboard across Emacs and other applications
+      select-enable-clipboard t
+      sentence-end-double-space nil
+      ;; set-mark-command-repeat-pop t
+      ;; Do not use shift-select for marking, use it for windmove
+      shift-select-mode nil
+      ;; suggest-key-bindings t
+      ;; switch-to-buffer-preserve-window-point t
+      ;; truncate-partial-width-windows nil
+      use-dialog-box nil
+      use-file-dialog nil
+      vc-handled-backends nil ; Disabling vc can improve performance
+      visible-bell nil
+      x-gtk-use-system-tooltips nil ; Do not use system tooltips
+      ;; Underline looks a bit better when drawn lower
+      ;; x-underline-at-descent-line t
+      )
 
+;; Changing buffer-local variables will only affect a single buffer. "setq-default" changes the
+;; buffer-local variable’s default value.
+;; FIXME: Are the following buffer local?
 (setq-default compilation-scroll-output t
               fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs
               indicate-empty-lines nil
               standard-indent 2
               ;; tab-always-indent 'complete
-              tab-width 4)
+              tab-width 4
+              truncate-lines nil)
 
 ;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
 (setq-default bidi-display-reordering 'left-to-right
@@ -404,6 +407,8 @@ whitespaces."
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
+;; SB: I do not use the following commands.
+
 ;; Do not disable narrowing commands
 ;; (put 'narrow-to-region 'disabled nil)
 ;; (put 'narrow-to-page 'disabled nil)
@@ -420,6 +425,7 @@ whitespaces."
          ;; Auto refresh dired when files change
          (dired-mode . auto-revert-mode))
   :custom
+  (auto-revert-interval 2 "Faster would mean less likely to use stale data")
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t "Enable auto revert on non-file buffers"))
 
@@ -470,10 +476,10 @@ whitespaces."
 ;; vertical - Split the selected window into two windows (e.g., "split-window-below"), one above the
 ;; other
 ;; horizontal - Split the selected window into two side-by-side windows (e.g., "split-window-right")
-(cond ((eq dotemacs-window-split 'vertical) (setq split-width-threshold nil
-                                                  split-height-threshold 0))
-      ((eq dotemacs-window-split 'horizontal) (setq split-height-threshold nil
-                                                    split-width-threshold 0)))
+(cond ((eq dotemacs-window-split 'vertical) (setq-default split-width-threshold nil
+                                                          split-height-threshold 0))
+      ((eq dotemacs-window-split 'horizontal) (setq-default split-height-threshold nil
+                                                            split-width-threshold 0)))
 ;; Magit is creating new frames
 ;; (setq split-height-threshold (* (window-height) 10)
 ;;       split-width-threshold (* (window-width) 10))
@@ -516,6 +522,7 @@ SAVE-FN with non-nil ARGS."
                 size-indication-mode
                 tool-bar-mode
                 tooltip-mode
+                desktop-save-mode
                 ))
   (when (fboundp mode)
     (funcall mode -1)))
@@ -702,6 +709,11 @@ SAVE-FN with non-nil ARGS."
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 ;; (set-frame-font "Roboto Mono")
+
+;; https://github.com/larstvei/dot-emacs
+(cond ((member "Inconsolata" (font-family-list))
+       (set-face-attribute 'default nil :font "Inconsolata-17")))
+
 (cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute
                                                           'default nil :height 135))
       ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute
@@ -1040,7 +1052,7 @@ SAVE-FN with non-nil ARGS."
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist"
                                                dotemacs-extras-directory))
-  (company-minimum-prefix-length 2 "Small words are faster to type")
+  (company-minimum-prefix-length 3 "Small words are faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
   (company-selection-wrap-around t)
   (company-show-numbers 'left "Speed up completion")
@@ -1060,21 +1072,22 @@ SAVE-FN with non-nil ARGS."
               ("M-/" . company-other-backend)
               ("C-s" . sb/quit-company-save-buffer)))
 
-;; ;; Silence "Starting 'look' process..." message
-(defun sb/ispell-lookup-words (old-fun &rest args)
-  (let ((inhibit-message t))
-    (apply old-fun args)))
-(advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
+;; FIXME: Silence "Starting 'look' process..." message
 
-;; (defun sb/ispell-init-process (old-fun &rest args)
+;; (defun sb/ispell-lookup-words (old-fun &rest args)
 ;;   (let ((inhibit-message t))
 ;;     (apply old-fun args)))
-;; (advice-add 'ispell-init-process :around #'sb/ispell-init-process)
+;; (advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
 
-;; (defun sb/lookup-words (orig-fun &rest args)
-;;   (let ((inhibit-message t))
-;;     (apply orig-fun args)))
-;; (advice-add 'lookup-words :around #'sb/lookup-words)
+(defun sb/ispell-init-process (old-fun &rest args)
+  (let ((inhibit-message t))
+    (apply old-fun args)))
+(advice-add 'ispell-init-process :around #'sb/ispell-init-process)
+
+(defun sb/lookup-words (orig-fun &rest args)
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
+(advice-add 'lookup-words :around #'sb/lookup-words)
 
 ;; Posframes do not have unaligned rendering issues with variable :height unlike an overlay.
 ;; However, the width of the frame popup is often not enough.
@@ -1576,6 +1589,7 @@ SAVE-FN with non-nil ARGS."
   :after counsel
   :hook (counsel-mode . counsel-projectile-mode)
   :custom
+  (counsel-projectile-find-file-more-chars 3)
   (counsel-projectile-remove-current-buffer t)
   (counsel-projectile-sort-buffers t)
   (counsel-projectile-sort-directories t)
@@ -1996,8 +2010,10 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :bind* ("C-." . iedit-mode))
 
+;; FIXME: What is the utility of this package?
 (use-package session
   :ensure t
+  :disabled t
   :init
   (setq session-save-file (expand-file-name "session"
                                             dotemacs-temp-directory))
@@ -2124,6 +2140,17 @@ SAVE-FN with non-nil ARGS."
   (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.0/languagetool-commandline.jar"
                                                 dotemacs-user-home)))
 
+(use-package olivetti
+  :ensure t
+  :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
+
+(use-package pdf-tools
+  :ensure t
+  :init (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
+  :config
+  (add-hook 'pdf-view-mode-hook
+            (lambda () (setq header-line-format nil))))
+
 (use-package logview
   :ensure t
   :custom
@@ -2234,7 +2261,10 @@ SAVE-FN with non-nil ARGS."
 (use-package eldoc
   :if dotemacs-is-linux
   :diminish
-  :config (global-eldoc-mode -1))
+  :hook ((emacs-lisp-mode . turn-on-eldoc-mode)
+         (lisp-interaction-mode . turn-on-eldoc-mode))
+  ;; :config (global-eldoc-mode -1)
+  )
 
 ;; Cannot load with use-package, do we need a :mode?
 ;; (use-package matlab-mode
@@ -2884,8 +2914,8 @@ SAVE-FN with non-nil ARGS."
        '(
          company-capf
          company-files
-         company-ispell ; Uses an English dictionary
          company-dabbrev
+         company-ispell ; Uses an English dictionary
          ;; company-dict
          ;; company-tabnine
          company-yasnippet ; Works everywhere
