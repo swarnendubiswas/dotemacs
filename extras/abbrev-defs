@@ -1072,6 +1072,7 @@
     ("shwon" "shown" nil :count 1)
     ("shwos" "shows" nil :count 2)
     ("signifacnt" "significant" nil :count 0)
+    ("signle" "single" nil :count 0)
     ("simalar" "similar" nil :count 0)
     ("similiar" "similar" nil :count 0)
     ("simpilified" "simplified" nil :count 0)

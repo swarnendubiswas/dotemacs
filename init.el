@@ -711,8 +711,8 @@ SAVE-FN with non-nil ARGS."
 ;; (set-frame-font "Roboto Mono")
 
 ;; https://github.com/larstvei/dot-emacs
-(cond ((member "Inconsolata" (font-family-list))
-       (set-face-attribute 'default nil :font "Inconsolata-17")))
+;; (cond ((member "Inconsolata" (font-family-list))
+;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute
                                                           'default nil :height 135))
@@ -789,12 +789,13 @@ SAVE-FN with non-nil ARGS."
 
 (use-package dired+ ; Do not create multiple dired buffers
   :load-path "extras"
-  :after dired-x
+  ;; :after dired
   :functions diredp-toggle-find-file-reuse-dir
   :custom
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil)
-  :config (diredp-toggle-find-file-reuse-dir 1))
+  :hook (dired-mode . (lambda ()
+                        (diredp-toggle-find-file-reuse-dir 1))))
 
 (use-package dired-efap
   :ensure t
@@ -1047,7 +1048,7 @@ SAVE-FN with non-nil ARGS."
     (save-buffer))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  (company-dabbrev-ignore-case nil)
+  ;; (company-dabbrev-ignore-case nil)
   (company-idle-delay 0.0 "Recommended by lsp")
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist"
@@ -1083,6 +1084,16 @@ SAVE-FN with non-nil ARGS."
   (let ((inhibit-message t))
     (apply old-fun args)))
 (advice-add 'ispell-init-process :around #'sb/ispell-init-process)
+
+(defun sb/message-off-advice (oldfun &rest args)
+  "Quiet down messages in adviced OLDFUN."
+  (let ((message-off (make-symbol "message-off")))
+    (unwind-protect
+        (progn
+          (advice-add #'message :around #'ignore (list 'name message-off))
+          (apply oldfun args))
+      (advice-remove #'message message-off))))
+(advice-add #'ispell-init-process :around #'sb/message-off-advice)
 
 (defun sb/lookup-words (orig-fun &rest args)
   (let ((inhibit-message t))
@@ -2151,6 +2162,10 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'pdf-view-mode-hook
             (lambda () (setq header-line-format nil))))
 
+(use-package saveplace-pdf-view
+  :ensure t
+  :config (saveplace-pdf-view-mode 1))
+
 (use-package logview
   :ensure t
   :custom
@@ -2499,6 +2514,8 @@ SAVE-FN with non-nil ARGS."
   :bind (("C-x p" . git-gutter:previous-hunk)
          ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode))
+
+(add-hook 'git-commit-setup-hook #'git-commit-turnon-flyspell)
 
 ;; FIXME: What is the purpose?
 (setq smerge-command-prefix "\C-c v")
@@ -2926,7 +2943,7 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-prog-mode ()
   "Add backends for program completion in company mode."
-  (setq-local company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
@@ -2942,7 +2959,7 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-c-mode ()
   "Add backends for C/C++ completion in company mode."
-  (setq-local company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
@@ -2963,7 +2980,7 @@ SAVE-FN with non-nil ARGS."
   (use-package company-shell
     :ensure t
     :custom (company-shell-delete-duplictes t))
-  (setq-local company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
@@ -2981,7 +2998,7 @@ SAVE-FN with non-nil ARGS."
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp mode."
-  (setq-local company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 2)
   (set (make-local-variable 'company-backends)
        '((
           company-elisp
@@ -3000,7 +3017,7 @@ SAVE-FN with non-nil ARGS."
   (use-package company-jedi
     :ensure t
     :after python-mode)
-  (setq-local company-minimum-prefix-length 1)
+  (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
