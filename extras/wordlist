@@ -3177,7 +3177,7 @@ itself
 jacket
 jackets
 jail
-jamming 
+jamming
 January
 Japanese
 java
@@ -6518,6 +6518,7 @@ zero
 zone
 supervised
 individual
+approximated
 
 ;; Local Variables:
 ;; mode: text

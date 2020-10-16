@@ -547,9 +547,10 @@ SAVE-FN with non-nil ARGS."
 
 (fringe-mode '(0 . 0))
 
-;; SB: Maximize Emacs on startup. I am not sure which one is faster
-;; (toggle-frame-maximized)
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; Maximize Emacs on startup. I am not sure which one of the following is better or faster
+;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+(add-hook 'emacs-startup-hook 'toggle-frame-maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames
 
 ;; Make use of wider screens
 ;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
@@ -714,10 +715,8 @@ SAVE-FN with non-nil ARGS."
 ;; (cond ((member "Inconsolata" (font-family-list))
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
-(cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute
-                                                          'default nil :height 135))
-      ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute
-                                                        'default nil :height 140)))
+(cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute 'default nil :height 135))
+      ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
 (set-face-attribute 'mode-line nil :height 100)
 (set-face-attribute 'mode-line-inactive nil :height 100)
 
@@ -795,6 +794,7 @@ SAVE-FN with non-nil ARGS."
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil)
   :hook (dired-mode . (lambda ()
+                        (require 'dired+)
                         (diredp-toggle-find-file-reuse-dir 1))))
 
 (use-package dired-efap
@@ -1074,7 +1074,6 @@ SAVE-FN with non-nil ARGS."
               ("C-s" . sb/quit-company-save-buffer)))
 
 ;; FIXME: Silence "Starting 'look' process..." message
-
 ;; (defun sb/ispell-lookup-words (old-fun &rest args)
 ;;   (let ((inhibit-message t))
 ;;     (apply old-fun args)))
@@ -2068,6 +2067,7 @@ SAVE-FN with non-nil ARGS."
   :bind (([remap other-window] . ace-window)
          ("<f10>" . ace-window)))
 
+;; Shift + direction arrows
 (use-package windmove
   :config (windmove-default-keybindings)
   :custom
@@ -2109,9 +2109,9 @@ SAVE-FN with non-nil ARGS."
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
 
-;; (use-package esup
-;;   :ensure t
-;;   :commands (esup))
+(use-package esup
+  :ensure t
+  :commands (esup))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
@@ -3055,8 +3055,8 @@ SAVE-FN with non-nil ARGS."
            company-reftex-citations
            company-files
            company-yasnippet
-           company-ispell
            company-dabbrev
+           company-ispell
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
