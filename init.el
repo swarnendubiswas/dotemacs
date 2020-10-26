@@ -50,20 +50,22 @@
 (defconst dotemacs-500mb (* 500 1000 1000))
 
 ;; Change parameters to defer GC during startup
-;; (setq gc-cons-percentage 0.6) ; Portion of heap used for allocation
 ;; (setq gc-cons-threshold most-positive-fixnum)
-(setq gc-cons-threshold dotemacs-200mb)
+(setq gc-cons-percentage 0.6 ; Portion of heap used for allocation
+      gc-cons-threshold dotemacs-200mb)
 
 ;; Ideally, we would have reset 'gc-cons-threshold' to its default value
 ;; otherwise there can be large pause times whenever GC eventually happens. But
 ;; lsp suggests increasing the limit permanently.
 
 (defun sb/defer-garbage-collection ()
-  (setq gc-cons-threshold dotemacs-64mb))
+  (setq gc-cons-threshold 0.3
+        gc-cons-threshold dotemacs-64mb))
 
 (defun sb/restore-garbage-collection ()
   ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
-  (setq gc-cons-threshold dotemacs-4mb))
+  (setq gc-cons-percentage 0.1
+        gc-cons-threshold dotemacs-4mb))
 
 ;; Restore to a reasonable value after startup
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
@@ -185,7 +187,7 @@ whitespaces."
   "User HOME directory.")
 
 (defcustom dotemacs-python-langserver
-  'pyls
+  'pyright
   "Choose the Python Language Server implementation."
   :type '(radio
           (const :tag "pyls" pyls)
@@ -198,11 +200,13 @@ whitespaces."
 ;; From Doom Emacs
 (defconst dotemacs-emacs27+ (> emacs-major-version 26))
 (defconst dotemacs-emacs28+ (> emacs-major-version 27))
+(defconst dotemacs-is-windows (eq system-type 'windows-nt))
 (defconst dotemacs-is-linux (eq system-type 'gnu/linux))
 
 ;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
 (defvar c-electric-indent)
+(defvar compilation-always-kill)
 (defvar tags-revert-without-query)
 (defvar use-package-enable-imenu-support)
 (defvar expand-line-mode)
@@ -215,9 +219,8 @@ whitespaces."
 
 (eval-when-compile
   (require 'package)
-  (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
-        ;; Avoid loading packages twice
-        package-enable-at-startup nil)
+  (setq package-enable-at-startup nil ; Avoid loading packages twice
+        package-user-dir (expand-file-name "elpa" user-emacs-directory))
   (when (< emacs-major-version 27)
     (package-initialize t))
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -284,6 +287,7 @@ whitespaces."
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren nil ; Distracting
       case-fold-search t ; Searches and matches should ignore case
+      compilation-always-kill t
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
       ;; Prevent "Active processes exist" when you quit Emacs
@@ -799,7 +803,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package dired-efap
   :ensure t
-  :after dired
+  ;; :after dired
+  :commands (dired-efap)
+  :hook (dired-mode . (lambda ()
+                        (require 'dired-efap)))
   :custom (dired-efap-initial-filename-selection nil)
   :bind* (:map dired-mode-map
                ("r" . dired-efap)))
@@ -1074,25 +1081,25 @@ SAVE-FN with non-nil ARGS."
               ("C-s" . sb/quit-company-save-buffer)))
 
 ;; FIXME: Silence "Starting 'look' process..." message
-;; (defun sb/ispell-lookup-words (old-fun &rest args)
-;;   (let ((inhibit-message t))
-;;     (apply old-fun args)))
-;; (advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
+(defun sb/ispell-lookup-words (old-fun &rest args)
+  (let ((inhibit-message t))
+    (apply old-fun args)))
+(advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
 
 (defun sb/ispell-init-process (old-fun &rest args)
   (let ((inhibit-message t))
     (apply old-fun args)))
 (advice-add 'ispell-init-process :around #'sb/ispell-init-process)
 
-(defun sb/message-off-advice (oldfun &rest args)
-  "Quiet down messages in adviced OLDFUN."
-  (let ((message-off (make-symbol "message-off")))
-    (unwind-protect
-        (progn
-          (advice-add #'message :around #'ignore (list 'name message-off))
-          (apply oldfun args))
-      (advice-remove #'message message-off))))
-(advice-add #'ispell-init-process :around #'sb/message-off-advice)
+;; (defun sb/message-off-advice (oldfun &rest args)
+;;   "Quiet down messages in adviced OLDFUN."
+;;   (let ((message-off (make-symbol "message-off")))
+;;     (unwind-protect
+;;         (progn
+;;           (advice-add #'message :around #'ignore (list 'name message-off))
+;;           (apply oldfun args))
+;;       (advice-remove #'message message-off))))
+;; (advice-add #'ispell-init-process :around #'sb/message-off-advice)
 
 (defun sb/lookup-words (orig-fun &rest args)
   (let ((inhibit-message t))
@@ -1120,6 +1127,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-box
   :ensure t
+  :if (display-graphic-p)
   :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
@@ -1500,7 +1508,7 @@ SAVE-FN with non-nil ARGS."
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  :disabled t
+  ;; :disabled t
   :diminish (smartparens-mode show-smartparens-mode)
   :hook ((after-init . smartparens-mode)
          (after-init . show-smartparens-mode)
@@ -1510,6 +1518,9 @@ SAVE-FN with non-nil ARGS."
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
   :config
+  ;; Stop pairing single quotes in elisp
+  (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+
   ;; Do not insert a parenthesis pair when the point is at the beginning of a
   ;; word
   ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
@@ -1549,6 +1560,11 @@ SAVE-FN with non-nil ARGS."
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
   (projectile-verbose nil)
   :config
+  ;; https://github.com/MatthewZMD/.emacs.d
+  (when (and dotemacs-is-windows
+             (executable-find "tr"))
+    (setq projectile-indexing-method 'alien))
+
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
@@ -1781,6 +1797,7 @@ SAVE-FN with non-nil ARGS."
 ;; NOTE: Does not pick up other usernames
 (use-package counsel-tramp
   :ensure t
+  :disabled t
   :bind ("C-c d t" . counsel-tramp)
   :config
   (defalias 'tramp 'counsel-tramp)
@@ -1795,6 +1812,40 @@ SAVE-FN with non-nil ARGS."
   ;;             (projectile-mode 1)
   ;;             (counsel-projectile-mode 1)))
   )
+
+;; https://github.com/masasam/emacs-counsel-tramp/issues/5
+(defun sb/sshlist ()
+  (let (hosts)
+    (push
+     (concat "/ssh:swarnendu@turing.cse.iitk.ac.in:/homepages/global/swarnendu")
+     hosts)
+    (push
+     (concat "/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu")
+     hosts)
+    (push
+     (concat "/ssh:swarnendu@himalaya.cse.iitk.ac.in:/home/swarnendu")
+     hosts)
+    (push
+     (concat "/ssh:swarnendu@swarnendu6.cse.iitk.ac.in:/home/swarnendu")
+     hosts)
+    (push
+     (concat "/ssh:admissions@turing.cse.iitk.ac.in:/homepages/global/admissions")
+     hosts)
+    (push
+     (concat "/ssh:swarnendu@gpu1.cse.iitk.ac.in:/home/swarnendu")
+     hosts)
+    (push
+     (concat "/ssh:swarnendu@gpu2.cse.iitk.ac.in:/home/swarnendu")
+     hosts)
+    (push
+     (concat "/ssh:swarnendu@aravalli.cse.iitk.ac.in:/home/swarnendu")
+     hosts)))
+
+(defun sb/counsel-tramp ()
+  (interactive)
+  (counsel-find-file (ivy-read "Tramp: " (sb/sshlist))))
+
+(bind-key "C-c d t" #'sb/counsel-tramp)
 
 (use-package imenu
   :defer 2
@@ -1970,6 +2021,7 @@ SAVE-FN with non-nil ARGS."
   (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
   (push '("*xref*" :noselect nil) popwin:special-display-config)
   (push '(helpful-mode :noselect t) popwin:special-display-config)
+  (push "*Shell Command Output*" popwin:special-display-config)
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
@@ -2153,6 +2205,8 @@ SAVE-FN with non-nil ARGS."
 
 (use-package olivetti
   :ensure t
+  :custom
+  (olivetti-set-width dotemacs-fill-column)
   :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
 
 (use-package pdf-tools
@@ -2164,6 +2218,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package saveplace-pdf-view
   :ensure t
+  :functions saveplace-pdf-view-mode
   :config (saveplace-pdf-view-mode 1))
 
 (use-package logview
@@ -2308,269 +2363,6 @@ SAVE-FN with non-nil ARGS."
             (lambda ()
               (when buffer-file-name
                 (add-hook 'after-save-hook #'check-parens nil t)))))
-
-;;  Call this in c-mode-common-hook:
-;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
-(use-package cc-mode
-  :defines (c-electric-brace c-enable-auto-newline)
-  :mode ("\\.h\\'" . c++-mode)
-  :mode ("\\.c\\'" . c++-mode)
-  :hook (c++-mode . lsp)
-  :custom
-  (c-set-style "cc-mode")
-  (c-basic-offset 2)
-  :config
-  ;; Disable electric indentation and on-type formatting
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (setq-local c-auto-newline nil
-                          c-electric-brace nil
-                          c-electric-flag nil
-                          c-electric-indent nil
-                          c-enable-auto-newline nil
-                          c-syntactic-indentation nil)))
-  (unbind-key "C-M-a" c-mode-map)
-  :bind (:map c-mode-base-map
-              ("C-c c a" . c-beginning-of-defun)
-              ("C-c c e" . c-end-of-defun)
-              ("M-q" . c-fill-paragraph)))
-
-(use-package modern-cpp-font-lock
-  :ensure t
-  :diminish modern-c++-font-lock-mode
-  :hook (c++-mode . modern-c++-font-lock-mode))
-
-(use-package flycheck-clang-analyzer
-  :ensure t
-  :after flycheck
-  :config (flycheck-clang-analyzer-setup))
-
-(use-package cuda-mode
-  :ensure t
-  :mode (("\\.cu\\'"	. cuda-mode)
-         ("\\.cuh\\'"	. cuda-mode)))
-
-(use-package opencl-mode
-  :ensure t
-  :mode ("\\.cl\\'" . opencl-mode))
-
-(use-package cmake-mode
-  :ensure t
-  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
-  :hook (cmake-mode . lsp)
-  ;; :config (add-to-list 'company-backends 'company-cmake)
-  )
-
-(use-package cmake-font-lock
-  :ensure t
-  :after cmake-mode
-  :hook (cmake-mode . cmake-font-lock-activate))
-
-(use-package python
-  :init
-  ;; Disable readline based native completion
-  (setq python-shell-completion-native-enable nil)
-  (setenv "PYTHONPATH" "python3")
-  (when (eq dotemacs-python-langserver 'pyls)
-    (add-hook 'python-mode-hook #'lsp))
-  :bind (:map python-mode-map
-              ("M-[" . python-nav-backward-block)
-              ("M-]" . python-nav-forward-block))
-  :config
-  ;; Is this required since pyls is the default client?
-  (with-eval-after-load 'lsp-mode
-    (dolist (ls '(pyright mspyls jedi))
-      (add-to-list 'lsp-disabled-clients ls))
-    (add-to-list 'lsp-enabled-clients 'pyls))
-  (setq python-indent-offset 4
-        python-indent-guess-indent-offset nil
-        python-shell-interpreter "python3"
-        auto-mode-alist (append '(("SConstruct\\'" . python-mode)
-                                  ("SConscript\\'" . python-mode))
-                                auto-mode-alist)))
-
-(use-package pyvenv
-  :ensure t
-  :diminish
-  :custom (pyvenv-mode-line-indicator
-           '(pyvenv-virtual-env-name ("[venv:"
-                                      pyvenv-virtual-env-name "]")))
-  :hook (python-mode . pyvenv-mode)
-  :config
-  (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat
-                                                pyvenv-virtual-env "bin/python3")))))
-  (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
-
-(use-package py-isort
-  :ensure t
-  :after python
-  :init
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook #'py-isort-before-save))))
-
-;; (use-package ein
-;;   :ensure t)
-
-(setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
-                              auto-mode-alist))
-
-(add-hook 'java-mode-hook
-          (lambda ()
-            (setq-default c-basic-offset 4
-                          c-set-style "java")))
-
-(use-package ant
-  :ensure t)
-
-;; Can disassemble .class files from within jars
-;; (use-package autodisass-java-bytecode
-;;   :ensure t)
-
-(setq-default shell-dirtrack-mode nil)
-
-(use-package sh-script ; Shell script mode
-  :mode (("\\.zsh\\'" . sh-mode)
-         ("\\bashrc\\'" . sh-mode))
-  :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
-  :hook (sh-mode . lsp)
-  :custom
-  (sh-basic-offset 2)
-  (sh-indent-comment t) ; Indent comments as a regular line
-  (sh-indent-after-continuation 'always))
-
-(use-package fish-mode
-  :ensure t
-  :mode "\\.fish\\'"
-  :interpreter "fish"
-  :hook
-  (fish-mode . (lambda ()
-                 (add-hook 'before-save-hook #'fish_indent-before-save))))
-
-;; https://github.com/amake/shfmt.el
-;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
-(use-package shfmt
-  :ensure reformatter
-  ;; :ensure-system-package (shfmt . "snap install shfmt")
-  :load-path "extras/shfmt"
-  ;; :diminish shfmt-on-save-mode
-  :hook (sh-mode . shfmt-on-save-mode)
-  :custom (shfmt-arguments "-i 4 -p -ci"))
-
-;; (with-eval-after-load 'sh-script-mode
-(use-package flycheck-shfmt
-  :ensure reformatter
-  :functions flycheck-shfmt-setup
-  :after flycheck
-  :load-path "extras/shfmt"
-  :config (flycheck-shfmt-setup))
-;; )
-
-(use-package magit
-  :ensure t
-  :functions magit-display-buffer-fullframe-status-v1
-  :bind ("C-x g" . magit-status)
-  :custom
-  (magit-completing-read-function 'ivy-completing-read)
-  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  (magit-save-repository-buffers t)
-  (transient-history-file (expand-file-name "transient/history.el"
-                                            dotemacs-temp-directory))
-  (transient-levels-file (expand-file-name "transient/levels.el"
-                                           dotemacs-temp-directory))
-  (transient-values-file (expand-file-name "transient/values.el"
-                                           dotemacs-temp-directory))
-  ;; https://irreal.org/blog/?p=8877
-  (magit-section-initial-visibility-alist '((stashes . show)
-                                            (untracked . show)
-                                            (unpushed . show))))
-
-(use-package gitignore-mode
-  :ensure t
-  :mode (("/\\.gitignore\\'"        . gitignore-mode)
-         ("/\\.git/info/exclude\\'" . gitignore-mode)
-         ("/git/ignore\\'"          . gitignore-mode)))
-
-(use-package gitattributes-mode
-  :ensure t
-  :mode (("/\\.gitattributes\\'"       . gitattributes-mode)
-         ("/\\.git/info/attributes\\'" . gitattributes-mode)
-         ("/git/attributes\\'"         . gitattributes-mode)))
-
-(use-package gitconfig-mode
-  :ensure t
-  :mode (("/\\.gitconfig\\'"  . gitconfig-mode)
-         ("/\\.git/config\\'" . gitconfig-mode)
-         ("/git/config\\'"    . gitconfig-mode)
-         ("/\\.gitmodules\\'" . gitconfig-mode)))
-
-(use-package git-gutter
-  :ensure t
-  :diminish
-  :bind (("C-x p" . git-gutter:previous-hunk)
-         ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init . global-git-gutter-mode))
-
-(add-hook 'git-commit-setup-hook #'git-commit-turnon-flyspell)
-
-;; FIXME: What is the purpose?
-(setq smerge-command-prefix "\C-c v")
-
-(use-package diff-hl
-  :ensure t
-  :hook ((after-init . global-diff-hl-mode)
-         (dired-mode . diff-hl-dired-mode))
-  :config
-  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-
-(use-package yaml-mode
-  :ensure t
-  :hook (yaml-mode . lsp))
-
-(use-package php-mode
-  :ensure t
-  :hook (php-mode . lsp))
-
-(use-package batch-mode
-  :mode (("\\.bat\\'" . batch-mode)
-         ("\\.cmd\\'" . batch-mode)))
-
-(use-package web-mode
-  :ensure t
-  :mode
-  (("\\.html?\\'" . web-mode)
-   ("\\.djhtml\\'" . web-mode)
-   ("\\.phtml\\'" . web-mode)
-   ("\\.hb\\.html\\'" . web-mode)
-   ("\\.tpl\\.php\\'" . web-mode)
-   ("\\.[agj]sp\\'" . web-mode)
-   ("\\.as[cp]x\\'" . web-mode)
-   ("\\.erb\\'" . web-mode))
-  :hook (web-mode . lsp)
-  :custom
-  (web-mode-enable-auto-pairing t)
-  (web-mode-enable-auto-closing t)
-  (web-mode-enable-auto-quoting t)
-  (web-mode-enable-css-colorization t)
-  (web-mode-enable-block-face t)
-  (web-mode-enable-current-element-highlight t)
-  (web-mode-enable-current-column-highlight t))
-
-(use-package rainbow-mode
-  :ensure t
-  :diminish
-  :hook ((css-mode html-mode sass-mode) . rainbow-mode))
-
-;; (use-package company-php
-;;   :ensure t
-;;   :init
-;;   (with-eval-after-load 'php-mode
-;;     (add-to-list 'company-backends 'company-ac-php-backend)))
 
 (use-package lsp-mode
   :ensure t
@@ -2842,6 +2634,275 @@ SAVE-FN with non-nil ARGS."
     (add-to-list 'lsp-disabled-clients ls))
   (add-to-list 'lsp-enabled-clients 'jedi))
 
+;;  Call this in c-mode-common-hook:
+;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
+(use-package cc-mode
+  :defines (c-electric-brace c-enable-auto-newline)
+  :mode ("\\.h\\'" . c++-mode)
+  :mode ("\\.c\\'" . c++-mode)
+  :hook (c++-mode . lsp)
+  :custom
+  (c-set-style "cc-mode")
+  (c-basic-offset 2)
+  :config
+  ;; Disable electric indentation and on-type formatting
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (setq-local c-auto-newline nil
+                          c-electric-brace nil
+                          c-electric-flag nil
+                          c-electric-indent nil
+                          c-enable-auto-newline nil
+                          c-syntactic-indentation nil)))
+  (unbind-key "C-M-a" c-mode-map)
+  :bind (:map c-mode-base-map
+              ("C-c c a" . c-beginning-of-defun)
+              ("C-c c e" . c-end-of-defun)
+              ("M-q" . c-fill-paragraph)))
+
+(use-package modern-cpp-font-lock
+  :ensure t
+  :diminish modern-c++-font-lock-mode
+  :hook (c++-mode . modern-c++-font-lock-global-mode))
+
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
+
+(use-package cuda-mode
+  :ensure t
+  :mode (("\\.cu\\'"	. cuda-mode)
+         ("\\.cuh\\'"	. cuda-mode)))
+
+(use-package opencl-mode
+  :ensure t
+  :mode ("\\.cl\\'" . opencl-mode))
+
+(use-package cmake-mode
+  :ensure t
+  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
+  :hook (cmake-mode . lsp)
+  ;; :config (add-to-list 'company-backends 'company-cmake)
+  )
+
+(use-package cmake-font-lock
+  :ensure t
+  :after cmake-mode
+  :hook (cmake-mode . cmake-font-lock-activate))
+
+(use-package python
+  :init
+  ;; Disable readline based native completion
+  (setq python-shell-completion-native-enable nil)
+  (setenv "PYTHONPATH" "python3")
+  (add-hook 'python-mode-hook #'lsp)
+  ;; :bind (:map python-mode-map
+  ;;             ("M-[" . python-nav-backward-block)
+  ;;             ("M-]" . python-nav-forward-block)
+  ;;             ("C-[" . python-indent-shift-left)
+  ;;             ("C-]" . python-indent-shift-right))
+  :config
+  (with-eval-after-load 'lsp-mode
+    (when (eq dotemacs-python-langserver 'pyls)
+      (dolist (ls '(pyright mspyls jedi))
+        (add-to-list 'lsp-disabled-clients ls))
+      (add-to-list 'lsp-enabled-clients 'pyls)))
+  (setq python-indent-offset 4
+        python-indent-guess-indent-offset nil
+        python-shell-interpreter "python3"
+        auto-mode-alist (append '(("SConstruct\\'" . python-mode)
+                                  ("SConscript\\'" . python-mode))
+                                auto-mode-alist)))
+
+(use-package pyvenv
+  :ensure t
+  :diminish
+  :custom (pyvenv-mode-line-indicator
+           '(pyvenv-virtual-env-name ("[venv:"
+                                      pyvenv-virtual-env-name "]")))
+  :hook (python-mode . pyvenv-mode)
+  :config
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat
+                                                pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
+
+(use-package py-isort
+  :ensure t
+  :after python
+  :init
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'py-isort-before-save))))
+
+;; (use-package ein
+;;   :ensure t)
+
+(setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
+                              auto-mode-alist))
+
+(add-hook 'java-mode-hook
+          (lambda ()
+            (setq-default c-basic-offset 4
+                          c-set-style "java")))
+
+(use-package ant
+  :ensure t)
+
+;; Can disassemble .class files from within jars
+;; (use-package autodisass-java-bytecode
+;;   :ensure t)
+
+(setq-default shell-dirtrack-mode nil)
+
+(use-package sh-script ; Shell script mode
+  :mode (("\\.zsh\\'" . sh-mode)
+         ("\\bashrc\\'" . sh-mode))
+  :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to sh-cd-here
+  :hook (sh-mode . lsp)
+  :custom
+  (sh-basic-offset 2)
+  (sh-indent-comment t) ; Indent comments as a regular line
+  (sh-indent-after-continuation 'always))
+
+(use-package fish-mode
+  :ensure t
+  :mode "\\.fish\\'"
+  :interpreter "fish"
+  :hook
+  (fish-mode . (lambda ()
+                 (add-hook 'before-save-hook #'fish_indent-before-save))))
+
+;; https://github.com/amake/shfmt.el
+;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
+(use-package shfmt
+  :ensure reformatter
+  ;; :ensure-system-package (shfmt . "snap install shfmt")
+  :load-path "extras/shfmt"
+  ;; :diminish shfmt-on-save-mode
+  :hook (sh-mode . shfmt-on-save-mode)
+  :custom (shfmt-arguments "-i 4 -p -ci"))
+
+;; (with-eval-after-load 'sh-script-mode
+(use-package flycheck-shfmt
+  :ensure reformatter
+  :functions flycheck-shfmt-setup
+  :after flycheck
+  :load-path "extras/shfmt"
+  :config (flycheck-shfmt-setup))
+;; )
+
+(use-package magit
+  :ensure t
+  :functions magit-display-buffer-fullframe-status-v1
+  :bind ("C-x g" . magit-status)
+  :custom
+  (magit-completing-read-function 'ivy-completing-read)
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (magit-save-repository-buffers t)
+  (transient-history-file (expand-file-name "transient/history.el"
+                                            dotemacs-temp-directory))
+  (transient-levels-file (expand-file-name "transient/levels.el"
+                                           dotemacs-temp-directory))
+  (transient-values-file (expand-file-name "transient/values.el"
+                                           dotemacs-temp-directory))
+  ;; https://irreal.org/blog/?p=8877
+  (magit-section-initial-visibility-alist '((stashes . show)
+                                            (untracked . show)
+                                            (unpushed . show))))
+
+(use-package gitignore-mode
+  :ensure t
+  :mode (("/\\.gitignore\\'"        . gitignore-mode)
+         ("/\\.git/info/exclude\\'" . gitignore-mode)
+         ("/git/ignore\\'"          . gitignore-mode)))
+
+(use-package gitattributes-mode
+  :ensure t
+  :mode (("/\\.gitattributes\\'"       . gitattributes-mode)
+         ("/\\.git/info/attributes\\'" . gitattributes-mode)
+         ("/git/attributes\\'"         . gitattributes-mode)))
+
+(use-package gitconfig-mode
+  :ensure t
+  :mode (("/\\.gitconfig\\'"  . gitconfig-mode)
+         ("/\\.git/config\\'" . gitconfig-mode)
+         ("/git/config\\'"    . gitconfig-mode)
+         ("/\\.gitmodules\\'" . gitconfig-mode)))
+
+(use-package git-gutter
+  :ensure t
+  :diminish
+  :bind (("C-x p" . git-gutter:previous-hunk)
+         ("C-x n" . git-gutter:next-hunk))
+  :hook (after-init . global-git-gutter-mode))
+
+(use-package git-commit
+  :ensure t
+  :hook (git-commit-setup . #'git-commit-turn-on-flyspell))
+
+;; FIXME: What is the purpose?
+(setq smerge-command-prefix "\C-c v")
+
+(use-package diff-hl
+  :ensure t
+  :hook ((after-init . global-diff-hl-mode)
+         (dired-mode . diff-hl-dired-mode))
+  :config
+  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+
+(use-package yaml-mode
+  :ensure t
+  :hook (yaml-mode . lsp))
+
+(use-package yaml-imenu
+  :ensure t)
+
+(use-package php-mode
+  :ensure t
+  :hook (php-mode . lsp))
+
+(use-package batch-mode
+  :mode (("\\.bat\\'" . batch-mode)
+         ("\\.cmd\\'" . batch-mode)))
+
+(use-package web-mode
+  :ensure t
+  :mode
+  (("\\.html?\\'" . web-mode)
+   ("\\.djhtml\\'" . web-mode)
+   ("\\.phtml\\'" . web-mode)
+   ("\\.hb\\.html\\'" . web-mode)
+   ("\\.tpl\\.php\\'" . web-mode)
+   ("\\.[agj]sp\\'" . web-mode)
+   ("\\.as[cp]x\\'" . web-mode)
+   ("\\.erb\\'" . web-mode))
+  :hook (web-mode . lsp)
+  :custom
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-auto-closing t)
+  (web-mode-enable-auto-quoting t)
+  (web-mode-enable-css-colorization t)
+  (web-mode-enable-block-face t)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-current-column-highlight t))
+
+(use-package rainbow-mode
+  :ensure t
+  :diminish
+  :hook ((css-mode html-mode sass-mode) . rainbow-mode))
+
+;; (use-package company-php
+;;   :ensure t
+;;   :init
+;;   (with-eval-after-load 'php-mode
+;;     (add-to-list 'company-backends 'company-ac-php-backend)))
+
 (use-package nxml-mode
   :hook (nxml-mode . lsp)
   ;; :init (fset 'xml-mode 'nxml-mode)
@@ -2852,24 +2913,24 @@ SAVE-FN with non-nil ARGS."
 (setq auto-mode-alist (append '((".classpath\\'" . xml-mode))
                               auto-mode-alist))
 
+(use-package latex-init
+  :load-path "extras"
+  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                          (require 'latex-init))))
+
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
 (use-package lsp-latex
   :ensure t
-  :after lsp
-  :hook ((tex-mode latex-mode bibtex-mode) . (lambda()
-                                               (require 'lsp-latex)
-                                               (lsp-deferred)))
+  ;; :after lsp
+  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                          (require 'lsp-latex)
+                                                          (lsp-deferred)))
   :custom
   (lsp-latex-bibtex-formatting-line-length 100)
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
-
-(use-package latex-init
-  :load-path "extras"
-  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                          (require 'latex-init))))
 
 (use-package js2-mode
   :ensure t

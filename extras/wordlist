@@ -335,6 +335,7 @@ approve
 approved
 approving
 approximate
+approximated
 approximately
 approximation
 April
@@ -453,6 +454,7 @@ auction
 auctions
 audience
 auditor
+augment
 August
 aunt
 authentication
@@ -1234,6 +1236,7 @@ constraints
 construct
 construction
 constructive
+constructs
 consult
 consultancy
 consultant
@@ -1722,6 +1725,7 @@ discretized
 discriminate
 discrimination
 discuss
+discusses
 discussion
 disease
 diseases
@@ -2800,6 +2804,7 @@ hunting
 hurry
 hurt
 husband
+hybrid
 hygiene
 hyperthreading
 hypervisor
@@ -3047,6 +3052,7 @@ institutionalized
 institutionally
 instruct
 instruction
+instructions
 instructive
 instructor
 instrument
@@ -3085,6 +3091,7 @@ intercollege
 interest
 interested
 interesting
+interface
 interim
 interior
 interleavings
@@ -3790,6 +3797,7 @@ nervous
 nervously
 nest
 nested
+nesting
 network
 networks
 neural
@@ -3934,6 +3942,7 @@ open
 opening
 openings
 openly
+OpenMP
 operate
 operated
 operates
@@ -4339,6 +4348,7 @@ precisely
 precision
 precisions
 precompute
+predecessor
 predict
 predictability
 predictable
@@ -4457,6 +4467,7 @@ profits
 program
 programmability
 programme
+programmer
 programming
 Programming
 programs
@@ -4481,6 +4492,7 @@ promptly
 pronounce
 pronunciation
 proof
+propagated
 proper
 properly
 property
@@ -5948,8 +5960,8 @@ tower
 town
 township
 trace
-traces
 traceable
+traces
 track
 tracked
 tracker
@@ -6516,9 +6528,6 @@ yourself
 youth
 zero
 zone
-supervised
-individual
-approximated
 
 ;; Local Variables:
 ;; mode: text
