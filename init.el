@@ -2121,14 +2121,14 @@ SAVE-FN with non-nil ARGS."
 
 ;; Shift + direction arrows
 (use-package windmove
-  :config (windmove-default-keybindings)
+  :init (windmove-default-keybindings)
   :custom
   ;; wrap around at edges
   (windmove-wrap-around t))
 
-;; This causes additional saves which leads to auto-formatters being invoked
-;; more frequently
-(use-package super-save ; Save buffers when Emacs loses focus
+;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
+;; being invoked more frequently.
+(use-package super-save
   :ensure t
   :diminish
   :custom
@@ -2395,19 +2395,19 @@ SAVE-FN with non-nil ARGS."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
-                              mspyls mspyls-remote jedi
-                              jedils-remote clangd clangd-remote
-                              jsts-ls flow-ls ts-ls eslint
-                              json-ls jsonls-remote cmakels
-                              cmakels-remote html-ls
-                              htmlls-remote angular-ls texlab
-                              texlab-remote jdtls bash-ls
-                              bashls-remote typescript-remote
-                              css-ls cssls-remote
-                              intelephense-remote
-                              perl-language-server xmlls yamlls
-                              php-ls))
+  ;; (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
+  ;;                             mspyls mspyls-remote jedi
+  ;;                             jedils-remote clangd clangd-remote
+  ;;                             jsts-ls flow-ls ts-ls eslint
+  ;;                             json-ls jsonls-remote cmakels
+  ;;                             cmakels-remote html-ls
+  ;;                             htmlls-remote angular-ls texlab
+  ;;                             texlab-remote jdtls bash-ls
+  ;;                             bashls-remote typescript-remote
+  ;;                             css-ls cssls-remote
+  ;;                             intelephense-remote
+  ;;                             perl-language-server xmlls yamlls
+  ;;                             php-ls))
   (lsp-html-format-wrap-line-length 80)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2605,10 +2605,11 @@ SAVE-FN with non-nil ARGS."
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp-deferred)))
-  :config
-  (dolist (ls '(pyls pyright jedi))
-    (add-to-list 'lsp-disabled-clients ls))
-  (add-to-list 'lsp-enabled-clients 'mspyls))
+  ;; :config
+  ;; (dolist (ls '(pyls pyright jedi))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'mspyls)
+  )
 
 (use-package lsp-pyright
   :ensure t
@@ -2616,12 +2617,13 @@ SAVE-FN with non-nil ARGS."
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
                          (lsp-deferred)))
-  ;; :custom
-  ;; (lsp-pyright-python-executable-cmd . "python3")
-  :config
-  (dolist (ls '(pyls mspyls jedi))
-    (add-to-list 'lsp-disabled-clients ls))
-  (add-to-list 'lsp-enabled-clients 'pyright))
+  :custom
+  (lsp-pyright-python-executable-cmd "python3")
+  ;; :config
+  ;; (dolist (ls '(pyls mspyls jedi))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'pyright)
+  )
 
 (use-package lsp-jedi
   :ensure t
@@ -2629,10 +2631,11 @@ SAVE-FN with non-nil ARGS."
   :hook (python-mode . (lambda ()
                          (require 'lsp-jedi)
                          (lsp-deferred)))
-  :config
-  (dolist (ls '(pyls mspyls pyright))
-    (add-to-list 'lsp-disabled-clients ls))
-  (add-to-list 'lsp-enabled-clients 'jedi))
+  ;; :config
+  ;; (dolist (ls '(pyls mspyls pyright))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'jedi)
+  )
 
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
@@ -2703,11 +2706,11 @@ SAVE-FN with non-nil ARGS."
   ;;             ("C-[" . python-indent-shift-left)
   ;;             ("C-]" . python-indent-shift-right))
   :config
-  (with-eval-after-load 'lsp-mode
-    (when (eq dotemacs-python-langserver 'pyls)
-      (dolist (ls '(pyright mspyls jedi))
-        (add-to-list 'lsp-disabled-clients ls))
-      (add-to-list 'lsp-enabled-clients 'pyls)))
+  ;; (with-eval-after-load 'lsp-mode
+  ;;   (when (eq dotemacs-python-langserver 'pyls)
+  ;;     (dolist (ls '(pyright mspyls jedi))
+  ;;       (add-to-list 'lsp-disabled-clients ls))
+  ;;     (add-to-list 'lsp-enabled-clients 'pyls)))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
         python-shell-interpreter "python3"
