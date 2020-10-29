@@ -186,6 +186,16 @@ whitespaces."
   (getenv "HOME")
   "User HOME directory.")
 
+(defconst dotemacs-user-tmp
+  (expand-file-name "tmp" dotemacs-user-home)
+  "User temp directory.")
+
+(defcustom dotemacs-textlint-home
+  (expand-file-name "texlint-workspace" dotemacs-user-tmp)
+  "Absolute path to textlint workspace."
+  :type 'string
+  :group 'dotemacs)
+
 (defcustom dotemacs-python-langserver
   'pyright
   "Choose the Python Language Server implementation."
@@ -491,7 +501,7 @@ whitespaces."
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun sb/auto-save-wrapper (save-fn &rest args)
   "Hide 'Auto-saving...done' messages by calling the method
-SAVE-FN with non-nil ARGS."
+  SAVE-FN with non-nil ARGS."
   (ignore args)
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
@@ -1444,8 +1454,8 @@ SAVE-FN with non-nil ARGS."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ;; ("C-," . flyspell-auto-correct-previous-word)
-   ("C-," . sb/flyspell-goto-previous-error)))
+  ;; ("C-," . flyspell-auto-correct-previous-word)
+  ("C-," . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion did not give the save option
 ;; in a few cases.
@@ -1645,12 +1655,9 @@ SAVE-FN with non-nil ARGS."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
-  (setq flycheck-textlint-config (expand-file-name
-                                  "tmp/textlint-workspace/textlintrc.json"
-                                  dotemacs-user-home)
-        flycheck-textlint-executable (expand-file-name
-                                      "tmp/textlint-workspace/node_modules/.bin/textlint"
-                                      dotemacs-user-home))
+  (setq flycheck-textlint-config (expand-file-name "textlintrc.json" dotemacs-textlint-home)
+        flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                       dotemacs-textlint-home))
   (add-hook 'python-mode-hook
             (lambda ()
               ;; (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
@@ -1677,7 +1684,9 @@ SAVE-FN with non-nil ARGS."
               (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
-  (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t)))
+  (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+  (add-to-list 'flycheck-hooks-alist
+               '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
   :ensure t
@@ -2413,7 +2422,7 @@ SAVE-FN with non-nil ARGS."
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io t)
+  (lsp-log-io nil)
   (lsp-modeline-diagnostics-scope :project)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)

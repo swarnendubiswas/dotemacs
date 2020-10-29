@@ -65,13 +65,19 @@ sudo cpanm Perl::LanguageServer
 
 #### Node Packages
 
+> Install node packages.
+
 ```Bash
 cd $HOME/tmp; cd ;
 npm init --yes
 sudo npm install -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright
 ```
 
+> Update node packages.
+
+```Bash
 sudo npm update -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright
+```
 
 Install `textlint` separately so that the installation is shared by other editors.
 
