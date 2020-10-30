@@ -36,6 +36,9 @@
 ;;   (x-mode . second)
 ;;   (x-mode . first))
 
+;; Good reference configurations
+;; https://protesilaos.com/dotemacs/
+
 ;;; Code:
 
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
@@ -239,11 +242,8 @@ whitespaces."
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-;; Need to set before loading use-package
+;; Configure use-package before loading
 (setq use-package-enable-imenu-support t)
-(eval-when-compile
-  (require 'use-package))
-
 (if (bound-and-true-p dotemacs-debug-init-file)
     (setq debug-on-error t
           use-package-compute-statistics t
@@ -256,6 +256,8 @@ whitespaces."
         ;; work
         use-package-expand-minimally t
         use-package-verbose nil))
+(eval-when-compile
+  (require 'use-package))
 
 (use-package use-package-ensure-system-package
   :ensure t)
@@ -381,15 +383,14 @@ whitespaces."
 ;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
 (setq-default bidi-display-reordering 'left-to-right
               bidi-inhibit-bpa t
-              ;; bidi-paragraph-direction 'left-to-right
-              )
+              bidi-paragraph-direction 'left-to-right)
 
 ;; LSP mode generates lots of objects, which causes a problem with gcmh mode.
-;; (use-package gcmh
-;;   :ensure t
-;;   :diminish
-;;   :hook ((after-init . gcmh-mode)
-;;          (focus-out-hook . gcmh-idle-garbage-collect)))
+(use-package gcmh
+  :ensure t
+  :diminish
+  :hook ((after-init . gcmh-mode)
+         (focus-out-hook . gcmh-idle-garbage-collect)))
 
 ;; Activate utf8 mode
 (setq locale-coding-system 'utf-8)
@@ -440,6 +441,7 @@ whitespaces."
          (dired-mode . auto-revert-mode))
   :custom
   (auto-revert-interval 2 "Faster would mean less likely to use stale data")
+  (auto-revert-remote-files t)
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t "Enable auto revert on non-file buffers"))
 
@@ -468,7 +470,7 @@ whitespaces."
   (uniquify-separator "/")
   (uniquify-strip-common-suffix t))
 
-(use-package hippie-exp
+(use-package hippie-exp ; Replace "dabbrev-exp"
   :custom
   (hippie-expand-try-functions-list '(try-expand-dabbrev
                                       try-expand-dabbrev-all-buffers
@@ -484,8 +486,7 @@ whitespaces."
 
 (use-package subword
   :diminish
-  :disabled t
-  :hook (after-init . global-subword-mode))
+  :hook (prog-mode . subword-mode))
 
 ;; vertical - Split the selected window into two windows (e.g., "split-window-below"), one above the
 ;; other
@@ -547,7 +548,7 @@ whitespaces."
                 ;; Typing with the mark active will overwrite the marked region
                 delete-selection-mode
                 global-visual-line-mode ; Wrap lines
-                ;; global-so-long-mode ; This puts the buffer in read-only mode
+                global-so-long-mode ; This puts the buffer in read-only mode
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
                 global-hl-line-mode
@@ -790,7 +791,9 @@ whitespaces."
   (dired-recursive-deletes 'always "Single prompt for all n directories"))
 
 (use-package dired-x
-  :custom (dired-omit-verbose nil "Do not show messages when omitting files")
+  :custom
+  (dired-cleanup-buffers-too t)
+  (dired-omit-verbose nil "Do not show messages when omitting files")
   :hook (dired-mode . dired-omit-mode)
   :bind ("C-x C-j" . dired-jump)
   ;; :diminish dired-omit-mode ; This does not work
@@ -811,15 +814,17 @@ whitespaces."
                         (require 'dired+)
                         (diredp-toggle-find-file-reuse-dir 1))))
 
-(use-package dired-efap
-  :ensure t
-  ;; :after dired
-  :commands (dired-efap)
-  :hook (dired-mode . (lambda ()
-                        (require 'dired-efap)))
-  :custom (dired-efap-initial-filename-selection nil)
-  :bind* (:map dired-mode-map
-               ("r" . dired-efap)))
+;; (use-package dired-efap
+;;   :ensure t
+;;   ;; :after dired
+;;   ;; :commands (dired-efap)
+;;   ;; :hook (dired-mode . (lambda ()
+;;   ;;                       (require 'dired-efap)))
+;;   :init (add-hook 'dired-mode-hook (lambda ()
+;;                                      (require 'dired-efap)))
+;;   :custom (dired-efap-initial-filename-selection nil)
+;;   :bind* (:map dired-mode-map
+;;                ("r" . dired-efap)))
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
@@ -841,9 +846,10 @@ whitespaces."
   :ensure t
   :hook (dired-mode . diredfl-mode))
 
-;; (use-package async
-;;   :ensure t
-;;   :config (dired-async-mode))
+(use-package async
+  :ensure t
+  :diminish
+  :hook (dired-mode . dired-async-mode))
 
 (use-package treemacs
   :ensure t
@@ -1025,6 +1031,8 @@ whitespaces."
   (recentf-exclude '("[/\\]elpa/"
                      "[/\\]\\.git/"
                      ".*\\.gz\\'"
+                     ".*\\.xz\\'"
+                     ".*\\.zip\\'"
                      ".*-autoloads.el\\'"
                      "[/\\]archive-contents\\'"
                      "[/\\]\\.loaddefs\\.el\\'"
@@ -1066,6 +1074,7 @@ whitespaces."
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; (company-dabbrev-ignore-case nil)
+  (company-dabbrev-other-buffers t "Search in other buffers with same major mode")
   (company-idle-delay 0.0 "Recommended by lsp")
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist"
@@ -1133,6 +1142,7 @@ whitespaces."
 
 (use-package company-quickhelp
   :ensure t
+  :if dotemacs-is-linux
   :hook (global-company-mode . company-quickhelp-mode))
 
 (use-package company-box
@@ -1220,7 +1230,7 @@ whitespaces."
   :diminish
   :bind
   (("C-c r" . ivy-resume)
-   ("<f3>" . ivy-switch-buffer)
+   ;; ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
@@ -1243,6 +1253,8 @@ whitespaces."
                     (if (executable-find "fasd")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
+  :init
+  (setq counsel-switch-buffer-preview-virtual-buffers nil)
   :bind
   (([remap execute-extended-command] . counsel-M-x)
    ("<f1>" . counsel-M-x)
@@ -1268,10 +1280,11 @@ whitespaces."
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
    ;; Having the preview can make switching buffers slow
-   ;; ("<f3>" . counsel-switch-buffer)
+   ("<f3>" . counsel-switch-buffer)
    ([remap yank-pop] . counsel-yank-pop))
   :bind* ("C-c C-j" . counsel-semantic-or-imenu)
   :custom
+  (counsel-find-file-at-point t)
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                     "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
@@ -1321,6 +1334,7 @@ whitespaces."
                                     "\\|.recommenders"
                                     ))
   (counsel-mode-override-describe-bindings t)
+  (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n-------------------------\n")
   :diminish
   :hook (ivy-mode . counsel-mode)
@@ -1780,7 +1794,7 @@ whitespaces."
 (use-package tramp
   :defer 2
   :custom
-  (tramp-default-method "ssh" "ssh is faster than the default scp")
+  (tramp-default-method "ssh" "SSH is faster than the default SCP")
   ;; Auto-save to a local directory for better performance
   (tramp-auto-save-directory (expand-file-name "tramp-auto-save"
                                                dotemacs-temp-directory))
@@ -1869,6 +1883,11 @@ whitespaces."
     :ensure t)
   (use-package popup-imenu
     :ensure t))
+
+(use-package flimenu
+  :ensure
+  :after imenu
+  :config (flimenu-global-mode 1))
 
 (setq-default large-file-warning-threshold (* 500 1024 1024)
               tags-add-tables nil
@@ -2007,10 +2026,6 @@ whitespaces."
   :mode "\\.gp\\'"
   :interpreter ("gnuplot" . gnuplot-mode))
 
-(use-package goto-last-change
-  :ensure t
-  :bind ("C-x C-\\" . goto-last-change))
-
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
@@ -2061,6 +2076,15 @@ whitespaces."
   :ensure t
   :diminish
   :config (whole-line-or-region-global-mode 1))
+
+(use-package goto-last-change
+  :ensure t
+  :bind ("C-x C-\\" . goto-last-change))
+
+(use-package beginend
+  :ensure
+  :diminish beginend-global-mode
+  :config (beginend-global-mode 1))
 
 ;; (use-package undo-tree
 ;;   :ensure t
@@ -2156,6 +2180,7 @@ whitespaces."
   :custom
   (avy-background t)
   (avy-highlight-first t)
+  (avy-indent-line-overlay t)
   (avy-style 'at)
   :config (avy-setup-default))
 
@@ -2164,8 +2189,13 @@ whitespaces."
   (bookmark-default-file (expand-file-name "bookmarks"
                                            dotemacs-temp-directory)))
 
+;; https://github.com/CSRaghunandan/.emacs.d/blob/master/setup-files/setup-bookmark.el
 (use-package bm
   :ensure t
+  :init (setq bm-restore-repository-on-load t)
+  :custom
+  (bm-buffer-persistence t)
+  (bm-repository-file (expand-file-name "bm-bookmarks" dotemacs-temp-directory))
   :bind (("C-<f1>" . bm-toggle)
          ("C-<f2>" . bm-next)
          ("C-<f3>" . bm-previous)))
@@ -2262,17 +2292,21 @@ whitespaces."
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; :init (setq-default markdown-hide-markup t)
   :custom
-  (markdown-enable-math t)
-  (mardown-indent-on-enter 'indent-and-new-item)
-  (markdown-split-window-direction 'vertical)
+  (markdown-command "pandoc -s --mathjax")  (markdown-enable-math t "Syntax highlight for LaTeX fragments")
+  (markdown-enable-wiki-links t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
   (markdown-fontify-code-blocks-natively t)
+  (mardown-indent-on-enter 'indent-and-new-item)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-command "pandoc -s --mathjax")
+  (markdown-split-window-direction 'vertical)
   :config
   (use-package markdown-mode+
     :ensure t))
+
+(use-package markdown-toc
+  :ensure t
+  :after markdown-mode)
 
 ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
@@ -2353,19 +2387,24 @@ whitespaces."
 (use-package octave
   :mode "\\.m\\'")
 
-;; (use-package ess
-;;   :ensure t
-;;   :custom
-;;   (inferior-R-args "--quiet --no-restore-history --no-save")
-;;   (ess-indent-offset 4)
-;;   (ess-indent-from-lhs 4)
-;;   :config
-;;   (use-package ess-smart-underscore
-;;     :ensure t))
+(use-package ess
+  :ensure t
+  :disabled t
+  :custom
+  (inferior-R-args "--quiet --no-restore-history --no-save")
+  (ess-indent-offset 4)
+  (ess-indent-from-lhs 4)
+  :config
+  (use-package ess-smart-underscore
+    :ensure t))
 
 (use-package ini-mode
   :ensure t
   :mode "\\.ini\\'")
+
+(use-package pkgbuild-mode
+  :ensure t
+  :mode ("PKGBUILD" . pkgbuild-mode))
 
 (dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
   (add-hook hooks
@@ -2387,7 +2426,7 @@ whitespaces."
   :hook (((cperl-mode css-mode javascript-mode js-mode less-mode
                       less-css-mode perl-mode sass-mode scss-mode sgml-mode typescript-mode) .
                       lsp-deferred)
-         ;; (lsp-mode . lsp-enable-which-key-integration)
+         (lsp-mode . lsp-enable-which-key-integration)
          (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode))
@@ -2579,7 +2618,8 @@ whitespaces."
               ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
 (use-package origami
-  :ensure t)
+  :ensure t
+  :hook (after-init . global-origami-mode))
 
 (use-package lsp-origami
   :ensure t
@@ -2727,6 +2767,15 @@ whitespaces."
                                   ("SConscript\\'" . python-mode))
                                 auto-mode-alist)))
 
+(use-package python-docstring
+  :ensure t
+  :diminish
+  :hook (python-mode . python-docstring-mode))
+
+(use-package pip-requirements
+  :ensure t
+  :hook (pip-requirements-mode . company-mode))
+
 (use-package pyvenv
   :ensure t
   :diminish
@@ -2827,6 +2876,10 @@ whitespaces."
                                             (untracked . show)
                                             (unpushed . show))))
 
+(use-package magit-diff
+  :after magit
+  :custom (magit-diff-refine-hunk t))
+
 (use-package gitignore-mode
   :ensure t
   :mode (("/\\.gitignore\\'"        . gitignore-mode)
@@ -2855,13 +2908,15 @@ whitespaces."
 
 (use-package git-commit
   :ensure t
-  :hook (git-commit-setup . #'git-commit-turn-on-flyspell))
+  :hook (git-commit-setup . #'git-commit-turn-on-flyspell)
+  :custom (git-commit-summary-max-length 50))
 
 ;; FIXME: What is the purpose?
 (setq smerge-command-prefix "\C-c v")
 
 (use-package diff-hl
   :ensure t
+  :custom (diff-hl-draw-borders nil)
   :hook ((after-init . global-diff-hl-mode)
          (dired-mode . diff-hl-dired-mode))
   :config
@@ -3004,11 +3059,11 @@ whitespaces."
        '(
          company-capf
          company-files
-         company-dabbrev
-         company-ispell ; Uses an English dictionary
+         (company-dabbrev :with
+                          company-ispell) ; Uses an English dictionary
          ;; company-dict
          ;; company-tabnine
-         company-yasnippet ; Works everywhere
+         ;; company-yasnippet ; Works everywhere
          )))
 (dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
   (add-hook hook (lambda ()
@@ -3021,12 +3076,13 @@ whitespaces."
   (setq company-backends
         '(
           company-capf ; Disabled LSP mode's capf autoconfiguration
+          (company-keywords :with
+                            company-files
+                            :with
+                            company-yasnippet)
           ;; company-tabnine
           (company-dabbrev-code
-           company-keywords)
-          company-yasnippet
-          company-files
-          company-dabbrev
+           company-dabbrev)
           )))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 

@@ -41,6 +41,7 @@
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
     ("handly" "handy" nil :count 0)
+    ("initialise" "Initialize" nil :count 0)
    ))
 
 (define-abbrev-table 'global-abbrev-table
