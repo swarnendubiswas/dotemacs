@@ -1656,12 +1656,10 @@ This function is intended for use with `ivy-ignore-buffers'."
                                    dotemacs-user-home) ))
     (add-to-list 'projectile-ignored-projects prjs))
   (dolist (dirs
-           '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx"
-             ".recommenders" ".svn" ".vscode" "__pycache__" "auto" "elpa"
-             "node_modules"))
+           '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn" ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
-  (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS"  "TAGS" "tags" ".dir-locals.el" ".projectile"
-                   ".project" ".tags" "__init__.py"))
+  (dolist (items
+           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".dir-locals.el" ".projectile" ".project" ".tags" "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files items))
   (dolist (exts
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
@@ -1671,7 +1669,25 @@ This function is intended for use with `ivy-ignore-buffers'."
 (use-package counsel-projectile
   :ensure t
   :after counsel
+  :defines counsel-projectile-default-file
   :hook (counsel-mode . counsel-projectile-mode)
+  :preface
+  (defun counsel-projectile-open-default-file ()
+    "Open the current project's default file.
+This file is specified in `counsel-projectile-default-file'."
+    (interactive)
+    (let ((file counsel-projectile-default-file))
+      (if (and file
+               (setq file (projectile-expand-root file))
+               (file-exists-p file))
+          (find-file file)
+        (message "File %s doesn't exist." file))))
+  ;; Set counsel-projectile-switch-project-action to the following action
+  (defun counsel-projectile-switch-project-action-default-file (project)
+    "Open PROJECT's default file.
+This file is specified in `counsel-projectile-default-file'."
+    (let ((projectile-switch-project-action #'counsel-projectile-open-default-file))
+      (counsel-projectile-switch-project-by-name project)))
   :custom
   (counsel-projectile-find-file-more-chars 3)
   (counsel-projectile-remove-current-buffer t)
@@ -2609,7 +2625,7 @@ This function is intended for use with `ivy-ignore-buffers'."
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection "texlab")
-    :major-modes '(tex-mode latex-mode bibtex-mode)
+    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
     :remote? t
     :server-id 'texlab-remote))
   (lsp-register-client
@@ -3029,6 +3045,19 @@ This function is intended for use with `ivy-ignore-buffers'."
 (setq auto-mode-alist (append '((".classpath\\'" . xml-mode))
                               auto-mode-alist))
 
+;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
+;; support
+(use-package lsp-latex
+  :ensure t
+  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                          (require 'lsp-latex)
+                                                          (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatting-line-length 100)
+  (lsp-latex-bibtex-formatting-formatter "latexindent")
+  (lsp-latex-build-on-save t)
+  (lsp-latex-lint-on-save t))
+
 ;; Configure latex mode. Auctex provides LaTeX-mode, which is an alias. Auctex overrides the tex
 ;; package
 (use-package tex-site
@@ -3207,21 +3236,6 @@ This function is intended for use with `ivy-ignore-buffers'."
   ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
   ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
   )
-
-
-;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
-;; support
-(use-package lsp-latex
-  :ensure t
-  ;; :after lsp
-  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                          (require 'lsp-latex)
-                                                          (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatting-line-length 100)
-  (lsp-latex-bibtex-formatting-formatter "latexindent")
-  (lsp-latex-build-on-save t)
-  (lsp-latex-lint-on-save t))
 
 (use-package js2-mode
   :ensure t

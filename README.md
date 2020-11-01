@@ -347,7 +347,6 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 ## TODO
 
 - Use custom major modes for files by names without using file-local variables
-- Open a default file in a `projectile` project
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`. My guess is this has to do with either `flycheck-grammarly` or `prettier`.
 - Remove `Starting "look" process...` echo message for `company-ispell`
 - `cmake-language-server` does not work on one Linux machine over `tramp` but works with another
