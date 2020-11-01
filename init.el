@@ -122,7 +122,7 @@
 
 ;; Doom is nice but it takes CPU cycles
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -180,7 +180,7 @@ whitespaces."
   :group 'dotemacs)
 
 (defcustom dotemacs-debug-init-file
-  nil
+  t
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -229,6 +229,12 @@ whitespaces."
 (defvar lsp-enabled-clients)
 (defvar lsp-disabled-clients)
 (defvar lsp-pyright-langserver-command-args)
+(defvar use-package-always-defer)
+(defvar use-package-compute-statistics)
+(defvar use-package-expand-minimally)
+(defvar use-package-verbose)
+(defvar font-latex-fontify-sectioning)
+(defvar TeX-syntactic-comment)
 
 (eval-when-compile
   (require 'package)
@@ -268,6 +274,18 @@ whitespaces."
 
 (use-package diminish
   :ensure t)
+
+(use-package dash
+  :ensure t
+  :commands -tree-map)
+
+(use-package f
+  :ensure t
+  :commands (f-join f-exists?))
+
+(use-package hydra
+  :ensure t
+  :commands (hydra-default-pre hydra-keyboard-quit hydra-show-hint hydra-set-transient-map hydra--call-interactively-remap-maybe))
 
 (setq custom-file dotemacs-custom-file)
 (when (file-exists-p custom-file)
@@ -805,8 +823,7 @@ whitespaces."
 
 (use-package dired+ ; Do not create multiple dired buffers
   :load-path "extras"
-  ;; :after dired
-  :functions diredp-toggle-find-file-reuse-dir
+  :commands diredp-toggle-find-file-reuse-dir
   :custom
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil)
@@ -995,6 +1012,7 @@ whitespaces."
   :ensure t
   :diminish anzu-mode
   :after isearch
+  :disabled t ; I do not use isearch in general
   :custom
   (anzu-search-threshold 10000)
   (anzu-minimum-input-length 2)
@@ -1063,7 +1081,7 @@ whitespaces."
 ;; https://emacs.stackexchange.com/questions/3813/what-is-the-hook-used-by-company-mode-to-perform-autocompletion
 (use-package company
   :ensure t
-  :functions company-abort
+  :commands company-abort
   :hook (after-init . global-company-mode)
   :preface
   (defun sb/quit-company-save-buffer ()
@@ -1096,7 +1114,7 @@ whitespaces."
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
               ("<tab>" . company-complete-common-or-cycle)
-              ("M-/" . company-other-backend)
+              ;; ("M-/" . company-other-backend)
               ("C-s" . sb/quit-company-save-buffer)))
 
 ;; FIXME: Silence "Starting 'look' process..." message
@@ -1132,6 +1150,9 @@ whitespaces."
   :ensure t
   :after company
   :diminish
+  :custom
+  (company-posframe-show-metadata nil)
+  (company-posframe-show-indicator nil)
   :hook (global-company-mode . company-posframe-mode))
 
 ;; ;; The package seems unmaintained and only works for elisp-mode
@@ -1201,7 +1222,13 @@ whitespaces."
 
 (use-package ivy
   :ensure t
-  :functions ivy-completion-in-region
+  :commands ivy-completion-in-region
+  :preface
+  (defun sb/ignore-dired-buffers (str)
+    "Return non-nil if STR names a Dired buffer.
+This function is intended for use with `ivy-ignore-buffers'."
+    (let ((buf (get-buffer str)))
+      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :custom
   (completion-in-region-function #'ivy-completion-in-region)
   (ivy-case-fold-search 'always "Always ignore case while searching")
@@ -1227,6 +1254,8 @@ whitespaces."
                     "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
                     "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
+  ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
+  (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish
   :bind
   (("C-c r" . ivy-resume)
@@ -1270,8 +1299,8 @@ whitespaces."
    ;; ([remap flycheck-list-errors] . counsel-flycheck)
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
-   ([remap swiper] . counsel-grep-or-swiper)
-   ("<f4>" . counsel-grep-or-swiper)
+   ([remap swiper] . swiper-isearch)
+   ("<f4>" . swiper-isearch)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap load-library] . counsel-load-library)
    ([remap load-theme] . counsel-load-theme)
@@ -1343,13 +1372,17 @@ whitespaces."
   ;; (defalias 'load-library 'counsel-load-library)
   (defalias 'load-theme 'counsel-load-theme)
   ;; (defalias 'yank-pop 'counsel-yank-pop)
-  )
+  (add-to-list 'ivy-display-functions-alist
+               '(counsel-company . ivy-display-function-overlay)))
 
 (use-package ivy-posframe
   :ensure t
   :diminish
   :disabled t
-  :hook (ivy-mode . ivy-posframe-mode))
+  :hook (ivy-mode . ivy-posframe-mode)
+  :custom
+  (ivy-posframe-parameters '((left-fringe . 8)
+                             (right-fringe . 8))))
 
 (use-package prescient
   :ensure t
@@ -1405,7 +1438,7 @@ whitespaces."
 
 (use-package flyspell
   :if dotemacs-is-linux
-  :functions flyspell-overlay-p
+  :commands flyspell-overlay-p
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -1468,8 +1501,8 @@ whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-  ;; ("C-," . flyspell-auto-correct-previous-word)
-  ("C-," . sb/flyspell-goto-previous-error)))
+   ;; ("C-," . flyspell-auto-correct-previous-word)
+   ("C-," . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion did not give the save option
 ;; in a few cases.
@@ -1532,10 +1565,12 @@ whitespaces."
 ;; "sp-cheat-sheet" will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  ;; :disabled t
   :diminish (smartparens-mode show-smartparens-mode)
-  :hook ((after-init . smartparens-mode)
-         (after-init . show-smartparens-mode)
+  :commands sp-local-pair
+  :hook ((after-init . (lambda ()
+                         (require 'smartparens-config)
+                         (smartparens-global-mode 1)
+                         (show-smartparens-global-mode 1)))
          ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
                                                 (require 'smartparens-latex))))
   :custom
@@ -1544,7 +1579,6 @@ whitespaces."
   :config
   ;; Stop pairing single quotes in elisp
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
-
   ;; Do not insert a parenthesis pair when the point is at the beginning of a
   ;; word
   ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
@@ -1658,7 +1692,7 @@ whitespaces."
 (use-package flycheck
   :ensure t
   :defer 2
-  :functions flycheck-add-next-checker
+  :commands (flycheck-add-next-checker flycheck-next-checker flycheck-previous-error flycheck-describe-checker flycheck-buffer flycheck-list-errors flycheck-disabled-checkers flycheck-select-checker flycheck-verify-setup flycheck-next-error flycheck-disable-checker)
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-display-errors-delay 0)
@@ -1706,9 +1740,9 @@ whitespaces."
   :ensure t
   :after flycheck
   :hook
-  (text-mode . (lambda ()
-                 (require 'flycheck-grammarly)
-                 (flycheck-add-next-checker 'grammarly-checker 'textlint))))
+  ((text-mode markdown-mode latex-mode LaTeX-mode) . (lambda ()
+                                                       (require 'flycheck-grammarly)
+                                                       (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
@@ -1887,6 +1921,7 @@ whitespaces."
 (use-package flimenu
   :ensure
   :after imenu
+  :commands flimenu-global-mode
   :config (flimenu-global-mode 1))
 
 (setq-default large-file-warning-threshold (* 500 1024 1024)
@@ -2054,7 +2089,8 @@ whitespaces."
   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-  (add-to-list 'popwin:special-display-config '(deadgrep-mode)))
+  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+  (add-to-list 'popwin:special-display-config '(flycheck-verify-mode)))
 
 ;; (use-package sudo-edit ; Edit file with sudo
 ;;   :ensure t
@@ -2074,7 +2110,7 @@ whitespaces."
 
 (use-package whole-line-or-region
   :ensure t
-  :diminish
+  :diminish (whole-line-or-region-local-mode)
   :config (whole-line-or-region-global-mode 1))
 
 (use-package goto-last-change
@@ -2082,24 +2118,28 @@ whitespaces."
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package beginend
-  :ensure
-  :diminish beginend-global-mode
-  :config (beginend-global-mode 1))
+  :ensure t
+  :commands beginend-global-mode
+  ;; :diminish (beginend-epa-key-list-mode beginend-global-mode beginend-rg-mode beginend-latex-mode beginend-LaTeX-mode beginend-org-mode)
+  :config
+  (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
+    (diminish mode))
+  (beginend-global-mode 1))
 
-;; (use-package undo-tree
-;;   :ensure t
-;;   :defines undo-tree-map
-;;   :custom
-;;   (undo-tree-mode-lighter "")
-;;   (undo-tree-visualizer-timestamps t)
-;;   (undo-tree-visualizer-relative-timestamps t)
-;;   (undo-tree-auto-save-history nil)
-;;   (undo-tree-visualizer-diff t)
-;;   :config
-;;   (global-undo-tree-mode 1)
-;;   (unbind-key "C-/" undo-tree-map)
-;;   :diminish
-;;   :bind ("C-x u" . undo-tree-visualize))
+(use-package undo-tree
+  :ensure t
+  :defines undo-tree-map
+  :custom
+  (undo-tree-mode-lighter "")
+  (undo-tree-visualizer-timestamps t)
+  (undo-tree-visualizer-relative-timestamps t)
+  (undo-tree-auto-save-history nil)
+  (undo-tree-visualizer-diff t)
+  :config
+  (global-undo-tree-mode 1)
+  (unbind-key "C-/" undo-tree-map)
+  :diminish
+  :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :ensure t
@@ -2244,8 +2284,8 @@ whitespaces."
 
 (use-package olivetti
   :ensure t
-  :custom
-  (olivetti-set-width dotemacs-fill-column)
+  :custom (olivetti-body-width dotemacs-fill-column)
+  :hook ((text-mode markdown-mode latex-mode LaTeX-mode) . olivetti-mode)
   :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
 
 (use-package pdf-tools
@@ -2257,11 +2297,11 @@ whitespaces."
 
 (use-package saveplace-pdf-view
   :ensure t
-  :functions saveplace-pdf-view-mode
-  :config (saveplace-pdf-view-mode 1))
+  :after saveplace)
 
 (use-package logview
   :ensure t
+  :mode ("\\.log\\'" . logview-mode)
   :custom
   (logview-cache-filename (expand-file-name "logview-cache.extmap"
                                             dotemacs-temp-directory)))
@@ -2311,7 +2351,7 @@ whitespaces."
 ;; Use 'pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
   :ensure t
-  :functions (pandoc-load-default-settings)
+  :commands (pandoc-load-default-settings)
   :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
@@ -2414,8 +2454,8 @@ whitespaces."
 
 (use-package lsp-mode
   :ensure t
-  :functions (lsp-register-client lsp-tramp-connection
-                                  make-lsp-client lsp-format-buffer)
+  :commands (lsp-register-client lsp-tramp-connection
+                                 make-lsp-client lsp-format-buffer)
   :commands (lsp lsp-deferred)
   ;; https://justin.abrah.ms/dotfiles/emacs.html
   ;; :ensure-system-package
@@ -2443,19 +2483,19 @@ whitespaces."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  ;; (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
-  ;;                             mspyls mspyls-remote jedi
-  ;;                             jedils-remote clangd clangd-remote
-  ;;                             jsts-ls flow-ls ts-ls eslint
-  ;;                             json-ls jsonls-remote cmakels
-  ;;                             cmakels-remote html-ls
-  ;;                             htmlls-remote angular-ls texlab
-  ;;                             texlab-remote jdtls bash-ls
-  ;;                             bashls-remote typescript-remote
-  ;;                             css-ls cssls-remote
-  ;;                             intelephense-remote
-  ;;                             perl-language-server xmlls yamlls
-  ;;                             php-ls))
+  (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
+                              mspyls mspyls-remote jedi
+                              jedils-remote clangd clangd-remote
+                              jsts-ls flow-ls ts-ls eslint
+                              json-ls jsonls-remote cmakels
+                              cmakels-remote html-ls
+                              htmlls-remote angular-ls texlab
+                              texlab-remote jdtls bash-ls
+                              bashls-remote typescript-remote
+                              css-ls cssls-remote
+                              intelephense-remote
+                              perl-language-server xmlls yamlls
+                              php-ls))
   (lsp-html-format-wrap-line-length 80)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2654,11 +2694,12 @@ whitespaces."
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp-deferred)))
-  ;; :config
-  ;; (dolist (ls '(pyls pyright jedi))
-  ;;   (add-to-list 'lsp-disabled-clients ls))
-  ;; (add-to-list 'lsp-enabled-clients 'mspyls)
-  )
+  :custom
+  (lsp-python-ms-python-executable-cmd "python3")
+  :config
+  (dolist (ls '(pyls pyright jedi))
+    (add-to-list 'lsp-disabled-clients ls))
+  (add-to-list 'lsp-enabled-clients 'mspyls))
 
 (use-package lsp-pyright
   :ensure t
@@ -2668,11 +2709,10 @@ whitespaces."
                          (lsp-deferred)))
   :custom
   (lsp-pyright-python-executable-cmd "python3")
-  ;; :config
-  ;; (dolist (ls '(pyls mspyls jedi))
-  ;;   (add-to-list 'lsp-disabled-clients ls))
-  ;; (add-to-list 'lsp-enabled-clients 'pyright)
-  )
+  :config
+  (dolist (ls '(pyls mspyls jedi))
+    (add-to-list 'lsp-disabled-clients ls))
+  (add-to-list 'lsp-enabled-clients 'pyright))
 
 (use-package lsp-jedi
   :ensure t
@@ -2680,11 +2720,19 @@ whitespaces."
   :hook (python-mode . (lambda ()
                          (require 'lsp-jedi)
                          (lsp-deferred)))
-  ;; :config
-  ;; (dolist (ls '(pyls mspyls pyright))
-  ;;   (add-to-list 'lsp-disabled-clients ls))
-  ;; (add-to-list 'lsp-enabled-clients 'jedi)
-  )
+  :config
+  (dolist (ls '(pyls mspyls pyright))
+    (add-to-list 'lsp-disabled-clients ls))
+  (add-to-list 'lsp-enabled-clients 'jedi))
+
+;; Py-yapf works on a temporary file (placed in /tmp). Therefore it does not pick up on any project
+;; specific YAPF styles. Yapfify works on the original file, so that any project settings supported
+;; by YAPF itself are used
+(use-package yapfify
+  :ensure t
+  :diminish yapf-mode
+  :if (eq dotemacs-python-langserver 'pyright)
+  :hook (python-mode . yapf-mode))
 
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
@@ -2720,6 +2768,7 @@ whitespaces."
 (use-package flycheck-clang-analyzer
   :ensure t
   :after flycheck
+  :commands flycheck-clang-analyzer-setup
   :config (flycheck-clang-analyzer-setup))
 
 (use-package cuda-mode
@@ -2755,11 +2804,11 @@ whitespaces."
   ;;             ("C-[" . python-indent-shift-left)
   ;;             ("C-]" . python-indent-shift-right))
   :config
-  ;; (with-eval-after-load 'lsp-mode
-  ;;   (when (eq dotemacs-python-langserver 'pyls)
-  ;;     (dolist (ls '(pyright mspyls jedi))
-  ;;       (add-to-list 'lsp-disabled-clients ls))
-  ;;     (add-to-list 'lsp-enabled-clients 'pyls)))
+  (with-eval-after-load 'lsp-mode
+    (when (eq dotemacs-python-langserver 'pyls)
+      (dolist (ls '(pyright mspyls jedi))
+        (add-to-list 'lsp-disabled-clients ls))
+      (add-to-list 'lsp-enabled-clients 'pyls)))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
         python-shell-interpreter "python3"
@@ -2794,7 +2843,6 @@ whitespaces."
 
 (use-package py-isort
   :ensure t
-  :after python
   :init
   (add-hook 'python-mode-hook
             (lambda ()
@@ -2851,7 +2899,7 @@ whitespaces."
 ;; (with-eval-after-load 'sh-script-mode
 (use-package flycheck-shfmt
   :ensure reformatter
-  :functions flycheck-shfmt-setup
+  :commands flycheck-shfmt-setup
   :after flycheck
   :load-path "extras/shfmt"
   :config (flycheck-shfmt-setup))
@@ -2916,6 +2964,7 @@ whitespaces."
 
 (use-package diff-hl
   :ensure t
+  :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
   :custom (diff-hl-draw-borders nil)
   :hook ((after-init . global-diff-hl-mode)
          (dired-mode . diff-hl-dired-mode))
@@ -2980,10 +3029,185 @@ whitespaces."
 (setq auto-mode-alist (append '((".classpath\\'" . xml-mode))
                               auto-mode-alist))
 
-(use-package latex-init
-  :load-path "extras"
-  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                          (require 'latex-init))))
+;; Configure latex mode. Auctex provides LaTeX-mode, which is an alias. Auctex overrides the tex
+;; package
+(use-package tex-site
+  :ensure auctex
+  :mode ("\\.tex\\'" . LaTeX-mode))
+
+(with-eval-after-load 'tex-mode
+  (use-package tex-buf
+    :commands (TeX-active-process TeX-save-document TeX-command-menu))
+
+  (setq font-latex-fontify-sectioning 1.0
+        TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
+        TeX-auto-untabify t ; Remove all tabs before saving
+        TeX-clean-confirm nil
+        TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+        TeX-parse-self t ; Parse documents
+        TeX-PDF-mode t ; Use pdflatex
+        TeX-quote-after-quote nil ; Allow original LaTeX quotes
+        TeX-save-query nil
+        TeX-source-correlate-method 'synctex
+        TeX-source-correlate-mode t
+        ;; Do not start the emacs server when correlating sources
+        TeX-source-correlate-start-server nil
+        TeX-syntactic-comment t
+        LaTeX-item-indent 0 ; Two spaces + Extra indentation
+        LaTeX-syntactic-comments t
+        ;; Don't insert line-break at inline math
+        LaTeX-fill-break-at-separators nil)
+
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  ;; (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+  ;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+  ;; (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
+  (add-hook 'LaTeX-mode-hook #'reftex-mode)
+
+  (setq-default TeX-master nil) ; Query for master file
+
+  ;; Enable rainbow mode after applying styles to the buffer
+  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
+
+  ;; Disable "LaTeX-insert-item" in favor of imenu
+  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
+  ;; Unset "C-c ;" since we want to bind it to 'comment-line
+  ;; (unbind-key "C-c ;" LaTeX-mode-map)
+
+  (use-package auctex-latexmk
+    :ensure t
+    :custom
+    (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the -pdf flag when TeX-PDF-mode is active")
+    (TeX-command-default "LatexMk")
+    :init (auctex-latexmk-setup)
+    ;; :hook (LaTeX-mode . (lambda()
+    ;;                       (require 'auctex-latexmk)))
+    )
+
+  (use-package company-auctex
+    :ensure t
+    :init (company-auctex-init))
+
+  (use-package ivy-bibtex
+    :ensure t
+    :bind ("C-c x b" . ivy-bibtex)
+    :config
+    (use-package bibtex-completion
+      :custom
+      (bibtex-completion-cite-prompt-for-optional-arguments nil)
+      (bibtex-completion-cite-default-as-initial-input t)
+      (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
+    :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+
+  (use-package bibtex
+    :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+    :custom
+    (bibtex-align-at-equal-sign t)
+    (bibtex-maintain-sorted-entries t)
+    :config
+    (use-package bibtex-utils
+      :ensure t))
+
+  (use-package reftex
+    :commands (reftex-get-bibfile-list bibtex-parse-keys)
+    :bind (("C-c [" . reftex-citation)
+           ("C-c )" . reftex-reference)
+           ("C-c (" . reftex-label))
+    ;; :preface
+    ;; (defun get-bibtex-keys (file)
+    ;;   (with-current-buffer (find-file-noselect file)
+    ;;     (mapcar 'car (bibtex-parse-keys))))
+    ;; (defun reftex-add-all-bibitems-from-bibtex ()
+    ;;   (interactive)
+    ;;   (mapc 'LaTeX-add-bibitems
+    ;;         (apply 'append
+    ;;                (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+    :custom
+    (reftex-plug-into-AUCTeX t)
+    (reftex-save-parse-info t)
+    (reftex-use-multiple-selection-buffers t)
+    (reftex-enable-partial-scans t)
+    (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
+    (reftex-highlight-selection 'both))
+
+  ;; (with-eval-after-load 'reftex
+  ;;     (reftex-add-all-bibitems-from-bibtex))
+
+  ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+
+  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+  (use-package reftex-cite
+    :after auctex
+    :preface
+    (defun get-bibtex-keys (file)
+      (with-current-buffer (find-file-noselect file)
+        (mapcar 'car (bibtex-parse-keys))))
+    (defun reftex-add-all-bibitems-from-bibtex ()
+      (interactive)
+      (mapc 'LaTeX-add-bibitems
+            (apply 'append
+                   (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+    :config (reftex-add-all-bibitems-from-bibtex))
+
+  ;; (use-package reftex-cite
+  ;;   :preface
+  ;;   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+  ;; (defun get-bibtex-keys (file)
+  ;;   (with-current-buffer (find-file-noselect file)
+  ;;     (mapcar 'car (bibtex-parse-keys))))
+  ;;   (defun find-bibliography-file ()
+  ;;     "Try to find a bibliography file using RefTeX."
+  ;;     ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
+  ;;     (interactive)
+  ;;     (let ((bibfile-list nil))
+  ;;       (condition-case nil
+  ;;           (setq bibfile-list (reftex-get-bibfile-list))
+  ;;         (error (ignore-errors
+  ;;                  (setq bibfile-list (reftex-default-bibliography)))))
+  ;;       (if bibfile-list
+  ;;           (car bibfile-list) "")))
+  ;; (defun reftex-add-all-bibitems-from-bibtex ()
+  ;;   (interactive)
+  ;;   (mapc 'LaTeX-add-bibitems
+  ;;         (apply 'append
+  ;;                (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+  ;;   :init (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex))
+
+  (use-package bib-cite
+    :diminish bib-cite-minor-mode
+    :init (add-hook 'LaTeX-mode-hook (lambda ()
+                                       (bib-cite-minor-mode 1)))
+    :custom (bib-cite-use-reftex-view-crossref t)
+    :bind (:map bib-cite-minor-mode-map
+                ("C-c b" . nil) ; We use "C-c b" for comment-box
+                ("C-c l a" . bib-apropos)
+                ("C-c l b" . bib-make-bibliography)
+                ("C-c l d" . bib-display)
+                ("C-c l t" . bib-etags)
+                ("C-c l f" . bib-find)
+                ("C-c l n" . bib-find-next)
+                ("C-c l h" . bib-highlight-mouse)))
+
+  ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+  (defun sb/save-buffer-and-run-latexmk ()
+    "Save the current buffer and run LaTeXMk also."
+    (interactive)
+    (require 'tex-buf)
+    (let ((process (TeX-active-process))) (if process (delete-process process)))
+    (let ((TeX-save-query nil)) (TeX-save-document ""))
+    (TeX-command-menu "LaTeXMk"))
+
+  ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+  ;;   (add-hook hook
+  ;;             (lambda ()
+  ;;               (add-hook 'after-save-hook
+  ;;                         (lambda ()
+  ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
+
+  ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
+  ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
+  )
+
 
 ;; Autocompletion with LSP, LaTeX, and Company does not work yet, so we continue to use AucTeX
 ;; support
