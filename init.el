@@ -488,12 +488,13 @@ whitespaces."
                                       try-expand-dabbrev-all-buffers
                                       try-expand-dabbrev-from-kill
                                       try-complete-file-name-partially
-                                      try-expand-all-abbrevs
                                       try-complete-file-name
+                                      try-expand-all-abbrevs
                                       try-expand-list
                                       try-expand-line
                                       try-complete-lisp-symbol-partially
                                       try-complete-lisp-symbol))
+  (hippie-expand-verbose nil)
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
@@ -645,7 +646,11 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
-                                            :init (load-theme 'modus-vivendi t)))
+                                            :init (load-theme 'modus-vivendi t)
+                                            :custom
+                                            (modus-vivendi-theme-mode-line '3d)
+                                            (modus-vivendi-theme-proportional-fonts nil)
+                                            (modus-vivendi-theme-scale-headings nil)))
 
       ((eq dotemacs-theme 'default) (progn
                                       ;; (setq frame-background-mode 'light)
@@ -844,7 +849,7 @@ whitespaces."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package diredfl ; Colored modes
+(use-package diredfl ; More detailed colors
   :ensure t
   :hook (dired-mode . diredfl-mode))
 
@@ -1108,7 +1113,8 @@ whitespaces."
               ("C-p" . company-select-previous)
               ("<tab>" . company-complete-common-or-cycle)
               ;; ("M-/" . company-other-backend)
-              ("C-s" . sb/quit-company-save-buffer)))
+              ("C-s" . sb/quit-company-save-buffer)
+              ("<escape>" . company-abort)))
 
 ;; FIXME: Silence "Starting 'look' process..." message
 (defun sb/ispell-lookup-words (old-fun &rest args)
@@ -1197,6 +1203,9 @@ whitespaces."
   :disabled t
   :diminish
   :init (global-company-fuzzy-mode 1))
+
+(use-package flx
+  :ensure t)
 
 (use-package yasnippet
   :ensure t
@@ -1792,10 +1801,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package whitespace
   :commands (whitespace-mode global-whitespace-mode)
-  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+  :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+  :hook (markdown-mode . whitespace-mode)
   :custom
-  (show-trailing-whitespace nil)
-  (whitespace-line-column dotemacs-fill-column))
+  (show-trailing-whitespace t)
+  (whitespace-line-column dotemacs-fill-column)
+  (whitespace-style '(trailing)))
 
 ;; This is different from whitespace-cleanup since this is unconditional
 (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
@@ -1818,16 +1829,29 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package highlight-symbol ; Highlight symbol under point
   :ensure t
+  :disabled t ; `symbol-overlay' is better
   :hook (prog-mode . highlight-symbol-mode)
   :bind (("M-p" . highlight-symbol-prev)
          ("M-n" . highlight-symbol-next))
   :diminish
   :custom (highlight-symbol-on-navigation-p t))
 
+(use-package symbol-overlay ; Highlight symbol under point
+  :ensure t
+  :commands (symbol-overlay-mode)
+  :diminish
+  :hook (prog-mode . symbol-overlay-mode)
+  :bind (("M-p" . symbol-overlay-jump-prev)
+         ("M-n" . symbol-overlay-jump-next)))
+
 (use-package hl-todo
   :ensure t
   :hook (after-init . global-hl-todo-mode)
   :custom (hl-todo-highlight-punctuation ":"))
+
+(use-package highlight-numbers
+  :ensure t
+  :hook ((prog-mode css-mode html-mode) . highlight-numbers-mode))
 
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -1937,24 +1961,24 @@ This file is specified in `counsel-projectile-default-file'."
 ;;     :demand t
 ;;     :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend)))
 
-;; (use-package xref
-;;   :if (eq dotemacs-tags-scheme 'ctags)
-;;   :config (xref-etags-mode)
-;;   :bind (("M-'" . xref-find-definitions)
-;;          ("M-?" . xref-find-references)
-;;          ("C-M-." . xref-find-apropos)
-;;          ("M-," . xref-pop-marker-stack)
-;;          :map xref--xref-buffer-mode-map
-;;          ("C-o" . xref-show-location-at-point)
-;;          ("<tab>" . xref-quit-and-goto-xref)
-;;          ("r" . xref-query-replace-in-results))
-;;   :config
-;;   (use-package ivy-xref
-;;     :ensure t
-;;     :demand t ; Load once xref is invoked
-;;     :config
-;;     (setq xref-show-definitions-function #'ivy-xref-show-defs
-;;           xref-show-xrefs-function #'ivy-xref-show-xrefs)))
+(use-package xref
+  :if (eq dotemacs-tags-scheme 'ctags)
+  :config (xref-etags-mode)
+  :bind (("M-'" . xref-find-definitions)
+         ("M-?" . xref-find-references)
+         ("C-M-." . xref-find-apropos)
+         ("M-," . xref-pop-marker-stack)
+         :map xref--xref-buffer-mode-map
+         ("C-o" . xref-show-location-at-point)
+         ("<tab>" . xref-quit-and-goto-xref)
+         ("r" . xref-query-replace-in-results)))
+
+(use-package ivy-xref
+  :ensure t
+  :after (ivy xref)
+  :custom
+  (xref-show-definitions-function #'ivy-xref-show-defs)
+  (xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
   :ensure t
@@ -2266,7 +2290,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package pdf-tools
   :ensure t
-  :init (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
+  :init
+  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
+  (setq pdf-view-display-size 'fit-page)
   :config
   (add-hook 'pdf-view-mode-hook (lambda ()
                                   (setq header-line-format nil))))
@@ -2322,7 +2348,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package markdown-toc
   :ensure t
-  :after markdown-mode)
+  :after markdown-mode
+  :commands (markdown-toc-refresh-toc
+             markdown-toc-generate-toc
+             markdown-toc-generate-or-refresh-toc))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf.
 (use-package pandoc-mode
@@ -2366,6 +2395,9 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (use-package highlight-doxygen
 ;;   :ensure t)
 
+(use-package rst
+  :mode ("\\.rst\\'" . rst-mode))
+
 (use-package boogie-friends
   :ensure t
   :mode ("\\.smt\\'" . z3-smt2-mode))
@@ -2404,11 +2436,12 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :mode ("PKGBUILD" . pkgbuild-mode))
 
-(dolist (hooks '(lisp-mode-hook emacs-lisp-mode-hook))
-  (add-hook hooks
-            (lambda ()
-              (when buffer-file-name
-                (add-hook 'after-save-hook #'check-parens nil t)))))
+(use-package elisp-mode
+  :mode (("\\.el\\'" . emacs-lisp-mode)
+         ("\\.elc\\'" . elisp-byte-code-mode))
+  :hook ((lisp-mode emacs-lisp-mode) . (lambda ()
+                                         (when buffer-file-name
+                                           (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package lsp-mode
   :ensure t
@@ -2802,6 +2835,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package py-isort
   :ensure t
+  :if (executable-find "isort")
   :hook (python-mode . (lambda ()
                          (add-hook 'before-save-hook #'py-isort-before-save))))
 
@@ -2911,6 +2945,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package git-commit
   :ensure t
+  :after magit
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :custom (git-commit-summary-max-length 50))
 

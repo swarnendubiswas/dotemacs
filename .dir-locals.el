@@ -13,6 +13,4 @@
              (eval ignore-errors (require 'shfmt))
              (mode . shfmt-on-save)
              ))
- ;; (gfm-mode . ((mode . prettier)))
- ;; (markdown-mode . ((mode . prettier)))
  )
