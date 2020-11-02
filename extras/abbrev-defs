@@ -520,6 +520,7 @@
     ("experienc" "experience" nil :count 0)
     ("experimet" "experiment" nil :count 1)
     ("experimetation" "experimentation" nil :count 0)
+    ("expliting" "exploiting" nil :count 0)
     ("exprience" "experience" nil :count 0)
     ("exprienced" "experienced" nil :count 0)
     ("eyt" "yet" nil :count 0)
@@ -1277,7 +1278,7 @@
     ("whos" "who's" nil :count 0)
     ("whove" "who've" nil :count 0)
     ("whre" "where" nil :count 1)
-    ("whta" "what" nil :count 0)
+    ("whta" "what" nil :count 1)
     ("wief" "wife" nil :count 0)
     ("wierd" "weird" nil :count 0)
     ("wihch" "which" nil :count 0)
@@ -1336,6 +1337,7 @@
     ("conrol" "control" nil :count 0)
     ("proessing" "processing" nil :count 0)
     ("sequenes" "sequence" nil :count 0)
+    ("serializaation" "serialization" nil :count 0)
    ))
 
 (define-abbrev-table 'text-mode-abbrev-table

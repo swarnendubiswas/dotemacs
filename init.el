@@ -1244,7 +1244,8 @@ whitespaces."
   :config
   (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*" "^\\*Help\\*$"
                     "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-                    "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$" "*emacs*"))
+                    "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$" "*emacs*" "*Warnings*"
+                    "^\\*prettier"))
     (add-to-list 'ivy-ignore-buffers buffer))
   (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish
@@ -1287,8 +1288,9 @@ whitespaces."
    ("C-x f" . counsel-file-jump) ; Jump to a file below the current directory
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
-   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
-   ([remap flycheck-list-errors] . counsel-flycheck)
+   ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
+   ;; argument error
+   ;; ([remap flycheck-list-errors] . counsel-flycheck)
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
    ([remap swiper] . swiper-isearch)
@@ -1359,8 +1361,9 @@ whitespaces."
   :diminish
   :hook (ivy-mode . counsel-mode)
   :config
-  ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
-  (defalias 'flycheck-list-errors 'counsel-flycheck)
+  ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
+  ;; argument error
+  ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
   ;; (defalias 'load-library 'counsel-load-library)
   (defalias 'load-theme 'counsel-load-theme)
   ;; (defalias 'yank-pop 'counsel-yank-pop)
@@ -2257,7 +2260,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package olivetti
   :ensure t
   :diminish
-  :custom (olivetti-body-width dotemacs-fill-column)
+  :custom (olivetti-body-width 0.8 "Fraction of the window width")
   :hook ((text-mode markdown-mode latex-mode LaTeX-mode) . olivetti-mode)
   :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
 
@@ -3480,7 +3483,7 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*")
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
