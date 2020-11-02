@@ -42,3 +42,4 @@ amx-items
 .ac-php-conf.json
 eln-cache
 package-quickstart.el
+private.el
