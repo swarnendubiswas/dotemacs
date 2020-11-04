@@ -124,7 +124,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -646,11 +646,12 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
-                                            :init (load-theme 'modus-vivendi t)
-                                            :custom
-                                            (modus-vivendi-theme-mode-line '3d)
+                                            :init
+                                            (modus-vivendi-theme-mode-line 'moody)
                                             (modus-vivendi-theme-proportional-fonts nil)
-                                            (modus-vivendi-theme-scale-headings nil)))
+                                            (modus-vivendi-theme-scale-headings nil)
+                                            (load-theme 'modus-vivendi t)
+                                            ))
 
       ((eq dotemacs-theme 'default) (progn
                                       ;; (setq frame-background-mode 'light)
@@ -713,18 +714,17 @@ whitespaces."
 
       ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
                                                      :ensure t
-                                                     :init (doom-modeline-mode 1)
-                                                     :custom
+                                                     :init
                                                      (doom-modeline-buffer-encoding nil)
-                                                     (doom-modeline-height 1)
+                                                     (doom-modeline-height 20)
                                                      (doom-modeline-indent-info t)
-                                                     (doom-modeline-minor-modes t)))
+                                                     (doom-modeline-minor-modes t)
+                                                     (doom-modeline-mode 1)))
 
       ((eq dotemacs-modeline-theme 'default)))
 
 (use-package awesome-tray
-  :if (and nil (eq dotemacs-modeline-theme 'default))
-  :disabled t
+  :if (eq dotemacs-modeline-theme 'default)
   :load-path "extras"
   :hook (after-init . awesome-tray-mode)
   :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
@@ -754,8 +754,8 @@ whitespaces."
 
 (cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute 'default nil :height 135))
       ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
-(set-face-attribute 'mode-line nil :height 100)
-(set-face-attribute 'mode-line-inactive nil :height 100)
+(set-face-attribute 'mode-line nil :height 90)
+(set-face-attribute 'mode-line-inactive nil :height 90)
 
 (use-package circadian
   :ensure t
@@ -922,8 +922,9 @@ whitespaces."
   :after (treemacs projectile))
 
 (use-package treemacs-icons-dired
-  :after treemacs
   :ensure t
+  :after treemacs
+  :disabled t
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
@@ -1260,7 +1261,7 @@ whitespaces."
   :diminish
   :bind
   (("C-c r" . ivy-resume)
-   ;; ("<f3>" . ivy-switch-buffer)
+   ("<f3>" . ivy-switch-buffer)
    :map ivy-minibuffer-map
    ("C-'" . ivy-avy)
    ("<return>" . ivy-alt-done) ; Continue completion
@@ -1297,8 +1298,7 @@ whitespaces."
    ("C-x f" . counsel-file-jump) ; Jump to a file below the current directory
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
-   ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
-   ;; argument error
+   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
    ;; ([remap flycheck-list-errors] . counsel-flycheck)
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
@@ -1311,7 +1311,7 @@ whitespaces."
    ("<f9>" . counsel-recentf)
    ("C-c s r" . counsel-rg)
    ("C-c C-m" . counsel-mark-ring)
-   ("<f3>" . counsel-switch-buffer)
+   ;; ("<f3>" . counsel-switch-buffer) ; Preview of buffers can be a bottleneck
    ([remap yank-pop] . counsel-yank-pop))
   :bind* ("C-c C-j" . counsel-semantic-or-imenu)
   :custom
@@ -1800,6 +1800,7 @@ This file is specified in `counsel-projectile-default-file'."
   ("v" flycheck-verify-setup))
 
 (use-package whitespace
+  :disabled t
   :commands (whitespace-mode global-whitespace-mode)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :hook (markdown-mode . whitespace-mode)
@@ -2150,7 +2151,7 @@ This file is specified in `counsel-projectile-default-file'."
   :init
   (setq session-save-file (expand-file-name "session"
                                             dotemacs-temp-directory))
-  (add-hook 'after-init-hook #'session-initialize))
+  :hook (after-init . #'session-initialize))
 
 (use-package immortal-scratch
   :ensure t
@@ -2217,10 +2218,10 @@ This file is specified in `counsel-projectile-default-file'."
   :bind (("M-b" . avy-goto-word-1)
          ("C-'" . avy-goto-char)
          ("C-/" . avy-goto-line))
+  :init (setq avy-indent-line-overlay nil)
   :custom
   (avy-background t)
   (avy-highlight-first t)
-  (avy-indent-line-overlay nil)
   (avy-style 'at)
   :config (avy-setup-default))
 
@@ -2255,7 +2256,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package explain-pause-mode
   :load-path "extras"
-  ;; :hook (after-init . explain-pause-mode)
+  :hook (after-init . explain-pause-mode)
   :diminish)
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also get run
@@ -2278,13 +2279,13 @@ This file is specified in `counsel-projectile-default-file'."
                        (require 'langtool)))
   :custom
   (langtool-default-language "en")
-  (langtool-language-tool-jar (expand-file-name "tmp/LanguageTool-5.1/languagetool-commandline.jar"
-                                                dotemacs-user-home)))
+  (langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
+                                                dotemacs-user-tmp)))
 
 (use-package olivetti
   :ensure t
   :diminish
-  :custom (olivetti-body-width 0.8 "Fraction of the window width")
+  :custom (olivetti-body-width 0.95 "Fraction of the window width")
   :hook ((text-mode markdown-mode latex-mode LaTeX-mode) . olivetti-mode)
   :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
 
@@ -2461,10 +2462,9 @@ This file is specified in `counsel-projectile-default-file'."
          (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode)
-         ((c++-mode-hook python-mode-hook java-mode-hook) . (lambda ()
-                                                              (add-hook
-                                                               'before-save-hook
-                                                               #'lsp-format-buffer))))
+         ((c++-mode java-mode) . (lambda ()
+                                   (when buffer-file-name
+                                     (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
                              "--fallback-style=LLVM" "--log=error"))
@@ -2562,7 +2562,20 @@ This file is specified in `counsel-projectile-default-file'."
                                        lsp-pyright-langserver-command-args)))
                               :major-modes '(python-mode)
                               :remote? t
-                              :server-id 'pyright-remote)))
+                              :server-id 'pyright-remote
+                              :multi-root t
+                              :initialization-options (lambda () (ht-merge (lsp-configuration-section "pyright")
+                                                                           (lsp-configuration-section "python")))
+                              :initialized-fn (lambda (workspace)
+                                                (with-lsp-workspace workspace
+                                                  (lsp--set-configuration
+                                                   (ht-merge (lsp-configuration-section "pyright")
+                                                             (lsp-configuration-section "python")))))
+                              :download-server-fn (lambda (_client callback error-callback _update?)
+                                                    (lsp-package-ensure 'pyright callback error-callback))
+                              :notification-handlers (lsp-ht ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+                                                             ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+                                                             ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
         ((eq dotemacs-python-langserver
              'jedi) (lsp-register-client
              (make-lsp-client :new-connection (lsp-tramp-connection "jedi-language-server")
@@ -2639,12 +2652,11 @@ This file is specified in `counsel-projectile-default-file'."
          ("C-c l f" . lsp-format-buffer)
          ("C-c l r" . lsp-find-references)))
 
-;; (dolist (hook '(c++-mode-hook python-mode-hook java-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (add-hook 'before-save-hook
-;;                         (lambda ()
-;;                           (lsp-format-buffer)) nil t))))
+
+(when (or (eq dotemacs-python-langserver 'pyls) (eq dotemacs-python-langserver 'mspyls))
+  (add-hook python-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 (use-package lsp-ui
   :ensure t
@@ -2675,7 +2687,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package lsp-java
   :ensure t
-  :hook (java-mode . lsp)
+  :hook (java-mode . lsp-deferred)
   :custom
   (lsp-java-inhibit-message t)
   (lsp-java-save-actions-organize-imports t))
@@ -2803,6 +2815,7 @@ This file is specified in `counsel-projectile-default-file'."
         (add-to-list 'lsp-enabled-clients 'pyls))))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
+        python-shell-exec-path "python3"
         python-shell-interpreter "python3"
         auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
