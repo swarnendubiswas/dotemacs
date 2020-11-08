@@ -106,7 +106,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-theme
-  'modus-operandi
+  'default ; SB: Use `circadian' to load the theme
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -268,8 +268,10 @@ whitespaces."
 (eval-when-compile
   (require 'use-package))
 
+;; Installation is one-time, so avoid the overhead of run-time checks
 (use-package use-package-ensure-system-package
-  :ensure t)
+  :ensure t
+  :disabled t)
 
 (use-package bind-key
   :ensure t
@@ -310,7 +312,9 @@ whitespaces."
 (use-package exec-path-from-shell
   :ensure t
   :if (or (daemonp) (memq window-system '(x ns)))
-  :custom (exec-path-from-shell-check-startup-files nil)
+  :custom
+  (exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
@@ -1757,8 +1761,9 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
    . (lambda ()
-       (require 'flycheck-grammarly)
-       (flycheck-add-next-checker 'grammarly-checker 'textlint))))
+       (unless (file-remote-p buffer-file-name)
+         (require 'flycheck-grammarly)
+         (flycheck-add-next-checker 'grammarly-checker 'textlint)))))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
@@ -1909,7 +1914,6 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
 (use-package imenu
-  :defer 2
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
@@ -2295,6 +2299,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
   (setq pdf-view-display-size 'fit-page)
   :config
+  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
   (add-hook 'pdf-view-mode-hook (lambda ()
                                   (setq header-line-format nil))))
 
@@ -2334,7 +2339,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
   :custom
-  (markdown-command "pandoc -s --mathjax")
+  (markdown-command "pandoc -f markdown -s --mathjax --highlight-style=pygments")
   (markdown-enable-math t "Syntax highlight for LaTeX fragments")
   (markdown-enable-wiki-links t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
@@ -2378,7 +2383,9 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prettier
   :ensure t
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-  :hook ((markdown-mode gfm-mode) . prettier-mode))
+  :hook ((markdown-mode gfm-mode) . (lambda ()
+                                      (unless (file-remote-p buffer-file-name)
+                                        prettier-mode))))
 
 (use-package csv-mode
   :ensure t
@@ -2432,6 +2439,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package ini-mode
   :ensure t
   :mode "\\.ini\\'")
+
+(add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
 (use-package pkgbuild-mode
   :ensure t
@@ -3075,9 +3084,8 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   ;; (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  ;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-  ;; (add-hook 'LaTeX-mode-hook #'turn-on-auto-fill)
   (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
   (setq-default TeX-master nil) ; Query for master file
 
@@ -3094,10 +3102,7 @@ This file is specified in `counsel-projectile-default-file'."
     :custom
     (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the -pdf flag when TeX-PDF-mode is active")
     (TeX-command-default "LatexMk")
-    :init (auctex-latexmk-setup)
-    ;; :hook (LaTeX-mode . (lambda()
-    ;;                       (require 'auctex-latexmk)))
-    )
+    :init (auctex-latexmk-setup))
 
   (use-package company-auctex
     :ensure t
@@ -3128,15 +3133,15 @@ This file is specified in `counsel-projectile-default-file'."
     :bind (("C-c [" . reftex-citation)
            ("C-c )" . reftex-reference)
            ("C-c (" . reftex-label))
-    ;; :preface
-    ;; (defun get-bibtex-keys (file)
-    ;;   (with-current-buffer (find-file-noselect file)
-    ;;     (mapcar 'car (bibtex-parse-keys))))
-    ;; (defun reftex-add-all-bibitems-from-bibtex ()
-    ;;   (interactive)
-    ;;   (mapc 'LaTeX-add-bibitems
-    ;;         (apply 'append
-    ;;                (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
+    :preface
+    (defun sb/get-bibtex-keys (file)
+      (with-current-buffer (find-file-noselect file)
+        (mapcar 'car (bibtex-parse-keys))))
+    (defun sb/reftex-add-all-bibitems-from-bibtex ()
+      (interactive)
+      (mapc 'LaTeX-add-bibitems
+            (apply 'append
+                   (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
     :custom
     (reftex-plug-into-AUCTeX t)
     (reftex-save-parse-info t)
@@ -3531,7 +3536,8 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log*")
+  '(;"*Messages*"
+    "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
@@ -3625,6 +3631,7 @@ Increase line spacing by two line height."
 (put 'company-clang-arguments 'safe-local-variable #'listp)
 (put 'counsel-etags-project-root 'safe-local-variable #'stringp)
 (put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
+(put 'counsel-projectile-default-file 'safe-local-variable #'stringp)
 (put 'dotemacs-projectile-default-file 'safe-local-variable #'stringp)
 (put 'flycheck-checker 'safe-local-variable #'listp)
 (put 'flycheck-clang-include-path 'safe-local-variable #'listp)
