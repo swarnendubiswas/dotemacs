@@ -183,9 +183,9 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 - `M-Ret` - Insert new list item (`markdown-insert-list-item`)
 - `C-c C-s e` - Make region or word italic (emphasis) (`markdown-insert-italic`)
-- `C-c C-s s` - Make region or word bold or strong (``)
-- `C-c C-s s` - Insert or start blockquote (``)
+- `C-c C-s s` - Insert markup to make a region or word strikethrough (`markdown-insert-strike-through`)
 - `C-c C-s p` - Insert pre-formatted code blocks (``)
+- `C-c C-s b` - Insert markup to make a region or word bold (`markdown-insert-bold`)
 - `C-c -` - Insert a horizontal rule (``)
 - `C-c C-c v` - Export the file and view in a browser (``)
 - `C-c C-c m` - Compile the file and show in another buffer (``)
@@ -198,6 +198,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 - `C-c C-f` - Format the region/buffer (`json-reformat-region`)
 - `C-c C-p` - Display a path to the object at point (`json-mode-show-path`)
+- `C-c C-t` - Toggle between `true` and `false` at point (`json-toggle-boolean`)
 
 ## Web mode
 

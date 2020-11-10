@@ -1265,6 +1265,7 @@ contextualize
 contiguous
 continent
 contingent
+continuation
 continue
 continued
 continuous
@@ -3888,6 +3889,7 @@ objects
 obligation
 observability
 observation
+observations
 observe
 observed
 observer
@@ -5191,6 +5193,7 @@ serial
 serializability
 Serializability
 serializable
+serialization
 series
 serious
 seriously
@@ -6213,6 +6216,7 @@ unsteady
 unstressed
 unstructured
 unsuccessful
+unsuitable
 unsustainable
 unsynchronized
 untidy
@@ -6530,11 +6534,3 @@ yourself
 youth
 zero
 zone
-serialization
-continuation
-unsuitable
-observations
-
-;; Local Variables:
-;; mode: text
-;; End:

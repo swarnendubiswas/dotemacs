@@ -620,8 +620,8 @@ whitespaces."
       ((eq dotemacs-theme 'solarized-light) (use-package solarized-light-theme
                                               :ensure solarized-theme
                                               :init
-                                              (load-theme 'solarized-light t)
-                                              (setq solarized-distinct-fringe-background t)))
+                                              (setq solarized-distinct-fringe-background t)
+                                              (load-theme 'solarized-light t)))
 
       ((eq dotemacs-theme 'solarized-dark) (use-package solarized-dark-theme
                                              :ensure solarized-theme
@@ -642,11 +642,11 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
                                              :ensure t
-                                             :init (load-theme 'modus-operandi t)
-                                             :custom
+                                             :init
                                              (modus-operandi-theme-mode-line '3d)
                                              (modus-operandi-theme-proportional-fonts nil)
-                                             (modus-operandi-theme-scale-headings nil)))
+                                             (modus-operandi-theme-scale-headings nil)
+                                             (load-theme 'modus-operandi t)))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
@@ -654,23 +654,21 @@ whitespaces."
                                             (modus-vivendi-theme-mode-line 'moody)
                                             (modus-vivendi-theme-proportional-fonts nil)
                                             (modus-vivendi-theme-scale-headings nil)
-                                            (load-theme 'modus-vivendi t)
-                                            ))
+                                            (load-theme 'modus-vivendi t)))
 
       ((eq dotemacs-theme 'default) (progn
                                       ;; (setq frame-background-mode 'light)
                                       ;; (set-background-color "#ffffff")
                                       ;; (set-foreground-color "#666666")
                                       (set-face-attribute 'region nil
-                                                          :background "gainsboro")
-                                      )))
+                                                          :background "gainsboro"))))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
                                                  :init
-                                                 (setq powerline-display-mule-info nil
-                                                       powerline-display-buffer-size t
+                                                 (setq powerline-display-buffer-size t
                                                        powerline-display-hud nil
+                                                       powerline-display-mule-info nil
                                                        powerline-gui-use-vcs-glyph t)
                                                  (when (eq dotemacs-theme 'leuven)
                                                    (set-face-attribute 'mode-line nil
@@ -686,8 +684,8 @@ whitespaces."
                                            :ensure t
                                            :init
                                            (setq sml/theme 'light
-                                                 sml/no-confirm-load-theme t
                                                  sml/mode-width 'full
+                                                 sml/no-confirm-load-theme t
                                                  sml/shorten-modes t
                                                  sml/shorten-directory t)
                                            (sml/setup)))
@@ -702,18 +700,18 @@ whitespaces."
                                                  :init
                                                  (require 'spaceline-config)
                                                  (setq spaceline-hud-p nil
-                                                       spaceline-selection-info-p nil
-                                                       spaceline-version-control-p t
                                                        spaceline-input-method-p nil
-                                                       spaceline-persp-name-p nil)
+                                                       spaceline-persp-name-p nil
+                                                       spaceline-selection-info-p nil
+                                                       spaceline-version-control-p t)
                                                  (spaceline-emacs-theme)))
 
       ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
                                                :ensure t
                                                :init
-                                               (require 'airline-themes)
-                                               (setq airline-hide-eyebrowse-on-inactive-buffers t
-                                                     airline-eshell-colors nil)
+                                               ;; (require 'airline-themes)
+                                               (setq airline-eshell-colors nil
+                                                     airline-hide-eyebrowse-on-inactive-buffers t)
                                                (load-theme 'airline-cool t)))
 
       ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
@@ -760,6 +758,12 @@ whitespaces."
       ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
 (set-face-attribute 'mode-line nil :height 90)
 (set-face-attribute 'mode-line-inactive nil :height 90)
+
+;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
+(defun sb/minibuffer-font-setup ()
+  (set (make-local-variable 'face-remapping-alist)
+       '((default :height 0.9))))
+(add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
 (use-package circadian
   :ensure t
@@ -840,8 +844,15 @@ whitespaces."
                         (diredp-toggle-find-file-reuse-dir 1))))
 
 ;; FIXME: I cannot get it to work with explicit loading
+
+(with-eval-after-load 'dired-mode
+  (require 'dired-efap)
+  (setq dired-efap-initial-filename-selection nil)
+  (bind-key "r" #'dired-efap dired-mode-map))
+
 (use-package dired-efap
   :ensure t
+  :disabled t
   :init (require 'dired-efap)
   :custom (dired-efap-initial-filename-selection nil)
   :bind* (:map dired-mode-map
@@ -929,6 +940,7 @@ whitespaces."
   :ensure t
   :after treemacs
   :disabled t
+  :if (display-graphic-p)
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
@@ -942,12 +954,14 @@ whitespaces."
 
 (use-package all-the-icons-ibuffer
   :ensure t
+  :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :ensure t
   :diminish
+  :if (display-graphic-p)
   :hook (dired-mode . (lambda ()
                         (interactive)
                         (unless (file-remote-p default-directory)
@@ -956,9 +970,7 @@ whitespaces."
 (use-package org
   :ensure t
   :defer t
-  :hook ((org-mode . visual-line-mode)
-         ;; (org-mode . turn-on-auto-fill)
-         )
+  :hook (org-mode . visual-line-mode)
   :diminish org-indent-mode
   :custom
   (org-src-fontify-natively t "Code block fontification using the major-mode of the code")
@@ -1172,13 +1184,9 @@ whitespaces."
 (use-package company-box
   :ensure t
   :if (display-graphic-p)
-  :disabled t
   :diminish
   :defines company-box-icons-all-the-icons
-  :hook (global-company-mode . company-box-mode)
-  :custom
-  ;; (company-box-backends-colors nil)
-  (company-box-doc-delay 0))
+  :hook (global-company-mode . company-box-mode))
 
 (use-package company-dict
   :ensure t
@@ -1428,12 +1436,17 @@ whitespaces."
   :ensure t
   :hook (company-mode . company-prescient-mode))
 
+(use-package all-the-icons-ivy
+  :ensure t
+  :hook (after-init . all-the-icons-ivy-setup))
+
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
 (use-package all-the-icons-ivy-rich
   :ensure t
+  :if (display-graphic-p)
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-  :custom (all-the-icons-ivy-rich-icon-size 0.8))
+  :init (setq all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
   :ensure t
@@ -1872,7 +1885,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                dotemacs-temp-directory))
   (tramp-persistency-file-name (expand-file-name "tramp"
                                                  dotemacs-temp-directory))
-  (tramp-verbose 1)
+  (tramp-verbose 7)
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-completion-reread-directory-timeout nil)
   ;; Disable version control
