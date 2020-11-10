@@ -369,7 +369,8 @@ whitespaces."
       ;; Ignore case when reading a file name completion
       read-file-name-completion-ignore-case t
       read-process-output-max (* 1024 1024) ; 1 MB
-      require-final-newline t ; Always end a file with a newline.
+      require-final-newline t ; Always end a file with a newline
+      resize-mini-windows nil ; Changing the height is jarring
       ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
       ;; Enable use of system clipboard across Emacs and other applications
@@ -1042,6 +1043,7 @@ whitespaces."
 
 (use-package swiper
   :ensure t
+  :defer t
   :custom (swiper-action-recenter t))
 
 (with-eval-after-load 'grep
@@ -1927,6 +1929,7 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
 (use-package imenu
+  :defer t
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
