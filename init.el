@@ -125,7 +125,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -313,11 +313,12 @@ whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
+;; Check the PATH with `(getenv "PATH")'
 (use-package exec-path-from-shell
   :ensure t
   :if (or (daemonp) (memq window-system '(x ns)))
   :custom
-  (exec-path-from-shell-arguments '("-l"))
+  ;; (exec-path-from-shell-arguments '("-l"))
   (exec-path-from-shell-check-startup-files nil)
   :init (exec-path-from-shell-initialize))
 
@@ -646,24 +647,18 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
                                              :ensure t
-                                             :commands (modus-operandi-theme-mode-line
-                                                        modus-operandi-theme-proportional-fonts
-                                                        modus-operandi-theme-scale-headings)
                                              :init
-                                             (modus-operandi-theme-mode-line '3d)
-                                             (modus-operandi-theme-proportional-fonts nil)
-                                             (modus-operandi-theme-scale-headings nil)
+                                             (setq modus-operandi-theme-mode-line '3d
+                                                   modus-operandi-theme-variable-pitch-headings nil
+                                                   modus-operandi-theme-scale-headings nil)
                                              (load-theme 'modus-operandi t)))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
-                                            :commands (modus-vivendi-theme-mode-line
-                                                       modus-vivendi-theme-proportional-fonts
-                                                       modus-vivendi-theme-scale-headings)
                                             :init
-                                            (modus-vivendi-theme-mode-line 'moody)
-                                            (modus-vivendi-theme-proportional-fonts nil)
-                                            (modus-vivendi-theme-scale-headings nil)
+                                            (setq modus-vivendi-theme-mode-line 'moody
+                                                  modus-vivendi-theme-variable-pitch-headings nil
+                                                  modus-vivendi-theme-scale-headings nil)
                                             (load-theme 'modus-vivendi t)))
 
       ((eq dotemacs-theme 'default) (progn
@@ -726,15 +721,15 @@ whitespaces."
 
       ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
                                                      :ensure t
-                                                     :commands (doom-modeline-buffer-encoding
-                                                                doom-modeline-indent-info
-                                                                doom-modeline-minor-modes
-                                                                doom-modeline-height)
+                                                     ;; Requires the fonts included with
+                                                     ;; `all-the-icons', run `M-x
+                                                     ;; all-the-icons-install-fonts'
+                                                     :ensure all-the-icons
                                                      :init
-                                                     (doom-modeline-buffer-encoding nil)
-                                                     (doom-modeline-height 20)
-                                                     (doom-modeline-indent-info t)
-                                                     (doom-modeline-minor-modes t)
+                                                     (setq doom-modeline-buffer-encoding nil
+                                                           doom-modeline-height 20
+                                                           doom-modeline-indent-info t
+                                                           doom-modeline-minor-modes t)
                                                      (doom-modeline-mode 1)))
 
       ((eq dotemacs-modeline-theme 'default)))
@@ -779,8 +774,8 @@ whitespaces."
        '((default :height 0.95))))
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
+;; Changing height of the echo area is jarring
 (add-hook 'emacs-startup-hook (lambda ()
-                                ;; Changing the height is jarring
                                 (setq resize-mini-windows nil)))
 
 (use-package circadian
@@ -2049,7 +2044,7 @@ This file is specified in `counsel-projectile-default-file'."
                         'local)))
   (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
-  (dolist (ignore-files '(".clang-format" "*.json" "*.html" "*.xml"))
+  (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package dumb-jump
@@ -3470,7 +3465,7 @@ This file is specified in `counsel-projectile-default-file'."
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
-;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
+;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 ;; (use-package server
 ;;   :if (not (string-equal "root" (getenv "USER"))) ; Only start server mode if not root
 ;;   :config (unless (server-running-p) (server-start)))
@@ -3587,8 +3582,7 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '(;"*Messages*"
-    "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log*")
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
@@ -3616,6 +3610,7 @@ Increase line spacing by two line height."
 
 ;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
 (defun sb/reinstall-package (package)
+  (interactive)
   (unload-feature package)
   (package-reinstall package)
   (require package))
@@ -3626,8 +3621,8 @@ Increase line spacing by two line height."
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
 ;; available bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
 
-;; bind-key*, bind* overrides all minor mode bindings. The kbd macro is not required with bind-key
-;; variants. With bind-key, you do not need an explicit `(kbd ...)'.
+;; `bind-key*', `bind*' overrides all minor mode bindings. The kbd macro is not required with
+;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
 ;; Other variants:
 ;; (global-set-key (kbd "RET") 'newline-and-indent)
 ;; (define-key global-map (kbd "RET") 'newline-and-indent)
