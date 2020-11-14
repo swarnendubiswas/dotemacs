@@ -95,7 +95,7 @@
     ("agreemnets" "agreements" nil :count 0)
     ("agressive" "aggressive" nil :count 0)
     ("ahppen" "happen" nil :count 0)
-    ("ahve" "have" nil :count 0)
+    ("ahve" "have" nil :count 1)
     ("alloted" "allotted" nil :count 0)
     ("allwasy" "always" nil :count 0)
     ("allwyas" "always" nil :count 0)
@@ -161,6 +161,7 @@
     ("articel" "article" nil :count 0)
     ("artificats" "artifacts" nil :count 0)
     ("asdvertising" "advertising" nil :count 0)
+    ("aslo" "also" nil :count 0)
     ("assistent" "assistant" nil :count 0)
     ("assuem" "assume" nil :count 1)
     ("asthe" "as the" nil :count 0)
@@ -1344,12 +1345,18 @@
     ("serializaation" "serialization" nil :count 0)
    ))
 
+(define-abbrev-table 'python-mode-abbrev-table
+  '(
+    ("temperory" "temporary" nil :count 0)
+   ))
+
 (define-abbrev-table 'text-mode-abbrev-table
   '(
     ("atend" "Attend" nil :count 0)
     ("beging" "being" nil :count 0)
     ("deepnds" "depends" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
+    ("hueristically" "heuristically" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("vidoes" "videos" nil :count 0)
    ))

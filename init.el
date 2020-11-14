@@ -37,6 +37,7 @@
 ;; Good reference configurations
 ;; https://protesilaos.com/dotemacs/
 ;; https://github.com/CSRaghunandan/.emacs.d/
+;; https://github.com/purcell/emacs.d
 
 ;;; Code:
 
@@ -370,7 +371,6 @@ whitespaces."
       read-file-name-completion-ignore-case t
       read-process-output-max (* 1024 1024) ; 1 MB
       require-final-newline t ; Always end a file with a newline
-      resize-mini-windows nil ; Changing the height is jarring
       ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
       ;; Enable use of system clipboard across Emacs and other applications
@@ -730,16 +730,16 @@ whitespaces."
   :if (eq dotemacs-modeline-theme 'default)
   :load-path "extras"
   :hook (after-init . awesome-tray-mode)
-  :custom (awesome-tray-active-modules '("buffer-name" "location" "file-path" "mode-name" "git"))
+  :custom (awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
   :custom-face
   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
-  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight bold :height 0.8))))
+  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
   (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
@@ -763,8 +763,12 @@ whitespaces."
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (defun sb/minibuffer-font-setup ()
   (set (make-local-variable 'face-remapping-alist)
-       '((default :height 0.9))))
+       '((default :height 0.95))))
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
+
+(add-hook 'emacs-startup-hook (lambda ()
+                                ;; Changing the height is jarring
+                                (setq resize-mini-windows nil)))
 
 (use-package circadian
   :ensure t
@@ -1043,7 +1047,9 @@ whitespaces."
 
 (use-package swiper
   :ensure t
-  :defer t
+  :bind
+  (([remap swiper] . swiper-isearch)
+   ("<f4>" . swiper-isearch))
   :custom (swiper-action-recenter t))
 
 (with-eval-after-load 'grep
@@ -1092,6 +1098,13 @@ whitespaces."
   (let ((inhibit-message t))
     (apply orig-fun args)))
 (advice-add 'recentf-save-list :around #'sb/recentf-save-list)
+
+;; Hide the "Wrote ..." message which is irritating
+(defun sb/write-region (orig-fun &rest args)
+  "Hide messages appearing in ORIG-FUN."
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
+(advice-add 'write-region :around #'sb/write-region)
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used
 ;; Try `M-x company-complete-common' when there are no completions
@@ -1316,8 +1329,6 @@ whitespaces."
    ;; ([remap flycheck-list-errors] . counsel-flycheck)
    ("C-c s g" . counsel-git-grep)
    ("C-<f9>" . sb/counsel-goto-recent-directory)
-   ([remap swiper] . swiper-isearch)
-   ("<f4>" . swiper-isearch)
    ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ([remap load-library] . counsel-load-library)
    ([remap load-theme] . counsel-load-theme)
@@ -1599,10 +1610,12 @@ whitespaces."
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
   :config
+  (turn-off-smartparens-strict-mode)
+
   ;; Stop pairing single quotes in elisp
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
-  ;; Do not insert a parenthesis pair when the point is at the beginning of a
-  ;; word
+
+  ;; Do not insert a parenthesis pair when the point is at the beginning of a word
   ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
   ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
   ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
@@ -1716,6 +1729,9 @@ This file is specified in `counsel-projectile-default-file'."
   (counsel-projectile-sort-directories t)
   (counsel-projectile-sort-files t)
   (counsel-projectile-sort-projects t)
+  (counsel-projectile-modify-action
+   'counsel-projectile-switch-project-action
+   '((default sb/counsel-projectile-switch-project-action-default-file)))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-rg)
@@ -1776,7 +1792,7 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
    . (lambda ()
-       (unless (file-remote-p buffer-file-name)
+       (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
          (require 'flycheck-grammarly)
          (flycheck-add-next-checker 'grammarly-checker 'textlint)))))
 
@@ -1887,7 +1903,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                dotemacs-temp-directory))
   (tramp-persistency-file-name (expand-file-name "tramp"
                                                  dotemacs-temp-directory))
-  (tramp-verbose 7)
+  (tramp-verbose 1)
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-completion-reread-directory-timeout nil)
   ;; Disable version control
@@ -2113,7 +2129,8 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
   (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-  (add-to-list 'popwin:special-display-config '(flycheck-verify-mode)))
+  (add-to-list 'popwin:special-display-config '(flycheck-verify-mode))
+  (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
 (use-package expand-region ; Expand region by semantic units
   :ensure t
@@ -2487,9 +2504,9 @@ This file is specified in `counsel-projectile-default-file'."
          (lsp-managed-mode . lsp-modeline-diagnostics-mode)
          ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
          (lsp-mode . lsp-modeline-code-actions-mode)
-         ((c++-mode java-mode) . (lambda ()
-                                   (when buffer-file-name
-                                     (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))
+         ((c++-mode java-mode json-mode) . (lambda ()
+                                             (when buffer-file-name
+                                               (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
                              "--fallback-style=LLVM" "--log=error"))
@@ -2502,25 +2519,23 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-highlighting t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  (lsp-enabled-clients '(pyls pyls-remote pyright pyright-remote
-                              mspyls mspyls-remote jedi
-                              jedils-remote clangd clangd-remote
-                              jsts-ls flow-ls ts-ls eslint
-                              json-ls jsonls-remote cmakels
-                              cmakels-remote html-ls
-                              htmlls-remote angular-ls texlab
-                              texlab-remote jdtls bash-ls
-                              bashls-remote typescript-remote
-                              css-ls cssls-remote
-                              intelephense-remote
-                              perl-language-server xmlls yamlls
-                              php-ls))
-  (lsp-html-format-wrap-line-length 80)
+  (lsp-enabled-clients '(clangd clangd-remote jsts-ls flow-ls
+                                ts-ls eslint json-ls
+                                jsonls-remote cmakels
+                                cmakels-remote html-ls
+                                htmlls-remote angular-ls texlab
+                                texlab-remote jdtls bash-ls
+                                bashls-remote typescript-remote
+                                css-ls cssls-remote
+                                intelephense-remote
+                                perl-language-server xmlls yamlls
+                                php-ls))
+  (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io nil)
+  (lsp-log-io t)
   (lsp-modeline-diagnostics-scope :project)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
@@ -2528,7 +2543,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-pyls-plugins-mccabe-enabled nil)
   (lsp-pyls-plugins-preload-modules ["numpy"])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
-  (lsp-pyls-plugins-pycodestyle-max-line-length 80)
+  (lsp-pyls-plugins-pycodestyle-max-line-length dotemacs-fill-column)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
   (lsp-pyls-plugins-pydocstyle-enabled nil)
   (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
@@ -2546,7 +2561,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
                       "org.eclipse.lemminx-0.13.1-uber.jar")))
-  (lsp-yaml-print-width 80)
+  (lsp-yaml-print-width dotemacs-fill-column)
   :custom-face
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
                                                font-lock-doc-face
@@ -2679,7 +2694,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (or (eq dotemacs-python-langserver 'pyls) (eq dotemacs-python-langserver 'mspyls))
-  (add-hook python-mode-hook
+  (add-hook 'python-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
@@ -2723,37 +2738,36 @@ This file is specified in `counsel-projectile-default-file'."
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
-                         (lsp-deferred)))
+                         (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
+                           (add-to-list 'lsp-disabled-clients ls))
+                         (add-to-list 'lsp-enabled-clients 'mspyls)
+                         (add-to-list 'lsp-enabled-clients 'mspyls-remote)))
   :custom
-  (lsp-python-ms-python-executable-cmd "python3")
-  :config
-  (dolist (ls '(pyls pyright jedi))
-    (add-to-list 'lsp-disabled-clients ls))
-  (add-to-list 'lsp-enabled-clients 'mspyls))
+  (lsp-python-ms-python-executable-cmd "python3"))
 
 (use-package lsp-pyright
   :ensure t
   :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
-                         (lsp-deferred)))
+                         (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
+                           (add-to-list 'lsp-disabled-clients ls))
+                         (add-to-list 'lsp-enabled-clients 'pyright)
+                         (add-to-list 'lsp-enabled-clients 'pyright-remote)))
   :custom
-  (lsp-pyright-python-executable-cmd "python3")
-  :config
-  (dolist (ls '(pyls mspyls jedi))
-    (add-to-list 'lsp-disabled-clients ls))
-  (add-to-list 'lsp-enabled-clients 'pyright))
+  (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package lsp-jedi
   :ensure t
   :if (eq dotemacs-python-langserver 'jedi)
   :hook (python-mode . (lambda ()
                          (require 'lsp-jedi)
-                         (lsp-deferred)))
-  :config
-  (dolist (ls '(pyls mspyls pyright))
-    (add-to-list 'lsp-disabled-clients ls))
-  (add-to-list 'lsp-enabled-clients 'jedi))
+                         (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
+                           (add-to-list 'lsp-disabled-clients ls))
+                         (add-to-list 'lsp-enabled-clients 'jedi)
+                         (add-to-list 'lsp-enabled-clients 'jedils-remote)))
+  :custom
+  (lsp-jedi-diagnostics-enable t))
 
 ;; Py-yapf works on a temporary file (placed in /tmp). Therefore it does not pick up on any project
 ;; specific YAPF styles. Yapfify works on the original file, so that any project settings supported
@@ -2803,6 +2817,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package cuda-mode
   :ensure t
+  :hook (cuda-mode . lsp-deferred)
   :mode (("\\.cu\\'"	. cuda-mode)
          ("\\.cuh\\'"	. cuda-mode)))
 
@@ -2822,8 +2837,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package python
   :init
-  ;; Disable readline based native completion
-  (setq python-shell-completion-native-enable nil)
+  (setq python-shell-completion-native-enable nil) ; Disable readline based native completion
   (setenv "PYTHONPATH" "python3")
   :hook (python-mode . lsp-deferred)
   ;; :bind (:map python-mode-map
@@ -2835,9 +2849,10 @@ This file is specified in `counsel-projectile-default-file'."
   (with-eval-after-load 'lsp-mode
     (when (eq dotemacs-python-langserver 'pyls)
       (progn
-        (dolist (ls '(pyright mspyls jedi))
+        (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
           (add-to-list 'lsp-disabled-clients ls))
-        (add-to-list 'lsp-enabled-clients 'pyls))))
+        (add-to-list 'lsp-enabled-clients 'pyls)
+        (add-to-list 'lsp-enabled-clients 'pyls-remote))))
   (setq python-indent-offset 4
         python-indent-guess-indent-offset nil
         python-shell-exec-path "python3"
@@ -3064,7 +3079,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                           (require 'lsp-latex)
                                                           (lsp-deferred)))
   :custom
-  (lsp-latex-bibtex-formatting-line-length 100)
+  (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
@@ -3080,12 +3095,12 @@ This file is specified in `counsel-projectile-default-file'."
     :commands (TeX-active-process TeX-save-document TeX-command-menu))
 
   (setq font-latex-fontify-sectioning 1.0
-        TeX-auto-save t ; Enable parse on save, stores parsed information in an "auto" directory
+        TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
         TeX-auto-untabify t ; Remove all tabs before saving
         TeX-clean-confirm nil
         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
         TeX-parse-self t ; Parse documents
-        TeX-PDF-mode t ; Use pdflatex
+        TeX-PDF-mode t ; Use `pdflatex'
         TeX-quote-after-quote nil ; Allow original LaTeX quotes
         TeX-save-query nil
         TeX-source-correlate-method 'synctex
@@ -3095,7 +3110,7 @@ This file is specified in `counsel-projectile-default-file'."
         TeX-syntactic-comment t
         LaTeX-item-indent 0 ; Two spaces + Extra indentation
         LaTeX-syntactic-comments t
-        ;; Don't insert line-break at inline math
+        ;; Do not insert line-break at inline math
         LaTeX-fill-break-at-separators nil)
 
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
@@ -3654,6 +3669,8 @@ Increase line spacing by two line height."
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
 (put 'lsp-clients-clangd-args 'safe-local-variable #'listp)
+(put 'lsp-python-ms-extra-paths 'safe-local-variable #'listp)
+(put 'lsp-pyright-extra-paths 'safe-local-variable #'listp)
 (put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)

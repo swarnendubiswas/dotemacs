@@ -1,4 +1,4 @@
-personal_ws-1.1 en 145 
+personal_ws-1.1 en 147 
 Akash
 Anupam
 Biswas
@@ -19,6 +19,7 @@ Mainak
 Migrator
 Modularity
 OpenMP
+Parallelize
 Prafulla
 Pretrained
 Refactor
@@ -84,6 +85,7 @@ optimality
 optimizations
 outliers
 parallelization
+parallelize
 parallelizes
 parallelizing
 partitioner
