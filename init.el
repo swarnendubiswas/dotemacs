@@ -225,6 +225,7 @@ whitespaces."
 (defvar c-electric-indent)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
+(defvar dired-efap-initial-filename-selection)
 (defvar expand-line-mode)
 (defvar font-latex-fontify-sectioning)
 (defvar lsp-disabled-clients)
@@ -240,6 +241,8 @@ whitespaces."
 (defvar use-package-enable-imenu-support)
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
+
+(declare-function sb/sshlist "private" ())
 
 (eval-when-compile
   (setq package-enable-at-startup nil ; Avoid loading packages twice
@@ -643,6 +646,9 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
                                              :ensure t
+                                             :commands (modus-operandi-theme-mode-line
+                                                        modus-operandi-theme-proportional-fonts
+                                                        modus-operandi-theme-scale-headings)
                                              :init
                                              (modus-operandi-theme-mode-line '3d)
                                              (modus-operandi-theme-proportional-fonts nil)
@@ -651,6 +657,9 @@ whitespaces."
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
+                                            :commands (modus-vivendi-theme-mode-line
+                                                       modus-vivendi-theme-proportional-fonts
+                                                       modus-vivendi-theme-scale-headings)
                                             :init
                                             (modus-vivendi-theme-mode-line 'moody)
                                             (modus-vivendi-theme-proportional-fonts nil)
@@ -717,6 +726,10 @@ whitespaces."
 
       ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
                                                      :ensure t
+                                                     :commands (doom-modeline-buffer-encoding
+                                                                doom-modeline-indent-info
+                                                                doom-modeline-minor-modes
+                                                                doom-modeline-height)
                                                      :init
                                                      (doom-modeline-buffer-encoding nil)
                                                      (doom-modeline-height 20)
@@ -2000,6 +2013,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package xref
   :if (eq dotemacs-tags-scheme 'ctags)
+  :commands xref-etags-mode
   :config (xref-etags-mode)
   :bind (("M-'" . xref-find-definitions)
          ("M-?" . xref-find-references)
@@ -2417,7 +2431,7 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   :hook ((markdown-mode gfm-mode) . (lambda ()
-                                      (unless (file-remote-p buffer-file-name)
+                                      (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
                                         prettier-mode))))
 
 (use-package csv-mode
@@ -2489,8 +2503,13 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package lsp-mode
   :ensure t
   :commands (lsp-register-client lsp-tramp-connection
-                                 make-lsp-client lsp-format-buffer)
-  :commands (lsp lsp-deferred)
+                                 make-lsp-client
+                                 lsp-format-buffer
+                                 lsp-configuration-section lsp
+                                 lsp-deferred
+                                 lsp--set-configuration
+                                 lsp-package-ensure
+                                 ht-merge)
   ;; https://justin.abrah.ms/dotfiles/emacs.html
   ;; :ensure-system-package
   ;; ((typescript-language-server . "npm install -g typescript-language-server")
@@ -2509,7 +2528,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
-                             "--fallback-style=LLVM" "--log=error"))
+                             "--suggest-missing-includes" "--fallback-style=LLVM" "--log=error"))
   (lsp-completion-provider :none)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-hook nil)
@@ -2554,7 +2573,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                (expand-file-name ".config/pylintrc"
                                                                  dotemacs-user-home)))))
   (lsp-pyls-plugins-yapf-enabled t)
-  (lsp-session-file (expand-file-name "lsp-session-v1" dotemacs-temp-directory))
+  (lsp-session-file (expand-file-name "lsp-session" dotemacs-temp-directory))
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
@@ -3079,8 +3098,8 @@ This file is specified in `counsel-projectile-default-file'."
                                                           (require 'lsp-latex)
                                                           (lsp-deferred)))
   :custom
-  (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
   (lsp-latex-bibtex-formatting-formatter "latexindent")
+  (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
 
@@ -3092,7 +3111,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (with-eval-after-load 'tex-mode
   (use-package tex-buf
-    :commands (TeX-active-process TeX-save-document TeX-command-menu))
+    :commands (TeX-active-process TeX-save-document
+                                  TeX-command-menu TeX-revert-document-buffer))
 
   (setq font-latex-fontify-sectioning 1.0
         TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory

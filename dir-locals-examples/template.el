@@ -62,12 +62,20 @@
                  (flycheck-pylintrc . "setup.cfg")
                  (lsp-pyls-plugins-pylint-enabled . t)
                  (lsp-pyls-plugins-yapf-enabled . t)
-                 (lsp-python-ms-extra-paths . ["./src"])
-                 (lsp-pyright-extra-paths . ["./python-src"])
                  (lsp-pyright-venv-path . ["./python-src"])
                  (python-shell-exec-path . "/usr/bin/python3")
                  (python-shell-interpreter . "/usr/bin/python3")
                  (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/2019-sharwari")
+                 (eval . (let (
+                               (paths
+                                (vconcat (list
+                                          (expand-file-name "python-src" (projectile-project-root))
+                                          ))
+                                )
+                               )
+                           (setq lsp-pyright-extra-paths paths
+                                 lsp-python-ms-extra-paths paths)
+                           ))
                  ))
 
  (diff-mode . ((mode . whitespace)))
@@ -102,17 +110,25 @@
                                            (expand-file-name "fasttrack/include" (projectile-project-root))
                                            (expand-file-name "newfasttrack/include" (projectile-project-root))
                                            (expand-file-name "new_algo/include" (projectile-project-root))
-                                           )))
+                                           ))
+                            (clangd-args (list
+                                          "-j=2"
+                                          "--background-index"
+                                          "--clang-tidy"
+                                          "--fallback-style=LLVM"
+                                          "--pch-storage=memory"
+                                          "--suggest-missing-includes"
+                                          "--log=error"
+                                          "--compile-commands-dir=build"
+                                          ))
+                            )
                         (setq-local company-clang-arguments clang-args
                                     flycheck-clang-args clang-args
                                     flycheck-gcc-args clang-args
                                     flycheck-gcc-include-path include-path
-                                    flycheck-clang-include-path include-path)
+                                    flycheck-clang-include-path include-path
+                                    lsp-clients-clangd-args clangd-args)
                         ))
-              (lsp-clients-clangd-args . ("--compile-commands-dir=build"
-                                          "--pch-storage=memory"
-                                          "--background-index"
-                                          "-j=4"))
               ))
 
  (latex-mode . (
