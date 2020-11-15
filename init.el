@@ -356,8 +356,8 @@ whitespaces."
       ;; Disable loading of "default.el" at startup, inhibits site default settings
       inhibit-default-init t
       inhibit-startup-echo-area-message t
-      inhibit-startup-screen t ; inhibit-splash-screen is an alias
-      ;; *scratch* is in Lisp interaction mode by default, use text mode. text-mode is more
+      inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
+      ;; *scratch* is in Lisp interaction mode by default, use text mode. `text-mode' is more
       ;; *expensive, but I use scratch for composing emails
       initial-major-mode 'text-mode
       initial-scratch-message nil
@@ -851,22 +851,18 @@ whitespaces."
   :custom
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil)
+  :config
+  (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
   :hook (dired-mode . (lambda ()
-                        (require 'dired+)
                         ;; Do not create multiple dired buffers
                         (diredp-toggle-find-file-reuse-dir 1))))
 
-;; FIXME: I cannot get it to work with explicit loading
-
-(with-eval-after-load 'dired-mode
-  (require 'dired-efap)
-  (setq dired-efap-initial-filename-selection nil)
-  (bind-key "r" #'dired-efap dired-mode-map))
-
 (use-package dired-efap
   :ensure t
-  :disabled t
-  :init (require 'dired-efap)
+  :after dired+
+  :commands dired-efap
+  :hook (dired-mode . (lambda ()
+                        (require 'dired-efap)))
   :custom (dired-efap-initial-filename-selection nil)
   :bind* (:map dired-mode-map
                ("r" . dired-efap)))
@@ -883,8 +879,11 @@ whitespaces."
 
 (use-package async
   :ensure t
-  :diminish
+  :after dired
   :hook (dired-mode . dired-async-mode))
+
+(use-package dired-async
+  :diminish)
 
 ;; (use-package dired-rsync
 ;;   :ensure t
@@ -1100,19 +1099,16 @@ whitespaces."
   :config (run-at-time nil 180 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
-;; Hide the "Wrote to recentf" message which is irritating
-(defun sb/recentf-save-list (orig-fun &rest args)
+(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
   (let ((inhibit-message t))
     (apply orig-fun args)))
-(advice-add 'recentf-save-list :around #'sb/recentf-save-list)
+
+;; Hide the "Wrote to recentf" message which is irritating
+(advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Hide the "Wrote ..." message which is irritating
-(defun sb/write-region (orig-fun &rest args)
-  "Hide messages appearing in ORIG-FUN."
-  (let ((inhibit-message t))
-    (apply orig-fun args)))
-(advice-add 'write-region :around #'sb/write-region)
+(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used
 ;; Try `M-x company-complete-common' when there are no completions
@@ -1156,31 +1152,10 @@ whitespaces."
               ("C-s" . sb/quit-company-save-buffer)
               ("<escape>" . company-abort)))
 
-;; FIXME: Silence "Starting 'look' process..." message
-(defun sb/ispell-lookup-words (old-fun &rest args)
-  (let ((inhibit-message t))
-    (apply old-fun args)))
-(advice-add 'ispell-lookup-words :around #'sb/ispell-lookup-words)
-
-(defun sb/ispell-init-process (old-fun &rest args)
-  (let ((inhibit-message t))
-    (apply old-fun args)))
-(advice-add 'ispell-init-process :around #'sb/ispell-init-process)
-
-;; (defun sb/message-off-advice (oldfun &rest args)
-;;   "Quiet down messages in adviced OLDFUN."
-;;   (let ((message-off (make-symbol "message-off")))
-;;     (unwind-protect
-;;         (progn
-;;           (advice-add #'message :around #'ignore (list 'name message-off))
-;;           (apply oldfun args))
-;;       (advice-remove #'message message-off))))
-;; (advice-add #'ispell-init-process :around #'sb/message-off-advice)
-
-(defun sb/lookup-words (orig-fun &rest args)
-  (let ((inhibit-message t))
-    (apply orig-fun args)))
-(advice-add 'lookup-words :around #'sb/lookup-words)
+;; Silence "Starting 'look' process..." message
+(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough.
@@ -1603,7 +1578,7 @@ whitespaces."
   (show-paren-when-point-in-periphery t))
 
 ;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
-;; "`sp-cheat-sheet' will show you all the commands available, with examples.
+;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
   :diminish (smartparens-mode show-smartparens-mode)
@@ -1706,7 +1681,6 @@ whitespaces."
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts)))
 
-;; FIXME: counsel-projectile is not working
 (use-package counsel-projectile
   :ensure t
   :after counsel
@@ -1769,7 +1743,6 @@ This file is specified in `counsel-projectile-default-file'."
                                                        dotemacs-textlint-home))
   (add-hook 'python-mode-hook
             (lambda ()
-              ;; (defvaralias 'flycheck-python-pylint-executable 'python-shell-interpreter)
               (setq-local flycheck-checker 'python-pylint
                           flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home)
                           flycheck-python-pylint-executable "python3"))
@@ -2190,14 +2163,13 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :bind* ("C-." . iedit-mode))
 
-;; FIXME: What is the utility of this package?
-(use-package session
+(use-package session ; Avoid the "Overwrite old session file (not loaded)?" warning
   :ensure t
-  :disabled t
   :init
   (setq session-save-file (expand-file-name "session"
                                             dotemacs-temp-directory))
-  :hook (after-init . #'session-initialize))
+  :hook (after-init . (lambda()
+                        (session-initialize))))
 
 (use-package immortal-scratch
   :ensure t
@@ -2542,8 +2514,9 @@ This file is specified in `counsel-projectile-default-file'."
                                 bashls-remote typescript-remote
                                 css-ls cssls-remote
                                 intelephense-remote
-                                perl-language-server xmlls yamlls
-                                php-ls))
+                                perl-language-server php-ls xmlls
+                                xmlls-remote yamlls yamlls-remote
+                                ))
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2574,7 +2547,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name
                      (locate-user-emacs-file
-                      "org.eclipse.lemminx-0.13.1-uber.jar")))
+                      "org.eclipse.lemminx-0.14.1-uber.jar")))
   (lsp-yaml-print-width dotemacs-fill-column)
   :custom-face
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
@@ -2691,14 +2664,19 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :server-id 'htmlls-remote))
   ;; FIXME: Get lsp to work for xml remote
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-tramp-connection
-  ;;                                    (cons lsp-xml-server-command lsp-xml-server-vmargs))
-  ;;                   :major-modes '(xml-mode nxml-mode)
-  ;;                   :remote? t
-  ;;                   :server-id 'xmlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("java" "-jar" "/home/swarnendu/.emacs.d/org.eclipse.lemminx-0.14.1-uber.jar"))
+                    :major-modes '(xml-mode nxml-mode)
+                    :remote? t
+                    :server-id 'xmlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     '("yaml-language-server" "--stdio"))
+                    :major-modes '(yaml-mode)
+                    :remote? t
+                    :server-id 'yamlls-remote))
   :bind (("M-." . lsp-find-definition)
-         ;; ("M-," . pop-tag-mark)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
          ("C-c l r" . lsp-rename)
