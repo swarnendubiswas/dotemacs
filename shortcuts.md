@@ -316,6 +316,7 @@ Use `magit-status` to display information about the current Git repository, and 
 - `v` - Revert item (`magit-revert-item`)
 - `F` - Pull (`magit-pull`)
 - `f` - Fetch (`magit-fetch`)
+- `y` - List and compare references (`magit-show-references`)
 
 ### Svn
 
@@ -326,6 +327,16 @@ Use `magit-status` to display information about the current Git repository, and 
 - `l` - Display log for marked files or file at point (``)
 - `=` - Run diff on the marked files or file at point (``)
 - `U` - Update files for currently examined repository (``)
+
+### SMerge
+
+- `C-c v u` - (`smerge-keep-upper`)
+- `C-c v l` - (`smerge-keep-lower`)
+- `C-c v b` - (`smerge-keep-base`)
+- `C-c v a` - (`smerge-keep-all`)
+- `C-c v n` - (`smerge-next`)
+- `C-c v p` - (`smerge-prev`)
+- `C-c v E` - (`smerge-ediff`)
 
 ## Use Cases
 

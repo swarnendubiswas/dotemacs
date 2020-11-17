@@ -292,9 +292,12 @@ whitespaces."
   :ensure t
   :commands (f-join f-exists?))
 
+;; Use `C-c h' consistently for invoking a hydra
 (use-package hydra
   :ensure t
-  :commands (hydra-default-pre hydra-keyboard-quit hydra-show-hint hydra-set-transient-map hydra--call-interactively-remap-maybe))
+  :commands (hydra-default-pre hydra-keyboard-quit
+                               hydra-show-hint hydra-set-transient-map
+                               hydra--call-interactively-remap-maybe))
 
 (setq custom-file dotemacs-custom-file)
 (when (file-exists-p custom-file)
@@ -317,10 +320,11 @@ whitespaces."
 (use-package exec-path-from-shell
   :ensure t
   :if (or (daemonp) (memq window-system '(x ns)))
-  :custom
-  ;; (exec-path-from-shell-arguments '("-l"))
-  (exec-path-from-shell-check-startup-files nil)
-  :init (exec-path-from-shell-initialize))
+  :init
+  (setq exec-path-from-shell-arguments '("-l")
+        exec-path-from-shell-check-startup-files nil
+        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME"))
+  (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       auto-mode-case-fold nil
@@ -570,7 +574,6 @@ whitespaces."
                 ;; Typing with the mark active will overwrite the marked region
                 delete-selection-mode
                 global-visual-line-mode ; Wrap lines
-                global-so-long-mode ; This puts the buffer in read-only mode
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
                 global-hl-line-mode
@@ -583,6 +586,11 @@ whitespaces."
 (diminish 'visual-line-mode)
 
 (fringe-mode '(0 . 0))
+
+(use-package so-long ; ; This puts the buffer in read-only mode
+  :defer 2
+  :hook (after-init . global-so-long-mode)
+  :custom (so-long-threshold 500))
 
 ;; Maximize Emacs on startup. I am not sure which one of the following is better or faster
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
@@ -783,8 +791,8 @@ whitespaces."
   :custom
   (calendar-latitude 26.50)
   (calendar-longitude 80.23)
-  (circadian-themes '((:sunrise . modus-operandi)
-                      (:sunset  . modus-vivendi)))
+  (circadian-themes '((:sunrise . default)
+                      (:sunset  . default)))
   :init (circadian-setup))
 
 (use-package ibuffer
@@ -1534,7 +1542,7 @@ whitespaces."
       :custom (flyspell-correct-interface #'flyspell-correct-ivy)
       :bind ("C-;" . flyspell-correct-wrapper)))
 
-(defhydra hydra-spelling (:color blue)
+(defhydra sb/hydra-spelling (:color blue)
   "
   ^
   ^Spelling^          ^Errors^            ^Checker^
@@ -1552,10 +1560,18 @@ whitespaces."
   ("f" flyspell-buffer)
   ("m" flyspell-mode))
 
-(use-package highlight-indentation
-  :ensure t
-  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-  :hook (python-mode . highlight-indentation-mode))
+;; SB: I am trying out the second package, the first one works fine for me.
+(or (use-package highlight-indentation
+      :ensure t
+      :disabled t
+      :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+      :hook (python-mode . highlight-indentation-mode))
+
+    (use-package highlight-indent-guides
+      :ensure t
+      :diminish
+      :hook (prog-mode . highlight-indent-guides-mode)
+      :custom (highlight-indent-guides-method 'bitmap)))
 
 ;; Claims to be better than electric-indent-mode
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
@@ -1593,7 +1609,7 @@ whitespaces."
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
   :config
-  (turn-off-smartparens-strict-mode)
+  (smartparens-strict-mode -1)
 
   ;; Stop pairing single quotes in elisp
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
@@ -1738,13 +1754,21 @@ This file is specified in `counsel-projectile-default-file'."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
   (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
-  (setq flycheck-textlint-config (expand-file-name "textlintrc.json" dotemacs-textlint-home)
-        flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                       dotemacs-textlint-home))
+
+  (dolist (hook '(text-mode-hook org-mode-hook markdown-mode-hook
+                                 latex-mode-hook LaTeX-mode-hook))
+    (add-hook hook (lambda ()
+                     (setq-local
+                      flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                                                 dotemacs-textlint-home)
+                      flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                                     dotemacs-textlint-home)))))
+
   (add-hook 'python-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'python-pylint
-                          flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home)
+                          flycheck-pylintrc (expand-file-name ".config/pylintrc"
+                                                              dotemacs-user-home)
                           flycheck-python-pylint-executable "python3"))
             ;; (with-eval-after-load 'lsp-mode
             ;;   (flycheck-add-next-checker 'lsp 'python-pylint))
@@ -1770,6 +1794,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flycheck-grammarly
   :ensure t
   :after flycheck
+  :defer 2
   :hook
   ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
    . (lambda ()
@@ -1793,7 +1818,7 @@ This file is specified in `counsel-projectile-default-file'."
       :ensure t
       :hook (flycheck-mode . flycheck-inline-mode)))
 
-(defhydra hydra-flycheck (:color blue)
+(defhydra sb/hydra-flycheck (:color blue)
   "
   ^
   ^Flycheck^          ^Errors^            ^Checker^
@@ -1931,6 +1956,7 @@ This file is specified in `counsel-projectile-default-file'."
   (imenu-auto-rescan t)
   (imenu-max-items 500)
   (imenu-max-item-length 100)
+  (imenu-use-popup-menu nil)
   :config
   (use-package imenu+
     :load-path "extras")
@@ -1940,7 +1966,7 @@ This file is specified in `counsel-projectile-default-file'."
     :ensure t))
 
 (use-package flimenu
-  :ensure
+  :ensure t
   :after imenu
   :commands flimenu-global-mode
   :config (flimenu-global-mode 1))
@@ -2040,6 +2066,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
   :ensure t
+  :defer 2
   :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
 
@@ -2309,6 +2336,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package pdf-tools
   :ensure t
+  :defer 2
   :init
   (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
   (setq pdf-view-display-size 'fit-page)
@@ -2319,6 +2347,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package saveplace-pdf-view
   :ensure t
+  :after pdf-tools
   :after saveplace)
 
 (use-package logview
@@ -2396,7 +2425,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package prettier
   :ensure t
-  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+  :defer 2
+  ;; :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   :hook ((markdown-mode gfm-mode) . (lambda ()
                                       (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
                                         prettier-mode))))
@@ -2739,6 +2769,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package lsp-pyright
   :ensure t
+  :defer 2
   :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
@@ -2994,11 +3025,38 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :custom (git-commit-summary-max-length 50))
 
-;; FIXME: What is the purpose?
-(setq smerge-command-prefix "\C-c v")
+;;  Use the minor mode `smerge-mode' to move between conflicts and resolve them
+(defun sb/enable-smerge-maybe ()
+  (when (and buffer-file-name (vc-backend buffer-file-name))
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^<<<<<<< " nil t)
+        (smerge-mode +1)))))
+(add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
+(add-hook 'find-file-hook #'sb/enable-smerge-maybe)
+(setq smerge-command-prefix "\C-cv")
+
+(defhydra sb/hydra-smerge-mode
+    (:color pink :hint nil :post (smerge-auto-leave))
+    "
+   ^Motions^      ^Actions^
+---^^-------------^^-------
+_n_: Next      _b_: Base
+_p_: Prev      _u_: Upper
+^^             _l_: Lower
+^^             _a_: All
+"
+    ("n" smerge-next)
+    ("p" smerge-prev)
+    ("b" smerge-keep-base)
+    ("u" smerge-keep-upper)
+    ("l" smerge-keep-lower)
+    ("a" smerge-keep-all)
+    ("q" nil "cancel" :color blue))
 
 (use-package diff-hl
   :ensure t
+  :defer 2
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
   :custom (diff-hl-draw-borders nil)
   :hook ((after-init . global-diff-hl-mode)
@@ -3154,6 +3212,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (use-package reftex
     :commands (reftex-get-bibfile-list bibtex-parse-keys)
+    :diminish
     :bind (("C-c [" . reftex-citation)
            ("C-c )" . reftex-reference)
            ("C-c (" . reftex-label))
@@ -3662,8 +3721,9 @@ Increase line spacing by two line height."
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
 (put 'lsp-clients-clangd-args 'safe-local-variable #'listp)
-(put 'lsp-python-ms-extra-paths 'safe-local-variable #'listp)
 (put 'lsp-pyright-extra-paths 'safe-local-variable #'listp)
+(put 'lsp-python-ms-extra-paths 'safe-local-variable #'listp)
+(put 'lsp-latex-root-directory 'safe-local-variable #'stringp)
 (put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
