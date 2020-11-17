@@ -788,6 +788,7 @@ whitespaces."
 
 (use-package circadian
   :ensure t
+  :disabled t
   :custom
   (calendar-latitude 26.50)
   (calendar-longitude 80.23)
@@ -2007,6 +2008,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package xref
   :if (eq dotemacs-tags-scheme 'ctags)
+  :defer 2
   :commands xref-etags-mode
   :config (xref-etags-mode)
   :bind (("M-'" . xref-find-definitions)
@@ -2048,6 +2050,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package dumb-jump
   :ensure t
+  :defer 2
   :custom (dumb-jump-prefer-searcher 'rg)
   :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
@@ -2297,7 +2300,8 @@ This file is specified in `counsel-projectile-default-file'."
                      (emacs-init-time) gcs-done)))
 
 (use-package bug-hunter
-  :ensure t)
+  :ensure t
+  :defer 2)
 
 (use-package explain-pause-mode
   :load-path "extras"
@@ -2927,7 +2931,8 @@ This file is specified in `counsel-projectile-default-file'."
                           c-set-style "java")))
 
 (use-package ant
-  :ensure t)
+  :ensure t
+  :defer 2)
 
 ;; Can disassemble .class files from within jars
 ;; (use-package autodisass-java-bytecode
