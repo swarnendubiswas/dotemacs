@@ -106,9 +106,8 @@
   :type 'string
   :group 'dotemacs)
 
-;; SB: Use `circadian' to load the theme
 (defcustom dotemacs-theme
-  'default
+  'none
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -122,7 +121,9 @@
           (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
-          (const :tag "default" default))
+          (const :tag "default" default)
+          (const :tag "none" none) ; No customizations, use `circadian' to load the theme
+          )
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
@@ -134,6 +135,7 @@
           (const :tag "spaceline" spaceline)
           (const :tag "airline" airline)
           (const :tag "doom-modeline" doom-modeline)
+          (const :tag "awesome-tray" awesome-tray)
           (const :tag "default" default))
   :group 'dotemacs)
 
@@ -661,7 +663,13 @@ whitespaces."
                                              (setq modus-operandi-theme-mode-line '3d
                                                    modus-operandi-theme-variable-pitch-headings nil
                                                    modus-operandi-theme-scale-headings nil)
-                                             (load-theme 'modus-operandi t)))
+                                             (load-theme 'modus-operandi t)
+                                             :custom-face
+                                             (mode-line ((t (:background "#d7d7d7"
+                                                                         :foreground "#0a0a0a"
+                                                                         :box (:line-width 1
+                                                                                           :color "#505050")
+                                                                         :height 0.8))))))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
@@ -724,7 +732,7 @@ whitespaces."
       ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
                                                :ensure t
                                                :init
-                                               ;; (require 'airline-themes)
+                                               (require 'airline-themes)
                                                (setq airline-eshell-colors nil
                                                      airline-hide-eyebrowse-on-inactive-buffers t)
                                                (load-theme 'airline-cool t)))
@@ -737,29 +745,63 @@ whitespaces."
                                                      :ensure all-the-icons
                                                      :init
                                                      (setq doom-modeline-buffer-encoding nil
-                                                           doom-modeline-height 20
                                                            doom-modeline-indent-info t
                                                            doom-modeline-minor-modes t)
                                                      (doom-modeline-mode 1)))
 
-      ((eq dotemacs-modeline-theme 'default)))
+      ((eq dotemacs-modeline-theme 'awesome-tray) (use-package
+                                                    awesome-tray
+                                                    :load-path "extras"
+                                                    :hook (after-init . awesome-tray-mode)
+                                                    :custom
+                                                    (awesome-tray-active-modules
+                                                     '("file-path" "buffer-name" "mode-name" "location" "git"))
+                                                    :custom-face
+                                                    (awesome-tray-default-face ((t (:inherit
+                                                                                    default
+                                                                                    :height
+                                                                                    0.8))))
+                                                    (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059"
+                                                                                                           :weight bold
+                                                                                                           :height
+                                                                                                           0.8))))
+                                                    (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700"
+                                                                                                           :weight bold
+                                                                                                           :height
+                                                                                                           0.8))))
+                                                    (awesome-tray-module-date-face ((t (:foreground "#717175"
+                                                                                                    :weight bold
+                                                                                                    :height
+                                                                                                    0.8))))
+                                                    (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e"
+                                                                                                         :weight
+                                                                                                         normal
+                                                                                                         :height
+                                                                                                         0.8))))
+                                                    (awesome-tray-module-git-face ((t (:foreground "#cc2444"
+                                                                                                   :weight
+                                                                                                   normal
+                                                                                                   :height
+                                                                                                   0.8))))
+                                                    (awesome-tray-module-last-command-face ((t (:foreground "#0061cc"
+                                                                                                            :weight bold
+                                                                                                            :height
+                                                                                                            0.8))))
+                                                    (awesome-tray-module-location-face ((t (:foreground "#cc7700"
+                                                                                                        :weight
+                                                                                                        normal
+                                                                                                        :height
+                                                                                                        0.8))))
+                                                    (awesome-tray-module-mode-name-face ((t (:foreground "#00a400"
+                                                                                                         :weight bold
+                                                                                                         :height
+                                                                                                         0.8))))
+                                                    (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e"
+                                                                                                          :weight bold
+                                                                                                          :height
+                                                                                                          0.8))))))
 
-(use-package awesome-tray
-  :if (eq dotemacs-modeline-theme 'default)
-  :load-path "extras"
-  :hook (after-init . awesome-tray-mode)
-  :custom (awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
-  :custom-face
-  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
-  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+      ((eq dotemacs-modeline-theme 'default)))
 
 (use-package auto-dim-other-buffers
   :ensure t
@@ -775,8 +817,8 @@ whitespaces."
 
 (cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute 'default nil :height 135))
       ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
-(set-face-attribute 'mode-line nil :height 90)
-(set-face-attribute 'mode-line-inactive nil :height 90)
+;; (set-face-attribute 'mode-line nil :height 90)
+;; (set-face-attribute 'mode-line-inactive nil :height 90)
 
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (defun sb/minibuffer-font-setup ()
@@ -790,12 +832,11 @@ whitespaces."
 
 (use-package circadian
   :ensure t
-  :disabled t
   :custom
   (calendar-latitude 26.50)
   (calendar-longitude 80.23)
-  (circadian-themes '((:sunrise . default)
-                      (:sunset  . default)))
+  (circadian-themes '((:sunrise . modus-operandi)
+                      (:sunset  . modus-vivendi)))
   :init (circadian-setup))
 
 (use-package ibuffer
@@ -977,16 +1018,19 @@ whitespaces."
 
 (use-package all-the-icons-ibuffer
   :ensure t
+  :after all-the-icons
   :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :ensure t
+  :after all-the-icons
   :diminish
   :if (display-graphic-p)
   :hook (dired-mode . (lambda ()
                         (interactive)
+                        ;; Do not show icons over tramp
                         (unless (file-remote-p default-directory)
                           (all-the-icons-dired-mode)))))
 
@@ -1013,7 +1057,7 @@ whitespaces."
   ;; their related keys.
   (org-use-speed-commands t)
   (org-src-strip-leading-and-trailing-blank-lines t)
-  ;; Display entities like \tilde and \alpha in UTF-8 characters
+  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
   (org-pretty-entities t)
   ;; Render subscripts and superscripts in org buffers
   (org-pretty-entities-include-sub-superscripts t)
@@ -1023,11 +1067,10 @@ whitespaces."
 
 (use-package org-bullets
   :ensure t
-  :after org-mode
   :hook (org-mode . org-bullets-mode))
 
-;; Use `C-'' in isearch-mode-map to use avy-isearch to select one of the currently visible isearch
-;; candidates.
+;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
+;; isearch candidates
 (use-package isearch
   :custom (search-highlight t "Highlight incremental search")
   :bind (("C-s" . nil) ; Change the binding for `isearch-forward-regexp'
@@ -1038,7 +1081,7 @@ whitespaces."
 
 (use-package isearch-symbol-at-point
   :ensure t
-  :after (isearch))
+  :after isearch)
 
 (use-package isearch-dabbrev
   :ensure t
@@ -1087,7 +1130,8 @@ whitespaces."
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check regex with `re-builder'
-  (recentf-exclude '("[/\\]elpa/"
+  (recentf-exclude '(
+                     "[/\\]elpa/"
                      "[/\\]\\.git/"
                      ".*\\.gz\\'"
                      ".*\\.xz\\'"
@@ -1100,7 +1144,6 @@ whitespaces."
                      "/ssh:"
                      "~$"
                      "/.autosaves/"
-                     ".*-loaddefs.el"
                      "/TAGS$"
                      "*.cache"
                      ))
@@ -1109,7 +1152,7 @@ whitespaces."
   (recentf-max-saved-items 100)
   (recentf-menu-filter 'recentf-sort-descending)
   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
-  :config (run-at-time nil 180 'recentf-save-list)
+  :config (run-at-time nil 300 'recentf-save-list)
   :hook (after-init . recentf-mode))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1196,7 +1239,6 @@ whitespaces."
   :ensure t
   :if (display-graphic-p)
   :diminish
-  :defines company-box-icons-all-the-icons
   :hook (global-company-mode . company-box-mode))
 
 (use-package company-dict
@@ -1395,7 +1437,7 @@ whitespaces."
   ;; argument error
   ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
   ;; (defalias 'load-library 'counsel-load-library)
-  (defalias 'load-theme 'counsel-load-theme)
+  ;; (defalias 'load-theme 'counsel-load-theme)
   ;; (defalias 'yank-pop 'counsel-yank-pop)
   (add-to-list 'ivy-display-functions-alist
                '(counsel-company . ivy-display-function-overlay)))
@@ -1749,11 +1791,18 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flycheck
   :ensure t
   :defer 2
-  :commands (flycheck-add-next-checker flycheck-next-checker flycheck-previous-error flycheck-describe-checker flycheck-buffer flycheck-list-errors flycheck-disabled-checkers flycheck-select-checker flycheck-verify-setup flycheck-next-error flycheck-disable-checker)
+  :commands (flycheck-add-next-checker flycheck-next-checker
+                                       flycheck-previous-error flycheck-describe-checker
+                                       flycheck-buffer flycheck-list-errors flycheck-disabled-checkers
+                                       flycheck-select-checker flycheck-verify-setup
+                                       flycheck-next-error flycheck-disable-checker)
   :hook (after-init . global-flycheck-mode)
   :custom
-  (flycheck-display-errors-delay 0)
+  (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch mode-enabled))
+  (flycheck-display-errors-delay 0.5)
   (flycheck-emacs-lisp-load-path 'inherit)
+  (flycheck-idle-buffer-switch-delay 1)
+  (flycheck-idle-change-delay 1)
   (flycheck-indication-mode 'left-margin)
   :config
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq
@@ -1779,6 +1828,7 @@ This file is specified in `counsel-projectile-default-file'."
             ;; (with-eval-after-load 'lsp-mode
             ;;   (flycheck-add-next-checker 'lsp 'python-pylint))
             )
+
   (add-hook 'markdown-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'markdown-markdownlint-cli
@@ -1787,10 +1837,12 @@ This file is specified in `counsel-projectile-default-file'."
                                                                      dotemacs-user-home))
               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)
               ))
+
   (add-hook 'sh-mode-hook
             (lambda ()
               (setq-local flycheck-checker 'sh-shellcheck)
               (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
@@ -1800,7 +1852,6 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flycheck-grammarly
   :ensure t
   :after flycheck
-  :defer 2
   :hook
   ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
    . (lambda ()
@@ -1907,7 +1958,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Edit local file with sudo: C-x C-f /sudo::/etc/hosts
 ;; Open a remote file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
 (use-package tramp
-  :defer 2
   :custom
   (tramp-default-method "ssh" "SSH is faster than the default SCP")
   ;; Auto-save to a local directory for better performance
@@ -2297,7 +2347,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package esup
   :ensure t
-  :commands (esup))
+  :commands esup)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
@@ -2312,6 +2362,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package explain-pause-mode
   :load-path "extras"
   :defer 2
+  :disabled t
   :hook (after-init . explain-pause-mode)
   :diminish)
 
@@ -2342,7 +2393,7 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :diminish
   :custom (olivetti-body-width 0.95 "Fraction of the window width")
-  :hook ((text-mode markdown-mode latex-mode LaTeX-mode) . olivetti-mode)
+  :hook ((text-mode org-mode markdown-mode latex-mode LaTeX-mode) . olivetti-mode)
   :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
 
 (use-package pdf-tools
@@ -3137,17 +3188,16 @@ _p_: Prev      _u_: Upper
 ;; Autocompletion with LSP, LaTeX, and Company is not perfect, so we continue to use AucTeX support
 (use-package lsp-latex
   :ensure t
-  :hook ((tex-mode latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                          (require 'lsp-latex)
-                                                          (lsp-deferred)))
+  :hook ((latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                                 (require 'lsp-latex)
+                                                 (lsp-deferred)))
   :custom
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
 
-;; Configure latex mode. Auctex provides LaTeX-mode, which is an alias. Auctex overrides the tex
-;; package
+;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex package.
 (use-package tex-site
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
@@ -3155,8 +3205,9 @@ _p_: Prev      _u_: Upper
 (with-eval-after-load 'tex-mode
   (use-package tex-buf
     :commands (TeX-active-process TeX-save-document
-                                  TeX-command-menu TeX-revert-document-buffer))
-
+                                  TeX-command-menu
+                                  TeX-revert-document-buffer))
+  :config
   (setq font-latex-fontify-sectioning 1.0
         TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
         TeX-auto-untabify t ; Remove all tabs before saving
@@ -3177,7 +3228,6 @@ _p_: Prev      _u_: Upper
         LaTeX-fill-break-at-separators nil)
 
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  ;; (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
   (add-hook 'LaTeX-mode-hook #'reftex-mode)
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
@@ -3205,22 +3255,23 @@ _p_: Prev      _u_: Upper
   (use-package ivy-bibtex
     :ensure t
     :bind ("C-c x b" . ivy-bibtex)
-    :config
-    (use-package bibtex-completion
-      :custom
-      (bibtex-completion-cite-prompt-for-optional-arguments nil)
-      (bibtex-completion-cite-default-as-initial-input t)
-      (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
-    :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+    :custom
+    (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+
+  (use-package bibtex-completion
+    :custom
+    (bibtex-completion-cite-default-as-initial-input t)
+    (bibtex-completion-cite-prompt-for-optional-arguments nil)
+    (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
   (use-package bibtex
     :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
     :custom
     (bibtex-align-at-equal-sign t)
-    (bibtex-maintain-sorted-entries t)
-    :config
-    (use-package bibtex-utils
-      :ensure t))
+    (bibtex-maintain-sorted-entries t))
+
+  (use-package bibtex-utils
+    :ensure t)
 
   (use-package reftex
     :commands (reftex-get-bibfile-list bibtex-parse-keys)
@@ -3238,12 +3289,12 @@ _p_: Prev      _u_: Upper
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
     :custom
+    (reftex-enable-partial-scans t)
+    (reftex-highlight-selection 'both)
     (reftex-plug-into-AUCTeX t)
     (reftex-save-parse-info t)
-    (reftex-use-multiple-selection-buffers t)
-    (reftex-enable-partial-scans t)
     (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
-    (reftex-highlight-selection 'both))
+    (reftex-use-multiple-selection-buffers t))
 
   ;; (with-eval-after-load 'reftex
   ;;     (reftex-add-all-bibitems-from-bibtex))
@@ -3252,49 +3303,39 @@ _p_: Prev      _u_: Upper
 
   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
   (use-package reftex-cite
-    :after auctex
     :preface
-    (defun get-bibtex-keys (file)
+    (defun sb/get-bibtex-keys (file)
       (with-current-buffer (find-file-noselect file)
         (mapcar 'car (bibtex-parse-keys))))
-    (defun reftex-add-all-bibitems-from-bibtex ()
+    (defun sb/reftex-add-all-bibitems-from-bibtex ()
       (interactive)
       (mapc 'LaTeX-add-bibitems
             (apply 'append
-                   (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
-    :config (reftex-add-all-bibitems-from-bibtex))
-
-  ;; (use-package reftex-cite
-  ;;   :preface
-  ;;   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-  ;; (defun get-bibtex-keys (file)
-  ;;   (with-current-buffer (find-file-noselect file)
-  ;;     (mapcar 'car (bibtex-parse-keys))))
-  ;;   (defun find-bibliography-file ()
-  ;;     "Try to find a bibliography file using RefTeX."
-  ;;     ;; Returns a string with text properties (as expected by read-file-name) or empty string if no file can be found
-  ;;     (interactive)
-  ;;     (let ((bibfile-list nil))
-  ;;       (condition-case nil
-  ;;           (setq bibfile-list (reftex-get-bibfile-list))
-  ;;         (error (ignore-errors
-  ;;                  (setq bibfile-list (reftex-default-bibliography)))))
-  ;;       (if bibfile-list
-  ;;           (car bibfile-list) "")))
-  ;; (defun reftex-add-all-bibitems-from-bibtex ()
-  ;;   (interactive)
-  ;;   (mapc 'LaTeX-add-bibitems
-  ;;         (apply 'append
-  ;;                (mapcar 'get-bibtex-keys (reftex-get-bibfile-list)))))
-  ;;   :init (add-hook 'reftex-load-hook #'reftex-add-all-bibitems-from-bibtex))
+                   (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+    (defun sb/find-bibliography-file ()
+      "Try to find a bibliography file using RefTeX."
+      ;; Returns a string with text properties (as expected by read-file-name) or empty string if no
+      ;; file can be found
+      (interactive)
+      (let ((bibfile-list nil))
+        (condition-case nil
+            (setq bibfile-list (reftex-get-bibfile-list))
+          (error (ignore-errors
+                   (setq bibfile-list (reftex-default-bibliography)))))
+        (if bibfile-list
+            (car bibfile-list) "")))
+    ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+    :config (sb/reftex-add-all-bibitems-from-bibtex))
 
   (use-package bib-cite
     :diminish bib-cite-minor-mode
-    :init (add-hook 'LaTeX-mode-hook (lambda ()
-                                       (bib-cite-minor-mode 1)))
-    :custom (bib-cite-use-reftex-view-crossref t)
+    :init
+    (add-hook 'LaTeX-mode-hook (lambda ()
+                                 (bib-cite-minor-mode 1)))
+    :custom
+    (bib-cite-use-reftex-view-crossref t)
     :bind (:map bib-cite-minor-mode-map
-                ("C-c b" . nil) ; We use "C-c b" for comment-box
+                ("C-c b" . nil) ; We use `C-c b' for `comment-box'
                 ("C-c l a" . bib-apropos)
                 ("C-c l b" . bib-make-bibliography)
                 ("C-c l d" . bib-display)
