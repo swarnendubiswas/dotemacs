@@ -3,20 +3,20 @@
 
 ;;; Commentary:
 
-;; To evaluate an Sexp, just go to the end of the sexp and type "C-x C-e", instead of evaluating the
-;; whole buffer Use C-M-x to evaluate the current top-level s-expression. Use M-: to evaluate any
+;; To evaluate an Sexp, just go to the end of the sexp and type `C-x C-e', instead of evaluating the
+;; whole buffer Use `C-M-x' to evaluate the current top-level s-expression. Use `M-:' to evaluate any
 ;; Emacs Lisp expression and print the result.
 
-;; Init file should not ideally contain calls to "load" or "require", since they cause eager loading
-;; and are expensive, a cheaper alternative is to use "autoload".
+;; Init file should not ideally contain calls to `load' or `require', since they cause eager loading
+;; and are expensive, a cheaper alternative is to use `autoload'.
 
-;; Only an interactive function can be invoked with "M-x" or a key binding.
+;; Only an interactive function can be invoked with `M-x' or a key binding.
 
 ;; When defining a lambda expression that is to be used as an anonymous function, you can in
 ;; principle use any method to construct the list. But typically you should use the lambda macro, or
 ;; the function special form, or the #' read syntax which is a short-hand for using function.
 ;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
-;; all equivalent: (lambda (x) (* x x)) (function (lambda (x) (* x x))) #'(lambda (x) (* x x))
+;; all equivalent: `(lambda (x) (* x x))' `(function (lambda (x) (* x x)))' `#'(lambda (x) (* x x))'
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
 ;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
@@ -57,7 +57,7 @@
 (setq gc-cons-percentage 0.6 ; Portion of heap used for allocation
       gc-cons-threshold dotemacs-200mb)
 
-;; Ideally, we would have reset 'gc-cons-threshold' to its default value otherwise there can be
+;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
 ;; permanently.
 
@@ -106,8 +106,9 @@
   :type 'string
   :group 'dotemacs)
 
+;; SB: Use `circadian' to load the theme
 (defcustom dotemacs-theme
-  'default ; SB: Use `circadian' to load the theme
+  'default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -323,7 +324,8 @@ whitespaces."
   :init
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME"))
+        exec-path-from-shell-variables
+        '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
@@ -1099,7 +1101,9 @@ whitespaces."
                      "~$"
                      "/.autosaves/"
                      ".*-loaddefs.el"
-                     "/TAGS$"))
+                     "/TAGS$"
+                     "*.cache"
+                     ))
   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
   ;; (recentf-keep '(file-remote-p file-readable-p))
   (recentf-max-saved-items 100)
@@ -1682,6 +1686,7 @@ whitespaces."
   (dolist (prjs (list
                  ;; Do not consider $HOME as a project
                  (expand-file-name dotemacs-user-home)
+                 (expand-file-name "/tmp")
                  (expand-file-name "bitbucket/.metadata" dotemacs-user-home)
                  (expand-file-name "github/.metadata" dotemacs-user-home)
                  (expand-file-name "iitk-workspace/.metadata" dotemacs-user-home)
@@ -1810,13 +1815,13 @@ This file is specified in `counsel-projectile-default-file'."
 
     (use-package flycheck-posframe
       :ensure t
-      :disabled t
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults))
 
     (use-package flycheck-inline
       :ensure t
+      :disabled t
       :hook (flycheck-mode . flycheck-inline-mode)))
 
 (defhydra sb/hydra-flycheck (:color blue)
@@ -1895,7 +1900,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package highlight-numbers
   :ensure t
-  :hook ((prog-mode css-mode html-mode) . highlight-numbers-mode))
+  :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -1969,6 +1974,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flimenu
   :ensure t
   :after imenu
+  :disabled t
   :commands flimenu-global-mode
   :config (flimenu-global-mode 1))
 
@@ -2305,6 +2311,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package explain-pause-mode
   :load-path "extras"
+  :defer 2
   :hook (after-init . explain-pause-mode)
   :diminish)
 
@@ -2431,9 +2438,10 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :defer 2
   ;; :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-  :hook ((markdown-mode gfm-mode) . (lambda ()
-                                      (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
-                                        prettier-mode))))
+  ;; :hook ((markdown-mode gfm-mode) . (lambda ()
+  ;;                                     (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
+  ;;                                       prettier-mode)))
+  :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package csv-mode
   :ensure t
@@ -2844,9 +2852,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package cuda-mode
   :ensure t
-  :hook (cuda-mode . lsp-deferred)
-  :mode (("\\.cu\\'"	. cuda-mode)
-         ("\\.cuh\\'"	. cuda-mode)))
+  :mode (("\\.cu\\'" . c++-mode)
+         ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
   :ensure t
