@@ -827,8 +827,8 @@ whitespaces."
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
 ;; Changing height of the echo area is jarring
-(add-hook 'emacs-startup-hook (lambda ()
-                                (setq resize-mini-windows nil)))
+;; (add-hook 'emacs-startup-hook (lambda ()
+;;                                 (setq resize-mini-windows nil)))
 
 (use-package circadian
   :ensure t
@@ -1618,7 +1618,7 @@ whitespaces."
       :ensure t
       :diminish
       :hook (prog-mode . highlight-indent-guides-mode)
-      :custom (highlight-indent-guides-method 'bitmap)))
+      :custom (highlight-indent-guides-method 'character)))
 
 ;; Claims to be better than electric-indent-mode
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
@@ -2007,19 +2007,24 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
 (use-package imenu
-  :defer t
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
   (imenu-max-item-length 100)
   (imenu-use-popup-menu nil)
-  :config
-  (use-package imenu+
-    :load-path "extras")
-  (use-package imenu-anywhere
-    :ensure t)
-  (use-package popup-imenu
-    :ensure t))
+  (imenu-sort-function nil))
+
+(use-package imenu+
+  :load-path "extras"
+  :after imenu)
+
+(use-package imenu-anywhere
+  :ensure t
+  :after imenu)
+
+(use-package popup-imenu
+  :ensure t
+  :after imenu)
 
 (use-package flimenu
   :ensure t
@@ -3014,24 +3019,10 @@ This file is specified in `counsel-projectile-default-file'."
   (fish-mode . (lambda ()
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
 
-;; https://github.com/amake/shfmt.el
-;; LATER: Could possibly switch to https://github.com/purcell/emacs-shfmt
 (use-package shfmt
-  :ensure reformatter
-  ;; :ensure-system-package (shfmt . "snap install shfmt")
-  :load-path "extras/shfmt"
-  ;; :diminish shfmt-on-save-mode
+  :ensure t
   :hook (sh-mode . shfmt-on-save-mode)
-  :custom (shfmt-arguments "-i 4 -p -ci"))
-
-;; (with-eval-after-load 'sh-script-mode
-(use-package flycheck-shfmt
-  :ensure reformatter
-  :commands flycheck-shfmt-setup
-  :after flycheck
-  :load-path "extras/shfmt"
-  :config (flycheck-shfmt-setup))
-;; )
+  :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 (use-package magit
   :ensure t

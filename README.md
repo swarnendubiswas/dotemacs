@@ -19,7 +19,7 @@ You can use the following instructions to install third-party applications. Add 
 #### Ubuntu 18.04 Packages
 
 ```Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf libperl-dev
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-11 clangd-11 clang-{format,tidy,tools}-11 clang-11-doc clang-11-examples llvm-11 lld-11 lldb-11 llvm-11-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
 sudo dpkg -i fd_8.1.1_amd64.deb
 ```
@@ -27,7 +27,7 @@ sudo dpkg -i fd_8.1.1_amd64.deb
 #### Ubuntu 20.04 Packages
 
 ```Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-10 clangd-10 clang-{format,tidy,tools}-10 clang-10-doc clang-10-examples llvm-10 lld-10 lldb-10 llvm-10-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf libperl-dev
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-11 clangd-11 clang-{format,tidy,tools}-11 clang-11-doc clang-11-examples llvm-11 lld-11 lldb-11 llvm-11-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts fonts-inconsolata xfonts-terminus ttf-anonymous-pro fonts-hack-ttf libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
 sudo dpkg -i fd_8.1.1_amd64.deb
 ```
@@ -42,10 +42,6 @@ sudo snap refresh
 ```
 
 #### Python Packages
-
-<!-- ```Bash -->
-<!-- python -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint grip --user -->
-<!-- ``` -->
 
 ```Bash
 python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip jedi-language-server --user
