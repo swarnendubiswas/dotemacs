@@ -1805,7 +1805,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package flycheck
   :ensure t
-  :defer 2
   :commands (flycheck-add-next-checker flycheck-next-checker
                                        flycheck-previous-error flycheck-describe-checker
                                        flycheck-buffer flycheck-list-errors flycheck-disabled-checkers
@@ -1823,44 +1822,34 @@ This file is specified in `counsel-projectile-default-file'."
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
-  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc))
 
-  (dolist (hook '(text-mode-hook org-mode-hook markdown-mode-hook
-                                 latex-mode-hook LaTeX-mode-hook))
+  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc)
+                flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                                           dotemacs-textlint-home)
+                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                               dotemacs-textlint-home)
+                flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home)
+                flycheck-python-pylint-executable "python3"
+                flycheck-markdown-markdownlint-cli-config (expand-file-name
+                                                           ".markdownlint.json"
+                                                           dotemacs-user-home))
+  (dolist (hook '(text-mode-hook org-mode-hook
+                                 latex-mode-hook
+                                 LaTeX-mode-hook))
     (add-hook hook (lambda ()
-                     (setq-local
-                      flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                                                 dotemacs-textlint-home)
-                      flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                                     dotemacs-textlint-home)))))
-
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (setq-local flycheck-checker 'python-pylint
-                          flycheck-pylintrc (expand-file-name ".config/pylintrc"
-                                                              dotemacs-user-home)
-                          flycheck-python-pylint-executable "python3"))
-            ;; (with-eval-after-load 'lsp-mode
-            ;;   (flycheck-add-next-checker 'lsp 'python-pylint))
-            )
-
-  (add-hook 'markdown-mode-hook
-            (lambda ()
-              (setq-local flycheck-checker 'markdown-markdownlint-cli
-                          flycheck-markdown-markdownlint-cli-config (expand-file-name
-                                                                     ".markdownlint.json"
-                                                                     dotemacs-user-home))
-              ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly-checker)
-              ))
-
-  (add-hook 'sh-mode-hook
-            (lambda ()
-              (setq-local flycheck-checker 'sh-shellcheck)
-              (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+                     (setq-local flycheck-checker 'textlint))))
+  (add-hook 'markdown-mode-hook (lambda ()
+                                  (setq-local flycheck-checker 'markdown-markdownlint-cli)))
+  (add-hook 'python-mode-hook (lambda ()
+                                (setq-local flycheck-checker 'python-pylint)))
+  (add-hook 'sh-mode-hook (lambda ()
+                            (setq-local flycheck-checker 'sh-shellcheck)
+                            (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+
   (add-to-list 'flycheck-hooks-alist
                '(after-revert-hook . flycheck-buffer)))
 
@@ -2497,13 +2486,13 @@ This file is specified in `counsel-projectile-default-file'."
   :bind (:map markdown-mode-command-map
               ("g" . grip-mode)))
 
-;; (use-package add-node-modules-path
-;;   :ensure t
-;;   :init
-;;   (with-eval-after-load 'typescript-mode
-;;     (add-hook 'typescript-mode-hook 'add-node-modules-path))
-;;   (with-eval-after-load 'js2-mode
-;;     (add-hook 'js2-mode-hook 'add-node-modules-path)))
+(use-package add-node-modules-path
+  :ensure t
+  :init
+  (with-eval-after-load 'typescript-mode
+    (add-hook 'typescript-mode-hook 'add-node-modules-path))
+  (with-eval-after-load 'js2-mode
+    (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
 (use-package prettier
   :ensure t
@@ -3106,8 +3095,8 @@ This file is specified in `counsel-projectile-default-file'."
 (setq smerge-command-prefix "\C-cv")
 
 (defhydra sb/hydra-smerge-mode
-    (:color pink :hint nil :post (smerge-auto-leave))
-    "
+  (:color pink :hint nil :post (smerge-auto-leave))
+  "
    ^Motions^      ^Actions^
 ---^^-------------^^-------
 _n_: Next      _b_: Base
@@ -3115,13 +3104,13 @@ _p_: Prev      _u_: Upper
 ^^             _l_: Lower
 ^^             _a_: All
 "
-    ("n" smerge-next)
-    ("p" smerge-prev)
-    ("b" smerge-keep-base)
-    ("u" smerge-keep-upper)
-    ("l" smerge-keep-lower)
-    ("a" smerge-keep-all)
-    ("q" nil "cancel" :color blue))
+  ("n" smerge-next)
+  ("p" smerge-prev)
+  ("b" smerge-keep-base)
+  ("u" smerge-keep-upper)
+  ("l" smerge-keep-lower)
+  ("a" smerge-keep-all)
+  ("q" nil "cancel" :color blue))
 
 (use-package diff-hl
   :ensure t
