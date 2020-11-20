@@ -1083,6 +1083,7 @@
     ("signifacnt" "significant" nil :count 0)
     ("signle" "single" nil :count 0)
     ("simalar" "similar" nil :count 0)
+    ("similary" "similarly" nil :count 0)
     ("similiar" "similar" nil :count 0)
     ("simpilified" "simplified" nil :count 0)
     ("simpyl" "simply" nil :count 0)
@@ -1362,6 +1363,7 @@
     ("expsoing" "Exposing" nil :count 0)
     ("hueristically" "heuristically" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
+    ("thesse" "these" nil :count 0)
     ("vidoes" "videos" nil :count 0)
    ))
 

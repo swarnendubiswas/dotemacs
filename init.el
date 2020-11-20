@@ -106,8 +106,9 @@
   :type 'string
   :group 'dotemacs)
 
+;; No customizations, use `circadian' to load the theme
 (defcustom dotemacs-theme
-  'none
+  'sb/default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -121,8 +122,8 @@
           (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
-          (const :tag "default" default)
-          (const :tag "none" none) ; No customizations, use `circadian' to load the theme
+          (const :tag "customized" sb/default)
+          (const :tag "none" none)
           )
   :group 'dotemacs)
 
@@ -229,6 +230,7 @@ whitespaces."
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
 (defvar dired-efap-initial-filename-selection)
+(defvar exec-path-from-shell-check-startup-files)
 (defvar expand-line-mode)
 (defvar font-latex-fontify-sectioning)
 (defvar lsp-disabled-clients)
@@ -246,6 +248,7 @@ whitespaces."
 (defvar use-package-verbose)
 
 (declare-function sb/sshlist "private" ())
+(declare-function smerge-next "" ())
 
 (eval-when-compile
   (setq package-enable-at-startup nil ; Avoid loading packages twice
@@ -669,7 +672,12 @@ whitespaces."
                                                                          :foreground "#0a0a0a"
                                                                          :box (:line-width 1
                                                                                            :color "#505050")
-                                                                         :height 0.8))))))
+                                                                         :height 0.8))))
+                                             (mode-line-inactive ((t (:background "#efefef"
+                                                                                  :foreground "#404148"
+                                                                                  :box (:line-width 1
+                                                                                                    :color "#bcbcbc")
+                                                                                  :height 0.8))))))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :ensure t
@@ -679,12 +687,13 @@ whitespaces."
                                                   modus-vivendi-theme-scale-headings nil)
                                             (load-theme 'modus-vivendi t)))
 
-      ((eq dotemacs-theme 'default) (progn
-                                      ;; (setq frame-background-mode 'light)
-                                      ;; (set-background-color "#ffffff")
-                                      ;; (set-foreground-color "#666666")
-                                      (set-face-attribute 'region nil
-                                                          :background "gainsboro"))))
+      ((eq dotemacs-theme 'sb/default) (progn
+                                         ;; (setq frame-background-mode 'light)
+                                         ;; (set-background-color "#ffffff")
+                                         ;; (set-foreground-color "#666666")
+                                         (set-foreground-color "#474747")
+                                         (set-face-attribute 'region nil
+                                                             :background "gainsboro"))))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :ensure t
@@ -801,7 +810,7 @@ whitespaces."
                                                                                                           :height
                                                                                                           0.8))))))
 
-      ((eq dotemacs-modeline-theme 'default)))
+      ((eq dotemacs-modeline-theme 'sb/default)))
 
 (use-package auto-dim-other-buffers
   :ensure t
@@ -826,12 +835,14 @@ whitespaces."
        '((default :height 0.95))))
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
-;; Changing height of the echo area is jarring
+;; Changing height of the echo area is jarring, but limiting the height can make it difficult to see
+;; useful information
 ;; (add-hook 'emacs-startup-hook (lambda ()
 ;;                                 (setq resize-mini-windows nil)))
 
 (use-package circadian
   :ensure t
+  :if (and (not (eq dotemacs-theme 'sb/default)) (not (eq dotemacs-theme 'none)))
   :custom
   (calendar-latitude 26.50)
   (calendar-longitude 80.23)
@@ -1239,7 +1250,11 @@ whitespaces."
   :ensure t
   :if (display-graphic-p)
   :diminish
-  :hook (global-company-mode . company-box-mode))
+  :hook (global-company-mode . company-box-mode)
+  :custom (company-box-show-single-candidate t)
+  :config
+  (set-face-background 'company-box-background "cornsilk")
+  (set-face-background 'company-box-selection "light blue"))
 
 (use-package company-dict
   :ensure t
@@ -1510,7 +1525,7 @@ whitespaces."
 
 (use-package flyspell
   :if dotemacs-is-linux
-  :commands flyspell-overlay-p
+  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -3654,7 +3669,7 @@ Increase line spacing by two line height."
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
   "List all files recursively."
-  (interactive "DDirectory: ")
+  (interactive " Directory: ")
   (let* ((cands (split-string
                  (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
     (ivy-read "File: " cands
@@ -3663,7 +3678,7 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log*")
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 

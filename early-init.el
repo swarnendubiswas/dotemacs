@@ -1,11 +1,11 @@
-;; early-init.el  -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8; fill-column: 1000 -*-
+;; early-init.el  -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8; fill-column: 100 -*-
 ;; Only for use with emacs 27 or higher
 
-;; Initialize installed packages
-(setq package-enable-at-startup t)
+;; ;; Initialize installed packages
+;; (setq package-enable-at-startup t)
 
-;; Allow loading from the package cache.
-(setq package-quickstart t)
+;; ;; Allow loading from the package cache.
+;; (setq package-quickstart t)
 
 ;; Do not resize the frame at this early stage.
 (setq frame-inhibit-implied-resize t)
