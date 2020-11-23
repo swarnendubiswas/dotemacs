@@ -344,4 +344,3 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 
 - Use custom major modes for files by names without using file-local variables
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`. My guess is this has to do with either `flycheck-grammarly` or `prettier`.
-- `pyright-remote` does not work

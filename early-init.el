@@ -13,3 +13,5 @@
 ;; disable tool-bar and menu-bar before being initialized
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames

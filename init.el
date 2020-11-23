@@ -221,8 +221,8 @@ whitespaces."
 
 (defconst dotemacs-emacs27+ (> emacs-major-version 26))
 (defconst dotemacs-emacs28+ (> emacs-major-version 27))
-(defconst dotemacs-is-windows (eq system-type 'windows-nt))
 (defconst dotemacs-is-linux (eq system-type 'gnu/linux))
+(defconst dotemacs-is-windows (eq system-type 'windows-nt))
 
 ;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
@@ -248,14 +248,12 @@ whitespaces."
 (defvar use-package-verbose)
 
 (declare-function sb/sshlist "private" ())
-(declare-function smerge-next "" ())
+(declare-function smerge-next "smerge-mode" ())
 
 (eval-when-compile
   (setq package-enable-at-startup nil ; Avoid loading packages twice
         package-user-dir (expand-file-name "elpa" user-emacs-directory))
-  (require 'package)
-  (when (< emacs-major-version 27)
-    (package-initialize t))
+  ;; (require 'package)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
@@ -599,10 +597,12 @@ whitespaces."
   :hook (after-init . global-so-long-mode)
   :custom (so-long-threshold 500))
 
+;; Moved to `early-init-file'
 ;; Maximize Emacs on startup. I am not sure which one of the following is better or faster
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
-(add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames
+;; Maximize all frames
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Make use of wider screens
 ;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
@@ -690,8 +690,7 @@ whitespaces."
       ((eq dotemacs-theme 'sb/default) (progn
                                          ;; (setq frame-background-mode 'light)
                                          ;; (set-background-color "#ffffff")
-                                         ;; (set-foreground-color "#666666")
-                                         (set-foreground-color "#474747")
+                                         (set-foreground-color "#333333")
                                          (set-face-attribute 'region nil
                                                              :background "gainsboro"))))
 
@@ -1632,7 +1631,7 @@ whitespaces."
     (use-package highlight-indent-guides
       :ensure t
       :diminish
-      :hook (prog-mode . highlight-indent-guides-mode)
+      :hook ((yaml-mode python-mode) . highlight-indent-guides-mode)
       :custom (highlight-indent-guides-method 'character)))
 
 ;; Claims to be better than electric-indent-mode
@@ -1812,13 +1811,13 @@ This file is specified in `counsel-projectile-default-file'."
                                        flycheck-next-error flycheck-disable-checker)
   :hook (after-init . global-flycheck-mode)
   :custom
-  (flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch mode-enabled))
+  (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled))
   (flycheck-display-errors-delay 0.5)
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-idle-buffer-switch-delay 1)
   (flycheck-idle-change-delay 1)
   (flycheck-indication-mode 'left-margin)
-  :config
+  :init
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
@@ -1849,7 +1848,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
-
+  :config
   (add-to-list 'flycheck-hooks-alist
                '(after-revert-hook . flycheck-buffer)))
 
@@ -1859,17 +1858,22 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
    . (lambda ()
-       (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
-         (require 'flycheck-grammarly)
-         (flycheck-add-next-checker 'grammarly-checker 'textlint)))))
+       ;; (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
+       (require 'flycheck-grammarly)
+       (flycheck-add-next-checker 'grammarly-checker 'textlint))))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
       :disabled t
       :hook (flycheck-mode . flycheck-popup-tip-mode))
 
+    (use-package flycheck-pos-tip
+      :ensure t
+      :hook (flycheck-mode . flycheck-pos-tip-mode))
+
     (use-package flycheck-posframe
       :ensure t
+      :disabled t
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults))
@@ -1910,7 +1914,7 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (show-trailing-whitespace t)
   (whitespace-line-column dotemacs-fill-column)
-  (whitespace-style '(trailing)))
+  (whitespace-style '(face lines-tail trailing)))
 
 ;; This is different from whitespace-cleanup since this is unconditional
 (when (bound-and-true-p dotemacs-delete-trailing-whitespace-p)
@@ -1956,6 +1960,11 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package highlight-numbers
   :ensure t
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
+
+(use-package volatile-highlights
+  :ensure t
+  :diminish
+  :config (volatile-highlights-mode 1))
 
 ;; Edit remote file: /method:user@host#port:filename.
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -2497,7 +2506,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prettier
   :ensure t
   :defer 2
-  ;; :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
+  :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   ;; :hook ((markdown-mode gfm-mode) . (lambda ()
   ;;                                     (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
   ;;                                       prettier-mode)))
@@ -2622,6 +2631,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
+  (lsp-html-format-max-preserve-new-lines nil 1)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
   (lsp-log-io t)
@@ -3239,9 +3249,9 @@ _p_: Prev      _u_: Upper
   (use-package auctex-latexmk
     :ensure t
     :custom
-    (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the -pdf flag when TeX-PDF-mode is active")
+    (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
     (TeX-command-default "LatexMk")
-    :init (auctex-latexmk-setup))
+    :config (auctex-latexmk-setup))
 
   (use-package company-auctex
     :ensure t
@@ -3298,6 +3308,7 @@ _p_: Prev      _u_: Upper
 
   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
   (use-package reftex-cite
+    :commands reftex-default-bibliography
     :preface
     (defun sb/get-bibtex-keys (file)
       (with-current-buffer (find-file-noselect file)
@@ -3375,12 +3386,11 @@ _p_: Prev      _u_: Upper
 (use-package json-mode
   :ensure t
   :mode "\\.json\\'"
-  :hook ((json-mode jsonc-mode) . lsp-deferred)
-  :config
-  (add-hook 'json-mode-hook
-            (lambda ()
-              (make-local-variable 'js-indent-level)
-              (setq js-indent-level 2))))
+  :hook
+  ((json-mode jsonc-mode) . (lambda ()
+                              (make-local-variable 'js-indent-level)
+                              (setq js-indent-level 2)
+                              (lsp-deferred))))
 
 (use-package less-css-mode
   :ensure t
@@ -3645,20 +3655,20 @@ Increase line spacing by two line height."
 ;; https://www.emacswiki.org/emacs/BuildTags
 (defun sb/create-ctags (dir-name)
   "Create tags file with ctags."
-  (interactive " Directory: ")
+  (interactive "DDirectory: ")
   (shell-command
    (format "%s -f TAGS -eR %s" dotemacs-ctags-path (directory-file-name dir-name))))
 
 (defun sb/create-gtags (dir-name)
   "Create tags file with gtags."
-  (interactive " Directory: ")
+  (interactive "DDirectory: ")
   (shell-command
    (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
   "List all files recursively."
-  (interactive " Directory: ")
+  (interactive "DDirectory: ")
   (let* ((cands (split-string
                  (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
     (ivy-read "File: " cands
@@ -3743,6 +3753,11 @@ Increase line spacing by two line height."
   :ensure t
   :bind (("C-M-+" . default-text-scale-increase)
          ("C-M--" . default-text-scale-decrease)))
+
+(defhydra sb/hydra-text-scale-zoom ()
+  "zoom"
+  ("i" default-text-scale-increase "in")
+  ("o" default-text-scale-decrease "out"))
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
