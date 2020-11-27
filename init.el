@@ -396,7 +396,8 @@ whitespaces."
       ;; truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends '(Git) ; Disabling vc can improve performance
+      ;; FIXME: Adding a list seems to introduce nesting problems
+      vc-handled-backends nil ; Disabling vc can improve performance
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-underline-at-descent-line t ; Underline looks a bit better when drawn lower
