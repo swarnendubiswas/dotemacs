@@ -34,6 +34,8 @@
 ;;   (x-mode . second)
 ;;   (x-mode . first))
 
+;; `emacs-startup-hook' runs later than the `after-init-hook'
+
 ;; Good reference configurations
 ;; https://protesilaos.com/dotemacs/
 ;; https://github.com/CSRaghunandan/.emacs.d/
@@ -52,25 +54,22 @@
 (defconst dotemacs-200mb (* 200 1000 1000))
 (defconst dotemacs-500mb (* 500 1000 1000))
 
-;; Change parameters to defer GC during startup
-;; (setq gc-cons-threshold most-positive-fixnum)
+;; Defer GC during startup
 (setq gc-cons-percentage 0.6 ; Portion of heap used for allocation
-      gc-cons-threshold dotemacs-200mb)
+      gc-cons-threshold dotemacs-500mb)
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
 ;; permanently.
 
 (defun sb/defer-garbage-collection ()
-  (setq gc-cons-percentage 0.3
+  (setq gc-cons-percentage 0.6
         gc-cons-threshold dotemacs-64mb))
 
 (defun sb/restore-garbage-collection ()
-  ;; (run-at-time 1 nil (lambda () (setq gc-cons-threshold dotemacs-128mb)))
   (setq gc-cons-percentage 0.1
         gc-cons-threshold dotemacs-4mb))
 
-;; Restore to a reasonable value after startup
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
@@ -248,12 +247,12 @@ whitespaces."
 (defvar use-package-verbose)
 
 (declare-function sb/sshlist "private" ())
+;; FIXME: Fix smerge warnings
 (declare-function smerge-next "smerge-mode" ())
 
 (eval-when-compile
   (setq package-enable-at-startup nil ; Avoid loading packages twice
         package-user-dir (expand-file-name "elpa" user-emacs-directory))
-  ;; (require 'package)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
@@ -325,10 +324,10 @@ whitespaces."
   :ensure t
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
-  (setq exec-path-from-shell-arguments '("-l")
-        exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables
-        '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
+  ;; (setq exec-path-from-shell-arguments '("-l")
+  ;;       exec-path-from-shell-check-startup-files nil
+  ;;       exec-path-from-shell-variables
+  ;;       '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
@@ -351,23 +350,23 @@ whitespaces."
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
-      ;; Avoid resizing the (GUI) frame when your newly set font is larger (or smaller) than the
-      ;; system default
+      ;; Avoid resizing the frame when your newly set font is larger (or smaller) than the system
+      ;; default
       frame-inhibit-implied-resize t
       frame-title-format (list '(buffer-file-name "%f" "%b"))
-      ;; help-window-select t
+      help-window-select t
       history-delete-duplicates t
-      ;; Doom Emacs: Emacs "updates" its ui more often than it needs to, so we slow it down slightly
+      ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
       ;; from 0.5s
       idle-update-delay 1.0
       indicate-buffer-boundaries nil
       inhibit-compacting-font-caches t ; Do not compact font caches during GC
-      ;; Disable loading of "default.el" at startup, inhibits site default settings
+      ;; Disable loading of `default.el' at startup, inhibits site default settings
       inhibit-default-init t
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
       ;; *scratch* is in Lisp interaction mode by default, use text mode. `text-mode' is more
-      ;; *expensive, but I use scratch for composing emails
+      ;; expensive, but I use *scratch* for composing emails
       initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
@@ -375,8 +374,8 @@ whitespaces."
       load-prefer-newer t
       ;; major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup ~ files
-      ;; mouse-drag-copy-region t
-      ;; mouse-yank-at-point t ; Yank at point instead of at click
+      mouse-drag-copy-region t
+      mouse-yank-at-point t ; Yank at point instead of at click
       pop-up-frames nil ; Avoid making separate frames
       ;; pop-up-windows nil ; Disallow creating new windows
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
@@ -390,14 +389,14 @@ whitespaces."
       select-enable-clipboard t
       sentence-end-double-space nil
       ;; set-mark-command-repeat-pop t
-      shift-select-mode nil ; Do not use shift-select for marking, use it for windmove
+      shift-select-mode nil ; Do not use `shift-select' for marking, use it for windmove
       standard-indent 2
       suggest-key-bindings t
       switch-to-buffer-preserve-window-point t
       ;; truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
-      vc-handled-backends nil ; Disabling vc can improve performance
+      vc-handled-backends '(Git) ; Disabling vc can improve performance
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-underline-at-descent-line t ; Underline looks a bit better when drawn lower
@@ -420,11 +419,11 @@ whitespaces."
 ;; LSP mode generates lots of objects, which causes a problem with gcmh mode.
 (use-package gcmh
   :ensure t
-  :diminish
+  ;; :diminish
   :hook ((after-init . gcmh-mode)
          (focus-out-hook . gcmh-idle-garbage-collect)))
 
-;; Activate utf8 mode
+;; Activate utf8
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
@@ -465,24 +464,23 @@ whitespaces."
 
 ;; Auto-refresh all buffers, does not work for remote files
 (use-package autorevert
-  :diminish auto-revert-mode
-  :hook ((after-init . global-auto-revert-mode)
-         ;; Auto refresh dired when files change
-         (dired-mode . auto-revert-mode))
+  ;; :diminish auto-revert-mode
+  :hook (emacs-startup . global-auto-revert-mode)
   :custom
-  (auto-revert-interval 2 "Faster would mean less likely to use stale data")
+  (auto-revert-interval 5 "Faster would mean less likely to use stale data")
   (auto-revert-remote-files t)
-  (auto-revert-verbose nil)
-  (global-auto-revert-non-file-buffers t "Enable auto revert on non-file buffers"))
+  (auto-revert-verbose nil))
 
 (use-package saveplace ; Remember cursor position in files
-  :hook (after-init . save-place-mode)
+  :defer 1
+  :hook (emacs-startup . save-place-mode)
   :custom
   (save-place-file (expand-file-name "places"
                                      dotemacs-temp-directory)))
 
 (use-package savehist ; Save minibuffer histories across sessions
-  :hook (after-init . savehist-mode)
+  :defer 1
+  :hook (emacs-startup . savehist-mode)
   :custom
   (savehist-additional-variables '(
                                    extended-command-history
@@ -516,19 +514,20 @@ whitespaces."
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
-  :diminish
+  ;; :diminish
   :hook (prog-mode . subword-mode))
 
-;; vertical - Split the selected window into two windows (e.g., `split-window-below'), one above the
+;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above the
 ;; other
-;; horizontal - Split the selected window into two side-by-side windows (e.g., `split-window-right')
-(cond ((eq dotemacs-window-split 'vertical) (setq-default split-width-threshold nil
-                                                          split-height-threshold 0))
-      ((eq dotemacs-window-split 'horizontal) (setq-default split-height-threshold nil
-                                                            split-width-threshold 0)))
-;; Magit is creating new frames
-;; (setq split-height-threshold (* (window-height) 10)
-;;       split-width-threshold (* (window-width) 10))
+;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right')
+(cond ((eq dotemacs-window-split 'horizontal) (setq split-width-threshold nil
+                                                    split-height-threshold 0))
+      ((eq dotemacs-window-split 'vertical) (setq split-height-threshold nil
+                                                  split-width-threshold 0)))
+
+;; Make use of wider screens
+;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+;;   (split-window-right))
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -539,7 +538,7 @@ whitespaces."
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
 (use-package abbrev
-  :diminish
+  ;; :diminish
   :hook ((text-mode prog-mode) . abbrev-mode)
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" dotemacs-extras-directory))
@@ -587,26 +586,21 @@ whitespaces."
     (funcall mode 1)))
 
 ;; Not a library/file, so `eval-after-load' does not work
-(diminish 'auto-fill-function)
-(diminish 'visual-line-mode)
+;; (diminish 'auto-fill-function)
+;; (diminish 'visual-line-mode)
 
-(fringe-mode '(0 . 0))
+(fringe-mode '(1 . 1))
 
 (use-package so-long ; ; This puts the buffer in read-only mode
-  :defer 2
-  :hook (after-init . global-so-long-mode)
+  :defer 1
+  :hook (emacs-startup . global-so-long-mode)
   :custom (so-long-threshold 500))
 
-;; Moved to `early-init-file'
-;; Maximize Emacs on startup. I am not sure which one of the following is better or faster
+;; Maximize Emacs on startup. Moved to `early-init-file'.
+;; I am not sure which one of the following is better or faster
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
-;; Maximize all frames
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-;; Make use of wider screens
-;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-;;   (split-window-right))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
                                      :ensure t
@@ -649,8 +643,8 @@ whitespaces."
 
       ((eq dotemacs-theme 'doom-molokai) (use-package doom-themes
                                            :ensure t
-                                           :init (load-theme 'doom-molokai t)
-                                           :config
+                                           :init
+                                           (load-theme 'doom-molokai t)
                                            (set-face-attribute 'font-lock-comment-face nil
                                                                ;; :foreground "#cccccc"
                                                                ;; :foreground "#b2b2b2"
@@ -757,8 +751,7 @@ whitespaces."
                                                            doom-modeline-minor-modes t)
                                                      (doom-modeline-mode 1)))
 
-      ((eq dotemacs-modeline-theme 'awesome-tray) (use-package
-                                                    awesome-tray
+      ((eq dotemacs-modeline-theme 'awesome-tray) (use-package awesome-tray
                                                     :load-path "extras"
                                                     :hook (after-init . awesome-tray-mode)
                                                     :custom
@@ -813,7 +806,8 @@ whitespaces."
 
 (use-package auto-dim-other-buffers
   :ensure t
-  :hook (after-init . auto-dim-other-buffers-mode))
+  :defer 1
+  :hook (emacs-startup . auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
@@ -846,7 +840,7 @@ whitespaces."
   (calendar-latitude 26.50)
   (calendar-longitude 80.23)
   (circadian-themes '((:sunrise . modus-operandi)
-                      (:sunset  . modus-vivendi)))
+                      (:sunset  . modus-operandi)))
   :init (circadian-setup))
 
 (use-package ibuffer
@@ -854,6 +848,7 @@ whitespaces."
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-display-summary nil)
   (ibuffer-use-header-line t)
+  :bind ("C-x C-b" . ibuffer)
   :config (defalias 'list-buffers 'ibuffer))
 
 (use-package ibuf-ext
@@ -875,11 +870,11 @@ whitespaces."
     (dired dotemacs-user-home))
   (defun sb/dired-jump-to-top ()
     (interactive)
-    (goto-char (point-min)) ; Faster than (beginning-of-buffer)
+    (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
     (dired-next-line 2))
   (defun sb/dired-jump-to-bottom ()
     (interactive)
-    (goto-char (point-max)) ; Faster than (end-of-buffer)
+    (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
   :bind (:map dired-mode-map
               ("M-<home>" . sb/dired-go-home)
@@ -888,11 +883,14 @@ whitespaces."
               ("M-<down>" . sb/dired-jump-to-bottom))
   :custom
   (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
-  (dired-dwim-target t "Guess a default target directory for copy, rename, etc.")
-  (dired-listing-switches "-ABhl --si --group-directories-first" "Check ls for additional options")
+  (dired-dwim-target t "Guess a default target directory")
+  (dired-listing-switches "-ABhl --si --group-directories-first" "Check `ls' for additional options")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories"))
+
+;; Auto refresh dired when files change
+(add-hook 'dired-mode #'auto-revert-mode)
 
 (use-package dired-x
   :custom
@@ -904,7 +902,7 @@ whitespaces."
   :config
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Remove \"Omit\" from the modeline."
+    "Remove 'Omit' from the modeline."
     (diminish 'dired-omit-mode) dired-mode-map))
 
 (use-package dired+
@@ -913,15 +911,14 @@ whitespaces."
   :custom
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil)
-  :config
-  (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
+  :config (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
   :hook (dired-mode . (lambda ()
                         ;; Do not create multiple dired buffers
                         (diredp-toggle-find-file-reuse-dir 1))))
 
 (use-package dired-efap
   :ensure t
-  :after dired+
+  ;; :after dired+
   :commands dired-efap
   :hook (dired-mode . (lambda ()
                         (require 'dired-efap)))
@@ -931,7 +928,7 @@ whitespaces."
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
-  :after dired
+  ;; :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -941,7 +938,7 @@ whitespaces."
 
 (use-package async
   :ensure t
-  :after dired
+  ;; :after dired
   :hook (dired-mode . dired-async-mode))
 
 (use-package dired-async
@@ -1008,18 +1005,20 @@ whitespaces."
 
 (use-package treemacs-projectile
   :ensure t
+  :disabled t
   :after (treemacs projectile))
 
 (use-package treemacs-icons-dired
   :ensure t
-  :after treemacs
   :disabled t
+  :after treemacs
   :if (display-graphic-p)
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
-  :after treemacs magit
-  :ensure t)
+  :ensure t
+  :disabled t
+  :after (treemacs magit))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 (use-package all-the-icons
@@ -1028,25 +1027,23 @@ whitespaces."
 
 (use-package all-the-icons-ibuffer
   :ensure t
-  :after all-the-icons
   :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :ensure t
-  :after all-the-icons
   :diminish
   :if (display-graphic-p)
-  :hook (dired-mode . (lambda ()
-                        (interactive)
-                        ;; Do not show icons over tramp
-                        (unless (file-remote-p default-directory)
-                          (all-the-icons-dired-mode)))))
+  ;; :hook (dired-mode . (lambda ()
+  ;;                       (interactive)
+  ;;                       ;; Do not show icons over tramp
+  ;;                       (unless (file-remote-p default-directory)
+  ;;                         (all-the-icons-dired-mode))))
+  :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package org
   :ensure t
-  :defer t
   :hook (org-mode . visual-line-mode)
   :diminish org-indent-mode
   :custom
@@ -1102,8 +1099,7 @@ whitespaces."
 (use-package anzu
   :ensure t
   :after isearch
-  :diminish anzu-mode
-  :disabled t ; I do not use `isearch' in general
+  ;; :diminish anzu-mode
   :custom
   (anzu-search-threshold 10000)
   (anzu-minimum-input-length 2)
@@ -1136,34 +1132,34 @@ whitespaces."
   :ensure t
   :bind ("<f8>" . deadgrep))
 
-(use-package recentf
-  :custom
-  (recentf-auto-cleanup 'never "Do not stat remote files")
-  ;; Check regex with `re-builder'
-  (recentf-exclude '(
-                     "[/\\]elpa/"
-                     "[/\\]\\.git/"
-                     ".*\\.gz\\'"
-                     ".*\\.xz\\'"
-                     ".*\\.zip\\'"
-                     ".*-autoloads.el\\'"
-                     "[/\\]archive-contents\\'"
-                     "[/\\]\\.loaddefs\\.el\\'"
-                     "[/\\]tmp/.*"
-                     ".*/recentf\\'"
-                     "/ssh:"
-                     "~$"
-                     "/.autosaves/"
-                     "/TAGS$"
-                     "*.cache"
-                     ))
-  ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-  ;; (recentf-keep '(file-remote-p file-readable-p))
-  (recentf-max-saved-items 100)
-  (recentf-menu-filter 'recentf-sort-descending)
-  (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
-  :config (run-at-time nil 300 'recentf-save-list)
-  :hook (after-init . recentf-mode))
+;; (use-package recentf
+;;   :custom
+;;   (recentf-auto-cleanup 'never "Do not stat remote files")
+;;   ;; Check regex with `re-builder'
+;;   (recentf-exclude '(
+;;                      "[/\\]elpa/"
+;;                      "[/\\]\\.git/"
+;;                      ".*\\.gz\\'"
+;;                      ".*\\.xz\\'"
+;;                      ".*\\.zip\\'"
+;;                      ".*-autoloads.el\\'"
+;;                      "[/\\]archive-contents\\'"
+;;                      "[/\\]\\.loaddefs\\.el\\'"
+;;                      "[/\\]tmp/.*"
+;;                      ".*/recentf\\'"
+;;                      "/ssh:"
+;;                      "~$"
+;;                      "/.autosaves/"
+;;                      "/TAGS$"
+;;                      "*.cache"
+;;                      ))
+;;   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+;;   ;; (recentf-keep '(file-remote-p file-readable-p))
+;;   (recentf-max-saved-items 100)
+;;   (recentf-menu-filter 'recentf-sort-descending)
+;;   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
+;;   :config (run-at-time nil 300 'recentf-save-list)
+;;   :hook (after-init . recentf-mode))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
@@ -1178,7 +1174,6 @@ whitespaces."
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used
 ;; Try `M-x company-complete-common' when there are no completions
-;; https://emacs.stackexchange.com/questions/3813/what-is-the-hook-used-by-company-mode-to-perform-autocompletion
 (use-package company
   :ensure t
   :commands company-abort
@@ -1203,12 +1198,13 @@ whitespaces."
   (company-show-numbers 'left "Speed up completion")
   (company-tooltip-align-annotations t)
   :config
-  (dolist (backend '(company-semantic company-bbdb company-oddmuse company-cmake))
-    (delq backend company-backends))
+  (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
+    (delq backends company-backends))
   ;; Ignore numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
-                         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+                         (lambda (c)
+                           (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
   :bind (:map company-active-map
               ("C-n" . company-select-next)
@@ -1224,18 +1220,18 @@ whitespaces."
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
-;; However, the width of the frame popup is often not enough.
 ;; https://github.com/company-mode/company-mode/issues/1010
+;; However, the width of the frame popup is often not enough.
 (use-package company-posframe
   :ensure t
   :after company
-  :diminish
+  ;; :diminish
   :custom
   (company-posframe-show-metadata nil)
   (company-posframe-show-indicator nil)
   :hook (global-company-mode . company-posframe-mode))
 
-;; The package seems unmaintained and only works for elisp-mode
+;; The package seems unmaintained and only works for `elisp-mode'
 (use-package company-flx
   :ensure t
   :disabled t
@@ -1248,7 +1244,7 @@ whitespaces."
 (use-package company-box
   :ensure t
   :if (display-graphic-p)
-  :diminish
+  ;; :diminish
   :hook (global-company-mode . company-box-mode)
   :custom (company-box-show-single-candidate t)
   :config
@@ -1258,6 +1254,7 @@ whitespaces."
 (use-package company-dict
   :ensure t
   :disabled t
+  :after company
   :custom
   (company-dict-dir (expand-file-name "dict" user-emacs-directory))
   (company-dict-enable-fuzzy t)
@@ -1266,6 +1263,7 @@ whitespaces."
 (use-package company-ctags
   :ensure t
   :disabled t
+  :after company
   :custom
   (company-ctags-fuzzy-match-p t)
   (company-ctags-everywhere t))
@@ -1292,7 +1290,7 @@ whitespaces."
   :defer 2
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (after-init . yas-global-mode)
+  :hook (emacs-startup . yas-global-mode)
   :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config (unbind-key "<tab>" yas-minor-mode-map))
 
@@ -1453,23 +1451,27 @@ whitespaces."
   ;; (defalias 'load-library 'counsel-load-library)
   ;; (defalias 'load-theme 'counsel-load-theme)
   ;; (defalias 'yank-pop 'counsel-yank-pop)
-  (add-to-list 'ivy-display-functions-alist
-               '(counsel-company . ivy-display-function-overlay)))
+
+  ;; (add-to-list 'ivy-display-functions-alist
+  ;;              '(counsel-company . ivy-display-function-overlay))
+  )
 
 (use-package ivy-posframe
   :ensure t
-  :diminish
   :disabled t
+  :diminish
   :hook (ivy-mode . ivy-posframe-mode)
   :custom
-  (ivy-posframe-parameters '((left-fringe . 8)
-                             (right-fringe . 8))))
+  (ivy-display-function #'ivy-posframe-display-at-frame-center)
+  (ivy-posframe-parameters '((left-fringe . 4)
+                             (right-fringe . 4))))
 
 (use-package prescient
   :ensure t
   :hook (counsel-mode . prescient-persist-mode)
-  :custom (prescient-save-file (expand-file-name "prescient-save.el"
-                                                 dotemacs-temp-directory)))
+  :custom
+  (prescient-save-file (expand-file-name "prescient-save.el"
+                                         dotemacs-temp-directory)))
 
 (use-package ivy-prescient
   :ensure t
@@ -1503,7 +1505,7 @@ whitespaces."
 
 (use-package all-the-icons-ivy
   :ensure t
-  :hook (after-init . all-the-icons-ivy-setup))
+  :hook (emacs-startup . all-the-icons-ivy-setup))
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
@@ -1587,8 +1589,8 @@ whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ;; ("C-," . flyspell-auto-correct-previous-word)
-   ("C-," . sb/flyspell-goto-previous-error)))
+    ;; ("C-," . flyspell-auto-correct-previous-word)
+    ("C-," . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not give the save option in a few cases.
 (or (use-package flyspell-popup
@@ -1766,6 +1768,11 @@ whitespaces."
   :commands counsel-projectile-switch-project-by-name
   :hook (counsel-mode . counsel-projectile-mode)
   :preface
+  (defun sb/counsel-projectile-switch-project-magit (project)
+    "Open Magit for the PROJECT."
+    (let ((projectile-switch-project-action 'magit-status))
+      (counsel-projectile-switch-project-by-name project)))
+
   (defun sb/counsel-projectile-open-default-file ()
     "Open the current project's default file.
 This file is specified in `counsel-projectile-default-file'."
@@ -1776,6 +1783,7 @@ This file is specified in `counsel-projectile-default-file'."
                (file-exists-p file))
           (find-file file)
         (message "File %s doesn't exist." file))))
+
   ;; Set `counsel-projectile-switch-project-action' to the following action
   (defun sb/counsel-projectile-switch-project-action-default-file (project)
     "Open PROJECT's default file.
@@ -2027,17 +2035,17 @@ This file is specified in `counsel-projectile-default-file'."
   (imenu-use-popup-menu nil)
   (imenu-sort-function nil))
 
-(use-package imenu+
-  :load-path "extras"
-  :after imenu)
+;; (use-package imenu+
+;;   :load-path "extras"
+;;   :after imenu)
 
-(use-package imenu-anywhere
-  :ensure t
-  :after imenu)
+;; (use-package imenu-anywhere
+;;   :ensure t
+;;   :after imenu)
 
-(use-package popup-imenu
-  :ensure t
-  :after imenu)
+;; (use-package popup-imenu
+;;   :ensure t
+;;   :after imenu)
 
 (use-package flimenu
   :ensure t
@@ -2515,7 +2523,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package csv-mode
   :ensure t
   :mode "\\.csv\\'"
-  :custom (csv-separators '("," ";" "|" " ")))
+  :custom (csv-separators '("," ";" "|" " "))
+  :config (csv-align-mode 1))
 
 ;; (use-package doxymacs
 ;;   :ensure t
@@ -3019,7 +3028,7 @@ This file is specified in `counsel-projectile-default-file'."
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
   :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-  :hook (sh-mode . lsp-deferred)
+  ;; :hook (sh-mode . lsp-deferred)
   :custom
   (sh-basic-offset 2)
   (sh-indent-comment t) ; Indent comments as a regular line
