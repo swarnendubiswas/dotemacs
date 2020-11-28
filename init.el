@@ -919,7 +919,7 @@ whitespaces."
 
 (use-package dired-efap
   :ensure t
-  ;; :after dired+
+  :after dired+
   :commands dired-efap
   :hook (dired-mode . (lambda ()
                         (require 'dired-efap)))
@@ -929,7 +929,7 @@ whitespaces."
 
 (use-package dired-narrow ; Narrow dired to match filter
   :ensure t
-  ;; :after dired
+  :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -939,7 +939,6 @@ whitespaces."
 
 (use-package async
   :ensure t
-  ;; :after dired
   :hook (dired-mode . dired-async-mode))
 
 (use-package dired-async
@@ -1508,23 +1507,6 @@ whitespaces."
   :ensure t
   :hook (emacs-startup . all-the-icons-ivy-setup))
 
-;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
-;; Enable before `ivy-rich-mode' for better performance
-(use-package all-the-icons-ivy-rich
-  :ensure t
-  :if (display-graphic-p)
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-  :init (setq all-the-icons-ivy-rich-icon-size 0.8))
-
-(use-package ivy-rich
-  :ensure t
-  :after (counsel projectile)
-  :functions ivy-format-function-line
-  :custom
-  (ivy-format-function #'ivy-format-function-line)
-  (ivy-rich-parse-remote-buffer nil)
-  :config (ivy-rich-mode 1))
-
 (use-package flyspell
   :if dotemacs-is-linux
   :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
@@ -1590,8 +1572,8 @@ whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-    ;; ("C-," . flyspell-auto-correct-previous-word)
-    ("C-," . sb/flyspell-goto-previous-error)))
+   ;; ("C-," . flyspell-auto-correct-previous-word)
+   ("C-," . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not give the save option in a few cases.
 (or (use-package flyspell-popup
@@ -1811,6 +1793,22 @@ This file is specified in `counsel-projectile-default-file'."
          ([remap projectile-switch-project] . counsel-projectile-switch-project)
          ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)))
 
+;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
+;; Enable before `ivy-rich-mode' for better performance
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :if (display-graphic-p)
+  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
+  :init (setq all-the-icons-ivy-rich-icon-size 0.8))
+
+(use-package ivy-rich
+  :ensure t
+  :functions ivy-format-function-line
+  :custom (ivy-rich-parse-remote-buffer nil)
+  :config
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  (ivy-rich-mode 1))
+
 (use-package flycheck
   :ensure t
   :commands (flycheck-add-next-checker flycheck-next-checker
@@ -1944,22 +1942,23 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   ;; :diminish
 ;;   :hook (prog-mode . ws-butler-mode))
 
-(use-package highlight-symbol ; Highlight symbol under point
-  :ensure t
-  :disabled t ; `symbol-overlay' is better
-  :hook (prog-mode . highlight-symbol-mode)
-  :bind (("M-p" . highlight-symbol-prev)
-         ("M-n" . highlight-symbol-next))
-  :diminish
-  :custom (highlight-symbol-on-navigation-p t))
+(or
+ (use-package highlight-symbol ; Highlight symbol under point
+   :ensure t
+   :disabled t ; `symbol-overlay' is better
+   :hook (prog-mode . highlight-symbol-mode)
+   :bind (("M-p" . highlight-symbol-prev)
+          ("M-n" . highlight-symbol-next))
+   :diminish
+   :custom (highlight-symbol-on-navigation-p t))
 
-(use-package symbol-overlay ; Highlight symbol under point
-  :ensure t
-  :commands (symbol-overlay-mode)
-  :diminish
-  :hook (prog-mode . symbol-overlay-mode)
-  :bind (("M-p" . symbol-overlay-jump-prev)
-         ("M-n" . symbol-overlay-jump-next)))
+ (use-package symbol-overlay ; Highlight symbol under point
+   :ensure t
+   :commands (symbol-overlay-mode)
+   ;; :diminish
+   :hook (prog-mode . symbol-overlay-mode)
+   :bind (("M-p" . symbol-overlay-jump-prev)
+          ("M-n" . symbol-overlay-jump-next))))
 
 (use-package hl-todo
   :ensure t
@@ -1975,10 +1974,10 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish
   :config (volatile-highlights-mode 1))
 
-;; Edit remote file: /method:user@host#port:filename.
+;; Edit remote file: `/method:user@host#port:filename'
 ;; Shortcut /ssh:: will connect to default user@host#port.
-;; Edit local file with sudo: C-x C-f /sudo::/etc/hosts
-;; Open a remote file with ssh + sudo: C-x C-f /ssh:host|sudo:root:/etc/passwd
+;; Edit local file with sudo: `C-x C-f /sudo::/etc/hosts'
+;; Open a remote file with ssh + sudo: `C-x C-f /ssh:host|sudo:root:/etc/passwd'
 (use-package tramp
   :custom
   (tramp-default-method "ssh" "SSH is faster than the default SCP")
@@ -2025,7 +2024,6 @@ This file is specified in `counsel-projectile-default-file'."
 (defun sb/counsel-tramp ()
   (interactive)
   (counsel-find-file (ivy-read "Tramp: " (sb/sshlist))))
-
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
 (use-package imenu
@@ -2091,7 +2089,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package xref
   :if (eq dotemacs-tags-scheme 'ctags)
-  :defer 2
   :commands xref-etags-mode
   :config (xref-etags-mode)
   :bind (("M-'" . xref-find-definitions)
@@ -2133,7 +2130,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package dumb-jump
   :ensure t
-  :defer 2
   :custom (dumb-jump-prefer-searcher 'rg)
   :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
 
@@ -2152,13 +2148,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
   :ensure t
-  :defer 2
   :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase all consecutive white space characters in a given direction
   :ensure t
-  :diminish
+  ;; :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config
   (with-eval-after-load 'ivy
@@ -2269,7 +2264,7 @@ This file is specified in `counsel-projectile-default-file'."
   :config
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
-  :diminish
+  ;; :diminish
   :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -3288,9 +3283,11 @@ _p_: Prev      _u_: Upper
   (use-package bibtex-utils
     :ensure t)
 
+  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
   (use-package reftex
-    :commands (reftex-get-bibfile-list bibtex-parse-keys)
-    :diminish
+    :commands (reftex-get-bibfile-list bibtex-parse-keys
+                                       reftex-default-bibliography)
+    ;; :diminish
     :bind (("C-c [" . reftex-citation)
            ("C-c )" . reftex-reference)
            ("C-c (" . reftex-label))
@@ -3303,35 +3300,10 @@ _p_: Prev      _u_: Upper
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
-    :custom
-    (reftex-enable-partial-scans t)
-    (reftex-highlight-selection 'both)
-    (reftex-plug-into-AUCTeX t)
-    (reftex-save-parse-info t)
-    (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
-    (reftex-use-multiple-selection-buffers t))
-
-  ;; (with-eval-after-load 'reftex
-  ;;     (reftex-add-all-bibitems-from-bibtex))
-
-  ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
-
-  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-  (use-package reftex-cite
-    :commands reftex-default-bibliography
-    :preface
-    (defun sb/get-bibtex-keys (file)
-      (with-current-buffer (find-file-noselect file)
-        (mapcar 'car (bibtex-parse-keys))))
-    (defun sb/reftex-add-all-bibitems-from-bibtex ()
-      (interactive)
-      (mapc 'LaTeX-add-bibitems
-            (apply 'append
-                   (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
     (defun sb/find-bibliography-file ()
-      "Try to find a bibliography file using RefTeX."
-      ;; Returns a string with text properties (as expected by read-file-name) or empty string if no
-      ;; file can be found
+      "Try to find a bibliography file using RefTeX.
+      Returns a string with text properties (as expected by read-file-name) or empty string if no
+      file can be found"
       (interactive)
       (let ((bibfile-list nil))
         (condition-case nil
@@ -3340,8 +3312,19 @@ _p_: Prev      _u_: Upper
                    (setq bibfile-list (reftex-default-bibliography)))))
         (if bibfile-list
             (car bibfile-list) "")))
+    :custom
+    (reftex-enable-partial-scans t)
+    (reftex-highlight-selection 'both)
+    (reftex-plug-into-AUCTeX t)
+    (reftex-save-parse-info t)
+    (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
+    (reftex-use-multiple-selection-buffers t)
+
     ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-    :config (sb/reftex-add-all-bibitems-from-bibtex))
+    :config
+    ;; (sb/reftex-add-all-bibitems-from-bibtex)
+    ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+    )
 
   (use-package bib-cite
     :diminish bib-cite-minor-mode

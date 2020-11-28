@@ -317,6 +317,7 @@ Use `magit-status` to display information about the current Git repository, and 
 - `F` - Pull (`magit-pull`)
 - `f` - Fetch (`magit-fetch`)
 - `y` - List and compare references (`magit-show-references`)
+- `i` - Instruct Git to ignore a file (`magit-gitignore`)
 
 ### Svn
 
