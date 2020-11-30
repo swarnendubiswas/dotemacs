@@ -421,8 +421,9 @@ whitespaces."
 (use-package gcmh
   :ensure t
   ;; :diminish
-  :hook ((after-init . gcmh-mode)
-         (focus-out-hook . gcmh-idle-garbage-collect)))
+  :hook
+  ((after-init . gcmh-mode)
+   (focus-out-hook . gcmh-idle-garbage-collect)))
 
 ;; Activate utf8
 (setq locale-coding-system 'utf-8)
@@ -473,14 +474,12 @@ whitespaces."
   (auto-revert-verbose nil))
 
 (use-package saveplace ; Remember cursor position in files
-  :defer 1
   :hook (emacs-startup . save-place-mode)
   :custom
   (save-place-file (expand-file-name "places"
                                      dotemacs-temp-directory)))
 
 (use-package savehist ; Save minibuffer histories across sessions
-  :defer 1
   :hook (emacs-startup . savehist-mode)
   :custom
   (savehist-additional-variables '(
@@ -515,7 +514,7 @@ whitespaces."
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
-  ;; :diminish
+  :diminish
   :hook (prog-mode . subword-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above the
@@ -539,8 +538,8 @@ whitespaces."
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
 (use-package abbrev
-  ;; :diminish
-  :hook ((text-mode prog-mode) . abbrev-mode)
+  :diminish
+  :hook ((text-mode org-mode markdown-mode latex-mode LaTeX-mode) . abbrev-mode)
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" dotemacs-extras-directory))
   (save-abbrevs 'silently))
@@ -587,13 +586,12 @@ whitespaces."
     (funcall mode 1)))
 
 ;; Not a library/file, so `eval-after-load' does not work
-;; (diminish 'auto-fill-function)
-;; (diminish 'visual-line-mode)
+(diminish 'auto-fill-function)
+(diminish 'visual-line-mode)
 
 (fringe-mode '(1 . 1))
 
 (use-package so-long ; ; This puts the buffer in read-only mode
-  :defer 1
   :hook (emacs-startup . global-so-long-mode)
   :custom (so-long-threshold 500))
 
@@ -807,7 +805,6 @@ whitespaces."
 
 (use-package auto-dim-other-buffers
   :ensure t
-  :defer 1
   :hook (emacs-startup . auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -913,16 +910,18 @@ whitespaces."
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil)
   :config (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
-  :hook (dired-mode . (lambda ()
-                        ;; Do not create multiple dired buffers
-                        (diredp-toggle-find-file-reuse-dir 1))))
+  :hook
+  (dired-mode . (lambda ()
+                  ;; Do not create multiple dired buffers
+                  (diredp-toggle-find-file-reuse-dir 1))))
 
 (use-package dired-efap
   :ensure t
   :after dired+
   :commands dired-efap
-  :hook (dired-mode . (lambda ()
-                        (require 'dired-efap)))
+  :hook
+  (dired-mode . (lambda ()
+                  (require 'dired-efap)))
   :custom (dired-efap-initial-filename-selection nil)
   :bind* (:map dired-mode-map
                ("r" . dired-efap)))
@@ -959,10 +958,11 @@ whitespaces."
   :disabled t
   :functions treemacs-git-mode
   :commands (treemacs treemacs-toggle)
-  :hook ((projectile-mode . treemacs-filewatch-mode)
-         (projectile-mode . treemacs-follow-mode)
-         ;; (projectile-mode . treemacs-fringe-indicator-mode)
-         )
+  :hook
+  ((projectile-mode . treemacs-filewatch-mode)
+   (projectile-mode . treemacs-follow-mode)
+   ;; (projectile-mode . treemacs-fringe-indicator-mode)
+   )
   :custom
   (treemacs-collapse-dirs 3)
   (treemacs-follow-after-init t)
@@ -1126,6 +1126,7 @@ whitespaces."
 
 (use-package wgrep ; Writable grep
   :ensure t
+  :commands (wgrep-change-to-wgrep-mode)
   :custom (wgrep-auto-save-buffer t))
 
 (use-package deadgrep
@@ -1287,7 +1288,6 @@ whitespaces."
 
 (use-package yasnippet
   :ensure t
-  :defer 2
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (emacs-startup . yas-global-mode)
@@ -1505,7 +1505,7 @@ whitespaces."
 
 (use-package all-the-icons-ivy
   :ensure t
-  :hook (emacs-startup . all-the-icons-ivy-setup))
+  :hook (after-init . all-the-icons-ivy-setup))
 
 (use-package flyspell
   :if dotemacs-is-linux
@@ -1955,7 +1955,7 @@ This file is specified in `counsel-projectile-default-file'."
  (use-package symbol-overlay ; Highlight symbol under point
    :ensure t
    :commands (symbol-overlay-mode)
-   ;; :diminish
+   :diminish
    :hook (prog-mode . symbol-overlay-mode)
    :bind (("M-p" . symbol-overlay-jump-prev)
           ("M-n" . symbol-overlay-jump-next))))
@@ -2130,8 +2130,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package dumb-jump
   :ensure t
-  :custom (dumb-jump-prefer-searcher 'rg)
-  :config (add-to-list 'xref-backend-functions #'dumb-jump-xref-activate))
+  :custom
+  (dumb-jump-prefer-searcher 'rg)
+  (dumb-jump-quiet t)
+  :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package helpful
   :ensure t
@@ -2148,12 +2150,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
   :ensure t
+  :commands vlf
   :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase all consecutive white space characters in a given direction
   :ensure t
-  ;; :diminish
+  :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config
   (with-eval-after-load 'ivy
@@ -2161,6 +2164,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package move-text ; Move lines with `M-<up>' and `M-<down>'
   :ensure t
+  :commands (move-text-up move-text-down)
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
@@ -2276,8 +2280,9 @@ This file is specified in `counsel-projectile-default-file'."
   :init
   (setq session-save-file (expand-file-name "session"
                                             dotemacs-temp-directory))
-  :hook (after-init . (lambda()
-                        (session-initialize))))
+  :hook
+  (after-init . (lambda()
+                  (session-initialize))))
 
 (use-package immortal-scratch
   :ensure t
@@ -2378,12 +2383,10 @@ This file is specified in `counsel-projectile-default-file'."
                      (emacs-init-time) gcs-done)))
 
 (use-package bug-hunter
-  :ensure t
-  :defer 2)
+  :ensure t)
 
 (use-package explain-pause-mode
   :load-path "extras"
-  :defer 2
   :disabled t
   :hook (after-init . explain-pause-mode)
   :diminish)
@@ -2404,8 +2407,9 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :disabled t
   :after text-mode
-  :hook (text-mode . (lambda()
-                       (require 'langtool)))
+  :hook
+  (text-mode . (lambda()
+                 (require 'langtool)))
   :custom
   (langtool-default-language "en")
   (langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
@@ -2420,7 +2424,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package pdf-tools
   :ensure t
-  :defer 2
   :init
   (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
   (setq pdf-view-display-size 'fit-page)
@@ -2452,8 +2455,8 @@ This file is specified in `counsel-projectile-default-file'."
   :load-path "extras"
   :mode "\\.ll\\'")
 
-;; (use-package autodisass-llvm-bitcode
-;;   :ensure t)
+(use-package autodisass-llvm-bitcode
+  :ensure t)
 
 (use-package markdown-mode
   :ensure t
@@ -2461,7 +2464,6 @@ This file is specified in `counsel-projectile-default-file'."
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
          ("\\.md\\'" . markdown-mode))
-  :bind ("C-c C-j" . nil)
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
@@ -2476,8 +2478,11 @@ This file is specified in `counsel-projectile-default-file'."
   (markdown-list-indent-width 2)
   (markdown-split-window-direction 'vertical)
   :config
-  (use-package markdown-mode+
-    :ensure t))
+  (unbind-key "C-c C-j"))
+
+(use-package markdown-mode+
+  :ensure t
+  :after markdown-mode)
 
 (use-package markdown-toc
   :ensure t
@@ -2486,7 +2491,7 @@ This file is specified in `counsel-projectile-default-file'."
              markdown-toc-generate-toc
              markdown-toc-generate-or-refresh-toc))
 
-;; Use `pandoc-convert-to-pdf' to export markdown file to pdf.
+;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 (use-package pandoc-mode
   :ensure t
   :commands (pandoc-load-default-settings)
@@ -2509,7 +2514,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package prettier
   :ensure t
-  :defer 2
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   ;; :hook ((markdown-mode gfm-mode) . (lambda ()
   ;;                                     (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
@@ -2549,8 +2553,9 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package eldoc
   :if dotemacs-is-linux
   :diminish
-  :hook ((emacs-lisp-mode . turn-on-eldoc-mode)
-         (lisp-interaction-mode . turn-on-eldoc-mode)))
+  :hook
+  ((emacs-lisp-mode . turn-on-eldoc-mode)
+   (lisp-interaction-mode . turn-on-eldoc-mode)))
 
 (use-package octave
   :mode "\\.m\\'")
@@ -2579,9 +2584,10 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package elisp-mode
   :mode (("\\.el\\'" . emacs-lisp-mode)
          ("\\.elc\\'" . elisp-byte-code-mode))
-  :hook ((lisp-mode emacs-lisp-mode) . (lambda ()
-                                         (when buffer-file-name
-                                           (add-hook 'after-save-hook #'check-parens nil t)))))
+  :hook
+  ((lisp-mode emacs-lisp-mode) . (lambda ()
+                                   (when buffer-file-name
+                                     (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package lsp-mode
   :ensure t
@@ -2599,16 +2605,17 @@ This file is specified in `counsel-projectile-default-file'."
   ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
-  :hook (((cperl-mode css-mode javascript-mode js-mode less-mode
-                      less-css-mode perl-mode sass-mode scss-mode sgml-mode typescript-mode) .
-                      lsp-deferred)
-         (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-managed-mode . lsp-modeline-diagnostics-mode)
-         ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
-         (lsp-mode . lsp-modeline-code-actions-mode)
-         ((c++-mode java-mode json-mode) . (lambda ()
-                                             (when buffer-file-name
-                                               (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))
+  :hook
+  (((cperl-mode css-mode javascript-mode js-mode less-mode
+                less-css-mode perl-mode sass-mode scss-mode sgml-mode typescript-mode) .
+                lsp-deferred)
+   (lsp-mode . lsp-enable-which-key-integration)
+   (lsp-managed-mode . lsp-modeline-diagnostics-mode)
+   ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
+   (lsp-mode . lsp-modeline-code-actions-mode)
+   ((c++-mode java-mode json-mode) . (lambda ()
+                                       (when buffer-file-name
+                                         (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
                              "--suggest-missing-includes" "--fallback-style=LLVM" "--log=error"))
@@ -2630,9 +2637,9 @@ This file is specified in `counsel-projectile-default-file'."
                                 bashls-remote typescript-remote
                                 css-ls cssls-remote
                                 intelephense-remote
-                                perl-language-server php-ls xmlls
-                                xmlls-remote yamlls yamlls-remote
-                                ))
+                                perl-language-server
+                                perlls-remote php-ls xmlls
+                                xmlls-remote yamlls yamlls-remote))
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2643,9 +2650,10 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-modeline-diagnostics-scope :project)
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
-  (lsp-pyls-plugins-jedi-completion-fuzzy t)
+  ;; Do not turn on fuzzy completion with jedi, lsp-mode is fuzzy on the client side
+  (lsp-pyls-plugins-jedi-completion-fuzzy nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
-  (lsp-pyls-plugins-preload-modules ["numpy"])
+  (lsp-pyls-plugins-preload-modules ["numpy", ""])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length dotemacs-fill-column)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
@@ -2657,6 +2665,7 @@ This file is specified in `counsel-projectile-default-file'."
                                        (concat "--rcfile="
                                                (expand-file-name ".config/pylintrc"
                                                                  dotemacs-user-home)))))
+  (lsp-pyls-plugins-pylint-enabled t "Pylint can be expensive")
   (lsp-pyls-plugins-yapf-enabled t)
   (lsp-session-file (expand-file-name "lsp-session" dotemacs-temp-directory))
   (lsp-signature-auto-activate nil)
@@ -2793,6 +2802,21 @@ This file is specified in `counsel-projectile-default-file'."
                     :major-modes '(yaml-mode)
                     :remote? t
                     :server-id 'yamlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tramp-connection
+                                     (lambda ()
+                                       (list lsp-perl-language-server-path
+                                             "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run" "--"
+                                             (format "--port %d --version %s"
+                                                     lsp-perl-language-server-port lsp-perl-language-server-client-version))))
+                    :major-modes '(perl-mode cperl-mode)
+                    :remote? t
+                    :initialized-fn (lambda (workspace)
+                                      (with-lsp-workspace workspace
+                                        (lsp--set-configuration
+                                         (lsp-configuration-section "perl"))))
+                    :priority -1
+                    :server-id 'perlls-remote))
   :bind (("M-." . lsp-find-definition)
          ("C-c l i" . lsp-goto-implementation)
          ("C-c l t" . lsp-goto-type-definition)
@@ -2845,37 +2869,39 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure t
   :if (eq dotemacs-python-langserver 'mspyls)
   :init (setq lsp-python-ms-auto-install-server t)
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-python-ms)
-                         (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-                           (add-to-list 'lsp-disabled-clients ls))
-                         (add-to-list 'lsp-enabled-clients 'mspyls)
-                         (add-to-list 'lsp-enabled-clients 'mspyls-remote)))
+  :hook
+  (python-mode . (lambda ()
+                   (require 'lsp-python-ms)
+                   (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
+                     (add-to-list 'lsp-disabled-clients ls))
+                   (add-to-list 'lsp-enabled-clients 'mspyls)
+                   (add-to-list 'lsp-enabled-clients 'mspyls-remote)))
   :custom
   (lsp-python-ms-python-executable-cmd "python3"))
 
 (use-package lsp-pyright
   :ensure t
-  :defer 2
   :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-                           (add-to-list 'lsp-disabled-clients ls))
-                         (add-to-list 'lsp-enabled-clients 'pyright)
-                         (add-to-list 'lsp-enabled-clients 'pyright-remote)))
+  :hook
+  (python-mode . (lambda ()
+                   (require 'lsp-pyright)
+                   (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
+                     (add-to-list 'lsp-disabled-clients ls))
+                   (add-to-list 'lsp-enabled-clients 'pyright)
+                   (add-to-list 'lsp-enabled-clients 'pyright-remote)))
   :custom
   (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package lsp-jedi
   :ensure t
-  :if (eq dotemacs-python-langserver 'jedi)
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-jedi)
-                         (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-                           (add-to-list 'lsp-disabled-clients ls))
-                         (add-to-list 'lsp-enabled-clients 'jedi)
-                         (add-to-list 'lsp-enabled-clients 'jedils-remote)))
+  :if (and (eq dotemacs-python-langserver 'jedi) (executable-find "jedi-language-server"))
+  :hook
+  (python-mode . (lambda ()
+                   (require 'lsp-jedi)
+                   (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
+                     (add-to-list 'lsp-disabled-clients ls))
+                   (add-to-list 'lsp-enabled-clients 'jedi)
+                   (add-to-list 'lsp-enabled-clients 'jedils-remote)))
   :custom
   (lsp-jedi-diagnostics-enable t))
 
@@ -2982,9 +3008,10 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package pyvenv
   :ensure t
   :diminish
-  :custom (pyvenv-mode-line-indicator
-           '(pyvenv-virtual-env-name ("[venv:"
-                                      pyvenv-virtual-env-name "]")))
+  :custom
+  (pyvenv-mode-line-indicator
+   '(pyvenv-virtual-env-name ("[venv:"
+                              pyvenv-virtual-env-name "]")))
   :hook (python-mode . pyvenv-mode)
   :config
   (setq pyvenv-post-activate-hooks
@@ -2998,11 +3025,12 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package py-isort
   :ensure t
   :if (executable-find "isort")
-  :hook (python-mode . (lambda ()
-                         (add-hook 'before-save-hook #'py-isort-before-save))))
+  :hook
+  (python-mode . (lambda ()
+                   (add-hook 'before-save-hook #'py-isort-before-save))))
 
-;; (use-package ein
-;;   :ensure t)
+(use-package ein
+  :ensure t)
 
 (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                               auto-mode-alist))
@@ -3013,12 +3041,11 @@ This file is specified in `counsel-projectile-default-file'."
                           c-set-style "java")))
 
 (use-package ant
-  :ensure t
-  :defer 2)
+  :ensure t)
 
-;; Can disassemble .class files from within jars
-;; (use-package autodisass-java-bytecode
-;;   :ensure t)
+;; Can disassemble `.class' files from within jars
+(use-package autodisass-java-bytecode
+  :ensure t)
 
 (use-package sh-script ; Shell script mode
   :mode (("\\.zsh\\'" . sh-mode)
@@ -3048,7 +3075,7 @@ This file is specified in `counsel-projectile-default-file'."
   :functions magit-display-buffer-fullframe-status-v1
   :bind ("C-x g" . magit-status)
   :custom
-  (magit-completing-read-function 'ivy-completing-read)
+  (magit-completing-read-function #'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (magit-save-repository-buffers t)
   (transient-history-file (expand-file-name "transient/history.el"
@@ -3104,7 +3131,7 @@ This file is specified in `counsel-projectile-default-file'."
     (save-excursion
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)
-        (smerge-mode +1)))))
+        (smerge-mode 1)))))
 (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
 (add-hook 'find-file-hook #'sb/enable-smerge-maybe)
 (setq smerge-command-prefix "\C-cv")
@@ -3129,11 +3156,11 @@ _p_: Prev      _u_: Upper
 
 (use-package diff-hl
   :ensure t
-  :defer 2
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
   :custom (diff-hl-draw-borders nil)
-  :hook ((after-init . global-diff-hl-mode)
-         (dired-mode . diff-hl-dired-mode))
+  :hook
+  ((after-init . global-diff-hl-mode)
+   (dired-mode . diff-hl-dired-mode))
   :config
   (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
@@ -3198,9 +3225,10 @@ _p_: Prev      _u_: Upper
 ;; Autocompletion with LSP, LaTeX, and Company is not perfect, so we continue to use AucTeX support
 (use-package lsp-latex
   :ensure t
-  :hook ((latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                                 (require 'lsp-latex)
-                                                 (lsp-deferred)))
+  :hook
+  ((latex-mode bibtex-mode LaTeX-mode) . (lambda()
+                                           (require 'lsp-latex)
+                                           (lsp-deferred)))
   :custom
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
@@ -3366,8 +3394,9 @@ _p_: Prev      _u_: Upper
 (use-package js2-mode
   :ensure t
   :mode "\\.js\\'"
-  :hook ((js2-mode . lsp-deferred)
-         (js2-mode . js2-imenu-extras-mode))
+  :hook
+  ((js2-mode . lsp-deferred)
+   (js2-mode . js2-imenu-extras-mode))
   :custom
   (js2-basic-offset 2)
   (js-indent-level 2))
@@ -3754,7 +3783,6 @@ Increase line spacing by two line height."
 
 (use-package which-key ; Show help popups for prefix keys
   :ensure t
-  :defer 2
   :hook (after-init . which-key-mode)
   :diminish
   :config

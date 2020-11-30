@@ -1,9 +1,12 @@
-personal_ws-1.1 en 149 
+personal_ws-1.1 en 156 
 Akash
+Anil
 Anupam
+Ashutosh
 Biswas
 CSE
 Covid
+Deba
 Dhandhania
 FIXME
 GPGPU
@@ -24,6 +27,7 @@ Parallelize
 Prafulla
 Pretrained
 README
+Rajat
 Refactor
 SIMD
 Samdekar
@@ -31,6 +35,7 @@ Samvid
 Sanket
 Sharwari
 Shivam
+Subhajit
 Sunidhi
 Surender
 Swaprava
@@ -69,6 +74,7 @@ invariants
 invertible
 irreflexive
 latencies
+linearized
 liveness
 locksteps
 metadata
@@ -88,6 +94,7 @@ optimizations
 outliers
 parallelization
 parallelize
+parallelized
 parallelizes
 parallelizing
 partitioner

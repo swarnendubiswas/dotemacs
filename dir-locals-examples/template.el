@@ -62,6 +62,7 @@
                  (flycheck-pylintrc . "setup.cfg")
                  (lsp-pyls-plugins-pylint-enabled . t)
                  (lsp-pyls-plugins-yapf-enabled . t)
+                 (lsp-pyls-plugins-jedi-environment . "*ABSOLUTE PATH TO YOUR VIRTUALENV*")
                  (lsp-pyright-venv-path . ["./python-src"])
                  (python-shell-exec-path . "/usr/bin/python3")
                  (python-shell-interpreter . "/usr/bin/python3")
