@@ -138,6 +138,7 @@
                 (reftex-default-bibliography . "/home/swarnendu/prospar-workspace/references/references.bib")
                 (company-bibtex-bibliography . "/home/swarnendu/prospar-workspace/references/references.bib")
                 (bibtex-completion-bibliography . "/home/swarnendu/prospar-workspace/references/references.bib")
+                (lsp-latex-root-directory . "/home/swarnendu/bitbucket/iitkanpur/courses/autumn2020-cs335/endsem")
                 ;; (eval . (add-hook 'before-save-hook #'sb/save-buffer-and-run-latexmk))
                 ))
 

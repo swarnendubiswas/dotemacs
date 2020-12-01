@@ -1231,22 +1231,21 @@ whitespaces."
 ;; However, the width of the frame popup is often not enough.
 (use-package company-posframe
   :ensure t
-  :after company
-  ;; :diminish
+  :diminish
   :custom
   (company-posframe-show-metadata nil)
   (company-posframe-show-indicator nil)
-  :hook (global-company-mode . company-posframe-mode))
+  :hook (company-mode . company-posframe-mode))
 
 ;; The package seems unmaintained and only works for `elisp-mode'
 (use-package company-flx
   :ensure t
   :disabled t
-  :hook (global-company-mode . company-flx-mode))
+  :hook (company-mode . company-flx-mode))
 
 (use-package company-quickhelp
   :ensure t
-  :hook (global-company-mode . company-quickhelp-mode))
+  :hook (company-mode . company-quickhelp-mode))
 
 (use-package company-box
   :ensure t
@@ -1329,7 +1328,7 @@ whitespaces."
   (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*" "^\\*Help\\*$"
                     "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
                     "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$" "*emacs*" "*Warnings*"
-                    "^\\*prettier"))
+                    "^\\*prettier" "^\\*json\\*$" "^\\*texlab\\*$"))
     (add-to-list 'ivy-ignore-buffers buffer))
   (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish
@@ -1474,13 +1473,21 @@ whitespaces."
   :ensure t
   :hook (counsel-mode . ivy-prescient-mode)
   :custom
-  (ivy-prescient-enable-sorting t "Allow prescient to override sorting logic")
+  (ivy-prescient-enable-sorting nil "Allow prescient to override sorting logic")
   (ivy-prescient-sort-function '(not swiper swiper-isearch
-                                     counsel-grep flyspell-correct-ivy ivy-switch-buffer)))
+                                     ivy-switch-buffer
+                                     counsel-recentf counsel-grep
+                                     flyspell-correct-ivy )))
 
-;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
-(with-eval-after-load 'ivy
-  (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
+;; ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
+;; (with-eval-after-load 'ivy
+;;   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
+
+;; (setq ivy-sort-matches-functions-alist
+;;       '((t . ivy--prefix-sort)))
+;; (add-to-list
+;;  'ivy-sort-matches-functions-alist
+;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
 (use-package orderless
   :ensure t
@@ -3273,8 +3280,7 @@ _p_: Prev      _u_: Upper
                                   TeX-command-menu
                                   TeX-revert-document-buffer))
   :config
-  (setq font-latex-fontify-sectioning 1.0
-        TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
         TeX-auto-untabify t ; Remove all tabs before saving
         TeX-clean-confirm nil
         TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
@@ -3291,6 +3297,14 @@ _p_: Prev      _u_: Upper
         LaTeX-syntactic-comments t
         ;; Do not insert line-break at inline math
         LaTeX-fill-break-at-separators nil)
+
+
+  ;; Avoid raising of superscripts and lowering of subscripts
+  (setq tex-fontify-script nil
+        font-latex-fontify-script nil)
+
+  ;; Avoid emphasizing sections
+  (setq font-latex-fontify-sectioning 1.0)
 
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   (add-hook 'LaTeX-mode-hook #'reftex-mode)
@@ -3355,6 +3369,7 @@ _p_: Prev      _u_: Upper
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+
     (defun sb/find-bibliography-file ()
       "Try to find a bibliography file using RefTeX.
       Returns a string with text properties (as expected by read-file-name) or empty string if no
@@ -3367,6 +3382,21 @@ _p_: Prev      _u_: Upper
                    (setq bibfile-list (reftex-default-bibliography)))))
         (if bibfile-list
             (car bibfile-list) "")))
+
+    (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
+      "Try to find a bibliography file using RefTex and parse the bib keys.
+Ignore if no file is found."
+      (interactive)
+      (let ((bibfile-list nil))
+        (condition-case nil
+            (setq bibfile-list (reftex-get-bibfile-list))
+          (error (ignore-errors
+                   (setq bibfile-list (reftex-default-bibliography)))))
+        (message "%s" bibfile-list)
+        (mapc 'LaTeX-add-bibitems
+              (apply 'append
+                     (mapcar 'sb/get-bibtex-keys bibfile-list)))
+        ))
     :custom
     (reftex-enable-partial-scans t)
     (reftex-highlight-selection 'both)
@@ -3377,7 +3407,7 @@ _p_: Prev      _u_: Upper
 
     ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
     :config
-    ;; (sb/reftex-add-all-bibitems-from-bibtex)
+    (sb/reftex-try-add-all-bibitems-from-bibtex)
     ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
     )
 
@@ -3726,7 +3756,7 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*")
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*lsp-log*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
