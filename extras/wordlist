@@ -1842,6 +1842,8 @@ dramatist
 dramatization
 dramatize
 draw
+drawback
+drawbacks
 drawer
 drawing
 drawings
@@ -1991,6 +1993,7 @@ employee
 employer
 employment
 empty
+emulation
 enable
 enabled
 enables
@@ -2033,6 +2036,7 @@ enormity
 enormous
 enormously
 enough
+enqueue
 enquiry
 enrolled
 ensemble
@@ -2224,6 +2228,7 @@ extended
 extends
 extensibility
 extension
+extensions
 extensive
 extent
 exterior
@@ -3063,6 +3068,7 @@ instructions
 instructive
 instructor
 instrument
+instrumentation
 instrumenting
 insufficient
 insufficiently
@@ -3738,8 +3744,8 @@ multidimensional
 multilayer
 multilevel
 multiple
-multiplier
 multiplication
+multiplier
 multiply
 multisocket
 multithreaded
@@ -4654,6 +4660,7 @@ reactivation
 reactive
 reactor
 read
+readability
 reader
 readers
 readily
@@ -5319,6 +5326,7 @@ simulate
 simulated
 simulation
 simultaneous
+simultaneously
 since
 sincere
 sincerely
@@ -6406,6 +6414,7 @@ water
 wave
 weak
 weakness
+weaknesses
 wealth
 wealthy
 weapon
@@ -6546,7 +6555,6 @@ yourself
 youth
 zero
 zone
-emulation
 
 ;; Local Variables:
 ;; mode: text

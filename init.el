@@ -40,6 +40,7 @@
 ;; https://protesilaos.com/dotemacs/
 ;; https://github.com/CSRaghunandan/.emacs.d/
 ;; https://github.com/purcell/emacs.d
+;; https://github.com/MatthewZMD/.emacs.d
 
 ;;; Code:
 
@@ -202,7 +203,7 @@ whitespaces."
   "User temp directory.")
 
 (defcustom dotemacs-textlint-home
-  (expand-file-name "texlint-workspace" dotemacs-user-tmp)
+  (expand-file-name "textlint-workspace" dotemacs-user-tmp)
   "Absolute path to textlint workspace."
   :type 'string
   :group 'dotemacs)
@@ -748,7 +749,12 @@ whitespaces."
                                                      (setq doom-modeline-buffer-encoding nil
                                                            doom-modeline-indent-info t
                                                            doom-modeline-minor-modes t)
-                                                     (doom-modeline-mode 1)))
+                                                     (doom-modeline-mode 1)
+                                                     :custom-face
+                                                     (doom-modeline-bar ((t (:inherit
+                                                                             default
+                                                                             :height
+                                                                             0.8))))))
 
       ((eq dotemacs-modeline-theme 'awesome-tray) (use-package awesome-tray
                                                     :load-path "extras"
@@ -1099,7 +1105,7 @@ whitespaces."
 (use-package anzu
   :ensure t
   :after isearch
-  ;; :diminish anzu-mode
+  :diminish anzu-mode
   :custom
   (anzu-search-threshold 10000)
   (anzu-minimum-input-length 2)
@@ -1133,34 +1139,34 @@ whitespaces."
   :ensure t
   :bind ("<f8>" . deadgrep))
 
-;; (use-package recentf
-;;   :custom
-;;   (recentf-auto-cleanup 'never "Do not stat remote files")
-;;   ;; Check regex with `re-builder'
-;;   (recentf-exclude '(
-;;                      "[/\\]elpa/"
-;;                      "[/\\]\\.git/"
-;;                      ".*\\.gz\\'"
-;;                      ".*\\.xz\\'"
-;;                      ".*\\.zip\\'"
-;;                      ".*-autoloads.el\\'"
-;;                      "[/\\]archive-contents\\'"
-;;                      "[/\\]\\.loaddefs\\.el\\'"
-;;                      "[/\\]tmp/.*"
-;;                      ".*/recentf\\'"
-;;                      "/ssh:"
-;;                      "~$"
-;;                      "/.autosaves/"
-;;                      "/TAGS$"
-;;                      "*.cache"
-;;                      ))
-;;   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-;;   ;; (recentf-keep '(file-remote-p file-readable-p))
-;;   (recentf-max-saved-items 100)
-;;   (recentf-menu-filter 'recentf-sort-descending)
-;;   (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
-;;   :config (run-at-time nil 300 'recentf-save-list)
-;;   :hook (after-init . recentf-mode))
+(use-package recentf
+  :custom
+  (recentf-auto-cleanup 'never "Do not stat remote files")
+  ;; Check regex with `re-builder'
+  (recentf-exclude '(
+                     "[/\\]elpa/"
+                     "[/\\]\\.git/"
+                     ".*\\.gz\\'"
+                     ".*\\.xz\\'"
+                     ".*\\.zip\\'"
+                     ".*-autoloads.el\\'"
+                     "[/\\]archive-contents\\'"
+                     "[/\\]\\.loaddefs\\.el\\'"
+                     "[/\\]tmp/.*"
+                     ".*/recentf\\'"
+                     "/ssh:"
+                     "~$"
+                     "/.autosaves/"
+                     "/TAGS$"
+                     "*.cache"
+                     ))
+  ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+  ;; (recentf-keep '(file-remote-p file-readable-p))
+  (recentf-max-saved-items 100)
+  (recentf-menu-filter 'recentf-sort-descending)
+  (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
+  :config (run-at-time nil (* 5 60) 'recentf-save-list) ; seconds
+  :hook (after-init . recentf-mode))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN."
@@ -1245,21 +1251,12 @@ whitespaces."
 (use-package company-box
   :ensure t
   :if (display-graphic-p)
-  ;; :diminish
-  :hook (global-company-mode . company-box-mode)
+  :diminish
+  :hook (company-mode . company-box-mode)
   :custom (company-box-show-single-candidate t)
   :config
   (set-face-background 'company-box-background "cornsilk")
   (set-face-background 'company-box-selection "light blue"))
-
-(use-package company-dict
-  :ensure t
-  :disabled t
-  :after company
-  :custom
-  (company-dict-dir (expand-file-name "dict" user-emacs-directory))
-  (company-dict-enable-fuzzy t)
-  (company-dict-enable-yasnippet nil))
 
 (use-package company-ctags
   :ensure t
@@ -1565,6 +1562,10 @@ whitespaces."
   :hook ((prog-mode . flyspell-prog-mode)
          ;; (before-save-hook . flyspell-buffer) ; Saving will be slow
          ((text-mode find-file-hooks) . flyspell-mode))
+  :config
+  ;; Skip regions in Org-mode
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
   :diminish
   :bind
   (("C-c f f" . flyspell-mode)
@@ -1774,15 +1775,16 @@ This file is specified in `counsel-projectile-default-file'."
     (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
       (counsel-projectile-switch-project-by-name project)))
   :custom
-  (counsel-projectile-find-file-more-chars 3)
+  ;; (counsel-projectile-find-file-more-chars 3)
   (counsel-projectile-remove-current-buffer t)
   (counsel-projectile-sort-buffers t)
   (counsel-projectile-sort-directories t)
   (counsel-projectile-sort-files t)
   (counsel-projectile-sort-projects t)
-  (counsel-projectile-modify-action
-   'counsel-projectile-switch-project-action
-   '((default sb/counsel-projectile-switch-project-action-default-file)))
+  ;; :config
+  ;; (counsel-projectile-modify-action
+  ;;  'counsel-projectile-switch-project-action
+  ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
   :bind (("<f5>" . counsel-projectile-switch-project)
          ("<f6>" . counsel-projectile-find-file)
          ("<f7>" . counsel-projectile-rg)
@@ -1812,10 +1814,15 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flycheck
   :ensure t
   :commands (flycheck-add-next-checker flycheck-next-checker
-                                       flycheck-previous-error flycheck-describe-checker
-                                       flycheck-buffer flycheck-list-errors flycheck-disabled-checkers
-                                       flycheck-select-checker flycheck-verify-setup
-                                       flycheck-next-error flycheck-disable-checker)
+                                       flycheck-previous-error
+                                       flycheck-describe-checker
+                                       flycheck-buffer
+                                       flycheck-list-errors
+                                       flycheck-disabled-checkers
+                                       flycheck-select-checker
+                                       flycheck-verify-setup
+                                       flycheck-next-error
+                                       flycheck-disable-checker)
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled))
@@ -1839,15 +1846,20 @@ This file is specified in `counsel-projectile-default-file'."
                 flycheck-markdown-markdownlint-cli-config (expand-file-name
                                                            ".markdownlint.json"
                                                            dotemacs-user-home))
+
   (dolist (hook '(text-mode-hook org-mode-hook
                                  latex-mode-hook
                                  LaTeX-mode-hook))
     (add-hook hook (lambda ()
-                     (setq-local flycheck-checker 'textlint))))
+                     (setq-local flycheck-checker 'textlint)
+                     (flycheck-add-next-checker 'textlint 'proselint))))
+
   (add-hook 'markdown-mode-hook (lambda ()
                                   (setq-local flycheck-checker 'markdown-markdownlint-cli)))
+
   (add-hook 'python-mode-hook (lambda ()
                                 (setq-local flycheck-checker 'python-pylint)))
+
   (add-hook 'sh-mode-hook (lambda ()
                             (setq-local flycheck-checker 'sh-shellcheck)
                             (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
@@ -1855,19 +1867,23 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+
   :config
+  ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
   :ensure t
   :after flycheck
-  :hook
-  ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
-   . (lambda ()
-       ;; (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
-       (require 'flycheck-grammarly)
-       (flycheck-add-next-checker 'grammarly-checker 'textlint))))
+  ;; :hook
+  ;; ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
+  ;;  . (lambda ()
+  ;;      ;; (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
+  ;;      (require 'flycheck-grammarly)
+  ;;      (flycheck-add-next-checker 'grammarly-checker 'textlint)))
+  :config
+  (flycheck-add-next-checker 'proselint 'grammarly-checker))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :ensure t
@@ -1881,6 +1897,7 @@ This file is specified in `counsel-projectile-default-file'."
     (use-package flycheck-posframe
       :ensure t
       :disabled t
+      :if (display-graphic-p)
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'window-bottom-left-corner)
       :config (flycheck-posframe-configure-pretty-defaults))
@@ -1972,6 +1989,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package volatile-highlights
   :ensure t
   :diminish
+  :commands volatile-highlights-mode
   :config (volatile-highlights-mode 1))
 
 ;; Edit remote file: `/method:user@host#port:filename'
@@ -2305,6 +2323,11 @@ This file is specified in `counsel-projectile-default-file'."
          ("C-c d s" . crux-sudo-edit)
          ("<f12>" . crux-kill-other-buffers)))
 
+(use-package disable-mouse
+  :ensure t
+  :diminish disable-mouse-global-mode
+  :hook (after-init . global-disable-mouse-mode))
+
 (use-package apt-sources-list
   :ensure t
   :mode ("\\.list\\'" . apt-sources-list-mode))
@@ -2522,6 +2545,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package csv-mode
   :ensure t
+  :commands csv-align-mode
   :mode "\\.csv\\'"
   :custom (csv-separators '("," ";" "|" " "))
   :config (csv-align-mode 1))
@@ -2591,6 +2615,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package lsp-mode
   :ensure t
+  :defines (lsp-perl-language-server-path
+            lsp-perl-language-server-port
+            lsp-perl-language-server-client-version)
   :commands (lsp-register-client lsp-tramp-connection
                                  make-lsp-client
                                  lsp-format-buffer
@@ -3072,7 +3099,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package magit
   :ensure t
-  :functions magit-display-buffer-fullframe-status-v1
+  :commands magit-display-buffer-fullframe-status-v1
   :bind ("C-x g" . magit-status)
   :custom
   (magit-completing-read-function #'ivy-completing-read)

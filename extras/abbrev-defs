@@ -520,6 +520,7 @@
     ("exhcange" "exchange" nil :count 0)
     ("exhcanges" "exchanges" nil :count 0)
     ("expectatoins" "expectations" nil :count 1)
+    ("expeirmental" "experimental" nil :count 0)
     ("experiance" "experience" nil :count 0)
     ("experienc" "experience" nil :count 0)
     ("experimet" "experiment" nil :count 1)
