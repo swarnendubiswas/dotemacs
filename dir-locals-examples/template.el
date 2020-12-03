@@ -37,7 +37,7 @@
                     "blur")))
          ;; https://emacs.stackexchange.com/questions/42463/load-package-in-dir-locals
          (eval . (use-package smart-tabs
-                   :ensure t
+                   : 
                    :config ()))
          ))
 

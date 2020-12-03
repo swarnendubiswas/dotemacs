@@ -265,6 +265,7 @@ whitespaces."
 (setq use-package-enable-imenu-support t)
 (if (bound-and-true-p dotemacs-debug-init-file)
     (setq debug-on-error t
+          use-package-always-ensure t
           use-package-compute-statistics t ; Use `M-x use-package-report' to see results
           use-package-expand-minimally nil
           use-package-verbose t)
@@ -278,27 +279,21 @@ whitespaces."
 
 ;; Installation is one-time, so avoid the overhead of run-time checks
 (use-package use-package-ensure-system-package
-  :ensure t
   :disabled t)
 
 (use-package bind-key
-  :ensure t
   :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package diminish
-  :ensure t)
+(use-package diminish)
 
 (use-package dash
-  :ensure t
   :commands -tree-map)
 
 (use-package f
-  :ensure t
   :commands (f-join f-exists?))
 
 ;; Use `C-c h' consistently for invoking a hydra
 (use-package hydra
-  :ensure t
   :commands (hydra-default-pre hydra-keyboard-quit
                                hydra-show-hint hydra-set-transient-map
                                hydra--call-interactively-remap-maybe))
@@ -311,7 +306,6 @@ whitespaces."
   (load dotemacs-private-file 'noerror))
 
 (use-package paradox
-  :ensure t
   :bind (("C-c d l" . paradox-list-packages)
          ("C-c d u" . paradox-upgrade-packages))
   :custom
@@ -322,7 +316,6 @@ whitespaces."
 
 ;; Check the PATH with `(getenv "PATH")'
 (use-package exec-path-from-shell
-  :ensure t
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
   ;; (setq exec-path-from-shell-arguments '("-l")
@@ -420,7 +413,6 @@ whitespaces."
 
 ;; LSP mode generates lots of objects, which causes a problem with gcmh mode.
 (use-package gcmh
-  :ensure t
   ;; :diminish
   :hook
   ((after-init . gcmh-mode)
@@ -467,6 +459,7 @@ whitespaces."
 
 ;; Auto-refresh all buffers, does not work for remote files
 (use-package autorevert
+  :ensure nil
   ;; :diminish auto-revert-mode
   :hook (emacs-startup . global-auto-revert-mode)
   :custom
@@ -475,12 +468,14 @@ whitespaces."
   (auto-revert-verbose nil))
 
 (use-package saveplace ; Remember cursor position in files
+  :ensure nil
   :hook (emacs-startup . save-place-mode)
   :custom
   (save-place-file (expand-file-name "places"
                                      dotemacs-temp-directory)))
 
 (use-package savehist ; Save minibuffer histories across sessions
+  :ensure nil
   :hook (emacs-startup . savehist-mode)
   :custom
   (savehist-additional-variables '(
@@ -492,6 +487,7 @@ whitespaces."
   (savehist-save-minibuffer-history t))
 
 (use-package uniquify
+  :ensure nil
   :custom
   (uniquify-after-kill-buffer-p t)
   (uniquify-buffer-name-style 'forward)
@@ -500,6 +496,7 @@ whitespaces."
   (uniquify-strip-common-suffix t))
 
 (use-package hippie-exp ; Replace `dabbrev-exp'
+  :ensure nil
   :custom
   (hippie-expand-try-functions-list '(try-expand-dabbrev
                                       try-expand-dabbrev-all-buffers
@@ -515,6 +512,7 @@ whitespaces."
   :bind ("M-/" . hippie-expand))
 
 (use-package subword
+  :ensure nil
   :diminish
   :hook (prog-mode . subword-mode))
 
@@ -539,6 +537,7 @@ whitespaces."
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
 (use-package abbrev
+  :ensure nil
   :diminish
   :hook ((text-mode org-mode markdown-mode latex-mode LaTeX-mode) . abbrev-mode)
   :custom
@@ -593,6 +592,7 @@ whitespaces."
 (fringe-mode '(1 . 1))
 
 (use-package so-long ; ; This puts the buffer in read-only mode
+  :ensure nil
   :hook (emacs-startup . global-so-long-mode)
   :custom (so-long-threshold 500))
 
@@ -603,11 +603,9 @@ whitespaces."
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
-                                     :ensure t
                                      :init (load-theme 'leuven t)))
 
       ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
-                                      :ensure t
                                       :init
                                       (load-theme 'eclipse t)
                                       (set-background-color "white")
@@ -628,7 +626,6 @@ whitespaces."
                                               ))
 
       ((eq dotemacs-theme 'zenburn) (use-package zenburn-theme
-                                      :ensure t
                                       :init (load-theme 'zenburn t)))
 
       ((eq dotemacs-theme 'solarized-light) (use-package solarized-light-theme
@@ -642,7 +639,6 @@ whitespaces."
                                              :init (load-theme 'solarized-dark t)))
 
       ((eq dotemacs-theme 'doom-molokai) (use-package doom-themes
-                                           :ensure t
                                            :init
                                            (load-theme 'doom-molokai t)
                                            (set-face-attribute 'font-lock-comment-face nil
@@ -651,11 +647,9 @@ whitespaces."
                                                                :foreground "#999999")))
 
       ((eq dotemacs-theme 'monokai) (use-package monokai-theme
-                                      :ensure t
                                       :init (load-theme 'monokai t)))
 
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
-                                             :ensure t
                                              :init
                                              (setq modus-operandi-theme-mode-line '3d
                                                    modus-operandi-theme-variable-pitch-headings nil
@@ -674,7 +668,6 @@ whitespaces."
                                                                                   :height 0.8))))))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
-                                            :ensure t
                                             :init
                                             (setq modus-vivendi-theme-mode-line 'moody
                                                   modus-vivendi-theme-variable-pitch-headings nil
@@ -689,7 +682,6 @@ whitespaces."
                                                              :background "gainsboro"))))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
-                                                 :ensure t
                                                  :init
                                                  (setq powerline-display-buffer-size t
                                                        powerline-display-hud nil
@@ -706,7 +698,6 @@ whitespaces."
                                                    (powerline-default-theme))))
 
       ((eq dotemacs-modeline-theme 'sml) (use-package smart-mode-line
-                                           :ensure t
                                            :init
                                            (setq sml/theme 'light
                                                  sml/mode-width 'full
@@ -716,7 +707,6 @@ whitespaces."
                                            (sml/setup)))
 
       ((eq dotemacs-modeline-theme 'spaceline) (use-package spaceline
-                                                 :ensure t
                                                  :defines (spaceline-hud-p
                                                            spaceline-selection-info-p
                                                            spaceline-version-control-p
@@ -732,7 +722,6 @@ whitespaces."
                                                  (spaceline-emacs-theme)))
 
       ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
-                                               :ensure t
                                                :init
                                                (require 'airline-themes)
                                                (setq airline-eshell-colors nil
@@ -740,7 +729,6 @@ whitespaces."
                                                (load-theme 'airline-cool t)))
 
       ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
-                                                     :ensure t
                                                      ;; Requires the fonts included with
                                                      ;; `all-the-icons', run `M-x
                                                      ;; all-the-icons-install-fonts'
@@ -757,6 +745,7 @@ whitespaces."
                                                                              0.8))))))
 
       ((eq dotemacs-modeline-theme 'awesome-tray) (use-package awesome-tray
+                                                    :ensure nil
                                                     :load-path "extras"
                                                     :hook (after-init . awesome-tray-mode)
                                                     :custom
@@ -810,7 +799,6 @@ whitespaces."
       ((eq dotemacs-modeline-theme 'sb/default)))
 
 (use-package auto-dim-other-buffers
-  :ensure t
   :hook (emacs-startup . auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -838,7 +826,6 @@ whitespaces."
 ;;                                 (setq resize-mini-windows nil)))
 
 (use-package circadian
-  :ensure t
   :if (and (not (eq dotemacs-theme 'sb/default)) (not (eq dotemacs-theme 'none)))
   :custom
   (calendar-latitude 26.50)
@@ -848,6 +835,7 @@ whitespaces."
   :init (circadian-setup))
 
 (use-package ibuffer
+  :ensure nil
   :custom
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-display-summary nil)
@@ -863,10 +851,10 @@ whitespaces."
   :hook (ibuffer . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
-  :ensure t
   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 (use-package dired
+  :ensure nil
   :functions dired-next-line
   :preface
   (defun sb/dired-go-home ()
@@ -897,6 +885,7 @@ whitespaces."
 (add-hook 'dired-mode #'auto-revert-mode)
 
 (use-package dired-x
+  :ensure nil
   :custom
   (dired-cleanup-buffers-too t)
   (dired-omit-verbose nil "Do not show messages when omitting files")
@@ -922,7 +911,6 @@ whitespaces."
                   (diredp-toggle-find-file-reuse-dir 1))))
 
 (use-package dired-efap
-  :ensure t
   :after dired+
   :commands dired-efap
   :hook
@@ -933,34 +921,29 @@ whitespaces."
                ("r" . dired-efap)))
 
 (use-package dired-narrow ; Narrow dired to match filter
-  :ensure t
   :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
 (use-package diredfl ; More detailed colors
-  :ensure t
   :hook (dired-mode . diredfl-mode))
 
 (use-package async
-  :ensure t
   :hook (dired-mode . dired-async-mode))
 
 (use-package dired-async
+  :ensure nil
   :diminish)
 
 ;; (use-package dired-rsync
-;;   :ensure t
 ;;   :bind (:map dired-mode-map
 ;;               ("C-c C-r" . dired-rsync)))
 
 ;; (use-package dired-posframe
-;;   :ensure t
 ;;   :hook (dired-mode . dired-posframe-mode)
 ;;   :diminish)
 
 (use-package treemacs
-  :ensure t
   :disabled t
   :functions treemacs-git-mode
   :commands (treemacs treemacs-toggle)
@@ -1010,35 +993,29 @@ whitespaces."
   :bind* ("C-j" . treemacs))
 
 (use-package treemacs-projectile
-  :ensure t
   :disabled t
   :after (treemacs projectile))
 
 (use-package treemacs-icons-dired
-  :ensure t
   :disabled t
   :after treemacs
   :if (display-graphic-p)
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
-  :ensure t
   :disabled t
   :after (treemacs magit))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 (use-package all-the-icons
-  :ensure t
   :if (display-graphic-p))
 
 (use-package all-the-icons-ibuffer
-  :ensure t
   :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
-  :ensure t
   :diminish
   :if (display-graphic-p)
   ;; :hook (dired-mode . (lambda ()
@@ -1049,7 +1026,6 @@ whitespaces."
   :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package org
-  :ensure t
   :hook (org-mode . visual-line-mode)
   :diminish org-indent-mode
   :custom
@@ -1079,12 +1055,12 @@ whitespaces."
   (unbind-key "M-<down>" org-mode-map))
 
 (use-package org-bullets
-  :ensure t
   :hook (org-mode . org-bullets-mode))
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; isearch candidates
 (use-package isearch
+  :ensure nil
   :custom (search-highlight t "Highlight incremental search")
   :bind (("C-s" . nil) ; Change the binding for `isearch-forward-regexp'
          ("C-f" . isearch-forward-regexp)
@@ -1093,17 +1069,14 @@ whitespaces."
          ("C-f" . isearch-repeat-forward)))
 
 (use-package isearch-symbol-at-point
-  :ensure t
   :after isearch)
 
 (use-package isearch-dabbrev
-  :ensure t
   :after isearch
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package anzu
-  :ensure t
   :after isearch
   :diminish anzu-mode
   :custom
@@ -1119,7 +1092,6 @@ whitespaces."
   (global-anzu-mode 1))
 
 (use-package swiper
-  :ensure t
   :bind
   (([remap swiper] . swiper-isearch)
    ("<f4>" . swiper-isearch))
@@ -1131,15 +1103,14 @@ whitespaces."
         grep-scroll-output t))
 
 (use-package wgrep ; Writable grep
-  :ensure t
   :commands (wgrep-change-to-wgrep-mode)
   :custom (wgrep-auto-save-buffer t))
 
 (use-package deadgrep
-  :ensure t
   :bind ("<f8>" . deadgrep))
 
 (use-package recentf
+  :ensure nil
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check regex with `re-builder'
@@ -1182,7 +1153,6 @@ whitespaces."
 ;; Use `M-x company-diag' or the modeline status to see the backend used
 ;; Try `M-x company-complete-common' when there are no completions
 (use-package company
-  :ensure t
   :commands company-abort
   :hook (after-init . global-company-mode)
   :preface
@@ -1230,7 +1200,6 @@ whitespaces."
 ;; https://github.com/company-mode/company-mode/issues/1010
 ;; However, the width of the frame popup is often not enough.
 (use-package company-posframe
-  :ensure t
   :diminish
   :custom
   (company-posframe-show-metadata nil)
@@ -1239,16 +1208,13 @@ whitespaces."
 
 ;; The package seems unmaintained and only works for `elisp-mode'
 (use-package company-flx
-  :ensure t
   :disabled t
   :hook (company-mode . company-flx-mode))
 
 (use-package company-quickhelp
-  :ensure t
   :hook (company-mode . company-quickhelp-mode))
 
 (use-package company-box
-  :ensure t
   :if (display-graphic-p)
   :diminish
   :hook (company-mode . company-box-mode)
@@ -1258,7 +1224,6 @@ whitespaces."
   (set-face-background 'company-box-selection "light blue"))
 
 (use-package company-ctags
-  :ensure t
   :disabled t
   :after company
   :custom
@@ -1268,35 +1233,31 @@ whitespaces."
 ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
 ;; computationally expensive
 (use-package company-tabnine
-  :ensure t
   :after company
   :disabled t)
 
 (use-package company-fuzzy
-  :ensure t
   :after company
   :disabled t
   :diminish
   :init (global-company-fuzzy-mode 1))
 
-(use-package flx
-  :ensure t)
+(use-package flx)
 
 (use-package yasnippet
-  :ensure t
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (emacs-startup . yas-global-mode)
-  :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  ;; :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config (unbind-key "<tab>" yas-minor-mode-map))
 
+(use-package yasnippet-snippets)
+
 (use-package amx
-  :ensure t
   :hook (after-init . amx-mode)
   :custom (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory)))
 
 (use-package ivy
-  :ensure t
   :commands ivy-completion-in-region
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
@@ -1307,6 +1268,7 @@ whitespaces."
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :custom
   (completion-in-region-function #'ivy-completion-in-region)
+  (ivy-initial-inputs-alist nil "Do not start completion with `^'")
   (ivy-case-fold-search 'always "Always ignore case while searching")
   (ivy-count-format "(%d/%d) " "Help identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
@@ -1342,7 +1304,6 @@ whitespaces."
    ("<right>" . ivy-next-line)))
 
 (use-package counsel
-  :ensure t
   :ensure amx
   ;; :ensure-system-package fasd
   :preface
@@ -1452,8 +1413,9 @@ whitespaces."
   ;;              '(counsel-company . ivy-display-function-overlay))
   )
 
+(use-package ivy-hydra)
+
 (use-package ivy-posframe
-  :ensure t
   :disabled t
   :diminish
   :hook (ivy-mode . ivy-posframe-mode)
@@ -1463,14 +1425,12 @@ whitespaces."
                              (right-fringe . 4))))
 
 (use-package prescient
-  :ensure t
   :hook (counsel-mode . prescient-persist-mode)
   :custom
   (prescient-save-file (expand-file-name "prescient-save.el"
                                          dotemacs-temp-directory)))
 
 (use-package ivy-prescient
-  :ensure t
   :hook (counsel-mode . ivy-prescient-mode)
   :custom
   (ivy-prescient-enable-sorting nil "Allow prescient to override sorting logic")
@@ -1490,7 +1450,6 @@ whitespaces."
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
 (use-package orderless
-  :ensure t
   :after ivy
   :disabled t
   :preface
@@ -1504,14 +1463,13 @@ whitespaces."
   :config (advice-add 'company-capf--candidates :around #'sb/just-one-face))
 
 (use-package company-prescient
-  :ensure t
   :hook (company-mode . company-prescient-mode))
 
 (use-package all-the-icons-ivy
-  :ensure t
   :hook (after-init . all-the-icons-ivy-setup))
 
 (use-package flyspell
+  :ensure nil
   :if dotemacs-is-linux
   :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
   :preface
@@ -1585,7 +1543,6 @@ whitespaces."
 
 ;; Flyspell popup is more efficient. Ivy-completion does not give the save option in a few cases.
 (or (use-package flyspell-popup
-      :ensure t
       :bind ("C-;" . flyspell-popup-correct)
       :custom (flyspell-popup-correct-delay 0.2))
 
@@ -1616,13 +1573,11 @@ whitespaces."
 
 ;; SB: I am trying out the second package, the first one works fine for me.
 (or (use-package highlight-indentation
-      :ensure t
       :disabled t
       :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
       :hook (python-mode . highlight-indentation-mode))
 
     (use-package highlight-indent-guides
-      :ensure t
       :diminish
       :hook ((yaml-mode python-mode) . highlight-indent-guides-mode)
       :custom (highlight-indent-guides-method 'character)))
@@ -1630,7 +1585,6 @@ whitespaces."
 ;; Claims to be better than electric-indent-mode
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
 (use-package aggressive-indent
-  :ensure t
   :diminish
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
   :custom
@@ -1640,6 +1594,7 @@ whitespaces."
 ;; (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
 (use-package paren
+  :ensure nil
   :hook (after-init . show-paren-mode)
   :custom
   (show-paren-delay 0)
@@ -1649,24 +1604,27 @@ whitespaces."
 
 ;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
-(use-package smartparens-config
-  :ensure smartparens
+(use-package smartparens
   :diminish (smartparens-mode show-smartparens-mode)
   :commands sp-local-pair
-  :hook ((after-init . (lambda ()
-                         (require 'smartparens-config)
-                         (smartparens-global-mode 1)
-                         (show-smartparens-global-mode 1)))
-         ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
-                                                (require 'smartparens-latex))))
+  :hook
+  ;; ((prog-mode . (lambda ()
+  ;;                 (require 'smartparens-config)
+  ;;                 (smartparens-global-mode 1)
+  ;;                 (show-smartparens-global-mode 1)))
+  ((prog-mode . smartparens-mode)
+   ((latex-mode LaTeX-mode) . (lambda ()
+                                (require 'smartparens-latex))))
   :custom
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
   :config
-  (smartparens-strict-mode -1)
+  ;; (smartparens-strict-mode -1)
 
   ;; Stop pairing single quotes in elisp
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+
+  (sp-local-pair 'markdown-mode "<" ">")
 
   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
   ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
@@ -1687,7 +1645,6 @@ whitespaces."
          ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
-  :ensure t
   :functions (projectile-project-name projectile-project-root)
   :commands projectile-expand-root
   ;; :ensure-system-package fd
@@ -1753,7 +1710,6 @@ whitespaces."
     (add-to-list 'projectile-globally-ignored-file-suffixes exts)))
 
 (use-package counsel-projectile
-  :ensure t
   :after counsel
   :defines counsel-projectile-default-file
   :commands counsel-projectile-switch-project-by-name
@@ -1805,13 +1761,11 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
 (use-package all-the-icons-ivy-rich
-  :ensure t
   :if (display-graphic-p)
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :init (setq all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
-  :ensure t
   :functions ivy-format-function-line
   :custom (ivy-rich-parse-remote-buffer nil)
   :config
@@ -1819,7 +1773,6 @@ This file is specified in `counsel-projectile-default-file'."
   (ivy-rich-mode 1))
 
 (use-package flycheck
-  :ensure t
   :commands (flycheck-add-next-checker flycheck-next-checker
                                        flycheck-previous-error
                                        flycheck-describe-checker
@@ -1862,7 +1815,8 @@ This file is specified in `counsel-projectile-default-file'."
                      (flycheck-add-next-checker 'textlint 'proselint))))
 
   (add-hook 'markdown-mode-hook (lambda ()
-                                  (setq-local flycheck-checker 'markdown-markdownlint-cli)))
+                                  (setq-local flycheck-checker 'markdown-markdownlint-cli)
+                                  (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint)))
 
   (add-hook 'python-mode-hook (lambda ()
                                 (setq-local flycheck-checker 'python-pylint)))
@@ -1881,7 +1835,6 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
-  :ensure t
   :after flycheck
   ;; :hook
   ;; ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
@@ -1893,16 +1846,14 @@ This file is specified in `counsel-projectile-default-file'."
   (flycheck-add-next-checker 'proselint 'grammarly-checker))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
-      :ensure t
+      :
       :disabled t
       :hook (flycheck-mode . flycheck-popup-tip-mode))
 
     (use-package flycheck-pos-tip
-      :ensure t
       :hook (flycheck-mode . flycheck-pos-tip-mode))
 
     (use-package flycheck-posframe
-      :ensure t
       :disabled t
       :if (display-graphic-p)
       :hook (flycheck-mode . flycheck-posframe-mode)
@@ -1910,7 +1861,6 @@ This file is specified in `counsel-projectile-default-file'."
       :config (flycheck-posframe-configure-pretty-defaults))
 
     (use-package flycheck-inline
-      :ensure t
       :disabled t
       :hook (flycheck-mode . flycheck-inline-mode)))
 
@@ -1952,7 +1902,6 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package whitespace-cleanup-mode
-  :ensure t
   :diminish
   :hook (after-init . global-whitespace-cleanup-mode)
   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes
@@ -1960,7 +1909,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; SB: This does not seem to be maintained any more
 ;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-;;   :ensure t
 ;;   :disabled t
 ;;   :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
 ;;   ;; :diminish
@@ -1968,7 +1916,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (or
  (use-package highlight-symbol ; Highlight symbol under point
-   :ensure t
    :disabled t ; `symbol-overlay' is better
    :hook (prog-mode . highlight-symbol-mode)
    :bind (("M-p" . highlight-symbol-prev)
@@ -1977,7 +1924,6 @@ This file is specified in `counsel-projectile-default-file'."
    :custom (highlight-symbol-on-navigation-p t))
 
  (use-package symbol-overlay ; Highlight symbol under point
-   :ensure t
    :commands (symbol-overlay-mode)
    :diminish
    :hook (prog-mode . symbol-overlay-mode)
@@ -1985,16 +1931,13 @@ This file is specified in `counsel-projectile-default-file'."
           ("M-n" . symbol-overlay-jump-next))))
 
 (use-package hl-todo
-  :ensure t
   :hook (after-init . global-hl-todo-mode)
   :custom (hl-todo-highlight-punctuation ":"))
 
 (use-package highlight-numbers
-  :ensure t
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
 (use-package volatile-highlights
-  :ensure t
   :diminish
   :commands volatile-highlights-mode
   :config (volatile-highlights-mode 1))
@@ -2029,7 +1972,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://github.com/masasam/emacs-counsel-tramp/issues/4
 ;; https://github.com/masasam/emacs-counsel-tramp/issues/5
 (use-package counsel-tramp
-  :ensure t
   :disabled t
   :bind ("C-c d t" . counsel-tramp)
   :config
@@ -2052,6 +1994,7 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
 (use-package imenu
+  :ensure nil
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
@@ -2064,15 +2007,12 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   :after imenu)
 
 ;; (use-package imenu-anywhere
-;;   :ensure t
 ;;   :after imenu)
 
 ;; (use-package popup-imenu
-;;   :ensure t
 ;;   :after imenu)
 
 (use-package flimenu
-  :ensure t
   :after imenu
   :disabled t
   :commands flimenu-global-mode
@@ -2086,7 +2026,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; FIXME: Remove support for gtags. It is less maintained than counsel-etags.
 ;; (use-package counsel-gtags
-;;   :ensure t
 ;;   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'gtags))
 ;;   :diminish
 ;;   ;; :ensure-system-package global
@@ -2107,12 +2046,12 @@ This file is specified in `counsel-projectile-default-file'."
 ;;               ("C-c g u" . counsel-gtags-update-tags))
 ;;   :config
 ;;   (use-package global-tags ; Make xref and gtags work together
-;;     :ensure t
 ;;     :if (eq dotemacs-tags-scheme 'gtags)
 ;;     :demand t
 ;;     :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend)))
 
 (use-package xref
+  :ensure nil
   :if (eq dotemacs-tags-scheme 'ctags)
   :commands xref-etags-mode
   :config (xref-etags-mode)
@@ -2126,14 +2065,12 @@ This file is specified in `counsel-projectile-default-file'."
          ("r" . xref-query-replace-in-results)))
 
 (use-package ivy-xref
-  :ensure t
   :after (ivy xref)
   :custom
   (xref-show-definitions-function #'ivy-xref-show-defs)
   (xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
-  :ensure t
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
   :bind (("M-]" . counsel-etags-find-tag-at-point)
@@ -2154,14 +2091,12 @@ This file is specified in `counsel-projectile-default-file'."
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package dumb-jump
-  :ensure t
   :custom
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-quiet t)
   :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package helpful
-  :ensure t
   :bind (([remap describe-variable] . helpful-variable)
          ("C-h v" . helpful-variable)
          ([remap describe-key] . helpful-key)
@@ -2174,13 +2109,11 @@ This file is specified in `counsel-projectile-default-file'."
          ("q" . helpful-kill-buffers)))
 
 (use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
-  :ensure t
   :commands vlf
   :custom (vlf-application 'dont-ask)
   :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase all consecutive white space characters in a given direction
-  :ensure t
   :diminish
   :hook (after-init . global-hungry-delete-mode)
   :config
@@ -2188,41 +2121,33 @@ This file is specified in `counsel-projectile-default-file'."
     (unbind-key "backspace" ivy-occur-grep-mode-map)))
 
 (use-package move-text ; Move lines with `M-<up>' and `M-<down>'
-  :ensure t
   :commands (move-text-up move-text-down)
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
-  :ensure t
   :bind* ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
-  :ensure t
   :bind ("C-h C-m" . discover-my-major))
 
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
-  :ensure t
   :bind ("C-c d m" . manage-minor-mode))
 
 (use-package jgraph-mode
-  :ensure t
   :mode "\\.jgr\\'")
 
 (use-package graphviz-dot-mode
-  :ensure t
   :mode "\\.dot\\'")
 
 (use-package gnuplot
-  :ensure t
   :mode "\\.gp\\'"
   :interpreter ("gnuplot" . gnuplot-mode))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-  :ensure t
   :hook (after-init . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -2252,29 +2177,23 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
 (use-package expand-region ; Expand region by semantic units
-  :ensure t
   :bind ("C-=" . er/expand-region))
 
 (use-package expand-line
-  :ensure t
   :defines expand-line-mode
   :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package smart-mark ; Restore point with `C-g' after marking a region
-  :ensure t
   :config (smart-mark-mode 1))
 
 (use-package whole-line-or-region
-  :ensure t
   :diminish (whole-line-or-region-local-mode)
   :config (whole-line-or-region-global-mode 1))
 
 (use-package goto-last-change
-  :ensure t
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package beginend
-  :ensure t
   :commands beginend-global-mode
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
@@ -2282,7 +2201,6 @@ This file is specified in `counsel-projectile-default-file'."
   (beginend-global-mode 1))
 
 (use-package undo-tree
-  :ensure t
   :defines undo-tree-map
   :custom
   (undo-tree-mode-lighter "")
@@ -2297,11 +2215,9 @@ This file is specified in `counsel-projectile-default-file'."
   :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
-  :ensure t
   :bind* ("C-." . iedit-mode))
 
 (use-package session ; Avoid the "Overwrite old session file (not loaded)?" warning
-  :ensure t
   :init
   (setq session-save-file (expand-file-name "session"
                                             dotemacs-temp-directory))
@@ -2310,41 +2226,33 @@ This file is specified in `counsel-projectile-default-file'."
                   (session-initialize))))
 
 (use-package immortal-scratch
-  :ensure t
   :hook (after-init . immortal-scratch-mode))
 
 (use-package persistent-scratch
-  :ensure t
   :hook (after-init . persistent-scratch-setup-default)
   :custom
   (persistent-scratch-save-file (expand-file-name "persistent-scratch"
                                                   dotemacs-temp-directory)))
 
 ;; (use-package sudo-edit ; Edit file with sudo
-;;   :ensure t
 ;;   :bind ("M-s e" . sudo-edit))
 
 (use-package crux
-  :ensure t
   :bind (("C-c d i" . crux-ispell-word-then-abbrev)
          ("C-c d s" . crux-sudo-edit)
          ("<f12>" . crux-kill-other-buffers)))
 
 (use-package disable-mouse
-  :ensure t
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
 
 (use-package apt-sources-list
-  :ensure t
   :mode ("\\.list\\'" . apt-sources-list-mode))
 
 (use-package rainbow-delimiters
-  :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package ssh-config-mode
-  :ensure t
   :mode ("/\\.ssh/config\\'" . ssh-config-mode)
   :mode ("/sshd?_config\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
@@ -2352,19 +2260,18 @@ This file is specified in `counsel-projectile-default-file'."
   :config (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
 
 (use-package ace-window
-  :ensure t
   :bind (([remap other-window] . ace-window)
          ("<f10>" . ace-window)))
 
 ;; `Shift + direction' arrows
 (use-package windmove
+  :ensure nil
   :init (windmove-default-keybindings)
   :custom (windmove-wrap-around t "Wrap around at edges"))
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
 ;; being invoked more frequently.
 (use-package super-save
-  :ensure t
   :diminish
   :custom
   (super-save-remote-files nil "Ignore remote files")
@@ -2375,7 +2282,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
 ;; one of the currently visible isearch candidates using avy.
 (use-package avy
-  :ensure t
   :bind (("M-b" . avy-goto-word-1)
          ("C-'" . avy-goto-char)
          ("C-/" . avy-goto-line))
@@ -2387,13 +2293,13 @@ This file is specified in `counsel-projectile-default-file'."
   :config (avy-setup-default))
 
 (use-package bookmark
+  :ensure nil
   :custom
   (bookmark-default-file (expand-file-name "bookmarks"
                                            dotemacs-temp-directory)))
 
 ;; https://github.com/CSRaghunandan/.emacs.d/blob/master/setup-files/setup-bookmark.el
 (use-package bm
-  :ensure t
   :init (setq bm-restore-repository-on-load t)
   :custom
   (bm-buffer-persistence t)
@@ -2403,7 +2309,6 @@ This file is specified in `counsel-projectile-default-file'."
          ("C-<f3>" . bm-previous)))
 
 (use-package esup
-  :ensure t
   :commands esup)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
@@ -2412,10 +2317,10 @@ This file is specified in `counsel-projectile-default-file'."
             (message "Emacs ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
 
-(use-package bug-hunter
-  :ensure t)
+(use-package bug-hunter)
 
 (use-package explain-pause-mode
+  :ensure nil
   :load-path "extras"
   :disabled t
   :hook (after-init . explain-pause-mode)
@@ -2429,12 +2334,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
-  :ensure t
   :diminish
   :hook (text-mode . writegood-mode))
 
 (use-package langtool
-  :ensure t
   :disabled t
   :after text-mode
   :hook
@@ -2446,14 +2349,14 @@ This file is specified in `counsel-projectile-default-file'."
                                                 dotemacs-user-tmp)))
 
 (use-package olivetti
-  :ensure t
   :diminish
   :custom (olivetti-body-width 0.95 "Fraction of the window width")
   :hook ((text-mode org-mode markdown-mode latex-mode LaTeX-mode) . olivetti-mode)
   :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode))
 
+(use-package emojify)
+
 (use-package pdf-tools
-  :ensure t
   :init
   (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
   (setq pdf-view-display-size 'fit-page)
@@ -2463,33 +2366,30 @@ This file is specified in `counsel-projectile-default-file'."
                                   (setq header-line-format nil))))
 
 (use-package saveplace-pdf-view
-  :ensure t
   :after pdf-tools
   :after saveplace)
 
 (use-package logview
-  :ensure t
   :mode ("\\.log\\'" . logview-mode)
   :custom
   (logview-cache-filename (expand-file-name "logview-cache.extmap"
                                             dotemacs-temp-directory)))
 
 (use-package antlr-mode
+  :ensure nil
   :mode "\\.g4\\'")
 
 (use-package bison-mode
-  :ensure t
   :mode ("\\.y\\'" "\\.l\\'" "\\.bison\\'"))
 
 (use-package llvm-mode
+  :ensure nil
   :load-path "extras"
   :mode "\\.ll\\'")
 
-(use-package autodisass-llvm-bitcode
-  :ensure t)
+(use-package autodisass-llvm-bitcode)
 
 (use-package markdown-mode
-  :ensure t
   ;; :ensure-system-package pandoc
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode)
@@ -2511,11 +2411,9 @@ This file is specified in `counsel-projectile-default-file'."
   (unbind-key "C-c C-j"))
 
 (use-package markdown-mode+
-  :ensure t
   :after markdown-mode)
 
 (use-package markdown-toc
-  :ensure t
   :after markdown-mode
   :commands (markdown-toc-refresh-toc
              markdown-toc-generate-toc
@@ -2523,19 +2421,16 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 (use-package pandoc-mode
-  :ensure t
   :commands (pandoc-load-default-settings)
   :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
 (use-package grip-mode
-  :ensure t
   :bind (:map markdown-mode-command-map
               ("g" . grip-mode)))
 
 (use-package add-node-modules-path
-  :ensure t
   :init
   (with-eval-after-load 'typescript-mode
     (add-hook 'typescript-mode-hook 'add-node-modules-path))
@@ -2543,7 +2438,6 @@ This file is specified in `counsel-projectile-default-file'."
     (add-hook 'js2-mode-hook 'add-node-modules-path)))
 
 (use-package prettier
-  :ensure t
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   ;; :hook ((markdown-mode gfm-mode) . (lambda ()
   ;;                                     (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
@@ -2551,37 +2445,36 @@ This file is specified in `counsel-projectile-default-file'."
   :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package csv-mode
-  :ensure t
   :commands csv-align-mode
   :mode "\\.csv\\'"
   :custom (csv-separators '("," ";" "|" " "))
   :config (csv-align-mode 1))
 
 ;; (use-package doxymacs
-;;   :ensure t
 ;;   :disabled t
 ;;   :commands (doxymacs-mode doxymacs-font-lock)
 ;;   :config
 ;;   (doxymacs-mode 1)
 ;;   (doxymacs-font-lock))
 
-;; (use-package highlight-doxygen
-;;   :ensure t)
+;; (use-package highlight-doxygen)
 
 (use-package rst
+  :ensure nil
   :mode ("\\.rst\\'" . rst-mode))
 
 (use-package boogie-friends
-  :ensure t
   :mode ("\\.smt\\'" . z3-smt2-mode))
 
 (use-package make-mode
+  :ensure nil
   :mode (("\\Makefile\\'" . makefile-mode)
          ;; Add `makefile.rules' to makefile-gmake-mode for Intel Pin
          ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
 (use-package eldoc
+  :ensure nil
   :if dotemacs-is-linux
   :diminish
   :hook
@@ -2589,30 +2482,28 @@ This file is specified in `counsel-projectile-default-file'."
    (lisp-interaction-mode . turn-on-eldoc-mode)))
 
 (use-package octave
+  :ensure nil
   :mode "\\.m\\'")
 
 (use-package ess
-  :ensure t
   :disabled t
   :custom
   (inferior-R-args "--quiet --no-restore-history --no-save")
   (ess-indent-offset 4)
   (ess-indent-from-lhs 4)
   :config
-  (use-package ess-smart-underscore
-    :ensure t))
+  (use-package ess-smart-underscore))
 
 (use-package ini-mode
-  :ensure t
   :mode "\\.ini\\'")
 
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
 (use-package pkgbuild-mode
-  :ensure t
   :mode ("PKGBUILD" . pkgbuild-mode))
 
 (use-package elisp-mode
+  :ensure nil
   :mode (("\\.el\\'" . emacs-lisp-mode)
          ("\\.elc\\'" . elisp-byte-code-mode))
   :hook
@@ -2621,7 +2512,6 @@ This file is specified in `counsel-projectile-default-file'."
                                      (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package lsp-mode
-  :ensure t
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version)
@@ -2866,7 +2756,6 @@ This file is specified in `counsel-projectile-default-file'."
               (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 (use-package lsp-ui
-  :ensure t
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
   :custom
@@ -2877,15 +2766,12 @@ This file is specified in `counsel-projectile-default-file'."
               ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
 (use-package origami
-  :ensure t
   :hook (after-init . global-origami-mode))
 
 (use-package lsp-origami
-  :ensure t
   :hook (origami-mode . lsp-origami-mode))
 
 (use-package lsp-ivy
-  :ensure t
   :after lsp-mode
   :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol)
   :bind
@@ -2893,14 +2779,12 @@ This file is specified in `counsel-projectile-default-file'."
    ("C-c l w" . lsp-ivy-workspace-symbol)))
 
 (use-package lsp-java
-  :ensure t
   :hook (java-mode . lsp-deferred)
   :custom
   (lsp-java-inhibit-message t)
   (lsp-java-save-actions-organize-imports t))
 
 (use-package lsp-python-ms
-  :ensure t
   :if (eq dotemacs-python-langserver 'mspyls)
   :init (setq lsp-python-ms-auto-install-server t)
   :hook
@@ -2914,7 +2798,6 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-python-ms-python-executable-cmd "python3"))
 
 (use-package lsp-pyright
-  :ensure t
   :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
   :hook
   (python-mode . (lambda ()
@@ -2927,7 +2810,6 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package lsp-jedi
-  :ensure t
   :if (and (eq dotemacs-python-langserver 'jedi) (executable-find "jedi-language-server"))
   :hook
   (python-mode . (lambda ()
@@ -2943,7 +2825,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; specific YAPF styles. Yapfify works on the original file, so that any project settings supported
 ;; by YAPF itself are used
 (use-package yapfify
-  :ensure t
   :diminish yapf-mode
   :if (eq dotemacs-python-langserver 'pyright)
   :hook (python-mode . yapf-mode))
@@ -2951,6 +2832,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
 (use-package cc-mode
+  :ensure nil
   :defines (c-electric-brace c-enable-auto-newline)
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
@@ -2975,32 +2857,26 @@ This file is specified in `counsel-projectile-default-file'."
               ("M-q" . c-fill-paragraph)))
 
 (use-package modern-cpp-font-lock
-  :ensure t
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode . modern-c++-font-lock-global-mode))
 
 (use-package flycheck-clang-analyzer
-  :ensure t
   :after flycheck
   :commands flycheck-clang-analyzer-setup
   :config (flycheck-clang-analyzer-setup))
 
 (use-package cuda-mode
-  :ensure t
   :mode (("\\.cu\\'" . c++-mode)
          ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
-  :ensure t
   :mode ("\\.cl\\'" . opencl-mode))
 
 (use-package cmake-mode
-  :ensure t
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
   :hook (cmake-mode . lsp-deferred))
 
 (use-package cmake-font-lock
-  :ensure t
   :after cmake-mode
   :hook (cmake-mode . cmake-font-lock-activate))
 
@@ -3031,16 +2907,13 @@ This file is specified in `counsel-projectile-default-file'."
                                 auto-mode-alist)))
 
 (use-package python-docstring
-  :ensure t
   :diminish
   :hook (python-mode . python-docstring-mode))
 
 (use-package pip-requirements
-  :ensure t
   :hook (pip-requirements-mode . company-mode))
 
 (use-package pyvenv
-  :ensure t
   :diminish
   :custom
   (pyvenv-mode-line-indicator
@@ -3057,14 +2930,12 @@ This file is specified in `counsel-projectile-default-file'."
                 (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
-  :ensure t
   :if (executable-find "isort")
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
 
-(use-package ein
-  :ensure t)
+(use-package ein)
 
 (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                               auto-mode-alist))
@@ -3074,17 +2945,20 @@ This file is specified in `counsel-projectile-default-file'."
             (setq-default c-basic-offset 4
                           c-set-style "java")))
 
-(use-package ant
-  :ensure t)
+(use-package ant)
 
 ;; Can disassemble `.class' files from within jars
-(use-package autodisass-java-bytecode
-  :ensure t)
+(use-package autodisass-java-bytecode)
+
+;; Syntax highlighting for Gradle files
+(use-package groovy-mode)
 
 (use-package sh-script ; Shell script mode
+  :ensure nil
   :mode (("\\.zsh\\'" . sh-mode)
          ("\\bashrc\\'" . sh-mode))
   :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+  ;; FIXME:
   ;; :hook (sh-mode . lsp-deferred)
   :custom
   (sh-basic-offset 2)
@@ -3092,7 +2966,6 @@ This file is specified in `counsel-projectile-default-file'."
   (sh-indent-after-continuation 'always))
 
 (use-package fish-mode
-  :ensure t
   :mode "\\.fish\\'"
   :interpreter "fish"
   :hook
@@ -3100,12 +2973,10 @@ This file is specified in `counsel-projectile-default-file'."
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package shfmt
-  :ensure t
   :hook (sh-mode . shfmt-on-save-mode)
   :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 (use-package magit
-  :ensure t
   :commands magit-display-buffer-fullframe-status-v1
   :bind ("C-x g" . magit-status)
   :custom
@@ -3124,37 +2995,39 @@ This file is specified in `counsel-projectile-default-file'."
                                             (unpushed . show))))
 
 (use-package magit-diff
+  :ensure nil
   :after magit
   :custom (magit-diff-refine-hunk t))
 
 (use-package gitignore-mode
-  :ensure t
-  :mode (("/\\.gitignore\\'"        . gitignore-mode)
-         ("/\\.git/info/exclude\\'" . gitignore-mode)
-         ("/git/ignore\\'"          . gitignore-mode)))
+  :mode
+  (("/\\.gitignore\\'"        . gitignore-mode)
+   ("/\\.git/info/exclude\\'" . gitignore-mode)
+   ("/git/ignore\\'"          . gitignore-mode)))
 
 (use-package gitattributes-mode
-  :ensure t
-  :mode (("/\\.gitattributes\\'"       . gitattributes-mode)
-         ("/\\.git/info/attributes\\'" . gitattributes-mode)
-         ("/git/attributes\\'"         . gitattributes-mode)))
+  :mode
+  (("/\\.gitattributes\\'"       . gitattributes-mode)
+   ("/\\.git/info/attributes\\'" . gitattributes-mode)
+   ("/git/attributes\\'"         . gitattributes-mode)))
 
 (use-package gitconfig-mode
-  :ensure t
-  :mode (("/\\.gitconfig\\'"  . gitconfig-mode)
-         ("/\\.git/config\\'" . gitconfig-mode)
-         ("/git/config\\'"    . gitconfig-mode)
-         ("/\\.gitmodules\\'" . gitconfig-mode)))
+  :mode
+  (("/\\.gitconfig\\'"  . gitconfig-mode)
+   ("/\\.git/config\\'" . gitconfig-mode)
+   ("/git/config\\'"    . gitconfig-mode)
+   ("/\\.gitmodules\\'" . gitconfig-mode)))
 
 (use-package git-gutter
-  :ensure t
   :diminish
-  :bind (("C-x p" . git-gutter:previous-hunk)
-         ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init . global-git-gutter-mode))
+  :bind
+  (("C-x p" . git-gutter:previous-hunk)
+   ("C-x n" . git-gutter:next-hunk))
+  :hook (after-init . global-git-gutter-mode)
+  :custom
+  (git-gutter:update-interval 1))
 
 (use-package git-commit
-  :ensure t
   :after magit
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :custom (git-commit-summary-max-length 50))
@@ -3189,7 +3062,6 @@ _p_: Prev      _u_: Upper
   ("q" nil "cancel" :color blue))
 
 (use-package diff-hl
-  :ensure t
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
   :custom (diff-hl-draw-borders nil)
   :hook
@@ -3200,22 +3072,20 @@ _p_: Prev      _u_: Upper
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
 (use-package yaml-mode
-  :ensure t
   :hook (yaml-mode . lsp-deferred))
 
-(use-package yaml-imenu
-  :ensure t)
+(use-package yaml-imenu)
 
 (use-package php-mode
-  :ensure t
   :hook (php-mode . lsp-deferred))
 
 (use-package batch-mode
-  :mode (("\\.bat\\'" . batch-mode)
+  :ensure nil
+  :mode
+  (("\\.bat\\'" . batch-mode)
          ("\\.cmd\\'" . batch-mode)))
 
 (use-package web-mode
-  :ensure t
   :mode
   (("\\.html?\\'" . web-mode)
    ("\\.djhtml\\'" . web-mode)
@@ -3236,17 +3106,16 @@ _p_: Prev      _u_: Upper
   (web-mode-enable-current-column-highlight t))
 
 (use-package rainbow-mode
-  :ensure t
   :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
 ;; (use-package company-php
-;;   :ensure t
 ;;   :init
 ;;   (with-eval-after-load 'php-mode
 ;;     (add-to-list 'company-backends 'company-ac-php-backend)))
 
 (use-package nxml-mode
+  :ensure nil
   :hook (nxml-mode . lsp-deferred)
   ;; :init (fset 'xml-mode 'nxml-mode)
   :custom
@@ -3258,7 +3127,6 @@ _p_: Prev      _u_: Upper
 
 ;; Autocompletion with LSP, LaTeX, and Company is not perfect, so we continue to use AucTeX support
 (use-package lsp-latex
-  :ensure t
   :hook
   ((latex-mode bibtex-mode LaTeX-mode) . (lambda()
                                            (require 'lsp-latex)
@@ -3276,6 +3144,7 @@ _p_: Prev      _u_: Upper
 
 (with-eval-after-load 'tex-mode
   (use-package tex-buf
+    :ensure nil
     :commands (TeX-active-process TeX-save-document
                                   TeX-command-menu
                                   TeX-revert-document-buffer))
@@ -3321,39 +3190,38 @@ _p_: Prev      _u_: Upper
   ;; (unbind-key "C-c ;" LaTeX-mode-map)
 
   (use-package auctex-latexmk
-    :ensure t
     :custom
     (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
     (TeX-command-default "LatexMk")
     :config (auctex-latexmk-setup))
 
   (use-package company-auctex
-    :ensure t
     :init (company-auctex-init))
 
   (use-package ivy-bibtex
-    :ensure t
     :bind ("C-c x b" . ivy-bibtex)
     :custom
     (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
   (use-package bibtex-completion
+    :ensure nil
     :custom
     (bibtex-completion-cite-default-as-initial-input t)
     (bibtex-completion-cite-prompt-for-optional-arguments nil)
     (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
   (use-package bibtex
+    :ensure nil
     :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
     :custom
     (bibtex-align-at-equal-sign t)
     (bibtex-maintain-sorted-entries t))
 
-  (use-package bibtex-utils
-    :ensure t)
+  (use-package bibtex-utils)
 
   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
   (use-package reftex
+    :ensure nil
     :commands (reftex-get-bibfile-list bibtex-parse-keys
                                        reftex-default-bibliography)
     ;; :diminish
@@ -3412,6 +3280,7 @@ Ignore if no file is found."
     )
 
   (use-package bib-cite
+    :ensure nil
     :diminish bib-cite-minor-mode
     :init
     (add-hook 'LaTeX-mode-hook (lambda ()
@@ -3449,7 +3318,6 @@ Ignore if no file is found."
   )
 
 (use-package js2-mode
-  :ensure t
   :mode "\\.js\\'"
   :hook
   ((js2-mode . lsp-deferred)
@@ -3459,11 +3327,9 @@ Ignore if no file is found."
   (js-indent-level 2))
 
 (use-package xref-js2
-  :ensure t
   :after js2-mode)
 
 (use-package json-mode
-  :ensure t
   :mode "\\.json\\'"
   :hook
   ((json-mode jsonc-mode) . (lambda ()
@@ -3472,33 +3338,28 @@ Ignore if no file is found."
                               (lsp-deferred))))
 
 (use-package less-css-mode
-  :ensure t
   :mode "\\.less\\'")
 
 (use-package scss-mode
-  :ensure t
   :mode "\\.scss\\'")
 
 (use-package sass-mode
-  :ensure t
   :mode "\\.sass\\'")
 
 (use-package mlir-mode
+  :ensure nil
   :load-path "extras"
   :mode ("\\.mlir\\'"))
 
 (use-package bazel-mode
-  :ensure t
   :mode (("\\.bzl$" . bazel-mode)
          ("\\BUILD\\'" . bazel-mode)
          ("\\.bazelrc\\'" . bazelrc-mode)))
 
 (use-package protobuf-mode
-  :ensure t
   :mode "\\.proto$")
 
 (use-package clang-format+
-  :ensure t
   :ensure clang-format
   :hook (mlir-mode . clang-format+-mode))
 
@@ -3510,7 +3371,6 @@ Ignore if no file is found."
          company-files
          (company-dabbrev :with
                           company-ispell) ; Uses an English dictionary
-         ;; company-dict
          ;; company-tabnine
          ;; company-yasnippet ; Works everywhere
          )))
@@ -3556,7 +3416,6 @@ Ignore if no file is found."
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
   (use-package company-shell
-    :ensure t
     :custom (company-shell-delete-duplictes t))
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
@@ -3593,7 +3452,6 @@ Ignore if no file is found."
   ;; Make sure to install virtualenv through pip, and not the distribution package manager. Run
   ;; `jedi:install-sever'.
   (use-package company-jedi
-    :ensure t
     :after python-mode)
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
@@ -3612,14 +3470,11 @@ Ignore if no file is found."
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
-  (use-package math-symbol-lists ; Required by ac-math and company-math
-    :ensure t)
-  (use-package company-math
-    :ensure t)
-  (use-package company-reftex
-    :ensure t)
-  (use-package company-bibtex
-    :ensure t)
+  ;; Required by ac-math and company-math
+  (use-package math-symbol-lists )
+  (use-package company-math)
+  (use-package company-reftex)
+  (use-package company-bibtex)
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
@@ -3756,17 +3611,31 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*lsp-log*")
+  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*lsp-log*" "*Paradox Report*"
+    "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
+;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
+(defun sb/get-buffer-major-mode (buffer-or-string)
+  "Returns the major mode associated with a buffer."
+  (with-current-buffer buffer-or-string
+    major-mode))
+
+(defcustom sb/skippable-modes
+  '(dired-mode fundamental-mode)
+  "List of major modes to skip over when calling `change-buffer'."
+  :type '(repeat string))
+
 (defun sb/change-buffer (change-buffer)
-  "Call CHANGE-BUFFER until current buffer is not in `sb/skippable-buffers'."
+  "Call CHANGE-BUFFER.
+Keep trying until current buffer is not in `sb/skippable-buffers'
+or the major mode is not in `sb/skippable-modes'."
   (let ((initial (current-buffer)))
     (funcall change-buffer)
     (let ((first-change (current-buffer)))
       (catch 'loop
-        (while (member (buffer-name) sb/skippable-buffers)
+        (while (or (member (buffer-name) sb/skippable-buffers) (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
           (funcall change-buffer)
           (when (eq (current-buffer) first-change)
             (switch-to-buffer initial)
@@ -3829,7 +3698,6 @@ Increase line spacing by two line height."
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
 (use-package default-text-scale
-  :ensure t
   :bind (("C-M-+" . default-text-scale-increase)
          ("C-M--" . default-text-scale-decrease)))
 
@@ -3839,13 +3707,11 @@ Increase line spacing by two line height."
   ("o" default-text-scale-decrease "out"))
 
 (use-package which-key ; Show help popups for prefix keys
-  :ensure t
   :hook (after-init . which-key-mode)
   :diminish
   :config
   (which-key-setup-side-window-right-bottom)
   (use-package which-key-posframe
-    :ensure t
     :hook (which-key-mode . which-key-posframe-mode)))
 
 ;; Mark safe variables
