@@ -41,6 +41,7 @@
 ;; https://github.com/CSRaghunandan/.emacs.d/
 ;; https://github.com/purcell/emacs.d
 ;; https://github.com/MatthewZMD/.emacs.d
+;; https://github.com/redguardtoo/emacs.d
 
 ;;; Code:
 
@@ -306,16 +307,18 @@ whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
+;; FIXME: Improve startup
 ;; Check the PATH with `(getenv "PATH")'
 (use-package exec-path-from-shell
   :defines  exec-path-from-shell-check-startup-files
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
-  ;; (setq exec-path-from-shell-arguments '("-l")
-  ;;       exec-path-from-shell-check-startup-files nil
-  ;;       exec-path-from-shell-variables
-  ;;       '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
-  (exec-path-from-shell-initialize))
+  (setq exec-path-from-shell-arguments '("-l")
+        exec-path-from-shell-check-startup-files nil
+        exec-path-from-shell-variables
+        '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
+  ;; (exec-path-from-shell-initialize)
+  )
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       auto-mode-case-fold nil
@@ -1122,7 +1125,7 @@ whitespaces."
                      "[/\\]\\.loaddefs\\.el\\'"
                      "[/\\]tmp/.*"
                      ".*/recentf\\'"
-                     "/ssh:"
+                     ;; "/ssh:"
                      "~$"
                      "/.autosaves/"
                      "/TAGS$"
@@ -1198,6 +1201,7 @@ whitespaces."
 ;; However, the width of the frame popup is often not enough.
 (use-package company-posframe
   :diminish
+  :disabled t ; FIXME: Issue with no completion shown
   :custom
   (company-posframe-show-metadata nil)
   (company-posframe-show-indicator nil)
@@ -1212,6 +1216,7 @@ whitespaces."
   :hook (company-mode . company-quickhelp-mode))
 
 (use-package company-box
+  :disabled t ; FIXME: Issue with no completion shown
   :if (display-graphic-p)
   :diminish
   :hook (company-mode . company-box-mode)
@@ -1284,10 +1289,13 @@ whitespaces."
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   (defalias 'occur 'ivy-occur)
   :config
-  (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*" "^\\*Help\\*$"
+  (dolist (buffer '(
+                    "TAGS" "magit-process" "*eldoc for use-package*" "^\\*Help\\*$"
                     "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
                     "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$" "*emacs*" "*Warnings*"
-                    "^\\*prettier" "^\\*json*" "^\\*texlab*" "^\\*clangd*"))
+                    "^\\*prettier" "^\\*json*" "^\\*texlab*" "^\\*clangd*"
+                    "^\\*shfmt*"
+                    ))
     (add-to-list 'ivy-ignore-buffers buffer))
   (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish
@@ -1821,9 +1829,10 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'python-mode-hook (lambda ()
                                 (setq-local flycheck-checker 'python-pylint)))
 
-  (add-hook 'sh-mode-hook (lambda ()
-                            (setq-local flycheck-checker 'sh-shellcheck)
-                            (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+  ;; FIXME: Shellcheck is a resource hog for $HOME/.bash* files
+  ;; (add-hook 'sh-mode-hook (lambda ()
+  ;;                           (setq-local flycheck-checker 'sh-shellcheck)
+  ;;                           (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
@@ -2218,6 +2227,7 @@ This file is specified in `counsel-projectile-default-file'."
   :bind* ("C-." . iedit-mode))
 
 (use-package session ; Avoid the "Overwrite old session file (not loaded)?" warning
+  :disabled t ; FIXME: Problem unresolved
   :init
   (setq session-save-file (expand-file-name "session"
                                             dotemacs-temp-directory))
@@ -2979,6 +2989,9 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package shfmt
   :hook (sh-mode . shfmt-on-save-mode)
   :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
+
+;; FIXME: Does this help?
+(remove-hook 'find-file-hook #'vc-refresh-state)
 
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1

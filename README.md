@@ -348,6 +348,10 @@ Test fast JSON is working, evaluate the following elisp in Emacs.
 
 Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 
+## Debugging Emacs
+
+`pkill -USR2 emacs`
+
 ## TODO
 
 - Use custom major modes for files by names without using file-local variables
