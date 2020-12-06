@@ -189,7 +189,7 @@ whitespaces."
 
 ;; Keep enabled till the configuration is stable
 (defcustom dotemacs-debug-init-file
-  t
+  nil
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -229,23 +229,15 @@ whitespaces."
 (defvar c-electric-indent)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
-(defvar dired-efap-initial-filename-selection)
-(defvar exec-path-from-shell-check-startup-files)
-(defvar expand-line-mode)
-(defvar font-latex-fontify-sectioning)
-(defvar lsp-disabled-clients)
-(defvar lsp-enabled-clients)
-(defvar lsp-pyright-langserver-command-args)
-(defvar org-hide-leading-stars-before-indent-mode)
-(defvar org-src-strip-leading-and-trailing-blank-lines)
-(defvar org-src-tabs-acts-natively)
 (defvar tags-revert-without-query)
-(defvar TeX-syntactic-comment)
 (defvar use-package-always-defer)
 (defvar use-package-compute-statistics)
 (defvar use-package-enable-imenu-support)
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
+(defvar use-package-always-ensure)
+
+
 
 (declare-function sb/sshlist "private" ())
 ;; FIXME: Fix smerge warnings
@@ -316,6 +308,7 @@ whitespaces."
 
 ;; Check the PATH with `(getenv "PATH")'
 (use-package exec-path-from-shell
+  :defines  exec-path-from-shell-check-startup-files
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
   ;; (setq exec-path-from-shell-arguments '("-l")
@@ -811,8 +804,8 @@ whitespaces."
 
 (cond ((string= (system-name) "swarnendu-Inspiron-7572") (set-face-attribute 'default nil :height 135))
       ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF") (set-face-attribute 'default nil :height 140)))
-;; (set-face-attribute 'mode-line nil :height 90)
-;; (set-face-attribute 'mode-line-inactive nil :height 90)
+(set-face-attribute 'mode-line nil :height 110)
+(set-face-attribute 'mode-line-inactive nil :height 110)
 
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (defun sb/minibuffer-font-setup ()
@@ -912,6 +905,7 @@ whitespaces."
 
 (use-package dired-efap
   :after dired+
+  :defines dired-efap-initial-filename-selection
   :commands dired-efap
   :hook
   (dired-mode . (lambda ()
@@ -1026,6 +1020,9 @@ whitespaces."
   :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package org
+  :defines (org-hide-leading-stars-before-indent-mode
+            org-src-strip-leading-and-trailing-blank-lines
+            org-src-tabs-acts-natively)
   :hook (org-mode . visual-line-mode)
   :diminish org-indent-mode
   :custom
@@ -1218,7 +1215,7 @@ whitespaces."
   :if (display-graphic-p)
   :diminish
   :hook (company-mode . company-box-mode)
-  :custom (company-box-show-single-candidate t)
+  ;; :custom (company-box-show-single-candidate t)
   :config
   (set-face-background 'company-box-background "cornsilk")
   (set-face-background 'company-box-selection "light blue"))
@@ -1263,7 +1260,7 @@ whitespaces."
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
     "Return non-nil if STR names a Dired buffer.
-    This function is intended for use with `ivy-ignore-buffers'."
+  This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :custom
@@ -1290,7 +1287,7 @@ whitespaces."
   (dolist (buffer '("TAGS" "magit-process" "*eldoc for use-package*" "^\\*Help\\*$"
                     "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
                     "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$" "*emacs*" "*Warnings*"
-                    "^\\*prettier" "^\\*json\\*$" "^\\*texlab\\*$"))
+                    "^\\*prettier" "^\\*json*" "^\\*texlab*" "^\\*clangd*"))
     (add-to-list 'ivy-ignore-buffers buffer))
   (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish
@@ -1538,8 +1535,8 @@ whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-   ;; ("C-," . flyspell-auto-correct-previous-word)
-   ("C-," . sb/flyspell-goto-previous-error)))
+  ;; ("C-," . flyspell-auto-correct-previous-word)
+  ("C-," . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not give the save option in a few cases.
 (or (use-package flyspell-popup
@@ -1796,16 +1793,19 @@ This file is specified in `counsel-projectile-default-file'."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
-  (setq-default flycheck-disabled-checkers '(tex-lacheck python-flake8 emacs-lisp-checkdoc)
+  (setq-default flycheck-disabled-checkers '(tex-lacheck
+                                             python-flake8
+                                             emacs-lisp-checkdoc)
+                flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                                            dotemacs-user-home)
+                flycheck-pylintrc (expand-file-name ".config/pylintrc"
+                                                    dotemacs-user-home)
+                flycheck-python-pylint-executable "python3"
+                flycheck-shellcheck-follow-sources nil
                 flycheck-textlint-config (expand-file-name "textlintrc.json"
                                                            dotemacs-textlint-home)
                 flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                               dotemacs-textlint-home)
-                flycheck-pylintrc (expand-file-name ".config/pylintrc" dotemacs-user-home)
-                flycheck-python-pylint-executable "python3"
-                flycheck-markdown-markdownlint-cli-config (expand-file-name
-                                                           ".markdownlint.json"
-                                                           dotemacs-user-home))
+                                                               dotemacs-textlint-home))
 
   (dolist (hook '(text-mode-hook org-mode-hook
                                  latex-mode-hook
@@ -2514,7 +2514,10 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package lsp-mode
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
-            lsp-perl-language-server-client-version)
+            lsp-perl-language-server-client-version
+            lsp-disabled-clients
+            lsp-enabled-clients
+            lsp-pyright-langserver-command-args)
   :commands (lsp-register-client lsp-tramp-connection
                                  make-lsp-client
                                  lsp-format-buffer
@@ -2881,6 +2884,7 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (cmake-mode . cmake-font-lock-activate))
 
 (use-package python
+  :ensure nil
   :init
   (setq python-shell-completion-native-enable nil) ; Disable readline based native completion
   (setenv "PYTHONPATH" "python3")
@@ -2955,11 +2959,11 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package sh-script ; Shell script mode
   :ensure nil
-  :mode (("\\.zsh\\'" . sh-mode)
-         ("\\bashrc\\'" . sh-mode))
+  :mode
+  (("\\.zsh\\'" . sh-mode)
+   ("\\bashrc\\'" . sh-mode))
   :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-  ;; FIXME:
-  ;; :hook (sh-mode . lsp-deferred)
+  :hook (sh-mode . lsp-deferred)
   :custom
   (sh-basic-offset 2)
   (sh-indent-comment t) ; Indent comments as a regular line
@@ -3024,8 +3028,7 @@ This file is specified in `counsel-projectile-default-file'."
   (("C-x p" . git-gutter:previous-hunk)
    ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode)
-  :custom
-  (git-gutter:update-interval 1))
+  :custom (git-gutter:update-interval 1))
 
 (use-package git-commit
   :after magit
@@ -3137,7 +3140,8 @@ _p_: Prev      _u_: Upper
   (lsp-latex-build-on-save t)
   (lsp-latex-lint-on-save t))
 
-;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex package.
+;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
+;; package.
 (use-package tex-site
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
@@ -3145,28 +3149,30 @@ _p_: Prev      _u_: Upper
 (with-eval-after-load 'tex-mode
   (use-package tex-buf
     :ensure nil
+    :defines (tex-fontify-script font-latex-fontify-script
+                                 font-latex-fontify-sectioning
+                                 TeX-syntactic-comment)
     :commands (TeX-active-process TeX-save-document
                                   TeX-command-menu
-                                  TeX-revert-document-buffer))
-  :config
-  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
-        TeX-auto-untabify t ; Remove all tabs before saving
-        TeX-clean-confirm nil
-        TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
-        TeX-parse-self t ; Parse documents
-        TeX-PDF-mode t ; Use `pdflatex'
-        TeX-quote-after-quote nil ; Allow original LaTeX quotes
-        TeX-save-query nil
-        TeX-source-correlate-method 'synctex
-        TeX-source-correlate-mode t
-        ;; Do not start the emacs server when correlating sources
-        TeX-source-correlate-start-server nil
-        TeX-syntactic-comment t
-        LaTeX-item-indent 0 ; Two spaces + Extra indentation
-        LaTeX-syntactic-comments t
-        ;; Do not insert line-break at inline math
-        LaTeX-fill-break-at-separators nil)
-
+                                  TeX-revert-document-buffer)
+    :config
+    (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+          TeX-auto-untabify t ; Remove all tabs before saving
+          TeX-clean-confirm nil
+          TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+          TeX-parse-self t ; Parse documents
+          TeX-PDF-mode t ; Use `pdflatex'
+          TeX-quote-after-quote nil ; Allow original LaTeX quotes
+          TeX-save-query nil
+          TeX-source-correlate-method 'synctex
+          TeX-source-correlate-mode t
+          ;; Do not start the emacs server when correlating sources
+          TeX-source-correlate-start-server nil
+          TeX-syntactic-comment t
+          LaTeX-item-indent 0 ; Two spaces + Extra indentation
+          LaTeX-syntactic-comments t
+          ;; Do not insert line-break at inline math
+          LaTeX-fill-break-at-separators nil))
 
   ;; Avoid raising of superscripts and lowering of subscripts
   (setq tex-fontify-script nil
@@ -3611,8 +3617,14 @@ Increase line spacing by two line height."
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 (defcustom sb/skippable-buffers
-  '("*Messages*" "*scratch*" "*Help*" "TAGS" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*" "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*lsp-log*" "*Paradox Report*"
-    "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*")
+  '(
+    "TAGS"
+    ;;"*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Backtrace*"
+    ;; "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox
+    ;; Report*" "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*"
+    ;; "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*"
+    ;; "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*" "*clangd::stderr*" "*shfmt errors*"
+    )
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
@@ -3623,7 +3635,7 @@ Increase line spacing by two line height."
     major-mode))
 
 (defcustom sb/skippable-modes
-  '(dired-mode fundamental-mode)
+  '(dired-mode fundamental-mode helpful-mode special-mode paradox-menu-mode lsp-log-io-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string))
 
@@ -3635,7 +3647,8 @@ or the major mode is not in `sb/skippable-modes'."
     (funcall change-buffer)
     (let ((first-change (current-buffer)))
       (catch 'loop
-        (while (or (member (buffer-name) sb/skippable-buffers) (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
+        (while (or (member (buffer-name) sb/skippable-buffers)
+                   (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
           (funcall change-buffer)
           (when (eq (current-buffer) first-change)
             (switch-to-buffer initial)
@@ -3651,6 +3664,9 @@ or the major mode is not in `sb/skippable-modes'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
 
+(global-set-key [remap next-buffer] 'sb/next-buffer)
+(global-set-key [remap previous-buffer] 'sb/previous-buffer)
+
 ;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
 (defun sb/reinstall-package (package)
   (interactive)
@@ -3658,13 +3674,10 @@ or the major mode is not in `sb/skippable-modes'."
   (package-reinstall package)
   (require package))
 
-(global-set-key [remap next-buffer] 'sb/next-buffer)
-(global-set-key [remap previous-buffer] 'sb/previous-buffer)
-
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
 ;; available bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
 
-;; `bind-key*', `bind*' overrides all minor mode bindings. The kbd macro is not required with
+;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd` macro is not required with
 ;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
 ;; Other variants:
 ;; (global-set-key (kbd "RET") 'newline-and-indent)
@@ -3707,12 +3720,12 @@ or the major mode is not in `sb/skippable-modes'."
   ("o" default-text-scale-decrease "out"))
 
 (use-package which-key ; Show help popups for prefix keys
-  :hook (after-init . which-key-mode)
   :diminish
-  :config
-  (which-key-setup-side-window-right-bottom)
-  (use-package which-key-posframe
-    :hook (which-key-mode . which-key-posframe-mode)))
+  :hook (after-init . which-key-mode)
+  :config (which-key-setup-side-window-right-bottom))
+
+(use-package which-key-posframe
+  :hook (which-key-mode . which-key-posframe-mode))
 
 ;; Mark safe variables
 
@@ -3728,9 +3741,9 @@ or the major mode is not in `sb/skippable-modes'."
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
 (put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
 (put 'lsp-clients-clangd-args 'safe-local-variable #'listp)
+(put 'lsp-latex-root-directory 'safe-local-variable #'stringp)
 (put 'lsp-pyright-extra-paths 'safe-local-variable #'listp)
 (put 'lsp-python-ms-extra-paths 'safe-local-variable #'listp)
-(put 'lsp-latex-root-directory 'safe-local-variable #'stringp)
 (put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)

@@ -14,4 +14,5 @@
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 
+;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames

@@ -2,7 +2,7 @@
 
 I use GNU Emacs as my primary editor on a GNU/Linux platform. This repository lists my preferred customizations. The setup should work on a GNU/Linux platform.
 
-Most of the included customizations are from the Internet. Suggestions and pull requests are welcome.
+Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ## Installation
 
@@ -59,7 +59,7 @@ cargo install --git https://github.com/latex-lsp/texlab.git
 sudo cpanm Perl::LanguageServer
 ```
 
-#### Node Packages
+#### Node.js Packages
 
 > Install node packages.
 
@@ -306,9 +306,17 @@ StartupWMClass=Emacs
 Keywords=Text;Editor;
 ```
 
+## Build GNU Emacs from source
+
+```Bash
+./configure --without-makeinfo --with-cairo --without-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-nativecomp CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
+make -j2
+make install
+```
+
 ## Setup GCCEmacs
 
-```bash
+```Bash
 sudo apt install libxpm-dev libgif-dev libjpeg-dev libpng-dev libtiff-dev libx11-dev libncurses5-dev automake autoconf texinfo libgtk2.0-dev librsvg2-dev
 sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
 sudo apt install gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
@@ -343,4 +351,6 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 ## TODO
 
 - Use custom major modes for files by names without using file-local variables
-- Emacs hangs sometimes when working with `text-mode` or `markdown-mode`. My guess is this has to do with either `flycheck-grammarly` or `prettier`.
+- Emacs hangs sometimes when working with `text-mode` or `markdown-mode`
+  - My guess is this has to do with either `flycheck-grammarly` or `prettier`
+- Resolve yaml and xml lsp over tramp

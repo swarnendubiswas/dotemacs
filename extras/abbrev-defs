@@ -1346,6 +1346,7 @@
 
 (define-abbrev-table 'markdown-mode-abbrev-table
   '(
+    ("chaning" "changing" nil :count 0)
     ("conrol" "control" nil :count 0)
     ("paritioning" "partitioning" nil :count 0)
     ("proessing" "processing" nil :count 0)
