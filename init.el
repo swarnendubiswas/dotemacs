@@ -4,8 +4,8 @@
 ;;; Commentary:
 
 ;; To evaluate an Sexp, just go to the end of the sexp and type `C-x C-e', instead of evaluating the
-;; whole buffer Use `C-M-x' to evaluate the current top-level s-expression. Use `M-:' to evaluate any
-;; Emacs Lisp expression and print the result.
+;; whole buffer Use `C-M-x' to evaluate the current top-level s-expression. Use `M-:' to evaluate
+;; any Emacs Lisp expression and print the result.
 
 ;; Init file should not ideally contain calls to `load' or `require', since they cause eager loading
 ;; and are expensive, a cheaper alternative is to use `autoload'.
@@ -15,6 +15,7 @@
 ;; When defining a lambda expression that is to be used as an anonymous function, you can in
 ;; principle use any method to construct the list. But typically you should use the lambda macro, or
 ;; the function special form, or the #' read syntax which is a short-hand for using function.
+
 ;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
 ;; all equivalent: `(lambda (x) (* x x))' `(function (lambda (x) (* x x)))' `#'(lambda (x) (* x x))'
 
@@ -27,7 +28,7 @@
 ;; A local variable specification takes the following form:
 ;; -*- mode: MODENAME; VAR: VALUE; ... -*-
 
-;; Hooks in the :hook section, run in reverse order. Example:
+;; Hooks in the `:hook' section, run in reverse order. Example:
 ;; (use-package package-name
 ;;   :hook
 ;;   (x-mode . last)
@@ -37,8 +38,8 @@
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 
 ;; Good reference configurations
-;; https://protesilaos.com/dotemacs/
-;; https://github.com/CSRaghunandan/.emacs.d/
+;; https://protesilaos.com/dotemacs
+;; https://github.com/CSRaghunandan/.emacs.d
 ;; https://github.com/purcell/emacs.d
 ;; https://github.com/MatthewZMD/.emacs.d
 ;; https://github.com/redguardtoo/emacs.d
@@ -299,8 +300,9 @@ whitespaces."
   (load dotemacs-private-file 'noerror))
 
 (use-package paradox
-  :bind (("C-c d l" . paradox-list-packages)
-         ("C-c d u" . paradox-upgrade-packages))
+  :bind
+  (("C-c d l" . paradox-list-packages)
+   ("C-c d u" . paradox-upgrade-packages))
   :custom
   (paradox-display-star-count nil)
   (paradox-execute-asynchronously t)
@@ -315,8 +317,7 @@ whitespaces."
   :init
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables
-        '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
+        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
@@ -355,14 +356,14 @@ whitespaces."
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
       ;; *scratch* is in Lisp interaction mode by default, use text mode. `text-mode' is more
-      ;; expensive, but I use *scratch* for composing emails
+      ;; expensive, but I use *scratch* for composing emails.
       initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
       load-prefer-newer t
       ;; major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
-      make-backup-files nil ; Stop making backup ~ files
+      make-backup-files nil ; Stop making backup `~' files
       mouse-drag-copy-region t
       mouse-yank-at-point t ; Yank at point instead of at click
       pop-up-frames nil ; Avoid making separate frames
@@ -378,7 +379,7 @@ whitespaces."
       select-enable-clipboard t
       sentence-end-double-space nil
       ;; set-mark-command-repeat-pop t
-      shift-select-mode nil ; Do not use `shift-select' for marking, use it for windmove
+      shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       standard-indent 2
       suggest-key-bindings t
       switch-to-buffer-preserve-window-point t
@@ -408,7 +409,7 @@ whitespaces."
 
 ;; LSP mode generates lots of objects, which causes a problem with gcmh mode.
 (use-package gcmh
-  ;; :diminish
+  :diminish
   :hook
   ((after-init . gcmh-mode)
    (focus-out-hook . gcmh-idle-garbage-collect)))
@@ -455,8 +456,8 @@ whitespaces."
 ;; Auto-refresh all buffers, does not work for remote files
 (use-package autorevert
   :ensure nil
-  ;; :diminish auto-revert-mode
-  :hook (emacs-startup . global-auto-revert-mode)
+  :diminish auto-revert-mode
+  :hook (after-init . global-auto-revert-mode)
   :custom
   (auto-revert-interval 5 "Faster would mean less likely to use stale data")
   (auto-revert-remote-files t)
@@ -471,8 +472,7 @@ whitespaces."
 
 (use-package savehist ; Save minibuffer histories across sessions
   :ensure nil
-  :disabled t
-  :hook (emacs-startup . savehist-mode)
+  :hook (after-init . savehist-mode)
   :custom
   (savehist-additional-variables '(
                                    extended-command-history
@@ -658,18 +658,19 @@ whitespaces."
                                                    modus-operandi-theme-scale-headings nil)
                                              (load-theme 'modus-operandi t)
                                              :custom-face
-                                             (mode-line ((t (:background "#d7d7d7"
-                                                                         :foreground "#0a0a0a"
-                                                                         :box (:line-width 1
-                                                                                           :color "#505050")
-                                                                         :height 0.8))))
-                                             (mode-line-inactive ((t (:background "#efefef"
-                                                                                  :foreground "#404148"
-                                                                                  :box (:line-width
-                                                                                        1
-                                                                                        :color "#bcbcbc")
-                                                                                  :height
-                                                                                  0.8))))))
+                                             (mode-line ((t (:background
+                                                             "#d7d7d7"
+                                                             :foreground "#0a0a0a"
+                                                             :box (:line-width 1 :color "#505050")
+                                                             :height 0.8))))
+                                             (mode-line-inactive ((t (:background
+                                                                      "#efefef"
+                                                                      :foreground "#404148"
+                                                                      :box (:line-width
+                                                                            1
+                                                                            :color "#bcbcbc")
+                                                                      :height
+                                                                      0.8))))))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :init
@@ -1083,11 +1084,12 @@ whitespaces."
 (use-package isearch
   :ensure nil
   :custom (search-highlight t "Highlight incremental search")
-  :bind (("C-s" . nil) ; Change the binding for `isearch-forward-regexp'
-         ("C-f" . isearch-forward-regexp)
-         :map isearch-mode-map
-         ("C-s" . nil) ; Change the binding for `isearch-repeat-forward'
-         ("C-f" . isearch-repeat-forward)))
+  :bind
+  (("C-s" . nil) ; Change the binding for `isearch-forward-regexp'
+   ("C-f" . isearch-forward-regexp)
+   :map isearch-mode-map
+   ("C-s" . nil) ; Change the binding for `isearch-repeat-forward'
+   ("C-f" . isearch-repeat-forward)))
 
 (use-package isearch-symbol-at-point
   :after isearch)
@@ -1557,9 +1559,10 @@ whitespaces."
   (flyspell-abbrev-p t)
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
-  :hook ((prog-mode . flyspell-prog-mode)
-         ;; (before-save-hook . flyspell-buffer) ; Saving will be slow
-         ((text-mode find-file-hooks) . flyspell-mode))
+  :hook
+  ((prog-mode . flyspell-prog-mode)
+   ;; (before-save-hook . flyspell-buffer) ; Saving will be slow
+   ((text-mode find-file-hooks) . flyspell-mode))
   :config
   ;; Skip regions in Org-mode
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
@@ -1571,8 +1574,8 @@ whitespaces."
    ("C-c f w" . ispell-word)
    :map flyspell-mode-map
    ("C-;" . nil)
-  ;; ("C-," . flyspell-auto-correct-previous-word)
-  ("C-," . sb/flyspell-goto-previous-error)))
+   ;; ("C-," . flyspell-auto-correct-previous-word)
+   ("C-," . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not give the save option in a few cases.
 (or (use-package flyspell-popup
@@ -1665,18 +1668,19 @@ whitespaces."
   ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
   ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
   ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
-  :bind (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-         ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-         ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-         ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-         ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
-         ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
-         ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
-         ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
-         ;; "(foo bar)" -> "foo bar"
-         ("C-M-k" . sp-splice-sexp)))
+  :bind
+  (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+   ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+   ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+   ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
+   ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
+   ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
+   ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
+   ;; "(foo bar)" -> "foo bar"
+   ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
   ;; :ensure-system-package fd
@@ -1781,15 +1785,16 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (counsel-projectile-modify-action
   ;;  'counsel-projectile-switch-project-action
   ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
-  :bind (("<f5>" . counsel-projectile-switch-project)
-         ("<f6>" . counsel-projectile-find-file)
-         ("<f7>" . counsel-projectile-rg)
-         ([remap projectile-ag] . counsel-projectile-ag)
-         ([remap projectile-find-dir] . counsel-projectile-find-dir)
-         ([remap projectile-find-file] . counsel-projectile-find-file)
-         ([remap projectile-grep] . counsel-projectile-grep)
-         ([remap projectile-switch-project] . counsel-projectile-switch-project)
-         ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)))
+  :bind
+  (("<f5>" . counsel-projectile-switch-project)
+   ("<f6>" . counsel-projectile-find-file)
+   ("<f7>" . counsel-projectile-rg)
+   ([remap projectile-ag] . counsel-projectile-ag)
+   ([remap projectile-find-dir] . counsel-projectile-find-dir)
+   ([remap projectile-find-file] . counsel-projectile-find-file)
+   ([remap projectile-grep] . counsel-projectile-grep)
+   ([remap projectile-switch-project] . counsel-projectile-switch-project)
+   ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)))
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
@@ -1959,8 +1964,9 @@ This file is specified in `counsel-projectile-default-file'."
  (use-package highlight-symbol ; Highlight symbol under point
    :disabled t ; `symbol-overlay' is better
    :hook (prog-mode . highlight-symbol-mode)
-   :bind (("M-p" . highlight-symbol-prev)
-          ("M-n" . highlight-symbol-next))
+   :bind
+   (("M-p" . highlight-symbol-prev)
+    ("M-n" . highlight-symbol-next))
    :diminish
    :custom (highlight-symbol-on-navigation-p t))
 
@@ -1969,8 +1975,9 @@ This file is specified in `counsel-projectile-default-file'."
    :commands (symbol-overlay-mode)
    :diminish
    :hook (prog-mode . symbol-overlay-mode)
-   :bind (("M-p" . symbol-overlay-jump-prev)
-          ("M-n" . symbol-overlay-jump-next))))
+   :bind
+   (("M-p" . symbol-overlay-jump-prev)
+    ("M-n" . symbol-overlay-jump-next))))
 
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
@@ -2099,14 +2106,15 @@ This file is specified in `counsel-projectile-default-file'."
   :if (eq dotemacs-tags-scheme 'ctags)
   :commands xref-etags-mode
   :config (xref-etags-mode)
-  :bind (("M-'" . xref-find-definitions)
-         ("M-?" . xref-find-references)
-         ("C-M-." . xref-find-apropos)
-         ("M-," . xref-pop-marker-stack)
-         :map xref--xref-buffer-mode-map
-         ("C-o" . xref-show-location-at-point)
-         ("<tab>" . xref-quit-and-goto-xref)
-         ("r" . xref-query-replace-in-results)))
+  :bind
+  (("M-'" . xref-find-definitions)
+   ("M-?" . xref-find-references)
+   ("C-M-." . xref-find-apropos)
+   ("M-," . xref-pop-marker-stack)
+   :map xref--xref-buffer-mode-map
+   ("C-o" . xref-show-location-at-point)
+   ("<tab>" . xref-quit-and-goto-xref)
+   ("r" . xref-query-replace-in-results)))
 
 (use-package ivy-xref
   :after (ivy xref)
@@ -2118,11 +2126,12 @@ This file is specified in `counsel-projectile-default-file'."
   :disabled t
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq dotemacs-tags-scheme 'ctags))
-  :bind (("M-]" . counsel-etags-find-tag-at-point)
-         ("C-c g s" . counsel-etags-find-symbol-at-point)
-         ("C-c g f" . counsel-etags-find-tag)
-         ("C-c g l" .  counsel-etags-list-tag)
-         ("C-c g c" . counsel-etags-scan-code))
+  :bind
+  (("M-]" . counsel-etags-find-tag-at-point)
+   ("C-c g s" . counsel-etags-find-symbol-at-point)
+   ("C-c g f" . counsel-etags-find-tag)
+   ("C-c g l" .  counsel-etags-list-tag)
+   ("C-c g c" . counsel-etags-scan-code))
   :config
   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
   (add-hook 'prog-mode-hook
@@ -2143,16 +2152,17 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package helpful
   :disabled t
-  :bind (([remap describe-variable] . helpful-variable)
-         ("C-h v" . helpful-variable)
-         ([remap describe-key] . helpful-key)
-         ("C-h k" . helpful-key)
-         ([remap describe-function] . helpful-function)
-         ("C-h f" . helpful-function)
-         ("C-h c" . helpful-command)
-         ("C-h p" . helpful-at-point)
-         :map helpful-mode-map
-         ("q" . helpful-kill-buffers)))
+  :bind
+  (([remap describe-variable] . helpful-variable)
+   ("C-h v" . helpful-variable)
+   ([remap describe-key] . helpful-key)
+   ("C-h k" . helpful-key)
+   ([remap describe-function] . helpful-function)
+   ("C-h f" . helpful-function)
+   ("C-h c" . helpful-command)
+   ("C-h p" . helpful-at-point)
+   :map helpful-mode-map
+   ("q" . helpful-kill-buffers)))
 
 (use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
   :commands vlf
@@ -2292,9 +2302,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   :bind ("M-s e" . sudo-edit))
 
 (use-package crux
-  :bind (("C-c d i" . crux-ispell-word-then-abbrev)
-         ("C-c d s" . crux-sudo-edit)
-         ("<f12>" . crux-kill-other-buffers)))
+  :bind
+  (("C-c d i" . crux-ispell-word-then-abbrev)
+   ("C-c d s" . crux-sudo-edit)
+   ("<f12>" . crux-kill-other-buffers)))
 
 (use-package disable-mouse
   :diminish disable-mouse-global-mode
@@ -2314,8 +2325,9 @@ This file is specified in `counsel-projectile-default-file'."
   :config (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
 
 (use-package ace-window
-  :bind (([remap other-window] . ace-window)
-         ("<f10>" . ace-window)))
+  :bind
+  (([remap other-window] . ace-window)
+   ("<f10>" . ace-window)))
 
 ;; `Shift + direction' arrows
 (use-package windmove
@@ -2362,18 +2374,13 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (bm-buffer-persistence t)
   (bm-repository-file (expand-file-name "bm-bookmarks" dotemacs-temp-directory))
-  :bind (("C-<f1>" . bm-toggle)
-         ("C-<f2>" . bm-next)
-         ("C-<f3>" . bm-previous)))
+  :bind
+  (("C-<f1>" . bm-toggle)
+   ("C-<f2>" . bm-next)
+   ("C-<f3>" . bm-previous)))
 
 (use-package esup
   :commands esup)
-
-;; https://blog.d46.us/advanced-emacs-startup/
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (message "Emacs ready in %s with %d garbage collections."
-                     (emacs-init-time) gcs-done)))
 
 (use-package bug-hunter)
 
@@ -2383,8 +2390,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; :hook (after-init . explain-pause-mode)
   :diminish)
 
-;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also get run
-;; for all modes derived from a basic mode such as `text-mode'.
+;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
+;; get run for all modes derived from a basic mode such as `text-mode'.
 
 ;; https://www.emacswiki.org/emacs/AutoFillMode
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
@@ -2508,9 +2515,11 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prettier
   :disabled t
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-  ;; :hook ((markdown-mode gfm-mode) . (lambda ()
-  ;;                                     (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
-  ;;                                       prettier-mode)))
+  ;; :hook
+  ;; ((markdown-mode gfm-mode) . (lambda ()
+  ;;                               (when (and buffer-file-name
+  ;;                                          (not (file-remote-p buffer-file-name)))
+  ;;                                 prettier-mode)))
   :hook ((markdown-mode gfm-mode) . prettier-mode))
 
 (use-package csv-mode
@@ -2537,9 +2546,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package make-mode
   :ensure nil
-  :mode (("\\Makefile\\'" . makefile-mode)
-         ;; Add `makefile.rules' to makefile-gmake-mode for Intel Pin
-         ("makefile\\.rules\\'" . makefile-gmake-mode)))
+  :mode
+  (("\\Makefile\\'" . makefile-mode)
+   ;; Add `makefile.rules' to makefile-gmake-mode for Intel Pin
+   ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
 (use-package eldoc
@@ -2573,8 +2583,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package elisp-mode
   :ensure nil
-  :mode (("\\.el\\'" . emacs-lisp-mode)
-         ("\\.elc\\'" . elisp-byte-code-mode))
+  :mode
+  (("\\.el\\'" . emacs-lisp-mode)
+   ("\\.elc\\'" . elisp-byte-code-mode))
   :hook
   ((lisp-mode emacs-lisp-mode) . (lambda ()
                                    (when buffer-file-name
@@ -2611,8 +2622,8 @@ This file is specified in `counsel-projectile-default-file'."
    (lsp-mode . lsp-modeline-code-actions-mode)
    ((c++-mode java-mode json-mode) . (lambda ()
                                        ;; (when buffer-file-name
-                                         (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-                                         ;; )
+                                       (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                                       ;; )
                                        ))
    )
   :custom
@@ -2818,13 +2829,14 @@ This file is specified in `counsel-projectile-default-file'."
                                          (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
-  :bind (("M-." . lsp-find-definition)
-         ("C-c l i" . lsp-goto-implementation)
-         ("C-c l t" . lsp-goto-type-definition)
-         ("C-c l r" . lsp-rename)
-         ("C-c l h" . lsp-symbol-highlight)
-         ("C-c l f" . lsp-format-buffer)
-         ("C-c l r" . lsp-find-references)))
+  :bind
+  (("M-." . lsp-find-definition)
+   ("C-c l i" . lsp-goto-implementation)
+   ("C-c l t" . lsp-goto-type-definition)
+   ("C-c l r" . lsp-rename)
+   ("C-c l h" . lsp-symbol-highlight)
+   ("C-c l f" . lsp-format-buffer)
+   ("C-c l r" . lsp-find-references)))
 
 
 (when (or (eq dotemacs-python-langserver 'pyls) (eq dotemacs-python-langserver 'mspyls))
@@ -3316,9 +3328,10 @@ _p_: Prev      _u_: Upper
     :commands (reftex-get-bibfile-list bibtex-parse-keys
                                        reftex-default-bibliography)
     ;; :diminish
-    :bind (("C-c [" . reftex-citation)
-           ("C-c )" . reftex-reference)
-           ("C-c (" . reftex-label))
+    :bind
+    (("C-c [" . reftex-citation)
+     ("C-c )" . reftex-reference)
+     ("C-c (" . reftex-label))
     :preface
     (defun sb/get-bibtex-keys (file)
       (with-current-buffer (find-file-noselect file)
@@ -3897,5 +3910,11 @@ specify by the keyword projectile-default-file define in
 
 ;; (with-eval-after-load "counsel-projectile"
 ;;   (add-to-list 'counsel-projectile-action '("d" sb/open-project-default-file2 "open default file") t))
+
+;; https://blog.d46.us/advanced-emacs-startup/
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (emacs-init-time) gcs-done)))
 
 ;;; init.el ends here
