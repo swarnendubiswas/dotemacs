@@ -41,6 +41,7 @@
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
     ("handly" "handy" nil :count 0)
+    ("icludes" "includes" nil :count 0)
     ("initialise" "Initialize" nil :count 0)
    ))
 
@@ -466,6 +467,7 @@
     ("dubugging" "debugging" nil :count 0)
     ("durign" "during" nil :count 2)
     ("dyanmically" "dynamically" nil :count 1)
+    ("eaiser" "easier" nil :count 0)
     ("eamil" "email" nil :count 1)
     ("eariler" "earlier" nil :count 0)
     ("eclair" "eclair" nil :count 0)
@@ -968,6 +970,7 @@
     ("quetion" "question" nil :count 0)
     ("quetions" "questions" nil :count 0)
     ("raidus" "RADIUS" nil :count 0)
+    ("readyness" "readiness" nil :count 0)
     ("realyl" "really" nil :count 0)
     ("reasearch" "research" nil :count 1)
     ("reasonble" "reasonable" nil :count 1)

@@ -44,7 +44,7 @@ sudo snap refresh
 #### Python Packages
 
 ```Bash
-python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip jedi-language-server --user
+python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip jedi-language-server data-science-types --user
 ```
 
 #### Other Packages
