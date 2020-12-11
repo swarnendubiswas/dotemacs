@@ -512,8 +512,8 @@ whitespaces."
   :diminish
   :hook (prog-mode . subword-mode))
 
-;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above the
-;; other
+;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
+;; the other
 ;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right')
 (cond ((eq dotemacs-window-split 'horizontal) (setq split-width-threshold nil
                                                     split-height-threshold 0))
@@ -590,7 +590,7 @@ whitespaces."
 ;; (fringe-mode '(1 . 1))
 
 ;; Native from Emacs 27+
-(global-display-fill-column-indicator-mode 1)
+(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 
 ;; This puts the buffer in read-only mode and disables font locking
 (use-package so-long
@@ -665,9 +665,11 @@ whitespaces."
                                                                          :height 0.8))))
                                              (mode-line-inactive ((t (:background "#efefef"
                                                                                   :foreground "#404148"
-                                                                                  :box (:line-width 1
-                                                                                                    :color "#bcbcbc")
-                                                                                  :height 0.8))))))
+                                                                                  :box (:line-width
+                                                                                        1
+                                                                                        :color "#bcbcbc")
+                                                                                  :height
+                                                                                  0.8))))))
 
       ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
                                             :init
@@ -676,12 +678,15 @@ whitespaces."
                                                   modus-vivendi-theme-scale-headings nil)
                                             (load-theme 'modus-vivendi t)))
 
-      ((eq dotemacs-theme 'sb/default) (progn
-                                         ;; (setq frame-background-mode 'light)
-                                         ;; (set-background-color "#ffffff")
-                                         (set-foreground-color "#333333")
-                                         (set-face-attribute 'region nil
-                                                             :background "gainsboro"))))
+      ((eq dotemacs-theme 'sb/default) (when (display-graphic-p)
+                                         (progn
+                                           ;; (setq frame-background-mode 'light)
+                                           ;; (set-background-color "#ffffff")
+                                           (set-foreground-color "#333333")
+                                           (set-face-attribute 'hl-line nil
+                                                               :background "light yellow")
+                                           (set-face-attribute 'region nil
+                                                               :background "gainsboro")))))
 
 (cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
                                                  :init
@@ -863,7 +868,7 @@ whitespaces."
 
 (use-package dired
   :ensure nil
-  :functions dired-next-line
+  :commands dired-next-line
   :preface
   (defun sb/dired-go-home ()
     (interactive)
@@ -1674,9 +1679,8 @@ whitespaces."
          ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
-  :functions (projectile-project-name projectile-project-root)
-  :commands projectile-expand-root
   ;; :ensure-system-package fd
+  :commands (projectile-project-name projectile-project-root projectile-expand-root)
   :bind-keymap ("C-c p" . projectile-command-map)
   :custom
   (projectile-auto-discover nil "Do not discover projects")
@@ -2403,7 +2407,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package olivetti
   :diminish
-  :custom (olivetti-body-width 0.90 "Fraction of the window width")
+  :custom (olivetti-body-width 0.92 "Fraction of the window width")
   :hook (text-mode . olivetti-mode)
   ;; :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode)
   )
@@ -2940,6 +2944,10 @@ This file is specified in `counsel-projectile-default-file'."
   :commands flycheck-clang-analyzer-setup
   :config (flycheck-clang-analyzer-setup))
 
+(use-package flycheck-clang-tidy
+  :after flycheck
+  :hook (flycheck-mode . flycheck-clang-tidy-setup))
+
 (use-package cuda-mode
   :mode (("\\.cu\\'" . c++-mode)
          ("\\.cuh\\'" . c++-mode)))
@@ -3280,10 +3288,7 @@ _p_: Prev      _u_: Upper
     (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
     (TeX-command-default "LatexMk")
     :config (auctex-latexmk-setup))
-
-  (use-package company-auctex
-    :init (company-auctex-init))
-
+  
   (use-package ivy-bibtex
     :bind ("C-c x b" . ivy-bibtex)
     :custom
@@ -3438,12 +3443,13 @@ Ignore if no file is found."
 (use-package mlir-mode
   :ensure nil
   :load-path "extras"
-  :mode ("\\.mlir\\'"))
+  :mode "\\.mlir\\'")
 
 (use-package bazel-mode
-  :mode (("\\.bzl$" . bazel-mode)
-         ("\\BUILD\\'" . bazel-mode)
-         ("\\.bazelrc\\'" . bazelrc-mode)))
+  :mode
+  (("\\.bzl$" . bazel-mode)
+   ("\\BUILD\\'" . bazel-mode)
+   ("\\.bazelrc\\'" . bazelrc-mode)))
 
 (use-package protobuf-mode
   :mode "\\.proto$")
@@ -3540,8 +3546,7 @@ Ignore if no file is found."
   "Add backends for Python completion in company mode."
   ;; Make sure to install virtualenv through pip, and not the distribution package manager. Run
   ;; `jedi:install-sever'.
-  (use-package company-jedi
-    :after python-mode)
+  (use-package company-jedi)
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -3559,8 +3564,8 @@ Ignore if no file is found."
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
-  ;; Required by ac-math and company-math
-  (use-package math-symbol-lists )
+  (use-package company-auctex)
+  (use-package math-symbol-lists) ; Required by `ac-math' and `company-math'
   (use-package company-math)
   (use-package company-reftex)
   (use-package company-bibtex)
@@ -3575,6 +3580,11 @@ Ignore if no file is found."
            company-math-symbols-unicode
            company-reftex-labels
            company-reftex-citations
+           company-auctex-labels
+           company-auctex-bibs
+           (company-auctex-macros
+            company-auctex-symbols
+            company-auctex-environments)
            company-files
            company-yasnippet
            company-dabbrev
@@ -3794,8 +3804,9 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
 (use-package default-text-scale
-  :bind (("C-M-+" . default-text-scale-increase)
-         ("C-M--" . default-text-scale-decrease)))
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
 
 (defhydra sb/hydra-text-scale-zoom ()
   "zoom"

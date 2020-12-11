@@ -692,6 +692,7 @@
     ("independant" "independent" nil :count 0)
     ("ineresting" "interesting" nil :count 0)
     ("infalted" "inflated" nil :count 1)
+    ("infleunces" "influences" nil :count 0)
     ("influance" "influence" nil :count 0)
     ("infomation" "information" nil :count 0)
     ("infomration" "information" nil :count 1)
