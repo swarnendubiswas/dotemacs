@@ -19,17 +19,19 @@ You can use the following instructions to install third-party applications. Add 
 #### Ubuntu 18.04 Packages
 
 ```Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-11 clangd-11 clang-{format,tidy,tools}-11 clang-11-doc clang-11-examples llvm-11 lld-11 lldb-11 llvm-11-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev
-wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
-sudo dpkg -i fd_8.1.1_amd64.deb
+LLVM_VERSION="-11"
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev
+wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
+sudo dpkg -i fd_8.2.1_amd64.deb
 ```
 
 #### Ubuntu 20.04 Packages
 
 ```Bash
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang-11 clangd-11 clang-{format,tidy,tools}-11 clang-11-doc clang-11-examples llvm-11 lld-11 lldb-11 llvm-11-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev
-wget https://github.com/sharkdp/fd/releases/download/v8.1.1/fd_8.1.1_amd64.deb
-sudo dpkg -i fd_8.1.1_amd64.deb
+LLVM_VERSION="-11"
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev
+wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
+sudo dpkg -i fd_8.2.1_amd64.deb
 ```
 
 #### Snap Packages
@@ -148,30 +150,26 @@ I plan to automate the complete setup sometime in the future.
 
 ## Directory structure
 
-| Directory | Purpose |
-| --- | --- |
-| `extras` | third-party packages (may not be available from the package archives) |
-| `reference-cards` | documentation and help files |
-| `snippets` | custom snippets |
+- `extras` -- third-party packages (may not be available from the package archives) 
+- `reference-cards` -- documentation and help files 
+- `snippets` -- custom snippets 
 
 ## Tweaking the default settings
 
 The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
 
-| Custom variable | Documentation |
-| --- | --- |
-| `dotemacs-theme` | Set the desired theme from a bunch of themes like `leuven`, `professional`, `eclipse`, and `zenburn` or use the `default`. |
-| `dotemacs-modeline-theme` | Set the desired modeline theme from `powerline`, `smart-mode-line`, `spaceline` or `default`. |
-| `dotemacs-window-split` | Specify the direction in which the windows should be split. This depends on the orientation of the display. |
-| `dotemacs-fill-column` | Column beyond which lines should not extend. |
-| `dotemacs-delete-trailing-whitespace-p` | Control whether trailing whitespace should be deleted or not. |
-| `dotemacs-tags-scheme` | Choose whether to use Gtags or Ctags for C/C++ programming. In general, we use `lsp-mode` for supported languages and projects. |
+- `dotemacs-theme` -- Set the desired theme from a bunch of themes
+- `dotemacs-modeline-theme` -- Set the desired modeline theme
+- `dotemacs-window-split` -- Specify the direction in which the windows should be split
+- `dotemacs-fill-column` -- Column beyond which lines should not extend
+- `dotemacs-delete-trailing-whitespace-p` -- Control whether trailing whitespace should be deleted or not
+- `dotemacs-tags-scheme` -- Choose whether to use Gtags or Ctags (we use `lsp-mode` for supported languages)
 
 Please check `init.el` for other options.
 
 ## Browsing Source Code
 
-Support for `LSP` protocol in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by the `lsp` mode or you cannot create a compilation database.
+Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by the `lsp` mode or you cannot create a compilation database.
 
 ### GNU Global
 
@@ -286,7 +284,7 @@ Restart=always
 WantedBy=default.target
 ```
 
-- Enable the unit to be started at login: `systemctl --user enable emacs.service`
+- Enable the unit to start at login: `systemctl --user enable emacs.service`
 - Start the service for the current session: `systemctl --user start emacs.service`
 
 Create a `emacsclient.desktop` file in `$HOME/.local/share/applications/` with the following content.

@@ -150,12 +150,13 @@ affected
 affection
 affects
 affine
+affinity
 afford
 afraid
 African
 after
 afternoon
-afterwards
+afterward
 again
 against
 aged
@@ -197,6 +198,7 @@ allergy
 alliance
 allied
 allocate
+allocated
 allocation
 allocator
 allocators
@@ -352,12 +354,15 @@ arbitrary
 architect
 architecture
 Architecture
+architectures
+Architectures
 archive
 archived
 archives
 area
 argue
 argument
+arguments
 arise
 arising
 arithmetic
@@ -426,6 +431,8 @@ assurance
 assure
 assured
 assuredly
+asynchronous
+asynchronously
 athlete
 athletes
 athletic
@@ -502,7 +509,6 @@ background
 backing
 backpack
 backward
-backwards
 bacteria
 badly
 baggage
@@ -567,6 +573,7 @@ beginning
 behalf
 behave
 behavior
+behavioral
 behind
 being
 belief
@@ -764,6 +771,8 @@ butter
 button
 buttons
 buyer
+bypass
+bypassing
 cabin
 cabinet
 cabinets
@@ -838,6 +847,7 @@ catalogs
 catalyst
 catch
 categorization
+categorized
 category
 catering
 Catholic
@@ -1095,6 +1105,7 @@ communicative
 community
 compact
 company
+comparatively
 comparator
 comparators
 compare
@@ -1538,7 +1549,6 @@ default
 defeat
 defect
 defects
-defence
 defend
 defendant
 defense
@@ -1999,6 +2009,8 @@ employer
 employment
 empty
 emulation
+emulator
+emulators
 enable
 enabled
 enables
@@ -2093,6 +2105,7 @@ erosion
 erroneous
 erroneously
 error
+errors
 escape
 escorts
 especially
@@ -2171,6 +2184,7 @@ exclusionary
 exclusive
 exclusively
 excuse
+executable
 executables
 execute
 executed
@@ -3433,6 +3447,7 @@ load
 loading
 loan
 local
+locality
 locally
 locate
 located
@@ -3807,6 +3822,7 @@ needle
 negate
 negative
 negatively
+negligible
 negotiate
 negotiation
 neighbor
@@ -3926,6 +3942,7 @@ occupation
 occupational
 occupied
 occupier
+occupies
 occupy
 occur
 occurred
@@ -4007,7 +4024,7 @@ organize
 organized
 orient
 oriental
-orientate
+orient
 orientation
 oriented
 origin
@@ -4113,6 +4130,7 @@ particular
 particularly
 parties
 partition
+partitioned
 partitioner
 partitioning
 partly
@@ -4384,6 +4402,7 @@ predominantly
 predominate
 prefer
 preference
+preferred
 prefers
 pregnancy
 pregnant
@@ -4485,12 +4504,13 @@ professionalism
 professionally
 professor
 profile
-profiling
 profiles
+profiling
 profit
 profits
 program
 programmability
+programmable
 programme
 programmer
 programming
@@ -4976,6 +4996,7 @@ return
 returned
 returns
 reunion
+reuse
 revalidate
 revalidates
 revalidation
@@ -5762,6 +5783,7 @@ symbols
 sympathetic
 sympathy
 symphony
+symposium
 symptom
 symptoms
 synchronization
@@ -5769,6 +5791,7 @@ synchronized
 synchronous
 syndrome
 synopsis
+syntactic
 syntax
 synthesis
 synthetic
@@ -5784,6 +5807,7 @@ tactic
 tactics
 tail
 take
+taken
 tale
 talent
 talented
@@ -6024,6 +6048,7 @@ transference
 transform
 transformation
 transformations
+transformed
 transient
 transit
 transition
@@ -6561,8 +6586,7 @@ yourself
 youth
 zero
 zone
-bypass
-bypassing
+empathize
 
 ;; Local Variables:
 ;; mode: text

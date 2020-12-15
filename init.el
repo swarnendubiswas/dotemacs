@@ -44,6 +44,9 @@
 ;; https://github.com/MatthewZMD/.emacs.d
 ;; https://github.com/redguardtoo/emacs.d
 
+;; TODO: Try the file-name-handler-alist change.
+;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
+
 ;;; Code:
 
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
@@ -110,7 +113,7 @@
 
 ;; No customizations, use `circadian' to load the theme
 (defcustom dotemacs-theme
-  'sb/default
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -143,7 +146,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-window-split
-  'vertical
+  'horizontal
   "Specify the direction in which the windows should be split.
 This depends on the orientation of the display."
   :type '(radio
@@ -388,6 +391,7 @@ whitespaces."
       use-file-dialog nil
       ;; FIXME: Adding a list seems to introduce nesting problems
       vc-handled-backends nil ; Disabling vc can improve performance
+      view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-underline-at-descent-line t ; Underline looks a bit better when drawn lower
@@ -1226,7 +1230,7 @@ whitespaces."
 ;; However, the width of the frame popup is often not enough.
 (use-package company-posframe
   :diminish
-  :disabled t ; FIXME: Issue with no completion shown
+  ;; :disabled t ; FIXME: Issue with no completion shown
   :custom
   (company-posframe-show-metadata nil)
   (company-posframe-show-indicator nil)
@@ -1274,7 +1278,7 @@ whitespaces."
 (use-package yasnippet
   :diminish yas-minor-mode
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (emacs-startup . yas-global-mode)
+  :hook (after-init . yas-global-mode)
   ;; :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config (unbind-key "<tab>" yas-minor-mode-map))
 
@@ -1306,6 +1310,7 @@ whitespaces."
                        lambda (_caller)
                        (/ (frame-height) 2))))
   (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+  (ivy-truncate-lines nil "`counsel-flycheck' output gets truncated")
   (ivy-wrap t)
   :hook (after-init . ivy-mode)
   :config
@@ -1626,14 +1631,13 @@ whitespaces."
   (aggressive-indent-comments-too t)
   (aggressive-indent-dont-electric-modes t))
 
-;; (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+(electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
 (use-package paren
   :ensure nil
-  :disabled t
-  :hook (after-init . show-paren-mode)
+  ;; :hook (after-init . show-paren-mode)
   :custom
-  (show-paren-delay 0)
+  ;; (show-paren-delay 0)
   (show-paren-style 'mixed)
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
@@ -1947,11 +1951,11 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package whitespace-cleanup-mode
-  :disabled t
   :diminish
   :hook (after-init . global-whitespace-cleanup-mode)
-  :config (add-to-list 'whitespace-cleanup-mode-ignore-modes
-                       'markdown-mode))
+  :config
+  (add-to-list 'whitespace-cleanup-mode-ignore-modes
+               'markdown-mode))
 
 ;; SB: This does not seem to be maintained any more
 ;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -2338,11 +2342,9 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
 ;; being invoked more frequently.
 (use-package super-save
-  :disabled t
   :diminish
   :custom
   (super-save-remote-files nil "Ignore remote files")
-  (super-save-auto-save-when-idle nil)
   :hook (find-file . super-save-mode)
   :config (add-to-list 'super-save-triggers 'ace-window))
 
@@ -2367,13 +2369,21 @@ This file is specified in `counsel-projectile-default-file'."
   (bookmark-default-file (expand-file-name "bookmarks"
                                            dotemacs-temp-directory)))
 
-;; https://github.com/CSRaghunandan/.emacs.d/blob/master/setup-files/setup-bookmark.el
 (use-package bm
-  :disabled t
+  :commands (bm-buffer-save-all bm-repository-save)
   :init (setq bm-restore-repository-on-load t)
-  :custom
-  (bm-buffer-persistence t)
-  (bm-repository-file (expand-file-name "bm-bookmarks" dotemacs-temp-directory))
+  :config
+  (setq-default bm-buffer-persistence t)
+  (setq bm-repository-file (expand-file-name "bm-bookmarks" dotemacs-temp-directory))
+  :hook
+  ((after-init . bm-repository-load)
+   (kill-buffer . bm-buffer-save)
+   (kill-emacs . (lambda ()
+                   (bm-buffer-save-all)
+                   (bm-repository-save)))
+   (after-save . bm-buffer-save)
+   (find-file . bm-buffer-restore)
+   (after-revert . bm-buffer-restore))
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)
@@ -2888,6 +2898,7 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (lsp-python-ms-python-executable-cmd "python3"))
 
+;; `pyright --createstub pandas'
 (use-package lsp-pyright
   :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
   :hook
@@ -3584,25 +3595,22 @@ Ignore if no file is found."
   (use-package company-bibtex)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-capf
-           ;; company-tabnine
-           company-bibtex
-           company-math-symbols-latex
-           company-latex-commands
-           company-math-symbols-unicode
-           company-reftex-labels
-           company-reftex-citations
-           company-auctex-labels
-           company-auctex-bibs
-           (company-auctex-macros
-            company-auctex-symbols
-            company-auctex-environments)
-           company-files
-           company-yasnippet
-           company-dabbrev
-           company-ispell
-           ))))
+        '(
+          company-yasnippet
+          company-capf
+          ;; company-tabnine
+          ;; company-bibtex
+          ;; company-math-symbols-latex
+          ;; company-latex-commands
+          ;; company-math-symbols-unicode
+          ;; company-reftex-labels
+          ;; company-reftex-citations
+          ;; company-auctex-labels
+          ;; company-auctex-bibs
+          company-files
+          (company-dabbrev
+           company-ispell)
+          )))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
@@ -3779,6 +3787,16 @@ or the major mode is not in `sb/skippable-modes'."
   (unload-feature package)
   (package-reinstall package)
   (require package))
+
+;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
+(defun sb/get-derived-modes (mode)
+  "Return a list of the ancestor modes that MODE is derived from."
+  (let ((modes   ())
+        (parent  nil))
+    (while (setq parent (get mode 'derived-mode-parent))
+      (push parent modes)
+      (setq mode parent))
+    (setq modes  (nreverse modes))))
 
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
 ;; available bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
