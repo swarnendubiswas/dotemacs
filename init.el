@@ -1809,7 +1809,7 @@ This file is specified in `counsel-projectile-default-file'."
   :init (setq all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
-  :disabled t
+  :after ivy
   :functions ivy-format-function-line
   :custom (ivy-rich-parse-remote-buffer nil)
   :config
@@ -2295,8 +2295,8 @@ This file is specified in `counsel-projectile-default-file'."
   :disabled t
   :hook (after-init . immortal-scratch-mode))
 
+;; SB: I use the *scratch* buffer for taking notes, it helps to make the data persist
 (use-package persistent-scratch
-  :disabled t
   :hook (after-init . persistent-scratch-setup-default)
   :custom
   (persistent-scratch-save-file (expand-file-name "persistent-scratch"
@@ -3748,8 +3748,12 @@ Increase line spacing by two line height."
   (with-current-buffer buffer-or-string
     major-mode))
 
-(defcustom sb/skippable-modes
-  '(dired-mode fundamental-mode helpful-mode special-mode paradox-menu-mode lsp-log-io-mode)
+(defcustom sb/skippable-modes '(dired-mode fundamental-mode
+                                           helpful-mode
+                                           special-mode
+                                           paradox-menu-mode
+                                           lsp-log-io-mode
+                                           help-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string))
 

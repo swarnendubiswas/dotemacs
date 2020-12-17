@@ -341,7 +341,17 @@ Use `magit-status` to display information about the current Git repository, and 
 
 ## Use Cases
 
-### Find and replace text in several files in a directory
+### Delete blank lines
+
+- Mark buffer (`C-x h`) or region
+- `M-x flush-lines RET ^$ RET`
+
+### Delete blank lines with only whitespace characters
+
+- Mark buffer (`C-x h`) or region 
+- `M-x flush-lines RET ^\s-*$ RET`
+
+### Find and replace text across files in a directory
 
 - Run `M-x rgrep` to find the string
 - Run `M-x wgrep` or use `C-s C-p`
