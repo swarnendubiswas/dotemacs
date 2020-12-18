@@ -2408,6 +2408,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
+  :disabled t ; textlint includes writegood
   :diminish
   :hook (text-mode . writegood-mode))
 
@@ -3311,7 +3312,7 @@ _p_: Prev      _u_: Upper
     (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
     (TeX-command-default "LatexMk")
     :config (auctex-latexmk-setup))
-  
+
   (use-package ivy-bibtex
     :bind ("C-c x b" . ivy-bibtex)
     :custom
