@@ -39,6 +39,10 @@
          (eval . (use-package smart-tabs
                    : 
                    :config ()))
+         (eval .
+               (set
+                (make-local-variable 'projectile-globally-ignored-files)
+                (push "SOME-VALUE" projectile-globally-ignored-files)))
          ))
 
  (nil
@@ -91,6 +95,7 @@
               (flycheck-gcc-language-standard . "c++11")
               (flycheck-clang-language-standard . "c++11")
               (eval add-hook 'hack-local-variables-hook (lambda () (when (string= major-mode 'c++-mode) (lsp))))
+              (eval add-hook 'before-save-hook #'clang-format-buffer nil t)
               ;; https://stackoverflow.com/questions/33063008/define-new-variable-in-dir-locals-el
               (eval . (let (
                             (clang-args (list

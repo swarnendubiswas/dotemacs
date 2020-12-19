@@ -1,4 +1,6 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile: nil; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile: nil; fill-column: 100
+;;; -*-
+
 ;; Swarnendu Biswas
 
 ;;; Commentary:
@@ -44,8 +46,9 @@
 ;; https://github.com/MatthewZMD/.emacs.d
 ;; https://github.com/redguardtoo/emacs.d
 
-;; TODO: Try the file-name-handler-alist change.
+;; TODO: Try the `file-name-handler-alist' change
 ;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
+;; TODO: Try the `package-quickstart' change
 
 ;;; Code:
 
@@ -58,11 +61,6 @@
 (defconst dotemacs-100mb (* 100 1000 1000))
 (defconst dotemacs-128mb (* 128 1000 1000))
 (defconst dotemacs-200mb (* 200 1000 1000))
-(defconst dotemacs-500mb (* 500 1000 1000))
-
-;; Defer GC during startup
-(setq gc-cons-percentage 0.6 ; Portion of heap used for allocation
-      gc-cons-threshold dotemacs-500mb)
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -84,32 +82,20 @@
   "Personal configuration for dotemacs."
   :group 'local)
 
-(defcustom dotemacs-temp-directory (expand-file-name "tmp"
-                                                     user-emacs-directory)
-  "Storage location for various configuration files."
-  :type 'string
-  :group 'dotemacs)
-
 (defcustom dotemacs-extras-directory (expand-file-name "extras"
                                                        user-emacs-directory)
   "Path for third-party packages and files."
   :type 'string
   :group 'dotemacs)
 
+(defcustom dotemacs-temp-directory (expand-file-name "tmp"
+                                                     user-emacs-directory)
+  "Storage location for various configuration files."
+  :type 'string
+  :group 'dotemacs)
+
 (unless (file-exists-p dotemacs-temp-directory)
   (make-directory dotemacs-temp-directory))
-
-(defcustom dotemacs-custom-file (expand-file-name "custom.el"
-                                                  dotemacs-temp-directory)
-  "File to write Emacs customizations."
-  :type 'string
-  :group 'dotemacs)
-
-(defcustom dotemacs-private-file (expand-file-name "private.el"
-                                                   user-emacs-directory)
-  "File to include private information."
-  :type 'string
-  :group 'dotemacs)
 
 ;; No customizations, use `circadian' to load the theme
 (defcustom dotemacs-theme
@@ -248,12 +234,7 @@ whitespaces."
 ;; FIXME: Fix smerge warnings
 (declare-function smerge-next "smerge-mode" ())
 
-(eval-when-compile
-  (setq package-enable-at-startup nil ; Avoid loading packages twice
-        package-user-dir (expand-file-name "elpa" user-emacs-directory))
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
-
+(package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -288,6 +269,21 @@ whitespaces."
 
 (use-package f
   :commands (f-join f-exists?))
+
+;; Put this early in the `user-init-file'
+(use-package no-littering)
+
+(defcustom dotemacs-custom-file
+  (no-littering-expand-etc-file-name "custom.el")
+  "File to write Emacs customizations."
+  :type 'string
+  :group 'dotemacs)
+
+(defcustom dotemacs-private-file
+  (no-littering-expand-etc-file-name "private.el")
+  "File to include private information."
+  :type 'string
+  :group 'dotemacs)
 
 ;; Use `C-c h' consistently for invoking a hydra
 (use-package hydra
@@ -325,8 +321,8 @@ whitespaces."
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       auto-mode-case-fold nil
-      auto-save-list-file-prefix (expand-file-name "auto-save"
-                                                   dotemacs-temp-directory)
+      ;; auto-save-list-file-prefix (expand-file-name "auto-save"
+      ;;                                              dotemacs-temp-directory)
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren nil ; Distracting
       case-fold-search t ; Searches and matches should ignore case
@@ -364,7 +360,6 @@ whitespaces."
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
-      load-prefer-newer t
       ;; major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup `~' files
       mouse-drag-copy-region t
@@ -470,9 +465,10 @@ whitespaces."
 (use-package saveplace ; Remember cursor position in files
   :ensure nil
   :hook (after-init . save-place-mode)
-  :custom
-  (save-place-file (expand-file-name "places"
-                                     dotemacs-temp-directory)))
+  ;; :custom
+  ;; (save-place-file (expand-file-name "places"
+  ;;                                    dotemacs-temp-directory))
+  )
 
 (use-package savehist ; Save minibuffer histories across sessions
   :ensure nil
@@ -483,7 +479,7 @@ whitespaces."
                                    kill-ring
                                    search-ring
                                    ))
-  (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
+  ;; (savehist-file (expand-file-name "savehist" dotemacs-temp-directory))
   (savehist-save-minibuffer-history t))
 
 (use-package uniquify
@@ -945,7 +941,7 @@ whitespaces."
               ("/" . dired-narrow)))
 
 (use-package diredfl ; More detailed colors
-  :disabled t ; Looks nice, but not useful
+  ;; :disabled t ; Looks nice, but not useful
   :hook (dired-mode . diredfl-mode))
 
 (use-package async
@@ -953,7 +949,9 @@ whitespaces."
 
 (use-package dired-async
   :ensure nil
-  :diminish)
+  :diminish
+  :after dired
+  )
 
 ;; (use-package dired-rsync
 ;;   :bind (:map dired-mode-map
@@ -979,7 +977,7 @@ whitespaces."
   (treemacs-indentation 2)
   (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
   (treemacs-lock-width t)
-  (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
+  ;; (treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory))
   (treemacs-position 'right)
   (treemacs-project-follow-cleanup t)
   (treemacs-recenter-after-file-follow t)
@@ -1029,7 +1027,8 @@ whitespaces."
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 (use-package all-the-icons
   :disabled t
-  :if (display-graphic-p))
+  :if (display-graphic-p)
+  :config (all-the-icons-install-fonts 'y))
 
 (use-package all-the-icons-ibuffer
   :disabled t
@@ -1152,6 +1151,7 @@ whitespaces."
                      "[/\\]\\.loaddefs\\.el\\'"
                      "[/\\]tmp/.*"
                      ".*/recentf\\'"
+                     ".*/recentf-save.el\\'"
                      ;; "/ssh:"
                      "~$"
                      "/.autosaves/"
@@ -1162,8 +1162,11 @@ whitespaces."
   ;; (recentf-keep '(file-remote-p file-readable-p))
   (recentf-max-saved-items 100)
   (recentf-menu-filter 'recentf-sort-descending)
-  (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
-  :config (run-at-time nil (* 5 60) 'recentf-save-list) ; seconds
+  ;; (recentf-save-file (expand-file-name "recentf" dotemacs-temp-directory))
+  :config
+  (run-at-time nil (* 5 60) 'recentf-save-list) ; seconds
+  (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
+  (add-to-list 'recentf-exclude (file-truename no-littering-var-directory))
   :hook (after-init . recentf-mode))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1287,7 +1290,8 @@ whitespaces."
 
 (use-package amx
   :hook (after-init . amx-mode)
-  :custom (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory)))
+  ;; :custom (amx-save-file (expand-file-name "amx-items" dotemacs-temp-directory))
+  )
 
 (use-package ivy
   :commands ivy-completion-in-region
@@ -1459,9 +1463,10 @@ whitespaces."
 (use-package prescient
   :disabled t
   :hook (counsel-mode . prescient-persist-mode)
-  :custom
-  (prescient-save-file (expand-file-name "prescient-save.el"
-                                         dotemacs-temp-directory)))
+  ;; :custom
+  ;; (prescient-save-file (expand-file-name "prescient-save.el"
+  ;;                                        dotemacs-temp-directory))
+  )
 
 (use-package ivy-prescient
   :disabled t
@@ -1635,7 +1640,7 @@ whitespaces."
 
 (use-package paren
   :ensure nil
-  ;; :hook (after-init . show-paren-mode)
+  :hook (after-init . show-paren-mode)
   :custom
   ;; (show-paren-delay 0)
   (show-paren-style 'mixed)
@@ -1692,15 +1697,15 @@ whitespaces."
   :bind-keymap ("C-c p" . projectile-command-map)
   :custom
   (projectile-auto-discover nil "Do not discover projects")
-  (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
+  ;; (projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory))
   (projectile-completion-system 'ivy)
   ;; (projectile-dynamic-mode-line nil "")
   (projectile-enable-caching nil "Problematic if you create new files often")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
   (projectile-indexing-method 'alien)
-  (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
-                                                    dotemacs-temp-directory))
+  ;; (projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
+  ;;                                                   dotemacs-temp-directory))
   (projectile-mode-line-prefix "")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
   (projectile-verbose nil)
@@ -1830,11 +1835,11 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled))
-  (flycheck-display-errors-delay 0.5)
+  ;; (flycheck-display-errors-delay 0.5)
   (flycheck-emacs-lisp-load-path 'inherit)
-  (flycheck-idle-buffer-switch-delay 1)
-  (flycheck-idle-change-delay 1)
-  (flycheck-indication-mode 'left-margin)
+  ;; (flycheck-idle-buffer-switch-delay 1)
+  ;; (flycheck-idle-change-delay 1)
+  ;; (flycheck-indication-mode 'left-margin)
   :init
   (when (or (eq dotemacs-modeline-theme 'spaceline) (eq
                                                      dotemacs-modeline-theme 'doom-modeline))
@@ -1843,7 +1848,8 @@ This file is specified in `counsel-projectile-default-file'."
   (setq-default flycheck-disabled-checkers '(tex-lacheck
                                              tex-chktex
                                              python-flake8
-                                             emacs-lisp-checkdoc)
+                                             python-mypy
+                                             python-pycompile)
                 flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                             dotemacs-user-home)
                 flycheck-pylintrc (expand-file-name ".config/pylintrc"
@@ -1855,29 +1861,39 @@ This file is specified in `counsel-projectile-default-file'."
                 flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
                                                                dotemacs-textlint-home))
 
-  (dolist (hook '(text-mode-hook org-mode-hook
-                                 latex-mode-hook
-                                 LaTeX-mode-hook))
+  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode))
+    (add-hook hook (lambda ()
+                     (setq-local flycheck-checker 'emacs-lisp)
+                     (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))
+
+  (dolist (hook '(text-mode-hook
+                  ;; org-mode-hook latex-mode-hook LaTeX-mode-hook
+                  ))
     (add-hook hook (lambda ()
                      (setq-local flycheck-checker 'textlint)
                      (flycheck-add-next-checker 'textlint 'proselint))))
 
-  (add-hook 'markdown-mode-hook (lambda ()
-                                  (setq-local flycheck-checker 'markdown-markdownlint-cli)
-                                  (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint)))
+  ;; TODO: Is `gfm-mode' derived from `markdown-mode'?
+  (dolist (hook '(markdown-mode-hook ;;gfm-mode-hook
+                  ))
+    (add-hook hook (lambda ()
+                     (setq-local flycheck-checker 'markdown-markdownlint-cli)
+                     (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint))))
 
   (add-hook 'python-mode-hook (lambda ()
                                 (setq-local flycheck-checker 'python-pylint)))
 
   ;; FIXME: Shellcheck is a resource hog for $HOME/.bash* files
-  ;; (add-hook 'sh-mode-hook (lambda ()
-  ;;                           (setq-local flycheck-checker 'sh-shellcheck)
-  ;;                           (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+  (add-hook 'sh-mode-hook (lambda ()
+                            (setq-local flycheck-checker 'sh-shellcheck)
+                            (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
 
+  (dolist (hook '(js-mode js2-mode typescript-mode))
+    (setq-local flycheck-checker 'javascript-eslint))
   :config
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist
@@ -2005,10 +2021,10 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (tramp-default-method "ssh" "SSH is faster than the default SCP")
   ;; Auto-save to a local directory for better performance
-  (tramp-auto-save-directory (expand-file-name "tramp-auto-save"
-                                               dotemacs-temp-directory))
-  (tramp-persistency-file-name (expand-file-name "tramp"
-                                                 dotemacs-temp-directory))
+  ;; (tramp-auto-save-directory (expand-file-name "tramp-auto-save"
+  ;;                                              dotemacs-temp-directory))
+  ;; (tramp-persistency-file-name (expand-file-name "tramp"
+  ;;                                                dotemacs-temp-directory))
   (tramp-verbose 1)
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-completion-reread-directory-timeout nil)
@@ -2284,9 +2300,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package session ; Avoid the "Overwrite old session file (not loaded)?" warning
   :disabled t ; FIXME: Problem unresolved
-  :init
-  (setq session-save-file (expand-file-name "session"
-                                            dotemacs-temp-directory))
+  ;; :init
+  ;; (setq session-save-file (expand-file-name "session"
+  ;;                                           dotemacs-temp-directory))
   :hook
   (after-init . (lambda()
                   (session-initialize))))
@@ -2298,9 +2314,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;; SB: I use the *scratch* buffer for taking notes, it helps to make the data persist
 (use-package persistent-scratch
   :hook (after-init . persistent-scratch-setup-default)
-  :custom
-  (persistent-scratch-save-file (expand-file-name "persistent-scratch"
-                                                  dotemacs-temp-directory)))
+  ;; :custom
+  ;; (persistent-scratch-save-file (expand-file-name "persistent-scratch"
+  ;;                                                 dotemacs-temp-directory))
+  )
 
 ;; (use-package sudo-edit ; Edit file with sudo
 ;;   :bind ("M-s e" . sudo-edit))
@@ -2366,15 +2383,16 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :disabled t
   :custom
-  (bookmark-default-file (expand-file-name "bookmarks"
-                                           dotemacs-temp-directory)))
+  ;; (bookmark-default-file (expand-file-name "bookmarks"
+  ;;                                          dotemacs-temp-directory))
+  )
 
 (use-package bm
   :commands (bm-buffer-save-all bm-repository-save)
   :init (setq bm-restore-repository-on-load t)
   :config
   (setq-default bm-buffer-persistence t)
-  (setq bm-repository-file (expand-file-name "bm-bookmarks" dotemacs-temp-directory))
+  ;; (setq bm-repository-file (expand-file-name "bm-bookmarks" dotemacs-temp-directory))
   :hook
   ((after-init . bm-repository-load)
    (kill-buffer . bm-buffer-save)
@@ -2435,10 +2453,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use regular `isearch', `swiper' will not work
 (use-package pdf-tools
-  ;; :init
-  ;; (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-tools-install))
+  :init
+  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-loader-install))
   :config
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
+  ;; (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
   ;; (add-hook 'pdf-view-mode-hook (lambda ()
   ;;                                 (setq header-line-format nil)))
@@ -2453,9 +2471,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package logview
   :mode ("\\.log\\'" . logview-mode)
-  :custom
-  (logview-cache-filename (expand-file-name "logview-cache.extmap"
-                                            dotemacs-temp-directory)))
+  ;; :custom
+  ;; (logview-cache-filename (expand-file-name "logview-cache.extmap"
+  ;;                                           dotemacs-temp-directory))
+  )
 
 (use-package antlr-mode
   :ensure nil
@@ -2546,7 +2565,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   (doxymacs-mode 1)
 ;;   (doxymacs-font-lock))
 
-;; (use-package highlight-doxygen)
+(use-package highlight-doxygen
+  :config (highlight-doxygen-global-mode 1))
 
 (use-package rst
   :ensure nil
@@ -2629,7 +2649,7 @@ This file is specified in `counsel-projectile-default-file'."
                 typescript-mode) . lsp-deferred)
    (lsp-mode . lsp-enable-which-key-integration)
    (lsp-managed-mode . lsp-modeline-diagnostics-mode)
-   ((c++-mode python-mode) . lsp-headerline-breadcrumb-mode)
+   ((c++-mode python-mode java-mode) . lsp-headerline-breadcrumb-mode)
    (lsp-mode . lsp-modeline-code-actions-mode)
    ((c++-mode java-mode json-mode) . (lambda ()
                                        ;; (when buffer-file-name
@@ -2663,6 +2683,7 @@ This file is specified in `counsel-projectile-default-file'."
                                 perl-language-server
                                 perlls-remote php-ls xmlls
                                 xmlls-remote yamlls yamlls-remote))
+  (lsp-headerline-breadcrumb-enable nil)
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2676,7 +2697,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Do not turn on fuzzy completion with jedi, lsp-mode is fuzzy on the client side
   (lsp-pyls-plugins-jedi-completion-fuzzy nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
-  (lsp-pyls-plugins-preload-modules ["numpy", ""])
+  (lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas"])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length dotemacs-fill-column)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
@@ -2690,7 +2711,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                                  dotemacs-user-home)))))
   (lsp-pyls-plugins-pylint-enabled t "Pylint can be expensive")
   (lsp-pyls-plugins-yapf-enabled t)
-  (lsp-session-file (expand-file-name "lsp-session" dotemacs-temp-directory))
+  ;; (lsp-session-file (expand-file-name "lsp-session" dotemacs-temp-directory))
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
@@ -2865,6 +2886,12 @@ This file is specified in `counsel-projectile-default-file'."
               ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
               ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
+(use-package lsp-treemacs
+  :commands lsp-treemacs-errors-list
+  :config
+  ;; Sync workspace folders and treemacs projects
+  (lsp-treemacs-sync-mode 1))
+
 (use-package origami
   :disabled t
   :hook (after-init . global-origami-mode))
@@ -2881,10 +2908,17 @@ This file is specified in `counsel-projectile-default-file'."
    ("C-c l w" . lsp-ivy-workspace-symbol)))
 
 (use-package lsp-java
+  :ensure request
   :hook (java-mode . lsp-deferred)
   :custom
   (lsp-java-inhibit-message t)
   (lsp-java-save-actions-organize-imports t))
+
+(use-package request
+  :after lsp-java
+  :custom
+  (request-storage-directory ())
+  )
 
 (use-package lsp-python-ms
   :if (eq dotemacs-python-langserver 'mspyls)
@@ -3097,12 +3131,12 @@ This file is specified in `counsel-projectile-default-file'."
   (magit-completing-read-function #'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (magit-save-repository-buffers t)
-  (transient-history-file (expand-file-name "transient/history.el"
-                                            dotemacs-temp-directory))
-  (transient-levels-file (expand-file-name "transient/levels.el"
-                                           dotemacs-temp-directory))
-  (transient-values-file (expand-file-name "transient/values.el"
-                                           dotemacs-temp-directory))
+  ;; (transient-history-file (expand-file-name "transient/history.el"
+  ;;                                           dotemacs-temp-directory))
+  ;; (transient-levels-file (expand-file-name "transient/levels.el"
+  ;;                                          dotemacs-temp-directory))
+  ;; (transient-values-file (expand-file-name "transient/values.el"
+  ;;                                          dotemacs-temp-directory))
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist '((stashes . show)
                                             (untracked . show)
@@ -3223,6 +3257,13 @@ _p_: Prev      _u_: Upper
   :disabled t
   :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
+
+(use-package prism
+  :load-path "extras"
+  :disabled t
+  :hook
+  (((emacs-lisp-mode lisp-mode) . prism-mode)
+   (python-mode . prism-whitespace-mode)))
 
 ;; (use-package company-php
 ;;   :init
@@ -3482,6 +3523,16 @@ Ignore if no file is found."
 (use-package clang-format+
   :ensure clang-format
   :hook (mlir-mode . clang-format+-mode))
+
+(use-package tree-sitter
+  :disabled t
+  :config (global-tree-sitter-mode 1))
+
+(use-package tree-sitter-langs
+  :after tree-sitter)
+
+(use-package adoc-mode
+  :mode "\\.adoc\\'")
 
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."

@@ -9,14 +9,17 @@ semanticdb
 .cache
 eclipse.jdt.ls
 var
-.log
+etc
+.python-environments
+workspace
+eln-cache
 
+.log
 *.elc
 .session
 session.*
 srecode-map.el
-.python-environments
-modules/flycheck_*.el
+flycheck_*.el
 recentf
 recentf~
 smex-items
@@ -30,9 +33,7 @@ network-security.data
 .tags1
 TAGS
 transient
-workspace
 request
-flycheck_init.el
 GPATH
 GTAGS
 GRTAGS
@@ -40,6 +41,5 @@ GRTAGS
 projectile-bookmarks.eld
 amx-items
 .ac-php-conf.json
-eln-cache
 package-quickstart.el
 private.el
