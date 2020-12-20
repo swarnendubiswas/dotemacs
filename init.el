@@ -1876,9 +1876,7 @@ This file is specified in `counsel-projectile-default-file'."
                      (setq-local flycheck-checker 'textlint)
                      (flycheck-add-next-checker 'textlint 'proselint))))
 
-  ;; TODO: Is `gfm-mode' derived from `markdown-mode'?
-  (dolist (hook '(markdown-mode-hook ;;gfm-mode-hook
-                  ))
+  (dolist (hook '(markdown-mode-hook))
     (add-hook hook (lambda ()
                      (setq-local flycheck-checker 'markdown-markdownlint-cli)
                      (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint))))
@@ -1903,15 +1901,11 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
-  :after flycheck
-  ;; :hook
-  ;; ((text-mode org-mode markdown-mode latex-mode LaTeX-mode)
-  ;;  . (lambda ()
-  ;;      ;; (when (and buffer-file-name (not (file-remote-p buffer-file-name)))
-  ;;      (require 'flycheck-grammarly)
-  ;;      (flycheck-add-next-checker 'grammarly-checker 'textlint)))
-  :config
-  (flycheck-add-next-checker 'proselint 'grammarly-checker))
+  :hook
+  ;; FIXME: Include support for `gfm-mode'
+  ((text-mode gfm-mode) . (lambda ()
+                            (require 'flycheck-grammarly)))
+  :config (flycheck-add-next-checker 'proselint 'grammarly-checker))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :disabled t
@@ -1923,6 +1917,7 @@ This file is specified in `counsel-projectile-default-file'."
       :hook (flycheck-mode . flycheck-pos-tip-mode))
 
     (use-package flycheck-posframe
+      :disabled t
       :if (display-graphic-p)
       :hook (flycheck-mode . flycheck-posframe-mode)
       :custom (flycheck-posframe-position 'point-bottom-left-corner)
@@ -2495,9 +2490,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package markdown-mode
   ;; :ensure-system-package pandoc
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.markdown\\'" . markdown-mode)
-         ("\\.md\\'" . markdown-mode))
+  :mode
+  (("\\.md\\'" . markdown-mode)
+   ("README\\.md\\'" . gfm-mode) ; The order is important to associate with `gfm-mode'
+   ("\\.markdown\\'" . markdown-mode))
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
