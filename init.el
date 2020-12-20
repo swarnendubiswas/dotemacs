@@ -1138,6 +1138,9 @@ SAVE-FN with non-nil ARGS."
 (use-package deadgrep
   :bind ("<f8>" . deadgrep))
 
+(use-package ripgrep
+  :commands ripgrep-regexp)
+
 (use-package recentf
   :ensure nil
   :custom
@@ -1817,12 +1820,15 @@ This file is specified in `counsel-projectile-default-file'."
   :init (setq all-the-icons-ivy-rich-icon-size 0.8))
 
 (use-package ivy-rich
-  :after ivy
   :functions ivy-format-function-line
   :custom (ivy-rich-parse-remote-buffer nil)
   :config
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
   (ivy-rich-mode 1))
+
+(use-package counsel-fd
+  :if (executable-find "fd")
+  :commands (counsel-fd-dired-jump counsel-fd-dired-jump))
 
 (use-package flycheck
   :commands (flycheck-add-next-checker flycheck-next-checker
@@ -2447,7 +2453,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode)
   )
 
-(use-package emojify)
+(use-package emojify
+  :hook (after-init . global-emojify-mode))
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use regular `isearch', `swiper' will not work
@@ -2498,7 +2505,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
   :custom
-  (markdown-command "pandoc -f markdown -s --mathjax --highlight-style=pygments")
+  (markdown-command "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
   (markdown-enable-math t "Syntax highlight for LaTeX fragments")
   (markdown-enable-wiki-links t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
@@ -2522,14 +2529,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 (use-package pandoc-mode
-  :disabled t
   :commands (pandoc-load-default-settings)
   :diminish
   :config (pandoc-load-default-settings)
   :hook (markdown-mode . pandoc-mode))
 
 (use-package grip-mode
-  :disabled t
+  :if (executable-find "grip")
   :bind (:map markdown-mode-command-map
               ("g" . grip-mode)))
 
