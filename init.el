@@ -1,5 +1,5 @@
 ;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile: nil; fill-column: 100
-;;; -*-
+t;;; -*-
 
 ;; Swarnendu Biswas
 
@@ -67,10 +67,12 @@
 ;; permanently.
 
 (defun sb/defer-garbage-collection ()
+  "Defer garbage collection."
   (setq gc-cons-percentage 0.6
         gc-cons-threshold dotemacs-64mb))
 
 (defun sb/restore-garbage-collection ()
+  "Restore garbage collection."
   (setq gc-cons-percentage 0.1
         gc-cons-threshold dotemacs-4mb))
 
@@ -180,7 +182,7 @@ whitespaces."
 
 ;; Keep enabled till the configuration is stable
 (defcustom dotemacs-debug-init-file
-  t
+  nil
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -526,8 +528,8 @@ whitespaces."
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun sb/auto-save-wrapper (save-fn &rest args)
-  "Hide 'Auto-saving...done' messages by calling the method
-  SAVE-FN with non-nil ARGS."
+  "Hide 'Auto-saving...done' messages by calling the method.
+SAVE-FN with non-nil ARGS."
   (ignore args)
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
@@ -827,6 +829,7 @@ whitespaces."
 
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (defun sb/minibuffer-font-setup ()
+  "Customize minibuffer font."
   (set (make-local-variable 'face-remapping-alist)
        '((default :height 0.95))))
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
@@ -1170,7 +1173,7 @@ whitespaces."
   :hook (after-init . recentf-mode))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
-  "Hide messages appearing in ORIG-FUN."
+  "Hide messages appearing in ORIG-FUN, forward ARGS."
   (let ((inhibit-message t))
     (apply orig-fun args)))
 
@@ -1845,8 +1848,9 @@ This file is specified in `counsel-projectile-default-file'."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
-  (setq-default flycheck-disabled-checkers '(tex-lacheck
-                                             tex-chktex
+  (setq-default flycheck-disabled-checkers '(
+                                             ;; tex-lacheck
+                                             ;; tex-chktex
                                              python-flake8
                                              python-mypy
                                              python-pycompile)
@@ -1858,17 +1862,16 @@ This file is specified in `counsel-projectile-default-file'."
                 flycheck-shellcheck-follow-sources nil
                 flycheck-textlint-config (expand-file-name "textlintrc.json"
                                                            dotemacs-textlint-home)
-                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                               dotemacs-textlint-home))
+                ;; flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                ;;                                                dotemacs-textlint-home)
+                )
 
-  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode))
+  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode-hook))
     (add-hook hook (lambda ()
-                     (setq-local flycheck-checker 'emacs-lisp)
+                     (setq-local flycheck-checker nil)
                      (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))
 
-  (dolist (hook '(text-mode-hook
-                  ;; org-mode-hook latex-mode-hook LaTeX-mode-hook
-                  ))
+  (dolist (hook '(text-mode-hook))
     (add-hook hook (lambda ()
                      (setq-local flycheck-checker 'textlint)
                      (flycheck-add-next-checker 'textlint 'proselint))))
@@ -1991,7 +1994,6 @@ This file is specified in `counsel-projectile-default-file'."
    :custom (highlight-symbol-on-navigation-p t))
 
  (use-package symbol-overlay ; Highlight symbol under point
-   :disabled t
    :commands (symbol-overlay-mode)
    :diminish
    :hook (prog-mode . symbol-overlay-mode)
@@ -2004,11 +2006,9 @@ This file is specified in `counsel-projectile-default-file'."
   :custom (hl-todo-highlight-punctuation ":"))
 
 (use-package highlight-numbers
-  :disabled t
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
 (use-package volatile-highlights
-  :disabled t
   :diminish
   :commands volatile-highlights-mode
   :config (volatile-highlights-mode 1))
@@ -2018,6 +2018,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Edit local file with sudo: `C-x C-f /sudo::/etc/hosts'
 ;; Open a remote file with ssh + sudo: `C-x C-f /ssh:host|sudo:root:/etc/passwd'
 (use-package tramp
+  :defer 2
   :custom
   (tramp-default-method "ssh" "SSH is faster than the default SCP")
   ;; Auto-save to a local directory for better performance
@@ -2060,6 +2061,7 @@ This file is specified in `counsel-projectile-default-file'."
   )
 
 (defun sb/counsel-tramp ()
+  "Invoke remote hosts with ivy and tramp."
   (interactive)
   (counsel-find-file (ivy-read "Tramp: " (sb/sshlist))))
 (bind-key "C-c d t" #'sb/counsel-tramp)
@@ -2284,16 +2286,18 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package undo-tree
   :defines undo-tree-map
   :custom
+  (undo-tree-auto-save-history t)
   (undo-tree-mode-lighter "")
-  (undo-tree-visualizer-timestamps t)
-  (undo-tree-visualizer-relative-timestamps t)
-  (undo-tree-auto-save-history nil)
   (undo-tree-visualizer-diff t)
+  (undo-tree-visualizer-relative-timestamps t)
+  (undo-tree-visualizer-timestamps t)
   :config
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
+  (defalias 'redo 'undo-tree-redo)
   :diminish
-  :bind ("C-x u" . undo-tree-visualize))
+  :bind
+  ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
@@ -2453,10 +2457,9 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use regular `isearch', `swiper' will not work
 (use-package pdf-tools
-  :init
-  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-loader-install))
+  :defer 2 ; Expensive to load
   :config
-  ;; (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
+  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
   ;; (add-hook 'pdf-view-mode-hook (lambda ()
   ;;                                 (setq header-line-format nil)))
@@ -3192,6 +3195,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;;  Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (defun sb/enable-smerge-maybe ()
+  "Enable smerge automatically based on conflict markers."
   (when (and buffer-file-name (vc-backend buffer-file-name))
     (save-excursion
       (goto-char (point-min))
@@ -3760,20 +3764,20 @@ Increase line spacing by two line height."
 
 ;; https://www.emacswiki.org/emacs/BuildTags
 (defun sb/create-ctags (dir-name)
-  "Create tags file with ctags."
+  "Create tags file with ctags in DIR-NAME."
   (interactive "DDirectory: ")
   (shell-command
    (format "%s -f TAGS -eR %s" dotemacs-ctags-path (directory-file-name dir-name))))
 
 (defun sb/create-gtags (dir-name)
-  "Create tags file with gtags."
+  "Create tags file with gtags in DIR-NAME."
   (interactive "DDirectory: ")
   (shell-command
    (format "%s -cv --gtagslabel=new-ctags %s" dotemacs-gtags-path (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
-  "List all files recursively."
+  "List all files recursively in DIR-NAME."
   (interactive "DDirectory: ")
   (let* ((cands (split-string
                  (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
@@ -3796,7 +3800,7 @@ Increase line spacing by two line height."
 
 ;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
 (defun sb/get-buffer-major-mode (buffer-or-string)
-  "Returns the major mode associated with a buffer."
+  "Return the major mode associated with BUFFER-OR-STRING."
   (with-current-buffer buffer-or-string
     major-mode))
 
@@ -3839,6 +3843,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
 (defun sb/reinstall-package (package)
+  "Reinstall PACKAGE without restarting Emacs."
   (interactive)
   (unload-feature package)
   (package-reinstall package)
@@ -3868,6 +3873,7 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-l" . goto-line)
  ("C-c z" . repeat)
  ("C-z" . undo)
+ ("C-S-z" . redo)
  ("<f11>" . delete-other-windows)
  ("C-x k" . kill-this-buffer)
  ("M-<left>" . previous-buffer)
@@ -3933,9 +3939,8 @@ or the major mode is not in `sb/skippable-modes'."
 (put 'tags-table-list 'safe-local-variable #'listp)
 
 (defun sb/open-local-file-projectile (directory)
-  "Helm action function, open projectile file within DIRECTORY
-specify by the keyword projectile-default-file define in
-`dir-locals-file'"
+  "Open projectile file within DIRECTORY.
+Specify by the keyword projectile-default-file define in `dir-locals-file'"
   (let ((default-file
           (f-join directory
                   (nth 1
@@ -3950,6 +3955,8 @@ specify by the keyword projectile-default-file define in
       (message "The file %s doesn't exist in the select project" default-file))))
 
 (defun sb/open-project-default-file1 (filepath)
+  "Open projectile file with FILEPATH.
+Specify by the keyword projectile-default-file define in `dir-locals-file'."
   (let ((liststring (with-temp-buffer
                       (insert-file-contents filepath)
                       (split-string (buffer-string) "\n"))))
@@ -3965,6 +3972,8 @@ specify by the keyword projectile-default-file define in
 ;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
 
 (defun sb/open-project-default-file2 ()
+  "Open projectile file with FILEPATH.
+Specify by the keyword projectile-default-file define in `dir-locals-file'."
   (interactive)
   (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir (projectile-project-root)))))
     (mapcar (lambda (node)

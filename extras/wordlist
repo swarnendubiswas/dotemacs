@@ -846,7 +846,6 @@ catalog
 catalogs
 catalyst
 catch
-categorized
 categorization
 categorized
 category
@@ -1994,6 +1993,7 @@ emotion
 emotional
 emotionally
 emotions
+empathize
 emperor
 emphasis
 emphasize
@@ -4025,7 +4025,6 @@ organize
 organized
 orient
 oriental
-orient
 orientation
 oriented
 origin
@@ -4402,7 +4401,6 @@ predominant
 predominantly
 predominate
 prefer
-preferred
 preference
 preferred
 prefers
@@ -6588,10 +6586,6 @@ yourself
 youth
 zero
 zone
-empathize
-bypass
-bypassing
-symposium
 
 ;; Local Variables:
 ;; mode: text
