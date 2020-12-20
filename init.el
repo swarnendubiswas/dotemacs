@@ -1822,9 +1822,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package ivy-rich
   :functions ivy-format-function-line
   :custom (ivy-rich-parse-remote-buffer nil)
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  (ivy-rich-mode 1))
+  :config (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  :hook (ivy-mode . ivy-rich-mode))
 
 (use-package counsel-fd
   :if (executable-find "fd")
@@ -1907,6 +1906,7 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
+  :defer 2 ; Expensive to load
   :hook
   ;; FIXME: Include support for `gfm-mode'
   ((text-mode gfm-mode) . (lambda ()
