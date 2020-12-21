@@ -182,7 +182,7 @@ whitespaces."
 
 ;; Keep enabled till the configuration is stable
 (defcustom dotemacs-debug-init-file
-  nil
+  t
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -1098,7 +1098,8 @@ SAVE-FN with non-nil ARGS."
    ("C-f" . isearch-repeat-forward)))
 
 (use-package isearch-symbol-at-point
-  :after isearch)
+  :after isearch
+  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point))
 
 (use-package isearch-dabbrev
   :after isearch
@@ -2169,9 +2170,20 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package dumb-jump
   :custom
+  (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-quiet t)
-  :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+  :config (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(defhydra sb/dumb-jump-hydra (:color blue :columns 3)
+  "Dumb Jump"
+  ("j" dumb-jump-go "Go")
+  ("o" dumb-jump-go-other-window "Other window")
+  ("e" dumb-jump-go-prefer-external "Go external")
+  ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
+  ("i" dumb-jump-go-prompt "Prompt")
+  ("l" dumb-jump-quick-look "Quick look")
+  ("b" dumb-jump-back "Back"))
 
 (use-package helpful
   :disabled t
@@ -2492,6 +2504,11 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :load-path "extras"
   :mode "\\.ll\\'")
+
+(use-package tablegen-mode
+  :ensure nil
+  :load-path "extras"
+  :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode)
 
@@ -3179,16 +3196,15 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (after-init . global-git-gutter-mode)
   :custom (git-gutter:update-interval 1))
 
-    (use-package diff-hl
+    (use-package diff-hl ; Based on `vc'
       :disabled t ; This does not work for me
       :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
       :custom (diff-hl-draw-borders nil)
       :hook
       ((after-init . global-diff-hl-mode)
        (dired-mode . diff-hl-dired-mode))
-      :config
-      (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-      (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
+       (magit-pre-refresh . diff-hl-magit-pre-refresh)
+       (magit-post-refresh . diff-hl-magit-post-refresh)))
 
 (use-package git-commit
   :after magit

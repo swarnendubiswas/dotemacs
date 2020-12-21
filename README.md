@@ -40,7 +40,6 @@ sudo dpkg -i fd_8.2.1_amd64.deb
 sudo snap install shfmt
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
-sudo snap refresh
 ```
 
 #### Python Packages
@@ -53,10 +52,8 @@ python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint 
 
 ```Bash
 sudo gem install scss_lint
-sudo gem update
 composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
-composer update
 cargo install --git https://github.com/latex-lsp/texlab.git
 sudo cpanm Perl::LanguageServer
 ```
@@ -69,12 +66,6 @@ sudo cpanm Perl::LanguageServer
 cd $HOME/tmp; cd ;
 npm init --yes
 sudo npm install -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
-```
-
-> Update node packages.
-
-```Bash
-sudo npm update -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
 ```
 
 `npm install -g git+https://gitlab.com/matsievskiysv/math-preview`
@@ -97,6 +88,21 @@ npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction 
 npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst textlint-plugin-json textlint-plugin-html
 ```
 
+#### Update helper packages
+
+```Bash
+cd; sudo apt update; sudo snap refresh; sudo npm update; sudo gem update; cd $HOME/tmp; composer update; cd textlint-workspace; npm update;
+
+```
+
+> Update node packages.
+
+```Bash
+sudo npm update -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
+```
+
+#### Edit Bash files
+
 Add the following definitions to `$HOME/.bashrc`.
 
 ```Bash
@@ -105,6 +111,8 @@ echo "export ALTERNATE_EDITOR=emacs EDITOR=emacs VISUAL=emacs" >> $HOME/.bashrc
 echo "export NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
 ```
 
+#### Universal Ctags
+
 The setup supports using both Universal Ctags (or `ctags`) and GNU Global (or `gtags`).
 
 ```Bash
@@ -112,6 +120,8 @@ git clone git@github.com:universal-ctags/ctags.git universal-ctags
 cd universal-ctags
 ./autogen.sh; ./configure; make; sudo make install;
 ```
+
+#### GNU Global
 
 ```Bash
 wget http://tamacom.com/global/global-6.6.4.tar.gz
@@ -152,9 +162,9 @@ I plan to automate the complete setup sometime in the future.
 
 ## Directory structure
 
-- `extras` -- third-party packages (may not be available from the package archives) 
-- `reference-cards` -- documentation and help files 
-- `snippets` -- custom snippets 
+- `extras` -- third-party packages (may not be available from the package archives)
+- `reference-cards` -- documentation and help files
+- `snippets` -- custom snippets
 
 ## Tweaking the default settings
 
