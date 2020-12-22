@@ -1348,6 +1348,11 @@
     ("while" "while" c-electric-continued-statement :count 0)
    ))
 
+(define-abbrev-table 'latex-mode-abbrev-table
+  '(
+    ("trainign" "training" nil :count 0)
+   ))
+
 (define-abbrev-table 'markdown-mode-abbrev-table
   '(
     ("chaning" "changing" nil :count 0)
@@ -1377,3 +1382,4 @@
     ("thesse" "these" nil :count 0)
     ("vidoes" "videos" nil :count 0)
    ))
+

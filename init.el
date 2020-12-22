@@ -859,7 +859,6 @@ SAVE-FN with non-nil ARGS."
   :config (defalias 'list-buffers 'ibuffer))
 
 (use-package ibuf-ext
-  :disabled t
   :load-path "extras"
   :custom
   ;; Do not show filter groups if there are no buffers in that group
@@ -867,7 +866,6 @@ SAVE-FN with non-nil ARGS."
   :hook (ibuffer . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
-  :disabled t
   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 (use-package dired
@@ -1109,16 +1107,17 @@ SAVE-FN with non-nil ARGS."
 (use-package anzu
   :after isearch
   :diminish anzu-mode
+  :commands anzu-mode
   :custom
   (anzu-search-threshold 10000)
   (anzu-minimum-input-length 2)
   :config
-  ;; (when (eq dotemacs-modeline-theme 'spaceline)
-  ;;   (setq anzu-cons-mode-line-p nil))
-  ;; (unless (eq dotemacs-theme 'leuven)
-  ;;   (set-face-attribute 'anzu-mode-line nil
-  ;;                       :foreground "blue"
-  ;;                       :weight 'light))
+  (when (eq dotemacs-modeline-theme 'spaceline)
+    (setq anzu-cons-mode-line-p nil))
+  (unless (eq dotemacs-theme 'leuven)
+    (set-face-attribute 'anzu-mode-line nil
+                        :foreground "blue"
+                        :weight 'light))
   (global-anzu-mode 1))
 
 (use-package swiper
@@ -1320,7 +1319,14 @@ SAVE-FN with non-nil ARGS."
   (ivy-height-alist '((t
                        lambda (_caller)
                        (/ (frame-height) 2))))
-  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+  (ivy-re-builders-alist '(
+                           (counsel-M-x . ivy--regex-fuzzy)
+                           (counsel-find-file . ivy--regex-fuzzy)
+                           (swiper . ivy--regex-fuzzy)
+                           (swiper-isearch . ivy--regex-fuzzy)
+                           (counsel-rg . ivy--regex-ignore-order)
+                           (t . ivy--regex-ignore-order)
+                           ))
   (ivy-truncate-lines nil "`counsel-flycheck' output gets truncated")
   (ivy-wrap t)
   :hook (after-init . ivy-mode)
@@ -1456,7 +1462,9 @@ SAVE-FN with non-nil ARGS."
   ;;              '(counsel-company . ivy-display-function-overlay))
   )
 
-(use-package ivy-hydra)
+(use-package ivy-hydra
+  :after (ivy hydra)
+  :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (use-package ivy-posframe
   :disabled t
@@ -1700,7 +1708,16 @@ SAVE-FN with non-nil ARGS."
 
 (use-package projectile
   ;; :ensure-system-package fd
-  :commands (projectile-project-name projectile-project-root projectile-expand-root)
+  :commands (projectile-project-name projectile-project-root
+                                     projectile-expand-root
+                                     projectile-command-map
+                                     projectile-default-mode-line
+                                     projectile-mode
+                                     projectile-switch-project
+                                     projectile-ignored-projects
+                                     projectile-globally-ignored-directories
+                                     projectile-globally-ignored-files
+                                     projectile-globally-ignored-file-suffixes)
   :bind-keymap ("C-c p" . projectile-command-map)
   :custom
   (projectile-auto-discover nil "Do not discover projects")
@@ -1730,7 +1747,7 @@ SAVE-FN with non-nil ARGS."
               (or project-name "-"))))
   (projectile-mode 1)
 
-  ;; Avoid search when `projectile-mode' is enabled for faster startup
+  ;; ;; Avoid search when `projectile-mode' is enabled for faster startup
   ;; (setq projectile-project-search-path (list
   ;;                                       (concat `,(getenv "HOME") "/bitbucket")
   ;;                                       (expand-file-name "github" dotemacs-user-home)
@@ -1874,7 +1891,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode-hook))
     (add-hook hook (lambda ()
-                     (setq-local flycheck-checker nil)
+                     (setq-local flycheck-checker 'emacs-lisp)
                      (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))
 
   (dolist (hook '(text-mode-hook))
@@ -1912,7 +1929,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; FIXME: Include support for `gfm-mode'
   ((text-mode gfm-mode) . (lambda ()
                             (require 'flycheck-grammarly)))
-  :config (flycheck-add-next-checker 'proselint 'grammarly-checker))
+  :config (flycheck-add-next-checker 'proselint 'grammarly-checker)
+  :custom (flycheck-grammarly-check-time 3))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
       :disabled t
@@ -2353,7 +2371,7 @@ This file is specified in `counsel-projectile-default-file'."
   :mode ("\\.list\\'" . apt-sources-list-mode))
 
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook ((prog-mode latex-mode LaTeX-mode) . rainbow-delimiters-mode))
 
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\'" . ssh-config-mode)
@@ -2432,6 +2450,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package explain-pause-mode
   :ensure nil
   :load-path "extras"
+  :commands (explain-pause-mode explain-pause-top)
   ;; :hook (after-init . explain-pause-mode)
   :diminish)
 
@@ -2471,7 +2490,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use regular `isearch', `swiper' will not work
 (use-package pdf-tools
-  :defer 2 ; Expensive to load
+  ;; :defer 2 ; Expensive to load
+  :mode ("\\.pdf\\'" . pdf-view-mode)
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
@@ -2482,7 +2502,6 @@ This file is specified in `counsel-projectile-default-file'."
   (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%"))
 
 (use-package saveplace-pdf-view
-  :disabled t
   :after pdf-tools
   :after saveplace)
 
@@ -2510,7 +2529,8 @@ This file is specified in `counsel-projectile-default-file'."
   :load-path "extras"
   :mode "\\.td\\'")
 
-(use-package autodisass-llvm-bitcode)
+(use-package autodisass-llvm-bitcode
+  :mode "\\.bc\\'")
 
 (use-package markdown-mode
   ;; :ensure-system-package pandoc
@@ -2588,6 +2608,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   (doxymacs-font-lock))
 
 (use-package highlight-doxygen
+  :commands highlight-doxygen-mode
   :config (highlight-doxygen-global-mode 1))
 
 (use-package rst
@@ -2618,7 +2639,6 @@ This file is specified in `counsel-projectile-default-file'."
   :mode "\\.m\\'")
 
 (use-package ess
-  :disabled t
   :custom
   (inferior-R-args "--quiet --no-restore-history --no-save")
   (ess-indent-offset 4)
@@ -3112,7 +3132,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package ant)
 
 ;; Can disassemble `.class' files from within jars
-(use-package autodisass-java-bytecode)
+(use-package autodisass-java-bytecode
+  :mode "\\.class\\'")
 
 ;; Syntax highlighting for Gradle files
 (use-package groovy-mode)
@@ -3306,9 +3327,9 @@ _p_: Prev      _u_: Upper
 ;; Autocompletion with LSP, LaTeX, and Company is not perfect, so we continue to use AucTeX support
 (use-package lsp-latex
   :hook
-  ((latex-mode bibtex-mode LaTeX-mode) . (lambda()
-                                           (require 'lsp-latex)
-                                           (lsp-deferred)))
+  ((latex-mode LaTeX-mode) . (lambda()
+                               (require 'lsp-latex)
+                               (lsp-deferred)))
   :custom
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
@@ -3321,180 +3342,174 @@ _p_: Prev      _u_: Upper
   :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode))
 
-(with-eval-after-load 'tex-mode
-  (use-package tex-buf
-    :ensure nil
-    :defines (tex-fontify-script font-latex-fontify-script
-                                 font-latex-fontify-sectioning
-                                 TeX-syntactic-comment)
-    :commands (TeX-active-process TeX-save-document
-                                  TeX-command-menu
-                                  TeX-revert-document-buffer)
-    :config
-    (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
-          TeX-auto-untabify t ; Remove all tabs before saving
-          TeX-clean-confirm nil
-          TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
-          TeX-parse-self t ; Parse documents
-          TeX-PDF-mode t ; Use `pdflatex'
-          TeX-quote-after-quote nil ; Allow original LaTeX quotes
-          TeX-save-query nil
-          TeX-source-correlate-method 'synctex
-          TeX-source-correlate-mode t
-          ;; Do not start the emacs server when correlating sources
-          TeX-source-correlate-start-server nil
-          TeX-syntactic-comment t
-          LaTeX-item-indent 0 ; Two spaces + Extra indentation
-          LaTeX-syntactic-comments t
-          ;; Do not insert line-break at inline math
-          LaTeX-fill-break-at-separators nil))
-
+(use-package tex-buf
+  :ensure nil
+  :defines (tex-fontify-script font-latex-fontify-script
+                               font-latex-fontify-sectioning
+                               TeX-syntactic-comment)
+  :commands (TeX-active-process TeX-save-document
+                                TeX-command-menu
+                                TeX-revert-document-buffer)
+  :hook
+  (((latex-mode LaTeX-mode) . LaTeX-math-mode)
+   (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
+   (LaTeX-mode . TeX-source-correlate-mode)
+   ;; Enable rainbow mode after applying styles to the buffer
+   (TeX-update-style . rainbow-delimiters-mode))
+  :custom
+  (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
+  (TeX-auto-untabify t "Remove all tabs before saving")
+  (TeX-clean-confirm nil)
+  (TeX-electric-sub-and-superscript t "Automatically insert braces in math mode")
+  (TeX-parse-self t "Parse documents")
+  (TeX-quote-after-quote nil "Allow original LaTeX quotes")
+  (TeX-save-query nil)
+  (TeX-source-correlate-method 'synctex)
+  (TeX-source-correlate-start-server nil "Do not start the emacs server when correlating sources")
+  (TeX-syntactic-comment t)
+  (LaTeX-item-indent 0 "Two spaces + Extra indentation")
+  (LaTeX-syntactic-comments t)
+  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
   ;; Avoid raising of superscripts and lowering of subscripts
-  (setq tex-fontify-script nil
-        font-latex-fontify-script nil)
-
-  ;; Avoid emphasizing sections
-  (setq font-latex-fontify-sectioning 1.0)
-
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  (tex-fontify-script nil)
+  (font-latex-fontify-script nil)
+  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing sections")
+  :config
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-
   (setq-default TeX-master nil) ; Query for master file
-
-  ;; Enable rainbow mode after applying styles to the buffer
-  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
-
   ;; Disable "LaTeX-insert-item" in favor of imenu
   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   ;; (unbind-key "C-c ;" LaTeX-mode-map)
+  )
 
-  (use-package auctex-latexmk
-    :custom
-    (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
-    (TeX-command-default "LatexMk")
-    :config (auctex-latexmk-setup))
+(use-package auctex-latexmk
+  :after tex-mode
+  :custom
+  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
+  (TeX-command-default "LatexMk")
+  :config (auctex-latexmk-setup))
 
-  (use-package ivy-bibtex
-    :bind ("C-c x b" . ivy-bibtex)
-    :custom
-    (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+(use-package bibtex
+  :ensure nil
+  :hook
+  ((bibtex-mode . turn-on-auto-revert-mode)
+   (bibtex-mode . lsp-deferred))
+  :custom
+  (bibtex-align-at-equal-sign t)
+  (bibtex-maintain-sorted-entries t))
 
-  (use-package bibtex-completion
-    :ensure nil
-    :custom
-    (bibtex-completion-cite-default-as-initial-input t)
-    (bibtex-completion-cite-prompt-for-optional-arguments nil)
-    (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
+(use-package bibtex-utils
+  :after bibtex)
 
-  (use-package bibtex
-    :ensure nil
-    :init (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
-    :custom
-    (bibtex-align-at-equal-sign t)
-    (bibtex-maintain-sorted-entries t))
+(use-package ivy-bibtex
+  :bind ("C-c x b" . ivy-bibtex)
+  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
-  (use-package bibtex-utils)
+(use-package bibtex-completion
+  :ensure nil
+  :after bibtex-mode
+  :custom
+  (bibtex-completion-cite-default-as-initial-input t)
+  (bibtex-completion-cite-prompt-for-optional-arguments nil)
+  (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
-  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-  (use-package reftex
-    :ensure nil
-    :commands (reftex-get-bibfile-list bibtex-parse-keys
-                                       reftex-default-bibliography)
-    ;; :diminish
-    :bind
-    (("C-c [" . reftex-citation)
-     ("C-c )" . reftex-reference)
-     ("C-c (" . reftex-label))
-    :preface
-    (defun sb/get-bibtex-keys (file)
-      (with-current-buffer (find-file-noselect file)
-        (mapcar 'car (bibtex-parse-keys))))
-    (defun sb/reftex-add-all-bibitems-from-bibtex ()
-      (interactive)
-      (mapc 'LaTeX-add-bibitems
-            (apply 'append
-                   (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+(use-package reftex
+  :ensure nil
+  :commands (reftex-get-bibfile-list bibtex-parse-keys
+                                     reftex-default-bibliography)
+  ;; :diminish
+  :hook ((LaTeX-mode latex-mode) . reftex-mode)
+  :bind
+  (("C-c [" . reftex-citation)
+   ("C-c )" . reftex-reference)
+   ("C-c (" . reftex-label))
+  :preface
+  (defun sb/get-bibtex-keys (file)
+    (with-current-buffer (find-file-noselect file)
+      (mapcar 'car (bibtex-parse-keys))))
+  (defun sb/reftex-add-all-bibitems-from-bibtex ()
+    (interactive)
+    (mapc 'LaTeX-add-bibitems
+          (apply 'append
+                 (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
 
-    (defun sb/find-bibliography-file ()
-      "Try to find a bibliography file using RefTeX.
+  (defun sb/find-bibliography-file ()
+    "Try to find a bibliography file using RefTeX.
       Returns a string with text properties (as expected by read-file-name) or empty string if no
       file can be found"
-      (interactive)
-      (let ((bibfile-list nil))
-        (condition-case nil
-            (setq bibfile-list (reftex-get-bibfile-list))
-          (error (ignore-errors
-                   (setq bibfile-list (reftex-default-bibliography)))))
-        (if bibfile-list
-            (car bibfile-list) "")))
-
-    (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
-      "Try to find a bibliography file using RefTex and parse the bib keys.
-Ignore if no file is found."
-      (interactive)
-      (let ((bibfile-list nil))
-        (condition-case nil
-            (setq bibfile-list (reftex-get-bibfile-list))
-          (error (ignore-errors
-                   (setq bibfile-list (reftex-default-bibliography)))))
-        (message "%s" bibfile-list)
-        (mapc 'LaTeX-add-bibitems
-              (apply 'append
-                     (mapcar 'sb/get-bibtex-keys bibfile-list)))
-        ))
-    :custom
-    (reftex-enable-partial-scans t)
-    (reftex-highlight-selection 'both)
-    (reftex-plug-into-AUCTeX t)
-    (reftex-save-parse-info t)
-    (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
-    (reftex-use-multiple-selection-buffers t)
-
-    ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-    :config
-    (sb/reftex-try-add-all-bibitems-from-bibtex)
-    ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
-    )
-
-  (use-package bib-cite
-    :ensure nil
-    :diminish bib-cite-minor-mode
-    :init
-    (add-hook 'LaTeX-mode-hook (lambda ()
-                                 (bib-cite-minor-mode 1)))
-    :custom
-    (bib-cite-use-reftex-view-crossref t)
-    :bind (:map bib-cite-minor-mode-map
-                ("C-c b" . nil) ; We use `C-c b' for `comment-box'
-                ("C-c l a" . bib-apropos)
-                ("C-c l b" . bib-make-bibliography)
-                ("C-c l d" . bib-display)
-                ("C-c l t" . bib-etags)
-                ("C-c l f" . bib-find)
-                ("C-c l n" . bib-find-next)
-                ("C-c l h" . bib-highlight-mouse)))
-
-  ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-  (defun sb/save-buffer-and-run-latexmk ()
-    "Save the current buffer and run LaTeXMk also."
     (interactive)
-    (require 'tex-buf)
-    (let ((process (TeX-active-process))) (if process (delete-process process)))
-    (let ((TeX-save-query nil)) (TeX-save-document ""))
-    (TeX-command-menu "LaTeXMk"))
+    (let ((bibfile-list nil))
+      (condition-case nil
+          (setq bibfile-list (reftex-get-bibfile-list))
+        (error (ignore-errors
+                 (setq bibfile-list (reftex-default-bibliography)))))
+      (if bibfile-list
+          (car bibfile-list) "")))
 
-  ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-  ;;   (add-hook hook
-  ;;             (lambda ()
-  ;;               (add-hook 'after-save-hook
-  ;;                         (lambda ()
-  ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
+  (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
+    "Try to find a bibliography file using RefTex and parse the bib keys.
+Ignore if no file is found."
+    (interactive)
+    (let ((bibfile-list nil))
+      (condition-case nil
+          (setq bibfile-list (reftex-get-bibfile-list))
+        (error (ignore-errors
+                 (setq bibfile-list (reftex-default-bibliography)))))
+      ;; (message "%s" bibfile-list)
+      (mapc 'LaTeX-add-bibitems
+            (apply 'append
+                   (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+  :custom
+  (reftex-enable-partial-scans t)
+  (reftex-highlight-selection 'both)
+  (reftex-plug-into-AUCTeX t)
+  (reftex-save-parse-info t)
+  (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
+  (reftex-use-multiple-selection-buffers t)
 
-  ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
-  ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
+  ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+  :config
+  (sb/reftex-try-add-all-bibitems-from-bibtex)
+  ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
   )
+
+(use-package bib-cite
+  :ensure nil
+  :diminish bib-cite-minor-mode
+  :hook
+  ((LaTeX-mode latex-mode) . (lambda ()
+                               (bib-cite-minor-mode 1)))
+  :custom (bib-cite-use-reftex-view-crossref t)
+  :bind (:map bib-cite-minor-mode-map
+              ("C-c b" . nil) ; We use `C-c b' for `comment-box'
+              ("C-c l a" . bib-apropos)
+              ("C-c l b" . bib-make-bibliography)
+              ("C-c l d" . bib-display)
+              ("C-c l t" . bib-etags)
+              ("C-c l f" . bib-find)
+              ("C-c l n" . bib-find-next)
+              ("C-c l h" . bib-highlight-mouse)))
+
+;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+(defun sb/save-buffer-and-run-latexmk ()
+  "Save the current buffer and run LaTeXMk also."
+  (interactive)
+  (require 'tex-buf)
+  (let ((process (TeX-active-process))) (if process (delete-process process)))
+  (let ((TeX-save-query nil)) (TeX-save-document ""))
+  (TeX-command-menu "LaTeXMk"))
+
+;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (add-hook 'after-save-hook
+;;                         (lambda ()
+;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
+
+;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
+;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
 
 (use-package js2-mode
   :mode "\\.js\\'"
@@ -3662,29 +3677,29 @@ Ignore if no file is found."
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
-  (use-package company-auctex)
-  (use-package math-symbol-lists) ; Required by `ac-math' and `company-math'
-  (use-package company-math)
+  ;; (use-package company-auctex)
+  ;; (use-package math-symbol-lists) ; Required by `ac-math' and `company-math'
+  ;; (use-package company-math)
   (use-package company-reftex)
   (use-package company-bibtex)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-yasnippet
-          company-capf
-          ;; company-tabnine
-          ;; company-bibtex
-          ;; company-math-symbols-latex
-          ;; company-latex-commands
-          ;; company-math-symbols-unicode
-          ;; company-reftex-labels
-          ;; company-reftex-citations
-          ;; company-auctex-labels
-          ;; company-auctex-bibs
-          company-files
-          (company-dabbrev
-           company-ispell)
-          )))
+        '((
+           company-yasnippet
+           company-capf
+           ;; company-tabnine
+           company-bibtex
+           ;; company-math-symbols-latex
+           ;; company-latex-commands
+           ;; company-math-symbols-unicode
+           company-reftex-labels
+           company-reftex-citations
+           ;; company-auctex-labels
+           ;; company-auctex-bibs
+           company-files
+           company-dabbrev
+           company-ispell
+           ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
