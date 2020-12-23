@@ -58,14 +58,14 @@ cargo install --git https://github.com/latex-lsp/texlab.git
 sudo cpanm Perl::LanguageServer
 ```
 
-#### Node.js Packages
+#### `Node.js` Packages
 
 > Install node packages.
 
 ```Bash
 cd $HOME/tmp; cd ;
 npm init --yes
-sudo npm install -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
+npm install -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
 ```
 
 `npm install -g git+https://gitlab.com/matsievskiysv/math-preview`
@@ -81,7 +81,7 @@ npm init --yes; npm install textlint
 ```
 
 ```Bash
-npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words  textlint-rule-sentence-length textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint textlint-rule-terminology textlint-filter-rule-comments textlint-rule-unexpanded-acronym textlint-rule-abbr-within-parentheses textlint-rule-no-dead-links
+npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words  textlint-rule-sentence-length textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint textlint-rule-terminology textlint-filter-rule-comments textlint-rule-unexpanded-acronym textlint-rule-abbr-within-parentheses textlint-rule-no-dead-link
 ```
 
 ```Bash
@@ -91,8 +91,7 @@ npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst te
 #### Update helper packages
 
 ```Bash
-cd; sudo apt update; sudo snap refresh; sudo npm update; sudo gem update; cd $HOME/tmp; composer update; cd textlint-workspace; npm update;
-
+cd; sudo apt update; sudo snap refresh; sudo npm update; sudo gem update; cd $HOME/tmp; composer update; cd textlint-workspace; npm update; cd;
 ```
 
 > Update node packages.

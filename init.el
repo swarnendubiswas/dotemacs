@@ -850,6 +850,7 @@ SAVE-FN with non-nil ARGS."
   :init (circadian-setup))
 
 (use-package beacon
+  :diminish
   :hook (after-init . beacon-mode))
 
 (use-package ibuffer
