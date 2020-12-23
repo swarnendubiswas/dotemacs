@@ -334,8 +334,8 @@ appreciably
 appreciate
 appreciation
 approach
-approaches
 approachable
+approaches
 appropriate
 appropriately
 approval
@@ -1086,6 +1086,7 @@ commencement
 comment
 commentary
 commentator
+commenting
 comments
 commerce
 commercial
@@ -1637,6 +1638,7 @@ deserve
 design
 designed
 designer
+designing
 designs
 desire
 desired
@@ -2967,6 +2969,7 @@ increasing
 increasingly
 incredible
 increment
+incrementally
 Incrementer
 incrementing
 incurred
@@ -4064,6 +4067,7 @@ overestimate
 overfit
 overfitted
 overfitting
+overflow
 overhead
 overlap
 overlapping
@@ -5046,6 +5050,7 @@ risk
 rival
 river
 road
+robotics
 robust
 robustness
 rock
@@ -6591,10 +6596,6 @@ yourself
 youth
 zero
 zone
-commenting
-incrementally
-designing
-robotics
 
 ;; Local Variables:
 ;; mode: text

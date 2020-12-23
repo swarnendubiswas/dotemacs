@@ -118,6 +118,7 @@
     ("amke" "make" nil :count 0)
     ("amkes" "makes" nil :count 0)
     ("analsis" "analysis" nil :count 1)
+    ("analsys" "analysis" nil :count 0)
     ("analsysi" "analysis" nil :count 0)
     ("analsysis" "analysis" nil :count 0)
     ("analyis" "analysis" nil :count 1)

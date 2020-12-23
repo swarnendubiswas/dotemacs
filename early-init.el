@@ -1,5 +1,5 @@
-;; early-init.el  -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8; fill-column: 100 -*-
-;; Only for use with emacs 27 or higher
+;; early-init.el -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8; no-byte-compile: nil;
+;; fill-column: 100 -*- Only for use with emacs 27 or higher
 
 (when (boundp 'comp-eln-load-path)
   (setcar comp-eln-load-path

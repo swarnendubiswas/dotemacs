@@ -1,5 +1,5 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; no-byte-compile: nil; fill-column: 100
-t;;; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -182,7 +182,7 @@ whitespaces."
 
 ;; Keep enabled till the configuration is stable
 (defcustom dotemacs-debug-init-file
-  t
+  nil
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -849,6 +849,9 @@ SAVE-FN with non-nil ARGS."
                       (:sunset  . modus-operandi)))
   :init (circadian-setup))
 
+(use-package beacon
+  :hook (after-init . beacon-mode))
+
 (use-package ibuffer
   :ensure nil
   :custom
@@ -942,7 +945,6 @@ SAVE-FN with non-nil ARGS."
               ("/" . dired-narrow)))
 
 (use-package diredfl ; More detailed colors
-  ;; :disabled t ; Looks nice, but not useful
   :hook (dired-mode . diredfl-mode))
 
 (use-package async
@@ -1322,9 +1324,9 @@ SAVE-FN with non-nil ARGS."
   (ivy-re-builders-alist '(
                            (counsel-M-x . ivy--regex-fuzzy)
                            (counsel-find-file . ivy--regex-fuzzy)
-                           (swiper . ivy--regex-fuzzy)
-                           (swiper-isearch . ivy--regex-fuzzy)
-                           (counsel-rg . ivy--regex-ignore-order)
+                           ;; (swiper . ivy--regex-fuzzy)
+                           ;; (swiper-isearch . ivy--regex-fuzzy)
+                           ;; (counsel-rg . ivy--regex-ignore-order)
                            (t . ivy--regex-ignore-order)
                            ))
   (ivy-truncate-lines nil "`counsel-flycheck' output gets truncated")
@@ -1992,9 +1994,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package whitespace-cleanup-mode
   :diminish
   :hook (after-init . global-whitespace-cleanup-mode)
-  :config
-  (add-to-list 'whitespace-cleanup-mode-ignore-modes
-               'markdown-mode))
+  :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
 
 ;; SB: This does not seem to be maintained any more
 ;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -2016,7 +2016,7 @@ This file is specified in `counsel-projectile-default-file'."
  (use-package symbol-overlay ; Highlight symbol under point
    :commands (symbol-overlay-mode)
    :diminish
-   :hook (prog-mode . symbol-overlay-mode)
+   :hook ((prog-mode html-mode yaml-mode) . symbol-overlay-mode)
    :bind
    (("M-p" . symbol-overlay-jump-prev)
     ("M-n" . symbol-overlay-jump-next))))
@@ -2032,6 +2032,17 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish
   :commands volatile-highlights-mode
   :config (volatile-highlights-mode 1))
+
+(use-package highlight-escape-sequences
+  :hook (after-init . hes-mode))
+
+;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
+;; an active region that spans multiple lines. add a cursor to each line:
+(use-package multiple-cursors
+  :bind
+  (("C-<" . mc/mark-previous-like-this)
+   ("C->" . mc/mark-next-like-this)
+   ("C-c C-<" . mc/mark-all-like-this)))
 
 ;; Edit remote file: `/method:user@host#port:filename'
 ;; Shortcut /ssh:: will connect to default user@host#port.
@@ -2160,6 +2171,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package ivy-xref
   :after (ivy xref)
+  :commands (ivy-xref-show-defs ivy-xref-show-xrefs)
   :custom
   (xref-show-definitions-function #'ivy-xref-show-defs)
   (xref-show-xrefs-function #'ivy-xref-show-xrefs))
@@ -2490,8 +2502,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use regular `isearch', `swiper' will not work
 (use-package pdf-tools
-  ;; :defer 2 ; Expensive to load
-  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :defer 2 ; Expensive to load
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
@@ -2577,12 +2588,9 @@ This file is specified in `counsel-projectile-default-file'."
               ("g" . grip-mode)))
 
 (use-package add-node-modules-path
-  :disabled t
   :init
-  (with-eval-after-load 'typescript-mode
-    (add-hook 'typescript-mode-hook 'add-node-modules-path))
-  (with-eval-after-load 'js2-mode
-    (add-hook 'js2-mode-hook 'add-node-modules-path)))
+  (dolist (mode '(typescript-mode js-mode js2-mode coffee-mode))
+    (add-hook (derived-mode-hook-name mode) 'add-node-modules-path)))
 
 (use-package prettier
   :disabled t
@@ -2630,9 +2638,11 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :if dotemacs-is-linux
   :diminish
-  :hook
-  ((emacs-lisp-mode . turn-on-eldoc-mode)
-   (lisp-interaction-mode . turn-on-eldoc-mode)))
+  :hook ((emacs-lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode))
+
+(use-package css-eldoc
+  :commands turn-on-css-eldoc
+  :hook (css-mode . turn-on-css-eldoc))
 
 (use-package octave
   :ensure nil
@@ -2807,9 +2817,9 @@ This file is specified in `counsel-projectile-default-file'."
                                                                            (lsp-configuration-section "python")))
                               :initialized-fn (lambda (workspace)
                                                 (with-lsp-workspace workspace
-                                                  (lsp--set-configuration
-                                                   (ht-merge (lsp-configuration-section "pyright")
-                                                             (lsp-configuration-section "python")))))
+                                                                    (lsp--set-configuration
+                                                                     (ht-merge (lsp-configuration-section "pyright")
+                                                                               (lsp-configuration-section "python")))))
                               :download-server-fn (lambda (_client callback error-callback _update?)
                                                     (lsp-package-ensure 'pyright callback error-callback))
                               :notification-handlers (lsp-ht ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
@@ -2892,15 +2902,19 @@ This file is specified in `counsel-projectile-default-file'."
    (make-lsp-client :new-connection (lsp-tramp-connection
                                      (lambda ()
                                        (list lsp-perl-language-server-path
-                                             "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run" "--"
-                                             (format "--port %d --version %s"
-                                                     lsp-perl-language-server-port lsp-perl-language-server-client-version))))
+                                             "-MPerl::LanguageServer" "-e"
+                                             "Perl::LanguageServer::run" "--"
+                                             (format "--port %d
+                                                     --version
+                                                     %s"
+                                                     lsp-perl-language-server-port
+                                                     lsp-perl-language-server-client-version))))
                     :major-modes '(perl-mode cperl-mode)
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                        (lsp--set-configuration
-                                         (lsp-configuration-section "perl"))))
+                                                          (lsp--set-configuration
+                                                           (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
   :bind
@@ -3136,7 +3150,10 @@ This file is specified in `counsel-projectile-default-file'."
   :mode "\\.class\\'")
 
 ;; Syntax highlighting for Gradle files
-(use-package groovy-mode)
+(use-package groovy-mode
+  :mode
+  (("\\.groovy\\'" . groovy-mode)
+   ("\\.gradle\\'" . groovy-mode)))
 
 (use-package sh-script ; Shell script mode
   :ensure nil
@@ -3297,7 +3314,6 @@ _p_: Prev      _u_: Upper
   (web-mode-enable-current-column-highlight t))
 
 (use-package rainbow-mode
-  :disabled t
   :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
@@ -3315,8 +3331,9 @@ _p_: Prev      _u_: Upper
 
 (use-package nxml-mode
   :ensure nil
+  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'")
+  :init (fset 'xml-mode 'nxml-mode)
   :hook (nxml-mode . lsp-deferred)
-  ;; :init (fset 'xml-mode 'nxml-mode)
   :custom
   (nxml-slash-auto-complete-flag t)
   (nxml-auto-insert-xml-declaration-flag t))
@@ -3334,7 +3351,10 @@ _p_: Prev      _u_: Upper
   (lsp-latex-bibtex-formatting-formatter "latexindent")
   (lsp-latex-bibtex-formatting-line-length dotemacs-fill-column)
   (lsp-latex-build-on-save t)
-  (lsp-latex-lint-on-save t))
+  (lsp-latex-lint-on-save t)
+  :config
+  (add-to-list 'lsp-latex-build-args "-c")
+  (add-to-list 'lsp-latex-build-args "-pvc"))
 
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
@@ -3375,6 +3395,7 @@ _p_: Prev      _u_: Upper
   (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing sections")
   :config
+  ;; Revert PDF buffer after TeX compilation has finished
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (setq-default TeX-master nil) ; Query for master file
   ;; Disable "LaTeX-insert-item" in favor of imenu
@@ -3521,10 +3542,17 @@ Ignore if no file is found."
   (js-indent-level 2))
 
 (use-package xref-js2
-  :after js2-mode)
+  :after js2-mode
+  :custom (xref-js2-search-program 'rg))
 
+;; LATER: The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
 (use-package json-mode
-  :mode "\\.json\\'"
+  :ensure nil
+  :load-path "extras"
+  :mode
+  (("\\.json\\'" . json-mode)
+   ("\\.vscode/settings.json$" . jsonc-mode)
+   ("User/settings.json$" . jsonc-mode))
   :hook
   ((json-mode jsonc-mode) . (lambda ()
                               (make-local-variable 'js-indent-level)
@@ -3822,11 +3850,11 @@ Increase line spacing by two line height."
 (defcustom sb/skippable-buffers
   '(
     "TAGS" "*Backtrace*"
-    ;; "*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*"
-    ;; "*Warnings*" "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox
-    ;; Report*" "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*"
-    ;; "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*"
-    ;; "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*" "*clangd::stderr*" "*shfmt errors*"
+    ;; "*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
+    ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
+    ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"
+    ;; "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*"
+    ;; "*jdtls::stderr*" "*clangd::stderr*" "*shfmt errors*"
     )
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
@@ -3995,8 +4023,11 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
                       (split-string (buffer-string) "\n"))))
     (mapcar (lambda (str)
               (when (cl-search "dotemacs-projectile-default-file" str)
-                (let ((x (substring str (+ 13 (length "dotemacs-projectile-default-file")) (length str))))
-                  (let ((default-file (expand-file-name (substring x 1 -2) (projectile-project-root))))
+                (let ((x (substring str (+
+                                         13 (length "dotemacs-projectile-default-file")) (length
+                                         str))))
+                  (let ((default-file (expand-file-name (substring
+                                                         x 1 -2) (projectile-project-root))))
                     (when (f-exists? default-file)
                       (let ((new-buffer (get-buffer-create default-file)))
                         (switch-to-buffer new-buffer)
@@ -4008,13 +4039,15 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   "Open projectile file with FILEPATH.
 Specify by the keyword projectile-default-file define in `dir-locals-file'."
   (interactive)
-  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir (projectile-project-root)))))
+  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
+                                                 (projectile-project-root)))))
     (mapcar (lambda (node)
               (when (eq (car node) nil)
                 (let ((nillist (cdr node)))
                   (mapcar (lambda (elem)
                             (when (eq (car elem) 'dotemacs-projectile-default-file)
-                              (let ((default-file (expand-file-name (cdr elem) (projectile-project-root))))
+                              (let ((default-file (expand-file-name (cdr elem)
+                                                                    (projectile-project-root))))
                                 (when (f-exists? default-file)
                                   ;; (let ((new-buffer (get-buffer-create default-file)))
                                   ;;   (switch-to-buffer new-buffer)
@@ -4024,8 +4057,8 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
             mylist)))
 ;; (sb/open-project-default-file2)
 
-;; (with-eval-after-load "counsel-projectile"
-;;   (add-to-list 'counsel-projectile-action '("d" sb/open-project-default-file2 "open default file") t))
+;; (with-eval-after-load "counsel-projectile" (add-to-list 'counsel-projectile-action '("d"
+;;   sb/open-project-default-file2 "open default file") t))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
