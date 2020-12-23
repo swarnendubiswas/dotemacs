@@ -54,13 +54,13 @@
 
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
-(defconst dotemacs-1mb (* 1 1000 1000))
-(defconst dotemacs-4mb (* 4 1000 1000))
-(defconst dotemacs-50mb (* 50 1000 1000))
-(defconst dotemacs-64mb (* 64 1000 1000))
-(defconst dotemacs-100mb (* 100 1000 1000))
-(defconst dotemacs-128mb (* 128 1000 1000))
-(defconst dotemacs-200mb (* 200 1000 1000))
+(defconst dotemacs-1MB (* 1 1000 1000))
+(defconst dotemacs-4MB (* 4 1000 1000))
+(defconst dotemacs-50MB (* 50 1000 1000))
+(defconst dotemacs-64MB (* 64 1000 1000))
+(defconst dotemacs-100MB (* 100 1000 1000))
+(defconst dotemacs-128MB (* 128 1000 1000))
+(defconst dotemacs-200MB (* 200 1000 1000))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -69,12 +69,12 @@
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
   (setq gc-cons-percentage 0.6
-        gc-cons-threshold dotemacs-64mb))
+        gc-cons-threshold dotemacs-64MB))
 
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
   (setq gc-cons-percentage 0.1
-        gc-cons-threshold dotemacs-4mb))
+        gc-cons-threshold dotemacs-4MB))
 
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)

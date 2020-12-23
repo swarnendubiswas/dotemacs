@@ -6,11 +6,11 @@
           (expand-file-name (convert-standard-filename "var/eln-cache/")
                             user-emacs-directory)))
 
-(defconst dotemacs-500mb (* 500 1000 1000))
+(defconst dotemacs-500MB (* 500 1000 1000))
 
 ;; Defer GC during startup
 (setq gc-cons-percentage 0.6 ; Portion of heap used for allocation
-      gc-cons-threshold dotemacs-500mb)
+      gc-cons-threshold dotemacs-500MB)
 
 (setq load-prefer-newer t
       package-enable-at-startup nil ; Avoid loading packages twice
