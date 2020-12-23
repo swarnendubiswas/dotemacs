@@ -45,10 +45,8 @@
 ;; https://github.com/purcell/emacs.d
 ;; https://github.com/MatthewZMD/.emacs.d
 ;; https://github.com/redguardtoo/emacs.d
-
-;; TODO: Try the `file-name-handler-alist' change
-;; https://github.com/jwiegley/dot-emacs/blob/master/init.el
-;; TODO: Try the `package-quickstart' change
+;; https://github.com/jwiegley/dot-emacs
+;; https://github.com/d12frosted/environment/tree/master/emacs
 
 ;;; Code:
 
@@ -301,6 +299,7 @@ whitespaces."
   (load dotemacs-private-file 'noerror))
 
 (use-package paradox
+  :commands (paradox-list-packages paradox-upgrade-packages)
   :bind
   (("C-c d l" . paradox-list-packages)
    ("C-c d u" . paradox-upgrade-packages))
@@ -325,6 +324,7 @@ whitespaces."
       auto-mode-case-fold nil
       ;; auto-save-list-file-prefix (expand-file-name "auto-save"
       ;;                                              dotemacs-temp-directory)
+      auto-save-no-message t
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren nil ; Distracting
       case-fold-search t ; Searches and matches should ignore case
@@ -464,6 +464,9 @@ whitespaces."
   (auto-revert-remote-files t)
   (auto-revert-verbose nil))
 
+;; Revert pdf files without asking
+(setq revert-without-query '("\\.pdf"))
+
 (use-package saveplace ; Remember cursor position in files
   :ensure nil
   :hook (after-init . save-place-mode)
@@ -550,23 +553,13 @@ SAVE-FN with non-nil ARGS."
 ;;     (scroll-bar-mode -1)
 ;;     (tool-bar-mode -1)))
 
-;; (when (fboundp 'tool-bar-mode)
-;;   (tool-bar-mode -1))
-;; (when (fboundp 'menu-bar-mode)
-;;   (menu-bar-mode -1))
-;; (when (fboundp 'scroll-bar-mode)
-;;   (scroll-bar-mode -1))
-
 ;; Disable the following modes
 (dolist (mode '(
                 blink-cursor-mode ; Blinking cursor is distracting
                 desktop-save-mode
                 global-prettify-symbols-mode ; Makes it difficult to edit the buffer
-                menu-bar-mode
                 minibuffer-depth-indicate-mode
-                scroll-bar-mode
                 size-indication-mode
-                tool-bar-mode
                 tooltip-mode
                 ))
   (when (fboundp mode)
@@ -655,9 +648,21 @@ SAVE-FN with non-nil ARGS."
 
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
                                              :init
-                                             (setq modus-operandi-theme-mode-line '3d
-                                                   modus-operandi-theme-variable-pitch-headings nil
-                                                   modus-operandi-theme-scale-headings nil)
+                                             (setq
+                                              modus-operandi-theme-3d-modeline
+                                              t
+                                              modus-operandi-theme-completions
+                                              'opinionated
+                                              modus-operandi-theme-fringes
+                                              'subtle
+                                              modus-operandi-theme-intense-standard-completions
+                                              t
+                                              modus-operandi-theme-mode-line
+                                              '3d
+                                              modus-operandi-theme-scale-headings
+                                              nil
+                                              modus-operandi-theme-variable-pitch-headings
+                                              nil)
                                              (load-theme 'modus-operandi t)
                                              :custom-face
                                              (mode-line ((t (:background
@@ -1146,6 +1151,9 @@ SAVE-FN with non-nil ARGS."
 
 (use-package recentf
   :ensure nil
+  :commands (recentf-mode recentf-add-file
+                          recentf-apply-filename-handlers)
+  :hook (dired-mode . recentf-add-dired-directory)
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check regex with `re-builder'
@@ -1716,6 +1724,7 @@ SAVE-FN with non-nil ARGS."
                                      projectile-command-map
                                      projectile-default-mode-line
                                      projectile-mode
+                                     projectile-locate-dominating-file
                                      projectile-switch-project
                                      projectile-ignored-projects
                                      projectile-globally-ignored-directories
@@ -1735,6 +1744,7 @@ SAVE-FN with non-nil ARGS."
   ;;                                                   dotemacs-temp-directory))
   (projectile-mode-line-prefix "")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
+  (projectile-sort-order 'access-time)
   (projectile-verbose nil)
   :config
   ;; https://github.com/MatthewZMD/.emacs.d
@@ -1980,7 +1990,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package whitespace
   :disabled t
-  :commands (whitespace-mode global-whitespace-mode)
+  :commands (whitespace-mode global-whitespace-mode
+                             whitespace-buffer whitespace-cleanup
+                             whitespace-turn-off)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :hook (markdown-mode . whitespace-mode)
   :custom
@@ -1994,15 +2006,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package whitespace-cleanup-mode
   :diminish
+  :commands whitespace-cleanup-mode
   :hook (after-init . global-whitespace-cleanup-mode)
   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
 
-;; SB: This does not seem to be maintained any more
-;; (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-;;   :disabled t
-;;   :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
-;;   ;; :diminish
-;;   :hook (prog-mode . ws-butler-mode))
+(use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+  :if (not (bound-and-true-p dotemacs-delete-trailing-whitespace-p))
+  :diminish
+  :hook (prog-mode . ws-butler-mode))
 
 (or
  (use-package highlight-symbol ; Highlight symbol under point
@@ -2204,6 +2215,7 @@ This file is specified in `counsel-projectile-default-file'."
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-quiet t)
+  :hook (emacs-lisp . dumb-jump-mode)
   :config (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (defhydra sb/dumb-jump-hydra (:color blue :columns 3)
@@ -2252,7 +2264,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
-  :bind ("C-h C-m" . discover-my-major))
+  :bind
+  (("C-h C-m" . discover-my-major)
+   ("C-h M-m" . discover-my-mode)))
 
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
@@ -2320,7 +2334,6 @@ This file is specified in `counsel-projectile-default-file'."
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package beginend
-  :disabled t
   :commands beginend-global-mode
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
@@ -2361,6 +2374,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; SB: I use the *scratch* buffer for taking notes, it helps to make the data persist
 (use-package persistent-scratch
+  :commands persistent-scratch-setup-default
   :hook (after-init . persistent-scratch-setup-default)
   ;; :custom
   ;; (persistent-scratch-save-file (expand-file-name "persistent-scratch"
@@ -2408,8 +2422,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; being invoked more frequently.
 (use-package super-save
   :diminish
-  :custom
-  (super-save-remote-files nil "Ignore remote files")
+  :commands super-save-mode
+  :custom (super-save-remote-files nil "Ignore remote files")
   :hook (find-file . super-save-mode)
   :config (add-to-list 'super-save-triggers 'ace-window))
 
@@ -2436,7 +2450,9 @@ This file is specified in `counsel-projectile-default-file'."
   )
 
 (use-package bm
-  :commands (bm-buffer-save-all bm-repository-save)
+  :commands (bm-buffer-save-all bm-repository-save
+                                bm-repository-load bm-buffer-save
+                                bm-buffer-restore)
   :init (setq bm-restore-repository-on-load t)
   :config
   (setq-default bm-buffer-persistence t)
@@ -2480,8 +2496,8 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (text-mode . writegood-mode))
 
 (use-package langtool
-  :disabled t
   :after text-mode
+  :commands langtool-check
   :hook
   (text-mode . (lambda()
                  (require 'langtool)))
@@ -2504,6 +2520,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Use regular `isearch', `swiper' will not work
 (use-package pdf-tools
   :defer 2 ; Expensive to load
+  :commands (pdf-tools-install pdf-loader-install)
+  :mode ("\\.pdf\\'" . pdf-view-mode)
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
@@ -2609,13 +2627,6 @@ This file is specified in `counsel-projectile-default-file'."
   :custom (csv-separators '("," ";" "|" " "))
   :config (csv-align-mode 1))
 
-;; (use-package doxymacs
-;;   :disabled t
-;;   :commands (doxymacs-mode doxymacs-font-lock)
-;;   :config
-;;   (doxymacs-mode 1)
-;;   (doxymacs-font-lock))
-
 (use-package highlight-doxygen
   :commands highlight-doxygen-mode
   :config (highlight-doxygen-global-mode 1))
@@ -2626,6 +2637,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package boogie-friends
   :mode ("\\.smt\\'" . z3-smt2-mode))
+
+(use-package z3-mode
+  :commands z3-mode)
 
 (use-package make-mode
   :ensure nil
@@ -3075,7 +3089,6 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (cmake-mode . lsp-deferred))
 
 (use-package cmake-font-lock
-  :after cmake-mode
   :hook (cmake-mode . cmake-font-lock-activate))
 
 (use-package python
@@ -3250,17 +3263,23 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :custom (git-commit-summary-max-length 50))
 
-;;  Use the minor mode `smerge-mode' to move between conflicts and resolve them
-(defun sb/enable-smerge-maybe ()
-  "Enable smerge automatically based on conflict markers."
-  (when (and buffer-file-name (vc-backend buffer-file-name))
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^<<<<<<< " nil t)
-        (smerge-mode 1)))))
-(add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe)
-(add-hook 'find-file-hook #'sb/enable-smerge-maybe)
-(setq smerge-command-prefix "\C-cv")
+;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
+(use-package smerge-mode
+  :ensure nil
+  :commands smerge-mode
+  :preface
+  (defun sb/enable-smerge-maybe ()
+    "Enable smerge automatically based on conflict markers."
+    (when (and buffer-file-name (vc-backend buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^<<<<<<< " nil t)
+          (smerge-mode 1)))))
+  :hook
+  ((buffer-list-update . sb/enable-smerge-maybe)
+   (find-file . sb/enable-smerge-maybe))
+  :bind-keymap ("\C-cv" . smerge-command-prefix))
+
 
 (defhydra sb/hydra-smerge-mode
   (:color pink :hint nil :post (smerge-auto-leave))
@@ -3332,6 +3351,7 @@ _p_: Prev      _u_: Upper
 
 (use-package nxml-mode
   :ensure nil
+  :commands nxml-mode
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'")
   :init (fset 'xml-mode 'nxml-mode)
   :hook (nxml-mode . lsp-deferred)
@@ -3533,6 +3553,9 @@ Ignore if no file is found."
 ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
 ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
 
+(use-package texinfo
+  :mode ("\\.texi\\'" . texinfo-mode))
+
 (use-package js2-mode
   :mode "\\.js\\'"
   :hook
@@ -3606,12 +3629,11 @@ Ignore if no file is found."
        '(
          company-capf
          company-files
+         company-yasnippet ; Works everywhere
          (company-dabbrev :with
                           company-ispell) ; Uses an English dictionary
-         ;; company-tabnine
-         ;; company-yasnippet ; Works everywhere
          )))
-(dolist (hook '(text-mode-hook markdown-mode-hook org-mode-hook))
+(dolist (hook '(text-mode-hook)) ; Should extend to `markdown-mode' and `org-mode'
   (add-hook hook (lambda ()
                    (sb/company-text-mode))))
 
@@ -3626,7 +3648,6 @@ Ignore if no file is found."
                             company-files
                             :with
                             company-yasnippet)
-          ;; company-tabnine
           (company-dabbrev-code
            company-dabbrev)
           )))
@@ -3639,7 +3660,6 @@ Ignore if no file is found."
   (setq company-backends
         '(
           company-capf ; Disabled LSP mode's capf autoconfiguration
-          ;; company-tabnine
           company-dabbrev-code
           company-keywords
           company-yasnippet
@@ -3659,11 +3679,10 @@ Ignore if no file is found."
   (setq company-backends
         '((
            company-capf ; LSP mode autoconfigures capf
-           ;; company-tabnine
-           company-shell
-           company-shell-env
-           company-fish-shell
-           company-yasnippet
+           (company-shell :with
+                          company-shell-env :with
+                          company-fish-shell :with
+                          company-yasnippet)
            company-files
            company-dabbrev-code
            ;; company-dabbrev
@@ -3871,7 +3890,10 @@ Increase line spacing by two line height."
                                            special-mode
                                            paradox-menu-mode
                                            lsp-log-io-mode
-                                           help-mode)
+                                           help-mode
+                                           magit-status-mode
+                                           magit-process-mode
+                                           magit-diff-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string))
 
