@@ -88,14 +88,14 @@
   :type 'string
   :group 'dotemacs)
 
-(defcustom dotemacs-temp-directory (expand-file-name "tmp"
-                                                     user-emacs-directory)
-  "Storage location for various configuration files."
-  :type 'string
-  :group 'dotemacs)
+;; (defcustom dotemacs-temp-directory (expand-file-name "tmp"
+;;                                                      user-emacs-directory)
+;;   "Storage location for various configuration files."
+;;   :type 'string
+;;   :group 'dotemacs)
 
-(unless (file-exists-p dotemacs-temp-directory)
-  (make-directory dotemacs-temp-directory))
+;; (unless (file-exists-p dotemacs-temp-directory)
+;;   (make-directory dotemacs-temp-directory))
 
 ;; No customizations, use `circadian' to load the theme
 (defcustom dotemacs-theme
@@ -1883,7 +1883,8 @@ This file is specified in `counsel-projectile-default-file'."
     (setq flycheck-mode-line nil))
 
   (setq-default flycheck-disabled-checkers '(
-                                             ;; tex-lacheck
+                                             emacs-lisp-checkdoc
+                                             tex-lacheck
                                              ;; tex-chktex
                                              python-flake8
                                              python-mypy
@@ -1902,8 +1903,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode-hook))
     (add-hook hook (lambda ()
-                     (setq-local flycheck-checker 'emacs-lisp)
-                     (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))
+                     (setq-local flycheck-checker 'emacs-lisp))))
 
   (dolist (hook '(text-mode-hook))
     (add-hook hook (lambda ()
@@ -2780,9 +2780,9 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
-  (lsp-xml-jar-file (expand-file-name
-                     (locate-user-emacs-file
-                      "org.eclipse.lemminx-0.14.1-uber.jar")))
+  ;; https://github.com/eclipse/lemminx/archive/0.14.1.tar.gz
+  (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
+                                      dotemacs-extras-directory))
   (lsp-yaml-print-width dotemacs-fill-column)
   :custom-face
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
