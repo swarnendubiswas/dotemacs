@@ -1882,53 +1882,56 @@ This file is specified in `counsel-projectile-default-file'."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
-  (setq-default flycheck-disabled-checkers '(
-                                             emacs-lisp-checkdoc
-                                             tex-lacheck
-                                             ;; tex-chktex
-                                             python-flake8
-                                             python-mypy
-                                             python-pycompile)
-                flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                                            dotemacs-user-home)
-                flycheck-pylintrc (expand-file-name ".config/pylintrc"
-                                                    dotemacs-user-home)
-                flycheck-python-pylint-executable "python3"
-                flycheck-shellcheck-follow-sources nil
-                flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                                           dotemacs-textlint-home)
-                ;; flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                ;;                                                dotemacs-textlint-home)
-                )
+  (setq-default
 
-  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode-hook))
-    (add-hook hook (lambda ()
-                     (setq-local flycheck-checker 'emacs-lisp))))
+   ;; flycheck-disabled-checkers '(
+   ;;                              emacs-lisp-checkdoc
+   ;;                              tex-lacheck
+   ;;                              ;; tex-chktex
+   ;;                              python-flake8
+   ;;                              python-mypy
+   ;; python-pycompile)
+   flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                               dotemacs-user-home)
+   flycheck-pylintrc (expand-file-name ".config/pylintrc"
+                                       dotemacs-user-home)
+   flycheck-python-pylint-executable "python3"
+   flycheck-shellcheck-follow-sources nil
+   flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                              dotemacs-textlint-home)
+   flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                  dotemacs-textlint-home)
+   ;; flycheck-emacs-lisp-executable "emacs"
+   )
 
-  (dolist (hook '(text-mode-hook))
-    (add-hook hook (lambda ()
-                     (setq-local flycheck-checker 'textlint)
-                     (flycheck-add-next-checker 'textlint 'proselint))))
+  ;; (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode-hook))
+  ;;   (add-hook hook (lambda ()
+  ;;                    (setq-local flycheck-checker 'emacs-lisp))))
 
-  (dolist (hook '(markdown-mode-hook))
-    (add-hook hook (lambda ()
-                     (setq-local flycheck-checker 'markdown-markdownlint-cli)
-                     (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint))))
+  ;; (dolist (hook '(text-mode-hook))
+  ;;   (add-hook hook (lambda ()
+  ;;                    (setq-local flycheck-checker 'textlint)
+  ;;                    (flycheck-add-next-checker 'textlint 'proselint))))
 
-  (add-hook 'python-mode-hook (lambda ()
-                                (setq-local flycheck-checker 'python-pylint)))
+  ;; (dolist (hook '(markdown-mode-hook))
+  ;;   (add-hook hook (lambda ()
+  ;;                    (setq-local flycheck-checker 'markdown-markdownlint-cli)
+  ;;                    (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint))))
+
+  ;; (add-hook 'python-mode-hook (lambda ()
+  ;;                               (setq-local flycheck-checker 'python-pylint)))
 
   ;; FIXME: Shellcheck is a resource hog for $HOME/.bash* files
-  (add-hook 'sh-mode-hook (lambda ()
-                            (setq-local flycheck-checker 'sh-shellcheck)
-                            (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+  ;; (add-hook 'sh-mode-hook (lambda ()
+  ;;                           (setq-local flycheck-checker 'sh-shellcheck)
+  ;;                           (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
-  (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+  ;; (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
 
-  (dolist (hook '(js-mode js2-mode typescript-mode))
-    (setq-local flycheck-checker 'javascript-eslint))
+  ;; (dolist (hook '(js-mode js2-mode typescript-mode))
+  ;;   (setq-local flycheck-checker 'javascript-eslint))
   :config
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist
@@ -1937,10 +1940,11 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flycheck-grammarly
   :defer 2 ; Expensive to load
   :hook
-  ;; FIXME: Include support for `gfm-mode'
-  ((text-mode gfm-mode) . (lambda ()
-                            (require 'flycheck-grammarly)))
-  :config (flycheck-add-next-checker 'proselint 'grammarly-checker)
+  (text-mode . (lambda ()
+                 (require 'flycheck-grammarly)
+                 ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+                 (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
+                 (add-to-list 'flycheck-checkers 'grammarly-checker t)))
   :custom (flycheck-grammarly-check-time 3))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
@@ -2213,7 +2217,6 @@ This file is specified in `counsel-projectile-default-file'."
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-quiet t)
-  :hook (emacs-lisp . dumb-jump-mode)
   :config (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (defhydra sb/dumb-jump-hydra (:color blue :columns 3)
@@ -2487,6 +2490,12 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://www.emacswiki.org/emacs/AutoFillMode
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
+(add-hook 'text-mode-hook
+          (lambda ()
+            ;; Add `proselint', then `textlint', then `grammarly-checker'
+            (flycheck-add-next-checker 'proselint 'textlint)
+            (flycheck-add-next-checker 'textlint 'grammarly-checker)))
+
 ;; Identify weasel words, passive voice, and duplicate words
 (use-package writegood-mode
   :disabled t ; textlint includes writegood
@@ -2570,7 +2579,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
   :custom
-  (markdown-command "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
+  (markdown-command
+   "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
   (markdown-enable-math t "Syntax highlight for LaTeX fragments")
   (markdown-enable-wiki-links t)
   ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
@@ -2578,9 +2588,11 @@ This file is specified in `counsel-projectile-default-file'."
   (markdown-indent-on-enter 'indent-and-new-item)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-list-indent-width 2)
-  (markdown-split-window-direction 'vertical)
+  (markdown-split-window-direction 'horizontal)
   :config
-  (unbind-key "C-c C-j"))
+  (unbind-key "C-c C-j")
+  ;; `markdown-mode' is derived from `text-mode'
+  (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint))
 
 (use-package markdown-mode+
   :after markdown-mode)
@@ -2685,7 +2697,8 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   ((lisp-mode emacs-lisp-mode) . (lambda ()
                                    (when buffer-file-name
-                                     (add-hook 'after-save-hook #'check-parens nil t)))))
+                                     (add-hook 'after-save-hook #'check-parens nil t))))
+  :config (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))
 
 (use-package lsp-mode
   :defines (lsp-perl-language-server-path
@@ -3114,7 +3127,10 @@ This file is specified in `counsel-projectile-default-file'."
         python-shell-interpreter "python3"
         auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
-                                auto-mode-alist)))
+                                auto-mode-alist))
+  ;; FIXME: `lsp' is the first checker, chain the other checkers
+  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
+  )
 
 (use-package python-docstring
   :diminish
@@ -3172,7 +3188,10 @@ This file is specified in `counsel-projectile-default-file'."
   :mode
   (("\\.zsh\\'" . sh-mode)
    ("\\bashrc\\'" . sh-mode))
-  :config (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+  :config
+  (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+  ;; FIXME: `lsp' is the first checker, chain the other checkers
+  ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
   :hook (sh-mode . lsp-deferred)
   :custom
   (sh-basic-offset 2)
@@ -3624,13 +3643,12 @@ Ignore if no file is found."
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (set (make-local-variable 'company-backends)
-       '(
-         company-capf
-         company-files
-         company-yasnippet ; Works everywhere
-         (company-dabbrev :with
-                          company-ispell) ; Uses an English dictionary
-         )))
+       '((
+          company-files
+          company-yasnippet ; Works everywhere
+          company-dabbrev
+          company-ispell ; Uses an English dictionary
+          ))))
 (dolist (hook '(text-mode-hook)) ; Should extend to `markdown-mode' and `org-mode'
   (add-hook hook (lambda ()
                    (sb/company-text-mode))))

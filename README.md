@@ -270,7 +270,7 @@ ctags -eR --languages=Python
 GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
 
 - <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
-- <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub/15169556#15169556>
+- <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub>
 - <https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html>
 
 ## Server Support
@@ -283,7 +283,7 @@ Create a file `$HOME/.config/systemd/user/emacs.service` with the following cont
 
 ```config
 [Unit]
-Description=Emacs Daemon
+Description=GNU Emacs Daemon
 
 [Service]
 Type=forking
@@ -364,6 +364,7 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 ## TODO
 
 - Use custom major modes for files by names without using file-local variables
+  - https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`
   - My guess is this has to do with either `flycheck-grammarly` or `prettier`
 - Resolve yaml and xml lsp over tramp

@@ -24,7 +24,7 @@
                                 (locate-dominating-file buffer-file-name
                                                         ".dir-locals.el"))))
          (eval . (flycheck-mode 0)) ; Enable/disable a minor mode
-         (flycheck-disabled-checkes . '(emacs-lisp-checkdoc))
+         (flycheck-disabled-checkers . '(emacs-lisp-checkdoc))
          (eval . (progn
                    (defun my-project-specific-function ()
                      ;; ...
@@ -44,6 +44,13 @@
                 (make-local-variable 'projectile-globally-ignored-files)
                 (push "SOME-VALUE" projectile-globally-ignored-files)))
          ))
+
+ (fundamental-mode . (
+                      (eval . (minor-mode))
+                      ))
+ (fundamental-mode . (
+                      (eval . (when (string-match "\.prof$" (buffer-file-name)) (minor-mode)))
+                      ))
 
  (nil
   (eval
