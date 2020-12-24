@@ -1494,8 +1494,9 @@ SAVE-FN with non-nil ARGS."
   ;;                                        dotemacs-temp-directory))
   )
 
+;; https://github.com/raxod502/prescient.el/issues/65
 (use-package ivy-prescient
-  :disabled t
+  :disabled t ; No longer maintained
   :hook (counsel-mode . ivy-prescient-mode)
   :custom
   (ivy-prescient-enable-sorting nil "Allow prescient to override sorting logic")
@@ -1504,7 +1505,7 @@ SAVE-FN with non-nil ARGS."
                                      counsel-recentf counsel-grep
                                      flyspell-correct-ivy )))
 
-;; ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
+;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 ;; (with-eval-after-load 'ivy
 ;;   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
@@ -1526,10 +1527,6 @@ SAVE-FN with non-nil ARGS."
   (orderless-component-separator "[ &]")
   (ivy-re-builders-alist '((t .  orderless-ivy-re-builder)))
   :config (advice-add 'company-capf--candidates :around #'sb/just-one-face))
-
-(use-package selectrum
-  :disabled t
-  :hook (after-init . selectrum-mode))
 
 (use-package company-prescient
   :disabled t
@@ -1782,6 +1779,7 @@ SAVE-FN with non-nil ARGS."
                  (expand-file-name "plass-workspace/.metadata" dotemacs-user-home)
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
+  ;; Filtering does not work with `alien' indexing
   (dolist (dirs
            '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn" ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
