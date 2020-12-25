@@ -47,6 +47,7 @@
 ;; https://github.com/redguardtoo/emacs.d
 ;; https://github.com/jwiegley/dot-emacs
 ;; https://github.com/d12frosted/environment/tree/master/emacs
+;; https://github.com/raxod502/radian/tree/develop/emacs
 
 ;;; Code:
 
@@ -287,7 +288,7 @@ whitespaces."
 
 ;; Use `C-c h' consistently for invoking a hydra
 (use-package hydra
-  :commands (hydra-default-pre hydra-keyboard-quit
+  :commands (hydra-default-pre hydra-keyboard-quit defhydra
                                hydra-show-hint hydra-set-transient-map
                                hydra--call-interactively-remap-maybe))
 
@@ -329,7 +330,10 @@ whitespaces."
       blink-matching-paren nil ; Distracting
       case-fold-search t ; Searches and matches should ignore case
       compilation-always-kill t
-      compilation-scroll-output t
+      compilation-ask-about-save nil
+      ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
+      ;; error
+      compilation-scroll-output 'first-error
       completion-ignore-case nil ; Consider case when completing
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
@@ -340,6 +344,8 @@ whitespaces."
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
+      ;; Disable the warning "X and Y are the same file"
+      find-file-suppress-same-file-warnings t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       ;; Avoid resizing the frame when your newly set font is larger (or smaller) than the system
       ;; default
@@ -567,6 +573,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Enable the following modes
 (dolist (mode '(
+                auto-compression-mode
                 column-number-mode
                 ;; Typing with the mark active will overwrite the marked region
                 delete-selection-mode
@@ -1144,7 +1151,8 @@ SAVE-FN with non-nil ARGS."
   :custom (wgrep-auto-save-buffer t))
 
 (use-package deadgrep
-  :bind ("<f8>" . deadgrep))
+  ;; :bind ("<f8>" . deadgrep)
+  )
 
 (use-package ripgrep
   :commands ripgrep-regexp)
@@ -1210,7 +1218,7 @@ SAVE-FN with non-nil ARGS."
     (save-buffer))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  (company-dabbrev-ignore-case nil)
+  (company-dabbrev-ignore-case nil "Backend is case-sensitive")
   (company-dabbrev-other-buffers t "Search in other buffers with same major mode")
   (company-idle-delay 0.0 "Recommended by lsp")
   (company-ispell-available t)
@@ -1297,9 +1305,12 @@ SAVE-FN with non-nil ARGS."
 
 (use-package yasnippet
   :diminish yas-minor-mode
+  :commands (yas-global-mode snippet-mode)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (after-init . yas-global-mode)
-  ;; :custom (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  :custom
+  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  (yas-verbosity 2)
   :config (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package yasnippet-snippets
@@ -1487,8 +1498,7 @@ SAVE-FN with non-nil ARGS."
                              (right-fringe . 4))))
 
 (use-package prescient
-  :disabled t
-  :hook (counsel-mode . prescient-persist-mode)
+  :hook (after-init . prescient-persist-mode)
   ;; :custom
   ;; (prescient-save-file (expand-file-name "prescient-save.el"
   ;;                                        dotemacs-temp-directory))
@@ -1515,26 +1525,23 @@ SAVE-FN with non-nil ARGS."
 ;;  'ivy-sort-matches-functions-alist
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
-(use-package orderless
-  :after ivy
-  :disabled t
-  :preface
-  (defun sb/just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
-  :custom
-  (completion-styles '(orderless))
-  (orderless-component-separator "[ &]")
-  (ivy-re-builders-alist '((t .  orderless-ivy-re-builder)))
-  :config (advice-add 'company-capf--candidates :around #'sb/just-one-face))
-
 (use-package company-prescient
-  :disabled t
   :hook (company-mode . company-prescient-mode))
 
 (use-package all-the-icons-ivy
   :disabled t
   :hook (after-init . all-the-icons-ivy-setup))
+
+(use-package ispell
+  :ensure nil
+  :if dotemacs-is-linux
+  :custom
+  (ispell-dictionary "en_US")
+  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
+  (ispell-local-dictionary "en_US")
+  (ispell-personal-dictionary (expand-file-name "spell"
+                                                dotemacs-extras-directory))
+  (ispell-silently-savep t "Save a new word to personal dictionary without asking"))
 
 (use-package flyspell
   :ensure nil
@@ -1582,20 +1589,13 @@ SAVE-FN with non-nil ARGS."
               (setq arg 0))
           (forward-word)))))
   :custom
-  (ispell-dictionary "en_US")
-  (ispell-extra-args
-   '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
-  (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell"
-                                                dotemacs-extras-directory))
-  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   (flyspell-abbrev-p t)
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
   :hook
   ((prog-mode . flyspell-prog-mode)
    ;; (before-save-hook . flyspell-buffer) ; Saving will be slow
-   ((text-mode find-file-hooks) . flyspell-mode))
+   (text-mode . flyspell-mode))
   :config
   ;; Skip regions in Org-mode
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
@@ -1757,7 +1757,7 @@ SAVE-FN with non-nil ARGS."
               (or project-name "-"))))
   (projectile-mode 1)
 
-  ;; ;; Avoid search when `projectile-mode' is enabled for faster startup
+  ;; Avoid search when `projectile-mode' is enabled for faster startup
   ;; (setq projectile-project-search-path (list
   ;;                                       (concat `,(getenv "HOME") "/bitbucket")
   ;;                                       (expand-file-name "github" dotemacs-user-home)
@@ -1781,13 +1781,17 @@ SAVE-FN with non-nil ARGS."
     (add-to-list 'projectile-ignored-projects prjs))
   ;; Filtering does not work with `alien' indexing
   (dolist (dirs
-           '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn" ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
+           '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
+             ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
   (dolist (items
-           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".dir-locals.el" ".projectile" ".project" ".tags" "__init__.py"))
+           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".dir-locals.el" ".projectile"
+             ".project" ".tags" "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files items))
   (dolist (exts
-           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar" ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
+           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar"
+             ".jpeg" ".jpg" ".o" ".odt" ".out" ".pdf" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc"
+             ".rel" ".rip" ".rpm" ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts)))
 
 (use-package counsel-projectile
@@ -1832,7 +1836,7 @@ This file is specified in `counsel-projectile-default-file'."
   :bind
   (("<f5>" . counsel-projectile-switch-project)
    ("<f6>" . counsel-projectile-find-file)
-   ("<f7>" . counsel-projectile-rg)
+   ;; ("<f7>" . counsel-projectile-rg)
    ([remap projectile-ag] . counsel-projectile-ag)
    ([remap projectile-find-dir] . counsel-projectile-find-dir)
    ([remap projectile-find-file] . counsel-projectile-find-file)
@@ -2019,12 +2023,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 (or
  (use-package highlight-symbol ; Highlight symbol under point
-   :disabled t ; `symbol-overlay' is better
+   :disabled t ; `symbol-overlay' is faster
+   :diminish
    :hook (prog-mode . highlight-symbol-mode)
    :bind
    (("M-p" . highlight-symbol-prev)
     ("M-n" . highlight-symbol-next))
-   :diminish
    :custom (highlight-symbol-on-navigation-p t))
 
  (use-package symbol-overlay ; Highlight symbol under point
@@ -2230,14 +2234,14 @@ This file is specified in `counsel-projectile-default-file'."
   ("b" dumb-jump-back "Back"))
 
 (use-package helpful
-  :disabled t
   :bind
   (([remap describe-variable] . helpful-variable)
    ("C-h v" . helpful-variable)
    ([remap describe-key] . helpful-key)
    ("C-h k" . helpful-key)
-   ([remap describe-function] . helpful-function)
-   ("C-h f" . helpful-function)
+   ([remap describe-function] . helpful-callable)
+   ("C-h f" . helpful-callable)
+   ([remap describe-symbol] . helpful-symbol)
    ("C-h c" . helpful-command)
    ("C-h p" . helpful-at-point)
    :map helpful-mode-map
@@ -2395,6 +2399,8 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
 
+(mouse-avoidance-mode 'exile)
+
 (use-package apt-sources-list
   :mode ("\\.list\\'" . apt-sources-list-mode))
 
@@ -2406,7 +2412,7 @@ This file is specified in `counsel-projectile-default-file'."
   :mode ("/sshd?_config\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
-  :config (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
+  :hook (ssh-config-mode . turn-on-font-lock))
 
 (use-package ace-window
   :bind
@@ -2416,6 +2422,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; `Shift + direction' arrows
 (use-package windmove
   :ensure nil
+  :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
   :custom (windmove-wrap-around t "Wrap around at edges"))
 
@@ -3210,24 +3217,33 @@ This file is specified in `counsel-projectile-default-file'."
   :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 ;; FIXME: Does this help?
-(remove-hook 'find-file-hook #'vc-refresh-state)
+(with-eval-after-load 'vc
+  (remove-hook 'find-file-hook #'vc-find-file-hook)
+  (remove-hook 'find-file-hook #'vc-refresh-state))
 
-(use-package magit
-  :commands magit-display-buffer-fullframe-status-v1
-  :bind
-  (("C-x g" . magit-status)
-   ("C-c M-g" . magit-file-dispatch)
-   ("C-x M-g" . magit-dispatch))
+(use-package transient
   :custom
-  (magit-completing-read-function #'ivy-completing-read)
-  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  (magit-save-repository-buffers t)
   ;; (transient-history-file (expand-file-name "transient/history.el"
   ;;                                           dotemacs-temp-directory))
   ;; (transient-levels-file (expand-file-name "transient/levels.el"
   ;;                                          dotemacs-temp-directory))
   ;; (transient-values-file (expand-file-name "transient/values.el"
   ;;                                          dotemacs-temp-directory))
+  :config (transient-bind-q-to-quit))
+
+(use-package magit
+  :commands (magit-display-buffer-fullframe-status-v1 magit-status)
+  :bind
+  (("C-x g" . magit-status)
+   ("C-c M-g" . magit-file-dispatch)
+   ("C-x M-g" . magit-dispatch))
+  :custom
+  ;; Suppress the message we get about "Turning on
+  ;; magit-auto-revert-mode" when loading Magit.
+  (magit-completing-read-function #'ivy-completing-read)
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (magit-no-message '("Turning on magit-auto-revert-mode..."))
+  (magit-save-repository-buffers t)
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist '((stashes . show)
                                             (untracked . show)
@@ -3257,23 +3273,28 @@ This file is specified in `counsel-projectile-default-file'."
    ("/git/config\\'"    . gitconfig-mode)
    ("/\\.gitmodules\\'" . gitconfig-mode)))
 
-(or (use-package git-gutter
-  :diminish
-  :bind
-  (("C-x p" . git-gutter:previous-hunk)
-   ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init . global-git-gutter-mode)
-  :custom (git-gutter:update-interval 1))
+(or
+ (use-package git-gutter
+   :diminish
+   :bind
+   (("C-x p" . git-gutter:previous-hunk)
+    ("C-x n" . git-gutter:next-hunk))
+   :hook (after-init . global-git-gutter-mode)
+   :custom (git-gutter:update-interval 1)
+   :config
+   ;; https://github.com/syl20bnr/spacemacs/issues/10555
+   ;; https://github.com/syohex/emacs-git-gutter/issues/24
+   (setq git-gutter:disabled-modes '(fundamental-mode org-mode)))
 
-    (use-package diff-hl ; Based on `vc'
-      :disabled t ; This does not work for me
-      :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
-      :custom (diff-hl-draw-borders nil)
-      :hook
-      ((after-init . global-diff-hl-mode)
-       (dired-mode . diff-hl-dired-mode))
-       (magit-pre-refresh . diff-hl-magit-pre-refresh)
-       (magit-post-refresh . diff-hl-magit-post-refresh)))
+ (use-package diff-hl ; Based on `vc'
+   :disabled t ; This does not work for me
+   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
+   :custom (diff-hl-draw-borders nil)
+   :hook
+   ((after-init . global-diff-hl-mode)
+    (dired-mode . diff-hl-dired-mode))
+   (magit-pre-refresh . diff-hl-magit-pre-refresh)
+   (magit-post-refresh . diff-hl-magit-post-refresh)))
 
 (use-package git-commit
   :after magit
@@ -3428,10 +3449,10 @@ _p_: Prev      _u_: Upper
   (LaTeX-item-indent 0 "Two spaces + Extra indentation")
   (LaTeX-syntactic-comments t)
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-  ;; Avoid raising of superscripts and lowering of subscripts
-  (tex-fontify-script nil)
-  (font-latex-fontify-script nil)
-  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing sections")
+  (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
+  (font-latex-fontify-script nil "Avoid superscripts and
+  subscripts from being displayed in a different font size")
+  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
   ;; Revert PDF buffer after TeX compilation has finished
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
@@ -3580,7 +3601,8 @@ Ignore if no file is found."
    (js2-mode . js2-imenu-extras-mode))
   :custom
   (js2-basic-offset 2)
-  (js-indent-level 2))
+  (js-indent-level 2)
+  :config (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode"))
 
 (use-package xref-js2
   :after js2-mode
@@ -3981,7 +4003,9 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-c d f" . auto-fill-mode)
  ("M-c" . capitalize-dwim)
  ("M-u" . upcase-dwim)
- ("M-l" . downcase-dwim))
+ ("M-l" . downcase-dwim)
+ ("<f7>" . previous-error)
+ ("<f8>" . next-error))
 
 ;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
