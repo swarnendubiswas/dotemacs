@@ -37,5 +37,8 @@
         "tmp": true,
         "workspace": true
     },
-    "git.enabled": true
+    "git.enabled": true,
+    "files.associations": {
+        "abbrev-defs": "lisp"
+    }
 }
