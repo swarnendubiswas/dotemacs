@@ -351,7 +351,7 @@ whitespaces."
       ;; default
       frame-inhibit-implied-resize t
       frame-title-format (list '(buffer-file-name "%f" "%b"))
-      help-window-select t
+      help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
       ;; from 0.5s
@@ -656,21 +656,20 @@ SAVE-FN with non-nil ARGS."
       ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
                                              :init
                                              (setq
-                                              modus-operandi-theme-3d-modeline
-                                              t
                                               modus-operandi-theme-completions
                                               'opinionated
                                               modus-operandi-theme-fringes
                                               'subtle
+                                              modus-operandi-theme-intense-hl-line t
                                               modus-operandi-theme-intense-standard-completions
                                               t
                                               modus-operandi-theme-mode-line
-                                              '3d
+                                              nil
                                               modus-operandi-theme-scale-headings
                                               nil
                                               modus-operandi-theme-variable-pitch-headings
                                               nil)
-                                             (load-theme 'modus-operandi t)
+                                             :config (load-theme 'modus-operandi t)
                                              :custom-face
                                              (mode-line ((t (:background
                                                              "#d7d7d7"
@@ -772,7 +771,8 @@ SAVE-FN with non-nil ARGS."
                                                     :hook (after-init . awesome-tray-mode)
                                                     :custom
                                                     (awesome-tray-active-modules
-                                                     '("file-path" "buffer-name" "mode-name" "location" "git"))
+                                                     '("file-path" "buffer-name" "mode-name"
+                                                       "location" "git"))
                                                     :custom-face
                                                     (awesome-tray-default-face ((t (:inherit
                                                                                     default
@@ -851,12 +851,17 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'emacs-startup-hook (lambda ()
 ;;                                 (setq resize-mini-windows nil)))
 
+(use-package solar
+  :ensure nil
+  :custom
+  (calendar-latitude 26.50)
+  (calendar-longitude 80.23))
+
 (use-package circadian
   :disabled t
   :if (and (not (eq dotemacs-theme 'sb/default)) (not (eq dotemacs-theme 'none)))
+  :after solar
   :custom
-  (calendar-latitude 26.50)
-  (calendar-longitude 80.23)
   (circadian-themes '((:sunrise . modus-operandi)
                       (:sunset  . modus-operandi)))
   :init (circadian-setup))
@@ -960,14 +965,10 @@ SAVE-FN with non-nil ARGS."
 (use-package diredfl ; More detailed colors
   :hook (dired-mode . diredfl-mode))
 
-(use-package async
-  :hook (dired-mode . dired-async-mode))
-
 (use-package dired-async
-  :ensure nil
+  :ensure async
   :diminish
-  :after dired
-  )
+  :hook (dired-mode . dired-async-mode))
 
 ;; (use-package dired-rsync
 ;;   :bind (:map dired-mode-map
@@ -1640,6 +1641,11 @@ SAVE-FN with non-nil ARGS."
   ("f" flyspell-buffer)
   ("m" flyspell-mode))
 
+;; As of Emacs 28, `flyspell' does not provide a way to automatically check all on-screen text,
+;; and running `flyspell-buffer' on an entire buffer can be slow.
+(use-package spell-fu
+  :config (global-spell-fu-mode))
+
 (or (use-package highlight-indentation
       :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
       :hook (python-mode . highlight-indentation-mode))
@@ -1862,6 +1868,8 @@ This file is specified in `counsel-projectile-default-file'."
   :if (executable-find "fd")
   :commands (counsel-fd-dired-jump counsel-fd-dired-jump))
 
+;; FIXME: Exclude directories and files from being checked
+;; https://github.com/flycheck/flycheck/issues/1745
 (use-package flycheck
   :commands (flycheck-add-next-checker flycheck-next-checker
                                        flycheck-previous-error
@@ -1886,49 +1894,24 @@ This file is specified in `counsel-projectile-default-file'."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
-  (setq-default
-
-   ;; flycheck-disabled-checkers '(
-   ;;                              emacs-lisp-checkdoc
-   ;;                              tex-lacheck
-   ;;                              ;; tex-chktex
-   ;;                              python-flake8
-   ;;                              python-mypy
-   ;; python-pycompile)
-   flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                               dotemacs-user-home)
-   flycheck-pylintrc (expand-file-name ".config/pylintrc"
-                                       dotemacs-user-home)
-   flycheck-python-pylint-executable "python3"
-   flycheck-shellcheck-follow-sources nil
-   flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                              dotemacs-textlint-home)
-   flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                  dotemacs-textlint-home)
-   ;; flycheck-emacs-lisp-executable "emacs"
-   )
-
-  ;; (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook lisp-interaction-mode-hook))
-  ;;   (add-hook hook (lambda ()
-  ;;                    (setq-local flycheck-checker 'emacs-lisp))))
-
-  ;; (dolist (hook '(text-mode-hook))
-  ;;   (add-hook hook (lambda ()
-  ;;                    (setq-local flycheck-checker 'textlint)
-  ;;                    (flycheck-add-next-checker 'textlint 'proselint))))
-
-  ;; (dolist (hook '(markdown-mode-hook))
-  ;;   (add-hook hook (lambda ()
-  ;;                    (setq-local flycheck-checker 'markdown-markdownlint-cli)
-  ;;                    (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint))))
-
-  ;; (add-hook 'python-mode-hook (lambda ()
-  ;;                               (setq-local flycheck-checker 'python-pylint)))
-
-  ;; FIXME: Shellcheck is a resource hog for $HOME/.bash* files
-  ;; (add-hook 'sh-mode-hook (lambda ()
-  ;;                           (setq-local flycheck-checker 'sh-shellcheck)
-  ;;                           (flycheck-add-next-checker 'sh-shellcheck 'sh-bash)))
+  (setq-default flycheck-disabled-checkers '(
+                                             ;; emacs-lisp-checkdoc
+                                             tex-lacheck
+                                             ;; tex-chktex
+                                             python-flake8
+                                             python-mypy
+                                             python-pycompile)
+                ;; flycheck-emacs-lisp-executable "emacs"
+                flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                                            dotemacs-user-home)
+                flycheck-pylintrc (expand-file-name ".config/pylintrc"
+                                                    dotemacs-user-home)
+                flycheck-python-pylint-executable "python3"
+                flycheck-shellcheck-follow-sources nil
+                flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                                           dotemacs-textlint-home)
+                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                               dotemacs-textlint-home))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
@@ -2704,8 +2687,11 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   ((lisp-mode emacs-lisp-mode) . (lambda ()
                                    (when buffer-file-name
-                                     (add-hook 'after-save-hook #'check-parens nil t))))
-  :config (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))
+                                     (add-hook 'after-save-hook #'check-parens nil t)
+                                     (flycheck-select-checker 'emacs-lisp)
+                                     (flycheck-add-next-checker
+                                      'emacs-lisp
+                                      'emacs-lisp-checkdoc)))))
 
 (use-package lsp-mode
   :defines (lsp-perl-language-server-path
@@ -3197,6 +3183,7 @@ This file is specified in `counsel-projectile-default-file'."
    ("\\bashrc\\'" . sh-mode))
   :config
   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+  ;; FIXME: Shellcheck is a resource hog for $HOME/.bash* files
   ;; FIXME: `lsp' is the first checker, chain the other checkers
   ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
   :hook (sh-mode . lsp-deferred)
@@ -3222,7 +3209,7 @@ This file is specified in `counsel-projectile-default-file'."
   (remove-hook 'find-file-hook #'vc-refresh-state))
 
 (use-package transient
-  :custom
+  ;; :custom
   ;; (transient-history-file (expand-file-name "transient/history.el"
   ;;                                           dotemacs-temp-directory))
   ;; (transient-levels-file (expand-file-name "transient/levels.el"
@@ -3696,16 +3683,16 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-capf ; Disabled LSP mode's capf autoconfiguration
-          company-dabbrev-code
-          company-keywords
-          company-yasnippet
-          company-files
-          ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-          ;; company-clang ; This can be slow
-          ;; company-dabbrev
-          )))
+        '((
+           company-capf ; Disabled LSP mode's capf autoconfiguration
+           company-dabbrev-code
+           company-keywords
+           company-yasnippet
+           company-files
+           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+           ;; company-clang ; This can be slow
+           ;; company-dabbrev
+           ))))
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
@@ -3732,8 +3719,8 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (set (make-local-variable 'company-backends)
        '((
-          company-elisp
           company-yasnippet
+          company-elisp
           company-files
           company-capf
           company-dabbrev-code

@@ -224,6 +224,7 @@
     ("bheavior" "behavior" nil :count 2)
     ("bheaviors" "" nil :count 1)
     ("blase" "blase" nil :count 0)
+    ("blieve" "believe" nil :count 0)
     ("boundaris" "boundaries" nil :count 1)
     ("boxs" "boxes" nil :count 0)
     ("brodcast" "broadcast" nil :count 0)
@@ -1009,6 +1010,7 @@
     ("reluctent" "reluctant" nil :count 0)
     ("remeber" "remember" nil :count 0)
     ("reommend" "recommend" nil :count 0)
+    ("repari" "repair" nil :count 0)
     ("repreated" "repeated" nil :count 1)
     ("represenative" "representative" nil :count 0)
     ("representativs" "representatives" nil :count 0)
@@ -1303,6 +1305,7 @@
     ("wiht" "with" nil :count 0)
     ("willbe" "will be" nil :count 0)
     ("windoes" "windows" nil :count 0)
+    ("wiould" "would" nil :count 0)
     ("witha" "with a" nil :count 0)
     ("withe" "with" nil :count 1)
     ("withthe" "with the" nil :count 0)
@@ -1383,3 +1386,4 @@
     ("thesse" "these" nil :count 0)
     ("vidoes" "videos" nil :count 0)
    ))
+

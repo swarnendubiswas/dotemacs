@@ -1277,6 +1277,7 @@ containers
 contains
 contemporary
 content
+contention
 contents
 contest
 contests
@@ -1323,6 +1324,7 @@ conversation
 conversely
 conversion
 convert
+converted
 convertible
 convex
 convexity
@@ -2159,6 +2161,7 @@ evolution
 evolutionary
 evolutionist
 evolve
+exacerbates
 exact
 exactly
 exaggerate
@@ -3095,7 +3098,9 @@ instructive
 instructor
 instrument
 instrumentation
+instrumented
 instrumenting
+instruments
 insufficient
 insufficiently
 insult
@@ -3354,7 +3359,6 @@ leaf
 league
 lean
 learn
-learned
 learners
 learning
 learnt
@@ -6596,6 +6600,8 @@ yourself
 youth
 zero
 zone
+alleviate
+
 
 ;; Local Variables:
 ;; mode: text
