@@ -606,219 +606,184 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-(cond ((eq dotemacs-theme 'leuven) (use-package leuven-theme
-                                     :init (load-theme 'leuven t)))
+(use-package leuven-theme
+  :if (eq dotemacs-theme 'leuven)
+  :init (load-theme 'leuven t))
 
-      ((eq dotemacs-theme 'eclipse) (use-package eclipse-theme
-                                      :init
-                                      (load-theme 'eclipse t)
-                                      (set-background-color "white")
-                                      (set-face-attribute 'region nil
-                                                          :background "LemonChiffon"
-                                                          :foreground "black")
-                                      (set-face-attribute 'mode-line nil
-                                                          :background "grey88"
-                                                          :foreground "black"
-                                                          :box nil)))
+(use-package eclipse-theme
+  :if (eq dotemacs-theme 'eclipse)
+  :init
+  (load-theme 'eclipse t)
+  (set-background-color "white")
+  (set-face-attribute 'region nil
+                      :background "LemonChiffon"
+                      :foreground "black")
+  (set-face-attribute 'mode-line nil
+                      :background "grey88"
+                      :foreground "black"
+                      :box nil))
 
-      ((eq dotemacs-theme 'spacemacs-light) (use-package spacemacs-common
-                                              :ensure spacemacs-theme
-                                              :init
-                                              (load-theme 'spacemacs-light t)
-                                              ;; (add-to-list 'default-frame-alist
-                                              ;;              '(background-color . "#fbf8ef"))
-                                              ))
+(use-package spacemacs-common
+  :ensure spacemacs-theme
+  :if (eq dotemacs-theme 'spacemacs-light)
+  :init
+  (load-theme 'spacemacs-light t)
+  ;; (add-to-list 'default-frame-alist
+  ;;              '(background-color . "#fbf8ef"))
+  )
 
-      ((eq dotemacs-theme 'zenburn) (use-package zenburn-theme
-                                      :init (load-theme 'zenburn t)))
+(use-package zenburn-theme
+  :if (eq dotemacs-theme 'zenburn)
+  :init (load-theme 'zenburn t))
 
-      ((eq dotemacs-theme 'solarized-light) (use-package solarized-light-theme
-                                              :ensure solarized-theme
-                                              :init
-                                              (setq solarized-distinct-fringe-background t)
-                                              (load-theme 'solarized-light t)))
+(use-package solarized-light-theme
+  :ensure solarized-theme
+  :if (eq dotemacs-theme 'solarized-light)
+  :init
+  (setq solarized-distinct-fringe-background t)
+  (load-theme 'solarized-light t))
 
-      ((eq dotemacs-theme 'solarized-dark) (use-package solarized-dark-theme
-                                             :ensure solarized-theme
-                                             :init (load-theme 'solarized-dark t)))
+(use-package solarized-dark-theme
+  :ensure solarized-theme
+  :if (eq dotemacs-theme 'solarized-dark)
+  :init (load-theme 'solarized-dark t))
 
-      ((eq dotemacs-theme 'doom-molokai) (use-package doom-themes
-                                           :init
-                                           (load-theme 'doom-molokai t)
-                                           (set-face-attribute 'font-lock-comment-face nil
-                                                               ;; :foreground "#cccccc"
-                                                               ;; :foreground "#b2b2b2"
-                                                               :foreground "#999999")))
+(use-package doom-themes
+  :if (eq dotemacs-theme 'doom-molokai)
+  :init
+  (load-theme 'doom-molokai t)
+  (set-face-attribute 'font-lock-comment-face nil
+                      ;; :foreground "#cccccc"
+                      ;; :foreground "#b2b2b2"
+                      :foreground "#999999"))
 
-      ((eq dotemacs-theme 'monokai) (use-package monokai-theme
-                                      :init (load-theme 'monokai t)))
+(use-package monokai-theme
+  :if (eq dotemacs-theme 'monokai)
+  :init (load-theme 'monokai t))
 
-      ((eq dotemacs-theme 'modus-operandi) (use-package modus-operandi-theme
-                                             :init
-                                             (setq
-                                              modus-operandi-theme-completions
-                                              'opinionated
-                                              modus-operandi-theme-fringes
-                                              'subtle
-                                              modus-operandi-theme-intense-hl-line t
-                                              modus-operandi-theme-intense-standard-completions
-                                              t
-                                              modus-operandi-theme-mode-line
-                                              nil
-                                              modus-operandi-theme-scale-headings
-                                              nil
-                                              modus-operandi-theme-variable-pitch-headings
-                                              nil)
-                                             (load-theme 'modus-operandi t)
-                                             :custom-face
-                                             (mode-line ((t (:background
-                                                             "#d7d7d7"
-                                                             :foreground "#0a0a0a"
-                                                             :box (:line-width 1 :color "#505050")
-                                                             :height 0.8))))
-                                             (mode-line-inactive ((t (:background
-                                                                      "#efefef"
-                                                                      :foreground "#404148"
-                                                                      :box (:line-width
-                                                                            1
-                                                                            :color "#bcbcbc")
-                                                                      :height
-                                                                      0.8))))))
+(use-package modus-operandi-theme
+  :if (eq dotemacs-theme 'modus-operandi)
+  :init
+  (setq modus-operandi-theme-completions 'opinionated
+        modus-operandi-theme-fringes 'subtle
+        modus-operandi-theme-intense-hl-line t
+        modus-operandi-theme-intense-standard-completions t
+        modus-operandi-theme-mode-line nil
+        modus-operandi-theme-scale-headings nil
+        modus-operandi-theme-variable-pitch-headings nil)
+  (load-theme 'modus-operandi t)
+  :custom-face
+  (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
+                              :box (:line-width 1 :color "#505050")
+                              :height 0.8))))
+  (mode-line-inactive ((t (:background "#efefef" :foreground "#404148"
+                                       :box (:line-width 1 :color "#bcbcbc")
+                                       :height 0.8)))))
 
-      ((eq dotemacs-theme 'modus-vivendi) (use-package modus-vivendi-theme
-                                            :init
-                                            (setq modus-vivendi-theme-mode-line 'moody
-                                                  modus-vivendi-theme-variable-pitch-headings nil
-                                                  modus-vivendi-theme-scale-headings nil)
-                                            (load-theme 'modus-vivendi t)))
+(use-package modus-vivendi-theme
+  :if (eq dotemacs-theme 'modus-vivendi)
+  :init
+  (setq modus-vivendi-theme-mode-line 'moody
+        modus-vivendi-theme-variable-pitch-headings nil
+        modus-vivendi-theme-scale-headings nil)
+  (load-theme 'modus-vivendi t))
 
-      ((eq dotemacs-theme 'sb/default) (when (display-graphic-p)
-                                         (progn
-                                           ;; (setq frame-background-mode 'light)
-                                           ;; (set-background-color "#ffffff")
-                                           (set-foreground-color "#333333")
-                                           (set-face-attribute 'hl-line nil
-                                                               :background "light yellow")
-                                           (set-face-attribute 'region nil
-                                                               :background "gainsboro")))))
+(when (and (eq dotemacs-theme 'sb/default) (display-graphic-p))
+  (progn
+    ;; (setq frame-background-mode 'light)
+    ;; (set-background-color "#ffffff")
+    (set-foreground-color "#333333")
+    (set-face-attribute 'hl-line nil
+                        :background "light yellow")
+    (set-face-attribute 'region nil
+                        :background "gainsboro")))
 
-(cond ((eq dotemacs-modeline-theme 'powerline) (use-package powerline
-                                                 :init
-                                                 (setq powerline-display-buffer-size t
-                                                       powerline-display-hud nil
-                                                       powerline-display-mule-info nil
-                                                       powerline-gui-use-vcs-glyph t)
-                                                 (when (eq dotemacs-theme 'leuven)
-                                                   (set-face-attribute 'mode-line nil
-                                                                       :background "grey88"
-                                                                       :foreground "black")
-                                                   (set-face-attribute 'mode-line-buffer-id nil
-                                                                       :weight 'bold
-                                                                       :foreground "black"
-                                                                       :background "gray88")
-                                                   (powerline-default-theme))))
+(use-package powerline
+  :if (eq dotemacs-modeline-theme 'powerline)
+  :init
+  (setq powerline-display-buffer-size t
+        powerline-display-hud nil
+        powerline-display-mule-info nil
+        powerline-gui-use-vcs-glyph t)
+  (when (eq dotemacs-theme 'leuven)
+    (set-face-attribute 'mode-line nil
+                        :background "grey88"
+                        :foreground "black")
+    (set-face-attribute 'mode-line-buffer-id nil
+                        :weight 'bold
+                        :foreground "black"
+                        :background "gray88")
+    (powerline-default-theme)))
 
-      ((eq dotemacs-modeline-theme 'sml) (use-package smart-mode-line
-                                           :init
-                                           (setq sml/theme 'light
-                                                 sml/mode-width 'full
-                                                 sml/no-confirm-load-theme t
-                                                 sml/shorten-modes t
-                                                 sml/shorten-directory t)
-                                           (sml/setup)))
+(use-package smart-mode-line
+  :if (eq dotemacs-modeline-theme 'sml)
+  :init
+  (setq sml/theme 'light
+        sml/mode-width 'full
+        sml/no-confirm-load-theme t
+        sml/shorten-modes t
+        sml/shorten-directory t)
+  (sml/setup))
 
-      ((eq dotemacs-modeline-theme 'spaceline) (use-package spaceline
-                                                 :defines (spaceline-hud-p
-                                                           spaceline-selection-info-p
-                                                           spaceline-version-control-p
-                                                           spaceline-input-method-p
-                                                           spaceline-persp-name-p)
-                                                 :init
-                                                 (require 'spaceline-config)
-                                                 (setq spaceline-hud-p nil
-                                                       spaceline-input-method-p nil
-                                                       spaceline-persp-name-p nil
-                                                       spaceline-selection-info-p nil
-                                                       spaceline-version-control-p t)
-                                                 (spaceline-emacs-theme)))
+(use-package spaceline
+  :if (eq dotemacs-modeline-theme 'spaceline)
+  :defines (spaceline-hud-p
+            spaceline-selection-info-p
+            spaceline-version-control-p
+            spaceline-input-method-p
+            spaceline-persp-name-p)
+  :init
+  (require 'spaceline-config)
+  (setq spaceline-hud-p nil
+        spaceline-input-method-p nil
+        spaceline-persp-name-p nil
+        spaceline-selection-info-p nil
+        spaceline-version-control-p t)
+  (spaceline-emacs-theme))
 
-      ((eq dotemacs-modeline-theme 'airline) (use-package airline-themes
-                                               :init
-                                               (require 'airline-themes)
-                                               (setq airline-eshell-colors nil
-                                                     airline-hide-eyebrowse-on-inactive-buffers t)
-                                               (load-theme 'airline-cool t)))
+(use-package airline-themes
+  :if (eq dotemacs-modeline-theme 'airline)
+  :init
+  (require 'airline-themes)
+  (setq airline-eshell-colors nil
+        airline-hide-eyebrowse-on-inactive-buffers t)
+  (load-theme 'airline-cool t))
 
-      ((eq dotemacs-modeline-theme 'doom-modeline) (use-package doom-modeline
-                                                     ;; Requires the fonts included with
-                                                     ;; `all-the-icons', run `M-x
-                                                     ;; all-the-icons-install-fonts'
-                                                     :ensure all-the-icons
-                                                     :init
-                                                     (setq doom-modeline-buffer-encoding nil
-                                                           doom-modeline-indent-info t
-                                                           doom-modeline-minor-modes t)
-                                                     (doom-modeline-mode 1)
-                                                     :custom-face
-                                                     (doom-modeline-bar ((t (:inherit
-                                                                             default
-                                                                             :height
-                                                                             0.8))))))
+(use-package doom-modeline
+  ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
+  :ensure all-the-icons
+  :if (eq dotemacs-modeline-theme 'doom-modeline)
+  :init
+  (setq doom-modeline-buffer-encoding nil
+        doom-modeline-indent-info t
+        doom-modeline-minor-modes t)
+  (doom-modeline-mode 1)
+  :custom-face
+  (doom-modeline-bar ((t (:inherit
+                          default
+                          :height
+                          0.8)))))
 
-      ((eq dotemacs-modeline-theme 'awesome-tray) (use-package awesome-tray
-                                                    :ensure nil
-                                                    :load-path "extras"
-                                                    :hook (after-init . awesome-tray-mode)
-                                                    :custom
-                                                    (awesome-tray-active-modules
-                                                     '("file-path" "buffer-name" "mode-name"
-                                                       "location" "git"))
-                                                    :custom-face
-                                                    (awesome-tray-default-face ((t (:inherit
-                                                                                    default
-                                                                                    :height
-                                                                                    0.8))))
-                                                    (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059"
-                                                                                                           :weight bold
-                                                                                                           :height
-                                                                                                           0.8))))
-                                                    (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700"
-                                                                                                           :weight bold
-                                                                                                           :height
-                                                                                                           0.8))))
-                                                    (awesome-tray-module-date-face ((t (:foreground "#717175"
-                                                                                                    :weight bold
-                                                                                                    :height
-                                                                                                    0.8))))
-                                                    (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e"
-                                                                                                         :weight
-                                                                                                         normal
-                                                                                                         :height
-                                                                                                         0.8))))
-                                                    (awesome-tray-module-git-face ((t (:foreground "#cc2444"
-                                                                                                   :weight
-                                                                                                   normal
-                                                                                                   :height
-                                                                                                   0.8))))
-                                                    (awesome-tray-module-last-command-face ((t (:foreground "#0061cc"
-                                                                                                            :weight bold
-                                                                                                            :height
-                                                                                                            0.8))))
-                                                    (awesome-tray-module-location-face ((t (:foreground "#cc7700"
-                                                                                                        :weight
-                                                                                                        normal
-                                                                                                        :height
-                                                                                                        0.8))))
-                                                    (awesome-tray-module-mode-name-face ((t (:foreground "#00a400"
-                                                                                                         :weight bold
-                                                                                                         :height
-                                                                                                         0.8))))
-                                                    (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e"
-                                                                                                          :weight bold
-                                                                                                          :height
-                                                                                                          0.8))))))
-
-      ((eq dotemacs-modeline-theme 'sb/default)))
+(use-package awesome-tray
+  :ensure nil
+  :if (eq dotemacs-modeline-theme 'awesome-tray)
+  :load-path "extras"
+  :hook (after-init . awesome-tray-mode)
+  :custom
+  (awesome-tray-active-modules
+   '("file-path" "buffer-name" "mode-name"
+     "location" "git"))
+  :custom-face
+  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
+  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
+  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
+  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (use-package auto-dim-other-buffers
   :disabled t ; Not super useful
@@ -2694,7 +2659,7 @@ This file is specified in `counsel-projectile-default-file'."
   ((lisp-mode emacs-lisp-mode) . (lambda ()
                                    (when buffer-file-name
                                      (add-hook 'after-save-hook #'check-parens nil t)
-                                     (flycheck-select-checker 'emacs-lisp)
+                                     ;; (flycheck-select-checker 'emacs-lisp)
                                      (flycheck-add-next-checker
                                       'emacs-lisp
                                       'emacs-lisp-checkdoc)))))
