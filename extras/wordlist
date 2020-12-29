@@ -195,6 +195,7 @@ alignment
 alive
 alleged
 allergy
+alleviate
 alliance
 allied
 allocate
@@ -1847,6 +1848,7 @@ double
 doubt
 down
 download
+downsampling
 downstairs
 downtown
 downward
@@ -3158,6 +3160,7 @@ interval
 intervene
 intervention
 interview
+interviews
 intimate
 into
 intractable
@@ -4525,6 +4528,7 @@ programmability
 programmable
 programme
 programmer
+programmers
 programming
 Programming
 programs
@@ -4592,6 +4596,7 @@ psychologist
 psychology
 public
 publication
+publications
 publicity
 publicly
 publish
@@ -6600,8 +6605,6 @@ yourself
 youth
 zero
 zone
-alleviate
-
 
 ;; Local Variables:
 ;; mode: text

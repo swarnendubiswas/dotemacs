@@ -669,7 +669,7 @@ SAVE-FN with non-nil ARGS."
                                               nil
                                               modus-operandi-theme-variable-pitch-headings
                                               nil)
-                                             :config (load-theme 'modus-operandi t)
+                                             (load-theme 'modus-operandi t)
                                              :custom-face
                                              (mode-line ((t (:background
                                                              "#d7d7d7"
@@ -1043,18 +1043,16 @@ SAVE-FN with non-nil ARGS."
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 (use-package all-the-icons
-  :disabled t
   :if (display-graphic-p)
-  :config (all-the-icons-install-fonts 'y))
+  ;; :config (all-the-icons-install-fonts 'y)
+  )
 
 (use-package all-the-icons-ibuffer
-  :disabled t
   :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
-  :disabled t
   :diminish
   :if (display-graphic-p)
   ;; :hook (dired-mode . (lambda ()
@@ -1853,7 +1851,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
 (use-package all-the-icons-ivy-rich
-  :disabled t
   :if (display-graphic-p)
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :init (setq all-the-icons-ivy-rich-icon-size 0.8))
@@ -1926,12 +1923,11 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package flycheck-grammarly
   :defer 2 ; Expensive to load
-  :hook
-  (text-mode . (lambda ()
-                 (require 'flycheck-grammarly)
-                 ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-                 (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
-                 (add-to-list 'flycheck-checkers 'grammarly-checker t)))
+  :config
+  (require 'flycheck-grammarly)
+  ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+  (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
+  (add-to-list 'flycheck-checkers 'grammarly-checker t)
   :custom (flycheck-grammarly-check-time 3))
 
 (or (use-package flycheck-popup-tip ; Show error messages in popups
@@ -2028,6 +2024,16 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package highlight-numbers
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
+
+(use-package number-separator
+  :ensure nil
+  :load-path "extras"
+  :custom
+  (number-separator ",")
+  (number-separator-interval 3)
+  (number-separator-ignore-threshold 4)
+  (number-separator-decimal-char ".")
+  :config (number-separator-mode 1))
 
 (use-package volatile-highlights
   :diminish
@@ -2836,9 +2842,9 @@ This file is specified in `counsel-projectile-default-file'."
                                                                            (lsp-configuration-section "python")))
                               :initialized-fn (lambda (workspace)
                                                 (with-lsp-workspace workspace
-                                                                    (lsp--set-configuration
-                                                                     (ht-merge (lsp-configuration-section "pyright")
-                                                                               (lsp-configuration-section "python")))))
+                                                  (lsp--set-configuration
+                                                   (ht-merge (lsp-configuration-section "pyright")
+                                                             (lsp-configuration-section "python")))))
                               :download-server-fn (lambda (_client callback error-callback _update?)
                                                     (lsp-package-ensure 'pyright callback error-callback))
                               :notification-handlers (lsp-ht ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
@@ -2924,16 +2930,16 @@ This file is specified in `counsel-projectile-default-file'."
                                              "-MPerl::LanguageServer" "-e"
                                              "Perl::LanguageServer::run" "--"
                                              (format "--port %d
-                                                     --version
-                                                     %s"
+  --version
+  %s"
                                                      lsp-perl-language-server-port
                                                      lsp-perl-language-server-client-version))))
                     :major-modes '(perl-mode cperl-mode)
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                                          (lsp--set-configuration
-                                                           (lsp-configuration-section "perl"))))
+                                        (lsp--set-configuration
+                                         (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
   :bind
@@ -3086,7 +3092,7 @@ This file is specified in `counsel-projectile-default-file'."
          ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
-  :mode ("\\.cl\\'" . opencl-mode))
+  :mode "\\.cl\\'")
 
 (use-package cmake-mode
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
