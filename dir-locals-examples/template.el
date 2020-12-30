@@ -4,7 +4,7 @@
          (compile-command . "make")
          (compile-command . "gradle compileTestJava")
          (lsp-enabled-clients . (pyls msplys pyright jedi))
-         (lsp-file-watch-ignored . ("/\\.git$" "/\\.clangd$" "build" "built"))
+         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "build" "built"))
          (projectile-enable-caching . t)
          (projectile-globally-ignored-files . ("MyBinaryFile")) ; Ignore file
          (projectile-project-compilation-cmd . "cd bin && cmake .. && cmake --build . && cd Debug && .\\shiolink.exe")

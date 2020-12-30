@@ -315,6 +315,8 @@ StartupWMClass=Emacs
 Keywords=Text;Editor;
 ```
 
+- <https://tychoish.com/post/running-emacs/>
+
 ## Build GNU Emacs from source
 
 ```Bash

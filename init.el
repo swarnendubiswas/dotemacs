@@ -39,7 +39,7 @@
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 
-;; Good reference configurations
+;; Good articles and reference configurations
 ;; https://protesilaos.com/dotemacs
 ;; https://github.com/CSRaghunandan/.emacs.d
 ;; https://github.com/purcell/emacs.d
@@ -48,6 +48,8 @@
 ;; https://github.com/jwiegley/dot-emacs
 ;; https://github.com/d12frosted/environment/tree/master/emacs
 ;; https://github.com/raxod502/radian/tree/develop/emacs
+;; https://github.com/dholm/dotemacs
+;; https://tychoish.com/post/towards-faster-emacs-start-times/
 
 ;;; Code:
 
@@ -98,7 +100,6 @@
 ;; (unless (file-exists-p dotemacs-temp-directory)
 ;;   (make-directory dotemacs-temp-directory))
 
-;; No customizations, use `circadian' to load the theme
 (defcustom dotemacs-theme
   'modus-operandi
   "Specify which Emacs theme to use."
@@ -759,10 +760,7 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-minor-modes t)
   (doom-modeline-mode 1)
   :custom-face
-  (doom-modeline-bar ((t (:inherit
-                          default
-                          :height
-                          0.8)))))
+  (doom-modeline-bar ((t (:inherit default :height 0.8)))))
 
 (use-package awesome-tray
   :ensure nil
@@ -786,7 +784,6 @@ SAVE-FN with non-nil ARGS."
   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (use-package auto-dim-other-buffers
-  :disabled t ; Not super useful
   :hook (after-init . auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -944,7 +941,6 @@ SAVE-FN with non-nil ARGS."
 ;;   :diminish)
 
 (use-package treemacs
-  :disabled t
   :functions treemacs-git-mode
   :commands (treemacs treemacs-toggle)
   :hook
@@ -975,20 +971,15 @@ SAVE-FN with non-nil ARGS."
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
-  (set-face-attribute 'treemacs-directory-collapsed-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-directory-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-file-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-root-face nil
-                      :height 0.9)
-  (set-face-attribute 'treemacs-tags-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-git-ignored-face nil
-                      :height 0.7)
-  (set-face-attribute 'treemacs-git-untracked-face nil
-                      :height 0.7)
+  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
+  (set-face-attribute 'treemacs-directory-face nil :height 0.7)
+  (set-face-attribute 'treemacs-file-face nil :height 0.7)
+  (set-face-attribute 'treemacs-root-face nil :height 0.9)
+  (set-face-attribute 'treemacs-tags-face nil :height 0.7)
+  (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
+  (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
+  (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
+  (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7)
   (treemacs-resize-icons 16)
   :bind* ("C-j" . treemacs))
 
@@ -1125,7 +1116,8 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :commands (recentf-mode recentf-add-file
                           recentf-apply-filename-handlers)
-  :hook (dired-mode . recentf-add-dired-directory)
+  :hook (dired-mode . (lambda ()
+                        (recentf-add-dired-directory)))
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check regex with `re-builder'
@@ -1383,6 +1375,8 @@ SAVE-FN with non-nil ARGS."
    ([remap yank-pop] . counsel-yank-pop))
   :bind* ("C-c C-j" . counsel-semantic-or-imenu)
   :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
   (counsel-find-file-at-point t)
   (counsel-find-file-ignore-regexp (concat
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
@@ -1503,9 +1497,11 @@ SAVE-FN with non-nil ARGS."
   (ispell-dictionary "en_US")
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell"
-                                                dotemacs-extras-directory))
+  (ispell-personal-dictionary (expand-file-name "spell" dotemacs-extras-directory))
   (ispell-silently-savep t "Save a new word to personal dictionary without asking"))
+
+;; Hide the "Starting new Ispell process" message
+(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 
 (use-package flyspell
   :ensure nil
@@ -1856,24 +1852,25 @@ This file is specified in `counsel-projectile-default-file'."
                                                      dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
-  (setq-default flycheck-disabled-checkers '(
-                                             ;; emacs-lisp-checkdoc
-                                             tex-lacheck
-                                             ;; tex-chktex
-                                             python-flake8
-                                             python-mypy
-                                             python-pycompile)
-                ;; flycheck-emacs-lisp-executable "emacs"
-                flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                                            dotemacs-user-home)
-                flycheck-pylintrc (expand-file-name ".config/pylintrc"
-                                                    dotemacs-user-home)
-                flycheck-python-pylint-executable "python3"
-                flycheck-shellcheck-follow-sources nil
-                flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                                           dotemacs-textlint-home)
-                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                               dotemacs-textlint-home))
+  (setq-default
+   ;; flycheck-disabled-checkers '(
+   ;;                              ;; emacs-lisp-checkdoc
+   ;;                              tex-lacheck
+   ;;                              ;; tex-chktex
+   ;;                              python-flake8
+   ;;                              python-mypy
+   ;; python-pycompile)
+   ;; flycheck-emacs-lisp-executable "emacs"
+   flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                               dotemacs-user-home)
+   flycheck-pylintrc (expand-file-name ".config/pylintrc"
+                                       dotemacs-user-home)
+   flycheck-python-pylint-executable "python3"
+   flycheck-shellcheck-follow-sources nil
+   flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                              dotemacs-textlint-home)
+   flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                  dotemacs-textlint-home))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
@@ -1985,7 +1982,15 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
-  :custom (hl-todo-highlight-punctuation ":"))
+  :custom (hl-todo-highlight-punctuation ":")
+  :config
+  (add-to-list 'hl-todo-keyword-faces '("LATER" . "#d0bf8f"))
+  (add-to-list 'hl-todo-keyword-faces '("ISSUE" . "#ff8c00"))
+  (add-to-list 'hl-todo-keyword-faces '("DEBUG" . "#ff8c00"))
+  (add-to-list 'hl-todo-keyword-faces '("TEST" . "tomato"))
+  (add-to-list 'hl-todo-keyword-faces '("WARNING" . "#cc0000"))
+  (add-to-list 'hl-todo-keyword-faces '("BEWARE" . "#aa0000"))
+  (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000")))
 
 (use-package highlight-numbers
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
@@ -2187,6 +2192,8 @@ This file is specified in `counsel-projectile-default-file'."
   ("l" dumb-jump-quick-look "Quick look")
   ("b" dumb-jump-back "Back"))
 
+;; The built-in `describe-function' includes both functions and macros. `helpful-function'
+;; is functions only, so `helpful-callable' as a drop-in replacement.
 (use-package helpful
   :bind
   (([remap describe-variable] . helpful-variable)
@@ -2328,7 +2335,6 @@ This file is specified in `counsel-projectile-default-file'."
                   (session-initialize))))
 
 (use-package immortal-scratch
-  :disabled t
   :hook (after-init . immortal-scratch-mode))
 
 ;; SB: I use the *scratch* buffer for taking notes, it helps to make the data persist
@@ -2472,7 +2478,7 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (langtool-default-language "en")
   (langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
-                                                dotemacs-user-tmp)))
+                                                no-littering-etc-directory)))
 
 (use-package olivetti
   :diminish
@@ -2531,10 +2537,10 @@ This file is specified in `counsel-projectile-default-file'."
   :mode "\\.bc\\'")
 
 (use-package markdown-mode
-  ;; :ensure-system-package pandoc
   :mode
+  ;; The order is important to associate "README.md" with `gfm-mode'
   (("\\.md\\'" . markdown-mode)
-   ("README\\.md\\'" . gfm-mode) ; The order is important to associate with `gfm-mode'
+   ("README\\.md\\'" . gfm-mode)
    ("\\.markdown\\'" . markdown-mode))
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
@@ -2567,6 +2573,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 (use-package pandoc-mode
+  ;; :ensure-system-package pandoc
   :commands (pandoc-load-default-settings)
   :diminish
   :config (pandoc-load-default-settings)
@@ -2583,7 +2590,6 @@ This file is specified in `counsel-projectile-default-file'."
     (add-hook (derived-mode-hook-name mode) 'add-node-modules-path)))
 
 (use-package prettier
-  :disabled t
   :init (setenv "NODE_PATH" "/usr/local/lib/node_modules")
   ;; :hook
   ;; ((markdown-mode gfm-mode) . (lambda ()
@@ -2596,7 +2602,9 @@ This file is specified in `counsel-projectile-default-file'."
   :commands csv-align-mode
   :mode "\\.csv\\'"
   :custom (csv-separators '("," ";" "|" " "))
-  :config (csv-align-mode 1))
+  :config
+  ;; FIXME: Aligning may be slow for large files
+  (csv-align-mode 1))
 
 (use-package highlight-doxygen
   :commands highlight-doxygen-mode
@@ -2616,7 +2624,7 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :mode
   (("\\Makefile\\'" . makefile-mode)
-   ;; Add `makefile.rules' to makefile-gmake-mode for Intel Pin
+   ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
@@ -2779,48 +2787,54 @@ This file is specified in `counsel-projectile-default-file'."
                                                       0.9))))
   :config
   ;; Support lsp over tramp
-  (cond ((eq dotemacs-python-langserver
-             'pyls) (lsp-register-client
-             (make-lsp-client
-              :new-connection (lsp-tramp-connection "pyls")
-              :major-modes '(python-mode)
-              :remote? t
-              :server-id 'pyls-remote)))
-        ((eq dotemacs-python-langserver
-             'mspyls) (lsp-register-client
-             (make-lsp-client :new-connection (lsp-tramp-connection "mspyls")
-                              :major-modes '(python-mode)
-                              :remote? t
-                              :server-id 'mspyls-remote)))
-        ((eq dotemacs-python-langserver
-             'pyright) (lsp-register-client
-             (make-lsp-client :new-connection
-                              (lsp-tramp-connection
-                               (lambda ()
-                                 (cons "pyright-langserver"
-                                       lsp-pyright-langserver-command-args)))
-                              :major-modes '(python-mode)
-                              :remote? t
-                              :server-id 'pyright-remote
-                              :multi-root t
-                              :initialization-options (lambda () (ht-merge (lsp-configuration-section "pyright")
-                                                                           (lsp-configuration-section "python")))
-                              :initialized-fn (lambda (workspace)
-                                                (with-lsp-workspace workspace
-                                                  (lsp--set-configuration
-                                                   (ht-merge (lsp-configuration-section "pyright")
-                                                             (lsp-configuration-section "python")))))
-                              :download-server-fn (lambda (_client callback error-callback _update?)
-                                                    (lsp-package-ensure 'pyright callback error-callback))
-                              :notification-handlers (lsp-ht ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-                                                             ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-                                                             ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
-        ((eq dotemacs-python-langserver
-             'jedi) (lsp-register-client
-             (make-lsp-client :new-connection (lsp-tramp-connection "jedi-language-server")
-                              :major-modes '(python-mode)
-                              :remote? t
-                              :server-id 'jedils-remote))))
+  (when (eq dotemacs-python-langserver 'pyls)
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection "pyls")
+      :major-modes '(python-mode)
+      :remote? t
+      :server-id 'pyls-remote)))
+
+  (when (eq dotemacs-python-langserver 'mspyls)
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-tramp-connection "mspyls")
+                      :major-modes '(python-mode)
+                      :remote? t
+                      :server-id 'mspyls-remote)))
+
+  (when (eq dotemacs-python-langserver 'pyright)
+    (lsp-register-client
+     (make-lsp-client :new-connection
+                      (lsp-tramp-connection
+                       (lambda ()
+                         (cons "pyright-langserver"
+                               lsp-pyright-langserver-command-args)))
+                      :major-modes '(python-mode)
+                      :remote? t
+                      :server-id 'pyright-remote
+                      :multi-root t
+                      :initialization-options (lambda ()
+                                                (ht-merge (lsp-configuration-section "pyright")
+                                                          (lsp-configuration-section "python")))
+                      :initialized-fn (lambda (workspace)
+                                        (with-lsp-workspace workspace
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
+                      :download-server-fn (lambda (_client callback error-callback _update?)
+                                            (lsp-package-ensure 'pyright callback error-callback))
+                      :notification-handlers
+                      (lsp-ht
+                       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+                       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+                       ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+
+  (when (eq dotemacs-python-langserver 'jedi)
+    (lsp-register-client
+     (make-lsp-client :new-connection (lsp-tramp-connection "jedi-language-server")
+                      :major-modes '(python-mode)
+                      :remote? t
+                      :server-id 'jedils-remote)))
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection "clangd")
@@ -2877,11 +2891,14 @@ This file is specified in `counsel-projectile-default-file'."
                     :server-id 'htmlls-remote))
   ;; FIXME: Get lsp to work for xml remote
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("java" "-jar" "/home/swarnendu/.emacs.d/org.eclipse.lemminx-0.14.1-uber.jar"))
-                    :major-modes '(xml-mode nxml-mode)
-                    :remote? t
-                    :server-id 'xmlls-remote))
+   (make-lsp-client
+    :new-connection
+    (lsp-tramp-connection
+     '("java" "-jar" (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
+                                       dotemacs-extras-directory)))
+    :major-modes '(xml-mode nxml-mode)
+    :remote? t
+    :server-id 'xmlls-remote))
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection
                                      '("yaml-language-server" "--stdio"))
@@ -2894,9 +2911,7 @@ This file is specified in `counsel-projectile-default-file'."
                                        (list lsp-perl-language-server-path
                                              "-MPerl::LanguageServer" "-e"
                                              "Perl::LanguageServer::run" "--"
-                                             (format "--port %d
-  --version
-  %s"
+                                             (format "--port %d --version %s"
                                                      lsp-perl-language-server-port
                                                      lsp-perl-language-server-client-version))))
                     :major-modes '(perl-mode cperl-mode)
@@ -2915,7 +2930,6 @@ This file is specified in `counsel-projectile-default-file'."
    ("C-c l h" . lsp-symbol-highlight)
    ("C-c l f" . lsp-format-buffer)
    ("C-c l r" . lsp-find-references)))
-
 
 (when (or (eq dotemacs-python-langserver 'pyls) (eq dotemacs-python-langserver 'mspyls))
   (add-hook 'python-mode-hook
@@ -2938,6 +2952,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Sync workspace folders and treemacs projects
   (lsp-treemacs-sync-mode 1))
 
+;; SB: I do not use code folding
 (use-package origami
   :disabled t
   :hook (after-init . global-origami-mode))
@@ -2962,9 +2977,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package request
   :after lsp-java
-  :custom
-  (request-storage-directory ())
-  )
+  :custom (request-storage-directory (expand-file-name "request" no-littering-var-directory)))
 
 (use-package lsp-python-ms
   :if (eq dotemacs-python-langserver 'mspyls)
@@ -3572,7 +3585,7 @@ Ignore if no file is found."
   :load-path "extras"
   :mode
   (("\\.json\\'" . json-mode)
-   ("\\.vscode/settings.json$" . jsonc-mode)
+   (".*/\\.vscode/settings.json$" . jsonc-mode)
    ("User/settings.json$" . jsonc-mode))
   :hook
   ((json-mode jsonc-mode) . (lambda ()
@@ -3601,21 +3614,22 @@ Ignore if no file is found."
   :mode
   (("\\.bzl$" . bazel-mode)
    ("\\BUILD\\'" . bazel-mode)
-   ("\\.bazelrc\\'" . bazelrc-mode)))
+   ("\\.bazelrc\\'" . bazelrc-mode))
+  :hook (bazel-mode . flycheck-mode))
 
 (use-package protobuf-mode
-  :mode "\\.proto$")
+  :mode "\\.proto$"
+  :hook (protobuf-mode . flycheck-mode))
 
 (use-package clang-format+
   :ensure clang-format
   :hook (mlir-mode . clang-format+-mode))
 
 (use-package tree-sitter
-  :disabled t
-  :config (global-tree-sitter-mode 1))
-
-(use-package tree-sitter-langs
-  :after tree-sitter)
+  :config
+  (require 'tree-sitter-langs)
+  (global-tree-sitter-mode 1)
+  :hook (tree-sitter-after-on . #'tree-sitter-hl-mode))
 
 (use-package adoc-mode
   :mode "\\.adoc\\'")
