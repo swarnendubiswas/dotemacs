@@ -521,6 +521,7 @@
     ("execption" "exception" nil :count 1)
     ("executiosn" "executions" nil :count 0)
     ("executoins" "executions" nil :count 1)
+    ("exeperiments" "experiments" nil :count 0)
     ("exhcange" "exchange" nil :count 0)
     ("exhcanges" "exchanges" nil :count 0)
     ("expectatoins" "expectations" nil :count 1)
@@ -596,6 +597,7 @@
     ("gonig" "going" nil :count 0)
     ("govenment" "government" nil :count 0)
     ("goverment" "government" nil :count 0)
+    ("gramamr" "grammar" nil :count 0)
     ("granuarlity" "granularity" nil :count 1)
     ("graudation" "graduation" nil :count 1)
     ("grpah" "graph" nil :count 0)
@@ -694,6 +696,7 @@
     ("independant" "independent" nil :count 0)
     ("ineresting" "interesting" nil :count 0)
     ("infalted" "inflated" nil :count 1)
+    ("infered" "inferred" nil :count 0)
     ("infleunces" "influences" nil :count 0)
     ("influance" "influence" nil :count 0)
     ("infomation" "information" nil :count 0)
@@ -1386,3 +1389,4 @@
     ("thesse" "these" nil :count 0)
     ("vidoes" "videos" nil :count 0)
    ))
+

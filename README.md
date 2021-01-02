@@ -60,15 +60,21 @@ sudo cpanm Perl::LanguageServer
 
 #### `Node.js` Packages
 
-> Install node packages.
+> Setup `nvm` to help with node packages
+
+```Bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash; source ~/.bashrc; nvm install node;
+```
+
+> Install node packages
 
 ```Bash
 cd $HOME/tmp; cd ;
 npm init --yes
-npm install -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
+npm install npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint
 ```
 
-`npm install -g git+https://gitlab.com/matsievskiysv/math-preview`
+`npm install git+https://gitlab.com/matsievskiysv/math-preview`
 
 Install `textlint` separately so that the installation is shared by other editors.
 
@@ -88,16 +94,21 @@ npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction 
 npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst textlint-plugin-json textlint-plugin-html
 ```
 
+> Uninstall `nvm`
+
+- `rm -rf "$NVM_DIR"`
+- Edit `$HOME/.bashrc` (or other shell resource config) and remove related lines
+
 #### Update helper packages
 
 ```Bash
-cd; sudo apt update; sudo snap refresh; sudo npm update; sudo gem update; cd $HOME/tmp; composer update; cd textlint-workspace; npm update; cd;
+cd; sudo apt update; sudo snap refresh; sudo gem update; cd $HOME/tmp; composer update; npm update; cd textlint-workspace; npm update; cd;
 ```
 
 > Update node packages.
 
 ```Bash
-sudo npm update -g npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli
+npm update npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint
 ```
 
 #### Edit Bash files
@@ -340,7 +351,7 @@ make -j2 NATIVE_FULL_AOT=1
 make install
 ```
 
-Test both the fast JSON and native compilation is working, evaluate the following elisp in Emacs.
+Test both the fast JSON and native compilation is working, evaluate the following in Emacs.
 
 ```emacs-lisp
 (if (and (fboundp 'native-comp-available-p)
@@ -349,7 +360,7 @@ Test both the fast JSON and native compilation is working, evaluate the followin
 (message "Native complation is *not* available"))
 ```
 
-Test fast JSON is working, evaluate the following elisp in Emacs.
+Test fast JSON is working, evaluate the following in Emacs.
 
 ```emacs-lisp
 (if (functionp 'json-serialize)
@@ -369,4 +380,8 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
   - https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`
   - My guess is this has to do with either `flycheck-grammarly` or `prettier`
-- Resolve yaml and xml lsp over tramp
+- Resolve yaml and xml lsp over tramp, not working
+- `xref-find-references` not working
+- LaTeX LSP: automatic gc and `flyspell-word` seem expensive
+- Bash LSP takes lot of memory
+- Flycheck not working with .el files

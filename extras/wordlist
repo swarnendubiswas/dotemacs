@@ -412,6 +412,7 @@ asset
 assign
 assigned
 assignment
+assignments
 assist
 assistance
 assistant
@@ -433,6 +434,9 @@ assurance
 assure
 assured
 assuredly
+asymptomatic
+asymptotic
+asymptotically
 asynchronous
 asynchronously
 athlete
@@ -978,6 +982,7 @@ claim
 claimed
 clap
 clarification
+clarified
 clarify
 clarity
 class
@@ -2478,6 +2483,7 @@ fortieth
 fortune
 forty
 forward
+forwarded
 found
 foundation
 founded
@@ -3679,6 +3685,7 @@ minibatch
 minimal
 minimalist
 minimally
+minimization
 minimize
 minimum
 minister
@@ -4185,6 +4192,8 @@ peaceful
 peak
 peculiarities
 peer
+penalize
+penalized
 penalty
 pencil
 pendant
@@ -4204,7 +4213,9 @@ perfect
 perfectly
 perform
 performance
+performed
 performer
+performing
 performs
 perfume
 perhaps
@@ -5804,6 +5815,7 @@ sympathy
 symphony
 symposium
 symptom
+symptomatic
 symptoms
 synchronization
 synchronized
@@ -6064,6 +6076,7 @@ transactional
 transfer
 transferable
 transference
+transferred
 transform
 transformation
 transformations
@@ -6605,8 +6618,6 @@ yourself
 youth
 zero
 zone
-clarified
-minimization
 
 ;; Local Variables:
 ;; mode: text

@@ -37,6 +37,8 @@
 ;;   (x-mode . second)
 ;;   (x-mode . first))
 
+;; If we omit :defer, :hook, :commands, or :after, then the package is loaded immediately.
+
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 
 ;; Good articles and reference configurations
@@ -50,6 +52,7 @@
 ;; https://github.com/raxod502/radian/tree/develop/emacs
 ;; https://github.com/dholm/dotemacs
 ;; https://tychoish.com/post/towards-faster-emacs-start-times/
+;; https://github.com/wandersoncferreira/dotfiles
 
 ;;; Code:
 
@@ -74,10 +77,12 @@
 
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
+  (when (bound-and-true-p dotemacs-debug-init-file)
+    (setq garbage-collection-messages t))
   (setq gc-cons-percentage 0.1
         gc-cons-threshold dotemacs-4MB))
 
-(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+(add-hook 'after-init-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
@@ -258,6 +263,10 @@ whitespaces."
   (require 'use-package))
 
 ;; Installation is one-time, so avoid the overhead of run-time checks
+(use-package system-packages
+  :disabled t
+  :custom (system-packages-use-sudo t))
+
 (use-package use-package-ensure-system-package
   :disabled t)
 
@@ -271,6 +280,14 @@ whitespaces."
 
 (use-package f
   :commands (f-join f-exists?))
+
+;; Use `C-c h' consistently for invoking a hydra
+(use-package hydra
+  :commands (hydra-default-pre hydra-keyboard-quit defhydra
+                               hydra-show-hint hydra-set-transient-map
+                               hydra--call-interactively-remap-maybe))
+
+(use-package use-package-hydra)
 
 ;; Put this early in the `user-init-file'
 (use-package no-littering)
@@ -286,12 +303,6 @@ whitespaces."
   "File to include private information."
   :type 'string
   :group 'dotemacs)
-
-;; Use `C-c h' consistently for invoking a hydra
-(use-package hydra
-  :commands (hydra-default-pre hydra-keyboard-quit defhydra
-                               hydra-show-hint hydra-set-transient-map
-                               hydra--call-interactively-remap-maybe))
 
 (setq custom-file dotemacs-custom-file)
 (when (file-exists-p custom-file)
@@ -313,6 +324,7 @@ whitespaces."
 
 ;; FIXME: Improve startup
 ;; Check the PATH with `(getenv "PATH")'
+;; (setenv "PATH" (concat (getenv "PATH") ":/home/wand/private/scripts"))
 (use-package exec-path-from-shell
   :defines  exec-path-from-shell-check-startup-files
   :if (or (daemonp) (memq window-system '(x ns)))
@@ -343,6 +355,8 @@ whitespaces."
       cursor-in-non-selected-windows t ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
+      delete-trailing-lines t
+      echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
       ;; Disable the warning "X and Y are the same file"
@@ -790,6 +804,11 @@ SAVE-FN with non-nil ARGS."
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 ;; (set-frame-font "Roboto Mono")
 
+;; https://github.com/wandersoncferreira/dotfiles
+;; (when (member "Monaco" (font-family-list))
+;;   (set-face-attribute 'default nil :font "Monaco" :height 120)
+;;   (setq default-frame-alist '((font . "Monaco-12"))))
+
 ;; https://github.com/larstvei/dot-emacs
 ;; (cond ((member "Inconsolata" (font-family-list))
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
@@ -813,12 +832,6 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'emacs-startup-hook (lambda ()
 ;;                                 (setq resize-mini-windows nil)))
 
-(use-package solar
-  :ensure nil
-  :custom
-  (calendar-latitude 26.50)
-  (calendar-longitude 80.23))
-
 (use-package circadian
   :disabled t
   :if (and (not (eq dotemacs-theme 'sb/default)) (not (eq dotemacs-theme 'none)))
@@ -826,7 +839,13 @@ SAVE-FN with non-nil ARGS."
   :custom
   (circadian-themes '((:sunrise . modus-operandi)
                       (:sunset  . modus-operandi)))
-  :init (circadian-setup))
+  :init
+  (use-package solar
+    :ensure nil
+    :custom
+    (calendar-latitude 26.50)
+    (calendar-longitude 80.23))
+  (circadian-setup))
 
 (use-package beacon
   :diminish
@@ -1001,7 +1020,7 @@ SAVE-FN with non-nil ARGS."
 (use-package all-the-icons
   :if (display-graphic-p)
   ;; :config (all-the-icons-install-fonts 'y)
-  )
+  :custom (all-the-icons-scale-factor 1.0))
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
@@ -1112,12 +1131,13 @@ SAVE-FN with non-nil ARGS."
 (use-package ripgrep
   :commands ripgrep-regexp)
 
+(use-package visual-regexp
+  :commands (vr/replace vr/query-replace vr/mark))
+
 (use-package recentf
   :ensure nil
   :commands (recentf-mode recentf-add-file
                           recentf-apply-filename-handlers)
-  :hook (dired-mode . (lambda ()
-                        (recentf-add-dired-directory)))
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check regex with `re-builder'
@@ -1283,7 +1303,7 @@ SAVE-FN with non-nil ARGS."
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
     "Return non-nil if STR names a Dired buffer.
-  This function is intended for use with `ivy-ignore-buffers'."
+    This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :custom
@@ -1603,7 +1623,10 @@ SAVE-FN with non-nil ARGS."
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check all on-screen text,
 ;; and running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
-  :config (global-spell-fu-mode))
+  :hook
+  (text-mode . (lambda ()
+                 (setq spell-fu-faces-exclude '(org-meta-line org-link org-code))
+                 (spell-fu-mode))))
 
 (or (use-package highlight-indentation
       :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
@@ -1842,6 +1865,7 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled))
+  (flycheck-checker-error-threshold 500)
   ;; (flycheck-display-errors-delay 0.5)
   (flycheck-emacs-lisp-load-path 'inherit)
   ;; (flycheck-idle-buffer-switch-delay 1)
@@ -1879,12 +1903,14 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (dolist (hook '(js-mode js2-mode typescript-mode))
   ;;   (setq-local flycheck-checker 'javascript-eslint))
   :config
+  (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
+  (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
-  :defer 2 ; Expensive to load
+  ;; :defer 2 ; Expensive to load
   :config
   (require 'flycheck-grammarly)
   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
@@ -1966,7 +1992,9 @@ This file is specified in `counsel-projectile-default-file'."
  (use-package highlight-symbol ; Highlight symbol under point
    :disabled t ; `symbol-overlay' is faster
    :diminish
-   :hook (prog-mode . highlight-symbol-mode)
+   :hook
+   ((highlight-symbol-mode . highlight-symbol-nav-mode)
+    (prog-mode . highlight-symbol-mode))
    :bind
    (("M-p" . highlight-symbol-prev)
     ("M-n" . highlight-symbol-next))
@@ -2083,12 +2111,13 @@ This file is specified in `counsel-projectile-default-file'."
   (imenu-use-popup-menu nil)
   (imenu-sort-function nil))
 
+;; Enabling this package introduces additional choices (for e.g., toggle) which are distracting
 ;; (use-package imenu+
 ;;   :load-path "extras"
 ;;   :after imenu)
 
-;; (use-package imenu-anywhere
-;;   :after imenu)
+(use-package imenu-anywhere
+  :after imenu)
 
 ;; (use-package popup-imenu
 ;;   :after imenu)
@@ -2176,6 +2205,7 @@ This file is specified in `counsel-projectile-default-file'."
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package dumb-jump
+  :commands (dumb-jump-go dumb-jump-back)
   :custom
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg)
@@ -2280,6 +2310,15 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'popwin:special-display-config '(flycheck-verify-mode))
   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
+;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
+(add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
+
+;; ;; Do not popup the *Async Shell Command* buffer
+;; (add-to-list 'display-buffer-alist
+;;              (cons "\\*Async Shell Command\\*.*"
+;;                    (cons #'display-buffer-no-window nil)))
+
 (use-package expand-region ; Expand region by semantic units
   :bind ("C-=" . er/expand-region))
 
@@ -2289,6 +2328,7 @@ This file is specified in `counsel-projectile-default-file'."
   :bind ("M-i" . turn-on-expand-line-mode))
 
 (use-package smart-mark ; Restore point with `C-g' after marking a region
+  :commands smart-mark-mode
   :config (smart-mark-mode 1))
 
 (use-package whole-line-or-region
@@ -2374,6 +2414,11 @@ This file is specified in `counsel-projectile-default-file'."
   :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
   :hook (ssh-config-mode . turn-on-font-lock))
 
+(use-package pomidor
+  :ensure alert
+  :commands (pomidor-quit pomidor-break pomidor-reset
+                          pomidor-stop pomidor-hold pomidor-unhold pomidor))
+
 (use-package ace-window
   :bind
   (([remap other-window] . ace-window)
@@ -2442,7 +2487,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package esup
   :commands esup)
 
-(use-package bug-hunter)
+(use-package bug-hunter
+  :commands (bug-hunter-init-file bug-hunter-file))
 
 (use-package explain-pause-mode
   :ensure nil
@@ -2487,6 +2533,9 @@ This file is specified in `counsel-projectile-default-file'."
   ;; :config (remove-hook 'olivetti-mode-on-hook 'visual-line-mode)
   )
 
+(use-package wc-mode
+  :commands wc-mode)
+
 (use-package emojify
   :hook (after-init . global-emojify-mode))
 
@@ -2496,6 +2545,8 @@ This file is specified in `counsel-projectile-default-file'."
   :defer 2 ; Expensive to load
   :commands (pdf-tools-install pdf-loader-install)
   :mode ("\\.pdf\\'" . pdf-view-mode)
+  :magic ("%PDF" . pdf-view-mode)
+  ;; :init (pdf-tools-install :no-query)
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
@@ -2503,7 +2554,12 @@ This file is specified in `counsel-projectile-default-file'."
   ;;                                 (setq header-line-format nil)))
   :custom
   (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
-  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%"))
+  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
+  :bind (:map pdf-view-mode-map
+              ("C-s" . isearch-forward)
+              ("d" . pdf-annot-delete)
+              ("h" . pdf-annot-add-highlight-markup-annotation)
+              ("t" . pdf-annot-add-text-annotation)))
 
 (use-package saveplace-pdf-view
   :after pdf-tools
@@ -2596,7 +2652,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;;                               (when (and buffer-file-name
   ;;                                          (not (file-remote-p buffer-file-name)))
   ;;                                 prettier-mode)))
-  :hook ((markdown-mode gfm-mode) . prettier-mode))
+  :hook ((markdown-mode gfm-mode web-mode) . prettier-mode))
 
 (use-package csv-mode
   :commands csv-align-mode
@@ -2632,7 +2688,8 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :if dotemacs-is-linux
   :diminish
-  :hook ((emacs-lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode))
+  :hook ((emacs-lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
+  :custom (eldoc-echo-area-use-multiline-p nil))
 
 (use-package css-eldoc
   :commands turn-on-css-eldoc
@@ -2643,6 +2700,8 @@ This file is specified in `counsel-projectile-default-file'."
   :mode "\\.m\\'")
 
 (use-package ess
+  :commands R
+  :mode ("/R/.*\\.q\\'" . R-mode)
   :custom
   (inferior-R-args "--quiet --no-restore-history --no-save")
   (ess-indent-offset 4)
@@ -2699,7 +2758,7 @@ This file is specified in `counsel-projectile-default-file'."
                 typescript-mode) . lsp-deferred)
    (lsp-mode . lsp-enable-which-key-integration)
    (lsp-managed-mode . lsp-modeline-diagnostics-mode)
-   ((c++-mode python-mode java-mode) . lsp-headerline-breadcrumb-mode)
+   ((c++-mode python-mode java-mode web-mode) . lsp-headerline-breadcrumb-mode)
    (lsp-mode . lsp-modeline-code-actions-mode)
    ((c++-mode java-mode json-mode) . (lambda ()
                                        ;; (when buffer-file-name
@@ -2710,16 +2769,16 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
                              ;; "--suggest-missing-includes"
-                             "--fallback-style=LLVM" "--log=error"))
+                             "--header-insertion=never" "--fallback-style=LLVM" "--log=error"))
   (lsp-completion-provider :none)
-  (lsp-eldoc-enable-hover nil)
-  (lsp-eldoc-hook nil)
+  ;; (lsp-eldoc-enable-hover nil)
+  ;; (lsp-eldoc-hook nil)
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-file-watchers nil) ; Could be a directory-local variable
   (lsp-enable-folding nil)
-  (lsp-enable-indentation nil)
+  ;; (lsp-enable-indentation nil)
   (lsp-enable-on-type-formatting nil)
-  (lsp-enable-semantic-highlighting t)
+  (lsp-enable-semantic-tokens t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
   (lsp-enabled-clients '(clangd clangd-remote jsts-ls flow-ls
                                 ts-ls eslint json-ls
@@ -2733,7 +2792,7 @@ This file is specified in `counsel-projectile-default-file'."
                                 perl-language-server
                                 perlls-remote php-ls xmlls
                                 xmlls-remote yamlls yamlls-remote))
-  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2741,13 +2800,14 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
   (lsp-log-io nil "texlab communication is huge")
-  (lsp-modeline-diagnostics-scope :project)
+  (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
   (lsp-pyls-configuration-sources [])
   (lsp-pyls-plugins-autopep8-enabled nil)
   ;; Do not turn on fuzzy completion with jedi, lsp-mode is fuzzy on the client side
-  (lsp-pyls-plugins-jedi-completion-fuzzy nil)
+  ;; (lsp-pyls-plugins-jedi-completion-fuzzy nil)
   (lsp-pyls-plugins-mccabe-enabled nil)
-  (lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas"])
+  ;; Set this per-project
+  ;; (lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"])
   (lsp-pyls-plugins-pycodestyle-enabled nil)
   (lsp-pyls-plugins-pycodestyle-max-line-length dotemacs-fill-column)
   (lsp-pyls-plugins-pydocstyle-convention "pep257")
@@ -2762,8 +2822,8 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-pyls-plugins-pylint-enabled t "Pylint can be expensive")
   (lsp-pyls-plugins-yapf-enabled t)
   ;; (lsp-session-file (expand-file-name "lsp-session" dotemacs-temp-directory))
-  (lsp-signature-auto-activate nil)
-  (lsp-signature-render-documentation nil)
+  ;; (lsp-signature-auto-activate nil)
+  ;; (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
   ;; https://github.com/eclipse/lemminx/archive/0.14.1.tar.gz
   (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
@@ -2787,6 +2847,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                       0.9))))
   :config
   ;; Support lsp over tramp
+  ;; (with-eval-after-load 'tramp
   (when (eq dotemacs-python-langserver 'pyls)
     (lsp-register-client
      (make-lsp-client
@@ -2795,46 +2856,50 @@ This file is specified in `counsel-projectile-default-file'."
       :remote? t
       :server-id 'pyls-remote)))
 
+  ;; TODO: Compare with https://github.com/MoozIiSP/doom-emacs-private/blob/e447d65f5887782e0fab67e373291fb07fc16911/site-lisp/config/init-python.el
   (when (eq dotemacs-python-langserver 'mspyls)
     (lsp-register-client
-     (make-lsp-client :new-connection (lsp-tramp-connection "mspyls")
-                      :major-modes '(python-mode)
-                      :remote? t
-                      :server-id 'mspyls-remote)))
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection "mspyls")
+      :major-modes '(python-mode)
+      :remote? t
+      :server-id 'mspyls-remote)))
 
   (when (eq dotemacs-python-langserver 'pyright)
     (lsp-register-client
-     (make-lsp-client :new-connection
-                      (lsp-tramp-connection
-                       (lambda ()
-                         (cons "pyright-langserver"
-                               lsp-pyright-langserver-command-args)))
-                      :major-modes '(python-mode)
-                      :remote? t
-                      :server-id 'pyright-remote
-                      :multi-root t
-                      :initialization-options (lambda ()
-                                                (ht-merge (lsp-configuration-section "pyright")
-                                                          (lsp-configuration-section "python")))
-                      :initialized-fn (lambda (workspace)
-                                        (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (ht-merge (lsp-configuration-section "pyright")
-                                                     (lsp-configuration-section "python")))))
-                      :download-server-fn (lambda (_client callback error-callback _update?)
-                                            (lsp-package-ensure 'pyright callback error-callback))
-                      :notification-handlers
-                      (lsp-ht
-                       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-                       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-                       ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+     (make-lsp-client
+      :new-connection
+      (lsp-tramp-connection
+       (lambda ()
+         (cons "pyright-langserver"
+               lsp-pyright-langserver-command-args)))
+      :major-modes '(python-mode)
+      :remote? t
+      :server-id 'pyright-remote
+      :multi-root t
+      :initialization-options (lambda ()
+                                (ht-merge (lsp-configuration-section "pyright")
+                                          (lsp-configuration-section "python")))
+      :initialized-fn (lambda (workspace)
+                        (with-lsp-workspace workspace
+                          (lsp--set-configuration
+                           (ht-merge (lsp-configuration-section "pyright")
+                                     (lsp-configuration-section "python")))))
+      :download-server-fn (lambda (_client callback error-callback _update?)
+                            (lsp-package-ensure 'pyright callback error-callback))
+      :notification-handlers
+      (lsp-ht
+       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+       ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
 
   (when (eq dotemacs-python-langserver 'jedi)
     (lsp-register-client
-     (make-lsp-client :new-connection (lsp-tramp-connection "jedi-language-server")
-                      :major-modes '(python-mode)
-                      :remote? t
-                      :server-id 'jedils-remote)))
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection "jedi-language-server")
+      :major-modes '(python-mode)
+      :remote? t
+      :server-id 'jedils-remote)))
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection "clangd")
@@ -2859,6 +2924,7 @@ This file is specified in `counsel-projectile-default-file'."
     :major-modes '(cmake-mode)
     :remote? t
     :server-id 'cmakels-remote))
+  ;; TODO: Check with https://github.com/MagicRB/dotfiles/blob/469f5ca6cfa7f13a8482733903f86b799e50bf65/nixos/home-manager/modules/emacs/.emacs.d/org/lsp-and-ide.org
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection
                                      '("typescript-language-server" "--stdio"))
@@ -2922,6 +2988,7 @@ This file is specified in `counsel-projectile-default-file'."
                                          (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
+  ;; )
   :bind
   (("M-." . lsp-find-definition)
    ("C-c l i" . lsp-goto-implementation)
@@ -2955,6 +3022,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; SB: I do not use code folding
 (use-package origami
   :disabled t
+  :commands origami-toggle-node
   :hook (after-init . global-origami-mode))
 
 (use-package lsp-origami
@@ -3090,6 +3158,11 @@ This file is specified in `counsel-projectile-default-file'."
   ;;             ("M-]" . python-nav-forward-block)
   ;;             ("C-[" . python-indent-shift-left)
   ;;             ("C-]" . python-indent-shift-right))
+  :custom
+  (python-indent-offset 4)
+  (python-indent-guess-indent-offset nil)
+  (python-shell-exec-path "python3")
+  (python-shell-interpreter "python3")
   :config
   (with-eval-after-load 'lsp-mode
     (when (eq dotemacs-python-langserver 'pyls)
@@ -3098,11 +3171,7 @@ This file is specified in `counsel-projectile-default-file'."
           (add-to-list 'lsp-disabled-clients ls))
         (add-to-list 'lsp-enabled-clients 'pyls)
         (add-to-list 'lsp-enabled-clients 'pyls-remote))))
-  (setq python-indent-offset 4
-        python-indent-guess-indent-offset nil
-        python-shell-exec-path "python3"
-        python-shell-interpreter "python3"
-        auto-mode-alist (append '(("SConstruct\\'" . python-mode)
+  (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
                                 auto-mode-alist))
   ;; FIXME: `lsp' is the first checker, chain the other checkers
@@ -3138,7 +3207,8 @@ This file is specified in `counsel-projectile-default-file'."
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
 
-(use-package ein)
+(use-package ein
+  :mode ("\\.ipynb\\'" . ein:ipynb-mode))
 
 (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                               auto-mode-alist))
@@ -3148,7 +3218,8 @@ This file is specified in `counsel-projectile-default-file'."
             (setq-default c-basic-offset 4
                           c-set-style "java")))
 
-(use-package ant)
+(use-package ant
+  :commands (ant ant-clean ant-compile ant-test))
 
 ;; Can disassemble `.class' files from within jars
 (use-package autodisass-java-bytecode
@@ -3311,7 +3382,9 @@ _p_: Prev      _u_: Upper
 (use-package yaml-mode
   :hook (yaml-mode . lsp-deferred))
 
-(use-package yaml-imenu)
+(use-package yaml-imenu
+  :commands (yaml-imenu-create-index yaml-imenu-activate
+                                     yaml-imenu-enable yaml-imenu-disable))
 
 (use-package php-mode
   :hook (php-mode . lsp-deferred))
@@ -3320,7 +3393,7 @@ _p_: Prev      _u_: Upper
   :ensure nil
   :mode
   (("\\.bat\\'" . batch-mode)
-         ("\\.cmd\\'" . batch-mode)))
+   ("\\.cmd\\'" . batch-mode)))
 
 (use-package web-mode
   :mode
@@ -3342,8 +3415,12 @@ _p_: Prev      _u_: Upper
   (web-mode-enable-current-element-highlight t)
   (web-mode-enable-current-column-highlight t))
 
+(use-package emmet-mode
+  :hook (web-mode . emmet-mode))
+
 (use-package rainbow-mode
   :diminish
+  :commands rainbow-mode
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
 (use-package prism
@@ -3361,7 +3438,7 @@ _p_: Prev      _u_: Upper
 (use-package nxml-mode
   :ensure nil
   :commands nxml-mode
-  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'")
+  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :init (fset 'xml-mode 'nxml-mode)
   :hook (nxml-mode . lsp-deferred)
   :custom
@@ -3388,12 +3465,9 @@ _p_: Prev      _u_: Upper
 
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
-(use-package tex-site
+(use-package tex
   :ensure auctex
-  :mode ("\\.tex\\'" . LaTeX-mode))
-
-(use-package tex-buf
-  :ensure nil
+  :mode ("\\.tex\\'" . LaTeX-mode)
   :defines (tex-fontify-script font-latex-fontify-script
                                font-latex-fontify-sectioning
                                TeX-syntactic-comment)
@@ -3417,6 +3491,8 @@ _p_: Prev      _u_: Upper
   (TeX-source-correlate-method 'synctex)
   (TeX-source-correlate-start-server nil "Do not start the emacs server when correlating sources")
   (TeX-syntactic-comment t)
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view)))
   (LaTeX-item-indent 0 "Two spaces + Extra indentation")
   (LaTeX-syntactic-comments t)
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
@@ -3689,10 +3765,10 @@ Ignore if no file is found."
   (setq company-backends
         '((
            company-capf ; LSP mode autoconfigures capf
-           (company-shell :with
-                          company-shell-env :with
-                          company-fish-shell :with
-                          company-yasnippet)
+           company-shell
+           company-shell-env
+           company-fish-shell
+           company-yasnippet
            company-files
            company-dabbrev-code
            ;; company-dabbrev
@@ -3760,6 +3836,21 @@ Ignore if no file is found."
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
+
+(defun sb/company-web-mode ()
+  "Add backends for web completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-yasnippet
+           company-capf
+           ;; company-tabnine
+           company-files
+           company-dabbrev
+           company-ispell
+           ))))
+(dolist (hook '(web-mode-hook))
+  (add-hook hook #'sb/company-web-mode))
 
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 ;; (use-package server
@@ -3903,7 +3994,8 @@ Increase line spacing by two line height."
                                            help-mode
                                            magit-status-mode
                                            magit-process-mode
-                                           magit-diff-mode)
+                                           magit-diff-mode
+                                           tags-table-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string))
 
@@ -4001,6 +4093,9 @@ or the major mode is not in `sb/skippable-modes'."
   "zoom"
   ("i" default-text-scale-increase "in")
   ("o" default-text-scale-decrease "out"))
+
+(use-package free-keys
+  :commands free-keys)
 
 (use-package which-key ; Show help popups for prefix keys
   :diminish

@@ -1,7 +1,13 @@
-;; early-init.el -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8; no-byte-compile: nil;
-;; fill-column: 100 -*-
+;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
 
-;; Only for use with emacs 27 or higher. This is run before package and UI initialization.
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;; Only for use with Emacs 27 or higher. This is run before package and UI initialization.
+
+;;; Code:
 
 (when (boundp 'comp-eln-load-path)
   (setcar comp-eln-load-path
