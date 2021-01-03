@@ -408,7 +408,7 @@ whitespaces."
       use-dialog-box nil
       use-file-dialog nil
       ;; FIXME: Adding a list seems to introduce nesting problems
-      vc-handled-backends nil ; Disabling vc can improve performance
+      vc-handled-backends '(Git) ; Disabling vc can improve performance
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
@@ -2703,9 +2703,9 @@ This file is specified in `counsel-projectile-default-file'."
   :commands R
   :mode ("/R/.*\\.q\\'" . R-mode)
   :custom
-  (inferior-R-args "--quiet --no-restore-history --no-save")
-  (ess-indent-offset 4)
   (ess-indent-from-lhs 4)
+  (ess-indent-offset 4)
+  (inferior-R-args "--quiet --no-restore-history --no-save")
   :config
   (use-package ess-smart-underscore))
 
@@ -3202,7 +3202,8 @@ This file is specified in `counsel-projectile-default-file'."
                 (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
-  :if (executable-find "isort")
+  :if (and (executable-find "isort") (eq dotemacs-python-langserver 'pyright))
+  :commands (py-isort-buffer py-isort-region py-isort-before-save)
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
@@ -3386,9 +3387,6 @@ _p_: Prev      _u_: Upper
   :commands (yaml-imenu-create-index yaml-imenu-activate
                                      yaml-imenu-enable yaml-imenu-disable))
 
-(use-package php-mode
-  :hook (php-mode . lsp-deferred))
-
 (use-package batch-mode
   :ensure nil
   :mode
@@ -3429,6 +3427,9 @@ _p_: Prev      _u_: Upper
   :hook
   (((emacs-lisp-mode lisp-mode) . prism-mode)
    (python-mode . prism-whitespace-mode)))
+
+(use-package php-mode
+  :hook (php-mode . lsp-deferred))
 
 ;; (use-package company-php
 ;;   :init
