@@ -386,3 +386,4 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - Bash LSP takes lot of memory
 - Flycheck not working with .el files
 - Auctex 13.0 support is not working
+- Use `straight` or `quelpa` to install packages directly from GitHub

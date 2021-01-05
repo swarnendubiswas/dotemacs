@@ -8,9 +8,4 @@
          ;;  (mode . whitespace-cleanup)
          (counsel-projectile-default-file . "init.el")
          ))
- (emacs-lisp-mode . ((no-byte-compile . t)))
- (sh-mode . (
-             (eval ignore-errors (require 'shfmt))
-             (mode . shfmt-on-save)
-             ))
  )

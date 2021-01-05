@@ -79,7 +79,7 @@
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
   (when (bound-and-true-p dotemacs-debug-init-file)
-    (setq garbage-collection-messages t))
+    (setq garbage-collection-messages nil))
   (setq gc-cons-percentage 0.1
         gc-cons-threshold dotemacs-8MB))
 
@@ -1031,13 +1031,25 @@ SAVE-FN with non-nil ARGS."
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 (use-package all-the-icons
   :if (display-graphic-p)
-  ;; :config (all-the-icons-install-fonts 'y)
+  :preface
+  (defun sb/font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (if (find-font (font-spec :name font-name))
+        t
+      nil))
+  :config
+  ;; https://github.com/domtronn/all-the-icons.el/issues/120
+  (when (and (not (sb/font-installed-p "all-the-icons"))
+             (display-graphic-p))
+    (all-the-icons-install-fonts t))
   :custom (all-the-icons-scale-factor 1.0))
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-  :custom (all-the-icons-ibuffer-icon-size 0.8))
+  :custom
+  (all-the-icons-ibuffer-human-readable-size t)
+  (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :diminish
@@ -1152,7 +1164,7 @@ SAVE-FN with non-nil ARGS."
                           recentf-apply-filename-handlers)
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
-  ;; Check regex with `re-builder'
+  ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
   (recentf-exclude '(
                      "[/\\]elpa/"
                      "[/\\]\\.git/"
@@ -2089,13 +2101,6 @@ This file is specified in `counsel-projectile-default-file'."
   (number-separator-ignore-threshold 4)
   (number-separator-decimal-char ".")
   :config (number-separator-mode 1))
-
-;; FIXME: Cannot get it to work
-(use-package volatile-highlights
-  :disabled t
-  :diminish
-  :commands volatile-highlights-mode
-  :config (volatile-highlights-mode 1))
 
 (use-package highlight-escape-sequences
   :hook (after-init . hes-mode))
