@@ -781,7 +781,7 @@ SAVE-FN with non-nil ARGS."
   :if (eq dotemacs-modeline-theme 'doom-modeline)
   :init
   (setq doom-modeline-buffer-encoding nil
-        doom-modeline-indent-info t
+        doom-modeline-indent-info nil
         doom-modeline-minor-modes t)
   (doom-modeline-mode 1)
   :custom-face
@@ -1588,8 +1588,12 @@ SAVE-FN with non-nil ARGS."
   (flyspell-issue-welcome-flag nil)
   :hook
   ((prog-mode . flyspell-prog-mode)
-   ;; (before-save-hook . flyspell-buffer) ; Saving will be slow
-   (text-mode . flyspell-mode))
+   ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
+   (text-mode  . flyspell-mode)
+   ;; `find-file-hook' will not work for buffers with no associated files
+   (after-init . (lambda ()
+                   (when (string= (buffer-name) "*scratch*")
+                     (flyspell-mode 1)))))
   :config
   ;; Skip regions in Org-mode
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
@@ -1771,7 +1775,7 @@ SAVE-FN with non-nil ARGS."
   :custom
   (projectile-auto-discover nil "Do not discover projects")
   (projectile-completion-system 'ivy)
-  ;; (projectile-dynamic-mode-line nil "")
+  (projectile-dynamic-mode-line nil "")
   (projectile-enable-caching nil "Problematic if you create new files often")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
@@ -1925,8 +1929,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (flycheck-idle-change-delay 1)
   ;; (flycheck-indication-mode 'left-margin)
   :init
-  (when (or (eq dotemacs-modeline-theme 'spaceline) (eq
-                                                     dotemacs-modeline-theme 'doom-modeline))
+  (when (or (eq dotemacs-modeline-theme 'spaceline)
+            (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
   (setq-default
@@ -2174,9 +2178,6 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package imenu-anywhere
   :after imenu)
 
-;; (use-package popup-imenu
-;;   :after imenu)
-
 (use-package flimenu
   :after imenu
   :disabled t
@@ -2368,6 +2369,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
 (add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2851,7 +2853,7 @@ This file is specified in `counsel-projectile-default-file'."
                                 perl-language-server
                                 perlls-remote php-ls xmlls
                                 xmlls-remote yamlls yamlls-remote))
-  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
+  (lsp-headerline-breadcrumb-enable t "Breadcrumb is not useful for all modes")
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2943,9 +2945,9 @@ This file is specified in `counsel-projectile-default-file'."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge (lsp-configuration-section "pyright")
-                                                       (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge (lsp-configuration-section "pyright")
+                                     (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -3045,8 +3047,8 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                                          (lsp--set-configuration
-                                                           (lsp-configuration-section "perl"))))
+                                        (lsp--set-configuration
+                                         (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
   ;; )

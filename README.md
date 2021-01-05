@@ -385,3 +385,4 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - LaTeX LSP: automatic gc and `flyspell-word` seem expensive
 - Bash LSP takes lot of memory
 - Flycheck not working with .el files
+- Auctex 13.0 support is not working
