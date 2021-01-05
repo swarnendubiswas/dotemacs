@@ -972,7 +972,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs
   :functions treemacs-git-mode
-  :commands (treemacs treemacs-toggle)
+  :commands (treemacs treemacs-toggle treemacs-git-mode)
   :hook
   ((projectile-mode . treemacs-filewatch-mode)
    (projectile-mode . treemacs-follow-mode)
@@ -1935,35 +1935,22 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled))
   (flycheck-checker-error-threshold 500)
-  ;; (flycheck-display-errors-delay 0.5)
   (flycheck-emacs-lisp-load-path 'inherit)
-  ;; (flycheck-idle-buffer-switch-delay 1)
-  ;; (flycheck-idle-change-delay 1)
-  ;; (flycheck-indication-mode 'left-margin)
   :init
   (when (or (eq dotemacs-modeline-theme 'spaceline)
             (eq dotemacs-modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
-  (setq-default
-   ;; flycheck-disabled-checkers '(
-   ;;                              ;; emacs-lisp-checkdoc
-   ;;                              tex-lacheck
-   ;;                              ;; tex-chktex
-   ;;                              python-flake8
-   ;;                              python-mypy
-   ;; python-pycompile)
-   ;; flycheck-emacs-lisp-executable "emacs"
-   flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                               dotemacs-user-home)
-   flycheck-pylintrc (expand-file-name ".config/pylintrc"
-                                       dotemacs-user-home)
-   flycheck-python-pylint-executable "python3"
-   flycheck-shellcheck-follow-sources nil
-   flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                              dotemacs-textlint-home)
-   flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                  dotemacs-textlint-home))
+  (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                                            dotemacs-user-home)
+                flycheck-pylintrc (expand-file-name ".config/pylintrc"
+                                                    dotemacs-user-home)
+                flycheck-python-pylint-executable "python3"
+                flycheck-shellcheck-follow-sources nil
+                flycheck-textlint-config (expand-file-name "textlintrc.json"
+                                                           dotemacs-textlint-home)
+                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                               dotemacs-textlint-home))
 
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
@@ -1981,31 +1968,33 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package flycheck-grammarly
   ;; :defer 2 ; Expensive to load
   :config
-  (require 'flycheck-grammarly)
   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
   (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
   (add-to-list 'flycheck-checkers 'grammarly-checker t)
   :custom (flycheck-grammarly-check-time 3))
 
-(or (use-package flycheck-popup-tip ; Show error messages in popups
-      :disabled t
-      :hook (flycheck-mode . flycheck-popup-tip-mode))
+(or
+ ;; This package does not seem to be actively maintained compared to `flycheck-pos-tip'
+ (use-package flycheck-popup-tip ; Show error messages in popups
+   :disabled t
+   :hook (flycheck-mode . flycheck-popup-tip-mode))
 
-    (use-package flycheck-pos-tip
-      :disabled t
-      :if (display-graphic-p)
-      :hook (flycheck-mode . flycheck-pos-tip-mode))
+ ;; Does not display popup under TTY, check possible workarounds at
+ ;; https://github.com/flycheck/flycheck-popup-tip
+ (use-package flycheck-pos-tip
+   :if (display-graphic-p)
+   :hook (flycheck-mode . flycheck-pos-tip-mode))
 
-    (use-package flycheck-posframe
-      :disabled t
-      :if (display-graphic-p)
-      :hook (flycheck-mode . flycheck-posframe-mode)
-      :custom (flycheck-posframe-position 'point-bottom-left-corner)
-      :config (flycheck-posframe-configure-pretty-defaults))
+ (use-package flycheck-posframe
+   :disabled t
+   :if (display-graphic-p)
+   :hook (flycheck-mode . flycheck-posframe-mode)
+   :custom (flycheck-posframe-position 'point-bottom-left-corner)
+   :config (flycheck-posframe-configure-pretty-defaults))
 
-    (use-package flycheck-inline
-      :disabled t
-      :hook (flycheck-mode . flycheck-inline-mode)))
+ (use-package flycheck-inline
+   :disabled t
+   :hook (flycheck-mode . flycheck-inline-mode)))
 
 (defhydra sb/hydra-flycheck (:color blue)
   "
@@ -2059,7 +2048,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (or
  (use-package highlight-symbol ; Highlight symbol under point
-   :disabled t ; `symbol-overlay' is faster
+   :disabled t ; This package has not been updated of late, `symbol-overlay' is faster
    :diminish
    :hook
    ((highlight-symbol-mode . highlight-symbol-nav-mode)
@@ -2266,22 +2255,22 @@ This file is specified in `counsel-projectile-default-file'."
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package dumb-jump
-  :commands (dumb-jump-go dumb-jump-back)
+  ;; :commands (dumb-jump-go dumb-jump-back)
   :custom
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg)
   (dumb-jump-quiet t)
   :config (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(defhydra sb/dumb-jump-hydra (:color blue :columns 3)
-  "Dumb Jump"
-  ("j" dumb-jump-go "Go")
-  ("o" dumb-jump-go-other-window "Other window")
-  ("e" dumb-jump-go-prefer-external "Go external")
-  ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
-  ("i" dumb-jump-go-prompt "Prompt")
-  ("l" dumb-jump-quick-look "Quick look")
-  ("b" dumb-jump-back "Back"))
+;; (defhydra sb/dumb-jump-hydra (:color blue :columns 3)
+;;   "Dumb Jump"
+;;   ("j" dumb-jump-go "Go")
+;;   ("o" dumb-jump-go-other-window "Other window")
+;;   ("e" dumb-jump-go-prefer-external "Go external")
+;;   ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
+;;   ("i" dumb-jump-go-prompt "Prompt")
+;;   ("l" dumb-jump-quick-look "Quick look")
+;;   ("b" dumb-jump-back "Back"))
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function'
 ;; is functions only, so `helpful-callable' as a drop-in replacement.
@@ -2506,6 +2495,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
 ;; one of the currently visible isearch candidates using `avy'.
 (use-package avy
+  :commands avy-resume
   :bind
   (("M-b" . avy-goto-word-1)
    ("C-'" . avy-goto-char)
@@ -3131,6 +3121,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; `pyright --createstub pandas'
 (use-package lsp-pyright
   :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "pyright"))
+  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-pyright)
@@ -3221,11 +3212,12 @@ This file is specified in `counsel-projectile-default-file'."
   (setq python-shell-completion-native-enable nil) ; Disable readline based native completion
   (setenv "PYTHONPATH" "python3")
   :hook (python-mode . lsp-deferred)
-  ;; :bind (:map python-mode-map
-  ;;             ("M-[" . python-nav-backward-block)
-  ;;             ("M-]" . python-nav-forward-block)
-  ;;             ("C-[" . python-indent-shift-left)
-  ;;             ("C-]" . python-indent-shift-right))
+  :bind
+  (:map python-mode-map
+        ("M-[" . python-nav-backward-block)
+        ("M-]" . python-nav-forward-block)
+        ("C-c ," . python-indent-shift-left)
+        ("C-c ." . python-indent-shift-right))
   :custom
   (python-indent-offset 4)
   (python-indent-guess-indent-offset nil)
@@ -3233,7 +3225,7 @@ This file is specified in `counsel-projectile-default-file'."
   (python-shell-interpreter "python3")
   :config
   (with-eval-after-load 'lsp-mode
-    (when (eq dotemacs-python-langserver 'pyls)
+    (when (and (eq dotemacs-python-langserver 'pyls) (executable-find "pyls"))
       (progn
         (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
           (add-to-list 'lsp-disabled-clients ls))
@@ -3331,7 +3323,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; FIXME: Does this help?
 (with-eval-after-load 'vc
-  (remove-hook 'find-file-hook #'vc-find-file-hook)
   (remove-hook 'find-file-hook #'vc-refresh-state))
 
 (use-package transient
@@ -3349,10 +3340,9 @@ This file is specified in `counsel-projectile-default-file'."
    ("C-c M-g" . magit-file-dispatch)
    ("C-x M-g" . magit-dispatch))
   :custom
-  ;; Suppress the message we get about "Turning on
-  ;; magit-auto-revert-mode" when loading Magit.
   (magit-completing-read-function #'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
   (magit-save-repository-buffers t)
   ;; https://irreal.org/blog/?p=8877

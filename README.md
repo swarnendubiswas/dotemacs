@@ -384,6 +384,6 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - `xref-find-references` not working
 - LaTeX LSP: automatic gc and `flyspell-word` seem expensive
 - Bash LSP takes lot of memory
-- Flycheck not working with .el files
+- Flycheck not working with .el files with `no-byte-compile` in `.dir-locals.el`
 - Auctex 13.0 support is not working
 - Use `straight` or `quelpa` to install packages directly from GitHub
