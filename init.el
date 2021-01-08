@@ -54,6 +54,7 @@
 ;; https://tychoish.com/post/towards-faster-emacs-start-times/
 ;; https://github.com/wandersoncferreira/dotfiles
 ;; https://github.com/rememberYou/.emacs.d
+;; https://github.com/seagle0128/.emacs.d/
 
 ;;; Code:
 
@@ -1727,7 +1728,6 @@ SAVE-FN with non-nil ARGS."
    :custom (highlight-indent-guides-method 'character)))
 
 ;; Claims to be better than electric-indent-mode
-;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-edit.el
 (use-package aggressive-indent
   :diminish
   :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
@@ -1747,18 +1747,17 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
-(use-package smartparens
+(use-package smartparens-config
+  :ensure smartparens
   :disabled t
   :diminish (smartparens-mode show-smartparens-mode)
   :commands sp-local-pair
   :hook
-  ;; ((prog-mode . (lambda ()
-  ;;                 (require 'smartparens-config)
-  ;;                 (smartparens-global-mode 1)
-  ;;                 (show-smartparens-global-mode 1)))
-  ((prog-mode . smartparens-mode)
-   ((latex-mode LaTeX-mode) . (lambda ()
-                                (require 'smartparens-latex))))
+  (((latex-mode LaTeX-mode) . (lambda ()
+                               (require 'smartparens-latex)))
+   (after-init . (lambda ()
+                   (smartparens-global-mode 1)
+                   (show-smartparens-global-mode 1))))
   :custom
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)
@@ -3803,6 +3802,7 @@ Ignore if no file is found."
   "Add backends for text completion in company mode."
   (set (make-local-variable 'company-backends)
        '((
+          company-tabnine
           company-files
           company-yasnippet ; Works everywhere
           company-dabbrev
