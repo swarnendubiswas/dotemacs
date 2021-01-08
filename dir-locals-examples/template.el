@@ -37,7 +37,7 @@
                     "blur")))
          ;; https://emacs.stackexchange.com/questions/42463/load-package-in-dir-locals
          (eval . (use-package smart-tabs
-                   : 
+                   :ensure t
                    :config ()))
          (eval .
                (set
@@ -47,8 +47,6 @@
 
  (fundamental-mode . (
                       (eval . (minor-mode))
-                      ))
- (fundamental-mode . (
                       (eval . (when (string-match "\.prof$" (buffer-file-name)) (minor-mode)))
                       ))
 
