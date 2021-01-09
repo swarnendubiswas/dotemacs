@@ -109,7 +109,7 @@
   (make-directory dotemacs-temp-directory))
 
 (defcustom dotemacs-theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -280,6 +280,8 @@ whitespaces."
 (use-package use-package-ensure-system-package
   :disabled t)
 
+;; `C-h b' lists all the bindings available in a buffer. `C-h m' shows the keybindings for the major
+;; and the minor modes.
 (use-package bind-key
   :bind ("C-c d k" . describe-personal-keybindings))
 
@@ -630,6 +632,22 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+;; Install fonts with `M-x all-the-icons-install-fonts'
+(use-package all-the-icons
+  :if (display-graphic-p)
+  :preface
+  (defun sb/font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (if (find-font (font-spec :name font-name))
+        t
+      nil))
+  :config
+  ;; https://github.com/domtronn/all-the-icons.el/issues/120
+  (when (and (not (sb/font-installed-p "all-the-icons"))
+             (display-graphic-p))
+    (all-the-icons-install-fonts t))
+  :custom (all-the-icons-scale-factor 1.0))
+
 (use-package leuven-theme
   :if (eq dotemacs-theme 'leuven)
   :init (load-theme 'leuven t))
@@ -690,6 +708,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package modus-operandi-theme
   :ensure moody
+  :ensure modus-themes
   :if (eq dotemacs-theme 'modus-operandi)
   :init
   (setq modus-operandi-theme-completions 'opinionated
@@ -710,6 +729,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package modus-vivendi-theme
   :ensure moody
+  :ensure modus-themes
   :if (eq dotemacs-theme 'modus-vivendi)
   :init
   (setq modus-vivendi-theme-mode-line 'moody
@@ -970,7 +990,8 @@ SAVE-FN with non-nil ARGS."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package diredfl ; More detailed colors
+(use-package diredfl ; More detailed colors, but can be jarring
+  :disabled t
   :commands (diredfl-mode diredfl-global-mode)
   :hook (dired-mode . diredfl-mode))
 
@@ -1042,22 +1063,6 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs-magit
   :after (treemacs magit))
-
-;; Install fonts with `M-x all-the-icons-install-fonts'
-(use-package all-the-icons
-  :if (display-graphic-p)
-  :preface
-  (defun sb/font-installed-p (font-name)
-    "Check if font with FONT-NAME is available."
-    (if (find-font (font-spec :name font-name))
-        t
-      nil))
-  :config
-  ;; https://github.com/domtronn/all-the-icons.el/issues/120
-  (when (and (not (sb/font-installed-p "all-the-icons"))
-             (display-graphic-p))
-    (all-the-icons-install-fonts t))
-  :custom (all-the-icons-scale-factor 1.0))
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
@@ -1509,6 +1514,10 @@ SAVE-FN with non-nil ARGS."
   ;;              '(counsel-company . ivy-display-function-overlay))
   )
 
+(with-eval-after-load 'company
+  (bind-key "C-;" #'counsel-company company-mode-map)
+  (bind-key "C-;" #'counsel-company company-active-map))
+
 (use-package ivy-hydra
   :after (ivy hydra)
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
@@ -1749,12 +1758,11 @@ SAVE-FN with non-nil ARGS."
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  :disabled t
   :diminish (smartparens-mode show-smartparens-mode)
   :commands sp-local-pair
   :hook
   (((latex-mode LaTeX-mode) . (lambda ()
-                               (require 'smartparens-latex)))
+                                (require 'smartparens-latex)))
    (after-init . (lambda ()
                    (smartparens-global-mode 1)
                    (show-smartparens-global-mode 1))))
@@ -1789,6 +1797,7 @@ SAVE-FN with non-nil ARGS."
    ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
+  :defer 2 ; Expensive to load
   ;; :ensure-system-package fd
   :commands (projectile-project-name projectile-project-root
                                      projectile-expand-root
@@ -1818,7 +1827,7 @@ SAVE-FN with non-nil ARGS."
     (setq projectile-cache-file (expand-file-name "projectile.cache" dotemacs-temp-directory)
           projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
                                                            dotemacs-temp-directory)))
-  (when (eq dotemacs-modeline-theme "doom-modeline")
+  (when (eq dotemacs-modeline-theme 'doom-modeline)
     (setq projectile-dynamic-mode-line nil))
 
   ;; https://github.com/MatthewZMD/.emacs.d
@@ -1952,8 +1961,11 @@ This file is specified in `counsel-projectile-default-file'."
                                        flycheck-disable-checker)
   :hook (after-init . global-flycheck-mode)
   :custom
-  (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled))
+  (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
   (flycheck-checker-error-threshold 500)
+  (flycheck-display-errors-delay 0)
+  (flycheck-idle-buffer-switch-delay 2) ; seconds
+  (flycheck-idle-change-delay 2) ; seconds
   (flycheck-emacs-lisp-load-path 'inherit)
   :init
   (when (or (eq dotemacs-modeline-theme 'spaceline)
@@ -3349,6 +3361,7 @@ This file is specified in `counsel-projectile-default-file'."
   (remove-hook 'find-file-hook #'vc-refresh-state))
 
 (use-package transient
+  :commands transient-bind-q-to-quit
   :config
   (unless (bound-and-true-p dotemacs-use-no-littering)
     (setq transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory)
@@ -3397,27 +3410,28 @@ This file is specified in `counsel-projectile-default-file'."
    ("/git/config\\'"    . gitconfig-mode)
    ("/\\.gitmodules\\'" . gitconfig-mode)))
 
-(use-package git-gutter
-  :diminish
-  :disabled t
-  :bind
-  (("C-x p" . git-gutter:previous-hunk)
-   ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init . global-git-gutter-mode)
-  :custom
-  (git-gutter:update-interval 1)
-  ;; https://github.com/syl20bnr/spacemacs/issues/10555
-  ;; https://github.com/syohex/emacs-git-gutter/issues/24
-  (git-gutter:disabled-modes '(fundamental-mode org-mode)))
+(or
+ (use-package git-gutter
+   :diminish
+   :disabled t
+   :bind
+   (("C-x p" . git-gutter:previous-hunk)
+    ("C-x n" . git-gutter:next-hunk))
+   :hook (after-init . global-git-gutter-mode)
+   :custom
+   (git-gutter:update-interval 1)
+   ;; https://github.com/syl20bnr/spacemacs/issues/10555
+   ;; https://github.com/syohex/emacs-git-gutter/issues/24
+   (git-gutter:disabled-modes '(fundamental-mode org-mode)))
 
-(use-package diff-hl ; Based on `vc'
-  :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
-  :custom (diff-hl-draw-borders nil)
-  :hook
-  ((after-init . global-diff-hl-mode)
-   (dired-mode . diff-hl-dired-mode))
-  (magit-pre-refresh . diff-hl-magit-pre-refresh)
-  (magit-post-refresh . diff-hl-magit-post-refresh))
+ (use-package diff-hl ; Based on `vc'
+   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
+   :custom (diff-hl-draw-borders nil)
+   :hook
+   ((magit-post-refresh . diff-hl-magit-post-refresh)
+    (magit-pre-refresh . diff-hl-magit-pre-refresh)
+    (dired-mode . diff-hl-dired-mode)
+    (after-init . global-diff-hl-mode))))
 
 (use-package git-commit
   :after magit
@@ -3460,17 +3474,21 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   ("q" nil "cancel" :color blue))
 
 (use-package yaml-mode
+  :mode
+  ((".clang-format" . yaml-mode)
+   (".clang-tidy" . yaml-mode))
   :hook (yaml-mode . lsp-deferred))
 
 (use-package yaml-imenu
   :commands (yaml-imenu-create-index yaml-imenu-activate
-                                     yaml-imenu-enable yaml-imenu-disable))
+                                     yaml-imenu-enable
+                                     yaml-imenu-disable))
 
-(use-package batch-mode
+(use-package bat-mode
   :ensure nil
   :mode
-  (("\\.bat\\'" . batch-mode)
-   ("\\.cmd\\'" . batch-mode)))
+  (("\\.bat\\'" . bat-mode)
+   ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
   :mode
@@ -3746,6 +3764,8 @@ Ignore if no file is found."
 ;; LATER: The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
 (use-package json-mode
   :ensure nil
+  :ensure json-reformat
+  :ensure json-snatcher
   :load-path "extras"
   :mode
   (("\\.json\\'" . json-mode)
@@ -3798,15 +3818,18 @@ Ignore if no file is found."
 (use-package adoc-mode
   :mode "\\.adoc\\'")
 
+;; A few backends are applicable to all modes and can be block: `company-yasnippet',
+;; `company-ispell', and `company-dabbrev'.
+;; https://tychoish.com/post/better-company/
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (set (make-local-variable 'company-backends)
        '((
           company-tabnine
           company-files
-          company-yasnippet ; Works everywhere
           company-dabbrev
           company-ispell ; Uses an English dictionary
+          company-yasnippet ; Works everywhere
           ))))
 (dolist (hook '(text-mode-hook)) ; Should extend to `markdown-mode' and `org-mode'
   (add-hook hook (lambda ()
@@ -3817,15 +3840,13 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          (company-capf ; Disabled LSP mode's capf autoconfiguration
-           :with
-           company-yasnippet
+        '((company-capf
            company-keywords
-           company-files)
-          (company-dabbrev-code
-           company-dabbrev)
-          )))
+           company-files
+           company-dabbrev-code
+           company-dabbrev
+           company-yasnippet
+           ))))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 (defun sb/company-c-mode ()
@@ -3834,11 +3855,12 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           company-capf ; Disabled LSP mode's capf autoconfiguration
-           company-dabbrev-code
+           company-capf
+           company-tabnine
            company-keywords
-           company-yasnippet
            company-files
+           company-yasnippet
+           company-dabbrev-code
            ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
            ;; company-clang ; This can be slow
            ;; company-dabbrev
@@ -3853,14 +3875,15 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           company-capf ; LSP mode autoconfigures capf
+           company-capf
+           company-tabnine
            company-shell
            company-shell-env
            company-fish-shell
-           company-yasnippet
            company-files
            company-dabbrev-code
-           ;; company-dabbrev
+           company-dabbrev
+           company-yasnippet
            ))))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
@@ -3870,11 +3893,11 @@ Ignore if no file is found."
   (set (make-local-variable 'company-backends)
        '((
           company-capf
-          company-yasnippet
           company-elisp
+          company-tabnine
           company-files
-          company-dabbrev-code
           company-dabbrev
+          company-yasnippet
           ))))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
@@ -3887,17 +3910,16 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          (company-capf :with
-                        ;; company-jedi
-                        ;; company-keywords
-                        company-yasnippet
-                        ;; company-tabnine
-                        company-files
-                        ;; company-dabbrev-code
-                        )
-          company-dabbrev
-          )))
+        '((company-capf
+           company-tabnine
+           company-files
+           ;; company-jedi
+           ;; company-keywords
+           ;; company-tabnine
+           ;; company-dabbrev-code
+           company-yasnippet
+           company-dabbrev
+           ))))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 (defun sb/company-latex-mode ()
@@ -3910,9 +3932,9 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           company-yasnippet
            company-capf
-           ;; company-tabnine
+           company-tabnine
+           company-files
            company-bibtex
            ;; company-math-symbols-latex
            ;; company-latex-commands
@@ -3921,9 +3943,9 @@ Ignore if no file is found."
            company-reftex-citations
            ;; company-auctex-labels
            ;; company-auctex-bibs
-           company-files
            company-dabbrev
            company-ispell
+           company-yasnippet
            ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
@@ -3933,12 +3955,12 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           (company-capf :with
-                         company-yasnippet
-                         ;; company-tabnine
-                         company-files)
+           company-capf
+           company-tabnine
+           company-files
            company-dabbrev
            company-ispell
+           company-yasnippet
            ))))
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))
