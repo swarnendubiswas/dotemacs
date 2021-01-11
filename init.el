@@ -109,7 +109,7 @@
   (make-directory dotemacs-temp-directory))
 
 (defcustom dotemacs-theme
-  'none
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -129,7 +129,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'moody
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -191,7 +191,7 @@ whitespaces."
 
 ;; Keep enabled till the configuration is stable
 (defcustom dotemacs-debug-init-file
-  t
+  nil
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -239,6 +239,9 @@ whitespaces."
 (defvar compilation-scroll-output)
 (defvar grep-highlight-matches)
 (defvar grep-scroll-output)
+(defvar quelpa-update-melpa-p)
+(defvar quelpa-upgrade-interval)
+(defvar quelpa-self-upgrade-p)
 (defvar tags-revert-without-query)
 (defvar use-package-always-defer)
 (defvar use-package-compute-statistics)
@@ -301,8 +304,18 @@ whitespaces."
 
 (use-package use-package-hydra)
 
-(use-package use-package-chords
-  :config (key-chord-mode 1))
+(require 'use-package-chords)
+(key-chord-mode 1)
+
+(unless (package-installed-p 'quelpa)
+  (package-refresh-contents)
+  (package-install 'quelpa))
+(setq quelpa-self-upgrade-p nil
+      quelpa-update-melpa-p nil
+      quelpa-upgrade-interval 30)
+
+(eval-when-compile
+  (require 'quelpa-use-package))
 
 ;; Put this early in the `user-init-file'
 (use-package no-littering)
@@ -709,6 +722,13 @@ SAVE-FN with non-nil ARGS."
 (use-package modus-operandi-theme
   :ensure moody
   :ensure modus-themes
+  :defines (modus-operandi-theme-completions
+            modus-operandi-theme-fringes
+            modus-operandi-theme-intense-hl-line
+            modus-operandi-theme-intense-standard-completions
+            modus-operandi-theme-mode-line
+            modus-operandi-theme-scale-headings
+            modus-operandi-theme-variable-pitch-headings)
   :if (eq dotemacs-theme 'modus-operandi)
   :init
   (setq modus-operandi-theme-completions 'opinionated
@@ -730,6 +750,9 @@ SAVE-FN with non-nil ARGS."
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
+  :defines (modus-vivendi-theme-mode-line
+            modus-vivendi-theme-scale-headings
+            modus-vivendi-theme-variable-pitch-headings)
   :if (eq dotemacs-theme 'modus-vivendi)
   :init
   (setq modus-vivendi-theme-mode-line 'moody
@@ -813,7 +836,8 @@ SAVE-FN with non-nil ARGS."
 (use-package awesome-tray
   :ensure nil
   :if (eq dotemacs-modeline-theme 'awesome-tray)
-  :load-path "extras"
+  ;; :load-path "extras"
+  :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
   :hook (after-init . awesome-tray-mode)
   :custom
   (awesome-tray-active-modules
@@ -1155,7 +1179,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package swiper
   :bind
-  (([remap swiper] . swiper-isearch)
+  (;; ([remap swiper] . swiper-isearch) ; `swiper' is slow
    ("<f4>" . swiper-isearch))
   :custom (swiper-action-recenter t))
 
@@ -1514,9 +1538,9 @@ SAVE-FN with non-nil ARGS."
   ;;              '(counsel-company . ivy-display-function-overlay))
   )
 
-(with-eval-after-load 'company
-  (bind-key "C-;" #'counsel-company company-mode-map)
-  (bind-key "C-;" #'counsel-company company-active-map))
+;; (with-eval-after-load 'company
+;;   (bind-key "C-;" #'counsel-company company-mode-map)
+;;   (bind-key "C-;" #'counsel-company company-active-map))
 
 (use-package ivy-hydra
   :after (ivy hydra)
@@ -1758,7 +1782,8 @@ SAVE-FN with non-nil ARGS."
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  :diminish (smartparens-mode show-smartparens-mode)
+  ;; :diminish (smartparens-global-mode smartparens-mode
+  ;;                                    show-smartparens-mode show-smartparens-global-mode)
   :commands sp-local-pair
   :hook
   (((latex-mode LaTeX-mode) . (lambda ()
@@ -1814,7 +1839,7 @@ SAVE-FN with non-nil ARGS."
   :custom
   (projectile-auto-discover nil "Do not discover projects")
   (projectile-completion-system 'ivy)
-  (projectile-enable-caching nil "Problematic if you create new files often")
+  (projectile-enable-caching t "Problematic if you create new files often")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the alien or hybrid indexing method
   (projectile-indexing-method 'alien)
@@ -1958,7 +1983,8 @@ This file is specified in `counsel-projectile-default-file'."
                                        flycheck-select-checker
                                        flycheck-verify-setup
                                        flycheck-next-error
-                                       flycheck-disable-checker)
+                                       flycheck-disable-checker
+                                       flycheck-add-mode)
   :hook (after-init . global-flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
@@ -1997,8 +2023,7 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
-  ;; :defer 2 ; Expensive to load
-  :after text-mode
+  :demand t
   :config
   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
   (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
@@ -2117,6 +2142,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package number-separator
   :ensure nil
   :load-path "extras"
+  ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el") :upgrade t)
   :custom
   (number-separator ",")
   (number-separator-interval 3)
@@ -2398,10 +2424,6 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package expand-region ; Expand region by semantic units
   :bind ("C-=" . er/expand-region))
 
-(use-package expand-line
-  :defines expand-line-mode
-  :bind ("M-i" . turn-on-expand-line-mode))
-
 (use-package smart-mark ; Restore point with `C-g' after marking a region
   :hook (after-init . smart-mark-mode))
 
@@ -2667,11 +2689,13 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package llvm-mode
   :ensure nil
   :load-path "extras"
+  ;; :quelpa ((llvm-mode :fetcher github :repo "llvm/llvm-project/tree/main/llvm/utils/emacs"))
   :mode "\\.ll\\'")
 
 (use-package tablegen-mode
   :ensure nil
   :load-path "extras"
+  ;; :quelpa ((tablegen-mode :fetcher github :repo "llvm/llvm-project/tree/main/llvm/utils/emacs"))
   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
@@ -3522,6 +3546,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prism
   :load-path "extras"
   :disabled t
+  ;; :quelpa ((prism-mode :fetcher github :repo "alphapapa/prism.el"))
   :hook
   (((emacs-lisp-mode lisp-mode) . prism-mode)
    (python-mode . prism-whitespace-mode)))

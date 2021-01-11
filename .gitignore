@@ -44,3 +44,5 @@ amx-items
 package-quickstart.el
 private.el
 spell-fu
+
+quelpa

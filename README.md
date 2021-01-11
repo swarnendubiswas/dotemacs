@@ -19,7 +19,7 @@ You can use the following instructions to install third-party applications. Add 
 #### Ubuntu 18.04 Packages
 
 ```Bash
-LLVM_VERSION="-11"
+export LLVM_VERSION="-11"
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
 sudo dpkg -i fd_8.2.1_amd64.deb
@@ -28,7 +28,7 @@ sudo dpkg -i fd_8.2.1_amd64.deb
 #### Ubuntu 20.04 Packages
 
 ```Bash
-LLVM_VERSION="-11"
+export LLVM_VERSION="-11"
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
 sudo dpkg -i fd_8.2.1_amd64.deb
@@ -61,6 +61,8 @@ sudo cpanm Perl::LanguageServer
 #### `Node.js` Packages
 
 > Setup `nvm` to help with node packages
+
+Reference: <https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-18-04>
 
 ```Bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash; source ~/.bashrc; nvm install node;
@@ -385,3 +387,4 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - Bash LSP takes lot of memory
 - Flycheck not working with .el files with `no-byte-compile` in `.dir-locals.el`
 - Use `straight` or `quelpa` to install packages directly from GitHub
+- `diminish smartparens-mode`
