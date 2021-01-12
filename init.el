@@ -444,7 +444,8 @@ whitespaces."
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
-(setq-default fill-column dotemacs-fill-column
+(setq-default electric-indent-inhibit nil
+              fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs
               indicate-empty-lines nil
               ;; tab-always-indent 'complete
@@ -784,8 +785,8 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'mode-line-buffer-id nil
                         :weight 'bold
                         :foreground "black"
-                        :background "gray88")
-    (powerline-default-theme)))
+                        :background "gray88"))
+  (powerline-default-theme))
 
 (use-package smart-mode-line
   :if (eq dotemacs-modeline-theme 'sml)
@@ -1109,7 +1110,9 @@ SAVE-FN with non-nil ARGS."
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
-  :hook (org-mode . visual-line-mode)
+  :hook
+  ((org-mode . visual-line-mode)
+   (org-mode . org-indent-mode))
   :diminish org-indent-mode
   :custom
   (org-src-fontify-natively t "Code block fontification using the major-mode of the code")
@@ -1393,8 +1396,8 @@ SAVE-FN with non-nil ARGS."
                        lambda (_caller)
                        (/ (frame-height) 2))))
   (ivy-re-builders-alist '(
-                           (counsel-M-x . ivy--regex-fuzzy)
-                           (counsel-find-file . ivy--regex-fuzzy)
+                           ;; (counsel-M-x . ivy--regex-fuzzy)
+                           ;; (counsel-find-file . ivy--regex-fuzzy)
                            ;; (swiper . ivy--regex-fuzzy)
                            ;; (swiper-isearch . ivy--regex-fuzzy)
                            ;; (counsel-rg . ivy--regex-ignore-order)
@@ -2783,6 +2786,9 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :mode ("\\.rst\\'" . rst-mode))
 
+(use-package xref-rst
+  :hook (rst-mode . xref-rst-mode))
+
 (use-package boogie-friends
   :mode ("\\.smt\\'" . z3-smt2-mode))
 
@@ -3842,6 +3848,12 @@ Ignore if no file is found."
 
 (use-package adoc-mode
   :mode "\\.adoc\\'")
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-delete-old-versions t)
+  (auto-package-update-hide-results t)
+  :config (auto-package-update-maybe))
 
 ;; A few backends are applicable to all modes and can be block: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
