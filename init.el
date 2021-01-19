@@ -2934,6 +2934,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;;                               perlls-remote php-ls xmlls
   ;;                               xmlls-remote yamlls yamlls-remote))
   (lsp-headerline-breadcrumb-enable t "Breadcrumb is not useful for all modes")
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -3316,6 +3317,7 @@ This file is specified in `counsel-projectile-default-file'."
   :custom
   (python-indent-offset 4)
   (python-indent-guess-indent-offset nil)
+  (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
   (python-shell-exec-path "python3")
   (python-shell-interpreter "python3")
   :config
@@ -3543,10 +3545,8 @@ This file is specified in `counsel-projectile-default-file'."
                  (lsp-deferred))))
 
 (use-package yaml-imenu
-  :commands (yaml-imenu-create-index yaml-imenu-activate
-                                     yaml-imenu-enable
-                                     yaml-imenu-disable)
-  :config (yaml-mode . yaml-imenu-enable))
+  :after yaml-mode
+  :config (yaml-imenu-enable))
 
 (use-package bat-mode
   :ensure nil
@@ -4151,7 +4151,9 @@ Increase line spacing by two line height."
 ;; used.
 (defcustom sb/skippable-buffers
   '(
-    "TAGS" "*Backtrace*" "*company-documentation*"
+    "TAGS"
+    "*Backtrace*"
+    "*company-documentation*" ; major mode is python-mode
     ;; "*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
     ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
     ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"
