@@ -309,7 +309,10 @@ WantedBy=default.target
 ```
 
 - Enable the unit to start at login: `systemctl --user enable emacs.service`
+- Disable the unit to start at login: `systemctl --user disable emacs.service`
 - Start the service for the current session: `systemctl --user start emacs.service`
+- Stop the service for the current session: `systemctl --user stop emacs.service`
+- Restart the service for the current session: `systemctl --user restart emacs.service`
 
 Create a `emacsclient.desktop` file in `$HOME/.local/share/applications/` with the following content.
 
@@ -319,8 +322,8 @@ Name=GNU Emacsclient
 GenericName=Text Editor
 Comment=Edit text
 MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-Exec=emacsclient -c -a "" -n -F "'(fullscreen . maximized)"
-Icon=emacs27
+Exec=emacsclient -c -a "" -n -F "'(fullscreen . maximized)" %f
+Icon=emacs
 Type=Application
 Terminal=false
 Categories=Development;TextEditor;Utility;

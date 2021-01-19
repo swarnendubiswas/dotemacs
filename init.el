@@ -39,8 +39,6 @@
 
 ;; If we omit :defer, :hook, :commands, or :after, then the package is loaded immediately.
 
-;; `emacs-startup-hook' runs later than the `after-init-hook'
-
 ;; Good articles and reference configurations
 ;; https://protesilaos.com/dotemacs
 ;; https://github.com/CSRaghunandan/.emacs.d
@@ -85,7 +83,8 @@
   (setq gc-cons-percentage 0.1
         gc-cons-threshold dotemacs-8MB))
 
-(add-hook 'after-init-hook #'sb/restore-garbage-collection)
+;; `emacs-startup-hook' runs later than the `after-init-hook'
+(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
@@ -239,6 +238,18 @@ whitespaces."
 (defvar compilation-scroll-output)
 (defvar grep-highlight-matches)
 (defvar grep-scroll-output)
+(defvar lsp-pyls-configuration-sources)
+(defvar lsp-pyls-plugins-autopep8-enable)
+(defvar lsp-pyls-plugins-mccabe-enabled)
+(defvar lsp-pyls-plugins-pycodestyle-enabled)
+(defvar lsp-pyls-plugins-pycodestyle-max-line-length)
+(defvar lsp-pyls-plugins-pydocstyle-convention)
+(defvar lsp-pyls-plugins-pydocstyle-enabled)
+(defvar lsp-pyls-plugins-pydocstyle-ignore)
+(defvar lsp-pyls-plugins-pyflakes-enabled)
+(defvar lsp-pyls-plugins-pylint-args)
+(defvar lsp-pyls-plugins-pylint-enabled)
+(defvar lsp-pyls-plugins-yapf-enabled)
 (defvar quelpa-update-melpa-p)
 (defvar quelpa-upgrade-interval)
 (defvar quelpa-self-upgrade-p)
@@ -304,8 +315,9 @@ whitespaces."
 
 (use-package use-package-hydra)
 
-(require 'use-package-chords)
-(key-chord-mode 1)
+(use-package use-package-chords
+  :demand t
+  :config (key-chord-mode 1))
 
 (unless (package-installed-p 'quelpa)
   (package-refresh-contents)
@@ -314,8 +326,8 @@ whitespaces."
       quelpa-update-melpa-p nil
       quelpa-upgrade-interval 30)
 
-(eval-when-compile
-  (require 'quelpa-use-package))
+(use-package quelpa-use-package
+  :demand t)
 
 ;; Put this early in the `user-init-file'
 (use-package no-littering)
@@ -1039,8 +1051,7 @@ SAVE-FN with non-nil ARGS."
   :hook
   ((projectile-mode . treemacs-filewatch-mode)
    (projectile-mode . treemacs-follow-mode)
-   ;; (projectile-mode . treemacs-fringe-indicator-mode)
-   )
+   (projectile-mode . treemacs-fringe-indicator-mode))
   :custom
   (treemacs-collapse-dirs 3)
   (treemacs-follow-after-init t)
@@ -1048,6 +1059,7 @@ SAVE-FN with non-nil ARGS."
   (treemacs-indentation 2)
   (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
   (treemacs-lock-width t)
+  (treemacs-no-png-images t)
   (treemacs-position 'right)
   (treemacs-project-follow-cleanup t)
   (treemacs-recenter-after-file-follow t)
@@ -1063,7 +1075,7 @@ SAVE-FN with non-nil ARGS."
   (unless (bound-and-true-p dotemacs-use-no-littering)
     (setq treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory)))
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
-  ;; (treemacs-tag-follow-mode 1)
+  (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
   (set-face-attribute 'treemacs-directory-face nil :height 0.7)
@@ -1341,13 +1353,15 @@ SAVE-FN with non-nil ARGS."
 ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
 ;; computationally expensive
 (use-package company-tabnine
-  :after company)
+  :after company
+  ;; Completions seem to be laggy with tabnine enabled
+  :disabled t)
 
 (use-package company-fuzzy
   :after company
-  :disabled t
+  :disabled t ; It seems there is a lag during completions
   :diminish
-  :init (global-company-fuzzy-mode 1))
+  :hook (after-init . global-company-fuzzy-mode))
 
 (use-package flx
   :disabled t)
@@ -1415,7 +1429,7 @@ SAVE-FN with non-nil ARGS."
                     "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
                     "*flycheck-posframe-buffer*" "^\\*Ibuffer\\*$" "*emacs*" "*Warnings*"
                     "^\\*prettier" "^\\*json*" "^\\*texlab*" "^\\*clangd*"
-                    "^\\*shfmt*"
+                    "^\\*shfmt*" "*company-documentation*" "*xref*"
                     ))
     (add-to-list 'ivy-ignore-buffers buffer))
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
@@ -1456,7 +1470,6 @@ SAVE-FN with non-nil ARGS."
    ([remap describe-function] . counsel-describe-function)
    ([remap describe-variable] . counsel-describe-variable)
    ([remap dired] . counsel-dired)
-   ("C-x f" . counsel-file-jump) ; Jump to a file below the current directory
    ([remap find-file] . counsel-find-file)
    ("<f2>" . counsel-find-file)
    ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
@@ -1472,7 +1485,7 @@ SAVE-FN with non-nil ARGS."
    ("C-c C-m" . counsel-mark-ring)
    ;; ("<f3>" . counsel-switch-buffer) ; Preview of buffers can be a bottleneck
    ([remap yank-pop] . counsel-yank-pop))
-  :bind* ("C-c C-j" . counsel-semantic-or-imenu)
+  :bind* ("C-c C-j" . counsel-imenu)
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -1685,7 +1698,6 @@ SAVE-FN with non-nil ARGS."
 
  (use-package flyspell-correct-ivy
    :ensure flyspell-correct
-   :custom (flyspell-correct-interface #'flyspell-correct-ivy)
    :bind ("C-;" . flyspell-correct-wrapper)))
 
 (defhydra sb/hydra-spelling (:color blue)
@@ -1781,10 +1793,11 @@ SAVE-FN with non-nil ARGS."
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
-;; FIXME: Seems to have performance issue with latex-mode and markdown-mode.
+;; FIXME: Seems to have performance issue with latex-mode, markdown-mode, and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
+  :disabled t
   ;; :diminish (smartparens-global-mode smartparens-mode
   ;;                                    show-smartparens-mode show-smartparens-global-mode)
   :commands sp-local-pair
@@ -1972,7 +1985,11 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package counsel-fd
   :if (executable-find "fd")
-  :commands (counsel-fd-dired-jump counsel-fd-file-jump))
+  :commands (counsel-fd-dired-jump counsel-fd-file-jump)
+  :bind
+  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
+   ;; Jump to a file below the current directory
+   ("C-x f" . counsel-fd-file-jump)))
 
 ;; FIXME: Exclude directories and files from being checked
 ;; https://github.com/flycheck/flycheck/issues/1745
@@ -1988,11 +2005,10 @@ This file is specified in `counsel-projectile-default-file'."
                                        flycheck-next-error
                                        flycheck-disable-checker
                                        flycheck-add-mode)
-  :hook (after-init . global-flycheck-mode)
+  :hook ((text-mode prog-mode) . flycheck-mode) ; There are no checkers for modes like `csv-mode'
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
   (flycheck-checker-error-threshold 500)
-  (flycheck-display-errors-delay 0)
   (flycheck-idle-buffer-switch-delay 2) ; seconds
   (flycheck-idle-change-delay 2) ; seconds
   (flycheck-emacs-lisp-load-path 'inherit)
@@ -2137,7 +2153,8 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'hl-todo-keyword-faces '("TEST" . "tomato"))
   (add-to-list 'hl-todo-keyword-faces '("WARNING" . "#cc0000"))
   (add-to-list 'hl-todo-keyword-faces '("BEWARE" . "#aa0000"))
-  (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000")))
+  (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
+  (add-to-list 'hl-todo-keyword-faces '("REFACTOR" . "#cc9393")))
 
 (use-package highlight-numbers
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
@@ -2145,17 +2162,17 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package number-separator
   :ensure nil
   :load-path "extras"
-  ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el") :upgrade t)
+  ;; :quelpa (number-separator :fetcher github :repo "legalnonsense/number-separator.el")
+  :diminish
   :custom
   (number-separator ",")
   (number-separator-interval 3)
   (number-separator-ignore-threshold 4)
   (number-separator-decimal-char ".")
-  :diminish
   :hook (after-init . number-separator-mode))
 
 (use-package highlight-escape-sequences
-  :hook (after-init . hes-mode))
+  :hook (prog-mode . hes-mode))
 
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
@@ -2220,7 +2237,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package imenu
   :ensure nil
-  :after (:any markdown-mode prog-mode)
+  :after (:any markdown-mode yaml-mode prog-mode)
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 500)
@@ -2418,6 +2435,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2558,6 +2576,10 @@ This file is specified in `counsel-projectile-default-file'."
   (avy-style 'at)
   :config (avy-setup-default))
 
+;; This package adds a "C-'" binding to Ivy minibuffer that uses Avy
+(use-package ivy-avy
+  :commands ivy-avy)
+
 (use-package bookmark
   :ensure nil
   :disabled t
@@ -2594,9 +2616,13 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package bug-hunter
   :commands (bug-hunter-init-file bug-hunter-file))
 
+;; (debug-on-entry 'package-initialize)
+
 (use-package explain-pause-mode
   :ensure nil
-  :load-path "extras"
+  :disabled t
+  ;; :load-path "extras"
+  :quelpa ((explain-pause-mode :fetcher github :repo "lastquestion/explain-pause-mode"))
   :commands (explain-pause-mode explain-pause-top)
   ;; :hook (after-init . explain-pause-mode)
   :diminish)
@@ -2870,9 +2896,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
   :hook
-  (
-   ((cperl-mode css-mode less-mode perl-mode sgml-mode
-                typescript-mode) . lsp-deferred)
+  (((cperl-mode css-mode less-mode perl-mode sgml-mode typescript-mode) . lsp-deferred)
    (lsp-mode . lsp-enable-which-key-integration)
    (lsp-managed-mode . lsp-modeline-diagnostics-mode)
    ((c++-mode python-mode java-mode web-mode) . lsp-headerline-breadcrumb-mode)
@@ -2897,18 +2921,18 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-semantic-tokens t)
   (lsp-enable-snippet t) ; Autocomplete parentheses
-  (lsp-enabled-clients '(clangd clangd-remote jsts-ls flow-ls
-                                ts-ls eslint json-ls
-                                jsonls-remote cmakels
-                                cmakels-remote html-ls
-                                htmlls-remote angular-ls texlab
-                                texlab-remote jdtls bash-ls
-                                bashls-remote typescript-remote
-                                css-ls cssls-remote
-                                intelephense-remote
-                                perl-language-server
-                                perlls-remote php-ls xmlls
-                                xmlls-remote yamlls yamlls-remote))
+  ;; (lsp-enabled-clients '(clangd clangd-remote jsts-ls flow-ls
+  ;;                               ts-ls eslint json-ls
+  ;;                               jsonls-remote cmakels
+  ;;                               cmakels-remote html-ls
+  ;;                               htmlls-remote angular-ls texlab
+  ;;                               texlab-remote jdtls bash-ls
+  ;;                               bashls-remote typescript-remote
+  ;;                               css-ls cssls-remote
+  ;;                               intelephense-remote
+  ;;                               perl-language-server
+  ;;                               perlls-remote php-ls xmlls
+  ;;                               xmlls-remote yamlls yamlls-remote))
   (lsp-headerline-breadcrumb-enable t "Breadcrumb is not useful for all modes")
   (lsp-html-format-wrap-line-length dotemacs-fill-column)
   (lsp-html-format-end-with-newline t)
@@ -2918,28 +2942,9 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-keep-workspace-alive nil)
   (lsp-log-io nil "texlab communication is huge")
   (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
-  (lsp-pyls-configuration-sources [])
-  (lsp-pyls-plugins-autopep8-enabled nil)
-  ;; Do not turn on fuzzy completion with jedi, lsp-mode is fuzzy on the client side
-  ;; (lsp-pyls-plugins-jedi-completion-fuzzy nil)
-  (lsp-pyls-plugins-mccabe-enabled nil)
-  ;; Set this per-project
-  ;; (lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"])
-  (lsp-pyls-plugins-pycodestyle-enabled nil)
-  (lsp-pyls-plugins-pycodestyle-max-line-length dotemacs-fill-column)
-  (lsp-pyls-plugins-pydocstyle-convention "pep257")
-  (lsp-pyls-plugins-pydocstyle-enabled nil)
-  (lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
-  (lsp-pyls-plugins-pyflakes-enabled nil)
-  (lsp-pyls-plugins-pylint-args (vconcat
-                                 (list "-j 2"
-                                       (concat "--rcfile="
-                                               (expand-file-name ".config/pylintrc"
-                                                                 dotemacs-user-home)))))
-  (lsp-pyls-plugins-pylint-enabled t "Pylint can be expensive")
-  (lsp-pyls-plugins-yapf-enabled t)
-  ;; (lsp-signature-auto-activate nil)
-  ;; (lsp-signature-render-documentation nil)
+  ;; Sudden changes in the height of the echo area causes the cursor to lose position
+  (lsp-signature-auto-activate nil)
+  (lsp-signature-render-documentation nil)
   (lsp-xml-logs-client nil)
   ;; https://github.com/eclipse/lemminx/archive/0.14.1.tar.gz
   (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
@@ -2964,6 +2969,28 @@ This file is specified in `counsel-projectile-default-file'."
   :config
   (unless (bound-and-true-p dotemacs-use-no-littering)
     (setq lsp-session-file (expand-file-name "lsp-session" dotemacs-temp-directory)))
+
+  (when (eq dotemacs-python-langserver 'pyls)
+    (setq lsp-pyls-configuration-sources []
+          lsp-pyls-plugins-autopep8-enable nil
+          ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
+          ;; lsp-pyls-plugins-jedi-completion-fuzzy nil
+          lsp-pyls-plugins-mccabe-enabled nil
+          ;; Set this per-project
+          ;; lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"]
+          lsp-pyls-plugins-pycodestyle-enabled nil
+          lsp-pyls-plugins-pycodestyle-max-line-length dotemacs-fill-column
+          lsp-pyls-plugins-pydocstyle-convention "pep257"
+          lsp-pyls-plugins-pydocstyle-enabled nil
+          lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+          lsp-pyls-plugins-pyflakes-enabled nil
+          lsp-pyls-plugins-pylint-args (vconcat
+                                        (list "-j 2"
+                                              (concat "--rcfile="
+                                                      (expand-file-name ".config/pylintrc"
+                                                                        dotemacs-user-home))))
+          lsp-pyls-plugins-pylint-enabled t ; Pylint can be expensive
+          lsp-pyls-plugins-yapf-enabled t))
 
   ;; Support lsp over tramp
   ;; (with-eval-after-load 'tramp
@@ -3127,6 +3154,7 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil)
+  (lsp-ui-imenu-auto-refresh 'after-save)
   (lsp-ui-sideline-enable nil)
   :bind (:map lsp-ui-mode-map
               ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -3176,10 +3204,11 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-python-ms)
-                   (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-                     (add-to-list 'lsp-disabled-clients ls))
-                   (add-to-list 'lsp-enabled-clients 'mspyls)
-                   (add-to-list 'lsp-enabled-clients 'mspyls-remote)))
+                   ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
+                   ;;   (add-to-list 'lsp-disabled-clients ls))
+                   ;; (add-to-list 'lsp-enabled-clients 'mspyls)
+                   ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
+                   ))
   :custom
   (lsp-python-ms-python-executable-cmd "python3"))
 
@@ -3190,10 +3219,11 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-pyright)
-                   (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-                     (add-to-list 'lsp-disabled-clients ls))
-                   (add-to-list 'lsp-enabled-clients 'pyright)
-                   (add-to-list 'lsp-enabled-clients 'pyright-remote)))
+                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
+                   ;;   (add-to-list 'lsp-disabled-clients ls))
+                   ;; (add-to-list 'lsp-enabled-clients 'pyright)
+                   ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
+                   ))
   :custom
   (lsp-pyright-python-executable-cmd "python3"))
 
@@ -3202,19 +3232,19 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-jedi)
-                   (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-                     (add-to-list 'lsp-disabled-clients ls))
-                   (add-to-list 'lsp-enabled-clients 'jedi)
-                   (add-to-list 'lsp-enabled-clients 'jedils-remote)))
-  :custom
-  (lsp-jedi-diagnostics-enable t))
+                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
+                   ;;   (add-to-list 'lsp-disabled-clients ls))
+                   ;; (add-to-list 'lsp-enabled-clients 'jedi)
+                   ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
+                   ))
+  :custom (lsp-jedi-diagnostics-enable t))
 
 ;; Py-yapf works on a temporary file (placed in /tmp). Therefore it does not pick up on any project
 ;; specific YAPF styles. Yapfify works on the original file, so that any project settings supported
 ;; by YAPF itself are used
 (use-package yapfify
   :diminish yapf-mode
-  :if (eq dotemacs-python-langserver 'pyright)
+  :if (and (eq dotemacs-python-langserver 'pyright) (executable-find "yapf"))
   :hook (python-mode . yapf-mode))
 
 ;;  Call this in c-mode-common-hook:
@@ -3289,13 +3319,13 @@ This file is specified in `counsel-projectile-default-file'."
   (python-shell-exec-path "python3")
   (python-shell-interpreter "python3")
   :config
-  (with-eval-after-load 'lsp-mode
-    (when (and (eq dotemacs-python-langserver 'pyls) (executable-find "pyls"))
-      (progn
-        (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
-          (add-to-list 'lsp-disabled-clients ls))
-        (add-to-list 'lsp-enabled-clients 'pyls)
-        (add-to-list 'lsp-enabled-clients 'pyls-remote))))
+  ;; (with-eval-after-load 'lsp-mode
+  ;;   (when (and (eq dotemacs-python-langserver 'pyls) (executable-find "pyls"))
+  ;;     (progn
+  ;;       (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
+  ;;         (add-to-list 'lsp-disabled-clients ls))
+  ;;       (add-to-list 'lsp-enabled-clients 'pyls)
+  ;;       (add-to-list 'lsp-enabled-clients 'pyls-remote))))
   (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
                                 auto-mode-alist))
@@ -3314,15 +3344,13 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package pyvenv
   :diminish
   :custom
-  (pyvenv-mode-line-indicator
-   '(pyvenv-virtual-env-name ("[venv:"
-                              pyvenv-virtual-env-name "]")))
+  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:"
+                                                         pyvenv-virtual-env-name "]")))
   :hook (python-mode . pyvenv-mode)
   :config
   (setq pyvenv-post-activate-hooks
         (list (lambda ()
-                (setq python-shell-interpreter (concat
-                                                pyvenv-virtual-env "bin/python3")))))
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
   (setq pyvenv-post-deactivate-hooks
         (list (lambda ()
                 (setq python-shell-interpreter "python3")))))
@@ -3330,6 +3358,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package py-isort
   :if (and (executable-find "isort") (eq dotemacs-python-langserver 'pyright))
   :commands (py-isort-buffer py-isort-region py-isort-before-save)
+  :custom
+  (py-isort-options '("--lines=100" "--atomic" "--balanced" "--settings-path"))
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
@@ -3397,7 +3427,7 @@ This file is specified in `counsel-projectile-default-file'."
     (setq transient-history-file (expand-file-name "transient/history.el" dotemacs-temp-directory)
           transient-levels-file (expand-file-name "transient/levels.el" dotemacs-temp-directory)
           transient-values-file (expand-file-name "transient/values.el" dotemacs-temp-directory)))
-  :config (transient-bind-q-to-quit))
+  (transient-bind-q-to-quit))
 
 (use-package magit
   :commands (magit-display-buffer-fullframe-status-v1 magit-status)
@@ -3410,7 +3440,6 @@ This file is specified in `counsel-projectile-default-file'."
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
-  (magit-save-repository-buffers t)
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist '((stashes . show)
                                             (untracked . show)
@@ -3440,6 +3469,7 @@ This file is specified in `counsel-projectile-default-file'."
    ("/git/config\\'"    . gitconfig-mode)
    ("/\\.gitmodules\\'" . gitconfig-mode)))
 
+;; Diff-hl looks nicer
 (or
  (use-package git-gutter
    :diminish
@@ -3456,7 +3486,7 @@ This file is specified in `counsel-projectile-default-file'."
 
  (use-package diff-hl ; Based on `vc'
    :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
-   :custom (diff-hl-draw-borders nil)
+   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
    :hook
    ((magit-post-refresh . diff-hl-magit-post-refresh)
     (magit-pre-refresh . diff-hl-magit-pre-refresh)
@@ -3506,13 +3536,17 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package yaml-mode
   :mode
   ((".clang-format" . yaml-mode)
-   (".clang-tidy" . yaml-mode))
-  :hook (yaml-mode . lsp-deferred))
+   (".clang-tidy"   . yaml-mode))
+  :hook
+  (yaml-mode . (lambda ()
+                 (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
+                 (lsp-deferred))))
 
 (use-package yaml-imenu
   :commands (yaml-imenu-create-index yaml-imenu-activate
                                      yaml-imenu-enable
-                                     yaml-imenu-disable))
+                                     yaml-imenu-disable)
+  :config (yaml-mode . yaml-imenu-enable))
 
 (use-package bat-mode
   :ensure nil
@@ -3522,14 +3556,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package web-mode
   :mode
-  (("\\.html?\\'" . web-mode)
-   ("\\.djhtml\\'" . web-mode)
-   ("\\.phtml\\'" . web-mode)
+  (("\\.html?\\'"     . web-mode)
+   ("\\.djhtml\\'"    . web-mode)
+   ("\\.phtml\\'"     . web-mode)
    ("\\.hb\\.html\\'" . web-mode)
    ("\\.tpl\\.php\\'" . web-mode)
-   ("\\.[agj]sp\\'" . web-mode)
-   ("\\.as[cp]x\\'" . web-mode)
-   ("\\.erb\\'" . web-mode))
+   ("\\.[agj]sp\\'"   . web-mode)
+   ("\\.as[cp]x\\'"   . web-mode)
+   ("\\.erb\\'"       . web-mode))
   :hook (web-mode . lsp-deferred)
   :config (flycheck-add-mode 'javascript-eslint 'web-mode)
   :custom
@@ -3546,7 +3580,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package rainbow-mode
   :diminish
-  :commands rainbow-mode
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
 (use-package prism
@@ -3855,19 +3888,22 @@ Ignore if no file is found."
   (auto-package-update-hide-results t)
   :config (auto-package-update-maybe))
 
-;; A few backends are applicable to all modes and can be block: `company-yasnippet',
+;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
 ;; https://tychoish.com/post/better-company/
+;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (set (make-local-variable 'company-backends)
-       '((
-          company-tabnine
-          company-files
-          company-dabbrev
-          company-ispell ; Uses an English dictionary
-          company-yasnippet ; Works everywhere
-          ))))
+       '(
+         company-files
+         company-yasnippet ; Works everywhere
+         company-ispell ; Uses an English dictionary
+         ;; `company-dabbrev' returns non-nil prefix in almost any context (major mode, inside
+         ;; strings or comments). That is why it is better to put it at the end of
+         ;; `company-backends'
+         company-dabbrev
+         )))
 (dolist (hook '(text-mode-hook)) ; Should extend to `markdown-mode' and `org-mode'
   (add-hook hook (lambda ()
                    (sb/company-text-mode))))
@@ -3877,13 +3913,14 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((company-capf
-           company-keywords
-           company-files
-           company-dabbrev-code
-           company-dabbrev
-           company-yasnippet
-           ))))
+        '(
+          company-files
+          company-keywords
+          company-capf
+          company-yasnippet
+          company-dabbrev-code
+          company-dabbrev
+          )))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 (defun sb/company-c-mode ()
@@ -3891,17 +3928,16 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-capf
-           company-tabnine
-           company-keywords
-           company-files
-           company-yasnippet
-           company-dabbrev-code
-           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-           ;; company-clang ; This can be slow
-           ;; company-dabbrev
-           ))))
+        '(
+          company-files
+          company-keywords
+          company-capf
+          company-yasnippet
+          company-dabbrev-code
+          ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+          ;; company-clang ; This can be slow
+          company-dabbrev
+          )))
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
@@ -3911,31 +3947,29 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-capf
-           company-tabnine
-           company-shell
+        '(
+          company-files
+          company-capf
+          (company-shell
            company-shell-env
-           company-fish-shell
-           company-files
-           company-dabbrev-code
-           company-dabbrev
-           company-yasnippet
-           ))))
+           company-fish-shell)
+          company-yasnippet
+          company-dabbrev-code
+          company-dabbrev
+          )))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp mode."
   (setq-local company-minimum-prefix-length 2)
   (set (make-local-variable 'company-backends)
-       '((
-          company-capf
-          company-elisp
-          company-tabnine
-          company-files
-          company-dabbrev
-          company-yasnippet
-          ))))
+       '(
+         company-files
+         company-capf
+         ;; company-elisp ; Prefer `company-capf'
+         company-yasnippet
+         company-dabbrev
+         )))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
 (defun sb/company-python-mode ()
@@ -3947,16 +3981,13 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((company-capf
-           company-tabnine
-           company-files
-           ;; company-jedi
-           ;; company-keywords
-           ;; company-tabnine
-           ;; company-dabbrev-code
-           company-yasnippet
-           company-dabbrev
-           ))))
+        '(
+          ;; Grouping the backends will show popups from all
+          company-files
+          company-capf
+          company-yasnippet
+          company-dabbrev
+          )))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 (defun sb/company-latex-mode ()
@@ -3968,22 +3999,21 @@ Ignore if no file is found."
   (use-package company-bibtex)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-capf
-           company-tabnine
-           company-files
-           company-bibtex
+        '(
+          company-files
+          company-capf
+          (company-bibtex
            ;; company-math-symbols-latex
            ;; company-latex-commands
            ;; company-math-symbols-unicode
            company-reftex-labels
-           company-reftex-citations
-           ;; company-auctex-labels
-           ;; company-auctex-bibs
-           company-dabbrev
-           company-ispell
-           company-yasnippet
-           ))))
+           company-reftex-citations)
+          ;; company-auctex-labels
+          ;; company-auctex-bibs
+          company-yasnippet
+          company-ispell
+          company-dabbrev
+          )))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
@@ -3991,14 +4021,13 @@ Ignore if no file is found."
   "Add backends for web completion in company mode."
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-capf
-           company-tabnine
-           company-files
-           company-dabbrev
-           company-ispell
-           company-yasnippet
-           ))))
+        '(
+          company-files
+          company-capf
+          company-yasnippet
+          company-ispell
+          company-dabbrev
+          )))
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))
 
@@ -4118,9 +4147,11 @@ Increase line spacing by two line height."
               :caller 'sb/counsel-all-files-recursively)))
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
+;; You need to check for either major modes or buffer names, since a few major modes are commonly
+;; used.
 (defcustom sb/skippable-buffers
   '(
-    "TAGS" "*Backtrace*"
+    "TAGS" "*Backtrace*" "*company-documentation*"
     ;; "*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
     ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
     ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"

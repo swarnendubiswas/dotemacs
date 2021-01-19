@@ -1385,6 +1385,7 @@
     ("atend" "Attend" nil :count 0)
     ("beging" "being" nil :count 0)
     ("buget" "budget" nil :count 0)
+    ("crituq" "critique" nil :count 0)
     ("deepnds" "depends" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
     ("hueristically" "heuristically" nil :count 0)

@@ -86,6 +86,7 @@
                            (setq lsp-pyright-extra-paths paths
                                  lsp-python-ms-extra-paths paths)
                            ))
+                 (py-isort-options . '("--settings-path=setup.cfg"))
                  ))
 
  (diff-mode . ((mode . whitespace)))
