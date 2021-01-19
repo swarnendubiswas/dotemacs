@@ -182,15 +182,16 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 ## Markdown
 
 - `M-Ret` - Insert new list item (`markdown-insert-list-item`)
-- `C-c C-s e` - Make region or word italic (emphasis) (`markdown-insert-italic`)
+- `C-c C-s i` - Make region or word italic (`markdown-insert-italic`)
+- `C-c C-s e` - Make region or word emphasis (`markdown-insert-emphasis`)
 - `C-c C-s s` - Insert markup to make a region or word strikethrough (`markdown-insert-strike-through`)
-- `C-c C-s p` - Insert pre-formatted code blocks (``)
+- `C-c C-s p` - Insert pre-formatted code blocks (`markdown-insert-p`)
 - `C-c C-s b` - Insert markup to make a region or word bold (`markdown-insert-bold`)
-- `C-c -` - Insert a horizontal rule (``)
-- `C-c C-c v` - Export the file and view in a browser (``)
-- `C-c C-c m` - Compile the file and show in another buffer (``)
+- `C-c -` - Insert a horizontal rule (`markdown-insert-hr`)
+- `C-c C-c v` - Export the file and view in a browser (`markdown-export-and-preview`)
+- `C-c C-c m` - Compile the file and show in another buffer (`markdown-other-window`)
 - `C-c C-j` - Insert a list (`markdown-insert-list-item`)
-- `C-c C-c p` - Live preview in a browser ()
+- `C-c C-c p` - Live preview in a browser (`markdown-preview`)
 - `C-c <` - Outdent the region (`markdown-outdent-region`)
 - `C-c >` - Indent the region (`markdown-indent-region`)
 
@@ -348,7 +349,7 @@ Use `magit-status` to display information about the current Git repository, and 
 
 ### Delete blank lines with only whitespace characters
 
-- Mark buffer (`C-x h`) or region 
+- Mark buffer (`C-x h`) or region
 - `M-x flush-lines RET ^\s-*$ RET`
 
 ### Find and replace text across files in a directory

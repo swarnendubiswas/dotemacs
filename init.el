@@ -385,7 +385,7 @@ whitespaces."
       ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
       ;; error
       compilation-scroll-output 'first-error
-      completion-ignore-case nil ; Consider case when completing
+      completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
@@ -419,7 +419,6 @@ whitespaces."
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
-      major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
       make-backup-files nil ; Stop making backup `~' files
       mouse-drag-copy-region nil ; Mouse is disabled
       mouse-yank-at-point t ; Yank at point instead of at click
@@ -460,6 +459,7 @@ whitespaces."
               fill-column dotemacs-fill-column
               indent-tabs-mode nil ; Spaces instead of tabs
               indicate-empty-lines nil
+              major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
               ;; tab-always-indent 'complete
               tab-width 4
               truncate-lines nil)
@@ -497,8 +497,7 @@ whitespaces."
       auto-window-vscroll nil
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
-      mouse-wheel-progressive-speed nil
-      mouse-avoidance-mode 'banish)
+      mouse-wheel-progressive-speed nil)
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -627,12 +626,11 @@ SAVE-FN with non-nil ARGS."
 (dolist (mode '(
                 auto-compression-mode
                 column-number-mode
-                ;; Typing with the mark active will overwrite the marked region
-                delete-selection-mode
+                delete-selection-mode ; Typing with the mark active will overwrite the marked region
+                global-hl-line-mode
                 global-visual-line-mode ; Wrap lines
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
-                global-hl-line-mode
                 ))
   (when (fboundp mode)
     (funcall mode 1)))
@@ -2517,7 +2515,10 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
 
-(mouse-avoidance-mode 'exile)
+(use-package avoid
+  :ensure nil
+  :if (display-graphic-p)
+  :config (mouse-avoidance-mode 'banish))
 
 (use-package apt-sources-list
   :mode ("\\.list\\'" . apt-sources-list-mode))
@@ -3315,9 +3316,9 @@ This file is specified in `counsel-projectile-default-file'."
         ("C-c ," . python-indent-shift-left)
         ("C-c ." . python-indent-shift-right))
   :custom
-  (python-indent-offset 4)
   (python-indent-guess-indent-offset nil)
   (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
+  (python-indent-offset 4)
   (python-shell-exec-path "python3")
   (python-shell-interpreter "python3")
   :config
@@ -3360,8 +3361,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package py-isort
   :if (and (executable-find "isort") (eq dotemacs-python-langserver 'pyright))
   :commands (py-isort-buffer py-isort-region py-isort-before-save)
-  :custom
-  (py-isort-options '("--lines=100" "--atomic" "--balanced" "--settings-path"))
+  :custom (py-isort-options '("--lines=100" "--atomic" "--balanced"))
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
@@ -3369,6 +3369,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package ein
   :mode ("\\.ipynb\\'" . ein:ipynb-mode))
 
+;; We always prefer CPerl mode to Perl mode
+(fset 'perl-mode 'cperl-mode)
 (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                               auto-mode-alist))
 
@@ -3397,15 +3399,15 @@ This file is specified in `counsel-projectile-default-file'."
    ("\\bashrc\\'" . sh-mode))
   :config
   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-  ;; FIXME: Shellcheck is a resource hog for $HOME/.bash* files
+  ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
   ;; FIXME: `lsp' is the first checker, chain the other checkers
   ;; https://github.com/flycheck/flycheck/issues/1762
   ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
   :hook (sh-mode . lsp-deferred)
   :custom
   (sh-basic-offset 2)
-  (sh-indent-comment t) ; Indent comments as a regular line
-  (sh-indent-after-continuation 'always))
+  (sh-indent-after-continuation 'always)
+  (sh-indent-comment t "Indent comments as a regular line"))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -3417,6 +3419,10 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package shfmt
   :hook (sh-mode . shfmt-on-save-mode)
   :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
+
+;; The following section helper ensures that files are given `+x' permissions when they are saved,
+;; if they contain a valid shebang line
+(add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
 
 ;; FIXME: Does this help?
 (with-eval-after-load 'vc
