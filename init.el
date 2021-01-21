@@ -362,6 +362,14 @@ whitespaces."
   (paradox-github-token t)
   :config (paradox-enable))
 
+(use-package auto-package-update ; Default update interval is 7 days
+  :commands (auto-package-update-now auto-package-update-maybe)
+  :custom
+  (auto-package-update-delete-old-versions t)
+  (auto-package-update-hide-results t)
+  (auto-package-update-prompt-before-update t)
+  :config (auto-package-update-maybe))
+
 ;; FIXME: Improve startup
 ;; Check the PATH with `(getenv "PATH")'
 ;; (setenv "PATH" (concat (getenv "PATH") ":/home/wand/private/scripts"))
@@ -3916,13 +3924,6 @@ Ignore if no file is found."
 
 (use-package adoc-mode
   :mode "\\.adoc\\'")
-
-(use-package auto-package-update
-  :commands (auto-package-update-now auto-package-update-maybe)
-  :custom
-  (auto-package-update-delete-old-versions t)
-  (auto-package-update-hide-results t)
-  :config (auto-package-update-maybe))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
