@@ -302,10 +302,10 @@ whitespaces."
 (use-package diminish)
 
 (use-package dash
-  :commands -tree-map)
+  :commands (-tree-map --remove))
 
 (use-package f
-  :commands (f-join f-exists?))
+  :commands (f-join f-exists? f-glob))
 
 ;; Use `C-c h' consistently for invoking a hydra
 (use-package hydra
@@ -516,6 +516,7 @@ whitespaces."
 (use-package autorevert ; Auto-refresh all buffers
   :ensure nil
   :diminish auto-revert-mode
+  :commands auto-revert-mode
   :hook (after-init . global-auto-revert-mode)
   :custom
   (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
@@ -2482,6 +2483,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package session ; Avoid the "Overwrite old session file (not loaded)?" warning
   :disabled t ; FIXME: Problem unresolved
+  :commands (session-initialize)
   :init
   (unless (bound-and-true-p dotemacs-use-no-littering)
     (setq session-save-file (expand-file-name "session"
@@ -2836,6 +2838,10 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish
   :hook ((emacs-lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
   :custom (eldoc-echo-area-use-multiline-p nil))
+
+(use-package c-eldoc
+  :commands (c-turn-on-eldoc-mode)
+  :hook (c-mode-common . c-turn-on-eldoc-mode))
 
 (use-package css-eldoc
   :commands turn-on-css-eldoc
@@ -3278,7 +3284,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package modern-cpp-font-lock
   :diminish modern-c++-font-lock-mode
-  :hook (c++-mode . modern-c++-font-lock-global-mode))
+  :hook (c++-mode . modern-c++-font-lock-mode))
 
 (use-package flycheck-clang-analyzer
   :after flycheck
@@ -3368,6 +3374,15 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package ein
   :mode ("\\.ipynb\\'" . ein:ipynb-mode))
+
+(use-package cython-mode
+  :mode (("\\.pyx\\'" . cython-mode)
+         ("\\.pxd\\'" . cython-mode)
+         ("\\.pxi\\'" . cython-mode)))
+
+(use-package jinja2-mode
+  :ensure t
+  :mode "\\.jinja\\'")
 
 ;; We always prefer CPerl mode to Perl mode
 (fset 'perl-mode 'cperl-mode)
@@ -3813,12 +3828,16 @@ Ignore if no file is found."
 (use-package js2-mode
   :mode "\\.js\\'"
   :hook
-  ((js2-mode . lsp-deferred)
-   (js2-mode . js2-imenu-extras-mode))
+  ((js2-mode . js2-imenu-extras-mode)
+   (js2-mode . lsp-deferred))
   :custom
-  (js2-basic-offset 2)
   (js-indent-level 2)
+  (js2-basic-offset 2)
   :config (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode"))
+
+(use-package js2-refactor
+  :ensure t
+  :hook (js2-mode . js2-refactor-mode))
 
 (use-package xref-js2
   :after js2-mode
@@ -3846,6 +3865,12 @@ Ignore if no file is found."
                               (make-local-variable 'js-indent-level)
                               (setq js-indent-level 2)
                               (lsp-deferred))))
+
+(use-package json-reformat
+  :after json-mode)
+
+(use-package json-snatcher
+  :after json-mode)
 
 (use-package less-css-mode
   :mode "\\.less\\'"
@@ -3875,6 +3900,10 @@ Ignore if no file is found."
   :mode "\\.proto$"
   :hook (protobuf-mode . flycheck-mode))
 
+(use-package clang-format
+  :after (c++-mode mlir-mode)
+  :commands (clang-format clang-format-buffer clang-format-region))
+
 (use-package clang-format+
   :ensure clang-format
   :hook (mlir-mode . clang-format+-mode))
@@ -3889,6 +3918,7 @@ Ignore if no file is found."
   :mode "\\.adoc\\'")
 
 (use-package auto-package-update
+  :commands (auto-package-update-now auto-package-update-maybe)
   :custom
   (auto-package-update-delete-old-versions t)
   (auto-package-update-hide-results t)
@@ -3900,16 +3930,17 @@ Ignore if no file is found."
 ;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
+  (use-package company-emoji)
   (set (make-local-variable 'company-backends)
-       '(
-         company-files
-         company-yasnippet ; Works everywhere
-         company-ispell ; Uses an English dictionary
-         ;; `company-dabbrev' returns non-nil prefix in almost any context (major mode, inside
-         ;; strings or comments). That is why it is better to put it at the end of
-         ;; `company-backends'
-         company-dabbrev
-         )))
+       '((
+          company-files
+          company-yasnippet ; Works everywhere
+          company-ispell ; Uses an English dictionary
+          ;; `company-dabbrev' returns non-nil prefix in almost any context (major mode, inside
+          ;; strings or comments). That is why it is better to put it at the end of
+          ;; `company-backends'
+          company-dabbrev
+          ))))
 (dolist (hook '(text-mode-hook)) ; Should extend to `markdown-mode' and `org-mode'
   (add-hook hook (lambda ()
                    (sb/company-text-mode))))
@@ -3919,14 +3950,13 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-files
-          company-keywords
-          company-capf
-          company-yasnippet
-          company-dabbrev-code
-          company-dabbrev
-          )))
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           company-dabbrev-code
+           company-dabbrev
+           ))))
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 (defun sb/company-c-mode ()
@@ -3934,16 +3964,15 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-files
-          company-keywords
-          company-capf
-          company-yasnippet
-          company-dabbrev-code
-          ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-          ;; company-clang ; This can be slow
-          company-dabbrev
-          )))
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           company-dabbrev-code
+           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+           ;; company-clang ; This can be slow
+           company-dabbrev
+           ))))
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
@@ -3953,29 +3982,29 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-files
-          company-capf
-          (company-shell
-           company-shell-env
-           company-fish-shell)
-          company-yasnippet
-          company-dabbrev-code
-          company-dabbrev
-          )))
+        '((
+           company-files
+           company-capf
+           (company-shell
+            company-shell-env
+            company-fish-shell)
+           company-yasnippet
+           company-dabbrev-code
+           company-dabbrev
+           ))))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp mode."
   (setq-local company-minimum-prefix-length 2)
   (set (make-local-variable 'company-backends)
-       '(
-         company-files
-         company-capf
-         ;; company-elisp ; Prefer `company-capf'
-         company-yasnippet
-         company-dabbrev
-         )))
+       '((
+          company-files
+          company-capf
+          ;; company-elisp ; Prefer `company-capf'
+          company-yasnippet
+          company-dabbrev
+          ))))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
 (defun sb/company-python-mode ()
@@ -3987,13 +4016,14 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          ;; Grouping the backends will show popups from all
-          company-files
-          company-capf
-          company-yasnippet
-          company-dabbrev
-          )))
+        '((
+           ;; Grouping the backends will show popups from all
+           company-files
+           company-capf
+           company-yasnippet
+           company-dabbrev-code
+           company-dabbrev
+           ))))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 (defun sb/company-latex-mode ()
@@ -4005,21 +4035,21 @@ Ignore if no file is found."
   (use-package company-bibtex)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-files
-          company-capf
-          (company-bibtex
-           ;; company-math-symbols-latex
-           ;; company-latex-commands
-           ;; company-math-symbols-unicode
-           company-reftex-labels
-           company-reftex-citations)
-          ;; company-auctex-labels
-          ;; company-auctex-bibs
-          company-yasnippet
-          company-ispell
-          company-dabbrev
-          )))
+        '((
+           company-files
+           company-capf
+           (company-bibtex
+            ;; company-math-symbols-latex
+            ;; company-latex-commands
+            ;; company-math-symbols-unicode
+            company-reftex-labels
+            company-reftex-citations)
+           ;; company-auctex-labels
+           ;; company-auctex-bibs
+           company-yasnippet
+           company-ispell
+           company-dabbrev
+           ))))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
@@ -4027,13 +4057,13 @@ Ignore if no file is found."
   "Add backends for web completion in company mode."
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-files
-          company-capf
-          company-yasnippet
-          company-ispell
-          company-dabbrev
-          )))
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           company-ispell
+           company-dabbrev
+           ))))
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))
 
