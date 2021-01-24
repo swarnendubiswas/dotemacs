@@ -1108,6 +1108,8 @@ SAVE-FN with non-nil ARGS."
 (use-package treemacs-magit
   :after (treemacs magit))
 
+(use-package treemacs-all-the-icons)
+
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
@@ -1338,7 +1340,12 @@ SAVE-FN with non-nil ARGS."
   :hook (company-mode . company-flx-mode))
 
 (use-package company-quickhelp
-  :hook (company-mode . company-quickhelp-mode))
+  :after company
+  :hook (emacs-lisp-mode . company-quickhelp-mode))
+
+(use-package company-quickhelp-terminal
+  :after company-quickhelp
+  :config (company-quickhelp-terminal-mode 1))
 
 (use-package company-box
   :disabled t ; FIXME: Issue with no completion shown if there is one candidate
@@ -3375,7 +3382,6 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package py-isort
   :if (and (executable-find "isort") (eq dotemacs-python-langserver 'pyright))
   :commands (py-isort-buffer py-isort-region py-isort-before-save)
-  :custom (py-isort-options '("--lines=100" "--atomic" "--balanced"))
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
@@ -3622,6 +3628,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package php-mode
   :hook (php-mode . lsp-deferred))
 
+;; FIXME: SB: Do we need this given LSP support?
 ;; (use-package company-php
 ;;   :init
 ;;   (with-eval-after-load 'php-mode
@@ -3830,6 +3837,11 @@ Ignore if no file is found."
 ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
 ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
 
+(use-package math-preview
+  :commands (math-preview-all math-preview-at-point math-preview-region)
+  :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+                                                  dotemacs-user-tmp)))
+
 (use-package texinfo
   :mode ("\\.texi\\'" . texinfo-mode))
 
@@ -3916,7 +3928,12 @@ Ignore if no file is found."
   :ensure clang-format
   :hook (mlir-mode . clang-format+-mode))
 
+(use-package format-all
+  :commands format-all-buffer
+  :hook ((emacs-lisp-mode bazel-mode) . format-all-mode))
+
 (use-package tree-sitter
+  :ensure tree-sitter-langs
   :config
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode 1)
@@ -3924,6 +3941,14 @@ Ignore if no file is found."
 
 (use-package adoc-mode
   :mode "\\.adoc\\'")
+
+(use-package editorconfig
+  :diminish
+  :config (editorconfig-mode 1))
+
+(use-package fasd
+  :commands fasd-find-file
+  :hook (after-init . global-fasd-mode))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
