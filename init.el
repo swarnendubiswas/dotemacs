@@ -742,42 +742,32 @@ SAVE-FN with non-nil ARGS."
 (use-package modus-operandi-theme
   :ensure moody
   :ensure modus-themes
-  :defines (modus-operandi-theme-completions
-            modus-operandi-theme-fringes
-            modus-operandi-theme-intense-hl-line
-            modus-operandi-theme-intense-standard-completions
-            modus-operandi-theme-mode-line
-            modus-operandi-theme-scale-headings
-            modus-operandi-theme-variable-pitch-headings)
   :if (eq dotemacs-theme 'modus-operandi)
   :init
-  (setq modus-operandi-theme-completions 'opinionated
-        modus-operandi-theme-fringes 'subtle
-        modus-operandi-theme-intense-hl-line t
-        modus-operandi-theme-intense-standard-completions t
-        modus-operandi-theme-mode-line 'moody
-        modus-operandi-theme-scale-headings nil
-        modus-operandi-theme-variable-pitch-headings nil)
+  (setq modus-themes-completions 'opinionated
+        modus-themes-fringes 'subtle
+        modus-themes-intense-hl-line t
+        modus-themes-mode-line 'borderless-moody
+        modus-themes-scale-headings nil
+        modus-themes-variable-pitch-headings nil)
   (load-theme 'modus-operandi t)
-  :custom-face
-  (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
-                              :box (:line-width 1 :color "#505050")
-                              :height 0.8))))
-  (mode-line-inactive ((t (:background "#efefef" :foreground "#404148"
-                                       :box (:line-width 1 :color "#bcbcbc")
-                                       :height 0.8)))))
+  ;; :custom-face
+  ;; (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
+  ;;                             :box (:line-width 1 :color "#505050")
+  ;;                             :height 0.8))))
+  ;; (mode-line-inactive ((t (:background "#efefef" :foreground "#404148"
+  ;;                                      :box (:line-width 1 :color "#bcbcbc")
+  ;;                                      :height 0.8))))
+  )
 
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
-  :defines (modus-vivendi-theme-mode-line
-            modus-vivendi-theme-scale-headings
-            modus-vivendi-theme-variable-pitch-headings)
   :if (eq dotemacs-theme 'modus-vivendi)
   :init
-  (setq modus-vivendi-theme-mode-line 'moody
-        modus-vivendi-theme-variable-pitch-headings nil
-        modus-vivendi-theme-scale-headings nil)
+  (setq modus-themes-mode-line 'moody
+        modus-themes-variable-pitch-headings nil
+        modus-themes-scale-headings nil)
   (load-theme 'modus-vivendi t))
 
 (when (and (eq dotemacs-theme 'sb/default) (display-graphic-p))
@@ -1108,7 +1098,8 @@ SAVE-FN with non-nil ARGS."
 (use-package treemacs-magit
   :after (treemacs magit))
 
-(use-package treemacs-all-the-icons)
+(use-package treemacs-all-the-icons
+  :after treemacs)
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
@@ -1291,7 +1282,8 @@ SAVE-FN with non-nil ARGS."
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-ignore-case nil "Backend is case-sensitive")
-  (company-dabbrev-other-buffers t "Search in other buffers with same major mode")
+  ;; Searching for other buffers is not useful with LSP support
+  (company-dabbrev-other-buffers nil "Search in other buffers with same major mode")
   (company-idle-delay 0.0 "Recommended by lsp")
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" dotemacs-extras-directory))
@@ -1345,6 +1337,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-quickhelp-terminal
   :after company-quickhelp
+  :if (not (display-graphic-p))
   :config (company-quickhelp-terminal-mode 1))
 
 (use-package company-box
@@ -3570,6 +3563,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   ("a" smerge-keep-all)
 ;;   ("q" nil "cancel" :color blue))
 
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
 (use-package yaml-mode
   :mode
   ((".clang-format" . yaml-mode)
@@ -3904,11 +3899,6 @@ Ignore if no file is found."
   :mode "\\.sass\\'"
   :hook (sass-mode . lsp-deferred))
 
-(use-package mlir-mode
-  :ensure nil
-  :load-path "extras"
-  :mode "\\.mlir\\'")
-
 (use-package bazel-mode
   :mode
   (("\\.bzl$" . bazel-mode)
@@ -3920,35 +3910,50 @@ Ignore if no file is found."
   :mode "\\.proto$"
   :hook (protobuf-mode . flycheck-mode))
 
+;; https://github.com/llvm/llvm-project/tree/main/mlir/utils/emacs
+(use-package mlir-mode
+  :ensure nil
+  ;; :load-path "extras"
+  :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
+  :mode "\\.mlir\\'")
+
 (use-package clang-format
-  :after (c++-mode mlir-mode)
+  :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region))
 
 (use-package clang-format+
   :ensure clang-format
-  :hook (mlir-mode . clang-format+-mode))
+  :hook (mlir-mode . clang-format+-mode)
+  :custom (clang-format+-always-enable t "Always enable"))
 
 (use-package format-all
-  :commands format-all-buffer
-  :hook ((emacs-lisp-mode bazel-mode) . format-all-mode))
+  :commands (format-all-buffer format-all-ensure-formatter)
+  :hook
+  ;; Use for major modes which do not provide a formatter
+  ((emacs-lisp-mode bazel-mode) . (lambda ()
+                                    (format-all-ensure-formatter)
+                                    (format-all-mode))))
 
 (use-package tree-sitter
   :ensure tree-sitter-langs
   :config
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode 1)
-  :hook (tree-sitter-after-on . #'tree-sitter-hl-mode))
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (use-package adoc-mode
   :mode "\\.adoc\\'")
 
 (use-package editorconfig
   :diminish
-  :config (editorconfig-mode 1))
+  :if (executable-find "editorconfig")
+  :commands editorconfig-mode)
 
+;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
   :commands fasd-find-file
-  :hook (after-init . global-fasd-mode))
+  :custom (fasd-enable-initial-prompt nil)
+  :bind ("C-h C-/" . fasd-find-file))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
@@ -3957,6 +3962,8 @@ Ignore if no file is found."
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (use-package company-emoji)
+  ;; Slightly larger value to have more precise matches
+  (setq-local company-minimum-prefix-length 3)
   (set (make-local-variable 'company-backends)
        '((
           company-files
@@ -4011,9 +4018,9 @@ Ignore if no file is found."
         '((
            company-files
            company-capf
-           (company-shell
-            company-shell-env
-            company-fish-shell)
+           company-shell
+           company-shell-env
+           company-fish-shell
            company-yasnippet
            company-dabbrev-code
            company-dabbrev
@@ -4047,7 +4054,8 @@ Ignore if no file is found."
            company-files
            company-capf
            company-yasnippet
-           company-dabbrev-code
+           ;; CAPF support with LSP is sufficient
+           ;; company-dabbrev-code
            company-dabbrev
            ))))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
@@ -4059,23 +4067,24 @@ Ignore if no file is found."
   ;; (use-package company-math)
   (use-package company-reftex)
   (use-package company-bibtex)
+  (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-files
-           company-capf
-           (company-bibtex
-            ;; company-math-symbols-latex
-            ;; company-latex-commands
-            ;; company-math-symbols-unicode
-            company-reftex-labels
-            company-reftex-citations)
-           ;; company-auctex-labels
-           ;; company-auctex-bibs
-           company-yasnippet
-           company-ispell
-           company-dabbrev
-           ))))
+        '(
+          company-files
+          company-bibtex
+          ;; company-math-symbols-latex
+          ;; company-latex-commands
+          ;; company-math-symbols-unicode
+          company-reftex-labels
+          company-reftex-citations
+          ;; company-auctex-labels
+          ;; company-auctex-bibs
+          company-capf
+          company-yasnippet
+          company-dabbrev
+          company-ispell
+          )))
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
@@ -4087,8 +4096,8 @@ Ignore if no file is found."
            company-files
            company-capf
            company-yasnippet
-           company-ispell
            company-dabbrev
+           company-ispell
            ))))
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))
@@ -4349,6 +4358,7 @@ or the major mode is not in `sb/skippable-modes'."
   :config (which-key-setup-side-window-right-bottom))
 
 (use-package which-key-posframe
+  :disabled t ; The posframe has a lower contrast
   :hook (which-key-mode . which-key-posframe-mode))
 
 ;; Mark safe variables
