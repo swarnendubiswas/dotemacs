@@ -128,7 +128,7 @@
   :group 'dotemacs)
 
 (defcustom dotemacs-modeline-theme
-  'doom-modeline
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -1072,7 +1072,7 @@ SAVE-FN with non-nil ARGS."
   (unless (bound-and-true-p dotemacs-use-no-littering)
     (setq treemacs-persist-file (expand-file-name "treemacs-persist" dotemacs-temp-directory)))
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
-  (treemacs-tag-follow-mode 1)
+  ;; (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
   (set-face-attribute 'treemacs-directory-face nil :height 0.7)
@@ -1092,6 +1092,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs-icons-dired
   :after treemacs
+  :disabled t
   :if (display-graphic-p)
   :config (treemacs-icons-dired-mode))
 
@@ -1413,9 +1414,9 @@ SAVE-FN with non-nil ARGS."
   (ivy-extra-directories nil "Hide . and ..")
   (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
   ;; Make the height of the minibuffer proportionate to the screen
-  (ivy-height-alist '((t
-                       lambda (_caller)
-                       (/ (frame-height) 2))))
+  ;; (ivy-height-alist '((t
+  ;;                      lambda (_caller)
+  ;;                      (/ (frame-height) 2))))
   (ivy-re-builders-alist '(
                            ;; (counsel-M-x . ivy--regex-fuzzy)
                            ;; (counsel-find-file . ivy--regex-fuzzy)
@@ -2961,6 +2962,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Sudden changes in the height of the echo area causes the cursor to lose position
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation nil)
+  ;; (lsp-tex-server 'digestif)
   (lsp-xml-logs-client nil)
   ;; https://github.com/eclipse/lemminx/archive/0.14.1.tar.gz
   (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
@@ -3150,7 +3152,9 @@ This file is specified in `counsel-projectile-default-file'."
                                          (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
-  ;; )
+
+  ;; Disable fuzzy matching
+  (advice-add #'lsp-completion--regex-fuz :override #'identity)
   :bind
   (("M-." . lsp-find-definition)
    ("C-c l i" . lsp-goto-implementation)
@@ -3177,6 +3181,7 @@ This file is specified in `counsel-projectile-default-file'."
               ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
 (use-package lsp-treemacs
+  :disabled t ; I do not like enabling the treemacs buffer
   :commands lsp-treemacs-errors-list
   :config
   ;; Sync workspace folders and treemacs projects
@@ -3642,7 +3647,7 @@ This file is specified in `counsel-projectile-default-file'."
 (setq auto-mode-alist (append '((".classpath\\'" . xml-mode))
                               auto-mode-alist))
 
-;; Autocompletion with LSP, LaTeX, and Company is not perfect, so we continue to use AucTeX support
+;; Texlab seems to have high overhead
 (use-package lsp-latex
   :hook
   ((latex-mode LaTeX-mode) . (lambda()
@@ -3914,7 +3919,7 @@ Ignore if no file is found."
 (use-package mlir-mode
   :ensure nil
   ;; :load-path "extras"
-  :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
+  ;; :quelpa ((mlir-mode :fetcher github :repo "llvm/llvm-project/tree/main/mlir/utils/emacs"))
   :mode "\\.mlir\\'")
 
 (use-package clang-format
@@ -3936,6 +3941,7 @@ Ignore if no file is found."
 
 (use-package tree-sitter
   :ensure tree-sitter-langs
+  :diminish tree-sitter-mode
   :config
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode 1)
@@ -3953,6 +3959,7 @@ Ignore if no file is found."
 (use-package fasd
   :commands fasd-find-file
   :custom (fasd-enable-initial-prompt nil)
+  :hook (emacs-startup . global-fasd-mode)
   :bind ("C-h C-/" . fasd-find-file))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
@@ -4015,16 +4022,16 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-shell
-           company-shell-env
-           company-fish-shell
-           company-yasnippet
-           company-dabbrev-code
-           company-dabbrev
-           ))))
+        '(
+          company-files
+          company-capf
+          company-shell
+          company-shell-env
+          company-fish-shell
+          company-yasnippet
+          company-dabbrev-code
+          company-dabbrev
+          )))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
 (defun sb/company-elisp-mode ()
@@ -4049,15 +4056,15 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           ;; Grouping the backends will show popups from all
-           company-files
-           company-capf
-           company-yasnippet
-           ;; CAPF support with LSP is sufficient
-           ;; company-dabbrev-code
-           company-dabbrev
-           ))))
+        '(
+          ;; Grouping the backends will show popups from all
+          company-files
+          company-capf
+          company-yasnippet
+          ;; CAPF support with LSP is sufficient
+          ;; company-dabbrev-code
+          company-dabbrev
+          )))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 (defun sb/company-latex-mode ()
