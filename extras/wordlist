@@ -1285,6 +1285,7 @@ container
 containers
 contains
 contemporary
+contenders
 content
 contention
 contents
@@ -1811,6 +1812,7 @@ distinguish
 distort
 distortion
 distribute
+distributed
 distribution
 distributional
 distributive
@@ -2550,6 +2552,7 @@ funny
 furniture
 further
 furthermore
+fusing
 future
 futures
 gadgets
@@ -2658,6 +2661,7 @@ grandparent
 grandson
 grant
 granted
+granularities
 granularity
 graph
 graphic
@@ -2722,6 +2726,8 @@ happy
 hard
 hardly
 hardware
+Hardware
+hardwired
 hardwood
 harm
 harmful
@@ -2915,6 +2921,7 @@ imperial
 implement
 implementation
 implementing
+Implementing
 implementors
 implicate
 implication
@@ -4555,6 +4562,7 @@ programming
 Programming
 programs
 progress
+progressive
 prohibit
 prohibition
 prohibitive
@@ -4578,6 +4586,7 @@ proof
 propagated
 proper
 properly
+properties
 property
 prophet
 proportion
@@ -4611,6 +4620,7 @@ providing
 province
 provision
 provisioning
+pruning
 pseudocode
 psychological
 psychologically
@@ -5464,6 +5474,7 @@ sock
 soft
 softly
 software
+Software
 soil
 solar
 soldier
@@ -5605,6 +5616,7 @@ steep
 steeply
 steer
 steering
+stemming
 step
 stick
 sticker
@@ -5667,6 +5679,7 @@ strongly
 structural
 structurally
 structure
+structures
 struggle
 student
 students
@@ -6003,6 +6016,7 @@ thriller
 throat
 through
 throughout
+throughput
 throw
 throwing
 thumb
@@ -6639,7 +6653,6 @@ yourself
 youth
 zero
 zone
-stemming
 
 ;; Local Variables:
 ;; mode: text

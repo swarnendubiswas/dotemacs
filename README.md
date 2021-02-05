@@ -336,6 +336,7 @@ Keywords=Text;Editor;
 ## Build GNU Emacs from source
 
 ```Bash
+sudo apt install texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev
 ./configure --without-makeinfo --with-cairo --without-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-nativecomp CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 make -j2
 make install
@@ -375,6 +376,9 @@ Test fast JSON is working, evaluate the following in Emacs.
 
 Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 
+## Setup Emacs NG 
+
+
 ## Debugging Emacs
 
 `pkill -USR2 emacs`
@@ -389,5 +393,4 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - LaTeX LSP: automatic gc and `flyspell-word` seem expensive
 - Bash LSP takes lot of memory
 - Flycheck not working with .el files with `no-byte-compile` in `.dir-locals.el`
-- Use `straight` or `quelpa` to install packages directly from GitHub
 - `diminish smartparens-mode`

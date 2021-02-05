@@ -17,7 +17,8 @@
 (defconst dotemacs-500MB (* 500 1000 1000))
 
 ;; Defer GC during startup
-(setq gc-cons-percentage 0.3 ; Portion of heap used for allocation
+(setq garbage-collection-messages t
+      gc-cons-percentage 0.3 ; Portion of heap used for allocation
       gc-cons-threshold dotemacs-500MB)
 
 (setq load-prefer-newer t
