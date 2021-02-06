@@ -192,7 +192,7 @@ whitespaces."
 
 ;; Keep enabled till the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors during Emacs initialization."
   :type 'boolean
   :group 'dotemacs)
@@ -1100,6 +1100,7 @@ SAVE-FN with non-nil ARGS."
   :after (treemacs magit))
 
 (use-package treemacs-all-the-icons
+  :commands treemacs-load-theme
   :config
   (require 'treemacs-all-the-icons)
   (treemacs-load-theme "all-the-icons"))
@@ -1937,7 +1938,10 @@ SAVE-FN with non-nil ARGS."
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar"
              ".jpeg" ".jpg" ".o" ".odt" ".out" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc"
              ".rel" ".rip" ".rpm" ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
-    (add-to-list 'projectile-globally-ignored-file-suffixes exts)))
+    (add-to-list 'projectile-globally-ignored-file-suffixes exts))
+  :bind ;; Set these in case `counsel-projectile' is disabled
+  (("<f5>" . projectile-switch-project)
+   ("<f6>" . projectile-find-file)))
 
 (use-package counsel-projectile
   :defines counsel-projectile-default-file
@@ -3067,9 +3071,9 @@ This file is specified in `counsel-projectile-default-file'."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge (lsp-configuration-section "pyright")
-                                                       (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge (lsp-configuration-section "pyright")
+                                     (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -3169,8 +3173,8 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                                          (lsp--set-configuration
-                                                           (lsp-configuration-section "perl"))))
+                                        (lsp--set-configuration
+                                         (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
 
@@ -3967,13 +3971,11 @@ Ignore if no file is found."
   :hook (mlir-mode . clang-format+-mode)
   :custom (clang-format+-always-enable t "Always enable"))
 
+;; Use for major modes which do not provide a formatter
 (use-package format-all
   :commands (format-all-buffer format-all-ensure-formatter)
-  :hook
-  ;; Use for major modes which do not provide a formatter
-  ((emacs-lisp-mode bazel-mode) . (lambda ()
-                                    (format-all-ensure-formatter)
-                                    (format-all-mode))))
+  :hook ((emacs-lisp-mode bazel-mode) . format-all-mode)
+  :config (format-all-ensure-formatter))
 
 (use-package tree-sitter
   :ensure tree-sitter-langs
@@ -4009,7 +4011,6 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 3)
   (set (make-local-variable 'company-backends)
        '((
-          company-files
           company-yasnippet ; Works everywhere
           company-ispell ; Uses an English dictionary
           ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
@@ -4026,7 +4027,6 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           company-files
            company-capf
            company-yasnippet
            company-dabbrev-code
@@ -4040,7 +4040,6 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           company-files
            company-capf
            company-yasnippet
            company-dabbrev-code
@@ -4058,7 +4057,6 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
-          company-files
           company-capf
           company-shell
           company-shell-env
@@ -4074,9 +4072,7 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (set (make-local-variable 'company-backends)
        '((
-          company-files
-          company-capf
-          ;; company-elisp ; Prefer `company-capf'
+          company-capf ; Prefer `company-capf' over the old `company-elisp'
           company-yasnippet
           company-dabbrev
           ))))
@@ -4093,7 +4089,6 @@ Ignore if no file is found."
   (setq company-backends
         '(
           ;; Grouping the backends will show popups from all
-          company-files
           company-capf
           company-yasnippet
           ;; company-dabbrev-code ; CAPF support with LSP is sufficient
@@ -4112,7 +4107,6 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '(
-          company-files
           company-bibtex
           ;; company-math-symbols-latex
           ;; company-latex-commands
@@ -4134,7 +4128,6 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
-           company-files
            company-capf
            company-yasnippet
            company-dabbrev
@@ -4342,7 +4335,7 @@ or the major mode is not in `sb/skippable-modes'."
     (setq modes  (nreverse modes))))
 
 (defun goto-line-with-feedback ()
-  "Show line numbers temporarily, while prompting for the line number input"
+  "Show line numbers temporarily, while prompting for the line number input."
   (interactive)
   (unwind-protect
       (progn

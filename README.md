@@ -20,7 +20,7 @@ You can use the following instructions to install third-party applications. Add 
 
 ```Bash
 export LLVM_VERSION="-11"
-sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev
+sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
 sudo dpkg -i fd_8.2.1_amd64.deb
 ```
@@ -336,7 +336,9 @@ Keywords=Text;Editor;
 ## Build GNU Emacs from source
 
 ```Bash
-sudo apt install texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev
+sudo apt install texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev
+
+git clone git://git.sv.gnu.org/emacs.git
 ./configure --without-makeinfo --with-cairo --without-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-nativecomp CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 make -j2
 make install
@@ -345,10 +347,9 @@ make install
 ## Setup GCCEmacs
 
 ```Bash
-sudo apt install libxpm-dev libgif-dev libjpeg-dev libpng-dev libtiff-dev libx11-dev libncurses5-dev automake autoconf texinfo libgtk2.0-dev librsvg2-dev
 sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
 sudo apt install gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
-git clone git://git.sv.gnu.org/emacs.git
+git clone git://git.sv.gnu.org/emacs.git gccemacs
 git checkout feature/native-comp
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
@@ -357,7 +358,7 @@ make -j2 NATIVE_FULL_AOT=1
 make install
 ```
 
-Test both the fast JSON and native compilation is working, evaluate the following in Emacs.
+Evaluate the following to test that both fast JSON and native compilation is working.
 
 ```emacs-lisp
 (if (and (fboundp 'native-comp-available-p)
@@ -366,7 +367,7 @@ Test both the fast JSON and native compilation is working, evaluate the followin
 (message "Native complation is *not* available"))
 ```
 
-Test fast JSON is working, evaluate the following in Emacs.
+Evaluate the following to test fast JSON is working.
 
 ```emacs-lisp
 (if (functionp 'json-serialize)
@@ -376,8 +377,9 @@ Test fast JSON is working, evaluate the following in Emacs.
 
 Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 
-## Setup Emacs NG 
+## Setup Emacs NG
 
+Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 ## Debugging Emacs
 
@@ -392,5 +394,5 @@ Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
 - Resolve yaml and xml lsp over tramp, not working
 - LaTeX LSP: automatic gc and `flyspell-word` seem expensive
 - Bash LSP takes lot of memory
-- Flycheck not working with .el files with `no-byte-compile` in `.dir-locals.el`
+- Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - `diminish smartparens-mode`
