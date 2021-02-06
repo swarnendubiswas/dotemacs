@@ -1052,6 +1052,7 @@ SAVE-FN with non-nil ARGS."
   :hook
   ((projectile-mode . treemacs-filewatch-mode)
    (projectile-mode . treemacs-follow-mode)
+   ;; `always' is implied in the absence of arguments
    (projectile-mode . treemacs-fringe-indicator-mode))
   :custom
   (treemacs-collapse-dirs 2)
@@ -1075,6 +1076,8 @@ SAVE-FN with non-nil ARGS."
   ;; (treemacs-tag-follow-mode 1)
 
   (treemacs-git-mode 'extended)
+  ;; FIXME: This should happen automatically
+  (treemacs-add-and-display-current-project)
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
   (set-face-attribute 'treemacs-directory-face nil :height 0.8)
@@ -1088,6 +1091,7 @@ SAVE-FN with non-nil ARGS."
   (treemacs-resize-icons 16)
   :bind* ("C-j" . treemacs))
 
+;; Allows to quickly add projectile projects to the treemacs workspace
 (use-package treemacs-projectile
   :after (treemacs projectile)
   :commands treemacs-projectile)
@@ -1095,9 +1099,7 @@ SAVE-FN with non-nil ARGS."
 (use-package treemacs-magit
   :after (treemacs magit))
 
-;; FIXME: This integration does not seem to be working
 (use-package treemacs-all-the-icons
-  :after treemacs
   :config
   (require 'treemacs-all-the-icons)
   (treemacs-load-theme "all-the-icons"))
@@ -1114,7 +1116,8 @@ SAVE-FN with non-nil ARGS."
   :if (display-graphic-p)
   :hook (dired-mode . all-the-icons-dired-mode))
 
-;; We use `all-the-icons-dired', enabling this will show two icons
+;; Allows you to use treemacs icons in dired buffers. We use `all-the-icons-dired', enabling this
+;; will show two icons
 (use-package treemacs-icons-dired
   :after (treemacs all-the-icons-dired treemacs-all-the-icons)
   :disabled t
@@ -2057,7 +2060,7 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
-  :after flycheck
+  :demand t
   :config
   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
   (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
@@ -2174,12 +2177,13 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package highlight-numbers
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
+;; (debug-on-entry 'package-initialize)
+
 (use-package number-separator
   :ensure nil
   :disabled t
-  :load-path "extras"
-  ;;:quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
-  ;;:files ("number-separator.el")))
+  :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
+                             :files ("number-separator.el")))
   :diminish
   :custom
   (number-separator ",")
@@ -2634,10 +2638,9 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package bug-hunter
   :commands (bug-hunter-init-file bug-hunter-file))
 
-;; (debug-on-entry 'package-initialize)
-
 (use-package explain-pause-mode
   :ensure nil
+  :disabled t
   :load-path "extras"
   ;; Generates the following warning with `quelpa'
   ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file"
