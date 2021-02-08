@@ -130,7 +130,7 @@
   :group 'dotemacs)
 
 (defcustom sb/modeline-theme
-  'default
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -750,9 +750,10 @@ SAVE-FN with non-nil ARGS."
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line t
-        modus-themes-mode-line 'borderless-moody
         modus-themes-scale-headings nil
         modus-themes-variable-pitch-headings nil)
+  (when (eq sb/modeline-theme 'moody)
+    (setq modus-themes-mode-line 'borderless-moody))
   (load-theme 'modus-operandi t)
   ;; :custom-face
   ;; (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
@@ -768,9 +769,13 @@ SAVE-FN with non-nil ARGS."
   :ensure modus-themes
   :if (eq sb/theme 'modus-vivendi)
   :init
-  (setq modus-themes-mode-line 'moody
-        modus-themes-variable-pitch-headings nil
-        modus-themes-scale-headings nil)
+  (setq modus-themes-completions 'opinionated
+        modus-themes-fringes 'subtle
+        modus-themes-intense-hl-line t
+        modus-themes-scale-headings nil
+        modus-themes-variable-pitch-headings nil)
+  (when (eq sb/modeline-theme 'moody)
+    (setq modus-themes-mode-line 'moody))
   (load-theme 'modus-vivendi t))
 
 (when (and (eq sb/theme 'sb/default) (display-graphic-p))
@@ -1047,13 +1052,44 @@ SAVE-FN with non-nil ARGS."
 ;;   :hook (dired-mode . dired-posframe-mode)
 ;;   :diminish)
 
+(use-package treemacs-all-the-icons
+  :demand t
+  :if (display-graphic-p))
+
 (use-package treemacs
   :commands (treemacs treemacs-toggle treemacs-git-mode)
+  :preface
+  (defun sb/setup-treemacs ()
+    "Setup treemacs."
+    (interactive)
+    (when (projectile-project-p)
+      (treemacs-add-and-display-current-project)
+      (ace-window)))
   :hook
   ((projectile-mode . treemacs-filewatch-mode)
    (projectile-mode . treemacs-follow-mode)
    ;; `always' is implied in the absence of arguments
-   (projectile-mode . treemacs-fringe-indicator-mode))
+   (projectile-mode . treemacs-fringe-indicator-mode)
+   (projectile-after-switch-project . (lambda ()
+                                        (let* ((root (treemacs--find-current-user-project))
+                                               (path (treemacs-canonical-path root))
+                                               (name (treemacs--filename path)))
+                                          (unless (treemacs-current-workspace)
+                                            (treemacs--find-workspace))
+                                          (if (treemacs-workspace->is-empty?)
+                                              (progn
+                                                (treemacs-do-add-project-to-workspace path name)
+                                                (treemacs-select-window)
+                                                (treemacs-pulse-on-success)
+                                                (other-window 1)
+                                                (adob--rescan-windows))
+                                            (treemacs-select-window)
+                                            (if (treemacs-is-path path :in-workspace)
+                                                (treemacs-goto-file-node path)
+                                              (treemacs-add-project-to-workspace path name))
+                                            (other-window 1)
+                                            (adob--rescan-windows))))
+                                    ))
   :custom
   (treemacs-collapse-dirs 2)
   (treemacs-follow-after-init t)
@@ -1071,13 +1107,10 @@ SAVE-FN with non-nil ARGS."
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
-
+  (treemacs-load-theme "all-the-icons")
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
-
   (treemacs-git-mode 'extended)
-  ;; FIXME: This should happen automatically
-  (treemacs-add-and-display-current-project)
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
   (set-face-attribute 'treemacs-directory-face nil :height 0.8)
@@ -1098,12 +1131,6 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs-magit
   :after (treemacs magit))
-
-(use-package treemacs-all-the-icons
-  :commands treemacs-load-theme
-  :config
-  (require 'treemacs-all-the-icons)
-  (treemacs-load-theme "all-the-icons"))
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
@@ -1737,13 +1764,15 @@ SAVE-FN with non-nil ARGS."
   ("f" flyspell-buffer)
   ("m" flyspell-mode))
 
-;; As of Emacs 28, `flyspell' does not provide a way to automatically check all on-screen text,
-;; and running `flyspell-buffer' on an entire buffer can be slow.
+;; As of Emacs 28, `flyspell' does not provide a way to automatically check all on-screen text.
+;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
   :hook
   (text-mode . (lambda ()
                  (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory)
                        spell-fu-faces-exclude '(
+                                                font-lock-string-face
+                                                lsp-face-highlight-read
                                                 markdown-blockquote-face
                                                 markdown-code-face
                                                 markdown-html-attr-name-face
@@ -1752,6 +1781,7 @@ SAVE-FN with non-nil ARGS."
                                                 markdown-inline-code-face
                                                 markdown-link-face
                                                 markdown-markup-face
+                                                markdown-plain-url-face
                                                 markdown-reference-face
                                                 markdown-url-face
                                                 org-block
@@ -1870,7 +1900,6 @@ SAVE-FN with non-nil ARGS."
                                      projectile-globally-ignored-directories
                                      projectile-globally-ignored-files
                                      projectile-globally-ignored-file-suffixes)
-  :bind-keymap ("C-c p" . projectile-command-map)
   :custom
   (projectile-auto-discover nil "Do not discover projects")
   (projectile-completion-system 'ivy)
@@ -1923,6 +1952,7 @@ SAVE-FN with non-nil ARGS."
                  (expand-file-name "github/.metadata" sb/user-home)
                  (expand-file-name "iitk-workspace/.metadata" sb/user-home)
                  (expand-file-name "plass-workspace/.metadata" sb/user-home)
+                 (expand-file-name ".local/lib" sb/user-home)
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
   ;; Filtering does not work with `alien' indexing
@@ -1939,9 +1969,10 @@ SAVE-FN with non-nil ARGS."
              ".jpeg" ".jpg" ".o" ".odt" ".out" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc"
              ".rel" ".rip" ".rpm" ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
+  :bind-keymap ("C-c p" . projectile-command-map)
   :bind ;; Set these in case `counsel-projectile' is disabled
-  (("<f5>" . projectile-switch-project)
-   ("<f6>" . projectile-find-file)))
+  (("<f5>"    . projectile-switch-project)
+   ("<f6>"    . projectile-find-file)))
 
 (use-package counsel-projectile
   :defines counsel-projectile-default-file
@@ -2942,16 +2973,21 @@ This file is specified in `counsel-projectile-default-file'."
    ;; ((c++-mode python-mode java-mode web-mode) . lsp-headerline-breadcrumb-mode)
    (lsp-mode . lsp-modeline-code-actions-mode)
    ;; FIXME: Registering `lsp-format-buffer' makes sense only if the server has started
-   ((c++-mode java-mode json-mode) . (lambda ()
-                                       ;; (when buffer-file-name
-                                       (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-                                       ;; )
-                                       ))
+   ((c++-mode java-mode json-mode nxml-mode) . (lambda ()
+                                                 ;; (when buffer-file-name
+                                                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                                                 ;; )
+                                                 ))
    )
   :custom
-  (lsp-clients-clangd-args '("-j=2" "--background-index" "--clang-tidy" "--pch-storage=memory"
+  (lsp-clients-clangd-args '("-j=2"
+                             "--background-index"
+                             "--clang-tidy"
+                             "--pch-storage=memory"
                              ;; "--suggest-missing-includes"
-                             "--header-insertion=never" "--fallback-style=LLVM" "--log=error"))
+                             "--header-insertion=never"
+                             "--fallback-style=LLVM"
+                             "--log=error"))
   (lsp-completion-provider :none)
   ;; (lsp-eldoc-enable-hover nil)
   ;; (lsp-eldoc-hook nil)
@@ -3201,6 +3237,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-ui-doc-enable nil)
   (lsp-ui-imenu-auto-refresh 'after-save)
   (lsp-ui-sideline-enable nil)
+  :config (lsp-ui-doc-mode -1)
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -4021,6 +4058,18 @@ Ignore if no file is found."
   (add-hook hook (lambda ()
                    (sb/company-text-mode))))
 
+(defun sb/company-xml-mode ()
+  "Add backends for completion with company."
+  (setq company-backends
+        '((
+           company-capf
+           company-yasnippet
+           company-dabbrev-code
+           ))))
+(dolist (hook '(nxml-mode-hook))
+  (add-hook hook (lambda ()
+                   (sb/company-xml-mode))))
+
 (defun sb/company-prog-mode ()
   "Add backends for program completion in company mode."
   (setq-local company-minimum-prefix-length 2)
@@ -4340,7 +4389,7 @@ or the major mode is not in `sb/skippable-modes'."
   (unwind-protect
       (progn
         (linum-mode 1)
-        (goto-line (read-number "Goto line: ")))
+        (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
