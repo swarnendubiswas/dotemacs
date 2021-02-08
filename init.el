@@ -1110,6 +1110,7 @@ SAVE-FN with non-nil ARGS."
   (treemacs-load-theme "all-the-icons")
   ;; Effectively overrides treemacs-follow-mode, but is a bit noisy
   ;; (treemacs-tag-follow-mode 1)
+
   (treemacs-git-mode 'extended)
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
@@ -2095,7 +2096,7 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
-  :demand t
+  :after flycheck
   :config
   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
   (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
@@ -3107,9 +3108,9 @@ This file is specified in `counsel-projectile-default-file'."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge (lsp-configuration-section "pyright")
-                                     (lsp-configuration-section "python")))))
+                                            (lsp--set-configuration
+                                             (ht-merge (lsp-configuration-section "pyright")
+                                                       (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -3209,8 +3210,8 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                        (lsp--set-configuration
-                                         (lsp-configuration-section "perl"))))
+                                                          (lsp--set-configuration
+                                                           (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
 

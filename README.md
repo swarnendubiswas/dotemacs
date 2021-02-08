@@ -337,7 +337,6 @@ Keywords=Text;Editor;
 
 ```Bash
 sudo apt install texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev
-
 git clone git://git.sv.gnu.org/emacs.git
 ./configure --without-makeinfo --with-cairo --without-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-nativecomp CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 make -j2
@@ -393,6 +392,8 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
   - My guess is this has to do with either `flycheck-grammarly` or `prettier`
 - Resolve yaml and xml lsp over tramp, not working
 - LaTeX LSP: automatic gc and `flyspell-word` seem expensive
-- Bash LSP takes lot of memory
-- Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
+- Bash LSP takes lot of memory <<<<<<< Updated upstream
+- # Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
+- Flycheck not working with .el files with `no-byte-compile` in `.dir-locals.el`
+  > > > > > > > Stashed changes
 - `diminish smartparens-mode`

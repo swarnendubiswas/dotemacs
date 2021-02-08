@@ -242,7 +242,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`)
 - `C-M-i` - Complete symbol at point (`complete-symbol`)
 
-### Python and Elpy
+### Python with Elpy
 
 - `C-c C-d` - Get object or function docs (`elpy-doc`)
 - `M-<left>` - (`elpy-nav-indent-shift-left`)
@@ -254,10 +254,14 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`)
 - `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`)
 
-### Python
+### Python with LSP
 
 - `C-c <` - Indent left (`python-indent-shift-left`)
 - `C-c >` - Indent right (`python-indent-shift-right`)
+- `` - Navigate to the previous function (`python-nav-backward-defun`)
+- `` - Navigate to the previous function (`python-nav-forward-defun`)
+- `` - Jump to the next block (``)
+- `` - Jump to the previous block (``)
 
 ### C/C++
 
