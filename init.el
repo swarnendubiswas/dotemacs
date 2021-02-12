@@ -40,6 +40,7 @@
 ;; https://github.com/seagle0128/.emacs.d/
 ;; https://github.com/Gleek/emacs.d/
 ;; https://github.com/magnars/.emacs.d
+;; https://github.com/kaushalmodi/.emacs.d
 
 ;;; Code:
 
@@ -223,10 +224,6 @@ This location is used for temporary installations and files.")
 ;; Silence "assignment to free variable" warning
 ;; (defvar apropos-do-all)
 
-(declare-function sb/sshlist "private" ())
-;; FIXME: Fix smerge warnings
-(declare-function smerge-next "smerge-mode" ())
-
 (package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -282,6 +279,9 @@ This location is used for temporary installations and files.")
 
 (use-package f
   :commands (f-join f-exists? f-glob))
+
+(use-package s
+  :commands s-starts-with?)
 
 ;; Use `C-c h' consistently for invoking a hydra
 (use-package hydra
@@ -1006,12 +1006,8 @@ SAVE-FN with non-nil ARGS."
                   (diredp-toggle-find-file-reuse-dir 1))))
 
 (use-package dired-efap
-  ;; :after dired+
+  :after dired+
   :defines dired-efap-initial-filename-selection
-  ;; :commands dired-efap
-  :hook
-  (dired-mode . (lambda ()
-                  (require 'dired-efap)))
   :custom (dired-efap-initial-filename-selection nil)
   :bind* (:map dired-mode-map
                ("r" . dired-efap)))
@@ -2329,6 +2325,7 @@ This file is specified in `counsel-projectile-default-file'."
   :bind ("C-c d t" . counsel-tramp)
   :config (defalias 'tramp 'counsel-tramp))
 
+(declare-function sb/sshlist "private")
 (defun sb/counsel-tramp ()
   "Invoke remote hosts with ivy and tramp."
   (interactive)
@@ -3549,19 +3546,12 @@ This file is specified in `counsel-projectile-default-file'."
   (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                                 auto-mode-alist)))
 
-(use-package java-mode
-  :ensure nil
-  :config
-  (setq-default c-basic-offset 4
-                c-set-style "java")
-  ;; (add-hook 'java-mode-hook
-  ;;           (lambda ()
-  ;;             (setq-default c-basic-offset 4
-  ;;                           c-set-style "java")))
-  )
-
 (use-package lsp-java
-  :hook (java-mode . lsp-deferred)
+  :hook (java-mode .
+                   (lambda ()
+                     (setq-default c-basic-offset 4
+                                   c-set-style "java")
+                     (lsp-deferred)))
   :custom
   (lsp-java-inhibit-message t)
   (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" "Requires Java 11")
@@ -3620,8 +3610,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package vc
   :config
+  ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
   (add-hook 'find-file-hook #'vc-refresh-state)
-  ;; FIXME: Does this help?
   ;; (remove-hook 'find-file-hook #'vc-refresh-state)
   )
 
@@ -3710,43 +3700,84 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :custom (git-commit-summary-max-length 50))
 
-;; ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
-;; (use-package smerge-mode
-;;   :ensure nil
-;;   :commands smerge-mode
-;;   :preface
-;;   (defun sb/enable-smerge-maybe ()
-;;     "Enable smerge automatically based on conflict markers."
-;;     (when (and buffer-file-name (vc-backend buffer-file-name))
-;;       (save-excursion
-;;         (goto-char (point-min))
-;;         (when (re-search-forward "^<<<<<<< " nil t)
-;;           (smerge-mode 1)))))
-;;   :hook
-;;   ((buffer-list-update . sb/enable-smerge-maybe)
-;;    (find-file . sb/enable-smerge-maybe))
-;;   :bind-keymap ("\C-cv" . smerge-command-prefix))
+;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
+(use-package smerge-mode
+  :ensure nil
+  :commands (smerge-next smerge-prev smerge-auto-leave
+                         smerge-keep-base smerge-keep-upper
+                         smerge-keep-lower smerge-keep-all
+                         smerge-diff-base-lower
+                         smerge-diff-base-upper
+                         smerge-diff-upper-lower smerge-refine
+                         smerge-combine-with-next smerge-resolve)
+  :preface
+  (defun sb/enable-smerge-maybe ()
+    "Enable smerge automatically based on conflict markers."
+    (when (and buffer-file-name (vc-backend buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^<<<<<<< " nil t)
+          (smerge-mode 1)))))
 
-;; (defhydra sb/hydra-smerge-mode
-;;   (:color pink :hint nil :post (smerge-auto-leave))
-;;   "
-;;    ^Motions^      ^Actions^
-;; ---^^-------------^^-------
-;; _n_: Next      _b_: Base
-;; _p_: Prev      _u_: Upper
-;; ^^             _l_: Lower
-;; ^^             _a_: All
-;; "
-;;   ("n" smerge-next)
-;;   ("p" smerge-prev)
-;;   ("b" smerge-keep-base)
-;;   ("u" smerge-keep-upper)
-;;   ("l" smerge-keep-lower)
-;;   ("a" smerge-keep-all)
-;;   ("q" nil "cancel" :color blue))
+  (defun sb/enable-smerge-maybe2 ()
+    "Enable `smerge-mode' automatically."
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^<<<<<<< " nil t)
+        (smerge-mode 1))))
+  :config (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
+  :bind-keymap ("C-c v" . smerge-command-prefix)
+  :bind
+  (:map smerge-mode-map
+        ("M-g n" . smerge-next)
+        ("M-g p" . smerge-prev)
+        ("M-g k c" . smerge-keep-current)
+        ("M-g k m" . smerge-keep-upper)
+        ("M-g k o" . smerge-keep-lower)
+        ("M-g k b" . smerge-keep-base)
+        ("M-g k a" . smerge-keep-all)
+        ("M-g e" . smerge-ediff)
+        ("M-g K" . smerge-kill-current)
+        ("M-g m" . smerge-context-menu)
+        ("M-g M" . smerge-popup-context-menu)))
 
-(defvar ediff-window-setup-function)
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(defhydra sm/smerge-hydra
+  (:color pink :hint nil :post (smerge-auto-leave))
+  "
+^Move^       ^Keep^               ^Diff^                 ^Other^
+^^-----------^^-------------------^^---------------------^^-------
+_n_ext       _b_ase               _<_: upper/base        _C_ombine
+_p_rev       _u_pper              _=_: upper/lower       _r_esolve
+^^           _l_ower              _>_: base/lower        _k_ill current
+^^           _a_ll                _R_efine
+^^           _RET_: current       _E_diff
+"
+  ("n" smerge-next)
+  ("p" smerge-prev)
+  ("b" smerge-keep-base)
+  ("u" smerge-keep-upper)
+  ("l" smerge-keep-lower)
+  ("a" smerge-keep-all)
+  ("RET" smerge-keep-current)
+  ("\C-m" smerge-keep-current)
+  ("<" smerge-diff-base-upper)
+  ("=" smerge-diff-upper-lower)
+  (">" smerge-diff-base-lower)
+  ("R" smerge-refine)
+  ("E" smerge-ediff)
+  ("C" smerge-combine-with-next)
+  ("r" smerge-resolve)
+  ("k" smerge-kill-current)
+  ("q" nil "cancel" :color blue))
+
+(use-package ediff
+  :ensure nil
+  :config
+  (defvar ediff-window-setup-function)
+  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  ;; Split windows horizontally in ediff (instead of vertically)
+  (setq ediff-split-window-function #'split-window-horizontally))
 
 (use-package yaml-mode
   :mode
@@ -3806,12 +3837,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package php-mode
   :hook (php-mode . lsp-deferred))
-
-;; FIXME: SB: Do we need this given LSP support?
-;; (use-package company-php
-;;   :init
-;;   (with-eval-after-load 'php-mode
-;;     (add-to-list 'company-backends 'company-ac-php-backend)))
 
 (use-package nxml-mode
   :ensure nil
@@ -3875,8 +3900,8 @@ This file is specified in `counsel-projectile-default-file'."
   (LaTeX-syntactic-comments t)
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
   (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
-  (font-latex-fontify-script nil "Avoid superscripts and
-  subscripts from being displayed in a different font size")
+  ;; Avoid superscripts and subscripts from being displayed in a different font size
+  (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
   ;; Revert PDF buffer after TeX compilation has finished
@@ -3924,7 +3949,7 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure nil
   :commands (reftex-get-bibfile-list bibtex-parse-keys
                                      reftex-default-bibliography)
-  ;; :diminish
+  :diminish
   :hook ((LaTeX-mode latex-mode) . reftex-mode)
   :bind
   (("C-c [" . reftex-citation)
@@ -3999,9 +4024,11 @@ Ignore if no file is found."
               ("C-c l h" . bib-highlight-mouse)))
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
+(declare-function TeX-active-process "tex.el" ())
 (defun sb/save-buffer-and-run-latexmk ()
   "Save the current buffer and run LaTeXMk also."
   (interactive)
+  (require 'tex)
   (require 'tex-buf)
   (let ((process (TeX-active-process))) (if process (delete-process process)))
   (let ((TeX-save-query nil)) (TeX-save-document ""))

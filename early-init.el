@@ -14,6 +14,14 @@
           (expand-file-name (convert-standard-filename "var/eln-cache/")
                             user-emacs-directory)))
 
+;; https://github.com/kiwanami/emacs-epc/issues/35
+(setq byte-compile-warnings '(cl-functions))
+
+;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
+;; Get a list of loaded packages that depend on `cl' by calling the following
+;; (require 'loadhist)
+;; (file-dependents (feature-file 'cl))
+
 (defconst dotemacs-500MB (* 500 1000 1000))
 
 ;; Defer GC during startup

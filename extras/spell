@@ -1,4 +1,4 @@
-personal_ws-1.1 en 209 
+personal_ws-1.1 en 209
 Aditya
 Agglomerative
 Agrawal
@@ -82,6 +82,7 @@ accuracies
 activations
 advisee
 affine
+allocators
 amongst
 analytical
 analytics
@@ -96,6 +97,7 @@ combinational
 covariance
 customizations
 cybersecurity
+deallocation
 declaratively
 deoptimization
 deoptimized
@@ -117,6 +119,8 @@ linearized
 liveness
 locksteps
 metadata
+microbenchmark
+microbenchmarks
 microcontroller
 microcontrollers
 midsem
@@ -147,6 +151,7 @@ polymorphism
 precimonious
 preprocessing
 probabilistically
+profiler
 programmability
 programmatically
 pseudocode
@@ -164,6 +169,7 @@ reimplementing
 reorderings
 reproducability
 requestor
+requestors
 resubmission
 revalidate
 revalidation
