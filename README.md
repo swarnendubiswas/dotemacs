@@ -387,13 +387,11 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 ## TODO
 
 - Use custom major modes for files by names without using file-local variables
-  - https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/
+  - <https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/>
 - Emacs hangs sometimes when working with `text-mode` or `markdown-mode`
   - My guess is this has to do with either `flycheck-grammarly` or `prettier`
 - Resolve yaml and xml lsp over tramp, not working
 - LaTeX LSP: automatic gc and `flyspell-word` seem expensive
-- Bash LSP takes lot of memory <<<<<<< Updated upstream
-- # Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
-- Flycheck not working with .el files with `no-byte-compile` in `.dir-locals.el`
-  > > > > > > > Stashed changes
+- Bash LSP takes lot of memory
+- Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - `diminish smartparens-mode`

@@ -8,9 +8,9 @@
 ;; Created: Fri Mar 19 15:58:58 1999
 ;; Version: 2020.12.01
 ;; Package-Requires: ()
-;; Last-Updated: Sun Jan  3 15:54:46 2021 (-0800)
+;; Last-Updated: Sun Feb  7 18:00:38 2021 (-0800)
 ;;           By: dradams
-;;     Update #: 12775
+;;     Update #: 12811
 ;; URL: https://www.emacswiki.org/emacs/download/dired%2b.el
 ;; Doc URL: https://www.emacswiki.org/emacs/DiredPlus
 ;; Keywords: unix, mouse, directories, diredp, dired
@@ -536,7 +536,7 @@
 ;;    `diredp-image-show-this-file', `diredp-insert-as-subdir',
 ;;    `diredp-insert-subdirs', `diredp-insert-subdirs-recursive',
 ;;    `diredp-kill-this-tree', `diredp-list-marked-recursive',
-;;    `diredp-load-this-file', `diredp-mark-autofiles',
+;;    `diredp-load-this-file', `diredp-mark', `diredp-mark-autofiles',
 ;;    `diredp-marked', `diredp-marked-other-window',
 ;;    `diredp-marked-recursive',
 ;;    `diredp-marked-recursive-other-window',
@@ -547,19 +547,20 @@
 ;;    `diredp-mark-files-tagged-not-all',
 ;;    `diredp-mark-files-tagged-some',
 ;;    `diredp-mark-files-tagged-regexp', `diredp-mark-region-files',
+;;    `diredp-mark-region-files-with-char',
 ;;    `diredp-mark-sexp-recursive' (Emacs 22+),
 ;;    `diredp-mark/unmark-autofiles', `diredp-mark/unmark-extension',
-;;    `diredp-mouse-3-menu', `diredp-mouse-backup-diff',
-;;    `diredp-mouse-copy-tags', `diredp-mouse-describe-autofile',
-;;    `diredp-mouse-describe-file', `diredp-mouse-diff',
-;;    `diredp-mouse-do-bookmark', `diredp-mouse-do-byte-compile',
-;;    `diredp-mouse-do-chgrp', `diredp-mouse-do-chmod',
-;;    `diredp-mouse-do-chown', `diredp-mouse-do-compress',
-;;    `diredp-mouse-do-copy', `diredp-mouse-do-delete',
-;;    `diredp-mouse-do-grep', `diredp-mouse-do-hardlink',
-;;    `diredp-mouse-do-load', `diredp-mouse-do-print',
-;;    `diredp-mouse-do-remove-all-tags', `diredp-mouse-do-rename',
-;;    `diredp-mouse-do-set-tag-value',
+;;    `diredp-mark-with-char', `diredp-mouse-3-menu',
+;;    `diredp-mouse-backup-diff', `diredp-mouse-copy-tags',
+;;    `diredp-mouse-describe-autofile', `diredp-mouse-describe-file',
+;;    `diredp-mouse-diff', `diredp-mouse-do-bookmark',
+;;    `diredp-mouse-do-byte-compile', `diredp-mouse-do-chgrp',
+;;    `diredp-mouse-do-chmod', `diredp-mouse-do-chown',
+;;    `diredp-mouse-do-compress', `diredp-mouse-do-copy',
+;;    `diredp-mouse-do-delete', `diredp-mouse-do-grep',
+;;    `diredp-mouse-do-hardlink', `diredp-mouse-do-load',
+;;    `diredp-mouse-do-print', `diredp-mouse-do-remove-all-tags',
+;;    `diredp-mouse-do-rename', `diredp-mouse-do-set-tag-value',
 ;;    `diredp-mouse-do-shell-command', `diredp-mouse-do-symlink',
 ;;    `diredp-mouse-do-tag', `diredp-mouse-do-untag',
 ;;    `diredp-mouse-downcase', `diredp-mouse-ediff',
@@ -844,6 +845,14 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2021/02/07 dadams
+;;     Added: diredp-mark.  Give it dired-mark's keys.
+;;     diredp-mark-region-files: Non-negative prefix arg now prompts for the CHAR to mark with.
+;; 2021/02/04 dadams
+;;     diredp-mark(-region-files)-with-char: Updated since bug #46243 is now fixed (for Emacs 28+).
+;; 2021/02/01 dadams
+;;     Added: diredp-mark-region-files-with-char, diredp-mark-with-char.
+;;     diredp-marks-mark-menu, diredp-mouse-3-menu: Added items for diredp-mark(-region-files)-with-char.
 ;; 2021/01/02 dadams
 ;;     Updates for Emacs 27.1.
 ;;       dired-map-over-marks-check: Use ngettext for Emacs 27.
@@ -10667,7 +10676,7 @@ Use \\[dired-hide-subdir] to (un)hide a particular subdirectory."
 ;; 2. Do not move to the next subdir.
 ;;
 ;;;###autoload
-(defun diredp-hide-subdir-nomove (arg &optional next)
+(defun diredp-hide-subdir-nomove (arg &optional next) ; Bound to `$'
     "Hide or unhide the current directory.
 Unlike `dired-hide-subdir', this does not advance the cursor to the
 next directory header line.
@@ -12396,8 +12405,73 @@ Optional arg MARK-CHAR is the type of mark to check.
                                                      (concat "^" (regexp-quote (char-to-string mark-char)))))
                                              (diredp-looking-at-p "^ ")))))
 
+(put 'diredp-mark 'interactive-only t)
 ;;;###autoload
-(defun diredp-mark-region-files (&optional unmark-p) ; Not bound
+(defun diredp-mark (arg &optional char) ; Bound to `m', `* m'
+  "Mark current line, lines in active region, or lines in subdir listing.
+If the region is active and nonempty:
+ * Mark the lines in the region.
+ * With a prefix arg, you are prompted for the CHAR to mark with.
+
+If cursor is on a subdir line:
+ * Mark all lines in the subdir listing except dirs `.' and `..'.
+ * With a prefix arg, you are prompted for the CHAR to mark with.
+
+Otherwise, with numeric prefix arg N, mark the next N lines.
+
+Use \\<dired-mode-map>`\\[dired-unmark-all-files]' to remove marks everywhere, \
+or `\\[dired-unmark]' on a subdir line to
+remove marks in the subdir listing."
+  (interactive "P")
+  (let ((dired-marker-char  dired-marker-char))
+    (cond ((diredp-nonempty-region-p)
+           (when arg
+             (when (< emacs-major-version 28) (message nil)) ; Workaround for bug #46243.
+             (setq dired-marker-char  (read-char "Mark region lines with char: ")))
+           (diredp-mark-region-files))
+          ((dired-get-subdir)
+           (when arg
+             (when (< emacs-major-version 28) (message nil)) ; Workaround for bug #46243.
+             (setq dired-marker-char  (read-char "Mark subdir lines with char: ")))
+           (save-excursion (dired-mark-subdir-files)))
+          (t
+           (let ((inhibit-read-only  t))
+             (dired-repeat-over-lines
+              (prefix-numeric-value arg)
+              (lambda () (delete-char 1) (insert dired-marker-char))))))))
+
+;;;###autoload
+(defun diredp-mark-with-char (char &optional arg) ; Not bound, except in menus
+  "Mark this line with CHAR.
+With numeric prefix arg N, mark the next N lines."
+  ;; Need workaround for Emacs < 28 - see Emacs bug #46243.
+  ;; (interactive "cMark this line with char: \np")
+  (interactive
+   (progn (when (< emacs-major-version 28) (message nil)) ; Workaround for bug #46243.
+          (list (read-char "Mark this line with char: ")
+                (prefix-numeric-value current-prefix-arg))))
+  (let ((dired-marker-char  char)) (dired-mark arg)))
+
+;;;###autoload
+(defun diredp-mark-region-files-with-char (char &optional unmark-p) ; Not bound, except in menus
+  "Mark lines in active region with CHAR.
+With non-nil prefix arg, unmark CHAR instead."
+  ;; Need workaround for Emacs < 28 - see Emacs bug #46243.
+  ;;(interactive "cMark region with char: \nP")
+  (interactive
+   (progn (when (< emacs-major-version 28) (message nil)) ; Workaround for bug #46243.
+          (list (read-char "Mark region with char: ") current-prefix-arg)))
+  (let ((dired-marker-char  char)
+        (beg                        (min (point) (mark)))
+        (end                        (max (point) (mark)))
+        (inhibit-field-text-motion  t)) ; Just in case.
+    (setq beg  (save-excursion (goto-char beg) (line-beginning-position))
+          end  (save-excursion (goto-char end) (when (and (bolp) (> end beg)) (backward-char)) (line-end-position)))
+    (let ((dired-marker-char  (if unmark-p ?\040 dired-marker-char)))
+      (diredp-mark-if (and (<= (point) end)  (>= (point) beg)  (diredp-this-file-unmarked-p)) "region file"))))
+
+;;;###autoload
+(defun diredp-mark-region-files (&optional unmark-p) ; Not bound, except in menus
   "Mark all of the files in the current region (if it is active).
 With non-nil prefix arg, unmark them instead."
   (interactive "P")
@@ -12410,7 +12484,7 @@ With non-nil prefix arg, unmark them instead."
       (diredp-mark-if (and (<= (point) end)  (>= (point) beg)  (diredp-this-file-unmarked-p)) "region file"))))
 
 ;;;###autoload
-(defun diredp-unmark-region-files (&optional mark-p) ; Not bound
+(defun diredp-unmark-region-files (&optional mark-p) ; Not bound, except in menus
   "Unmark all of the files in the current region (if it is active).
 With non-nil prefix arg, mark them instead."
   (interactive "P")
@@ -12478,6 +12552,7 @@ With non-nil prefix arg, mark them instead."
                               (list "Files in Region"
                                     (list ""
                                           '("Mark" . diredp-mark-region-files)
+                                          '("Mark with Char" . diredp-mark-region-files-with-char) ; But bug #46243.
                                           '("Unmark" . diredp-unmark-region-files)
                                           '("Toggle Marked/Unmarked" .
                                             diredp-toggle-marks-in-region)
@@ -12530,9 +12605,10 @@ With non-nil prefix arg, mark them instead."
                                                'diredp-describe-file
                                                'diredp-describe-autofile)] ; Requires `bookmark+.el'
                              ;; Stuff from `Marks' menu.
-                             ["Mark"  dired-mark
+                             ["Mark"  diredp-mark
                               :visible (not (eql (dired-file-marker file/dir-name)
                                              dired-marker-char))]
+                             ["Mark with Char..."  diredp-mark-with-char] ; But see bug #46243.
                              ["Unmark" dired-unmark
                               :visible (dired-file-marker file/dir-name)]
                              ["Flag for Deletion" dired-flag-file-deletion
@@ -13251,12 +13327,15 @@ Mouse
 Marking
 -------
 
-  \\[dired-mark]\t\t- Mark this file/dir
-  \\[dired-unmark]\t\t- Unmark this file/dir
+  \\[diredp-mark]\t\t- Mark this line or those in region or subdir listing
+  \t\t  Prefix arg (region/subdir): mark with a given char
+  \\[dired-unmark]\t\t- Unmark this line
   \\[dired-toggle-marks]\t\t- Toggle marked/unmarked
   \\[dired-mark-sexp]\t\t- Mark all satisfying a predicate
   \\[dired-unmark-all-marks]\t\t- Unmark all
   \\[diredp-mark/unmark-extension]\t\t- Mark/unmark all that have a given extension
+  \\[dired-mark-files-regexp]\t\t- Mark/unmark files with names matching a regexp
+  \\[dired-mark-files-containing-regexp]\t\t- Mark/unmark files containing a regexp match
 "
 
     (and (fboundp 'dired-mark-omitted)  ; In `dired-x.el' Emacs 22+.
@@ -14983,16 +15062,24 @@ If no one is selected, symmetric encryption will be performed.  "
     :help "Flag old numbered backups for deletion"))
 (define-key diredp-marks-mark-menu [marks-mark-executables]
   '(menu-item "Mark Executables" dired-mark-executables :help "Mark all executable files"))
+(define-key diredp-marks-mark-menu [diredp-mark-with-char]
+  '(menu-item "Mark This with Char..." diredp-mark-with-char
+              :visible (not (diredp-nonempty-region-p))
+              :help "Mark this line with a character you type"))
+(define-key diredp-marks-mark-menu [diredp-mark-region-files-with-char]
+  '(menu-item "Mark Region with Char..." diredp-mark-region-files-with-char
+              :visible (diredp-nonempty-region-p)
+              :help "Mark lines in region with a character you type"))
 (define-key diredp-marks-mark-menu [marks-mark-region]
   '(menu-item "Mark Region" diredp-mark-region-files
     :visible (diredp-nonempty-region-p)
-    :help "Mark all of the files in the region (selection)"))
+    :help "Mark the lines in the region (selection)"))
 (when (< emacs-major-version 21)
   (put 'diredp-mark-region-files 'menu-enable '(diredp-nonempty-region-p)))
 (define-key diredp-marks-mark-menu [marks-mark-this]
   '(menu-item "Mark This" dired-mark
     :visible (not (diredp-nonempty-region-p))
-    :help "Mark current line's file for future operations"))
+    :help "Mark current line"))
 
 
 ;; `Marks' > `Here and Below' menu.
@@ -15311,6 +15398,7 @@ If no one is selected, symmetric encryption will be performed.  "
 (define-key dired-mode-map "U"       'dired-unmark-all-marks)                       ; `U'
 (substitute-key-definition 'describe-mode 'diredp-describe-mode                     ; `h', `C-h m'
                            dired-mode-map (current-global-map))
+(substitute-key-definition 'dired-mark 'diredp-mark dired-mode-map)                 ; `m', `* m'
 
 ;; Tags - same keys as in `*Bookmark List*'.
 ;;
