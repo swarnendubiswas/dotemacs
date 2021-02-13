@@ -1377,6 +1377,7 @@
   '(
     ("chaning" "changing" nil :count 0)
     ("conrol" "control" nil :count 0)
+    ("jin" "join" nil :count 0)
     ("paritioning" "partitioning" nil :count 0)
     ("proessing" "processing" nil :count 0)
     ("sequenes" "sequence" nil :count 0)

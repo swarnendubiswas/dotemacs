@@ -116,7 +116,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'moody
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -885,7 +885,7 @@ SAVE-FN with non-nil ARGS."
 (when (string= (system-name) "swarnendu-Inspiron-7572")
   (set-face-attribute 'default nil
                       :font "JetBrains Mono"
-                      :height 135))
+                      :height 140))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
   (set-face-attribute 'default nil
@@ -899,7 +899,7 @@ SAVE-FN with non-nil ARGS."
 (defun sb/minibuffer-font-setup ()
   "Customize minibuffer font."
   (set (make-local-variable 'face-remapping-alist)
-       '((default :height 1.0))))
+       '((default :height 0.95))))
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
@@ -995,6 +995,8 @@ SAVE-FN with non-nil ARGS."
 
 (use-package dired+
   :load-path "extras"
+  ;; :quelpa ((dired+ :fetcher github :repo "emacsmirror/dired-plus"
+  ;;                  :files (dired+.el)))
   :commands diredp-toggle-find-file-reuse-dir
   :custom
   (diredp-hide-details-initially-flag nil)
@@ -1038,11 +1040,8 @@ SAVE-FN with non-nil ARGS."
 ;;   :hook (dired-mode . dired-posframe-mode)
 ;;   :diminish)
 
-(use-package treemacs-all-the-icons
-  :demand t
-  :if (display-graphic-p))
-
 (use-package treemacs
+  :if (display-graphic-p)
   :commands (treemacs-current-workspace treemacs--find-current-user-project
                                         treemacs-do-add-project-to-workspace
                                         treemacs-add-project-to-workspace
@@ -1111,6 +1110,10 @@ SAVE-FN with non-nil ARGS."
   (treemacs-tag-follow-mode 1)
   (treemacs-git-mode 'extended)
   (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
+
+  (use-package treemacs-all-the-icons
+    :demand t
+    :if (display-graphic-p))
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
@@ -1392,7 +1395,7 @@ SAVE-FN with non-nil ARGS."
 ;; https://github.com/company-mode/company-mode/issues/1010
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 (use-package company-posframe
-  :after company-mode
+  :after company
   :diminish
   :custom
   (company-posframe-show-metadata nil)
@@ -1411,7 +1414,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-box
   :if (display-graphic-p)
-  :after company-mode
+  :after company
   :diminish
   :custom (company-box-icons-alist 'company-box-icons-all-the-icons)
   ;; :config
@@ -1681,12 +1684,16 @@ SAVE-FN with non-nil ARGS."
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
 (use-package company-prescient
-  :after company-mode
+  :after company
   :config (company-prescient-mode 1))
 
 (use-package all-the-icons-ivy
   :after ivy
   :config (all-the-icons-ivy-setup))
+
+(use-package orderless
+  :custom (completion-styles '(orderless))
+  :config (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
 (use-package ispell
   :ensure nil
@@ -1879,6 +1886,12 @@ SAVE-FN with non-nil ARGS."
   (show-paren-when-point-in-periphery t))
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+;; Disable pairs when entering minibuffer
+(add-hook 'minibuffer-setup-hook (lambda ()
+                                   (electric-pair-mode -1)))
+;; Renable pairs when existing minibuffer
+(add-hook 'minibuffer-exit-hook (lambda ()
+                                  (electric-pair-mode 1)))
 
 ;; FIXME: Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
@@ -2075,13 +2088,9 @@ This file is specified in `counsel-projectile-default-file'."
   :config (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
-  :after all-the-icons-ivy-rich
-  ;; :functions ivy-format-function-line
   :custom (ivy-rich-parse-remote-buffer nil)
-  ;; :hook (ivy-mode . ivy-rich-mode)
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  (ivy-rich-mode 1))
+  :hook (ivy-mode . ivy-rich-mode)
+  :config (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 (use-package counsel-fd
   :if (executable-find "fd")
@@ -2117,9 +2126,9 @@ This file is specified in `counsel-projectile-default-file'."
   (flycheck-emacs-lisp-load-path 'inherit)
   :init
   ;; TODO: Is this the reason why flycheck and doom-modeline does not work well?
-  ;; (when (or (eq sb/modeline-theme 'spaceline)
-  ;;           (eq sb/modeline-theme 'doom-modeline))
-  ;;   (setq flycheck-mode-line nil))
+  (when (or (eq sb/modeline-theme 'spaceline)
+            (eq sb/modeline-theme 'doom-modeline))
+    (setq flycheck-mode-line nil))
 
   (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                             sb/user-home)
@@ -2776,6 +2785,10 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package wc-mode
   :commands wc-mode)
 
+;; Gets the definition of word or phrase at point from https://wordnik.com/
+(use-package define-word
+  :commands (define-word define-word-at-point))
+
 (use-package emojify
   :commands (global-emojify-mode emojify-mode))
 
@@ -2893,6 +2906,9 @@ This file is specified in `counsel-projectile-default-file'."
   (:map markdown-mode-command-map
         ("g" . grip-mode)))
 
+(use-package markdown-preview-mode
+  :commands markdown-preview-mode)
+
 ;; Search the current buffer's parent directories for `node_modules/.bin'. Traverse the directory
 ;; structure up, until reaching the user's home directory, or hitting `add-node-modules-max-depth'.
 ;; Any path found is added to the `exec-path'.
@@ -2912,8 +2928,12 @@ This file is specified in `counsel-projectile-default-file'."
   ;;                               (when (and buffer-file-name
   ;;                                          (not (file-remote-p buffer-file-name)))
   ;;                                 prettier-mode)))
-  :hook ((markdown-mode ;; gfm-mode
-          web-mode) . prettier-mode))
+  :hook ((markdown-mode ; gfm-mode
+          web-mode ; should include `css-mode' and `html-mode'
+          json-mode
+          jsonc-mode
+          js2-mode) . prettier-mode)
+  :custom (prettier-lighter nil))
 
 ;; Align fields with `C-c C-a'
 (use-package csv-mode
@@ -3029,7 +3049,9 @@ This file is specified in `counsel-projectile-default-file'."
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
   :hook
-  (((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
+  (
+   ;; https://github.com/emacs-lsp/lsp-mode/issues/2598#issuecomment-776506077
+   ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
    (lsp-mode . lsp-enable-which-key-integration)
    (lsp-managed-mode . lsp-modeline-diagnostics-mode)
    ;; Let us not enable breadcrumbs for all modes
@@ -3071,7 +3093,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;;                               perl-language-server
   ;;                               perlls-remote php-ls xmlls
   ;;                               xmlls-remote yamlls yamlls-remote))
-  ;; (lsp-headerline-breadcrumb-enable t "Breadcrumb is not useful for all modes")
+  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
   (lsp-headerline-breadcrumb-enable-diagnostics nil)
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
@@ -3294,8 +3316,10 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; Disable fuzzy matching
   (advice-add #'lsp-completion--regex-fuz :override #'identity)
+  ;; :bind-keymap ("C-c l" . lsp-keymap-prefix)
   :bind
   (("M-."     . lsp-find-definition)
+   ("C-c l d" . lsp-find-declaration)
    ("C-c l i" . lsp-goto-implementation)
    ("C-c l t" . lsp-goto-type-definition)
    ("C-c l r" . lsp-rename)
@@ -3469,11 +3493,11 @@ This file is specified in `counsel-projectile-default-file'."
   (:map python-mode-map
         ("M-[" . python-nav-backward-block)
         ("M-]" . python-nav-forward-block)
-        ;; FIXME: `[' is treated as `meta'
-        ;; ("C-[" . python-indent-shift-left)
+        ;; ;; FIXME: `[' is treated as `meta'
+        ;; ("C-\[" . python-indent-shift-left)
+        ;; ("C-]" . python-indent-shift-right)
         ("C-c ," . python-indent-shift-left)
-        ("C-c ." . python-indent-shift-right)
-        ("C-]" . python-indent-shift-right))
+        ("C-c ." . python-indent-shift-right))
   :custom
   (python-indent-guess-indent-offset nil)
   (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
@@ -3501,8 +3525,7 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish
   :config (python-docstring-mode 1))
 
-(use-package pip-requirements
-  :hook (pip-requirements-mode . company-mode))
+(use-package pip-requirements)
 
 (use-package pyvenv
   :diminish
@@ -3546,6 +3569,7 @@ This file is specified in `counsel-projectile-default-file'."
   (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                                 auto-mode-alist)))
 
+;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
   :hook (java-mode .
                    (lambda ()
@@ -4186,7 +4210,8 @@ Ignore if no file is found."
 ;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
-  (use-package company-emoji)
+  (use-package company-emoji
+    :disabled t)
   ;; Slightly larger value to have more precise matches
   (setq-local company-minimum-prefix-length 3)
   (set (make-local-variable 'company-backends)

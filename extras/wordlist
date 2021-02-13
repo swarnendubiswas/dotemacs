@@ -594,6 +594,7 @@ belongs
 below
 belt
 bench
+benchmark
 benchmarked
 benchmarking
 benchmarks
@@ -691,6 +692,7 @@ both
 bother
 bottle
 bottleneck
+bottlenecks
 bottles
 bottom
 boulder
@@ -814,6 +816,7 @@ capability
 capable
 capacity
 capital
+capitalization
 capitol
 captain
 caption
@@ -876,6 +879,7 @@ centered
 centers
 centimeter
 central
+centralized
 century
 ceramic
 ceremony
@@ -1240,6 +1244,7 @@ consequence
 consequent
 consequently
 conservative
+conservatively
 consider
 considerable
 considerably
@@ -1646,7 +1651,9 @@ descend
 descent
 describe
 describes
+describing
 description
+descriptors
 desert
 deserted
 deserve
@@ -2042,6 +2049,7 @@ enclosed
 encoding
 encodings
 encounter
+encountered
 encourage
 encouragement
 ending
@@ -2798,11 +2806,6 @@ highway
 highways
 hill
 Himalaya
-capitalization
-describing
-understands
-bottlenecks
-installations
 himself
 hire
 histogram
@@ -2886,6 +2889,7 @@ identically
 identifiable
 identification
 identified
+identifies
 identify
 identity
 ideological
@@ -3111,6 +3115,7 @@ inspired
 instability
 install
 installation
+installations
 instance
 instant
 instantiation
@@ -3141,6 +3146,7 @@ integer
 integral
 integrate
 integrated
+integrating
 integration
 integrity
 intellectual
@@ -4067,6 +4073,7 @@ ordinary
 organ
 organic
 organization
+organizations
 organize
 organized
 orient
@@ -5204,6 +5211,7 @@ scenarios
 scene
 schedule
 scheduled
+schedules
 schematic
 schematically
 scheme
@@ -5531,6 +5539,8 @@ speakers
 speaking
 special
 specialist
+specialization
+specialized
 specially
 species
 specifiable
@@ -5603,6 +5613,7 @@ startup
 state
 statement
 statements
+statically
 stating
 station
 stations
@@ -6128,6 +6139,7 @@ transformed
 transient
 transit
 transition
+transitivity
 transitional
 transitory
 translate
@@ -6252,6 +6264,7 @@ underneath
 understand
 understandable
 understanding
+understands
 undertake
 undertaking
 undertook
@@ -6663,10 +6676,8 @@ youth
 zero
 zombie
 zone
-organizations
-specialization
-specialized
-integrating
+incorrect
+commute
 
 ;; Local Variables:
 ;; mode: text
