@@ -1118,6 +1118,7 @@ communicate
 communication
 communicative
 community
+commute
 compact
 company
 comparatively
@@ -2999,6 +3000,7 @@ inconsistent
 inconstancy
 incorporate
 incorporation
+incorrect
 increase
 increased
 increasing
@@ -6139,8 +6141,8 @@ transformed
 transient
 transit
 transition
-transitivity
 transitional
+transitivity
 transitory
 translate
 translation
@@ -6676,8 +6678,6 @@ youth
 zero
 zombie
 zone
-incorrect
-commute
 
 ;; Local Variables:
 ;; mode: text

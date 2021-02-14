@@ -1106,13 +1106,15 @@ SAVE-FN with non-nil ARGS."
 
   (treemacs-filewatch-mode 1)
   (treemacs-follow-mode 1)
-  ;; Effectively overrides `treemacs-follow-mode' but is a bit noisy
-  (treemacs-tag-follow-mode 1)
+
+  ;; Disables `treemacs-follow-mode', focuses the tag
+  (add-hook 'prog-mode-hook (lambda ()
+                              (treemacs-tag-follow-mode 1)))
+
   (treemacs-git-mode 'extended)
   (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
 
   (use-package treemacs-all-the-icons
-    :demand t
     :if (display-graphic-p))
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
@@ -1138,7 +1140,7 @@ SAVE-FN with non-nil ARGS."
                   icons))
        icons)))
 
-  ;; (treemacs-load-theme "all-the-icons-tighter")
+  (treemacs-load-theme "all-the-icons")
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.9)
   (set-face-attribute 'treemacs-directory-face nil :height 0.9)
@@ -2081,16 +2083,21 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
 (use-package all-the-icons-ivy-rich
-  :after ivy
+  :ensure t
+  :ensure ivy-rich
+  :after (ivy counsel)
   :if (display-graphic-p)
   ;; :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :init (setq all-the-icons-ivy-rich-icon-size 0.9)
   :config (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
+  :after all-the-icons-ivy-rich
   :custom (ivy-rich-parse-remote-buffer nil)
-  :hook (ivy-mode . ivy-rich-mode)
-  :config (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+  ;; :hook (ivy-mode . ivy-rich-mode)
+  :config
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  (ivy-rich-mode 1))
 
 (use-package counsel-fd
   :if (executable-find "fd")
