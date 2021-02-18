@@ -47,8 +47,8 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `C-M-f` - Move forward over a balanced expression (`forward-sexp`)
 - `C-M-b` - Move backward over a balanced expression (`backward-sexp`)
 - `C-M-k` - Kill balanced expression forward (`kill-sexp`)
-- `C-M-a` - Goto the start of a function (`beginning-of-defun`)
-- `C-M-e` - Goto the end of a function (`end-of-defun`)
+- `C-M-a` - Go to the start of a function (`beginning-of-defun`)
+- `C-M-e` - Go to the end of a function (`end-of-defun`)
 - `M-a` - Move back to the beginning of the sentence (`backward-sentence`)
 - `M-e` - Move forward to the end of the sentence (`forward-sentence`)
 - `M-{` - Move back to the previous paragraph beginning (`backward-paragraph`)
@@ -56,7 +56,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Dired
 
-- `C-x d` - Show dired buffer (`dired`)
+- `C-x d` - Show `dired` buffer (`dired`)
 - `+` - Create a new directory (`dired-create-directory`)
 - `g` - Update the entire contents (`revert-buffer`)
 - `l` - Update the specified files (`dired-do-redisplay`)
@@ -157,7 +157,7 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 - `C-c @ C-p` - Move to previous heading (at any level) (`outline-previous-visible-heading`)
 - `C-c @ C-f` - Move Forward to next heading at the same level (`outline-forward-same-level`)
 - `C-c @ C-b` - Move Backward to previous heading at the same level (`outline-backward-same-level`)
-- `C-c C-e` - Make LaTeX environment (\begin{...}-\end{...} pair) (`LaTeX-environment`)
+- `C-c C-e` - Make LaTeX environment (`\begin{...}-\end{...}` pair) (`LaTeX-environment`)
 - `C-c ]` - Close LaTeX environment (`LaTeX-close-environment`)
 - `C-c C-o C-f` - Toggle folding mode (`TeX-fold-mode`)
 - `C-c C-f C-e` - Insert formatted text (`TeX-font`)
@@ -260,8 +260,8 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `C-c >` - Indent right (`python-indent-shift-right`)
 - `` - Navigate to the previous function (`python-nav-backward-defun`)
 - `` - Navigate to the previous function (`python-nav-forward-defun`)
-- `` - Jump to the next block (``)
-- `` - Jump to the previous block (``)
+- `M-]` - Jump to the forward block (`python-nav-forward-block`)
+- `M-[` - Jump to the backward block (`python-nav-backward-block`)
 
 ### C/C++
 

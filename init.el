@@ -116,7 +116,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'moody
+  'default
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -638,7 +638,7 @@ SAVE-FN with non-nil ARGS."
 (diminish 'auto-fill-function)
 (diminish 'visual-line-mode)
 
-;; (fringe-mode '(1 . 1))
+(fringe-mode '(10 . 10)) ; Default is 8 pixels, which is too narrow for my comfort
 
 ;; Native from Emacs 27+
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
@@ -735,11 +735,13 @@ SAVE-FN with non-nil ARGS."
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line t
+        modus-themes-mode-line 'borderless-3d
         modus-themes-scale-headings nil
         modus-themes-variable-pitch-headings nil)
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
-  (load-theme 'modus-operandi t)
+  (modus-themes-load-themes)
+  :config (modus-themes-load-operandi)
   ;; :custom-face
   ;; (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
   ;;                             :box (:line-width 1 :color "#505050")
@@ -757,11 +759,13 @@ SAVE-FN with non-nil ARGS."
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line t
+        modus-themes-mode-line 'borderless-3d
         modus-themes-scale-headings nil
         modus-themes-variable-pitch-headings nil)
   (when (eq sb/modeline-theme 'moody)
-    (setq modus-themes-mode-line 'moody))
-  (load-theme 'modus-vivendi t))
+    (setq modus-themes-mode-line 'borderless-moody))
+  (modus-themes-load-themes)
+  :config (modus-themes-load-vivendi))
 
 (when (and (eq sb/theme 'sb/default) (display-graphic-p))
   (progn
@@ -816,6 +820,10 @@ SAVE-FN with non-nil ARGS."
         spaceline-version-control-p t)
   (spaceline-emacs-theme))
 
+(use-package spaceline-all-the-icons
+  :after spaceline
+  :config (spaceline-all-the-icons-theme))
+
 (use-package airline-themes
   :if (eq sb/modeline-theme 'airline)
   :init
@@ -860,7 +868,8 @@ SAVE-FN with non-nil ARGS."
   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (use-package moody
-  :if (eq sb/modeline-theme 'moody)
+  :if (and (eq sb/modeline-theme 'moody) (not (or (eq sb/theme 'modus-vivendi)
+                                                  (eq sb/theme 'modus-operandi))))
   :init
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
@@ -1015,7 +1024,7 @@ SAVE-FN with non-nil ARGS."
                ("r" . dired-efap)))
 
 (use-package dired-narrow ; Narrow dired to match filter
-  ;; :after dired
+  :after dired
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
@@ -1045,7 +1054,6 @@ SAVE-FN with non-nil ARGS."
   :commands (treemacs-current-workspace treemacs--find-current-user-project
                                         treemacs-do-add-project-to-workspace
                                         treemacs-add-project-to-workspace
-                                        ;; treemacs treemacs-toggle
                                         treemacs-git-mode
                                         treemacs-follow-mode
                                         treemacs-fringe-indicator-mode
@@ -1054,6 +1062,7 @@ SAVE-FN with non-nil ARGS."
                                         treemacs--propagate-new-icons
                                         treemacs-scope->current-scope
                                         treemacs--restore-eldoc-after-log
+                                        treemacs-load-theme
                                         )
   :preface
   (defun sb/setup-treemacs-quick ()
@@ -1064,8 +1073,7 @@ SAVE-FN with non-nil ARGS."
       (ace-window)))
 
   (defun sb/setup-treemacs-detailed (args)
-    "docstring"
-    (interactive "P")
+    "Setup treemacs."
     (let* ((root (treemacs--find-current-user-project))
            (path (treemacs-canonical-path root))
            (name (treemacs--filename path)))
@@ -1119,26 +1127,26 @@ SAVE-FN with non-nil ARGS."
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
-    :extends "Default"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash
-       (lambda (ext icon)
-         (puthash ext (concat (substring icon 0 1)
-                              (propertize " " 'display '(space . (:width 0.5))))
-                  icons))
-       icons)))
+                         :extends "Default"
+                         :config
+                         (let ((icons (treemacs-theme->gui-icons theme)))
+                           (maphash
+                            (lambda (ext icon)
+                              (puthash ext (concat (substring icon 0 1)
+                                                   (propertize " " 'display '(space . (:width 0.5))))
+                                       icons))
+                            icons)))
 
   (treemacs-create-theme "all-the-icons-tighter"
-    :extends "all-the-icons"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash
-       (lambda (ext icon)
-         (puthash ext (concat (substring icon 0 1)
-                              (propertize " " 'display '(space . (:width 0.5))))
-                  icons))
-       icons)))
+                         :extends "all-the-icons"
+                         :config
+                         (let ((icons (treemacs-theme->gui-icons theme)))
+                           (maphash
+                            (lambda (ext icon)
+                              (puthash ext (concat (substring icon 0 1)
+                                                   (propertize " " 'display '(space . (:width 0.5))))
+                                       icons))
+                            icons)))
 
   (treemacs-load-theme "all-the-icons")
 
@@ -1242,8 +1250,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: Check anzu frequency count
 (use-package anzu
-  ;; :after isearch
-  ;; :diminish anzu-mode
+  :diminish anzu-mode
   :commands anzu-mode
   :hook (isearch-mode . anzu-mode)
   :custom
@@ -1255,9 +1262,7 @@ SAVE-FN with non-nil ARGS."
   (unless (eq sb/theme 'leuven)
     (set-face-attribute 'anzu-mode-line nil
                         :foreground "blue"
-                        :weight 'light))
-  ;; (global-anzu-mode 1)
-  )
+                        :weight 'light)))
 
 (use-package swiper
   :bind ("<f4>" . swiper-isearch)
@@ -1402,7 +1407,6 @@ SAVE-FN with non-nil ARGS."
   :custom
   (company-posframe-show-metadata nil)
   (company-posframe-show-indicator nil)
-  ;; :hook (company-mode . company-posframe-mode)
   :config (company-posframe-mode))
 
 (use-package company-quickhelp
@@ -1416,7 +1420,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-box
   :if (display-graphic-p)
-  :after company
+  :hook (company-mode . company-box-mode)
   :diminish
   :custom (company-box-icons-alist 'company-box-icons-all-the-icons)
   ;; :config
@@ -2031,7 +2035,6 @@ SAVE-FN with non-nil ARGS."
   :after (counsel projectile)
   :defines counsel-projectile-default-file
   :commands counsel-projectile-switch-project-by-name
-  ;; :hook (counsel-mode . counsel-projectile-mode)
   :preface
   (defun sb/counsel-projectile-switch-project-magit (project)
     "Open Magit for the PROJECT."
@@ -2087,21 +2090,22 @@ This file is specified in `counsel-projectile-default-file'."
   :ensure ivy-rich
   :after (ivy counsel)
   :if (display-graphic-p)
-  ;; :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :init (setq all-the-icons-ivy-rich-icon-size 0.9)
   :config (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
-  :after all-the-icons-ivy-rich
+  :commands ivy-rich-modify-column
   :custom (ivy-rich-parse-remote-buffer nil)
-  ;; :hook (ivy-mode . ivy-rich-mode)
+  :hook (ivy-mode . ivy-rich-mode)
   :config
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  (ivy-rich-mode 1))
+  (ivy-rich-mode 1)
+  (ivy-rich-modify-column 'ivy-switch-buffer
+                          'ivy-rich-switch-buffer-major-mode
+                          '(:width 30 :face warning)))
 
 (use-package counsel-fd
   :if (executable-find "fd")
-  ;; :commands (counsel-fd-dired-jump counsel-fd-file-jump)
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
    ;; Jump to a file below the current directory
@@ -2117,7 +2121,6 @@ This file is specified in `counsel-projectile-default-file'."
              flycheck-describe-checker
              flycheck-buffer
              flycheck-list-errors
-             ;;                                      flycheck-disabled-checkers
              flycheck-select-checker
              flycheck-verify-setup
              flycheck-next-error
@@ -2235,7 +2238,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package whitespace-cleanup-mode
   :diminish
-  ;; :commands whitespace-cleanup-mode
   :hook (after-init . global-whitespace-cleanup-mode)
   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
 
@@ -2257,7 +2259,6 @@ This file is specified in `counsel-projectile-default-file'."
    :custom (highlight-symbol-on-navigation-p t))
 
  (use-package symbol-overlay ; Highlight symbol under point
-   ;; :commands (symbol-overlay-mode)
    :diminish
    :hook ((prog-mode html-mode yaml-mode) . symbol-overlay-mode)
    :bind
@@ -2513,7 +2514,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-  :disabled t
   :hook (after-init . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -2567,7 +2567,6 @@ This file is specified in `counsel-projectile-default-file'."
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package beginend
-  ;; :commands beginend-global-mode
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode))
@@ -2606,7 +2605,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; SB: I use the *scratch* buffer for taking notes, it helps to make the data persist
 (use-package persistent-scratch
-  ;; :commands persistent-scratch-setup-default
   :hook (after-init . persistent-scratch-setup-default)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
@@ -2658,7 +2656,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package windmove ; `Shift + direction' arrows
   :ensure nil
-  ;; :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
   :custom (windmove-wrap-around t "Wrap around at edges"))
 
@@ -2666,7 +2663,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; being invoked more frequently.
 (use-package super-save
   :diminish
-  ;; :commands super-save-mode
   :custom (super-save-remote-files nil "Ignore remote files")
   :hook (find-file . super-save-mode)
   :config (add-to-list 'super-save-triggers 'ace-window))
@@ -2675,7 +2671,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; one of the currently visible isearch candidates using `avy'.
 (use-package avy
   :demand t
-  ;; :commands avy-resume
   :bind
   (("M-b" . avy-goto-word-1)
    ("C-'" . avy-goto-char)
@@ -2737,13 +2732,11 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package explain-pause-mode
   :ensure nil
-  :disabled t
   :load-path "extras"
   ;; Generates the following warning with `quelpa'
   ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file"
   ;; :quelpa ((explain-pause-mode :fetcher github :repo "lastquestion/explain-pause-mode"))
   :commands (explain-pause-mode explain-pause-top)
-  ;; :hook (after-init . explain-pause-mode)
   :diminish)
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
@@ -2765,11 +2758,8 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (text-mode . writegood-mode))
 
 (use-package langtool
-  ;; :after text-mode
+  :after text-mode
   :commands langtool-check
-  ;; :hook
-  ;; (text-mode . (lambda()
-  ;;                (require 'langtool)))
   :custom
   (langtool-default-language "en")
   (langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
@@ -2885,6 +2875,7 @@ This file is specified in `counsel-projectile-default-file'."
   (markdown-split-window-direction 'horizontal)
   :config
   (unbind-key "C-c C-j")
+  ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
   ;; `markdown-mode' is derived from `text-mode'
   (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint))
 
@@ -2944,7 +2935,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Align fields with `C-c C-a'
 (use-package csv-mode
-  ;; :commands (csv-align-mode csv-align-fields)
   :mode "\\.csv\\'"
   :custom (csv-separators '("," ";" "|" " ")))
 
@@ -2981,12 +2971,10 @@ This file is specified in `counsel-projectile-default-file'."
   :custom (eldoc-echo-area-use-multiline-p nil))
 
 (use-package c-eldoc
-  ;; :commands (c-turn-on-eldoc-mode)
   :hook (c-mode-common . c-turn-on-eldoc-mode))
 
 (use-package css-eldoc
   :after css-mode
-  ;; :commands turn-on-css-eldoc
   :hook (css-eldoc-enable))
 
 (use-package octave
@@ -3065,9 +3053,9 @@ This file is specified in `counsel-projectile-default-file'."
    ;; ((c++-mode python-mode java-mode web-mode) . lsp-headerline-breadcrumb-mode)
    (lsp-mode . lsp-modeline-code-actions-mode)
    ;; FIXME: Registering `lsp-format-buffer' makes sense only if the server has started
-   ((c++-mode java-mode json-mode nxml-mode) . (lambda ()
-                                                 (add-hook 'before-save-hook #'lsp-format-buffer
-                                                           nil t) )) )
+   ((c++-mode java-mode nxml-mode) . (lambda ()
+                                       (add-hook 'before-save-hook #'lsp-format-buffer
+                                                 nil t) )) )
   :custom
   (lsp-clients-clangd-args '("-j=2"
                              "--background-index"
@@ -3355,8 +3343,7 @@ This file is specified in `counsel-projectile-default-file'."
         ([remap xref-find-references]  . lsp-ui-peek-find-references)))
 
 (use-package lsp-treemacs
-  ;; :disabled t ; I do not like enabling the treemacs buffer
-  ;; :commands lsp-treemacs-errors-list
+  :commands lsp-treemacs-errors-list
   :config
   ;; Sync workspace folders and treemacs projects
   (lsp-treemacs-sync-mode 1))
@@ -3372,7 +3359,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package lsp-ivy
   :after (lsp-mode ivy-mode)
-  ;; :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol)
   :bind
   (("C-c l g" . lsp-ivy-global-workspace-symbol)
    ("C-c l w" . lsp-ivy-workspace-symbol)))
@@ -3467,7 +3453,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package flycheck-clang-analyzer
   :after flycheck
-  ;; :commands flycheck-clang-analyzer-setup
   :config (flycheck-clang-analyzer-setup))
 
 (use-package flycheck-clang-tidy
@@ -3498,13 +3483,14 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (python-mode . lsp-deferred)
   :bind
   (:map python-mode-map
-        ("M-[" . python-nav-backward-block)
-        ("M-]" . python-nav-forward-block)
-        ;; ;; FIXME: `[' is treated as `meta'
+        ("M-["   . python-nav-backward-block)
+        ("M-]"   . python-nav-forward-block)
+        ("C-c <" . python-indent-shift-left)
+        ("C-c >" . python-indent-shift-right)
+        ;; FIXME: `[' is treated as `meta'
         ;; ("C-\[" . python-indent-shift-left)
         ;; ("C-]" . python-indent-shift-right)
-        ("C-c ," . python-indent-shift-left)
-        ("C-c ." . python-indent-shift-right))
+        )
   :custom
   (python-indent-guess-indent-offset nil)
   (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
@@ -3550,7 +3536,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  ;; :commands (py-isort-buffer py-isort-region py-isort-before-save)
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
@@ -3567,12 +3552,11 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package jinja2-mode
   :mode "\\.jinja\\'")
 
-;; We always prefer CPerl mode to Perl mode
 (use-package cperl-mode
   :ensure nil
   :hook (cperl-mode . lsp-deferred)
   :config
-  (fset 'perl-mode 'cperl-mode)
+  (fset 'perl-mode 'cperl-mode) ; Prefer CPerl mode to Perl mode
   (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
                                 auto-mode-alist)))
 
@@ -3630,8 +3614,7 @@ This file is specified in `counsel-projectile-default-file'."
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package shfmt
-  :after sh-mode
-  ;; :hook (sh-mode . shfmt-on-save-mode)
+  :hook (sh-mode . shfmt-on-save-mode)
   :config (shfmt-on-save-mode 1)
   :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
@@ -3656,7 +3639,6 @@ This file is specified in `counsel-projectile-default-file'."
   (transient-bind-q-to-quit))
 
 (use-package magit
-  ;; :commands (magit-display-buffer-fullframe-status-v1 magit-status)
   :bind
   (("C-x g" . magit-status)
    ("C-c M-g" . magit-file-dispatch)
@@ -3702,7 +3684,7 @@ This file is specified in `counsel-projectile-default-file'."
    ("/git/config\\'"    . gitconfig-mode)
    ("/\\.gitmodules\\'" . gitconfig-mode)))
 
-;; Diff-hl looks nicer
+;; Diff-hl looks nicer than git-gutter
 (or
  (use-package git-gutter
    :diminish
@@ -3718,7 +3700,6 @@ This file is specified in `counsel-projectile-default-file'."
    (git-gutter:disabled-modes '(fundamental-mode org-mode)))
 
  (use-package diff-hl ; Based on `vc'
-   ;; :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh)
    :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
    :hook
    ((magit-post-refresh . diff-hl-magit-post-refresh)
@@ -4195,7 +4176,6 @@ Ignore if no file is found."
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
-  ;; :commands fasd-find-file
   :custom (fasd-enable-initial-prompt nil)
   :hook (emacs-startup . global-fasd-mode)
   :bind ("C-h C-/" . fasd-find-file))
