@@ -1,44 +1,44 @@
 {
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file",
-    "files.trimTrailingWhitespace": true,
-    "files.trimFinalNewlines": true,
-    "files.insertFinalNewline": true,
-    "files.exclude": {
-        "irony": true,
-        "auto-save-list": true,
-        "eshell": true,
-        "session.*": true,
-        ".session*": true,
-        "ac-html-csswatcher": true,
-        ".python-environments": true,
-        "srecode-map.el": true,
-        "ede-projects.el": true,
-        ".project": true,
-        ".projectile": true,
-        "network-security*": true,
-        "semanticdb": true,
-        ".cache": true,
-        "transient": true,
-        "tramp": true,
-        "workspace": true,
-        "eclipse.jdt.ls": true,
-        "**/*.jar": true,
-        ".log": true
-    },
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/bower_components": true,
-        "elpa/": true,
-        "**/irony/": true,
-        "auto-save-list": true,
-        "eshell": true,
-        "reference-cards": true,
-        "tmp": true,
-        "workspace": true
-    },
-    "git.enabled": true,
-    "files.associations": {
-        "abbrev-defs": "lisp"
-    }
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "files.associations": {
+    "abbrev-defs": "lisp"
+  },
+  "files.exclude": {
+    "**/*.jar": true,
+    ".cache": true,
+    ".log": true,
+    ".project": true,
+    ".projectile": true,
+    ".python-environments": true,
+    ".session*": true,
+    "ac-html-csswatcher": true,
+    "auto-save-list": true,
+    "eclipse.jdt.ls": true,
+    "ede-projects.el": true,
+    "eshell": true,
+    "irony": true,
+    "network-security*": true,
+    "semanticdb": true,
+    "session.*": true,
+    "srecode-map.el": true,
+    "tramp": true,
+    "transient": true,
+    "workspace": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "git.enabled": true,
+  "search.exclude": {
+    "**/bower_components": true,
+    "**/irony/": true,
+    "**/node_modules": true,
+    "auto-save-list": true,
+    "elpa/": true,
+    "eshell": true,
+    "reference-cards": true,
+    "tmp": true,
+    "workspace": true
+  }
 }

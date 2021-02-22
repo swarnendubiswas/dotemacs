@@ -179,7 +179,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -220,9 +220,6 @@ This location is used for temporary installations and files.")
 (defconst dotemacs-emacs28+ (> emacs-major-version 27))
 (defconst dotemacs-is-linux (eq system-type 'gnu/linux))
 (defconst dotemacs-is-windows (eq system-type 'windows-nt))
-
-;; Silence "assignment to free variable" warning
-;; (defvar apropos-do-all)
 
 (package-initialize)
 (unless (package-installed-p 'use-package)
@@ -361,9 +358,13 @@ This location is used for temporary installations and files.")
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 
+;; Silence "assignment to free variable" warning
+(defvar apropos-do-all)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
+
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
+      apropos-do-all t ; Make `apropos' search more extensively
       auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
       auto-save-no-message t
       backup-inhibited t ; Disable backup for a per-file basis
@@ -431,6 +432,7 @@ This location is used for temporary installations and files.")
       ;; truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
+      vc-follow-symlinks t ; No need to ask
       vc-handled-backends '(Git) ; Disabling vc can improve performance
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
@@ -470,6 +472,11 @@ This location is used for temporary installations and files.")
   :config
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
+
+(use-package request
+  :config
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq request-storage-directory (expand-file-name "request" no-littering-var-directory))))
 
 ;; Activate utf-8
 (setq locale-coding-system 'utf-8)
@@ -668,7 +675,7 @@ SAVE-FN with non-nil ARGS."
   ;; https://github.com/domtronn/all-the-icons.el/issues/120
   (when (and (not (sb/font-installed-p "all-the-icons")))
     (all-the-icons-install-fonts t))
-  :custom (all-the-icons-scale-factor 1.2))
+  :custom (all-the-icons-scale-factor 1.1))
 
 (use-package leuven-theme
   :if (eq sb/theme 'leuven)
@@ -721,12 +728,14 @@ SAVE-FN with non-nil ARGS."
                       :foreground "#999999")
   :config
   (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification
   (doom-themes-org-config))
 
 (use-package monokai-theme
   :if (eq sb/theme 'monokai)
   :init (load-theme 'monokai t))
 
+;; FIXME: Modeline configuration is not working
 (use-package modus-operandi-theme
   :ensure moody
   :ensure modus-themes
@@ -1123,30 +1132,30 @@ SAVE-FN with non-nil ARGS."
   (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
 
   (use-package treemacs-all-the-icons
-    :if (display-graphic-p))
+    :demand t)
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
-                         :extends "Default"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash
-                            (lambda (ext icon)
-                              (puthash ext (concat (substring icon 0 1)
-                                                   (propertize " " 'display '(space . (:width 0.5))))
-                                       icons))
-                            icons)))
+    :extends "Default"
+    :config
+    (let ((icons (treemacs-theme->gui-icons theme)))
+      (maphash
+       (lambda (ext icon)
+         (puthash ext (concat (substring icon 0 1)
+                              (propertize " " 'display '(space . (:width 0.5))))
+                  icons))
+       icons)))
 
   (treemacs-create-theme "all-the-icons-tighter"
-                         :extends "all-the-icons"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash
-                            (lambda (ext icon)
-                              (puthash ext (concat (substring icon 0 1)
-                                                   (propertize " " 'display '(space . (:width 0.5))))
-                                       icons))
-                            icons)))
+    :extends "all-the-icons"
+    :config
+    (let ((icons (treemacs-theme->gui-icons theme)))
+      (maphash
+       (lambda (ext icon)
+         (puthash ext (concat (substring icon 0 1)
+                              (propertize " " 'display '(space . (:width 0.5))))
+                  icons))
+       icons)))
 
   (treemacs-load-theme "all-the-icons")
 
@@ -1199,17 +1208,19 @@ SAVE-FN with non-nil ARGS."
    (org-mode . org-indent-mode))
   :diminish org-indent-mode
   :custom
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-hide-emphasis-markers t)
+  (org-hide-leading-stars t)
+  (org-hide-leading-stars-before-indent-mode t)
   (org-src-fontify-natively t "Code block fontification using the major-mode of the code")
-  (org-startup-indented t)
-  (org-startup-truncated nil)
   (org-src-preserve-indentation t)
   (org-src-tabs-acts-natively t)
   (org-src-window-setup 'current-window)
-  (org-fontify-done-headline t)
-  (org-fontify-whole-heading-line t)
+  (org-startup-indented t)
+  (org-startup-truncated nil)
   (org-startup-folded 'showeverything)
-  (org-hide-leading-stars t)
-  (org-hide-leading-stars-before-indent-mode t)
+  (org-startup-with-inline-images t)
   (org-support-shift-select t)
   ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the beginning
   ;; of headlines. `org-babel-describe-bindings' will display a list of the code blocks commands and
@@ -1328,7 +1339,7 @@ SAVE-FN with non-nil ARGS."
                      ))
   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
   ;; (recentf-keep '(file-remote-p file-readable-p))
-  (recentf-max-saved-items 200)
+  (recentf-max-saved-items 250)
   (recentf-menu-filter 'recentf-sort-descending)
   :config
   ;; FIXME: Should we move this to `:init'?
@@ -1352,6 +1363,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
 ;; company-complete-common' when there are no completions.
+;; Use `C-M-i' for `complete-symbol' with regex search.
 (use-package company
   :commands company-abort
   :hook (after-init . global-company-mode)
@@ -1420,7 +1432,8 @@ SAVE-FN with non-nil ARGS."
 
 (use-package company-box
   :if (display-graphic-p)
-  :hook (company-mode . company-box-mode)
+  :after company
+  :config (company-box-mode 1)
   :diminish
   :custom (company-box-icons-alist 'company-box-icons-all-the-icons)
   ;; :config
@@ -1877,6 +1890,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
+  :disabled t ; Prefer `format-all'
   :diminish
   :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
   :custom
@@ -2088,10 +2102,9 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package all-the-icons-ivy-rich
   :ensure t
   :ensure ivy-rich
-  :after (ivy counsel)
   :if (display-graphic-p)
-  :init (setq all-the-icons-ivy-rich-icon-size 0.9)
-  :config (all-the-icons-ivy-rich-mode 1))
+  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
+  :custom (all-the-icons-ivy-rich-icon-size 0.9))
 
 (use-package ivy-rich
   :commands ivy-rich-modify-column
@@ -2099,10 +2112,10 @@ This file is specified in `counsel-projectile-default-file'."
   :hook (ivy-mode . ivy-rich-mode)
   :config
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  (ivy-rich-mode 1)
+  ;; Increase the width to see the major mode clearly
   (ivy-rich-modify-column 'ivy-switch-buffer
                           'ivy-rich-switch-buffer-major-mode
-                          '(:width 30 :face warning)))
+                          '(:width 18 :face warning)))
 
 (use-package counsel-fd
   :if (executable-find "fd")
@@ -2314,10 +2327,11 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package tramp
   :defer 2
   :custom
-  (tramp-default-method "ssh" "SSH is faster than the default SCP")
-  (tramp-verbose 1)
-  (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-completion-reread-directory-timeout nil)
+  (tramp-default-method "ssh" "SSH is faster than the default SCP")
+  (tramp-default-remote-shell "/bin/bash")
+  (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
+  (tramp-verbose 1)
   ;; Disable version control
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
                                 tramp-file-name-regexp))
@@ -2543,10 +2557,11 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-(add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
+(unless (featurep 'popwin)
+  (add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
+  (add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
+  (add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
+  (add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window)))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2914,7 +2929,7 @@ This file is specified in `counsel-projectile-default-file'."
   :disabled t
   :init
   (dolist (mode '(typescript-mode js-mode js2-mode coffee-mode))
-    (add-hook (derived-mode-hook-name mode) 'add-node-modules-path)))
+    (add-hook (derived-mode-hook-name mode) #'add-node-modules-path)))
 
 (use-package prettier
   :if (executable-find "prettier")
@@ -2975,7 +2990,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package css-eldoc
   :after css-mode
-  :hook (css-eldoc-enable))
+  :config (css-eldoc-enable))
 
 (use-package octave
   :ensure nil
@@ -3096,7 +3111,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-html-format-max-preserve-new-lines nil 1)
   (lsp-imenu-sort-methods '(position))
   (lsp-keep-workspace-alive nil)
-  (lsp-log-io t "texlab communication is huge")
+  (lsp-log-io nil "texlab communication is huge")
   (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
   ;; Sudden changes in the height of the echo area causes the cursor to lose position
   (lsp-signature-auto-activate nil)
@@ -3554,11 +3569,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package cperl-mode
   :ensure nil
+  :mode ("latexmkrc\\'")
   :hook (cperl-mode . lsp-deferred)
   :config
-  (fset 'perl-mode 'cperl-mode) ; Prefer CPerl mode to Perl mode
-  (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
-                                auto-mode-alist)))
+  ;; Prefer CPerl mode to Perl mode
+  (fset 'perl-mode 'cperl-mode))
+
+;; (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
+;;                               auto-mode-alist))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -3571,10 +3589,6 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-java-inhibit-message t)
   (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" "Requires Java 11")
   (lsp-java-save-actions-organize-imports t))
-
-(use-package request
-  :after lsp-java
-  :custom (request-storage-directory (expand-file-name "request" no-littering-var-directory)))
 
 (use-package ant
   :commands (ant ant-clean ant-compile ant-test))
@@ -3644,7 +3658,6 @@ This file is specified in `counsel-projectile-default-file'."
    ("C-c M-g" . magit-file-dispatch)
    ("C-x M-g" . magit-dispatch))
   :custom
-  (magit-completing-read-function #'ivy-completing-read)
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
@@ -3784,10 +3797,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (use-package ediff
   :ensure nil
+  :defines ediff-window-setup-function
+  :commands ediff-setup-windows-plain
   :config
-  (defvar ediff-window-setup-function)
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
   ;; Split windows horizontally in ediff (instead of vertically)
   (setq ediff-split-window-function #'split-window-horizontally))
 
@@ -3823,11 +3837,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :hook (web-mode . lsp-deferred)
   :config (flycheck-add-mode 'javascript-eslint 'web-mode)
   :custom
-  (web-mode-enable-auto-pairing t)
   (web-mode-enable-auto-closing t)
+  (web-mode-enable-auto-pairing t)
   (web-mode-enable-auto-quoting t)
-  (web-mode-enable-css-colorization t)
   (web-mode-enable-block-face t)
+  (web-mode-enable-css-colorization t)
   (web-mode-enable-current-element-highlight t)
   (web-mode-enable-current-column-highlight t))
 
@@ -3838,8 +3852,9 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
+;; I am unsure of the usefulness of this package
 (use-package prism
-  :disabled t ; TODO: I am unsure of the usefulness of this package
+  :disabled t
   :load-path "extras"
   ;; :quelpa ((prism-mode :fetcher github :repo "alphapapa/prism.el"
   ;;                      :files ("prism.el")))
@@ -4053,8 +4068,12 @@ Ignore if no file is found."
 ;;                         (lambda ()
 ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
 
-;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
-;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
+(with-eval-after-load 'LaTeX-mode
+  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
+
+(defvar latex-mode-map)
+(with-eval-after-load 'latex-mode
+  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map))
 
 (use-package math-preview
   :commands (math-preview-all math-preview-at-point math-preview-region)
@@ -4155,7 +4174,9 @@ Ignore if no file is found."
 ;; Use for major modes which do not provide a formatter
 (use-package format-all
   :commands (format-all-ensure-formatter)
-  :hook ((emacs-lisp-mode bazel-mode) . format-all-mode)
+  :hook
+  ((emacs-lisp-mode lisp-mode lisp-interaction-mode bazel-mode) . (lambda ()
+                                                                    (format-all-mode 1)))
   :config (format-all-ensure-formatter))
 
 (use-package tree-sitter

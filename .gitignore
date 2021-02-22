@@ -2,7 +2,6 @@ elpa
 tmp
 auto-save-list
 irony
-tramp
 ac-html-csswatcher
 eshell
 semanticdb
@@ -13,8 +12,11 @@ etc
 .python-environments
 workspace
 eln-cache
-
+quelpa
+request
+spell-fu
 .log
+
 *.elc
 .session
 session.*
@@ -33,7 +35,6 @@ network-security.data
 .tags1
 TAGS
 transient
-request
 GPATH
 GTAGS
 GRTAGS
@@ -43,6 +44,4 @@ amx-items
 .ac-php-conf.json
 package-quickstart.el
 private.el
-spell-fu
-
-quelpa
+tramp

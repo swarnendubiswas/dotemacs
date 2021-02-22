@@ -46,6 +46,11 @@
     ("initialise" "Initialize" nil :count 0)
    ))
 
+(define-abbrev-table 'gfm-mode-abbrev-table
+  '(
+    ("initialised" "initialized" nil :count 0)
+   ))
+
 (define-abbrev-table 'global-abbrev-table
   '(
     ("abbout" "about" nil :count 0)
