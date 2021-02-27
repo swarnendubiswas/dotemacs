@@ -46,6 +46,14 @@
 
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
+
+;; Load built-in libraries
+(require 'cl-lib)
+(require 'map)
+(require 'subr-x)
+
+;; (debug-on-entry 'package-initialize)
+
 (defconst dotemacs-1MB (* 1 1000 1000))
 (defconst dotemacs-4MB (* 4 1000 1000))
 (defconst dotemacs-8MB (* 8 1000 1000))
@@ -62,14 +70,15 @@
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
   (setq gc-cons-percentage 0.3
-        gc-cons-threshold dotemacs-128MB))
+        gc-cons-threshold dotemacs-200MB))
 
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
   (when (bound-and-true-p sb/debug-init-file)
     (setq garbage-collection-messages nil))
   (setq gc-cons-percentage 0.1
-        gc-cons-threshold dotemacs-8MB))
+        ;; https://github.com/emacs-lsp/lsp-mode#performance
+        gc-cons-threshold dotemacs-100MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
@@ -240,6 +249,8 @@ This location is used for temporary installations and files.")
           use-package-compute-statistics t ; Use `M-x use-package-report' to see results
           use-package-expand-minimally nil
           use-package-verbose t)
+  ;; Always load features lazily unless told otherwise
+  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
   (setq use-package-always-defer t
         use-package-compute-statistics nil
         ;; Avoid printing errors and warnings since the configuration is known to work
@@ -370,6 +381,7 @@ This location is used for temporary installations and files.")
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
       case-fold-search t ; Searches and matches should ignore case
+      comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
       compilation-ask-about-save nil
       ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
@@ -391,6 +403,7 @@ This location is used for temporary installations and files.")
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       ;; Avoid resizing the frame when the font is larger (or smaller) than the system default
       frame-inhibit-implied-resize t
+      frame-resize-pixelwise t
       frame-title-format (list '(buffer-file-name "%f" "%b"))
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
@@ -521,10 +534,11 @@ This location is used for temporary installations and files.")
   :diminish auto-revert-mode
   :hook (after-init . global-auto-revert-mode)
   :custom
-  (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
+  (auto-revert-interval 2 "Faster (seconds) would mean less likely to use stale data")
   (auto-revert-remote-files t)
   (auto-revert-use-notify nil)
-  (auto-revert-verbose nil))
+  (auto-revert-verbose nil)
+  (global-auto-revert-non-file-buffers t))
 
 ;; Revert PDF files without asking
 (setq revert-without-query '("\\.pdf"))
@@ -635,6 +649,7 @@ SAVE-FN with non-nil ARGS."
                 global-hl-line-mode
                 global-visual-line-mode ; Wrap lines
                 minibuffer-depth-indicate-mode
+                outline-minor-mode
                 ;; Enable visual feedback on selections, mark follows the point
                 transient-mark-mode
                 ))
@@ -644,6 +659,7 @@ SAVE-FN with non-nil ARGS."
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)
 (diminish 'visual-line-mode)
+(diminish 'outline-minor-mode)
 
 (fringe-mode '(10 . 10)) ; Default is 8 pixels, which is too narrow for my comfort
 
@@ -859,7 +875,8 @@ SAVE-FN with non-nil ARGS."
 (use-package awesome-tray
   :ensure nil
   :if (eq sb/modeline-theme 'awesome-tray)
-  :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
+  :load-path "extras"
+  ;; :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
   :hook (after-init . awesome-tray-mode)
   :custom
   (awesome-tray-active-modules
@@ -965,6 +982,14 @@ SAVE-FN with non-nil ARGS."
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
+(use-package bufler
+  :commands bufler-mode
+  :diminish bufler-workspace-mode
+  ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
+  ;;                 :files (:defaults (:exclude "helm-bufler.el")))
+  :config (bufler-mode 1)
+  :bind ("C-x C-b" . bufler))
+
 (use-package dired
   :ensure nil
   :commands dired-next-line
@@ -1003,12 +1028,12 @@ SAVE-FN with non-nil ARGS."
   (dired-omit-verbose nil "Do not show messages when omitting files")
   :hook (dired-mode . dired-omit-mode)
   :bind ("C-x C-j" . dired-jump)
-  :diminish dired-omit-mode ; This does not work
-  ;; :config
-  ;; ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  ;; (defadvice dired-omit-startup (after diminish-dired-omit activate)
-  ;;   "Remove 'Omit' from the modeline."
-  ;;   (diminish 'dired-omit-mode) dired-mode-map)
+  :config
+  ;; `:diminish dired-omit-mode' does not work
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Remove 'Omit' from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map)
   )
 
 (use-package dired+
@@ -1310,7 +1335,8 @@ SAVE-FN with non-nil ARGS."
   :commands ripgrep-regexp)
 
 (use-package visual-regexp
-  :commands (vr/replace vr/query-replace vr/mark))
+  :commands (vr/replace vr/query-replace vr/mark)
+  :bind ([remap query-replace] . vr/query-replace))
 
 (use-package recentf
   :ensure nil
@@ -1366,7 +1392,6 @@ SAVE-FN with non-nil ARGS."
 ;; Use `C-M-i' for `complete-symbol' with regex search.
 (use-package company
   :commands company-abort
-  :hook (after-init . global-company-mode)
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
@@ -1374,19 +1399,21 @@ SAVE-FN with non-nil ARGS."
     (company-abort)
     (save-buffer))
   :custom
-  ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; (company-dabbrev-ignore-case nil "Backend is case-sensitive")
-  ;; Searching for other buffers is not useful with LSP support
-  (company-dabbrev-other-buffers t "Search in other buffers with same major mode")
-  (company-idle-delay 0.1 "Recommended by lsp")
+  ;; Searching for other buffers is not useful with LSP support, and can cause slowdowns
+  (company-dabbrev-other-buffers nil "Search in other buffers with same major mode")
+  (company-idle-delay 0.1 "Decrease the delay before the popup is shown")
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words are faster to type")
-  ;; (company-require-match nil "Allow input string that do not match candidates")
+  (company-require-match nil "Allow input string that do not match candidates")
   (company-selection-wrap-around t)
   (company-show-numbers t "Speed up completion")
-  ;; (company-tooltip-align-annotations t)
+  ;; Align additional metadata, like type signatures, to the right-hand side
+  (company-tooltip-align-annotations t)
   :config
+  (global-company-mode 1)
   ;; We set `company-backends' as a local variable
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
   ;;   (delq backends company-backends))
@@ -1679,7 +1706,8 @@ SAVE-FN with non-nil ARGS."
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq prescient-save-file (expand-file-name "prescient-save.el"
-                                                sb/temp-directory))))
+                                                sb/temp-directory)))
+  :custom (prescient-history-length 500))
 
 ;; https://github.com/raxod502/prescient.el/issues/65
 (use-package ivy-prescient
@@ -1890,7 +1918,6 @@ SAVE-FN with non-nil ARGS."
 
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
-  :disabled t ; Prefer `format-all'
   :diminish
   :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
   :custom
@@ -2140,7 +2167,9 @@ This file is specified in `counsel-projectile-default-file'."
              flycheck-disable-checker
              flycheck-add-mode
              )
-  :hook ((text-mode prog-mode) . flycheck-mode) ; There are no checkers for modes like `csv-mode'
+  :hook
+  ;; There are no checkers for modes like `csv-mode', and many program modes use lsp
+  ((text-mode emacs-lisp-mode) . flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
   (flycheck-checker-error-threshold 500)
@@ -2178,6 +2207,7 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (use-package flycheck-grammarly
+  :after flycheck
   :demand t
   :config
   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
@@ -2294,13 +2324,11 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package highlight-numbers
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
-;; (debug-on-entry 'package-initialize)
-
 (use-package number-separator
   :ensure nil
-  :disabled t
-  :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
-                             :files ("number-separator.el")))
+  :load-path "extras"
+  ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
+  ;;                            :files ("number-separator.el")))
   :diminish
   :custom
   (number-separator ",")
@@ -2553,15 +2581,14 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
   (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-  (add-to-list 'popwin:special-display-config '(flycheck-verify-mode))
   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-(unless (featurep 'popwin)
-  (add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
-  (add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
-  (add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
-  (add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window)))
+(add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Bufler*" display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2983,7 +3010,10 @@ This file is specified in `counsel-projectile-default-file'."
   :if dotemacs-is-linux
   :diminish
   :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
-  :custom (eldoc-echo-area-use-multiline-p nil))
+  :custom
+  ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing itself
+  ;; unexpectedly when point is on a variable with a multiline docstring.
+  (eldoc-echo-area-use-multiline-p nil))
 
 (use-package c-eldoc
   :hook (c-mode-common . c-turn-on-eldoc-mode))
@@ -3319,13 +3349,14 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                        (lsp--set-configuration
-                                         (lsp-configuration-section "perl"))))
+                                                          (lsp--set-configuration
+                                                           (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
 
   ;; Disable fuzzy matching
   (advice-add #'lsp-completion--regex-fuz :override #'identity)
+  (lsp-dired-mode)
   ;; :bind-keymap ("C-c l" . lsp-keymap-prefix)
   :bind
   (("M-."     . lsp-find-definition)
@@ -3381,55 +3412,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (use-package url-cookie
 ;;   :ensure nil
 ;;   :custom (url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data))))
-
-(use-package lsp-python-ms
-  :if (eq sb/python-langserver 'mspyls)
-  :init (setq lsp-python-ms-auto-install-server t)
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-python-ms)
-                   ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'mspyls)
-                   ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
-                   ))
-  :custom
-  (lsp-python-ms-python-executable-cmd "python3"))
-
-;; `pyright --createstub pandas'
-(use-package lsp-pyright
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
-  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-pyright)
-                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'pyright)
-                   ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
-                   ))
-  :custom
-  (lsp-pyright-python-executable-cmd "python3"))
-
-(use-package lsp-jedi
-  :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-jedi)
-                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'jedi)
-                   ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
-                   ))
-  :custom (lsp-jedi-diagnostics-enable t))
-
-;; Py-yapf works on a temporary file (placed in `/tmp'). Therefore it does not pick up on any
-;; project specific YAPF styles. Yapfify works on the original file, so that any project settings
-;; supported by YAPF itself are used.
-(use-package yapfify
-  :diminish yapf-mode
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
-  :hook (python-mode . yapf-mode))
 
 ;;  Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
@@ -3507,6 +3489,7 @@ This file is specified in `counsel-projectile-default-file'."
         ;; ("C-]" . python-indent-shift-right)
         )
   :custom
+  (python-fill-docstring-style 'django)
   (python-indent-guess-indent-offset nil)
   (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
   (python-indent-offset 4)
@@ -3554,6 +3537,56 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
+
+(use-package lsp-python-ms
+  :if (eq sb/python-langserver 'mspyls)
+  :after (:all lsp-mode python)
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook
+  (python-mode . (lambda ()
+                   (require 'lsp-python-ms)
+                   ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
+                   ;;   (add-to-list 'lsp-disabled-clients ls))
+                   ;; (add-to-list 'lsp-enabled-clients 'mspyls)
+                   ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
+                   ))
+  :custom
+  (lsp-python-ms-python-executable-cmd "python3"))
+
+;; `pyright --createstub pandas'
+(use-package lsp-pyright
+  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
+  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
+  :hook
+  (python-mode . (lambda ()
+                   (require 'lsp-pyright)
+                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
+                   ;;   (add-to-list 'lsp-disabled-clients ls))
+                   ;; (add-to-list 'lsp-enabled-clients 'pyright)
+                   ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
+                   ))
+  :custom
+  (lsp-pyright-python-executable-cmd "python3"))
+
+(use-package lsp-jedi
+  :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
+  :hook
+  (python-mode . (lambda ()
+                   (require 'lsp-jedi)
+                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
+                   ;;   (add-to-list 'lsp-disabled-clients ls))
+                   ;; (add-to-list 'lsp-enabled-clients 'jedi)
+                   ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
+                   ))
+  :custom (lsp-jedi-diagnostics-enable t))
+
+;; Py-yapf works on a temporary file (placed in `/tmp'). Therefore it does not pick up on any
+;; project specific YAPF styles. Yapfify works on the original file, so that any project settings
+;; supported by YAPF itself are used.
+(use-package yapfify
+  :diminish yapf-mode
+  :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
+  :hook (python-mode . yapf-mode))
 
 (use-package ein
   :mode ("\\.ipynb\\'" . ein:ipynb-mode))
@@ -3650,6 +3683,7 @@ This file is specified in `counsel-projectile-default-file'."
     (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
           transient-levels-file (expand-file-name "transient/levels.el" sb/temp-directory)
           transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
+  ;; Allow using `q' to quit out of popups, in addition to `C-g'
   (transient-bind-q-to-quit))
 
 (use-package magit
@@ -3917,7 +3951,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (TeX-electric-sub-and-superscript t "Automatically insert braces in math mode")
   (TeX-parse-self t "Parse documents")
   (TeX-quote-after-quote nil "Allow original LaTeX quotes")
-  (TeX-save-query nil)
+  (TeX-save-query nil "Save buffers automatically when compiling")
   (TeX-source-correlate-method 'synctex)
   (TeX-source-correlate-start-server nil "Do not start the emacs server when correlating sources")
   (TeX-syntactic-comment t)
@@ -4604,7 +4638,6 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-l" . goto-line)
  ("C-c z" . repeat)
  ("C-z" . undo)
- ("C-S-z" . redo)
  ("<f11>" . delete-other-windows)
  ("C-x k" . kill-this-buffer)
  ("M-<left>" . previous-buffer)
@@ -4645,13 +4678,19 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package which-key ; Show help popups for prefix keys
   :diminish
   :hook (after-init . which-key-mode)
-  :config (which-key-setup-side-window-right-bottom))
+  :config (which-key-setup-side-window-right-bottom)
+  :custom
+  ;; Allow C-h to trigger which-key before it is done automatically
+  (which-key-show-early-on-C-h t))
 
 (use-package which-key-posframe
   :disabled t ; The posframe has a lower contrast
   :hook (which-key-mode . which-key-posframe-mode))
 
 ;; Mark safe variables
+
+;; (add-to-list 'safe-local-variable-values '(auto-fill-function . nil))
+;; (add-to-list 'safe-local-eval-forms '(visual-line-mode +1))
 
 (put 'bibtex-completion-bibliography 'safe-local-variable #'listp)
 (put 'company-bibtex-bibliography 'safe-local-variable #'listp)
@@ -4674,6 +4713,8 @@ or the major mode is not in `sb/skippable-modes'."
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'tags-table-list 'safe-local-variable #'listp)
+
+;; Custom functions
 
 (defun sb/open-local-file-projectile (directory)
   "Open projectile file within DIRECTORY.
