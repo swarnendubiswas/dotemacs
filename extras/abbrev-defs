@@ -91,6 +91,7 @@
     ("adequite" "adequate" nil :count 0)
     ("adn" "and" nil :count 3)
     ("advanage" "advantage" nil :count 0)
+    ("advertize" "advertise" nil :count 0)
     ("affraid" "afraid" nil :count 0)
     ("afterthe" "after the" nil :count 0)
     ("aganist" "against" nil :count 0)

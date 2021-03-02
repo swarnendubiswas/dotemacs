@@ -382,7 +382,9 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 ## Debugging Emacs
 
-`pkill -USR2 emacs`
+- `kill -s USR2 [pid]`
+- `killall -s USR2 emacs`
+- `pkill -USR2 emacs`
 
 ## TODO
 

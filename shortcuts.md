@@ -24,6 +24,7 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `M-q` - Fill paragraph at or after point (`fill-paragraph`)
 - `M-d` - Kill the next word (`kill-word`)
 - `M-- M-d` - Kill the previous word (`negative-argument kill-word`)
+- `C-x i` -Insert file contents (`insert-file`)
 
 ## Marking
 

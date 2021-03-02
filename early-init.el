@@ -26,8 +26,8 @@
 
 ;; Defer GC during startup
 (setq garbage-collection-messages nil
-      gc-cons-percentage 0.3 ; Portion of heap used for allocation
-      gc-cons-threshold dotemacs-500MB)
+      gc-cons-percentage 0.6 ; Portion of heap used for allocation
+      gc-cons-threshold most-positive-fixnum)
 
 (setq load-prefer-newer t
       package-enable-at-startup nil ; Avoid loading packages twice
@@ -44,7 +44,14 @@
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
-;; Do not resize the frame at this early stage
+;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+
+;; Do not resize the frame at this early stage. Resizing the Emacs frame can be a terribly expensive
+;; part of changing the font. By inhibiting this, we easily halve startup times with fonts that are
+;; larger than the system default.
 (setq frame-inhibit-implied-resize t)
 
 ;; Disable UI elements before being initialized
@@ -54,8 +61,6 @@
   (menu-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(menu-bar-lines . 0) default-frame-alist)
 
 ;; (customize-set-variable 'menu-bar-mode nil)
 ;; (customize-set-variable 'tool-bar-mode nil)
