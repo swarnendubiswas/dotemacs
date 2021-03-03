@@ -872,8 +872,8 @@ SAVE-FN with non-nil ARGS."
   :ensure all-the-icons
   :ensure doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
-  :demand t
   :init
+  (require 'doom-modeline)
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format nil
         doom-modeline-indent-info nil
@@ -881,7 +881,7 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-minor-modes t)
   :config (doom-modeline-mode 1)
   ;; :custom-face
-  ;; (doom-modeline-bar ((t (:inherit default :height 0.7))))
+  ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
   )
 
 (use-package awesome-tray
@@ -917,6 +917,7 @@ SAVE-FN with non-nil ARGS."
   :hook (after-init . auto-dim-other-buffers-mode))
 
 (use-package centaur-tabs
+  :commands centaur-tabs-group-by-projectile-project
   :hook (after-init . centaur-tabs-mode)
   :custom
   (centaur-tabs-cycle-scope 'tabs)
@@ -1975,6 +1976,7 @@ SAVE-FN with non-nil ARGS."
   (show-paren-when-point-in-periphery t))
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+(defvar electric-pair-preserve-balance)
 (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
 ;; Disable pairs when entering minibuffer
 (add-hook 'minibuffer-setup-hook (lambda ()
@@ -2270,9 +2272,8 @@ This file is specified in `counsel-projectile-default-file'."
  ;; Does not display popup under TTY, check possible workarounds at
  ;; https://github.com/flycheck/flycheck-popup-tip
  (use-package flycheck-pos-tip
-   :after flycheck
    :if (display-graphic-p)
-   :config (flycheck-pos-tip-mode 1))
+   :hook (flycheck-mode . flycheck-pos-tip-mode))
 
  (use-package flycheck-posframe
    :disabled t
@@ -3754,6 +3755,10 @@ This file is specified in `counsel-projectile-default-file'."
           transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
   ;; Allow using `q' to quit out of popups, in addition to `C-g'
   (transient-bind-q-to-quit))
+
+(use-package with-editor
+  :after magit
+  :diminish with-editor-mode)
 
 (use-package magit
   :bind
