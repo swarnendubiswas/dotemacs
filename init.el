@@ -106,17 +106,18 @@
   (make-directory sb/temp-directory))
 
 (defcustom sb/theme
-  'modus-operandi
+  'doom-one-light
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
           (const :tag "leuven" leuven)
           (const :tag "solarized-light" solarized-light)
-          (const :tag "spacemacs-light" spacemacs-light)
           (const :tag "solarized-dark" solarized-dark)
+          (const :tag "spacemacs-light" spacemacs-light)
           (const :tag "tangotango" tangotango)
           (const :tag "zenburn" zenburn)
           (const :tag "doom-molokai" doom-molokai)
+          (const :tag "doom-one-light" doom-one-light)
           (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
@@ -754,6 +755,14 @@ SAVE-FN with non-nil ARGS."
                       ;; :foreground "#cccccc"
                       ;; :foreground "#b2b2b2"
                       :foreground "#999999")
+  :config
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification
+  (doom-themes-org-config))
+
+(use-package doom-themes
+  :if (eq sb/theme 'doom-one-light)
+  :init (load-theme 'doom-one-light t)
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
