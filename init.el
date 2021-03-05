@@ -106,7 +106,7 @@
   (make-directory sb/temp-directory))
 
 (defcustom sb/theme
-  'doom-one-light
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -459,7 +459,7 @@ This location is used for temporary installations and files.")
       use-dialog-box nil
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
-      vc-handled-backends '(Git) ; Disabling vc can improve performance
+      vc-handled-backends nil ; Disabling vc improves performance, alternate option '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
@@ -926,6 +926,7 @@ SAVE-FN with non-nil ARGS."
   :hook (after-init . auto-dim-other-buffers-mode))
 
 (use-package centaur-tabs
+  :disabled t
   :commands centaur-tabs-group-by-projectile-project
   :hook (after-init . centaur-tabs-mode)
   :custom
@@ -3031,8 +3032,6 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prettier
   :if (executable-find "prettier")
   ;; :init (setenv "NODE_PATH" (expand-file-name "node_modules" sb/user-tmp))
-  ;; :init (setenv "NODE_PATH" (expand-file-name ".nvm/versions/node/v15.5.0/lib/node_modules"
-  ;;                                             sb/user-home))
   ;; :hook
   ;; ((markdown-mode gfm-mode) . (lambda ()
   ;;                               (when (and buffer-file-name
@@ -3751,9 +3750,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package vc
   :init
   ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-  (add-hook 'find-file-hook #'vc-refresh-state)
-  ;; (remove-hook 'find-file-hook #'vc-refresh-state)
-  )
+  ;; (add-hook 'find-file-hook #'vc-refresh-state)
+  (remove-hook 'find-file-hook #'vc-refresh-state))
 
 (use-package transient
   :commands transient-bind-q-to-quit
