@@ -309,7 +309,6 @@ This location is used for temporary installations and files.")
 (use-package use-package-hydra)
 
 (use-package use-package-chords
-  :demand t
   :config (key-chord-mode 1))
 
 (unless (package-installed-p 'quelpa)
@@ -351,7 +350,7 @@ This location is used for temporary installations and files.")
   (load sb/private-file 'noerror))
 
 (use-package paradox
-  :commands (paradox-list-packages paradox-upgrade-packages)
+  :commands (paradox-list-packages paradox-upgrade-packages paradox-enable)
   :bind
   (("C-c d l" . paradox-list-packages)
    ("C-c d u" . paradox-upgrade-packages))
@@ -374,6 +373,7 @@ This location is used for temporary installations and files.")
 ;; (setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
+  :commands exec-path-from-shell-initialize
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
   (setq exec-path-from-shell-arguments '("-l" "-i")
@@ -487,6 +487,20 @@ This location is used for temporary installations and files.")
 (setq-default bidi-display-reordering 'left-to-right
               bidi-inhibit-bpa t
               bidi-paragraph-direction 'left-to-right)
+
+(dolist (exts '(
+                ;; Extensions
+                ".aux"
+                ".exe"
+                ".fls"
+                ".lof"
+                ".rel"
+                ".rip"
+                ".toc"
+                ;; Directories
+                "__pycache__/"
+                ))
+  (add-to-list 'completion-ignored-extensions exts))
 
 ;; During normal use a high GC threshold is set. When idling GC is triggered and a low threshold is
 ;; set.
@@ -648,6 +662,7 @@ SAVE-FN with non-nil ARGS."
                 blink-cursor-mode ; Blinking cursor is distracting
                 desktop-save-mode
                 global-prettify-symbols-mode ; Makes it difficult to edit the buffer
+                shell-dirtrack-mode
                 size-indication-mode
                 tooltip-mode
                 ))
@@ -694,6 +709,7 @@ SAVE-FN with non-nil ARGS."
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 (use-package all-the-icons
   :if (display-graphic-p)
+  :commands all-the-icons-install-fonts
   :preface
   (defun sb/font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
@@ -749,6 +765,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package doom-themes
   :if (eq sb/theme 'doom-molokai)
+  :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (load-theme 'doom-molokai t)
   (set-face-attribute 'font-lock-comment-face nil
@@ -762,6 +779,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package doom-themes
   :if (eq sb/theme 'doom-one-light)
+  :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init (load-theme 'doom-one-light t)
   :config
   (doom-themes-treemacs-config)
@@ -841,6 +859,8 @@ SAVE-FN with non-nil ARGS."
 
 (use-package smart-mode-line
   :if (eq sb/modeline-theme 'sml)
+  :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
+                      sml/shorten-modes sml/shorten-directory)
   :init
   (setq sml/theme 'light
         sml/mode-width 'full
@@ -1132,7 +1152,8 @@ SAVE-FN with non-nil ARGS."
                                         treemacs--propagate-new-icons
                                         treemacs-scope->current-scope
                                         treemacs--restore-eldoc-after-log
-                                        treemacs-load-theme)
+                                        treemacs-load-theme
+                                        treemacs-find-file-node)
   :preface
   (defun sb/setup-treemacs-quick ()
     "Setup treemacs."
@@ -1326,7 +1347,7 @@ SAVE-FN with non-nil ARGS."
   :diminish anzu-mode
   :commands anzu-mode
   ;; :hook (isearch-mode . anzu-mode)
-  :hook (after-init . global-anzu-mode)
+  ;; :hook (after-init . global-anzu-mode)
   ;; :custom
   ;; (anzu-search-threshold 10000)
   ;; (anzu-minimum-input-length 2)
@@ -1340,7 +1361,8 @@ SAVE-FN with non-nil ARGS."
   )
 
 (use-package swiper
-  :bind ("<f4>" . swiper-isearch)
+  :commands (swiper swiper-isearch)
+  ;; :bind ("<f4>" . swiper-isearch)
   :custom (swiper-action-recenter t))
 
 ;; (defvar grep-highlight-matches)
@@ -1372,6 +1394,18 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ripgrep
   :commands ripgrep-regexp)
+
+(use-package ctrlf
+  :commands (ctrlf-mode ctrlf-local-mode)
+  :config
+  (ctrlf-mode 1)
+  (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
+                                           (ctrlf-local-mode -1)))
+  :bind
+  (("C-f"   . ctrlf-forward-literal)
+   ("C-r"   . ctrlf-backward-literal)
+   ("C-M-s" . ctrlf-forward-regexp)
+   ("C-M-r" . ctrlf-backward-regexp)))
 
 (use-package visual-regexp
   :commands (vr/replace vr/query-replace vr/mark)
@@ -1917,6 +1951,7 @@ SAVE-FN with non-nil ARGS."
                                                 font-lock-string-face
                                                 ;; `nxml-mode' is derived from `text-mode'
                                                 lsp-face-highlight-read
+                                                hl-line
                                                 markdown-blockquote-face
                                                 markdown-code-face
                                                 markdown-html-attr-name-face
@@ -2227,6 +2262,7 @@ This file is specified in `counsel-projectile-default-file'."
              )
   :hook
   ;; There are no checkers for modes like `csv-mode', and many program modes use lsp
+  ;; `yaml-mode' is derived from `text-mode'
   ((text-mode emacs-lisp-mode) . flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
@@ -2411,12 +2447,15 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Shortcut /ssh:: will connect to default user@host#port.
 ;; Edit local file with sudo: `C-x C-f /sudo::/etc/hosts'
 ;; Open a remote file with ssh + sudo: `C-x C-f /ssh:host|sudo:root:/etc/passwd'
+;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
+;; bookmark with `bookmark-set'. To revisit that bookmark, use `bookmark-jump'.
 (use-package tramp
   ;; :defer 2
   :custom
   (tramp-completion-reread-directory-timeout nil)
   (tramp-default-method "ssh" "SSH is faster than the default SCP")
   (tramp-default-remote-shell "/bin/bash")
+  (tramp-default-user "swarnendu")
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-verbose 1)
   ;; Disable version control
@@ -2434,6 +2473,10 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
+;; https://www.gnu.org/software/tramp/
+(setq debug-ignored-errors
+      (cons 'remote-file-error debug-ignored-errors))
 
 ;; Does not pick up other usernames, difficult to customize different default home directories
 ;; https://github.com/masasam/emacs-counsel-tramp/issues/4
@@ -2588,7 +2631,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package hungry-delete ; Erase all consecutive white space characters in a given direction
   :diminish
-  :hook (after-init . global-hungry-delete-mode))
+  :hook
+  ((minibuffer-setup . (lambda ()
+                         (hungry-delete-mode -1)))
+   (after-init . global-hungry-delete-mode)))
 
 (use-package move-text ; Move lines with `M-<up>' and `M-<down>'
   :commands (move-text-up move-text-down)
@@ -2656,6 +2702,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'display-buffer-alist '("*Bufler*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*manage-minor-mode*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*deadgrep-mode*" display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2665,7 +2712,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package expand-region ; Expand region by semantic units
   :bind ("C-=" . er/expand-region))
 
-(use-package smart-mark ; Restore point with `C-g' after marking a region
+;; Restore point to the initial location with `C-g' after marking a region
+(use-package smart-mark
   :hook (after-init . smart-mark-mode))
 
 (use-package whole-line-or-region
@@ -2728,8 +2776,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package crux
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
-   ("C-c d s" . crux-sudo-edit)
-   ("<f12>"   . crux-kill-other-buffers)))
+   ("<f12>"   . crux-kill-other-buffers)
+   ("C-c d s" . crux-sudo-edit)))
 
 (use-package disable-mouse
   :diminish disable-mouse-global-mode
@@ -2802,7 +2850,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package bookmark
   :ensure nil
-  :disabled t
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory))))
@@ -2811,8 +2858,8 @@ This file is specified in `counsel-projectile-default-file'."
   :commands (
              bm-buffer-save-all
              bm-repository-save
-             ;;                               bm-repository-load bm-buffer-save
-             ;;                               bm-buffer-restore
+             ;; bm-repository-load bm-buffer-save
+             ;; bm-buffer-restore
              )
   :init (setq bm-restore-repository-on-load t) ; Must be set before `bm' is loaded
   :config
@@ -3428,7 +3475,6 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; Disable fuzzy matching
   (advice-add #'lsp-completion--regex-fuz :override #'identity)
-  (lsp-dired-mode)
   ;; :bind-keymap ("C-c l" . lsp-keymap-prefix)
   :bind
   (("M-."     . lsp-find-definition)
@@ -3817,7 +3863,6 @@ This file is specified in `counsel-projectile-default-file'."
 (or
  (use-package git-gutter
    :diminish
-   :disabled t
    :bind
    (("C-x p" . git-gutter:previous-hunk)
     ("C-x n" . git-gutter:next-hunk))
@@ -3829,6 +3874,7 @@ This file is specified in `counsel-projectile-default-file'."
    (git-gutter:disabled-modes '(fundamental-mode org-mode)))
 
  (use-package diff-hl ; Based on `vc'
+   :disabled t
    :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
    :hook
    ((magit-post-refresh . diff-hl-magit-post-refresh)

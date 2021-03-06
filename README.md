@@ -89,7 +89,7 @@ npm init --yes; npm install textlint
 ```
 
 ```Bash
-npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words  textlint-rule-sentence-length textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint textlint-rule-terminology textlint-filter-rule-comments textlint-rule-unexpanded-acronym textlint-rule-abbr-within-parentheses textlint-rule-no-dead-link
+npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-rule-sentence-length textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint textlint-rule-terminology textlint-filter-rule-comments textlint-rule-unexpanded-acronym textlint-rule-abbr-within-parentheses textlint-rule-no-dead-link
 ```
 
 ```Bash
@@ -352,12 +352,13 @@ git clone git://git.sv.gnu.org/emacs.git gccemacs
 git checkout feature/native-comp
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
-./configure --with-nativecomp --with-modules --with-json --with-harfbuzz --with-cairo CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
+# Add --prefix=/usr if the build works
+./configure --without-makeinfo --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 make -j2 NATIVE_FULL_AOT=1
 make install
 ```
 
-Evaluate the following to test that both fast JSON and native compilation is working.
+Evaluate the following to test that both fast JSON and native compilation are working.
 
 ```emacs-lisp
 (if (and (fboundp 'native-comp-available-p)
@@ -395,3 +396,4 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 - Bash LSP takes lot of memory
 - Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - `diminish smartparens-mode`
+- Associate XML LSP with `.classpath`
