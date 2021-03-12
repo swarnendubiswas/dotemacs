@@ -32,6 +32,7 @@
 (setq load-prefer-newer t
       package-enable-at-startup nil ; Avoid loading packages twice
       package-user-dir (expand-file-name "elpa" user-emacs-directory)
+      package-native-compile t
       package-quickstart t ; Populate one big autoloads file
       package-quickstart-file (expand-file-name "var/package-quickstart.el"
                                                 user-emacs-directory))

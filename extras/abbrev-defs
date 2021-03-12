@@ -103,7 +103,7 @@
     ("agreemnets" "agreements" nil :count 0)
     ("agressive" "aggressive" nil :count 0)
     ("ahppen" "happen" nil :count 0)
-    ("ahve" "have" nil :count 1)
+    ("ahve" "have" nil :count 2)
     ("alloted" "allotted" nil :count 0)
     ("allwasy" "always" nil :count 0)
     ("allwyas" "always" nil :count 0)
@@ -1065,7 +1065,7 @@
     ("runnning" "running" nil :count 0)
     ("rwite" "write" nil :count 0)
     ("rythm" "rhythm" nil :count 0)
-    ("sahred" "shared" nil :count 1)
+    ("sahred" "shared" nil :count 2)
     ("saidhe" "said he" nil :count 0)
     ("saidit" "said it" nil :count 0)
     ("saidthat" "said that" nil :count 0)
@@ -1379,6 +1379,7 @@
 (define-abbrev-table 'latex-mode-abbrev-table
   '(
     ("additionaly" "Additionally" nil :count 0)
+    ("quizes" "quizzes" nil :count 0)
     ("trainign" "training" nil :count 0)
    ))
 
@@ -1386,6 +1387,7 @@
   '(
     ("chaning" "changing" nil :count 0)
     ("conrol" "control" nil :count 0)
+    ("currenly" "currently" nil :count 0)
     ("jin" "join" nil :count 0)
     ("paritioning" "partitioning" nil :count 0)
     ("proessing" "processing" nil :count 0)

@@ -73,7 +73,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash;
 ```Bash
 cd $HOME/tmp; cd ;
 npm init --yes
-sudo npm install npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint
+sudo npm install npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint unofficial-grammarly-language-server-2
 ```
 
 `npm install git+https://gitlab.com/matsievskiysv/math-preview`
@@ -110,7 +110,7 @@ cd; sudo apt update; sudo snap refresh; sudo gem update; cd $HOME/tmp; composer 
 > Update node packages.
 
 ```Bash
-sudo npm update npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint
+sudo npm update npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint unofficial-grammarly-language-server-2
 ```
 
 #### Edit Bash files
@@ -336,7 +336,7 @@ Keywords=Text;Editor;
 ## Build GNU Emacs from source
 
 ```Bash
-sudo apt install texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev
+sudo apt install texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev
 git clone git://git.sv.gnu.org/emacs.git
 ./configure --without-makeinfo --with-cairo --without-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-nativecomp CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 make -j2
@@ -352,8 +352,7 @@ git clone git://git.sv.gnu.org/emacs.git gccemacs
 git checkout feature/native-comp
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
-# Add --prefix=/usr if the build works
-./configure --without-makeinfo --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
+./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 make -j2 NATIVE_FULL_AOT=1
 make install
 ```
@@ -376,6 +375,10 @@ Evaluate the following to test fast JSON is working.
 ```
 
 Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
+
+Run the following to native-compile all Elisp files under a directory.
+
+`(native-compile-async "/home/swarnendu/.emacs.d/elpa" 'recursively)`
 
 ## Setup Emacs NG
 

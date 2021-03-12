@@ -190,7 +190,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -329,6 +329,10 @@ This location is used for temporary installations and files.")
 ;; Put this early in the `user-init-file'
 (use-package no-littering
   :demand t)
+
+;; This is not a great idea, but I expect most warnings will arise from third-party packages
+(use-package warnings
+  :custom (warning-minimum-level :emergency))
 
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
@@ -798,7 +802,7 @@ SAVE-FN with non-nil ARGS."
   :init
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
-        modus-themes-intense-hl-line t
+        modus-themes-intense-hl-line nil
         modus-themes-mode-line 'borderless-3d
         modus-themes-scale-headings nil
         modus-themes-prompts 'intense-accented
@@ -904,7 +908,7 @@ SAVE-FN with non-nil ARGS."
   :init
   (require 'doom-modeline)
   (setq doom-modeline-buffer-encoding nil
-        doom-modeline-checker-simple-format nil
+        doom-modeline-checker-simple-format t
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t)
@@ -946,7 +950,6 @@ SAVE-FN with non-nil ARGS."
   :hook (after-init . auto-dim-other-buffers-mode))
 
 (use-package centaur-tabs
-  :disabled t
   :commands centaur-tabs-group-by-projectile-project
   :hook (after-init . centaur-tabs-mode)
   :custom
@@ -954,8 +957,7 @@ SAVE-FN with non-nil ARGS."
   (centaur-tabs-set-close-button t)
   (centaur-tabs-set-icons t)
   (centaur-tabs-set-modified-marker t)
-  :config
-  (centaur-tabs-group-by-projectile-project))
+  :config (centaur-tabs-group-by-projectile-project))
 
 (use-package hide-mode-line
   :commands (hide-mode-line-mode))
@@ -1370,7 +1372,9 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load 'grep
   (setq grep-command "grep -irHn "
         grep-highlight-matches t
-        grep-scroll-output t))
+        grep-scroll-output t)
+  (add-to-list 'grep-find-ignored-directories ".cache")
+  (add-to-list 'grep-find-ignored-directories "vendor"))
 
 ;; When the *grep* buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
@@ -2119,6 +2123,11 @@ SAVE-FN with non-nil ARGS."
       (format " %s [%s] "
               projectile-mode-line-prefix
               (or project-name "-"))))
+
+  (setq projectile-project-root-files
+  '("build.gradle" "pom.xml" "Pipfile" "tox.ini" "setup.py" "requirements.txt" "package.json"
+    "composer.json" "CMakeLists.txt" "Makefile" "WORKSPACE" "meson.build" "SConstruct"
+    "configure.ac" "configure.in"))
 
   ;; Avoid search when `projectile-mode' is enabled for faster startup
   ;; (setq projectile-project-search-path (list
@@ -2932,6 +2941,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Not very useful to help focus on work
 (use-package olivetti
+  :disabled t
   :diminish
   :custom (olivetti-body-width 0.80 "Fraction of the window width")
   :hook (text-mode . olivetti-mode))
@@ -3050,13 +3060,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 (use-package pandoc-mode
   ;; :ensure-system-package pandoc
-  :after markdown-mode
   :commands (pandoc-load-default-settings)
-  :demand t
   :diminish
-  :config (pandoc-load-default-settings)
-  ;; :hook (markdown-mode . pandoc-mode)
-  )
+  :hook (markdown-mode . pandoc-mode)
+  :config (pandoc-load-default-settings))
 
 (use-package grip-mode
   :if (executable-find "grip")
@@ -3354,9 +3361,9 @@ This file is specified in `counsel-projectile-default-file'."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge (lsp-configuration-section "pyright")
-                                                       (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge (lsp-configuration-section "pyright")
+                                     (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -3468,8 +3475,8 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :initialized-fn (lambda (workspace)
                                       (with-lsp-workspace workspace
-                                                          (lsp--set-configuration
-                                                           (lsp-configuration-section "perl"))))
+                                        (lsp--set-configuration
+                                         (lsp-configuration-section "perl"))))
                     :priority -1
                     :server-id 'perlls-remote))
 
@@ -3868,6 +3875,9 @@ This file is specified in `counsel-projectile-default-file'."
     ("C-x n" . git-gutter:next-hunk))
    :hook (after-init . global-git-gutter-mode)
    :custom
+   (git-gutter:added-sign " ")
+   (git-gutter:deleted-sign " ")
+   (git-gutter:modified-sign " ")
    (git-gutter:update-interval 1)
    ;; https://github.com/syl20bnr/spacemacs/issues/10555
    ;; https://github.com/syohex/emacs-git-gutter/issues/24
@@ -4824,6 +4834,10 @@ or the major mode is not in `sb/skippable-modes'."
 
 (global-set-key [remap next-buffer] 'sb/next-buffer)
 (global-set-key [remap previous-buffer] 'sb/previous-buffer)
+
+(with-eval-after-load 'centaur-tabs
+  (global-set-key [remap next-buffer] 'centaur-tabs-forward)
+  (global-set-key [remap previous-buffer] 'centaur-tabs-backward))
 
 (use-package default-text-scale
   :bind
