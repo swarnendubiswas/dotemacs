@@ -1641,14 +1641,23 @@ SAVE-FN with non-nil ARGS."
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   (defalias 'occur 'ivy-occur)
   (dolist (buffer '(
-                    "TAGS" "magit-process" "*eldoc for use-package*"
+                    "TAGS"
+                    "magit-process"
+                    ;; "*eldoc for use-package*"
                     ;; "^\\*Help\\*$"
                     ;; "^\\*Ibuffer\\*$"
                     ;; "*Warnings*"
-                    "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-                    "*flycheck-posframe-buffer*" "*emacs*"
-                    "^\\*prettier" "^\\*json*" "^\\*texlab*" "^\\*clangd*"
-                    "^\\*shfmt*" "*company-documentation*" "*xref*"
+                    ;; "^\\*Compile-Log\\*$"
+                    ;; "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+                    ;; "*flycheck-posframe-buffer*"
+                    ;; "*emacs*"
+                    ;; "^\\*prettier"
+                    ;; "^\\*json*"
+                    ;; "^\\*texlab*"
+                    ;; "^\\*clangd*"
+                    ;; "^\\*shfmt*"
+                    ;; "*company-documentation*"
+                    ;; "*xref*"
                     ))
     (add-to-list 'ivy-ignore-buffers buffer))
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
@@ -3652,10 +3661,11 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (flycheck-add-next-checker 'lsp 'python-pylint)
   )
 
-(defhydra sb/hydra-python-indent (python-mode-map "C-c")
-  "Adjust Python indentation."
-  (">" python-indent-shift-right "right")
-  ("<" python-indent-shift-left "left"))
+(with-eval-after-load 'python-mode
+  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
+    "Adjust Python indentation."
+    (">" python-indent-shift-right "right")
+    ("<" python-indent-shift-left "left")))
 
 (use-package python-docstring
   :after python-mode
@@ -4403,8 +4413,8 @@ Ignore if no file is found."
   :mode "\\.adoc\\'")
 
 (use-package editorconfig
-  :diminish
   :if (executable-find "editorconfig")
+  :diminish editorconfig-mode
   :commands editorconfig-mode)
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
