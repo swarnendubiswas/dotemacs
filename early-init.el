@@ -22,8 +22,6 @@
 ;; (require 'loadhist)
 ;; (file-dependents (feature-file 'cl))
 
-(defconst dotemacs-500MB (* 500 1000 1000))
-
 ;; Defer GC during startup
 (setq garbage-collection-messages nil
       gc-cons-percentage 0.6 ; Portion of heap used for allocation

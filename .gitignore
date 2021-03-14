@@ -45,3 +45,4 @@ amx-items
 package-quickstart.el
 private.el
 tramp
+/checks.json

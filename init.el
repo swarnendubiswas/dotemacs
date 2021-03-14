@@ -63,6 +63,7 @@
 (defconst dotemacs-100MB (* 100 1000 1000))
 (defconst dotemacs-128MB (* 128 1000 1000))
 (defconst dotemacs-200MB (* 200 1000 1000))
+(defconst dotemacs-500MB (* 500 1000 1000))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -102,9 +103,6 @@
   :type 'string
   :group 'sb/emacs)
 
-(unless (file-exists-p sb/temp-directory)
-  (make-directory sb/temp-directory))
-
 (defcustom sb/theme
   'modus-operandi
   "Specify which Emacs theme to use."
@@ -127,7 +125,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -226,6 +224,10 @@ This location is used for temporary installations and files.")
   "Use the `no-littering' package to keep `.emacs.d' clean."
   :type 'boolean
   :group 'sb/emacs)
+
+(unless (or (file-exists-p sb/temp-directory)
+            (bound-and-true-p sb/use-no-littering))
+  (make-directory sb/temp-directory))
 
 (defconst dotemacs-emacs27+ (> emacs-major-version 26))
 (defconst dotemacs-emacs28+ (> emacs-major-version 27))
@@ -501,8 +503,10 @@ This location is used for temporary installations and files.")
                 ".rel"
                 ".rip"
                 ".toc"
+                "__init__.py"
                 ;; Directories
                 "__pycache__/"
+                "eln-cache"
                 ))
   (add-to-list 'completion-ignored-extensions exts))
 
@@ -525,6 +529,7 @@ This location is used for temporary installations and files.")
 ;; Activate utf-8
 (setq locale-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-language-environment 'utf-8)
 (set-selection-coding-system 'utf-8)
@@ -585,11 +590,9 @@ This location is used for temporary installations and files.")
   :ensure nil
   :hook (after-init . savehist-mode)
   :custom
-  (savehist-additional-variables '(
-                                   extended-command-history
+  (savehist-additional-variables '(extended-command-history
                                    kill-ring
-                                   search-ring
-                                   ))
+                                   search-ring))
   (savehist-save-minibuffer-history t)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
@@ -673,6 +676,9 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode -1)))
 
+(autoload #'hl-line-highlight "hl-line" nil t)
+(declare-function #'hl-line-highlight "hl-line")
+
 ;; Enable the following modes
 (dolist (mode '(
                 auto-compression-mode
@@ -693,7 +699,7 @@ SAVE-FN with non-nil ARGS."
 (diminish 'visual-line-mode)
 (diminish 'outline-minor-mode)
 
-(fringe-mode '(10 . 10)) ; Default is 8 pixels, which is too narrow for my comfort
+;; (fringe-mode '(10 . 10)) ; Default is 8 pixels, which is too narrow for my comfort
 
 ;; Native from Emacs 27+
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
@@ -847,10 +853,12 @@ SAVE-FN with non-nil ARGS."
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
   :init
-  (setq powerline-display-buffer-size t
+  (setq powerline-default-separator 'box
+        powerline-display-buffer-size t
         powerline-display-hud nil
         powerline-display-mule-info nil
-        powerline-gui-use-vcs-glyph t)
+        powerline-gui-use-vcs-glyph t
+        powerline-height 17)
   (when (eq sb/theme 'leuven)
     (set-face-attribute 'mode-line nil
                         :background "grey88"
@@ -866,6 +874,8 @@ SAVE-FN with non-nil ARGS."
   :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
                       sml/shorten-modes sml/shorten-directory)
   :init
+  (use-package smart-mode-line-powerline-theme
+    :demand t)
   (setq sml/theme 'light
         sml/mode-width 'full
         sml/no-confirm-load-theme t
@@ -890,6 +900,7 @@ SAVE-FN with non-nil ARGS."
   (spaceline-emacs-theme)
   (use-package spaceline-all-the-icons
     :demand t
+    :commands spaceline-all-the-icons-theme
     :config (spaceline-all-the-icons-theme)))
 
 (use-package airline-themes
@@ -1483,7 +1494,7 @@ SAVE-FN with non-nil ARGS."
   (company-dabbrev-other-buffers nil "Search in other buffers with same major mode")
   (company-idle-delay 0.1 "Decrease the delay before the popup is shown")
   (company-ispell-available t)
-  (company-ispell-dictionary (expand-file-name "wordlist" sb/extras-directory))
+  (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words are faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
   (company-selection-wrap-around t)
@@ -3085,17 +3096,15 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package prettier
   :if (executable-find "prettier")
-  ;; :init (setenv "NODE_PATH" (expand-file-name "node_modules" sb/user-tmp))
-  ;; :hook
-  ;; ((markdown-mode gfm-mode) . (lambda ()
-  ;;                               (when (and buffer-file-name
-  ;;                                          (not (file-remote-p buffer-file-name)))
-  ;;                                 prettier-mode)))
-  :hook ((markdown-mode ; gfm-mode
-          web-mode ; should include `css-mode' and `html-mode'
-          json-mode
-          jsonc-mode
-          js2-mode) . prettier-mode)
+  :hook
+  ((markdown-mode ; gfm-mode
+    web-mode ; should include `css-mode' and `html-mode'
+    json-mode
+    jsonc-mode
+    js2-mode) . (lambda ()
+    (when (and buffer-file-name
+               (not (file-remote-p buffer-file-name)))
+      prettier-mode)))
   :custom (prettier-lighter nil))
 
 ;; Align fields with `C-c C-a'
@@ -3147,8 +3156,10 @@ This file is specified in `counsel-projectile-default-file'."
   :config (css-eldoc-enable))
 
 (use-package octave
-  :ensure nil
-  :mode "\\.m\\'")
+  :ensure nil)
+
+(use-package matlab-mode
+  :mode ("\\.m$" . matlab-mode))
 
 (use-package ess
   ;; :commands R
@@ -3641,6 +3652,11 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (flycheck-add-next-checker 'lsp 'python-pylint)
   )
 
+(defhydra sb/hydra-python-indent (python-mode-map "C-c")
+  "Adjust Python indentation."
+  (">" python-indent-shift-right "right")
+  ("<" python-indent-shift-left "left"))
+
 (use-package python-docstring
   :after python-mode
   :demand t
@@ -4060,7 +4076,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
 
 (use-package lsp-grammarly
-  :disabled t
   :hook
   (text-mode . (lambda ()
                  (require 'lsp-grammarly)
@@ -4288,6 +4303,7 @@ Ignore if no file is found."
 (use-package js2-refactor
   :after js2-mode
   :demand t
+  :diminish
   :config (js2-refactor-mode 1))
 
 (use-package xref-js2
@@ -4418,6 +4434,11 @@ Ignore if no file is found."
 
 (use-package nix-mode
   :mode "\\.nix\\'")
+
+(use-package rust-mode
+  :mode "\\.rs\\'"
+  :hook (rust-mode . lsp)
+  :config (setq rust-format-on-save t))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
