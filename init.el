@@ -188,7 +188,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -852,6 +852,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
+  :commands powerline-default-theme
   :init
   (setq powerline-default-separator 'box
         powerline-display-buffer-size t
@@ -873,6 +874,7 @@ SAVE-FN with non-nil ARGS."
   :if (eq sb/modeline-theme 'sml)
   :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
                       sml/shorten-modes sml/shorten-directory)
+  :commands sml/setup
   :init
   (use-package smart-mode-line-powerline-theme
     :demand t)
@@ -890,6 +892,7 @@ SAVE-FN with non-nil ARGS."
             spaceline-version-control-p
             spaceline-input-method-p
             spaceline-persp-name-p)
+  :functions spaceline-emacs-theme
   :init
   (require 'spaceline-config)
   (setq spaceline-hud-p nil
@@ -916,6 +919,7 @@ SAVE-FN with non-nil ARGS."
   :ensure all-the-icons
   :ensure doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
+  :commands doom-modeline-mode
   :init
   (require 'doom-modeline)
   (setq doom-modeline-buffer-encoding nil
@@ -952,6 +956,7 @@ SAVE-FN with non-nil ARGS."
 (use-package moody
   :if (and (eq sb/modeline-theme 'moody) (not (or (eq sb/theme 'modus-vivendi)
                                                   (eq sb/theme 'modus-operandi))))
+  :commands (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
   :init
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
@@ -1105,7 +1110,7 @@ SAVE-FN with non-nil ARGS."
     (diminish 'dired-omit-mode) dired-mode-map))
 
 (use-package dired+
-  :load-path "extras"
+  ;; :load-path "extras"
   ;; :quelpa ((dired+ :fetcher github :repo "emacsmirror/dired-plus"
   ;;                  :files (dired+.el)))
   :commands diredp-toggle-find-file-reuse-dir
@@ -1137,6 +1142,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package async
   :demand t
+  :functions async-bytecomp-package-mode
   :config (async-bytecomp-package-mode 1))
 
 (use-package dired-async
@@ -1154,6 +1160,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package treemacs
   :if (display-graphic-p)
+  :functions treemacs-tag-follow-mode
   :commands (treemacs-current-workspace treemacs--find-current-user-project
                                         treemacs-do-add-project-to-workspace
                                         treemacs-add-project-to-workspace
@@ -1230,26 +1237,26 @@ SAVE-FN with non-nil ARGS."
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
-                         :extends "Default"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash
-                            (lambda (ext icon)
-                              (puthash ext (concat (substring icon 0 1)
-                                                   (propertize " " 'display '(space . (:width 0.5))))
-                                       icons))
-                            icons)))
+    :extends "Default"
+    :config
+    (let ((icons (treemacs-theme->gui-icons theme)))
+      (maphash
+       (lambda (ext icon)
+         (puthash ext (concat (substring icon 0 1)
+                              (propertize " " 'display '(space . (:width 0.5))))
+                  icons))
+       icons)))
 
   (treemacs-create-theme "all-the-icons-tighter"
-                         :extends "all-the-icons"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash
-                            (lambda (ext icon)
-                              (puthash ext (concat (substring icon 0 1)
-                                                   (propertize " " 'display '(space . (:width 0.5))))
-                                       icons))
-                            icons)))
+    :extends "all-the-icons"
+    :config
+    (let ((icons (treemacs-theme->gui-icons theme)))
+      (maphash
+       (lambda (ext icon)
+         (puthash ext (concat (substring icon 0 1)
+                              (propertize " " 'display '(space . (:width 0.5))))
+                  icons))
+       icons)))
 
   (treemacs-load-theme "all-the-icons")
 
@@ -1531,6 +1538,7 @@ SAVE-FN with non-nil ARGS."
 (use-package company-posframe
   :after company
   :demand t
+  :commands company-posframe-mode
   :diminish
   :custom
   (company-posframe-show-metadata nil)
@@ -1551,6 +1559,7 @@ SAVE-FN with non-nil ARGS."
   :if (display-graphic-p)
   :after company
   :demand t
+  :commands company-box-mode
   :config (company-box-mode 1)
   :diminish
   :custom (company-box-icons-alist 'company-box-icons-all-the-icons)
@@ -1833,6 +1842,7 @@ SAVE-FN with non-nil ARGS."
 (use-package company-prescient
   :after company
   :demand t
+  :commands company-prescient-mode
   :config (company-prescient-mode 1))
 
 (use-package all-the-icons-ivy
@@ -2195,7 +2205,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package counsel-projectile
   :defines counsel-projectile-default-file
-  :commands counsel-projectile-switch-project-by-name
+  :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
   :preface
   (defun sb/counsel-projectile-switch-project-magit (project)
     "Open Magit for the PROJECT."
@@ -3106,14 +3116,8 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prettier
   :if (executable-find "prettier")
   :hook
-  ((markdown-mode ; gfm-mode
-    web-mode ; should include `css-mode' and `html-mode'
-    json-mode
-    jsonc-mode
-    js2-mode) . (lambda ()
-    (when (and buffer-file-name
-               (not (file-remote-p buffer-file-name)))
-      prettier-mode)))
+  ;; Should work `gfm-mode', `css-mode', and `html-mode'
+  ((markdown-mode web-mode json-mode jsonc-mode js2-mode) . prettier-mode)
   :custom (prettier-lighter nil))
 
 ;; Align fields with `C-c C-a'
@@ -3248,14 +3252,16 @@ This file is specified in `counsel-projectile-default-file'."
                                                  nil t)))
    )
   :custom
-  (lsp-clients-clangd-args '("-j=2"
+  (lsp-clients-clangd-args '(
+                             "-j=2"
                              "--background-index"
                              "--clang-tidy"
                              "--pch-storage=memory"
                              ;; "--suggest-missing-includes"
                              "--header-insertion=never"
                              "--fallback-style=LLVM"
-                             "--log=error"))
+                             "--log=error"
+                             ))
   (lsp-completion-enable-additional-text-edit t)
   (lsp-completion-provider :none)
   ;; (lsp-eldoc-enable-hover nil)
@@ -3546,6 +3552,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package lsp-origami
   :after origami
+  :functions lsp-origami-mode
+  :commands lsp-origami-mode
   :demand t
   :config (lsp-origami-mode 1))
 
@@ -3592,17 +3600,20 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package modern-cpp-font-lock
   :after c++-mode
   :demand t
+  :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
   :config (modern-c++-font-lock-mode 1))
 
 (use-package flycheck-clang-analyzer
   :after (flycheck cc-mode)
   :demand t
+  :commands flycheck-clang-analyzer-setup
   :config (flycheck-clang-analyzer-setup))
 
 (use-package flycheck-clang-tidy
   :after (flycheck cc-mode)
   :demand t
+  :commands flycheck-clang-tidy-setup
   :config (flycheck-clang-tidy-setup))
 
 (use-package cuda-mode
@@ -3620,6 +3631,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package cmake-font-lock
   :after cmake-mode
   :demand t
+  :commands cmake-font-lock-activate
   :config (cmake-font-lock-activate))
 
 (use-package python
@@ -3670,6 +3682,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package python-docstring
   :after python-mode
   :demand t
+  :commands python-docstring-mode
   :diminish
   :config (python-docstring-mode 1))
 
@@ -3691,6 +3704,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
+  :commands py-isort-before-save
   :hook
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save))))
@@ -3764,9 +3778,6 @@ This file is specified in `counsel-projectile-default-file'."
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode))
-
-;; (setq auto-mode-alist (append '(("latexmkrc\\'" . cperl-mode))
-;;                               auto-mode-alist))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -4020,6 +4031,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (use-package yaml-imenu
   :after yaml-mode
   :demand t
+  :commands yaml-imenu-enable
   :config (yaml-imenu-enable))
 
 (use-package bat-mode
@@ -4157,6 +4169,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (use-package auctex-latexmk
   :after tex-mode
   :demand t
+  :commands auctex-latexmk-setup
   :custom
   (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
   (TeX-command-default "LatexMk")
@@ -4253,6 +4266,7 @@ Ignore if no file is found."
 (use-package bib-cite
   :ensure nil
   :diminish bib-cite-minor-mode
+  :commands bib-cite-minor-mode
   :hook
   ((LaTeX-mode latex-mode) . (lambda ()
                                (bib-cite-minor-mode 1)))
@@ -4313,10 +4327,12 @@ Ignore if no file is found."
 (use-package js2-refactor
   :after js2-mode
   :demand t
+  :commands js2-refactor-mode
   :diminish
   :config (js2-refactor-mode 1))
 
 (use-package xref-js2
+  :commands xref-js2-xref-backend
   :custom (xref-js2-search-program 'rg)
   :hook
   (js2-mode . (lambda ()
@@ -4391,7 +4407,7 @@ Ignore if no file is found."
 
 ;; Use for major modes which do not provide a formatter
 (use-package format-all
-  :commands (format-all-ensure-formatter)
+  :commands (format-all-ensure-formatter format-all-buffer)
   :config
   (format-all-ensure-formatter)
   (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook bazel-mode-hook))
@@ -4401,6 +4417,7 @@ Ignore if no file is found."
 
 (use-package tree-sitter
   :ensure tree-sitter-langs
+  :functions tree-sitter-hl-mode
   :diminish tree-sitter-mode
   :hook
   (python-mode . (lambda ()
@@ -4885,6 +4902,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 (use-package which-key ; Show help popups for prefix keys
   :diminish
+  :commands which-key-setup-side-window-right-bottom
   :hook (after-init . which-key-mode)
   :config (which-key-setup-side-window-right-bottom)
   :custom

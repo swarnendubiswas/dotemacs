@@ -6,6 +6,8 @@
 -/.gitignore
 -/reference-cards
 -/snippets
+-/var
+-/etc
 
 -*.doc
 -*.docx 
