@@ -1173,7 +1173,10 @@ SAVE-FN with non-nil ARGS."
                                         treemacs-scope->current-scope
                                         treemacs--restore-eldoc-after-log
                                         treemacs-load-theme
-                                        treemacs-find-file-node)
+                                        treemacs-find-file-node
+                                        treemacs-resize-icons
+                                        treemacs-select-window
+                                        treemacs-add-and-display-current-project)
   :preface
   (defun sb/setup-treemacs-quick ()
     "Setup treemacs."
@@ -1550,9 +1553,10 @@ SAVE-FN with non-nil ARGS."
   :hook (emacs-lisp-mode . company-quickhelp-mode))
 
 (use-package company-quickhelp-terminal
+  :unless (display-graphic-p)
   :after company-quickhelp
   :demand t
-  :unless (display-graphic-p)
+  :commands company-quickhelp-terminal-mode
   :config (company-quickhelp-terminal-mode 1))
 
 (use-package company-box
@@ -1601,6 +1605,7 @@ SAVE-FN with non-nil ARGS."
 (use-package yasnippet-snippets
   :after yasnippet
   :demand t
+  :commands yasnippet-snippets-initialize
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
@@ -1617,6 +1622,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ivy
   :functions ivy-format-function-line
+  :commands ivy-read
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
@@ -1848,6 +1854,7 @@ SAVE-FN with non-nil ARGS."
 (use-package all-the-icons-ivy
   :after ivy
   :demand t
+  :commands all-the-icons-ivy-setup
   :config (all-the-icons-ivy-setup))
 
 (use-package orderless
@@ -1978,6 +1985,8 @@ SAVE-FN with non-nil ARGS."
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check all on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
+  :defines spell-fu-directory
+  :commands spell-fu-mode
   :hook
   (text-mode . (lambda ()
                  (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory)
@@ -2115,7 +2124,7 @@ SAVE-FN with non-nil ARGS."
                                   projectile-project-root
                                   ;; projectile-command-map
                                   ;; projectile-default-mode-line
-                                  ;; projectile-mode
+                                  projectile-mode
                                   ;; projectile-locate-dominating-file
                                   ;; projectile-switch-project
                                   ;; projectile-ignored-projects
@@ -2298,6 +2307,7 @@ This file is specified in `counsel-projectile-default-file'."
              flycheck-next-error
              flycheck-disable-checker
              flycheck-add-mode
+             flycheck-manual
              )
   :hook
   ;; There are no checkers for modes like `csv-mode', and many program modes use lsp
@@ -2496,7 +2506,7 @@ This file is specified in `counsel-projectile-default-file'."
   (tramp-default-remote-shell "/bin/bash")
   (tramp-default-user "swarnendu")
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
-  (tramp-verbose 1)
+  (tramp-verbose 10)
   ;; Disable version control
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
                                 tramp-file-name-regexp))
@@ -2641,6 +2651,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package dumb-jump
   :after xref
   :demand t
+  :commands dumb-jump-xref-activate
   :custom
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg)
@@ -2669,6 +2680,7 @@ This file is specified in `counsel-projectile-default-file'."
   :config (use-package vlf-setup))
 
 (use-package hungry-delete ; Erase all consecutive white space characters in a given direction
+  :commands hungry-delete-mode
   :diminish
   :hook
   ((minibuffer-setup . (lambda ()
@@ -2676,7 +2688,7 @@ This file is specified in `counsel-projectile-default-file'."
    (after-init . global-hungry-delete-mode)))
 
 (use-package move-text ; Move lines with `M-<up>' and `M-<down>'
-  :commands (move-text-up move-text-down)
+  :commands (move-text-up move-text-down move-text-default-bindings)
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
@@ -2741,7 +2753,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'display-buffer-alist '("*Bufler*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*manage-minor-mode*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*deadgrep-mode*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*deadgrep*" display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2770,6 +2782,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (use-package undo-tree
   :defines undo-tree-map
+  :commands global-undo-tree-mode
   :custom
   (undo-tree-auto-save-history t)
   (undo-tree-mode-lighter "")
@@ -2869,6 +2882,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; one of the currently visible isearch candidates using `avy'.
 (use-package avy
   :demand t
+  :commands avy-setup-default
   :bind
   (("M-b" . avy-goto-word-1)
    ("C-'" . avy-goto-char)
@@ -3126,6 +3140,7 @@ This file is specified in `counsel-projectile-default-file'."
   :custom (csv-separators '("," ";" "|" " ")))
 
 (use-package highlight-doxygen
+  :commands highlight-doxygen-global-mode
   :config (highlight-doxygen-global-mode))
 
 (use-package rst
@@ -3166,6 +3181,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package css-eldoc
   :after css-mode
   :demand t
+  :commands css-eldoc-enable
   :config (css-eldoc-enable))
 
 (use-package octave
@@ -3525,7 +3541,7 @@ This file is specified in `counsel-projectile-default-file'."
               (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 (use-package lsp-ui
-  :commands lsp-ui-doc-mode
+  :commands (lsp-ui-doc-mode lsp-ui-mode)
   :after lsp-mode
   :demand t
   :custom
@@ -3541,7 +3557,7 @@ This file is specified in `counsel-projectile-default-file'."
         ([remap xref-find-references]  . lsp-ui-peek-find-references)))
 
 (use-package lsp-treemacs
-  :commands lsp-treemacs-errors-list
+  :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
   :config
   ;; Sync workspace folders and treemacs projects
   (lsp-treemacs-sync-mode 1))
@@ -3567,7 +3583,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   :ensure nil
 ;;   :custom (url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data))))
 
-;;  Call this in c-mode-common-hook:
+;; Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
 (use-package cc-mode
   :ensure nil
@@ -3824,6 +3840,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package fish-mode
   :mode "\\.fish\\'"
   :interpreter "fish"
+  :commands fish_indent-before-save
   :hook
   (fish-mode . (lambda ()
                  (add-hook 'before-save-hook #'fish_indent-before-save))))

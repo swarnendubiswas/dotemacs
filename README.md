@@ -400,3 +400,4 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 - Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - `diminish smartparens-mode`
 - Associate XML LSP with `.classpath`
+- Pair `parens` in `.md` files
