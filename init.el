@@ -1987,54 +1987,54 @@ SAVE-FN with non-nil ARGS."
 (use-package spell-fu
   :defines spell-fu-directory
   :commands spell-fu-mode
-  :hook
-  (text-mode . (lambda ()
-                 (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory)
-                       spell-fu-faces-exclude '(
-                                                font-lock-string-face
-                                                ;; `nxml-mode' is derived from `text-mode'
-                                                lsp-face-highlight-read
-                                                hl-line
-                                                markdown-blockquote-face
-                                                markdown-code-face
-                                                markdown-html-attr-name-face
-                                                markdown-html-attr-value-face
-                                                markdown-html-tag-name-face
-                                                markdown-inline-code-face
-                                                markdown-link-face
-                                                markdown-markup-face
-                                                markdown-plain-url-face
-                                                markdown-reference-face
-                                                markdown-url-face
-                                                nxml-attribute-local-name
-                                                org-block
-                                                org-block-begin-line
-                                                org-block-end-line
-                                                org-code
-                                                org-date
-                                                org-formula
-                                                org-latex-and-related
-                                                org-link
-                                                org-meta-line
-                                                org-property-value
-                                                org-ref-cite-face
-                                                org-special-keyword
-                                                org-tag
-                                                org-todo
-                                                org-todo-keyword-done
-                                                org-todo-keyword-habt
-                                                org-todo-keyword-kill
-                                                org-todo-keyword-outd
-                                                org-todo-keyword-todo
-                                                org-todo-keyword-wait
-                                                org-verbatim
-                                                font-latex-math-face
-                                                font-latex-sedate-face
-                                                font-lock-function-name-face
-                                                font-lock-keyword-face
-                                                font-lock-variable-name-face
-                                                ))
-                 (spell-fu-mode))))
+  :hook (text-mode . spell-fu-mode)
+  :custom
+  (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+  (spell-fu-faces-exclude '( font-lock-string-face
+                             ;; `nxml-mode' is derived from `text-mode'
+                             lsp-face-highlight-read
+                             hl-line
+                             markdown-blockquote-face
+                             markdown-code-face
+                             markdown-html-attr-name-face
+                             markdown-html-attr-value-face
+                             markdown-html-tag-name-face
+                             markdown-inline-code-face
+                             markdown-link-face
+                             markdown-markup-face
+                             markdown-plain-url-face
+                             markdown-reference-face
+                             markdown-url-face
+                             nxml-attribute-local-name
+                             org-block
+                             org-block-begin-line
+                             org-block-end-line
+                             org-code
+                             org-date
+                             org-formula
+                             org-latex-and-related
+                             org-link
+                             org-meta-line
+                             org-property-value
+                             org-ref-cite-face
+                             org-special-keyword
+                             org-tag
+                             org-todo
+                             org-todo-keyword-done
+                             org-todo-keyword-habt
+                             org-todo-keyword-kill
+                             org-todo-keyword-outd
+                             org-todo-keyword-todo
+                             org-todo-keyword-wait
+                             org-verbatim
+                             font-latex-math-face
+                             font-latex-sedate-face
+                             font-lock-function-name-face
+                             font-lock-keyword-face
+                             font-lock-variable-name-face))
+  :config
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory))))
 
 (or
  (use-package highlight-indentation
@@ -2064,6 +2064,7 @@ SAVE-FN with non-nil ARGS."
   (show-paren-when-point-in-periphery t))
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+
 (defvar electric-pair-preserve-balance)
 (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
 ;; Disable pairs when entering minibuffer
@@ -2117,24 +2118,13 @@ SAVE-FN with non-nil ARGS."
    ("C-M-k" . sp-splice-sexp)))
 
 (use-package projectile
-  ;; :defer 2 ; Expensive to load
   ;; :ensure-system-package fd
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
-                                  ;; projectile-command-map
-                                  ;; projectile-default-mode-line
-                                  projectile-mode
-                                  ;; projectile-locate-dominating-file
-                                  ;; projectile-switch-project
-                                  ;; projectile-ignored-projects
-                                  ;; projectile-globally-ignored-directories
-                                  ;; projectile-globally-ignored-files
-                                  ;; projectile-globally-ignored-file-suffixes
-                                  )
+                                  projectile-mode)
   :custom
   (projectile-auto-discover nil "Do not discover projects")
-  ;; (projectile-completion-system 'ivy)
   (projectile-enable-caching t "Caching will not watch for new files automatically")
   (projectile-file-exists-remote-cache-expire nil)
   ;; Contents of .projectile are ignored when using the `alien' indexing method
@@ -2148,6 +2138,7 @@ SAVE-FN with non-nil ARGS."
     (setq projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
           projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
                                                            sb/temp-directory)))
+
   (when (eq sb/modeline-theme 'doom-modeline)
     (setq projectile-dynamic-mode-line nil))
 
@@ -2164,9 +2155,9 @@ SAVE-FN with non-nil ARGS."
               (or project-name "-"))))
 
   (setq projectile-project-root-files
-  '("build.gradle" "pom.xml" "Pipfile" "tox.ini" "setup.py" "requirements.txt" "package.json"
-    "composer.json" "CMakeLists.txt" "Makefile" "WORKSPACE" "meson.build" "SConstruct"
-    "configure.ac" "configure.in"))
+        '("build.gradle" "pom.xml" "Pipfile" "tox.ini" "setup.py" "requirements.txt" "package.json"
+          "composer.json" "CMakeLists.txt" "Makefile" "WORKSPACE" "meson.build" "SConstruct"
+          "configure.ac" "configure.in"))
 
   ;; Avoid search when `projectile-mode' is enabled for faster startup
   ;; (setq projectile-project-search-path (list
@@ -2191,20 +2182,25 @@ SAVE-FN with non-nil ARGS."
                  ;; (expand-file-name ".local/lib" sb/user-home)
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
+
   ;; Filtering does not work with `alien' indexing
   (dolist (dirs
            '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
              ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
+
   (dolist (items
-           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".dir-locals.el" ".projectile"
-             ".project" ".tags" "__init__.py"))
+           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"
+             ;;".dir-locals.el" ".projectile" ".project"
+             ))
     (add-to-list 'projectile-globally-ignored-files items))
+
   (dolist (exts
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar"
-             ".jpeg" ".jpg" ".o" ".odt" ".out" ".png" ".ppt" ".pptx" ".ps" ".pt" ".pyc"
-             ".rel" ".rip" ".rpm" ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
+             ".jpeg" ".jpg" ".o" ".odt" ".png" ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm"
+             ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
+
   (projectile-mode 1)
   :bind-keymap ("C-c p" . projectile-command-map)
   :bind
@@ -2276,8 +2272,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; FIXME: `ivy-rich-modify-column' is not taking effect.
 (use-package ivy-rich
   :commands ivy-rich-modify-column
-  :custom (ivy-rich-parse-remote-buffer nil)
   :hook (ivy-mode . ivy-rich-mode)
+  :custom (ivy-rich-parse-remote-buffer nil)
   :config
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
   ;; Increase the width to see the major mode clearly
@@ -2312,7 +2308,7 @@ This file is specified in `counsel-projectile-default-file'."
   :hook
   ;; There are no checkers for modes like `csv-mode', and many program modes use lsp
   ;; `yaml-mode' is derived from `text-mode'
-  ((text-mode emacs-lisp-mode) . flycheck-mode)
+  (emacs-lisp-mode . flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
   (flycheck-checker-error-threshold 500)
@@ -2320,7 +2316,7 @@ This file is specified in `counsel-projectile-default-file'."
   (flycheck-idle-change-delay 5) ; seconds
   (flycheck-emacs-lisp-load-path 'inherit)
   :init
-  ;; TODO: Is this the reason why flycheck and doom-modeline does not work well?
+  ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
   (when (or (eq sb/modeline-theme 'spaceline)
             (eq sb/modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
@@ -2348,15 +2344,6 @@ This file is specified in `counsel-projectile-default-file'."
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist
                '(after-revert-hook . flycheck-buffer)))
-
-(use-package flycheck-grammarly
-  :after flycheck
-  :demand t
-  :config
-  ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-  (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
-  (add-to-list 'flycheck-checkers 'grammarly-checker t)
-  :custom (flycheck-grammarly-check-time 3))
 
 (or
  ;; This package does not seem to be actively maintained compared to `flycheck-pos-tip'
@@ -2959,9 +2946,8 @@ This file is specified in `counsel-projectile-default-file'."
 (with-eval-after-load 'flycheck
   (add-hook 'text-mode-hook
             (lambda ()
-              ;; Add `proselint', then `textlint', then `grammarly-checker'
-              (flycheck-add-next-checker 'proselint 'textlint)
-              (flycheck-add-next-checker 'textlint 'grammarly-checker))))
+              ;; Add `proselint', then `textlint'
+              (flycheck-add-next-checker 'proselint 'textlint))))
 
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :disabled t ; textlint includes writegood
@@ -3316,8 +3302,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-signature-render-documentation nil)
   ;; (lsp-tex-server 'digestif)
   (lsp-xml-logs-client nil)
-  ;; https://github.com/eclipse/lemminx/archive/0.14.1.tar.gz
-  (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
+  (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
                                       sb/extras-directory))
   (lsp-yaml-print-width sb/fill-column)
   :custom-face
@@ -3458,12 +3443,12 @@ This file is specified in `counsel-projectile-default-file'."
                     :remote? t
                     :server-id 'typescript-remote))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "texlab")
-    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-    :remote? t
-    :server-id 'texlab-remote))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-tramp-connection "texlab")
+  ;;   :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+  ;;   :remote? t
+  ;;   :server-id 'texlab-remote))
 
   (lsp-register-client
    (make-lsp-client :new-connection (lsp-tramp-connection
@@ -4107,21 +4092,36 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t))
 
-;; FIXME: Open `.classpath' file with LSP support
-;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
-;;                               auto-mode-alist))
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-language-id-configuration '("\\.classpath$" . "xml"))
-  (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
+;; ;; FIXME: Open `.classpath' file with LSP support
+;; ;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
+;; ;;                               auto-mode-alist))
+;; (with-eval-after-load 'lsp-mode
+;;   (add-to-list 'lsp-language-id-configuration '("\\.classpath$" . "xml"))
+;;   (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
 
-(use-package lsp-grammarly
-  :hook
-  (text-mode . (lambda ()
-                 (require 'lsp-grammarly)
-                 (lsp-deferred))))
+(or
+ (use-package flycheck-grammarly
+   :disabled t
+   :after flycheck
+   :demand t
+   :config
+   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+   (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
+   (add-to-list 'flycheck-checkers 'grammarly-checker t)
+   (flycheck-add-next-checker 'textlint 'grammarly-checker)
+   :custom (flycheck-grammarly-check-time 3))
+
+ (use-package lsp-grammarly
+   :hook
+   (text-mode . (lambda ()
+                  (require 'lsp-grammarly)
+                  (lsp-deferred)))
+   :custom
+   (lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))))
 
 ;; Texlab seems to have high overhead
 (use-package lsp-latex
+  :disabled t
   :hook
   ((latex-mode LaTeX-mode) . (lambda()
                                (require 'lsp-latex)
@@ -4325,7 +4325,8 @@ Ignore if no file is found."
 
 (use-package math-preview
   :commands (math-preview-all math-preview-at-point math-preview-region)
-  :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+  :custom
+  (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
                                                   sb/user-tmp)))
 
 (use-package texinfo
@@ -4354,7 +4355,7 @@ Ignore if no file is found."
   :hook
   (js2-mode . (lambda ()
                 (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-  :config
+  ;; :config
   ;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
   ;; (define-key js-mode-map (kbd "M-.") nil)
   )
@@ -4436,12 +4437,17 @@ Ignore if no file is found."
   :ensure tree-sitter-langs
   :functions tree-sitter-hl-mode
   :diminish tree-sitter-mode
-  :hook
-  (python-mode . (lambda ()
-                   (require 'tree-sitter)
-                   (require 'tree-sitter-langs)
-                   (require 'tree-sitter-hl)
-                   (tree-sitter-hl-mode 1))))
+  :init
+  (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
+                               css-mode-hook html-mode-hook java-mode-hook js-mode-hook
+                               js2-mode-hook json-mode-hook jsonc-mode-hook php-mode-hook
+                               python-mode-hook typescript-mode-hook))
+    (add-hook hook (lambda ()
+                     (require 'tree-sitter)
+                     (require 'tree-sitter-langs)
+                     (require 'tree-sitter-hl)
+                     (global-tree-sitter-mode 1)
+                     (tree-sitter-hl-mode 1)))))
 
 (use-package adoc-mode
   :mode "\\.adoc\\'")
@@ -4566,6 +4572,7 @@ Ignore if no file is found."
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
   (use-package company-shell
+    :demand t
     :custom (company-shell-delete-duplictes t))
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
@@ -4615,24 +4622,30 @@ Ignore if no file is found."
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
-  ;; (use-package company-auctex)
-  ;; (use-package math-symbol-lists) ; Required by `ac-math' and `company-math'
-  ;; (use-package company-math)
-  (use-package company-reftex)
-  (use-package company-bibtex)
+  (use-package company-auctex
+    :demand t
+    :config (company-auctex-init))
+  (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
+    :demand t)
+  (use-package company-math
+    :demand t)
+  (use-package company-reftex
+    :demand t)
+  (use-package company-bibtex
+    :demand t)
   (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
            company-files
            company-bibtex
-           ;; company-math-symbols-latex
-           ;; company-latex-commands
-           ;; company-math-symbols-unicode
+           company-math-symbols-latex
+           company-latex-commands
+           company-math-symbols-unicode
            company-reftex-labels
            company-reftex-citations
-           ;; company-auctex-labels
-           ;; company-auctex-bibs
+           company-auctex-labels
+           company-auctex-bibs
            company-capf
            company-yasnippet
            company-dabbrev
