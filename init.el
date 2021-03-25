@@ -53,40 +53,6 @@
 (require 'map)
 (require 'subr-x)
 
-;; (debug-on-entry 'package-initialize)
-
-(defconst dotemacs-1MB (* 1 1000 1000))
-(defconst dotemacs-4MB (* 4 1000 1000))
-(defconst dotemacs-8MB (* 8 1000 1000))
-(defconst dotemacs-50MB (* 50 1000 1000))
-(defconst dotemacs-64MB (* 64 1000 1000))
-(defconst dotemacs-100MB (* 100 1000 1000))
-(defconst dotemacs-128MB (* 128 1000 1000))
-(defconst dotemacs-200MB (* 200 1000 1000))
-(defconst dotemacs-500MB (* 500 1000 1000))
-
-;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
-;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
-;; permanently.
-
-(defun sb/defer-garbage-collection ()
-  "Defer garbage collection."
-  (setq gc-cons-percentage 0.3
-        gc-cons-threshold dotemacs-200MB))
-
-(defun sb/restore-garbage-collection ()
-  "Restore garbage collection."
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq garbage-collection-messages nil))
-  (setq gc-cons-percentage 0.1
-        ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold dotemacs-100MB))
-
-;; `emacs-startup-hook' runs later than the `after-init-hook'
-(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
-(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
-
 (defgroup sb/emacs nil
   "Personal configuration for dotemacs."
   :group 'local)
@@ -234,6 +200,40 @@ This location is used for temporary installations and files.")
 (defconst dotemacs-is-linux (eq system-type 'gnu/linux))
 (defconst dotemacs-is-windows (eq system-type 'windows-nt))
 
+;; (debug-on-entry 'package-initialize)
+
+(defconst dotemacs-1MB (* 1 1000 1000))
+(defconst dotemacs-4MB (* 4 1000 1000))
+(defconst dotemacs-8MB (* 8 1000 1000))
+(defconst dotemacs-50MB (* 50 1000 1000))
+(defconst dotemacs-64MB (* 64 1000 1000))
+(defconst dotemacs-100MB (* 100 1000 1000))
+(defconst dotemacs-128MB (* 128 1000 1000))
+(defconst dotemacs-200MB (* 200 1000 1000))
+(defconst dotemacs-500MB (* 500 1000 1000))
+
+;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
+;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
+;; permanently.
+
+(defun sb/defer-garbage-collection ()
+  "Defer garbage collection."
+  (setq gc-cons-percentage 0.3
+        gc-cons-threshold dotemacs-200MB))
+
+(defun sb/restore-garbage-collection ()
+  "Restore garbage collection."
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq garbage-collection-messages nil))
+  (setq gc-cons-percentage 0.1
+        ;; https://github.com/emacs-lsp/lsp-mode#performance
+        gc-cons-threshold dotemacs-100MB))
+
+;; `emacs-startup-hook' runs later than the `after-init-hook'
+(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
+(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
+
 (package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -330,6 +330,7 @@ This location is used for temporary installations and files.")
 
 ;; Put this early in the `user-init-file'
 (use-package no-littering
+  :if (bound-and-true-p sb/use-no-littering)
   :demand t)
 
 ;; This is not a great idea, but I expect most warnings will arise from third-party packages
@@ -1719,6 +1720,7 @@ SAVE-FN with non-nil ARGS."
    ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
    ([remap load-library]             . counsel-load-library)
    ([remap load-theme]               . counsel-load-theme)
+   ("C-c d m"                        . counsel-minor)
    ([remap recentf-open-files]       . counsel-recentf)
    ("<f9>"                           . counsel-recentf)
    ("C-c s r"                        . counsel-rg)
@@ -1734,26 +1736,26 @@ SAVE-FN with non-nil ARGS."
                                     "\\(?:\\`[#.]\\)" ; File names beginning with # or .
                                     "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
                                     "\\|__pycache__"
-                                    "\\|.aux$"
-                                    "\\|.bbl$"
-                                    "\\|.blg$"
+                                    ;; "\\|.aux$"
+                                    ;; "\\|.bbl$"
+                                    ;; "\\|.blg$"
                                     "\\|.cb$"
                                     "\\|.cb2$"
                                     "\\|.djvu$"
                                     "\\|.doc$"
                                     "\\|.docx$"
-                                    "\\|.dvi$"
+                                    ;; "\\|.dvi$"
                                     "\\|.elc$"
                                     "\\|.fdb_latexmk$"
                                     "\\|.fls$"
-                                    "\\|.jar$"
-                                    "\\|.jpeg$"
-                                    "\\|.jpg$"
+                                    ;; "\\|.jar$"
+                                    ;; "\\|.jpeg$"
+                                    ;; "\\|.jpg$"
                                     "\\|.lof$"
                                     "\\|.lot$"
                                     "\\|.o$"
                                     "\\|.out$"
-                                    "\\|.png$"
+                                    ;; "\\|.png$"
                                     "\\|.ppt$"
                                     "\\|.pptx$"
                                     "\\|.pyc$"
@@ -1762,8 +1764,8 @@ SAVE-FN with non-nil ARGS."
                                     "\\|.so$"
                                     "\\|.synctex$"
                                     "\\|.synctex.gz$"
-                                    "\\|.tar.gz$"
-                                    "\\|.tar.xz$"
+                                    ;; "\\|.tar.gz$"
+                                    ;; "\\|.tar.xz$"
                                     "\\|.toc$"
                                     "\\|.xls$"
                                     "\\|.xlsx$"
@@ -1775,9 +1777,9 @@ SAVE-FN with non-nil ARGS."
                                     "\\|tramp"
                                     "\\|.clangd"
                                     "\\|.metadata"
-                                    "\\|.recommenders"
-                                    ))
+                                    "\\|.recommenders"))
   (counsel-mode-override-describe-bindings t)
+  (counsel-preselect-current-file t)
   (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n-------------------------\n")
   :diminish
@@ -1860,6 +1862,7 @@ SAVE-FN with non-nil ARGS."
 (use-package orderless
   :after ivy
   :demand t
+  :defines orderless-component-separator
   :functions just-one-face
   :config
   (setq completion-styles '(orderless)
@@ -2205,8 +2208,11 @@ SAVE-FN with non-nil ARGS."
   :bind-keymap ("C-c p" . projectile-command-map)
   :bind
   ;; Set these in case `counsel-projectile' is disabled
-  (("<f5>" . projectile-switch-project)
-   ("<f6>" . projectile-find-file)))
+  (("<f6>" . projectile-find-file)
+   ("<f5>" . projectile-switch-project)
+   ;; :map projectile-mode-map
+   ;; ("a"    . projectile-add-known-project)
+   ))
 
 (use-package counsel-projectile
   :defines counsel-projectile-default-file
@@ -2291,8 +2297,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; FIXME: Exclude directories and files from being checked
 ;; https://github.com/flycheck/flycheck/issues/1745
 (use-package flycheck
-  :commands (
-             flycheck-add-next-checker
+  :commands (flycheck-add-next-checker
              flycheck-next-checker
              flycheck-previous-error
              flycheck-describe-checker
@@ -2303,8 +2308,7 @@ This file is specified in `counsel-projectile-default-file'."
              flycheck-next-error
              flycheck-disable-checker
              flycheck-add-mode
-             flycheck-manual
-             )
+             flycheck-manual)
   :hook
   ;; There are no checkers for modes like `csv-mode', and many program modes use lsp
   ;; `yaml-mode' is derived from `text-mode'
@@ -2346,11 +2350,6 @@ This file is specified in `counsel-projectile-default-file'."
                '(after-revert-hook . flycheck-buffer)))
 
 (or
- ;; This package does not seem to be actively maintained compared to `flycheck-pos-tip'
- (use-package flycheck-popup-tip ; Show error messages in popups
-   :disabled t
-   :hook (flycheck-mode . flycheck-popup-tip-mode))
-
  ;; Does not display popup under TTY, check possible workarounds at
  ;; https://github.com/flycheck/flycheck-popup-tip
  (use-package flycheck-pos-tip
@@ -2493,7 +2492,7 @@ This file is specified in `counsel-projectile-default-file'."
   (tramp-default-remote-shell "/bin/bash")
   (tramp-default-user "swarnendu")
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
-  (tramp-verbose 10)
+  (tramp-verbose 1)
   ;; Disable version control
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
                                 tramp-file-name-regexp))
@@ -2689,7 +2688,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
-  :bind ("C-c d m" . manage-minor-mode))
+  :commands manage-minor-mode)
 
 (use-package jgraph-mode
   :mode "\\.jgr\\'")
@@ -3117,7 +3116,12 @@ This file is specified in `counsel-projectile-default-file'."
   :if (executable-find "prettier")
   :hook
   ;; Should work `gfm-mode', `css-mode', and `html-mode'
-  ((markdown-mode web-mode json-mode jsonc-mode js2-mode) . prettier-mode)
+  ((markdown-mode web-mode json-mode jsonc-mode js2-mode)
+   . (lambda ()
+       ;; LATER: Prettier times out setting up the process on a remote machine
+       (when (and buffer-file-name
+                  (not (file-remote-p buffer-file-name)))
+         prettier-mode)))
   :custom (prettier-lighter nil))
 
 ;; Align fields with `C-c C-a'
@@ -4112,6 +4116,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
    :custom (flycheck-grammarly-check-time 3))
 
  (use-package lsp-grammarly
+   :disabled t
    :hook
    (text-mode . (lambda ()
                   (require 'lsp-grammarly)
@@ -4196,7 +4201,9 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :ensure nil
   :hook
   ((bibtex-mode . turn-on-auto-revert-mode)
-   (bibtex-mode . lsp-deferred))
+   ;; LATER: LaTeX LS is not good yet
+   ;; (bibtex-mode . lsp-deferred)
+   )
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t))
@@ -4624,6 +4631,7 @@ Ignore if no file is found."
   "Add backends for latex completion in company mode."
   (use-package company-auctex
     :demand t
+    :commands company-auctex-init
     :config (company-auctex-init))
   (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
     :demand t)
