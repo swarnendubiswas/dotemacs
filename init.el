@@ -1241,26 +1241,26 @@ SAVE-FN with non-nil ARGS."
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
-    :extends "Default"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash
-       (lambda (ext icon)
-         (puthash ext (concat (substring icon 0 1)
-                              (propertize " " 'display '(space . (:width 0.5))))
-                  icons))
-       icons)))
+                         :extends "Default"
+                         :config
+                         (let ((icons (treemacs-theme->gui-icons theme)))
+                           (maphash
+                            (lambda (ext icon)
+                              (puthash ext (concat (substring icon 0 1)
+                                                   (propertize " " 'display '(space . (:width 0.5))))
+                                       icons))
+                            icons)))
 
   (treemacs-create-theme "all-the-icons-tighter"
-    :extends "all-the-icons"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash
-       (lambda (ext icon)
-         (puthash ext (concat (substring icon 0 1)
-                              (propertize " " 'display '(space . (:width 0.5))))
-                  icons))
-       icons)))
+                         :extends "all-the-icons"
+                         :config
+                         (let ((icons (treemacs-theme->gui-icons theme)))
+                           (maphash
+                            (lambda (ext icon)
+                              (puthash ext (concat (substring icon 0 1)
+                                                   (propertize " " 'display '(space . (:width 0.5))))
+                                       icons))
+                            icons)))
 
   (treemacs-load-theme "all-the-icons")
 
@@ -1298,7 +1298,7 @@ SAVE-FN with non-nil ARGS."
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :custom
   (all-the-icons-ibuffer-human-readable-size t)
-  (all-the-icons-ibuffer-icon-size 0.9))
+  (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package all-the-icons-dired
   :diminish
@@ -1386,7 +1386,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package swiper
   :commands (swiper swiper-isearch)
-  ;; :bind ("<f4>" . swiper-isearch)
+  :bind ("<f4>" . swiper-isearch)
   :custom (swiper-action-recenter t))
 
 ;; (defvar grep-highlight-matches)
@@ -1415,8 +1415,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package deadgrep
   :commands deadgrep
-  ;; :bind ("<f8>" . deadgrep)
-  )
+  :bind ("C-c s d" . deadgrep))
 
 (use-package ripgrep
   :commands ripgrep-regexp)
@@ -1547,7 +1546,7 @@ SAVE-FN with non-nil ARGS."
   :custom
   (company-posframe-show-metadata nil)
   (company-posframe-show-indicator nil)
-  :config (company-posframe-mode))
+  :config (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
@@ -1565,10 +1564,10 @@ SAVE-FN with non-nil ARGS."
   :after company
   :demand t
   :commands company-box-mode
-  :config (company-box-mode 1)
   :diminish
   :custom (company-box-icons-alist 'company-box-icons-all-the-icons)
-  ;; :config
+  :config
+  (company-box-mode 1)
   ;; (set-face-background 'company-box-background "cornsilk")
   ;; (set-face-background 'company-box-selection "light blue")
   )
@@ -2254,9 +2253,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;;  'counsel-projectile-switch-project-action
   ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
   :bind
-  (
+  (("<f6>" . counsel-projectile-find-file)
    ("<f5>" . counsel-projectile-switch-project)
-   ("<f6>" . counsel-projectile-find-file)
    ;; ("<f7>" . counsel-projectile-rg)
    ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
    ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
@@ -2417,24 +2415,12 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish
   :hook (prog-mode . ws-butler-mode))
 
-(or
- (use-package highlight-symbol ; Highlight symbol under point
-   :disabled t ; This package has not been updated of late, `symbol-overlay' is faster
-   :diminish
-   :hook
-   ((highlight-symbol-mode . highlight-symbol-nav-mode)
-    (prog-mode . highlight-symbol-mode))
-   :bind
-   (("M-p" . highlight-symbol-prev)
-    ("M-n" . highlight-symbol-next))
-   :custom (highlight-symbol-on-navigation-p t))
-
- (use-package symbol-overlay ; Highlight symbol under point
-   :diminish
-   :hook ((prog-mode html-mode yaml-mode) . symbol-overlay-mode)
-   :bind
-   (("M-p" . symbol-overlay-jump-prev)
-    ("M-n" . symbol-overlay-jump-next))))
+(use-package symbol-overlay ; Highlight symbol under point
+  :diminish
+  :hook ((prog-mode html-mode yaml-mode) . symbol-overlay-mode)
+  :bind
+  (("M-p" . symbol-overlay-jump-prev)
+   ("M-n" . symbol-overlay-jump-next)))
 
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
@@ -2457,6 +2443,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package number-separator
   :ensure nil
   :load-path "extras"
+  :commands number-separator-mode
   ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
   ;;                            :files ("number-separator.el")))
   :diminish
@@ -2464,8 +2451,7 @@ This file is specified in `counsel-projectile-default-file'."
   (number-separator ",")
   (number-separator-interval 3)
   (number-separator-ignore-threshold 4)
-  (number-separator-decimal-char ".")
-  :hook (after-init . number-separator-mode))
+  (number-separator-decimal-char "."))
 
 (use-package highlight-escape-sequences
   :hook (prog-mode . hes-mode))
@@ -4443,6 +4429,7 @@ Ignore if no file is found."
 (use-package tree-sitter
   :ensure tree-sitter-langs
   :functions tree-sitter-hl-mode
+  :commands global-tree-sitter-mode
   :diminish tree-sitter-mode
   :init
   (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook

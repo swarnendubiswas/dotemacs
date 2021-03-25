@@ -1,6 +1,7 @@
-personal_ws-1.1 en 224 
+personal_ws-1.1 en 227
 microbenchmarks
 Vikash
+nonconflicting
 precimonious
 centroid
 unordered
@@ -154,6 +155,8 @@ vectorized
 analytical
 dimensionality
 outliers
+linearizability
+Linearizability
 Swarnendu
 swarnendu
 Rajat
