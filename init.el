@@ -154,7 +154,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -3107,7 +3107,7 @@ This file is specified in `counsel-projectile-default-file'."
        ;; LATER: Prettier times out setting up the process on a remote machine
        (when (and buffer-file-name
                   (not (file-remote-p buffer-file-name)))
-         prettier-mode)))
+         (prettier-mode 1))))
   :custom (prettier-lighter nil))
 
 ;; Align fields with `C-c C-a'
@@ -4421,7 +4421,8 @@ Ignore if no file is found."
   :commands (format-all-ensure-formatter format-all-buffer)
   :config
   (format-all-ensure-formatter)
-  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook bazel-mode-hook))
+  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
+                                       bazel-mode-hook LaTeX-mode-hook latex-mode-hook))
     (add-hook hook (lambda ()
                      (when buffer-file-name
                        (add-hook 'before-save-hook #'format-all-buffer nil t))))))

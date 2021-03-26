@@ -1,7 +1,6 @@
-personal_ws-1.1 en 227
+personal_ws-1.1 en 228 
 microbenchmarks
 Vikash
-nonconflicting
 precimonious
 centroid
 unordered
@@ -11,6 +10,7 @@ tradeoff
 resubmission
 Keshav
 vectorization
+customizable
 optimizations
 Arnab
 transactional
@@ -156,11 +156,12 @@ analytical
 dimensionality
 outliers
 linearizability
-Linearizability
 Swarnendu
 swarnendu
 Rajat
+nonconflicting
 Mishra
+vectorizer
 unintuitive
 reorderings
 Modi
