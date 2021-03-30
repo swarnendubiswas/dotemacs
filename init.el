@@ -466,7 +466,7 @@ This location is used for temporary installations and files.")
       use-dialog-box nil
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
-      vc-handled-backends nil ; Disabling vc improves performance, alternate option '(Git)
+      vc-handled-backends '(Git) ; Disabling vc improves performance, alternate option '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
@@ -520,7 +520,7 @@ This location is used for temporary installations and files.")
   :hook (after-init . gcmh-mode)
   :config
   (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose t)))
+    (setq gcmh-verbose nil)))
 
 (use-package request
   :config
@@ -841,7 +841,8 @@ SAVE-FN with non-nil ARGS."
     (setq modus-themes-mode-line 'borderless-moody))
   (load-theme 'modus-vivendi t))
 
-(when (and (eq sb/theme 'sb/default) (display-graphic-p))
+(when (and (eq sb/theme 'sb/default)
+           (display-graphic-p))
   (progn
     ;; (setq frame-background-mode 'light)
     ;; (set-background-color "#ffffff")
@@ -856,7 +857,7 @@ SAVE-FN with non-nil ARGS."
   :commands powerline-default-theme
   :init
   (setq powerline-default-separator 'box
-        powerline-display-buffer-size t
+        powerline-display-buffer-size nil
         powerline-display-hud nil
         powerline-display-mule-info nil
         powerline-gui-use-vcs-glyph t
@@ -961,6 +962,12 @@ SAVE-FN with non-nil ARGS."
   :init
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
+
+(use-package mode-icons
+  :disabled t
+  :if (eq sb/modeline-theme 'powerline)
+  :demand t
+  :config (mode-icons-mode 1))
 
 (use-package auto-dim-other-buffers
   :commands adob--rescan-windows
@@ -1366,15 +1373,15 @@ SAVE-FN with non-nil ARGS."
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
-;; FIXME: Check anzu frequency count
 (use-package anzu
   :diminish anzu-mode
-  :commands anzu-mode
-  ;; :hook (isearch-mode . anzu-mode)
-  ;; :hook (after-init . global-anzu-mode)
-  ;; :custom
-  ;; (anzu-search-threshold 10000)
-  ;; (anzu-minimum-input-length 2)
+  :after isearch
+  :demand t
+  :custom
+  (anzu-search-threshold 10000)
+  (anzu-minimum-input-length 2)
+  :config
+  (global-anzu-mode 1)
   ;; :config
   ;; (when (eq sb/modeline-theme 'spaceline)
   ;;   (setq anzu-cons-mode-line-p nil))
@@ -1502,6 +1509,7 @@ SAVE-FN with non-nil ARGS."
   ;; (company-dabbrev-ignore-case nil "Backend is case-sensitive")
   ;; Searching for other buffers is not useful with LSP support, and can cause slowdowns
   (company-dabbrev-other-buffers nil "Search in other buffers with same major mode")
+  ;; (company-format-margin-function 'company-vscode-light-icons-margin)
   (company-idle-delay 0.1 "Decrease the delay before the popup is shown")
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
@@ -1641,12 +1649,10 @@ SAVE-FN with non-nil ARGS."
   ;; (ivy-height-alist '((t
   ;;                      lambda (_caller)
   ;;                      (/ (frame-height) 2))))
+  ;; We update this after loading `orderless'
   (ivy-re-builders-alist '(
-                           ;; (counsel-M-x . ivy--regex-fuzzy)
-                           ;; (counsel-find-file . ivy--regex-fuzzy)
-                           ;; (swiper . ivy--regex-fuzzy)
-                           ;; (swiper-isearch . ivy--regex-fuzzy)
-                           ;; (counsel-rg . ivy--regex-ignore-order)
+                           (counsel-M-x . ivy--regex-fuzzy)
+                           (counsel-find-file . ivy--regex-fuzzy)
                            (t . ivy--regex-ignore-order)
                            ))
   (ivy-truncate-lines nil "`counsel-flycheck' output gets truncated")
@@ -1700,10 +1706,6 @@ SAVE-FN with non-nil ARGS."
                     (if (executable-find "fasd")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
-  :init
-  ;; Enabling preview can make switching buffers slow
-  ;; FIXME: This does not work
-  (setq counsel-switch-buffer-preview-virtual-buffers nil)
   :bind
   (([remap execute-extended-command] . counsel-M-x)
    ("<f1>"                           . counsel-M-x)
@@ -1724,7 +1726,8 @@ SAVE-FN with non-nil ARGS."
    ("<f9>"                           . counsel-recentf)
    ("C-c s r"                        . counsel-rg)
    ("C-c C-m"                        . counsel-mark-ring)
-   ;; ("<f3>"                        . counsel-switch-buffer) ; Previewing buffers is a bottleneck
+   ;; Enabling preview can make switching over remote buffers slow
+   ;; ("<f3>"                        . counsel-switch-buffer)
    ([remap yank-pop]                 . counsel-yank-pop))
   :bind* ("C-c C-j"                  . counsel-imenu)
   :custom
@@ -1779,6 +1782,7 @@ SAVE-FN with non-nil ARGS."
                                     "\\|.recommenders"))
   (counsel-mode-override-describe-bindings t)
   (counsel-preselect-current-file t)
+  (counsel-switch-buffer-preview-virtual-buffers nil)
   (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n-------------------------\n")
   :diminish
@@ -1865,12 +1869,16 @@ SAVE-FN with non-nil ARGS."
   :functions just-one-face
   :config
   (setq completion-styles '(orderless)
-        ivy-re-builders-alist '((t . orderless-ivy-re-builder))
         orderless-component-separator "[ &]")
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
-  (advice-add 'company-capf--candidates :around #'just-one-face))
+  (advice-add 'company-capf--candidates :around #'just-one-face)
+
+  (setq ivy-re-builders-alist '(
+                                (counsel-M-x . ivy--regex-fuzzy)
+                                (counsel-find-file . ivy--regex-fuzzy)
+                                (t . orderless-ivy-re-builder))))
 
 (use-package ispell
   :ensure nil
@@ -1984,7 +1992,7 @@ SAVE-FN with non-nil ARGS."
   ("f" flyspell-buffer)
   ("m" flyspell-mode))
 
-;; As of Emacs 28, `flyspell' does not provide a way to automatically check all on-screen text.
+;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
   :defines spell-fu-directory
@@ -1992,48 +2000,48 @@ SAVE-FN with non-nil ARGS."
   :hook (text-mode . spell-fu-mode)
   :custom
   (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
-  (spell-fu-faces-exclude '( font-lock-string-face
-                             ;; `nxml-mode' is derived from `text-mode'
-                             lsp-face-highlight-read
-                             hl-line
-                             markdown-blockquote-face
-                             markdown-code-face
-                             markdown-html-attr-name-face
-                             markdown-html-attr-value-face
-                             markdown-html-tag-name-face
-                             markdown-inline-code-face
-                             markdown-link-face
-                             markdown-markup-face
-                             markdown-plain-url-face
-                             markdown-reference-face
-                             markdown-url-face
-                             nxml-attribute-local-name
-                             org-block
-                             org-block-begin-line
-                             org-block-end-line
-                             org-code
-                             org-date
-                             org-formula
-                             org-latex-and-related
-                             org-link
-                             org-meta-line
-                             org-property-value
-                             org-ref-cite-face
-                             org-special-keyword
-                             org-tag
-                             org-todo
-                             org-todo-keyword-done
-                             org-todo-keyword-habt
-                             org-todo-keyword-kill
-                             org-todo-keyword-outd
-                             org-todo-keyword-todo
-                             org-todo-keyword-wait
-                             org-verbatim
-                             font-latex-math-face
-                             font-latex-sedate-face
-                             font-lock-function-name-face
-                             font-lock-keyword-face
-                             font-lock-variable-name-face))
+  (spell-fu-faces-exclude '(font-latex-math-face
+                            font-latex-sedate-face
+                            font-lock-function-name-face
+                            font-lock-keyword-face
+                            font-lock-string-face
+                            font-lock-variable-name-face
+                            hl-line
+                            ;; `nxml-mode' is derived from `text-mode'
+                            lsp-face-highlight-read
+                            markdown-blockquote-face
+                            markdown-code-face
+                            markdown-html-attr-name-face
+                            markdown-html-attr-value-face
+                            markdown-html-tag-name-face
+                            markdown-inline-code-face
+                            markdown-link-face
+                            markdown-markup-face
+                            markdown-plain-url-face
+                            markdown-reference-face
+                            markdown-url-face
+                            nxml-attribute-local-name
+                            org-block
+                            org-block-begin-line
+                            org-block-end-line
+                            org-code
+                            org-date
+                            org-formula
+                            org-latex-and-related
+                            org-link
+                            org-meta-line
+                            org-property-value
+                            org-ref-cite-face
+                            org-special-keyword
+                            org-tag
+                            org-todo
+                            org-todo-keyword-done
+                            org-todo-keyword-habt
+                            org-todo-keyword-kill
+                            org-todo-keyword-outd
+                            org-todo-keyword-todo
+                            org-todo-keyword-wait
+                            org-verbatim))
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory))))
@@ -2066,6 +2074,14 @@ SAVE-FN with non-nil ARGS."
   (show-paren-when-point-in-periphery t))
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+
+;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+(defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+(defun sb/add-markdown-pairs ()
+  "Add custom pairs to `markdown-mode'."
+  (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+  (setq-local electric-pair-text-pairs electric-pair-pairs))
+(add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
 (defvar electric-pair-preserve-balance)
 (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
@@ -2880,8 +2896,7 @@ This file is specified in `counsel-projectile-default-file'."
     (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory))))
 
 (use-package bm
-  :commands (
-             bm-buffer-save-all
+  :commands (bm-buffer-save-all
              bm-repository-save
              ;; bm-repository-load bm-buffer-save
              ;; bm-buffer-restore
@@ -3098,13 +3113,13 @@ This file is specified in `counsel-projectile-default-file'."
   (dolist (mode '(typescript-mode js-mode js2-mode coffee-mode))
     (add-hook (derived-mode-hook-name mode) #'add-node-modules-path)))
 
+;; LATER: Prettier times out setting up the process on a remote machine
 (use-package prettier
   :if (executable-find "prettier")
   :hook
   ;; Should work `gfm-mode', `css-mode', and `html-mode'
   ((markdown-mode web-mode json-mode jsonc-mode js2-mode)
    . (lambda ()
-       ;; LATER: Prettier times out setting up the process on a remote machine
        (when (and buffer-file-name
                   (not (file-remote-p buffer-file-name)))
          (prettier-mode 1))))
@@ -3238,7 +3253,7 @@ This file is specified in `counsel-projectile-default-file'."
    ;; Let us not enable breadcrumbs for all modes
    ;; ((c++-mode python-mode java-mode web-mode) . lsp-headerline-breadcrumb-mode)
    (lsp-mode . lsp-modeline-code-actions-mode)
-   ;; FIXME: Registering `lsp-format-buffer' makes sense only if the server has started
+   ;; FIXME: Registering `lsp-format-buffer' makes sense only if the server is active
    ((c++-mode java-mode nxml-mode) . (lambda ()
                                        (add-hook 'before-save-hook #'lsp-format-buffer
                                                  nil t)))
@@ -4320,7 +4335,7 @@ Ignore if no file is found."
   :commands (math-preview-all math-preview-at-point math-preview-region)
   :custom
   (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                                  sb/user-tmp)))
+                                          sb/user-tmp)))
 
 (use-package texinfo
   :mode ("\\.texi\\'" . texinfo-mode))
@@ -4413,19 +4428,20 @@ Ignore if no file is found."
 
 (use-package clang-format+
   :ensure clang-format
+  :ensure t
   :hook (mlir-mode . clang-format+-mode)
   :custom (clang-format+-always-enable t "Always enable"))
 
 ;; Use for major modes which do not provide a formatter
 (use-package format-all
   :commands (format-all-ensure-formatter format-all-buffer)
-  :config
-  (format-all-ensure-formatter)
+  :init
   (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
-                                       bazel-mode-hook LaTeX-mode-hook latex-mode-hook))
+                                       bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
     (add-hook hook (lambda ()
                      (when buffer-file-name
-                       (add-hook 'before-save-hook #'format-all-buffer nil t))))))
+                       (add-hook 'before-save-hook #'format-all-buffer nil t)))))
+  :config (format-all-ensure-formatter))
 
 (use-package tree-sitter
   :ensure tree-sitter-langs
@@ -4489,6 +4505,15 @@ Ignore if no file is found."
 ;; `company-ispell', and `company-dabbrev'.
 ;; https://tychoish.com/post/better-company/
 ;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
+
+;; https://emacs.stackexchange.com/questions/64038/how-to-use-multiple-backends-in-priority-for-company-mode
+;; Try completion backends in order till there is a non-empty completion list
+;; (setq company-backends '(company-xxx company-yyy company-zzz))
+;; Merge completions of all the backends
+;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+;; Merge completions of all the backends, give priority to `company-xxx'
+;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
+
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (use-package company-emoji
@@ -4510,13 +4535,14 @@ Ignore if no file is found."
 
 (defun sb/company-xml-mode ()
   "Add backends for completion with company."
+  (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev-code
-           ))))
+        '(
+          company-files
+          company-capf :separate
+          company-yasnippet
+          company-dabbrev-code
+          )))
 (dolist (hook '(nxml-mode-hook))
   (add-hook hook (lambda ()
                    (sb/company-xml-mode))))
@@ -4592,6 +4618,7 @@ Ignore if no file is found."
           company-files
           company-capf ; Prefer `company-capf' over the old `company-elisp'
           company-yasnippet
+          company-dabbrev-code
           company-dabbrev
           ))))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)

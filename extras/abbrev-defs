@@ -646,6 +646,7 @@
     ("helath" "health" nil :count 1)
     ("helpfull" "helpful" nil :count 0)
     ("herat" "heart" nil :count 0)
+    ("heristically" "heuristically" nil :count 0)
     ("hesaid" "he said" nil :count 0)
     ("hewas" "he was" nil :count 0)
     ("hge" "he" nil :count 0)
@@ -1209,7 +1210,7 @@
     ("techniuqe" "technique" nil :count 0)
     ("techqnieu" "technique" nil :count 1)
     ("tecnical" "technical" nil :count 0)
-    ("teh" "the" nil :count 52)
+    ("teh" "the" nil :count 53)
     ("tehre" "there" nil :count 2)
     ("tehse" "these" nil :count 0)
     ("tehy" "they" nil :count 0)
@@ -1402,6 +1403,7 @@
     ("recompiliation" "recompilation" nil :count 0)
     ("sequenes" "sequence" nil :count 0)
     ("serializaation" "serialization" nil :count 0)
+    ("severse" "severe" nil :count 0)
    ))
 
 (define-abbrev-table 'python-mode-abbrev-table
