@@ -154,7 +154,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -218,7 +218,7 @@ This location is used for temporary installations and files.")
 
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
-  (setq gc-cons-percentage 0.3
+  (setq gc-cons-percentage 0.1
         gc-cons-threshold sb/dotemacs-200MB))
 
 (defun sb/restore-garbage-collection ()
@@ -262,6 +262,7 @@ This location is used for temporary installations and files.")
 ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer t
+        use-package-always-ensure t
         use-package-compute-statistics nil
         ;; Avoid printing errors and warnings since the configuration is known to work
         use-package-expand-minimally t
@@ -495,8 +496,7 @@ This location is used for temporary installations and files.")
               bidi-inhibit-bpa t
               bidi-paragraph-direction 'left-to-right)
 
-(dolist (exts '(
-                ;; Extensions
+(dolist (exts '(;; Extensions
                 ".aux"
                 ".exe"
                 ".fls"
@@ -507,8 +507,7 @@ This location is used for temporary installations and files.")
                 "__init__.py"
                 ;; Directories
                 "__pycache__/"
-                "eln-cache"
-                ))
+                "eln-cache"))
   (add-to-list 'completion-ignored-extensions exts))
 
 ;; During normal use a high GC threshold is set. When idling GC is triggered and a low threshold is
@@ -571,7 +570,7 @@ This location is used for temporary installations and files.")
   :diminish auto-revert-mode
   :hook (after-init . global-auto-revert-mode)
   :custom
-  (auto-revert-interval 2 "Faster (seconds) would mean less likely to use stale data")
+  (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
   (auto-revert-remote-files t)
   (auto-revert-use-notify nil)
   (auto-revert-verbose nil)
@@ -666,14 +665,12 @@ SAVE-FN with non-nil ARGS."
 ;;     (tool-bar-mode -1)))
 
 ;; Disable the following modes
-(dolist (mode '(
-                blink-cursor-mode ; Blinking cursor is distracting
+(dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
                 desktop-save-mode
                 global-prettify-symbols-mode ; Makes it difficult to edit the buffer
                 shell-dirtrack-mode
                 size-indication-mode
-                tooltip-mode
-                ))
+                tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
 
@@ -681,8 +678,7 @@ SAVE-FN with non-nil ARGS."
   (declare-function hl-line-highlight "hl-line"))
 
 ;; Enable the following modes
-(dolist (mode '(
-                auto-compression-mode
+(dolist (mode '(auto-compression-mode
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 global-hl-line-mode
@@ -690,8 +686,7 @@ SAVE-FN with non-nil ARGS."
                 minibuffer-depth-indicate-mode
                 outline-minor-mode
                 ;; Enable visual feedback on selections, mark follows the point
-                transient-mark-mode
-                ))
+                transient-mark-mode))
   (when (fboundp mode)
     (funcall mode 1)))
 
@@ -700,7 +695,7 @@ SAVE-FN with non-nil ARGS."
 (diminish 'visual-line-mode)
 (diminish 'outline-minor-mode)
 
-;; (fringe-mode '(10 . 10)) ; Default is 8 pixels, which is too narrow for my comfort
+;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
 
 ;; Native from Emacs 27+
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
@@ -731,7 +726,7 @@ SAVE-FN with non-nil ARGS."
   ;; https://github.com/domtronn/all-the-icons.el/issues/120
   (when (and (not (sb/font-installed-p "all-the-icons")))
     (all-the-icons-install-fonts t))
-  :custom (all-the-icons-scale-factor 1.1))
+  :custom (all-the-icons-scale-factor 1.2))
 
 (use-package leuven-theme
   :if (eq sb/theme 'leuven)
@@ -742,13 +737,8 @@ SAVE-FN with non-nil ARGS."
   :init
   (load-theme 'eclipse t)
   (set-background-color "white")
-  (set-face-attribute 'region nil
-                      :background "LemonChiffon"
-                      :foreground "black")
-  (set-face-attribute 'mode-line nil
-                      :background "grey88"
-                      :foreground "black"
-                      :box nil))
+  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
+  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
 
 (use-package spacemacs-common
   :ensure spacemacs-theme
@@ -847,10 +837,8 @@ SAVE-FN with non-nil ARGS."
     ;; (setq frame-background-mode 'light)
     ;; (set-background-color "#ffffff")
     (set-foreground-color "#333333")
-    (set-face-attribute 'hl-line nil
-                        :background "light yellow")
-    (set-face-attribute 'region nil
-                        :background "gainsboro")))
+    (set-face-attribute 'hl-line nil :background "light yellow")
+    (set-face-attribute 'region nil :background "gainsboro")))
 
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
@@ -863,13 +851,9 @@ SAVE-FN with non-nil ARGS."
         powerline-gui-use-vcs-glyph t
         powerline-height 17)
   (when (eq sb/theme 'leuven)
-    (set-face-attribute 'mode-line nil
-                        :background "grey88"
-                        :foreground "black")
-    (set-face-attribute 'mode-line-buffer-id nil
-                        :weight 'bold
-                        :foreground "black"
-                        :background "gray88"))
+    (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
+    (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
+                        :foreground "black" :background "gray88"))
   (powerline-default-theme))
 
 (use-package smart-mode-line
@@ -1000,14 +984,10 @@ SAVE-FN with non-nil ARGS."
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "swarnendu-Inspiron-7572")
-  (set-face-attribute 'default nil
-                      ;; :font "JetBrains Mono"
-                      :height 140))
+  (set-face-attribute 'default nil :height 140))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil
-                      ;; :font "DejaVu Sans Mono"
-                      :height 140))
+  (set-face-attribute 'default nil :height 140))
 
 (set-face-attribute 'mode-line nil :height 110)
 (set-face-attribute 'mode-line-inactive nil :height 110)
@@ -1064,11 +1044,18 @@ SAVE-FN with non-nil ARGS."
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
+(use-package all-the-icons-ibuffer
+  :if (display-graphic-p)
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
+  :custom
+  (all-the-icons-ibuffer-human-readable-size t)
+  (all-the-icons-ibuffer-icon-size 0.8))
+
 (use-package bufler
   :commands bufler-mode
-  :diminish bufler-workspace-mode
   ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
   ;;                 :files (:defaults (:exclude "helm-bufler.el")))
+  :diminish bufler-workspace-mode
   :config (bufler-mode 1)
   :bind ("C-x C-b" . bufler))
 
@@ -1158,13 +1145,10 @@ SAVE-FN with non-nil ARGS."
   :diminish
   :hook (dired-mode . dired-async-mode))
 
-;; (use-package dired-rsync
-;;   :bind (:map dired-mode-map
-;;               ("C-c C-r" . dired-rsync)))
-
-;; (use-package dired-posframe
-;;   :hook (dired-mode . dired-posframe-mode)
-;;   :diminish)
+(use-package all-the-icons-dired
+  :diminish
+  :if (display-graphic-p)
+  :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package treemacs
   :if (display-graphic-p)
@@ -1299,18 +1283,6 @@ SAVE-FN with non-nil ARGS."
   :disabled t
   :if (display-graphic-p)
   :config (treemacs-icons-dired-mode))
-
-(use-package all-the-icons-ibuffer
-  :if (display-graphic-p)
-  :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-  :custom
-  (all-the-icons-ibuffer-human-readable-size t)
-  (all-the-icons-ibuffer-icon-size 0.8))
-
-(use-package all-the-icons-dired
-  :diminish
-  :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package org
   :defines (org-hide-leading-stars-before-indent-mode
@@ -1477,6 +1449,7 @@ SAVE-FN with non-nil ARGS."
   (unless (bound-and-true-p sb/use-no-littering)
     (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
   (run-at-time nil (* 5 60) 'recentf-save-list) ; seconds
+  (run-at-time nil (* 10 60) 'recentf-cleanup) ; seconds
   (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
   (add-to-list 'recentf-exclude (file-truename no-littering-var-directory))
   :hook (after-init . recentf-mode))
@@ -1493,8 +1466,8 @@ SAVE-FN with non-nil ARGS."
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
-;; company-complete-common' when there are no completions.
-;; Use `C-M-i' for `complete-symbol' with regex search.
+;; company-complete-common' when there are no completions. Use `C-M-i' for `complete-symbol' with
+;; regex search.
 (use-package company
   :commands company-abort
   :preface
@@ -1579,13 +1552,6 @@ SAVE-FN with non-nil ARGS."
   ;; (set-face-background 'company-box-background "cornsilk")
   ;; (set-face-background 'company-box-selection "light blue")
   )
-
-(use-package company-ctags
-  :disabled t
-  :after company
-  :custom
-  (company-ctags-fuzzy-match-p t)
-  (company-ctags-everywhere t))
 
 ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
 ;; computationally expensive
@@ -3182,24 +3148,22 @@ This file is specified in `counsel-projectile-default-file'."
             lsp-completion--regex-fuz
             ;; lsp-tramp-connection
             ;; make-lsp-client
-            ;;           lsp-disabled-clients
-            ;;           lsp-enabled-clients
-            ;;           lsp-pyright-langserver-command-args
+            ;; lsp-disabled-clients
+            ;; lsp-enabled-clients
+            ;; lsp-pyright-langserver-command-args
             )
-  :commands (
-             lsp--set-configuration
+  :commands (lsp--set-configuration
              lsp-completion--regex-fuz
              lsp-register-client
              lsp-tramp-connection
              make-lsp-client
-             ;;                                lsp-format-buffer
+             ;; lsp-format-buffer
              lsp-configuration-section
              ;; lsp
-             ;;                                lsp-deferred
-             ;;                                lsp--set-configuration
+             ;; lsp-deferred
+             ;; lsp--set-configuration
              lsp-package-ensure
-             ht-merge
-             )
+             ht-merge)
   ;; https://justin.abrah.ms/dotfiles/emacs.html
   ;; :ensure-system-package
   ;; ((typescript-language-server . "npm install -g typescript-language-server")
@@ -3221,16 +3185,14 @@ This file is specified in `counsel-projectile-default-file'."
                                                  nil t)))
    )
   :custom
-  (lsp-clients-clangd-args '(
-                             "-j=2"
+  (lsp-clients-clangd-args '("-j=2"
                              "--background-index"
                              "--clang-tidy"
                              "--pch-storage=memory"
                              ;; "--suggest-missing-includes"
                              "--header-insertion=never"
                              "--fallback-style=LLVM"
-                             "--log=error"
-                             ))
+                             "--log=error"))
   (lsp-completion-enable-additional-text-edit t)
   (lsp-completion-provider :none)
   ;; (lsp-eldoc-enable-hover nil)
@@ -3267,16 +3229,14 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Sudden changes in the height of the echo area causes the cursor to lose position
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation nil)
-  ;; (lsp-tex-server 'digestif)
   (lsp-xml-logs-client nil)
   (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
                                       sb/extras-directory))
   (lsp-yaml-print-width sb/fill-column)
   :custom-face
-  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit font-lock-doc-face :weight bold
-                                                        :height 0.9))))
-  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face
-                                                       :height 0.9))))
+  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
+                                               font-lock-doc-face :weight bold :height 0.9))))
+  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
   (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
                                                                :weight bold :height 0.9))))
   :config
@@ -3319,8 +3279,6 @@ This file is specified in `counsel-projectile-default-file'."
           lsp-pyls-plugins-pylint-enabled t ; Pylint can be expensive
           lsp-pyls-plugins-yapf-enabled t))
 
-  ;; Support lsp over tramp
-  ;; (with-eval-after-load 'tramp
   (when (eq sb/python-langserver 'pyls)
     (lsp-register-client
      (make-lsp-client
@@ -3341,11 +3299,10 @@ This file is specified in `counsel-projectile-default-file'."
   (when (eq sb/python-langserver 'pyright)
     (lsp-register-client
      (make-lsp-client
-      :new-connection
-      (lsp-tramp-connection
-       (lambda ()
-         (cons "pyright-langserver"
-               lsp-pyright-langserver-command-args)))
+      :new-connection (lsp-tramp-connection
+                       (lambda ()
+                         (cons "pyright-langserver"
+                               lsp-pyright-langserver-command-args)))
       :major-modes '(python-mode)
       :remote? t
       :server-id 'pyright-remote
@@ -3382,11 +3339,12 @@ This file is specified in `counsel-projectile-default-file'."
     :server-id 'clangd-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("bash-language-server" "start"))
-                    :major-modes '(sh-mode)
-                    :remote? t
-                    :server-id 'bashls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("bash-language-server" "start"))
+    :major-modes '(sh-mode)
+    :remote? t
+    :server-id 'bashls-remote))
 
   (lsp-register-client
    (make-lsp-client
@@ -3404,11 +3362,12 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; TODO: Check with https://github.com/MagicRB/dotfiles/blob/469f5ca6cfa7f13a8482733903f86b799e50bf65/nixos/home-manager/modules/emacs/.emacs.d/org/lsp-and-ide.org
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("typescript-language-server" "--stdio"))
-                    :major-modes '(js-mode typescript-mode)
-                    :remote? t
-                    :server-id 'typescript-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("typescript-language-server" "--stdio"))
+    :major-modes '(js-mode typescript-mode)
+    :remote? t
+    :server-id 'typescript-remote))
 
   ;; (lsp-register-client
   ;;  (make-lsp-client
@@ -3418,61 +3377,65 @@ This file is specified in `counsel-projectile-default-file'."
   ;;   :server-id 'texlab-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("vscode-json-languageserver" "--stdio"))
-                    :major-modes '(json-mode jsonc-mode)
-                    :remote? t
-                    :server-id 'jsonls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("vscode-json-languageserver" "--stdio"))
+    :major-modes '(json-mode jsonc-mode)
+    :remote? t
+    :server-id 'jsonls-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("css-languageserver" "--stdio"))
-                    :major-modes '(css-mode less-mode sass-mode scss-mode)
-                    :remote? t
-                    :server-id 'cssls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+    :major-modes '(css-mode less-mode sass-mode scss-mode)
+    :remote? t
+    :server-id 'cssls-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("html-languageserver" "--stdio"))
-                    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
-                    :remote? t
-                    :server-id 'htmlls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("html-languageserver" "--stdio"))
+    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
+    :remote? t
+    :server-id 'htmlls-remote))
 
   ;; FIXME: Get lsp to work for xml remote
   (lsp-register-client
    (make-lsp-client
-    :new-connection
-    (lsp-tramp-connection
-     '("java" "-jar" (expand-file-name "org.eclipse.lemminx-0.14.1-uber.jar"
-                                       sb/extras-directory)))
+    :new-connection (lsp-tramp-connection
+                     '("java" "-jar" (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
+                                                       sb/extras-directory)))
     :major-modes '(xml-mode nxml-mode)
     :remote? t
     :server-id 'xmlls-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     '("yaml-language-server" "--stdio"))
-                    :major-modes '(yaml-mode)
-                    :remote? t
-                    :server-id 'yamlls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("yaml-language-server" "--stdio"))
+    :major-modes '(yaml-mode)
+    :remote? t
+    :server-id 'yamlls-remote))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-tramp-connection
-                                     (lambda ()
-                                       (list lsp-perl-language-server-path
-                                             "-MPerl::LanguageServer" "-e"
-                                             "Perl::LanguageServer::run" "--"
-                                             (format "--port %d --version %s"
-                                                     lsp-perl-language-server-port
-                                                     lsp-perl-language-server-client-version))))
-                    :major-modes '(perl-mode cperl-mode)
-                    :remote? t
-                    :initialized-fn (lambda (workspace)
-                                      (with-lsp-workspace workspace
-                                        (lsp--set-configuration
-                                         (lsp-configuration-section "perl"))))
-                    :priority -1
-                    :server-id 'perlls-remote))
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (list lsp-perl-language-server-path
+                             "-MPerl::LanguageServer" "-e"
+                             "Perl::LanguageServer::run" "--"
+                             (format "--port %d --version %s"
+                                     lsp-perl-language-server-port
+                                     lsp-perl-language-server-client-version))))
+    :major-modes '(perl-mode cperl-mode)
+    :remote? t
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
+    :priority -1
+    :server-id 'perlls-remote))
 
   ;; Disable fuzzy matching
   (advice-add #'lsp-completion--regex-fuz :override #'identity)
@@ -4330,8 +4293,8 @@ Ignore if no file is found."
 
 (use-package bazel-mode
   :mode
-  (("\\.bzl$" . bazel-mode)
-   ("\\BUILD\\'" . bazel-mode)
+  (("\\.bzl$"       . bazel-mode)
+   ("\\BUILD\\'"    . bazel-mode)
    ("\\.bazelrc\\'" . bazelrc-mode))
   :hook (bazel-mode . flycheck-mode))
 
@@ -4398,7 +4361,7 @@ Ignore if no file is found."
 (use-package fasd
   :custom (fasd-enable-initial-prompt nil)
   :hook (emacs-startup . global-fasd-mode)
-  :bind ("C-h C-/" . fasd-find-file))
+  :bind ("C-c /" . fasd-find-file))
 
 (use-package dotenv-mode)
 
