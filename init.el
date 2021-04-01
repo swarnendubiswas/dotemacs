@@ -195,22 +195,22 @@ This location is used for temporary installations and files.")
             (bound-and-true-p sb/use-no-littering))
   (make-directory sb/temp-directory))
 
-(defconst dotemacs-emacs27+ (> emacs-major-version 26))
-(defconst dotemacs-emacs28+ (> emacs-major-version 27))
-(defconst dotemacs-is-linux (eq system-type 'gnu/linux))
-(defconst dotemacs-is-windows (eq system-type 'windows-nt))
+(defconst sb/dotemacs-emacs27+ (> emacs-major-version 26))
+(defconst sb/dotemacs-emacs28+ (> emacs-major-version 27))
+(defconst sb/dotemacs-is-linux (eq system-type 'gnu/linux))
+(defconst sb/dotemacs-is-windows (eq system-type 'windows-nt))
 
 ;; (debug-on-entry 'package-initialize)
 
-(defconst dotemacs-1MB (* 1 1000 1000))
-(defconst dotemacs-4MB (* 4 1000 1000))
-(defconst dotemacs-8MB (* 8 1000 1000))
-(defconst dotemacs-50MB (* 50 1000 1000))
-(defconst dotemacs-64MB (* 64 1000 1000))
-(defconst dotemacs-100MB (* 100 1000 1000))
-(defconst dotemacs-128MB (* 128 1000 1000))
-(defconst dotemacs-200MB (* 200 1000 1000))
-(defconst dotemacs-500MB (* 500 1000 1000))
+(defconst sb/dotemacs-1MB (* 1 1000 1000))
+(defconst sb/dotemacs-4MB (* 4 1000 1000))
+(defconst sb/dotemacs-8MB (* 8 1000 1000))
+(defconst sb/dotemacs-50MB (* 50 1000 1000))
+(defconst sb/dotemacs-64MB (* 64 1000 1000))
+(defconst sb/dotemacs-100MB (* 100 1000 1000))
+(defconst sb/dotemacs-128MB (* 128 1000 1000))
+(defconst sb/dotemacs-200MB (* 200 1000 1000))
+(defconst sb/dotemacs-500MB (* 500 1000 1000))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -219,7 +219,7 @@ This location is used for temporary installations and files.")
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
   (setq gc-cons-percentage 0.3
-        gc-cons-threshold dotemacs-200MB))
+        gc-cons-threshold sb/dotemacs-200MB))
 
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
@@ -227,7 +227,7 @@ This location is used for temporary installations and files.")
     (setq garbage-collection-messages nil))
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold dotemacs-100MB))
+        gc-cons-threshold sb/dotemacs-100MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
@@ -677,8 +677,8 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode -1)))
 
-(autoload #'hl-line-highlight "hl-line" nil t)
-(declare-function #'hl-line-highlight "hl-line")
+(with-eval-after-load 'hl-line
+  (declare-function hl-line-highlight "hl-line"))
 
 ;; Enable the following modes
 (dolist (mode '(
@@ -1882,7 +1882,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ispell
   :ensure nil
-  :if dotemacs-is-linux
+  :if sb/dotemacs-is-linux
   :custom
   (ispell-dictionary "en_US")
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
@@ -1899,7 +1899,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package flyspell
   :ensure nil
-  :if dotemacs-is-linux
+  :if sb/dotemacs-is-linux
   :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
   :preface
   ;; Move point to previous error
@@ -1974,24 +1974,6 @@ SAVE-FN with non-nil ARGS."
    :ensure flyspell-correct
    :bind ("C-;" . flyspell-correct-wrapper)))
 
-(defhydra sb/hydra-spelling (:color blue)
-  "
-  ^
-  ^Spelling^          ^Errors^            ^Checker^
-  ^────────^──────────^──────^────────────^───────^───────
-  _q_ quit            _<_ previous        _c_ correction
-  ^^                  _>_ next            _d_ dictionary
-  ^^                  _f_ check           _m_ mode
-  ^^                  ^^                  ^^
-  "
-  ("q" nil)
-  ("<" flyspell-correct-previous :color pink)
-  (">" flyspell-correct-next :color pink)
-  ("c" ispell)
-  ("d" ispell-change-dictionary)
-  ("f" flyspell-buffer)
-  ("m" flyspell-mode))
-
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
@@ -2044,7 +2026,11 @@ SAVE-FN with non-nil ARGS."
                             org-verbatim))
   :config
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory))))
+    (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
+  :bind
+  (("C-c f n" . spell-fu-goto-next-error)
+   ("C-c f p" . spell-fu-goto-previous-error)
+   ("C-c f a" . spell-fu-word-add)))
 
 (or
  (use-package highlight-indentation
@@ -2161,7 +2147,7 @@ SAVE-FN with non-nil ARGS."
     (setq projectile-dynamic-mode-line nil))
 
   ;; https://github.com/MatthewZMD/.emacs.d
-  (when (and dotemacs-is-windows
+  (when (and sb/dotemacs-is-windows
              (executable-find "tr"))
     (setq projectile-indexing-method 'alien))
 
@@ -2381,29 +2367,6 @@ This file is specified in `counsel-projectile-default-file'."
    :disabled t
    :hook (flycheck-mode . flycheck-inline-mode)))
 
-(defhydra sb/hydra-flycheck (:color blue)
-  "
-  ^
-  ^Flycheck^          ^Errors^            ^Checker^
-  ^────────^──────────^──────^────────────^───────^─────
-  _q_ quit            _<_ previous        _?_ describe
-  _M_ manual          _>_ next            _d_ disable
-  _v_ verify setup    _f_ check           _m_ mode
-  ^^                  _l_ list            _s_ select
-  ^^                  ^^                  ^^
-  "
-  ("q" nil)
-  ("<" flycheck-previous-error :color pink)
-  (">" flycheck-next-error :color pink)
-  ("?" flycheck-describe-checker)
-  ("M" flycheck-manual)
-  ("d" flycheck-disable-checker)
-  ("f" flycheck-buffer)
-  ("l" flycheck-list-errors)
-  ("m" flycheck-mode)
-  ("s" flycheck-select-checker)
-  ("v" flycheck-verify-setup))
-
 (use-package whitespace
   :disabled t
   :commands (whitespace-mode global-whitespace-mode
@@ -2476,8 +2439,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
   :bind
-  (("C-<" . mc/mark-previous-like-this)
-   ("C->" . mc/mark-next-like-this)
+  (("C-<"     . mc/mark-previous-like-this)
+   ("C->"     . mc/mark-next-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
 
 ;; Edit remote file: `/method:user@host#port:filename'
@@ -3158,7 +3121,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
 (use-package eldoc
   :ensure nil
-  :if dotemacs-is-linux
+  :if sb/dotemacs-is-linux
   :diminish
   :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
   :custom
@@ -3182,7 +3145,6 @@ This file is specified in `counsel-projectile-default-file'."
   :mode ("\\.m$" . matlab-mode))
 
 (use-package ess
-  ;; :commands R
   :mode ("/R/.*\\.q\\'" . R-mode)
   :custom
   (ess-indent-from-lhs 4)
@@ -3679,12 +3641,6 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (flycheck-add-next-checker 'lsp 'python-pylint)
   )
 
-(with-eval-after-load 'python-mode
-  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
-    "Adjust Python indentation."
-    (">" python-indent-shift-right "right")
-    ("<" python-indent-shift-left "left")))
-
 (use-package python-docstring
   :after python-mode
   :demand t
@@ -3985,35 +3941,6 @@ This file is specified in `counsel-projectile-default-file'."
         ("M-g m" . smerge-context-menu)
         ("M-g M" . smerge-popup-context-menu)))
 
-(defhydra sb/smerge-hydra
-  (:color pink :hint nil :post (smerge-auto-leave))
-  "
-^Move^       ^Keep^               ^Diff^                 ^Other^
-^^-----------^^-------------------^^---------------------^^-------
-_n_ext       _b_ase               _<_: upper/base        _C_ombine
-_p_rev       _u_pper              _=_: upper/lower       _r_esolve
-^^           _l_ower              _>_: base/lower        _k_ill current
-^^           _a_ll                _R_efine
-^^           _RET_: current       _E_diff
-"
-  ("n" smerge-next)
-  ("p" smerge-prev)
-  ("b" smerge-keep-base)
-  ("u" smerge-keep-upper)
-  ("l" smerge-keep-lower)
-  ("a" smerge-keep-all)
-  ("RET" smerge-keep-current)
-  ("\C-m" smerge-keep-current)
-  ("<" smerge-diff-base-upper)
-  ("=" smerge-diff-upper-lower)
-  (">" smerge-diff-base-lower)
-  ("R" smerge-refine)
-  ("E" smerge-ediff)
-  ("C" smerge-combine-with-next)
-  ("r" smerge-resolve)
-  ("k" smerge-kill-current)
-  ("q" nil "cancel" :color blue))
-
 (use-package ediff
   :ensure nil
   :after (magit)
@@ -4117,7 +4044,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
    :custom (flycheck-grammarly-check-time 3))
 
  (use-package lsp-grammarly
-   :disabled t
    :hook
    (text-mode . (lambda ()
                   (require 'lsp-grammarly)
@@ -4933,6 +4859,9 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
+(when sb/dotemacs-emacs28+
+  (bind-key "C-c d p" #'package-quickstart-refresh))
+
 (global-set-key [remap next-buffer] 'sb/next-buffer)
 (global-set-key [remap previous-buffer] 'sb/previous-buffer)
 
@@ -4944,11 +4873,6 @@ or the major mode is not in `sb/skippable-modes'."
   :bind
   (("C-M-+" . default-text-scale-increase)
    ("C-M--" . default-text-scale-decrease)))
-
-(defhydra sb/hydra-text-scale-zoom ()
-  "Zoom the text"
-  ("i" default-text-scale-increase "in")
-  ("o" default-text-scale-decrease "out"))
 
 (use-package free-keys
   :commands free-keys)
@@ -4965,6 +4889,134 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package which-key-posframe
   :disabled t ; The posframe has a lower contrast
   :hook (which-key-mode . which-key-posframe-mode))
+
+;; Hydras
+
+(defhydra sb/hydra-spelling (:color blue)
+  "
+  ^
+  ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
+  ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
+  _q_ quit            _<_ previous        _c_ correction        _n_ next error
+  ^^                  _>_ next            _d_ dictionary        _p_ previous error
+  ^^                  _f_ check           _m_ mode              _a_ add word
+  ^^                  ^^                  ^^                    ^^
+  "
+  ("q" nil)
+  ("<" flyspell-correct-previous :color pink)
+  (">" flyspell-correct-next :color pink)
+  ("c" ispell)
+  ("d" ispell-change-dictionary)
+  ("f" flyspell-buffer)
+  ("m" flyspell-mode)
+  ("n" spell-fu-goto-next-error)
+  ("p" spell-fu-goto-previous-error)
+  ("a" spell-fu-word-add))
+
+(defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
+  "Zoom the text"
+  ("i" default-text-scale-increase "in")
+  ("o" default-text-scale-decrease "out"))
+
+(defhydra sb/hydra-error (global-map "C-c h e")
+  "goto-error"
+  ("h" first-error "first")
+  ("j" next-error "next")
+  ("k" previous-error "prev")
+  ("v" recenter-top-bottom "recenter")
+  ("q" nil "quit"))
+
+(defhydra sb/hydra-projectile (:color teal
+                                      :hint nil)
+  "
+     PROJECTILE: %(projectile-project-root)
+
+     Find File            Search/Tags          Buffers                Cache
+------------------------------------------------------------------------------------------
+_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
+ _ff_: file dwim       _g_: update gtags      _b_: switch to buffer  _x_: remove known project
+ _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
+  _r_: recent file                                               ^^^^_z_: cache current
+  _d_: dir
+
+"
+  ("b"   projectile-switch-to-buffer)
+  ("c"   projectile-invalidate-cache)
+  ("d"   projectile-find-dir)
+  ("s-f" projectile-find-file)
+  ("ff"  projectile-find-file-dwim)
+  ("fd"  projectile-find-file-in-directory)
+  ("i"   projectile-ibuffer)
+  ("K"   projectile-kill-buffers)
+  ("s-k" projectile-kill-buffers)
+  ("m"   projectile-multi-occur)
+  ("o"   projectile-multi-occur)
+  ("s-p" projectile-switch-project "switch project")
+  ("p"   projectile-switch-project)
+  ("s"   projectile-switch-project)
+  ("r"   projectile-recentf)
+  ("x"   projectile-remove-known-project)
+  ("X"   projectile-cleanup-known-projects)
+  ("z"   projectile-cache-current-file)
+  ("q"   nil "cancel" :color blue))
+
+(defhydra sb/hydra-flycheck (:color blue)
+  "
+  ^
+  ^Flycheck^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^─────
+  _q_ quit            _<_ previous        _?_ describe
+  _M_ manual          _>_ next            _d_ disable
+  _v_ verify setup    _f_ check           _m_ mode
+  ^^                  _l_ list            _s_ select
+  ^^                  ^^                  ^^
+  "
+  ("q" nil)
+  ("<" flycheck-previous-error :color pink)
+  (">" flycheck-next-error :color pink)
+  ("?" flycheck-describe-checker)
+  ("M" flycheck-manual)
+  ("d" flycheck-disable-checker)
+  ("f" flycheck-buffer)
+  ("l" flycheck-list-errors)
+  ("m" flycheck-mode)
+  ("s" flycheck-select-checker)
+  ("v" flycheck-verify-setup))
+
+(with-eval-after-load 'python-mode
+  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
+    "Adjust Python indentation."
+    (">" python-indent-shift-right "right")
+    ("<" python-indent-shift-left "left")))
+
+(defhydra sb/smerge-hydra
+  (:color pink :hint nil :post (smerge-auto-leave))
+  "
+^Move^       ^Keep^               ^Diff^                 ^Other^
+^^-----------^^-------------------^^---------------------^^-------
+_n_ext       _b_ase               _<_: upper/base        _C_ombine
+_p_rev       _u_pper              _=_: upper/lower       _r_esolve
+^^           _l_ower              _>_: base/lower        _k_ill current
+^^           _a_ll                _R_efine
+^^           _RET_: current       _E_diff
+"
+  ("n" smerge-next)
+  ("p" smerge-prev)
+  ("b" smerge-keep-base)
+  ("u" smerge-keep-upper)
+  ("l" smerge-keep-lower)
+  ("a" smerge-keep-all)
+  ("RET" smerge-keep-current)
+  ("\C-m" smerge-keep-current)
+  ("<" smerge-diff-base-upper)
+  ("=" smerge-diff-upper-lower)
+  (">" smerge-diff-base-lower)
+  ("R" smerge-refine)
+  ("E" smerge-ediff)
+  ("C" smerge-combine-with-next)
+  ("r" smerge-resolve)
+  ("k" smerge-kill-current)
+  ("q" nil "cancel" :color blue))
 
 ;; Mark safe variables
 
