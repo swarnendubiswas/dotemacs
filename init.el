@@ -1220,9 +1220,9 @@ SAVE-FN with non-nil ARGS."
   (treemacs-filewatch-mode 1)
   (treemacs-follow-mode 1)
 
-  ;; Disables `treemacs-follow-mode', focuses the tag
-  (add-hook 'prog-mode-hook (lambda ()
-                              (treemacs-tag-follow-mode 1)))
+  ;; ;; Disables `treemacs-follow-mode', focuses the tag
+  ;; (add-hook 'prog-mode-hook (lambda ()
+  ;;                             (treemacs-tag-follow-mode 1)))
 
   (treemacs-git-mode 'extended)
   (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
@@ -2044,6 +2044,7 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'minibuffer-exit-hook (lambda ()
                                   (electric-pair-mode 1)))
 
+;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
 ;; FIXME: Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens-config
@@ -3022,7 +3023,10 @@ This file is specified in `counsel-projectile-default-file'."
   :commands (pandoc-load-default-settings)
   :diminish
   :hook (markdown-mode . pandoc-mode)
-  :config (pandoc-load-default-settings))
+  :config
+  (pandoc-load-default-settings)
+  ;; Binds `C-c /' to `pandoc-main-hydra/body'.
+  (unbind-key "C-c /" pandoc-mode-map))
 
 (use-package grip-mode
   :if (executable-find "grip")
@@ -3465,7 +3469,7 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-ui-sideline-enable nil)
   :config
   (lsp-ui-mode 1)
-  (lsp-ui-doc-mode -1)
+  (lsp-ui-doc-mode 1)
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -3996,8 +4000,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (or
  (use-package flycheck-grammarly
-   :disabled t
    :after flycheck
+   :disabled t
    :demand t
    :config
    ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
@@ -4007,6 +4011,7 @@ This file is specified in `counsel-projectile-default-file'."
    :custom (flycheck-grammarly-check-time 3))
 
  (use-package lsp-grammarly
+   :disabled t
    :hook
    (text-mode . (lambda ()
                   (require 'lsp-grammarly)
@@ -4390,6 +4395,19 @@ Ignore if no file is found."
   :hook (rust-mode . lsp)
   :config (setq rust-format-on-save t))
 
+
+(defun sb/colorize-compilation-buffer ()
+  "Colorize compile mode output."
+  (require 'ansi-color)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+
+(add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
+
+(use-package aggressive-completion
+  :disabled t
+  :hook (after-init . aggressive-completion-mode))
+
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
 ;; https://tychoish.com/post/better-company/
@@ -4701,8 +4719,8 @@ Increase line spacing by two line height."
 (defcustom sb/skippable-buffers
   '(
     "TAGS"
-    "*Backtrace*"
-    "*company-documentation*" ; Major mode is `python-mode'
+    ;; "*Backtrace*"
+    ;; "*company-documentation*" ; Major mode is `python-mode'
     ;; "*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
     ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
     ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"
@@ -4768,12 +4786,12 @@ or the major mode is not in `sb/skippable-modes'."
 ;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
 (defun sb/get-derived-modes (mode)
   "Return a list of the ancestor modes that MODE is derived from."
-  (let ((modes   ())
-        (parent  nil))
+  (let ((modes ())
+        (parent nil))
     (while (setq parent (get mode 'derived-mode-parent))
       (push parent modes)
       (setq mode parent))
-    (setq modes  (nreverse modes))))
+    (setq modes (nreverse modes))))
 
 (defun sb/goto-line-with-feedback ()
   "Show line numbers temporarily, while prompting for the line number input."
@@ -4794,20 +4812,20 @@ or the major mode is not in `sb/skippable-modes'."
 ;; `(define-key global-map (kbd "RET") 'newline-and-indent)'
 
 (bind-keys
- ("RET" . newline-and-indent)
- ("C-l" . goto-line)
- ("C-c z" . repeat)
- ("C-z" . undo)
- ("<f11>" . delete-other-windows)
- ("C-x k" . kill-this-buffer)
- ("M-<left>" . previous-buffer)
+ ("RET"       . newline-and-indent)
+ ("C-l"       . goto-line)
+ ("C-c z"     . repeat)
+ ("C-z"       . undo)
+ ("<f11>"     . delete-other-windows)
+ ("C-x k"     . kill-this-buffer)
+ ("M-<left>"  . previous-buffer)
  ("M-<right>" . next-buffer)
- ("C-c d f" . auto-fill-mode)
- ("M-c" . capitalize-dwim)
- ("M-u" . upcase-dwim)
- ("M-l" . downcase-dwim)
- ("<f7>" . previous-error)
- ("<f8>" . next-error))
+ ("C-c d f"   . auto-fill-mode)
+ ("M-c"       . capitalize-dwim)
+ ("M-u"       . upcase-dwim)
+ ("M-l"       . downcase-dwim)
+ ("<f7>"      . previous-error)
+ ("<f8>"      . next-error))
 
 ;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
@@ -4816,7 +4834,7 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-c m" . uncomment-region)
  ("C-c ;" . sb/comment-line)
  ("C-c b" . comment-box)
- ("C-s" . save-buffer)
+ ("C-s"   . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
@@ -4825,12 +4843,12 @@ or the major mode is not in `sb/skippable-modes'."
 (when sb/dotemacs-emacs28+
   (bind-key "C-c d p" #'package-quickstart-refresh))
 
-(global-set-key [remap next-buffer] 'sb/next-buffer)
-(global-set-key [remap previous-buffer] 'sb/previous-buffer)
+(global-set-key [remap next-buffer] #'sb/next-buffer)
+(global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
 (with-eval-after-load 'centaur-tabs
-  (global-set-key [remap next-buffer] 'centaur-tabs-forward)
-  (global-set-key [remap previous-buffer] 'centaur-tabs-backward))
+  (global-set-key [remap next-buffer] #'centaur-tabs-forward)
+  (global-set-key [remap previous-buffer] #'centaur-tabs-backward))
 
 (use-package default-text-scale
   :bind
@@ -4849,8 +4867,8 @@ or the major mode is not in `sb/skippable-modes'."
   ;; Allow C-h to trigger which-key before it is done automatically
   (which-key-show-early-on-C-h t))
 
+;; The posframe has a lower contrast
 (use-package which-key-posframe
-  :disabled t ; The posframe has a lower contrast
   :hook (which-key-mode . which-key-posframe-mode))
 
 ;; Hydras
@@ -4946,7 +4964,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ("s" flycheck-select-checker)
   ("v" flycheck-verify-setup))
 
-(with-eval-after-load 'python-mode
+(with-eval-after-load 'python
   (defhydra sb/hydra-python-indent (python-mode-map "C-c")
     "Adjust Python indentation."
     (">" python-indent-shift-right "right")

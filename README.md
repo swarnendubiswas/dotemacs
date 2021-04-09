@@ -395,9 +395,8 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 - Use custom major modes for files by names without using file-local variables
   - <https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/>
 - Resolve xml lsp over tramp, not working
-- LaTeX LSP: automatic gc and `flyspell-word` seem expensive
 - Bash LSP takes lot of memory
 - Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - `diminish smartparens-mode`
 - Associate XML LSP with `.classpath`
-- Pair `parens` in `.md` files
+- Try `https://github.com/Kungsgeten/selected.el`
