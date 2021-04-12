@@ -400,3 +400,4 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 - `diminish smartparens-mode`
 - Associate XML LSP with `.classpath`
 - Try `https://github.com/Kungsgeten/selected.el`
+- Remote projects are getting removed on Emacs restart

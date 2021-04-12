@@ -1276,14 +1276,6 @@ SAVE-FN with non-nil ARGS."
   :after (treemacs magit)
   :demand t)
 
-;; Allows you to use treemacs icons in dired buffers. We use `all-the-icons-dired', enabling this
-;; will show two icons
-(use-package treemacs-icons-dired
-  :after (treemacs dired)
-  :disabled t
-  :if (display-graphic-p)
-  :config (treemacs-icons-dired-mode))
-
 (use-package org
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
@@ -1422,8 +1414,7 @@ SAVE-FN with non-nil ARGS."
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
-  (recentf-exclude '(
-                     "[/\\]elpa/"
+  (recentf-exclude '("[/\\]elpa/"
                      "[/\\]\\.git/"
                      ".*\\.gz\\'"
                      ".*\\.xz\\'"
@@ -1438,8 +1429,7 @@ SAVE-FN with non-nil ARGS."
                      "~$"
                      "/.autosaves/"
                      ".*/TAGS\\'"
-                     "*.cache"
-                     ))
+                     "*.cache"))
   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
   ;; (recentf-keep '(file-remote-p file-readable-p))
   (recentf-max-saved-items 250)
@@ -1938,6 +1928,7 @@ SAVE-FN with non-nil ARGS."
 
  (use-package flyspell-correct-ivy
    :ensure flyspell-correct
+   :ensure t
    :bind ("C-;" . flyspell-correct-wrapper)))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
@@ -2012,10 +2003,10 @@ SAVE-FN with non-nil ARGS."
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
   :diminish
-  :hook ((lisp-mode emacs-lisp-mode) . aggressive-indent-mode)
+  :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
   :custom
   (aggressive-indent-comments-too t)
-  (aggressive-indent-dont-electric-modes t))
+  (aggressive-indent-dont-electric-modes t "Never use `electric-indent-mode'"))
 
 (use-package paren
   :ensure nil
@@ -2029,6 +2020,8 @@ SAVE-FN with non-nil ARGS."
 
 ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
 (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+(defvar electric-pair-pairs)
+(defvar electric-pair-text-pairs)
 (defun sb/add-markdown-pairs ()
   "Add custom pairs to `markdown-mode'."
   (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
@@ -2176,11 +2169,10 @@ SAVE-FN with non-nil ARGS."
   :bind-keymap ("C-c p" . projectile-command-map)
   :bind
   ;; Set these in case `counsel-projectile' is disabled
-  (("<f6>" . projectile-find-file)
-   ("<f5>" . projectile-switch-project)
-   ;; :map projectile-mode-map
-   ;; ("a"    . projectile-add-known-project)
-   ))
+  (("<f6>"    . projectile-find-file)
+   ("<f5>"    . projectile-switch-project)
+   :map projectile-command-map
+   ("A" . projectile-add-known-project)))
 
 (use-package counsel-projectile
   :defines counsel-projectile-default-file
@@ -2213,8 +2205,8 @@ This file is specified in `counsel-projectile-default-file'."
   (counsel-projectile-remove-current-buffer t)
   ;; TODO: Is sorting expensive?
   ;; (counsel-projectile-sort-buffers t)
-  ;; (counsel-projectile-sort-directories t)
-  ;; (counsel-projectile-sort-files t)
+  (counsel-projectile-sort-directories t)
+  (counsel-projectile-sort-files t)
   ;; (counsel-projectile-sort-projects t)
   :config
   (counsel-projectile-mode 1)
@@ -2227,7 +2219,6 @@ This file is specified in `counsel-projectile-default-file'."
    ;; ("<f7>" . counsel-projectile-rg)
    ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
    ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
-   ;; ([remap projectile-ag]               . counsel-projectile-ag)
    ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
    ;; ([remap projectile-grep]             . counsel-projectile-grep)
    ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
@@ -2294,12 +2285,10 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                             sb/user-home)
-                flycheck-pylintrc (expand-file-name ".config/pylintrc"
-                                                    sb/user-home)
+                flycheck-pylintrc (expand-file-name ".config/pylintrc" sb/user-home)
                 flycheck-python-pylint-executable "python3"
                 flycheck-shellcheck-follow-sources nil
-                flycheck-textlint-config (expand-file-name "textlintrc.json"
-                                                           sb/textlint-home)
+                flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
                 flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
                                                                sb/textlint-home))
 
@@ -2328,11 +2317,7 @@ This file is specified in `counsel-projectile-default-file'."
    :if (display-graphic-p)
    :hook (flycheck-mode . flycheck-posframe-mode)
    :custom (flycheck-posframe-position 'point-bottom-left-corner)
-   :config (flycheck-posframe-configure-pretty-defaults))
-
- (use-package flycheck-inline
-   :disabled t
-   :hook (flycheck-mode . flycheck-inline-mode)))
+   :config (flycheck-posframe-configure-pretty-defaults)))
 
 (use-package whitespace
   :disabled t
@@ -2354,10 +2339,10 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package whitespace-cleanup-mode
   :diminish
   :hook (after-init . global-whitespace-cleanup-mode)
+  :custom (whitespace-cleanup-mode-preserve-point t)
   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
 
 (use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-  :unless (bound-and-true-p sb/delete-trailing-whitespace-p)
   :diminish
   :hook (prog-mode . ws-butler-mode))
 
@@ -2445,14 +2430,6 @@ This file is specified in `counsel-projectile-default-file'."
 (setq debug-ignored-errors
       (cons 'remote-file-error debug-ignored-errors))
 
-;; Does not pick up other usernames, difficult to customize different default home directories
-;; https://github.com/masasam/emacs-counsel-tramp/issues/4
-;; https://github.com/masasam/emacs-counsel-tramp/issues/5
-(use-package counsel-tramp
-  :disabled t
-  :bind ("C-c d t" . counsel-tramp)
-  :config (defalias 'tramp 'counsel-tramp))
-
 (declare-function sb/sshlist "private")
 (defun sb/counsel-tramp ()
   "Invoke remote hosts with ivy and tramp."
@@ -2470,23 +2447,9 @@ This file is specified in `counsel-projectile-default-file'."
   (imenu-use-popup-menu t "`t' will use a popup menu rather than a minibuffer prompt")
   (imenu-sort-function nil "`nil' implies no sorting or listing by position in the buffer"))
 
-;; Enabling this package introduces additional choices (for e.g., toggle) which are distracting
-(use-package imenu+
-  :load-path "extras"
-  :after imenu
-  :demand t
-  :disabled t)
-
 (use-package imenu-anywhere
   :after imenu
   :demand t)
-
-(use-package flimenu
-  :disabled t
-  :after imenu
-  :demand t
-  :commands flimenu-global-mode
-  :config (flimenu-global-mode 1))
 
 (defvar tags-revert-without-query)
 (setq large-file-warning-threshold (* 500 1024 1024) ; MB
@@ -2495,9 +2458,7 @@ This file is specified in `counsel-projectile-default-file'."
       ;; Do not ask before rereading the `TAGS' files if they have changed
       tags-revert-without-query t)
 
-;; FIXME: Remove support for gtags. It is less maintained than `counsel-etags'.
-(use-package counsel-gtags
-  :disabled t
+(use-package counsel-gtags ; It is less maintained than `counsel-etags'
   :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'gtags))
   :diminish
   ;; :ensure-system-package global
@@ -2508,18 +2469,18 @@ This file is specified in `counsel-projectile-default-file'."
   ;;               (counsel-gtags-mode 1))))
   :hook ((prog-mode protobuf-mode latex-mode) . counsel-gtags-mode)
   :custom (counsel-gtags-auto-update t)
-  :bind (:map counsel-gtags-mode-map
-              ("M-'" . counsel-gtags-dwim)
-              ("M-," . counsel-gtags-go-backward)
-              ("M-?" . counsel-gtags-find-reference)
-              ("C-c g s" . counsel-gtags-find-symbol)
-              ("C-c g d" . counsel-gtags-find-definition)
-              ("C-c g c" . counsel-gtags-create-tags)
-              ("C-c g u" . counsel-gtags-update-tags)))
+  :bind
+  (:map counsel-gtags-mode-map
+        ("M-'"     . counsel-gtags-dwim)
+        ("M-,"     . counsel-gtags-go-backward)
+        ("M-?"     . counsel-gtags-find-reference)
+        ("C-c g s" . counsel-gtags-find-symbol)
+        ("C-c g d" . counsel-gtags-find-definition)
+        ("C-c g c" . counsel-gtags-create-tags)
+        ("C-c g u" . counsel-gtags-update-tags)))
 
 (use-package global-tags ; Make xref and gtags work together
   :after counsel-gtags
-  :if (eq sb/tags-scheme 'gtags)
   :demand t
   :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend))
 
@@ -2545,7 +2506,6 @@ This file is specified in `counsel-projectile-default-file'."
   (xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
-  :disabled t
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'ctags))
   :bind
@@ -2721,8 +2681,7 @@ This file is specified in `counsel-projectile-default-file'."
   :commands (session-initialize)
   :init
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq session-save-file (expand-file-name "session"
-                                              sb/temp-directory)))
+    (setq session-save-file (expand-file-name "session" sb/temp-directory)))
   :hook
   (after-init . (lambda()
                   (session-initialize))))
@@ -2736,8 +2695,7 @@ This file is specified in `counsel-projectile-default-file'."
   :custom (persistent-scratch-autosave-interval 60)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch"
-                                                         sb/temp-directory))))
+    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
 
 ;; Avoid using a separate package, instead use `crux-sudo-edit'
 ;; (use-package sudo-edit ; Edit file with sudo
@@ -2791,6 +2749,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
 ;; being invoked more frequently.
 (use-package super-save
+  :disabled t
   :diminish
   :custom (super-save-remote-files nil "Ignore remote files")
   :hook (find-file . super-save-mode)
@@ -2837,16 +2796,14 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (bound-and-true-p sb/use-no-littering)
     (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory)))
   :hook
-  (
-   (kill-emacs . (lambda ()
-                   (bm-buffer-save-all)
-                   (bm-repository-save)))
-   (after-save . bm-buffer-save)
-   (kill-buffer . bm-buffer-save)
-   (find-file . bm-buffer-restore)
+  ((kill-emacs   . (lambda ()
+                     (bm-buffer-save-all)
+                     (bm-repository-save)))
+   (after-save   . bm-buffer-save)
+   (kill-buffer  . bm-buffer-save)
+   (find-file    . bm-buffer-restore)
    (after-revert . bm-buffer-restore)
-   (after-init . bm-repository-load)
-   )
+   (after-init   . bm-repository-load))
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)
@@ -2899,13 +2856,6 @@ This file is specified in `counsel-projectile-default-file'."
   (langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
                                                 no-littering-etc-directory)))
 
-;; Not very useful to help focus on work
-(use-package olivetti
-  :disabled t
-  :diminish
-  :custom (olivetti-body-width 0.80 "Fraction of the window width")
-  :hook (text-mode . olivetti-mode))
-
 (use-package wc-mode
   :commands wc-mode)
 
@@ -2948,8 +2898,7 @@ This file is specified in `counsel-projectile-default-file'."
   :mode ("\\.log\\'" . logview-mode)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq logview-cache-filename (expand-file-name "logview-cache.extmap"
-                                                   sb/temp-directory))))
+    (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory))))
 
 (use-package antlr-mode
   :ensure nil
@@ -2984,7 +2933,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package markdown-mode
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'" . markdown-mode)
+  (("\\.md\\'"       . markdown-mode)
    ("\\.markdown\\'" . markdown-mode)
    ("README\\.md\\'" . gfm-mode))
   ;; :init
@@ -3084,7 +3033,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package make-mode
   :ensure nil
   :mode
-  (("\\Makefile\\'" . makefile-mode)
+  (("\\Makefile\\'"       . makefile-mode)
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
@@ -3969,16 +3918,6 @@ This file is specified in `counsel-projectile-default-file'."
   :diminish
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
-;; I am unsure of the usefulness of this package
-(use-package prism
-  :disabled t
-  :load-path "extras"
-  ;; :quelpa ((prism-mode :fetcher github :repo "alphapapa/prism.el"
-  ;;                      :files ("prism.el")))
-  :hook
-  (((emacs-lisp-mode lisp-mode) . prism-mode)
-   (python-mode . prism-whitespace-mode)))
-
 (use-package php-mode
   :hook (php-mode . lsp-deferred))
 
@@ -4332,10 +4271,10 @@ Ignore if no file is found."
   :init
   (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
                                        bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
-    (add-hook hook (lambda ()
-                     (when buffer-file-name
-                       (add-hook 'before-save-hook #'format-all-buffer nil t)))))
-  :config (format-all-ensure-formatter))
+    (add-hook hook #'format-all-mode))
+  (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)
+  ;; :hook ((format-all-mode . format-all-ensure-formatter))
+  )
 
 (use-package tree-sitter
   :ensure tree-sitter-langs
@@ -4370,20 +4309,6 @@ Ignore if no file is found."
 
 (use-package dotenv-mode)
 
-(use-package dap-mode
-  :disabled t
-  :after lsp-mode
-  :demand t
-  :config
-  (dap-auto-configure-mode)
-  (require 'dap-ui)
-  (dap-ui-mode 1))
-
-(use-package dap-java
-  :ensure nil
-  :after (lsp-java dap-mode)
-  :demand t)
-
 (use-package toml-mode
   :mode "\\.toml\\'")
 
@@ -4395,7 +4320,7 @@ Ignore if no file is found."
   :hook (rust-mode . lsp)
   :config (setq rust-format-on-save t))
 
-
+(declare-function ansi-color-apply-on-region "ansi-color")
 (defun sb/colorize-compilation-buffer ()
   "Colorize compile mode output."
   (require 'ansi-color)
@@ -4444,12 +4369,12 @@ Ignore if no file is found."
   "Add backends for completion with company."
   (make-local-variable 'company-backends)
   (setq company-backends
-        '(
-          company-files
-          company-capf :separate
-          company-yasnippet
-          company-dabbrev-code
-          )))
+        '((
+           company-files
+           company-capf :separate
+           company-yasnippet
+           company-dabbrev-code
+           ))))
 (dolist (hook '(nxml-mode-hook))
   (add-hook hook (lambda ()
                    (sb/company-xml-mode))))
@@ -4532,10 +4457,6 @@ Ignore if no file is found."
 
 (defun sb/company-python-mode ()
   "Add backends for Python completion in company mode."
-  ;; Make sure to install virtualenv through pip, and not the distribution package manager. Run
-  ;; `jedi:install-sever'.
-  (use-package company-jedi ; Not required with lsp support
-    :disabled t)
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -4939,6 +4860,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ("x"   projectile-remove-known-project)
   ("X"   projectile-cleanup-known-projects)
   ("z"   projectile-cache-current-file)
+  ("a"   projectile-ag)
   ("q"   nil "cancel" :color blue))
 
 (defhydra sb/hydra-flycheck (:color blue)
