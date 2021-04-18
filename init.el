@@ -12,9 +12,6 @@
 (require 'map)
 (require 'subr-x)
 
-(package-initialize)
-;; (debug-on-entry 'package-initialize)
-
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
@@ -152,6 +149,10 @@ This location is used for temporary installations and files.")
   "Use the `no-littering' package to keep `.emacs.d' clean."
   :type 'boolean
   :group 'sb/emacs)
+
+(add-to-list 'load-path sb/extras-directory)
+(package-initialize)
+;; (debug-on-entry 'package-initialize)
 
 (when (bound-and-true-p sb/use-no-littering)
   (require 'no-littering))
@@ -725,65 +726,140 @@ SAVE-FN with non-nil ARGS."
   (powerline-default-theme))
 
 (when (eq sb/modeline-theme 'sml)
-  (require 'smart-mode-line)
+  (unless (fboundp 'sml/setup)
+    (autoload #'sml/setup "smart-mode-line" nil t))
+
   (require 'smart-mode-line-powerline-theme)
+
+  (defvar sml/theme)
+  (defvar sml/mode-width)
+  (defvar sml/no-confirm-load-theme)
+  (defvar sml/shorten-modes)
+  (defvar sml/shorten-directory)
+
   (setq sml/theme 'light
         sml/mode-width 'full
         sml/no-confirm-load-theme t
         sml/shorten-modes t
         sml/shorten-directory t)
+
   (sml/setup))
 
 (when (eq sb/modeline-theme 'spaceline)
-  (require 'spaceline)
   (require 'spaceline-config)
-  (require 'spaceline-all-the-icons
-           (setq spaceline-hud-p nil
-                 spaceline-input-method-p nil
-                 spaceline-persp-name-p nil
-                 spaceline-selection-info-p nil
-                 spaceline-version-control-p t)
-           ;; (spaceline-emacs-theme)
-           (spaceline-all-the-icons-theme)))
+  (require 'spaceline-all-the-icons)
+
+  (defvar spaceline-hud-p)
+  (defvar spaceline-input-method-p)
+  (defvar spaceline-persp-name-p)
+  (defvar spaceline-selection-info-p)
+  (defvar spaceline-version-control-p)
+
+  (setq spaceline-hud-p nil
+        spaceline-input-method-p nil
+        spaceline-persp-name-p nil
+        spaceline-selection-info-p nil
+        spaceline-version-control-p t)
+
+  (spaceline-all-the-icons-theme))
 
 (when (eq sb/modeline-theme 'airline)
-  (require 'airline-themes)
+  (defvar airline-eshell-colors)
+  (defvar airline-hide-eyebrowse-on-inactive-buffers)
+
   (setq airline-eshell-colors nil
         airline-hide-eyebrowse-on-inactive-buffers t)
+
   (load-theme 'airline-cool t))
 
 (when (eq sb/modeline-theme 'doom-modeline)
-  (require 'doom-modeline)
+  (unless (fboundp 'doom-modeline-mode)
+    (autoload #'doom-modeline-mode "doom-modeline" nil t))
+
+  (defvar doom-modeline-buffer-encoding)
+  (defvar doom-modeline-checker-simple-format)
+  (defvar doom-modeline-indent-info)
+  (defvar doom-modeline-lsp)
+  (defvar doom-modeline-minor-modes)
+
   ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format t
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t)
+
   (doom-modeline-mode 1)
-  ;; :custom-face
   ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
+
   )
 
 (when (eq sb/modeline-theme 'awesome-tray)
-  (require 'awesome-tray)
+  (unless (fboundp 'awesome-tray-mode)
+    (autoload #'awesome-tray-mode "awesome-tray" nil t))
+  (add-hook 'after-init-hook #'awesome-tray-mode)
+
+  (defvar awesome-tray-active-modules)
   (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
-  (add-hook 'after-init-hook awesome-tray-mode)
-  ;;   :custom-face
-  ;;   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  ;;   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  ;;   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  ;;   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-  ;;   (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-  ;;   (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-  ;;   (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  ;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-  ;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
-  ;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+
+  (custom-set-faces (backquote
+                     (awesome-tray-default-face
+                      ((t
+                        (:inherit default :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-awesome-tab-face
+     ((t
+       (:foreground "#b83059" :weight bold :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-buffer-name-face
+     ((t
+       (:foreground "#cc7700" :weight bold :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-date-face
+     ((t
+       (:foreground "#717175" :weight bold :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-file-path-face
+     ((t
+       (:foreground "#5e8e2e" :weight normal :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-git-face
+     ((t
+       (:foreground "#cc2444" :weight normal :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-last-command-face
+     ((t
+       (:foreground "#0061cc" :weight bold :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-location-face
+     ((t
+       (:foreground "#cc7700" :weight normal :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-mode-name-face
+     ((t
+       (:foreground "#00a400" :weight bold :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-module-parent-dir-face
+     ((t
+       (:foreground "#5e8e2e" :weight bold :height 0.8))))))
+
   )
 
 (when (eq sb/modeline-theme 'moody)
-  (require 'moody)
+  (unless (fboundp 'moody-replace-vc-mode)
+    (autoload #'moody-replace-vc-mode "moody" nil t))
+  (unless (fboundp 'moody-replace-mode-line-buffer-identification)
+    (autoload #'moody-replace-mode-line-buffer-identification "moody" nil t))
+
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 
@@ -791,22 +867,39 @@ SAVE-FN with non-nil ARGS."
 ;;   (require 'mode-icons)
 ;;   (mode-icons-mode 1))
 
+
+(unless (fboundp 'auto-dim-other-buffers-mode)
+  (autoload #'auto-dim-other-buffers-mode "auto-dim-other-buffers" nil t))
+(unless (fboundp 'adob--rescan-windows)
+  (autoload #'adob--rescan-windows "auto-dim-other-buffers" nil t))
 (add-hook 'after-init-hook #'auto-dim-other-buffers-mode)
 
-(add-hook 'after-init-hook #'centaur-tabs-mode)
-(setq centaur-tabs-cycle-scope 'tabs
-      centaur-tabs-set-close-button t
-      centaur-tabs-set-icons t
-      centaur-tabs-set-modified-marker t)
+
+(unless (fboundp 'centaur-tabs-mode)
+  (autoload #'centaur-tabs-mode "centaur-tabs" nil t))
 (unless (fboundp 'centaur-tabs-group-by-projectile-project)
   (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
+(add-hook 'after-init-hook #'centaur-tabs-mode)
+
 (eval-after-load 'centaur-tabs
   '(progn
+     (defvar centaur-tabs-cycle-scope)
+     (defvar centaur-tabs-set-close-button)
+     (defvar centaur-tabs-set-icons)
+     (defvar centaur-tabs-set-modified-marker)
+
+     (setq centaur-tabs-cycle-scope 'tabs
+           centaur-tabs-set-close-button t
+           centaur-tabs-set-icons t
+           centaur-tabs-set-modified-marker t)
+
      (centaur-tabs-group-by-projectile-project)
      t))
 
+
 (unless (fboundp 'hide-mode-line-mode)
   (autoload #'hide-mode-line-mode "hide-mode-line" nil t))
+
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
@@ -843,59 +936,111 @@ SAVE-FN with non-nil ARGS."
 ;;                                 (setq resize-mini-windows nil)))
 
 
-(setq circadian-themes '((:sunrise . modus-operandi)
-                         (:sunset  . modus-operandi)))
+(unless (fboundp 'circadian-setup)
+  (autoload #'circadian-setup "circadian" nil t))
+
 (eval-after-load 'circadian
   '(progn
-     (circadian-setup)
      (require 'solar nil nil)
+
+     (defvar calendar-latitude)
+     (defvar calendar-longitude)
+     (defvar circadian-themes)
+
      ;; Kanpur, UP
      (setq calendar-latitude 26.50
            calendar-longitude 80.23)
+
+     (setq circadian-themes '((:sunrise . modus-operandi)
+                              (:sunset  . modus-operandi)))
      t))
 
+
+(unless (fboundp 'beacon-mode)
+  (autoload #'beacon-mode "beacon") nil t)
 (add-hook 'after-init-mode beacon-mode)
+
 
 (unless (fboundp 'ibuffer)
   (autoload #'ibuffer "ibuffer" nil t))
+
 (eval-after-load 'ibuffer
   '(progn
      (defalias 'list-buffers 'ibuffer)
      t))
+
 (bind-keys :package ibuffer
            ("C-x C-b" . ibuffer))
 
-(add-to-list 'load-path "/home/swarnendu/.emacs.d/extras")
+
 (unless (fboundp 'ibuffer-auto-mode)
   (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+
 ;; Do not show filter groups if there are no buffers in that group
-(setq ibuffer-show-empty-filter-groups nil)
+(eval-after-load 'ibuffer-ext
+  '(progn
+     (defvar ibuffer-show-empty-filter-groups)
+
+     (setq ibuffer-show-empty-filter-groups nil)
+     t))
+
 
 ;; Group buffers by projectile project
 (unless (fboundp 'ibuffer-projectile-set-filter-groups)
   (autoload #'ibuffer-projectile-set-filter-groups "ibuffer-projectile" nil t))
 (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
 
+
 (when (display-graphic-p)
   (unless (fboundp 'all-the-icons-ibuffer-mode)
     (autoload #'all-the-icons-ibuffer-mode "all-the-icons-ibuffer" nil t))
-  (setq all-the-icons-ibuffer-human-readable-size t
-        all-the-icons-ibuffer-icon-size 0.8)
-  (add-hook 'ibuffer-mode-hook #'all-the-icons-ibuffer-mode))
+  (add-hook 'ibuffer-mode-hook #'all-the-icons-ibuffer-mode)
+
+  (eval-after-load 'all-the-icons-ibuffer
+    '(progn
+       (defvar all-the-icons-ibuffer-human-readable-size)
+       (defvar all-the-icons-ibuffer-icon-size)
+
+       (setq all-the-icons-ibuffer-human-readable-size t
+             all-the-icons-ibuffer-icon-size 0.8)
+
+       t)))
+
 
 (unless (fboundp 'bufler)
   (autoload #'bufler "bufler" nil t))
 (unless (fboundp 'bufler-mode)
   (autoload #'bufler-mode "bufler" nil t))
+
 (eval-after-load 'bufler
   '(progn
      (bufler-mode 1)
      (if (fboundp 'diminish)
          (diminish 'bufler-workspace-mode))
      t))
+
 (bind-keys :package bufler
            ("C-x C-b" . bufler))
+
+
+(unless (fboundp 'sb/dired-go-home)
+  (autoload #'sb/dired-go-home "dired" nil t))
+(unless (fboundp 'find-file)
+  (autoload #'find-file "dired" nil t))
+(unless (fboundp 'sb/dired-jump-to-top)
+  (autoload #'sb/dired-jump-to-top "dired" nil t))
+(unless (fboundp 'sb/dired-jump-to-bottom)
+  (autoload #'sb/dired-jump-to-bottom "dired" nil t))
+(unless (fboundp 'auto-revert-mode)
+  (autoload #'auto-revert-mode "dired" nil t))
+(unless (fboundp 'dired-next-line)
+  (autoload #'dired-next-line "dired" nil t))
+
+(unless (fboundp 'dired-jump)
+  (autoload #'dired-jump "dired-x" nil t))
+(unless (fboundp 'dired-omit-mode)
+  (autoload #'dired-omit-mode "dired-x" nil t))
 
 (eval-and-compile
   (defun sb/dired-go-home nil
@@ -914,28 +1059,28 @@ SAVE-FN with non-nil ARGS."
      (point-max))
     (dired-next-line -1)))
 
-(setq dired-auto-revert-buffer t
-      dired-dwim-target t ; Guess a default target directory
-      dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
-      dired-ls-F-marks-symlinks t ; -F marks links with @
-      dired-recursive-copies 'always ; Single prompt for all n directories
-      ;; Single prompt for all n directories
-      dired-recursive-deletes 'always)
+(eval-after-load 'dired
+  '(progn
 
-(unless (fboundp 'sb/dired-go-home)
-  (autoload #'sb/dired-go-home "dired" nil t))
-(unless (fboundp 'find-file)
-  (autoload #'find-file "dired" nil t))
-(unless (fboundp 'sb/dired-jump-to-top)
-  (autoload #'sb/dired-jump-to-top "dired" nil t))
-(unless (fboundp 'sb/dired-jump-to-bottom)
-  (autoload #'sb/dired-jump-to-bottom "dired" nil t))
-(unless (fboundp 'auto-revert-mode)
-  (autoload #'auto-revert-mode "dired" nil t))
-(unless (fboundp 'dired-next-line)
-  (autoload #'dired-next-line "dired" nil t))
+     (defvar dired-auto-revert-buffer)
+     (defvar dired-dwim-target)
+     (defvar dired-ls-F-marks-symlinks)
+     (defvar dired-recursive-copies)
+     (defvar dired-recursive-deletes)
 
-(add-hook 'dired-mode-hook #'auto-revert-mode)
+     (setq dired-auto-revert-buffer t
+           dired-dwim-target t ; Guess a default target directory
+           dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
+           dired-ls-F-marks-symlinks t ; -F marks links with @
+           dired-recursive-copies 'always ; Single prompt for all n directories
+           ;; Single prompt for all n directories
+           dired-recursive-deletes 'always
+           ;; Do not show messages when omitting files
+           dired-omit-verbose nil)
+
+     (add-hook 'dired-mode-hook #'auto-revert-mode)
+     (add-hook 'dired-mode-hook #'dired-omit-mode)
+     t))
 
 (bind-keys :package dired :map dired-mode-map
            ("M-<home>" . sb/dired-go-home)
@@ -943,11 +1088,6 @@ SAVE-FN with non-nil ARGS."
            ("M-<up>" . sb/dired-jump-to-top)
            ("M-<down>" . sb/dired-jump-to-bottom))
 
-(setq dired-cleanup-buffers-too t
-      ;; Do not show messages when omitting files
-      dired-omit-verbose nil)
-(unless (fboundp 'dired-omit-mode)
-  (autoload #'dired-omit-mode "dired-x" nil t))
 (eval-after-load 'dired-x
   '(progn
      ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
@@ -956,102 +1096,73 @@ SAVE-FN with non-nil ARGS."
        (diminish 'dired-omit-mode)
        dired-mode-map)
      t))
-(add-hook 'dired-mode-hook #'dired-omit-mode)
-(unless (fboundp 'dired-jump)
-  (autoload #'dired-jump "dired-x" nil t))
+
 (bind-keys :package dired-x
            ("C-x C-j" . dired-jump))
+
 
 ;; Do not create multiple dired buffers
 (unless  (fboundp 'diredp-toggle-find-file-reuse-dir)
   (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
-(add-hook 'dired-mode-hook
-          #'(lambda ()
-              (diredp-toggle-find-file-reuse-dir 1)))
-
-(setq diredp-hide-details-initially-flag nil
-      diredp-hide-details-propagate-flag nil)
-;;   :config (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
-
+(add-hook 'dired-mode-hook #'(lambda ()
+                               (diredp-toggle-find-file-reuse-dir 1)))
 (eval-after-load 'dired+
   '(progn
-     '(setq dired-efap-initial-filename-selection nil)
+     (defvar diredp-hide-details-initially-flag)
+     (defvar diredp-hide-details-propagate-flag)
+
+     (setq diredp-hide-details-initially-flag nil
+           diredp-hide-details-propagate-flag nil)
+
+     ;; (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
+
+     (defvar dired-efap-initial-filename-selection)
+
+     (setq dired-efap-initial-filename-selection nil)
+
      (unless (fboundp 'dired-efap)
        (autoload #'dired-efap "dired-efap" nil t))
-     (bind-keys* :package dired-efap :map dired-mode-map
-                 ("r" . dired-efap))))
 
-;; Narrow dired to match filter
-(eval-after-load 'dired
-  '(progn
+     (bind-keys* :package dired-efap :map dired-mode-map
+                 ("r" . dired-efap))
+
+     ;; Narrow dired to match filter
      (unless (fboundp 'dired-narrow)
        (autoload #'dired-narrow "dired-narrow" nil t))
      (bind-keys :package dired-narrow :map dired-mode-map
-                ("/" . dired-narrow))))
+                ("/" . dired-narrow))
+     t))
+
 
 ;; More detailed colors, but can be jarring with certain themes
 (unless (fboundp #'diredfl-mode)
   (autoload #'diredfl-mode "diredfl" nil t))
 (add-hook 'dired-mode-hook #'diredfl-mode)
 
-(require 'async nil nil)
+
+(unless (fboundp 'async-bytecomp-package-mode)
+  (autoload #'async-bytecomp-package-mode "async" nil t))
 (async-bytecomp-package-mode 1)
+
 (unless (fboundp 'dired-async-mode)
   (autoload #'dired-async-mode "dired-async" nil t))
-(eval-after-load 'dired-async
-  '(if
-       (fboundp 'diminish)
-       (diminish 'dired-async-mode)))
 (add-hook 'dired-mode-hook #'dired-async-mode)
+
+(eval-after-load 'dired-async
+  '(if (fboundp 'diminish)
+       (diminish 'dired-async-mode)))
+
 
 (when (display-graphic-p)
   (unless (fboundp 'all-the-icons-dired-mode)
     (autoload #'all-the-icons-dired-mode "all-the-icons-dired" nil t))
+
+  (add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
+
   (eval-after-load 'all-the-icons-dired
-    '(if
-         (fboundp 'diminish)
-         (diminish 'all-the-icons-dired-mode)))
-  (add-hook 'dired-mode-hook #'all-the-icons-dired-mode))
+    '(if (fboundp 'diminish)
+         (diminish 'all-the-icons-dired-mode))))
 
-(eval-and-compile
-  (defun sb/setup-treemacs-quick nil
-    "Setup treemacs."
-    (interactive)
-    (when
-        (projectile-project-p)
-      (treemacs-add-and-display-current-project)
-      (ace-window)))
-
-  (defun sb/setup-treemacs-detailed (args)
-    "Setup treemacs."
-    (let* ((root
-            (treemacs--find-current-user-project))
-           (path
-            (treemacs-canonical-path root))
-           (name
-            (treemacs--filename path)))
-      (unless
-          (treemacs-current-workspace)
-        (treemacs--find-workspace))
-      (if
-          (treemacs-workspace->is-empty\?)
-          (progn
-            (treemacs-do-add-project-to-workspace path name)
-            (treemacs-select-window)
-            (treemacs-pulse-on-success)
-            (other-window 1)
-            (when
-                (featurep 'auto-dim-other-buffers)
-              (adob--rescan-windows)))
-        (treemacs-select-window)
-        (if
-            (treemacs-is-path path :in-workspace)
-            (treemacs-goto-file-node path)
-          (treemacs-add-project-to-workspace path name))
-        (other-window 1)
-        (when
-            (featurep 'auto-dim-other-buffers)
-          (adob--rescan-windows))))))
 
 (when (display-graphic-p)
   (unless (fboundp 'treemacs)
@@ -1091,6 +1202,37 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'treemacs-add-and-display-current-project)
     (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
 
+  (eval-and-compile
+    (defun sb/setup-treemacs-quick nil
+      "Setup treemacs."
+      (interactive)
+      (when (projectile-project-p)
+        (treemacs-add-and-display-current-project)
+        (ace-window)))
+
+    (defun sb/setup-treemacs-detailed (args)
+      "Setup treemacs."
+      (let* ((root (treemacs--find-current-user-project))
+             (path (treemacs-canonical-path root))
+             (name (treemacs--filename path)))
+        (unless (treemacs-current-workspace)
+          (treemacs--find-workspace))
+        (if (treemacs-workspace->is-empty\?)
+            (progn
+              (treemacs-do-add-project-to-workspace path name)
+              (treemacs-select-window)
+              (treemacs-pulse-on-success)
+              (other-window 1)
+              (when (featurep 'auto-dim-other-buffers)
+                (adob--rescan-windows)))
+          (treemacs-select-window)
+          (if (treemacs-is-path path :in-workspace)
+              (treemacs-goto-file-node path)
+            (treemacs-add-project-to-workspace path name))
+          (other-window 1)
+          (when (featurep 'auto-dim-other-buffers)
+            (adob--rescan-windows))))))
+
   (eval-after-load 'treemacs
     '(progn
        (setq treemacs-collapse-dirs 2
@@ -1113,10 +1255,17 @@ SAVE-FN with non-nil ARGS."
        (treemacs-filewatch-mode 1)
        (treemacs-follow-mode 1)
        (treemacs-git-mode 'extended)
+
+       ;; `always' is implied in the absence of arguments
        (treemacs-fringe-indicator-mode 'always)
+
+       ;; Disables `treemacs-follow-mode', focuses the tag
+       ;; (add-hook 'prog-mode-hook (lambda ()
+       ;;                             (treemacs-tag-follow-mode 1)))
 
        (require 'treemacs-all-the-icons nil nil)
 
+       ;; https://github.com/Alexander-Miller/treemacs/issues/735
        (treemacs-create-theme "Default-Tighter" :extends "Default" :config
                               (let
                                   ((icons
@@ -1166,49 +1315,6 @@ SAVE-FN with non-nil ARGS."
   (bind-keys* :package treemacs
               ("C-j" . treemacs)))
 
-;;   ;; ;; Disables `treemacs-follow-mode', focuses the tag
-;;   ;; (add-hook 'prog-mode-hook (lambda ()
-;;   ;;                             (treemacs-tag-follow-mode 1)))
-
-;;   (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
-
-
-;;   ;; https://github.com/Alexander-Miller/treemacs/issues/735
-;;   (treemacs-create-theme "Default-Tighter"
-;;     :extends "Default"
-;;     :config
-;;     (let ((icons (treemacs-theme->gui-icons theme)))
-;;       (maphash
-;;        (lambda (ext icon)
-;;          (puthash ext (concat (substring icon 0 1)
-;;                               (propertize " " 'display '(space . (:width 0.5))))
-;;                   icons))
-;;        icons)))
-
-;;   (treemacs-create-theme "all-the-icons-tighter"
-;;     :extends "all-the-icons"
-;;     :config
-;;     (let ((icons (treemacs-theme->gui-icons theme)))
-;;       (maphash
-;;        (lambda (ext icon)
-;;          (puthash ext (concat (substring icon 0 1)
-;;                               (propertize " " 'display '(space . (:width 0.5))))
-;;                   icons))
-;;        icons)))
-
-;;   (treemacs-load-theme "all-the-icons")
-
-;;   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-directory-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-file-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-root-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-tags-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-git-ignored-face nil :height 0.8)
-;;   (set-face-attribute 'treemacs-git-untracked-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-git-modified-face nil :height 0.9)
-;;   (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.9)
-;;   (treemacs-resize-icons 16)
-;;   :bind* ("C-j" . treemacs))
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
 (eval-after-load 'projectile
@@ -1216,21 +1322,33 @@ SAVE-FN with non-nil ARGS."
      '(unless (fboundp 'treemacs-projectile)
         (autoload #'treemacs-projectile "treemacs-projectile" nil t))))
 
+
 (eval-after-load 'magit
   '(eval-after-load 'treemacs
      '(require 'treemacs-magit nil nil)))
 
 
-(unless (fboundp 'visual-line-mode)
-  (autoload #'visual-line-mode "org" nil t))
-(unless (fboundp 'org-indent-mode)
-  (autoload #'org-indent-mode "org" nil t))
-(unless (fboundp 'prettify-symbols-mode)
-  (autoload #'prettify-symbols-mode "org" nil t))
-
-
 (eval-after-load 'org
   '(progn
+     (defvar org-fontify-done-headline)
+     (defvar org-fontify-whole-heading-line)
+     (defvar org-hide-emphasis-markers)
+     (defvar org-hide-leading-stars)
+     (defvar org-hide-leading-stars-before-indent-mode)
+     (defvar org-src-fontify-natively)
+     (defvar org-src-preserve-indentation)
+     (defvar org-src-tabs-acts-natively)
+     (defvar org-src-window-setup)
+     (defvar org-startup-indented)
+     (defvar org-startup-truncated)
+     (defvar org-startup-folded)
+     (defvar org-startup-with-inline-images)
+     (defvar org-support-shift-select)
+     (defvar org-use-speed-commands)
+     (defvar org-src-strip-leading-and-trailing-blank-lines)
+     (defvar org-pretty-entities)
+     (defvar org-pretty-entities-include-sub-superscripts)
+
      (setq org-fontify-done-headline t
            org-fontify-whole-heading-line t
            org-hide-emphasis-markers t
@@ -1273,11 +1391,48 @@ SAVE-FN with non-nil ARGS."
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; isearch candidates
-(setq search-highlight t) ; Highlight incremental search
 (unless (fboundp 'isearch-forward-regexp)
   (autoload #'isearch-forward-regexp "isearch" nil t))
 (unless (fboundp 'isearch-repeat-forward)
   (autoload #'isearch-repeat-forward "isearch" nil t))
+
+(eval-after-load 'isearch
+  '(progn
+     (setq search-highlight t) ; Highlight incremental search
+
+     (unless (fboundp 'isearch-symbol-at-point)
+       (autoload #'isearch-symbol-at-point "isearch-symbol-at-point" nil t))
+     (unless (fboundp 'isearch-backward-symbol-at-point)
+       (autoload #'isearch-backward-symbol-at-point "isearch-symbol-at-point" nil t))
+
+     (unless (fboundp 'isearch-dabbrev-expand)
+       (autoload #'isearch-dabbrev-expand "isearch-dabbrev" nil t))
+
+     (bind-keys :package isearch-dabbrev :map isearch-mode-map
+                ("<tab>" . isearch-dabbrev-expand))
+
+     (unless (fboundp 'global-anzu-mode)
+       (autoload #'global-anzu-mode "anzu" nil t))
+
+     (global-anzu-mode 1)
+
+     (defvar anzu-search-threshold)
+     (defvar anzu-minimum-input-length)
+
+     (setq anzu-search-threshold 10000
+           anzu-minimum-input-length 2)
+
+     ;; (when (eq sb/modeline-theme 'spaceline)
+     ;;   (setq anzu-cons-mode-line-p nil))
+
+     ;; (unless (eq sb/theme 'leuven)
+     ;;   (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'light))
+
+     (if (fboundp 'diminish)
+         (diminish 'anzu-mode))
+
+     t))
+
 ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
 (bind-keys :package isearch
            ("C-s")
@@ -1286,55 +1441,30 @@ SAVE-FN with non-nil ARGS."
            ("C-s")
            ("C-f" . isearch-repeat-forward))
 
-(eval-after-load 'isearch
-  '(progn
-     (unless (fboundp 'isearch-symbol-at-point)
-       (autoload #'isearch-symbol-at-point "isearch-symbol-at-point" nil t))
-     (unless (fboundp 'isearch-backward-symbol-at-point)
-       (autoload #'isearch-backward-symbol-at-point "isearch-symbol-at-point" nil t))))
-
-(eval-after-load 'isearch
-  '(progn
-     (unless (fboundp 'isearch-dabbrev-expand)
-       (autoload #'isearch-dabbrev-expand "isearch-dabbrev" nil t))
-     (bind-keys :package isearch-dabbrev :map isearch-mode-map
-                ("<tab>" . isearch-dabbrev-expand))))
-
-(eval-after-load 'isearch
-  '(progn
-     (require 'anzu nil nil)
-     (setq anzu-search-threshold 10000
-           anzu-minimum-input-length 2)
-     (global-anzu-mode 1)
-     (if
-         (fboundp 'diminish)
-         (diminish 'anzu-mode))
-     t))
-
-;;   :config
-;;   (global-anzu-mode 1)
-;;   ;; :config
-;;   ;; (when (eq sb/modeline-theme 'spaceline)
-;;   ;;   (setq anzu-cons-mode-line-p nil))
-;;   ;; (unless (eq sb/theme 'leuven)
-;;   ;;   (set-face-attribute 'anzu-mode-line nil
-;;   ;;                       :foreground "blue"
-;;   ;;                       :weight 'light))
-
 (unless (fboundp 'swiper-isearch)
   (autoload #'swiper-isearch "swiper" nil t))
 (unless (fboundp 'swiper)
   (autoload #'swiper "swiper" nil t))
-(setq swiper-action-recenter t)
+
+(eval-after-load 'swiper
+  '(progn
+     (defvar swiper-action-recenter)
+
+     (setq swiper-action-recenter t)
+     t))
+
 (bind-keys :package swiper
            ("<f4>" . swiper-isearch))
 
-;; (defvar grep-highlight-matches)
-;; (defvar grep-scroll-output)
 (with-eval-after-load 'grep
+  (defvar grep-highlight-matches)
+  (defvar grep-scroll-output)
+  (defvar grep-find-ignored-directories)
+
   (setq grep-command "grep -irHn "
         grep-highlight-matches t
         grep-scroll-output t)
+
   (add-to-list 'grep-find-ignored-directories ".cache")
   (add-to-list 'grep-find-ignored-directories "vendor"))
 
@@ -1349,21 +1479,32 @@ SAVE-FN with non-nil ARGS."
   (autoload #'wgrep-abort-changes "wgrep" nil t))
 (unless (fboundp 'wgrep-change-to-wgrep-mode)
   (autoload #'wgrep-change-to-wgrep-mode "wgrep" nil t))
+
+(eval-after-load 'wgrep
+  '(progn
+     (defvar wgrep-auto-save-buffer)
+
+     (setq wgrep-auto-save-buffer t)
+     t))
+
 (bind-keys :package wgrep :map grep-mode-map
            ("C-c C-c" . wgrep-finish-edit)
            ("C-x C-s" . wgrep-finish-edit)
            ("C-x C-q" . wgrep-exit)
            ("C-c C-k" . wgrep-abort-changes)
            ("C-x C-p" . wgrep-change-to-wgrep-mode))
-(setq wgrep-auto-save-buffer t)
+
 
 (unless (fboundp 'deadgrep)
   (autoload #'deadgrep "deadgrep" nil t))
+
 (bind-keys :package deadgrep
            ("C-c s d" . deadgrep))
 
+
 (unless (fboundp 'ripgrep)
   (autoload #'ripgrep-regexp "ripgrep" nil t))
+
 
 (unless (fboundp 'ctrlf-forward-literal)
   (autoload #'ctrlf-forward-literal "ctrlf" nil t))
@@ -1377,23 +1518,28 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ctrlf-mode "ctrlf" nil t))
 (unless (fboundp 'ctrlf-local-mode)
   (autoload #'ctrlf-local-mode "ctrlf" nil t))
+
 (eval-after-load 'ctrlf
   '(progn
      (ctrlf-mode 1)
-     (add-hook 'pdf-isearch-minor-mode-hook
-               (lambda ()
-                 (ctrlf-local-mode -1)))
+
+     (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
+                                              (ctrlf-local-mode -1)))
      t))
+
 (bind-keys :package ctrlf
            ("C-f"   . ctrlf-forward-literal)
            ("C-r"   . ctrlf-backward-literal)
            ("C-M-s" . ctrlf-forward-regexp)
            ("C-M-r" . ctrlf-backward-regexp))
 
+
 (unless (fboundp 'vr/query-replace)
   (autoload #'vr/query-replace "visual-regexp" nil t))
+
 (bind-keys :package visual-regexp
            ([remap query-replace] . vr/query-replace))
+
 
 (setq recentf-auto-cleanup 'never ; Do not stat remote files
       ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
