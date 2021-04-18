@@ -1541,32 +1541,58 @@ SAVE-FN with non-nil ARGS."
            ([remap query-replace] . vr/query-replace))
 
 
-(setq recentf-auto-cleanup 'never ; Do not stat remote files
-      ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
-      recentf-exclude '("[/\\]elpa/" "[/\\]\\.git/" ".*\\.gz\\'" ".*\\.xz\\'" ".*\\.zip\\'" ".*-autoloads.el\\'" "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "[/\\]tmp/.*" ".*/recentf\\'" ".*/recentf-save.el\\'" "~$" "/.autosaves/" ".*/TAGS\\'" "*.cache")
-      recentf-max-saved-items 250
-      recentf-menu-filter 'recentf-sort-descending)
-;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-;; (setq recentf-keep '(file-remote-p file-readable-p))
-
-(unless (bound-and-true-p sb/use-no-littering)
-  (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
-(when (bound-and-true-p sb/use-no-littering)
-  (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
-  (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
-
 (unless (fboundp 'recentf-mode)
   (autoload #'recentf-mode "recentf" nil t))
 (unless (fboundp 'recentf-save-file)
   (autoload #'recentf-save-file "recentf" nil t))
 (unless (fboundp 'recentf-cleanup)
   (autoload #'recentf-cleanup "recentf" nil t))
+(add-hook 'after-init-hook #'recentf-mode)
+
 (eval-after-load 'recentf
   '(progn
+     (defvar recentf-auto-cleanup)
+     (defvar recentf-exclude)
+     (defvar recentf-max-saved-items)
+     (defvar recentf-menu-filter)
+     (defvar recentf-save-file)
+
+     (setq recentf-auto-cleanup 'never ; Do not stat remote files
+           ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
+           recentf-exclude '("[/\\]elpa/"
+                             "[/\\]\\.git/"
+                             ".*\\.gz\\'"
+                             ".*\\.xz\\'"
+                             ".*\\.zip\\'"
+                             ".*-autoloads.el\\'"
+                             "[/\\]archive-contents\\'"
+                             "[/\\]\\.loaddefs\\.el\\'"
+                             "[/\\]tmp/.*"
+                             ".*/recentf\\'"
+                             ".*/recentf-save.el\\'"
+                             "~$"
+                             "/.autosaves/"
+                             ".*/TAGS\\'"
+                             "*.cache")
+           ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+           ;; recentf-keep '(file-remote-p file-readable-p)
+           recentf-max-saved-items 250
+           recentf-menu-filter 'recentf-sort-descending)
+
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
+
+     (when (bound-and-true-p sb/use-no-littering)
+       (defvar no-littering-etc-directory)
+       (defvar no-littering-var-directory)
+
+       (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
+       (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
+
      (run-at-time nil (* 5 60) 'recentf-save-list)
      (run-at-time nil (* 10 60) 'recentf-cleanup)
      t))
-(add-hook 'after-init-hook #'recentf-mode)
+
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."
@@ -1579,16 +1605,11 @@ SAVE-FN with non-nil ARGS."
 ;; Hide the "Wrote ..." message which is irritating
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
+
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
-;; company-complete-common' when there are no completions. Use `C-M-i' for `complete-symbol' with
+;; company-complete-common' when there are no completions. Use `C-M-i' to `complete-symbol' with
 ;; regex search.
 
-(eval-and-compile
-  (defun sb/quit-company-save-buffer ()
-    "Quit company popup and save the buffer."
-    (interactive)
-    (company-abort)
-    (save-buffer)))
 (unless (fboundp 'global-company-mode)
   (autoload #'global-company-mode "company" nil t))
 (unless (fboundp 'company-select-next)
@@ -1601,32 +1622,50 @@ SAVE-FN with non-nil ARGS."
   (autoload #'sb/quit-company-save-buffer "company" nil t))
 (unless (fboundp 'company-abort)
   (autoload #'company-abort "company" nil t))
+(add-hook 'after-init-hook #'global-company-mode)
 
-(setq company-dabbrev-other-buffers nil ; Search in other buffers with same major mode
-      company-idle-delay 0.1 ; Decrease the delay before the popup is shown
-      company-ispell-available t
-      company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-      company-minimum-prefix-length 3 ; Small words are faster to type
-      company-require-match nil ; Allow input string that do not match candidates
-      company-selection-wrap-around t
-      company-show-numbers t ; Speed up completion
-      ;; Align additional metadata, like type signatures, to the right-hand side
-      company-tooltip-align-annotations t)
+(eval-and-compile
+  (defun sb/quit-company-save-buffer ()
+    "Quit company popup and save the buffer."
+    (interactive)
+    (company-abort)
+    (save-buffer)))
 
 (eval-after-load 'company
   '(progn
+     (defvar company-dabbrev-other-buffers)
+     (defvar company-idle-delay)
+     (defvar company-ispell-available)
+     (defvar company-ispell-dictionary)
+     (defvar company-minimum-prefix-length)
+     (defvar company-require-match)
+     (defvar company-selection-wrap-around)
+     (defvar company-show-numbers)
+     (defvar company-tooltip-align-annotations)
+     (defvar company-transformers)
+
+     (setq company-dabbrev-other-buffers nil ; Search in other buffers with same major mode
+           company-idle-delay 0.1 ; Decrease the delay before the popup is shown
+           company-ispell-available t
+           company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
+           company-minimum-prefix-length 3 ; Small words are faster to type
+           company-require-match nil ; Allow input string that do not match candidates
+           company-selection-wrap-around t
+           company-show-numbers t ; Speed up completion
+           ;; Align additional metadata, like type signatures, to the right-hand side
+           company-tooltip-align-annotations t)
+
      ;; Ignore matches that consist solely of numbers from `company-dabbrev'
      ;; https://github.com/company-mode/company-mode/issues/358
-     (push
-      (apply-partially #'cl-remove-if
-                       (lambda (c)
-                         (string-match-p "\\`[0-9]+\\'" c)))
-      company-transformers)
+     (push (apply-partially #'cl-remove-if (lambda (c)
+                                             (string-match-p "\\`[0-9]+\\'" c)))
+           company-transformers)
+
      ;; We set `company-backends' as a local variable
      ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
      ;;   (delq backends company-backends))
      t))
-(add-hook 'after-init-hook #'global-company-mode)
+
 (bind-keys :package company :map company-active-map
            ("C-n"      . company-select-next)
            ("C-p"      . company-select-previous)
@@ -1639,65 +1678,72 @@ SAVE-FN with non-nil ARGS."
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
-;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
-;; https://github.com/company-mode/company-mode/issues/1010
-;; However, the width of the frame popup is often not enough and the right side gets cut off.
-
 (eval-after-load 'company
   '(progn
+
+     ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
+     ;; https://github.com/company-mode/company-mode/issues/1010
+     ;; However, the width of the frame popup is often not enough and the right side gets cut off.
+
+     (unless (fboundp 'company-posframe-mode)
+       (autoload #'company-posframe-mode "company-posframe" nil t))
+     (company-posframe-mode 1)
+
+     (defvar company-posframe-show-metadata)
+     (defvar company-posframe-show-indicator)
+
      (setq company-posframe-show-metadata nil
            company-posframe-show-indicator nil)
-     (require 'company-posframe nil nil)
-     (company-posframe-mode 1)
-     (if
-         (fboundp 'diminish)
+
+     (if (fboundp 'diminish)
          (diminish 'company-posframe-mode))
-     t))
 
-(eval-after-load 'company
-  '(progn
+
      (unless (fboundp 'company-quickhelp-mode)
-       (autoload #'company-quickhelp-mode "company-quickhelp" nil t))))
-(add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
+       (autoload #'company-quickhelp-mode "company-quickhelp" nil t))
+     (add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
 
 
-(when (display-graphic-p)
-  (eval-after-load 'company
-    '(progn
-       (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-       (require 'company-box nil nil)
+     (when (display-graphic-p)
+       (unless (fboundp 'company-box-mode)
+         (autoload #'company-box-mode "company-box" nil t))
        (company-box-mode 1)
+       (defvar company-box-icons-alist)
+       (setq company-box-icons-alist 'company-box-icons-all-the-icons)
        (if (fboundp 'diminish)
            (diminish 'company-box-mode))
 
        ;; (set-face-background 'company-box-background "cornsilk")
        ;; (set-face-background 'company-box-selection "light blue")
-       t)))
+       )
 
-;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
-;; computationally expensive. Completions seem to be laggy with TabNine enabled.
+     ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
+     ;; computationally expensive. Completions seem to be laggy with TabNine enabled.
+     t))
 
-(setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
-      yas-verbosity 1)
+
+
 (unless (fboundp 'snippet-mode)
   (autoload #'snippet-mode "yasnippet" nil t))
 (unless (fboundp 'yas-global-mode)
   (autoload #'yas-global-mode "yasnippet" nil t))
-(eval-after-load 'yasnippet
-  '(progn
-     (if
-         (fboundp 'diminish)
-         (diminish 'yas-minor-mode))
-     t))
 (add-hook 'text-mode-hook #'yas-global-mode)
 (add-hook 'prog-mode-hook #'yas-global-mode)
-(add-to-list 'auto-mode-alist
-             '("/\\.emacs\\.d/snippets/" . snippet-mode))
+(add-to-list 'auto-mode-alist '("/\\.emacs\\.d/snippets/" . snippet-mode))
 
 (eval-after-load 'yasnippet
   '(progn
-     (require 'yasnippet-snippets nil nil)
-     (yasnippet-snippets-initialize)
+     (defvar yas-snippet-dirs)
+     (defvar yas-verbosity)
+
+     (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
+           yas-verbosity 1)
+
+     (if (fboundp 'diminish)
+         (diminish 'yas-minor-mode))
+
+     (unless (fboundp 'yasnippet-snippets-initialize)
+       (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
      t))
 
 (eval-after-load 'ivy
@@ -1705,16 +1751,21 @@ SAVE-FN with non-nil ARGS."
      '(progn
         (unless (fboundp 'ivy-yasnippet)
           (autoload #'ivy-yasnippet "ivy-yasnippet" nil t))
+
         (bind-keys :package ivy-yasnippet
                    ("C-M-y" . ivy-yasnippet)))))
+
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (unless (fboundp 'amx-mode)
   (autoload #'amx-mode "amx" nil t))
 (add-hook 'after-init-hook #'amx-mode)
+
 (eval-after-load 'amx
   '(progn
+     (defvar amx-save-file)
+
      (unless (bound-and-true-p sb/use-no-littering)
        (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory)))
      t))
