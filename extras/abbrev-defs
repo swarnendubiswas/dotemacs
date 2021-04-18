@@ -1418,6 +1418,11 @@
     ("severse" "severe" nil :count 0)
    ))
 
+(define-abbrev-table 'org-mode-abbrev-table
+  '(
+    ("discssion" "discussion" nil :count 0)
+   ))
+
 (define-abbrev-table 'python-mode-abbrev-table
   '(
     ("temperory" "temporary" nil :count 0)

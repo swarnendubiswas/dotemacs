@@ -191,6 +191,32 @@ This location is used for temporary installations and files.")
   :type 'boolean
   :group 'sb/emacs)
 
+(package-initialize)
+
+(when (bound-and-true-p sb/use-no-littering)
+  (require 'no-littering))
+(unless (fboundp 'no-littering-expand-etc-file-name)
+  (autoload #'no-littering-expand-etc-file-name "no-littering" nil t))
+
+(defcustom sb/custom-file
+  (no-littering-expand-etc-file-name "custom.el")
+  "File to write Emacs customizations."
+  :type 'string
+  :group 'sb/emacs)
+
+(defcustom sb/private-file
+  (no-littering-expand-etc-file-name "private.el")
+  "File to include private information."
+  :type 'string
+  :group 'sb/emacs)
+
+(setq custom-file sb/custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
+
+(when (file-exists-p sb/private-file)
+  (load sb/private-file 'noerror))
+
 (unless (or (file-exists-p sb/temp-directory)
             (bound-and-true-p sb/use-no-littering))
   (make-directory sb/temp-directory))
@@ -234,162 +260,24 @@ This location is used for temporary installations and files.")
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
-(package-initialize)
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(unless (fboundp 'paradox-list-packages)
+  (autoload #'paradox-list-packages "paradox" nil t))
+(unless (fboundp 'paradox-upgrade-packages)
+  (autoload #'paradox-upgrade-packages "paradox" nil t))
+(unless (fboundp 'paradox-enable)
+  (autoload #'paradox-enable "paradox" nil t))
+(eval-after-load 'paradox
+  '(progn
+     (paradox-enable)
+     t))
+(bind-keys :package paradox
+           ("C-c d l" . paradox-list-packages)
+           ("C-c d u" . paradox-upgrade-packages))
 
-;; Configure `use-package' before loading
-(defvar use-package-always-defer)
-(defvar use-package-always-ensure)
-(defvar use-package-compute-statistics)
-(defvar use-package-enable-imenu-support)
-(defvar use-package-expand-minimally)
-(defvar use-package-verbose)
+(setq paradox-display-star-count nil
+      paradox-execute-asynchronously t
+      paradox-github-token t)
 
-(setq use-package-enable-imenu-support t)
-(when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error nil
-        use-package-always-ensure t
-        use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-        use-package-expand-minimally nil
-        use-package-verbose t))
-
-;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
-;; instead of `:config', since otherwise packages may not be loaded. Be careful about using
-;; `:after' and always deferring loading, because then we will need to specifiy alternate ways of
-;; loading the package.
-;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
-(unless (bound-and-true-p sb/debug-init-file)
-  (setq use-package-always-defer t
-        use-package-always-ensure t
-        use-package-compute-statistics nil
-        ;; Avoid printing errors and warnings since the configuration is known to work
-        use-package-expand-minimally t
-        use-package-verbose nil))
-
-(eval-when-compile
-  (require 'use-package))
-
-;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
-;; Hooks in the `:hook' section, run in reverse order. Example:
-;; (use-package package-name
-;;   :hook
-;;   (x-mode . last)
-;;   (x-mode . second)
-;;   (x-mode . first))
-
-;; Installation is one-time, so avoid the overhead of run-time checks
-(use-package system-packages
-  :commands (system-packages-ensure system-packages-install)
-  :custom (system-packages-use-sudo t))
-
-(use-package use-package-ensure-system-package)
-
-;; `C-h b' lists all the bindings available in a buffer. `C-h m' shows the keybindings for the major
-;; and the minor modes.
-(use-package bind-key
-  :functions bind-key--remove
-  :bind ("C-c d k" . describe-personal-keybindings))
-
-(use-package diminish)
-
-(use-package dash
-  :commands (-tree-map --remove))
-
-(use-package f
-  :commands (f-join f-exists? f-glob))
-
-(use-package s
-  :commands s-starts-with?)
-
-;; Use `C-c h' consistently for invoking a hydra
-(use-package hydra
-  :commands (hydra-default-pre hydra-keyboard-quit defhydra
-                               hydra-show-hint hydra-set-transient-map
-                               hydra--call-interactively-remap-maybe))
-
-(use-package use-package-hydra)
-
-(use-package use-package-chords
-  :config (key-chord-mode 1))
-
-(unless (package-installed-p 'quelpa)
-  (package-refresh-contents)
-  (package-install 'quelpa))
-(defvar quelpa-update-melpa-p)
-(defvar quelpa-upgrade-interval)
-(defvar quelpa-self-upgrade-p)
-(setq quelpa-self-upgrade-p nil
-      quelpa-update-melpa-p nil
-      quelpa-upgrade-interval 30)
-
-;; Using quelpa is convenient but slow
-(use-package quelpa-use-package
-  :disabled t
-  :demand t)
-
-;; Put this early in the `user-init-file'
-(use-package no-littering
-  :if (bound-and-true-p sb/use-no-littering)
-  :demand t)
-
-;; This is not a great idea, but I expect most warnings will arise from third-party packages
-(use-package warnings
-  :custom (warning-minimum-level :emergency))
-
-(defcustom sb/custom-file
-  (no-littering-expand-etc-file-name "custom.el")
-  "File to write Emacs customizations."
-  :type 'string
-  :group 'sb/emacs)
-
-(defcustom sb/private-file
-  (no-littering-expand-etc-file-name "private.el")
-  "File to include private information."
-  :type 'string
-  :group 'sb/emacs)
-
-(setq custom-file sb/custom-file)
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror))
-
-(when (file-exists-p sb/private-file)
-  (load sb/private-file 'noerror))
-
-(use-package paradox
-  :commands (paradox-list-packages paradox-upgrade-packages paradox-enable)
-  :bind
-  (("C-c d l" . paradox-list-packages)
-   ("C-c d u" . paradox-upgrade-packages))
-  :custom
-  (paradox-display-star-count nil)
-  (paradox-execute-asynchronously t)
-  (paradox-github-token t)
-  :config (paradox-enable))
-
-(use-package auto-package-update ; Default update interval is 7 days
-  :commands (auto-package-update-now auto-package-update-maybe)
-  :custom
-  (auto-package-update-delete-old-versions t)
-  (auto-package-update-hide-results t)
-  (auto-package-update-prompt-before-update t)
-  :config (auto-package-update-maybe))
-
-;; FIXME: Improve startup
-;; Check the PATH with `(getenv "PATH")'
-;; (setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))
-(use-package exec-path-from-shell
-  :defines exec-path-from-shell-check-startup-files
-  :commands exec-path-from-shell-initialize
-  :if (or (daemonp) (memq window-system '(x ns)))
-  :init
-  (setq exec-path-from-shell-arguments '("-l" "-i")
-        exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
-  (exec-path-from-shell-initialize))
-
-;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
@@ -439,7 +327,7 @@ This location is used for temporary installations and files.")
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
       ;; *scratch* is in `lisp-interaction-mode' by default, use `text-mode'. `text-mode' is more
       ;; expensive to start, but I use *scratch* for composing emails.
-      initial-major-mode 'text-mode
+      ;; initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
@@ -475,8 +363,7 @@ This location is used for temporary installations and files.")
       )
 
 (unless (bound-and-true-p sb/use-no-littering)
-  (setq auto-save-list-file-prefix (expand-file-name "auto-save"
-                                                     sb/temp-directory)))
+  (setq auto-save-list-file-prefix (expand-file-name "auto-save" sb/temp-directory)))
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
@@ -509,22 +396,6 @@ This location is used for temporary installations and files.")
                 "__pycache__/"
                 "eln-cache"))
   (add-to-list 'completion-ignored-extensions exts))
-
-;; During normal use a high GC threshold is set. When idling GC is triggered and a low threshold is
-;; set.
-;; TODO: LSP mode generates lots of objects, which causes a problem with gcmh mode.
-(use-package gcmh
-  :diminish
-  :commands (gcmh-mode gcmh-idle-garbage-collect)
-  :hook (after-init . gcmh-mode)
-  :config
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose nil)))
-
-(use-package request
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq request-storage-directory (expand-file-name "request" no-littering-var-directory))))
 
 ;; Activate utf-8
 (setq locale-coding-system 'utf-8)
@@ -565,69 +436,52 @@ This location is used for temporary installations and files.")
 ;; (put 'upcase-region 'disabled nil)
 ;; (put 'downcase-region 'disabled nil)
 
-(use-package autorevert ; Auto-refresh all buffers
-  :ensure nil
-  :diminish auto-revert-mode
-  :hook (after-init . global-auto-revert-mode)
-  :custom
-  (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
-  (auto-revert-remote-files t)
-  (auto-revert-use-notify nil)
-  (auto-revert-verbose nil)
-  (global-auto-revert-non-file-buffers t))
+(add-hook 'after-init-hook #'global-auto-revert-mode)
+(setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+      auto-revert-remote-files t
+      auto-revert-use-notify nil
+      auto-revert-verbose t
+      global-auto-revert-non-file-buffers t)
 
 ;; Revert PDF files without asking
 (setq revert-without-query '("\\.pdf"))
 
-(use-package saveplace ; Remember cursor position in files
-  :ensure nil
-  :hook (after-init . save-place-mode)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq save-place-file (expand-file-name "places" sb/temp-directory))))
+;; Remember cursor position in files
+(add-hook 'after-init-hook #'save-place-mode)
+(unless (bound-and-true-p sb/use-no-littering)
+  (setq save-place-file (expand-file-name "places" sb/temp-directory)))
 
-(use-package savehist ; Save minibuffer history across sessions
-  :ensure nil
-  :hook (after-init . savehist-mode)
-  :custom
-  (savehist-additional-variables '(extended-command-history
-                                   kill-ring
-                                   search-ring))
-  (savehist-save-minibuffer-history t)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq savehist-file (expand-file-name "savehist" sb/temp-directory))))
+;; Save minibuffer history across sessions
+(require 'savehist)
+(savehist-mode 1)
+(setq savehist-additional-variables '(extended-command-history kill-ring search-ring)
+      savehist-save-minibuffer-history t)
+(unless (bound-and-true-p sb/use-no-littering)
+  (setq savehist-file (expand-file-name "savehist" sb/temp-directory)))
 
-(use-package uniquify
-  :ensure nil
-  :custom
-  (uniquify-after-kill-buffer-p t)
-  (uniquify-buffer-name-style 'forward)
-  (uniquify-ignore-buffers-re "^\\*")
-  (uniquify-separator "/")
-  (uniquify-strip-common-suffix t))
 
-;; Use `C-M-/' for `dabbrev-completion'
-(use-package hippie-exp ; Replace `dabbrev-exp'
-  :ensure nil
-  :custom
-  (hippie-expand-try-functions-list '(try-expand-dabbrev
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev-from-kill
-                                      try-complete-file-name-partially
-                                      try-complete-file-name
-                                      try-expand-all-abbrevs
-                                      try-expand-list
-                                      try-expand-line
-                                      try-complete-lisp-symbol-partially
-                                      try-complete-lisp-symbol))
-  (hippie-expand-verbose nil)
-  :bind ("M-/" . hippie-expand))
+(require 'uniquify)
+(setq uniquify-after-kill-buffer-p t
+      uniquify-buffer-name-style 'forward
+      uniquify-ignore-buffers-re "^\\*"
+      uniquify-separator "/"
+      uniquify-strip-common-suffix t)
 
-(use-package subword
-  :ensure nil
-  :diminish
-  :hook (prog-mode . subword-mode))
+;; Replace `dabbrev-exp' with `hippie-expand', use `C-M-/' for `dabbrev-completion'
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev-from-kill
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-expand-all-abbrevs
+                                         try-expand-list
+                                         try-expand-line
+                                         try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol)
+      hippie-expand-verbose nil)
+(bind-key "M-/" #'hippie-expand)
+
+(add-hook 'prog-mode #'subword-mode)
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
@@ -650,14 +504,11 @@ SAVE-FN with non-nil ARGS."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
-(use-package abbrev
-  :ensure nil
-  :diminish
-  :hook (text-mode . abbrev-mode)
-  :custom
-  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
-  (save-abbrevs 'silently))
+(add-hook 'text-mode #'abbrev-mode)
+(setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
+      save-abbrevs 'silently)
 
+;; Moved to `early-init.el'
 ;; (when (display-graphic-p) ; `window-system' is deprecated
 ;;   (progn
 ;;     (menu-bar-mode -1)
@@ -701,10 +552,8 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 
 ;; This puts the buffer in read-only mode and disables font locking
-(use-package so-long
-  :ensure nil
-  :hook (after-init . global-so-long-mode)
-  :custom (so-long-threshold 800))
+(add-hook 'after-init #'global-so-long-mode)
+(setq so-long-threshold 800)
 
 ;; Maximize Emacs on startup, moved to `early-init-file'. I am not sure which one of the following
 ;; is better or faster.
@@ -712,91 +561,81 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; Install fonts with `M-x all-the-icons-install-fonts'
-(use-package all-the-icons
-  :if (display-graphic-p)
-  :commands all-the-icons-install-fonts
-  :preface
+;; ;; Install fonts with `M-x all-the-icons-install-fonts'
+(eval-and-compile
   (defun sb/font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
-    (if (find-font (font-spec :name font-name))
-        t
-      nil))
-  :config
-  ;; https://github.com/domtronn/all-the-icons.el/issues/120
-  (when (not (sb/font-installed-p "all-the-icons"))
-    (all-the-icons-install-fonts t))
-  :custom (all-the-icons-scale-factor 1.2))
+    (if (find-font
+         (font-spec :name font-name))
+        t nil)))
 
-(use-package leuven-theme
-  :if (eq sb/theme 'leuven)
-  :init (load-theme 'leuven t))
+(when (display-graphic-p)
+  (setq all-the-icons-scale-factor 1.2)
+  (unless (fboundp 'all-the-icons-install-fonts)
+    (autoload #'all-the-icons-install-fonts "all-the-icons" nil t))
 
-(use-package eclipse-theme
-  :if (eq sb/theme 'eclipse)
-  :init
+  (eval-after-load 'all-the-icons
+    '(progn
+       ;; https://github.com/domtronn/all-the-icons.el/issues/120
+       (when (and (not (sb/font-installed-p "all-the-icons")))
+         (all-the-icons-install-fonts t))
+       t)))
+
+
+(when (eq sb/theme 'leuven)
+  (require 'leuven-theme)
+  (load-theme 'leuven t))
+
+(when (eq sb/theme 'eclipse)
+  (require 'eclipse-theme)
   (load-theme 'eclipse t)
   (set-background-color "white")
   (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
   (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
 
-(use-package spacemacs-common
-  :ensure spacemacs-theme
-  :if (eq sb/theme 'spacemacs-light)
-  :init
+(when (eq sb/theme 'spacemacs-light)
+  (require 'spacemacs-common)
   (load-theme 'spacemacs-light t)
   ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
   )
 
-(use-package zenburn-theme
-  :if (eq sb/theme 'zenburn)
-  :init (load-theme 'zenburn t))
+(when (eq sb/theme 'zenburn)
+  (require 'zenburn-theme)
+  (load-theme 'zenburn t))
 
-(use-package solarized-light-theme
-  :ensure solarized-theme
-  :if (eq sb/theme 'solarized-light)
-  :init
+(when (eq sb/theme 'solarized-light)
+  (require 'solarized-light-theme)
   (setq solarized-distinct-fringe-background t)
   (load-theme 'solarized-light t))
 
-(use-package solarized-dark-theme
-  :ensure solarized-theme
-  :if (eq sb/theme 'solarized-dark)
-  :init (load-theme 'solarized-dark t))
+(when (eq sb/theme 'solarized-dark)
+  (require 'solarized-dark-theme)
+  (load-theme 'solarized-dark t))
 
-(use-package doom-themes
-  :if (eq sb/theme 'doom-molokai)
-  :commands (doom-themes-org-config doom-themes-treemacs-config)
-  :init
+(when (eq sb/theme 'doom-molokai)
+  (require 'doom-molokai)
   (load-theme 'doom-molokai t)
   (set-face-attribute 'font-lock-comment-face nil
                       ;; :foreground "#cccccc"
                       ;; :foreground "#b2b2b2"
                       :foreground "#999999")
-  :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
   (doom-themes-org-config))
 
-(use-package doom-themes
-  :if (eq sb/theme 'doom-one-light)
-  :commands (doom-themes-org-config doom-themes-treemacs-config)
-  :init (load-theme 'doom-one-light t)
-  :config
+(when (eq sb/theme 'doom-one-light)
+  (require 'doom-themes)
+  (load-theme 'doom-one-light t)
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
   (doom-themes-org-config))
 
-(use-package monokai-theme
-  :if (eq sb/theme 'monokai)
-  :init (load-theme 'monokai t))
+(when (eq sb/theme 'monokai)
+  (require 'monokai-theme)
+  (load-theme 'monokai t))
 
-;; FIXME: Moody modeline configuration is not working
-(use-package modus-operandi-theme
-  :ensure moody
-  :ensure modus-themes
-  :if (eq sb/theme 'modus-operandi)
-  :init
+(when (eq sb/theme 'modus-operandi)
+  (require 'modus-operandi-theme)
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line nil
@@ -804,6 +643,7 @@ SAVE-FN with non-nil ARGS."
         modus-themes-scale-headings nil
         modus-themes-prompts 'intense-accented
         modus-themes-variable-pitch-headings nil)
+  ;; FIXME: Moody modeline configuration is not working
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
   (load-theme 'modus-operandi t)
@@ -816,11 +656,8 @@ SAVE-FN with non-nil ARGS."
   ;;                                      :height 0.8))))
   )
 
-(use-package modus-vivendi-theme
-  :ensure moody
-  :ensure modus-themes
-  :if (eq sb/theme 'modus-vivendi)
-  :init
+(when (eq sb/theme 'modus-vivendi)
+  (require 'modus-vivendi-theme)
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line t
@@ -831,8 +668,7 @@ SAVE-FN with non-nil ARGS."
     (setq modus-themes-mode-line 'borderless-moody))
   (load-theme 'modus-vivendi t))
 
-(when (and (eq sb/theme 'sb/default)
-           (display-graphic-p))
+(when (and (eq sb/theme 'sb/default) (display-graphic-p))
   (progn
     ;; (setq frame-background-mode 'light)
     ;; (set-background-color "#ffffff")
@@ -840,10 +676,8 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'hl-line nil :background "light yellow")
     (set-face-attribute 'region nil :background "gainsboro")))
 
-(use-package powerline
-  :if (eq sb/modeline-theme 'powerline)
-  :commands powerline-default-theme
-  :init
+(when (eq sb/modeline-theme 'powerline)
+  (require 'powerline)
   (setq powerline-default-separator 'box
         powerline-display-buffer-size nil
         powerline-display-hud nil
@@ -852,18 +686,12 @@ SAVE-FN with non-nil ARGS."
         powerline-height 17)
   (when (eq sb/theme 'leuven)
     (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
-    (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
-                        :foreground "black" :background "gray88"))
+    (set-face-attribute 'mode-line-buffer-id nil :weight 'bold :foreground "black" :background "gray88"))
   (powerline-default-theme))
 
-(use-package smart-mode-line
-  :if (eq sb/modeline-theme 'sml)
-  :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
-                      sml/shorten-modes sml/shorten-directory)
-  :commands sml/setup
-  :init
-  (use-package smart-mode-line-powerline-theme
-    :demand t)
+(when (eq sb/modeline-theme 'sml)
+  (require 'smart-mode-line)
+  (require 'smart-mode-line-powerline-theme)
   (setq sml/theme 'light
         sml/mode-width 'full
         sml/no-confirm-load-theme t
@@ -871,104 +699,79 @@ SAVE-FN with non-nil ARGS."
         sml/shorten-directory t)
   (sml/setup))
 
-(use-package spaceline
-  :if (eq sb/modeline-theme 'spaceline)
-  :defines (spaceline-hud-p
-            spaceline-selection-info-p
-            spaceline-version-control-p
-            spaceline-input-method-p
-            spaceline-persp-name-p)
-  :functions spaceline-emacs-theme
-  :init
+(when (eq sb/modeline-theme 'spaceline)
+  (require 'spaceline)
   (require 'spaceline-config)
-  (setq spaceline-hud-p nil
-        spaceline-input-method-p nil
-        spaceline-persp-name-p nil
-        spaceline-selection-info-p nil
-        spaceline-version-control-p t)
-  (spaceline-emacs-theme)
-  (use-package spaceline-all-the-icons
-    :demand t
-    :commands spaceline-all-the-icons-theme
-    :config (spaceline-all-the-icons-theme)))
+  (require 'spaceline-all-the-icons
+           (setq spaceline-hud-p nil
+                 spaceline-input-method-p nil
+                 spaceline-persp-name-p nil
+                 spaceline-selection-info-p nil
+                 spaceline-version-control-p t)
+           ;; (spaceline-emacs-theme)
+           (spaceline-all-the-icons-theme)))
 
-(use-package airline-themes
-  :if (eq sb/modeline-theme 'airline)
-  :init
+(when (eq sb/modeline-theme 'airline)
   (require 'airline-themes)
   (setq airline-eshell-colors nil
         airline-hide-eyebrowse-on-inactive-buffers t)
   (load-theme 'airline-cool t))
 
-(use-package doom-modeline
-  ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
-  :ensure all-the-icons
-  :ensure doom-modeline
-  :if (eq sb/modeline-theme 'doom-modeline)
-  :commands doom-modeline-mode
-  :init
+(when (eq sb/modeline-theme 'doom-modeline)
   (require 'doom-modeline)
+  ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format t
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t)
-  :config (doom-modeline-mode 1)
+  (doom-modeline-mode 1)
   ;; :custom-face
   ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
   )
 
-(use-package awesome-tray
-  :ensure nil
-  :if (eq sb/modeline-theme 'awesome-tray)
-  :load-path "extras"
-  ;; :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
-  :hook (after-init . awesome-tray-mode)
-  :custom
-  (awesome-tray-active-modules
-   '("file-path" "buffer-name" "mode-name" "location" "git"))
-  :custom-face
-  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
-  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+(when (eq sb/modeline-theme 'awesome-tray)
+  (require 'awesome-tray)
+  (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
+  (add-hook 'after-init-hook awesome-tray-mode)
+  ;;   :custom-face
+  ;;   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  ;;   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  ;;   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  ;;   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
+  ;;   (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  ;;   (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
+  ;;   (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  ;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
+  ;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  ;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+  )
 
-(use-package moody
-  :if (and (eq sb/modeline-theme 'moody) (not (or (eq sb/theme 'modus-vivendi)
-                                                  (eq sb/theme 'modus-operandi))))
-  :commands (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
-  :init
+(when (eq sb/modeline-theme 'moody)
+  (require 'moody)
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 
-(use-package mode-icons
-  :disabled t
-  :if (eq sb/modeline-theme 'powerline)
-  :demand t
-  :config (mode-icons-mode 1))
+;; (when (eq sb/modeline-theme 'powerline)
+;;   (require 'mode-icons)
+;;   (mode-icons-mode 1))
 
-(use-package auto-dim-other-buffers
-  :commands adob--rescan-windows
-  :hook (after-init . auto-dim-other-buffers-mode))
+(add-hook 'after-init-hook #'auto-dim-other-buffers-mode)
 
-(use-package centaur-tabs
-  :commands centaur-tabs-group-by-projectile-project
-  :hook (after-init . centaur-tabs-mode)
-  :custom
-  (centaur-tabs-cycle-scope 'tabs)
-  (centaur-tabs-set-close-button t)
-  (centaur-tabs-set-icons t)
-  (centaur-tabs-set-modified-marker t)
-  :config (centaur-tabs-group-by-projectile-project))
+(add-hook 'after-init-hook #'centaur-tabs-mode)
+(setq centaur-tabs-cycle-scope 'tabs
+      centaur-tabs-set-close-button t
+      centaur-tabs-set-icons t
+      centaur-tabs-set-modified-marker t)
+(unless (fboundp 'centaur-tabs-group-by-projectile-project)
+  (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
+(eval-after-load 'centaur-tabs
+  '(progn
+     (centaur-tabs-group-by-projectile-project)
+     t))
 
-(use-package hide-mode-line
-  :commands (hide-mode-line-mode))
+(unless (fboundp 'hide-mode-line-mode)
+  (autoload #'hide-mode-line-mode "hide-mode-line" nil t))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
@@ -1004,361 +807,492 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'emacs-startup-hook (lambda ()
 ;;                                 (setq resize-mini-windows nil)))
 
-(use-package circadian
-  :disabled t
-  :if (and (not (eq sb/theme 'sb/default)) (not (eq sb/theme 'none)))
-  :custom
-  (circadian-themes '((:sunrise . modus-operandi)
-                      (:sunset  . modus-operandi)))
-  :config
-  (circadian-setup)
-  (use-package solar
-    :ensure nil
-    :demand t
-    :custom
-    (calendar-latitude 26.50 "Kanpur, UP")
-    (calendar-longitude 80.23 "Kanpur, UP")))
 
-(use-package beacon
-  :diminish
-  :hook (after-init . beacon-mode))
+(setq circadian-themes '((:sunrise . modus-operandi)
+                         (:sunset  . modus-operandi)))
+(eval-after-load 'circadian
+  '(progn
+     (circadian-setup)
+     (require 'solar nil nil)
+     ;; Kanpur, UP
+     (setq calendar-latitude 26.50
+           calendar-longitude 80.23)
+     t))
 
-(use-package ibuffer
-  :ensure nil
-  :custom
-  (ibuffer-default-sorting-mode 'alphabetic)
-  (ibuffer-display-summary nil)
-  (ibuffer-use-header-line t)
-  :bind ("C-x C-b" . ibuffer)
-  :config (defalias 'list-buffers 'ibuffer))
+(add-hook 'after-init-mode beacon-mode)
 
-(use-package ibuf-ext
-  :load-path "extras"
-  ;; :quelpa ((ibuf-ext :fetcher github :repo "emacs-mirror/emacs"
-  ;;                    :files ("lisp/ibuf-ext.el")))
-  :custom
-  ;; Do not show filter groups if there are no buffers in that group
-  (ibuffer-show-empty-filter-groups nil)
-  :hook (ibuffer . ibuffer-auto-mode))
+(unless (fboundp 'ibuffer)
+  (autoload #'ibuffer "ibuffer" nil t))
+(eval-after-load 'ibuffer
+  '(progn
+     (defalias 'list-buffers 'ibuffer)
+     t))
+(bind-keys :package ibuffer
+           ("C-x C-b" . ibuffer))
 
-(use-package ibuffer-projectile ; Group buffers by projectile project
-  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+(add-to-list 'load-path "/home/swarnendu/.emacs.d/extras")
+(unless (fboundp 'ibuffer-auto-mode)
+  (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
+(add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+;; Do not show filter groups if there are no buffers in that group
+(setq ibuffer-show-empty-filter-groups nil)
 
-(use-package all-the-icons-ibuffer
-  :if (display-graphic-p)
-  :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-  :custom
-  (all-the-icons-ibuffer-human-readable-size t)
-  (all-the-icons-ibuffer-icon-size 0.8))
+;; Group buffers by projectile project
+(unless (fboundp 'ibuffer-projectile-set-filter-groups)
+  (autoload #'ibuffer-projectile-set-filter-groups "ibuffer-projectile" nil t))
+(add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
 
-(use-package bufler
-  :commands bufler-mode
-  ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
-  ;;                 :files (:defaults (:exclude "helm-bufler.el")))
-  :diminish bufler-workspace-mode
-  :config (bufler-mode 1)
-  :bind ("C-x C-b" . bufler))
+(when (display-graphic-p)
+  (unless (fboundp 'all-the-icons-ibuffer-mode)
+    (autoload #'all-the-icons-ibuffer-mode "all-the-icons-ibuffer" nil t))
+  (setq all-the-icons-ibuffer-human-readable-size t
+        all-the-icons-ibuffer-icon-size 0.8)
+  (add-hook 'ibuffer-mode-hook #'all-the-icons-ibuffer-mode))
 
-(use-package dired
-  :ensure nil
-  :commands dired-next-line
-  :preface
-  (defun sb/dired-go-home ()
+(unless (fboundp 'bufler)
+  (autoload #'bufler "bufler" nil t))
+(unless (fboundp 'bufler-mode)
+  (autoload #'bufler-mode "bufler" nil t))
+(eval-after-load 'bufler
+  '(progn
+     (bufler-mode 1)
+     (if (fboundp 'diminish)
+         (diminish 'bufler-workspace-mode))
+     t))
+(bind-keys :package bufler
+           ("C-x C-b" . bufler))
+
+(eval-and-compile
+  (defun sb/dired-go-home nil
     (interactive)
     (dired sb/user-home))
 
-  (defun sb/dired-jump-to-top ()
+  (defun sb/dired-jump-to-top nil
     (interactive)
-    (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
+    (goto-char
+     (point-min))
     (dired-next-line 2))
 
-  (defun sb/dired-jump-to-bottom ()
+  (defun sb/dired-jump-to-bottom nil
     (interactive)
-    (goto-char (point-max)) ; Faster than `(end-of-buffer)'
-    (dired-next-line -1))
-  :bind (:map dired-mode-map
-              ("M-<home>" . sb/dired-go-home)
-              ("i" . find-file)
-              ("M-<up>" . sb/dired-jump-to-top)
-              ("M-<down>" . sb/dired-jump-to-bottom))
-  :hook (dired-mode . auto-revert-mode) ; Auto refresh dired when files change
-  :custom
-  (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
-  (dired-dwim-target t "Guess a default target directory")
-  (dired-listing-switches "-ABhl --si --group-directories-first" "Check `ls' for additional options")
-  (dired-ls-F-marks-symlinks t "-F marks links with @")
-  (dired-recursive-copies 'always "Single prompt for all n directories")
-  (dired-recursive-deletes 'always "Single prompt for all n directories"))
+    (goto-char
+     (point-max))
+    (dired-next-line -1)))
 
-(use-package dired-x
-  :ensure nil
-  :custom
-  (dired-cleanup-buffers-too t)
-  (dired-omit-verbose nil "Do not show messages when omitting files")
-  :hook (dired-mode . dired-omit-mode)
-  :bind ("C-x C-j" . dired-jump)
-  :config
-  ;; `:diminish dired-omit-mode' does not work
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Remove 'Omit' from the modeline."
-    (diminish 'dired-omit-mode) dired-mode-map))
+(setq dired-auto-revert-buffer t
+      dired-dwim-target t ; Guess a default target directory
+      dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
+      dired-ls-F-marks-symlinks t ; -F marks links with @
+      dired-recursive-copies 'always ; Single prompt for all n directories
+      ;; Single prompt for all n directories
+      dired-recursive-deletes 'always)
 
-(use-package dired+
-  ;; :load-path "extras"
-  ;; :quelpa ((dired+ :fetcher github :repo "emacsmirror/dired-plus"
-  ;;                  :files (dired+.el)))
-  :commands diredp-toggle-find-file-reuse-dir
-  :custom
-  (diredp-hide-details-initially-flag nil)
-  (diredp-hide-details-propagate-flag nil)
-  :config (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
-  :hook
-  (dired-mode . (lambda ()
-                  ;; Do not create multiple dired buffers
-                  (diredp-toggle-find-file-reuse-dir 1))))
+(unless (fboundp 'sb/dired-go-home)
+  (autoload #'sb/dired-go-home "dired" nil t))
+(unless (fboundp 'find-file)
+  (autoload #'find-file "dired" nil t))
+(unless (fboundp 'sb/dired-jump-to-top)
+  (autoload #'sb/dired-jump-to-top "dired" nil t))
+(unless (fboundp 'sb/dired-jump-to-bottom)
+  (autoload #'sb/dired-jump-to-bottom "dired" nil t))
+(unless (fboundp 'auto-revert-mode)
+  (autoload #'auto-revert-mode "dired" nil t))
+(unless (fboundp 'dired-next-line)
+  (autoload #'dired-next-line "dired" nil t))
 
-(use-package dired-efap
-  :after dired+
-  :defines dired-efap-initial-filename-selection
-  :custom (dired-efap-initial-filename-selection nil)
-  :bind*
-  (:map dired-mode-map
-        ("r" . dired-efap)))
+(add-hook 'dired-mode-hook #'auto-revert-mode)
 
-(use-package dired-narrow ; Narrow dired to match filter
-  :after dired
-  :bind (:map dired-mode-map
-              ("/" . dired-narrow)))
+(bind-keys :package dired :map dired-mode-map
+           ("M-<home>" . sb/dired-go-home)
+           ("i" . find-file)
+           ("M-<up>" . sb/dired-jump-to-top)
+           ("M-<down>" . sb/dired-jump-to-bottom))
 
-(use-package diredfl ; More detailed colors, but can be jarring with certain themes
-  :commands (diredfl-mode diredfl-global-mode)
-  :hook (dired-mode . diredfl-mode))
+(setq dired-cleanup-buffers-too t
+      ;; Do not show messages when omitting files
+      dired-omit-verbose nil)
+(unless (fboundp 'dired-omit-mode)
+  (autoload #'dired-omit-mode "dired-x" nil t))
+(eval-after-load 'dired-x
+  '(progn
+     ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+     (defadvice dired-omit-startup (after diminish-dired-omit activate)
+       "Remove 'Omit' from the modeline."
+       (diminish 'dired-omit-mode)
+       dired-mode-map)
+     t))
+(add-hook 'dired-mode-hook #'dired-omit-mode)
+(unless (fboundp 'dired-jump)
+  (autoload #'dired-jump "dired-x" nil t))
+(bind-keys :package dired-x
+           ("C-x C-j" . dired-jump))
 
-(use-package async
-  :demand t
-  :functions async-bytecomp-package-mode
-  :config (async-bytecomp-package-mode 1))
+;; Do not create multiple dired buffers
+(unless  (fboundp 'diredp-toggle-find-file-reuse-dir)
+  (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
+(add-hook 'dired-mode-hook
+          #'(lambda ()
+              (diredp-toggle-find-file-reuse-dir 1)))
 
-(use-package dired-async
-  :ensure async
-  :diminish
-  :hook (dired-mode . dired-async-mode))
+(setq diredp-hide-details-initially-flag nil
+      diredp-hide-details-propagate-flag nil)
+;;   :config (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
 
-(use-package all-the-icons-dired
-  :diminish
-  :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode))
+(eval-after-load 'dired+
+  '(progn
+     '(setq dired-efap-initial-filename-selection nil)
+     (unless (fboundp 'dired-efap)
+       (autoload #'dired-efap "dired-efap" nil t))
+     (bind-keys* :package dired-efap :map dired-mode-map
+                 ("r" . dired-efap))))
 
-(use-package treemacs
-  :if (display-graphic-p)
-  :functions treemacs-tag-follow-mode
-  :commands (treemacs-current-workspace treemacs--find-current-user-project
-                                        treemacs-do-add-project-to-workspace
-                                        treemacs-add-project-to-workspace
-                                        treemacs-git-mode
-                                        treemacs-follow-mode
-                                        treemacs-fringe-indicator-mode
-                                        treemacs-filewatch-mode
-                                        treemacs-goto-file-node
-                                        treemacs--propagate-new-icons
-                                        treemacs-scope->current-scope
-                                        treemacs--restore-eldoc-after-log
-                                        treemacs-load-theme
-                                        treemacs-find-file-node
-                                        treemacs-resize-icons
-                                        treemacs-select-window
-                                        treemacs-add-and-display-current-project)
-  :preface
-  (defun sb/setup-treemacs-quick ()
+;; Narrow dired to match filter
+(eval-after-load 'dired
+  '(progn
+     (unless (fboundp 'dired-narrow)
+       (autoload #'dired-narrow "dired-narrow" nil t))
+     (bind-keys :package dired-narrow :map dired-mode-map
+                ("/" . dired-narrow))))
+
+;; More detailed colors, but can be jarring with certain themes
+(unless (fboundp #'diredfl-mode)
+  (autoload #'diredfl-mode "diredfl" nil t))
+(add-hook 'dired-mode-hook #'diredfl-mode)
+
+(require 'async nil nil)
+(async-bytecomp-package-mode 1)
+(unless (fboundp 'dired-async-mode)
+  (autoload #'dired-async-mode "dired-async" nil t))
+(eval-after-load 'dired-async
+  '(if
+       (fboundp 'diminish)
+       (diminish 'dired-async-mode)))
+(add-hook 'dired-mode-hook #'dired-async-mode)
+
+(when (display-graphic-p)
+  (unless (fboundp 'all-the-icons-dired-mode)
+    (autoload #'all-the-icons-dired-mode "all-the-icons-dired" nil t))
+  (eval-after-load 'all-the-icons-dired
+    '(if
+         (fboundp 'diminish)
+         (diminish 'all-the-icons-dired-mode)))
+  (add-hook 'dired-mode-hook #'all-the-icons-dired-mode))
+
+(eval-and-compile
+  (defun sb/setup-treemacs-quick nil
     "Setup treemacs."
     (interactive)
-    (when (projectile-project-p)
+    (when
+        (projectile-project-p)
       (treemacs-add-and-display-current-project)
       (ace-window)))
 
   (defun sb/setup-treemacs-detailed (args)
     "Setup treemacs."
-    (let* ((root (treemacs--find-current-user-project))
-           (path (treemacs-canonical-path root))
-           (name (treemacs--filename path)))
-      (unless (treemacs-current-workspace)
+    (let* ((root
+            (treemacs--find-current-user-project))
+           (path
+            (treemacs-canonical-path root))
+           (name
+            (treemacs--filename path)))
+      (unless
+          (treemacs-current-workspace)
         (treemacs--find-workspace))
-      (if (treemacs-workspace->is-empty?)
+      (if
+          (treemacs-workspace->is-empty\?)
           (progn
             (treemacs-do-add-project-to-workspace path name)
             (treemacs-select-window)
             (treemacs-pulse-on-success)
             (other-window 1)
-            (when (featurep 'auto-dim-other-buffers)
+            (when
+                (featurep 'auto-dim-other-buffers)
               (adob--rescan-windows)))
         (treemacs-select-window)
-        (if (treemacs-is-path path :in-workspace)
+        (if
+            (treemacs-is-path path :in-workspace)
             (treemacs-goto-file-node path)
           (treemacs-add-project-to-workspace path name))
         (other-window 1)
-        (when (featurep 'auto-dim-other-buffers)
-          (adob--rescan-windows)))))
-  :custom
-  (treemacs-collapse-dirs 2)
-  (treemacs-follow-after-init t)
-  (treemacs-indentation 1)
-  (treemacs-is-never-other-window nil "Prevents treemacs from being selected with `other-window`")
-  (treemacs-no-png-images nil)
-  (treemacs-position 'right)
-  (treemacs-project-follow-cleanup t)
-  (treemacs-recenter-after-file-follow 'on-distance)
-  (treemacs-recenter-after-tag-follow 'on-distance)
-  (treemacs-show-hidden-files nil)
-  (treemacs-silent-filewatch t)
-  (treemacs-silent-refresh t)
-  (treemacs-width 24)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
+        (when
+            (featurep 'auto-dim-other-buffers)
+          (adob--rescan-windows))))))
 
-  (treemacs-filewatch-mode 1)
-  (treemacs-follow-mode 1)
+(when (display-graphic-p)
+  (unless (fboundp 'treemacs)
+    (autoload #'treemacs "treemacs" nil t))
+  (unless (fboundp 'treemacs-current-workspace)
+    (autoload #'treemacs-current-workspace "treemacs" nil t))
+  (unless (fboundp 'treemacs--find-current-user-project)
+    (autoload #'treemacs--find-current-user-project "treemacs" nil t))
+  (unless (fboundp 'treemacs-do-add-project-to-workspace)
+    (autoload #'treemacs-do-add-project-to-workspace "treemacs" nil t))
+  (unless (fboundp 'treemacs-add-project-to-workspace)
+    (autoload #'treemacs-add-project-to-workspace "treemacs" nil t))
+  (unless (fboundp 'treemacs-git-mode)
+    (autoload #'treemacs-git-mode "treemacs" nil t))
+  (unless (fboundp 'treemacs-follow-mode)
+    (autoload #'treemacs-follow-mode "treemacs" nil t))
+  (unless (fboundp 'treemacs-fringe-indicator-mode)
+    (autoload #'treemacs-fringe-indicator-mode "treemacs" nil t))
+  (unless (fboundp 'treemacs-filewatch-mode)
+    (autoload #'treemacs-filewatch-mode "treemacs" nil t))
+  (unless (fboundp 'treemacs-goto-file-node)
+    (autoload #'treemacs-goto-file-node "treemacs" nil t))
+  (unless (fboundp 'treemacs--propagate-new-icons)
+    (autoload #'treemacs--propagate-new-icons "treemacs" nil t))
+  (unless (fboundp 'treemacs-scope->current-scope)
+    (autoload #'treemacs-scope->current-scope "treemacs" nil t))
+  (unless (fboundp 'treemacs--restore-eldoc-after-log)
+    (autoload #'treemacs--restore-eldoc-after-log "treemacs" nil t))
+  (unless (fboundp 'treemacs-load-theme)
+    (autoload #'treemacs-load-theme "treemacs" nil t))
+  (unless (fboundp 'treemacs-find-file-node)
+    (autoload #'treemacs-find-file-node "treemacs" nil t))
+  (unless (fboundp 'treemacs-resize-icons)
+    (autoload #'treemacs-resize-icons "treemacs" nil t))
+  (unless (fboundp 'treemacs-select-window)
+    (autoload #'treemacs-select-window "treemacs" nil t))
+  (unless (fboundp 'treemacs-add-and-display-current-project)
+    (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
 
-  ;; ;; Disables `treemacs-follow-mode', focuses the tag
-  ;; (add-hook 'prog-mode-hook (lambda ()
-  ;;                             (treemacs-tag-follow-mode 1)))
+  (eval-after-load 'treemacs
+    '(progn
+       (setq treemacs-collapse-dirs 2
+             treemacs-follow-after-init t
+             treemacs-indentation 1
+             treemacs-is-never-other-window nil ; Prevents treemacs from being selected with `other-window`
+             treemacs-no-png-images nil
+             treemacs-position 'right
+             treemacs-project-follow-cleanup t
+             treemacs-recenter-after-file-follow 'on-distance
+             treemacs-recenter-after-tag-follow 'on-distance
+             treemacs-show-hidden-files nil
+             treemacs-silent-filewatch t
+             treemacs-silent-refresh t
+             treemacs-width 24)
 
-  (treemacs-git-mode 'extended)
-  (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
+       (unless (bound-and-true-p sb/use-no-littering)
+         (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
 
-  (use-package treemacs-all-the-icons
-    :demand t)
+       (treemacs-filewatch-mode 1)
+       (treemacs-follow-mode 1)
+       (treemacs-git-mode 'extended)
+       (treemacs-fringe-indicator-mode 'always)
 
-  ;; https://github.com/Alexander-Miller/treemacs/issues/735
-  (treemacs-create-theme "Default-Tighter"
-                         :extends "Default"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash
-                            (lambda (ext icon)
-                              (puthash ext (concat (substring icon 0 1)
-                                                   (propertize " " 'display '(space . (:width 0.5))))
-                                       icons))
-                            icons)))
+       (require 'treemacs-all-the-icons nil nil)
 
-  (treemacs-create-theme "all-the-icons-tighter"
-                         :extends "all-the-icons"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash
-                            (lambda (ext icon)
-                              (puthash ext (concat (substring icon 0 1)
-                                                   (propertize " " 'display '(space . (:width 0.5))))
-                                       icons))
-                            icons)))
+       (treemacs-create-theme "Default-Tighter" :extends "Default" :config
+                              (let
+                                  ((icons
+                                    (treemacs-theme->gui-icons theme)))
+                                (maphash
+                                 (lambda
+                                   (ext icon)
+                                   (puthash ext
+                                            (concat
+                                             (substring icon 0 1)
+                                             (propertize " " 'display
+                                                         '(space :width 0.5)))
+                                            icons))
+                                 icons)))
 
-  (treemacs-load-theme "all-the-icons")
+       (treemacs-create-theme "all-the-icons-tighter" :extends "all-the-icons" :config
+                              (let
+                                  ((icons
+                                    (treemacs-theme->gui-icons theme)))
+                                (maphash
+                                 (lambda
+                                   (ext icon)
+                                   (puthash ext
+                                            (concat
+                                             (substring icon 0 1)
+                                             (propertize " " 'display
+                                                         '(space :width 0.5)))
+                                            icons))
+                                 icons)))
 
-  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.9)
-  (set-face-attribute 'treemacs-directory-face nil :height 0.9)
-  (set-face-attribute 'treemacs-file-face nil :height 0.9)
-  (set-face-attribute 'treemacs-root-face nil :height 0.9)
-  (set-face-attribute 'treemacs-tags-face nil :height 0.9)
-  (set-face-attribute 'treemacs-git-ignored-face nil :height 0.8)
-  (set-face-attribute 'treemacs-git-untracked-face nil :height 0.9)
-  (set-face-attribute 'treemacs-git-modified-face nil :height 0.9)
-  (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.9)
-  (treemacs-resize-icons 16)
-  :bind* ("C-j" . treemacs))
+       (treemacs-load-theme "all-the-icons")
+
+       (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.9)
+       (set-face-attribute 'treemacs-directory-face nil :height 0.9)
+       (set-face-attribute 'treemacs-file-face nil :height 0.9)
+       (set-face-attribute 'treemacs-root-face nil :height 0.9)
+       (set-face-attribute 'treemacs-tags-face nil :height 0.9)
+       (set-face-attribute 'treemacs-git-ignored-face nil :height 0.8)
+       (set-face-attribute 'treemacs-git-untracked-face nil :height 0.9)
+       (set-face-attribute 'treemacs-git-modified-face nil :height 0.9)
+       (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.9)
+
+       (treemacs-resize-icons 16)
+
+       t))
+
+  (bind-keys* :package treemacs
+              ("C-j" . treemacs)))
+
+;;   ;; ;; Disables `treemacs-follow-mode', focuses the tag
+;;   ;; (add-hook 'prog-mode-hook (lambda ()
+;;   ;;                             (treemacs-tag-follow-mode 1)))
+
+;;   (treemacs-fringe-indicator-mode 'always) ; `always' is implied in the absence of arguments
+
+
+;;   ;; https://github.com/Alexander-Miller/treemacs/issues/735
+;;   (treemacs-create-theme "Default-Tighter"
+;;     :extends "Default"
+;;     :config
+;;     (let ((icons (treemacs-theme->gui-icons theme)))
+;;       (maphash
+;;        (lambda (ext icon)
+;;          (puthash ext (concat (substring icon 0 1)
+;;                               (propertize " " 'display '(space . (:width 0.5))))
+;;                   icons))
+;;        icons)))
+
+;;   (treemacs-create-theme "all-the-icons-tighter"
+;;     :extends "all-the-icons"
+;;     :config
+;;     (let ((icons (treemacs-theme->gui-icons theme)))
+;;       (maphash
+;;        (lambda (ext icon)
+;;          (puthash ext (concat (substring icon 0 1)
+;;                               (propertize " " 'display '(space . (:width 0.5))))
+;;                   icons))
+;;        icons)))
+
+;;   (treemacs-load-theme "all-the-icons")
+
+;;   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-directory-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-file-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-root-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-tags-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-git-ignored-face nil :height 0.8)
+;;   (set-face-attribute 'treemacs-git-untracked-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-git-modified-face nil :height 0.9)
+;;   (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.9)
+;;   (treemacs-resize-icons 16)
+;;   :bind* ("C-j" . treemacs))
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :commands treemacs-projectile)
+(eval-after-load 'projectile
+  '(eval-after-load 'treemacs
+     '(unless (fboundp 'treemacs-projectile)
+        (autoload #'treemacs-projectile "treemacs-projectile" nil t))))
 
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :demand t)
+(eval-after-load 'magit
+  '(eval-after-load 'treemacs
+     '(require 'treemacs-magit nil nil)))
 
-(use-package org
-  :defines (org-hide-leading-stars-before-indent-mode
-            org-src-strip-leading-and-trailing-blank-lines
-            org-src-tabs-acts-natively)
-  :hook
-  ((org-mode . visual-line-mode)
-   (org-mode . org-indent-mode)
-   (org-mode . prettify-symbols-mode))
-  :diminish org-indent-mode
-  :custom
-  (org-fontify-done-headline t)
-  (org-fontify-whole-heading-line t)
-  (org-hide-emphasis-markers t)
-  (org-hide-leading-stars t)
-  (org-hide-leading-stars-before-indent-mode t)
-  (org-src-fontify-natively t "Code block fontification using the major-mode of the code")
-  (org-src-preserve-indentation t)
-  (org-src-tabs-acts-natively t)
-  (org-src-window-setup 'current-window)
-  (org-startup-indented t)
-  (org-startup-truncated nil)
-  (org-startup-folded 'showeverything)
-  (org-startup-with-inline-images t)
-  (org-support-shift-select t)
-  ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the beginning
-  ;; of headlines. `org-babel-describe-bindings' will display a list of the code blocks commands and
-  ;; their related keys.
-  (org-use-speed-commands t)
-  (org-src-strip-leading-and-trailing-blank-lines t)
-  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
-  (org-pretty-entities t)
-  ;; Render subscripts and superscripts in org buffers
-  (org-pretty-entities-include-sub-superscripts t)
-  :config
-  (unbind-key "M-<up>" org-mode-map)
-  (unbind-key "M-<down>" org-mode-map))
 
-(use-package org-bullets
-  :hook (org-mode . org-bullets-mode))
+(unless (fboundp 'visual-line-mode)
+  (autoload #'visual-line-mode "org" nil t))
+(unless (fboundp 'org-indent-mode)
+  (autoload #'org-indent-mode "org" nil t))
+(unless (fboundp 'prettify-symbols-mode)
+  (autoload #'prettify-symbols-mode "org" nil t))
+
+
+(eval-after-load 'org
+  '(progn
+     (setq org-fontify-done-headline t
+           org-fontify-whole-heading-line t
+           org-hide-emphasis-markers t
+           org-hide-leading-stars t
+           org-hide-leading-stars-before-indent-mode t
+           ;; Code block fontification using the major-mode of the code
+           org-src-fontify-natively t
+           org-src-preserve-indentation t
+           org-src-tabs-acts-natively t
+           org-src-window-setup 'current-window
+           org-startup-indented t
+           org-startup-truncated nil
+           org-startup-folded 'showeverything
+           org-startup-with-inline-images t
+           org-support-shift-select t
+           ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the beginning
+           ;; of headlines. `org-babel-describe-bindings' will display a list of the code blocks commands and
+           ;; their related keys.
+           org-use-speed-commands t
+           org-src-strip-leading-and-trailing-blank-lines t
+           ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
+           org-pretty-entities t
+           ;; Render subscripts and superscripts in org buffers
+           org-pretty-entities-include-sub-superscripts t)
+
+     ;;   (unbind-key "M-<up>" org-mode-map)
+     ;;   (unbind-key "M-<down>" org-mode-map))
+
+     (add-hook 'org-mode-hook #'visual-line-mode)
+     (add-hook 'org-mode-hook #'org-indent-mode)
+     (add-hook 'org-mode-hook #'prettify-symbols-mode)
+
+     (if (fboundp 'diminish)
+         (diminish 'org-indent-mode))
+     t))
+
+(unless (fboundp 'org-bullets-mode)
+  (autoload #'org-bullets-mode "org-bullets" nil t))
+(add-hook 'org-mode-hook #'org-bullets-mode)
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; isearch candidates
-(use-package isearch
-  :ensure nil
-  :custom (search-highlight t "Highlight incremental search")
-  :bind
-  (("C-s" . nil) ; Change the binding for `isearch-forward-regexp'
-   ("C-f" . isearch-forward-regexp)
-   :map isearch-mode-map
-   ("C-s" . nil) ; Change the binding for `isearch-repeat-forward'
-   ("C-f" . isearch-repeat-forward)))
+(setq search-highlight t) ; Highlight incremental search
+(unless (fboundp 'isearch-forward-regexp)
+  (autoload #'isearch-forward-regexp "isearch" nil t))
+(unless (fboundp 'isearch-repeat-forward)
+  (autoload #'isearch-repeat-forward "isearch" nil t))
+;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
+(bind-keys :package isearch
+           ("C-s")
+           ("C-f" . isearch-forward-regexp)
+           :map isearch-mode-map
+           ("C-s")
+           ("C-f" . isearch-repeat-forward))
 
-(use-package isearch-symbol-at-point
-  :after isearch
-  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point))
+(eval-after-load 'isearch
+  '(progn
+     (unless (fboundp 'isearch-symbol-at-point)
+       (autoload #'isearch-symbol-at-point "isearch-symbol-at-point" nil t))
+     (unless (fboundp 'isearch-backward-symbol-at-point)
+       (autoload #'isearch-backward-symbol-at-point "isearch-symbol-at-point" nil t))))
 
-(use-package isearch-dabbrev
-  :after isearch
-  :bind (:map isearch-mode-map
-              ("<tab>" . isearch-dabbrev-expand)))
+(eval-after-load 'isearch
+  '(progn
+     (unless (fboundp 'isearch-dabbrev-expand)
+       (autoload #'isearch-dabbrev-expand "isearch-dabbrev" nil t))
+     (bind-keys :package isearch-dabbrev :map isearch-mode-map
+                ("<tab>" . isearch-dabbrev-expand))))
 
-(use-package anzu
-  :diminish anzu-mode
-  :after isearch
-  :demand t
-  :custom
-  (anzu-search-threshold 10000)
-  (anzu-minimum-input-length 2)
-  :config
-  (global-anzu-mode 1)
-  ;; :config
-  ;; (when (eq sb/modeline-theme 'spaceline)
-  ;;   (setq anzu-cons-mode-line-p nil))
-  ;; (unless (eq sb/theme 'leuven)
-  ;;   (set-face-attribute 'anzu-mode-line nil
-  ;;                       :foreground "blue"
-  ;;                       :weight 'light))
-  )
+(eval-after-load 'isearch
+  '(progn
+     (require 'anzu nil nil)
+     (setq anzu-search-threshold 10000
+           anzu-minimum-input-length 2)
+     (global-anzu-mode 1)
+     (if
+         (fboundp 'diminish)
+         (diminish 'anzu-mode))
+     t))
 
-(use-package swiper
-  :commands (swiper swiper-isearch)
-  :bind ("<f4>" . swiper-isearch)
-  :custom (swiper-action-recenter t))
+;;   :config
+;;   (global-anzu-mode 1)
+;;   ;; :config
+;;   ;; (when (eq sb/modeline-theme 'spaceline)
+;;   ;;   (setq anzu-cons-mode-line-p nil))
+;;   ;; (unless (eq sb/theme 'leuven)
+;;   ;;   (set-face-attribute 'anzu-mode-line nil
+;;   ;;                       :foreground "blue"
+;;   ;;                       :weight 'light))
+
+(unless (fboundp 'swiper-isearch)
+  (autoload #'swiper-isearch "swiper" nil t))
+(unless (fboundp 'swiper)
+  (autoload #'swiper "swiper" nil t))
+(setq swiper-action-recenter t)
+(bind-keys :package swiper
+           ("<f4>" . swiper-isearch))
 
 ;; (defvar grep-highlight-matches)
 ;; (defvar grep-scroll-output)
@@ -1371,78 +1305,87 @@ SAVE-FN with non-nil ARGS."
 
 ;; When the *grep* buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
-(use-package wgrep ; Writable grep
-  ;; :commands (wgrep-change-to-wgrep-mode wgrep-abort-changes
-  ;;                                       wgrep-setup wgrep-exit
-  ;;                                       wgrep-finish-edit)
-  :bind
-  (:map grep-mode-map
-        ("C-c C-c" . wgrep-finish-edit)
-        ("C-x C-s" . wgrep-finish-edit)
-        ("C-x C-q" . wgrep-exit)
-        ("C-c C-k" . wgrep-abort-changes)
-        ("C-x C-p" . wgrep-change-to-wgrep-mode))
-  :custom (wgrep-auto-save-buffer t))
 
-(use-package deadgrep
-  :commands deadgrep
-  :bind ("C-c s d" . deadgrep))
+(unless (fboundp 'wgrep-finish-edit)
+  (autoload #'wgrep-finish-edit "wgrep" nil t))
+(unless (fboundp 'wgrep-exit)
+  (autoload #'wgrep-exit "wgrep" nil t))
+(unless (fboundp 'wgrep-abort-changes)
+  (autoload #'wgrep-abort-changes "wgrep" nil t))
+(unless (fboundp 'wgrep-change-to-wgrep-mode)
+  (autoload #'wgrep-change-to-wgrep-mode "wgrep" nil t))
+(bind-keys :package wgrep :map grep-mode-map
+           ("C-c C-c" . wgrep-finish-edit)
+           ("C-x C-s" . wgrep-finish-edit)
+           ("C-x C-q" . wgrep-exit)
+           ("C-c C-k" . wgrep-abort-changes)
+           ("C-x C-p" . wgrep-change-to-wgrep-mode))
+(setq wgrep-auto-save-buffer t)
 
-(use-package ripgrep
-  :commands ripgrep-regexp)
+(unless (fboundp 'deadgrep)
+  (autoload #'deadgrep "deadgrep" nil t))
+(bind-keys :package deadgrep
+           ("C-c s d" . deadgrep))
 
-(use-package ctrlf
-  :commands (ctrlf-mode ctrlf-local-mode)
-  :config
-  (ctrlf-mode 1)
-  (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
-                                           (ctrlf-local-mode -1)))
-  :bind
-  (("C-f"   . ctrlf-forward-literal)
-   ("C-r"   . ctrlf-backward-literal)
-   ("C-M-s" . ctrlf-forward-regexp)
-   ("C-M-r" . ctrlf-backward-regexp)))
+(unless (fboundp 'ripgrep)
+  (autoload #'ripgrep-regexp "ripgrep" nil t))
 
-(use-package visual-regexp
-  :commands (vr/replace vr/query-replace vr/mark)
-  :bind ([remap query-replace] . vr/query-replace))
+(unless (fboundp 'ctrlf-forward-literal)
+  (autoload #'ctrlf-forward-literal "ctrlf" nil t))
+(unless (fboundp 'ctrlf-backward-literal)
+  (autoload #'ctrlf-backward-literal "ctrlf" nil t))
+(unless (fboundp 'ctrlf-forward-regexp)
+  (autoload #'ctrlf-forward-regexp "ctrlf" nil t))
+(unless (fboundp 'ctrlf-backward-regexp)
+  (autoload #'ctrlf-backward-regexp "ctrlf" nil t))
+(unless (fboundp 'ctrlf-mode)
+  (autoload #'ctrlf-mode "ctrlf" nil t))
+(unless (fboundp 'ctrlf-local-mode)
+  (autoload #'ctrlf-local-mode "ctrlf" nil t))
+(eval-after-load 'ctrlf
+  '(progn
+     (ctrlf-mode 1)
+     (add-hook 'pdf-isearch-minor-mode-hook
+               (lambda ()
+                 (ctrlf-local-mode -1)))
+     t))
+(bind-keys :package ctrlf
+           ("C-f"   . ctrlf-forward-literal)
+           ("C-r"   . ctrlf-backward-literal)
+           ("C-M-s" . ctrlf-forward-regexp)
+           ("C-M-r" . ctrlf-backward-regexp))
 
-(use-package recentf
-  :ensure nil
-  :commands (recentf-mode recentf-add-file
-                          recentf-apply-filename-handlers)
-  :custom
-  (recentf-auto-cleanup 'never "Do not stat remote files")
-  ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
-  (recentf-exclude '("[/\\]elpa/"
-                     "[/\\]\\.git/"
-                     ".*\\.gz\\'"
-                     ".*\\.xz\\'"
-                     ".*\\.zip\\'"
-                     ".*-autoloads.el\\'"
-                     "[/\\]archive-contents\\'"
-                     "[/\\]\\.loaddefs\\.el\\'"
-                     "[/\\]tmp/.*"
-                     ".*/recentf\\'"
-                     ".*/recentf-save.el\\'"
-                     ;; "/ssh:"
-                     "~$"
-                     "/.autosaves/"
-                     ".*/TAGS\\'"
-                     "*.cache"))
-  ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-  ;; (recentf-keep '(file-remote-p file-readable-p))
-  (recentf-max-saved-items 250)
-  (recentf-menu-filter 'recentf-sort-descending)
-  :config
-  ;; FIXME: Should we move this to `:init'?
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
-  (run-at-time nil (* 5 60) 'recentf-save-list) ; seconds
-  (run-at-time nil (* 10 60) 'recentf-cleanup) ; seconds
+(unless (fboundp 'vr/query-replace)
+  (autoload #'vr/query-replace "visual-regexp" nil t))
+(bind-keys :package visual-regexp
+           ([remap query-replace] . vr/query-replace))
+
+(setq recentf-auto-cleanup 'never ; Do not stat remote files
+      ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
+      recentf-exclude '("[/\\]elpa/" "[/\\]\\.git/" ".*\\.gz\\'" ".*\\.xz\\'" ".*\\.zip\\'" ".*-autoloads.el\\'" "[/\\]archive-contents\\'" "[/\\]\\.loaddefs\\.el\\'" "[/\\]tmp/.*" ".*/recentf\\'" ".*/recentf-save.el\\'" "~$" "/.autosaves/" ".*/TAGS\\'" "*.cache")
+      recentf-max-saved-items 250
+      recentf-menu-filter 'recentf-sort-descending)
+;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+;; (setq recentf-keep '(file-remote-p file-readable-p))
+
+(unless (bound-and-true-p sb/use-no-littering)
+  (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
+(when (bound-and-true-p sb/use-no-littering)
   (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
-  (add-to-list 'recentf-exclude (file-truename no-littering-var-directory))
-  :hook (after-init . recentf-mode))
+  (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
+
+(unless (fboundp 'recentf-mode)
+  (autoload #'recentf-mode "recentf" nil t))
+(unless (fboundp 'recentf-save-file)
+  (autoload #'recentf-save-file "recentf" nil t))
+(unless (fboundp 'recentf-cleanup)
+  (autoload #'recentf-cleanup "recentf" nil t))
+(eval-after-load 'recentf
+  '(progn
+     (run-at-time nil (* 5 60) 'recentf-save-list)
+     (run-at-time nil (* 10 60) 'recentf-cleanup)
+     t))
+(add-hook 'after-init-hook #'recentf-mode)
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."
@@ -1458,48 +1401,57 @@ SAVE-FN with non-nil ARGS."
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
 ;; company-complete-common' when there are no completions. Use `C-M-i' for `complete-symbol' with
 ;; regex search.
-(use-package company
-  :commands company-abort
-  :preface
+
+(eval-and-compile
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
     (interactive)
     (company-abort)
-    (save-buffer))
-  :hook (after-init . global-company-mode)
-  :custom
-  (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  ;; (company-dabbrev-ignore-case nil "Backend is case-sensitive")
-  ;; Searching for other buffers is not useful with LSP support, and can cause slowdowns
-  (company-dabbrev-other-buffers nil "Search in other buffers with same major mode")
-  ;; (company-format-margin-function 'company-vscode-light-icons-margin)
-  (company-idle-delay 0.1 "Decrease the delay before the popup is shown")
-  (company-ispell-available t)
-  (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
-  (company-minimum-prefix-length 3 "Small words are faster to type")
-  (company-require-match nil "Allow input string that do not match candidates")
-  (company-selection-wrap-around t)
-  (company-show-numbers t "Speed up completion")
-  ;; Align additional metadata, like type signatures, to the right-hand side
-  (company-tooltip-align-annotations t)
-  :config
-  ;; We set `company-backends' as a local variable
-  ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
-  ;;   (delq backends company-backends))
+    (save-buffer)))
+(unless (fboundp 'global-company-mode)
+  (autoload #'global-company-mode "company" nil t))
+(unless (fboundp 'company-select-next)
+  (autoload #'company-select-next "company" nil t))
+(unless (fboundp 'company-select-previous)
+  (autoload #'company-select-previous "company" nil t))
+(unless (fboundp 'company-complete-common-or-cycle)
+  (autoload #'company-complete-common-or-cycle "company" nil t))
+(unless (fboundp 'sb/quit-company-save-buffer)
+  (autoload #'sb/quit-company-save-buffer "company" nil t))
+(unless (fboundp 'company-abort)
+  (autoload #'company-abort "company" nil t))
 
-  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
-  ;; https://github.com/company-mode/company-mode/issues/358
-  (push (apply-partially #'cl-remove-if
-                         (lambda (c)
-                           (string-match-p "\\`[0-9]+\\'" c)))
-        company-transformers)
-  :bind (:map company-active-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)
-              ("<tab>" . company-complete-common-or-cycle)
-              ;; ("C-M-/" . company-other-backend) ; Was bound to `dabbrev-completion'
-              ("C-s" . sb/quit-company-save-buffer)
-              ("<escape>" . company-abort)))
+(setq company-dabbrev-other-buffers nil ; Search in other buffers with same major mode
+      company-idle-delay 0.1 ; Decrease the delay before the popup is shown
+      company-ispell-available t
+      company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
+      company-minimum-prefix-length 3 ; Small words are faster to type
+      company-require-match nil ; Allow input string that do not match candidates
+      company-selection-wrap-around t
+      company-show-numbers t ; Speed up completion
+      ;; Align additional metadata, like type signatures, to the right-hand side
+      company-tooltip-align-annotations t)
+
+(eval-after-load 'company
+  '(progn
+     ;; Ignore matches that consist solely of numbers from `company-dabbrev'
+     ;; https://github.com/company-mode/company-mode/issues/358
+     (push
+      (apply-partially #'cl-remove-if
+                       (lambda (c)
+                         (string-match-p "\\`[0-9]+\\'" c)))
+      company-transformers)
+     ;; We set `company-backends' as a local variable
+     ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
+     ;;   (delq backends company-backends))
+     t))
+(add-hook 'after-init-hook #'global-company-mode)
+(bind-keys :package company :map company-active-map
+           ("C-n"      . company-select-next)
+           ("C-p"      . company-select-previous)
+           ("<tab>"    . company-complete-common-or-cycle)
+           ("C-s"      . sb/quit-company-save-buffer)
+           ("<escape>" . company-abort))
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -1509,292 +1461,275 @@ SAVE-FN with non-nil ARGS."
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; https://github.com/company-mode/company-mode/issues/1010
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
-(use-package company-posframe
-  :after company
-  :demand t
-  :commands company-posframe-mode
-  :diminish
-  :custom
-  (company-posframe-show-metadata nil)
-  (company-posframe-show-indicator nil)
-  :config (company-posframe-mode 1))
 
-(use-package company-quickhelp
-  :after company
-  :hook (emacs-lisp-mode . company-quickhelp-mode))
+(eval-after-load 'company
+  '(progn
+     (setq company-posframe-show-metadata nil
+           company-posframe-show-indicator nil)
+     (require 'company-posframe nil nil)
+     (company-posframe-mode 1)
+     (if
+         (fboundp 'diminish)
+         (diminish 'company-posframe-mode))
+     t))
 
-(use-package company-quickhelp-terminal
-  :unless (display-graphic-p)
-  :after company-quickhelp
-  :demand t
-  :commands company-quickhelp-terminal-mode
-  :config (company-quickhelp-terminal-mode 1))
+(eval-after-load 'company
+  '(progn
+     (unless (fboundp 'company-quickhelp-mode)
+       (autoload #'company-quickhelp-mode "company-quickhelp" nil t))))
+(add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
 
-(use-package company-box
-  :if (display-graphic-p)
-  :after company
-  :demand t
-  :commands company-box-mode
-  :diminish
-  :custom (company-box-icons-alist 'company-box-icons-all-the-icons)
-  :config
-  (company-box-mode 1)
-  ;; (set-face-background 'company-box-background "cornsilk")
-  ;; (set-face-background 'company-box-selection "light blue")
-  )
+
+(when (display-graphic-p)
+  (eval-after-load 'company
+    '(progn
+       (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+       (require 'company-box nil nil)
+       (company-box-mode 1)
+       (if (fboundp 'diminish)
+           (diminish 'company-box-mode))
+
+       ;; (set-face-background 'company-box-background "cornsilk")
+       ;; (set-face-background 'company-box-selection "light blue")
+       t)))
 
 ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
-;; computationally expensive
-(use-package company-tabnine
-  :after company
-  ;; Completions seem to be laggy with TabNine enabled
-  :disabled t)
+;; computationally expensive. Completions seem to be laggy with TabNine enabled.
 
-(use-package company-fuzzy
-  :after company
-  :disabled t ; It seems there is a lag during completions
-  :diminish
-  :hook (after-init . global-company-fuzzy-mode))
+(setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
+      yas-verbosity 1)
+(unless (fboundp 'snippet-mode)
+  (autoload #'snippet-mode "yasnippet" nil t))
+(unless (fboundp 'yas-global-mode)
+  (autoload #'yas-global-mode "yasnippet" nil t))
+(eval-after-load 'yasnippet
+  '(progn
+     (if
+         (fboundp 'diminish)
+         (diminish 'yas-minor-mode))
+     t))
+(add-hook 'text-mode-hook #'yas-global-mode)
+(add-hook 'prog-mode-hook #'yas-global-mode)
+(add-to-list 'auto-mode-alist
+             '("/\\.emacs\\.d/snippets/" . snippet-mode))
 
-(use-package yasnippet
-  :diminish yas-minor-mode
-  :commands (yas-global-mode snippet-mode)
-  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((text-mode prog-mode) . yas-global-mode)
-  :custom
-  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
-  (yas-verbosity 1)
-  :config (unbind-key "<tab>" yas-minor-mode-map))
+(eval-after-load 'yasnippet
+  '(progn
+     (require 'yasnippet-snippets nil nil)
+     (yasnippet-snippets-initialize)
+     t))
 
-(use-package yasnippet-snippets
-  :after yasnippet
-  :demand t
-  :commands yasnippet-snippets-initialize
-  :config (yasnippet-snippets-initialize))
-
-(use-package ivy-yasnippet
-  :after (yasnippet ivy)
-  :bind ("C-M-y" . ivy-yasnippet))
+(eval-after-load 'ivy
+  '(eval-after-load 'yasnippet
+     '(progn
+        (unless (fboundp 'ivy-yasnippet)
+          (autoload #'ivy-yasnippet "ivy-yasnippet" nil t))
+        (bind-keys :package ivy-yasnippet
+                   ("C-M-y" . ivy-yasnippet)))))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
-(use-package amx
-  :hook (after-init . amx-mode)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory))))
+(unless (fboundp 'amx-mode)
+  (autoload #'amx-mode "amx" nil t))
+(add-hook 'after-init-hook #'amx-mode)
+(eval-after-load 'amx
+  '(progn
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory)))
+     t))
 
-(use-package ivy
-  :functions ivy-format-function-line
-  :commands ivy-read
-  :preface
+(eval-and-compile
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
     "Return non-nil if STR names a Dired buffer.
-    This function is intended for use with `ivy-ignore-buffers'."
+ This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
-      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
-  :custom
-  (completion-in-region-function #'ivy-completion-in-region)
-  (ivy-initial-inputs-alist nil "Do not start completion with `^'")
-  (ivy-case-fold-search 'always "Always ignore case while searching")
-  (ivy-count-format "(%d/%d) " "Help identify wrap around")
-  (ivy-extra-directories nil "Hide . and ..")
-  (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
-  ;; Make the height of the minibuffer proportionate to the screen
-  ;; (ivy-height-alist '((t
-  ;;                      lambda (_caller)
-  ;;                      (/ (frame-height) 2))))
-  ;; We update this after loading `orderless'
-  (ivy-re-builders-alist '(
-                           (counsel-M-x . ivy--regex-fuzzy)
-                           (counsel-find-file . ivy--regex-fuzzy)
-                           (t . ivy--regex-ignore-order)
-                           ))
-  (ivy-truncate-lines nil "`counsel-flycheck' output gets truncated")
-  (ivy-wrap t)
-  :hook (after-init . ivy-mode)
-  :config
-  (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
-  (defalias 'occur 'ivy-occur)
-  (dolist (buffer '(
-                    "TAGS"
-                    "magit-process"
-                    ;; "*eldoc for use-package*"
-                    ;; "^\\*Help\\*$"
-                    ;; "^\\*Ibuffer\\*$"
-                    ;; "*Warnings*"
-                    ;; "^\\*Compile-Log\\*$"
-                    ;; "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-                    ;; "*flycheck-posframe-buffer*"
-                    ;; "*emacs*"
-                    ;; "^\\*prettier"
-                    ;; "^\\*json*"
-                    ;; "^\\*texlab*"
-                    ;; "^\\*clangd*"
-                    ;; "^\\*shfmt*"
-                    ;; "*company-documentation*"
-                    ;; "*xref*"
-                    ))
-    (add-to-list 'ivy-ignore-buffers buffer))
-  ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
-  :diminish
-  :bind
-  (("C-c r" . ivy-resume)
-   ("<f3>" . ivy-switch-buffer)
-   :map ivy-minibuffer-map
-   ("<return>" . ivy-alt-done) ; Continue completion
-   ("<left>" . ivy-previous-line)
-   ("<right>" . ivy-next-line)))
+      (and buf (eq (buffer-local-value 'major-mode buf)
+                   'dired-mode)))))
 
-(use-package counsel
-  :ensure amx
-  ;; :ensure-system-package fasd
-  :preface
+(setq completion-in-region-function #'ivy-completion-in-region
+      ivy-initial-inputs-alist nil ; Do not start completion with `^'
+      ivy-case-fold-search 'always ; Always ignore case while searching
+      ivy-count-format "(%d/%d) " ; Help identify wrap around
+      ivy-extra-directories nil ; Hide . and ..
+      ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+      ;; Make the height of the minibuffer proportionate to the screen
+      ;; ivy-height-alist '((t
+      ;;                      lambda (_caller)
+      ;;                      (/ (frame-height) 2)))
+      ;; We update this after loading `orderless'
+      ;; ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
+      ;;                         (counsel-find-file . ivy--regex-fuzzy)
+      ;;                         (t . ivy--regex-ignore-order))
+      ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
+      ivy-wrap t)
+
+(unless (fboundp 'ivy-mode)
+  (autoload #'ivy-mode "ivy" nil t))
+(unless (fboundp 'ivy-resume)
+  (autoload #'ivy-resume "ivy" nil t))
+(unless (fboundp 'ivy-switch-buffer)
+  (autoload #'ivy-switch-buffer "ivy" nil t))
+(unless (fboundp 'ivy-alt-done)
+  (autoload #'ivy-alt-done "ivy" nil t))
+(unless (fboundp 'ivy-previous-line)
+  (autoload #'ivy-previous-line "ivy" nil t))
+(unless (fboundp 'ivy-next-line)
+  (autoload #'ivy-next-line "ivy" nil t))
+(unless (fboundp 'ivy-read)
+  (autoload #'ivy-read "ivy" nil t))
+
+(eval-after-load 'ivy
+  '(progn
+     (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
+     (defalias 'occur 'ivy-occur)
+     (dolist
+         (buffer
+          '("TAGS" "magit-process"
+            ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
+            ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+            ;; "*flycheck-posframe-buffer*" "*emacs*" "^\\*prettier" "^\\*json*"
+            ;; "^\\*texlab*" "^\\*clangd*" "^\\*shfmt*" "*company-documentation*" "*xref*"
+            ))
+       (add-to-list 'ivy-ignore-buffers buffer)
+       ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
+       )
+     (if
+         (fboundp 'diminish)
+         (diminish 'ivy-mode))
+     t))
+(add-hook 'after-init-hook #'ivy-mode)
+(bind-keys :package ivy
+           ("C-c r" . ivy-resume)
+           ("<f3>" . ivy-switch-buffer)
+           :map ivy-minibuffer-map
+           ("<return>" . ivy-alt-done)
+           ("<left>" . ivy-previous-line)
+           ("<right>" . ivy-next-line))
+
+
+(eval-and-compile
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun sb/counsel-goto-recent-directory ()
     "Open recent directories with `dired'."
     (interactive)
-    (unless recentf-mode (recentf-mode 1))
-    (let ((collection
-           (delete-dups
-            (append (mapcar 'file-name-directory recentf-list)
-                    (if (executable-find "fasd")
-                        (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
-      (ivy-read "Directories:" collection :action 'dired)))
-  :bind
-  (([remap execute-extended-command] . counsel-M-x)
-   ("<f1>"                           . counsel-M-x)
-   ([remap completion-at-point]      . counsel-company)
-   ([remap describe-bindings]        . counsel-descbinds)
-   ([remap dired]                    . counsel-dired)
-   ([remap find-file]                . counsel-find-file)
-   ("<f2>"                           . counsel-find-file)
-   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
-   ;; ([remap flycheck-list-errors]  . counsel-flycheck)
-   ("C-c s g"                        . counsel-git-grep)
-   ("C-<f9>"                         . sb/counsel-goto-recent-directory)
-   ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
-   ([remap load-library]             . counsel-load-library)
-   ([remap load-theme]               . counsel-load-theme)
-   ("C-c d m"                        . counsel-minor)
-   ([remap recentf-open-files]       . counsel-recentf)
-   ("<f9>"                           . counsel-recentf)
-   ("C-c s r"                        . counsel-rg)
-   ("C-c C-m"                        . counsel-mark-ring)
-   ;; Enabling preview can make switching over remote buffers slow
-   ;; ("<f3>"                        . counsel-switch-buffer)
-   ([remap yank-pop]                 . counsel-yank-pop))
-  :bind* ("C-c C-j"                  . counsel-imenu)
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  (counsel-find-file-at-point t)
-  (counsel-find-file-ignore-regexp (concat
-                                    "\\(?:\\`[#.]\\)" ; File names beginning with # or .
-                                    "\\|\\(?:\\`.+?[#~]\\'\\)" ; File names ending with # or ~
-                                    "\\|__pycache__"
-                                    ;; "\\|.aux$"
-                                    ;; "\\|.bbl$"
-                                    ;; "\\|.blg$"
-                                    "\\|.cb$"
-                                    "\\|.cb2$"
-                                    "\\|.djvu$"
-                                    "\\|.doc$"
-                                    "\\|.docx$"
-                                    ;; "\\|.dvi$"
-                                    "\\|.elc$"
-                                    "\\|.fdb_latexmk$"
-                                    "\\|.fls$"
-                                    ;; "\\|.jar$"
-                                    ;; "\\|.jpeg$"
-                                    ;; "\\|.jpg$"
-                                    "\\|.lof$"
-                                    "\\|.lot$"
-                                    "\\|.o$"
-                                    "\\|.out$"
-                                    ;; "\\|.png$"
-                                    "\\|.ppt$"
-                                    "\\|.pptx$"
-                                    "\\|.pyc$"
-                                    "\\|.rel$"
-                                    "\\|.rip$"
-                                    "\\|.so$"
-                                    "\\|.synctex$"
-                                    "\\|.synctex.gz$"
-                                    ;; "\\|.tar.gz$"
-                                    ;; "\\|.tar.xz$"
-                                    "\\|.toc$"
-                                    "\\|.xls$"
-                                    "\\|.xlsx$"
-                                    "\\|tags"
-                                    "\\|TAGS"
-                                    "\\|GPATH"
-                                    "\\|GRTAGS"
-                                    "\\|GTAGS"
-                                    "\\|tramp"
-                                    "\\|.clangd"
-                                    "\\|.metadata"
-                                    "\\|.recommenders"))
-  (counsel-mode-override-describe-bindings t)
-  (counsel-preselect-current-file t)
-  (counsel-switch-buffer-preview-virtual-buffers nil)
-  (counsel-yank-pop-preselect-last t)
-  (counsel-yank-pop-separator "\n-------------------------\n")
-  :diminish
-  :hook (ivy-mode . counsel-mode)
-  :config
-  ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
-  ;; argument error
-  ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
-  ;; (defalias 'load-library 'counsel-load-library)
-  ;; (defalias 'load-theme 'counsel-load-theme)
-  ;; (defalias 'yank-pop 'counsel-yank-pop)
+    (unless recentf-mode
+      (recentf-mode 1))
+    (let
+        ((collection
+          (delete-dups
+           (append
+            (mapcar 'file-name-directory recentf-list)
+            (if
+                (executable-find "fasd")
+                (split-string
+                 (shell-command-to-string "fasd -ld")
+                 "\n" t))))))
+      (ivy-read "Directories:" collection :action 'dired))))
 
-  ;; (add-to-list 'ivy-display-functions-alist
-  ;;              '(counsel-company . ivy-display-function-overlay))
-  )
+(setq counsel-describe-function-function #'helpful-callable
+      counsel-describe-variable-function #'helpful-variable
+      counsel-find-file-at-point t
+      counsel-find-file-ignore-regexp (concat "\\(?:\\`[#.]\\)" "\\|\\(?:\\`.+?[#~]\\'\\)" "\\|__pycache__" "\\|.cb$" "\\|.cb2$" "\\|.djvu$" "\\|.doc$" "\\|.docx$" "\\|.elc$" "\\|.fdb_latexmk$" "\\|.fls$" "\\|.lof$" "\\|.lot$" "\\|.o$" "\\|.out$" "\\|.ppt$" "\\|.pptx$" "\\|.pyc$" "\\|.rel$" "\\|.rip$" "\\|.so$" "\\|.synctex$" "\\|.synctex.gz$" "\\|.toc$" "\\|.xls$" "\\|.xlsx$" "\\|tags" "\\|TAGS" "\\|GPATH" "\\|GRTAGS" "\\|GTAGS" "\\|tramp" "\\|.clangd" "\\|.metadata" "\\|.recommenders")
+      counsel-mode-override-describe-bindings t
+      counsel-preselect-current-file t
+      counsel-switch-buffer-preview-virtual-buffers nil
+      counsel-yank-pop-preselect-last t
+      counsel-yank-pop-separator "\n-------------------------\n")
 
-(use-package ivy-hydra
-  :after (ivy hydra)
-  :demand t
-  :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
+(unless (fboundp 'counsel-M-x)
+  (autoload #'counsel-M-x "counsel" nil t))
+(unless (fboundp 'counsel-company)
+  (autoload #'counsel-company "counsel" nil t))
+(unless (fboundp 'counsel-descbinds)
+  (autoload #'counsel-descbinds "counsel" nil t))
+(unless (fboundp 'counsel-dired)
+  (autoload #'counsel-dired "counsel" nil t))
+(unless (fboundp 'counsel-find-file)
+  (autoload #'counsel-find-file "counsel" nil t))
+(unless (fboundp 'counsel-git-grep)
+  (autoload #'counsel-git-grep "counsel" nil t))
+(unless (fboundp 'sb/counsel-goto-recent-directory)
+  (autoload #'sb/counsel-goto-recent-directory "counsel" nil t))
+(unless (fboundp 'counsel-info-lookup-symbol)
+  (autoload #'counsel-info-lookup-symbol "counsel" nil t))
+(unless (fboundp 'counsel-load-library)
+  (autoload #'counsel-load-library "counsel" nil t))
+(unless (fboundp 'counsel-load-theme)
+  (autoload #'counsel-load-theme "counsel" nil t))
+(unless (fboundp 'counsel-minor)
+  (autoload #'counsel-minor "counsel" nil t))
+(unless (fboundp 'counsel-recentf)
+  (autoload #'counsel-recentf "counsel" nil t))
+(unless (fboundp 'counsel-rg)
+  (autoload #'counsel-rg "counsel" nil t))
+(unless (fboundp 'counsel-mark-ring)
+  (autoload #'counsel-mark-ring "counsel" nil t))
+(unless (fboundp 'counsel-yank-pop)
+  (autoload #'counsel-yank-pop "counsel" nil t))
+(unless (fboundp 'counsel-imenu)
+  (autoload #'counsel-imenu "counsel" nil t))
+(unless (fboundp 'counsel-mode)
+  (autoload #'counsel-mode "counsel" nil t))
 
-(use-package ivy-posframe
-  :after ivy
-  :disabled t ; The width is narrow and the text at the end gets cut off
-  :diminish
-  :config
-  ;; Different command can use different display function.
-  (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-posframe-display-at-window-bottom-left)
-          (complete-symbol . ivy-posframe-display-at-point)
-          (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-          (t               . ivy-posframe-display)))
-  (ivy-posframe-mode 1)
-  :custom
-  (ivy-display-function #'ivy-posframe-display-at-frame-center)
-  (ivy-posframe-parameters '((left-fringe . 4)
-                             (right-fringe . 4))))
+(eval-after-load 'counsel
+  '(progn
+     ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
+     ;; argument error
+     ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
+     ;; (defalias 'load-library 'counsel-load-library)
+     ;; (defalias load-theme 'counsel-load-theme)
+     ;; (defalias 'yank-pop 'counsel-yank-pop)
 
-(use-package prescient
-  :hook (after-init . prescient-persist-mode)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq prescient-save-file (expand-file-name "prescient-save.el"
-                                                sb/temp-directory)))
-  :custom (prescient-history-length 500))
+     ;; (add-to-list 'ivy-display-functions-alist
+     ;;   '(counsel-company . ivy-display-function-overlay))
 
-;; https://github.com/raxod502/prescient.el/issues/65
-(use-package ivy-prescient
-  :disabled t ; No longer maintained
-  :hook (counsel-mode . ivy-prescient-mode)
-  :custom
-  (ivy-prescient-enable-sorting nil "Allow prescient to override sorting logic")
-  (ivy-prescient-sort-function '(not swiper swiper-isearch
-                                     ivy-switch-buffer
-                                     counsel-recentf counsel-grep
-                                     flyspell-correct-ivy )))
+     (if
+         (fboundp 'diminish)
+         (diminish 'counsel-mode))
+     t))
+
+(add-hook 'ivy-mode-hook #'counsel-mode)
+(bind-keys* :package counsel
+            ("C-c C-j" . counsel-imenu))
+(bind-keys :package counsel
+           ([remap execute-extended-command] . counsel-M-x)
+           ("<f1>" . counsel-M-x)
+           ([remap completion-at-point] . counsel-company)
+           ([remap describe-bindings] . counsel-descbinds)
+           ([remap dired] . counsel-dired)
+           ([remap find-file] . counsel-find-file)
+           ("<f2>" . counsel-find-file)
+           ("C-c s g" . counsel-git-grep)
+           ("C-<f9>" . sb/counsel-goto-recent-directory)
+           ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
+           ([remap load-library] . counsel-load-library)
+           ([remap load-theme] . counsel-load-theme)
+           ("C-c d m" . counsel-minor)
+           ([remap recentf-open-files] . counsel-recentf)
+           ("<f9>" . counsel-recentf)
+           ("C-c s r" . counsel-rg)
+           ("C-c C-m" . counsel-mark-ring)
+           ([remap yank-pop] . counsel-yank-pop)
+           ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
+           ;; ([remap flycheck-list-errors]  . counsel-flycheck)
+           ;; Enabling preview can make switching over remote buffers slow
+           ;; ("<f3>"                        . counsel-switch-buffer)
+           )
+
+(eval-after-load 'hydra
+  '(eval-after-load 'ivy
+     '(require 'ivy-hydra nil nil)))
+
+(eval-after-load 'prescient
+  '(progn
+     (setq prescient-history-length 500)
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory)))
+     t))
+(unless (fboundp 'prescient-persist-mode)
+  (autoload #'prescient-persist-mode "prescient" nil t))
+(add-hook 'after-init-hook #'prescient-persist-mode)
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 ;; (with-eval-after-load 'ivy
@@ -1806,215 +1741,268 @@ SAVE-FN with non-nil ARGS."
 ;;  'ivy-sort-matches-functions-alist
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
-(use-package company-prescient
-  :after company
-  :demand t
-  :commands company-prescient-mode
-  :config (company-prescient-mode 1))
+(eval-after-load 'company
+  '(progn
+     (require 'company-prescient nil nil)
+     (company-prescient-mode 1)
+     t))
 
-(use-package all-the-icons-ivy
-  :after ivy
-  :demand t
-  :commands all-the-icons-ivy-setup
-  :config (all-the-icons-ivy-setup))
+(eval-after-load 'ivy
+  '(progn
+     (require 'all-the-icons-ivy nil nil)
+     (all-the-icons-ivy-setup)
+     t))
 
-(use-package orderless
-  :after ivy
-  :demand t
-  :defines orderless-component-separator
-  :functions just-one-face
-  :config
-  (setq completion-styles '(orderless)
-        orderless-component-separator "[ &]")
-  (defun just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
-  (advice-add 'company-capf--candidates :around #'just-one-face)
+(eval-after-load 'ivy
+  '(progn
+     (require 'orderless nil nil)
+     (setq completion-styles '(orderless)
+           orderless-component-separator "[ &]")
+     (defun sb/just-one-face (fn &rest args)
+       (let ((orderless-match-faces
+              [completions-common-part]))
+         (apply fn args)))
+     (advice-add 'company-capf--candidates :around #'sb/just-one-face)
+     (setq ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
+                                   (counsel-find-file . ivy--regex-fuzzy)
+                                   (t . orderless-ivy-re-builder)))
+     t))
 
-  (setq ivy-re-builders-alist '(
-                                (counsel-M-x . ivy--regex-fuzzy)
-                                (counsel-find-file . ivy--regex-fuzzy)
-                                (t . orderless-ivy-re-builder))))
 
-(use-package ispell
-  :ensure nil
-  :if sb/dotemacs-is-linux
-  :custom
-  (ispell-dictionary "en_US")
-  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
-  (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
-  :config
-  ;; Skip regions in Org-mode
-  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
-  (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example")))
+(when (symbol-value 'sb/dotemacs-is-linux)
+  (setq ispell-dictionary "en_US"
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
+        ispell-local-dictionary "en_US"
+        ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory)
+        ;; Save a new word to personal dictionary without asking
+        ispell-silently-savep t)
+  (eval-after-load 'ispell
+    '(progn
+       ;; Skip regions in Org-mode
+       (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+       (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+       t)))
 
 ;; Hide the "Starting new Ispell process" message
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 
-(use-package flyspell
-  :ensure nil
-  :if sb/dotemacs-is-linux
-  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
-  :preface
+(eval-and-compile
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
   ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
   (defun sb/flyspell-goto-previous-error (arg)
     "Go to arg previous spelling error."
     (interactive "p")
-    (while (not (= 0 arg))
-      (let ((pos (point))
-            (min (point-min)))
-        (if (and (eq (current-buffer) flyspell-old-buffer-error)
-                 (eq pos flyspell-old-pos-error))
+    (while (not
+            (= 0 arg))
+      (let
+          ((pos
+            (point))
+           (min
+            (point-min)))
+        (if
+            (and
+             (eq
+              (current-buffer)
+              flyspell-old-buffer-error)
+             (eq pos flyspell-old-pos-error))
             (progn
-              (if (= flyspell-old-pos-error min)
-                  ;; goto beginning of buffer
+              (if
+                  (= flyspell-old-pos-error min)
                   (progn
                     (message "Restarting from end of buffer")
-                    (goto-char (point-max)))
+                    (goto-char
+                     (point-max)))
                 (backward-word 1))
-              (setq pos (point))))
-        ;; seek the next error
-        (while (and (> pos min)
-                    (let ((ovs (overlays-at pos))
-                          (r '()))
-                      (while (and (not r) (consp ovs))
-                        (if (flyspell-overlay-p (car ovs))
-                            (setq r t)
-                          (setq ovs (cdr ovs))))
-                      (not r)))
+              (setq pos
+                    (point))))
+        (while
+            (and
+             (> pos min)
+             (let
+                 ((ovs
+                   (overlays-at pos))
+                  (r 'nil))
+               (while
+                   (and
+                    (not r)
+                    (consp ovs))
+                 (if
+                     (flyspell-overlay-p
+                      (car ovs))
+                     (setq r t)
+                   (setq ovs
+                         (cdr ovs))))
+               (not r)))
           (backward-word 1)
-          (setq pos (point)))
-        ;; save the current location for next invocation
-        (setq arg (1- arg))
+          (setq pos
+                (point)))
+        (setq arg
+              (1- arg))
         (setq flyspell-old-pos-error pos)
-        (setq flyspell-old-buffer-error (current-buffer))
+        (setq flyspell-old-buffer-error
+              (current-buffer))
         (goto-char pos)
-        (if (= pos min)
+        (if
+            (= pos min)
             (progn
               (message "No more misspelled word!")
               (setq arg 0))
-          (forward-word)))))
-  :custom
-  (flyspell-abbrev-p t)
-  (flyspell-issue-message-flag nil)
-  (flyspell-issue-welcome-flag nil)
-  :hook
-  (((prog-mode conf-mode) . flyspell-prog-mode)
-   ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
-   (text-mode  . flyspell-mode)
-   ;; `find-file-hook' will not work for buffers with no associated files
-   (after-init . (lambda ()
-                   (when (string= (buffer-name) "*scratch*")
-                     (flyspell-mode 1)))))
-  :diminish
-  :bind
-  (("C-c f f" . flyspell-mode)
-   ("C-c f b" . flyspell-buffer)
-   :map flyspell-mode-map
-   ("C-;" . nil)
-   ;; ("C-," . flyspell-auto-correct-previous-word)
-   ("C-," . sb/flyspell-goto-previous-error)))
+          (forward-word))))))
+
+(when (symbol-value 'sb/dotemacs-is-linux)
+  (setq flyspell-abbrev-p t
+        flyspell-issue-message-flag nil
+        flyspell-issue-welcome-flag nil)
+  (unless (fboundp 'flyspell-prog-mode)
+    (autoload #'flyspell-prog-mode "flyspell" nil t))
+  (unless (fboundp 'flyspell-mode)
+    (autoload #'flyspell-mode "flyspell" nil t))
+  (unless (fboundp 'flyspell-buffer)
+    (autoload #'flyspell-buffer "flyspell" nil t))
+  (unless (fboundp 'sb/flyspell-goto-previous-error)
+    (autoload #'sb/flyspell-goto-previous-error "flyspell" nil t))
+  (unless (fboundp 'flyspell-overlay-p)
+    (autoload #'flyspell-overlay-p "flyspell" nil t))
+  (unless (fboundp 'flyspell-correct-previous)
+    (autoload #'flyspell-correct-previous "flyspell" nil t))
+  (unless (fboundp 'flyspell-correct-next)
+    (autoload #'flyspell-correct-next "flyspell" nil t))
+
+  (eval-after-load 'flyspell
+    '(if
+         (fboundp 'diminish)
+         (diminish 'flyspell-mode)))
+
+  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  (add-hook 'conf-mode-hook #'flyspell-prog-mode)
+  (add-hook 'text-mode-hook #'flyspell-mode)
+  ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
+  ;; `find-file-hook' will not work for buffers with no associated files
+  (add-hook 'after-init-hook #'(lambda nil
+                                 (when (string= (buffer-name) "*scratch*")
+                                   (flyspell-mode 1))))
+  (bind-keys :package flyspell
+             ("C-c f f" . flyspell-mode)
+             ("C-c f b" . flyspell-buffer)
+             :map flyspell-mode-map
+             ("C-;")
+             ("C-," . sb/flyspell-goto-previous-error)))
+
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the Save option in a few cases.
-(or
- (use-package flyspell-popup
-   :disabled t
-   :bind ("C-;" . flyspell-popup-correct)
-   :custom (flyspell-popup-correct-delay 0.2))
+;; (unless (fboundp 'flyspell-popup-correct)
+;;   (autoload #'flyspell-popup-correct "flyspell-popup" nil t))
+;; (setq flyspell-popup-correct-delay 0.2)
+;; (bind-keys :package flyspell-popup
+;;            ("C-;" . flyspell-popup-correct))
 
- (use-package flyspell-correct-ivy
-   :ensure flyspell-correct
-   :ensure t
-   :bind ("C-;" . flyspell-correct-wrapper)))
+(unless (fboundp 'flyspell-correct-wrapper)
+  (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
+(bind-keys :package flyspell-correct-ivy
+           ("C-;" . flyspell-correct-wrapper))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
-(use-package spell-fu
-  :defines spell-fu-directory
-  :commands spell-fu-mode
-  :hook (text-mode . spell-fu-mode)
-  :custom
-  (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
-  (spell-fu-faces-exclude '(font-latex-math-face
-                            font-latex-sedate-face
-                            font-lock-function-name-face
-                            font-lock-keyword-face
-                            font-lock-string-face
-                            font-lock-variable-name-face
-                            hl-line
-                            ;; `nxml-mode' is derived from `text-mode'
-                            lsp-face-highlight-read
-                            markdown-blockquote-face
-                            markdown-code-face
-                            markdown-html-attr-name-face
-                            markdown-html-attr-value-face
-                            markdown-html-tag-name-face
-                            markdown-inline-code-face
-                            markdown-link-face
-                            markdown-markup-face
-                            markdown-plain-url-face
-                            markdown-reference-face
-                            markdown-url-face
-                            nxml-attribute-local-name
-                            org-block
-                            org-block-begin-line
-                            org-block-end-line
-                            org-code
-                            org-date
-                            org-formula
-                            org-latex-and-related
-                            org-link
-                            org-meta-line
-                            org-property-value
-                            org-ref-cite-face
-                            org-special-keyword
-                            org-tag
-                            org-todo
-                            org-todo-keyword-done
-                            org-todo-keyword-habt
-                            org-todo-keyword-kill
-                            org-todo-keyword-outd
-                            org-todo-keyword-todo
-                            org-todo-keyword-wait
-                            org-verbatim))
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
-  :bind
-  (("C-c f n" . spell-fu-goto-next-error)
-   ("C-c f p" . spell-fu-goto-previous-error)
-   ("C-c f a" . spell-fu-word-add)))
 
-(or
- (use-package highlight-indentation
-   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-   :hook ((yaml-mode python-mode) . highlight-indentation-mode))
+(unless (fboundp 'spell-fu-mode)
+  (autoload #'spell-fu-mode "spell-fu" nil t))
+(unless (fboundp 'spell-fu-goto-next-error)
+  (autoload #'spell-fu-goto-next-error "spell-fu" nil t))
+(unless (fboundp 'spell-fu-goto-previous-error)
+  (autoload #'spell-fu-goto-previous-error "spell-fu" nil t))
+(unless (fboundp 'spell-fu-word-add)
+  (autoload #'spell-fu-word-add "spell-fu" nil t))
+(add-hook 'text-mode-hook #'spell-fu-mode)
 
- (use-package highlight-indent-guides
-   :disabled t
-   :diminish
-   :hook ((yaml-mode python-mode) . highlight-indent-guides-mode)
-   :custom (highlight-indent-guides-method 'character)))
+(eval-after-load 'spell-fu
+  '(progn
+     ;; `nxml-mode' is derived from `text-mode'
+     (setq spell-fu-faces-exclude '(font-latex-math-face
+                                    font-latex-sedate-face
+                                    font-lock-function-name-face
+                                    font-lock-keyword-face
+                                    font-lock-string-face
+                                    font-lock-variable-name-face
+                                    hl-line
+                                    lsp-face-highlight-read
+                                    markdown-blockquote-face
+                                    markdown-code-face
+                                    markdown-html-attr-name-face
+                                    markdown-html-attr-value-face
+                                    markdown-html-tag-name-face
+                                    markdown-inline-code-face
+                                    markdown-link-face
+                                    markdown-markup-face
+                                    markdown-plain-url-face
+                                    markdown-reference-face
+                                    markdown-url-face
+                                    nxml-attribute-local-name
+                                    org-block
+                                    org-block-begin-line
+                                    org-block-end-line
+                                    org-code
+                                    org-date
+                                    org-formula
+                                    org-latex-and-related
+                                    org-link
+                                    org-meta-line
+                                    org-property-value
+                                    org-ref-cite-face
+                                    org-special-keyword
+                                    org-tag
+                                    org-todo
+                                    org-todo-keyword-done
+                                    org-todo-keyword-habt
+                                    org-todo-keyword-kill
+                                    org-todo-keyword-outd
+                                    org-todo-keyword-todo
+                                    org-todo-keyword-wait
+                                    org-verbatim))
+
+     (if (bound-and-true-p sb/use-no-littering)
+         (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+       (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
+     t))
+(bind-keys :package spell-fu
+           ("C-c f n" . spell-fu-goto-next-error)
+           ("C-c f p" . spell-fu-goto-previous-error)
+           ("C-c f a" . spell-fu-word-add))
+
+(unless (fboundp 'highlight-indentation-mode)
+  (autoload #'highlight-indentation-mode "highlight-indentation" nil t))
+(add-hook 'yaml-mode-hook #'highlight-indentation-mode)
+(add-hook 'python-mode-hook #'highlight-indentation-mode)
+
+(eval-after-load 'highlight-indentation
+  '(progn
+     (if (fboundp 'diminish)
+         (diminish 'highlight-indentation-mode))
+     (if (fboundp 'diminish)
+         (diminish 'highlight-indentation-current-column-mode))))
 
 ;; Claims to be better than `electric-indent-mode'
-(use-package aggressive-indent
-  :diminish
-  :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
-  :custom
-  (aggressive-indent-comments-too t)
-  (aggressive-indent-dont-electric-modes t "Never use `electric-indent-mode'"))
+(unless (fboundp 'aggressive-indent-mode)
+  (autoload #'aggressive-indent-mode "aggressive-indent" nil t))
+(add-hook 'lisp-mode-hook #'aggressive-indent-mode)
+(add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+(add-hook 'lisp-interaction-mode-hook #'aggressive-indent-mode)
 
-(use-package paren
-  :ensure nil
-  :hook (after-init . show-paren-mode)
-  :custom
-  (show-paren-style 'parenthesis) ; `mixed' may lead to performance problems
-  (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t))
+(eval-after-load 'aggressive-indent
+  '(progn
+     (setq aggressive-indent-comments-too t
+           ;; Never use `electric-indent-mode'
+           aggressive-indent-dont-electric-modes t)
+     (if (fboundp 'diminish)
+         (diminish 'aggressive-indent-mode))
+     t))
+
+(unless (fboundp 'show-paren-mode)
+  (autoload #'show-paren-mode "paren" nil t))
+(add-hook 'after-init-hook #'show-paren-mode)
+(setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
+      show-paren-when-point-inside-paren t
+      show-paren-when-point-in-periphery t)
 
 (electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
 
@@ -2040,391 +2028,548 @@ SAVE-FN with non-nil ARGS."
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
 ;; FIXME: Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
-(use-package smartparens-config
-  :ensure smartparens
-  :disabled t
-  ;; :diminish (smartparens-global-mode smartparens-mode
-  ;;                                    show-smartparens-mode show-smartparens-global-mode)
-  :hook
-  (((latex-mode LaTeX-mode) . (lambda ()
-                                (require 'smartparens-latex)))
-   (after-init . (lambda ()
-                   (smartparens-global-mode 1)
-                   (show-smartparens-global-mode 1))))
-  :custom
-  (sp-show-pair-from-inside t)
-  (sp-autoskip-closing-pair 'always)
-  :config
-  ;; (smartparens-strict-mode -1)
 
-  ;; Stop pairing single quotes in elisp
-  (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+;; (unless (fboundp 'sp-beginning-of-sexp)
+;;   (autoload #'sp-beginning-of-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-end-of-sexp)
+;;   (autoload #'sp-end-of-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-up-sexp)
+;;   (autoload #'sp-up-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-down-sexp)
+;;   (autoload #'sp-down-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-forward-sexp)
+;;   (autoload #'sp-forward-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-backward-sexp)
+;;   (autoload #'sp-backward-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-next-sexp)
+;;   (autoload #'sp-next-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-previous-sexp)
+;;   (autoload #'sp-previous-sexp "smartparens-config" nil t))
+;; (unless (fboundp 'sp-backward-symbol)
+;;   (autoload #'sp-backward-symbol "smartparens-config" nil t))
+;; (unless (fboundp 'sp-forward-symbol)
+;;   (autoload #'sp-forward-symbol "smartparens-config" nil t))
+;; (unless (fboundp 'sp-splice-sexp)
+;;   (autoload #'sp-splice-sexp "smartparens-config" nil t))
 
-  (sp-local-pair 'markdown-mode "<" ">")
+;; (add-hook 'latex-mode-hook #'(lambda nil
+;;                                (require 'smartparens-latex)))
+;; (add-hook 'LaTeX-mode-hook #'(lambda nil
+;;                                (require 'smartparens-latex)))
+;; (add-hook 'after-init-hook #'(lambda nil
+;;                                (smartparens-global-mode 1)
+;;                                (show-smartparens-global-mode 1)))
 
-  ;; Do not insert a parenthesis pair when the point is at the beginning of a word
-  ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
-  ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
-  ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
-  ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
-  :bind
-  (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-   ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-   ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-   ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-   ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-   ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-   ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
-   ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
-   ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
-   ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
-   ;; "(foo bar)" -> "foo bar"
-   ("C-M-k" . sp-splice-sexp)))
+;; (eval-after-load 'smartparens-config
+;;   '(progn
+;;      (setq sp-show-pair-from-inside t
+;;            sp-autoskip-closing-pair 'always)
 
-(use-package projectile
-  ;; :ensure-system-package fd
-  :commands (projectile-project-p projectile-project-name
-                                  projectile-expand-root
-                                  projectile-project-root
-                                  projectile-mode)
-  :custom
-  (projectile-auto-discover nil "Do not discover projects")
-  (projectile-enable-caching t "Caching will not watch for new files automatically")
-  (projectile-file-exists-remote-cache-expire nil)
-  ;; Contents of .projectile are ignored when using the `alien' indexing method
-  (projectile-indexing-method 'alien)
-  (projectile-mode-line-prefix "")
-  (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
-  (projectile-sort-order 'access-time)
-  (projectile-verbose nil)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
-          projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
-                                                           sb/temp-directory)))
+;;      ;; Stop pairing single quotes in elisp
+;;      (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+;;      (sp-local-pair 'markdown-mode "<" ">")
 
-  (when (eq sb/modeline-theme 'doom-modeline)
-    (setq projectile-dynamic-mode-line nil))
+;;   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
+;;   ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
+;;   ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
+;;   ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
+;;   ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
 
-  ;; https://github.com/MatthewZMD/.emacs.d
-  (when (and sb/dotemacs-is-windows
-             (executable-find "tr"))
-    (setq projectile-indexing-method 'alien))
+;;      t))
 
-  (defun projectile-default-mode-line ()
-    "Report project name and type in the modeline."
-    (let ((project-name (projectile-project-name)))
-      (format " %s [%s] "
-              projectile-mode-line-prefix
-              (or project-name "-"))))
+;; (bind-keys :package smartparens-config
+;;            ("C-M-a" . sp-beginning-of-sexp)
+;;            ("C-M-e" . sp-end-of-sexp)
+;;            ("C-M-u" . sp-up-sexp)
+;;            ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
+;;            ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+;;            ("C-M-b" . sp-backward-sexp)
+;;            ("C-M-n" . sp-next-sexp)
+;;            ("C-M-p" . sp-previous-sexp)
+;;            ("C-S-b" . sp-backward-symbol)
+;;            ("C-S-f" . sp-forward-symbol)
+;;            ("C-M-k" . sp-splice-sexp))
 
-  (setq projectile-project-root-files
-        '("build.gradle" "pom.xml" "Pipfile" "tox.ini" "setup.py" "requirements.txt" "package.json"
-          "composer.json" "CMakeLists.txt" "Makefile" "WORKSPACE" "meson.build" "SConstruct"
-          "configure.ac" "configure.in"))
 
-  ;; Avoid search when `projectile-mode' is enabled for faster startup
-  ;; (setq projectile-project-search-path (list
-  ;;                                       (concat `,(getenv "HOME") "/bitbucket")
-  ;;                                       (expand-file-name "github" sb/user-home)
-  ;;                                       (expand-file-name "iitk-workspace" sb/user-home)
-  ;;                                       (expand-file-name "iitkgp-workspace" sb/user-home)
-  ;;                                       (expand-file-name "iss-workspace" sb/user-home)
-  ;;                                       (expand-file-name "plass-workspace" sb/user-home)
-  ;;                                       (expand-file-name "prospar-workspace" sb/user-home)
-  ;;                                       (expand-file-name "research" sb/user-home)
-  ;;                                       ))
 
-  (dolist (prjs (list
-                 (expand-file-name sb/user-home) ; Do not consider $HOME as a project
-                 "~/"
-                 (expand-file-name "/tmp")
-                 (expand-file-name "bitbucket/.metadata" sb/user-home)
-                 (expand-file-name "github/.metadata" sb/user-home)
-                 (expand-file-name "iitk-workspace/.metadata" sb/user-home)
-                 (expand-file-name "plass-workspace/.metadata" sb/user-home)
-                 ;; (expand-file-name ".local/lib" sb/user-home)
-                 ))
-    (add-to-list 'projectile-ignored-projects prjs))
+;;   :bind
+;;   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+;;    ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+;;    ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+;;    ("C-M-w" . sp-down-sexp)
+;;    ("C-M-f" . sp-forward-sexp)
+;;    ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+;;    ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
+;;    ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
+;;    ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
+;;    ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
+;;    ;; "(foo bar)" -> "foo bar"
+;;    ("C-M-k" . sp-splice-sexp)))
 
-  ;; Filtering does not work with `alien' indexing
-  (dolist (dirs
-           '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
-             ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
-    (add-to-list 'projectile-globally-ignored-directories dirs))
 
-  (dolist (items
-           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"
-             ;;".dir-locals.el" ".projectile" ".project"
-             ))
-    (add-to-list 'projectile-globally-ignored-files items))
+(unless (fboundp 'projectile-find-file)
+  (autoload #'projectile-find-file "projectile" nil t))
+(unless (fboundp 'projectile-switch-project)
+  (autoload #'projectile-switch-project "projectile" nil t))
+(unless (fboundp 'projectile-add-known-project)
+  (autoload #'projectile-add-known-project "projectile" nil t))
+(unless (fboundp 'projectile-project-p)
+  (autoload #'projectile-project-p "projectile" nil t))
+(unless (fboundp 'projectile-project-name)
+  (autoload #'projectile-project-name "projectile" nil t))
+(unless (fboundp 'projectile-expand-root)
+  (autoload #'projectile-expand-root "projectile" nil t))
+(unless (fboundp 'projectile-project-root)
+  (autoload #'projectile-project-root "projectile" nil t))
+(unless (fboundp 'projectile-mode)
+  (autoload #'projectile-mode "projectile" nil t))
 
-  (dolist (exts
-           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif" ".jar"
-             ".jpeg" ".jpg" ".o" ".odt" ".png" ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm"
-             ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
-    (add-to-list 'projectile-globally-ignored-file-suffixes exts))
+(eval-after-load 'projectile
+  '(progn
+     (setq projectile-auto-discover nil ; Do not discover projects
+           projectile-enable-caching t ; Caching will not watch for new files automatically
+           projectile-file-exists-remote-cache-expire nil
+           projectile-indexing-method 'alien
+           projectile-mode-line-prefix ""
+           projectile-require-project-root t ; Use only in desired directories, too much noise otherwise
+           projectile-sort-order 'access-time
+           projectile-verbose nil)
 
-  (projectile-mode 1)
-  :bind-keymap ("C-c p" . projectile-command-map)
-  :bind
-  ;; Set these in case `counsel-projectile' is disabled
-  (("<f6>"    . projectile-find-file)
-   ("<f5>"    . projectile-switch-project)
-   :map projectile-command-map
-   ("A" . projectile-add-known-project)))
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq  projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
+              projectile-known-projects-file (expand-file-name
+                                              "projectile-known-projects.eld"
+                                              sb/temp-directory)))
+     (when (eq sb/modeline-theme 'doom-modeline)
+       (setq projectile-dynamic-mode-line nil))
 
-(use-package counsel-projectile
-  :defines counsel-projectile-default-file
-  :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
-  :preface
+     ;; https://github.com/MatthewZMD/.emacs.d
+     (when (and sb/dotemacs-is-windows (executable-find "tr"))
+       (setq projectile-indexing-method 'alien))
+
+     (defun projectile-default-mode-line nil
+       "Report project name and type in the modeline."
+       (let
+           ((project-name
+             (projectile-project-name)))
+         (format " %s [%s] " projectile-mode-line-prefix
+                 (or project-name "-"))))
+
+     (setq projectile-project-root-files '("build.gradle"
+                                           "setup.py"
+                                           "requirements.txt"
+                                           "package.json"
+                                           "composer.json"
+                                           "CMakeLists.txt"
+                                           "Makefile"
+                                           "WORKSPACE"
+                                           "meson.build"
+                                           "SConstruct"
+                                           "configure.ac"
+                                           "configure.in"))
+
+     ;; Avoid search when `projectile-mode' is enabled for faster startup
+     ;; (setq projectile-project-search-path (list
+     ;;                                       (concat `,(getenv "HOME") "/bitbucket")
+     ;;                                       (expand-file-name "github" sb/user-home)
+     ;;                                       (expand-file-name "iitk-workspace" sb/user-home)
+     ;;                                       (expand-file-name "iitkgp-workspace" sb/user-home)
+     ;;                                       (expand-file-name "iss-workspace" sb/user-home)
+     ;;                                       (expand-file-name "plass-workspace" sb/user-home)
+     ;;                                       (expand-file-name "prospar-workspace" sb/user-home)
+     ;;                                       (expand-file-name "research" sb/user-home)
+     ;;                                       ))
+
+     (dolist (prjs (list (expand-file-name sb/user-home) ; Do not consider $HOME as a project
+                         "~/"
+                         (expand-file-name "/tmp")
+                         (expand-file-name "bitbucket/.metadata" sb/user-home)
+                         (expand-file-name "github/.metadata" sb/user-home)
+                         (expand-file-name "iitk-workspace/.metadata" sb/user-home)
+                         (expand-file-name "plass-workspace/.metadata" sb/user-home)))
+       (add-to-list 'projectile-ignored-projects prjs))
+
+     ;; Filtering does not work with `alien' indexing
+     (dolist (dirs '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders"
+                     ".svn" ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
+       (add-to-list 'projectile-globally-ignored-directories dirs))
+
+     (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"))
+       (add-to-list 'projectile-globally-ignored-files items))
+
+     (dolist (exts '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif"
+                     ".jar" ".jpeg" ".jpg" ".o" ".odt" ".png" ".ppt" ".pptx" ".pt" ".pyc" ".rel"
+                     ".rip" ".rpm" ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
+       (add-to-list 'projectile-globally-ignored-file-suffixes exts))
+
+     (projectile-mode 1)
+     t))
+
+
+;; Set these in case `counsel-projectile' is disabled
+(bind-keys :package projectile
+           ("<f6>" . projectile-find-file)
+           ("<f5>" . projectile-switch-project)
+           :map projectile-command-map
+           ("A" . projectile-add-known-project))
+
+(unless (fboundp 'counsel-projectile-find-file)
+  (autoload #'counsel-projectile-find-file "counsel-projectile" nil t))
+(unless (fboundp 'counsel-projectile-switch-project)
+  (autoload #'counsel-projectile-switch-project "counsel-projectile" nil t))
+(unless (fboundp 'counsel-projectile-switch-project-by-name)
+  (autoload #'counsel-projectile-switch-project-by-name "counsel-projectile" nil t))
+(unless (fboundp 'counsel-projectile-mode)
+  (autoload #'counsel-projectile-mode "counsel-projectile" nil t))
+
+(eval-and-compile
   (defun sb/counsel-projectile-switch-project-magit (project)
     "Open Magit for the PROJECT."
-    (let ((projectile-switch-project-action 'magit-status))
+    (let
+        ((projectile-switch-project-action 'magit-status))
       (counsel-projectile-switch-project-by-name project)))
 
-  (defun sb/counsel-projectile-open-default-file ()
+  (defun sb/counsel-projectile-open-default-file nil
     "Open the current project's default file.
 This file is specified in `counsel-projectile-default-file'."
     (interactive)
-    (let ((file counsel-projectile-default-file))
-      (if (and file
-               (setq file (projectile-expand-root file))
+    (let
+        ((file counsel-projectile-default-file))
+      (if
+          (and file
+               (setq file
+                     (projectile-expand-root file))
                (file-exists-p file))
           (find-file file)
         (message "File %s doesn't exist." file))))
 
-  ;; Set `counsel-projectile-switch-project-action' to the following action
   (defun sb/counsel-projectile-switch-project-action-default-file (project)
     "Open PROJECT's default file.
 This file is specified in `counsel-projectile-default-file'."
-    (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
+    (let
+        ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
       (counsel-projectile-switch-project-by-name project)))
-  :custom
-  ;; (counsel-projectile-find-file-more-chars 3)
-  (counsel-projectile-remove-current-buffer t)
-  ;; TODO: Is sorting expensive?
-  ;; (counsel-projectile-sort-buffers t)
-  (counsel-projectile-sort-directories t)
-  (counsel-projectile-sort-files t)
-  ;; (counsel-projectile-sort-projects t)
-  :config
-  (counsel-projectile-mode 1)
-  ;; (counsel-projectile-modify-action
-  ;;  'counsel-projectile-switch-project-action
-  ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
-  :bind
-  (("<f6>" . counsel-projectile-find-file)
-   ("<f5>" . counsel-projectile-switch-project)
-   ;; ("<f7>" . counsel-projectile-rg)
-   ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
-   ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
-   ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
-   ;; ([remap projectile-grep]             . counsel-projectile-grep)
-   ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
-   ))
+
+  ;; Set `counsel-projectile-switch-project-action' to the following action
+  ;;   (defun sb/counsel-projectile-switch-project-action-default-file (project)
+  ;;     "Open PROJECT's default file.
+  ;; This file is specified in `counsel-projectile-default-file'."
+  ;;     (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
+  ;;       (counsel-projectile-switch-project-by-name project)))
+
+  )
+
+(eval-after-load 'counsel-projectile
+  '(progn
+     (setq counsel-projectile-remove-current-buffer t
+           counsel-projectile-sort-directories t
+           ;; counsel-projectile-find-file-more-chars 3
+           ;; counsel-projectile-sort-buffers
+           ;; counsel-projectile-sort-projects t
+           counsel-projectile-sort-files t)
+     (counsel-projectile-mode 1)
+     ;; (counsel-projectile-modify-action
+     ;;  'counsel-projectile-switch-project-action
+     ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
+
+     t))
+
+(bind-keys :package counsel-projectile
+           ("<f6>" . counsel-projectile-find-file)
+           ("<f5>" . counsel-projectile-switch-project)
+           ;; ("<f7>" . counsel-projectile-rg)
+           ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
+           ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
+           ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
+           ;; ([remap projectile-grep]             . counsel-projectile-grep)
+           ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
+           )
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
-(use-package all-the-icons-ivy-rich
-  :ensure t
-  :ensure ivy-rich
-  :if (display-graphic-p)
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-  :custom (all-the-icons-ivy-rich-icon-size 0.9))
+(when (display-graphic-p)
+  (unless (fboundp 'all-the-icons-ivy-rich-mode)
+    (autoload #'all-the-icons-ivy-rich-mode "all-the-icons-ivy-rich" nil t))
+  (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
+  (setq all-the-icons-ivy-rich-icon-size 0.9))
 
-;; FIXME: `ivy-rich-modify-column' is not taking effect.
-(use-package ivy-rich
-  :commands ivy-rich-modify-column
-  :hook (ivy-mode . ivy-rich-mode)
-  :custom (ivy-rich-parse-remote-buffer nil)
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  ;; Increase the width to see the major mode clearly
-  (ivy-rich-modify-column 'ivy-switch-buffer
-                          'ivy-rich-switch-buffer-major-mode
-                          '(:width 18 :face warning)))
 
-(use-package counsel-fd
-  :if (executable-find "fd")
-  :bind
-  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
-   ;; Jump to a file below the current directory
-   ("C-x f" . counsel-fd-file-jump)))
+(unless (fboundp 'ivy-rich-mode)
+  (autoload #'ivy-rich-mode "ivy-rich" nil t))
+(unless (fboundp 'ivy-rich-modify-column)
+  (autoload #'ivy-rich-modify-column "ivy-rich" nil t))
+(add-hook 'ivy-mode-hook #'ivy-rich-mode)
+
+(eval-after-load 'ivy-rich
+  '(progn
+     (setq ivy-rich-parse-remote-buffer nil)
+     (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+     ;; FIXME: `ivy-rich-modify-column' is not taking effect.
+     ;; Increase the width to see the major mode clearly
+     (ivy-rich-modify-column 'ivy-switch-buffer 'ivy-rich-switch-buffer-major-mode
+                             '(:width 18 :face warning))
+     t))
+
+(when (executable-find "fd")
+  (unless (fboundp 'counsel-fd-file-jump)
+    autoload( #'counsel-fd-file-jump "counsel-fd" nil t))
+  (unless (fboundp 'counsel-fd-dired-jump)
+    (autoload #'counsel-fd-dired-jump "counsel-fd" nil t))
+  (bind-keys :package counsel-fd
+             ("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
+             ("C-x f" . counsel-fd-file-jump)))
+
+
+(unless (fboundp 'flycheck-mode)
+  (autoload #'flycheck-mode "flycheck" nil t))
+(unless (fboundp 'flycheck-add-next-checker)
+  (autoload #'flycheck-add-next-checker "flycheck" nil t))
+(unless (fboundp 'flycheck-next-checker)
+  (autoload #'flycheck-next-checker "flycheck" nil t))
+(unless (fboundp 'flycheck-previous-error)
+  (autoload #'flycheck-previous-error "flycheck" nil t))
+(unless (fboundp 'flycheck-describe-checker)
+  (autoload #'flycheck-describe-checker "flycheck" nil t))
+(unless (fboundp 'flycheck-buffer)
+  (autoload #'flycheck-buffer "flycheck" nil t))
+(unless (fboundp 'flycheck-list-errors)
+  (autoload #'flycheck-list-errors "flycheck" nil t))
+(unless (fboundp 'flycheck-select-checker)
+  (autoload #'flycheck-select-checker "flycheck" nil t))
+(unless (fboundp 'flycheck-verify-setup)
+  (autoload #'flycheck-verify-setup "flycheck" nil t))
+(unless (fboundp 'flycheck-next-error)
+  (autoload #'flycheck-next-error "flycheck" nil t))
+(unless (fboundp 'flycheck-disable-checker)
+  (autoload #'flycheck-disable-checker "flycheck" nil t))
+(unless (fboundp 'flycheck-add-mode)
+  (autoload #'flycheck-add-mode "flycheck" nil t))
+(unless (fboundp 'flycheck-manual)
+  (autoload #'flycheck-manual "flycheck" nil t))
+
+;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
+;; derived from `text-mode'
+(add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 
 ;; FIXME: Exclude directories and files from being checked
 ;; https://github.com/flycheck/flycheck/issues/1745
-(use-package flycheck
-  :commands (flycheck-add-next-checker
-             flycheck-next-checker
-             flycheck-previous-error
-             flycheck-describe-checker
-             flycheck-buffer
-             flycheck-list-errors
-             flycheck-select-checker
-             flycheck-verify-setup
-             flycheck-next-error
-             flycheck-disable-checker
-             flycheck-add-mode
-             flycheck-manual)
-  :hook
-  ;; There are no checkers for modes like `csv-mode', and many program modes use lsp
-  ;; `yaml-mode' is derived from `text-mode'
-  (emacs-lisp-mode . flycheck-mode)
-  :custom
-  (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line mode-enabled))
-  (flycheck-checker-error-threshold 500)
-  (flycheck-idle-buffer-switch-delay 5) ; seconds
-  (flycheck-idle-change-delay 5) ; seconds
-  (flycheck-emacs-lisp-load-path 'inherit)
-  :init
-  ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
-  (when (or (eq sb/modeline-theme 'spaceline)
-            (eq sb/modeline-theme 'doom-modeline))
-    (setq flycheck-mode-line nil))
+(eval-after-load 'flycheck
+  '(progn
+     (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line
+                                                      mode-enabled)
+           flycheck-checker-error-threshold 500
+           flycheck-idle-buffer-switch-delay 5
+           flycheck-idle-change-delay 5
+           flycheck-emacs-lisp-load-path 'inherit)
 
-  (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                                            sb/user-home)
-                flycheck-pylintrc (expand-file-name ".config/pylintrc" sb/user-home)
-                flycheck-python-pylint-executable "python3"
-                flycheck-shellcheck-follow-sources nil
-                flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
-                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                               sb/textlint-home))
+     ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
+     (when (or (eq sb/modeline-theme 'spaceline)
+               (eq sb/modeline-theme 'doom-modeline))
+       (setq flycheck-mode-line nil))
 
-  ;; Workaround for eslint loading slow
-  ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
-  ;; (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
+     (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name
+                                                              ".markdownlint.json"
+                                                              sb/user-home)
+                   flycheck-pylintrc (expand-file-name ".config/pylintrc" sb/user-home)
+                   flycheck-python-pylint-executable "python3"
+                   flycheck-shellcheck-follow-sources nil
+                   flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
+                   flycheck-textlint-executable (expand-file-name
+                                                 "node_modules/.bin/textlint"
+                                                 sb/textlint-home))
 
-  ;; (dolist (hook '(js-mode js2-mode typescript-mode))
-  ;;   (setq-local flycheck-checker 'javascript-eslint))
-  :config
-  (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
-  (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
-  ;; https://github.com/flycheck/flycheck/issues/1833
-  (add-to-list 'flycheck-hooks-alist
-               '(after-revert-hook . flycheck-buffer)))
+     (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
+     (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
+     ;; https://github.com/flycheck/flycheck/issues/1833
+     (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-(or
- ;; Does not display popup under TTY, check possible workarounds at
- ;; https://github.com/flycheck/flycheck-popup-tip
- (use-package flycheck-pos-tip
-   :if (display-graphic-p)
-   :hook (flycheck-mode . flycheck-pos-tip-mode))
+     ;; Workaround for `eslint' loading slow
+     ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
+     ;; (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
 
- (use-package flycheck-posframe
-   :disabled t
-   :if (display-graphic-p)
-   :hook (flycheck-mode . flycheck-posframe-mode)
-   :custom (flycheck-posframe-position 'point-bottom-left-corner)
-   :config (flycheck-posframe-configure-pretty-defaults)))
+     ;; (dolist (hook '(js-mode js2-mode typescript-mode))
+     ;;   (setq-local flycheck-checker 'javascript-eslint))
 
-(use-package whitespace
-  :disabled t
-  :commands (whitespace-mode global-whitespace-mode
-                             whitespace-buffer whitespace-cleanup
-                             whitespace-turn-off)
-  :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :hook (markdown-mode . whitespace-mode)
-  :custom
-  (show-trailing-whitespace t)
-  (whitespace-line-column sb/fill-column)
-  (whitespace-style '(face lines-tail trailing)))
+     t))
+
+
+;; Does not display popup under TTY, check possible workarounds at
+;; https://github.com/flycheck/flycheck-popup-tip
+(when (display-graphic-p)
+  (unless (fboundp 'flycheck-pos-tip-mode)
+    (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
+  (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
+
+
+(when (display-graphic-p)
+  (unless (fboundp 'flycheck-posframe-mode)
+    (autoload #'flycheck-posframe-mode "flycheck-posframe" nil t))
+  (unless (fboundp 'flycheck-posframe-configure-pretty-defaults)
+    (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
+  (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+
+  (eval-after-load 'flycheck-posframe
+    '(progn
+       (setq flycheck-posframe-position 'point-bottom-left-corner)
+       (flycheck-posframe-configure-pretty-defaults)
+       t)))
+
+(unless (fboundp 'whitespace-mode)
+  (autoload #'whitespace-mode "whitespace" nil t))
+(unless (fboundp 'global-whitespace-mode)
+  (autoload #'global-whitespace-mode "whitespace" nil t))
+(unless (fboundp 'whitespace-buffer)
+  (autoload #'whitespace-buffer "whitespace" nil t))
+(unless (fboundp 'whitespace-cleanup)
+  (autoload #'whitespace-cleanup "whitespace" nil t))
+(unless (fboundp 'whitespace-turn-off)
+  (autoload #'whitespace-turn-off "whitespace" nil t))
+
+(add-hook 'markdown-mode-hook #'whitespace-mode)
+
+(eval-after-load 'whitespace
+  '(progn
+     (setq show-trailing-whitespace t
+           whitespace-line-column sb/fill-column
+           whitespace-style '(face lines-tail trailing))
+     (if (fboundp 'diminish)
+         (diminish 'global-whitespace-mode))
+     (if (fboundp 'diminish)
+         (diminish 'whitespace-mode))
+     (if (fboundp 'diminish)
+         (diminish 'whitespace-newline-mode))))
 
 ;; This is different from whitespace-cleanup since this is unconditional
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
   (setq delete-trailing-lines t) ; `M-x delete-trailing-whitespace' deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-(use-package whitespace-cleanup-mode
-  :diminish
-  :hook (after-init . global-whitespace-cleanup-mode)
-  :custom (whitespace-cleanup-mode-preserve-point t)
-  :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode))
+(unless (fboundp 'global-whitespace-cleanup-mode)
+  (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
+(add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
+(eval-after-load 'whitespace-cleanup-mode
+  '(progn
+     (setq whitespace-cleanup-mode-preserve-point t)
+     (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+     (if
+         (fboundp 'diminish)
+         (diminish 'whitespace-cleanup-mode))
+     t))
 
-(use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-  :diminish
-  :hook (prog-mode . ws-butler-mode))
+;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+(unless (fboundp 'ws-butler-mode)
+  (autoload #'ws-butler-mode "ws-butler" nil t))
+(add-hook 'prog-mode-hook #'ws-butler-mode)
+(eval-after-load 'ws-butler
+  '(if (fboundp 'diminish)
+       (diminish 'ws-butler-mode)))
 
-(use-package symbol-overlay ; Highlight symbol under point
-  :diminish
-  :hook ((prog-mode html-mode yaml-mode) . symbol-overlay-mode)
-  :bind
-  (("M-p" . symbol-overlay-jump-prev)
-   ("M-n" . symbol-overlay-jump-next)))
+;; Highlight symbol under point
+(unless (fboundp 'symbol-overlay-mode)
+  (autoload #'symbol-overlay-mode "symbol-overlay" nil t))
+(unless (fboundp 'symbol-overlay-jump-prev)
+  (autoload #'symbol-overlay-jump-prev "symbol-overlay" nil t))
+(unless (fboundp 'symbol-overlay-jump-next)
+  (autoload #'symbol-overlay-jump-next "symbol-overlay" nil t))
 
-(use-package hl-todo
-  :hook (after-init . global-hl-todo-mode)
-  :custom (hl-todo-highlight-punctuation ":")
-  :config
-  (add-to-list 'hl-todo-keyword-faces '("LATER" . "#d0bf8f"))
-  (add-to-list 'hl-todo-keyword-faces '("ISSUE" . "#ff8c00"))
-  (add-to-list 'hl-todo-keyword-faces '("DEBUG" . "#ff8c00"))
-  (add-to-list 'hl-todo-keyword-faces '("TEST" . "tomato"))
-  (add-to-list 'hl-todo-keyword-faces '("WARNING" . "#cc0000"))
-  (add-to-list 'hl-todo-keyword-faces '("BEWARE" . "#aa0000"))
-  (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
-  (add-to-list 'hl-todo-keyword-faces '("REFACTOR" . "#cc9393"))
-  (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
-  (add-to-list 'hl-todo-keyword-faces '("REVIEW" . "#6ae4b9")))
+(add-hook 'prog-mode-hook #'symbol-overlay-mode)
+(add-hook 'html-mode-hook #'symbol-overlay-mode)
+(add-hook 'yaml-mode-hook #'symbol-overlay-mode)
+(eval-after-load 'symbol-overlay
+  '(if (fboundp 'diminish)
+       (diminish 'symbol-overlay-mode)
+     ))
+(bind-keys :package symbol-overlay
+           ("M-p" . symbol-overlay-jump-prev)
+           ("M-n" . symbol-overlay-jump-next))
 
-(use-package highlight-numbers
-  :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
+(unless (fboundp 'global-hl-todo-mode)
+  (autoload #'global-hl-todo-mode "hl-todo" nil t))
+(add-hook 'after-init-hook #'global-hl-todo-mode)
+(eval-after-load 'hl-todo
+  '(progn
+     (setq hl-todo-highlight-punctuation ":")
+     (add-to-list 'hl-todo-keyword-faces '("LATER" . "#d0bf8f"))
+     (add-to-list 'hl-todo-keyword-faces '("ISSUE" . "#ff8c00"))
+     (add-to-list 'hl-todo-keyword-faces '("DEBUG" . "#ff8c00"))
+     (add-to-list 'hl-todo-keyword-faces '("TEST" . "tomato"))
+     (add-to-list 'hl-todo-keyword-faces '("WARNING" . "#cc0000"))
+     (add-to-list 'hl-todo-keyword-faces '("BEWARE" . "#aa0000"))
+     (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
+     (add-to-list 'hl-todo-keyword-faces '("REFACTOR" . "#cc9393"))
+     (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
+     (add-to-list 'hl-todo-keyword-faces '("REVIEW" . "#6ae4b9"))
+     t))
 
-(use-package number-separator
-  :ensure nil
-  :load-path "extras"
-  :commands number-separator-mode
-  ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
-  ;;                            :files ("number-separator.el")))
-  :diminish
-  :custom
-  (number-separator ",")
-  (number-separator-interval 3)
-  (number-separator-ignore-threshold 4)
-  (number-separator-decimal-char "."))
+(unless (fboundp 'highlight-numbers-mode)
+  (autoload #'highlight-numbers-mode "highlight-numbers" nil t))
+(add-hook 'prog-mode-hook #'highlight-numbers-mode)
+(add-hook 'conf-mode-hook #'highlight-numbers-mode)
+(add-hook 'css-mode-hook #'highlight-numbers-mode)
+(add-hook 'html-mode-hook #'highlight-numbers-mode)
 
-(use-package highlight-escape-sequences
-  :hook (prog-mode . hes-mode))
+(eval-after-load 'number-separator
+  '(progn
+     (setq number-separator ","
+           number-separator-interval 3
+           number-separator-ignore-threshold 4
+           number-separator-decimal-char ".")
+     (if (fboundp 'diminish)
+         (diminish 'number-sepator-mode))
+     t))
+
+(unless (fboundp 'hes-mode)
+  (autoload #'hes-mode "highlight-escape-sequences" nil t))
+(add-hook 'prog-mode-hook #'hes-mode)
 
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
-(use-package multiple-cursors
-  :bind
-  (("C-<"     . mc/mark-previous-like-this)
-   ("C->"     . mc/mark-next-like-this)
-   ("C-c C-<" . mc/mark-all-like-this)))
 
-;; Edit remote file: `/method:user@host#port:filename'
-;; Shortcut /ssh:: will connect to default user@host#port.
-;; Edit local file with sudo: `C-x C-f /sudo::/etc/hosts'
-;; Open a remote file with ssh + sudo: `C-x C-f /ssh:host|sudo:root:/etc/passwd'
+(unless (fboundp 'mc/mark-previous-like-this)
+  (autoload #'mc/mark-previous-like-this "multiple-cursors" nil t))
+(unless (fboundp 'mc/mark-next-like-this)
+  (autoload #'mc/mark-next-like-this "multiple-cursors" nil t))
+(unless (fboundp 'mc/mark-all-like-this)
+  (autoload #'mc/mark-all-like-this "multiple-cursors" nil t))
+
+(bind-keys :package multiple-cursor
+           ("C-<"     . mc/mark-previous-like-this)
+           ("C->"     . mc/mark-next-like-this)
+           ("C-c C-<" . mc/mark-all-like-this))
+
+;; Edit remote file: `/method:user@host#port:filename'. Shortcut /ssh:: will connect to default
+;; user@host#port.
+;; Edit local file with sudo: `C-x C-f /sudo::/etc/hosts'.
+;; Open a remote file with ssh + sudo: `C-x C-f /ssh:host|sudo:root:/etc/passwd'.
 ;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
 ;; bookmark with `bookmark-set'. To revisit that bookmark, use `bookmark-jump'.
-(use-package tramp
-  ;; :defer 2
-  :custom
-  (tramp-completion-reread-directory-timeout nil)
-  (tramp-default-method "ssh" "SSH is faster than the default SCP")
-  (tramp-default-remote-shell "/bin/bash")
-  (tramp-default-user "swarnendu")
-  (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
-  (tramp-verbose 1)
-  ;; Disable version control
-  (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp
-                                tramp-file-name-regexp))
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    ;; Auto-save to a local directory for better performance
-    (setq tramp-auto-save-directory (expand-file-name "tramp-auto-save" sb/temp-directory)
-          tramp-persistency-file-name (expand-file-name "tramp" sb/temp-directory)))
-  (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  (setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
-  ;; Disable backup
-  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
-  ;; Include this directory in $PATH on remote
-  (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
+(eval-after-load 'tramp
+  '(progn
+     ;; Auto-save to a local directory for better performance
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq tramp-auto-save-directory (expand-file-name "tramp-auto-save" sb/temp-directory)
+             tramp-persistency-file-name (expand-file-name "tramp" sb/temp-directory)))
+
+     (setq tramp-completion-reread-directory-timeout nil
+           tramp-default-method "ssh" ; SSH is faster than the default SCP
+           tramp-default-remote-shell "/bin/bash"
+           tramp-default-user "swarnendu"
+           remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
+           tramp-verbose 1
+           ;; Disable version control
+           vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
+                                        vc-ignore-dir-regexp tramp-file-name-regexp))
+
+     (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
+     (setenv "SHELL" "/bin/bash")
+     ;; Disable backup
+     (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
+     ;; Include this directory in $PATH on remote
+     (add-to-list 'tramp-remote-path (expand-file-name ".local/bin"
+                                                       (getenv "HOME")))
+     (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+     t))
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors
@@ -2437,191 +2582,297 @@ This file is specified in `counsel-projectile-default-file'."
   (counsel-find-file (ivy-read "Remote Tramp targets: " (sb/sshlist))))
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
-(use-package imenu
-  :ensure nil
-  :after (:any markdown-mode yaml-mode prog-mode)
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-items 500)
-  (imenu-max-item-length 100)
-  (imenu-use-popup-menu t "`t' will use a popup menu rather than a minibuffer prompt")
-  (imenu-sort-function nil "`nil' implies no sorting or listing by position in the buffer"))
+;; (eval-after-load 'markdown-mode
+;;   (require 'imenu nil nil))
+;; (eval-after-load 'yaml-mode
+;;   (require 'imenu nil nil))
+;; (eval-after-load 'prog-mode
+;;   (require 'imenu))
 
-(use-package imenu-anywhere
-  :after imenu
-  :demand t)
+(eval-after-load 'imenu
+  '(progn
+     (setq imenu-auto-rescan t
+           imenu-max-items 500
+           imenu-max-item-length 100
+           imenu-use-popup-menu t ; `t' will use a popup menu rather than a minibuffer prompt
+           ;; `nil' implies no sorting or listing by position in the buffer
+           imenu-sort-function nil)
+     (require 'imenu-anywhere nil nil)
+     t))
 
-(defvar tags-revert-without-query)
+;; (defvar tags-revert-without-query)
 (setq large-file-warning-threshold (* 500 1024 1024) ; MB
       tags-add-tables nil
       tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
       ;; Do not ask before rereading the `TAGS' files if they have changed
       tags-revert-without-query t)
 
-(use-package counsel-gtags ; It is less maintained than `counsel-etags'
-  :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'gtags))
-  :diminish
-  ;; :ensure-system-package global
-  ;; :init
-  ;; (add-hook 'c-mode-common-hook
-  ;;           (lambda ()
-  ;;             (when (derived-mode-p 'c-mode 'c++-mode)
-  ;;               (counsel-gtags-mode 1))))
-  :hook ((prog-mode protobuf-mode latex-mode) . counsel-gtags-mode)
-  :custom (counsel-gtags-auto-update t)
-  :bind
-  (:map counsel-gtags-mode-map
-        ("M-'"     . counsel-gtags-dwim)
-        ("M-,"     . counsel-gtags-go-backward)
-        ("M-?"     . counsel-gtags-find-reference)
-        ("C-c g s" . counsel-gtags-find-symbol)
-        ("C-c g d" . counsel-gtags-find-definition)
-        ("C-c g c" . counsel-gtags-create-tags)
-        ("C-c g u" . counsel-gtags-update-tags)))
+;; Gtags is less maintained than `universal-ctags'
+(when (and (eq system-type 'gnu/linux)
+           (eq sb/tags-scheme 'gtags))
+  (unless (fboundp 'counsel-gtags-mode)
+    (autoload #'counsel-gtags-mode "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-dwim)
+    (autoload #'counsel-gtags-dwim "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-go-backward)
+    (autoload #'counsel-gtags-go-backward "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-find-reference)
+    (autoload #'counsel-gtags-find-reference "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-find-symbol)
+    (autoload #'counsel-gtags-find-symbol "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-find-definition)
+    (autoload #'counsel-gtags-find-definition "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-create-tags)
+    (autoload #'counsel-gtags-create-tags "counsel-gtags" nil t))
+  (unless (fboundp 'counsel-gtags-update-tags)
+    (autoload #'counsel-gtags-update-tags "counsel-gtags" nil t))
 
-(use-package global-tags ; Make xref and gtags work together
-  :after counsel-gtags
-  :demand t
-  :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend))
+  (eval-after-load 'counsel-gtags
+    '(progn
+       (setq counsel-gtags-auto-update t)
+       (if (fboundp 'diminish)
+           (diminish 'counsel-gtags-mode))
+       t))
 
-(use-package xref
-  :commands xref-etags-mode
-  :config (xref-etags-mode)
-  :bind
-  (("M-'"   . xref-find-definitions)
-   ("M-?"   . xref-find-references)
-   ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-pop-marker-stack)
-   :map xref--xref-buffer-mode-map
-   ("C-o"   . xref-show-location-at-point)
-   ("<tab>" . xref-quit-and-goto-xref)
-   ("r"     . xref-query-replace-in-results)))
+  (add-hook 'prog-mode-hook #'counsel-gtags-mode)
+  (add-hook 'protobuf-mode-hook #'counsel-gtags-mode)
+  (add-hook 'latex-mode-hook #'counsel-gtags-mode)
 
-(use-package ivy-xref
-  :after (ivy xref)
-  ;; :commands (ivy-xref-show-defs ivy-xref-show-xrefs)
-  :demand t
-  :custom
-  (xref-show-definitions-function #'ivy-xref-show-defs)
-  (xref-show-xrefs-function #'ivy-xref-show-xrefs))
+  (bind-keys :package counsel-gtags :map counsel-gtags-mode-map
+             ("M-'" . counsel-gtags-dwim)
+             ("M-," . counsel-gtags-go-backward)
+             ("M-?" . counsel-gtags-find-reference)
+             ("C-c g s" . counsel-gtags-find-symbol)
+             ("C-c g d" . counsel-gtags-find-definition)
+             ("C-c g c" . counsel-gtags-create-tags)
+             ("C-c g u" . counsel-gtags-update-tags)))
 
-(use-package counsel-etags
-  ;; :ensure-system-package (ctags . "snap install universal-ctags")
-  :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'ctags))
-  :bind
-  (("M-]"     . counsel-etags-find-tag-at-point)
-   ("C-c g s" . counsel-etags-find-symbol-at-point)
-   ("C-c g f" . counsel-etags-find-tag)
-   ("C-c g l" .  counsel-etags-list-tag)
-   ("C-c g c" . counsel-etags-scan-code))
-  :config
-  (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (add-hook 'after-save-hook
-                        #'counsel-etags-virtual-update-tags 'append
-                        'local)))
-  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
-    (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
-  (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
-    (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
+;; Make xref and gtags work together
+(eval-after-load 'counsel-gtags
+  '(progn
+     (require 'global-tags nil nil)
+     (add-to-list 'xref-backend-functions 'global-tags-xref-backend)
+     t))
 
-(use-package dumb-jump
-  :after xref
-  :demand t
-  :commands dumb-jump-xref-activate
-  :custom
-  (dumb-jump-force-searcher 'rg)
-  (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-quiet t)
-  :config (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(unless (fboundp 'xref-find-definitions)
+  (autoload #'xref-find-definitions "xref" nil t))
+(unless (fboundp 'xref-find-references)
+  (autoload #'xref-find-references "xref" nil t))
+(unless (fboundp 'xref-find-apropos)
+  (autoload #'xref-find-apropos "xref" nil t))
+(unless (fboundp 'xref-pop-marker-stack)
+  (autoload #'xref-pop-marker-stack "xref" nil t))
+(unless (fboundp 'xref-show-location-at-point)
+  (autoload #'xref-show-location-at-point "xref" nil t))
+(unless (fboundp 'xref-quit-and-goto-xref)
+  (autoload #'xref-quit-and-goto-xref "xref" nil t))
+(unless (fboundp 'xref-query-replace-in-results)
+  (autoload #'xref-query-replace-in-results "xref" nil t))
+(unless (fboundp 'xref-etags-mode)
+  (autoload #'xref-etags-mode "xref" nil t))
+
+(eval-after-load 'xref
+  '(progn
+     (xref-etags-mode)
+     t))
+
+(bind-keys :package xref
+           ("M-'" . xref-find-definitions)
+           ("M-?" . xref-find-references)
+           ("C-M-." . xref-find-apropos)
+           ("M-," . xref-pop-marker-stack)
+           :map xref--xref-buffer-mode-map
+           ("C-o" . xref-show-location-at-point)
+           ("<tab>" . xref-quit-and-goto-xref)
+           ("r" . xref-query-replace-in-results))
+
+(eval-after-load 'xref
+  '(eval-after-load 'ivy
+     '(progn
+        (setq xref-show-definitions-function #'ivy-xref-show-defs
+              xref-show-xrefs-function #'ivy-xref-show-xrefs)
+        (require 'ivy-xref nil nil))))
+
+
+(when (and (eq system-type 'gnu/linux)
+           (eq sb/tags-scheme 'ctags))
+  (unless (fboundp 'counsel-etags-find-tag-at-point)
+    (autoload #'counsel-etags-find-tag-at-point "counsel-etags" nil t))
+  (unless (fboundp 'counsel-etags-find-symbol-at-point)
+    (autoload #'counsel-etags-find-symbol-at-point "counsel-etags" nil t))
+  (unless (fboundp 'counsel-etags-find-tag)
+    (autoload #'counsel-etags-find-tag "counsel-etags" nil t))
+  (unless (fboundp 'counsel-etags-list-tag)
+    (autoload #'counsel-etags-list-tag "counsel-etags" nil t))
+  (unless (fboundp 'counsel-etags-scan-code)
+    (autoload #'counsel-etags-scan-code "counsel-etags" nil t))
+
+  (eval-after-load 'counsel-etags
+    '(progn
+       (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
+
+       (add-hook 'prog-mode-hook (lambda nil
+                                   (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags
+                                             'append 'local)))
+
+       (dolist  (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
+         (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
+
+       (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
+         (add-to-list 'counsel-etags-ignore-filenames ignore-files))
+       t))
+
+  (bind-keys :package counsel-etags
+             ("M-]" . counsel-etags-find-tag-at-point)
+             ("C-c g s" . counsel-etags-find-symbol-at-point)
+             ("C-c g f" . counsel-etags-find-tag)
+             ("C-c g l" . counsel-etags-list-tag)
+             ("C-c g c" . counsel-etags-scan-code)))
+
+(eval-after-load 'xref
+  '(progn
+     (setq dumb-jump-force-searcher 'rg
+           dumb-jump-prefer-searcher 'rg
+           dumb-jump-quiet t)
+
+     (require 'dumb-jump nil nil)
+
+     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+     t))
+
+(unless (fboundp 'helpful-variable)
+  (autoload #'helpful-variable "helpful" nil t))
+(unless (fboundp 'helpful-key)
+  (autoload #'helpful-key "helpful" nil t))
+(unless (fboundp 'helpful-callable)
+  (autoload #'helpful-callable "helpful" nil t))
+(unless (fboundp 'helpful-symbol)
+  (autoload #'helpful-symbol "helpful" nil t))
+(unless (fboundp 'helpful-command)
+  (autoload #'helpful-command "helpful" nil t))
+(unless (fboundp 'helpful-at-point)
+  (autoload #'helpful-at-point "helpful" nil t))
+(unless (fboundp 'helpful-kill-buffers)
+  (autoload #'helpful-kill-buffers "helpful" nil t))
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so `helpful-callable' as a drop-in replacement.
-(use-package helpful
-  :bind
-  (([remap describe-variable] . helpful-variable)
-   ([remap describe-key]      . helpful-key)
-   ([remap describe-function] . helpful-callable)
-   ([remap describe-symbol]   . helpful-symbol)
-   ("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h f" . helpful-callable)
-   ("C-h c" . helpful-command)
-   ("C-h p" . helpful-at-point)
-   :map helpful-mode-map
-   ("q"     . helpful-kill-buffers)))
+(bind-keys :package helpful
+           ([remap describe-variable] . helpful-variable)
+           ([remap describe-key] . helpful-key)
+           ([remap describe-function] . helpful-callable)
+           ([remap describe-symbol] . helpful-symbol)
+           ("C-h v" . helpful-variable)
+           ("C-h k" . helpful-key)
+           ("C-h f" . helpful-callable)
+           ("C-h c" . helpful-command)
+           ("C-h p" . helpful-at-point)
+           :map helpful-mode-map
+           ("q" . helpful-kill-buffers))
 
-(use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
-  :commands vlf
-  :custom (vlf-application 'dont-ask)
-  :config (use-package vlf-setup))
+;; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
+(unless (fboundp 'vlf)
+  (autoload #'vlf "vlf" nil t))
+(eval-after-load 'vlf
+  '(progn
+     (setq vlf-application 'dont-ask)
+     (require 'vlf-setup nil nil )
+     t))
 
-(use-package hungry-delete ; Erase all consecutive white space characters in a given direction
-  :commands hungry-delete-mode
-  :diminish
-  :hook
-  ((minibuffer-setup . (lambda ()
-                         (hungry-delete-mode -1)))
-   (after-init . global-hungry-delete-mode)))
+;; Erase all consecutive white space characters in a given direction
+(unless (fboundp 'hungry-delete-mode)
+  (autoload #'hungry-delete-mode "hungry-delete" nil t))
+(unless (fboundp 'global-hungry-delete-mode)
+  (autoload #'global-hungry-delete-mode "hungry-delete" nil t))
 
-(use-package move-text ; Move lines with `M-<up>' and `M-<down>'
-  :commands (move-text-up move-text-down move-text-default-bindings)
-  :init (move-text-default-bindings))
+(add-hook 'after-init-hook #'global-hungry-delete-mode)
+(add-hook 'minibuffer-setup-hook #'(lambda nil
+                                     (hungry-delete-mode -1)))
 
-(use-package duplicate-thing
-  :bind* ("C-c C-d" . duplicate-thing))
+(eval-after-load 'hungry-delete
+  '(if
+       (fboundp 'diminish)
+       (diminish 'hungry-delete-mode)))
+
+
+;; Move lines with `M-<up>' and `M-<down>'
+(unless (fboundp 'move-text-up)
+  (autoload #'move-text-up "move-text" nil t))
+(unless (fboundp 'move-text-down)
+  (autoload #'move-text-down "move-text" nil t))
+(unless (fboundp 'move-text-default-bindings)
+  (autoload #'move-text-default-bindings "move-text" nil t))
+(move-text-default-bindings)
+
+
+(unless (fboundp 'duplicate-thing)
+  (autoload #'duplicate-thing "duplicate-thing" nil t))
+(bind-keys* :package duplicate-thing
+            ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
-(use-package discover-my-major
-  :bind
-  (("C-h C-m" . discover-my-major)
-   ("C-h M-m" . discover-my-mode)))
+(unless (fboundp 'discover-my-major)
+  (autoload #'discover-my-major "discover-my-major" nil t))
+(unless (fboundp 'discover-my-mode)
+  (autoload #'discover-my-mode "discover-my-major" nil t))
+(bind-keys :package discover-my-major
+           ("C-h C-m" . discover-my-major)
+           ("C-h M-m" . discover-my-mode))
 
 ;; Manage minor-mode on the dedicated interface buffer
-(use-package manage-minor-mode
-  :commands manage-minor-mode)
+(unless (fboundp 'manage-minor-mode)
+  (autoload #'manage-minor-mode "manage-minor-mode" nil t))
 
-(use-package jgraph-mode
-  :mode "\\.jgr\\'")
+(unless (fboundp 'jgraph-mode)
+  (autoload #'jgraph-mode "jgraph-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.jgr\\'" . jgraph-mode))
 
-(use-package graphviz-dot-mode
-  :mode "\\.dot\\'")
+(unless (fboundp 'graphviz-dot-mode)
+  (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
 
-(use-package gnuplot
-  :mode "\\.gp\\'"
-  :interpreter ("gnuplot" . gnuplot-mode))
+(unless (fboundp 'gnuplot)
+  (autoload #'gnuplot "gnuplot" nil t))
+(unless (fboundp 'gnuplot-mode)
+  (autoload #'gnuplot-mode "gnuplot" nil t))
+(add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot))
+(add-to-list 'interpreter-mode-alist '("gnuplot" . gnuplot-mode))
+
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
-(use-package popwin
-  :disabled t
-  :hook (after-init . popwin-mode)
-  :config
-  (defvar popwin:special-display-config-backup popwin:special-display-config)
-  (push '("*Help*" :noselect t) popwin:special-display-config)
-  (push '(compilation-mode :noselect t) popwin:special-display-config)
-  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
-  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-  (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
-  (push '("*Selection Ring:") popwin:special-display-config)
-  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
-  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
-  (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
-  (push '("*xref*" :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode :noselect t) popwin:special-display-config)
-  (push "*Shell Command Output*" popwin:special-display-config)
-  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-  (add-to-list 'popwin:special-display-config '("*lsp session*")))
+(unless (fboundp 'popwin-mode)
+  (autoload #'popwin-mode "popwin" nil t))
+(add-hook 'after-init-hook #'popwin-mode)
+
+(eval-after-load 'popwin
+  '(progn
+     (defvar popwin:special-display-config-backup popwin:special-display-config)
+     (push '("*Help*" :noselect t) popwin:special-display-config)
+     (push '(compilation-mode :noselect t) popwin:special-display-config)
+     (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
+     (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
+     (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
+     (push '("*Selection Ring:") popwin:special-display-config)
+     (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+     (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+     (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
+     (push '("^*magit:.+*$" :noselect nil) popwin:special-display-config)
+     (push '("*xref*" :noselect nil) popwin:special-display-config)
+     (push '(helpful-mode :noselect t) popwin:special-display-config)
+     (push "*Shell Command Output*" popwin:special-display-config)
+     (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+     (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+     (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+     (add-to-list 'popwin:special-display-config '("*Apropos*"))
+     (add-to-list 'popwin:special-display-config '("*Warnings*"))
+     (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+     (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+     (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+     (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+     (add-to-list 'popwin:special-display-config '("*lsp session*"))
+     t))
 
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
 (add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
@@ -2638,191 +2889,281 @@ This file is specified in `counsel-projectile-default-file'."
 ;;              (cons "\\*Async Shell Command\\*.*"
 ;;                    (cons #'display-buffer-no-window nil)))
 
-(use-package expand-region ; Expand region by semantic units
-  :bind ("C-=" . er/expand-region))
+;; Expand region by semantic units
+(unless (fboundp 'er/expand-region)
+  (autoload #'er/expand-region "expand-region" nil t))
+(bind-keys :package er/expand-region
+           ("C-=" . er/expand-region))
 
 ;; Restore point to the initial location with `C-g' after marking a region
-(use-package smart-mark
-  :hook (after-init . smart-mark-mode))
+(unless (fboundp 'smart-mark-mode)
+  (autoload #'smart-mark-mode "smart-mark" nil t))
+(add-hook 'after-init-hook #'smart-mark-mode)
 
-(use-package whole-line-or-region
-  :diminish (whole-line-or-region-local-mode)
-  :hook (after-init . whole-line-or-region-global-mode))
+(unless (fboundp 'whole-line-or-region-global-mode)
+  (autoload #'whole-line-or-region-global-mode "whole-line-or-region" nil t))
+(add-hook 'after-init-hook #'whole-line-or-region-global-mode)
+(eval-after-load 'whole-line-or-region
+  '(progn
+     (if (boundp 'diminish)
+         (progn
+           (diminish 'whole-line-or-region-local-mode)
+           (diminish 'whole-line-or-region-global-mode)))
+     t))
 
-(use-package goto-last-change
-  :bind ("C-x C-\\" . goto-last-change))
+(unless (fboundp 'goto-last-change)
+  (autoload #'goto-last-change "goto-last-change" nil t))
+(bind-keys :package goto-last-change
+           ("C-x C-\\" . goto-last-change))
 
-(use-package beginend
-  :hook (after-init . beginend-global-mode)
-  :config
-  (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
-    (diminish mode)))
 
-(use-package undo-tree
-  :defines undo-tree-map
-  :commands global-undo-tree-mode
-  :custom
-  (undo-tree-auto-save-history t)
-  (undo-tree-mode-lighter "")
-  (undo-tree-visualizer-diff t)
-  (undo-tree-visualizer-relative-timestamps t)
-  (undo-tree-visualizer-timestamps t)
-  :config
-  (global-undo-tree-mode 1)
-  (unbind-key "C-/" undo-tree-map)
-  :diminish
-  :bind ("C-x u" . undo-tree-visualize))
+(unless (fboundp 'beginend-global-mode)
+  (autoload #'beginend-global-mode "beginend" nil t))
+(add-hook 'after-init-hook #'beginend-global-mode)
+(eval-after-load 'beginend
+  '(progn
+     (dolist
+         (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
+       (diminish mode))
+     t))
 
-(use-package iedit ; Edit multiple regions in the same way simultaneously
-  :bind* ("C-." . iedit-mode))
+(unless (fboundp 'undo-tree-visualize)
+  (autoload #'undo-tree-visualize "undo-tree" nil t))
+(unless (fboundp 'global-undo-tree-mode)
+  (autoload #'global-undo-tree-mode "undo-tree" nil t))
+(eval-after-load 'undo-tree
+  '(progn
+     (setq undo-tree-auto-save-history t
+           undo-tree-mode-lighter ""
+           undo-tree-visualizer-diff t
+           undo-tree-visualizer-relative-timestamps t
+           undo-tree-visualizer-timestamps t)
+     (global-undo-tree-mode 1)
+     (if
+         (fboundp 'diminish)
+         (diminish 'undo-tree-mode))
+     t))
+(bind-keys :package undo-tree
+           ("C-x u" . undo-tree-visualize))
 
-(use-package session ; Avoid the "Overwrite old session file (not loaded)?" warning
-  :disabled t ; FIXME: Problem unresolved
-  :commands (session-initialize)
-  :init
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq session-save-file (expand-file-name "session" sb/temp-directory)))
-  :hook
-  (after-init . (lambda()
-                  (session-initialize))))
 
-(use-package immortal-scratch
-  :hook (after-init . immortal-scratch-mode))
+;; Edit multiple regions in the same way simultaneously
+(unless (fboundp 'iedit-mode)
+  (autoload #'iedit-mode "iedit" nil t))
+(bind-keys* :package iedit
+            ("C-." . iedit-mode))
 
-;; SB: I use the *scratch* buffer for taking notes, it helps to make the data persist
-(use-package persistent-scratch
-  :hook (after-init . persistent-scratch-setup-default)
-  :custom (persistent-scratch-autosave-interval 60)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
 
-;; Avoid using a separate package, instead use `crux-sudo-edit'
-;; (use-package sudo-edit ; Edit file with sudo
-;;   :bind ("M-s e" . sudo-edit))
+;; Avoid the "Overwrite old session file (not loaded)?" warning
+(unless (fboundp 'session-initialize)
+  (autoload #'session-initialize "session" nil t))
+(unless (bound-and-true-p sb/use-no-littering)
+  (setq session-save-file (expand-file-name "session" sb/temp-directory)))
+(add-hook 'after-init-hook #'(lambda nil
+                               (session-initialize)))
 
-(use-package crux
-  :bind
-  (("C-c d i" . crux-ispell-word-then-abbrev)
-   ("<f12>"   . crux-kill-other-buffers)
-   ("C-c d s" . crux-sudo-edit)))
+(unless (fboundp 'immortal-scratch-mode)
+  (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
+(add-hook 'after-init-hook #'immortal-scratch-mode)
 
-(use-package disable-mouse
-  :diminish disable-mouse-global-mode
-  :hook (after-init . global-disable-mouse-mode))
+;; I use the *scratch* buffer for taking notes, it helps to make the data persist
+(unless (fboundp 'persistent-scratch-setup-default)
+  (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
+(add-hook 'after-init-hook #'persistent-scratch-setup-default)
+(eval-after-load 'persistent-scratch
+  '(progn
+     (setq persistent-scratch-autosave-interval 60)
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq persistent-scratch-save-file (expand-file-name "persistent-scratch"
+                                                            sb/temp-directory)))
+     t))
 
-(use-package avoid
-  :ensure nil
-  :demand t
-  :if (display-graphic-p)
-  :config (mouse-avoidance-mode 'banish))
+(unless (fboundp 'crux-sudo-edit)
+  (autoload #'crux-sudo-edit "crux" nil t))
+(unless (fboundp 'crux-kill-other-buffers)
+  (autoload #'crux-kill-other-buffers "crux" nil t))
+(unless (fboundp 'crux-ispell-word-then-abbrev)
+  (autoload #'crux-ispell-word-then-abbrev "crux" nil t))
+(bind-keys :package crux
+           ("C-c d i" . crux-ispell-word-then-abbrev)
+           ("<f12>"   . crux-kill-other-buffers)
+           ("C-c d s" . crux-sudo-edit))
 
-(use-package apt-sources-list
-  :mode ("\\.list\\'" . apt-sources-list-mode))
+(unless (fboundp 'global-disable-mouse-mode)
+  (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
+(add-hook 'after-init-hook #'global-disable-mouse-mode)
+(eval-after-load 'disable-mouse
+  '(if (fboundp 'diminish)
+       (diminish 'disable-mouse-global-mode)))
 
-(use-package rainbow-delimiters
-  :hook ((prog-mode latex-mode LaTeX-mode) . rainbow-delimiters-mode))
+(when (display-graphic-p)
+  (require 'avoid nil nil)
+  (mouse-avoidance-mode 'banish))
 
-(use-package ssh-config-mode
-  :mode ("/\\.ssh/config\\'"     . ssh-config-mode)
-  :mode ("/sshd?_config\\'"      . ssh-config-mode)
-  :mode ("/known_hosts\\'"       . ssh-known-hosts-mode)
-  :mode ("/authorized_keys2?\\'" . ssh-authorized-keys-mode)
-  :hook (ssh-config-mode . turn-on-font-lock))
+(unless (fboundp 'apt-sources-list-mode)
+  (autoload #'apt-sources-list-mode "apt-sources-list" nil t))
+(add-to-list 'auto-mode-alist '("\\.list\\'" . apt-sources-list-mode))
 
-(use-package pomidor
-  :ensure alert
-  :ensure t
-  :commands (pomidor-quit pomidor-break pomidor-reset
-                          pomidor-stop pomidor-hold pomidor-unhold pomidor))
+(unless (fboundp 'rainbow-delimiters-mode)
+  (autoload #'rainbow-delimiters-mode "rainbow-delimiters" nil t))
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'latex-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'LaTex-mode-hook #'rainbow-delimiters-mode)
 
-(use-package ace-window
-  :bind
-  (([remap other-window] . ace-window)
-   ("<f10>"              . ace-window)))
 
-(use-package windmove ; `Shift + direction' arrows
-  :ensure nil
-  :init (windmove-default-keybindings)
-  :custom (windmove-wrap-around t "Wrap around at edges"))
+(unless (fboundp 'ssh-config-mode)
+  (autoload #'ssh-config-mode "ssh-config-mode" nil t))
+(unless (fboundp 'ssh-known-hosts-mode)
+  (autoload #'ssh-known-hosts-mode "ssh-config-mode" nil t))
+(unless (fboundp 'ssh-authorized-keys-mode)
+  (autoload #'ssh-authorized-keys-mode "ssh-config-mode" nil t))
+(unless (fboundp 'turn-on-font-lock)
+  (autoload #'turn-on-font-lock "ssh-config-mode" nil t))
+
+(add-hook 'ssh-config-mode-hook #'turn-on-font-lock)
+
+(add-to-list 'auto-mode-alist '("/\\.ssh/config\\'" . ssh-config-mode))
+(add-to-list 'auto-mode-alist '("/sshd?_config\\'" . ssh-config-mode))
+(add-to-list 'auto-mode-alist '("/known_hosts\\'" . ssh-known-hosts-mode))
+(add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+
+
+(unless (fboundp 'pomidor-quit)
+  (autoload #'pomidor-quit "pomidor" nil t))
+(unless (fboundp 'pomidor-break)
+  (autoload #'pomidor-break "pomidor" nil t))
+(unless (fboundp 'pomidor-reset)
+  (autoload #'pomidor-reset "pomidor" nil t))
+(unless (fboundp 'pomidor-stop)
+  (autoload #'pomidor-stop "pomidor" nil t))
+(unless (fboundp 'pomidor-hold)
+  (autoload #'pomidor-hold "pomidor" nil t))
+(unless (fboundp 'pomidor-unhold)
+  (autoload #'pomidor-unhold "pomidor" nil t))
+(unless (fboundp 'pomidor)
+  (autoload #'pomidor "pomidor" nil t))
+
+(unless (fboundp 'ace-window)
+  (autoload #'ace-window "ace-window" nil t))
+(bind-keys :package ace-window
+           ([remap other-window] . ace-window)
+           ("<f10>" . ace-window))
+
+
+;; `Shift + direction' arrows
+(windmove-default-keybindings)
+(setq windmove-wrap-around t) ; Wrap around at edges
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
 ;; being invoked more frequently.
-(use-package super-save
-  :disabled t
-  :diminish
-  :custom (super-save-remote-files nil "Ignore remote files")
-  :hook (find-file . super-save-mode)
-  :config (add-to-list 'super-save-triggers 'ace-window))
+
+(unless (fboundp 'super-save-mode)
+  (autoload #'super-save-mode "super-save" nil t))
+(add-hook 'find-file-hook #'super-save-mode)
+
+(eval-after-load 'super-save
+  '(progn
+     (setq super-save-remote-files nil) ; Ignore remote files
+     (add-to-list 'super-save-triggers 'ace-window)
+     (if
+         (fboundp 'diminish)
+         (diminish 'super-save-mode))
+     t))
+
 
 ;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
 ;; one of the currently visible isearch candidates using `avy'.
-(use-package avy
-  :demand t
-  :commands avy-setup-default
-  :bind
-  (("M-b" . avy-goto-word-1)
-   ("C-'" . avy-goto-char)
-   ("C-/" . avy-goto-line))
-  ;; :init (setq avy-indent-line-overlay nil)
-  ;; :custom
-  ;; (avy-background t)
-  ;; (avy-highlight-first t)
-  ;; (avy-style 'at)
-  :config (avy-setup-default))
+
+;; (require 'avy nil nil)
+(unless (fboundp 'avy-setup-default)
+  (autoload #'avy-setup-default "avy" nil t))
+(avy-setup-default)
+(eval-after-load 'avy
+  '(progn
+     (setq avy-indent-line-overlay nil
+           avy-background t
+           avy-highlight-first t
+           avy-style 'at)
+     t))
+(bind-keys :package avy
+           ("M-b" . avy-goto-word-1)
+           ("C-'" . avy-goto-char)
+           ("C-/" . avy-goto-line))
 
 ;; This package adds a "C-'" binding to Ivy minibuffer that uses Avy
-(use-package ivy-avy
-  :after (ivy avy)
-  :bind
-  (:map ivy-minibuffer-map
-        ("C-'" . ivy-avy)))
+(eval-after-load 'avy
+  '(eval-after-load 'ivy
+     '(progn
+        (unless (fboundp 'ivy-avy)
+          (autoload #'ivy-avy "ivy-avy" nil t))
+        (bind-keys :package ivy-avy :map ivy-minibuffer-map
+                   ("C-'" . ivy-avy)))))
 
-(use-package bookmark
-  :ensure nil
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory))))
+(eval-after-load 'bookmark
+  '(progn
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory)))
+     t))
 
-(use-package bm
-  :commands (bm-buffer-save-all
-             bm-repository-save
-             ;; bm-repository-load bm-buffer-save
-             ;; bm-buffer-restore
-             )
-  :init (setq bm-restore-repository-on-load t) ; Must be set before `bm' is loaded
-  :config
-  (setq-default bm-buffer-persistence t)
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory)))
-  :hook
-  ((kill-emacs   . (lambda ()
-                     (bm-buffer-save-all)
-                     (bm-repository-save)))
-   (after-save   . bm-buffer-save)
-   (kill-buffer  . bm-buffer-save)
-   (find-file    . bm-buffer-restore)
-   (after-revert . bm-buffer-restore)
-   (after-init   . bm-repository-load))
-  :bind
-  (("C-<f1>" . bm-toggle)
-   ("C-<f2>" . bm-next)
-   ("C-<f3>" . bm-previous)))
 
-(use-package esup
-  :commands esup)
+;; Must be set before `bm' is loaded
+(setq bm-restore-repository-on-load t)
 
-(use-package bug-hunter
-  :commands (bug-hunter-init-file bug-hunter-file))
+(unless (fboundp 'bm-buffer-save)
+  (autoload #'bm-buffer-save "bm" nil t))
+(unless (fboundp 'bm-buffer-restore)
+  (autoload #'bm-buffer-restore "bm" nil t))
+(unless (fboundp 'bm-repository-load)
+  (autoload #'bm-repository-load "bm" nil t))
+(unless (fboundp 'bm-toggle)
+  (autoload #'bm-toggle "bm" nil t))
+(unless (fboundp 'bm-next)
+  (autoload #'bm-next "bm" nil t))
+(unless (fboundp 'bm-previous)
+  (autoload #'bm-previous "bm" nil t))
+(unless (fboundp 'bm-buffer-save-all)
+  (autoload #'bm-buffer-save-all "bm" nil t))
+(unless (fboundp 'bm-repository-save)
+  (autoload #'bm-repository-save "bm" nil t))
 
-(use-package explain-pause-mode
-  :ensure nil
-  :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file"
-  ;; :quelpa ((explain-pause-mode :fetcher github :repo "lastquestion/explain-pause-mode"))
-  :commands (explain-pause-mode explain-pause-top)
-  :diminish)
+(add-hook 'kill-emacs-hook #'(lambda nil
+                               (bm-buffer-save-all)
+                               (bm-repository-save)))
+(add-hook 'after-save-hook #'bm-buffer-save)
+(add-hook 'kill-buffer-hook #'bm-buffer-save)
+(add-hook 'find-file-hook #'bm-buffer-restore)
+(add-hook 'after-revert-hook #'bm-buffer-restore)
+(add-hook 'after-init-hook #'bm-repository-load)
+
+(eval-after-load 'bm
+  '(progn
+     (setq-default bm-buffer-persistence t)
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory)))
+     t))
+
+(bind-keys :package bm
+           ("C-<f1>" . bm-toggle)
+           ("C-<f2>" . bm-next)
+           ("C-<f3>" . bm-previous))
+
+(unless (fboundp 'esup)
+  (autoload #'esup "esup" nil t))
+
+(unless (fboundp 'bug-hunter-file)
+  (autoload #'bug-hunter-file "bug-hunter" nil t))
+(unless (fboundp 'bug-hunter-init-file)
+  (autoload #'bug-hunter-init-file "bug-hunter" nil t))
+
+(unless (fboundp 'explain-pause-mode)
+  (autoload #'explain-pause-mode "explain-pause-mode" nil t))
+(unless (fboundp 'explain-pause-top)
+  (autoload #'explain-pause-top "explain-pause-mode" nil t))
+(eval-after-load 'explain-pause-mode
+  '(
+    (if (fboundp 'diminish)
+        (diminish 'explain-pause-mode))
+    ))
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
 ;; get run for all modes derived from a basic mode such as `text-mode'.
@@ -2836,1099 +3177,1333 @@ This file is specified in `counsel-projectile-default-file'."
               ;; Add `proselint', then `textlint'
               (flycheck-add-next-checker 'proselint 'textlint))))
 
-(use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
-  :disabled t ; textlint includes writegood
-  :diminish
-  :hook (text-mode . writegood-mode))
+;; Identify weasel words, passive voice, and duplicate words
+(unless (fboundp 'writegood-mode)
+  (autoload #'writegood-mode "writegood-mode" nil t))
+(eval-after-load 'writegood-mode
+  '(
+    (if (fboundp 'writegood-mode)
+        (diminish 'writegood-mode))
+    ))
 
-(use-package langtool
-  :after text-mode
-  :commands langtool-check
-  :custom
-  (langtool-default-language "en")
-  (langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
-                             "COPYRIGHT"
-                             "DASH_RULE"
-                             "EN_QUOTES"
-                             "EN_UNPAIRED_BRACKETS"
-                             "UPPERCASE_SENTENCE_START"
-                             "WHITESPACE_RULE"))
-  (langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
-                                                no-littering-etc-directory)))
+(eval-after-load 'text-mode
+  '(progn
+     (unless (fboundp 'langtool-check)
+       (autoload #'langtool-check "langtool" nil t))
 
-(use-package wc-mode
-  :commands wc-mode)
+     (setq langtool-default-language "en"
+           langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE" "COPYRIGHT" "DASH_RULE" "EN_QUOTES" "EN_UNPAIRED_BRACKETS" "UPPERCASE_SENTENCE_START" "WHITESPACE_RULE")
+           langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
+                                                        no-littering-etc-directory))))
+
+(unless (fboundp 'wc-mode)
+  (autoload #'wc-mode "wc-mode" nil t))
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
-(use-package define-word
-  :commands (define-word define-word-at-point))
+(unless (fboundp 'define-word)
+  (autoload #'define-word "define-word" nil t))
+(unless (fboundp 'define-word-at-point)
+  (autoload #'define-word-at-point "define-word" nil t))
 
-(use-package emojify
-  :commands (global-emojify-mode emojify-mode))
+(unless (fboundp 'emojify-mode)
+  (autoload #'emojify-mode "emojify" nil t))
+(unless (fboundp 'global-emojify-mode)
+  (autoload #'global-emojify-mode "emojify" nil t))
+
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
-(use-package pdf-tools
-  :defer 2 ; Expensive to load
-  :commands (pdf-tools-install pdf-loader-install)
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  :magic ("%PDF" . pdf-view-mode)
-  ;; :init (pdf-tools-install :no-query)
-  :config
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
-  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
-  ;; (add-hook 'pdf-view-mode-hook (lambda ()
-  ;;                                 (setq header-line-format nil)))
-  :custom
-  (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
-  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
-  :bind
-  (:map pdf-view-mode-map
-        ("C-s" . isearch-forward)
-        ("d" . pdf-annot-delete)
-        ("h" . pdf-annot-add-highlight-markup-annotation)
-        ("t" . pdf-annot-add-text-annotation)))
+(unless (fboundp 'pdf-view-mode)
+  (autoload #'pdf-view-mode "pdf-tools" nil t))
+(unless (fboundp 'isearch-forward)
+  (autoload #'isearch-forward "pdf-tools" nil t))
+(unless (fboundp 'pdf-annot-delete)
+  (autoload #'pdf-annot-delete "pdf-tools" nil t))
+(unless (fboundp 'pdf-annot-add-highlight-markup-annotation)
+  (autoload #'pdf-annot-add-highlight-markup-annotation "pdf-tools" nil t))
+(unless (fboundp 'pdf-annot-add-text-annotation)
+  (autoload #'pdf-annot-add-text-annotation "pdf-tools" nil t))
+(unless (fboundp 'pdf-tools-install)
+  (autoload #'pdf-tools-install "pdf-tools" nil t))
+(unless (fboundp 'pdf-loader-install)
+  (autoload #'pdf-loader-install "pdf-tools" nil t))
 
-(use-package saveplace-pdf-view
-  :after pdf-tools
-  :after saveplace
-  :demand t)
+;; Expensive to load
+(run-with-idle-timer 2 nil #'require 'pdf-tools nil t)
+(add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
+(add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
 
-(use-package logview
-  :mode ("\\.log\\'" . logview-mode)
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory))))
+(eval-after-load 'pdf-tools
+  '(progn
+     ;; (pdf-tools-install :no-query)
+     (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
 
-(use-package antlr-mode
-  :ensure nil
-  :mode "\\.g4\\'")
+     (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
+           ;; Fine-grained zoom factor of 10%
+           pdf-view-resize-factor 1.1)
 
-(use-package bison-mode
-  :mode ("\\.y\\'" "\\.l\\'" "\\.bison\\'"))
+     (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
-(use-package llvm-mode
-  :ensure nil
-  :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file [3 times]"
-  ;; This will clone the llvm project
-  ;; :quelpa ((llvm-mode :fetcher github :repo "llvm/llvm-project"
-  ;;                     :files ("llvm/utils/emacs/llvm-mode.el")))
-  :mode "\\.ll\\'")
+     ;; (add-hook 'pdf-view-mode-hook (lambda ()
+     ;;                                 (setq header-line-format nil)))
 
-(use-package tablegen-mode
-  :ensure nil
-  :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file [3 times]"
-  ;; This will clone the llvm project
-  ;; :quelpa ((tablegen-mode :fetcher github :repo "llvm/llvm-project"
-  ;;                         :files ("llvm/utils/emacs/tablegen-mode.el")))
-  :mode "\\.td\\'")
+     t))
 
-(use-package autodisass-llvm-bitcode
-  :mode "\\.bc\\'")
+(bind-keys :package pdf-tools :map pdf-view-mode-map
+           ("C-s" . isearch-forward)
+           ("d" . pdf-annot-delete)
+           ("h" . pdf-annot-add-highlight-markup-annotation)
+           ("t" . pdf-annot-add-text-annotation))
 
-(use-package markdown-mode
-  :mode
-  ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'"       . markdown-mode)
-   ("\\.markdown\\'" . markdown-mode)
-   ("README\\.md\\'" . gfm-mode))
-  ;; :init
-  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
-  ;; (setq-default markdown-hide-markup t)
-  :custom
-  (markdown-command
-   "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
-  (markdown-enable-math t "Syntax highlight for LaTeX fragments")
-  (markdown-enable-wiki-links t)
-  ;; https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
-  (markdown-fontify-code-blocks-natively t)
-  (markdown-indent-on-enter 'indent-and-new-item)
-  ;; (markdown-make-gfm-checkboxes-buttons nil)
-  (markdown-list-indent-width 2)
-  (markdown-split-window-direction 'horizontal)
-  :config
-  (unbind-key "C-c C-j")
-  ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
-  ;; `markdown-mode' is derived from `text-mode'
-  (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint))
+(eval-after-load 'saveplace
+  '(eval-after-load 'pdf-tools
+     '(require 'saveplace-pdf-view nil nil)))
 
-(use-package markdown-mode+
-  :after markdown-mode
-  :demand t)
+(unless (fboundp 'logview-mode)
+  (autoload #'logview-mode "logview" nil t))
+(eval-after-load 'logview
+  '(progn
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory)))
+     t))
+(add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
 
-(use-package markdown-toc
-  :after markdown-mode
-  :commands (markdown-toc-refresh-toc
-             markdown-toc-generate-toc
-             markdown-toc-generate-or-refresh-toc))
+(unless (fboundp 'antlr-mode)
+  (autoload #'antlr-mode "antlr-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
+
+(unless (fboundp 'bison-mode)
+  (autoload #'bison-mode "bison-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.y\\'" . bison-mode))
+(add-to-list 'auto-mode-alist '("\\.l\\'" . bison-mode))
+(add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode))
+
+
+(eval-and-compile
+  (add-to-list 'load-path "/home/swarnendu/.emacs.d/extras"))
+(unless (fboundp 'llvm-mode)
+  (autoload #'llvm-mode "llvm-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
+
+(eval-and-compile
+  (add-to-list 'load-path "/home/swarnendu/.emacs.d/extras"))
+(unless
+    (fboundp 'tablegen-mode)
+  (autoload #'tablegen-mode "tablegen-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.td\\'" . tablegen-mode))
+
+
+(unless (fboundp 'autodisass-llvm-bitcode)
+  (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
+(add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
+
+
+(unless (fboundp 'markdown-mode)
+  (autoload #'markdown-mode "markdown-mode" nil t))
+(unless (fboundp 'gfm-mode)
+  (autoload #'gfm-mode "markdown-mode" nil t))
+
+(eval-after-load 'markdown-mode
+  '(progn
+     ;; Looks good, but hiding markup makes it difficult to be consistent while editing
+     ;; (setq-default markdown-hide-markup t)
+
+     (setq markdown-command
+           "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
+           markdown-enable-math t ; Syntax highlight for LaTeX fragments
+           markdown-enable-wiki-links t
+           ;;   https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
+           markdown-fontify-code-blocks-natively t
+           markdown-indent-on-enter 'indent-and-new-item
+           markdown-list-indent-width 2
+           ;; markdown-make-gfm-checkboxes-buttons nil
+           markdown-split-window-direction 'horizontal)
+
+     (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)
+     ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
+     ;; `markdown-mode' is derived from `text-mode'
+
+     t))
+
+;; The order is important to associate "README.md" with `gfm-mode'
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+
+(eval-after-load 'markdown-mode
+  '(require 'markdown-mode+ nil nil))
+
+(eval-after-load 'markdown-mode
+  '(progn
+     (unless (fboundp 'markdown-toc-refresh-toc)
+       (autoload #'markdown-toc-refresh-toc "markdown-toc" nil t))
+     (unless (fboundp 'markdown-toc-generate-toc)
+       (autoload #'markdown-toc-generate-toc "markdown-toc" nil t))
+     (unless (fboundp 'markdown-toc-generate-or-refresh-toc)
+       (autoload #'markdown-toc-generate-or-refresh-toc "markdown-toc" nil t))))
+
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
-(use-package pandoc-mode
-  ;; :ensure-system-package pandoc
-  :commands (pandoc-load-default-settings)
-  :diminish
-  :hook (markdown-mode . pandoc-mode)
-  :config
-  (pandoc-load-default-settings)
-  ;; Binds `C-c /' to `pandoc-main-hydra/body'.
-  (unbind-key "C-c /" pandoc-mode-map))
+(unless (fboundp 'pandoc-mode)
+  (autoload #'pandoc-mode "pandoc-mode" nil t))
+(unless (fboundp 'pandoc-load-default-settings)
+  (autoload #'pandoc-load-default-settings "pandoc-mode" nil t))
+(add-hook 'markdown-mode-hook #'pandoc-mode)
 
-(use-package grip-mode
-  :if (executable-find "grip")
-  :bind
-  (:map markdown-mode-command-map
-        ("g" . grip-mode)))
+;; Binds `C-c /' to `pandoc-main-hydra/body'.
+;; (unbind-key "C-c /" pandoc-mode-map))
+(eval-after-load 'pandoc-mode
+  '(progn
+     (pandoc-load-default-settings)
+     (if
+         (fboundp 'diminish)
+         (diminish 'pandoc-mode))
+     t))
 
-(use-package markdown-preview-mode
-  :commands markdown-preview-mode)
+(when (executable-find "grip")
+  (unless (fboundp 'grip-mode)
+    (autoload #'grip-mode "grip-mode" nil t))
+  (bind-keys :package grip-mode :map markdown-mode-command-map
+             ("g" . grip-mode)))
 
-;; Search the current buffer's parent directories for `node_modules/.bin'. Traverse the directory
-;; structure up, until reaching the user's home directory, or hitting `add-node-modules-max-depth'.
-;; Any path found is added to the `exec-path'.
-(use-package add-node-modules-path
-  :disabled t
-  :init
-  (dolist (mode '(typescript-mode js-mode js2-mode coffee-mode))
-    (add-hook (derived-mode-hook-name mode) #'add-node-modules-path)))
+(unless (fboundp 'markdown-preview-mode)
+  (autoload #'markdown-preview-mode "markdown-preview-mode" nil t))
 
 ;; LATER: Prettier times out setting up the process on a remote machine
-(use-package prettier
-  :if (executable-find "prettier")
-  :hook
-  ;; Should work with `gfm-mode', `css-mode', and `html-mode'
-  ((markdown-mode web-mode json-mode jsonc-mode js2-mode)
-   . (lambda ()
-       (when (and buffer-file-name
-                  (not (file-remote-p buffer-file-name)))
-         (prettier-mode 1))))
-  :custom (prettier-lighter nil))
+
+(when (executable-find "prettier")
+  (setq prettier-lighter nil)
+  ;; Should work with `gfm-mode'
+  (add-hook 'markdown-mode-hook #'(lambda nil
+                                    (when (and buffer-file-name
+                                               (not (file-remote-p buffer-file-name)))
+                                      (prettier-mode 1))))
+  ;; Should work with `css-mode' and `html-mode'
+  (add-hook 'web-mode-hook #'(lambda nil
+                               (when (and buffer-file-name
+                                          (not (file-remote-p buffer-file-name)))
+                                 (prettier-mode 1))))
+  (add-hook 'json-mode-hook #'(lambda nil
+                                (when (and buffer-file-name
+                                           (not (file-remote-p buffer-file-name)))
+                                  (prettier-mode 1))))
+  (add-hook 'jsonc-mode-hook #'(lambda nil
+                                 (when (and buffer-file-name
+                                            (not (file-remote-p buffer-file-name)))
+                                   (prettier-mode 1))))
+  (add-hook 'js2-mode-hook #'(lambda nil
+                               (when (and buffer-file-name
+                                          (not (file-remote-p buffer-file-name)))
+                                 (prettier-mode 1)))))
+
 
 ;; Align fields with `C-c C-a'
-(use-package csv-mode
-  :mode "\\.csv\\'"
-  :custom (csv-separators '("," ";" "|" " ")))
+(unless (fboundp 'csv-mode)
+  (autoload #'csv-mode "csv-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+(setq csv-separators '("," ";" "|" " "))
 
-(use-package highlight-doxygen
-  :commands highlight-doxygen-global-mode
-  :config (highlight-doxygen-global-mode))
+(unless (fboundp 'highlight-doxygen-global-mode)
+  (autoload #'highlight-doxygen-global-mode "highlight-doxygen" nil t))
+(eval-after-load 'highlight-doxygen
+  '(progn
+     (highlight-doxygen-global-mode)
+     t))
 
-(use-package rst
-  :ensure nil
-  :mode ("\\.rst\\'" . rst-mode))
+(unless (fboundp 'rst-mode)
+  (autoload #'rst-mode "rst" nil t))
+(add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode))
 
-(use-package xref-rst
-  :hook (rst-mode . xref-rst-mode))
+(unless (fboundp 'xref-rst-mode)
+  (autoload #'xref-rst-mode "xref-rst" nil t))
+(add-hook 'rst-mode-hook #'xref-rst-mode)
 
-(use-package boogie-friends
-  :mode ("\\.smt\\'" . z3-smt2-mode))
+(unless (fboundp 'z3-smt2-mode)
+  (autoload #'z3-smt2-mode "boogie-friends" nil t))
+(add-to-list 'auto-mode-alist '("\\.smt\\'" . z3-smt2-mode))
 
-(use-package z3-mode
-  :commands z3-mode
-  :custom (z3-solver-cmd "z3"))
+(unless (fboundp 'z3-mode)
+  (autoload #'z3-mode "z3-mode" nil t))
+(setq z3-solver-cmd "z3")
 
-(use-package make-mode
-  :ensure nil
-  :mode
-  (("\\Makefile\\'"       . makefile-mode)
-   ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-   ("makefile\\.rules\\'" . makefile-gmake-mode)))
+(unless (fboundp 'makefile-mode)
+  (autoload #'makefile-mode "make-mode" nil t))
+(unless (fboundp 'makefile-gmake-mode)
+  (autoload #'makefile-gmake-mode "make-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
+;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
+(add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
+
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
-(use-package eldoc
-  :ensure nil
-  :if sb/dotemacs-is-linux
-  :diminish
-  :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
-  :custom
-  ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing itself
-  ;; unexpectedly when point is on a variable with a multiline docstring.
-  (eldoc-echo-area-use-multiline-p nil))
+(when (symbol-value 'sb/dotemacs-is-linux)
+  (unless (fboundp 'turn-on-eldoc-mode)
+    (autoload #'turn-on-eldoc-mode "eldoc" nil t))
+  (eval-after-load 'eldoc
+    '(progn
+       ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
+       ;; itself unexpectedly when point is on a variable with a multiline docstring.
+       (setq eldoc-echo-area-use-multiline-p nil)
+       (if (fboundp 'diminish)
+           (diminish 'eldoc-mode))
+       t))
+  (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+  (add-hook 'lisp-mode-hook #'turn-on-eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode))
 
-(use-package c-eldoc
-  :hook (c-mode-common . c-turn-on-eldoc-mode))
+(unless (fboundp 'c-turn-on-eldoc-mode)
+  (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
+(add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
 
-(use-package css-eldoc
-  :after css-mode
-  :demand t
-  :commands css-eldoc-enable
-  :config (css-eldoc-enable))
+(eval-after-load 'css-mode
+  '(progn
+     (require 'css-eldoc nil nil)
+     (css-eldoc-enable)
+     t))
 
-(use-package octave
-  :ensure nil)
+(unless (fboundp 'matlab-mode)
+  (autoload #'matlab-mode "matlab-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.m$" . matlab-mode))
 
-(use-package matlab-mode
-  :mode ("\\.m$" . matlab-mode))
 
-(use-package ess
-  :mode ("/R/.*\\.q\\'" . R-mode)
-  :custom
-  (ess-indent-from-lhs 4)
-  (ess-indent-offset 4)
-  (inferior-R-args "--quiet --no-restore-history --no-save"))
+(unless (fboundp 'R-mode)
+  (autoload #'R-mode "ess" nil t))
+(add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
+(eval-after-load 'ess
+  '(progn
+     (setq ess-indent-from-lhs 4
+           ess-indent-offset 4
+           inferior-R-args "--quiet --no-restore-history --no-save")
+     t))
 
-(use-package ess-smart-underscore
-  :after (:any R-mode ess-mode)
-  :demand t)
+(eval-after-load 'R-mode
+  '(require 'ess-smart-underscore nil nil))
+(eval-after-load 'ess-mode
+  '(require 'ess-smart-underscore nil nil))
 
-(use-package ini-mode
-  :mode "\\.ini\\'")
+(unless (fboundp 'ini-mode)
+  (autoload #'ini-mode "ini-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.ini\\'" . ini-mode))
 
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
-(use-package pkgbuild-mode
-  :mode ("PKGBUILD" . pkgbuild-mode))
+(unless (fboundp 'pkgbuild-mode)
+  (autoload #'pkgbuild-mode "pkgbuild-mode" nil t))
+(add-to-list 'auto-mode-alist '("PKGBUILD" . pkgbuild-mode))
 
-(use-package elisp-mode
-  :ensure nil
-  :mode
-  (("\\.el\\'"  . emacs-lisp-mode)
-   ("\\.elc\\'" . elisp-byte-code-mode))
-  :hook
-  ((lisp-mode emacs-lisp-mode) . (lambda ()
-                                   (when buffer-file-name
-                                     (add-hook 'after-save-hook #'check-parens nil t)
-                                     (flycheck-add-next-checker 'emacs-lisp
-                                                                'emacs-lisp-checkdoc)))))
+(unless (fboundp 'emacs-lisp-mode)
+  (autoload #'emacs-lisp-mode "elisp-mode" nil t))
+(unless (fboundp 'elisp-byte-code-mode)
+  (autoload #'elisp-byte-code-mode "elisp-mode" nil t))
+(add-hook 'lisp-mode-hook #'(lambda nil
+                              (when buffer-file-name
+                                (add-hook 'after-save-hook #'check-parens nil t)
+                                (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))
+(add-hook 'emacs-lisp-mode-hook #'(lambda nil
+                                    (when buffer-file-name
+                                      (add-hook 'after-save-hook #'check-parens nil t)
+                                      (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))
+(add-to-list 'auto-mode-alist '("\\.el\\'" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.elc\\'" . elisp-byte-code-mode))
 
-(use-package lsp-mode
-  :defines (lsp-perl-language-server-path
-            lsp-perl-language-server-port
-            lsp-perl-language-server-client-version
-            lsp-completion--regex-fuz
-            ;; lsp-tramp-connection
-            ;; make-lsp-client
-            ;; lsp-disabled-clients
-            ;; lsp-enabled-clients
-            ;; lsp-pyright-langserver-command-args
-            )
-  :commands (lsp--set-configuration
-             lsp-completion--regex-fuz
-             lsp-register-client
-             lsp-tramp-connection
-             make-lsp-client
-             ;; lsp-format-buffer
-             lsp-configuration-section
-             ;; lsp
-             ;; lsp-deferred
-             ;; lsp--set-configuration
-             lsp-package-ensure
-             ht-merge)
-  ;; https://justin.abrah.ms/dotfiles/emacs.html
-  ;; :ensure-system-package
-  ;; ((typescript-language-server . "npm install -g typescript-language-server")
-  ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
-  ;;  (yaml-language-server . "npm install -g yaml-language-server")
-  ;;  (tsc . "npm install -g typescript"))
-  :hook
-  (
-   ;; https://github.com/emacs-lsp/lsp-mode/issues/2598#issuecomment-776506077
-   ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
-   (lsp-mode . lsp-enable-which-key-integration)
-   (lsp-managed-mode . lsp-modeline-diagnostics-mode)
-   ;; Let us not enable breadcrumbs for all modes
-   ;; ((c++-mode python-mode java-mode web-mode) . lsp-headerline-breadcrumb-mode)
-   (lsp-mode . lsp-modeline-code-actions-mode)
-   ;; FIXME: Registering `lsp-format-buffer' makes sense only if the server is active
-   ((c++-mode java-mode nxml-mode) . (lambda ()
-                                       (add-hook 'before-save-hook #'lsp-format-buffer
-                                                 nil t)))
-   )
-  :custom
-  (lsp-clients-clangd-args '("-j=2"
-                             "--background-index"
-                             "--clang-tidy"
-                             "--pch-storage=memory"
-                             ;; "--suggest-missing-includes"
-                             "--header-insertion=never"
-                             "--fallback-style=LLVM"
-                             "--log=error"))
-  (lsp-completion-enable-additional-text-edit t)
-  (lsp-completion-provider :none)
-  ;; (lsp-eldoc-enable-hover nil)
-  ;; (lsp-eldoc-hook nil)
-  (lsp-enable-dap-auto-configure nil)
-  (lsp-enable-file-watchers nil) ; Could be a directory-local variable
-  (lsp-enable-folding nil)
-  ;; (lsp-enable-indentation nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-semantic-tokens t)
-  (lsp-enable-snippet t) ; Autocomplete parentheses
-  ;; (lsp-enabled-clients '(clangd clangd-remote jsts-ls flow-ls
-  ;;                               ts-ls eslint json-ls
-  ;;                               jsonls-remote cmakels
-  ;;                               cmakels-remote html-ls
-  ;;                               htmlls-remote angular-ls texlab
-  ;;                               texlab-remote jdtls bash-ls
-  ;;                               bashls-remote typescript-remote
-  ;;                               css-ls cssls-remote
-  ;;                               intelephense-remote
-  ;;                               perl-language-server
-  ;;                               perlls-remote php-ls xmlls
-  ;;                               xmlls-remote yamlls yamlls-remote))
-  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
-  (lsp-headerline-breadcrumb-enable-diagnostics nil)
-  (lsp-html-format-wrap-line-length sb/fill-column)
-  (lsp-html-format-end-with-newline t)
-  (lsp-html-format-indent-inner-html t)
-  (lsp-html-format-max-preserve-new-lines nil 1)
-  (lsp-imenu-sort-methods '(position))
-  (lsp-keep-workspace-alive nil)
-  (lsp-log-io nil "texlab communication is huge")
-  (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
-  ;; Sudden changes in the height of the echo area causes the cursor to lose position
-  (lsp-signature-auto-activate nil)
-  (lsp-signature-render-documentation nil)
-  (lsp-xml-logs-client nil)
-  (lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
-                                      sb/extras-directory))
-  (lsp-yaml-print-width sb/fill-column)
-  :custom-face
-  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
-                                               font-lock-doc-face :weight bold :height 0.9))))
-  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
-  (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
-                                                               :weight bold :height 0.9))))
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq lsp-session-file (expand-file-name "lsp-session" sb/temp-directory)))
 
-  (defvar lsp-pyls-configuration-sources)
-  (defvar lsp-pyls-plugins-autopep8-enable)
-  (defvar lsp-pyls-plugins-mccabe-enabled)
-  (defvar lsp-pyls-plugins-pycodestyle-enabled)
-  (defvar lsp-pyls-plugins-pycodestyle-max-line-length)
-  (defvar lsp-pyls-plugins-pydocstyle-convention)
-  (defvar lsp-pyls-plugins-pydocstyle-enabled)
-  (defvar lsp-pyls-plugins-pydocstyle-ignore)
-  (defvar lsp-pyls-plugins-pyflakes-enabled)
-  (defvar lsp-pyls-plugins-pylint-args)
-  (defvar lsp-pyls-plugins-pylint-enabled)
-  (defvar lsp-pyls-plugins-yapf-enabled)
-  (defvar lsp-pyright-langserver-command-args)
+;; LSP support
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "lsp-mode" nil t))
+(unless (fboundp 'lsp-enable-which-key-integration)
+  (autoload #'lsp-enable-which-key-integration "lsp-mode" nil t))
+(unless (fboundp 'lsp-modeline-diagnostics-mode)
+  (autoload #'lsp-modeline-diagnostics-mode "lsp-mode" nil t))
+(unless (fboundp 'lsp-modeline-code-actions-mode)
+  (autoload #'lsp-modeline-code-actions-mode "lsp-mode" nil t))
+(unless (fboundp 'lsp-find-definition)
+  (autoload #'lsp-find-definition "lsp-mode" nil t))
+(unless (fboundp 'lsp-find-declaration)
+  (autoload #'lsp-find-declaration "lsp-mode" nil t))
+(unless (fboundp 'lsp-goto-implementation)
+  (autoload #'lsp-goto-implementation "lsp-mode" nil t))
+(unless (fboundp 'lsp-goto-type-definition)
+  (autoload #'lsp-goto-type-definition "lsp-mode" nil t))
+(unless (fboundp 'lsp-rename)
+  (autoload #'lsp-rename "lsp-mode" nil t))
+(unless (fboundp 'lsp-symbol-highlight)
+  (autoload #'lsp-symbol-highlight "lsp-mode" nil t))
+(unless (fboundp 'lsp-format-buffer)
+  (autoload #'lsp-format-buffer "lsp-mode" nil t))
+(unless (fboundp 'lsp-find-references)
+  (autoload #'lsp-find-references "lsp-mode" nil t))
+(unless (fboundp 'lsp--set-configuration)
+  (autoload #'lsp--set-configuration "lsp-mode" nil t))
+(unless (fboundp 'lsp-completion--regex-fuz)
+  (autoload #'lsp-completion--regex-fuz "lsp-mode" nil t))
+(unless (fboundp 'lsp-register-client)
+  (autoload #'lsp-register-client "lsp-mode" nil t))
+(unless (fboundp 'lsp-tramp-connection)
+  (autoload #'lsp-tramp-connection "lsp-mode" nil t))
+(unless (fboundp 'make-lsp-client)
+  (autoload #'make-lsp-client "lsp-mode" nil t))
+(unless (fboundp 'lsp-configuration-section)
+  (autoload #'lsp-configuration-section "lsp-mode" nil t))
+(unless (fboundp 'lsp-package-ensure)
+  (autoload #'lsp-package-ensure "lsp-mode" nil t))
+(unless (fboundp 'ht-merge)
+  (autoload #'ht-merge "lsp-mode" nil t))
 
-  (when (eq sb/python-langserver 'pyls)
-    (setq lsp-pyls-configuration-sources []
-          lsp-pyls-plugins-autopep8-enable nil
-          ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
-          ;; lsp-pyls-plugins-jedi-completion-fuzzy nil
-          lsp-pyls-plugins-mccabe-enabled nil
-          ;; Set this per-project
-          ;; lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"]
-          lsp-pyls-plugins-pycodestyle-enabled nil
-          lsp-pyls-plugins-pycodestyle-max-line-length sb/fill-column
-          lsp-pyls-plugins-pydocstyle-convention "pep257"
-          lsp-pyls-plugins-pydocstyle-enabled nil
-          lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-          lsp-pyls-plugins-pyflakes-enabled nil
-          lsp-pyls-plugins-pylint-args (vconcat
-                                        (list "-j 2"
-                                              (concat "--rcfile="
-                                                      (expand-file-name ".config/pylintrc"
-                                                                        sb/user-home))))
-          lsp-pyls-plugins-pylint-enabled t ; Pylint can be expensive
-          lsp-pyls-plugins-yapf-enabled t))
+(add-hook 'css-mode-hook #'lsp-deferred)
+(add-hook 'less-mode-hook #'lsp-deferred)
+(add-hook 'sgml-mode-hook #'lsp-deferred)
+(add-hook 'typescript-mode-hook #'lsp-deferred)
+(add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+(add-hook 'lsp-managed-mode-hook #'lsp-modeline-diagnostics-mode)
+(add-hook 'lsp-mode-hook #'lsp-modeline-code-actions-mode)
+(add-hook 'c++-mode-hook #'(lambda nil
+                             (add-hook 'before-save-hook #'lsp-format-buffer nil t)))
+(add-hook 'java-mode-hook #'(lambda nil
+                              (add-hook 'before-save-hook #'lsp-format-buffer nil t)))
+(add-hook 'nxml-mode-hook #'(lambda nil
+                              (add-hook 'before-save-hook #'lsp-format-buffer nil t)))
 
-  (when (eq sb/python-langserver 'pyls)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection "pyls")
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'pyls-remote)))
+(eval-after-load 'lsp-mode
+  '(progn
+     (defvar lsp-pyls-configuration-sources)
+     (defvar lsp-pyls-plugins-autopep8-enable)
+     (defvar lsp-pyls-plugins-mccabe-enabled)
+     (defvar lsp-pyls-plugins-pycodestyle-enabled)
+     (defvar lsp-pyls-plugins-pycodestyle-max-line-length)
+     (defvar lsp-pyls-plugins-pydocstyle-convention)
+     (defvar lsp-pyls-plugins-pydocstyle-enabled)
+     (defvar lsp-pyls-plugins-pydocstyle-ignore)
+     (defvar lsp-pyls-plugins-pyflakes-enabled)
+     (defvar lsp-pyls-plugins-pylint-args)
+     (defvar lsp-pyls-plugins-pylint-enabled)
+     (defvar lsp-pyls-plugins-yapf-enabled)
+     (defvar lsp-pyright-langserver-command-args)
 
-  ;; TODO: Compare with https://github.com/MoozIiSP/doom-emacs-private/blob/e447d65f5887782e0fab67e373291fb07fc16911/site-lisp/config/init-python.el
-  (when (eq sb/python-langserver 'mspyls)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection "mspyls")
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'mspyls-remote)))
+     (setq lsp-clients-clangd-args '("-j=2"
+                                     "--background-index"
+                                     "--clang-tidy"
+                                     "--pch-storage=memory"
+                                     "--header-insertion=never"
+                                     "--fallback-style=LLVM"
+                                     "--log=error")
+           lsp-completion-enable-additional-text-edit t
+           lsp-completion-provider :none
+           lsp-enable-dap-auto-configure nil
+           lsp-enable-file-watchers nil
+           lsp-enable-folding nil
+           lsp-enable-on-type-formatting nil
+           lsp-enable-semantic-tokens t
+           lsp-enable-snippet t
+           lsp-headerline-breadcrumb-enable nil
+           lsp-headerline-breadcrumb-enable-diagnostics nil
+           lsp-html-format-wrap-line-length sb/fill-column
+           lsp-html-format-end-with-newline t
+           lsp-html-format-indent-inner-html t
+           lsp-html-format-max-preserve-new-lines nil
+           lsp-imenu-sort-methods '(position)
+           lsp-keep-workspace-alive nil
+           lsp-log-io nil ; `texlab' communication is huge
+           lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
+           lsp-signature-auto-activate nil
+           lsp-signature-render-documentation nil
+           lsp-xml-logs-client nil
+           lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
+                                              sb/extras-directory)
+           lsp-yaml-print-width sb/fill-column)
 
-  (when (eq sb/python-langserver 'pyright)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       (lambda ()
-                         (cons "pyright-langserver"
-                               lsp-pyright-langserver-command-args)))
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'pyright-remote
-      :multi-root t
-      :initialization-options (lambda ()
-                                (ht-merge (lsp-configuration-section "pyright")
-                                          (lsp-configuration-section "python")))
-      :initialized-fn (lambda (workspace)
-                        (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge (lsp-configuration-section "pyright")
-                                     (lsp-configuration-section "python")))))
-      :download-server-fn (lambda (_client callback error-callback _update?)
-                            (lsp-package-ensure 'pyright callback error-callback))
-      :notification-handlers
-      (lsp-ht
-       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-       ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq lsp-session-file (expand-file-name "lsp-session" sb/temp-directory)))
 
-  (when (eq sb/python-langserver 'jedi)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection "jedi-language-server")
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'jedils-remote)))
+     (custom-set-faces
+      (backquote
+       (lsp-headerline-breadcrumb-symbols-face
+        ((t (:inherit font-lock-doc-face :weight bold :height 0.9))))))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "clangd")
-    :major-modes '(c-mode c++-mode)
-    :remote? t
-    :server-id 'clangd-remote))
+     (custom-set-faces
+      (backquote
+       (lsp-headerline-breadcrumb-prefix-face
+        ((t (:inherit font-lock-string-face :height 0.9))))))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("bash-language-server" "start"))
-    :major-modes '(sh-mode)
-    :remote? t
-    :server-id 'bashls-remote))
+     (custom-set-faces
+      (backquote
+       (lsp-headerline-breadcrumb-project-prefix-face
+        ((t (:inherit font-lock-string-face :weight bold :height 0.9))))))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "intelephense")
-    :major-modes '(php-mode)
-    :remote? t
-    :server-id 'intelephense-remote))
+     (when (eq sb/python-langserver 'pyls)
+       (setq lsp-pyls-configuration-sources []
+             lsp-pyls-plugins-autopep8-enable nil
+             lsp-pyls-plugins-mccabe-enabled nil
+             lsp-pyls-plugins-pycodestyle-enabled nil
+             lsp-pyls-plugins-pycodestyle-max-line-length sb/fill-column
+             lsp-pyls-plugins-pydocstyle-convention "pep257"
+             lsp-pyls-plugins-pydocstyle-enabled nil
+             lsp-pyls-plugins-pydocstyle-ignore (vconcat
+                                                 (list "D100" "D101" "D103" "D213"))
+             lsp-pyls-plugins-pyflakes-enabled nil
+             lsp-pyls-plugins-pylint-args
+             (vconcat
+              (list "-j 2"
+                    (concat "--rcfile="
+                            (expand-file-name ".config/pylintrc" sb/user-home))))
+             lsp-pyls-plugins-pylint-enabled t
+             lsp-pyls-plugins-yapf-enabled t))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "cmake-language-server")
-    :major-modes '(cmake-mode)
-    :remote? t
-    :server-id 'cmakels-remote))
+     (when (eq sb/python-langserver 'pyls)
+       (lsp-register-client
+        (make-lsp-client :new-connection
+                         (lsp-tramp-connection "pyls")
+                         :major-modes
+                         '(python-mode)
+                         :remote\? t :server-id 'pyls-remote)))
 
-  ;; TODO: Check with https://github.com/MagicRB/dotfiles/blob/469f5ca6cfa7f13a8482733903f86b799e50bf65/nixos/home-manager/modules/emacs/.emacs.d/org/lsp-and-ide.org
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("typescript-language-server" "--stdio"))
-    :major-modes '(js-mode typescript-mode)
-    :remote? t
-    :server-id 'typescript-remote))
+     (when (eq sb/python-langserver 'mspyls)
+       (lsp-register-client
+        (make-lsp-client :new-connection
+                         (lsp-tramp-connection "mspyls")
+                         :major-modes
+                         '(python-mode)
+                         :remote\? t :server-id 'mspyls-remote)))
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "texlab")
-  ;;   :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-  ;;   :remote? t
-  ;;   :server-id 'texlab-remote))
+     (when (eq sb/python-langserver 'pyright)
+       (lsp-register-client
+        (make-lsp-client :new-connection
+                         (lsp-tramp-connection
+                          (lambda nil
+                            (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
+                         :major-modes
+                         '(python-mode)
+                         :remote\? t :server-id 'pyright-remote :multi-root t
+                         :initialization-options
+                         (lambda nil
+                           (ht-merge
+                            (lsp-configuration-section "pyright")
+                            (lsp-configuration-section "python")))
+                         :initialized-fn
+                         (lambda
+                           (workspace)
+                           (with-lsp-workspace workspace
+                                               (lsp--set-configuration
+                                                (ht-merge
+                                                 (lsp-configuration-section "pyright")
+                                                 (lsp-configuration-section "python")))))
+                         :download-server-fn
+                         (lambda
+                           (_client callback error-callback _update\?)
+                           (lsp-package-ensure 'pyright callback error-callback))
+                         :notification-handlers
+                         (lsp-ht
+                          ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+                          ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+                          ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("vscode-json-languageserver" "--stdio"))
-    :major-modes '(json-mode jsonc-mode)
-    :remote? t
-    :server-id 'jsonls-remote))
+     (when (eq sb/python-langserver 'jedi)
+       (lsp-register-client
+        (make-lsp-client :new-connection
+                         (lsp-tramp-connection "jedi-language-server")
+                         :major-modes
+                         '(python-mode)
+                         :remote\? t :server-id 'jedils-remote)))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("css-languageserver" "--stdio"))
-    :major-modes '(css-mode less-mode sass-mode scss-mode)
-    :remote? t
-    :server-id 'cssls-remote))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection "clangd")
+                       :major-modes
+                       '(c-mode c++-mode)
+                       :remote\? t :server-id 'clangd-remote))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("html-languageserver" "--stdio"))
-    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
-    :remote? t
-    :server-id 'htmlls-remote))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        '("bash-language-server" "start"))
+                       :major-modes
+                       '(sh-mode)
+                       :remote\? t :server-id 'bashls-remote))
 
-  ;; FIXME: Get lsp to work for xml remote
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("java" "-jar" (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
-                                                       sb/extras-directory)))
-    :major-modes '(xml-mode nxml-mode)
-    :remote? t
-    :server-id 'xmlls-remote))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection "intelephense")
+                       :major-modes
+                       '(php-mode)
+                       :remote\? t :server-id 'intelephense-remote))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("yaml-language-server" "--stdio"))
-    :major-modes '(yaml-mode)
-    :remote? t
-    :server-id 'yamlls-remote))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection "cmake-language-server")
+                       :major-modes
+                       '(cmake-mode)
+                       :remote\? t :server-id 'cmakels-remote))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     (lambda ()
-                       (list lsp-perl-language-server-path
-                             "-MPerl::LanguageServer" "-e"
-                             "Perl::LanguageServer::run" "--"
-                             (format "--port %d --version %s"
-                                     lsp-perl-language-server-port
-                                     lsp-perl-language-server-client-version))))
-    :major-modes '(perl-mode cperl-mode)
-    :remote? t
-    :initialized-fn (lambda (workspace)
-                      (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
-    :priority -1
-    :server-id 'perlls-remote))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        '("typescript-language-server" "--stdio"))
+                       :major-modes
+                       '(js-mode typescript-mode)
+                       :remote\? t :server-id 'typescript-remote))
 
-  ;; Disable fuzzy matching
-  (advice-add #'lsp-completion--regex-fuz :override #'identity)
-  ;; :bind-keymap ("C-c l" . lsp-keymap-prefix)
-  :bind
-  (("M-."     . lsp-find-definition)
-   ("C-c l d" . lsp-find-declaration)
-   ("C-c l i" . lsp-goto-implementation)
-   ("C-c l t" . lsp-goto-type-definition)
-   ("C-c l r" . lsp-rename)
-   ("C-c l h" . lsp-symbol-highlight)
-   ("C-c l f" . lsp-format-buffer)
-   ("C-c l r" . lsp-find-references)))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        '("vscode-json-languageserver" "--stdio"))
+                       :major-modes
+                       '(json-mode jsonc-mode)
+                       :remote\? t :server-id 'jsonls-remote))
+
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        '("css-languageserver" "--stdio"))
+                       :major-modes
+                       '(css-mode less-mode sass-mode scss-mode)
+                       :remote\? t :server-id 'cssls-remote))
+
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        '("html-languageserver" "--stdio"))
+                       :major-modes
+                       '(html-mode web-mode mhtml-mode sgml-mode)
+                       :remote\? t :server-id 'htmlls-remote))
+
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection '("java" "-jar"
+                                               (expand-file-name
+                                                "org.eclipse.lemminx-0.15.0-uber.jar"
+                                                sb/extras-directory)))
+                       :major-modes
+                       '(xml-mode nxml-mode)
+                       :remote\? t :server-id 'xmlls-remote))
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        '("yaml-language-server" "--stdio"))
+                       :major-modes
+                       '(yaml-mode)
+                       :remote\? t :server-id 'yamlls-remote))
+
+     (lsp-register-client
+      (make-lsp-client :new-connection
+                       (lsp-tramp-connection
+                        (lambda nil
+                          (list
+                           lsp-perl-language-server-path "-MPerl::LanguageServer" "-e"
+                           "Perl::LanguageServer::run" "--"
+                           (format "--port %d --version %s"
+                                   lsp-perl-language-server-port
+                                   lsp-perl-language-server-client-version))))
+                       :major-modes
+                       '(perl-mode cperl-mode)
+                       :remote\? t :initialized-fn
+                       (lambda
+                         (workspace)
+                         (with-lsp-workspace workspace
+                                             (lsp--set-configuration
+                                              (lsp-configuration-section "perl"))))
+                       :priority -1 :server-id 'perlls-remote))
+
+     (advice-add #'lsp-completion--regex-fuz :override #'identity)
+     t))
+
+(bind-keys :package lsp-mode
+           ("M-." . lsp-find-definition)
+           ("C-c l d" . lsp-find-declaration)
+           ("C-c l i" . lsp-goto-implementation)
+           ("C-c l t" . lsp-goto-type-definition)
+           ("C-c l r" . lsp-rename)
+           ("C-c l h" . lsp-symbol-highlight)
+           ("C-c l f" . lsp-format-buffer)
+           ("C-c l r" . lsp-find-references))
+
+
 
 (when (or (eq sb/python-langserver 'pyls) (eq sb/python-langserver 'mspyls))
   (add-hook 'python-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
-(use-package lsp-ui
-  :commands (lsp-ui-doc-mode lsp-ui-mode)
-  :after lsp-mode
-  :demand t
-  :custom
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-imenu-auto-refresh 'after-save)
-  (lsp-ui-sideline-enable nil)
-  :config
-  (lsp-ui-mode 1)
-  (lsp-ui-doc-mode 1)
-  :bind
-  (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references]  . lsp-ui-peek-find-references)))
 
-(use-package lsp-treemacs
-  :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
-  :config
-  ;; Sync workspace folders and treemacs projects
-  (lsp-treemacs-sync-mode 1))
+(eval-after-load 'lsp-mode
+  '(progn
+     (setq lsp-ui-doc-enable nil
+           lsp-ui-imenu-auto-refresh 'after-save
+           lsp-ui-sideline-enable nil)
+     (require 'lsp-ui nil nil)
+     (lsp-ui-mode 1)
+     (lsp-ui-doc-mode 1)
 
-(use-package origami
-  :commands origami-toggle-node
-  :hook ((java-mode python-mode c++-mode) . global-origami-mode))
+     (bind-keys :package lsp-ui :map lsp-ui-mode-map
+                ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+                ([remap xref-find-references] . lsp-ui-peek-find-references))))
 
-(use-package lsp-origami
-  :after origami
-  :functions lsp-origami-mode
-  :commands lsp-origami-mode
-  :demand t
-  :config (lsp-origami-mode 1))
+;; Sync workspace folders and treemacs projects
+(unless (fboundp 'lsp-treemacs-errors-list)
+  (autoload #'lsp-treemacs-errors-list "lsp-treemacs" nil t))
+(unless (fboundp 'lsp-treemacs-sync-mode)
+  (autoload #'lsp-treemacs-sync-mode "lsp-treemacs" nil t))
+(eval-after-load 'lsp-treemacs
+  '(progn
+     (lsp-treemacs-sync-mode 1)
+     t))
 
-(use-package lsp-ivy
-  :after (lsp-mode ivy-mode)
-  :bind
-  (("C-c l g" . lsp-ivy-global-workspace-symbol)
-   ("C-c l w" . lsp-ivy-workspace-symbol)))
+(unless (fboundp 'global-origami-mode)
+  (autoload #'global-origami-mode "origami" nil t))
+(unless (fboundp 'origami-toggle-node)
+  (autoload #'origami-toggle-node "origami" nil t))
 
-;; (use-package url-cookie
-;;   :ensure nil
-;;   :custom (url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data))))
+(add-hook 'java-mode-hook #'global-origami-mode)
+(add-hook 'python-mode-hook #'global-origami-mode)
+(add-hook 'c++-mode-hook #'global-origami-mode)
+
+(eval-after-load 'origami
+  '(progn
+     (require 'lsp-origami nil nil)
+     (lsp-origami-mode 1)
+     t))
+
+(eval-after-load 'ivy-mode
+  '(eval-after-load 'lsp-mode
+     '(progn
+        (unless (fboundp 'lsp-ivy-global-workspace-symbol)
+          (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
+        (unless (fboundp 'lsp-ivy-workspace-symbol)
+          (autoload #'lsp-ivy-workspace-symbol "lsp-ivy" nil t))
+        (bind-keys :package lsp-ivy
+                   ("C-c l g" . lsp-ivy-global-workspace-symbol)
+                   ("C-c l w" . lsp-ivy-workspace-symbol)))))
+
+(setq url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data)))
 
 ;; Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
-(use-package cc-mode
-  :ensure nil
-  :defines (c-electric-brace c-enable-auto-newline)
-  :mode ("\\.h\\'" . c++-mode)
-  :mode ("\\.c\\'" . c++-mode)
-  :hook (c++-mode . lsp-deferred)
-  :custom
-  (c-set-style "cc-mode")
-  (c-basic-offset 2)
-  :config
-  (defvar c-electric-indent)
+(unless (fboundp 'c++-mode)
+  (autoload #'c++-mode "cc-mode" nil t))
+(unless (fboundp 'c-beginning-of-defun)
+  (autoload #'c-beginning-of-defun "cc-mode" nil t))
+(unless (fboundp 'c-end-of-defun)
+  (autoload #'c-end-of-defun "cc-mode" nil t))
+(unless (fboundp 'c-fill-paragraph)
+  (autoload #'c-fill-paragraph "cc-mode" nil t))
 
-  ;; Disable electric indentation and on-type formatting
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (setq-local c-auto-newline nil
-                          c-electric-brace nil
-                          c-electric-flag nil
-                          c-electric-indent nil
-                          c-enable-auto-newline nil
-                          c-syntactic-indentation nil)))
-  (unbind-key "C-M-a" c-mode-map)
-  :bind
-  (:map c-mode-base-map
-        ("C-c c a" . c-beginning-of-defun)
-        ("C-c c e" . c-end-of-defun)
-        ("M-q" . c-fill-paragraph)))
+(eval-after-load 'cc-mode
+  '(progn
+     (defvar c-electric-indent)
+     (setq c-set-style "cc-mode"
+           c-basic-offset 2)
 
-(use-package modern-cpp-font-lock
-  :after c++-mode
-  :demand t
-  :commands modern-c++-font-lock-mode
-  :diminish modern-c++-font-lock-mode
-  :config (modern-c++-font-lock-mode 1))
+     ;; Disable electric indentation and on-type formatting
+     (add-hook 'c++-mode-hook (lambda nil
+                                (setq-local c-auto-newline nil
+                                            c-electric-brace nil
+                                            c-electric-flag nil
+                                            c-electric-indent nil
+                                            c-enable-auto-newline nil
+                                            c-syntactic-indentation nil)))
 
-(use-package flycheck-clang-analyzer
-  :after (flycheck cc-mode)
-  :demand t
-  :commands flycheck-clang-analyzer-setup
-  :config (flycheck-clang-analyzer-setup))
+     ;;   (unbind-key "C-M-a" c-mode-map)
 
-(use-package flycheck-clang-tidy
-  :after (flycheck cc-mode)
-  :demand t
-  :commands flycheck-clang-tidy-setup
-  :config (flycheck-clang-tidy-setup))
+     t))
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.c\\'" . c++-mode))
+(bind-keys :package cc-mode :map c-mode-base-map
+           ("C-c c a" . c-beginning-of-defun)
+           ("C-c c e" . c-end-of-defun)
+           ("M-q" . c-fill-paragraph))
 
-(use-package cuda-mode
-  :mode
-  (("\\.cu\\'" . c++-mode)
-   ("\\.cuh\\'" . c++-mode)))
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "cc-mode" nil t))
+(add-hook 'c++-mode-hook #'lsp-deferred)
 
-(use-package opencl-mode
-  :mode "\\.cl\\'")
+(eval-after-load 'c++-mode
+  '(progn
+     (require 'modern-cpp-font-lock nil nil)
+     (modern-c++-font-lock-mode 1)
+     (if (fboundp 'diminish)
+         (diminish 'modern-c++-font-lock-mode))
+     t))
 
-(use-package cmake-mode
-  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
-  :hook (cmake-mode . lsp-deferred))
+(eval-after-load 'cc-mode
+  '(eval-after-load 'flycheck
+     '(progn
+        (require 'flycheck-clang-analyzer nil nil)
+        (flycheck-clang-analyzer-setup)
+        t)))
 
-(use-package cmake-font-lock
-  :after cmake-mode
-  :demand t
-  :commands cmake-font-lock-activate
-  :config (cmake-font-lock-activate))
+(eval-after-load 'cc-mode
+  '(eval-after-load 'flycheck
+     '(progn
+        (require 'flycheck-clang-tidy nil nil)
+        (flycheck-clang-tidy-setup)
+        t)))
 
-(use-package python
-  :ensure nil
-  :init
-  (setq python-shell-completion-native-enable nil) ; Disable readline based native completion
-  (setenv "PYTHONPATH" "python3")
-  :hook (python-mode . lsp-deferred)
-  :bind
-  (:map python-mode-map
-        ("M-["   . python-nav-backward-block)
-        ("M-]"   . python-nav-forward-block)
-        ("C-c <" . python-indent-shift-left)
-        ("C-c >" . python-indent-shift-right)
-        ;; FIXME: `[' is treated as `meta'
-        ;; ("C-\[" . python-indent-shift-left)
-        ;; ("C-]" . python-indent-shift-right)
-        )
-  :custom
-  (python-fill-docstring-style 'django)
-  (python-indent-guess-indent-offset nil)
-  (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
-  (python-indent-offset 4)
-  (python-shell-exec-path "python3")
-  (python-shell-interpreter "python3")
-  :config
-  ;; (with-eval-after-load 'lsp-mode
-  ;;   (when (and (eq sb/python-langserver 'pyls) (executable-find "pyls"))
-  ;;     (progn
-  ;;       (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
-  ;;         (add-to-list 'lsp-disabled-clients ls))
-  ;;       (add-to-list 'lsp-enabled-clients 'pyls)
-  ;;       (add-to-list 'lsp-enabled-clients 'pyls-remote))))
-  (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
-                                  ("SConscript\\'" . python-mode))
-                                auto-mode-alist))
-  ;; FIXME: `lsp' is the first checker, chain the other checkers
-  ;; https://github.com/flycheck/flycheck/issues/1762
-  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
-  )
+(unless (fboundp 'c++-mode)
+  (autoload #'c++-mode "cuda-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.cuh\\'" . c++-mode))
 
-(use-package python-docstring
-  :after python-mode
-  :demand t
-  :commands python-docstring-mode
-  :diminish
-  :config (python-docstring-mode 1))
+(unless (fboundp 'opencl-mode)
+  (autoload #'opencl-mode "opencl-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.cl\\'" . opencl-mode))
 
-(use-package pip-requirements)
+(unless (fboundp 'cmake-mode)
+  (autoload #'cmake-mode "cmake-mode" nil t))
+(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 
-(use-package pyvenv
-  :diminish
-  :custom
-  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:"
-                                                         pyvenv-virtual-env-name "]")))
-  :hook (python-mode . pyvenv-mode)
-  :config
-  (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
-  (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "cmake-mode" nil t))
+(add-hook 'cmake-mode-hook #'lsp-deferred)
 
-(use-package py-isort
-  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  :commands py-isort-before-save
-  :hook
-  (python-mode . (lambda ()
-                   (add-hook 'before-save-hook #'py-isort-before-save))))
+(eval-after-load 'cmake-mode
+  '(progn
+     (require 'cmake-font-lock nil nil)
+     (cmake-font-lock-activate)
+     t))
 
-(use-package lsp-python-ms
-  :if (eq sb/python-langserver 'mspyls)
-  :after (lsp-mode python)
-  :init (setq lsp-python-ms-auto-install-server t)
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-python-ms)
-                   ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'mspyls)
-                   ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
-                   ))
-  :custom
-  (lsp-python-ms-python-executable-cmd "python3"))
+(unless (fboundp 'python-nav-backward-block)
+  (autoload #'python-nav-backward-block "python" nil t))
+(unless (fboundp 'python-nav-forward-block)
+  (autoload #'python-nav-forward-block "python" nil t))
+(unless (fboundp 'python-indent-shift-left)
+  (autoload #'python-indent-shift-left "python" nil t))
+(unless (fboundp 'python-indent-shift-right)
+  (autoload #'python-indent-shift-right "python" nil t))
+
+(setenv "PYTHONPATH" "python3")
+(eval-after-load 'python
+  '(progn
+     (setq python-shell-completion-native-enable nil ; Disable readline based native completion
+           python-fill-docstring-style 'django
+           python-indent-guess-indent-offset nil
+           python-indent-guess-indent-offset-verbose nil ; Remove guess indent python message
+           python-indent-offset 4
+           python-shell-exec-path "python3"
+           python-shell-interpreter "python3")
+
+     (setq auto-mode-alist
+           (append
+            '(("SConstruct\\'" . python-mode)
+              ("SConscript\\'" . python-mode))
+            auto-mode-alist))
+
+     ;; FIXME: `lsp' is the first checker, chain the other checkers
+     ;; https://github.com/flycheck/flycheck/issues/1762
+     ;; (flycheck-add-next-checker 'lsp 'python-pylint)
+
+     t))
+
+(bind-keys :package python :map python-mode-map
+           ("M-[" . python-nav-backward-block)
+           ("M-]" . python-nav-forward-block)
+           ("C-c <" . python-indent-shift-left)
+           ("C-c >" . python-indent-shift-right)
+           ;; FIXME: `[' is treated as `meta'
+           ;; ("C-\[" . python-indent-shift-left)
+           ;; ("C-]" . python-indent-shift-right)
+           )
+
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "python" nil t))
+(add-hook 'python-mode-hook #'lsp-deferred)
+
+;; (with-eval-after-load 'lsp-mode
+;;   (when (and (eq sb/python-langserver 'pyls) (executable-find "pyls"))
+;;     (progn
+;;       (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
+;;         (add-to-list 'lsp-disabled-clients ls))
+;;       (add-to-list 'lsp-enabled-clients 'pyls)
+;;       (add-to-list 'lsp-enabled-clients 'pyls-remote))))
+
+
+;; FIXME: Should we use an `autoload' and avoid `require'?
+(eval-after-load 'python-mode
+  '(progn
+     (require 'python-docstring nil nil)
+     (python-docstring-mode 1)
+     (if (fboundp 'diminish)
+         (diminish 'python-docstring-mode))
+     t))
+
+(setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name
+                                   ("[venv:" pyvenv-virtual-env-name "]")))
+(unless (fboundp 'pyvenv-mode)
+  (autoload #'pyvenv-mode "pyvenv" nil t))
+(add-hook 'python-mode-hook #'pyvenv-mode)
+(eval-after-load 'pyvenv
+  '(progn
+     (setq pyvenv-post-activate-hooks
+           (list
+            (lambda nil
+              (setq python-shell-interpreter
+                    (concat pyvenv-virtual-env "bin/python3")))))
+     (setq pyvenv-post-deactivate-hooks
+           (list
+            (lambda nil
+              (setq python-shell-interpreter "python3"))))
+     (if (fboundp 'diminish)
+         (diminish 'pyvenv-mode))
+     t))
+
+
+(when (and (executable-find "isort")
+           (eq sb/python-langserver 'pyright))
+  (unless (fboundp 'py-isort-before-save)
+    (autoload #'py-isort-before-save "py-isort" nil t))
+  (add-hook 'python-mode-hook #'(lambda nil
+                                  (add-hook 'before-save-hook #'py-isort-before-save))))
+
+
+(when (eq sb/python-langserver 'mspyls)
+  (eval-after-load 'python
+    '(eval-after-load 'lsp-mode
+       '(progn
+          (setq lsp-python-ms-python-executable-cmd "python3")
+          (setq lsp-python-ms-auto-install-server t)
+
+          ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
+          ;;   (add-to-list 'lsp-disabled-clients ls))
+          ;; (add-to-list 'lsp-enabled-clients 'mspyls)
+          ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
+
+          (add-hook 'python-mode-hook #'(lambda nil
+                                          (require 'lsp-python-ms)))))))
 
 ;; `pyright --createstub pandas'
-(use-package lsp-pyright
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
-  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-pyright)
-                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'pyright)
-                   ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
-                   ))
-  :custom
-  (lsp-pyright-python-executable-cmd "python3"))
+(when (and (eq sb/python-langserver 'pyright)
+           (executable-find "pyright"))
+  (setq lsp-pyright-python-executable-cmd "python3")
 
-(use-package lsp-jedi
-  :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-jedi)
-                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'jedi)
-                   ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
-                   ))
-  :custom (lsp-jedi-diagnostics-enable t))
+  ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'pyright)
+  ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
+
+  (unless (fboundp 'lsp-pyright-locate-python)
+    (autoload #'lsp-pyright-locate-python "lsp-pyright" nil t))
+  (unless (fboundp 'lsp-pyright-locate-venv)
+    (autoload #'lsp-pyright-locate-venv "lsp-pyright" nil t))
+  (add-hook 'python-mode-hook #'(lambda nil
+                                  (require 'lsp-pyright))))
+
+(when (and (eq sb/python-langserver 'jedi)
+           (executable-find "jedi-language-server"))
+  (setq lsp-jedi-diagnostics-enable t)
+
+  ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'jedi)
+  ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
+
+  (add-hook 'python-mode-hook #'(lambda nil
+                                  (require 'lsp-jedi))))
+
 
 ;; Py-yapf works on a temporary file (placed in `/tmp'). Therefore it does not pick up on any
 ;; project specific YAPF styles. Yapfify works on the original file, so that any project settings
 ;; supported by YAPF itself are used.
-(use-package yapfify
-  :diminish yapf-mode
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
-  :hook (python-mode . yapf-mode))
+(when (and (eq sb/python-langserver 'pyright)
+           (executable-find "yapf"))
+  (unless (fboundp 'yapf-mode)
+    (autoload #'yapf-mode "yapfify" nil t))
+  (add-hook 'python-mode-hook #'yapf-mode)
+  (eval-after-load 'yapfify
+    '(if (fboundp 'diminish)
+         (diminish 'yapf-mode))))
 
-(use-package ein
-  :mode ("\\.ipynb\\'" . ein:ipynb-mode))
+(unless (fboundp 'ein:ipynb-mode)
+  (autoload #'ein:ipynb-mode "ein" nil t))
+(add-to-list 'auto-mode-alist '("\\.ipynb\\'" . ein:ipynb-mode))
 
-(use-package cython-mode
-  :mode
-  (("\\.pyx\\'" . cython-mode)
-   ("\\.pxd\\'" . cython-mode)
-   ("\\.pxi\\'" . cython-mode)))
+(unless (fboundp 'cython-mode)
+  (autoload #'cython-mode "cython-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.pyx\\'" . cython-mode))
+(add-to-list 'auto-mode-alist '("\\.pxd\\'" . cython-mode))
+(add-to-list 'auto-mode-alist '("\\.pxi\\'" . cython-mode))
 
-(use-package jinja2-mode
-  :mode "\\.jinja\\'")
+(unless (fboundp 'jinja2-mode)
+  (autoload #'jinja2-mode "jinja2-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.jinja\\'" . jinja2-mode))
 
-(use-package cperl-mode
-  :ensure nil
-  :mode ("latexmkrc\\'")
-  :hook (cperl-mode . lsp-deferred)
-  :config
-  ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode))
+(unless (fboundp 'cperl-mode)
+  (autoload #'cperl-mode "cperl-mode" nil t))
+(eval-after-load 'cperl-mode
+  '(progn
+     ;; Prefer CPerl mode to Perl mode
+     (fset 'perl-mode 'cperl-mode)
+     t))
+(add-to-list 'auto-mode-alist '("latexmkrc\\'" . cperl-mode))
+
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "cperl-mode" nil t))
+(add-hook 'cperl-mode-hook #'lsp-deferred)
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
-(use-package lsp-java
-  :hook (java-mode .
-                   (lambda ()
-                     (setq-default c-basic-offset 4
-                                   c-set-style "java")
-                     (lsp-deferred)))
-  :custom
-  (lsp-java-inhibit-message t)
-  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" "Requires Java 11")
-  (lsp-java-save-actions-organize-imports t))
+(setq lsp-java-inhibit-message t
+      lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" ; Requires Java 11
+      lsp-java-save-actions-organize-imports t)
+(add-hook 'java-mode-hook #'(lambda nil
+                              (setq-default c-basic-offset 4 c-set-style "java")
+                              (lsp-deferred)))
 
-(use-package ant
-  :commands (ant ant-clean ant-compile ant-test))
+(unless (fboundp 'ant)
+  (autoload #'ant "ant" nil t))
+(unless (fboundp 'ant-clean)
+  (autoload #'ant-clean "ant" nil t))
+(unless (fboundp 'ant-compile)
+  (autoload #'ant-compile "ant" nil t))
+(unless (fboundp 'ant-test)
+  (autoload #'ant-test "ant" nil t))
 
 ;; Can disassemble `.class' files from within jars
-(use-package autodisass-java-bytecode
-  :mode "\\.class\\'")
+(unless (fboundp 'autodisass-java-bytecode)
+  (autoload #'autodisass-java-bytecode "autodisass-java-bytecode" nil t))
+(add-to-list 'auto-mode-alist '("\\.class\\'" . autodisass-java-bytecode))
 
 ;; Syntax highlighting for Gradle files
-(use-package groovy-mode
-  :mode
-  (("\\.groovy\\'" . groovy-mode)
-   ("\\.gradle\\'" . groovy-mode)))
+(unless (fboundp 'groovy-mode)
+  (autoload #'groovy-mode "groovy-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
+(add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))
 
-(use-package sh-script ; Shell script mode
-  :ensure nil
-  :mode
-  (("\\.zsh\\'" . sh-mode)
-   ("\\bashrc\\'" . sh-mode))
-  :config
-  (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-  ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
-  ;; FIXME: `lsp' is the first checker, chain the other checkers
-  ;; https://github.com/flycheck/flycheck/issues/1762
-  ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
-  :hook (sh-mode . lsp-deferred)
-  :custom
-  (sh-basic-offset 2)
-  (sh-indent-after-continuation 'always)
-  (sh-indent-comment t "Indent comments as a regular line"))
+;; Shell script mode
+(unless (fboundp 'sh-mode)
+  (autoload #'sh-mode "sh-script" nil t))
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+(add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
 
-(use-package fish-mode
-  :mode "\\.fish\\'"
-  :interpreter "fish"
-  :commands fish_indent-before-save
-  :hook
-  (fish-mode . (lambda ()
-                 (add-hook 'before-save-hook #'fish_indent-before-save))))
+(eval-after-load 'sh-script
+  '(progn
+     (setq sh-basic-offset 2
+           sh-indent-after-continuation 'always
+           sh-indent-comment t)
 
-(use-package shfmt
-  :hook (sh-mode . shfmt-on-save-mode)
-  :config (shfmt-on-save-mode 1)
-  :custom (shfmt-arguments '("-i" "4" "-p" "-ci")))
+     ;;   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+     ;;   ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
+     ;;   ;; FIXME: `lsp' is the first checker, chain the other checkers
+     ;;   ;; https://github.com/flycheck/flycheck/issues/1762
+     ;;   ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
+
+     t))
+
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "sh-script" nil t))
+(add-hook 'sh-mode-hook #'lsp-deferred)
+
+
+(unless (fboundp 'fish-mode)
+  (autoload #'fish-mode "fish-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.fish\\'" . fish-mode))
+(add-to-list 'interpreter-mode-alist '("fish" . fish-mode))
+
+(unless (fboundp 'fish_indent-before-save)
+  (autoload #'fish_indent-before-save "fish-mode" nil t))
+(add-hook 'fish-mode-hook #'(lambda nil
+                              (add-hook 'before-save-hook #'fish_indent-before-save)))
+
+
+(unless (fboundp 'shfmt-on-save-mode)
+  (autoload #'shfmt-on-save-mode "shfmt" nil t))
+(add-hook 'sh-mode-hook #'shfmt-on-save-mode)
+(eval-after-load 'shfmt
+  '(progn
+     (setq shfmt-arguments '("-i" "4" "-p" "-ci"))
+     (shfmt-on-save-mode 1)
+     t))
+
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line
 (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
 
-(use-package vc
-  :init
-  ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-  ;; (add-hook 'find-file-hook #'vc-refresh-state)
-  (remove-hook 'find-file-hook #'vc-refresh-state))
+;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
+(add-hook 'find-file-hook #'vc-refresh-state)
+;; (remove-hook 'find-file-hook #'vc-refresh-state))
 
-(use-package transient
-  :commands transient-bind-q-to-quit
-  :config
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
-          transient-levels-file (expand-file-name "transient/levels.el" sb/temp-directory)
-          transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
-  ;; Allow using `q' to quit out of popups, in addition to `C-g'
-  (transient-bind-q-to-quit))
 
-(use-package with-editor
-  :after magit
-  :diminish with-editor-mode)
+(unless (fboundp 'transient-bind-q-to-quit)
+  (autoload #'transient-bind-q-to-quit "transient" nil t))
+(eval-after-load 'transient
+  '(progn
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
+             transient-levels-file (expand-file-name "transient/levels.el" sb/temp-directory)
+             transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
+     ;; Allow using `q' to quit out of popups, in addition to `C-g'
+     (transient-bind-q-to-quit)
+     t))
 
-(use-package magit
-  :bind
-  (("C-x g" . magit-status)
-   ("C-c M-g" . magit-file-dispatch)
-   ("C-x M-g" . magit-dispatch))
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
-  (magit-no-message '("Turning on magit-auto-revert-mode..."))
-  ;; https://irreal.org/blog/?p=8877
-  (magit-section-initial-visibility-alist '((stashes . show)
-                                            (untracked . show)
-                                            (unpushed . show)))
-  :config
-  ;; These give a performance boost to magit
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-pushremote)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
+(unless (fboundp 'magit-status)
+  (autoload #'magit-status "magit" nil t))
+(unless (fboundp 'magit-file-dispatch)
+  (autoload #'magit-file-dispatch "magit" nil t))
+(unless (fboundp 'magit-dispatch)
+  (autoload #'magit-dispatch "magit" nil t))
 
-  (use-package magit-diff
-    :ensure nil
-    :demand t
-    :custom (magit-diff-refine-hunk t)))
+(eval-after-load 'magit
+  '(progn
+     (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
+           ;; Suppress the message about "Turning on magit-auto-revert-mode" when loading Magit
+           magit-no-message '("Turning on magit-auto-revert-mode...")
+           ;; https://irreal.org/blog/?p=8877
+           magit-section-initial-visibility-alist '((stashes . show)
+                                                    (untracked . show)
+                                                    (unpushed . show)))
 
-(use-package gitignore-mode
-  :mode
-  (("/\\.gitignore\\'"        . gitignore-mode)
-   ("/\\.git/info/exclude\\'" . gitignore-mode)
-   ("/git/ignore\\'"          . gitignore-mode)))
+     ;; These give a performance boost to magit
+     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
+     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
+     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-pushremote)
+     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
+     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
 
-(use-package gitattributes-mode
-  :mode
-  (("/\\.gitattributes\\'"       . gitattributes-mode)
-   ("/\\.git/info/attributes\\'" . gitattributes-mode)
-   ("/git/attributes\\'"         . gitattributes-mode)))
+     (require 'magit-diff nil nil)
+     (setq magit-diff-refine-hunk t)
+     t))
 
-(use-package gitconfig-mode
-  :mode
-  (("/\\.gitconfig\\'"  . gitconfig-mode)
-   ("/\\.git/config\\'" . gitconfig-mode)
-   ("/git/config\\'"    . gitconfig-mode)
-   ("/\\.gitmodules\\'" . gitconfig-mode)))
+(bind-keys :package magit
+           ("C-x g" . magit-status)
+           ("C-c M-g" . magit-file-dispatch)
+           ("C-x M-g" . magit-dispatch))
 
-;; Diff-hl looks nicer than git-gutter
-(or
- (use-package git-gutter
-   :diminish
-   :bind
-   (("C-x p" . git-gutter:previous-hunk)
-    ("C-x n" . git-gutter:next-hunk))
-   :hook (after-init . global-git-gutter-mode)
-   :custom
-   (git-gutter:added-sign " ")
-   (git-gutter:deleted-sign " ")
-   (git-gutter:modified-sign " ")
-   (git-gutter:update-interval 1)
-   ;; https://github.com/syl20bnr/spacemacs/issues/10555
-   ;; https://github.com/syohex/emacs-git-gutter/issues/24
-   (git-gutter:disabled-modes '(fundamental-mode org-mode)))
 
- (use-package diff-hl ; Based on `vc'
-   :disabled t
-   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
-   :hook
-   ((magit-post-refresh . diff-hl-magit-post-refresh)
-    (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-    (dired-mode         . diff-hl-dired-mode-unless-remote)
-    (after-init         . global-diff-hl-mode))))
+(eval-after-load 'magit
+  '(eval-after-load 'with-editor
+     '(if (fboundp 'diminish)
+          (diminish 'with-editor-mode))))
 
-(use-package git-commit
-  :hook (git-commit-setup . git-commit-turn-on-flyspell)
-  :custom (git-commit-summary-max-length 50))
+(unless (fboundp 'gitignore-mode)
+  (autoload #'gitignore-mode "gitignore-mode" nil t))
+(add-to-list 'auto-mode-alist '("/\\.gitignore\\'" . gitignore-mode))
+(add-to-list 'auto-mode-alist '("/\\.git/info/exclude\\'" . gitignore-mode))
+(add-to-list 'auto-mode-alist '("/git/ignore\\'" . gitignore-mode))
+
+(unless (fboundp 'gitattributes-mode)
+  (autoload #'gitattributes-mode "gitattributes-mode" nil t))
+(add-to-list 'auto-mode-alist '("/\\.gitattributes\\'" . gitattributes-mode))
+(add-to-list 'auto-mode-alist '("/\\.git/info/attributes\\'" . gitattributes-mode))
+(add-to-list 'auto-mode-alist '("/git/attributes\\'" . gitattributes-mode))
+
+
+(unless (fboundp 'gitconfig-mode)
+  (autoload #'gitconfig-mode "gitconfig-mode" nil t))
+(add-to-list 'auto-mode-alist '("/\\.gitconfig\\'" . gitconfig-mode))
+(add-to-list 'auto-mode-alist '("/\\.git/config\\'" . gitconfig-mode))
+(add-to-list 'auto-mode-alist '("/git/config\\'" . gitconfig-mode))
+(add-to-list 'auto-mode-alist '("/\\.gitmodules\\'" . gitconfig-mode))
+
+(unless (fboundp 'git-gutter:previous-hunk)
+  (autoload #'git-gutter:previous-hunk "git-gutter" nil t))
+(unless (fboundp 'git-gutter:next-hunk)
+  (autoload #'git-gutter:next-hunk "git-gutter" nil t))
+(unless (fboundp 'global-git-gutter-mode)
+  (autoload #'global-git-gutter-mode "git-gutter" nil t))
+(add-hook 'after-init-hook #'global-git-gutter-mode)
+
+(eval-after-load 'git-gutter
+  '(progn
+     (setq git-gutter:added-sign " "
+           git-gutter:deleted-sign " "
+           git-gutter:modified-sign " "
+           git-gutter:update-interval 1
+           ;; https://github.com/syl20bnr/spacemacs/issues/10555
+           ;; https://github.com/syohex/emacs-git-gutter/issues/24
+           git-gutter:disabled-modes '(fundamental-mode org-mode))
+     (if (fboundp 'diminish)
+         (diminish 'git-gutter-mode))
+     t))
+
+(bind-keys :package git-gutter
+           ("C-x p" . git-gutter:previous-hunk)
+           ("C-x n" . git-gutter:next-hunk))
+
+
+;; Diff-hl looks nicer than `git-gutter', based on `vc'
+(setq diff-hl-draw-borders nil) ; Highlight without a border looks nicer
+(unless (fboundp 'diff-hl-magit-post-refresh)
+  (autoload #'diff-hl-magit-post-refresh "diff-hl" nil t))
+(unless (fboundp 'diff-hl-magit-pre-refresh)
+  (autoload #'diff-hl-magit-pre-refresh "diff-hl" nil t))
+(unless (fboundp 'diff-hl-dired-mode-unless-remote)
+  (autoload #'diff-hl-dired-mode-unless-remote "diff-hl" nil t))
+(unless (fboundp 'global-diff-hl-mode)
+  (autoload #'global-diff-hl-mode "diff-hl" nil t))
+;; (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+;; (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
+;; (add-hook 'after-init-hook #'global-diff-hl-mode)
+
+(unless (fboundp 'git-commit-turn-on-flyspell)
+  (autoload #'git-commit-turn-on-flyspell "git-commit" nil t))
+(add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
+(setq git-commit-summary-max-length 50)
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
-(use-package smerge-mode
-  :ensure nil
-  :commands (smerge-next smerge-prev smerge-auto-leave
-                         smerge-keep-base smerge-keep-upper
-                         smerge-keep-lower smerge-keep-all
-                         smerge-diff-base-lower
-                         smerge-diff-base-upper
-                         smerge-diff-upper-lower smerge-refine
-                         smerge-combine-with-next smerge-resolve)
-  :preface
-  (defun sb/enable-smerge-maybe ()
+
+(eval-and-compile
+  (defun sb/enable-smerge-maybe nil
     "Enable smerge automatically based on conflict markers."
-    (when (and buffer-file-name (vc-backend buffer-file-name))
+    (when (and buffer-file-name
+               (vc-backend buffer-file-name))
       (save-excursion
         (goto-char (point-min))
         (when (re-search-forward "^<<<<<<< " nil t)
           (smerge-mode 1)))))
 
-  (defun sb/enable-smerge-maybe2 ()
+  (defun sb/enable-smerge-maybe2 nil
     "Enable `smerge-mode' automatically."
     (save-excursion
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)
-        (smerge-mode 1))))
-  :init (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
-  :hook
-  (magit-diff-visit-file . (lambda ()
-                             (when smerge-mode
-                               (sb/smerge-hydra/body))))
-  :bind-keymap ("C-c v" . smerge-command-prefix)
-  :bind
-  (:map smerge-mode-map
-        ("M-g n" . smerge-next)
-        ("M-g p" . smerge-prev)
-        ("M-g k c" . smerge-keep-current)
-        ("M-g k m" . smerge-keep-upper)
-        ("M-g k o" . smerge-keep-lower)
-        ("M-g k b" . smerge-keep-base)
-        ("M-g k a" . smerge-keep-all)
-        ("M-g e" . smerge-ediff)
-        ("M-g K" . smerge-kill-current)
-        ("M-g m" . smerge-context-menu)
-        ("M-g M" . smerge-popup-context-menu)))
+        (smerge-mode 1)))))
 
-(use-package ediff
-  :ensure nil
-  :after (magit)
-  :demand t
-  :defines ediff-window-setup-function
-  :commands ediff-setup-windows-plain
-  :config
-  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
-  ;; Split windows horizontally in ediff (instead of vertically)
-  (setq ediff-split-window-function #'split-window-horizontally))
+(unless (fboundp 'smerge-next)
+  (autoload #'smerge-next "smerge-mode" nil t))
+(unless (fboundp 'smerge-prev)
+  (autoload #'smerge-prev "smerge-mode" nil t))
+(unless (fboundp 'smerge-keep-current)
+  (autoload #'smerge-keep-current "smerge-mode" nil t))
+(unless (fboundp 'smerge-keep-upper)
+  (autoload #'smerge-keep-upper "smerge-mode" nil t))
+(unless (fboundp 'smerge-keep-lower)
+  (autoload #'smerge-keep-lower "smerge-mode" nil t))
+(unless (fboundp 'smerge-keep-base)
+  (autoload #'smerge-keep-base "smerge-mode" nil t))
+(unless (fboundp 'smerge-keep-all)
+  (autoload #'smerge-keep-all "smerge-mode" nil t))
+(unless (fboundp 'smerge-ediff)
+  (autoload #'smerge-ediff "smerge-mode" nil t))
+(unless (fboundp 'smerge-kill-current)
+  (autoload #'smerge-kill-current "smerge-mode" nil t))
+(unless (fboundp 'smerge-context-menu)
+  (autoload #'smerge-context-menu "smerge-mode" nil t))
+(unless (fboundp 'smerge-popup-context-menu)
+  (autoload #'smerge-popup-context-menu "smerge-mode" nil t))
+(unless (fboundp 'smerge-auto-leave)
+  (autoload #'smerge-auto-leave "smerge-mode" nil t))
+(unless (fboundp 'smerge-diff-base-lower)
+  (autoload #'smerge-diff-base-lower "smerge-mode" nil t))
+(unless (fboundp 'smerge-diff-base-upper)
+  (autoload #'smerge-diff-base-upper "smerge-mode" nil t))
+(unless (fboundp 'smerge-diff-upper-lower)
+  (autoload #'smerge-diff-upper-lower "smerge-mode" nil t))
+(unless (fboundp 'smerge-refine)
+  (autoload #'smerge-refine "smerge-mode" nil t))
+(unless (fboundp 'smerge-combine-with-next)
+  (autoload #'smerge-combine-with-next "smerge-mode" nil t))
+(unless (fboundp 'smerge-resolve)
+  (autoload #'smerge-resolve "smerge-mode" nil t))
 
-(use-package yaml-mode
-  :mode
-  ((".clang-format" . yaml-mode)
-   (".clang-tidy"   . yaml-mode))
-  :hook
-  (yaml-mode . (lambda ()
-                 (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
-                 (lsp-deferred))))
+(add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
+(add-hook 'magit-diff-visit-file-hook #'(lambda nil
+                                          (when smerge-mode
+                                            (sb/smerge-hydra/body))))
+(bind-keys :package smerge-mode :map smerge-mode-map
+           ("M-g n" . smerge-next)
+           ("M-g p" . smerge-prev)
+           ("M-g k c" . smerge-keep-current)
+           ("M-g k m" . smerge-keep-upper)
+           ("M-g k o" . smerge-keep-lower)
+           ("M-g k b" . smerge-keep-base)
+           ("M-g k a" . smerge-keep-all)
+           ("M-g e" . smerge-ediff)
+           ("M-g K" . smerge-kill-current)
+           ("M-g m" . smerge-context-menu)
+           ("M-g M" . smerge-popup-context-menu))
 
-(use-package yaml-imenu
-  :after yaml-mode
-  :demand t
-  :commands yaml-imenu-enable
-  :config (yaml-imenu-enable))
 
-(use-package bat-mode
-  :ensure nil
-  :mode
-  (("\\.bat\\'" . bat-mode)
-   ("\\.cmd\\'" . bat-mode)))
+(eval-after-load 'magit
+  '(progn
+     (require 'ediff nil nil)
+     ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+     (setq ediff-window-setup-function #'ediff-setup-windows-plain)
+     ;; Split windows horizontally in ediff (instead of vertically)
+     (setq ediff-split-window-function #'split-window-horizontally)
+     t))
 
-(use-package web-mode
-  :mode
-  (("\\.html?\\'"     . web-mode)
-   ("\\.djhtml\\'"    . web-mode)
-   ("\\.phtml\\'"     . web-mode)
-   ("\\.hb\\.html\\'" . web-mode)
-   ("\\.tpl\\.php\\'" . web-mode)
-   ("\\.[agj]sp\\'"   . web-mode)
-   ("\\.as[cp]x\\'"   . web-mode)
-   ("\\.erb\\'"       . web-mode))
-  :hook (web-mode . lsp-deferred)
-  :config (flycheck-add-mode 'javascript-eslint 'web-mode)
-  :custom
-  (web-mode-enable-auto-closing t)
-  (web-mode-enable-auto-pairing t)
-  (web-mode-enable-auto-quoting t)
-  (web-mode-enable-block-face t)
-  (web-mode-enable-css-colorization t)
-  (web-mode-enable-current-element-highlight t)
-  (web-mode-enable-current-column-highlight t))
+(unless (fboundp 'yaml-mode)
+  (autoload #'yaml-mode "yaml-mode" nil t))
+(add-hook 'yaml-mode-hook #'(lambda nil
+                              ;; `yaml-mode' is derived from `text-mode'
+                              (spell-fu-mode -1)
+                              (lsp-deferred)))
+(add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
+(add-to-list 'auto-mode-alist '(".clang-tidy" . yaml-mode))
 
-(use-package emmet-mode
-  :hook ((web-mode sgml-mode css-mode html-mode) . emmet-mode))
+(eval-after-load 'yaml-mode
+  '(progn
+     (require 'yaml-imenu nil nil)
+     (yaml-imenu-enable)
+     t))
 
-(use-package rainbow-mode
-  :diminish
-  :hook ((css-mode html-mode sass-mode) . rainbow-mode))
+(unless (fboundp 'bat-mode)
+  (autoload #'bat-mode "bat-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
+(add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode))
 
-(use-package php-mode
-  :hook (php-mode . lsp-deferred))
+(unless (fboundp 'web-mode)
+  (autoload #'web-mode "web-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.hb\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 
-(use-package nxml-mode
-  :ensure nil
-  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
-  :init (fset 'xml-mode 'nxml-mode)
-  :hook (nxml-mode . lsp-deferred)
-  :custom
-  (nxml-auto-insert-xml-declaration-flag t)
-  (nxml-slash-auto-complete-flag t))
+(eval-after-load 'web-mode
+  '(progn
+     (setq web-mode-enable-auto-closing t
+           web-mode-enable-auto-pairing t
+           web-mode-enable-auto-quoting t
+           web-mode-enable-block-face t
+           web-mode-enable-css-colorization t
+           web-mode-enable-current-element-highlight t
+           web-mode-enable-current-column-highlight t)
+     (flycheck-add-mode 'javascript-eslint 'web-mode)
+     t))
+
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "web-mode" nil t))
+(add-hook 'web-mode-hook #'lsp-deferred)
+
+
+(unless (fboundp 'emmet-mode)
+  (autoload #'emmet-mode "emmet-mode" nil t))
+(add-hook 'web-mode-hook #'emmet-mode)
+(add-hook 'sgml-mode-hook #'emmet-mode)
+(add-hook 'css-mode-hook #'emmet-mode)
+(add-hook 'html-mode-hook #'emmet-mode)
+
+(unless (fboundp 'rainbow-mode)
+  (autoload #'rainbow-mode "rainbow-mode" nil t))
+(add-hook 'css-mode-hook #'rainbow-mode)
+(add-hook 'html-mode-hook #'rainbow-mode)
+(add-hook 'sass-mode-hook #'rainbow-mode)
+
+(eval-after-load 'rainbow-mode
+  '(if (fboundp 'diminish)
+       (diminish 'rainbow-mode)))
+
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "php-mode" nil t))
+(add-hook 'php-mode-hook #'lsp-deferred)
+
+(setq nxml-auto-insert-xml-declaration-flag t
+      nxml-slash-auto-complete-flag t)
+(unless (fboundp 'nxml-mode)
+  (autoload #'nxml-mode "nxml-mode" nil t))
+(fset 'xml-mode 'nxml-mode)
+
+(add-hook 'nxml-mode-hook #'lsp-deferred)
+(add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.xsd\\'" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.xslt\\'" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.pom$" . nxml-mode))
+
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "nxml-mode" nil t))
 
 ;; ;; FIXME: Open `.classpath' file with LSP support
 ;; ;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
@@ -3937,207 +4512,278 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   (add-to-list 'lsp-language-id-configuration '("\\.classpath$" . "xml"))
 ;;   (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
 
-(or
- (use-package flycheck-grammarly
-   :after flycheck
-   :disabled t
-   :demand t
-   :config
-   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-   (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
-   (add-to-list 'flycheck-checkers 'grammarly-checker t)
-   (flycheck-add-next-checker 'textlint 'grammarly-checker)
-   :custom (flycheck-grammarly-check-time 3))
 
- (use-package lsp-grammarly
-   :disabled t
-   :hook
-   (text-mode . (lambda ()
-                  (require 'lsp-grammarly)
-                  (lsp-deferred)))
-   :custom
-   (lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))))
+;; (eval-after-load 'flycheck
+;;   '(progn
+;;      (setq flycheck-grammarly-check-time 3)
+;;      (require 'flycheck-grammarly nil nil)
+;;      ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+;;      (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
+;;      (add-to-list 'flycheck-checkers 'grammarly-checker t)
+;;      (flycheck-add-next-checker 'textlint 'grammarly-checker)
+;;      t))
+
+
+;; (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+;; (add-hook 'text-mode-hook #'(lambda nil
+;;                               (require 'lsp-grammarly)
+;;                               (lsp-deferred)))
+
 
 ;; Texlab seems to have high overhead
-(use-package lsp-latex
-  :disabled t
-  :hook
-  ((latex-mode LaTeX-mode) . (lambda()
-                               (require 'lsp-latex)
-                               (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatting-formatter "latexindent")
-  (lsp-latex-bibtex-formatting-line-length sb/fill-column)
-  (lsp-latex-build-on-save t)
-  (lsp-latex-lint-on-save t)
-  :config
-  (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc"))
+
+;; (add-hook 'latex-mode-hook #'(lambda nil
+;;                                (require 'lsp-latex)
+;;                                (lsp-deferred)))
+;; (add-hook 'LaTeX-mode-hook #'(lambda nil
+;;                                (require 'lsp-latex)
+;;                                (lsp-deferred)))
+
+(eval-after-load 'lsp-latex
+  '(progn
+     (setq lsp-latex-bibtex-formatting-formatter "latexindent"
+           lsp-latex-bibtex-formatting-line-length sb/fill-column
+           lsp-latex-build-on-save t
+           lsp-latex-lint-on-save t)
+
+     (add-to-list 'lsp-latex-build-args "-c")
+     (add-to-list 'lsp-latex-build-args "-pvc")
+     t))
 
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
-(use-package tex
-  :ensure auctex
-  :mode ("\\.tex\\'" . LaTeX-mode)
-  :defines (tex-fontify-script font-latex-fontify-script
-                               font-latex-fontify-sectioning
-                               TeX-syntactic-comment)
-  :functions TeX-active-process
-  :commands (TeX-active-process TeX-save-document
-                                TeX-command-menu
-                                TeX-revert-document-buffer)
-  :hook
-  (((latex-mode LaTeX-mode) . LaTeX-math-mode)
-   ((latex-mode LaTeX-mode) . TeX-PDF-mode) ; Use `pdflatex'
-   ((latex-mode LaTeX-mode) . TeX-source-correlate-mode)
-   ;; Enable rainbow mode after applying styles to the buffer
-   (TeX-update-style . rainbow-delimiters-mode))
-  :custom
-  (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
-  (TeX-auto-untabify t "Remove all tabs before saving")
-  (TeX-clean-confirm nil)
-  (TeX-electric-sub-and-superscript t "Automatically insert braces in math mode")
-  (TeX-parse-self t "Parse documents")
-  (TeX-quote-after-quote nil "Allow original LaTeX quotes")
-  (TeX-save-query nil "Save buffers automatically when compiling")
-  (TeX-source-correlate-method 'synctex)
-  (TeX-source-correlate-start-server nil "Do not start the emacs server when correlating sources")
-  (TeX-syntactic-comment t)
-  (TeX-view-program-selection '((output-pdf "PDF Tools")))
-  (TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view)))
-  (LaTeX-item-indent 0 "Two spaces + Extra indentation")
-  (LaTeX-syntactic-comments t)
-  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-  (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
-  ;; Avoid superscripts and subscripts from being displayed in a different font size
-  (font-latex-fontify-script nil)
-  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
-  :config
-  ;; Revert PDF buffer after TeX compilation has finished
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  (setq-default TeX-master nil) ; Query for master file
-  ;; Disable "LaTeX-insert-item" in favor of imenu
-  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
-  ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  ;; (unbind-key "C-c ;" LaTeX-mode-map)
-  )
 
-(use-package auctex-latexmk
-  :after tex-mode
-  :demand t
-  :commands auctex-latexmk-setup
-  :custom
-  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the `-pdf' flag when `TeX-PDF-mode' is active")
-  (TeX-command-default "LatexMk")
-  :config (auctex-latexmk-setup))
+(unless (fboundp 'LaTeX-mode)
+  (autoload #'LaTeX-mode "tex" nil t))
+(unless (fboundp 'LaTeX-math-mode)
+  (autoload #'LaTeX-math-mode "tex" nil t))
+(unless (fboundp 'TeX-PDF-mode)
+  (autoload #'TeX-PDF-mode "tex" nil t))
+(unless (fboundp 'TeX-source-correlate-mode)
+  (autoload #'TeX-source-correlate-mode "tex" nil t))
+(unless (fboundp 'rainbow-delimiters-mode)
+  (autoload #'rainbow-delimiters-mode "tex" nil t))
+(unless (fboundp 'TeX-active-process)
+  (autoload #'TeX-active-process "tex" nil t))
+(unless (fboundp 'TeX-save-document)
+  (autoload #'TeX-save-document "tex" nil t))
+(unless (fboundp 'TeX-command-menu)
+  (autoload #'TeX-command-menu "tex" nil t))
+(unless (fboundp 'TeX-revert-document-buffer)
+  (autoload #'TeX-revert-document-buffer "tex" nil t))
 
-(use-package bibtex
-  :ensure nil
-  :hook
-  ((bibtex-mode . turn-on-auto-revert-mode)
-   ;; LATER: LaTeX LS is not good yet
-   ;; (bibtex-mode . lsp-deferred)
-   )
-  :custom
-  (bibtex-align-at-equal-sign t)
-  (bibtex-maintain-sorted-entries t))
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
 
-(use-package bibtex-utils
-  :after bibtex
-  :demand t)
+(add-hook 'latex-mode-hook #'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+(add-hook 'latex-mode-hook #'TeX-PDF-mode) ; Use `pdflatex'
+(add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; Use `pdflatex'
+(add-hook 'latex-mode-hook #'TeX-source-correlate-mode)
+(add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
 
-(use-package ivy-bibtex
-  :bind ("C-c x b" . ivy-bibtex)
-  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+(eval-after-load 'tex
+  '(progn
+     (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+           TeX-auto-untabify t ; Remove all tabs before saving
+           TeX-clean-confirm nil
+           TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+           TeX-parse-self t ; Parse documents
+           TeX-quote-after-quote nil ; Allow original LaTeX quotes
+           TeX-save-query nil ; Save buffers automatically when compiling
+           TeX-source-correlate-method 'synctex
+           TeX-source-correlate-start-server nil ; Do not start the emacs server when correlating sources
+           TeX-syntactic-comment t
+           TeX-view-program-selection '((output-pdf "PDF Tools"))
+           TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+           LaTeX-item-indent 0 ; Two spaces + Extra indentation
+           LaTeX-syntactic-comments t
+           LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
+           tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
+           ;; Avoid superscripts and subscripts from being displayed in a different font size
+           font-latex-fontify-script nil
+           ;; Avoid emphasizing section headers
+           font-latex-fontify-sectioning 1.0)
 
-(use-package bibtex-completion
-  :ensure nil
-  :after ivy-bibtex
-  :demand t
-  :custom
-  (bibtex-completion-cite-default-as-initial-input t)
-  (bibtex-completion-cite-prompt-for-optional-arguments nil)
-  (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
+     (setq-default TeX-master nil) ; Query for master file
+
+     ;; Revert PDF buffer after TeX compilation has finished
+     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+
+     ;; Enable rainbow mode after applying styles to the buffer
+     (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
+
+     ;; Disable "LaTeX-insert-item" in favor of imenu
+     ;; (unbind-key "C-c C-d" LaTeX-mode-map)
+     ;; Unset "C-c ;" since we want to bind it to 'comment-line
+     ;; (unbind-key "C-c ;" LaTeX-mode-map)
+
+     t))
+
+
+(eval-after-load 'tex-mode
+  '(progn
+     ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
+     (setq auctex-latexmk-inherit-TeX-PDF-mode t
+           TeX-command-default "LatexMk")
+     (require 'auctex-latexmk nil nil)
+     (auctex-latexmk-setup)
+     t))
+
+(unless (fboundp 'turn-on-auto-revert-mode)
+  (autoload #'turn-on-auto-revert-mode "bibtex" nil t))
+(add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+(add-hook 'bibtex-mode-hook #'lsp-deferred) ;; LATER: LaTeX LS is not good yet
+(setq bibtex-align-at-equal-sign t
+      bibtex-maintain-sorted-entries t)
+
+(eval-after-load 'bibtex
+  '(require 'bibtex-utils nil nil))
+
+(setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+(unless (fboundp 'ivy-bibtex)
+  (autoload #'ivy-bibtex "ivy-bibtex" nil t))
+(bind-keys :package ivy-bibtex
+           ("C-c x b" . ivy-bibtex))
+
+(eval-after-load 'ivy-bibtex
+  '(progn
+     (setq bibtex-completion-cite-default-as-initial-input t
+           bibtex-completion-cite-prompt-for-optional-arguments nil
+           bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}")))
+     (require 'bibtex-completion nil nil)))
 
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-(use-package reftex
-  :ensure nil
-  :commands (reftex-get-bibfile-list bibtex-parse-keys
-                                     reftex-default-bibliography)
-  :diminish
-  :hook ((LaTeX-mode latex-mode) . reftex-mode)
-  :bind
-  (("C-c [" . reftex-citation)
-   ("C-c )" . reftex-reference)
-   ("C-c (" . reftex-label))
-  :preface
+(eval-and-compile
   (defun sb/get-bibtex-keys (file)
-    (with-current-buffer (find-file-noselect file)
-      (mapcar 'car (bibtex-parse-keys))))
+    (with-current-buffer
+        (find-file-noselect file)
+      (mapcar 'car
+              (bibtex-parse-keys))))
 
-  (defun sb/reftex-add-all-bibitems-from-bibtex ()
+  (defun sb/reftex-add-all-bibitems-from-bibtex nil
     (interactive)
     (mapc 'LaTeX-add-bibitems
           (apply 'append
-                 (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+                 (mapcar 'sb/get-bibtex-keys
+                         (reftex-get-bibfile-list)))))
 
-  (defun sb/find-bibliography-file ()
+  (defun sb/find-bibliography-file nil
     "Try to find a bibliography file using RefTeX.
-      Returns a string with text properties (as expected by read-file-name) or empty string if no
-      file can be found"
+Returns a string with text properties (as expected by
+read-file-name) or empty string if no file can be found"
     (interactive)
-    (let ((bibfile-list nil))
+    (let
+        ((bibfile-list nil))
       (condition-case nil
-          (setq bibfile-list (reftex-get-bibfile-list))
-        (error (ignore-errors
-                 (setq bibfile-list (reftex-default-bibliography)))))
+          (setq bibfile-list
+                (reftex-get-bibfile-list))
+        (error
+         (ignore-errors
+           (setq bibfile-list
+                 (reftex-default-bibliography)))))
       (if bibfile-list
-          (car bibfile-list) "")))
+          (car bibfile-list)
+        "")))
 
-  (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
+  (defun sb/reftex-try-add-all-bibitems-from-bibtex nil
     "Try to find a bibliography file using RefTex and parse the bib keys.
 Ignore if no file is found."
     (interactive)
-    (let ((bibfile-list nil))
+    (let
+        ((bibfile-list nil))
       (condition-case nil
-          (setq bibfile-list (reftex-get-bibfile-list))
-        (error (ignore-errors
-                 (setq bibfile-list (reftex-default-bibliography)))))
-      ;; (message "%s" bibfile-list)
+          (setq bibfile-list
+                (reftex-get-bibfile-list))
+        (error
+         (ignore-errors
+           (setq bibfile-list
+                 (reftex-default-bibliography)))))
       (mapc 'LaTeX-add-bibitems
             (apply 'append
-                   (mapcar 'sb/get-bibtex-keys bibfile-list)))))
-  :custom
-  (reftex-enable-partial-scans t)
-  (reftex-highlight-selection 'both)
-  (reftex-plug-into-AUCTeX t)
-  (reftex-save-parse-info t)
-  (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
-  (reftex-use-multiple-selection-buffers t)
+                   (mapcar 'sb/get-bibtex-keys bibfile-list))))))
 
-  ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-  :config
-  (sb/reftex-try-add-all-bibitems-from-bibtex)
-  ;;  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
-  )
 
-(use-package bib-cite
-  :ensure nil
-  :diminish bib-cite-minor-mode
-  :commands bib-cite-minor-mode
-  :hook
-  ((LaTeX-mode latex-mode) . (lambda ()
+(unless (fboundp 'reftex-mode)
+  (autoload #'reftex-mode "reftex" nil t))
+(unless (fboundp 'reftex-citation)
+  (autoload #'reftex-citation "reftex" nil t))
+(unless (fboundp 'reftex-reference)
+  (autoload #'reftex-reference "reftex" nil t))
+(unless (fboundp 'reftex-label)
+  (autoload #'reftex-label "reftex" nil t))
+(unless (fboundp 'reftex-get-bibfile-list)
+  (autoload #'reftex-get-bibfile-list "reftex" nil t))
+(unless (fboundp 'bibtex-parse-keys)
+  (autoload #'bibtex-parse-keys "reftex" nil t))
+(unless (fboundp 'reftex-default-bibliography)
+  (autoload #'reftex-default-bibliography "reftex" nil t))
+
+(add-hook 'LaTeX-mode-hook #'reftex-mode)
+(add-hook 'latex-mode-hook #'reftex-mode)
+
+(eval-after-load 'reftex
+  '(progn
+     (setq reftex-enable-partial-scans t
+           reftex-highlight-selection 'both
+           reftex-plug-into-AUCTeX t
+           reftex-save-parse-info t
+           reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
+           reftex-use-multiple-selection-buffers t)
+
+     (sb/reftex-try-add-all-bibitems-from-bibtex)
+
+     ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+     ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+
+     (if (fboundp 'diminish)
+         (diminish 'reftex-mode))
+     t))
+
+(bind-keys :package reftex
+           ("C-c [" . reftex-citation)
+           ("C-c )" . reftex-reference)
+           ("C-c (" . reftex-label))
+
+
+(unless (fboundp 'bib-apropos)
+  (autoload #'bib-apropos "bib-cite" nil t))
+(unless (fboundp 'bib-make-bibliography)
+  (autoload #'bib-make-bibliography "bib-cite" nil t))
+(unless (fboundp 'bib-display)
+  (autoload #'bib-display "bib-cite" nil t))
+(unless (fboundp 'bib-etags)
+  (autoload #'bib-etags "bib-cite" nil t))
+(unless (fboundp 'bib-find)
+  (autoload #'bib-find "bib-cite" nil t))
+(unless (fboundp 'bib-find-next)
+  (autoload #'bib-find-next "bib-cite" nil t))
+(unless (fboundp 'bib-highlight-mouse)
+  (autoload #'bib-highlight-mouse "bib-cite" nil t))
+(unless (fboundp 'bib-cite-minor-mode)
+  (autoload #'bib-cite-minor-mode "bib-cite" nil t))
+
+(add-hook 'LaTeX-mode-hook #'(lambda nil
                                (bib-cite-minor-mode 1)))
-  :custom (bib-cite-use-reftex-view-crossref t)
-  :bind (:map bib-cite-minor-mode-map
-              ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-              ("C-c l a" . bib-apropos)
-              ("C-c l b" . bib-make-bibliography)
-              ("C-c l d" . bib-display)
-              ("C-c l t" . bib-etags)
-              ("C-c l f" . bib-find)
-              ("C-c l n" . bib-find-next)
-              ("C-c l h" . bib-highlight-mouse)))
+(add-hook 'latex-mode-hook #'(lambda nil
+                               (bib-cite-minor-mode 1)))
+
+(eval-after-load 'bib-cite
+  '(progn
+     (setq bib-cite-use-reftex-view-crossref t)
+
+     if (fboundp 'diminish)
+     (diminish 'bib-cite-minor-mode)
+     t))
+
+(bind-keys :package bib-cite :map bib-cite-minor-mode-map
+           ("C-c b") ; We use `C-c b' for `comment-box'
+           ("C-c l a" . bib-apropos)
+           ("C-c l b" . bib-make-bibliography)
+           ("C-c l d" . bib-display)
+           ("C-c l t" . bib-etags)
+           ("C-c l f" . bib-find)
+           ("C-c l n" . bib-find-next)
+           ("C-c l h" . bib-highlight-mouse))
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el" ())
@@ -4162,160 +4808,202 @@ Ignore if no file is found."
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map))
 
-(use-package math-preview
-  :commands (math-preview-all math-preview-at-point math-preview-region)
-  :custom
-  (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp)))
 
-(use-package texinfo
-  :mode ("\\.texi\\'" . texinfo-mode))
+(unless (fboundp 'math-preview-all)
+  (autoload #'math-preview-all "math-preview" nil t))
+(unless (fboundp 'math-preview-at-point)
+  (autoload #'math-preview-at-point "math-preview" nil t))
+(unless (fboundp 'math-preview-region)
+  (autoload #'math-preview-region "math-preview" nil t))
+(setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp))
 
-(use-package js2-mode
-  :mode "\\.js\\'"
-  :hook
-  ((js2-mode . js2-imenu-extras-mode)
-   (js2-mode . lsp-deferred))
-  :custom
-  (js-indent-level 2)
-  (js2-basic-offset 2)
-  :config (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode"))
+(unless (fboundp 'texinfo-mode)
+  (autoload #'texinfo-mode "texinfo" nil t))
+(add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode))
 
-(use-package js2-refactor
-  :after js2-mode
-  :demand t
-  :commands js2-refactor-mode
-  :diminish
-  :config (js2-refactor-mode 1))
+(unless (fboundp 'js2-mode)
+  (autoload #'js2-mode "js2-mode" nil t))
+(unless (fboundp 'js2-imenu-extras-mode)
+  (autoload #'js2-imenu-extras-mode "js2-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+(eval-after-load 'js2-mode
+  '(progn
+     (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
+     (setq js-indent-level 2
+           js2-basic-offset 2)
+     t))
 
-(use-package xref-js2
-  :commands xref-js2-xref-backend
-  :custom (xref-js2-search-program 'rg)
-  :hook
-  (js2-mode . (lambda ()
-                (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-  ;; :config
-  ;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
-  ;; (define-key js-mode-map (kbd "M-.") nil)
-  )
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "js2-mode" nil t))
+(add-hook 'js2-mode-hook #'lsp-deferred)
+
+(eval-after-load 'js2-mode
+  '(progn
+     (require 'js2-refactor nil nil)
+     (js2-refactor-mode 1)
+     (if (fboundp 'diminish)
+         (diminish 'js2-refactor-mode))
+     t))
+
+(setq xref-js2-search-program 'rg)
+(unless (fboundp 'xref-js2-xref-backend)
+  (autoload #'xref-js2-xref-backend "xref-js2" nil t))
+(add-hook 'js2-mode-hook #'(lambda nil
+                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+
+;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
+;; (define-key js-mode-map (kbd "M-.") nil)
+
+(eval-and-compile
+  (add-to-list 'load-path "/home/swarnendu/.emacs.d/extras"))
 
 ;; LATER: The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
-(use-package json-mode
-  :ensure nil
-  :ensure json-reformat
-  :ensure json-snatcher
-  :load-path "extras"
-  :mode
-  (("\\.json\\'" . json-mode)
-   (".*/\\.vscode/settings.json$" . jsonc-mode)
-   ("User/settings.json$" . jsonc-mode))
-  :hook
-  ((json-mode jsonc-mode) . (lambda ()
+(unless (fboundp 'json-mode)
+  (autoload #'json-mode "json-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+
+(unless (fboundp 'jsonc-mode)
+  (autoload #'jsonc-mode "json-mode" nil t))
+(add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
+(add-to-list 'auto-mode-alist '("User/settings.json$" . jsonc-mode))
+
+(add-hook 'json-mode-hook #'(lambda nil
                               (make-local-variable 'js-indent-level)
                               (setq js-indent-level 2)
-                              (lsp-deferred))))
+                              (lsp-deferred)))
+(add-hook 'jsonc-mode-hook #'(lambda nil
+                               (make-local-variable 'js-indent-level)
+                               (setq js-indent-level 2)
+                               (lsp-deferred)))
 
-(use-package json-reformat
-  :after json-mode)
+(unless (fboundp 'less-css-mode)
+  (autoload #'less-css-mode "less-css-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
 
-(use-package json-snatcher
-  :after json-mode)
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "scss-mode" nil t))
+(add-hook 'less-css-mode-hook #'lsp-deferred)
 
-(use-package less-css-mode
-  :mode "\\.less\\'"
-  :hook (less-css-mode . lsp-deferred))
 
-(use-package scss-mode
-  :mode "\\.scss\\'"
-  :hook (scss-mode . lsp-deferred))
+(unless (fboundp 'scss-mode)
+  (autoload #'scss-mode "scss-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 
-(use-package sass-mode
-  :mode "\\.sass\\'"
-  :hook (sass-mode . lsp-deferred))
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "scss-mode" nil t))
+(add-hook 'scss-mode-hook #'lsp-deferred)
 
-(use-package bazel-mode
-  :mode
-  (("\\.bzl$"       . bazel-mode)
-   ("\\BUILD\\'"    . bazel-mode)
-   ("\\.bazelrc\\'" . bazelrc-mode))
-  :hook (bazel-mode . flycheck-mode))
 
-(use-package protobuf-mode
-  :mode "\\.proto$"
-  :hook (protobuf-mode . flycheck-mode))
+(unless (fboundp 'sass-mode)
+  (autoload #'sass-mode "sass-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
 
-(use-package mlir-mode
-  :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file [3 times]"
-  ;; This will clone the llvm project
-  ;; :quelpa ((mlir-mode :fetcher github :repo "llvm/llvm-project"
-  ;;                     :files ("mlir/utils/emacs/mlir-mode.el")))
-  :mode "\\.mlir\\'")
+(unless (fboundp 'lsp-deferred)
+  (autoload #'lsp-deferred "sass-mode" nil t))
+(add-hook 'sass-mode-hook #'lsp-deferred)
 
-(use-package clang-format
-  :after (mlir-mode)
-  :commands (clang-format clang-format-buffer clang-format-region))
+(unless (fboundp 'bazel-mode)
+  (autoload #'bazel-mode "bazel-mode" nil t))
+(unless (fboundp 'bazelrc-mode)
+  (autoload #'bazelrc-mode "bazel-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.bzl$" . bazel-mode))
+(add-to-list 'auto-mode-alist '("\\BUILD\\'" . bazel-mode))
+(add-to-list 'auto-mode-alist '("\\.bazelrc\\'" . bazelrc-mode))
+(unless (fboundp 'flycheck-mode)
+  (autoload #'flycheck-mode "flycheck" nil t))
+(add-hook 'bazel-mode-hook #'flycheck-mode)
 
-(use-package clang-format+
-  :ensure clang-format
-  :ensure t
-  :hook (mlir-mode . clang-format+-mode)
-  :custom (clang-format+-always-enable t "Always enable"))
+(unless (fboundp 'protobuf-mode)
+  (autoload #'protobuf-mode "protobuf-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
+(unless (fboundp 'flycheck-mode)
+  (autoload #'flycheck-mode "flycheck" nil t))
+(add-hook 'protobuf-mode-hook #'flycheck-mode)
+
+(eval-after-load 'mlir-mode
+  '(progn
+     (unless (fboundp 'clang-format)
+       (autoload #'clang-format "clang-format" nil t))
+     (unless (fboundp 'clang-format-buffer)
+       (autoload #'clang-format-buffer "clang-format" nil t))
+     (unless (fboundp 'clang-format-region)
+       (autoload #'clang-format-region "clang-format" nil t))))
+
+(unless (fboundp 'clang-format+-mode)
+  (autoload #'clang-format+-mode "clang-format+" nil t))
+(add-hook 'mlir-mode-hook #'clang-format+-mode)
+(setq clang-format+-always-enable t)
+
 
 ;; Use for major modes which do not provide a formatter
-(use-package format-all
-  :commands (format-all-ensure-formatter format-all-buffer)
-  :init
-  (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
-                                       bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
-    (add-hook hook #'format-all-mode))
-  (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)
-  ;; :hook ((format-all-mode . format-all-ensure-formatter))
-  )
+(unless (fboundp 'format-all-ensure-formatter)
+  (autoload #'format-all-ensure-formatter "format-all" nil t))
+(unless (fboundp 'format-all-buffer)
+  (autoload #'format-all-buffer "format-all" nil t))
+(dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
+  (add-hook hook #'format-all-mode))
+(add-hook 'format-all-mode-hook #'format-all-ensure-formatter)
 
-(use-package tree-sitter
-  :ensure tree-sitter-langs
-  :functions tree-sitter-hl-mode
-  :commands global-tree-sitter-mode
-  :diminish tree-sitter-mode
-  :init
-  (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
-                               css-mode-hook html-mode-hook java-mode-hook js-mode-hook
-                               js2-mode-hook json-mode-hook jsonc-mode-hook php-mode-hook
-                               python-mode-hook typescript-mode-hook))
-    (add-hook hook (lambda ()
-                     (require 'tree-sitter)
-                     (require 'tree-sitter-langs)
-                     (require 'tree-sitter-hl)
-                     (global-tree-sitter-mode 1)
-                     (tree-sitter-hl-mode 1)))))
 
-(use-package adoc-mode
-  :mode "\\.adoc\\'")
+(unless (fboundp 'global-tree-sitter-mode)
+  (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
+(dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
+                             css-mode-hook html-mode-hook java-mode-hook js-mode-hook
+                             js2-mode-hook json-mode-hook jsonc-mode-hook php-mode-hook
+                             python-mode-hook typescript-mode-hook))
+  (add-hook hook
+            (lambda nil
+              (require 'tree-sitter)
+              (require 'tree-sitter-langs)
+              (require 'tree-sitter-hl)
+              (global-tree-sitter-mode 1)
+              (tree-sitter-hl-mode 1))))
+(eval-after-load 'tree-sitter
+  '(if (fboundp 'diminish)
+       (diminish 'tree-sitter-mode)))
 
-(use-package editorconfig
-  :if (executable-find "editorconfig")
-  :diminish editorconfig-mode
-  :commands editorconfig-mode)
+
+(unless (fboundp 'adoc-mode)
+  (autoload #'adoc-mode "adoc-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
+
+(when (executable-find "editorconfig")
+  (unless (fboundp 'editorconfig-mode)
+    (autoload #'editorconfig-mode "editorconfig" nil t))
+
+  (eval-after-load 'editorconfig
+    '(if (fboundp 'diminish)
+         (diminish 'editorconfig-mode))))
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
-(use-package fasd
-  :custom (fasd-enable-initial-prompt nil)
-  :hook (emacs-startup . global-fasd-mode)
-  :bind ("C-c /" . fasd-find-file))
+(unless (fboundp 'global-fasd-mode)
+  (autoload #'global-fasd-mode "fasd" nil t))
+(unless (fboundp 'fasd-find-file)
+  (autoload #'fasd-find-file "fasd" nil t))
+(add-hook 'emacs-startup-hook #'global-fasd-mode)
+(setq fasd-enable-initial-prompt nil)
+(bind-keys :package fasd
+           ("C-c /" . fasd-find-file))
 
-(use-package dotenv-mode)
+(unless (fboundp 'toml-mode)
+  (autoload #'toml-mode "toml-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-mode))
 
-(use-package toml-mode
-  :mode "\\.toml\\'")
+(unless (fboundp 'nix-mode)
+  (autoload #'nix-mode "nix-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 
-(use-package nix-mode
-  :mode "\\.nix\\'")
-
-(use-package rust-mode
-  :mode "\\.rs\\'"
-  :hook (rust-mode . lsp)
-  :config (setq rust-format-on-save t))
+(unless (fboundp 'rust-mode)
+  (autoload #'rust-mode "rust-mode" nil t))
+(unless (fboundp 'lsp)
+  (autoload #'lsp "rust-mode" nil t))
+(add-hook 'rust-mode-hook #'lsp)
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+(eval-after-load 'rust-mode
+  '(progn
+     (setq rust-format-on-save t)
+     t))
 
 (declare-function ansi-color-apply-on-region "ansi-color")
 (defun sb/colorize-compilation-buffer ()
@@ -4323,12 +5011,7 @@ Ignore if no file is found."
   (require 'ansi-color)
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region (point-min) (point-max))))
-
 (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
-
-(use-package aggressive-completion
-  :disabled t
-  :hook (after-init . aggressive-completion-mode))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
@@ -4343,87 +5026,84 @@ Ignore if no file is found."
 ;; Merge completions of all the backends, give priority to `company-xxx'
 ;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
 
-(defun sb/company-text-mode ()
-  "Add backends for text completion in company mode."
-  (use-package company-emoji
-    :disabled t)
-  ;; Slightly larger value to have more precise matches
-  (setq-local company-minimum-prefix-length 3)
-  (set (make-local-variable 'company-backends)
-       '((
-          company-files
-          company-yasnippet ; Works everywhere
-          company-ispell ; Uses an English dictionary
-          ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
-          ;; strings or comments). That is why it is better to put it at the end.
-          company-dabbrev
-          ))))
-(dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
-  (add-hook hook (lambda ()
-                   (sb/company-text-mode))))
+;; (defun sb/company-text-mode ()
+;;   "Add backends for text completion in company mode."
+;;   ;; Slightly larger value to have more precise matches
+;;   (setq-local company-minimum-prefix-length 3)
+;;   (set (make-local-variable 'company-backends)
+;;        '((
+;;           company-files
+;;           company-yasnippet ; Works everywhere
+;;           company-ispell ; Uses an English dictionary
+;;           ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
+;;           ;; strings or comments). That is why it is better to put it at the end.
+;;           company-dabbrev
+;;           ))))
+;; (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
+;;   (add-hook hook (lambda ()
+;;                    (sb/company-text-mode))))
 
-(defun sb/company-xml-mode ()
-  "Add backends for completion with company."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf :separate
-           company-yasnippet
-           company-dabbrev-code
-           ))))
-(dolist (hook '(nxml-mode-hook))
-  (add-hook hook (lambda ()
-                   (sb/company-xml-mode))))
+;; (defun sb/company-xml-mode ()
+;;   "Add backends for completion with company."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((
+;;            company-files
+;;            company-capf :separate
+;;            company-yasnippet
+;;            company-dabbrev-code
+;;            ))))
+;; (dolist (hook '(nxml-mode-hook))
+;;   (add-hook hook (lambda ()
+;;                    (sb/company-xml-mode))))
 
-(defun sb/company-prog-mode ()
-  "Add backends for program completion in company mode."
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev-code
-           company-dabbrev
-           ))))
-(add-hook 'prog-mode-hook #'sb/company-prog-mode)
+;; (defun sb/company-prog-mode ()
+;;   "Add backends for program completion in company mode."
+;;   (setq-local company-minimum-prefix-length 2)
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((
+;;            company-files
+;;            company-capf
+;;            company-yasnippet
+;;            company-dabbrev-code
+;;            company-dabbrev
+;;            ))))
+;; (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
-(defun sb/company-java-mode ()
-  "Add backends for Java completion in company mode."
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev
-           ))))
-(add-hook 'java-mode-hook #'sb/company-java-mode)
+;; (defun sb/company-java-mode ()
+;;   "Add backends for Java completion in company mode."
+;;   (setq-local company-minimum-prefix-length 2)
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((
+;;            company-files
+;;            company-capf
+;;            company-yasnippet
+;;            company-dabbrev
+;;            ))))
+;; (add-hook 'java-mode-hook #'sb/company-java-mode)
 
-(defun sb/company-c-mode ()
-  "Add backends for C/C++ completion in company mode."
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           ;; company-dabbrev-code
-           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-           ;; company-clang ; This can be slow
-           company-dabbrev
-           ))))
-(add-hook 'c-mode-common-hook #'sb/company-c-mode)
+;; (defun sb/company-c-mode ()
+;;   "Add backends for C/C++ completion in company mode."
+;;   (setq-local company-minimum-prefix-length 2)
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((
+;;            company-files
+;;            company-capf
+;;            company-yasnippet
+;;            ;; company-dabbrev-code
+;;            ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;;            ;; company-clang ; This can be slow
+;;            company-dabbrev
+;;            ))))
+;; (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
-  (use-package company-shell
-    :demand t
-    :custom (company-shell-delete-duplictes t))
+  (require 'company-shell nil nil)
+  (setq company-shell-delete-duplictes t)
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -4469,18 +5149,12 @@ Ignore if no file is found."
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
-  (use-package company-auctex
-    :demand t
-    :commands company-auctex-init
-    :config (company-auctex-init))
-  (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
-    :demand t)
-  (use-package company-math
-    :demand t)
-  (use-package company-reftex
-    :demand t)
-  (use-package company-bibtex
-    :demand t)
+  (require 'company-auctex nil nil)
+  (company-auctex-init)
+  (require 'math-symbol-lists nil nil) ; Required by `ac-math' and `company-math'
+  (require 'company-math nil nil)
+  (require 'company-reftex nil nil)
+  (require 'company-bibtex nil nil)
   (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -4502,24 +5176,27 @@ Ignore if no file is found."
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
-(defun sb/company-web-mode ()
-  "Add backends for web completion in company mode."
-  (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev
-           company-ispell
-           ))))
-(dolist (hook '(web-mode-hook))
-  (add-hook hook #'sb/company-web-mode))
+;; (defun sb/company-web-mode ()
+;;   "Add backends for web completion in company mode."
+;;   (make-local-variable 'company-backends)
+;;   (setq company-backends
+;;         '((
+;;            company-files
+;;            company-capf
+;;            company-yasnippet
+;;            company-dabbrev
+;;            company-ispell
+;;            ))))
+;; (dolist (hook '(web-mode-hook))
+;;   (add-hook hook #'sb/company-web-mode))
 
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
-;; (use-package server
-;;   :unless (string-equal "root" (getenv "USER")) ; Only start server mode if not root
-;;   :config (unless (server-running-p) (server-start)))
+;; (when (not (string-equal "root" (getenv "USER"))) ; Only start server mode if not root
+;;   (eval-after-load 'server
+;;     '(progn
+;;        (unless (server-running-p)
+;;          (server-start))
+;;        t)))
 
 ;; Function definitions
 
@@ -4768,162 +5445,169 @@ or the major mode is not in `sb/skippable-modes'."
   (global-set-key [remap next-buffer] #'centaur-tabs-forward)
   (global-set-key [remap previous-buffer] #'centaur-tabs-backward))
 
-(use-package default-text-scale
-  :bind
-  (("C-M-+" . default-text-scale-increase)
-   ("C-M--" . default-text-scale-decrease)))
+(unless (fboundp 'default-text-scale-increase)
+  (autoload #'default-text-scale-increase "default-text-scale" nil t))
+(unless (fboundp 'default-text-scale-decrease)
+  (autoload #'default-text-scale-decrease "default-text-scale" nil t))
+(bind-keys :package default-text-scale
+           ("C-M-+" . default-text-scale-increase)
+           ("C-M--" . default-text-scale-decrease))
 
-(use-package free-keys
-  :commands free-keys)
+(unless (fboundp 'free-keys)
+  (autoload #'free-keys "free-keys" nil t))
 
-(use-package which-key ; Show help popups for prefix keys
-  :diminish
-  :commands which-key-setup-side-window-right-bottom
-  :hook (after-init . which-key-mode)
-  :config (which-key-setup-side-window-right-bottom)
-  :custom
-  ;; Allow C-h to trigger which-key before it is done automatically
-  (which-key-show-early-on-C-h t))
+;; Show help popups for prefix keys
+(unless (fboundp 'which-key-setup-side-window-right-bottom)
+  (autoload #'which-key-setup-side-window-right-bottom nil t))
+(unless (fboundp 'which-key-mode)
+  (autoload #'which-key-mode nil t))
+(add-hook 'after-init-hook #'which-key-mode)
+(eval-after-load 'which-key
+  '(progn
+     ;; Allow C-h to trigger which-key before it is done automatically
+     (setq which-key-show-early-on-C-h t)
+     (which-key-setup-side-window-right-bottom)
+     (if
+         (fboundp 'diminish)
+         (diminish 'which-key-mode))
+     t))
 
 ;; The posframe has a lower contrast
-(use-package which-key-posframe
-  :disabled t
-  :hook (which-key-mode . which-key-posframe-mode))
+(unless (fboundp 'which-key-posframe-mode)
+  (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
+(add-hook 'which-key-mode-hook #'which-key-posframe-mode)
 
 ;; Hydras
 
-(defhydra sb/hydra-spelling (:color blue)
-  "
-  ^
-  ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
-  ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
-  _q_ quit            _<_ previous        _c_ correction        _n_ next error
-  ^^                  _>_ next            _d_ dictionary        _p_ previous error
-  ^^                  _f_ check           _m_ mode              _a_ add word
-  ^^                  ^^                  ^^                    ^^
-  "
-  ("q" nil)
-  ("<" flyspell-correct-previous :color pink)
-  (">" flyspell-correct-next :color pink)
-  ("c" ispell)
-  ("d" ispell-change-dictionary)
-  ("f" flyspell-buffer)
-  ("m" flyspell-mode)
-  ("n" spell-fu-goto-next-error)
-  ("p" spell-fu-goto-previous-error)
-  ("a" spell-fu-word-add))
+;; (defhydra sb/hydra-spelling (:color blue)
+;;   "
+;;   ^
+;;   ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
+;;   ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
+;;   _q_ quit            _<_ previous        _c_ correction        _n_ next error
+;;   ^^                  _>_ next            _d_ dictionary        _p_ previous error
+;;   ^^                  _f_ check           _m_ mode              _a_ add word
+;;   ^^                  ^^                  ^^                    ^^
+;;   "
+;;   ("q" nil)
+;;   ("<" flyspell-correct-previous :color pink)
+;;   (">" flyspell-correct-next :color pink)
+;;   ("c" ispell)
+;;   ("d" ispell-change-dictionary)
+;;   ("f" flyspell-buffer)
+;;   ("m" flyspell-mode)
+;;   ("n" spell-fu-goto-next-error)
+;;   ("p" spell-fu-goto-previous-error)
+;;   ("a" spell-fu-word-add))
 
-(defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
-  "Zoom the text"
-  ("i" default-text-scale-increase "in")
-  ("o" default-text-scale-decrease "out"))
+;; (defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
+;;   "Zoom the text"
+;;   ("i" default-text-scale-increase "in")
+;;   ("o" default-text-scale-decrease "out"))
 
-(defhydra sb/hydra-error (global-map "C-c h e")
-  "goto-error"
-  ("h" first-error "first")
-  ("j" next-error "next")
-  ("k" previous-error "prev")
-  ("v" recenter-top-bottom "recenter")
-  ("q" nil "quit"))
+;; (defhydra sb/hydra-error (global-map "C-c h e")
+;;   "goto-error"
+;;   ("h" first-error "first")
+;;   ("j" next-error "next")
+;;   ("k" previous-error "prev")
+;;   ("v" recenter-top-bottom "recenter")
+;;   ("q" nil "quit"))
 
-(defhydra sb/hydra-projectile (:color teal
-                                      :hint nil)
-  "
-     PROJECTILE: %(projectile-project-root)
+;; (defhydra sb/hydra-projectile (:color teal
+;;                                       :hint nil)
+;;   "
+;;      PROJECTILE: %(projectile-project-root)
 
-     Find File            Search/Tags          Buffers                Cache
-------------------------------------------------------------------------------------------
-_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
- _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
- _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-  _r_: recent file                                               ^^^^_z_: cache current
-  _d_: dir
+;;      Find File            Search/Tags          Buffers                Cache
+;; ------------------------------------------------------------------------------------------
+;; _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
+;;  _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
+;;  _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
+;;   _r_: recent file                                               ^^^^_z_: cache current
+;;   _d_: dir
 
-"
-  ("b"   projectile-switch-to-buffer)
-  ("c"   projectile-invalidate-cache)
-  ("d"   projectile-find-dir)
-  ("s-f" projectile-find-file)
-  ("ff"  projectile-find-file-dwim)
-  ("fd"  projectile-find-file-in-directory)
-  ("i"   projectile-ibuffer)
-  ("K"   projectile-kill-buffers)
-  ("s-k" projectile-kill-buffers)
-  ("m"   projectile-multi-occur)
-  ("o"   projectile-multi-occur)
-  ("s-p" projectile-switch-project "switch project")
-  ("p"   projectile-switch-project)
-  ("s"   projectile-switch-project)
-  ("r"   projectile-recentf)
-  ("x"   projectile-remove-known-project)
-  ("X"   projectile-cleanup-known-projects)
-  ("z"   projectile-cache-current-file)
-  ("a"   projectile-ag)
-  ("g"   projectile-find-tag)
-  ("q"   nil "cancel" :color blue))
+;; "
+;;   ("b"   projectile-switch-to-buffer)
+;;   ("c"   projectile-invalidate-cache)
+;;   ("d"   projectile-find-dir)
+;;   ("s-f" projectile-find-file)
+;;   ("ff"  projectile-find-file-dwim)
+;;   ("fd"  projectile-find-file-in-directory)
+;;   ("i"   projectile-ibuffer)
+;;   ("K"   projectile-kill-buffers)
+;;   ("s-k" projectile-kill-buffers)
+;;   ("m"   projectile-multi-occur)
+;;   ("o"   projectile-multi-occur)
+;;   ("s-p" projectile-switch-project "switch project")
+;;   ("p"   projectile-switch-project)
+;;   ("s"   projectile-switch-project)
+;;   ("r"   projectile-recentf)
+;;   ("x"   projectile-remove-known-project)
+;;   ("X"   projectile-cleanup-known-projects)
+;;   ("z"   projectile-cache-current-file)
+;;   ("a"   projectile-ag)
+;;   ("g"   projectile-find-tag)
+;;   ("q"   nil "cancel" :color blue))
 
-(defhydra sb/hydra-flycheck (:color blue)
-  "
-  ^
-  ^Flycheck^          ^Errors^            ^Checker^
-  ^────────^──────────^──────^────────────^───────^─────
-  _q_ quit            _<_ previous        _?_ describe
-  _M_ manual          _>_ next            _d_ disable
-  _v_ verify setup    _f_ check           _m_ mode
-  ^^                  _l_ list            _s_ select
-  ^^                  ^^                  ^^
-  "
-  ("q" nil)
-  ("<" flycheck-previous-error :color pink)
-  (">" flycheck-next-error :color pink)
-  ("?" flycheck-describe-checker)
-  ("M" flycheck-manual)
-  ("d" flycheck-disable-checker)
-  ("f" flycheck-buffer)
-  ("l" flycheck-list-errors)
-  ("m" flycheck-mode)
-  ("s" flycheck-select-checker)
-  ("v" flycheck-verify-setup))
+;; (defhydra sb/hydra-flycheck (:color blue)
+;;   "
+;;   ^
+;;   ^Flycheck^          ^Errors^            ^Checker^
+;;   ^────────^──────────^──────^────────────^───────^─────
+;;   _q_ quit            _<_ previous        _?_ describe
+;;   _M_ manual          _>_ next            _d_ disable
+;;   _v_ verify setup    _f_ check           _m_ mode
+;;   ^^                  _l_ list            _s_ select
+;;   ^^                  ^^                  ^^
+;;   "
+;;   ("q" nil)
+;;   ("<" flycheck-previous-error :color pink)
+;;   (">" flycheck-next-error :color pink)
+;;   ("?" flycheck-describe-checker)
+;;   ("M" flycheck-manual)
+;;   ("d" flycheck-disable-checker)
+;;   ("f" flycheck-buffer)
+;;   ("l" flycheck-list-errors)
+;;   ("m" flycheck-mode)
+;;   ("s" flycheck-select-checker)
+;;   ("v" flycheck-verify-setup))
 
-(with-eval-after-load 'python
-  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
-    "Adjust Python indentation."
-    (">" python-indent-shift-right "right")
-    ("<" python-indent-shift-left "left")))
+;; (with-eval-after-load 'python
+;;   (defhydra sb/hydra-python-indent (python-mode-map "C-c")
+;;     "Adjust Python indentation."
+;;     (">" python-indent-shift-right "right")
+;;     ("<" python-indent-shift-left "left")))
 
-(defhydra sb/smerge-hydra
-  (:color pink :hint nil :post (smerge-auto-leave))
-  "
-^Move^       ^Keep^               ^Diff^                 ^Other^
-^^-----------^^-------------------^^---------------------^^-------
-_n_ext       _b_ase               _<_: upper/base        _C_ombine
-_p_rev       _u_pper              _=_: upper/lower       _r_esolve
-^^           _l_ower              _>_: base/lower        _k_ill current
-^^           _a_ll                _R_efine
-^^           _RET_: current       _E_diff
-"
-  ("n" smerge-next)
-  ("p" smerge-prev)
-  ("b" smerge-keep-base)
-  ("u" smerge-keep-upper)
-  ("l" smerge-keep-lower)
-  ("a" smerge-keep-all)
-  ("RET" smerge-keep-current)
-  ("\C-m" smerge-keep-current)
-  ("<" smerge-diff-base-upper)
-  ("=" smerge-diff-upper-lower)
-  (">" smerge-diff-base-lower)
-  ("R" smerge-refine)
-  ("E" smerge-ediff)
-  ("C" smerge-combine-with-next)
-  ("r" smerge-resolve)
-  ("k" smerge-kill-current)
-  ("q" nil "cancel" :color blue))
+;; (defhydra sb/smerge-hydra
+;;   (:color pink :hint nil :post (smerge-auto-leave))
+;;   "
+;; ^Move^       ^Keep^               ^Diff^                 ^Other^
+;; ^^-----------^^-------------------^^---------------------^^-------
+;; _n_ext       _b_ase               _<_: upper/base        _C_ombine
+;; _p_rev       _u_pper              _=_: upper/lower       _r_esolve
+;; ^^           _l_ower              _>_: base/lower        _k_ill current
+;; ^^           _a_ll                _R_efine
+;; ^^           _RET_: current       _E_diff
+;; "
+;;   ("n" smerge-next)
+;;   ("p" smerge-prev)
+;;   ("b" smerge-keep-base)
+;;   ("u" smerge-keep-upper)
+;;   ("l" smerge-keep-lower)
+;;   ("a" smerge-keep-all)
+;;   ("RET" smerge-keep-current)
+;;   ("\C-m" smerge-keep-current)
+;;   ("<" smerge-diff-base-upper)
+;;   ("=" smerge-diff-upper-lower)
+;;   (">" smerge-diff-base-lower)
+;;   ("R" smerge-refine)
+;;   ("E" smerge-ediff)
+;;   ("C" smerge-combine-with-next)
+;;   ("r" smerge-resolve)
+;;   ("k" smerge-kill-current)
+;;   ("q" nil "cancel" :color blue))
 
 ;; Mark safe variables
-
-;; (add-to-list 'safe-local-variable-values '(auto-fill-function . nil))
-;; (add-to-list 'safe-local-eval-forms '(visual-line-mode +1))
 
 (put 'bibtex-completion-bibliography 'safe-local-variable #'listp)
 (put 'company-bibtex-bibliography 'safe-local-variable #'listp)
@@ -4946,69 +5630,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'tags-table-list 'safe-local-variable #'listp)
-
-;; Test functions
-
-(defun sb/open-local-file-projectile (directory)
-  "Open projectile file within DIRECTORY.
-Specify by the keyword projectile-default-file define in `dir-locals-file'"
-  (let ((default-file
-          (f-join directory
-                  (nth 1
-                       (car (-tree-map (lambda (node)
-                                         (when (eq (car node)
-                                                   'dotemacs-projectile-default-file)
-                                           (format "%s" (cdr node))))
-                                       (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                                        directory))))))))
-    (if (f-exists? default-file)
-        (counsel-find-file default-file)
-      (message "The file %s doesn't exist in the select project" default-file))))
-
-(defun sb/open-project-default-file1 (filepath)
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (let ((liststring (with-temp-buffer
-                      (insert-file-contents filepath)
-                      (split-string (buffer-string) "\n"))))
-    (mapcar (lambda (str)
-              (when (cl-search "dotemacs-projectile-default-file" str)
-                (let ((x (substring str (+
-                                         13 (length "dotemacs-projectile-default-file")) (length
-                                         str))))
-                  (let ((default-file (expand-file-name (substring
-                                                         x 1 -2) (projectile-project-root))))
-                    (when (f-exists? default-file)
-                      (let ((new-buffer (get-buffer-create default-file)))
-                        (switch-to-buffer new-buffer)
-                        (insert-file-contents default-file)))))))
-            liststring)))
-;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
-
-(defun sb/open-project-default-file2 ()
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (interactive)
-  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                 (projectile-project-root)))))
-    (mapcar (lambda (node)
-              (when (eq (car node) nil)
-                (let ((nillist (cdr node)))
-                  (mapcar (lambda (elem)
-                            (when (eq (car elem) 'dotemacs-projectile-default-file)
-                              (let ((default-file (expand-file-name (cdr elem)
-                                                                    (projectile-project-root))))
-                                (when (f-exists? default-file)
-                                  ;; (let ((new-buffer (get-buffer-create default-file)))
-                                  ;;   (switch-to-buffer new-buffer)
-                                  ;;   (insert-file-contents default-file))
-                                  (find-file default-file)))))
-                          nillist))))
-            mylist)))
-;; (sb/open-project-default-file2)
-
-;; (with-eval-after-load "counsel-projectile" (add-to-list 'counsel-projectile-action '("d"
-;;   sb/open-project-default-file2 "open default file") t))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
