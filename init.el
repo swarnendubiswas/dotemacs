@@ -1779,22 +1779,6 @@ SAVE-FN with non-nil ARGS."
       (and buf (eq (buffer-local-value 'major-mode buf)
                    'dired-mode)))))
 
-(setq completion-in-region-function #'ivy-completion-in-region
-      ivy-initial-inputs-alist nil ; Do not start completion with `^'
-      ivy-case-fold-search 'always ; Always ignore case while searching
-      ivy-count-format "(%d/%d) " ; Help identify wrap around
-      ivy-extra-directories nil ; Hide . and ..
-      ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
-      ;; Make the height of the minibuffer proportionate to the screen
-      ;; ivy-height-alist '((t
-      ;;                      lambda (_caller)
-      ;;                      (/ (frame-height) 2)))
-      ;; We update this after loading `orderless'
-      ;; ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
-      ;;                         (counsel-find-file . ivy--regex-fuzzy)
-      ;;                         (t . ivy--regex-ignore-order))
-      ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
-      ivy-wrap t)
 
 (unless (fboundp 'ivy-mode)
   (autoload #'ivy-mode "ivy" nil t))
@@ -1810,27 +1794,53 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ivy-next-line "ivy" nil t))
 (unless (fboundp 'ivy-read)
   (autoload #'ivy-read "ivy" nil t))
+(add-hook 'after-init-hook #'ivy-mode)
 
 (eval-after-load 'ivy
   '(progn
+     (defvar ivy-initial-inputs-alist)
+     (defvar ivy-case-fold-search)
+     (defvar ivy-count-format)
+     (defvar ivy-extra-directories)
+     (defvar ivy-fixed-height-minibuffer)
+     (defvar ivy-ignore-buffers)
+     (defvar ivy-truncate-lines)
+     (defvar ivy-wrap)
+
+     (setq completion-in-region-function #'ivy-completion-in-region
+           ivy-initial-inputs-alist nil ; Do not start completion with `^'
+           ivy-case-fold-search 'always ; Always ignore case while searching
+           ivy-count-format "(%d/%d) " ; Help identify wrap around
+           ivy-extra-directories nil ; Hide . and ..
+           ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+           ;; Make the height of the minibuffer proportionate to the screen
+           ;; ivy-height-alist '((t
+           ;;                      lambda (_caller)
+           ;;                      (/ (frame-height) 2)))
+           ;; We update this after loading `orderless'
+           ;; ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
+           ;;                         (counsel-find-file . ivy--regex-fuzzy)
+           ;;                         (t . ivy--regex-ignore-order))
+           ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
+           ivy-wrap t)
+
      (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
      (defalias 'occur 'ivy-occur)
-     (dolist
-         (buffer
-          '("TAGS" "magit-process"
-            ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
-            ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-            ;; "*flycheck-posframe-buffer*" "*emacs*" "^\\*prettier" "^\\*json*"
-            ;; "^\\*texlab*" "^\\*clangd*" "^\\*shfmt*" "*company-documentation*" "*xref*"
-            ))
-       (add-to-list 'ivy-ignore-buffers buffer)
-       ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
-       )
-     (if
-         (fboundp 'diminish)
+
+     (dolist (buffer
+              '("TAGS" "magit-process"
+                ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
+                ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+                ;; "*flycheck-posframe-buffer*" "*emacs*" "^\\*prettier" "^\\*json*"
+                ;; "^\\*texlab*" "^\\*clangd*" "^\\*shfmt*" "*company-documentation*" "*xref*"
+                ))
+       (add-to-list 'ivy-ignore-buffers buffer))
+     ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
+
+     (if (fboundp 'diminish)
          (diminish 'ivy-mode))
      t))
-(add-hook 'after-init-hook #'ivy-mode)
+
 (bind-keys :package ivy
            ("C-c r" . ivy-resume)
            ("<f3>" . ivy-switch-buffer)
@@ -1859,15 +1869,6 @@ SAVE-FN with non-nil ARGS."
                  "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired))))
 
-(setq counsel-describe-function-function #'helpful-callable
-      counsel-describe-variable-function #'helpful-variable
-      counsel-find-file-at-point t
-      counsel-find-file-ignore-regexp (concat "\\(?:\\`[#.]\\)" "\\|\\(?:\\`.+?[#~]\\'\\)" "\\|__pycache__" "\\|.cb$" "\\|.cb2$" "\\|.djvu$" "\\|.doc$" "\\|.docx$" "\\|.elc$" "\\|.fdb_latexmk$" "\\|.fls$" "\\|.lof$" "\\|.lot$" "\\|.o$" "\\|.out$" "\\|.ppt$" "\\|.pptx$" "\\|.pyc$" "\\|.rel$" "\\|.rip$" "\\|.so$" "\\|.synctex$" "\\|.synctex.gz$" "\\|.toc$" "\\|.xls$" "\\|.xlsx$" "\\|tags" "\\|TAGS" "\\|GPATH" "\\|GRTAGS" "\\|GTAGS" "\\|tramp" "\\|.clangd" "\\|.metadata" "\\|.recommenders")
-      counsel-mode-override-describe-bindings t
-      counsel-preselect-current-file t
-      counsel-switch-buffer-preview-virtual-buffers nil
-      counsel-yank-pop-preselect-last t
-      counsel-yank-pop-separator "\n-------------------------\n")
 
 (unless (fboundp 'counsel-M-x)
   (autoload #'counsel-M-x "counsel" nil t))
@@ -1903,9 +1904,37 @@ SAVE-FN with non-nil ARGS."
   (autoload #'counsel-imenu "counsel" nil t))
 (unless (fboundp 'counsel-mode)
   (autoload #'counsel-mode "counsel" nil t))
+(add-hook 'ivy-mode-hook #'counsel-mode)
 
 (eval-after-load 'counsel
   '(progn
+     (defvar counsel-describe-function-function)
+     (defvar counsel-describe-variable-function)
+     (defvar counsel-find-file-at-point)
+     (defvar counsel-find-file-ignore-regexp)
+     (defvar counsel-mode-override-describe-bindings)
+     (defvar counsel-preselect-current-file)
+     (defvar counsel-switch-buffer-preview-virtual-buffers)
+     (defvar counsel-yank-pop-preselect-last)
+     (defvar counsel-yank-pop-separator)
+
+     (setq counsel-describe-function-function #'helpful-callable
+           counsel-describe-variable-function #'helpful-variable
+           counsel-find-file-at-point t
+           counsel-find-file-ignore-regexp
+           (concat
+            "\\(?:\\`[#.]\\)" "\\|\\(?:\\`.+?[#~]\\'\\)" "\\|__pycache__" "\\|.cb$" "\\|.cb2$"
+            "\\|.djvu$" "\\|.doc$" "\\|.docx$" "\\|.elc$" "\\|.fdb_latexmk$" "\\|.fls$" "\\|.lof$"
+            "\\|.lot$" "\\|.o$" "\\|.out$" "\\|.ppt$" "\\|.pptx$" "\\|.pyc$" "\\|.rel$" "\\|.rip$"
+            "\\|.so$" "\\|.synctex$" "\\|.synctex.gz$" "\\|.toc$" "\\|.xls$" "\\|.xlsx$" "\\|tags"
+            "\\|TAGS" "\\|GPATH" "\\|GRTAGS" "\\|GTAGS" "\\|tramp" "\\|.clangd" "\\|.metadata"
+            "\\|.recommenders")
+           counsel-mode-override-describe-bindings t
+           counsel-preselect-current-file t
+           counsel-switch-buffer-preview-virtual-buffers nil
+           counsel-yank-pop-preselect-last t
+           counsel-yank-pop-separator "\n-------------------------\n")
+
      ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
      ;; argument error
      ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
@@ -1916,12 +1945,10 @@ SAVE-FN with non-nil ARGS."
      ;; (add-to-list 'ivy-display-functions-alist
      ;;   '(counsel-company . ivy-display-function-overlay))
 
-     (if
-         (fboundp 'diminish)
+     (if (fboundp 'diminish)
          (diminish 'counsel-mode))
      t))
 
-(add-hook 'ivy-mode-hook #'counsel-mode)
 (bind-keys* :package counsel
             ("C-c C-j" . counsel-imenu))
 (bind-keys :package counsel
@@ -1953,15 +1980,20 @@ SAVE-FN with non-nil ARGS."
   '(eval-after-load 'ivy
      '(require 'ivy-hydra nil nil)))
 
-(eval-after-load 'prescient
-  '(progn
-     (setq prescient-history-length 500)
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory)))
-     t))
+
 (unless (fboundp 'prescient-persist-mode)
   (autoload #'prescient-persist-mode "prescient" nil t))
 (add-hook 'after-init-hook #'prescient-persist-mode)
+
+(eval-after-load 'prescient
+  '(progn
+     (defvar prescient-history-length)
+
+     (setq prescient-history-length 500)
+
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory)))
+     t))
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 ;; (with-eval-after-load 'ivy
@@ -1973,28 +2005,41 @@ SAVE-FN with non-nil ARGS."
 ;;  'ivy-sort-matches-functions-alist
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
+
 (eval-after-load 'company
   '(progn
-     (require 'company-prescient nil nil)
+     (unless (fboundp 'company-prescient-mode)
+       (autoload #'company-prescient-mode "company-prescient" nil t))
      (company-prescient-mode 1)
      t))
 
+
 (eval-after-load 'ivy
   '(progn
-     (require 'all-the-icons-ivy nil nil)
+     (unless (fboundp 'all-the-icons-ivy-setup)
+       (autoload #'all-the-icons-ivy-setup "all-the-icons-ivy" nil t))
+
      (all-the-icons-ivy-setup)
      t))
+
 
 (eval-after-load 'ivy
   '(progn
      (require 'orderless nil nil)
+
+     (defvar orderless-component-separator)
+     (defvar ivy-re-builders-alist)
+
      (setq completion-styles '(orderless)
            orderless-component-separator "[ &]")
+
      (defun sb/just-one-face (fn &rest args)
        (let ((orderless-match-faces
               [completions-common-part]))
          (apply fn args)))
+
      (advice-add 'company-capf--candidates :around #'sb/just-one-face)
+
      (setq ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
                                    (counsel-find-file . ivy--regex-fuzzy)
                                    (t . orderless-ivy-re-builder)))
@@ -2002,14 +2047,20 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (symbol-value 'sb/is-linux)
-  (setq ispell-dictionary "en_US"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
-        ispell-local-dictionary "en_US"
-        ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory)
-        ;; Save a new word to personal dictionary without asking
-        ispell-silently-savep t)
   (eval-after-load 'ispell
     '(progn
+       (defvar ispell-dictionary)
+       (defvar ispell-extra-args)
+       (defvar ispell-local-dictionary)
+       (defvar ispell-silently-savep)
+
+       (setq ispell-dictionary "en_US"
+             ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
+             ispell-local-dictionary "en_US"
+             ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory)
+             ;; Save a new word to personal dictionary without asking
+             ispell-silently-savep t)
+
        ;; Skip regions in Org-mode
        (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
        (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
@@ -2017,6 +2068,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Hide the "Starting new Ispell process" message
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+
 
 (eval-and-compile
   ;; Move point to previous error
@@ -2083,9 +2135,6 @@ SAVE-FN with non-nil ARGS."
           (forward-word))))))
 
 (when (symbol-value 'sb/is-linux)
-  (setq flyspell-abbrev-p t
-        flyspell-issue-message-flag nil
-        flyspell-issue-welcome-flag nil)
   (unless (fboundp 'flyspell-prog-mode)
     (autoload #'flyspell-prog-mode "flyspell" nil t))
   (unless (fboundp 'flyspell-mode)
@@ -2101,19 +2150,31 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'flyspell-correct-next)
     (autoload #'flyspell-correct-next "flyspell" nil t))
 
-  (eval-after-load 'flyspell
-    '(if
-         (fboundp 'diminish)
-         (diminish 'flyspell-mode)))
-
   (add-hook 'prog-mode-hook #'flyspell-prog-mode)
   (add-hook 'conf-mode-hook #'flyspell-prog-mode)
   (add-hook 'text-mode-hook #'flyspell-mode)
+
   ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
+
   ;; `find-file-hook' will not work for buffers with no associated files
   (add-hook 'after-init-hook #'(lambda nil
                                  (when (string= (buffer-name) "*scratch*")
                                    (flyspell-mode 1))))
+
+  (eval-after-load 'flyspell
+    '(progn
+       (defvar flyspell-abbrev-p)
+       (defvar flyspell-issue-message-flag)
+       (defvar flyspell-issue-welcome-flag)
+
+       (setq flyspell-abbrev-p t
+             flyspell-issue-message-flag nil
+             flyspell-issue-welcome-flag nil)
+
+       (if (fboundp 'diminish)
+           (diminish 'flyspell-mode))
+       t))
+
   (bind-keys :package flyspell
              ("C-c f f" . flyspell-mode)
              ("C-c f b" . flyspell-buffer)
