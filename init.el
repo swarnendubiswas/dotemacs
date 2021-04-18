@@ -724,7 +724,7 @@ SAVE-FN with non-nil ARGS."
       nil))
   :config
   ;; https://github.com/domtronn/all-the-icons.el/issues/120
-  (when (and (not (sb/font-installed-p "all-the-icons")))
+  (when (not (sb/font-installed-p "all-the-icons"))
     (all-the-icons-install-fonts t))
   :custom (all-the-icons-scale-factor 1.2))
 
@@ -1131,7 +1131,7 @@ SAVE-FN with non-nil ARGS."
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
 
-(use-package diredfl ; More detailed colors, but can be jarring
+(use-package diredfl ; More detailed colors, but can be jarring with certain themes
   :commands (diredfl-mode diredfl-global-mode)
   :hook (dired-mode . diredfl-mode))
 
@@ -2999,7 +2999,7 @@ This file is specified in `counsel-projectile-default-file'."
 (use-package prettier
   :if (executable-find "prettier")
   :hook
-  ;; Should work `gfm-mode', `css-mode', and `html-mode'
+  ;; Should work with `gfm-mode', `css-mode', and `html-mode'
   ((markdown-mode web-mode json-mode jsonc-mode js2-mode)
    . (lambda ()
        (when (and buffer-file-name
@@ -4787,6 +4787,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; The posframe has a lower contrast
 (use-package which-key-posframe
+  :disabled t
   :hook (which-key-mode . which-key-posframe-mode))
 
 ;; Hydras
