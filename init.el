@@ -5,66 +5,29 @@
 
 ;;; Commentary:
 
-;; To evaluate an sexp, use `C-x C-e'. Use `C-M-x' to evaluate the current top-level s-expression.
-;; Use `M-:' to evaluate a Emacs Lisp expression and print the result.
-;; Only an interactive function can be invoked with `M-x' or a key binding.
-
-;; Init file should not ideally contain calls to `load' or `require', since they cause eager loading
-;; and are expensive, a cheaper alternative is to use `autoload'.
-
-;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
-;; all equivalent: `(lambda (x) (* x x))', `(function (lambda (x) (* x x)))',
-;; `#'(lambda (x) (* x x))'
-
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
-;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
-;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
-;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
-
-;; A local variable specification takes the following form:
-;; -*- mode: MODENAME; VAR: VALUE; ... -*-
-
-;; Good articles and reference configurations
-;; https://protesilaos.com/dotemacs
-;; https://github.com/CSRaghunandan/.emacs.d
-;; https://github.com/purcell/emacs.d
-;; https://github.com/MatthewZMD/.emacs.d
-;; https://github.com/redguardtoo/emacs.d
-;; https://github.com/jwiegley/dot-emacs
-;; https://github.com/d12frosted/environment/tree/master/emacs
-;; https://github.com/raxod502/radian/tree/develop/emacs
-;; https://github.com/dholm/dotemacs
-;; https://tychoish.com/post/towards-faster-emacs-start-times/
-;; https://github.com/wandersoncferreira/dotfiles
-;; https://github.com/rememberYou/.emacs.d
-;; https://github.com/seagle0128/.emacs.d/
-;; https://github.com/Gleek/emacs.d/
-;; https://github.com/magnars/.emacs.d
-;; https://github.com/kaushalmodi/.emacs.d
-;; https://luca.cambiaghi.me/vanilla-emacs/readme.html
-
 ;;; Code:
-
-;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
-;; decrease this. If you experience stuttering, increase this.
 
 ;; Load built-in libraries
 (require 'cl-lib)
 (require 'map)
 (require 'subr-x)
 
-(defgroup sb/emacs nil
+(package-initialize)
+;; (debug-on-entry 'package-initialize)
+
+(defgroup sb/emacs
+  nil
   "Personal configuration for dotemacs."
   :group 'local)
 
-(defcustom sb/extras-directory (expand-file-name "extras"
-                                                 user-emacs-directory)
+(defcustom sb/extras-directory
+  (expand-file-name "extras" user-emacs-directory)
   "Path for third-party packages and files."
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/temp-directory (expand-file-name "tmp"
-                                               user-emacs-directory)
+(defcustom sb/temp-directory
+  (expand-file-name "tmp" user-emacs-directory)
   "Storage location for various configuration files."
   :type 'string
   :group 'sb/emacs)
@@ -86,8 +49,7 @@
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
           (const :tag "customized" sb/default)
-          (const :tag "none" none)
-          )
+          (const :tag "none" none))
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
@@ -116,7 +78,8 @@ This depends on the orientation of the display."
   :group 'sb/emacs)
 
 ;; Large values make reading difficult when the window is split
-(defcustom sb/fill-column 100
+(defcustom sb/fill-column
+  100
   "Column beyond which lines should not extend."
   :type 'number
   :group 'sb/emacs)
@@ -130,9 +93,8 @@ whitespaces."
   :type 'boolean
   :group 'sb/emacs)
 
-;; We use lsp and dumb-jump
 (defcustom sb/tags-scheme
-  'none
+  'none ; We use `lsp-mode' and `dumb-jump'
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
@@ -191,8 +153,6 @@ This location is used for temporary installations and files.")
   :type 'boolean
   :group 'sb/emacs)
 
-(package-initialize)
-
 (when (bound-and-true-p sb/use-no-littering)
   (require 'no-littering))
 (unless (fboundp 'no-littering-expand-etc-file-name)
@@ -221,39 +181,38 @@ This location is used for temporary installations and files.")
             (bound-and-true-p sb/use-no-littering))
   (make-directory sb/temp-directory))
 
-(defconst sb/dotemacs-emacs27+ (> emacs-major-version 26))
-(defconst sb/dotemacs-emacs28+ (> emacs-major-version 27))
-(defconst sb/dotemacs-is-linux (eq system-type 'gnu/linux))
-(defconst sb/dotemacs-is-windows (eq system-type 'windows-nt))
+(defconst sb/emacs27+ (> emacs-major-version 26))
+(defconst sb/emacs28+ (> emacs-major-version 27))
+(defconst sb/is-linux (eq system-type 'gnu/linux))
+(defconst sb/is-windows (eq system-type 'windows-nt))
 
-;; (debug-on-entry 'package-initialize)
+(defconst sb/emacs-1MB (* 1 1000 1000))
+(defconst sb/emacs-4MB (* 4 1000 1000))
+(defconst sb/emacs-8MB (* 8 1000 1000))
+(defconst sb/emacs-50MB (* 50 1000 1000))
+(defconst sb/emacs-64MB (* 64 1000 1000))
+(defconst sb/emacs-100MB (* 100 1000 1000))
+(defconst sb/emacs-128MB (* 128 1000 1000))
+(defconst sb/emacs-200MB (* 200 1000 1000))
+(defconst sb/emacs-500MB (* 500 1000 1000))
 
-(defconst sb/dotemacs-1MB (* 1 1000 1000))
-(defconst sb/dotemacs-4MB (* 4 1000 1000))
-(defconst sb/dotemacs-8MB (* 8 1000 1000))
-(defconst sb/dotemacs-50MB (* 50 1000 1000))
-(defconst sb/dotemacs-64MB (* 64 1000 1000))
-(defconst sb/dotemacs-100MB (* 100 1000 1000))
-(defconst sb/dotemacs-128MB (* 128 1000 1000))
-(defconst sb/dotemacs-200MB (* 200 1000 1000))
-(defconst sb/dotemacs-500MB (* 500 1000 1000))
+;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
+;; decrease this. If you experience stuttering, increase this.
+(defun sb/defer-garbage-collection ()
+  "Defer garbage collection."
+  (setq gc-cons-percentage 0.1
+        gc-cons-threshold sb/emacs-200MB))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
 ;; permanently.
-
-(defun sb/defer-garbage-collection ()
-  "Defer garbage collection."
-  (setq gc-cons-percentage 0.1
-        gc-cons-threshold sb/dotemacs-200MB))
-
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
   (when (bound-and-true-p sb/debug-init-file)
     (setq garbage-collection-messages nil))
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/dotemacs-100MB))
+        gc-cons-threshold sb/emacs-100MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
@@ -268,15 +227,19 @@ This location is used for temporary installations and files.")
   (autoload #'paradox-enable "paradox" nil t))
 (eval-after-load 'paradox
   '(progn
+     (defvar paradox-display-star-count)
+     (defvar paradox-execute-asynchronously)
+     (defvar paradox-github-token)
+     (setq paradox-display-star-count nil
+           paradox-execute-asynchronously t
+           paradox-github-token t)
+
      (paradox-enable)
      t))
 (bind-keys :package paradox
            ("C-c d l" . paradox-list-packages)
            ("C-c d u" . paradox-upgrade-packages))
 
-(setq paradox-display-star-count nil
-      paradox-execute-asynchronously t
-      paradox-github-token t)
 
 (defvar apropos-do-all)
 (defvar compilation-always-kill)
@@ -325,8 +288,8 @@ This location is used for temporary installations and files.")
       inhibit-default-init t
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
-      ;; *scratch* is in `lisp-interaction-mode' by default, use `text-mode'. `text-mode' is more
-      ;; expensive to start, but I use *scratch* for composing emails.
+      ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start,
+      ;; but I use *scratch* for composing emails.
       ;; initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
@@ -425,49 +388,70 @@ This location is used for temporary installations and files.")
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
-;; SB: I do not use the following commands so it is fine to keep them disabled
-
-;; Do not disable narrowing commands
-;; (put 'narrow-to-region 'disabled nil)
-;; (put 'narrow-to-page 'disabled nil)
-;; (put 'narrow-to-defun 'disabled nil)
-
-;; Do not disable case-change functions
-;; (put 'upcase-region 'disabled nil)
-;; (put 'downcase-region 'disabled nil)
-
+(unless (fboundp 'global-auto-revert-mode)
+  (autoload #'global-auto-revert-mode "autorevert" nil t))
 (add-hook 'after-init-hook #'global-auto-revert-mode)
-(setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-      auto-revert-remote-files t
-      auto-revert-use-notify nil
-      auto-revert-verbose t
-      global-auto-revert-non-file-buffers t)
+
+(eval-after-load 'autorevert
+  '(progn
+     (defvar auto-revert-interval)
+     (defvar auto-revert-remote-files)
+     (defvar auto-revert-use-notify)
+     (defvar auto-revert-verbose)
+     (defvar global-auto-revert-non-file-buffers)
+
+     (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+           auto-revert-remote-files t
+           auto-revert-use-notify nil
+           auto-revert-verbose t
+           global-auto-revert-non-file-buffers t)
+
+     (if (fboundp 'diminish)
+         (diminish 'auto-revert-mode))))
 
 ;; Revert PDF files without asking
 (setq revert-without-query '("\\.pdf"))
 
 ;; Remember cursor position in files
+(unless (fboundp 'save-place-mode)
+  (autoload #'save-place-mode "saveplace" nil t))
 (add-hook 'after-init-hook #'save-place-mode)
-(unless (bound-and-true-p sb/use-no-littering)
-  (setq save-place-file (expand-file-name "places" sb/temp-directory)))
+
+(eval-after-load 'saveplace
+  '(progn
+     (defvar save-place-file)
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq save-place-file (expand-file-name "places" sb/temp-directory)))
+     t))
 
 ;; Save minibuffer history across sessions
-(require 'savehist)
-(savehist-mode 1)
-(setq savehist-additional-variables '(extended-command-history kill-ring search-ring)
-      savehist-save-minibuffer-history t)
-(unless (bound-and-true-p sb/use-no-littering)
-  (setq savehist-file (expand-file-name "savehist" sb/temp-directory)))
+(unless (fboundp 'savehist-mode)
+  (autoload #'savehist-mode "savehist" nil t))
+(add-hook 'after-init-hook #'savehist-mode)
+
+(eval-after-load 'savehist
+  '(progn
+     (defvar savehist-additional-variables)
+     (defvar savehist-file)
+     (defvar savehist-save-minibuffer-history)
+
+     (setq savehist-additional-variables '(extended-command-history kill-ring search-ring)
+           savehist-save-minibuffer-history t)
+
+     (unless (bound-and-true-p sb/use-no-littering)
+       (setq savehist-file (expand-file-name "savehist" sb/temp-directory)))
+     t))
 
 
-(require 'uniquify)
 (setq uniquify-after-kill-buffer-p t
       uniquify-buffer-name-style 'forward
       uniquify-ignore-buffers-re "^\\*"
       uniquify-separator "/"
       uniquify-strip-common-suffix t)
 
+
 ;; Replace `dabbrev-exp' with `hippie-expand', use `C-M-/' for `dabbrev-completion'
+(defvar hippie-expand-verbose)
 (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                          try-expand-dabbrev-all-buffers
                                          try-expand-dabbrev-from-kill
@@ -481,7 +465,14 @@ This location is used for temporary installations and files.")
       hippie-expand-verbose nil)
 (bind-key "M-/" #'hippie-expand)
 
-(add-hook 'prog-mode #'subword-mode)
+
+(unless (fboundp 'subword-mode)
+  (autoload #'subword-mode "subword" nil t))
+(add-hook 'prog-mode-hook #'subword-mode)
+(eval-after-load 'subword
+  '(if (fboundp 'diminish)
+       (diminish 'subword-mode)))
+
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
@@ -504,9 +495,20 @@ SAVE-FN with non-nil ARGS."
   (apply save-fn '(t)))
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
-(add-hook 'text-mode #'abbrev-mode)
-(setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
-      save-abbrevs 'silently)
+
+(unless (fboundp 'abbrev-mode)
+  (autoload #'abbrev-mode "abbrev" nil t))
+(add-hook 'text-mode-hook #'abbrev-mode)
+
+(eval-after-load 'abbrev
+  '(progn
+     (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
+           save-abbrevs 'silently)
+
+     (if (fboundp 'diminish)
+         (diminish 'abbrev-mode))
+     t))
+
 
 ;; Moved to `early-init.el'
 ;; (when (display-graphic-p) ; `window-system' is deprecated
@@ -525,8 +527,8 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode -1)))
 
-(with-eval-after-load 'hl-line
-  (declare-function hl-line-highlight "hl-line"))
+;; (with-eval-after-load 'hl-line
+;;   (declare-function hl-line-highlight "hl-line"))
 
 ;; Enable the following modes
 (dolist (mode '(auto-compression-mode
@@ -552,8 +554,16 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 
 ;; This puts the buffer in read-only mode and disables font locking
-(add-hook 'after-init #'global-so-long-mode)
-(setq so-long-threshold 800)
+(unless (fboundp 'global-so-long-mode)
+  (autoload #'global-so-long-mode "so-long" nil t))
+(add-hook 'after-init-hook #'global-so-long-mode)
+
+(eval-after-load 'so-long
+  '(progn
+     (defvar so-long-threshold)
+
+     (setq so-long-threshold 800)
+     t))
 
 ;; Maximize Emacs on startup, moved to `early-init-file'. I am not sure which one of the following
 ;; is better or faster.
@@ -570,7 +580,6 @@ SAVE-FN with non-nil ARGS."
         t nil)))
 
 (when (display-graphic-p)
-  (setq all-the-icons-scale-factor 1.2)
   (unless (fboundp 'all-the-icons-install-fonts)
     (autoload #'all-the-icons-install-fonts "all-the-icons" nil t))
 
@@ -579,41 +588,39 @@ SAVE-FN with non-nil ARGS."
        ;; https://github.com/domtronn/all-the-icons.el/issues/120
        (when (and (not (sb/font-installed-p "all-the-icons")))
          (all-the-icons-install-fonts t))
+
+       (defvar all-the-icons-scale-factor)
+
+       (setq all-the-icons-scale-factor 1.2)
        t)))
 
 
 (when (eq sb/theme 'leuven)
-  (require 'leuven-theme)
   (load-theme 'leuven t))
 
 (when (eq sb/theme 'eclipse)
-  (require 'eclipse-theme)
   (load-theme 'eclipse t)
   (set-background-color "white")
   (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
   (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
 
 (when (eq sb/theme 'spacemacs-light)
-  (require 'spacemacs-common)
   (load-theme 'spacemacs-light t)
   ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
   )
 
 (when (eq sb/theme 'zenburn)
-  (require 'zenburn-theme)
   (load-theme 'zenburn t))
 
 (when (eq sb/theme 'solarized-light)
-  (require 'solarized-light-theme)
+  (defvar solarized-distinct-fringe-background)
   (setq solarized-distinct-fringe-background t)
   (load-theme 'solarized-light t))
 
 (when (eq sb/theme 'solarized-dark)
-  (require 'solarized-dark-theme)
   (load-theme 'solarized-dark t))
 
 (when (eq sb/theme 'doom-molokai)
-  (require 'doom-molokai)
   (load-theme 'doom-molokai t)
   (set-face-attribute 'font-lock-comment-face nil
                       ;; :foreground "#cccccc"
@@ -624,18 +631,24 @@ SAVE-FN with non-nil ARGS."
   (doom-themes-org-config))
 
 (when (eq sb/theme 'doom-one-light)
-  (require 'doom-themes)
   (load-theme 'doom-one-light t)
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
   (doom-themes-org-config))
 
 (when (eq sb/theme 'monokai)
-  (require 'monokai-theme)
   (load-theme 'monokai t))
 
 (when (eq sb/theme 'modus-operandi)
-  (require 'modus-operandi-theme)
+  (defvar modus-themes-completions)
+  (defvar modus-themes-fringes)
+  (defvar modus-themes-intense-hl-line)
+  (defvar modus-themes-mode-line)
+  (defvar modus-themes-scale-headings)
+  (defvar modus-themes-prompts)
+  (defvar modus-themes-variable-pitch-headings)
+
+
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line nil
@@ -643,10 +656,13 @@ SAVE-FN with non-nil ARGS."
         modus-themes-scale-headings nil
         modus-themes-prompts 'intense-accented
         modus-themes-variable-pitch-headings nil)
+
   ;; FIXME: Moody modeline configuration is not working
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
+
   (load-theme 'modus-operandi t)
+
   ;; :custom-face
   ;; (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
   ;;                             :box (:line-width 1 :color "#505050")
@@ -657,15 +673,23 @@ SAVE-FN with non-nil ARGS."
   )
 
 (when (eq sb/theme 'modus-vivendi)
-  (require 'modus-vivendi-theme)
+  (defvar modus-themes-completions)
+  (defvar modus-themes-fringes)
+  (defvar modus-themes-intense-hl-line)
+  (defvar modus-themes-mode-line)
+  (defvar modus-themes-scale-headings)
+  (defvar modus-themes-variable-pitch-headings)
+
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line t
         modus-themes-mode-line 'borderless-3d
         modus-themes-scale-headings nil
         modus-themes-variable-pitch-headings nil)
+
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
+
   (load-theme 'modus-vivendi t))
 
 (when (and (eq sb/theme 'sb/default) (display-graphic-p))
@@ -677,16 +701,27 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'region nil :background "gainsboro")))
 
 (when (eq sb/modeline-theme 'powerline)
-  (require 'powerline)
+  (unless (fboundp 'powerline-default-theme)
+    (autoload #'powerline-default-theme "powerline" nil t))
+
+  (defvar powerline-default-separator)
+  (defvar powerline-display-buffer-size)
+  (defvar powerline-display-hud)
+  (defvar powerline-display-mule-info)
+  (defvar powerline-gui-use-vcs-glyph)
+  (defvar powerline-height)
+
   (setq powerline-default-separator 'box
         powerline-display-buffer-size nil
         powerline-display-hud nil
         powerline-display-mule-info nil
         powerline-gui-use-vcs-glyph t
         powerline-height 17)
+
   (when (eq sb/theme 'leuven)
     (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
     (set-face-attribute 'mode-line-buffer-id nil :weight 'bold :foreground "black" :background "gray88"))
+
   (powerline-default-theme))
 
 (when (eq sb/modeline-theme 'sml)
@@ -1769,7 +1804,7 @@ SAVE-FN with non-nil ARGS."
      t))
 
 
-(when (symbol-value 'sb/dotemacs-is-linux)
+(when (symbol-value 'sb/is-linux)
   (setq ispell-dictionary "en_US"
         ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
         ispell-local-dictionary "en_US"
@@ -1850,7 +1885,7 @@ SAVE-FN with non-nil ARGS."
               (setq arg 0))
           (forward-word))))))
 
-(when (symbol-value 'sb/dotemacs-is-linux)
+(when (symbol-value 'sb/is-linux)
   (setq flyspell-abbrev-p t
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
@@ -2144,7 +2179,7 @@ SAVE-FN with non-nil ARGS."
        (setq projectile-dynamic-mode-line nil))
 
      ;; https://github.com/MatthewZMD/.emacs.d
-     (when (and sb/dotemacs-is-windows (executable-find "tr"))
+     (when (and sb/is-windows (executable-find "tr"))
        (setq projectile-indexing-method 'alien))
 
      (defun projectile-default-mode-line nil
@@ -3436,7 +3471,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
-(when (symbol-value 'sb/dotemacs-is-linux)
+(when (symbol-value 'sb/is-linux)
   (unless (fboundp 'turn-on-eldoc-mode)
     (autoload #'turn-on-eldoc-mode "eldoc" nil t))
   (eval-after-load 'eldoc
@@ -3872,7 +3907,7 @@ This file is specified in `counsel-projectile-default-file'."
                    ("C-c l g" . lsp-ivy-global-workspace-symbol)
                    ("C-c l w" . lsp-ivy-workspace-symbol)))))
 
-(setq url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data)))
+;; (setq url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data)))
 
 ;; Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
@@ -5435,7 +5470,7 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
-(when sb/dotemacs-emacs28+
+(when sb/emacs28+
   (bind-key "C-c d p" #'package-quickstart-refresh))
 
 (global-set-key [remap next-buffer] #'sb/next-buffer)

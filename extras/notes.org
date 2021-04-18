@@ -1,0 +1,39 @@
+t;; To evaluate an sexp, use `C-x C-e'. Use `C-M-x' to evaluate the current top-level s-expression.
+;; Use `M-:' to evaluate a Emacs Lisp expression and print the result.
+;; Only an interactive function can be invoked with `M-x' or a key binding.
+
+;; Init file should not ideally contain calls to `load' or `require', since they cause eager loading
+;; and are expensive, a cheaper alternative is to use `autoload'.
+
+;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
+;; all equivalent: `(lambda (x) (* x x))', `(function (lambda (x) (* x x)))',
+;; `#'(lambda (x) (* x x))'
+
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
+;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
+;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
+;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
+
+;; A local variable specification takes the following form:
+;; -*- mode: MODENAME; VAR: VALUE; ... -*-
+
+;; Good articles and reference configurations
+;; https://protesilaos.com/dotemacs
+;; https://github.com/CSRaghunandan/.emacs.d
+;; https://github.com/purcell/emacs.d
+;; https://github.com/MatthewZMD/.emacs.d
+;; https://github.com/redguardtoo/emacs.d
+;; https://github.com/jwiegley/dot-emacs
+;; https://github.com/d12frosted/environment/tree/master/emacs
+;; https://github.com/raxod502/radian/tree/develop/emacs
+;; https://github.com/dholm/dotemacs
+;; https://tychoish.com/post/towards-faster-emacs-start-times/
+;; https://github.com/wandersoncferreira/dotfiles
+;; https://github.com/rememberYou/.emacs.d
+;; https://github.com/seagle0128/.emacs.d/
+;; https://github.com/Gleek/emacs.d/
+;; https://github.com/magnars/.emacs.d
+;; https://github.com/kaushalmodi/.emacs.d
+;; https://luca.cambiaghi.me/vanilla-emacs/readme.html
+
+
