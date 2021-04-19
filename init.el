@@ -2187,11 +2187,13 @@ SAVE-FN with non-nil ARGS."
 ;; (unless (fboundp 'flyspell-popup-correct)
 ;;   (autoload #'flyspell-popup-correct "flyspell-popup" nil t))
 ;; (setq flyspell-popup-correct-delay 0.2)
+
 ;; (bind-keys :package flyspell-popup
 ;;            ("C-;" . flyspell-popup-correct))
 
 (unless (fboundp 'flyspell-correct-wrapper)
   (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
+
 (bind-keys :package flyspell-correct-ivy
            ("C-;" . flyspell-correct-wrapper))
 
@@ -2210,6 +2212,10 @@ SAVE-FN with non-nil ARGS."
 
 (eval-after-load 'spell-fu
   '(progn
+     (defvar spell-fu-faces-exclude)
+     (defvar spell-fu-directory)
+     (defvar no-littering-var-directory)
+
      ;; `nxml-mode' is derived from `text-mode'
      (setq spell-fu-faces-exclude '(font-latex-math-face
                                     font-latex-sedate-face
@@ -2257,10 +2263,12 @@ SAVE-FN with non-nil ARGS."
          (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
        (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
      t))
+
 (bind-keys :package spell-fu
            ("C-c f n" . spell-fu-goto-next-error)
            ("C-c f p" . spell-fu-goto-previous-error)
            ("C-c f a" . spell-fu-word-add))
+
 
 (unless (fboundp 'highlight-indentation-mode)
   (autoload #'highlight-indentation-mode "highlight-indentation" nil t))
@@ -2274,6 +2282,7 @@ SAVE-FN with non-nil ARGS."
      (if (fboundp 'diminish)
          (diminish 'highlight-indentation-current-column-mode))))
 
+
 ;; Claims to be better than `electric-indent-mode'
 (unless (fboundp 'aggressive-indent-mode)
   (autoload #'aggressive-indent-mode "aggressive-indent" nil t))
@@ -2283,6 +2292,9 @@ SAVE-FN with non-nil ARGS."
 
 (eval-after-load 'aggressive-indent
   '(progn
+     (defvar aggressive-indent-comments-too)
+     (defvar aggressive-indent-dont-electric-modes)
+
      (setq aggressive-indent-comments-too t
            ;; Never use `electric-indent-mode'
            aggressive-indent-dont-electric-modes t)
@@ -2290,33 +2302,51 @@ SAVE-FN with non-nil ARGS."
          (diminish 'aggressive-indent-mode))
      t))
 
+
 (unless (fboundp 'show-paren-mode)
   (autoload #'show-paren-mode "paren" nil t))
 (add-hook 'after-init-hook #'show-paren-mode)
-(setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
-      show-paren-when-point-inside-paren t
-      show-paren-when-point-in-periphery t)
 
-(electric-pair-mode 1) ; Enable autopairing, smartparens seems slow
+(eval-after-load 'show-paren-mode
+  '(progn
+     (defvar show-paren-style)
+     (defvar show-paren-when-point-inside-paren)
+     (defvar show-paren-when-point-in-periphery)
 
-;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
-(defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
-(defvar electric-pair-pairs)
-(defvar electric-pair-text-pairs)
-(defun sb/add-markdown-pairs ()
-  "Add custom pairs to `markdown-mode'."
-  (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
-  (setq-local electric-pair-text-pairs electric-pair-pairs))
-(add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+     (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
+           show-paren-when-point-inside-paren t
+           show-paren-when-point-in-periphery t)
+     t)
+  )
 
-(defvar electric-pair-preserve-balance)
-(setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
-;; Disable pairs when entering minibuffer
-(add-hook 'minibuffer-setup-hook (lambda ()
-                                   (electric-pair-mode -1)))
-;; Re-enable pairs when existing minibuffer
-(add-hook 'minibuffer-exit-hook (lambda ()
-                                  (electric-pair-mode 1)))
+
+(unless (fboundp 'electric-pair-mode)
+  (autoload #'electric-pair-mode "elec-pair" nil t))
+(add-hook 'after-init-hook #'electric-pair-mode) ; Enable autopairing, smartparens seems slow
+
+(eval-after-load 'electric-pair-mode
+  '(progn
+
+     ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+     (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+     (defvar electric-pair-pairs)
+     (defvar electric-pair-text-pairs)
+     (defun sb/add-markdown-pairs ()
+       "Add custom pairs to `markdown-mode'."
+       (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+       (setq-local electric-pair-text-pairs electric-pair-pairs))
+     (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+
+     (defvar electric-pair-preserve-balance)
+     (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
+     ;; Disable pairs when entering minibuffer
+     (add-hook 'minibuffer-setup-hook (lambda ()
+                                        (electric-pair-mode -1)))
+     ;; Re-enable pairs when existing minibuffer
+     (add-hook 'minibuffer-exit-hook (lambda ()
+                                       (electric-pair-mode 1)))
+
+     t))
 
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
 ;; FIXME: Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
@@ -2371,33 +2401,19 @@ SAVE-FN with non-nil ARGS."
 ;;      t))
 
 ;; (bind-keys :package smartparens-config
-;;            ("C-M-a" . sp-beginning-of-sexp)
-;;            ("C-M-e" . sp-end-of-sexp)
-;;            ("C-M-u" . sp-up-sexp)
+;;            ("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+;;            ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+;;            ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
 ;;            ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
 ;;            ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-;;            ("C-M-b" . sp-backward-sexp)
-;;            ("C-M-n" . sp-next-sexp)
-;;            ("C-M-p" . sp-previous-sexp)
-;;            ("C-S-b" . sp-backward-symbol)
-;;            ("C-S-f" . sp-forward-symbol)
+;;            ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+;;            ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
+;;            ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
+;;            ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
+;;            ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
+;;            ;; "(foo bar)" -> "foo bar"
 ;;            ("C-M-k" . sp-splice-sexp))
 
-
-
-;;   :bind
-;;   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-;;    ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-;;    ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-;;    ("C-M-w" . sp-down-sexp)
-;;    ("C-M-f" . sp-forward-sexp)
-;;    ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-;;    ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
-;;    ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
-;;    ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
-;;    ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
-;;    ;; "(foo bar)" -> "foo bar"
-;;    ("C-M-k" . sp-splice-sexp)))
 
 
 (unless (fboundp 'projectile-find-file)
@@ -2419,12 +2435,30 @@ SAVE-FN with non-nil ARGS."
 
 (eval-after-load 'projectile
   '(progn
+     (defvar projectile-auto-discover)
+     (defvar projectile-enable-caching)
+     (defvar projectile-file-exists-remote-cache-expire)
+     (defvar projectile-require-project-root)
+     (defvar projectile-sort-order)
+     (defvar projectile-verbose)
+     (defvar projectile-cache-file)
+     (defvar projectile-known-projects-file)
+     (defvar projectile-dynamic-mode-line)
+     (defvar projectile-indexing-method)
+     (defvar projectile-project-root-files)
+     (defvar projectile-globally-ignored-directories)
+     (defvar projectile-globally-ignored-file-suffixes)
+     (defvar projectile-ignored-projects)
+     (defvar projectile-globally-ignored-files)
+     (defvar projectile-mode-line-prefix)
+
      (setq projectile-auto-discover nil ; Do not discover projects
            projectile-enable-caching t ; Caching will not watch for new files automatically
            projectile-file-exists-remote-cache-expire nil
            projectile-indexing-method 'alien
            projectile-mode-line-prefix ""
-           projectile-require-project-root t ; Use only in desired directories, too much noise otherwise
+           ;; Use only in desired directories, too much noise otherwise
+           projectile-require-project-root t
            projectile-sort-order 'access-time
            projectile-verbose nil)
 
@@ -2442,9 +2476,7 @@ SAVE-FN with non-nil ARGS."
 
      (defun projectile-default-mode-line nil
        "Report project name and type in the modeline."
-       (let
-           ((project-name
-             (projectile-project-name)))
+       (let ((project-name (projectile-project-name)))
          (format " %s [%s] " projectile-mode-line-prefix
                  (or project-name "-"))))
 
@@ -2498,13 +2530,13 @@ SAVE-FN with non-nil ARGS."
      (projectile-mode 1)
      t))
 
-
 ;; Set these in case `counsel-projectile' is disabled
 (bind-keys :package projectile
            ("<f6>" . projectile-find-file)
            ("<f5>" . projectile-switch-project)
            :map projectile-command-map
            ("A" . projectile-add-known-project))
+
 
 (unless (fboundp 'counsel-projectile-find-file)
   (autoload #'counsel-projectile-find-file "counsel-projectile" nil t))
@@ -2526,6 +2558,7 @@ SAVE-FN with non-nil ARGS."
     "Open the current project's default file.
 This file is specified in `counsel-projectile-default-file'."
     (interactive)
+    (defvar counsel-projectile-default-file)
     (let
         ((file counsel-projectile-default-file))
       (if
@@ -2554,12 +2587,20 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'counsel-projectile
   '(progn
+     (defvar counsel-projectile-remove-current-buffer)
+     (defvar counsel-projectile-sort-directories)
+     (defvar counsel-projectile-sort-files)
+     (defvar counsel-projectile-find-file-more-chars)
+     (defvar counsel-projectile-sort-buffers)
+     (defvar counsel-projectile-sort-projects)
+
      (setq counsel-projectile-remove-current-buffer t
            counsel-projectile-sort-directories t
            ;; counsel-projectile-find-file-more-chars 3
            ;; counsel-projectile-sort-buffers
            ;; counsel-projectile-sort-projects t
            counsel-projectile-sort-files t)
+
      (counsel-projectile-mode 1)
      ;; (counsel-projectile-modify-action
      ;;  'counsel-projectile-switch-project-action
@@ -2578,13 +2619,19 @@ This file is specified in `counsel-projectile-default-file'."
            ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
            )
 
+
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
 (when (display-graphic-p)
   (unless (fboundp 'all-the-icons-ivy-rich-mode)
     (autoload #'all-the-icons-ivy-rich-mode "all-the-icons-ivy-rich" nil t))
   (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
-  (setq all-the-icons-ivy-rich-icon-size 0.9))
+
+  (eval-after-load 'all-the-icons-ivy-rich-mode
+    '(progn
+       (defvar all-the-icons-ivy-rich-icon-size)
+       (setq all-the-icons-ivy-rich-icon-size 0.9)
+       t)))
 
 
 (unless (fboundp 'ivy-rich-mode)
@@ -2595,19 +2642,24 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'ivy-rich
   '(progn
+     (defvar ivy-rich-parse-remote-buffer)
+     (defvar ivy-format-functions-alist)
+
      (setq ivy-rich-parse-remote-buffer nil)
      (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-     ;; FIXME: `ivy-rich-modify-column' is not taking effect.
      ;; Increase the width to see the major mode clearly
+     ;; FIXME: `ivy-rich-modify-column' is not taking effect.
      (ivy-rich-modify-column 'ivy-switch-buffer 'ivy-rich-switch-buffer-major-mode
                              '(:width 18 :face warning))
      t))
+
 
 (when (executable-find "fd")
   (unless (fboundp 'counsel-fd-file-jump)
     autoload( #'counsel-fd-file-jump "counsel-fd" nil t))
   (unless (fboundp 'counsel-fd-dired-jump)
     (autoload #'counsel-fd-dired-jump "counsel-fd" nil t))
+
   (bind-keys :package counsel-fd
              ("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
              ("C-x f" . counsel-fd-file-jump)))
@@ -2644,10 +2696,17 @@ This file is specified in `counsel-projectile-default-file'."
 ;; derived from `text-mode'
 (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 
-;; FIXME: Exclude directories and files from being checked
-;; https://github.com/flycheck/flycheck/issues/1745
 (eval-after-load 'flycheck
   '(progn
+     (defvar flycheck-check-syntax-automatically)
+     (defvar flycheck-checker-error-threshold)
+     (defvar flycheck-idle-buffer-switch-delay)
+     (defvar flycheck-idle-change-delay)
+     (defvar flycheck-emacs-lisp-load-path)
+     (defvar flycheck-mode-line)
+     (defvar flycheck-textlint-plugin-alist)
+     (defvar flycheck-hooks-alist)
+
      (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line
                                                       mode-enabled)
            flycheck-checker-error-threshold 500
@@ -2673,6 +2732,7 @@ This file is specified in `counsel-projectile-default-file'."
 
      (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
      (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
+
      ;; https://github.com/flycheck/flycheck/issues/1833
      (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
@@ -2683,15 +2743,18 @@ This file is specified in `counsel-projectile-default-file'."
      ;; (dolist (hook '(js-mode js2-mode typescript-mode))
      ;;   (setq-local flycheck-checker 'javascript-eslint))
 
+     ;; FIXME: Exclude directories and files from being checked
+     ;; https://github.com/flycheck/flycheck/issues/1745
+
      t))
 
 
 ;; Does not display popup under TTY, check possible workarounds at
 ;; https://github.com/flycheck/flycheck-popup-tip
-(when (display-graphic-p)
-  (unless (fboundp 'flycheck-pos-tip-mode)
-    (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
-  (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
+;; (when (display-graphic-p)
+;;   (unless (fboundp 'flycheck-pos-tip-mode)
+;;     (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
+;;   (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
 
 
 (when (display-graphic-p)
@@ -2703,9 +2766,11 @@ This file is specified in `counsel-projectile-default-file'."
 
   (eval-after-load 'flycheck-posframe
     '(progn
+       (defvar flycheck-posframe-position)
        (setq flycheck-posframe-position 'point-bottom-left-corner)
        (flycheck-posframe-configure-pretty-defaults)
        t)))
+
 
 (unless (fboundp 'whitespace-mode)
   (autoload #'whitespace-mode "whitespace" nil t))
@@ -2722,9 +2787,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'whitespace
   '(progn
+     (defvar whitespace-line-column)
+     (defvar whitespace-style)
+
      (setq show-trailing-whitespace t
            whitespace-line-column sb/fill-column
            whitespace-style '(face lines-tail trailing))
+
      (if (fboundp 'diminish)
          (diminish 'global-whitespace-mode))
      (if (fboundp 'diminish)
@@ -2732,22 +2801,29 @@ This file is specified in `counsel-projectile-default-file'."
      (if (fboundp 'diminish)
          (diminish 'whitespace-newline-mode))))
 
-;; This is different from whitespace-cleanup since this is unconditional
+
+;; This is different from `whitespace-cleanup' since this is unconditional
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
   (setq delete-trailing-lines t) ; `M-x delete-trailing-whitespace' deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-(unless (fboundp 'global-whitespace-cleanup-mode)
-  (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
-(add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
-(eval-after-load 'whitespace-cleanup-mode
-  '(progn
-     (setq whitespace-cleanup-mode-preserve-point t)
-     (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
-     (if
-         (fboundp 'diminish)
-         (diminish 'whitespace-cleanup-mode))
-     t))
+
+;; (unless (fboundp 'global-whitespace-cleanup-mode)
+;;   (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
+;; (add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
+
+;; (eval-after-load 'whitespace-cleanup-mode
+;;   '(progn
+;;      (defvar whitespace-cleanup-mode-preserve-point)
+;;      (defvar whitespace-cleanup-mode-ignore-modes)
+
+;;      (setq whitespace-cleanup-mode-preserve-point t)
+;;      (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+
+;;      (if (fboundp 'diminish)
+;;          (diminish 'whitespace-cleanup-mode))
+;;      t))
+
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (unless (fboundp 'ws-butler-mode)
@@ -2756,6 +2832,7 @@ This file is specified in `counsel-projectile-default-file'."
 (eval-after-load 'ws-butler
   '(if (fboundp 'diminish)
        (diminish 'ws-butler-mode)))
+
 
 ;; Highlight symbol under point
 (unless (fboundp 'symbol-overlay-mode)
@@ -2768,19 +2845,26 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'prog-mode-hook #'symbol-overlay-mode)
 (add-hook 'html-mode-hook #'symbol-overlay-mode)
 (add-hook 'yaml-mode-hook #'symbol-overlay-mode)
+
 (eval-after-load 'symbol-overlay
   '(if (fboundp 'diminish)
        (diminish 'symbol-overlay-mode)
      ))
+
 (bind-keys :package symbol-overlay
            ("M-p" . symbol-overlay-jump-prev)
            ("M-n" . symbol-overlay-jump-next))
 
+
 (unless (fboundp 'global-hl-todo-mode)
   (autoload #'global-hl-todo-mode "hl-todo" nil t))
 (add-hook 'after-init-hook #'global-hl-todo-mode)
+
 (eval-after-load 'hl-todo
   '(progn
+     (defvar hl-todo-highlight-punctuation)
+     (defvar hl-todo-keyword-faces)
+
      (setq hl-todo-highlight-punctuation ":")
      (add-to-list 'hl-todo-keyword-faces '("LATER" . "#d0bf8f"))
      (add-to-list 'hl-todo-keyword-faces '("ISSUE" . "#ff8c00"))
@@ -2793,6 +2877,7 @@ This file is specified in `counsel-projectile-default-file'."
      (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
      (add-to-list 'hl-todo-keyword-faces '("REVIEW" . "#6ae4b9"))
      t))
+
 
 (unless (fboundp 'highlight-numbers-mode)
   (autoload #'highlight-numbers-mode "highlight-numbers" nil t))
