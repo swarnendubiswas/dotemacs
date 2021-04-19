@@ -391,6 +391,9 @@ This location is used for temporary installations and files.")
 
 (unless (fboundp 'global-auto-revert-mode)
   (autoload #'global-auto-revert-mode "autorevert" nil t))
+(unless (fboundp 'turn-on-auto-revert-mode)
+  (autoload #'turn-on-auto-revert-mode "autorevert" nil t))
+
 (add-hook 'after-init-hook #'global-auto-revert-mode)
 
 (eval-after-load 'autorevert
@@ -3403,8 +3406,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Avoid the "Overwrite old session file (not loaded)?" warning
 (unless (fboundp 'session-initialize)
   (autoload #'session-initialize "session" nil t))
-(add-hook 'after-init-hook #'(lambda nil
-                               (session-initialize)))
+;; (add-hook 'after-init-hook #'(lambda nil
+;;                                (session-initialize)))
 
 (eval-after-load 'session
   '(progn
@@ -3904,11 +3907,11 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'prettier-mode "prettier" nil t))
 
   ;; Should work with `gfm-mode', `css-mode', and `html-mode'
-  (dolist (hook '(markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook)
-                (add-hook hook (lambda ()
-                                 (when (and buffer-file-name
-                                            (not (file-remote-p buffer-file-name)))
-                                   (prettier-mode 1))))))
+  (dolist (hook '(markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook))
+    (add-hook hook (lambda ()
+                     (when (and buffer-file-name
+                                (not (file-remote-p buffer-file-name)))
+                       (prettier-mode 1)))))
 
   (eval-after-load 'prettier
     '(progn
@@ -4946,18 +4949,27 @@ This file is specified in `counsel-projectile-default-file'."
      (require 'magit-diff nil nil)
      (defvar magit-diff-refine-hunk)
      (setq magit-diff-refine-hunk t)
+
+     (eval-after-load 'with-editor
+       '(if (fboundp 'diminish)
+            (diminish 'with-editor-mode)))
+
+     (require 'ediff nil nil)
+
+     (defvar ediff-window-setup-function)
+     (defvar ediff-split-window-function)
+
+     ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+     (setq ediff-window-setup-function #'ediff-setup-windows-plain)
+     ;; Split windows horizontally in ediff (instead of vertically)
+     (setq ediff-split-window-function #'split-window-horizontally)
+
      t))
 
 (bind-keys :package magit
            ("C-x g" . magit-status)
            ("C-c M-g" . magit-file-dispatch)
            ("C-x M-g" . magit-dispatch))
-
-
-(eval-after-load 'magit
-  '(eval-after-load 'with-editor
-     '(if (fboundp 'diminish)
-          (diminish 'with-editor-mode))))
 
 
 (unless (fboundp 'gitignore-mode)
@@ -5033,7 +5045,6 @@ This file is specified in `counsel-projectile-default-file'."
 (eval-after-load 'diff-hl
   '(progn
      (defvar diff-hl-draw-borders)
-
      (setq diff-hl-draw-borders nil) ; Highlight without a border looks nicer
      t))
 
@@ -5108,6 +5119,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'magit-diff-visit-file-hook #'(lambda nil
                                           (when smerge-mode
                                             (sb/smerge-hydra/body))))
+
 (bind-keys :package smerge-mode :map smerge-mode-map
            ("M-g n" . smerge-next)
            ("M-g p" . smerge-prev)
@@ -5122,34 +5134,29 @@ This file is specified in `counsel-projectile-default-file'."
            ("M-g M" . smerge-popup-context-menu))
 
 
-(eval-after-load 'magit
-  '(progn
-     (require 'ediff nil nil)
-     ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-     (setq ediff-window-setup-function #'ediff-setup-windows-plain)
-     ;; Split windows horizontally in ediff (instead of vertically)
-     (setq ediff-split-window-function #'split-window-horizontally)
-     t))
-
 (unless (fboundp 'yaml-mode)
   (autoload #'yaml-mode "yaml-mode" nil t))
-(add-hook 'yaml-mode-hook #'(lambda nil
-                              ;; `yaml-mode' is derived from `text-mode'
-                              (spell-fu-mode -1)
-                              (lsp-deferred)))
 (add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
 (add-to-list 'auto-mode-alist '(".clang-tidy" . yaml-mode))
 
+(add-hook 'yaml-mode-hook (lambda ()
+                            (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
+                            (lsp-deferred)))
+
 (eval-after-load 'yaml-mode
   '(progn
-     (require 'yaml-imenu nil nil)
+     (unless (fboundp 'yaml-imenu-enable)
+       (autoload #'yaml-imenu-enable "yaml-imenu" nil t))
+
      (yaml-imenu-enable)
      t))
+
 
 (unless (fboundp 'bat-mode)
   (autoload #'bat-mode "bat-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
 (add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode))
+
 
 (unless (fboundp 'web-mode)
   (autoload #'web-mode "web-mode" nil t))
@@ -5164,6 +5171,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'web-mode
   '(progn
+     (defvar web-mode-enable-auto-closing)
+     (defvar web-mode-enable-auto-pairing)
+     (defvar web-mode-enable-auto-quoting)
+     (defvar web-mode-enable-block-face)
+     (defvar web-mode-enable-css-colorization)
+     (defvar web-mode-enable-current-element-highlight)
+     (defvar web-mode-enable-current-column-highlight)
+
      (setq web-mode-enable-auto-closing t
            web-mode-enable-auto-pairing t
            web-mode-enable-auto-quoting t
@@ -5174,8 +5189,7 @@ This file is specified in `counsel-projectile-default-file'."
      (flycheck-add-mode 'javascript-eslint 'web-mode)
      t))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "web-mode" nil t))
+
 (add-hook 'web-mode-hook #'lsp-deferred)
 
 
@@ -5185,6 +5199,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'sgml-mode-hook #'emmet-mode)
 (add-hook 'css-mode-hook #'emmet-mode)
 (add-hook 'html-mode-hook #'emmet-mode)
+
 
 (unless (fboundp 'rainbow-mode)
   (autoload #'rainbow-mode "rainbow-mode" nil t))
@@ -5196,28 +5211,33 @@ This file is specified in `counsel-projectile-default-file'."
   '(if (fboundp 'diminish)
        (diminish 'rainbow-mode)))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "php-mode" nil t))
+
 (add-hook 'php-mode-hook #'lsp-deferred)
 
-(setq nxml-auto-insert-xml-declaration-flag t
-      nxml-slash-auto-complete-flag t)
 (unless (fboundp 'nxml-mode)
   (autoload #'nxml-mode "nxml-mode" nil t))
-(fset 'xml-mode 'nxml-mode)
-
 (add-hook 'nxml-mode-hook #'lsp-deferred)
+
 (add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xsd\\'" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xslt\\'" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.pom$" . nxml-mode))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "nxml-mode" nil t))
+(eval-after-load 'nxml-mode
+  '(progn
+     (fset 'xml-mode 'nxml-mode)
 
-;; ;; FIXME: Open `.classpath' file with LSP support
-;; ;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
-;; ;;                               auto-mode-alist))
+     (defvar nxml-auto-insert-xml-declaration-flag)
+     (defvar nxml-slash-auto-complete-flag)
+
+     (setq nxml-auto-insert-xml-declaration-flag t
+           nxml-slash-auto-complete-flag t)
+     t))
+
+;; FIXME: Open `.classpath' file with LSP support
+;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
+;;                               auto-mode-alist))
+
 ;; (with-eval-after-load 'lsp-mode
 ;;   (add-to-list 'lsp-language-id-configuration '("\\.classpath$" . "xml"))
 ;;   (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
@@ -5242,15 +5262,19 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Texlab seems to have high overhead
 
-;; (add-hook 'latex-mode-hook #'(lambda nil
-;;                                (require 'lsp-latex)
-;;                                (lsp-deferred)))
-;; (add-hook 'LaTeX-mode-hook #'(lambda nil
-;;                                (require 'lsp-latex)
-;;                                (lsp-deferred)))
+;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
+;;   (add-hook hook (lambda nil
+;;                    (require 'lsp-latex)
+;;                    (lsp-deferred))))
 
 (eval-after-load 'lsp-latex
   '(progn
+     (defvar lsp-latex-bibtex-formatting-formatter)
+     (defvar lsp-latex-bibtex-formatting-line-length)
+     (defvar lsp-latex-build-on-save)
+     (defvar lsp-latex-lint-on-save)
+     (defvar lsp-latex-build-args)
+
      (setq lsp-latex-bibtex-formatting-formatter "latexindent"
            lsp-latex-bibtex-formatting-line-length sb/fill-column
            lsp-latex-build-on-save t
@@ -5293,6 +5317,25 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'tex
   '(progn
+     (defvar TeX-auto-save)
+     (defvar TeX-auto-untabify)
+     (defvar TeX-clean-confirm)
+     (defvar TeX-electric-sub-and-superscript)
+     (defvar TeX-parse-self)
+     (defvar TeX-quote-after-quote)
+     (defvar TeX-save-query)
+     (defvar TeX-source-correlate-method)
+     (defvar TeX-source-correlate-start-server)
+     (defvar TeX-syntactic-comment)
+     (defvar TeX-view-program-selection)
+     (defvar TeX-view-program-list)
+     (defvar LaTeX-item-indent)
+     (defvar LaTeX-syntactic-comments)
+     (defvar LaTeX-fill-break-at-separators)
+     (defvar tex-fontify-script)
+     (defvar font-latex-fontify-script)
+     (defvar font-latex-fontify-sectioning)
+
      (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
            TeX-auto-untabify t ; Remove all tabs before saving
            TeX-clean-confirm nil
@@ -5332,35 +5375,76 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'tex-mode
   '(progn
+     (defvar auctex-latexmk-inherit-TeX-PDF-mode)
+     (defvar TeX-command-default)
+
      ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
      (setq auctex-latexmk-inherit-TeX-PDF-mode t
            TeX-command-default "LatexMk")
-     (require 'auctex-latexmk nil nil)
+
+     (unless (fboundp 'auctex-latexmk)
+       (autoload #'auctex-latexmk "auctex-latexmk" nil t))
+
      (auctex-latexmk-setup)
      t))
 
-(unless (fboundp 'turn-on-auto-revert-mode)
-  (autoload #'turn-on-auto-revert-mode "bibtex" nil t))
+
 (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
-(add-hook 'bibtex-mode-hook #'lsp-deferred) ;; LATER: LaTeX LS is not good yet
-(setq bibtex-align-at-equal-sign t
-      bibtex-maintain-sorted-entries t)
+;; (add-hook 'bibtex-mode-hook #'lsp-deferred) ;; LATER: LaTeX LS is not good yet
 
 (eval-after-load 'bibtex
-  '(require 'bibtex-utils nil nil))
+  '(progn
+     (defvar bibtex-align-at-equal-sign)
+     (defvar bibtex-maintain-sorted-entries)
 
-(setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+     (setq bibtex-align-at-equal-sign t
+           bibtex-maintain-sorted-entries t)
+
+     (require 'bibtex-utils nil nil)
+     t))
+
+
 (unless (fboundp 'ivy-bibtex)
   (autoload #'ivy-bibtex "ivy-bibtex" nil t))
-(bind-keys :package ivy-bibtex
-           ("C-c x b" . ivy-bibtex))
 
 (eval-after-load 'ivy-bibtex
   '(progn
+     (defvar ivy-bibtex-default-action)
+     (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+
+     (require 'bibtex-completion nil nil)
+
+     (defvar bibtex-completion-cite-default-as-initial-input)
+     (defvar bibtex-completion-cite-prompt-for-optional-arguments)
+     (defvar bibtex-completion-display-formats)
+
      (setq bibtex-completion-cite-default-as-initial-input t
-           bibtex-completion-cite-prompt-for-optional-arguments nil
-           bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}")))
-     (require 'bibtex-completion nil nil)))
+           bibtex-completion-cite-prompt-for-optional-arguments
+           nil bibtex-completion-display-formats '((t
+                                                    . "${author:24} ${title:*} ${=key=:16}
+           ${=type=:12}"))) t))
+
+(bind-keys :package ivy-bibtex
+           ("C-c x b" . ivy-bibtex))
+
+
+(unless (fboundp 'reftex-mode)
+  (autoload #'reftex-mode "reftex" nil t))
+(unless (fboundp 'reftex-citation)
+  (autoload #'reftex-citation "reftex" nil t))
+(unless (fboundp 'reftex-reference)
+  (autoload #'reftex-reference "reftex" nil t))
+(unless (fboundp 'reftex-label)
+  (autoload #'reftex-label "reftex" nil t))
+(unless (fboundp 'reftex-get-bibfile-list)
+  (autoload #'reftex-get-bibfile-list "reftex" nil t))
+(unless (fboundp 'bibtex-parse-keys)
+  (autoload #'bibtex-parse-keys "reftex" nil t))
+(unless (fboundp 'reftex-default-bibliography)
+  (autoload #'reftex-default-bibliography "reftex" nil t))
+
+(add-hook 'LaTeX-mode-hook #'reftex-mode)
+(add-hook 'latex-mode-hook #'reftex-mode)
 
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 (eval-and-compile
@@ -5412,27 +5496,15 @@ Ignore if no file is found."
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list))))))
 
-
-(unless (fboundp 'reftex-mode)
-  (autoload #'reftex-mode "reftex" nil t))
-(unless (fboundp 'reftex-citation)
-  (autoload #'reftex-citation "reftex" nil t))
-(unless (fboundp 'reftex-reference)
-  (autoload #'reftex-reference "reftex" nil t))
-(unless (fboundp 'reftex-label)
-  (autoload #'reftex-label "reftex" nil t))
-(unless (fboundp 'reftex-get-bibfile-list)
-  (autoload #'reftex-get-bibfile-list "reftex" nil t))
-(unless (fboundp 'bibtex-parse-keys)
-  (autoload #'bibtex-parse-keys "reftex" nil t))
-(unless (fboundp 'reftex-default-bibliography)
-  (autoload #'reftex-default-bibliography "reftex" nil t))
-
-(add-hook 'LaTeX-mode-hook #'reftex-mode)
-(add-hook 'latex-mode-hook #'reftex-mode)
-
 (eval-after-load 'reftex
   '(progn
+     (defvar reftex-enable-partial-scans)
+     (defvar reftex-highlight-selection)
+     (defvar reftex-plug-into-AUCTeX)
+     (defvar reftex-save-parse-info)
+     (defvar reftex-toc-follow-mode)
+     (defvar reftex-use-multiple-selection-buffers)
+
      (setq reftex-enable-partial-scans t
            reftex-highlight-selection 'both
            reftex-plug-into-AUCTeX t
@@ -5479,10 +5551,11 @@ Ignore if no file is found."
 
 (eval-after-load 'bib-cite
   '(progn
+     (defvar bib-cite-use-reftex-view-crossref)
      (setq bib-cite-use-reftex-view-crossref t)
 
-     if (fboundp 'diminish)
-     (diminish 'bib-cite-minor-mode)
+     (if (fboundp 'diminish)
+         (diminish 'bib-cite-minor-mode))
      t))
 
 (bind-keys :package bib-cite :map bib-cite-minor-mode-map
@@ -5495,8 +5568,9 @@ Ignore if no file is found."
            ("C-c l n" . bib-find-next)
            ("C-c l h" . bib-highlight-mouse))
 
+
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-(declare-function TeX-active-process "tex.el" ())
+(declare-function TeX-active-process "tex" ())
 (defun sb/save-buffer-and-run-latexmk ()
   "Save the current buffer and run LaTeXMk also."
   (interactive)
@@ -5514,6 +5588,8 @@ Ignore if no file is found."
 ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
 
 (defvar latex-mode-map)
+(defvar LaTeX-mode-map)
+
 (with-eval-after-load 'latex
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map))
@@ -5525,48 +5601,61 @@ Ignore if no file is found."
   (autoload #'math-preview-at-point "math-preview" nil t))
 (unless (fboundp 'math-preview-region)
   (autoload #'math-preview-region "math-preview" nil t))
-(setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp))
+
+(eval-after-load 'math-preview
+  '(progn
+     (defvar math-preview-command)
+     (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp))
+     t))
+
 
 (unless (fboundp 'texinfo-mode)
   (autoload #'texinfo-mode "texinfo" nil t))
 (add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode))
 
+
 (unless (fboundp 'js2-mode)
   (autoload #'js2-mode "js2-mode" nil t))
 (unless (fboundp 'js2-imenu-extras-mode)
   (autoload #'js2-imenu-extras-mode "js2-mode" nil t))
+
+(add-hook 'js2-mode-hook #'lsp-deferred)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+
 (eval-after-load 'js2-mode
   '(progn
      (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
+
+     (defvar js-indent-level)
+     (defvar js2-basic-offset)
+
      (setq js-indent-level 2
            js2-basic-offset 2)
-     t))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "js2-mode" nil t))
-(add-hook 'js2-mode-hook #'lsp-deferred)
-
-(eval-after-load 'js2-mode
-  '(progn
-     (require 'js2-refactor nil nil)
+     (unless (fboundp 'js2-refactor-mode)
+       (autoload #'js2-refactor-mode "js2-refactor" nil t))
      (js2-refactor-mode 1)
+
      (if (fboundp 'diminish)
          (diminish 'js2-refactor-mode))
      t))
 
-(setq xref-js2-search-program 'rg)
+
 (unless (fboundp 'xref-js2-xref-backend)
   (autoload #'xref-js2-xref-backend "xref-js2" nil t))
 (add-hook 'js2-mode-hook #'(lambda nil
                              (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
+(eval-after-load 'xref-js2
+  '(progn
+     (defvar xref-js2-search-program)
+     (setq xref-js2-search-program 'rg)
+     t))
+
 ;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
 ;; (define-key js-mode-map (kbd "M-.") nil)
 
-(eval-and-compile
-  (add-to-list 'load-path "/home/swarnendu/.emacs.d/extras"))
 
 ;; LATER: The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
 (unless (fboundp 'json-mode)
@@ -5575,61 +5664,59 @@ Ignore if no file is found."
 
 (unless (fboundp 'jsonc-mode)
   (autoload #'jsonc-mode "json-mode" nil t))
+
 (add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
 (add-to-list 'auto-mode-alist '("User/settings.json$" . jsonc-mode))
 
-(add-hook 'json-mode-hook #'(lambda nil
-                              (make-local-variable 'js-indent-level)
-                              (setq js-indent-level 2)
-                              (lsp-deferred)))
-(add-hook 'jsonc-mode-hook #'(lambda nil
-                               (make-local-variable 'js-indent-level)
-                               (setq js-indent-level 2)
-                               (lsp-deferred)))
+(dolist (hook '(json-mode-hook jsonc-mode-hook))
+  (add-hook hook (lambda nil
+                   (make-local-variable 'js-indent-level)
+                   (setq js-indent-level 2)
+                   (lsp-deferred))))
+
 
 (unless (fboundp 'less-css-mode)
   (autoload #'less-css-mode "less-css-mode" nil t))
-(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "scss-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
 (add-hook 'less-css-mode-hook #'lsp-deferred)
 
 
 (unless (fboundp 'scss-mode)
   (autoload #'scss-mode "scss-mode" nil t))
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "scss-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 (add-hook 'scss-mode-hook #'lsp-deferred)
 
 
 (unless (fboundp 'sass-mode)
   (autoload #'sass-mode "sass-mode" nil t))
-(add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
 
-(unless (fboundp 'lsp-deferred)
-  (autoload #'lsp-deferred "sass-mode" nil t))
+(add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
 (add-hook 'sass-mode-hook #'lsp-deferred)
 
 (unless (fboundp 'bazel-mode)
   (autoload #'bazel-mode "bazel-mode" nil t))
 (unless (fboundp 'bazelrc-mode)
   (autoload #'bazelrc-mode "bazel-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.bzl$" . bazel-mode))
 (add-to-list 'auto-mode-alist '("\\BUILD\\'" . bazel-mode))
 (add-to-list 'auto-mode-alist '("\\.bazelrc\\'" . bazelrc-mode))
+
 (unless (fboundp 'flycheck-mode)
   (autoload #'flycheck-mode "flycheck" nil t))
 (add-hook 'bazel-mode-hook #'flycheck-mode)
 
+
 (unless (fboundp 'protobuf-mode)
   (autoload #'protobuf-mode "protobuf-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
+
 (unless (fboundp 'flycheck-mode)
   (autoload #'flycheck-mode "flycheck" nil t))
 (add-hook 'protobuf-mode-hook #'flycheck-mode)
+
 
 (eval-after-load 'mlir-mode
   '(progn
@@ -5651,6 +5738,7 @@ Ignore if no file is found."
   (autoload #'format-all-ensure-formatter "format-all" nil t))
 (unless (fboundp 'format-all-buffer)
   (autoload #'format-all-buffer "format-all" nil t))
+
 (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'format-all-mode))
 (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)
@@ -5658,10 +5746,9 @@ Ignore if no file is found."
 
 (unless (fboundp 'global-tree-sitter-mode)
   (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
-(dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
-                             css-mode-hook html-mode-hook java-mode-hook js-mode-hook
-                             js2-mode-hook json-mode-hook jsonc-mode-hook php-mode-hook
-                             python-mode-hook typescript-mode-hook))
+(dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook css-mode-hook html-mode-hook
+                             java-mode-hook js-mode-hook js2-mode-hook json-mode-hook
+                             jsonc-mode-hook php-mode-hook python-mode-hook typescript-mode-hook))
   (add-hook hook
             (lambda nil
               (require 'tree-sitter)
@@ -5669,6 +5756,7 @@ Ignore if no file is found."
               (require 'tree-sitter-hl)
               (global-tree-sitter-mode 1)
               (tree-sitter-hl-mode 1))))
+
 (eval-after-load 'tree-sitter
   '(if (fboundp 'diminish)
        (diminish 'tree-sitter-mode)))
@@ -5678,6 +5766,7 @@ Ignore if no file is found."
   (autoload #'adoc-mode "adoc-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
 
+
 (when (executable-find "editorconfig")
   (unless (fboundp 'editorconfig-mode)
     (autoload #'editorconfig-mode "editorconfig" nil t))
@@ -5686,34 +5775,46 @@ Ignore if no file is found."
     '(if (fboundp 'diminish)
          (diminish 'editorconfig-mode))))
 
+
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (unless (fboundp 'global-fasd-mode)
   (autoload #'global-fasd-mode "fasd" nil t))
 (unless (fboundp 'fasd-find-file)
   (autoload #'fasd-find-file "fasd" nil t))
 (add-hook 'emacs-startup-hook #'global-fasd-mode)
-(setq fasd-enable-initial-prompt nil)
+
+(eval-after-load 'fasd
+  '(progn
+     (setq fasd-enable-initial-prompt nil)
+     t))
+
 (bind-keys :package fasd
            ("C-c /" . fasd-find-file))
+
 
 (unless (fboundp 'toml-mode)
   (autoload #'toml-mode "toml-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-mode))
 
+
 (unless (fboundp 'nix-mode)
   (autoload #'nix-mode "nix-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
+
 
 (unless (fboundp 'rust-mode)
   (autoload #'rust-mode "rust-mode" nil t))
 (unless (fboundp 'lsp)
   (autoload #'lsp "rust-mode" nil t))
-(add-hook 'rust-mode-hook #'lsp)
+
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+(add-hook 'rust-mode-hook #'lsp)
+
 (eval-after-load 'rust-mode
   '(progn
      (setq rust-format-on-save t)
      t))
+
 
 (declare-function ansi-color-apply-on-region "ansi-color")
 (defun sb/colorize-compilation-buffer ()
@@ -5722,6 +5823,7 @@ Ignore if no file is found."
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region (point-min) (point-max))))
 (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
+
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
@@ -5736,79 +5838,83 @@ Ignore if no file is found."
 ;; Merge completions of all the backends, give priority to `company-xxx'
 ;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
 
-;; (defun sb/company-text-mode ()
-;;   "Add backends for text completion in company mode."
-;;   ;; Slightly larger value to have more precise matches
-;;   (setq-local company-minimum-prefix-length 3)
-;;   (set (make-local-variable 'company-backends)
-;;        '((
-;;           company-files
-;;           company-yasnippet ; Works everywhere
-;;           company-ispell ; Uses an English dictionary
-;;           ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
-;;           ;; strings or comments). That is why it is better to put it at the end.
-;;           company-dabbrev
-;;           ))))
-;; (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
-;;   (add-hook hook (lambda ()
-;;                    (sb/company-text-mode))))
+(defun sb/company-text-mode ()
+  "Add backends for text completion in company mode."
+  ;; Slightly larger value to have more precise matches
+  (setq-local company-minimum-prefix-length 3)
+  (set (make-local-variable 'company-backends)
+       '((
+          company-files
+          company-yasnippet ; Works everywhere
+          company-ispell ; Uses an English dictionary
+          ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
+          ;; strings or comments). That is why it is better to put it at the end.
+          company-dabbrev
+          ))))
+(dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
+  (add-hook hook (lambda ()
+                   (sb/company-text-mode))))
 
-;; (defun sb/company-xml-mode ()
-;;   "Add backends for completion with company."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((
-;;            company-files
-;;            company-capf :separate
-;;            company-yasnippet
-;;            company-dabbrev-code
-;;            ))))
-;; (dolist (hook '(nxml-mode-hook))
-;;   (add-hook hook (lambda ()
-;;                    (sb/company-xml-mode))))
 
-;; (defun sb/company-prog-mode ()
-;;   "Add backends for program completion in company mode."
-;;   (setq-local company-minimum-prefix-length 2)
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((
-;;            company-files
-;;            company-capf
-;;            company-yasnippet
-;;            company-dabbrev-code
-;;            company-dabbrev
-;;            ))))
-;; (add-hook 'prog-mode-hook #'sb/company-prog-mode)
+(defun sb/company-xml-mode ()
+  "Add backends for completion with company."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-files
+           company-capf :separate
+           company-yasnippet
+           company-dabbrev-code
+           ))))
+(dolist (hook '(nxml-mode-hook))
+  (add-hook hook (lambda ()
+                   (sb/company-xml-mode))))
 
-;; (defun sb/company-java-mode ()
-;;   "Add backends for Java completion in company mode."
-;;   (setq-local company-minimum-prefix-length 2)
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((
-;;            company-files
-;;            company-capf
-;;            company-yasnippet
-;;            company-dabbrev
-;;            ))))
-;; (add-hook 'java-mode-hook #'sb/company-java-mode)
 
-;; (defun sb/company-c-mode ()
-;;   "Add backends for C/C++ completion in company mode."
-;;   (setq-local company-minimum-prefix-length 2)
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((
-;;            company-files
-;;            company-capf
-;;            company-yasnippet
-;;            ;; company-dabbrev-code
-;;            ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;;            ;; company-clang ; This can be slow
-;;            company-dabbrev
-;;            ))))
-;; (add-hook 'c-mode-common-hook #'sb/company-c-mode)
+(defun sb/company-prog-mode ()
+  "Add backends for program completion in company mode."
+  (setq-local company-minimum-prefix-length 2)
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           company-dabbrev-code
+           company-dabbrev
+           ))))
+(add-hook 'prog-mode-hook #'sb/company-prog-mode)
+
+
+(defun sb/company-java-mode ()
+  "Add backends for Java completion in company mode."
+  (setq-local company-minimum-prefix-length 2)
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           company-dabbrev
+           ))))
+(add-hook 'java-mode-hook #'sb/company-java-mode)
+
+
+(defun sb/company-c-mode ()
+  "Add backends for C/C++ completion in company mode."
+  (setq-local company-minimum-prefix-length 2)
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           ;; company-dabbrev-code
+           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+           ;; company-clang ; This can be slow
+           company-dabbrev
+           ))))
+(add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
@@ -5829,6 +5935,7 @@ Ignore if no file is found."
           )))
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
+
 (defun sb/company-elisp-mode ()
   "Set up company for elisp mode."
   (setq-local company-minimum-prefix-length 2)
@@ -5841,6 +5948,7 @@ Ignore if no file is found."
           company-dabbrev
           ))))
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
+
 
 (defun sb/company-python-mode ()
   "Add backends for Python completion in company mode."
@@ -5856,6 +5964,7 @@ Ignore if no file is found."
           company-dabbrev
           )))
 (add-hook 'python-mode-hook #'sb/company-python-mode)
+
 
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
@@ -5886,19 +5995,21 @@ Ignore if no file is found."
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
-;; (defun sb/company-web-mode ()
-;;   "Add backends for web completion in company mode."
-;;   (make-local-variable 'company-backends)
-;;   (setq company-backends
-;;         '((
-;;            company-files
-;;            company-capf
-;;            company-yasnippet
-;;            company-dabbrev
-;;            company-ispell
-;;            ))))
-;; (dolist (hook '(web-mode-hook))
-;;   (add-hook hook #'sb/company-web-mode))
+
+(defun sb/company-web-mode ()
+  "Add backends for web completion in company mode."
+  (make-local-variable 'company-backends)
+  (setq company-backends
+        '((
+           company-files
+           company-capf
+           company-yasnippet
+           company-dabbrev
+           company-ispell
+           ))))
+(dolist (hook '(web-mode-hook))
+  (add-hook hook #'sb/company-web-mode))
+
 
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 ;; (when (not (string-equal "root" (getenv "USER"))) ; Only start server mode if not root
@@ -5908,6 +6019,7 @@ Ignore if no file is found."
 ;;          (server-start))
 ;;        t)))
 
+
 ;; Function definitions
 
 ;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
@@ -5915,6 +6027,7 @@ Ignore if no file is found."
   "Save all modified buffers without prompting."
   (interactive)
   (save-some-buffers t))
+
 
 ;; http://endlessparentheses.com/implementing-comment-line.html
 (defun sb/comment-line (n)
@@ -5935,6 +6048,7 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
+
 ;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
 (defun sb/toggle-line-spacing ()
   "Toggle line spacing.  Increase the line spacing to help readability.
@@ -5945,16 +6059,19 @@ Increase line spacing by two line height."
     (setq line-spacing nil))
   (redraw-frame (selected-frame)))
 
+
 (defun sb/byte-compile-current-file ()
   "Byte compile the current file."
   (interactive)
   (byte-compile-file buffer-file-name))
+
 
 ;; http://emacsredux.com/blog/2013/06/25/boost-performance-by-leveraging-byte-compilation/
 (defun sb/byte-compile-init-dir ()
   "Byte-compile all elisp files in the user init directory."
   (interactive)
   (byte-recompile-directory user-emacs-directory 0))
+
 
 ;; https://github.com/thomasf/dotfiles-thomasf-emacs/blob/e14a7e857a89b7488ba5bdae54877abdc77fa9e6/emacs.d/init.el
 (defun sb/switch-to-minibuffer ()
@@ -5964,10 +6081,12 @@ Increase line spacing by two line height."
       (select-window (active-minibuffer-window))
     (error "Minibuffer is not active")))
 
+
 (defun sb/switch-to-scratch ()
   "Switch to the *scratch* buffer."
   (interactive)
   (switch-to-buffer "*scratch*"))
+
 
 ;; https://www.emacswiki.org/emacs/InsertDate
 (defun sb/insert-date (arg)
@@ -5976,6 +6095,7 @@ Increase line spacing by two line height."
   (insert (if arg
               (format-time-string "%d.%m.%Y")
             (format-time-string "%\"Mmmm\" %d, %Y"))))
+
 
 ;; http://zck.me/emacs-move-file
 (defun sb/move-file (new-location)
@@ -5995,6 +6115,7 @@ Increase line spacing by two line height."
                (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
+
 ;; https://www.emacswiki.org/emacs/BuildTags
 (defun sb/create-ctags (dir-name)
   "Create tags file with ctags in DIR-NAME."
@@ -6008,6 +6129,7 @@ Increase line spacing by two line height."
   (shell-command
    (format "%s -cv --gtagslabel=new-ctags %s" sb/gtags-path (directory-file-name dir-name))))
 
+
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
   "List all files recursively in DIR-NAME."
@@ -6017,6 +6139,7 @@ Increase line spacing by two line height."
     (ivy-read "File: " cands
               :action #'find-file
               :caller 'sb/counsel-all-files-recursively)))
+
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 ;; You need to check for either major modes or buffer names, since a few major modes are commonly
@@ -6035,11 +6158,13 @@ Increase line spacing by two line height."
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
 
+
 ;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
 (defun sb/get-buffer-major-mode (buffer-or-string)
   "Return the major mode associated with BUFFER-OR-STRING."
   (with-current-buffer buffer-or-string
     major-mode))
+
 
 (defcustom sb/skippable-modes '(dired-mode fundamental-mode
                                            helpful-mode
@@ -6054,6 +6179,7 @@ Increase line spacing by two line height."
                                            compilation-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string))
+
 
 (defun sb/change-buffer (change-buffer)
   "Call CHANGE-BUFFER.
@@ -6070,15 +6196,18 @@ or the major mode is not in `sb/skippable-modes'."
             (switch-to-buffer initial)
             (throw 'loop t)))))))
 
+
 (defun sb/next-buffer ()
   "Variant of `next-buffer' that skips `sb/skippable-buffers'."
   (interactive)
   (sb/change-buffer 'next-buffer))
 
+
 (defun sb/previous-buffer ()
   "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
+
 
 ;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
 (defun sb/reinstall-package (package)
@@ -6087,6 +6216,7 @@ or the major mode is not in `sb/skippable-modes'."
   (unload-feature package)
   (package-reinstall package)
   (require package))
+
 
 ;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
 (defun sb/get-derived-modes (mode)
@@ -6098,6 +6228,7 @@ or the major mode is not in `sb/skippable-modes'."
       (setq mode parent))
     (setq modes (nreverse modes))))
 
+
 (defun sb/goto-line-with-feedback ()
   "Show line numbers temporarily, while prompting for the line number input."
   (interactive)
@@ -6106,6 +6237,7 @@ or the major mode is not in `sb/skippable-modes'."
         (linum-mode 1)
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
+
 
 ;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
 ;; available bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
@@ -6155,13 +6287,16 @@ or the major mode is not in `sb/skippable-modes'."
   (global-set-key [remap next-buffer] #'centaur-tabs-forward)
   (global-set-key [remap previous-buffer] #'centaur-tabs-backward))
 
+
 (unless (fboundp 'default-text-scale-increase)
   (autoload #'default-text-scale-increase "default-text-scale" nil t))
 (unless (fboundp 'default-text-scale-decrease)
   (autoload #'default-text-scale-decrease "default-text-scale" nil t))
+
 (bind-keys :package default-text-scale
            ("C-M-+" . default-text-scale-increase)
            ("C-M--" . default-text-scale-decrease))
+
 
 (unless (fboundp 'free-keys)
   (autoload #'free-keys "free-keys" nil t))
@@ -6172,20 +6307,24 @@ or the major mode is not in `sb/skippable-modes'."
 (unless (fboundp 'which-key-mode)
   (autoload #'which-key-mode nil t))
 (add-hook 'after-init-hook #'which-key-mode)
+
 (eval-after-load 'which-key
   '(progn
      ;; Allow C-h to trigger which-key before it is done automatically
      (setq which-key-show-early-on-C-h t)
+
      (which-key-setup-side-window-right-bottom)
-     (if
-         (fboundp 'diminish)
+
+     (if (fboundp 'diminish)
          (diminish 'which-key-mode))
      t))
+
 
 ;; The posframe has a lower contrast
 (unless (fboundp 'which-key-posframe-mode)
   (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
 (add-hook 'which-key-mode-hook #'which-key-posframe-mode)
+
 
 ;; Hydras
 
@@ -6340,6 +6479,7 @@ or the major mode is not in `sb/skippable-modes'."
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'tags-table-list 'safe-local-variable #'listp)
+
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
