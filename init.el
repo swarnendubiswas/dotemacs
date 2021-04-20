@@ -12,6 +12,8 @@
 (require 'map)
 (require 'subr-x)
 
+(declare-function ht-merge "ht")
+
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
@@ -151,6 +153,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (add-to-list 'load-path sb/extras-directory)
+(defvar sb/core-packages)
 (setq sb/core-packages '())
 (package-initialize)
 ;; (debug-on-entry 'package-initialize)
@@ -882,6 +885,8 @@ SAVE-FN with non-nil ARGS."
 ;;   (mode-icons-mode 1))
 
 
+(declare-function adob--rescan-windows "auto-dim-other-buffers")
+
 (unless (fboundp 'auto-dim-other-buffers-mode)
   (autoload #'auto-dim-other-buffers-mode "auto-dim-other-buffers" nil t))
 (unless (fboundp 'adob--rescan-windows)
@@ -1040,6 +1045,8 @@ SAVE-FN with non-nil ARGS."
            ("C-x C-b" . bufler))
 
 
+(declare-function dired-next-line "dired")
+
 (unless (fboundp 'sb/dired-go-home)
   (autoload #'sb/dired-go-home "dired" nil t))
 (unless (fboundp 'find-file)
@@ -1053,9 +1060,11 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'dired-next-line)
   (autoload #'dired-next-line "dired" nil t))
 
+(declare-function dired-jump "dired-x")
+(declare-function dired-omit-mode "dired-x")
+
 (unless (fboundp 'dired-jump)
   (autoload #'dired-jump "dired-x" nil t))
-(declare-function dired-omit-mode "dired-x")
 (unless (fboundp 'dired-omit-mode)
   (autoload #'dired-omit-mode "dired-x" nil t))
 
@@ -1203,6 +1212,9 @@ SAVE-FN with non-nil ARGS."
   (declare-function treemacs-pulse-on-success "treemacs")
   (declare-function treemacs-is-path "treemacs")
   (declare-function treemacs-theme->gui-icons "treemacs")
+  (declare-function treemacs--find-current-user-project "treemacs")
+  (declare-function treemacs--propagate-new-icons "treemacs")
+  (declare-function treemacs-workspace->is-empty? "treemacs")
 
   (unless (fboundp 'treemacs)
     (autoload #'treemacs "treemacs" nil t))
@@ -1335,7 +1347,6 @@ SAVE-FN with non-nil ARGS."
                                             icons))
                                  icons)))
 
-       (defvar theme)
        (treemacs-create-theme "all-the-icons-tighter" :extends "all-the-icons" :config
                               (let
                                   ((icons
@@ -1431,6 +1442,8 @@ SAVE-FN with non-nil ARGS."
 
      ;;   (unbind-key "M-<up>" org-mode-map)
      ;;   (unbind-key "M-<down>" org-mode-map))
+
+     (declare-function org-indent-mode "org-indent")
 
      (add-hook 'org-mode-hook #'visual-line-mode)
      (add-hook 'org-mode-hook #'org-indent-mode)
@@ -1601,6 +1614,9 @@ SAVE-FN with non-nil ARGS."
 (bind-keys :package visual-regexp
            ([remap query-replace] . vr/query-replace))
 
+
+(declare-function recentf-save-file "recentf")
+(declare-function recentf-cleanup "recentf")
 
 (unless (fboundp 'recentf-mode)
   (autoload #'recentf-mode "recentf" nil t))
@@ -1856,6 +1872,12 @@ SAVE-FN with non-nil ARGS."
                    'dired-mode)))))
 
 
+(declare-function ivy-alt-done "ivy")
+(declare-function ivy-previous-line "ivy")
+(declare-function ivy-next-line "ivy")
+(declare-function ivy-completion-in-region "ivy")
+(declare-function ivy-format-function-line "ivy")
+
 (unless (fboundp 'ivy-mode)
   (autoload #'ivy-mode "ivy" nil t))
 (unless (fboundp 'ivy-resume)
@@ -2059,6 +2081,8 @@ SAVE-FN with non-nil ARGS."
      '(require 'ivy-hydra nil nil)))
 
 
+(declare-function prescient-persist-mode "prescient")
+
 (unless (fboundp 'prescient-persist-mode)
   (autoload #'prescient-persist-mode "prescient" nil t))
 (add-hook 'after-init-hook #'prescient-persist-mode)
@@ -2073,6 +2097,7 @@ SAVE-FN with non-nil ARGS."
      (unless (bound-and-true-p sb/use-no-littering)
        (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory)))
      t))
+
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 ;; (with-eval-after-load 'ivy
@@ -2112,6 +2137,8 @@ SAVE-FN with non-nil ARGS."
      (setq completion-styles '(orderless)
            orderless-component-separator "[ &]")
 
+     (declare-function sb/just-one-face "init")
+
      (defun sb/just-one-face (fn &rest args)
        (let ((orderless-match-faces
               [completions-common-part]))
@@ -2149,53 +2176,9 @@ SAVE-FN with non-nil ARGS."
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 
 
-(eval-and-compile
-  ;; Move point to previous error
-  ;; http://emacs.stackexchange.com/a/14912/2017
-  ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
-  (defun sb/flyspell-goto-previous-error (arg)
-    "Go to arg previous spelling error."
-    (interactive "p")
-    (defvar flyspell-old-pos-error)
-    (defvar flyspell-old-buffer-error)
-
-    (while (not (= 0 arg))
-      (let ((pos (point))
-            (min (point-min)))
-        (if (and (eq (current-buffer) flyspell-old-buffer-error)
-                 (eq pos flyspell-old-pos-error))
-            (progn
-              (if (= flyspell-old-pos-error min)
-                  (progn
-                    (message "Restarting from end of buffer")
-                    (goto-char (point-max)))
-                (backward-word 1))
-              (setq pos (point))))
-        (while (and (> pos min)
-                    (let ((ovs (overlays-at pos))
-                          (r 'nil))
-                      (while (and (not r)
-                                  (consp ovs))
-                        (if (flyspell-overlay-p
-                             (car ovs))
-                            (setq r t)
-                          (setq ovs (cdr ovs))))
-                      (not r)))
-          (backward-word 1)
-          (setq pos (point)))
-        (setq arg (1- arg))
-        (setq flyspell-old-pos-error pos)
-        (setq flyspell-old-buffer-error
-              (current-buffer))
-        (goto-char pos)
-        (if
-            (= pos min)
-            (progn
-              (message "No more misspelled word!")
-              (setq arg 0))
-          (forward-word))))))
-
 (when (symbol-value 'sb/is-linux)
+  (declare-function flyspell-overlay-p "flyspell")
+
   (unless (fboundp 'flyspell-prog-mode)
     (autoload #'flyspell-prog-mode "flyspell" nil t))
   (unless (fboundp 'flyspell-mode)
@@ -2221,6 +2204,52 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'after-init-hook #'(lambda nil
                                  (when (string= (buffer-name) "*scratch*")
                                    (flyspell-mode 1))))
+
+  (eval-and-compile
+    ;; Move point to previous error
+    ;; http://emacs.stackexchange.com/a/14912/2017
+    ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
+    (defun sb/flyspell-goto-previous-error (arg)
+      "Go to arg previous spelling error."
+      (interactive "p")
+      (defvar flyspell-old-pos-error)
+      (defvar flyspell-old-buffer-error)
+
+      (while (not (= 0 arg))
+        (let ((pos (point))
+              (min (point-min)))
+          (if (and (eq (current-buffer) flyspell-old-buffer-error)
+                   (eq pos flyspell-old-pos-error))
+              (progn
+                (if (= flyspell-old-pos-error min)
+                    (progn
+                      (message "Restarting from end of buffer")
+                      (goto-char (point-max)))
+                  (backward-word 1))
+                (setq pos (point))))
+          (while (and (> pos min)
+                      (let ((ovs (overlays-at pos))
+                            (r 'nil))
+                        (while (and (not r)
+                                    (consp ovs))
+                          (if (flyspell-overlay-p
+                               (car ovs))
+                              (setq r t)
+                            (setq ovs (cdr ovs))))
+                        (not r)))
+            (backward-word 1)
+            (setq pos (point)))
+          (setq arg (1- arg))
+          (setq flyspell-old-pos-error pos)
+          (setq flyspell-old-buffer-error
+                (current-buffer))
+          (goto-char pos)
+          (if
+              (= pos min)
+              (progn
+                (message "No more misspelled word!")
+                (setq arg 0))
+            (forward-word))))))
 
   (eval-after-load 'flyspell
     '(progn
@@ -2259,8 +2288,13 @@ SAVE-FN with non-nil ARGS."
 (bind-keys :package flyspell-correct-ivy
            ("C-;" . flyspell-correct-wrapper))
 
+
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
+
+(declare-function spell-fu-goto-next-error "spell-fu")
+(declare-function spell-fu-goto-previous-error "spell-fu")
+(declare-function spell-fu-word-add "spell-fu")
 
 (unless (fboundp 'spell-fu-mode)
   (autoload #'spell-fu-mode "spell-fu" nil t))
@@ -2393,6 +2427,9 @@ SAVE-FN with non-nil ARGS."
      (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
      (defvar electric-pair-pairs)
      (defvar electric-pair-text-pairs)
+
+     (declare-function sb/add-markdown-pairs "init")
+
      (defun sb/add-markdown-pairs ()
        "Add custom pairs to `markdown-mode'."
        (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
@@ -2477,6 +2514,10 @@ SAVE-FN with non-nil ARGS."
 ;;            ("C-M-k" . sp-splice-sexp))
 
 
+(declare-function projectile-project-root "projectile")
+(declare-function projectile-expand-root "projectile")
+(declare-function projectile-project-name "projectile")
+(declare-function projectile-project-p "projectile")
 
 (unless (fboundp 'projectile-find-file)
   (autoload #'projectile-find-file "projectile" nil t))
@@ -2601,6 +2642,8 @@ SAVE-FN with non-nil ARGS."
            ("A" . projectile-add-known-project))
 
 
+(declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
+
 (unless (fboundp 'counsel-projectile-find-file)
   (autoload #'counsel-projectile-find-file "counsel-projectile" nil t))
 (unless (fboundp 'counsel-projectile-switch-project)
@@ -2697,6 +2740,8 @@ This file is specified in `counsel-projectile-default-file'."
        t)))
 
 
+(declare-function ivy-rich-modify-column "ivy-rich")
+
 (unless (fboundp 'ivy-rich-mode)
   (autoload #'ivy-rich-mode "ivy-rich" nil t))
 (unless (fboundp 'ivy-rich-modify-column)
@@ -2727,6 +2772,18 @@ This file is specified in `counsel-projectile-default-file'."
              ("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
              ("C-x f" . counsel-fd-file-jump)))
 
+
+(declare-function flycheck-buffer "flycheck")
+(declare-function flycheck-add-next-checker "flycheck")
+(declare-function flycheck-describe-checker "flycheck")
+(declare-function flycheck-select-checker "flycheck")
+(declare-function flycheck-verify-setup "flycheck")
+(declare-function flycheck-next-error "flycheck")
+(declare-function flycheck-previous-error "flycheck")
+(declare-function flycheck-next-checker "flycheck")
+(declare-function flycheck-list-errors "flycheck")
+(declare-function flycheck-disable-checker "flycheck")
+(declare-function flycheck-add-mode "flycheck")
 
 (unless (fboundp 'flycheck-mode)
   (autoload #'flycheck-mode "flycheck" nil t))
@@ -2834,6 +2891,9 @@ This file is specified in `counsel-projectile-default-file'."
        (flycheck-posframe-configure-pretty-defaults)
        t)))
 
+
+(declare-function whitespace-buffer "whitespace")
+(declare-function whitespace-turn-off "whitespace")
 
 (unless (fboundp 'whitespace-mode)
   (autoload #'whitespace-mode "whitespace" nil t))
@@ -2948,6 +3008,9 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'conf-mode-hook #'highlight-numbers-mode)
 (add-hook 'css-mode-hook #'highlight-numbers-mode)
 (add-hook 'html-mode-hook #'highlight-numbers-mode)
+
+
+(declare-function number-separator-mode "number-separator")
 
 (unless (fboundp 'number-separator-mode)
   (autoload #'number-separator-mode "number-separator" nil t))
@@ -3077,6 +3140,11 @@ This file is specified in `counsel-projectile-default-file'."
       tags-revert-without-query t)
 
 
+(declare-function xref-etags-mode "xref")
+(declare-function xref-show-location-at-point "xref")
+(declare-function xref-quit-and-goto-xref "xref")
+(declare-function xref-query-replace-in-results "xref")
+
 (unless (fboundp 'xref-find-definitions)
   (autoload #'xref-find-definitions "xref" nil t))
 (unless (fboundp 'xref-find-references)
@@ -3137,6 +3205,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Gtags is less maintained than `universal-ctags'
 (when (and (eq system-type 'gnu/linux)
            (eq sb/tags-scheme 'gtags))
+  (declare-function counsel-gtags-dwim "counsel-gtags")
+
   (unless (fboundp 'counsel-gtags-mode)
     (autoload #'counsel-gtags-mode "counsel-gtags" nil t))
   (unless (fboundp 'counsel-gtags-dwim)
@@ -3170,7 +3240,6 @@ This file is specified in `counsel-projectile-default-file'."
        ;; Make xref and gtags work together
        (require 'global-tags nil nil)
        (add-to-list 'xref-backend-functions 'global-tags-xref-backend)
-
        t))
 
   (defvar counsel-gtags-mode-map)
@@ -3186,6 +3255,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (when (and (eq system-type 'gnu/linux)
            (eq sb/tags-scheme 'ctags))
+  (declare-function counsel-etags-find-symbol-at-point "counsel-etags")
+
   (unless (fboundp 'counsel-etags-find-tag-at-point)
     (autoload #'counsel-etags-find-tag-at-point "counsel-etags" nil t))
   (unless (fboundp 'counsel-etags-find-symbol-at-point)
@@ -3222,6 +3293,8 @@ This file is specified in `counsel-projectile-default-file'."
              ("C-c g l" . counsel-etags-list-tag)
              ("C-c g c" . counsel-etags-scan-code)))
 
+
+(declare-function helpful-kill-buffers "helpful")
 
 (unless (fboundp 'helpful-variable)
   (autoload #'helpful-variable "helpful" nil t))
@@ -3323,6 +3396,8 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
 
+
+(declare-function gnuplot "gnuplot")
 
 (unless (fboundp 'gnuplot)
   (autoload #'gnuplot "gnuplot" nil t))
@@ -3431,6 +3506,8 @@ This file is specified in `counsel-projectile-default-file'."
      t))
 
 
+(declare-function undo-tree-visualize "undo-tree")
+
 (unless (fboundp 'undo-tree-visualize)
   (autoload #'undo-tree-visualize "undo-tree" nil t))
 (unless (fboundp 'global-undo-tree-mode)
@@ -3468,6 +3545,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Avoid the "Overwrite old session file (not loaded)?" warning
+(declare-function session-initialize "session")
+
 (unless (fboundp 'session-initialize)
   (autoload #'session-initialize "session" nil t))
 ;; (add-hook 'after-init-hook #'(lambda nil
@@ -3560,6 +3639,13 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
 
 
+(declare-function pomidor-quit "pomidor")
+(declare-function pomidor-break "pomidor")
+(declare-function pomidor-reset "pomidor")
+(declare-function pomidor-stop "pomidor")
+(declare-function pomidor-hold "pomidor")
+(declare-function pomidor-unhold "pomidor")
+
 (unless (fboundp 'pomidor-quit)
   (autoload #'pomidor-quit "pomidor" nil t))
 (unless (fboundp 'pomidor-break)
@@ -3646,6 +3732,7 @@ This file is specified in `counsel-projectile-default-file'."
 (eval-after-load 'avy
   '(eval-after-load 'ivy
      '(progn
+        (declare-function ivy-avy "ivy-avy")
         (unless (fboundp 'ivy-avy)
           (autoload #'ivy-avy "ivy-avy" nil t))
 
@@ -3661,6 +3748,12 @@ This file is specified in `counsel-projectile-default-file'."
        (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory)))
      t))
 
+
+(declare-function bm-buffer-save "bm")
+(declare-function bm-buffer-restore "bm")
+(declare-function bm-buffer-save-all "bm")
+(declare-function bm-repository-load "bm")
+(declare-function bm-repository-save "bm")
 
 (unless (fboundp 'bm-buffer-save)
   (autoload #'bm-buffer-save "bm" nil t))
@@ -3717,6 +3810,9 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'bug-hunter-init-file "bug-hunter" nil t))
 
 
+(declare-function explain-pause-mode "explain-pause-mode")
+(declare-function explain-pause-top "explain-pause-mode")
+
 (unless (fboundp 'explain-pause-mode)
   (autoload #'explain-pause-mode "explain-pause-mode" nil t))
 (unless (fboundp 'explain-pause-top)
@@ -3743,6 +3839,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Identify weasel words, passive voice, and duplicate words
+(declare-function writegood-mode "writegood-mode")
+
 (unless (fboundp 'writegood-mode)
   (autoload #'writegood-mode "writegood-mode" nil t))
 
@@ -3751,6 +3849,7 @@ This file is specified in `counsel-projectile-default-file'."
      (if (fboundp 'writegood-mode)
          (diminish 'writegood-mode))
      t))
+
 
 (eval-after-load 'text-mode
   '(progn
@@ -3795,6 +3894,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
+
+(declare-function pdf-view-mode "pdf-tools")
+(declare-function pdf-annot-delete "pdf-tools")
+(declare-function pdf-annot-add-highlight-markup-annotation "pdf-tools")
+(declare-function pdf-annot-add-text-annotation "pdf-tools")
+
 (unless (fboundp 'pdf-view-mode)
   (autoload #'pdf-view-mode "pdf-tools" nil t))
 (unless (fboundp 'isearch-forward)
@@ -3877,16 +3982,20 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode))
 
 
+(declare-function llvm-mode "llvm-mode")
 (unless (fboundp 'llvm-mode)
   (autoload #'llvm-mode "llvm-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
 
+
+(declare-function tablegen-mode "tablegen-mode")
 
 (unless (fboundp 'tablegen-mode)
   (autoload #'tablegen-mode "tablegen-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.td\\'" . tablegen-mode))
 
 
+(declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
 (unless (fboundp 'autodisass-llvm-bitcode)
   (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
 (add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
@@ -3946,12 +4055,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
+(declare-function pandoc-load-default-settings "pandoc-mode")
+
 (unless (fboundp 'pandoc-mode)
   (autoload #'pandoc-mode "pandoc-mode" nil t))
 (unless (fboundp 'pandoc-load-default-settings)
   (autoload #'pandoc-load-default-settings "pandoc-mode" nil t))
 (add-hook 'markdown-mode-hook #'pandoc-mode)
-
 
 (eval-after-load 'pandoc-mode
   '(progn
@@ -4156,6 +4266,29 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; LSP support
+
+(declare-function lsp-find-declaration "lsp-mode")
+(declare-function lsp-goto-implementation "lsp-mode")
+(declare-function lsp-goto-type-definition "lsp-mode")
+(declare-function lsp-rename "lsp-mode")
+(declare-function lsp-symbol-highlight "lsp-mode")
+(declare-function lsp-format-buffer "lsp-mode")
+(declare-function lsp-find-references "lsp-mode")
+(declare-function lsp--set-configuration "lsp-mode")
+(declare-function lsp-completion--regex-fuz "lsp-mode")
+(declare-function lsp-register-client "lsp-mode")
+(declare-function lsp-tramp-connection "lsp-mode")
+(declare-function make-lsp-client "lsp-mode")
+(declare-function lsp-configuration-section "lsp-mode")
+(declare-function lsp-package-ensure "lsp-mode")
+(declare-function with-lsp-workspace "lsp-mode")
+(declare-function lsp-ht "lsp-mode")
+(declare-function lsp-ui-doc-mode "lsp-mode")
+(declare-function lsp-ui-peek-find-definitions "lsp-mode")
+(declare-function lsp-ui-peek-find-references "lsp-mode")
+(declare-function lsp-enable-which-key-integration "lsp-mode")
+(declare-function lsp-find-definition "lsp-mode")
+
 (unless (fboundp 'lsp-deferred)
   (autoload #'lsp-deferred "lsp-mode" nil t))
 (unless (fboundp 'lsp-enable-which-key-integration)
@@ -4350,10 +4483,10 @@ This file is specified in `counsel-projectile-default-file'."
                          (lambda
                            (workspace)
                            (with-lsp-workspace workspace
-                                               (lsp--set-configuration
-                                                (ht-merge
-                                                 (lsp-configuration-section "pyright")
-                                                 (lsp-configuration-section "python")))))
+                             (lsp--set-configuration
+                              (ht-merge
+                               (lsp-configuration-section "pyright")
+                               (lsp-configuration-section "python")))))
                          :download-server-fn
                          (lambda
                            (_client callback error-callback _update\?)
@@ -4471,8 +4604,8 @@ This file is specified in `counsel-projectile-default-file'."
                        (lambda
                          (workspace)
                          (with-lsp-workspace workspace
-                                             (lsp--set-configuration
-                                              (lsp-configuration-section "perl"))))
+                           (lsp--set-configuration
+                            (lsp-configuration-section "perl"))))
                        :priority -1 :server-id 'perlls-remote))
 
      (advice-add #'lsp-completion--regex-fuz :override #'identity)
@@ -4566,6 +4699,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Call this in c-mode-common-hook:
 ;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
+
+(declare-function c-beginning-of-defun "cc-mode")
+(declare-function c-end-of-defun "cc-mode")
+(declare-function c-fill-paragraph "cc-mode")
 
 (unless (fboundp 'c++-mode)
   (autoload #'c++-mode "cc-mode" nil t))
@@ -4674,6 +4811,11 @@ This file is specified in `counsel-projectile-default-file'."
      (cmake-font-lock-activate)
      t))
 
+
+(declare-function python-nav-backward-block "python")
+(declare-function python-nav-forward-block "python")
+(declare-function python-indent-shift-left "python")
+(declare-function python-indent-shift-right "python")
 
 (unless (fboundp 'python-nav-backward-block)
   (autoload #'python-nav-backward-block "python" nil t))
@@ -4815,6 +4957,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; `pyright --createstub pandas'
+(declare-function lsp-pyright-locate-python "lsp-pyright")
+(declare-function lsp-pyright-locate-venv "lsp-pyright")
+
 (when (and (eq sb/python-langserver 'pyright)
            (executable-find "pyright"))
   (eval-after-load 'python
@@ -4931,6 +5076,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Can disassemble `.class' files from within jars
+(declare-function autodisass-java-bytecode "autodisass-java-bytecode")
+
 (unless (fboundp 'autodisass-java-bytecode)
   (autoload #'autodisass-java-bytecode "autodisass-java-bytecode" nil t))
 (add-to-list 'auto-mode-alist '("\\.class\\'" . autodisass-java-bytecode))
@@ -5004,6 +5151,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (remove-hook 'find-file-hook #'vc-refresh-state))
 
 
+(declare-function transient-bind-q-to-quit "transient")
 (unless (fboundp 'transient-bind-q-to-quit)
   (autoload #'transient-bind-q-to-quit "transient" nil t))
 
@@ -5021,6 +5169,9 @@ This file is specified in `counsel-projectile-default-file'."
      ;; Allow using `q' to quit out of popups, in addition to `C-g'
      (transient-bind-q-to-quit)
      t))
+
+
+(declare-function magit-display-buffer-fullframe-status-v1 "magit")
 
 (unless (fboundp 'magit-status)
   (autoload #'magit-status "magit" nil t))
@@ -5069,6 +5220,7 @@ This file is specified in `counsel-projectile-default-file'."
 
      (defvar ediff-window-setup-function)
      (defvar ediff-split-window-function)
+     (declare-function ediff-setup-windows-plain "ediff")
 
      ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
      (setq ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -5105,6 +5257,9 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("/\\.gitmodules\\'" . gitconfig-mode))
 
 
+(declare-function git-gutter:previous-hunk "git-gutter")
+(declare-function git-gutter:next-hunk "git-gutter")
+
 (unless (fboundp 'git-gutter:previous-hunk)
   (autoload #'git-gutter:previous-hunk "git-gutter" nil t))
 (unless (fboundp 'git-gutter:next-hunk)
@@ -5139,6 +5294,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Diff-hl looks nicer than `git-gutter', based on `vc'
+(declare-function diff-hl-magit-pre-refresh "diff-hl")
+(declare-function diff-hl-magit-post-refresh "diff-hl")
+
 (unless (fboundp 'diff-hl-magit-post-refresh)
   (autoload #'diff-hl-magit-post-refresh "diff-hl" nil t))
 (unless (fboundp 'diff-hl-magit-pre-refresh)
@@ -5160,6 +5318,7 @@ This file is specified in `counsel-projectile-default-file'."
      t))
 
 
+(declare-function git-commit-turn-on-flyspell "git-commit")
 (unless (fboundp 'git-commit-turn-on-flyspell)
   (autoload #'git-commit-turn-on-flyspell "git-commit" nil t))
 (add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
@@ -5229,6 +5388,8 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'smerge-resolve "smerge-mode" nil t))
 
 (defvar smerge-mode)
+(declare-function sb/smerge-hydra/body "init")
+
 (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
 (add-hook 'magit-diff-visit-file-hook #'(lambda nil
                                           (when smerge-mode
@@ -5421,6 +5582,13 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
 
+(declare-function LaTeX-math-mode "tex")
+(declare-function TeX-PDF-mode "tex")
+(declare-function TeX-source-correlate-mode "tex")
+(declare-function TeX-save-document "tex")
+(declare-function TeX-command-menu "tex")
+(declare-function TeX-revert-document-buffer "tex")
+
 (unless (fboundp 'LaTeX-mode)
   (autoload #'LaTeX-mode "tex" nil t))
 (unless (fboundp 'LaTeX-math-mode)
@@ -5509,17 +5677,18 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'tex-mode
   '(progn
+     (declare-function auctex-latexmk "auctex-latexmk")
+     (unless (fboundp 'auctex-latexmk)
+       (autoload #'auctex-latexmk "auctex-latexmk" nil t))
+
+     (auctex-latexmk-setup)
+
      (defvar auctex-latexmk-inherit-TeX-PDF-mode)
      (defvar TeX-command-default)
 
      ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
      (setq auctex-latexmk-inherit-TeX-PDF-mode t
            TeX-command-default "LatexMk")
-
-     (unless (fboundp 'auctex-latexmk)
-       (autoload #'auctex-latexmk "auctex-latexmk" nil t))
-
-     (auctex-latexmk-setup)
      t))
 
 
@@ -5561,6 +5730,19 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-keys :package ivy-bibtex
            ("C-c x b" . ivy-bibtex))
 
+
+(declare-function reftex-reference "reftex")
+(declare-function reftex-label "reftex")
+(declare-function reftex-get-bibfile-list "reftex")
+(declare-function reftex-default-bibliography "reftex")
+(declare-function bibtex-parse-keys "reftex")
+(declare-function bib-apropos "reftex")
+(declare-function bib-make-bibliography "reftex")
+(declare-function bib-display "reftex")
+(declare-function bib-etags "reftex")
+(declare-function bib-find "reftex")
+(declare-function bib-find-next "reftex")
+(declare-function bib-highlight-mouse "reftex")
 
 (unless (fboundp 'reftex-mode)
   (autoload #'reftex-mode "reftex" nil t))
@@ -5793,6 +5975,9 @@ Ignore if no file is found."
 
 
 ;; LATER: The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
+(declare-function json-mode "json")
+(declare-function jsonc-mode "json")
+
 (unless (fboundp 'json-mode)
   (autoload #'json-mode "json-mode" nil t))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
@@ -6455,7 +6640,7 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
-(when sb/emacs28+
+(when sb/emacs27+
   (bind-key "C-c d p" #'package-quickstart-refresh))
 
 (global-set-key [remap next-buffer] #'sb/next-buffer)
@@ -6478,6 +6663,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 (unless (fboundp 'free-keys)
   (autoload #'free-keys "free-keys" nil t))
+
 
 ;; Show help popups for prefix keys
 (unless (fboundp 'which-key-setup-side-window-right-bottom)
