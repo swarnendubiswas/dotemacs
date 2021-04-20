@@ -793,11 +793,14 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-minor-modes t)
 
   (doom-modeline-mode 1)
+
   ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
 
   )
 
 (when (eq sb/modeline-theme 'awesome-tray)
+  (declare-function awesome-tray-mode "awesome-tray")
+
   (unless (fboundp 'awesome-tray-mode)
     (autoload #'awesome-tray-mode "awesome-tray" nil t))
   (add-hook 'after-init-hook #'awesome-tray-mode)
@@ -880,6 +883,7 @@ SAVE-FN with non-nil ARGS."
 
 (unless (fboundp 'centaur-tabs-mode)
   (autoload #'centaur-tabs-mode "centaur-tabs" nil t))
+(declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
 (unless (fboundp 'centaur-tabs-group-by-projectile-project)
   (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
 (add-hook 'after-init-hook #'centaur-tabs-mode)
@@ -939,6 +943,7 @@ SAVE-FN with non-nil ARGS."
 ;;                                 (setq resize-mini-windows nil)))
 
 
+(declare-function circadian-setup "circadian")
 (unless (fboundp 'circadian-setup)
   (autoload #'circadian-setup "circadian" nil t))
 
@@ -976,15 +981,15 @@ SAVE-FN with non-nil ARGS."
            ("C-x C-b" . ibuffer))
 
 
+(declare-function ibuffer-auto-mode "ibuffer-ext")
 (unless (fboundp 'ibuffer-auto-mode)
   (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
-;; Do not show filter groups if there are no buffers in that group
 (eval-after-load 'ibuffer-ext
   '(progn
+     ;; Do not show filter groups if there are no buffers in that group
      (defvar ibuffer-show-empty-filter-groups)
-
      (setq ibuffer-show-empty-filter-groups nil)
      t))
 
@@ -1042,6 +1047,7 @@ SAVE-FN with non-nil ARGS."
 
 (unless (fboundp 'dired-jump)
   (autoload #'dired-jump "dired-x" nil t))
+(declare-function dired-omit-mode "dired-x")
 (unless (fboundp 'dired-omit-mode)
   (autoload #'dired-omit-mode "dired-x" nil t))
 
@@ -1064,12 +1070,12 @@ SAVE-FN with non-nil ARGS."
 
 (eval-after-load 'dired
   '(progn
-
      (defvar dired-auto-revert-buffer)
      (defvar dired-dwim-target)
      (defvar dired-ls-F-marks-symlinks)
      (defvar dired-recursive-copies)
      (defvar dired-recursive-deletes)
+     (defvar dired-omit-verbose)
 
      (setq dired-auto-revert-buffer t
            dired-dwim-target t ; Guess a default target directory
@@ -1085,6 +1091,7 @@ SAVE-FN with non-nil ARGS."
      (add-hook 'dired-mode-hook #'dired-omit-mode)
      t))
 
+(defvar dired-mode-map)
 (bind-keys :package dired :map dired-mode-map
            ("M-<home>" . sb/dired-go-home)
            ("i" . find-file)
@@ -1168,6 +1175,27 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (display-graphic-p)
+  (declare-function treemacs-git-mode "treemacs")
+  (declare-function treemacs-follow-mode "treemacs")
+  (declare-function treemacs-current-workspace "treemacs")
+  (declare-function treemacs-fringe-indicator-mode "treemacs")
+  (declare-function treemacs-goto-file-node "treemacs")
+  (declare-function treemacs-find-file-node "treemacs")
+  (declare-function treemacs-filewatch-mode "treemacs")
+  (declare-function treemacs-create-theme "treemacs")
+  (declare-function treemacs-load-theme "treemacs")
+  (declare-function treemacs-canonical-path "treemacs")
+  (declare-function treemacs-add-project-to-workspace "treemacs")
+  (declare-function treemacs-do-add-project-to-workspace "treemacs")
+  (declare-function treemacs-scope->current-scope "treemacs")
+  (declare-function treemacs--restore-eldoc-after-log "treemacs")
+  (declare-function treemacs--filename "treemacs")
+  (declare-function treemacs--find-workspace "treemacs")
+  (declare-function treemacs-workspace->is-empty "treemacs")
+  (declare-function treemacs-pulse-on-success "treemacs")
+  (declare-function treemacs-is-path "treemacs")
+  (declare-function treemacs-theme->gui-icons "treemacs")
+
   (unless (fboundp 'treemacs)
     (autoload #'treemacs "treemacs" nil t))
   (unless (fboundp 'treemacs-current-workspace)
@@ -1238,6 +1266,21 @@ SAVE-FN with non-nil ARGS."
 
   (eval-after-load 'treemacs
     '(progn
+       (defvar treemacs-collapse-dirs)
+       (defvar treemacs-follow-after-init)
+       (defvar treemacs-indentation)
+       (defvar treemacs-is-never-other-window)
+       (defvar treemacs-no-png-images)
+       (defvar treemacs-position)
+       (defvar treemacs-project-follow-cleanup)
+       (defvar treemacs-recenter-after-file-follow)
+       (defvar treemacs-recenter-after-tag-follow)
+       (defvar treemacs-show-hidden-files)
+       (defvar treemacs-silent-filewatch)
+       (defvar treemacs-silent-refresh)
+       (defvar treemacs-width)
+       (defvar treemacs-persist-file)
+
        (setq treemacs-collapse-dirs 2
              treemacs-follow-after-init t
              treemacs-indentation 1
@@ -1284,6 +1327,7 @@ SAVE-FN with non-nil ARGS."
                                             icons))
                                  icons)))
 
+       (defvar theme)
        (treemacs-create-theme "all-the-icons-tighter" :extends "all-the-icons" :config
                               (let
                                   ((icons
@@ -1474,6 +1518,11 @@ SAVE-FN with non-nil ARGS."
 ;; When the *grep* buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
 
+(declare-function wgrep-finish-edit "wgrep")
+(declare-function wgrep-exit "wgrep")
+(declare-function wgrep-abort-changes "wgrep")
+(declare-function wgrep-change-to-wgrep-mode "wgrep")
+
 (unless (fboundp 'wgrep-finish-edit)
   (autoload #'wgrep-finish-edit "wgrep" nil t))
 (unless (fboundp 'wgrep-exit)
@@ -1490,6 +1539,7 @@ SAVE-FN with non-nil ARGS."
      (setq wgrep-auto-save-buffer t)
      t))
 
+(defvar grep-mode-map)
 (bind-keys :package wgrep :map grep-mode-map
            ("C-c C-c" . wgrep-finish-edit)
            ("C-x C-s" . wgrep-finish-edit)
@@ -1613,6 +1663,11 @@ SAVE-FN with non-nil ARGS."
 ;; company-complete-common' when there are no completions. Use `C-M-i' to `complete-symbol' with
 ;; regex search.
 
+(declare-function company-select-next "company")
+(declare-function company-select-previous "company")
+(declare-function company-complete-common-or-cycle "company")
+(declare-function company-abort "company")
+
 (unless (fboundp 'global-company-mode)
   (autoload #'global-company-mode "company" nil t))
 (unless (fboundp 'company-select-next)
@@ -1669,6 +1724,7 @@ SAVE-FN with non-nil ARGS."
      ;;   (delq backends company-backends))
      t))
 
+(defvar company-active-map)
 (bind-keys :package company :map company-active-map
            ("C-n"      . company-select-next)
            ("C-p"      . company-select-previous)
@@ -1844,6 +1900,7 @@ SAVE-FN with non-nil ARGS."
          (diminish 'ivy-mode))
      t))
 
+(defvar ivy-minibuffer-map)
 (bind-keys :package ivy
            ("C-c r" . ivy-resume)
            ("<f3>" . ivy-switch-buffer)
@@ -1858,6 +1915,7 @@ SAVE-FN with non-nil ARGS."
   (defun sb/counsel-goto-recent-directory ()
     "Open recent directories with `dired'."
     (interactive)
+    (defvar recentf-list)
     (unless recentf-mode
       (recentf-mode 1))
     (let
@@ -1991,6 +2049,7 @@ SAVE-FN with non-nil ARGS."
 (eval-after-load 'prescient
   '(progn
      (defvar prescient-history-length)
+     (defvar prescient-save-file)
 
      (setq prescient-history-length 500)
 
@@ -2080,52 +2139,34 @@ SAVE-FN with non-nil ARGS."
   (defun sb/flyspell-goto-previous-error (arg)
     "Go to arg previous spelling error."
     (interactive "p")
-    (while (not
-            (= 0 arg))
-      (let
-          ((pos
-            (point))
-           (min
-            (point-min)))
-        (if
-            (and
-             (eq
-              (current-buffer)
-              flyspell-old-buffer-error)
-             (eq pos flyspell-old-pos-error))
+    (defvar flyspell-old-pos-error)
+    (defvar flyspell-old-buffer-error)
+
+    (while (not (= 0 arg))
+      (let ((pos (point))
+            (min (point-min)))
+        (if (and (eq (current-buffer) flyspell-old-buffer-error)
+                 (eq pos flyspell-old-pos-error))
             (progn
-              (if
-                  (= flyspell-old-pos-error min)
+              (if (= flyspell-old-pos-error min)
                   (progn
                     (message "Restarting from end of buffer")
-                    (goto-char
-                     (point-max)))
+                    (goto-char (point-max)))
                 (backward-word 1))
-              (setq pos
-                    (point))))
-        (while
-            (and
-             (> pos min)
-             (let
-                 ((ovs
-                   (overlays-at pos))
-                  (r 'nil))
-               (while
-                   (and
-                    (not r)
-                    (consp ovs))
-                 (if
-                     (flyspell-overlay-p
-                      (car ovs))
-                     (setq r t)
-                   (setq ovs
-                         (cdr ovs))))
-               (not r)))
+              (setq pos (point))))
+        (while (and (> pos min)
+                    (let ((ovs (overlays-at pos))
+                          (r 'nil))
+                      (while (and (not r)
+                                  (consp ovs))
+                        (if (flyspell-overlay-p
+                             (car ovs))
+                            (setq r t)
+                          (setq ovs (cdr ovs))))
+                      (not r)))
           (backward-word 1)
-          (setq pos
-                (point)))
-        (setq arg
-              (1- arg))
+          (setq pos (point)))
+        (setq arg (1- arg))
         (setq flyspell-old-pos-error pos)
         (setq flyspell-old-buffer-error
               (current-buffer))
@@ -2178,6 +2219,7 @@ SAVE-FN with non-nil ARGS."
            (diminish 'flyspell-mode))
        t))
 
+  (defvar flyspell-mode-map)
   (bind-keys :package flyspell
              ("C-c f f" . flyspell-mode)
              ("C-c f b" . flyspell-buffer)
@@ -2534,6 +2576,7 @@ SAVE-FN with non-nil ARGS."
      t))
 
 ;; Set these in case `counsel-projectile' is disabled
+(defvar projectile-command-map)
 (bind-keys :package projectile
            ("<f6>" . projectile-find-file)
            ("<f5>" . projectile-switch-project)
@@ -2659,7 +2702,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (when (executable-find "fd")
   (unless (fboundp 'counsel-fd-file-jump)
-    autoload( #'counsel-fd-file-jump "counsel-fd" nil t))
+    (autoload #'counsel-fd-file-jump "counsel-fd" nil t))
   (unless (fboundp 'counsel-fd-dired-jump)
     (autoload #'counsel-fd-dired-jump "counsel-fd" nil t))
 
@@ -3062,6 +3105,7 @@ This file is specified in `counsel-projectile-default-file'."
 
      t))
 
+(defvar xref--xref-buffer-mode-map)
 (bind-keys :package xref
            ("M-'" . xref-find-definitions)
            ("M-?" . xref-find-references)
@@ -3112,6 +3156,7 @@ This file is specified in `counsel-projectile-default-file'."
 
        t))
 
+  (defvar counsel-gtags-mode-map)
   (bind-keys :package counsel-gtags :map counsel-gtags-mode-map
              ("M-'" . counsel-gtags-dwim)
              ("M-," . counsel-gtags-go-backward)
@@ -3178,6 +3223,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so `helpful-callable' as a drop-in replacement.
+(defvar helpful-mode-map)
 (bind-keys :package helpful
            ([remap describe-variable] . helpful-variable)
            ([remap describe-key] . helpful-key)
@@ -3362,6 +3408,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (eval-after-load 'beginend
   '(progn
+     (defvar beginend-modes)
      (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
        (diminish mode))
      t))
@@ -3768,6 +3815,7 @@ This file is specified in `counsel-projectile-default-file'."
 
      t))
 
+(defvar pdf-view-mode-map)
 (bind-keys :package pdf-tools :map pdf-view-mode-map
            ("C-s" . isearch-forward)
            ("d" . pdf-annot-delete)
@@ -3897,6 +3945,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'grip-mode)
     (autoload #'grip-mode "grip-mode" nil t))
 
+  (defvar markdown-mode-command-map)
   (bind-keys :package grip-mode :map markdown-mode-command-map
              ("g" . grip-mode)))
 
@@ -4425,6 +4474,7 @@ This file is specified in `counsel-projectile-default-file'."
            lsp-ui-imenu-auto-refresh 'after-save
            lsp-ui-sideline-enable nil)
 
+     (defvar lsp-ui-mode-map)
      (bind-keys :package lsp-ui :map lsp-ui-mode-map
                 ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
                 ([remap xref-find-references] . lsp-ui-peek-find-references))))
@@ -4497,6 +4547,11 @@ This file is specified in `counsel-projectile-default-file'."
      (defvar c-electric-indent)
      (defvar c-set-style)
      (defvar c-basic-offset)
+     (defvar c-enable-auto-newline)
+     (defvar c-electric-brace)
+     (defvar c-auto-newline)
+     (defvar c-electric-flag)
+     (defvar c-syntactic-indentation)
 
      (setq c-set-style "cc-mode"
            c-basic-offset 2)
@@ -4514,6 +4569,7 @@ This file is specified in `counsel-projectile-default-file'."
 
      t))
 
+(defvar c-mode-base-map)
 (bind-keys :package cc-mode :map c-mode-base-map
            ("C-c c a" . c-beginning-of-defun)
            ("C-c c e" . c-end-of-defun)
@@ -4630,6 +4686,7 @@ This file is specified in `counsel-projectile-default-file'."
 
      t))
 
+(defvar python-mode-map)
 (bind-keys :package python :map python-mode-map
            ("M-[" . python-nav-backward-block)
            ("M-]" . python-nav-forward-block)
@@ -5061,22 +5118,23 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 
-(eval-and-compile
-  (defun sb/enable-smerge-maybe nil
-    "Enable smerge automatically based on conflict markers."
-    (when (and buffer-file-name
-               (vc-backend buffer-file-name))
-      (save-excursion
-        (goto-char (point-min))
-        (when (re-search-forward "^<<<<<<< " nil t)
-          (smerge-mode 1)))))
-
-  (defun sb/enable-smerge-maybe2 nil
-    "Enable `smerge-mode' automatically."
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^<<<<<<< " nil t)
-        (smerge-mode 1)))))
+(declare-function smerge-next "smerge-mode")
+(declare-function smerge-prev "smerge-mode")
+(declare-function smerge-keep-current "smerge-mode")
+(declare-function smerge-keep-upper "smerge-mode")
+(declare-function smerge-keep-lower "smerge-mode")
+(declare-function smerge-keep-base "smerge-mode")
+(declare-function smerge-keep-all "smerge-mode")
+(declare-function smerge-kill-current "smerge-mode")
+(declare-function smerge-context-menu "smerge-mode")
+(declare-function smerge-popup-context-menu "smerge-mode")
+(declare-function smerge-auto-leave "smerge-mode")
+(declare-function smerge-diff-base-lower "smerge-mode")
+(declare-function smerge-diff-base-upper "smerge-mode")
+(declare-function smerge-diff-upper-lower "smerge-mode")
+(declare-function smerge-refine "smerge-mode")
+(declare-function smerge-combine-with-next "smerge-mode")
+(declare-function smerge-resolve "smerge-mode")
 
 (unless (fboundp 'smerge-next)
   (autoload #'smerge-next "smerge-mode" nil t))
@@ -5115,11 +5173,30 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'smerge-resolve)
   (autoload #'smerge-resolve "smerge-mode" nil t))
 
+(defvar smerge-mode)
 (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
 (add-hook 'magit-diff-visit-file-hook #'(lambda nil
                                           (when smerge-mode
                                             (sb/smerge-hydra/body))))
 
+(eval-and-compile
+  (defun sb/enable-smerge-maybe nil
+    "Enable smerge automatically based on conflict markers."
+    (when (and buffer-file-name
+               (vc-backend buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^<<<<<<< " nil t)
+          (smerge-mode 1)))))
+
+  (defun sb/enable-smerge-maybe2 nil
+    "Enable `smerge-mode' automatically."
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^<<<<<<< " nil t)
+        (smerge-mode 1)))))
+
+(defvar smerge-mode-map)
 (bind-keys :package smerge-mode :map smerge-mode-map
            ("M-g n" . smerge-next)
            ("M-g p" . smerge-prev)
@@ -5558,6 +5635,7 @@ Ignore if no file is found."
          (diminish 'bib-cite-minor-mode))
      t))
 
+(defvar bib-cite-minor-mode-map)
 (bind-keys :package bib-cite :map bib-cite-minor-mode-map
            ("C-c b") ; We use `C-c b' for `comment-box'
            ("C-c l a" . bib-apropos)
@@ -5670,6 +5748,7 @@ Ignore if no file is found."
 
 (dolist (hook '(json-mode-hook jsonc-mode-hook))
   (add-hook hook (lambda nil
+                   (defvar js-indent-level)
                    (make-local-variable 'js-indent-level)
                    (setq js-indent-level 2)
                    (lsp-deferred))))
@@ -5695,6 +5774,8 @@ Ignore if no file is found."
 (add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
 (add-hook 'sass-mode-hook #'lsp-deferred)
 
+
+(declare-function bazel-mode "bazel-mode")
 (unless (fboundp 'bazel-mode)
   (autoload #'bazel-mode "bazel-mode" nil t))
 (unless (fboundp 'bazelrc-mode)
@@ -5730,10 +5811,16 @@ Ignore if no file is found."
 (unless (fboundp 'clang-format+-mode)
   (autoload #'clang-format+-mode "clang-format+" nil t))
 (add-hook 'mlir-mode-hook #'clang-format+-mode)
-(setq clang-format+-always-enable t)
+(eval-after-load 'clang-format+-mode
+  '(progn
+     (defvar clang-format+-always-enable)
+
+     (setq clang-format+-always-enable t)
+     t))
 
 
 ;; Use for major modes which do not provide a formatter
+(declare-function format-all-ensure-formatter "format-all")
 (unless (fboundp 'format-all-ensure-formatter)
   (autoload #'format-all-ensure-formatter "format-all" nil t))
 (unless (fboundp 'format-all-buffer)
@@ -5785,6 +5872,8 @@ Ignore if no file is found."
 
 (eval-after-load 'fasd
   '(progn
+     (defvar fasd-enable-initial-prompt)
+
      (setq fasd-enable-initial-prompt nil)
      t))
 
@@ -5812,6 +5901,7 @@ Ignore if no file is found."
 
 (eval-after-load 'rust-mode
   '(progn
+     (defvar rust-format-on-save)
      (setq rust-format-on-save t)
      t))
 
@@ -5840,6 +5930,9 @@ Ignore if no file is found."
 
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   ;; Slightly larger value to have more precise matches
   (setq-local company-minimum-prefix-length 3)
   (set (make-local-variable 'company-backends)
@@ -5858,6 +5951,9 @@ Ignore if no file is found."
 
 (defun sb/company-xml-mode ()
   "Add backends for completion with company."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
@@ -5873,6 +5969,9 @@ Ignore if no file is found."
 
 (defun sb/company-prog-mode ()
   "Add backends for program completion in company mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -5888,6 +5987,9 @@ Ignore if no file is found."
 
 (defun sb/company-java-mode ()
   "Add backends for Java completion in company mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -5902,6 +6004,9 @@ Ignore if no file is found."
 
 (defun sb/company-c-mode ()
   "Add backends for C/C++ completion in company mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -5918,6 +6023,10 @@ Ignore if no file is found."
 
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+  (defvar company-shell-delete-duplictes)
+
   (require 'company-shell nil nil)
   (setq company-shell-delete-duplictes t)
   (setq-local company-minimum-prefix-length 2)
@@ -5938,6 +6047,9 @@ Ignore if no file is found."
 
 (defun sb/company-elisp-mode ()
   "Set up company for elisp mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (setq-local company-minimum-prefix-length 2)
   (set (make-local-variable 'company-backends)
        '((
@@ -5952,6 +6064,9 @@ Ignore if no file is found."
 
 (defun sb/company-python-mode ()
   "Add backends for Python completion in company mode."
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -5974,6 +6089,10 @@ Ignore if no file is found."
   (require 'company-math nil nil)
   (require 'company-reftex nil nil)
   (require 'company-bibtex nil nil)
+
+  (defvar company-minimum-prefix-length)
+  (defvar company-backends)
+
   (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -5998,6 +6117,8 @@ Ignore if no file is found."
 
 (defun sb/company-web-mode ()
   "Add backends for web completion in company mode."
+  (defvar company-backends)
+
   (make-local-variable 'company-backends)
   (setq company-backends
         '((
@@ -6311,6 +6432,7 @@ or the major mode is not in `sb/skippable-modes'."
 (eval-after-load 'which-key
   '(progn
      ;; Allow C-h to trigger which-key before it is done automatically
+     (defvar which-key-show-early-on-C-h)
      (setq which-key-show-early-on-C-h t)
 
      (which-key-setup-side-window-right-bottom)
