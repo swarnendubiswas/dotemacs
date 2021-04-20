@@ -27,8 +27,9 @@
       gc-cons-percentage 0.6 ; Portion of heap used for allocation
       gc-cons-threshold most-positive-fixnum)
 
-(setq load-prefer-newer t
-      package-enable-at-startup nil ; Avoid loading packages twice
+(setq load-prefer-newer t ; Prefer new files to avoid loading stable bytecode
+      ;; Avoid loading packages twice, this is set during `(package-initialize)'
+      package-enable-at-startup nil
       package-user-dir (expand-file-name "elpa" user-emacs-directory)
       package-native-compile t
       package-quickstart t ; Populate one big autoloads file

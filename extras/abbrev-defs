@@ -617,6 +617,7 @@
     ("goverment" "government" nil :count 0)
     ("graading" "grading" nil :count 0)
     ("grahical" "graphical" nil :count 0)
+    ("grahp" "graph" nil :count 0)
     ("gramamr" "grammar" nil :count 0)
     ("granuarlity" "granularity" nil :count 1)
     ("graudation" "graduation" nil :count 1)

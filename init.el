@@ -151,13 +151,14 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (add-to-list 'load-path sb/extras-directory)
+(setq sb/core-packages '())
 (package-initialize)
 ;; (debug-on-entry 'package-initialize)
 
 (when (bound-and-true-p sb/use-no-littering)
-  (require 'no-littering))
-(unless (fboundp 'no-littering-expand-etc-file-name)
-  (autoload #'no-littering-expand-etc-file-name "no-littering" nil t))
+  (require 'no-littering nil nil)
+  (unless (fboundp 'no-littering-expand-etc-file-name)
+    (autoload #'no-littering-expand-etc-file-name "no-littering" nil t)))
 
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
@@ -477,6 +478,13 @@ This location is used for temporary installations and files.")
   '(if (fboundp 'diminish)
        (diminish 'subword-mode)))
 
+
+;; Looks better than the default
+(setq window-divider-default-places t
+      window-divider-default-bottom-width 1
+      window-divider-default-right-width 1)
+
+(window-divider-mode)
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
@@ -1701,8 +1709,10 @@ SAVE-FN with non-nil ARGS."
      (defvar company-show-numbers)
      (defvar company-tooltip-align-annotations)
      (defvar company-transformers)
+     (defvar company-dabbrev-downcase)
 
      (setq company-dabbrev-other-buffers nil ; Search in other buffers with same major mode
+           company-dabbrev-downcase nil
            company-idle-delay 0.1 ; Decrease the delay before the popup is shown
            company-ispell-available t
            company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
@@ -1767,8 +1777,15 @@ SAVE-FN with non-nil ARGS."
        (unless (fboundp 'company-box-mode)
          (autoload #'company-box-mode "company-box" nil t))
        (company-box-mode 1)
+
        (defvar company-box-icons-alist)
-       (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+       (defvar company-box-show-single-candidate)
+       (defvar company-frontends)
+
+       (setq company-box-icons-alist 'company-box-icons-all-the-icons
+             company-box-show-single-candidate t
+             company-frontends '(company-box-frontend))
+
        (if (fboundp 'diminish)
            (diminish 'company-box-mode))
 
@@ -3773,6 +3790,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-emojify-mode)
   (autoload #'global-emojify-mode "emojify" nil t))
 
+(add-hook 'markdown-mode-hook #'emojify-mode)
+
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
@@ -3809,6 +3828,11 @@ This file is specified in `counsel-projectile-default-file'."
            pdf-view-resize-factor 1.1)
 
      (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+
+     (add-hook 'pdf-view-mode #'pdf-links-minor-mode)
+     (add-hook 'pdf-view-mode #'pdf-isearch-minor-mode)
+     (add-hook 'pdf-view-mode #'pdf-outline-minor-mode)
+     (add-hook 'pdf-view-mode #'pdf-history-minor-mode)
 
      ;; (add-hook 'pdf-view-mode-hook (lambda ()
      ;;                                 (setq header-line-format nil)))
@@ -4045,6 +4069,21 @@ This file is specified in `counsel-projectile-default-file'."
        (if (fboundp 'diminish)
            (diminish 'eldoc-mode))
        t)))
+
+
+(unless (fboundp 'eldoc-box-hover-mode)
+  (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
+(unless (fboundp 'eldoc-box-hover-at-point-mode)
+  (autoload #'eldoc-box-hover-at-point-mode "eldoc-box" nil t))
+
+(add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
+(add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
+
+(eval-after-load 'eldoc-box
+  '(progn
+     (defvar eldoc-box-clear-with-C-g)
+     (setq eldoc-box-clear-with-C-g t)
+     t))
 
 
 (unless (fboundp 'c-turn-on-eldoc-mode)
@@ -4461,7 +4500,7 @@ This file is specified in `counsel-projectile-default-file'."
      (unless (fboundp 'lsp-ui-mode)
        (autoload #'lsp-ui-mode "lsp-ui" nil t))
      (unless (fboundp 'lsp-ui-doc-mode)
-       (autoload #'lsp-ui-mode "lsp-ui-doc" nil t))
+       (autoload #'lsp-ui-doc-mode "lsp-ui-doc" nil t))
 
      (lsp-ui-mode 1)
      (lsp-ui-doc-mode 1)
@@ -4746,6 +4785,14 @@ This file is specified in `counsel-projectile-default-file'."
                                   (add-hook 'before-save-hook #'py-isort-before-save))))
 
 
+(unless (fboundp 'pip-requirements-mode)
+  (autoload #'pip-requirements-mode "pip-requirements" nil t))
+
+(add-to-list 'auto-mode-alist '("\\.pip\\'" . pip-requirements-mode))
+(add-to-list 'auto-mode-alist '("requirements[^z-a]*\\.txt\\'" . pip-requirements-mode))
+(add-to-list 'auto-mode-alist '("requirements\\.in" . pip-requirements-mode))
+
+
 (when (eq sb/python-langserver 'mspyls)
   (eval-after-load 'python
     '(eval-after-load 'lsp-mode
@@ -4924,6 +4971,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'fish-mode)
   (autoload #'fish-mode "fish-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.fish\\'" . fish-mode))
 (add-to-list 'interpreter-mode-alist '("fish" . fish-mode))
 
@@ -5004,8 +5052,14 @@ This file is specified in `counsel-projectile-default-file'."
      ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
 
      (require 'magit-diff nil nil)
+
      (defvar magit-diff-refine-hunk)
-     (setq magit-diff-refine-hunk t)
+     (defvar magit-diff-paint-whitespace)
+     (defvar magit-diff-highlight-trailing)
+
+     (setq magit-diff-refine-hunk t
+           magit-diff-highlight-trailing nil
+           magit-diff-paint-whitespace nil)
 
      (eval-after-load 'with-editor
        '(if (fboundp 'diminish)
@@ -5094,10 +5148,10 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-diff-hl-mode)
   (autoload #'global-diff-hl-mode "diff-hl" nil t))
 
+;; (add-hook 'after-init-hook #'global-diff-hl-mode)
 ;; (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
 ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
 ;; (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
-;; (add-hook 'after-init-hook #'global-diff-hl-mode)
 
 (eval-after-load 'diff-hl
   '(progn
@@ -5109,6 +5163,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'git-commit-turn-on-flyspell)
   (autoload #'git-commit-turn-on-flyspell "git-commit" nil t))
 (add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
+
 (eval-after-load 'git-commit
   '(progn
      (defvar git-commit-summary-max-length)
@@ -5237,6 +5292,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'web-mode)
   (autoload #'web-mode "web-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
@@ -5245,6 +5301,10 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.handlebars\\'" . web-mode))
+
+(add-hook 'web-mode-hook #'lsp-deferred)
 
 (eval-after-load 'web-mode
   '(progn
@@ -5263,19 +5323,16 @@ This file is specified in `counsel-projectile-default-file'."
            web-mode-enable-css-colorization t
            web-mode-enable-current-element-highlight t
            web-mode-enable-current-column-highlight t)
+
      (flycheck-add-mode 'javascript-eslint 'web-mode)
      t))
 
 
-(add-hook 'web-mode-hook #'lsp-deferred)
-
-
 (unless (fboundp 'emmet-mode)
   (autoload #'emmet-mode "emmet-mode" nil t))
-(add-hook 'web-mode-hook #'emmet-mode)
-(add-hook 'sgml-mode-hook #'emmet-mode)
-(add-hook 'css-mode-hook #'emmet-mode)
-(add-hook 'html-mode-hook #'emmet-mode)
+
+(dolist (hook '(web-mode-hook sgml-mode-hook css-mode-hook html-mode-hook))
+  (add-hook hook #'emmet-mode))
 
 
 (unless (fboundp 'rainbow-mode)
@@ -6446,6 +6503,12 @@ or the major mode is not in `sb/skippable-modes'."
 (unless (fboundp 'which-key-posframe-mode)
   (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
 (add-hook 'which-key-mode-hook #'which-key-posframe-mode)
+
+(eval-after-load 'which-key-posframe
+  '(progn
+     (defvar which-key-posframe-border-width)
+     (setq which-key-posframe-border-width 2)
+     t))
 
 
 ;; Hydras
