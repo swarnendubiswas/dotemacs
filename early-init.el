@@ -30,11 +30,11 @@
 (setq load-prefer-newer t ; Prefer new files to avoid loading stable bytecode
       ;; Avoid loading packages twice, this is set during `(package-initialize)'
       package-enable-at-startup nil
+      ;; package-native-compile t ; Defined from Emacs 28+
       package-user-dir (expand-file-name "elpa" user-emacs-directory)
-      package-native-compile t
       package-quickstart t ; Populate one big autoloads file
-      package-quickstart-file (expand-file-name "var/package-quickstart.el"
-                                                user-emacs-directory))
+      package-quickstart-file (expand-file-name "var/package-quickstart.el" user-emacs-directory))
+
 ;; (customize-set-variable
 ;;  'package-quickstart-file
 ;;  (expand-file-name "tmp/package-quickstart.el" user-emacs-directory))

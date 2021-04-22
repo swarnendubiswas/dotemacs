@@ -9,7 +9,7 @@
 
 ;; Load built-in libraries
 (require 'cl-lib)
-(require 'map)
+;; (require 'map)
 (require 'subr-x)
 
 (declare-function ht-merge "ht")
@@ -224,26 +224,42 @@ This location is used for temporary installations and files.")
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
+
 (unless (fboundp 'paradox-list-packages)
   (autoload #'paradox-list-packages "paradox" nil t))
 (unless (fboundp 'paradox-upgrade-packages)
   (autoload #'paradox-upgrade-packages "paradox" nil t))
 (unless (fboundp 'paradox-enable)
   (autoload #'paradox-enable "paradox" nil t))
-(eval-after-load 'paradox
-  '(progn
-     (defvar paradox-display-star-count)
-     (defvar paradox-execute-asynchronously)
-     (defvar paradox-github-token)
-     (setq paradox-display-star-count nil
-           paradox-execute-asynchronously t
-           paradox-github-token t)
 
-     (paradox-enable)
-     t))
+(with-eval-after-load 'paradox
+  (defvar paradox-display-star-count)
+  (defvar paradox-execute-asynchronously)
+  (defvar paradox-github-token)
+  (setq paradox-display-star-count nil
+        paradox-execute-asynchronously t
+        paradox-github-token t)
+
+  (paradox-enable))
+
 (bind-keys :package paradox
            ("C-c d l" . paradox-list-packages)
            ("C-c d u" . paradox-upgrade-packages))
+
+
+(when (or (daemonp) (memq window-system '(x ns)))
+  (unless (fboundp 'exec-path-from-shell-initialize)
+    (autoload #'exec-path-from-shell-initialize "exec-path-from-shell" nil t))
+
+  (defvar exec-path-from-shell-arguments)
+  (defvar exec-path-from-shell-check-startup-files)
+  (defvar exec-path-from-shell-variables)
+
+  (setq exec-path-from-shell-arguments '("-l" "-i")
+        exec-path-from-shell-check-startup-files nil
+        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
+
+  (exec-path-from-shell-initialize))
 
 
 (defvar apropos-do-all)
@@ -393,6 +409,7 @@ This location is used for temporary installations and files.")
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
+
 (unless (fboundp 'global-auto-revert-mode)
   (autoload #'global-auto-revert-mode "autorevert" nil t))
 (unless (fboundp 'turn-on-auto-revert-mode)
@@ -400,55 +417,54 @@ This location is used for temporary installations and files.")
 
 (add-hook 'after-init-hook #'global-auto-revert-mode)
 
-(eval-after-load 'autorevert
-  '(progn
-     (defvar auto-revert-interval)
-     (defvar auto-revert-remote-files)
-     (defvar auto-revert-use-notify)
-     (defvar auto-revert-verbose)
-     (defvar global-auto-revert-non-file-buffers)
+(with-eval-after-load 'autorevert
+  (defvar auto-revert-interval)
+  (defvar auto-revert-remote-files)
+  (defvar auto-revert-use-notify)
+  (defvar auto-revert-verbose)
+  (defvar global-auto-revert-non-file-buffers)
 
-     (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-           auto-revert-remote-files t
-           auto-revert-use-notify nil
-           auto-revert-verbose t
-           global-auto-revert-non-file-buffers t)
+  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+        auto-revert-remote-files t
+        auto-revert-use-notify nil
+        auto-revert-verbose t
+        global-auto-revert-non-file-buffers t)
 
-     (if (fboundp 'diminish)
-         (diminish 'auto-revert-mode))))
+  (if (fboundp 'diminish)
+      (diminish 'auto-revert-mode)))
 
 ;; Revert PDF files without asking
 (setq revert-without-query '("\\.pdf"))
 
+
 ;; Remember cursor position in files
 (unless (fboundp 'save-place-mode)
   (autoload #'save-place-mode "saveplace" nil t))
+
 (add-hook 'after-init-hook #'save-place-mode)
 
-(eval-after-load 'saveplace
-  '(progn
-     (defvar save-place-file)
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq save-place-file (expand-file-name "places" sb/temp-directory)))
-     t))
+(with-eval-after-load 'saveplace
+  (defvar save-place-file)
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq save-place-file (expand-file-name "places" sb/temp-directory))))
+
 
 ;; Save minibuffer history across sessions
 (unless (fboundp 'savehist-mode)
   (autoload #'savehist-mode "savehist" nil t))
+
 (add-hook 'after-init-hook #'savehist-mode)
 
-(eval-after-load 'savehist
-  '(progn
-     (defvar savehist-additional-variables)
-     (defvar savehist-file)
-     (defvar savehist-save-minibuffer-history)
+(with-eval-after-load 'savehist
+  (defvar savehist-additional-variables)
+  (defvar savehist-file)
+  (defvar savehist-save-minibuffer-history)
 
-     (setq savehist-additional-variables '(extended-command-history kill-ring search-ring)
-           savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables '(extended-command-history kill-ring search-ring)
+        savehist-save-minibuffer-history t)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq savehist-file (expand-file-name "savehist" sb/temp-directory)))
-     t))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq savehist-file (expand-file-name "savehist" sb/temp-directory))))
 
 
 (setq uniquify-after-kill-buffer-p t
@@ -476,10 +492,12 @@ This location is used for temporary installations and files.")
 
 (unless (fboundp 'subword-mode)
   (autoload #'subword-mode "subword" nil t))
+
 (add-hook 'prog-mode-hook #'subword-mode)
-(eval-after-load 'subword
-  '(if (fboundp 'diminish)
-       (diminish 'subword-mode)))
+
+(with-eval-after-load 'subword
+  (if (fboundp 'diminish)
+      (diminish 'subword-mode)))
 
 
 ;; Looks better than the default
@@ -488,6 +506,7 @@ This location is used for temporary installations and files.")
       window-divider-default-right-width 1)
 
 (window-divider-mode)
+
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
@@ -513,16 +532,15 @@ SAVE-FN with non-nil ARGS."
 
 (unless (fboundp 'abbrev-mode)
   (autoload #'abbrev-mode "abbrev" nil t))
+
 (add-hook 'text-mode-hook #'abbrev-mode)
 
-(eval-after-load 'abbrev
-  '(progn
-     (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
-           save-abbrevs 'silently)
+(with-eval-after-load 'abbrev
+  (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
+        save-abbrevs 'silently)
 
-     (if (fboundp 'diminish)
-         (diminish 'abbrev-mode))
-     t))
+  (if (fboundp 'diminish)
+      (diminish 'abbrev-mode)))
 
 
 ;; Moved to `early-init.el'
@@ -1378,8 +1396,10 @@ SAVE-FN with non-nil ARGS."
 
        t))
 
-  (bind-keys* :package treemacs
-              ("C-j" . treemacs)))
+  ;; Interferes with `dired-jump'
+  ;; (bind-keys* :package treemacs
+  ;;             ("C-j" . treemacs))
+  )
 
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
@@ -1522,7 +1542,7 @@ SAVE-FN with non-nil ARGS."
      t))
 
 (bind-keys :package swiper
-           ("<f4>" . swiper-isearch))
+           ("<f4>" . swiper))
 
 (with-eval-after-load 'grep
   (defvar grep-highlight-matches)
@@ -1535,6 +1555,7 @@ SAVE-FN with non-nil ARGS."
 
   (add-to-list 'grep-find-ignored-directories ".cache")
   (add-to-list 'grep-find-ignored-directories "vendor"))
+
 
 ;; When the *grep* buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
@@ -1667,8 +1688,8 @@ SAVE-FN with non-nil ARGS."
        (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
        (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
 
-     (run-at-time 5 (* 5 60) 'recentf-save-list)
-     (run-at-time 5 (* 10 60) 'recentf-cleanup)
+     ;; (run-at-time 5 (* 5 60) 'recentf-save-list)
+     ;; (run-at-time 5 (* 10 60) 'recentf-cleanup)
      t))
 
 
@@ -1907,7 +1928,7 @@ SAVE-FN with non-nil ARGS."
      (defvar ivy-wrap)
 
      (setq completion-in-region-function #'ivy-completion-in-region
-           ivy-initial-inputs-alist nil ; Do not start completion with `^'
+           ;; ivy-initial-inputs-alist nil ; Do not start completion with `^'
            ivy-case-fold-search 'always ; Always ignore case while searching
            ivy-count-format "(%d/%d) " ; Help identify wrap around
            ivy-extra-directories nil ; Hide . and ..
@@ -2022,14 +2043,42 @@ SAVE-FN with non-nil ARGS."
      (setq counsel-describe-function-function #'helpful-callable
            counsel-describe-variable-function #'helpful-variable
            counsel-find-file-at-point t
-           counsel-find-file-ignore-regexp
-           (concat
-            "\\(?:\\`[#.]\\)" "\\|\\(?:\\`.+?[#~]\\'\\)" "\\|__pycache__" "\\|.cb$" "\\|.cb2$"
-            "\\|.djvu$" "\\|.doc$" "\\|.docx$" "\\|.elc$" "\\|.fdb_latexmk$" "\\|.fls$" "\\|.lof$"
-            "\\|.lot$" "\\|.o$" "\\|.out$" "\\|.ppt$" "\\|.pptx$" "\\|.pyc$" "\\|.rel$" "\\|.rip$"
-            "\\|.so$" "\\|.synctex$" "\\|.synctex.gz$" "\\|.toc$" "\\|.xls$" "\\|.xlsx$" "\\|tags"
-            "\\|TAGS" "\\|GPATH" "\\|GRTAGS" "\\|GTAGS" "\\|tramp" "\\|.clangd" "\\|.metadata"
-            "\\|.recommenders")
+           counsel-find-file-ignore-regexp (concat
+                                            "\\(?:\\`[#.]\\)"
+                                            "\\|\\(?:\\`.+?[#~]\\'\\)"
+                                            "\\|__pycache__"
+                                            "\\|.cb$"
+                                            "\\|.cb2$"
+                                            "\\|.djvu$"
+                                            "\\|.doc$"
+                                            "\\|.docx$"
+                                            "\\|.elc$"
+                                            "\\|.fdb_latexmk$"
+                                            "\\|.fls$"
+                                            "\\|.lof$"
+                                            "\\|.lot$"
+                                            "\\|.o$"
+                                            "\\|.out$"
+                                            "\\|.ppt$"
+                                            "\\|.pptx$"
+                                            "\\|.pyc$"
+                                            "\\|.rel$"
+                                            "\\|.rip$"
+                                            "\\|.so$"
+                                            "\\|.synctex$"
+                                            "\\|.synctex.gz$"
+                                            "\\|.toc$"
+                                            "\\|.xls$"
+                                            "\\|.xlsx$"
+                                            "\\|tags"
+                                            "\\|TAGS"
+                                            "\\|GPATH"
+                                            "\\|GRTAGS"
+                                            "\\|GTAGS"
+                                            "\\|tramp"
+                                            "\\|.clangd"
+                                            "\\|.metadata"
+                                            "\\|.recommenders")
            counsel-mode-override-describe-bindings t
            counsel-preselect-current-file t
            counsel-switch-buffer-preview-virtual-buffers nil
@@ -2076,6 +2125,7 @@ SAVE-FN with non-nil ARGS."
            ;; Enabling preview can make switching over remote buffers slow
            ;; ("<f3>"                        . counsel-switch-buffer)
            )
+
 
 (eval-after-load 'hydra
   '(eval-after-load 'ivy
@@ -2147,9 +2197,7 @@ SAVE-FN with non-nil ARGS."
 
      (advice-add 'company-capf--candidates :around #'sb/just-one-face)
 
-     (setq ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
-                                   (counsel-find-file . ivy--regex-fuzzy)
-                                   (t . orderless-ivy-re-builder)))
+     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
      t))
 
 
@@ -2419,11 +2467,11 @@ SAVE-FN with non-nil ARGS."
 
 (unless (fboundp 'electric-pair-mode)
   (autoload #'electric-pair-mode "elec-pair" nil t))
+
 (add-hook 'after-init-hook #'electric-pair-mode) ; Enable autopairing, smartparens seems slow
 
 (eval-after-load 'electric-pair-mode
   '(progn
-
      ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
      (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
      (defvar electric-pair-pairs)
@@ -2439,6 +2487,7 @@ SAVE-FN with non-nil ARGS."
 
      (defvar electric-pair-preserve-balance)
      (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
+
      ;; Disable pairs when entering minibuffer
      (add-hook 'minibuffer-setup-hook (lambda ()
                                         (electric-pair-mode -1)))
@@ -2632,6 +2681,9 @@ SAVE-FN with non-nil ARGS."
        (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
      (projectile-mode 1)
+
+     (defvar projectile-mode-map)
+     (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
      t))
 
 ;; Set these in case `counsel-projectile' is disabled
@@ -2872,25 +2924,28 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Does not display popup under TTY, check possible workarounds at
 ;; https://github.com/flycheck/flycheck-popup-tip
-;; (when (display-graphic-p)
-;;   (unless (fboundp 'flycheck-pos-tip-mode)
-;;     (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
-;;   (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
-
-
 (when (display-graphic-p)
-  (unless (fboundp 'flycheck-posframe-mode)
-    (autoload #'flycheck-posframe-mode "flycheck-posframe" nil t))
-  (unless (fboundp 'flycheck-posframe-configure-pretty-defaults)
-    (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
-  (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+  (unless (fboundp 'flycheck-pos-tip-mode)
+    (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
 
-  (eval-after-load 'flycheck-posframe
-    '(progn
-       (defvar flycheck-posframe-position)
-       (setq flycheck-posframe-position 'point-bottom-left-corner)
-       (flycheck-posframe-configure-pretty-defaults)
-       t)))
+  (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
+
+
+;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
+
+;; (when (display-graphic-p)
+;;   (unless (fboundp 'flycheck-posframe-mode)
+;;     (autoload #'flycheck-posframe-mode "flycheck-posframe" nil t))
+;;   (unless (fboundp 'flycheck-posframe-configure-pretty-defaults)
+;;     (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
+;;   (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+
+;;   (eval-after-load 'flycheck-posframe
+;;     '(progn
+;;        (defvar flycheck-posframe-position)
+;;        (setq flycheck-posframe-position 'point-bottom-left-corner)
+;;        (flycheck-posframe-configure-pretty-defaults)
+;;        t)))
 
 
 (declare-function whitespace-buffer "whitespace")
@@ -3060,41 +3115,38 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
 ;; bookmark with `bookmark-set'. To revisit that bookmark, use `bookmark-jump'.
 
-(eval-after-load 'tramp
-  '(progn
-     (defvar tramp-auto-save-directory)
-     (defvar tramp-persistency-file-name)
-     (defvar tramp-completion-reread-directory-timeout)
-     (defvar tramp-default-method)
-     (defvar tramp-default-user)
-     (defvar tramp-default-remote-shell)
-     (defvar tramp-verbose)
-     (defvar tramp-remote-path)
+(defvar tramp-auto-save-directory)
+(defvar tramp-persistency-file-name)
+(defvar tramp-completion-reread-directory-timeout)
+(defvar tramp-default-method)
+(defvar tramp-default-user)
+(defvar tramp-default-remote-shell)
+(defvar tramp-verbose)
+(defvar tramp-remote-path)
 
-     ;; Auto-save to a local directory for better performance
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq tramp-auto-save-directory (expand-file-name "tramp-auto-save" sb/temp-directory)
-             tramp-persistency-file-name (expand-file-name "tramp" sb/temp-directory)))
+;; Auto-save to a local directory for better performance
+(unless (bound-and-true-p sb/use-no-littering)
+  (setq tramp-auto-save-directory (expand-file-name "tramp-auto-save" sb/temp-directory)
+        tramp-persistency-file-name (expand-file-name "tramp" sb/temp-directory)))
 
-     (setq tramp-completion-reread-directory-timeout nil
-           tramp-default-method "ssh" ; SSH is faster than the default SCP
-           tramp-default-remote-shell "/bin/bash"
-           tramp-default-user "swarnendu"
-           remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
-           tramp-verbose 1
-           ;; Disable version control
-           vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
-                                        vc-ignore-dir-regexp tramp-file-name-regexp))
+(setq tramp-completion-reread-directory-timeout nil
+      tramp-default-method "ssh" ; SSH is faster than the default SCP
+      tramp-default-remote-shell "/bin/bash"
+      tramp-default-user "swarnendu"
+      remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
+      tramp-verbose 1
+      ;; Disable version control
+      vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
+                                   vc-ignore-dir-regexp tramp-file-name-regexp))
 
-     (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-     (setenv "SHELL" "/bin/bash")
-     ;; Disable backup
-     (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
-     ;; Include this directory in $PATH on remote
-     (add-to-list 'tramp-remote-path (expand-file-name ".local/bin"
-                                                       (getenv "HOME")))
-     (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-     t))
+(defalias 'exit-tramp 'tramp-cleanup-all-buffers)
+(setenv "SHELL" "/bin/bash")
+;; Disable backup
+(add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
+
+;; ;; Include this directory in $PATH on remote
+;; (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
+;; (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors
@@ -3413,7 +3465,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (unless (fboundp 'popwin-mode)
   (autoload #'popwin-mode "popwin" nil t))
-(add-hook 'after-init-hook #'popwin-mode)
+;; (add-hook 'after-init-hook #'popwin-mode)
 
 (eval-after-load 'popwin
   '(progn
@@ -4186,13 +4238,15 @@ This file is specified in `counsel-projectile-default-file'."
        t)))
 
 
+(declare-function eldoc-box-hover-mode "eldoc-box")
+(declare-function eldoc-box-hover-at-point-mode "eldoc-box")
 (unless (fboundp 'eldoc-box-hover-mode)
   (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
 (unless (fboundp 'eldoc-box-hover-at-point-mode)
   (autoload #'eldoc-box-hover-at-point-mode "eldoc-box" nil t))
 
-(add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
-(add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
+;; (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
+;; (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
 
 (eval-after-load 'eldoc-box
   '(progn
@@ -4833,8 +4887,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'python-indent-shift-right)
   (autoload #'python-indent-shift-right "python" nil t))
 
-(add-hook 'python-mode-hook #'lsp-deferred)
-
 (eval-after-load 'python
   '(progn
      (setenv "PYTHONPATH" "python3")
@@ -4925,13 +4977,20 @@ This file is specified in `counsel-projectile-default-file'."
      t))
 
 
+;; FIXME: Leads to errors over tramp and possibly blocks Emacs
 (when (and (executable-find "isort")
            (eq sb/python-langserver 'pyright))
   (unless (fboundp 'py-isort-before-save)
     (autoload #'py-isort-before-save "py-isort" nil t))
 
-  (add-hook 'python-mode-hook #'(lambda nil
-                                  (add-hook 'before-save-hook #'py-isort-before-save))))
+  ;; (add-hook 'python-mode-hook #'(lambda nil
+  ;;                                 (add-hook 'before-save-hook #'py-isort-before-save)))
+
+  (eval-after-load 'py-isort
+    '(progn
+       (defvar py-isort-options)
+       (setq py-isort-options '("--lines=100"))
+       t)))
 
 
 (unless (fboundp 'pip-requirements-mode)
@@ -4943,24 +5002,21 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (eq sb/python-langserver 'mspyls)
-  (eval-after-load 'python
-    '(eval-after-load 'lsp-mode
-       '(progn
-          (add-hook 'python-mode-hook #'(lambda nil
-                                          (require 'lsp-python-ms)))
+  (add-hook 'python-mode-hook (lambda nil
+                                (require 'lsp-python-ms)))
 
-          (defvar lsp-python-ms-python-executable-cmd)
-          (defvar lsp-python-ms-auto-install-server)
+  (defvar lsp-python-ms-python-executable-cmd)
+  (defvar lsp-python-ms-auto-install-server)
 
-          (setq lsp-python-ms-python-executable-cmd "python3")
-          (setq lsp-python-ms-auto-install-server t)
+  (setq lsp-python-ms-python-executable-cmd "python3")
+  (setq lsp-python-ms-auto-install-server t)
 
-          ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-          ;;   (add-to-list 'lsp-disabled-clients ls))
-          ;; (add-to-list 'lsp-enabled-clients 'mspyls)
-          ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
+  ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'mspyls)
+  ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
 
-          t))))
+  t)
 
 
 ;; `pyright --createstub pandas'
@@ -4969,48 +5025,42 @@ This file is specified in `counsel-projectile-default-file'."
 
 (when (and (eq sb/python-langserver 'pyright)
            (executable-find "pyright"))
-  (eval-after-load 'python
-    '(eval-after-load 'lsp-mode
-       '(progn
-          (unless (fboundp 'lsp-pyright-locate-python)
-            (autoload #'lsp-pyright-locate-python "lsp-pyright" nil t))
-          (unless (fboundp 'lsp-pyright-locate-venv)
-            (autoload #'lsp-pyright-locate-venv "lsp-pyright" nil t))
+  (unless (fboundp 'lsp-pyright-locate-python)
+    (autoload #'lsp-pyright-locate-python "lsp-pyright" nil t))
+  (unless (fboundp 'lsp-pyright-locate-venv)
+    (autoload #'lsp-pyright-locate-venv "lsp-pyright" nil t))
 
-          (add-hook 'python-mode-hook #'(lambda nil
-                                          (require 'lsp-pyright)))
+  (add-hook 'python-mode-hook (lambda ()
+                                (require 'lsp-pyright)))
 
-          (defvar lsp-pyright-python-executable-cmd)
+  (defvar lsp-pyright-python-executable-cmd)
+  (setq lsp-pyright-python-executable-cmd "python3")
 
-          (setq lsp-pyright-python-executable-cmd "python3")
+  ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'pyright)
+  ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
 
-          ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-          ;;   (add-to-list 'lsp-disabled-clients ls))
-          ;; (add-to-list 'lsp-enabled-clients 'pyright)
-          ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
-
-          t))))
+  t)
 
 
 (when (and (eq sb/python-langserver 'jedi)
            (executable-find "jedi-language-server"))
-  (eval-after-load 'python
-    '(eval-after-load 'lsp-mode
-       '(progn
-          (add-hook 'python-mode-hook #'(lambda nil
-                                          (require 'lsp-jedi)))
+  (add-hook 'python-mode-hook #'(lambda nil
+                                  (require 'lsp-jedi)))
 
-          (defvar lsp-jedi-diagnostics-enable)
+  (defvar lsp-jedi-diagnostics-enable)
+  (setq lsp-jedi-diagnostics-enable t)
 
-          (setq lsp-jedi-diagnostics-enable t)
+  ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
+  ;;   (add-to-list 'lsp-disabled-clients ls))
+  ;; (add-to-list 'lsp-enabled-clients 'jedi)
+  ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
 
-          ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-          ;;   (add-to-list 'lsp-disabled-clients ls))
-          ;; (add-to-list 'lsp-enabled-clients 'jedi)
-          ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
+  t)
 
-          t))))
-
+;; Initiate the lsp server after all the language server code has been processed
+(add-hook 'python-mode-hook #'lsp-deferred)
 
 ;; Py-yapf works on a temporary file (placed in `/tmp'). Therefore it does not pick up on any
 ;; project specific YAPF styles. Yapfify works on the original file, so that any project settings
@@ -6870,4 +6920,5 @@ or the major mode is not in `sb/skippable-modes'."
             (message "Emacs is ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
 
-;;; init.el ends here
+(provide 'init-autoloads)
+;;; init-autoloads.el ends here
