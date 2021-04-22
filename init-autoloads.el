@@ -4319,284 +4319,282 @@ This file is specified in `counsel-projectile-default-file'."
 
 (dolist (hooks '(css-mode-hook less-mode-hook sgml-mode-hook typescript-mode-hook))
   (add-hook hooks #'lsp-deferred))
+(add-hook 'lsp-mode-hook #'lsp-modeline-code-actions-mode)
 (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
 (add-hook 'lsp-managed-mode-hook #'lsp-modeline-diagnostics-mode)
-(add-hook 'lsp-mode-hook #'lsp-modeline-code-actions-mode)
 
 (dolist (hooks '(c++-mode-hook java-mode-hook nxml-mode-hook))
   (add-hook hooks (lambda ()
                     (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
-(eval-after-load 'lsp-mode
-  '(progn
-     (defvar lsp-pyls-configuration-sources)
-     (defvar lsp-pyls-plugins-autopep8-enable)
-     (defvar lsp-pyls-plugins-mccabe-enabled)
-     (defvar lsp-pyls-plugins-pycodestyle-enabled)
-     (defvar lsp-pyls-plugins-pycodestyle-max-line-length)
-     (defvar lsp-pyls-plugins-pydocstyle-convention)
-     (defvar lsp-pyls-plugins-pydocstyle-enabled)
-     (defvar lsp-pyls-plugins-pydocstyle-ignore)
-     (defvar lsp-pyls-plugins-pyflakes-enabled)
-     (defvar lsp-pyls-plugins-pylint-args)
-     (defvar lsp-pyls-plugins-pylint-enabled)
-     (defvar lsp-pyls-plugins-yapf-enabled)
-     (defvar lsp-pyright-langserver-command-args)
-     (defvar lsp-clients-clangd-args)
-     (defvar lsp-completion-enable-additional-text-edit)
-     (defvar lsp-completion-provider)
-     (defvar lsp-enable-dap-auto-configure)
-     (defvar lsp-enable-file-watchers)
-     (defvar lsp-enable-folding)
-     (defvar lsp-enable-on-type-formatting)
-     (defvar lsp-enable-semantic-tokens)
-     (defvar lsp-enable-snippet)
-     (defvar lsp-headerline-breadcrumb-enable)
-     (defvar lsp-headerline-breadcrumb-enable-diagnostics)
-     (defvar lsp-html-format-wrap-line-length)
-     (defvar lsp-html-format-end-with-newline)
-     (defvar lsp-html-format-indent-inner-html)
-     (defvar lsp-html-format-max-preserve-new-lines)
-     (defvar lsp-imenu-sort-methods)
-     (defvar lsp-keep-workspace-alive)
-     (defvar lsp-log-io)
-     (defvar lsp-modeline-diagnostics-scope)
-     (defvar lsp-signature-auto-activate)
-     (defvar lsp-signature-render-documentation)
-     (defvar lsp-xml-logs-client)
-     (defvar lsp-xml-jar-file)
-     (defvar lsp-yaml-print-width)
-     (defvar lsp-session-file)
+(with-eval-after-load 'lsp-mode
+  (defvar lsp-pyls-configuration-sources)
+  (defvar lsp-pyls-plugins-autopep8-enable)
+  (defvar lsp-pyls-plugins-mccabe-enabled)
+  (defvar lsp-pyls-plugins-pycodestyle-enabled)
+  (defvar lsp-pyls-plugins-pycodestyle-max-line-length)
+  (defvar lsp-pyls-plugins-pydocstyle-convention)
+  (defvar lsp-pyls-plugins-pydocstyle-enabled)
+  (defvar lsp-pyls-plugins-pydocstyle-ignore)
+  (defvar lsp-pyls-plugins-pyflakes-enabled)
+  (defvar lsp-pyls-plugins-pylint-args)
+  (defvar lsp-pyls-plugins-pylint-enabled)
+  (defvar lsp-pyls-plugins-yapf-enabled)
+  (defvar lsp-pyright-langserver-command-args)
+  (defvar lsp-clients-clangd-args)
+  (defvar lsp-completion-enable-additional-text-edit)
+  (defvar lsp-completion-provider)
+  (defvar lsp-enable-dap-auto-configure)
+  (defvar lsp-enable-file-watchers)
+  (defvar lsp-enable-folding)
+  (defvar lsp-enable-on-type-formatting)
+  (defvar lsp-enable-semantic-tokens)
+  (defvar lsp-enable-snippet)
+  (defvar lsp-headerline-breadcrumb-enable)
+  (defvar lsp-headerline-breadcrumb-enable-diagnostics)
+  (defvar lsp-html-format-wrap-line-length)
+  (defvar lsp-html-format-end-with-newline)
+  (defvar lsp-html-format-indent-inner-html)
+  (defvar lsp-html-format-max-preserve-new-lines)
+  (defvar lsp-imenu-sort-methods)
+  (defvar lsp-keep-workspace-alive)
+  (defvar lsp-log-io)
+  (defvar lsp-modeline-diagnostics-scope)
+  (defvar lsp-signature-auto-activate)
+  (defvar lsp-signature-render-documentation)
+  (defvar lsp-xml-logs-client)
+  (defvar lsp-xml-jar-file)
+  (defvar lsp-yaml-print-width)
+  (defvar lsp-session-file)
 
-     (setq lsp-clients-clangd-args '("-j=2"
-                                     "--background-index"
-                                     "--clang-tidy"
-                                     "--pch-storage=memory"
-                                     "--header-insertion=never"
-                                     "--fallback-style=LLVM"
-                                     "--log=error")
-           lsp-completion-enable-additional-text-edit t
-           lsp-completion-provider :none
-           lsp-enable-dap-auto-configure nil
-           lsp-enable-file-watchers nil
-           lsp-enable-folding nil
-           lsp-enable-on-type-formatting nil
-           lsp-enable-semantic-tokens t
-           lsp-enable-snippet t
-           lsp-headerline-breadcrumb-enable nil
-           lsp-headerline-breadcrumb-enable-diagnostics nil
-           lsp-html-format-wrap-line-length sb/fill-column
-           lsp-html-format-end-with-newline t
-           lsp-html-format-indent-inner-html t
-           lsp-html-format-max-preserve-new-lines nil
-           lsp-imenu-sort-methods '(position)
-           lsp-keep-workspace-alive nil
-           lsp-log-io nil ; `texlab' communication is huge
-           lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
-           lsp-signature-auto-activate nil
-           lsp-signature-render-documentation nil
-           lsp-xml-logs-client nil
-           lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
-                                              sb/extras-directory)
-           lsp-yaml-print-width sb/fill-column)
+  (setq lsp-clients-clangd-args '("-j=2"
+                                  "--background-index"
+                                  "--clang-tidy"
+                                  "--pch-storage=memory"
+                                  "--header-insertion=never"
+                                  "--fallback-style=LLVM"
+                                  "--log=error")
+        lsp-completion-enable-additional-text-edit t
+        lsp-completion-provider :none
+        lsp-enable-dap-auto-configure nil
+        lsp-enable-file-watchers nil
+        lsp-enable-folding nil
+        lsp-enable-on-type-formatting nil
+        lsp-enable-semantic-tokens t
+        lsp-enable-snippet t
+        lsp-headerline-breadcrumb-enable nil
+        lsp-headerline-breadcrumb-enable-diagnostics nil
+        lsp-html-format-wrap-line-length sb/fill-column
+        lsp-html-format-end-with-newline t
+        lsp-html-format-indent-inner-html t
+        lsp-html-format-max-preserve-new-lines nil
+        lsp-imenu-sort-methods '(position)
+        lsp-keep-workspace-alive nil
+        lsp-log-io nil ; `texlab' communication is huge
+        lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
+        lsp-signature-auto-activate nil
+        lsp-signature-render-documentation nil
+        lsp-xml-logs-client nil
+        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
+                                           sb/extras-directory)
+        lsp-yaml-print-width sb/fill-column)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq lsp-session-file (expand-file-name "lsp-session" sb/temp-directory)))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq lsp-session-file (expand-file-name "lsp-session" sb/temp-directory)))
 
-     (custom-set-faces
-      (backquote
-       (lsp-headerline-breadcrumb-symbols-face
-        ((t (:inherit font-lock-doc-face :weight bold :height 0.9))))))
+  (custom-set-faces
+   (backquote
+    (lsp-headerline-breadcrumb-symbols-face
+     ((t (:inherit font-lock-doc-face :weight bold :height 0.9))))))
 
-     (custom-set-faces
-      (backquote
-       (lsp-headerline-breadcrumb-prefix-face
-        ((t (:inherit font-lock-string-face :height 0.9))))))
+  (custom-set-faces
+   (backquote
+    (lsp-headerline-breadcrumb-prefix-face
+     ((t (:inherit font-lock-string-face :height 0.9))))))
 
-     (custom-set-faces
-      (backquote
-       (lsp-headerline-breadcrumb-project-prefix-face
-        ((t (:inherit font-lock-string-face :weight bold :height 0.9))))))
+  (custom-set-faces
+   (backquote
+    (lsp-headerline-breadcrumb-project-prefix-face
+     ((t (:inherit font-lock-string-face :weight bold :height 0.9))))))
 
-     (when (eq sb/python-langserver 'pyls)
-       (setq lsp-pyls-configuration-sources []
-             lsp-pyls-plugins-autopep8-enable nil
-             lsp-pyls-plugins-mccabe-enabled nil
-             lsp-pyls-plugins-pycodestyle-enabled nil
-             lsp-pyls-plugins-pycodestyle-max-line-length sb/fill-column
-             lsp-pyls-plugins-pydocstyle-convention "pep257"
-             lsp-pyls-plugins-pydocstyle-enabled nil
-             lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-             lsp-pyls-plugins-pyflakes-enabled nil
-             lsp-pyls-plugins-pylint-args
-             (vconcat
-              (list "-j 2"
-                    (concat "--rcfile="
-                            (expand-file-name ".config/pylintrc" sb/user-home))))
-             lsp-pyls-plugins-pylint-enabled t
-             lsp-pyls-plugins-yapf-enabled t))
+  (when (eq sb/python-langserver 'pyls)
+    (setq lsp-pyls-configuration-sources []
+          lsp-pyls-plugins-autopep8-enable nil
+          lsp-pyls-plugins-mccabe-enabled nil
+          lsp-pyls-plugins-pycodestyle-enabled nil
+          lsp-pyls-plugins-pycodestyle-max-line-length sb/fill-column
+          lsp-pyls-plugins-pydocstyle-convention "pep257"
+          lsp-pyls-plugins-pydocstyle-enabled nil
+          lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+          lsp-pyls-plugins-pyflakes-enabled nil
+          lsp-pyls-plugins-pylint-args
+          (vconcat
+           (list "-j 2"
+                 (concat "--rcfile="
+                         (expand-file-name ".config/pylintrc" sb/user-home))))
+          lsp-pyls-plugins-pylint-enabled t
+          lsp-pyls-plugins-yapf-enabled t))
 
-     (when (eq sb/python-langserver 'pyls)
-       (lsp-register-client
-        (make-lsp-client :new-connection
-                         (lsp-tramp-connection "pyls")
-                         :major-modes
-                         '(python-mode)
-                         :remote\? t :server-id 'pyls-remote)))
+  (when (eq sb/python-langserver 'pyls)
+    (lsp-register-client
+     (make-lsp-client :new-connection
+                      (lsp-tramp-connection "pyls")
+                      :major-modes
+                      '(python-mode)
+                      :remote\? t :server-id 'pyls-remote)))
 
-     (when (eq sb/python-langserver 'mspyls)
-       (lsp-register-client
-        (make-lsp-client :new-connection
-                         (lsp-tramp-connection "mspyls")
-                         :major-modes
-                         '(python-mode)
-                         :remote\? t :server-id 'mspyls-remote)))
+  (when (eq sb/python-langserver 'mspyls)
+    (lsp-register-client
+     (make-lsp-client :new-connection
+                      (lsp-tramp-connection "mspyls")
+                      :major-modes
+                      '(python-mode)
+                      :remote\? t :server-id 'mspyls-remote)))
 
-     (when (eq sb/python-langserver 'pyright)
-       (lsp-register-client
-        (make-lsp-client :new-connection
-                         (lsp-tramp-connection
-                          (lambda nil
-                            (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
-                         :major-modes
-                         '(python-mode)
-                         :remote\? t :server-id 'pyright-remote :multi-root t
-                         :initialization-options
-                         (lambda nil
-                           (ht-merge
-                            (lsp-configuration-section "pyright")
-                            (lsp-configuration-section "python")))
-                         :initialized-fn
-                         (lambda
-                           (workspace)
-                           (with-lsp-workspace workspace
-                             (lsp--set-configuration
-                              (ht-merge
-                               (lsp-configuration-section "pyright")
-                               (lsp-configuration-section "python")))))
-                         :download-server-fn
-                         (lambda
-                           (_client callback error-callback _update\?)
-                           (lsp-package-ensure 'pyright callback error-callback))
-                         :notification-handlers
-                         (lsp-ht
-                          ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-                          ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-                          ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+  (when (eq sb/python-langserver 'pyright)
+    (lsp-register-client
+     (make-lsp-client :new-connection
+                      (lsp-tramp-connection
+                       (lambda nil
+                         (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
+                      :major-modes
+                      '(python-mode)
+                      :remote\? t :server-id 'pyright-remote :multi-root t
+                      :initialization-options
+                      (lambda nil
+                        (ht-merge
+                         (lsp-configuration-section "pyright")
+                         (lsp-configuration-section "python")))
+                      :initialized-fn
+                      (lambda
+                        (workspace)
+                        (with-lsp-workspace workspace
+                                            (lsp--set-configuration
+                                             (ht-merge
+                                              (lsp-configuration-section "pyright")
+                                              (lsp-configuration-section "python")))))
+                      :download-server-fn
+                      (lambda
+                        (_client callback error-callback _update\?)
+                        (lsp-package-ensure 'pyright callback error-callback))
+                      :notification-handlers
+                      (lsp-ht
+                       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+                       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+                       ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
 
-     (when (eq sb/python-langserver 'jedi)
-       (lsp-register-client
-        (make-lsp-client :new-connection
-                         (lsp-tramp-connection "jedi-language-server")
-                         :major-modes
-                         '(python-mode)
-                         :remote\? t :server-id 'jedils-remote)))
+  (when (eq sb/python-langserver 'jedi)
+    (lsp-register-client
+     (make-lsp-client :new-connection
+                      (lsp-tramp-connection "jedi-language-server")
+                      :major-modes
+                      '(python-mode)
+                      :remote\? t :server-id 'jedils-remote)))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection "clangd")
-                       :major-modes
-                       '(c-mode c++-mode)
-                       :remote\? t :server-id 'clangd-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection "clangd")
+                    :major-modes
+                    '(c-mode c++-mode)
+                    :remote\? t :server-id 'clangd-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        '("bash-language-server" "start"))
-                       :major-modes
-                       '(sh-mode)
-                       :remote\? t :server-id 'bashls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     '("bash-language-server" "start"))
+                    :major-modes
+                    '(sh-mode)
+                    :remote\? t :server-id 'bashls-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection "intelephense")
-                       :major-modes
-                       '(php-mode)
-                       :remote\? t :server-id 'intelephense-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection "intelephense")
+                    :major-modes
+                    '(php-mode)
+                    :remote\? t :server-id 'intelephense-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection "cmake-language-server")
-                       :major-modes
-                       '(cmake-mode)
-                       :remote\? t :server-id 'cmakels-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection "cmake-language-server")
+                    :major-modes
+                    '(cmake-mode)
+                    :remote\? t :server-id 'cmakels-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        '("typescript-language-server" "--stdio"))
-                       :major-modes
-                       '(js-mode typescript-mode)
-                       :remote\? t :server-id 'typescript-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     '("typescript-language-server" "--stdio"))
+                    :major-modes
+                    '(js-mode typescript-mode)
+                    :remote\? t :server-id 'typescript-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        '("vscode-json-languageserver" "--stdio"))
-                       :major-modes
-                       '(json-mode jsonc-mode)
-                       :remote\? t :server-id 'jsonls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     '("vscode-json-languageserver" "--stdio"))
+                    :major-modes
+                    '(json-mode jsonc-mode)
+                    :remote\? t :server-id 'jsonls-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        '("css-languageserver" "--stdio"))
-                       :major-modes
-                       '(css-mode less-mode sass-mode scss-mode)
-                       :remote\? t :server-id 'cssls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+                    :major-modes
+                    '(css-mode less-mode sass-mode scss-mode)
+                    :remote\? t :server-id 'cssls-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        '("html-languageserver" "--stdio"))
-                       :major-modes
-                       '(html-mode web-mode mhtml-mode sgml-mode)
-                       :remote\? t :server-id 'htmlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     '("html-languageserver" "--stdio"))
+                    :major-modes
+                    '(html-mode web-mode mhtml-mode sgml-mode)
+                    :remote\? t :server-id 'htmlls-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection '("java" "-jar"
-                                               (expand-file-name
-                                                "org.eclipse.lemminx-0.15.0-uber.jar"
-                                                sb/extras-directory)))
-                       :major-modes
-                       '(xml-mode nxml-mode)
-                       :remote\? t :server-id 'xmlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection '("java" "-jar"
+                                            (expand-file-name
+                                             "org.eclipse.lemminx-0.15.0-uber.jar"
+                                             sb/extras-directory)))
+                    :major-modes
+                    '(xml-mode nxml-mode)
+                    :remote\? t :server-id 'xmlls-remote))
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        '("yaml-language-server" "--stdio"))
-                       :major-modes
-                       '(yaml-mode)
-                       :remote\? t :server-id 'yamlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     '("yaml-language-server" "--stdio"))
+                    :major-modes
+                    '(yaml-mode)
+                    :remote\? t :server-id 'yamlls-remote))
 
-     (defvar lsp-perl-language-server-path)
-     (defvar lsp-perl-language-server-port)
-     (defvar lsp-perl-language-server-client-version)
+  (defvar lsp-perl-language-server-path)
+  (defvar lsp-perl-language-server-port)
+  (defvar lsp-perl-language-server-client-version)
 
-     (lsp-register-client
-      (make-lsp-client :new-connection
-                       (lsp-tramp-connection
-                        (lambda nil
-                          (list
-                           lsp-perl-language-server-path "-MPerl::LanguageServer" "-e"
-                           "Perl::LanguageServer::run" "--"
-                           (format "--port %d --version %s"
-                                   lsp-perl-language-server-port
-                                   lsp-perl-language-server-client-version))))
-                       :major-modes
-                       '(perl-mode cperl-mode)
-                       :remote\? t :initialized-fn
-                       (lambda
-                         (workspace)
-                         (with-lsp-workspace workspace
-                           (lsp--set-configuration
-                            (lsp-configuration-section "perl"))))
-                       :priority -1 :server-id 'perlls-remote))
+  (lsp-register-client
+   (make-lsp-client :new-connection
+                    (lsp-tramp-connection
+                     (lambda nil
+                       (list
+                        lsp-perl-language-server-path "-MPerl::LanguageServer" "-e"
+                        "Perl::LanguageServer::run" "--"
+                        (format "--port %d --version %s"
+                                lsp-perl-language-server-port
+                                lsp-perl-language-server-client-version))))
+                    :major-modes
+                    '(perl-mode cperl-mode)
+                    :remote\? t :initialized-fn
+                    (lambda
+                      (workspace)
+                      (with-lsp-workspace workspace
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
+                    :priority -1 :server-id 'perlls-remote))
 
-     (advice-add #'lsp-completion--regex-fuz :override #'identity)
-     t))
+  (advice-add #'lsp-completion--regex-fuz :override #'identity))
 
 (bind-keys :package lsp-mode
            ("M-." . lsp-find-definition)
@@ -4610,33 +4608,31 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (or (eq sb/python-langserver 'pyls) (eq sb/python-langserver 'mspyls))
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+  (add-hook 'python-mode-hook (lambda ()
+                                (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 
-(eval-after-load 'lsp-mode
-  '(progn
-     (unless (fboundp 'lsp-ui-mode)
-       (autoload #'lsp-ui-mode "lsp-ui" nil t))
-     (unless (fboundp 'lsp-ui-doc-mode)
-       (autoload #'lsp-ui-doc-mode "lsp-ui-doc" nil t))
+(with-eval-after-load 'lsp-mode
+  (unless (fboundp 'lsp-ui-mode)
+    (autoload #'lsp-ui-mode "lsp-ui" nil t))
+  (unless (fboundp 'lsp-ui-doc-mode)
+    (autoload #'lsp-ui-doc-mode "lsp-ui-doc" nil t))
 
-     (lsp-ui-mode 1)
-     (lsp-ui-doc-mode 1)
+  (lsp-ui-mode 1)
+  (lsp-ui-doc-mode 1)
 
-     (defvar lsp-ui-doc-enable)
-     (defvar lsp-ui-imenu-auto-refresh)
-     (defvar lsp-ui-sideline-enable)
+  (defvar lsp-ui-doc-enable)
+  (defvar lsp-ui-imenu-auto-refresh)
+  (defvar lsp-ui-sideline-enable)
 
-     (setq lsp-ui-doc-enable nil
-           lsp-ui-imenu-auto-refresh 'after-save
-           lsp-ui-sideline-enable nil)
+  (setq lsp-ui-doc-enable nil
+        lsp-ui-imenu-auto-refresh 'after-save
+        lsp-ui-sideline-enable nil)
 
-     (defvar lsp-ui-mode-map)
-     (bind-keys :package lsp-ui :map lsp-ui-mode-map
-                ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-                ([remap xref-find-references] . lsp-ui-peek-find-references))))
+  (defvar lsp-ui-mode-map)
+  (bind-keys :package lsp-ui :map lsp-ui-mode-map
+             ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+             ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
 
 ;; Sync workspace folders and treemacs projects
@@ -4644,10 +4640,9 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'lsp-treemacs-errors-list "lsp-treemacs" nil t))
 (unless (fboundp 'lsp-treemacs-sync-mode)
   (autoload #'lsp-treemacs-sync-mode "lsp-treemacs" nil t))
-(eval-after-load 'lsp-treemacs
-  '(progn
-     (lsp-treemacs-sync-mode 1)
-     t))
+
+(with-eval-after-load 'lsp-treemacs
+  (lsp-treemacs-sync-mode 1))
 
 
 (unless (fboundp 'global-origami-mode)
@@ -4655,30 +4650,26 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'origami-toggle-node)
   (autoload #'origami-toggle-node "origami" nil t))
 
-(add-hook 'java-mode-hook #'global-origami-mode)
-(add-hook 'python-mode-hook #'global-origami-mode)
-(add-hook 'c++-mode-hook #'global-origami-mode)
+(dolist (hook '(python-mode-hook java-mode-hook c-mode-hook c++-mode-hook))
+  (add-hook hook #'global-origami-mode))
 
-(eval-after-load 'origami
-  '(progn
-     (unless (fboundp 'lsp-origami-mode)
-       (autoload #'lsp-origami-mode "lsp-origami" nil t))
+(with-eval-after-load 'origami
+  (unless (fboundp 'lsp-origami-mode)
+    (autoload #'lsp-origami-mode "lsp-origami" nil t))
 
-     (lsp-origami-mode 1)
-     t))
+  (lsp-origami-mode 1))
 
 
-(eval-after-load 'ivy-mode
-  '(eval-after-load 'lsp-mode
-     '(progn
-        (unless (fboundp 'lsp-ivy-global-workspace-symbol)
-          (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
-        (unless (fboundp 'lsp-ivy-workspace-symbol)
-          (autoload #'lsp-ivy-workspace-symbol "lsp-ivy" nil t))
+(with-eval-after-load 'ivy-mode
+  (with-eval-after-load 'lsp-mode
+    (unless (fboundp 'lsp-ivy-global-workspace-symbol)
+      (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
+    (unless (fboundp 'lsp-ivy-workspace-symbol)
+      (autoload #'lsp-ivy-workspace-symbol "lsp-ivy" nil t))
 
-        (bind-keys :package lsp-ivy
-                   ("C-c l g" . lsp-ivy-global-workspace-symbol)
-                   ("C-c l w" . lsp-ivy-workspace-symbol)))))
+    (bind-keys :package lsp-ivy
+               ("C-c l g" . lsp-ivy-global-workspace-symbol)
+               ("C-c l w" . lsp-ivy-workspace-symbol))))
 
 
 ;; (setq url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data)))
@@ -4705,32 +4696,31 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-hook 'c++-mode-hook #'lsp-deferred)
 
-(eval-after-load 'cc-mode
-  '(progn
-     (defvar c-electric-indent)
-     (defvar c-set-style)
-     (defvar c-basic-offset)
-     (defvar c-enable-auto-newline)
-     (defvar c-electric-brace)
-     (defvar c-auto-newline)
-     (defvar c-electric-flag)
-     (defvar c-syntactic-indentation)
+(with-eval-after-load 'cc-mode
+  (defvar c-electric-indent)
+  (defvar c-set-style)
+  (defvar c-basic-offset)
+  (defvar c-enable-auto-newline)
+  (defvar c-electric-brace)
+  (defvar c-auto-newline)
+  (defvar c-electric-flag)
+  (defvar c-syntactic-indentation)
 
-     (setq c-set-style "cc-mode"
-           c-basic-offset 2)
+  (setq c-set-style "cc-mode"
+        c-basic-offset 2)
 
-     ;; Disable electric indentation and on-type formatting
-     (add-hook 'c++-mode-hook (lambda nil
-                                (setq-local c-auto-newline nil
-                                            c-electric-brace nil
-                                            c-electric-flag nil
-                                            c-electric-indent nil
-                                            c-enable-auto-newline nil
-                                            c-syntactic-indentation nil)))
+  ;; Disable electric indentation and on-type formatting
+  (add-hook 'c++-mode-hook (lambda nil
+                             (setq-local c-auto-newline nil
+                                         c-electric-brace nil
+                                         c-electric-flag nil
+                                         c-electric-indent nil
+                                         c-enable-auto-newline nil
+                                         c-syntactic-indentation nil)))
 
-     ;;   (unbind-key "C-M-a" c-mode-map)
+  ;;   (unbind-key "C-M-a" c-mode-map)
 
-     t))
+  )
 
 (defvar c-mode-base-map)
 (bind-keys :package cc-mode :map c-mode-base-map
@@ -4739,64 +4729,56 @@ This file is specified in `counsel-projectile-default-file'."
            ("M-q" . c-fill-paragraph))
 
 
-(eval-after-load 'c++-mode
-  '(progn
-     (unless (fboundp 'modern-c++-font-lock-mode)
-       (autoload #'modern-c++-font-lock-mode "modern-cpp-font-lock" nil t))
+(with-eval-after-load 'c++-mode
+  (unless (fboundp 'modern-c++-font-lock-mode)
+    (autoload #'modern-c++-font-lock-mode "modern-cpp-font-lock" nil t))
 
-     (modern-c++-font-lock-mode 1)
+  (modern-c++-font-lock-mode 1)
 
-     (if (fboundp 'diminish)
-         (diminish 'modern-c++-font-lock-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'modern-c++-font-lock-mode)))
 
 
-(eval-after-load 'cc-mode
-  '(eval-after-load 'flycheck
-     '(progn
-        (unless (fboundp 'flycheck-clang-analyzer-setup)
-          (autoload #'flycheck-clang-analyzer-setup "flycheck-clang-analyzer" nil t))
+(with-eval-after-load 'cc-mode
+  (with-eval-after-load 'flycheck
+    (unless (fboundp 'flycheck-clang-analyzer-setup)
+      (autoload #'flycheck-clang-analyzer-setup "flycheck-clang-analyzer" nil t))
 
-        (flycheck-clang-analyzer-setup)
-        t)))
+    (flycheck-clang-analyzer-setup)
 
+    (unless (fboundp 'flycheck-clang-tidy-setup)
+      (autoload #'flycheck-clang-tidy-setup "flycheck-clang-tidy" nil t))
 
-(eval-after-load 'cc-mode
-  '(eval-after-load 'flycheck
-     '(progn
-        (unless (fboundp 'flycheck-clang-tidy-setup)
-          (autoload #'flycheck-clang-tidy-setup "flycheck-clang-tidy" nil t))
-
-        (flycheck-clang-tidy-setup)
-        t)))
+    (flycheck-clang-tidy-setup)))
 
 
 (unless (fboundp 'c++-mode)
   (autoload #'c++-mode "cuda-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.cuh\\'" . c++-mode))
 
 
 (unless (fboundp 'opencl-mode)
   (autoload #'opencl-mode "opencl-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.cl\\'" . opencl-mode))
 
 
 (unless (fboundp 'cmake-mode)
   (autoload #'cmake-mode "cmake-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 
 
 (add-hook 'cmake-mode-hook #'lsp-deferred)
 
-(eval-after-load 'cmake-mode
-  '(progn
-     (unless (fboundp 'cmake-font-lock-activate)
-       (autoload #'cmake-font-lock-activate "cmake-font-lock" nil t))
+(with-eval-after-load 'cmake-mode
+  (unless (fboundp 'cmake-font-lock-activate)
+    (autoload #'cmake-font-lock-activate "cmake-font-lock" nil t))
 
-     (cmake-font-lock-activate)
-     t))
+  (cmake-font-lock-activate))
 
 
 (declare-function python-nav-backward-block "python")
@@ -4813,44 +4795,42 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'python-indent-shift-right)
   (autoload #'python-indent-shift-right "python" nil t))
 
-(eval-after-load 'python
-  '(progn
-     (setenv "PYTHONPATH" "python3")
+(with-eval-after-load 'python
+  (setenv "PYTHONPATH" "python3")
 
-     (defvar python-shell-completion-native-enable)
-     (defvar python-fill-docstring-style)
-     (defvar python-indent-guess-indent-offset)
-     (defvar python-indent-guess-indent-offset-verbose)
-     (defvar python-indent-offset)
-     (defvar python-shell-exec-path)
-     (defvar python-shell-interpreter)
+  (defvar python-shell-completion-native-enable)
+  (defvar python-fill-docstring-style)
+  (defvar python-indent-guess-indent-offset)
+  (defvar python-indent-guess-indent-offset-verbose)
+  (defvar python-indent-offset)
+  (defvar python-shell-exec-path)
+  (defvar python-shell-interpreter)
 
-     (setq python-shell-completion-native-enable nil ; Disable readline based native completion
-           python-fill-docstring-style 'django
-           python-indent-guess-indent-offset-verbose nil ; Remove guess indent python message
-           python-indent-guess-indent-offset nil
-           python-indent-offset 4
-           python-shell-exec-path "python3"
-           python-shell-interpreter "python3")
+  (setq python-shell-completion-native-enable nil ; Disable readline based native completion
+        python-fill-docstring-style 'django
+        python-indent-guess-indent-offset-verbose nil ; Remove guess indent python message
+        python-indent-guess-indent-offset nil
+        python-indent-offset 4
+        python-shell-exec-path "python3"
+        python-shell-interpreter "python3")
 
-     (setq auto-mode-alist (append
-                            '(("SConstruct\\'" . python-mode)
-                              ("SConscript\\'" . python-mode))
-                            auto-mode-alist))
+  (setq auto-mode-alist (append
+                         '(("SConstruct\\'" . python-mode)
+                           ("SConscript\\'" . python-mode))
+                         auto-mode-alist))
 
-     ;; FIXME: `lsp' is the first checker, chain the other checkers
-     ;; https://github.com/flycheck/flycheck/issues/1762
-     ;; (flycheck-add-next-checker 'lsp 'python-pylint)
+  ;; FIXME: `lsp' is the first checker, chain the other checkers
+  ;; https://github.com/flycheck/flycheck/issues/1762
+  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
 
-     (unless (fboundp 'python-docstring-mode)
-       (autoload #'python-docstring-mode "python-docstring" nil t))
+  (unless (fboundp 'python-docstring-mode)
+    (autoload #'python-docstring-mode "python-docstring" nil t))
 
-     (python-docstring-mode 1)
+  (python-docstring-mode 1)
 
-     (if (fboundp 'diminish)
-         (diminish 'python-docstring-mode))
+  (when (fboundp 'diminish)
+    (diminish 'python-docstring-mode)))
 
-     t))
 
 (defvar python-mode-map)
 (bind-keys :package python :map python-mode-map
@@ -4876,31 +4856,28 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'pyvenv-mode)
   (autoload #'pyvenv-mode "pyvenv" nil t))
+
 (add-hook 'python-mode-hook #'pyvenv-mode)
 
-(eval-after-load 'pyvenv
-  '(progn
-     (defvar pyvenv-mode-line-indicator)
-     (defvar pyvenv-post-activate-hooks)
-     (defvar pyvenv-post-deactivate-hooks)
-     (defvar pyvenv-virtual-env)
-     (defvar python-shell-interpreter)
+(with-eval-after-load 'pyvenv
+  (defvar pyvenv-mode-line-indicator)
+  (defvar pyvenv-post-activate-hooks)
+  (defvar pyvenv-post-deactivate-hooks)
+  (defvar pyvenv-virtual-env)
+  (defvar python-shell-interpreter)
 
-     (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name
-                                        ("[venv:" pyvenv-virtual-env-name "]"))
+  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name
+                                     ("[venv:" pyvenv-virtual-env-name "]"))
+        pyvenv-post-activate-hooks (list
+                                    (lambda nil
+                                      (setq python-shell-interpreter
+                                            (concat pyvenv-virtual-env "bin/python3"))))
+        pyvenv-post-deactivate-hooks (list
+                                      (lambda nil
+                                        (setq python-shell-interpreter "python3"))))
 
-           pyvenv-post-activate-hooks (list
-                                       (lambda nil
-                                         (setq python-shell-interpreter
-                                               (concat pyvenv-virtual-env "bin/python3"))))
-
-           pyvenv-post-deactivate-hooks (list
-                                         (lambda nil
-                                           (setq python-shell-interpreter "python3"))))
-
-     (if (fboundp 'diminish)
-         (diminish 'pyvenv-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'pyvenv-mode)))
 
 
 ;; FIXME: Leads to errors over tramp and possibly blocks Emacs
@@ -4912,11 +4889,9 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (add-hook 'python-mode-hook #'(lambda nil
   ;;                                 (add-hook 'before-save-hook #'py-isort-before-save)))
 
-  (eval-after-load 'py-isort
-    '(progn
-       (defvar py-isort-options)
-       (setq py-isort-options '("--lines=100"))
-       t)))
+  (with-eval-after-load 'py-isort
+    (defvar py-isort-options)
+    (setq py-isort-options '("--lines=100"))))
 
 
 (unless (fboundp 'pip-requirements-mode)
@@ -4941,8 +4916,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;;   (add-to-list 'lsp-disabled-clients ls))
   ;; (add-to-list 'lsp-enabled-clients 'mspyls)
   ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
-
-  t)
+  )
 
 
 ;; `pyright --createstub pandas'
@@ -4967,7 +4941,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (add-to-list 'lsp-enabled-clients 'pyright)
   ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
 
-  t)
+  )
 
 
 (when (and (eq sb/python-langserver 'jedi)
@@ -4983,7 +4957,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (add-to-list 'lsp-enabled-clients 'jedi)
   ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
 
-  t)
+  )
 
 ;; Initiate the lsp server after all the language server code has been processed
 (add-hook 'python-mode-hook #'lsp-deferred)
@@ -4995,20 +4969,23 @@ This file is specified in `counsel-projectile-default-file'."
            (executable-find "yapf"))
   (unless (fboundp 'yapf-mode)
     (autoload #'yapf-mode "yapfify" nil t))
+
   (add-hook 'python-mode-hook #'yapf-mode)
 
-  (eval-after-load 'yapfify
-    '(if (fboundp 'diminish)
-         (diminish 'yapf-mode))))
+  (with-eval-after-load 'yapfify
+    (when (fboundp 'diminish)
+      (diminish 'yapf-mode))))
 
 
 (unless (fboundp 'ein:ipynb-mode)
   (autoload #'ein:ipynb-mode "ein" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.ipynb\\'" . ein:ipynb-mode))
 
 
 (unless (fboundp 'cython-mode)
   (autoload #'cython-mode "cython-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.pyx\\'" . cython-mode))
 (add-to-list 'auto-mode-alist '("\\.pxd\\'" . cython-mode))
 (add-to-list 'auto-mode-alist '("\\.pxi\\'" . cython-mode))
@@ -5016,36 +4993,35 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'jinja2-mode)
   (autoload #'jinja2-mode "jinja2-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.jinja\\'" . jinja2-mode))
 
 
 (unless (fboundp 'cperl-mode)
   (autoload #'cperl-mode "cperl-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("latexmkrc\\'" . cperl-mode))
 (add-hook 'cperl-mode-hook #'lsp-deferred)
 
-(eval-after-load 'cperl-mode
-  '(progn
-     ;; Prefer CPerl mode to Perl mode
-     (fset 'perl-mode 'cperl-mode)
-     t))
+(with-eval-after-load 'cperl-mode
+  ;; Prefer CPerl mode to Perl mode
+  (fset 'perl-mode 'cperl-mode))
 
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
-(add-hook 'java-mode-hook #'(lambda nil
-                              (setq-default c-basic-offset 4 c-set-style "java")
-                              (lsp-deferred)))
+(add-hook 'java-mode-hook (lambda nil
+                            (setq-default c-basic-offset 4
+                                          c-set-style "java")
+                            (lsp-deferred)))
 
-(eval-after-load 'lsp-java
-  '(progn
-     (defvar lsp-java-inhibit-message)
-     (defvar lsp-java-java-path)
-     (defvar lsp-java-save-actions-organize-imports)
+(with-eval-after-load 'lsp-java
+  (defvar lsp-java-inhibit-message)
+  (defvar lsp-java-java-path)
+  (defvar lsp-java-save-actions-organize-imports)
 
-     (setq lsp-java-inhibit-message t
-           lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" ; Requires Java 11
-           lsp-java-save-actions-organize-imports t)
-     t))
+  (setq lsp-java-inhibit-message t
+        lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" ; Requires Java 11
+        lsp-java-save-actions-organize-imports t))
 
 
 (unless (fboundp 'ant)
@@ -5063,12 +5039,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'autodisass-java-bytecode)
   (autoload #'autodisass-java-bytecode "autodisass-java-bytecode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.class\\'" . autodisass-java-bytecode))
 
 
 ;; Syntax highlighting for Gradle files
 (unless (fboundp 'groovy-mode)
   (autoload #'groovy-mode "groovy-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
 (add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))
 
@@ -5076,27 +5054,27 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Shell script mode
 (unless (fboundp 'sh-mode)
   (autoload #'sh-mode "sh-script" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
 (add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
 (add-hook 'sh-mode-hook #'lsp-deferred)
 
-(eval-after-load 'sh-script
-  '(progn
-     (defvar sh-basic-offset)
-     (defvar sh-indent-comment)
-     (defvar sh-indent-after-continuation)
+(with-eval-after-load 'sh-script
+  (defvar sh-basic-offset)
+  (defvar sh-indent-comment)
+  (defvar sh-indent-after-continuation)
 
-     (setq sh-basic-offset 2
-           sh-indent-after-continuation 'always
-           sh-indent-comment t)
+  (setq sh-basic-offset 2
+        sh-indent-after-continuation 'always
+        sh-indent-comment t)
 
-     ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-     ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
-     ;; FIXME: `lsp' is the first checker, chain the other checkers
-     ;; https://github.com/flycheck/flycheck/issues/1762
-     ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
+  ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+  ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
+  ;; FIXME: `lsp' is the first checker, chain the other checkers
+  ;; https://github.com/flycheck/flycheck/issues/1762
+  ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
 
-     t))
+  )
 
 
 (unless (fboundp 'fish-mode)
@@ -5107,21 +5085,21 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'fish_indent-before-save)
   (autoload #'fish_indent-before-save "fish-mode" nil t))
+
 (add-hook 'fish-mode-hook #'(lambda nil
                               (add-hook 'before-save-hook #'fish_indent-before-save)))
 
 
 (unless (fboundp 'shfmt-on-save-mode)
   (autoload #'shfmt-on-save-mode "shfmt" nil t))
+
 (add-hook 'sh-mode-hook #'shfmt-on-save-mode)
 
-(eval-after-load 'shfmt
-  '(progn
-     (defvar shfmt-arguments)
+(with-eval-after-load 'shfmt
+  (defvar shfmt-arguments)
 
-     (setq shfmt-arguments '("-i" "4" "-p" "-ci"))
-     (shfmt-on-save-mode 1)
-     t))
+  (setq shfmt-arguments '("-i" "4" "-p" "-ci"))
+  (shfmt-on-save-mode 1))
 
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
@@ -5138,20 +5116,18 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'transient-bind-q-to-quit)
   (autoload #'transient-bind-q-to-quit "transient" nil t))
 
-(eval-after-load 'transient
-  '(progn
-     (defvar transient-history-file)
-     (defvar transient-levels-file)
-     (defvar transient-values-file)
+(with-eval-after-load 'transient
+  (defvar transient-history-file)
+  (defvar transient-levels-file)
+  (defvar transient-values-file)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
-             transient-levels-file (expand-file-name "transient/levels.el" sb/temp-directory)
-             transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
+          transient-levels-file (expand-file-name "transient/levels.el" sb/temp-directory)
+          transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
 
-     ;; Allow using `q' to quit out of popups, in addition to `C-g'
-     (transient-bind-q-to-quit)
-     t))
+  ;; Allow using `q' to quit out of popups, in addition to `C-g'
+  (transient-bind-q-to-quit))
 
 
 (declare-function magit-display-buffer-fullframe-status-v1 "magit")
@@ -5163,54 +5139,51 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'magit-dispatch)
   (autoload #'magit-dispatch "magit" nil t))
 
-(eval-after-load 'magit
-  '(progn
-     (defvar magit-display-buffer-function)
-     (defvar magit-no-message)
-     (defvar magit-section-initial-visibility-alist)
+(with-eval-after-load 'magit
+  (defvar magit-display-buffer-function)
+  (defvar magit-no-message)
+  (defvar magit-section-initial-visibility-alist)
 
-     (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
-           ;; Suppress the message about "Turning on magit-auto-revert-mode" when loading Magit
-           magit-no-message '("Turning on magit-auto-revert-mode...")
-           ;; https://irreal.org/blog/?p=8877
-           magit-section-initial-visibility-alist '((stashes . show)
-                                                    (untracked . show)
-                                                    (unpushed . show)))
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
+        ;; Suppress the message about "Turning on magit-auto-revert-mode" when loading Magit
+        magit-no-message '("Turning on magit-auto-revert-mode...")
+        ;; https://irreal.org/blog/?p=8877
+        magit-section-initial-visibility-alist '((stashes . show)
+                                                 (untracked . show)
+                                                 (unpushed . show)))
 
-     ;; These give a performance boost to magit
-     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
-     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
-     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-pushremote)
-     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
-     ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
+  ;; These give a performance boost to magit
+  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
+  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
+  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-pushremote)
+  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
+  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
 
-     (require 'magit-diff nil nil)
+  (require 'magit-diff nil nil)
 
-     (defvar magit-diff-refine-hunk)
-     (defvar magit-diff-paint-whitespace)
-     (defvar magit-diff-highlight-trailing)
+  (defvar magit-diff-refine-hunk)
+  (defvar magit-diff-paint-whitespace)
+  (defvar magit-diff-highlight-trailing)
 
-     (setq magit-diff-refine-hunk t
-           magit-diff-highlight-trailing nil
-           magit-diff-paint-whitespace nil)
+  (setq magit-diff-refine-hunk t
+        magit-diff-highlight-trailing nil
+        magit-diff-paint-whitespace nil)
 
-     (eval-after-load 'with-editor
-       '(if (fboundp 'diminish)
-            (diminish 'with-editor-mode)))
+  (with-eval-after-load 'with-editor
+    (if (fboundp 'diminish)
+        (diminish 'with-editor-mode)))
 
-     (require 'ediff nil nil)
+  (require 'ediff nil nil)
 
-     (defvar ediff-window-setup-function)
-     (defvar ediff-split-window-function)
-     (declare-function ediff-setup-windows-plain "ediff")
+  (defvar ediff-window-setup-function)
+  (defvar ediff-split-window-function)
+  (declare-function ediff-setup-windows-plain "ediff")
 
-     ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-     (setq ediff-window-setup-function #'ediff-setup-windows-plain)
-     ;; Split windows horizontally in ediff (instead of vertically)
-     (setq ediff-split-window-function #'split-window-horizontally)
-
-     t))
+  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
+  ;; Split windows horizontally in ediff (instead of vertically)
+  (setq ediff-split-window-function #'split-window-horizontally))
 
 (bind-keys :package magit
            ("C-x g" . magit-status)
@@ -5220,6 +5193,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'gitignore-mode)
   (autoload #'gitignore-mode "gitignore-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("/\\.gitignore\\'" . gitignore-mode))
 (add-to-list 'auto-mode-alist '("/\\.git/info/exclude\\'" . gitignore-mode))
 (add-to-list 'auto-mode-alist '("/git/ignore\\'" . gitignore-mode))
@@ -5227,6 +5201,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'gitattributes-mode)
   (autoload #'gitattributes-mode "gitattributes-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("/\\.gitattributes\\'" . gitattributes-mode))
 (add-to-list 'auto-mode-alist '("/\\.git/info/attributes\\'" . gitattributes-mode))
 (add-to-list 'auto-mode-alist '("/git/attributes\\'" . gitattributes-mode))
@@ -5234,6 +5209,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'gitconfig-mode)
   (autoload #'gitconfig-mode "gitconfig-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("/\\.gitconfig\\'" . gitconfig-mode))
 (add-to-list 'auto-mode-alist '("/\\.git/config\\'" . gitconfig-mode))
 (add-to-list 'auto-mode-alist '("/git/config\\'" . gitconfig-mode))
@@ -5249,27 +5225,26 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'git-gutter:next-hunk "git-gutter" nil t))
 (unless (fboundp 'global-git-gutter-mode)
   (autoload #'global-git-gutter-mode "git-gutter" nil t))
+
 (add-hook 'after-init-hook #'global-git-gutter-mode)
 
-(eval-after-load 'git-gutter
-  '(progn
-     (defvar git-gutter:added-sign)
-     (defvar git-gutter:deleted-sign)
-     (defvar git-gutter:modified-sign)
-     (defvar git-gutter:update-interval)
-     (defvar git-gutter:disabled-modes)
+(with-eval-after-load 'git-gutter
+  (defvar git-gutter:added-sign)
+  (defvar git-gutter:deleted-sign)
+  (defvar git-gutter:modified-sign)
+  (defvar git-gutter:update-interval)
+  (defvar git-gutter:disabled-modes)
 
-     (setq git-gutter:added-sign " "
-           git-gutter:deleted-sign " "
-           git-gutter:modified-sign " "
-           git-gutter:update-interval 1
-           ;; https://github.com/syl20bnr/spacemacs/issues/10555
-           ;; https://github.com/syohex/emacs-git-gutter/issues/24
-           git-gutter:disabled-modes '(fundamental-mode org-mode))
+  (setq git-gutter:added-sign " "
+        git-gutter:deleted-sign " "
+        git-gutter:modified-sign " "
+        git-gutter:update-interval 1
+        ;; https://github.com/syl20bnr/spacemacs/issues/10555
+        ;; https://github.com/syohex/emacs-git-gutter/issues/24
+        git-gutter:disabled-modes '(fundamental-mode org-mode))
 
-     (if (fboundp 'diminish)
-         (diminish 'git-gutter-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'git-gutter-mode)))
 
 (bind-keys :package git-gutter
            ("C-x p" . git-gutter:previous-hunk)
@@ -5294,23 +5269,21 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
 ;; (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
 
-(eval-after-load 'diff-hl
-  '(progn
-     (defvar diff-hl-draw-borders)
-     (setq diff-hl-draw-borders nil) ; Highlight without a border looks nicer
-     t))
+(with-eval-after-load 'diff-hl
+  (defvar diff-hl-draw-borders)
+  ;; Highlight without a border looks nicer
+  (setq diff-hl-draw-borders nil))
 
 
 (declare-function git-commit-turn-on-flyspell "git-commit")
 (unless (fboundp 'git-commit-turn-on-flyspell)
   (autoload #'git-commit-turn-on-flyspell "git-commit" nil t))
+
 (add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
 
-(eval-after-load 'git-commit
-  '(progn
-     (defvar git-commit-summary-max-length)
-     (setq git-commit-summary-max-length 50)
-     t))
+(with-eval-after-load 'git-commit
+  (defvar git-commit-summary-max-length)
+  (setq git-commit-summary-max-length 50))
 
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
@@ -5374,9 +5347,9 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function sb/smerge-hydra/body "init")
 
 (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
-(add-hook 'magit-diff-visit-file-hook #'(lambda nil
-                                          (when smerge-mode
-                                            (sb/smerge-hydra/body))))
+(add-hook 'magit-diff-visit-file-hook (lambda nil
+                                        (when smerge-mode
+                                          (sb/smerge-hydra/body))))
 
 (eval-and-compile
   (defun sb/enable-smerge-maybe nil
@@ -5412,6 +5385,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'yaml-mode)
   (autoload #'yaml-mode "yaml-mode" nil t))
+
 (add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
 (add-to-list 'auto-mode-alist '(".clang-tidy" . yaml-mode))
 
@@ -5419,17 +5393,16 @@ This file is specified in `counsel-projectile-default-file'."
                             (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
                             (lsp-deferred)))
 
-(eval-after-load 'yaml-mode
-  '(progn
-     (unless (fboundp 'yaml-imenu-enable)
-       (autoload #'yaml-imenu-enable "yaml-imenu" nil t))
+(with-eval-after-load 'yaml-mode
+  (unless (fboundp 'yaml-imenu-enable)
+    (autoload #'yaml-imenu-enable "yaml-imenu" nil t))
 
-     (yaml-imenu-enable)
-     t))
+  (yaml-imenu-enable))
 
 
 (unless (fboundp 'bat-mode)
   (autoload #'bat-mode "bat-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
 (add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode))
 
@@ -5450,26 +5423,24 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-hook 'web-mode-hook #'lsp-deferred)
 
-(eval-after-load 'web-mode
-  '(progn
-     (defvar web-mode-enable-auto-closing)
-     (defvar web-mode-enable-auto-pairing)
-     (defvar web-mode-enable-auto-quoting)
-     (defvar web-mode-enable-block-face)
-     (defvar web-mode-enable-css-colorization)
-     (defvar web-mode-enable-current-element-highlight)
-     (defvar web-mode-enable-current-column-highlight)
+(with-eval-after-load 'web-mode
+  (defvar web-mode-enable-auto-closing)
+  (defvar web-mode-enable-auto-pairing)
+  (defvar web-mode-enable-auto-quoting)
+  (defvar web-mode-enable-block-face)
+  (defvar web-mode-enable-css-colorization)
+  (defvar web-mode-enable-current-element-highlight)
+  (defvar web-mode-enable-current-column-highlight)
 
-     (setq web-mode-enable-auto-closing t
-           web-mode-enable-auto-pairing t
-           web-mode-enable-auto-quoting t
-           web-mode-enable-block-face t
-           web-mode-enable-css-colorization t
-           web-mode-enable-current-element-highlight t
-           web-mode-enable-current-column-highlight t)
+  (setq web-mode-enable-auto-closing t
+        web-mode-enable-auto-pairing t
+        web-mode-enable-auto-quoting t
+        web-mode-enable-block-face t
+        web-mode-enable-css-colorization t
+        web-mode-enable-current-element-highlight t
+        web-mode-enable-current-column-highlight t)
 
-     (flycheck-add-mode 'javascript-eslint 'web-mode)
-     t))
+  (flycheck-add-mode 'javascript-eslint 'web-mode))
 
 
 (unless (fboundp 'emmet-mode)
@@ -5481,19 +5452,21 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'rainbow-mode)
   (autoload #'rainbow-mode "rainbow-mode" nil t))
-(add-hook 'css-mode-hook #'rainbow-mode)
-(add-hook 'html-mode-hook #'rainbow-mode)
-(add-hook 'sass-mode-hook #'rainbow-mode)
 
-(eval-after-load 'rainbow-mode
-  '(if (fboundp 'diminish)
-       (diminish 'rainbow-mode)))
+(dolist (hook '(html-mode-hook css-mode-hook sass-mode-hook))
+  (add-hook hook #'rainbow-mode))
+
+(with-eval-after-load 'rainbow-mode
+  (when (fboundp 'diminish)
+    (diminish 'rainbow-mode)))
 
 
 (add-hook 'php-mode-hook #'lsp-deferred)
 
+
 (unless (fboundp 'nxml-mode)
   (autoload #'nxml-mode "nxml-mode" nil t))
+
 (add-hook 'nxml-mode-hook #'lsp-deferred)
 
 (add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
@@ -5501,16 +5474,14 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("\\.xslt\\'" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.pom$" . nxml-mode))
 
-(eval-after-load 'nxml-mode
-  '(progn
-     (fset 'xml-mode 'nxml-mode)
+(with-eval-after-load 'nxml-mode
+  (fset 'xml-mode 'nxml-mode)
 
-     (defvar nxml-auto-insert-xml-declaration-flag)
-     (defvar nxml-slash-auto-complete-flag)
+  (defvar nxml-auto-insert-xml-declaration-flag)
+  (defvar nxml-slash-auto-complete-flag)
 
-     (setq nxml-auto-insert-xml-declaration-flag t
-           nxml-slash-auto-complete-flag t)
-     t))
+  (setq nxml-auto-insert-xml-declaration-flag t
+        nxml-slash-auto-complete-flag t))
 
 ;; FIXME: Open `.classpath' file with LSP support
 ;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
@@ -5545,22 +5516,21 @@ This file is specified in `counsel-projectile-default-file'."
 ;;                    (require 'lsp-latex)
 ;;                    (lsp-deferred))))
 
-(eval-after-load 'lsp-latex
-  '(progn
-     (defvar lsp-latex-bibtex-formatting-formatter)
-     (defvar lsp-latex-bibtex-formatting-line-length)
-     (defvar lsp-latex-build-on-save)
-     (defvar lsp-latex-lint-on-save)
-     (defvar lsp-latex-build-args)
+(with-eval-after-load 'lsp-latex
+  (defvar lsp-latex-bibtex-formatting-formatter)
+  (defvar lsp-latex-bibtex-formatting-line-length)
+  (defvar lsp-latex-build-on-save)
+  (defvar lsp-latex-lint-on-save)
+  (defvar lsp-latex-build-args)
 
-     (setq lsp-latex-bibtex-formatting-formatter "latexindent"
-           lsp-latex-bibtex-formatting-line-length sb/fill-column
-           lsp-latex-build-on-save t
-           lsp-latex-lint-on-save t)
+  (setq lsp-latex-bibtex-formatting-formatter "latexindent"
+        lsp-latex-bibtex-formatting-line-length sb/fill-column
+        lsp-latex-build-on-save t
+        lsp-latex-lint-on-save t)
 
-     (add-to-list 'lsp-latex-build-args "-c")
-     (add-to-list 'lsp-latex-build-args "-pvc")
-     t))
+  (add-to-list 'lsp-latex-build-args "-c")
+  (add-to-list 'lsp-latex-build-args "-pvc"))
+
 
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
@@ -5593,122 +5563,114 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
 
-(add-hook 'latex-mode-hook #'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-(add-hook 'latex-mode-hook #'TeX-PDF-mode) ; Use `pdflatex'
-(add-hook 'LaTeX-mode-hook #'TeX-PDF-mode) ; Use `pdflatex'
-(add-hook 'latex-mode-hook #'TeX-source-correlate-mode)
-(add-hook 'LaTeX-mode-hook #'TeX-source-correlate-mode)
+(dolist (hook '(LaTex-mode-hook latex-mode-hook))
+  (add-hook hook #'LaTeX-math-mode)
+  (add-hook hook #'TeX-PDF-mode) ; Use `pdflatex'
+  (add-hook hook #'TeX-source-correlate-mode))
 
-(eval-after-load 'tex
-  '(progn
-     (defvar TeX-auto-save)
-     (defvar TeX-auto-untabify)
-     (defvar TeX-clean-confirm)
-     (defvar TeX-electric-sub-and-superscript)
-     (defvar TeX-parse-self)
-     (defvar TeX-quote-after-quote)
-     (defvar TeX-save-query)
-     (defvar TeX-source-correlate-method)
-     (defvar TeX-source-correlate-start-server)
-     (defvar TeX-syntactic-comment)
-     (defvar TeX-view-program-selection)
-     (defvar TeX-view-program-list)
-     (defvar LaTeX-item-indent)
-     (defvar LaTeX-syntactic-comments)
-     (defvar LaTeX-fill-break-at-separators)
-     (defvar tex-fontify-script)
-     (defvar font-latex-fontify-script)
-     (defvar font-latex-fontify-sectioning)
+(with-eval-after-load 'tex
+  (defvar TeX-auto-save)
+  (defvar TeX-auto-untabify)
+  (defvar TeX-clean-confirm)
+  (defvar TeX-electric-sub-and-superscript)
+  (defvar TeX-parse-self)
+  (defvar TeX-quote-after-quote)
+  (defvar TeX-save-query)
+  (defvar TeX-source-correlate-method)
+  (defvar TeX-source-correlate-start-server)
+  (defvar TeX-syntactic-comment)
+  (defvar TeX-view-program-selection)
+  (defvar TeX-view-program-list)
+  (defvar LaTeX-item-indent)
+  (defvar LaTeX-syntactic-comments)
+  (defvar LaTeX-fill-break-at-separators)
+  (defvar tex-fontify-script)
+  (defvar font-latex-fontify-script)
+  (defvar font-latex-fontify-sectioning)
 
-     (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
-           TeX-auto-untabify t ; Remove all tabs before saving
-           TeX-clean-confirm nil
-           TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
-           TeX-parse-self t ; Parse documents
-           TeX-quote-after-quote nil ; Allow original LaTeX quotes
-           TeX-save-query nil ; Save buffers automatically when compiling
-           TeX-source-correlate-method 'synctex
-           TeX-source-correlate-start-server nil ; Do not start the emacs server when correlating sources
-           TeX-syntactic-comment t
-           TeX-view-program-selection '((output-pdf "PDF Tools"))
-           TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-           LaTeX-item-indent 0 ; Two spaces + Extra indentation
-           LaTeX-syntactic-comments t
-           LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
-           tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
-           ;; Avoid superscripts and subscripts from being displayed in a different font size
-           font-latex-fontify-script nil
-           ;; Avoid emphasizing section headers
-           font-latex-fontify-sectioning 1.0)
+  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+        TeX-auto-untabify t ; Remove all tabs before saving
+        TeX-clean-confirm nil
+        TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+        TeX-parse-self t ; Parse documents
+        TeX-quote-after-quote nil ; Allow original LaTeX quotes
+        TeX-save-query nil ; Save buffers automatically when compiling
+        TeX-source-correlate-method 'synctex
+        ;; Do not start the emacs server when correlating sources
+        TeX-source-correlate-start-server nil
+        TeX-syntactic-comment t
+        TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+        LaTeX-item-indent 0 ; Two spaces + Extra indentation
+        LaTeX-syntactic-comments t
+        LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
+        tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
+        ;; Avoid superscripts and subscripts from being displayed in a different font size
+        font-latex-fontify-script nil
+        ;; Avoid emphasizing section headers
+        font-latex-fontify-sectioning 1.0)
 
-     (setq-default TeX-master nil) ; Query for master file
+  (setq-default TeX-master nil) ; Query for master file
 
-     ;; Revert PDF buffer after TeX compilation has finished
-     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; Revert PDF buffer after TeX compilation has finished
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
-     ;; Enable rainbow mode after applying styles to the buffer
-     (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
+  ;; Enable rainbow mode after applying styles to the buffer
+  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
 
-     ;; Disable "LaTeX-insert-item" in favor of imenu
-     ;; (unbind-key "C-c C-d" LaTeX-mode-map)
-     ;; Unset "C-c ;" since we want to bind it to 'comment-line
-     ;; (unbind-key "C-c ;" LaTeX-mode-map)
+  ;; Disable "LaTeX-insert-item" in favor of imenu
+  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
+  ;; Unset "C-c ;" since we want to bind it to 'comment-line
+  ;; (unbind-key "C-c ;" LaTeX-mode-map)
 
-     t))
+  )
 
 
-(eval-after-load 'tex-mode
-  '(progn
-     (declare-function auctex-latexmk "auctex-latexmk")
-     (unless (fboundp 'auctex-latexmk)
-       (autoload #'auctex-latexmk "auctex-latexmk" nil t))
+(with-eval-after-load 'tex-mode
+  (declare-function auctex-latexmk "auctex-latexmk")
+  (unless (fboundp 'auctex-latexmk)
+    (autoload #'auctex-latexmk "auctex-latexmk" nil t))
 
-     (auctex-latexmk-setup)
+  (auctex-latexmk-setup)
 
-     (defvar auctex-latexmk-inherit-TeX-PDF-mode)
-     (defvar TeX-command-default)
+  (defvar auctex-latexmk-inherit-TeX-PDF-mode)
+  (defvar TeX-command-default)
 
-     ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
-     (setq auctex-latexmk-inherit-TeX-PDF-mode t
-           TeX-command-default "LatexMk")
-     t))
+  ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t
+        TeX-command-default "LatexMk"))
 
 
 (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
 ;; (add-hook 'bibtex-mode-hook #'lsp-deferred) ;; LATER: LaTeX LS is not good yet
 
-(eval-after-load 'bibtex
-  '(progn
-     (defvar bibtex-align-at-equal-sign)
-     (defvar bibtex-maintain-sorted-entries)
+(with-eval-after-load 'bibtex
+  (defvar bibtex-align-at-equal-sign)
+  (defvar bibtex-maintain-sorted-entries)
 
-     (setq bibtex-align-at-equal-sign t
-           bibtex-maintain-sorted-entries t)
+  (setq bibtex-align-at-equal-sign t
+        bibtex-maintain-sorted-entries t)
 
-     (require 'bibtex-utils nil nil)
-     t))
+  (require 'bibtex-utils nil nil))
 
 
 (unless (fboundp 'ivy-bibtex)
   (autoload #'ivy-bibtex "ivy-bibtex" nil t))
 
-(eval-after-load 'ivy-bibtex
-  '(progn
-     (defvar ivy-bibtex-default-action)
-     (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+(with-eval-after-load 'ivy-bibtex
+  (defvar ivy-bibtex-default-action)
+  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
-     (require 'bibtex-completion nil nil)
+  (require 'bibtex-completion nil nil)
 
-     (defvar bibtex-completion-cite-default-as-initial-input)
-     (defvar bibtex-completion-cite-prompt-for-optional-arguments)
-     (defvar bibtex-completion-display-formats)
+  (defvar bibtex-completion-cite-default-as-initial-input)
+  (defvar bibtex-completion-cite-prompt-for-optional-arguments)
+  (defvar bibtex-completion-display-formats)
 
-     (setq bibtex-completion-cite-default-as-initial-input t
-           bibtex-completion-cite-prompt-for-optional-arguments
-           nil bibtex-completion-display-formats '((t
-                                                    . "${author:24} ${title:*} ${=key=:16}
-           ${=type=:12}"))) t))
+  (setq bibtex-completion-cite-default-as-initial-input t
+        bibtex-completion-cite-prompt-for-optional-arguments nil
+        bibtex-completion-display-formats
+        '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
 (bind-keys :package ivy-bibtex
            ("C-c x b" . ivy-bibtex))
@@ -5795,30 +5757,28 @@ Ignore if no file is found."
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list))))))
 
-(eval-after-load 'reftex
-  '(progn
-     (defvar reftex-enable-partial-scans)
-     (defvar reftex-highlight-selection)
-     (defvar reftex-plug-into-AUCTeX)
-     (defvar reftex-save-parse-info)
-     (defvar reftex-toc-follow-mode)
-     (defvar reftex-use-multiple-selection-buffers)
+(with-eval-after-load 'reftex
+  (defvar reftex-enable-partial-scans)
+  (defvar reftex-highlight-selection)
+  (defvar reftex-plug-into-AUCTeX)
+  (defvar reftex-save-parse-info)
+  (defvar reftex-toc-follow-mode)
+  (defvar reftex-use-multiple-selection-buffers)
 
-     (setq reftex-enable-partial-scans t
-           reftex-highlight-selection 'both
-           reftex-plug-into-AUCTeX t
-           reftex-save-parse-info t
-           reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-           reftex-use-multiple-selection-buffers t)
+  (setq reftex-enable-partial-scans t
+        reftex-highlight-selection 'both
+        reftex-plug-into-AUCTeX t
+        reftex-save-parse-info t
+        reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
+        reftex-use-multiple-selection-buffers t)
 
-     (sb/reftex-try-add-all-bibitems-from-bibtex)
+  (sb/reftex-try-add-all-bibitems-from-bibtex)
 
-     ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-     ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+  ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+  ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
 
-     (if (fboundp 'diminish)
-         (diminish 'reftex-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'reftex-mode)))
 
 (bind-keys :package reftex
            ("C-c [" . reftex-citation)
@@ -5843,19 +5803,16 @@ Ignore if no file is found."
 (unless (fboundp 'bib-cite-minor-mode)
   (autoload #'bib-cite-minor-mode "bib-cite" nil t))
 
-(add-hook 'LaTeX-mode-hook #'(lambda nil
-                               (bib-cite-minor-mode 1)))
-(add-hook 'latex-mode-hook #'(lambda nil
-                               (bib-cite-minor-mode 1)))
+(dolist (hook '(latex-mode-hook LaTex-mode-hook))
+  (add-hook hook (lambda nil
+                   (bib-cite-minor-mode 1))))
 
-(eval-after-load 'bib-cite
-  '(progn
-     (defvar bib-cite-use-reftex-view-crossref)
-     (setq bib-cite-use-reftex-view-crossref t)
+(with-eval-after-load 'bib-cite
+  (defvar bib-cite-use-reftex-view-crossref)
+  (setq bib-cite-use-reftex-view-crossref t)
 
-     (if (fboundp 'diminish)
-         (diminish 'bib-cite-minor-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'bib-cite-minor-mode)))
 
 (defvar bib-cite-minor-mode-map)
 (bind-keys :package bib-cite :map bib-cite-minor-mode-map
@@ -5902,15 +5859,15 @@ Ignore if no file is found."
 (unless (fboundp 'math-preview-region)
   (autoload #'math-preview-region "math-preview" nil t))
 
-(eval-after-load 'math-preview
-  '(progn
-     (defvar math-preview-command)
-     (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp))
-     t))
+(with-eval-after-load 'math-preview
+  (defvar math-preview-command)
+
+  (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp)))
 
 
 (unless (fboundp 'texinfo-mode)
   (autoload #'texinfo-mode "texinfo" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode))
 
 
@@ -5923,35 +5880,34 @@ Ignore if no file is found."
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
 
-(eval-after-load 'js2-mode
-  '(progn
-     (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
+(with-eval-after-load 'js2-mode
+  (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
 
-     (defvar js-indent-level)
-     (defvar js2-basic-offset)
+  (defvar js-indent-level)
+  (defvar js2-basic-offset)
 
-     (setq js-indent-level 2
-           js2-basic-offset 2)
+  (setq js-indent-level 2
+        js2-basic-offset 2)
 
-     (unless (fboundp 'js2-refactor-mode)
-       (autoload #'js2-refactor-mode "js2-refactor" nil t))
-     (js2-refactor-mode 1)
+  (unless (fboundp 'js2-refactor-mode)
+    (autoload #'js2-refactor-mode "js2-refactor" nil t))
 
-     (if (fboundp 'diminish)
-         (diminish 'js2-refactor-mode))
-     t))
+  (js2-refactor-mode 1)
+
+  (when (fboundp 'diminish)
+    (diminish 'js2-refactor-mode)))
 
 
 (unless (fboundp 'xref-js2-xref-backend)
   (autoload #'xref-js2-xref-backend "xref-js2" nil t))
-(add-hook 'js2-mode-hook #'(lambda nil
-                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
-(eval-after-load 'xref-js2
-  '(progn
-     (defvar xref-js2-search-program)
-     (setq xref-js2-search-program 'rg)
-     t))
+(add-hook 'js2-mode-hook (lambda ()
+                           (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+
+(with-eval-after-load 'xref-js2
+  (defvar xref-js2-search-program)
+
+  (setq xref-js2-search-program 'rg))
 
 ;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
 ;; (define-key js-mode-map (kbd "M-.") nil)
@@ -5963,6 +5919,7 @@ Ignore if no file is found."
 
 (unless (fboundp 'json-mode)
   (autoload #'json-mode "json-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
 
 (unless (fboundp 'jsonc-mode)
@@ -6024,24 +5981,23 @@ Ignore if no file is found."
 (add-hook 'protobuf-mode-hook #'flycheck-mode)
 
 
-(eval-after-load 'mlir-mode
-  '(progn
-     (unless (fboundp 'clang-format)
-       (autoload #'clang-format "clang-format" nil t))
-     (unless (fboundp 'clang-format-buffer)
-       (autoload #'clang-format-buffer "clang-format" nil t))
-     (unless (fboundp 'clang-format-region)
-       (autoload #'clang-format-region "clang-format" nil t))))
+(with-eval-after-load 'mlir-mode
+  (unless (fboundp 'clang-format)
+    (autoload #'clang-format "clang-format" nil t))
+  (unless (fboundp 'clang-format-buffer)
+    (autoload #'clang-format-buffer "clang-format" nil t))
+  (unless (fboundp 'clang-format-region)
+    (autoload #'clang-format-region "clang-format" nil t)))
 
 (unless (fboundp 'clang-format+-mode)
   (autoload #'clang-format+-mode "clang-format+" nil t))
-(add-hook 'mlir-mode-hook #'clang-format+-mode)
-(eval-after-load 'clang-format+-mode
-  '(progn
-     (defvar clang-format+-always-enable)
 
-     (setq clang-format+-always-enable t)
-     t))
+(add-hook 'mlir-mode-hook #'clang-format+-mode)
+
+(with-eval-after-load 'clang-format+-mode
+  (defvar clang-format+-always-enable)
+
+  (setq clang-format+-always-enable t))
 
 
 ;; Use for major modes which do not provide a formatter
@@ -6063,24 +6019,29 @@ Ignore if no file is found."
 
 (unless (fboundp 'global-tree-sitter-mode)
   (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
+(unless (fboundp 'tree-sitter-hl-mode)
+  (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
+
 (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook css-mode-hook html-mode-hook
                              java-mode-hook js-mode-hook js2-mode-hook json-mode-hook
                              jsonc-mode-hook php-mode-hook python-mode-hook typescript-mode-hook))
-  (add-hook hook
-            (lambda nil
-              (require 'tree-sitter)
-              (require 'tree-sitter-langs)
-              (require 'tree-sitter-hl)
-              (global-tree-sitter-mode 1)
-              (tree-sitter-hl-mode 1))))
+  (add-hook hook (lambda nil
+                   (require 'tree-sitter)
+                   (require 'tree-sitter-langs)
+                   (require 'tree-sitter-hl)
 
-(eval-after-load 'tree-sitter
-  '(if (fboundp 'diminish)
-       (diminish 'tree-sitter-mode)))
+                   (global-tree-sitter-mode 1))))
+
+(with-eval-after-load 'tree-sitter
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+  (when (fboundp 'diminish)
+    (diminish 'tree-sitter-mode)))
 
 
 (unless (fboundp 'adoc-mode)
   (autoload #'adoc-mode "adoc-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
 
 
@@ -6088,9 +6049,9 @@ Ignore if no file is found."
   (unless (fboundp 'editorconfig-mode)
     (autoload #'editorconfig-mode "editorconfig" nil t))
 
-  (eval-after-load 'editorconfig
-    '(if (fboundp 'diminish)
-         (diminish 'editorconfig-mode))))
+  (with-eval-after-load 'editorconfig
+    (when (fboundp 'diminish)
+      (diminish 'editorconfig-mode))))
 
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
@@ -6098,14 +6059,13 @@ Ignore if no file is found."
   (autoload #'global-fasd-mode "fasd" nil t))
 (unless (fboundp 'fasd-find-file)
   (autoload #'fasd-find-file "fasd" nil t))
+
 (add-hook 'emacs-startup-hook #'global-fasd-mode)
 
-(eval-after-load 'fasd
-  '(progn
-     (defvar fasd-enable-initial-prompt)
+(with-eval-after-load 'fasd
+  (defvar fasd-enable-initial-prompt)
 
-     (setq fasd-enable-initial-prompt nil)
-     t))
+  (setq fasd-enable-initial-prompt nil))
 
 (bind-keys :package fasd
            ("C-c /" . fasd-find-file))
@@ -6113,11 +6073,13 @@ Ignore if no file is found."
 
 (unless (fboundp 'toml-mode)
   (autoload #'toml-mode "toml-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-mode))
 
 
 (unless (fboundp 'nix-mode)
   (autoload #'nix-mode "nix-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 
 
@@ -6129,11 +6091,10 @@ Ignore if no file is found."
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 (add-hook 'rust-mode-hook #'lsp)
 
-(eval-after-load 'rust-mode
-  '(progn
-     (defvar rust-format-on-save)
-     (setq rust-format-on-save t)
-     t))
+(with-eval-after-load 'rust-mode
+  (defvar rust-format-on-save)
+
+  (setq rust-format-on-save t))
 
 
 (declare-function ansi-color-apply-on-region "ansi-color")
@@ -6142,6 +6103,7 @@ Ignore if no file is found."
   (require 'ansi-color)
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region (point-min) (point-max))))
+
 (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
 
 
@@ -6174,6 +6136,7 @@ Ignore if no file is found."
           ;; strings or comments). That is why it is better to put it at the end.
           company-dabbrev
           ))))
+
 (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
   (add-hook hook (lambda ()
                    (sb/company-text-mode))))
@@ -6192,6 +6155,7 @@ Ignore if no file is found."
            company-yasnippet
            company-dabbrev-code
            ))))
+
 (dolist (hook '(nxml-mode-hook))
   (add-hook hook (lambda ()
                    (sb/company-xml-mode))))
@@ -6212,6 +6176,7 @@ Ignore if no file is found."
            company-dabbrev-code
            company-dabbrev
            ))))
+
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 
@@ -6229,6 +6194,7 @@ Ignore if no file is found."
            company-yasnippet
            company-dabbrev
            ))))
+
 (add-hook 'java-mode-hook #'sb/company-java-mode)
 
 
@@ -6249,6 +6215,7 @@ Ignore if no file is found."
            ;; company-clang ; This can be slow
            company-dabbrev
            ))))
+
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 (defun sb/company-sh-mode ()
@@ -6272,6 +6239,7 @@ Ignore if no file is found."
           ;; company-dabbrev-code
           company-dabbrev
           )))
+
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
 
@@ -6284,11 +6252,12 @@ Ignore if no file is found."
   (set (make-local-variable 'company-backends)
        '((
           company-files
-          company-capf ; Prefer `company-capf' over the old `company-elisp'
+          (company-capf ; Prefer `company-capf' over the old `company-elisp'
+           :separate company-dabbrev-code)
           company-yasnippet
-          company-dabbrev-code
           company-dabbrev
           ))))
+
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
 
@@ -6308,6 +6277,7 @@ Ignore if no file is found."
           ;; company-dabbrev-code ; CAPF support with LSP is sufficient
           company-dabbrev
           )))
+
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 
@@ -6341,6 +6311,7 @@ Ignore if no file is found."
            company-dabbrev
            company-ispell
            ))))
+
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
@@ -6358,6 +6329,7 @@ Ignore if no file is found."
            company-dabbrev
            company-ispell
            ))))
+
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))
 
@@ -6383,9 +6355,10 @@ Ignore if no file is found."
 ;; http://endlessparentheses.com/implementing-comment-line.html
 (defun sb/comment-line (n)
   "Comment or uncomment current line and leave point after it.
+
 With positive prefix, apply to N lines including current one.
-With negative prefix, apply to -N lines above.
-If region is active, apply to active region instead."
+With negative prefix, apply to -N lines above. If region is
+active, apply to active region instead."
   (interactive "p")
   (if (use-region-p)
       (comment-or-uncomment-region
@@ -6402,8 +6375,9 @@ If region is active, apply to active region instead."
 
 ;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
 (defun sb/toggle-line-spacing ()
-  "Toggle line spacing.  Increase the line spacing to help readability.
-Increase line spacing by two line height."
+  "Toggle line spacing.
+
+Increase the line spacing to help readability. Increase line spacing by two line height."
   (interactive)
   (if (eq line-spacing nil)
       (setq line-spacing 2)
@@ -6451,15 +6425,19 @@ Increase line spacing by two line height."
 ;; http://zck.me/emacs-move-file
 (defun sb/move-file (new-location)
   "Write this file to NEW-LOCATION, and delete the old one."
-  (interactive (list (if buffer-file-name
-                         (read-file-name "Move file to: ")
-                       (read-file-name "Move file to: "
-                                       default-directory
-                                       (expand-file-name (file-name-nondirectory (buffer-name))
-                                                         default-directory)))))
+  (interactive (list (expand-file-name
+                      (if buffer-file-name
+                          (read-file-name "Move file to: ")
+                        (read-file-name "Move file to: "
+                                        default-directory
+                                        (expand-file-name (file-name-nondirectory (buffer-name))
+                                                          default-directory))))))
   (when (file-exists-p new-location)
     (delete-file new-location))
-  (let ((old-location (buffer-file-name)))
+  (let ((old-location (expand-file-name (buffer-file-name))))
+    (message "old file is %s and new file is %s"
+             old-location
+             new-location)
     (write-file new-location t)
     (when (and old-location
                (file-exists-p new-location)
@@ -6473,6 +6451,7 @@ Increase line spacing by two line height."
   (interactive "DDirectory: ")
   (shell-command
    (format "%s -f TAGS -eR %s" sb/ctags-path (directory-file-name dir-name))))
+
 
 (defun sb/create-gtags (dir-name)
   "Create tags file with gtags in DIR-NAME."
@@ -6534,8 +6513,8 @@ Increase line spacing by two line height."
 
 (defun sb/change-buffer (change-buffer)
   "Call CHANGE-BUFFER.
-Keep trying until current buffer is not in `sb/skippable-buffers'
-or the major mode is not in `sb/skippable-modes'."
+Keep trying until current buffer is not in `sb/skippable-buffers' or the major
+mode is not in `sb/skippable-modes'."
   (let ((initial (current-buffer)))
     (funcall change-buffer)
     (let ((first-change (current-buffer)))
@@ -6595,6 +6574,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd` macro is not required with
 ;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
+
 ;; Other variants:
 ;; `(global-set-key (kbd "RET") 'newline-and-indent)'
 ;; `(define-key global-map (kbd "RET") 'newline-and-indent)'
@@ -6624,6 +6604,7 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-c b" . comment-box)
  ("C-s"   . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
+
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
@@ -6686,133 +6667,131 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; Hydras
 
-;; (defhydra sb/hydra-spelling (:color blue)
-;;   "
-;;   ^
-;;   ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
-;;   ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
-;;   _q_ quit            _<_ previous        _c_ correction        _n_ next error
-;;   ^^                  _>_ next            _d_ dictionary        _p_ previous error
-;;   ^^                  _f_ check           _m_ mode              _a_ add word
-;;   ^^                  ^^                  ^^                    ^^
-;;   "
-;;   ("q" nil)
-;;   ("<" flyspell-correct-previous :color pink)
-;;   (">" flyspell-correct-next :color pink)
-;;   ("c" ispell)
-;;   ("d" ispell-change-dictionary)
-;;   ("f" flyspell-buffer)
-;;   ("m" flyspell-mode)
-;;   ("n" spell-fu-goto-next-error)
-;;   ("p" spell-fu-goto-previous-error)
-;;   ("a" spell-fu-word-add))
+(defhydra sb/hydra-spelling (:color blue)
+  "
+  ^
+  ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
+  ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
+  _q_ quit            _<_ previous        _c_ correction        _n_ next error
+  ^^                  _>_ next            _d_ dictionary        _p_ previous error
+  ^^                  _f_ check           _m_ mode              _a_ add word
+  ^^                  ^^                  ^^                    ^^
+  "
+  ("q" nil)
+  ("<" flyspell-correct-previous :color pink)
+  (">" flyspell-correct-next :color pink)
+  ("c" ispell)
+  ("d" ispell-change-dictionary)
+  ("f" flyspell-buffer)
+  ("m" flyspell-mode)
+  ("n" spell-fu-goto-next-error)
+  ("p" spell-fu-goto-previous-error)
+  ("a" spell-fu-word-add))
 
-;; (defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
-;;   "Zoom the text"
-;;   ("i" default-text-scale-increase "in")
-;;   ("o" default-text-scale-decrease "out"))
+(defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
+  "Zoom the text"
+  ("i" default-text-scale-increase "in")
+  ("o" default-text-scale-decrease "out"))
 
-;; (defhydra sb/hydra-error (global-map "C-c h e")
-;;   "goto-error"
-;;   ("h" first-error "first")
-;;   ("j" next-error "next")
-;;   ("k" previous-error "prev")
-;;   ("v" recenter-top-bottom "recenter")
-;;   ("q" nil "quit"))
+(defhydra sb/hydra-error (global-map "C-c h e")
+  "goto-error"
+  ("h" first-error "first")
+  ("j" next-error "next")
+  ("k" previous-error "prev")
+  ("v" recenter-top-bottom "recenter")
+  ("q" nil "quit"))
 
-;; (defhydra sb/hydra-projectile (:color teal
-;;                                       :hint nil)
-;;   "
-;;      PROJECTILE: %(projectile-project-root)
+(defhydra sb/hydra-projectile (:color teal :hint nil)
+  "
+     PROJECTILE: %(projectile-project-root)
 
-;;      Find File            Search/Tags          Buffers                Cache
-;; ------------------------------------------------------------------------------------------
-;; _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
-;;  _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
-;;  _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-;;   _r_: recent file                                               ^^^^_z_: cache current
-;;   _d_: dir
+     Find File            Search/Tags          Buffers                Cache
+------------------------------------------------------------------------------------------
+_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
+ _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
+ _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
+  _r_: recent file                                               ^^^^_z_: cache current
+  _d_: dir
+"
+  ("b"   projectile-switch-to-buffer)
+  ("c"   projectile-invalidate-cache)
+  ("d"   projectile-find-dir)
+  ("s-f" projectile-find-file)
+  ("ff"  projectile-find-file-dwim)
+  ("fd"  projectile-find-file-in-directory)
+  ("i"   projectile-ibuffer)
+  ("K"   projectile-kill-buffers)
+  ("s-k" projectile-kill-buffers)
+  ("m"   projectile-multi-occur)
+  ("o"   projectile-multi-occur)
+  ("s-p" projectile-switch-project "switch project")
+  ("p"   projectile-switch-project)
+  ("s"   projectile-switch-project)
+  ("r"   projectile-recentf)
+  ("x"   projectile-remove-known-project)
+  ("X"   projectile-cleanup-known-projects)
+  ("z"   projectile-cache-current-file)
+  ("a"   projectile-ag)
+  ("g"   projectile-find-tag)
+  ("q"   nil "cancel" :color blue))
 
-;; "
-;;   ("b"   projectile-switch-to-buffer)
-;;   ("c"   projectile-invalidate-cache)
-;;   ("d"   projectile-find-dir)
-;;   ("s-f" projectile-find-file)
-;;   ("ff"  projectile-find-file-dwim)
-;;   ("fd"  projectile-find-file-in-directory)
-;;   ("i"   projectile-ibuffer)
-;;   ("K"   projectile-kill-buffers)
-;;   ("s-k" projectile-kill-buffers)
-;;   ("m"   projectile-multi-occur)
-;;   ("o"   projectile-multi-occur)
-;;   ("s-p" projectile-switch-project "switch project")
-;;   ("p"   projectile-switch-project)
-;;   ("s"   projectile-switch-project)
-;;   ("r"   projectile-recentf)
-;;   ("x"   projectile-remove-known-project)
-;;   ("X"   projectile-cleanup-known-projects)
-;;   ("z"   projectile-cache-current-file)
-;;   ("a"   projectile-ag)
-;;   ("g"   projectile-find-tag)
-;;   ("q"   nil "cancel" :color blue))
+(defhydra sb/hydra-flycheck (:color blue)
+  "
+  ^
+  ^Flycheck^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^─────
+  _q_ quit            _<_ previous        _?_ describe
+  _M_ manual          _>_ next            _d_ disable
+  _v_ verify setup    _f_ check           _m_ mode
+  ^^                  _l_ list            _s_ select
+  ^^                  ^^                  ^^
+  "
+  ("q" nil)
+  ("<" flycheck-previous-error :color pink)
+  (">" flycheck-next-error :color pink)
+  ("?" flycheck-describe-checker)
+  ("M" flycheck-manual)
+  ("d" flycheck-disable-checker)
+  ("f" flycheck-buffer)
+  ("l" flycheck-list-errors)
+  ("m" flycheck-mode)
+  ("s" flycheck-select-checker)
+  ("v" flycheck-verify-setup))
 
-;; (defhydra sb/hydra-flycheck (:color blue)
-;;   "
-;;   ^
-;;   ^Flycheck^          ^Errors^            ^Checker^
-;;   ^────────^──────────^──────^────────────^───────^─────
-;;   _q_ quit            _<_ previous        _?_ describe
-;;   _M_ manual          _>_ next            _d_ disable
-;;   _v_ verify setup    _f_ check           _m_ mode
-;;   ^^                  _l_ list            _s_ select
-;;   ^^                  ^^                  ^^
-;;   "
-;;   ("q" nil)
-;;   ("<" flycheck-previous-error :color pink)
-;;   (">" flycheck-next-error :color pink)
-;;   ("?" flycheck-describe-checker)
-;;   ("M" flycheck-manual)
-;;   ("d" flycheck-disable-checker)
-;;   ("f" flycheck-buffer)
-;;   ("l" flycheck-list-errors)
-;;   ("m" flycheck-mode)
-;;   ("s" flycheck-select-checker)
-;;   ("v" flycheck-verify-setup))
+(with-eval-after-load 'python
+  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
+    "Adjust Python indentation."
+    (">" python-indent-shift-right "right")
+    ("<" python-indent-shift-left "left")))
 
-;; (with-eval-after-load 'python
-;;   (defhydra sb/hydra-python-indent (python-mode-map "C-c")
-;;     "Adjust Python indentation."
-;;     (">" python-indent-shift-right "right")
-;;     ("<" python-indent-shift-left "left")))
-
-;; (defhydra sb/smerge-hydra
-;;   (:color pink :hint nil :post (smerge-auto-leave))
-;;   "
-;; ^Move^       ^Keep^               ^Diff^                 ^Other^
-;; ^^-----------^^-------------------^^---------------------^^-------
-;; _n_ext       _b_ase               _<_: upper/base        _C_ombine
-;; _p_rev       _u_pper              _=_: upper/lower       _r_esolve
-;; ^^           _l_ower              _>_: base/lower        _k_ill current
-;; ^^           _a_ll                _R_efine
-;; ^^           _RET_: current       _E_diff
-;; "
-;;   ("n" smerge-next)
-;;   ("p" smerge-prev)
-;;   ("b" smerge-keep-base)
-;;   ("u" smerge-keep-upper)
-;;   ("l" smerge-keep-lower)
-;;   ("a" smerge-keep-all)
-;;   ("RET" smerge-keep-current)
-;;   ("\C-m" smerge-keep-current)
-;;   ("<" smerge-diff-base-upper)
-;;   ("=" smerge-diff-upper-lower)
-;;   (">" smerge-diff-base-lower)
-;;   ("R" smerge-refine)
-;;   ("E" smerge-ediff)
-;;   ("C" smerge-combine-with-next)
-;;   ("r" smerge-resolve)
-;;   ("k" smerge-kill-current)
-;;   ("q" nil "cancel" :color blue))
+(defhydra sb/smerge-hydra
+  (:color pink :hint nil :post (smerge-auto-leave))
+  "
+^Move^       ^Keep^               ^Diff^                 ^Other^
+^^-----------^^-------------------^^---------------------^^-------
+_n_ext       _b_ase               _<_: upper/base        _C_ombine
+_p_rev       _u_pper              _=_: upper/lower       _r_esolve
+^^           _l_ower              _>_: base/lower        _k_ill current
+^^           _a_ll                _R_efine
+^^           _RET_: current       _E_diff
+"
+  ("n" smerge-next)
+  ("p" smerge-prev)
+  ("b" smerge-keep-base)
+  ("u" smerge-keep-upper)
+  ("l" smerge-keep-lower)
+  ("a" smerge-keep-all)
+  ("RET" smerge-keep-current)
+  ("\C-m" smerge-keep-current)
+  ("<" smerge-diff-base-upper)
+  ("=" smerge-diff-upper-lower)
+  (">" smerge-diff-base-lower)
+  ("R" smerge-refine)
+  ("E" smerge-ediff)
+  ("C" smerge-combine-with-next)
+  ("r" smerge-resolve)
+  ("k" smerge-kill-current)
+  ("q" nil "cancel" :color blue))
 
 ;; Mark safe variables
 
