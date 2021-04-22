@@ -430,8 +430,8 @@ This location is used for temporary installations and files.")
         auto-revert-verbose t
         global-auto-revert-non-file-buffers t)
 
-  (if (fboundp 'diminish)
-      (diminish 'auto-revert-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'auto-revert-mode)))
 
 ;; Revert PDF files without asking
 (setq revert-without-query '("\\.pdf"))
@@ -496,8 +496,8 @@ This location is used for temporary installations and files.")
 (add-hook 'prog-mode-hook #'subword-mode)
 
 (with-eval-after-load 'subword
-  (if (fboundp 'diminish)
-      (diminish 'subword-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'subword-mode)))
 
 
 ;; Looks better than the default
@@ -539,8 +539,8 @@ SAVE-FN with non-nil ARGS."
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently)
 
-  (if (fboundp 'diminish)
-      (diminish 'abbrev-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'abbrev-mode)))
 
 
 ;; Moved to `early-init.el'
@@ -692,11 +692,10 @@ SAVE-FN with non-nil ARGS."
   (defvar modus-themes-prompts)
   (defvar modus-themes-variable-pitch-headings)
 
-
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line nil
-        modus-themes-mode-line 'borderless-3d
+        modus-themes-mode-line 'accented-3d
         modus-themes-scale-headings nil
         modus-themes-prompts 'intense-accented
         modus-themes-variable-pitch-headings nil)
@@ -1069,8 +1068,8 @@ SAVE-FN with non-nil ARGS."
 
 (with-eval-after-load 'bufler
   (bufler-mode 1)
-  (if (fboundp 'diminish)
-      (diminish 'bufler-workspace-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'bufler-workspace-mode)))
 
 (bind-keys :package bufler
            ("C-x C-b" . bufler))
@@ -1206,8 +1205,8 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'dired-mode-hook #'dired-async-mode)
 
 (with-eval-after-load 'dired-async
-  (if (fboundp 'diminish)
-      (diminish 'dired-async-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'dired-async-mode)))
 
 
 (when (display-graphic-p)
@@ -1217,8 +1216,8 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
 
   (with-eval-after-load 'all-the-icons-dired
-    (if (fboundp 'diminish)
-        (diminish 'all-the-icons-dired-mode))))
+    (when (fboundp 'diminish)
+      (diminish 'all-the-icons-dired-mode))))
 
 
 (when (display-graphic-p)
@@ -1473,8 +1472,8 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'org-mode-hook #'org-indent-mode)
   (add-hook 'org-mode-hook #'prettify-symbols-mode)
 
-  (if (fboundp 'diminish)
-      (diminish 'org-indent-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'org-indent-mode)))
 
 
 (unless (fboundp 'org-bullets-mode)
@@ -1521,8 +1520,8 @@ SAVE-FN with non-nil ARGS."
   ;; (unless (eq sb/theme 'leuven)
   ;;   (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'light))
 
-  (if (fboundp 'diminish)
-      (diminish 'anzu-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'anzu-mode)))
 
 ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
 (bind-keys :package isearch
@@ -3169,33 +3168,29 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'xref-etags-mode)
   (autoload #'xref-etags-mode "xref" nil t))
 
-(eval-after-load 'xref
-  '(progn
-     (xref-etags-mode)
+(with-eval-after-load 'xref
+  (xref-etags-mode)
 
-     (eval-after-load 'ivy
-       '(progn
-          (defvar xref-show-definitions-function)
-          (defvar xref-show-xrefs-function)
+  (with-eval-after-load 'ivy
+    (defvar xref-show-definitions-function)
+    (defvar xref-show-xrefs-function)
 
-          (setq xref-show-definitions-function #'ivy-xref-show-defs
-                xref-show-xrefs-function #'ivy-xref-show-xrefs)
-          (require 'ivy-xref nil nil)
-          t))
+    (setq xref-show-definitions-function #'ivy-xref-show-defs
+          xref-show-xrefs-function #'ivy-xref-show-xrefs)
+    (require 'ivy-xref nil nil))
 
-     (unless (fboundp 'dump-jump-xref-activate)
-       (autoload #'dumb-jump-xref-activate "dumb-jump" nil t))
-     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (unless (fboundp 'dump-jump-xref-activate)
+    (autoload #'dumb-jump-xref-activate "dumb-jump" nil t))
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
-     (defvar dumb-jump-force-searcher)
-     (defvar dumb-jump-prefer-searcher)
-     (defvar dumb-jump-quiet)
+  (defvar dumb-jump-force-searcher)
+  (defvar dumb-jump-prefer-searcher)
+  (defvar dumb-jump-quiet)
 
-     (setq dumb-jump-force-searcher 'rg
-           dumb-jump-prefer-searcher 'rg
-           dumb-jump-quiet t)
+  (setq dumb-jump-force-searcher 'rg
+        dumb-jump-prefer-searcher 'rg
+        dumb-jump-quiet t))
 
-     t))
 
 (defvar xref--xref-buffer-mode-map)
 (bind-keys :package xref
@@ -3231,23 +3226,21 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'counsel-gtags-update-tags)
     (autoload #'counsel-gtags-update-tags "counsel-gtags" nil t))
 
-  (add-hook 'prog-mode-hook #'counsel-gtags-mode)
-  (add-hook 'protobuf-mode-hook #'counsel-gtags-mode)
-  (add-hook 'latex-mode-hook #'counsel-gtags-mode)
+  (dolist (hook '(prog-mode-hook protobuf-mode-hook LaTex-mode-hook latex-mode-hook))
+    (add-hook hook #'counsel-gtags-mode))
 
-  (eval-after-load 'counsel-gtags
-    '(progn
-       (defvar counsel-gtags-auto-update)
+  (with-eval-after-load 'counsel-gtags
+    (defvar counsel-gtags-auto-update)
 
-       (setq counsel-gtags-auto-update t)
+    (setq counsel-gtags-auto-update t)
 
-       (if (fboundp 'diminish)
-           (diminish 'counsel-gtags-mode))
+    (when (fboundp 'diminish)
+      (diminish 'counsel-gtags-mode))
 
-       ;; Make xref and gtags work together
-       (require 'global-tags nil nil)
-       (add-to-list 'xref-backend-functions 'global-tags-xref-backend)
-       t))
+    ;; Make xref and gtags work together
+    (require 'global-tags nil nil)
+
+    (add-to-list 'xref-backend-functions 'global-tags-xref-backend))
 
   (defvar counsel-gtags-mode-map)
   (bind-keys :package counsel-gtags :map counsel-gtags-mode-map
@@ -3275,23 +3268,21 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'counsel-etags-scan-code)
     (autoload #'counsel-etags-scan-code "counsel-etags" nil t))
 
-  (eval-after-load 'counsel-etags
-    '(progn
-       (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
+  (with-eval-after-load 'counsel-etags
+    (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-       (add-hook 'prog-mode-hook (lambda nil
-                                   (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags
-                                             'append 'local)))
+    (add-hook 'prog-mode-hook (lambda nil
+                                (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags
+                                          'append 'local)))
 
-       (defvar counsel-etags-ignore-directories)
-       (defvar counsel-etags-ignore-filenames)
+    (defvar counsel-etags-ignore-directories)
+    (defvar counsel-etags-ignore-filenames)
 
-       (dolist  (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
-         (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
+    (dolist  (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
+      (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
 
-       (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
-         (add-to-list 'counsel-etags-ignore-filenames ignore-files))
-       t))
+    (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
+      (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
   (bind-keys :package counsel-etags
              ("M-]" . counsel-etags-find-tag-at-point)
@@ -3338,13 +3329,13 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
 (unless (fboundp 'vlf)
   (autoload #'vlf "vlf" nil t))
-(eval-after-load 'vlf
-  '(progn
-     (defvar vlf-application)
 
-     (setq vlf-application 'dont-ask)
-     (require 'vlf-setup nil nil )
-     t))
+(with-eval-after-load 'vlf
+  (defvar vlf-application)
+
+  (setq vlf-application 'dont-ask)
+
+  (require 'vlf-setup nil nil))
 
 
 ;; Erase all consecutive white space characters in a given direction
@@ -3354,12 +3345,12 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'global-hungry-delete-mode "hungry-delete" nil t))
 
 (add-hook 'after-init-hook #'global-hungry-delete-mode)
-(add-hook 'minibuffer-setup-hook #'(lambda nil
-                                     (hungry-delete-mode -1)))
+(add-hook 'minibuffer-setup-hook (lambda nil
+                                   (hungry-delete-mode -1)))
 
-(eval-after-load 'hungry-delete
-  '(if (fboundp 'diminish)
-       (diminish 'hungry-delete-mode)))
+(with-eval-after-load 'hungry-delete
+  (when (fboundp 'diminish)
+    (diminish 'hungry-delete-mode)))
 
 
 ;; Move lines with `M-<up>' and `M-<down>'
@@ -3369,11 +3360,13 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'move-text-down "move-text" nil t))
 (unless (fboundp 'move-text-default-bindings)
   (autoload #'move-text-default-bindings "move-text" nil t))
+
 (move-text-default-bindings)
 
 
 (unless (fboundp 'duplicate-thing)
   (autoload #'duplicate-thing "duplicate-thing" nil t))
+
 (bind-keys* :package duplicate-thing
             ("C-c C-d" . duplicate-thing))
 
@@ -3396,11 +3389,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'jgraph-mode)
   (autoload #'jgraph-mode "jgraph-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.jgr\\'" . jgraph-mode))
 
 
 (unless (fboundp 'graphviz-dot-mode)
   (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
 
 
@@ -3419,36 +3414,35 @@ This file is specified in `counsel-projectile-default-file'."
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (unless (fboundp 'popwin-mode)
   (autoload #'popwin-mode "popwin" nil t))
+
 ;; (add-hook 'after-init-hook #'popwin-mode)
 
-(eval-after-load 'popwin
-  '(progn
-     (defvar popwin:special-display-config)
+(with-eval-after-load 'popwin
+  (defvar popwin:special-display-config)
 
-     (push '("*Help*" :noselect t) popwin:special-display-config)
-     (push '(compilation-mode :noselect t) popwin:special-display-config)
-     (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
-     (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-     (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
-     (push '("*Selection Ring:") popwin:special-display-config)
-     (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
-     (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-     (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
-     (push '("^*magit:.+*$" :noselect nil) popwin:special-display-config)
-     (push '("*xref*" :noselect nil) popwin:special-display-config)
-     (push '(helpful-mode :noselect t) popwin:special-display-config)
-     (push "*Shell Command Output*" popwin:special-display-config)
-     (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-     (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-     (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-     (add-to-list 'popwin:special-display-config '("*Apropos*"))
-     (add-to-list 'popwin:special-display-config '("*Warnings*"))
-     (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-     (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-     (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-     (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-     (add-to-list 'popwin:special-display-config '("*lsp session*"))
-     t))
+  (push '("*Help*" :noselect t) popwin:special-display-config)
+  (push '(compilation-mode :noselect t) popwin:special-display-config)
+  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
+  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
+  (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
+  (push '("*Selection Ring:") popwin:special-display-config)
+  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
+  (push '("^*magit:.+*$" :noselect nil) popwin:special-display-config)
+  (push '("*xref*" :noselect nil) popwin:special-display-config)
+  (push '(helpful-mode :noselect t) popwin:special-display-config)
+  (push "*Shell Command Output*" popwin:special-display-config)
+  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+  (add-to-list 'popwin:special-display-config '("*Apropos*"))
+  (add-to-list 'popwin:special-display-config '("*Warnings*"))
+  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+  (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
 (add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
@@ -3477,6 +3471,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Restore point to the initial location with `C-g' after marking a region
 (unless (fboundp 'smart-mark-mode)
   (autoload #'smart-mark-mode "smart-mark" nil t))
+
 (add-hook 'after-init-hook #'smart-mark-mode)
 
 
@@ -3487,13 +3482,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-hook 'after-init-hook #'whole-line-or-region-global-mode)
 
-(eval-after-load 'whole-line-or-region
-  '(progn
-     (if (boundp 'diminish)
-         (diminish 'whole-line-or-region-local-mode))
-     (if (boundp 'diminish)
-         (diminish 'whole-line-or-region-global-mode))
-     t))
+(with-eval-after-load 'whole-line-or-region
+  (when (boundp 'diminish)
+    (diminish 'whole-line-or-region-local-mode)
+    (diminish 'whole-line-or-region-global-mode)))
 
 
 (unless (fboundp 'goto-last-change)
@@ -3505,14 +3497,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'beginend-global-mode)
   (autoload #'beginend-global-mode "beginend" nil t))
+
 (add-hook 'after-init-hook #'beginend-global-mode)
 
-(eval-after-load 'beginend
-  '(progn
-     (defvar beginend-modes)
-     (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
-       (diminish mode))
-     t))
+(with-eval-after-load 'beginend
+  (defvar beginend-modes)
+
+  (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
+    (diminish mode)))
 
 
 (declare-function undo-tree-visualize "undo-tree")
@@ -3522,25 +3514,23 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-undo-tree-mode)
   (autoload #'global-undo-tree-mode "undo-tree" nil t))
 
-(eval-after-load 'undo-tree
-  '(progn
-     (defvar undo-tree-auto-save-history)
-     (defvar undo-tree-mode-lighter)
-     (defvar undo-tree-visualizer-diff)
-     (defvar undo-tree-visualizer-relative-timestamps)
-     (defvar undo-tree-visualizer-timestamps)
+(with-eval-after-load 'undo-tree
+  (defvar undo-tree-auto-save-history)
+  (defvar undo-tree-mode-lighter)
+  (defvar undo-tree-visualizer-diff)
+  (defvar undo-tree-visualizer-relative-timestamps)
+  (defvar undo-tree-visualizer-timestamps)
 
-     (setq undo-tree-auto-save-history t
-           undo-tree-mode-lighter ""
-           undo-tree-visualizer-diff t
-           undo-tree-visualizer-relative-timestamps t
-           undo-tree-visualizer-timestamps t)
+  (setq undo-tree-auto-save-history t
+        undo-tree-mode-lighter ""
+        undo-tree-visualizer-diff t
+        undo-tree-visualizer-relative-timestamps t
+        undo-tree-visualizer-timestamps t)
 
-     (global-undo-tree-mode 1)
+  (global-undo-tree-mode 1)
 
-     (if (fboundp 'diminish)
-         (diminish 'undo-tree-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'undo-tree-mode)))
 
 (bind-keys :package undo-tree
            ("C-x u" . undo-tree-visualize))
@@ -3549,6 +3539,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Edit multiple regions in the same way simultaneously
 (unless (fboundp 'iedit-mode)
   (autoload #'iedit-mode "iedit" nil t))
+
 (bind-keys* :package iedit
             ("C-." . iedit-mode))
 
@@ -3558,39 +3549,38 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'session-initialize)
   (autoload #'session-initialize "session" nil t))
+
 ;; (add-hook 'after-init-hook #'(lambda nil
 ;;                                (session-initialize)))
 
-(eval-after-load 'session
-  '(progn
-     (defvar session-save-file)
+(with-eval-after-load 'session
+  (defvar session-save-file)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq session-save-file (expand-file-name "session" sb/temp-directory)))
-     t))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq session-save-file (expand-file-name "session" sb/temp-directory))))
 
 
 (unless (fboundp 'immortal-scratch-mode)
   (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
+
 (add-hook 'after-init-hook #'immortal-scratch-mode)
 
 
 ;; I use the *scratch* buffer for taking notes, it helps to make the data persist
 (unless (fboundp 'persistent-scratch-setup-default)
   (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
+
 (add-hook 'after-init-hook #'persistent-scratch-setup-default)
 
-(eval-after-load 'persistent-scratch
-  '(progn
-     (defvar persistent-scratch-autosave-interval)
-     (defvar persistent-scratch-save-file)
+(with-eval-after-load 'persistent-scratch
+  (defvar persistent-scratch-autosave-interval)
+  (defvar persistent-scratch-save-file)
 
-     (setq persistent-scratch-autosave-interval 60)
+  (setq persistent-scratch-autosave-interval 60)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq persistent-scratch-save-file (expand-file-name "persistent-scratch"
-                                                            sb/temp-directory)))
-     t))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch"
+                                                         sb/temp-directory))))
 
 (unless (fboundp 'crux-sudo-edit)
   (autoload #'crux-sudo-edit "crux" nil t))
@@ -3607,11 +3597,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'global-disable-mouse-mode)
   (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
+
 (add-hook 'after-init-hook #'global-disable-mouse-mode)
 
-(eval-after-load 'disable-mouse
-  '(if (fboundp 'diminish)
-       (diminish 'disable-mouse-global-mode)))
+(with-eval-after-load 'disable-mouse
+  (when (fboundp 'diminish)
+    (diminish 'disable-mouse-global-mode)))
 
 
 (when (display-graphic-p)
@@ -3621,14 +3612,15 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'apt-sources-list-mode)
   (autoload #'apt-sources-list-mode "apt-sources-list" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.list\\'" . apt-sources-list-mode))
 
 
 (unless (fboundp 'rainbow-delimiters-mode)
   (autoload #'rainbow-delimiters-mode "rainbow-delimiters" nil t))
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'latex-mode-hook #'rainbow-delimiters-mode)
-(add-hook 'LaTex-mode-hook #'rainbow-delimiters-mode)
+
+(dolist (hook '(prog-mode-hook latex-mode-hook LaTex-mode-hook))
+  (add-hook hook #'rainbow-delimiters-mode))
 
 
 (unless (fboundp 'ssh-config-mode)
@@ -3673,6 +3665,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'ace-window)
   (autoload #'ace-window "ace-window" nil t))
+
 (bind-keys :package ace-window
            ([remap other-window] . ace-window)
            ("<f10>" . ace-window))
@@ -3681,33 +3674,32 @@ This file is specified in `counsel-projectile-default-file'."
 ;; `Shift + direction' arrows
 (unless (fboundp 'windmove-default-keybindings)
   (autoload #'windmove-default-keybindings "windmove" nil t))
+
 (windmove-default-keybindings)
 
-(eval-after-load 'windmove
-  '(progn
-     (defvar windmove-wrap-around)
+(with-eval-after-load 'windmove
+  (defvar windmove-wrap-around)
 
-     (setq windmove-wrap-around t) ; Wrap around at edges
-     t))
+  ;; Wrap around at edges
+  (setq windmove-wrap-around t))
 
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
 ;; being invoked more frequently.
 (unless (fboundp 'super-save-mode)
   (autoload #'super-save-mode "super-save" nil t))
+
 (add-hook 'find-file-hook #'super-save-mode)
 
-(eval-after-load 'super-save
-  '(progn
-     (defvar super-save-remote-files)
-     (defvar super-save-triggers)
+(with-eval-after-load 'super-save
+  (defvar super-save-remote-files)
+  (defvar super-save-triggers)
 
-     (setq super-save-remote-files nil) ; Ignore remote files
-     (add-to-list 'super-save-triggers 'ace-window)
+  (setq super-save-remote-files nil) ; Ignore remote files
+  (add-to-list 'super-save-triggers 'ace-window)
 
-     (if (fboundp 'diminish)
-         (diminish 'super-save-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'super-save-mode)))
 
 
 ;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
@@ -3716,20 +3708,18 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'avy-setup-default)
   (autoload #'avy-setup-default "avy" nil t))
 
-(eval-after-load 'avy
-  '(progn
-     (defvar avy-indent-line-overlay)
-     (defvar avy-background)
-     (defvar avy-highlight-first)
-     (defvar avy-style)
+(with-eval-after-load 'avy
+  (defvar avy-indent-line-overlay)
+  (defvar avy-background)
+  (defvar avy-highlight-first)
+  (defvar avy-style)
 
-     (setq avy-indent-line-overlay nil
-           avy-background t
-           avy-highlight-first t
-           avy-style 'at)
+  (setq avy-indent-line-overlay nil
+        avy-background t
+        avy-highlight-first t
+        avy-style 'at)
 
-     (avy-setup-default)
-     t))
+  (avy-setup-default))
 
 (bind-keys :package avy
            ("M-b" . avy-goto-word-1)
@@ -3738,24 +3728,21 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; This package adds a "C-'" binding to Ivy minibuffer that uses Avy
-(eval-after-load 'avy
-  '(eval-after-load 'ivy
-     '(progn
-        (declare-function ivy-avy "ivy-avy")
-        (unless (fboundp 'ivy-avy)
-          (autoload #'ivy-avy "ivy-avy" nil t))
+(with-eval-after-load 'avy
+  (with-eval-after-load 'ivy
+    (declare-function ivy-avy "ivy-avy")
+    (unless (fboundp 'ivy-avy)
+      (autoload #'ivy-avy "ivy-avy" nil t))
 
-        (bind-keys :package ivy-avy :map ivy-minibuffer-map
-                   ("C-'" . ivy-avy)))))
+    (bind-keys :package ivy-avy :map ivy-minibuffer-map
+               ("C-'" . ivy-avy))))
 
 
-(eval-after-load 'bookmark
-  '(progn
-     (defvar bookmark-default-file)
+(with-eval-after-load 'bookmark
+  (defvar bookmark-default-file)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory)))
-     t))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory))))
 
 
 (declare-function bm-buffer-save "bm")
@@ -3785,9 +3772,9 @@ This file is specified in `counsel-projectile-default-file'."
 (defvar bm-restore-repository-on-load)
 (setq bm-restore-repository-on-load t)
 
-(add-hook 'kill-emacs-hook #'(lambda nil
-                               (bm-buffer-save-all)
-                               (bm-repository-save)))
+(add-hook 'kill-emacs-hook (lambda ()
+                             (bm-buffer-save-all)
+                             (bm-repository-save)))
 (add-hook 'after-save-hook #'bm-buffer-save)
 (add-hook 'kill-buffer-hook #'bm-buffer-save)
 (add-hook 'find-file-hook #'bm-buffer-restore)
@@ -3796,14 +3783,12 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (add-hook 'after-init-hook #'bm-repository-load)
 ;; (run-at-time 5 nil #'bm-repository-load)
 
-(eval-after-load 'bm
-  '(progn
-     (defvar bm-repository-file)
+(with-eval-after-load 'bm
+  (defvar bm-repository-file)
 
-     (setq-default bm-buffer-persistence t)
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory)))
-     t))
+  (setq-default bm-buffer-persistence t)
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory))))
 
 (bind-keys :package bm
            ("C-<f1>" . bm-toggle)
@@ -3829,11 +3814,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'explain-pause-top)
   (autoload #'explain-pause-top "explain-pause-mode" nil t))
 
-(eval-after-load 'explain-pause-mode
-  '(progn
-     (if (fboundp 'diminish)
-         (diminish 'explain-pause-mode))
-     t))
+(with-eval-after-load 'explain-pause-mode
+  (when (fboundp 'diminish)
+    (diminish 'explain-pause-mode)))
 
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
@@ -3855,33 +3838,30 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'writegood-mode)
   (autoload #'writegood-mode "writegood-mode" nil t))
 
-(eval-after-load 'writegood-mode
-  '(progn
-     (if (fboundp 'writegood-mode)
-         (diminish 'writegood-mode))
-     t))
+(with-eval-after-load 'writegood-mode
+  (when (fboundp 'writegood-mode)
+    (diminish 'writegood-mode)))
 
 
-(eval-after-load 'text-mode
-  '(progn
-     (unless (fboundp 'langtool-check)
-       (autoload #'langtool-check "langtool" nil t))
+(with-eval-after-load 'text-mode
+  (unless (fboundp 'langtool-check)
+    (autoload #'langtool-check "langtool" nil t))
 
-     (defvar langtool-default-language)
-     (defvar langtool-disabled-rules)
-     (defvar langtool-language-tool-jar)
-     (defvar no-littering-etc-directory)
+  (defvar langtool-default-language)
+  (defvar langtool-disabled-rules)
+  (defvar langtool-language-tool-jar)
+  (defvar no-littering-etc-directory)
 
-     (setq langtool-default-language "en"
-           langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
-                                     "COPYRIGHT"
-                                     "DASH_RULE"
-                                     "EN_QUOTES"
-                                     "EN_UNPAIRED_BRACKETS"
-                                     "UPPERCASE_SENTENCE_START"
-                                     "WHITESPACE_RULE")
-           langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
-                                                        no-littering-etc-directory))))
+  (setq langtool-default-language "en"
+        langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
+                                  "COPYRIGHT"
+                                  "DASH_RULE"
+                                  "EN_QUOTES"
+                                  "EN_UNPAIRED_BRACKETS"
+                                  "UPPERCASE_SENTENCE_START"
+                                  "WHITESPACE_RULE")
+        langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
+                                                     no-littering-etc-directory)))
 
 
 (unless (fboundp 'wc-mode)
@@ -3931,29 +3911,28 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
 (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
 
-(eval-after-load 'pdf-tools
-  '(progn
-     ;; (pdf-tools-install :no-query)
-     (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
+(with-eval-after-load 'pdf-tools
+  ;; (pdf-tools-install :no-query)
+  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
 
-     (defvar pdf-annot-activate-created-annotations)
-     (defvar pdf-view-resize-factor)
+  (defvar pdf-annot-activate-created-annotations)
+  (defvar pdf-view-resize-factor)
 
-     (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
-           ;; Fine-grained zoom factor of 10%
-           pdf-view-resize-factor 1.1)
+  (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
+        ;; Fine-grained zoom factor of 10%
+        pdf-view-resize-factor 1.1)
 
-     (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
-     (add-hook 'pdf-view-mode #'pdf-links-minor-mode)
-     (add-hook 'pdf-view-mode #'pdf-isearch-minor-mode)
-     (add-hook 'pdf-view-mode #'pdf-outline-minor-mode)
-     (add-hook 'pdf-view-mode #'pdf-history-minor-mode)
+  (add-hook 'pdf-view-mode #'pdf-links-minor-mode)
+  (add-hook 'pdf-view-mode #'pdf-isearch-minor-mode)
+  (add-hook 'pdf-view-mode #'pdf-outline-minor-mode)
+  (add-hook 'pdf-view-mode #'pdf-history-minor-mode)
 
-     ;; (add-hook 'pdf-view-mode-hook (lambda ()
-     ;;                                 (setq header-line-format nil)))
+  ;; (add-hook 'pdf-view-mode-hook (lambda ()
+  ;;                                 (setq header-line-format nil)))
 
-     t))
+  )
 
 (defvar pdf-view-mode-map)
 (bind-keys :package pdf-tools :map pdf-view-mode-map
@@ -3963,31 +3942,32 @@ This file is specified in `counsel-projectile-default-file'."
            ("t" . pdf-annot-add-text-annotation))
 
 
-(eval-after-load 'saveplace
-  '(eval-after-load 'pdf-tools
-     '(require 'saveplace-pdf-view nil nil)))
+(with-eval-after-load 'saveplace
+  (with-eval-after-load 'pdf-tools
+    (require 'saveplace-pdf-view nil nil)))
 
 
 (unless (fboundp 'logview-mode)
   (autoload #'logview-mode "logview" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
 
-(eval-after-load 'logview
-  '(progn
-     (defvar logview-cache-filename)
+(with-eval-after-load 'logview
+  (defvar logview-cache-filename)
 
-     (unless (bound-and-true-p sb/use-no-littering)
-       (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory)))
-     t))
+  (unless (bound-and-true-p sb/use-no-littering)
+    (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory))))
 
 
 (unless (fboundp 'antlr-mode)
   (autoload #'antlr-mode "antlr-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
 
 
 (unless (fboundp 'bison-mode)
   (autoload #'bison-mode "bison-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.y\\'" . bison-mode))
 (add-to-list 'auto-mode-alist '("\\.l\\'" . bison-mode))
 (add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode))
@@ -3996,6 +3976,7 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function llvm-mode "llvm-mode")
 (unless (fboundp 'llvm-mode)
   (autoload #'llvm-mode "llvm-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
 
 
@@ -4003,12 +3984,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'tablegen-mode)
   (autoload #'tablegen-mode "tablegen-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.td\\'" . tablegen-mode))
 
 
 (declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
 (unless (fboundp 'autodisass-llvm-bitcode)
   (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
 
 
@@ -4022,47 +4005,44 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
-(eval-after-load 'markdown-mode
-  '(progn
-     ;; Looks good, but hiding markup makes it difficult to be consistent while editing
-     ;; (setq-default markdown-hide-markup t)
+(with-eval-after-load 'markdown-mode
+  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
+  ;; (setq-default markdown-hide-markup t)
 
-     (defvar markdown-command)
-     (defvar markdown-enable-math)
-     (defvar markdown-enable-wiki-links)
-     (defvar markdown-fontify-code-blocks-natively)
-     (defvar markdown-indent-on-enter)
-     (defvar markdown-list-indent-width)
-     (defvar markdown-split-window-direction)
+  (defvar markdown-command)
+  (defvar markdown-enable-math)
+  (defvar markdown-enable-wiki-links)
+  (defvar markdown-fontify-code-blocks-natively)
+  (defvar markdown-indent-on-enter)
+  (defvar markdown-list-indent-width)
+  (defvar markdown-split-window-direction)
 
-     (setq markdown-command
-           "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
-           markdown-enable-math t ; Syntax highlight for LaTeX fragments
-           markdown-enable-wiki-links t
-           ;;   https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
-           markdown-fontify-code-blocks-natively t
-           markdown-indent-on-enter 'indent-and-new-item
-           markdown-list-indent-width 2
-           ;; markdown-make-gfm-checkboxes-buttons nil
-           markdown-split-window-direction 'horizontal)
+  (setq markdown-command
+        "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
+        markdown-enable-math t ; Syntax highlight for LaTeX fragments
+        markdown-enable-wiki-links t
+        ;;   https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
+        markdown-fontify-code-blocks-natively t
+        markdown-indent-on-enter 'indent-and-new-item
+        markdown-list-indent-width 2
+        ;; markdown-make-gfm-checkboxes-buttons nil
+        markdown-split-window-direction 'horizontal)
 
-     ;; `markdown-mode' is derived from `text-mode'
-     (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)
-     ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
+  ;; `markdown-mode' is derived from `text-mode'
+  (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)
+  ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
 
-     (require 'markdown-mode+ nil nil)
+  (require 'markdown-mode+ nil nil)
 
-     (unless (fboundp 'markdown-toc-refresh-toc)
-       (autoload #'markdown-toc-refresh-toc "markdown-toc" nil t))
-     (unless (fboundp 'markdown-toc-generate-toc)
-       (autoload #'markdown-toc-generate-toc "markdown-toc" nil t))
-     (unless (fboundp 'markdown-toc-generate-or-refresh-toc)
-       (autoload #'markdown-toc-generate-or-refresh-toc "markdown-toc" nil t))
+  (unless (fboundp 'markdown-toc-refresh-toc)
+    (autoload #'markdown-toc-refresh-toc "markdown-toc" nil t))
+  (unless (fboundp 'markdown-toc-generate-toc)
+    (autoload #'markdown-toc-generate-toc "markdown-toc" nil t))
+  (unless (fboundp 'markdown-toc-generate-or-refresh-toc)
+    (autoload #'markdown-toc-generate-or-refresh-toc "markdown-toc" nil t))
 
-     (unless (fboundp 'markdown-preview-mode)
-       (autoload #'markdown-preview-mode "markdown-preview-mode" nil t))
-
-     t))
+  (unless (fboundp 'markdown-preview-mode)
+    (autoload #'markdown-preview-mode "markdown-preview-mode" nil t)))
 
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
@@ -4074,16 +4054,14 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'pandoc-load-default-settings "pandoc-mode" nil t))
 (add-hook 'markdown-mode-hook #'pandoc-mode)
 
-(eval-after-load 'pandoc-mode
-  '(progn
-     (pandoc-load-default-settings)
+(with-eval-after-load 'pandoc-mode
+  (pandoc-load-default-settings)
 
-     ;; Binds `C-c /' to `pandoc-main-hydra/body'.
-     ;; (unbind-key "C-c /" pandoc-mode-map))
+  ;; Binds `C-c /' to `pandoc-main-hydra/body'.
+  ;; (unbind-key "C-c /" pandoc-mode-map))
 
-     (if (fboundp 'diminish)
-         (diminish 'pandoc-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'pandoc-mode)))
 
 
 (when (executable-find "grip")
@@ -4107,59 +4085,56 @@ This file is specified in `counsel-projectile-default-file'."
                                 (not (file-remote-p buffer-file-name)))
                        (prettier-mode 1)))))
 
-  (eval-after-load 'prettier
-    '(progn
-       (defvar prettier-lighter)
-       (setq prettier-lighter nil)
-       t)))
+  (with-eval-after-load 'prettier
+    (defvar prettier-lighter)
+
+    (setq prettier-lighter nil)))
 
 
 ;; Align fields with `C-c C-a'
 (unless (fboundp 'csv-mode)
   (autoload #'csv-mode "csv-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
 
-(eval-after-load 'csv-mode
-  '(progn
-     (defvar csv-separators)
+(with-eval-after-load 'csv-mode
+  (defvar csv-separators)
 
-     (setq csv-separators '("," ";" "|" " "))
-     t))
+  (setq csv-separators '("," ";" "|" " ")))
 
 
 (unless (fboundp 'highlight-doxygen-global-mode)
   (autoload #'highlight-doxygen-global-mode "highlight-doxygen" nil t))
 
-(eval-after-load 'highlight-doxygen
-  '(progn
-     (highlight-doxygen-global-mode)
-     t))
+(with-eval-after-load 'highlight-doxygen
+  (highlight-doxygen-global-mode))
 
 
 (unless (fboundp 'rst-mode)
   (autoload #'rst-mode "rst" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode))
 
 
 (unless (fboundp 'xref-rst-mode)
   (autoload #'xref-rst-mode "xref-rst" nil t))
+
 (add-hook 'rst-mode-hook #'xref-rst-mode)
 
 
 (unless (fboundp 'z3-smt2-mode)
   (autoload #'z3-smt2-mode "boogie-friends" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.smt\\'" . z3-smt2-mode))
 
 
 (unless (fboundp 'z3-mode)
   (autoload #'z3-mode "z3-mode" nil t))
 
-(eval-after-load 'z3-mode
-  '(progn
-     (defvar z3-solver-cmd)
+(with-eval-after-load 'z3-mode
+  (defvar z3-solver-cmd)
 
-     (setq z3-solver-cmd "z3")
-     t))
+  (setq z3-solver-cmd "z3"))
 
 
 (unless (fboundp 'makefile-mode)
@@ -4181,15 +4156,13 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'lisp-mode-hook #'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode)
 
-  (eval-after-load 'eldoc
-    '(progn
-       ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
-       ;; itself unexpectedly when point is on a variable with a multiline docstring.
-       (setq eldoc-echo-area-use-multiline-p nil)
+  (with-eval-after-load 'eldoc
+    ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
+    ;; itself unexpectedly when point is on a variable with a multiline docstring.
+    (setq eldoc-echo-area-use-multiline-p nil)
 
-       (if (fboundp 'diminish)
-           (diminish 'eldoc-mode))
-       t)))
+    (when (fboundp 'diminish)
+      (diminish 'eldoc-mode))))
 
 
 (declare-function eldoc-box-hover-mode "eldoc-box")
@@ -4202,58 +4175,56 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
 ;; (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
 
-(eval-after-load 'eldoc-box
-  '(progn
-     (defvar eldoc-box-clear-with-C-g)
-     (setq eldoc-box-clear-with-C-g t)
-     (if (fboundp 'diminish)
-         (diminish 'eldoc-box-hover-mode))
-     t))
+(with-eval-after-load 'eldoc-box
+  (defvar eldoc-box-clear-with-C-g)
+  (setq eldoc-box-clear-with-C-g t)
+  (if (fboundp 'diminish)
+      (diminish 'eldoc-box-hover-mode)))
 
 
 (unless (fboundp 'c-turn-on-eldoc-mode)
   (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
+
 (add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
 
 
-(eval-after-load 'css-mode
-  '(progn
-     (unless (fboundp 'css-eldoc-enable)
-       (autoload #'css-eldoc-enable "css-eldoc" nil t))
+(with-eval-after-load 'css-mode
+  (unless (fboundp 'css-eldoc-enable)
+    (autoload #'css-eldoc-enable "css-eldoc" nil t))
 
-     (css-eldoc-enable)
-     t))
+  (css-eldoc-enable))
 
 
 (unless (fboundp 'matlab-mode)
   (autoload #'matlab-mode "matlab-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.m$" . matlab-mode))
 
 
 (unless (fboundp 'R-mode)
   (autoload #'R-mode "ess" nil t))
+
 (add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
 
-(eval-after-load 'R-mode
-  '(require 'ess-smart-underscore nil nil))
+(with-eval-after-load 'R-mode
+  (require 'ess-smart-underscore nil nil))
 
 
-(eval-after-load 'ess
-  '(progn
-     (defvar ess-indent-offset)
-     (defvar ess-indent-from-lhs)
-     (defvar inferior-R-args)
+(with-eval-after-load 'ess
+  (defvar ess-indent-offset)
+  (defvar ess-indent-from-lhs)
+  (defvar inferior-R-args)
 
-     (setq ess-indent-from-lhs 4
-           ess-indent-offset 4
-           inferior-R-args "--quiet --no-restore-history --no-save")
+  (setq ess-indent-from-lhs 4
+        ess-indent-offset 4
+        inferior-R-args "--quiet --no-restore-history --no-save")
 
-     (require 'ess-smart-underscore nil nil)
-     t))
+  (require 'ess-smart-underscore nil nil))
 
 
 (unless (fboundp 'ini-mode)
   (autoload #'ini-mode "ini-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.ini\\'" . ini-mode))
 
 
@@ -4262,6 +4233,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'pkgbuild-mode)
   (autoload #'pkgbuild-mode "pkgbuild-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("PKGBUILD" . pkgbuild-mode))
 
 
@@ -4498,10 +4470,10 @@ This file is specified in `counsel-projectile-default-file'."
                          (lambda
                            (workspace)
                            (with-lsp-workspace workspace
-                                               (lsp--set-configuration
-                                                (ht-merge
-                                                 (lsp-configuration-section "pyright")
-                                                 (lsp-configuration-section "python")))))
+                             (lsp--set-configuration
+                              (ht-merge
+                               (lsp-configuration-section "pyright")
+                               (lsp-configuration-section "python")))))
                          :download-server-fn
                          (lambda
                            (_client callback error-callback _update\?)
@@ -4619,8 +4591,8 @@ This file is specified in `counsel-projectile-default-file'."
                        (lambda
                          (workspace)
                          (with-lsp-workspace workspace
-                                             (lsp--set-configuration
-                                              (lsp-configuration-section "perl"))))
+                           (lsp--set-configuration
+                            (lsp-configuration-section "perl"))))
                        :priority -1 :server-id 'perlls-remote))
 
      (advice-add #'lsp-completion--regex-fuz :override #'identity)
@@ -6686,31 +6658,30 @@ or the major mode is not in `sb/skippable-modes'."
   (autoload #'which-key-setup-side-window-right-bottom nil t))
 (unless (fboundp 'which-key-mode)
   (autoload #'which-key-mode nil t))
+
 (add-hook 'after-init-hook #'which-key-mode)
 
-(eval-after-load 'which-key
-  '(progn
-     ;; Allow C-h to trigger which-key before it is done automatically
-     (defvar which-key-show-early-on-C-h)
-     (setq which-key-show-early-on-C-h t)
+(with-eval-after-load 'which-key
+  ;; Allow C-h to trigger which-key before it is done automatically
+  (defvar which-key-show-early-on-C-h)
+  (setq which-key-show-early-on-C-h t)
 
-     (which-key-setup-side-window-right-bottom)
+  (which-key-setup-side-window-right-bottom)
 
-     (if (fboundp 'diminish)
-         (diminish 'which-key-mode))
-     t))
+  (when (fboundp 'diminish)
+    (diminish 'which-key-mode)))
 
 
 ;; The posframe has a lower contrast
 (unless (fboundp 'which-key-posframe-mode)
   (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
+
 (add-hook 'which-key-mode-hook #'which-key-posframe-mode)
 
-(eval-after-load 'which-key-posframe
-  '(progn
-     (defvar which-key-posframe-border-width)
-     (setq which-key-posframe-border-width 2)
-     t))
+(with-eval-after-load 'which-key-posframe
+  (defvar which-key-posframe-border-width)
+
+  (setq which-key-posframe-border-width 2))
 
 
 ;; Hydras
