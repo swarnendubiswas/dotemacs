@@ -52,7 +52,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'powerline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -115,10 +115,14 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
+
+(when (bound-and-true-p sb/debug-init-file)
+  (setq garbage-collection-messages t
+        debug-on-error t))
 
 (defconst sb/user-home
   (getenv "HOME")
@@ -159,9 +163,7 @@ This location is used for temporary installations and files.")
 ;; (debug-on-entry 'package-initialize)
 
 (when (bound-and-true-p sb/use-no-littering)
-  (require 'no-littering nil nil)
-  (unless (fboundp 'no-littering-expand-etc-file-name)
-    (autoload #'no-littering-expand-etc-file-name "no-littering" nil t)))
+  (require 'no-littering nil nil))
 
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
@@ -182,14 +184,14 @@ This location is used for temporary installations and files.")
 (when (file-exists-p sb/private-file)
   (load sb/private-file 'noerror))
 
-(unless (or (file-exists-p sb/temp-directory)
-            (bound-and-true-p sb/use-no-littering))
+(unless (and (bound-and-true-p sb/use-no-littering)
+             (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
 
-(defconst sb/emacs27+ (> emacs-major-version 26))
-(defconst sb/emacs28+ (> emacs-major-version 27))
-(defconst sb/is-linux (eq system-type 'gnu/linux))
-(defconst sb/is-windows (eq system-type 'windows-nt))
+(defconst sb/EMACS27+ (> emacs-major-version 26))
+(defconst sb/EMACS28+ (> emacs-major-version 27))
+(defconst sb/IS-LINUX (eq system-type 'gnu/linux))
+(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
 (defconst sb/emacs-1MB (* 1 1000 1000))
 (defconst sb/emacs-4MB (* 4 1000 1000))
@@ -213,8 +215,6 @@ This location is used for temporary installations and files.")
 ;; permanently.
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq garbage-collection-messages nil))
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
         gc-cons-threshold sb/emacs-100MB))
@@ -236,6 +236,7 @@ This location is used for temporary installations and files.")
   (defvar paradox-display-star-count)
   (defvar paradox-execute-asynchronously)
   (defvar paradox-github-token)
+
   (setq paradox-display-star-count nil
         paradox-execute-asynchronously t
         paradox-github-token t)
@@ -510,16 +511,19 @@ This location is used for temporary installations and files.")
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
-(cond ((eq sb/window-split 'horizontal) (setq split-width-threshold nil
-                                              split-height-threshold 0))
-      ;; vertical - Split the selected window into two side-by-side windows (e.g.,
-      ;; `split-window-right')
-      ((eq sb/window-split 'vertical) (setq split-height-threshold nil
-                                            split-width-threshold 0)))
+(when (eq sb/window-split 'horizontal)
+  (setq split-width-threshold nil
+        split-height-threshold 0))
+
+;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right')
+(when (eq sb/window-split 'vertical)
+  (setq split-height-threshold nil
+        split-width-threshold 0))
 
 ;; Make use of wider screens
 ;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
 ;;   (split-window-right))
+
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -550,6 +554,7 @@ SAVE-FN with non-nil ARGS."
 ;;     (scroll-bar-mode -1)
 ;;     (tool-bar-mode -1)))
 
+
 ;; Disable the following modes
 (dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
                 desktop-save-mode
@@ -560,9 +565,6 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode -1)))
 
-
-;; (with-eval-after-load 'hl-line
-;;   (declare-function hl-line-highlight "hl-line"))
 
 ;; Enable the following modes
 (dolist (mode '(auto-compression-mode
@@ -581,6 +583,7 @@ SAVE-FN with non-nil ARGS."
 (diminish 'auto-fill-function)
 (diminish 'visual-line-mode)
 (diminish 'outline-minor-mode)
+
 
 ;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
 
@@ -695,10 +698,12 @@ SAVE-FN with non-nil ARGS."
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line nil
-        modus-themes-mode-line 'accented-3d
         modus-themes-scale-headings nil
         modus-themes-prompts 'intense-accented
         modus-themes-variable-pitch-headings nil)
+
+  (when (eq sb/modeline-theme 'default)
+    (setq modus-themes-mode-line 'accented-3d))
 
   ;; FIXME: Moody modeline configuration is not working
   (when (eq sb/modeline-theme 'moody)
@@ -727,9 +732,12 @@ SAVE-FN with non-nil ARGS."
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'subtle
         modus-themes-intense-hl-line t
-        modus-themes-mode-line 'borderless-3d
+        modus-themes-mode-line 'accented-3d
         modus-themes-scale-headings nil
         modus-themes-variable-pitch-headings nil)
+
+  (when (eq sb/modeline-theme 'default)
+    (setq modus-themes-mode-line 'accented-3d))
 
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
@@ -916,6 +924,7 @@ SAVE-FN with non-nil ARGS."
   (moody-replace-vc-mode))
 
 
+;; The icons do not look good.
 ;; (when (eq sb/modeline-theme 'powerline)
 ;;   (require 'mode-icons)
 ;;   (mode-icons-mode 1))
@@ -931,9 +940,10 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'after-init-hook #'auto-dim-other-buffers-mode)
 
 
+(declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
+
 (unless (fboundp 'centaur-tabs-mode)
   (autoload #'centaur-tabs-mode "centaur-tabs" nil t))
-(declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
 (unless (fboundp 'centaur-tabs-group-by-projectile-project)
   (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
 
@@ -944,9 +954,11 @@ SAVE-FN with non-nil ARGS."
   (defvar centaur-tabs-set-close-button)
   (defvar centaur-tabs-set-icons)
   (defvar centaur-tabs-set-modified-marker)
+  (defvar centaur-tabs-icon-scale-factor)
 
   (setq centaur-tabs-cycle-scope 'tabs
-        centaur-tabs-set-close-button t
+        centaur-tabs-icon-scale-factor 0.8
+        centaur-tabs-set-close-button nil
         centaur-tabs-set-icons t
         centaur-tabs-set-modified-marker t)
 
@@ -983,7 +995,7 @@ SAVE-FN with non-nil ARGS."
 (defun sb/minibuffer-font-setup ()
   "Customize minibuffer font."
   (set (make-local-variable 'face-remapping-alist)
-       '((default :height 0.95))))
+       '((default :height 0.90))))
 
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
@@ -1060,7 +1072,11 @@ SAVE-FN with non-nil ARGS."
     (setq all-the-icons-ibuffer-human-readable-size t
           all-the-icons-ibuffer-icon-size 0.8)))
 
+(bind-keys :package ibuffer
+           ("C-x C-b" . ibuffer))
 
+
+;; IBuffer works well enough for me
 (unless (fboundp 'bufler)
   (autoload #'bufler "bufler" nil t))
 (unless (fboundp 'bufler-mode)
@@ -1071,8 +1087,6 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp 'diminish)
     (diminish 'bufler-workspace-mode)))
 
-(bind-keys :package bufler
-           ("C-x C-b" . bufler))
 
 
 (declare-function dired-next-line "dired")
@@ -1134,7 +1148,13 @@ SAVE-FN with non-nil ARGS."
         dired-omit-verbose nil)
 
   (add-hook 'dired-mode-hook #'auto-revert-mode)
-  (add-hook 'dired-mode-hook #'dired-omit-mode))
+  (add-hook 'dired-mode-hook #'dired-omit-mode)
+
+  ;; More detailed colors, but can be jarring with certain themes
+  (unless (fboundp #'diredfl-mode)
+    (autoload #'diredfl-mode "diredfl" nil t))
+
+  (add-hook 'dired-mode-hook #'diredfl-mode))
 
 (defvar dired-mode-map)
 (bind-keys :package dired :map dired-mode-map
@@ -1155,11 +1175,11 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; Do not create multiple dired buffers
-(unless  (fboundp 'diredp-toggle-find-file-reuse-dir)
+(unless (fboundp 'diredp-toggle-find-file-reuse-dir)
   (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
 
-(add-hook 'dired-mode-hook #'(lambda ()
-                               (diredp-toggle-find-file-reuse-dir 1)))
+(add-hook 'dired-mode-hook (lambda ()
+                             (diredp-toggle-find-file-reuse-dir 1)))
 (with-eval-after-load 'dired+
   (defvar diredp-hide-details-initially-flag)
   (defvar diredp-hide-details-propagate-flag)
@@ -1185,13 +1205,6 @@ SAVE-FN with non-nil ARGS."
 
   (bind-keys :package dired-narrow :map dired-mode-map
              ("/" . dired-narrow)))
-
-
-;; More detailed colors, but can be jarring with certain themes
-(unless (fboundp #'diredfl-mode)
-  (autoload #'diredfl-mode "diredfl" nil t))
-
-(add-hook 'dired-mode-hook #'diredfl-mode)
 
 
 (unless (fboundp 'async-bytecomp-package-mode)
@@ -1332,7 +1345,8 @@ SAVE-FN with non-nil ARGS."
     (setq treemacs-collapse-dirs 2
           treemacs-follow-after-init t
           treemacs-indentation 1
-          treemacs-is-never-other-window nil ; Prevents treemacs from being selected with `other-window`
+          ;; Prevents treemacs from being selected with `other-window`
+          treemacs-is-never-other-window nil
           treemacs-no-png-images nil
           treemacs-position 'right
           treemacs-project-follow-cleanup t
@@ -1341,7 +1355,7 @@ SAVE-FN with non-nil ARGS."
           treemacs-show-hidden-files nil
           treemacs-silent-filewatch t
           treemacs-silent-refresh t
-          treemacs-width 24)
+          treemacs-width 22)
 
     (unless (bound-and-true-p sb/use-no-littering)
       (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
@@ -1404,19 +1418,19 @@ SAVE-FN with non-nil ARGS."
   )
 
 
-;; Allows to quickly add projectile projects to the treemacs workspace
-(with-eval-after-load 'projectile
-  (with-eval-after-load 'treemacs
+(with-eval-after-load 'treemacs
+  ;; Allows to quickly add projectile projects to the treemacs workspace
+  (with-eval-after-load 'projectile
     (unless (fboundp 'treemacs-projectile)
-      (autoload #'treemacs-projectile "treemacs-projectile" nil t))))
+      (autoload #'treemacs-projectile "treemacs-projectile" nil t)))
 
 
-(with-eval-after-load 'magit
-  (with-eval-after-load 'treemacs
+  (with-eval-after-load 'magit
     (require 'treemacs-magit nil nil)))
 
 
 (declare-function org-indent-mode "org-indent")
+
 (unless (fboundp 'org-indent-mode)
   (autoload #'org-indent-mode "org-indent" nil t))
 
@@ -1455,9 +1469,9 @@ SAVE-FN with non-nil ARGS."
         org-startup-folded 'showeverything
         org-startup-with-inline-images t
         org-support-shift-select t
-        ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the beginning
-        ;; of headlines. `org-babel-describe-bindings' will display a list of the code blocks commands and
-        ;; their related keys.
+        ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
+        ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
+        ;; blocks commands and their related keys.
         org-use-speed-commands t
         org-src-strip-leading-and-trailing-blank-lines t
         ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
@@ -1526,10 +1540,11 @@ SAVE-FN with non-nil ARGS."
 ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
 (bind-keys :package isearch
            ("C-s")
-           ("C-f" . isearch-forward-regexp)
+           ;; ("C-f" . isearch-forward-regexp)
            :map isearch-mode-map
            ("C-s")
-           ("C-f" . isearch-repeat-forward))
+           ;; ("C-f" . isearch-repeat-forward)
+           )
 
 
 (unless (fboundp 'swiper-isearch)
@@ -1698,8 +1713,9 @@ SAVE-FN with non-nil ARGS."
 ;; Hide the "Wrote to recentf" message which is irritating
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
 
+;; TODO: Is this causing tramp to fail? I have disabled it to test.
 ;; Hide the "Wrote ..." message which is irritating
-(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+;; (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
@@ -1778,8 +1794,8 @@ SAVE-FN with non-nil ARGS."
   (defvar company-posframe-show-metadata)
   (defvar company-posframe-show-indicator)
 
-  (setq company-posframe-show-metadata nil
-        company-posframe-show-indicator nil)
+  ;; (setq company-posframe-show-metadata nil
+  ;;       company-posframe-show-indicator nil)
 
   (if (fboundp 'diminish)
       (diminish 'company-posframe-mode))
@@ -1787,12 +1803,15 @@ SAVE-FN with non-nil ARGS."
 
   (unless (fboundp 'company-quickhelp-mode)
     (autoload #'company-quickhelp-mode "company-quickhelp" nil t))
+
   (add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
 
 
   (when (display-graphic-p)
     (unless (fboundp 'company-box-mode)
       (autoload #'company-box-mode "company-box" nil t))
+
+    ;; FIXME: This is not working.
     (company-box-mode 1)
 
     (defvar company-box-icons-alist)
@@ -1833,9 +1852,11 @@ SAVE-FN with non-nil ARGS."
   (autoload #'snippet-mode "yasnippet" nil t))
 (unless (fboundp 'yas-global-mode)
   (autoload #'yas-global-mode "yasnippet" nil t))
+
+(add-to-list 'auto-mode-alist '("/\\.emacs\\.d/snippets/" . snippet-mode))
+
 (add-hook 'text-mode-hook #'yas-global-mode)
 (add-hook 'prog-mode-hook #'yas-global-mode)
-(add-to-list 'auto-mode-alist '("/\\.emacs\\.d/snippets/" . snippet-mode))
 
 (with-eval-after-load 'yasnippet
   (defvar yas-snippet-dirs)
@@ -1844,8 +1865,8 @@ SAVE-FN with non-nil ARGS."
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
         yas-verbosity 1)
 
-  (if (fboundp 'diminish)
-      (diminish 'yas-minor-mode))
+  (when (fboundp 'diminish)
+    (diminish 'yas-minor-mode))
 
   (unless (fboundp 'yasnippet-snippets-initialize)
     (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
@@ -1892,6 +1913,7 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ivy-next-line "ivy" nil t))
 (unless (fboundp 'ivy-read)
   (autoload #'ivy-read "ivy" nil t))
+
 (add-hook 'after-init-hook #'ivy-mode)
 
 (eval-and-compile
@@ -1944,8 +1966,8 @@ SAVE-FN with non-nil ARGS."
 
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
 
-  (if (fboundp 'diminish)
-      (diminish 'ivy-mode))
+  (when (fboundp 'diminish)
+    (diminish 'ivy-mode))
 
   (with-eval-after-load 'hydra
     (require 'ivy-hydra nil nil)))
@@ -2083,8 +2105,8 @@ SAVE-FN with non-nil ARGS."
   ;; (add-to-list 'ivy-display-functions-alist
   ;;   '(counsel-company . ivy-display-function-overlay))
 
-  (if (fboundp 'diminish)
-      (diminish 'counsel-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'counsel-mode)))
 
 (bind-keys* :package counsel
             ("C-c C-j" . counsel-imenu))
@@ -2119,6 +2141,7 @@ SAVE-FN with non-nil ARGS."
 
 (unless (fboundp 'prescient-persist-mode)
   (autoload #'prescient-persist-mode "prescient" nil t))
+
 (add-hook 'after-init-hook #'prescient-persist-mode)
 
 (with-eval-after-load 'prescient
@@ -2175,7 +2198,7 @@ SAVE-FN with non-nil ARGS."
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
 
-(when (symbol-value 'sb/is-linux)
+(when (symbol-value 'sb/IS-LINUX)
   (with-eval-after-load 'ispell
     (defvar ispell-dictionary)
     (defvar ispell-extra-args)
@@ -2197,7 +2220,7 @@ SAVE-FN with non-nil ARGS."
     (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)))
 
 
-(when (symbol-value 'sb/is-linux)
+(when (symbol-value 'sb/IS-LINUX)
   (declare-function flyspell-overlay-p "flyspell")
 
   (unless (fboundp 'flyspell-prog-mode)
@@ -2281,8 +2304,8 @@ SAVE-FN with non-nil ARGS."
           flyspell-issue-message-flag nil
           flyspell-issue-welcome-flag nil)
 
-    (if (fboundp 'diminish)
-        (diminish 'flyspell-mode)))
+    (when (fboundp 'diminish)
+      (diminish 'flyspell-mode)))
 
   (defvar flyspell-mode-map)
   (bind-keys :package flyspell
@@ -2302,11 +2325,12 @@ SAVE-FN with non-nil ARGS."
 ;;            ("C-;" . flyspell-popup-correct))
 
 
-(unless (fboundp 'flyspell-correct-wrapper)
-  (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
+;; FIXME: Is this any good?
+;; (unless (fboundp 'flyspell-correct-wrapper)
+;;   (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
 
-(bind-keys :package flyspell-correct-ivy
-           ("C-;" . flyspell-correct-wrapper))
+;; (bind-keys :package flyspell-correct-ivy
+;;            ("C-;" . flyspell-correct-wrapper))
 
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
@@ -2401,9 +2425,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'aggressive-indent-mode)
   (autoload #'aggressive-indent-mode "aggressive-indent" nil t))
 
-(add-hook 'lisp-mode-hook #'aggressive-indent-mode)
-(add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
-(add-hook 'lisp-interaction-mode-hook #'aggressive-indent-mode)
+(dolist (hook '(lisp-interaction-mode-hook lisp-mode-hook emacs-lisp-mode-hook))
+  (add-hook hook #'aggressive-indent-mode))
 
 (with-eval-after-load 'aggressive-indent
   (defvar aggressive-indent-comments-too)
@@ -2581,14 +2604,13 @@ SAVE-FN with non-nil ARGS."
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq  projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
-           projectile-known-projects-file (expand-file-name
-                                           "projectile-known-projects.eld"
-                                           sb/temp-directory)))
+           projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
+                                                            sb/temp-directory)))
   (when (eq sb/modeline-theme 'doom-modeline)
     (setq projectile-dynamic-mode-line nil))
 
   ;; https://github.com/MatthewZMD/.emacs.d
-  (when (and sb/is-windows (executable-find "tr"))
+  (when (and sb/IS-WINDOWS (executable-find "tr"))
     (setq projectile-indexing-method 'alien))
 
   (defun projectile-default-mode-line nil
@@ -2623,7 +2645,7 @@ SAVE-FN with non-nil ARGS."
   ;;                                       ))
 
   (dolist (prjs (list (expand-file-name sb/user-home) ; Do not consider $HOME as a project
-                      "~/"
+                      "~/" ; Do not consider $HOME as a project
                       (expand-file-name "/tmp")
                       (expand-file-name "bitbucket/.metadata" sb/user-home)
                       (expand-file-name "github/.metadata" sb/user-home)
@@ -2718,8 +2740,8 @@ This file is specified in `counsel-projectile-default-file'."
   (setq counsel-projectile-remove-current-buffer t
         counsel-projectile-sort-directories t
         ;; counsel-projectile-find-file-more-chars 3
-        ;; counsel-projectile-sort-buffers
-        ;; counsel-projectile-sort-projects t
+        counsel-projectile-sort-buffers t
+        counsel-projectile-sort-projects t
         counsel-projectile-sort-files t)
 
   (counsel-projectile-mode 1)
@@ -2751,6 +2773,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (with-eval-after-load 'all-the-icons-ivy-rich-mode
     (defvar all-the-icons-ivy-rich-icon-size)
+
     (setq all-the-icons-ivy-rich-icon-size 0.9)))
 
 
@@ -2885,7 +2908,9 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'flycheck-pos-tip-mode)
     (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
 
-  (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
+  ;; This should be handy only for `emacs-lisp-mode', lsp has `lsp-ui-mode'
+  ;; (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
+  )
 
 
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
@@ -2897,12 +2922,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;;     (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
 ;;   (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
 
-;;   (eval-after-load 'flycheck-posframe
-;;     '(progn
+;;   (with-eval-after-load 'flycheck-posframe
 ;;        (defvar flycheck-posframe-position)
 ;;        (setq flycheck-posframe-position 'point-bottom-left-corner)
-;;        (flycheck-posframe-configure-pretty-defaults)
-;;        t)))
+;;        (flycheck-posframe-configure-pretty-defaults)))
 
 
 (declare-function whitespace-buffer "whitespace")
@@ -2945,19 +2968,18 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; (unless (fboundp 'global-whitespace-cleanup-mode)
 ;;   (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
+
 ;; (add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
 
-;; (eval-after-load 'whitespace-cleanup-mode
-;;   '(progn
+;; (with-eval-after-load 'whitespace-cleanup-mode
 ;;      (defvar whitespace-cleanup-mode-preserve-point)
 ;;      (defvar whitespace-cleanup-mode-ignore-modes)
 
 ;;      (setq whitespace-cleanup-mode-preserve-point t)
 ;;      (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
 
-;;      (if (fboundp 'diminish)
-;;          (diminish 'whitespace-cleanup-mode))
-;;      t))
+;;      (when (fboundp 'diminish)
+;;          (diminish 'whitespace-cleanup-mode)))
 
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -4148,13 +4170,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
-(when (symbol-value 'sb/is-linux)
+(when (symbol-value 'sb/IS-LINUX)
   (unless (fboundp 'turn-on-eldoc-mode)
     (autoload #'turn-on-eldoc-mode "eldoc" nil t))
 
-  (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
-  (add-hook 'lisp-mode-hook #'turn-on-eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode)
+  (dolist (hook '(lisp-mode-hook lisp-interaction-mode-hook emacs-lisp-mode-hook))
+    (add-hook hook #'turn-on-eldoc-mode))
 
   (with-eval-after-load 'eldoc
     ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
@@ -4167,6 +4188,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (declare-function eldoc-box-hover-mode "eldoc-box")
 (declare-function eldoc-box-hover-at-point-mode "eldoc-box")
+
 (unless (fboundp 'eldoc-box-hover-mode)
   (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
 (unless (fboundp 'eldoc-box-hover-at-point-mode)
@@ -4185,14 +4207,17 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'c-turn-on-eldoc-mode)
   (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
 
-(add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
+;; We use LSP
+;; (add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
 
 
 (with-eval-after-load 'css-mode
   (unless (fboundp 'css-eldoc-enable)
     (autoload #'css-eldoc-enable "css-eldoc" nil t))
 
-  (css-eldoc-enable))
+  ;; We use LSP
+  ;; (css-eldoc-enable)
+  )
 
 
 (unless (fboundp 'matlab-mode)
@@ -6249,14 +6274,14 @@ Ignore if no file is found."
   (defvar company-backends)
 
   (setq-local company-minimum-prefix-length 2)
-  (set (make-local-variable 'company-backends)
-       '((
-          company-files
-          (company-capf ; Prefer `company-capf' over the old `company-elisp'
-           :separate company-dabbrev-code)
-          company-yasnippet
-          company-dabbrev
-          ))))
+  (make-local-variable 'company-backends)
+  (setq company-backends '((
+                            company-files
+                            company-capf ; Prefer `company-capf' over the old `company-elisp'
+                            ;; company-dabbrev-code
+                            company-yasnippet
+                            company-dabbrev
+                            ))))
 
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
@@ -6609,7 +6634,7 @@ mode is not in `sb/skippable-modes'."
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
-(when sb/emacs27+
+(when sb/EMACS27+
   (bind-key "C-c d p" #'package-quickstart-refresh))
 
 (global-set-key [remap next-buffer] #'sb/next-buffer)

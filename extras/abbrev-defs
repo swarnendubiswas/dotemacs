@@ -1436,6 +1436,7 @@
     ("beging" "being" nil :count 0)
     ("buget" "budget" nil :count 0)
     ("compromized" "compromised" nil :count 0)
+    ("conurrency" "concurrency" nil :count 0)
     ("crituq" "critique" nil :count 0)
     ("deepnds" "depends" nil :count 0)
     ("dta" "data" nil :count 0)
