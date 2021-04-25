@@ -2851,6 +2851,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
 ;; derived from `text-mode'
+(add-hook 'text-mode-hook #'flycheck-mode)
 (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 
 (with-eval-after-load 'flycheck
@@ -2994,6 +2995,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Highlight symbol under point
+
 (unless (fboundp 'symbol-overlay-mode)
   (autoload #'symbol-overlay-mode "symbol-overlay" nil t))
 (unless (fboundp 'symbol-overlay-jump-prev)
@@ -3029,10 +3031,11 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'hl-todo-keyword-faces '("TEST" . "tomato"))
   (add-to-list 'hl-todo-keyword-faces '("WARNING" . "#cc0000"))
   (add-to-list 'hl-todo-keyword-faces '("BEWARE" . "#aa0000"))
-  (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
   (add-to-list 'hl-todo-keyword-faces '("REFACTOR" . "#cc9393"))
-  (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
-  (add-to-list 'hl-todo-keyword-faces '("REVIEW" . "#6ae4b9")))
+  ;; (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
+  ;; (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
+  ;; (add-to-list 'hl-todo-keyword-faces '("REVIEW" . "#6ae4b9"))
+  )
 
 
 (unless (fboundp 'highlight-numbers-mode)
@@ -3161,6 +3164,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (defvar tags-revert-without-query)
+
 (setq large-file-warning-threshold (* 500 1024 1024) ; MB
       tags-add-tables nil
       tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
@@ -3199,10 +3203,12 @@ This file is specified in `counsel-projectile-default-file'."
 
     (setq xref-show-definitions-function #'ivy-xref-show-defs
           xref-show-xrefs-function #'ivy-xref-show-xrefs)
+
     (require 'ivy-xref nil nil))
 
   (unless (fboundp 'dump-jump-xref-activate)
     (autoload #'dumb-jump-xref-activate "dumb-jump" nil t))
+
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
   (defvar dumb-jump-force-searcher)
@@ -3336,9 +3342,9 @@ This file is specified in `counsel-projectile-default-file'."
 (defvar helpful-mode-map)
 (bind-keys :package helpful
            ([remap describe-variable] . helpful-variable)
-           ([remap describe-key] . helpful-key)
+           ([remap describe-key]      . helpful-key)
            ([remap describe-function] . helpful-callable)
-           ([remap describe-symbol] . helpful-symbol)
+           ([remap describe-symbol]   . helpful-symbol)
            ("C-h v" . helpful-variable)
            ("C-h k" . helpful-key)
            ("C-h f" . helpful-callable)
@@ -3394,6 +3400,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
+
 (unless (fboundp 'discover-my-major)
   (autoload #'discover-my-major "discover-my-major" nil t))
 (unless (fboundp 'discover-my-mode)
@@ -3466,6 +3473,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-to-list 'popwin:special-display-config '(deadgrep-mode))
   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
+;; Learn about display actions, see [[info:elisp#Display Action Functions]]
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
 (add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
@@ -3475,6 +3483,11 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'display-buffer-alist '("*manage-minor-mode*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*deadgrep*" display-buffer-same-window))
+;; Open shell in same window.
+(add-to-list 'display-buffer-alist `(,(regexp-quote "*shell") display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Warnings\\*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Backtrace\\*" display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -3572,8 +3585,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'session-initialize)
   (autoload #'session-initialize "session" nil t))
 
-;; (add-hook 'after-init-hook #'(lambda nil
-;;                                (session-initialize)))
+;; (add-hook 'after-init-hook (lambda nil
+;;                              (session-initialize)))
 
 (with-eval-after-load 'session
   (defvar session-save-file)
@@ -3598,11 +3611,10 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar persistent-scratch-autosave-interval)
   (defvar persistent-scratch-save-file)
 
-  (setq persistent-scratch-autosave-interval 60)
+  (setq persistent-scratch-autosave-interval 300)
 
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch"
-                                                         sb/temp-directory))))
+    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
 
 (unless (fboundp 'crux-sudo-edit)
   (autoload #'crux-sudo-edit "crux" nil t))
@@ -3628,7 +3640,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (display-graphic-p)
-  (require 'avoid nil nil)
+  (unless (fboundp 'mouse-avoidance-mode)
+    (autoload #'mouse-avoidance-mode "avoid" nil t))
+
   (mouse-avoidance-mode 'banish))
 
 
@@ -3656,9 +3670,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-hook 'ssh-config-mode-hook #'turn-on-font-lock)
 
-(add-to-list 'auto-mode-alist '("/\\.ssh/config\\'" . ssh-config-mode))
-(add-to-list 'auto-mode-alist '("/sshd?_config\\'" . ssh-config-mode))
-(add-to-list 'auto-mode-alist '("/known_hosts\\'" . ssh-known-hosts-mode))
+(add-to-list 'auto-mode-alist '("/\\.ssh/config\\'"     . ssh-config-mode))
+(add-to-list 'auto-mode-alist '("/sshd?_config\\'"      . ssh-config-mode))
+(add-to-list 'auto-mode-alist '("/known_hosts\\'"       . ssh-known-hosts-mode))
 (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
 
 
@@ -5517,17 +5531,24 @@ This file is specified in `counsel-projectile-default-file'."
 ;;   (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
 
 
-;; (eval-after-load 'flycheck
-;;   '(progn
-;;      (setq flycheck-grammarly-check-time 3)
-;;      (require 'flycheck-grammarly nil nil)
-;;      ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-;;      (setq flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
-;;      (add-to-list 'flycheck-checkers 'grammarly-checker t)
-;;      (flycheck-add-next-checker 'textlint 'grammarly-checker)
-;;      t))
+;; The advantage with flycheck-grammarly is that you need not set up lsp support, so you can use it
+;; anywhere
+
+(with-eval-after-load 'flycheck
+  (defvar flycheck-grammarly-check-time)
+  (defvar flycheck-checkers)
+
+  (require 'flycheck-grammarly nil nil)
+
+  (setq flycheck-grammarly-check-time 3
+        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+        flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
+
+  (add-to-list 'flycheck-checkers 'grammarly-checker t)
+  (flycheck-add-next-checker 'textlint 'grammarly-checker))
 
 
+;; We need to enable lsp workspace to allow `lsp-grammarly' to work
 ;; (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
 ;; (add-hook 'text-mode-hook #'(lambda nil
 ;;                               (require 'lsp-grammarly)
@@ -5874,7 +5895,9 @@ Ignore if no file is found."
 
 (with-eval-after-load 'latex
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
-  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map))
+  ;; FIXME: void variable latex-mode-map error
+  ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
+  )
 
 
 (unless (fboundp 'math-preview-all)
