@@ -2305,7 +2305,18 @@ SAVE-FN with non-nil ARGS."
           flyspell-issue-welcome-flag nil)
 
     (when (fboundp 'diminish)
-      (diminish 'flyspell-mode)))
+      (diminish 'flyspell-mode))
+
+    ;; Flyspell popup is more efficient. Ivy-completion does not show the Save option in a few cases.
+    (unless (fboundp 'flyspell-popup-correct)
+      (autoload #'flyspell-popup-correct "flyspell-popup" nil t))
+
+    (defvar flyspell-popup-correct-delay)
+
+    (setq flyspell-popup-correct-delay 0.2)
+
+    (bind-keys :package flyspell-popup
+               ("C-;" . flyspell-popup-correct)))
 
   (defvar flyspell-mode-map)
   (bind-keys :package flyspell
@@ -2314,15 +2325,6 @@ SAVE-FN with non-nil ARGS."
              :map flyspell-mode-map
              ("C-;")
              ("C-," . sb/flyspell-goto-previous-error)))
-
-
-;; Flyspell popup is more efficient. Ivy-completion does not show the Save option in a few cases.
-;; (unless (fboundp 'flyspell-popup-correct)
-;;   (autoload #'flyspell-popup-correct "flyspell-popup" nil t))
-;; (setq flyspell-popup-correct-delay 0.2)
-
-;; (bind-keys :package flyspell-popup
-;;            ("C-;" . flyspell-popup-correct))
 
 
 ;; FIXME: Is this any good?
@@ -5542,10 +5544,10 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq flycheck-grammarly-check-time 3
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-        flycheck-checkers (delete 'grammarly-checker flycheck-checkers))
+        flycheck-checkers (delete 'grammarly flycheck-checkers))
 
-  (add-to-list 'flycheck-checkers 'grammarly-checker t)
-  (flycheck-add-next-checker 'textlint 'grammarly-checker))
+  (add-to-list 'flycheck-checkers 'grammarly t)
+  (flycheck-add-next-checker 'textlint 'grammarly))
 
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work
@@ -6869,6 +6871,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
           (lambda ()
+            ;; (setq debug-on-error nil)
             (message "Emacs is ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
 
