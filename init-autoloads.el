@@ -52,7 +52,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'moody
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -705,7 +705,6 @@ SAVE-FN with non-nil ARGS."
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
 
-  ;; FIXME: Moody modeline configuration is not working
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
 
@@ -816,6 +815,8 @@ SAVE-FN with non-nil ARGS."
         spaceline-persp-name-p nil
         spaceline-selection-info-p nil
         spaceline-version-control-p t)
+
+  (declare-function spaceline-all-the-icons-theme "spaceline-all-the-icons")
 
   (spaceline-all-the-icons-theme))
 
@@ -2245,9 +2246,9 @@ SAVE-FN with non-nil ARGS."
   ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
 
   ;; `find-file-hook' will not work for buffers with no associated files
-  (add-hook 'after-init-hook #'(lambda nil
-                                 (when (string= (buffer-name) "*scratch*")
-                                   (flyspell-mode 1))))
+  (add-hook 'after-init-hook (lambda nil
+                               (when (string= (buffer-name) "*scratch*")
+                                 (flyspell-mode 1))))
 
   (eval-and-compile
     ;; Move point to previous error
@@ -2324,7 +2325,7 @@ SAVE-FN with non-nil ARGS."
              ("C-c f b" . flyspell-buffer)
              :map flyspell-mode-map
              ("C-;")
-             ("C-," . sb/flyspell-goto-previous-error)))
+             ("C-,"     . sb/flyspell-goto-previous-error)))
 
 
 ;; FIXME: Is this any good?
@@ -2679,7 +2680,7 @@ SAVE-FN with non-nil ARGS."
            ("<f6>" . projectile-find-file)
            ("<f5>" . projectile-switch-project)
            :map projectile-command-map
-           ("A" . projectile-add-known-project))
+           ("A"    . projectile-add-known-project))
 
 
 (declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
@@ -2771,6 +2772,7 @@ This file is specified in `counsel-projectile-default-file'."
 (when (display-graphic-p)
   (unless (fboundp 'all-the-icons-ivy-rich-mode)
     (autoload #'all-the-icons-ivy-rich-mode "all-the-icons-ivy-rich" nil t))
+
   (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
 
   (with-eval-after-load 'all-the-icons-ivy-rich-mode
@@ -3027,12 +3029,13 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar hl-todo-keyword-faces)
 
   (setq hl-todo-highlight-punctuation ":")
-  (add-to-list 'hl-todo-keyword-faces '("LATER" . "#d0bf8f"))
-  (add-to-list 'hl-todo-keyword-faces '("ISSUE" . "#ff8c00"))
-  (add-to-list 'hl-todo-keyword-faces '("DEBUG" . "#ff8c00"))
-  (add-to-list 'hl-todo-keyword-faces '("TEST" . "tomato"))
-  (add-to-list 'hl-todo-keyword-faces '("WARNING" . "#cc0000"))
-  (add-to-list 'hl-todo-keyword-faces '("BEWARE" . "#aa0000"))
+
+  (add-to-list 'hl-todo-keyword-faces '("LATER"    . "#d0bf8f"))
+  (add-to-list 'hl-todo-keyword-faces '("ISSUE"    . "#ff8c00"))
+  (add-to-list 'hl-todo-keyword-faces '("DEBUG"    . "#ff8c00"))
+  (add-to-list 'hl-todo-keyword-faces '("TEST"     . "tomato"))
+  (add-to-list 'hl-todo-keyword-faces '("WARNING"  . "#cc0000"))
+  (add-to-list 'hl-todo-keyword-faces '("BEWARE"   . "#aa0000"))
   (add-to-list 'hl-todo-keyword-faces '("REFACTOR" . "#cc9393"))
   ;; (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
   ;; (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
@@ -3224,14 +3227,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (defvar xref--xref-buffer-mode-map)
 (bind-keys :package xref
-           ("M-'" . xref-find-definitions)
-           ("M-?" . xref-find-references)
+           ("M-'"   . xref-find-definitions)
+           ("M-?"   . xref-find-references)
            ("C-M-." . xref-find-apropos)
-           ("M-," . xref-pop-marker-stack)
+           ("M-,"   . xref-pop-marker-stack)
            :map xref--xref-buffer-mode-map
-           ("C-o" . xref-show-location-at-point)
+           ("C-o"   . xref-show-location-at-point)
            ("<tab>" . xref-quit-and-goto-xref)
-           ("r" . xref-query-replace-in-results))
+           ("r"     . xref-query-replace-in-results))
 
 
 ;; Gtags is less maintained than `universal-ctags'
@@ -3274,9 +3277,9 @@ This file is specified in `counsel-projectile-default-file'."
 
   (defvar counsel-gtags-mode-map)
   (bind-keys :package counsel-gtags :map counsel-gtags-mode-map
-             ("M-'" . counsel-gtags-dwim)
-             ("M-," . counsel-gtags-go-backward)
-             ("M-?" . counsel-gtags-find-reference)
+             ("M-'"     . counsel-gtags-dwim)
+             ("M-,"     . counsel-gtags-go-backward)
+             ("M-?"     . counsel-gtags-find-reference)
              ("C-c g s" . counsel-gtags-find-symbol)
              ("C-c g d" . counsel-gtags-find-definition)
              ("C-c g c" . counsel-gtags-create-tags)
@@ -3315,7 +3318,7 @@ This file is specified in `counsel-projectile-default-file'."
       (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
   (bind-keys :package counsel-etags
-             ("M-]" . counsel-etags-find-tag-at-point)
+             ("M-]"     . counsel-etags-find-tag-at-point)
              ("C-c g s" . counsel-etags-find-symbol-at-point)
              ("C-c g f" . counsel-etags-find-tag)
              ("C-c g l" . counsel-etags-list-tag)
@@ -3353,7 +3356,7 @@ This file is specified in `counsel-projectile-default-file'."
            ("C-h c" . helpful-command)
            ("C-h p" . helpful-at-point)
            :map helpful-mode-map
-           ("q" . helpful-kill-buffers))
+           ("q"     . helpful-kill-buffers))
 
 
 ;; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
@@ -3438,6 +3441,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'gnuplot-mode "gnuplot" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot))
+
 (add-to-list 'interpreter-mode-alist '("gnuplot" . gnuplot-mode))
 
 
@@ -3477,19 +3481,19 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Learn about display actions, see [[info:elisp#Display Action Functions]]
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-(add-to-list 'display-buffer-alist '("*Faces*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck checkers*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck errors*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Bufler*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*manage-minor-mode*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Faces*"                  display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck checkers*"      display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck errors*"        display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Help*"                   display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*deadgrep*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*deadgrep*"               display-buffer-same-window))
 ;; Open shell in same window.
-(add-to-list 'display-buffer-alist `(,(regexp-quote "*shell") display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Warnings\\*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Backtrace\\*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -3946,7 +3950,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Expensive to load
 (run-with-idle-timer 2 nil #'require 'pdf-tools nil t)
+
 (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
+
 (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
 
 (with-eval-after-load 'pdf-tools
@@ -3975,9 +3981,9 @@ This file is specified in `counsel-projectile-default-file'."
 (defvar pdf-view-mode-map)
 (bind-keys :package pdf-tools :map pdf-view-mode-map
            ("C-s" . isearch-forward)
-           ("d" . pdf-annot-delete)
-           ("h" . pdf-annot-add-highlight-markup-annotation)
-           ("t" . pdf-annot-add-text-annotation))
+           ("d"   . pdf-annot-delete)
+           ("h"   . pdf-annot-add-highlight-markup-annotation)
+           ("t"   . pdf-annot-add-text-annotation))
 
 
 (with-eval-after-load 'saveplace
@@ -4006,12 +4012,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'bison-mode)
   (autoload #'bison-mode "bison-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.y\\'" . bison-mode))
-(add-to-list 'auto-mode-alist '("\\.l\\'" . bison-mode))
+(add-to-list 'auto-mode-alist '("\\.y\\'"     . bison-mode))
+(add-to-list 'auto-mode-alist '("\\.l\\'"     . bison-mode))
 (add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode))
 
 
 (declare-function llvm-mode "llvm-mode")
+
 (unless (fboundp 'llvm-mode)
   (autoload #'llvm-mode "llvm-mode" nil t))
 
@@ -4039,7 +4046,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'gfm-mode "markdown-mode" nil t))
 
 ;; The order is important to associate "README.md" with `gfm-mode'
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'"       . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
@@ -4180,7 +4187,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'makefile-gmake-mode)
   (autoload #'makefile-gmake-mode "make-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
+(add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
 ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
 (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
 
@@ -4283,7 +4290,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'elisp-byte-code-mode)
   (autoload #'elisp-byte-code-mode "elisp-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.el\\'" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.el\\'"  . emacs-lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.elc\\'" . elisp-byte-code-mode))
 
 (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
@@ -4510,10 +4517,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge
-                                              (lsp-configuration-section "pyright")
-                                              (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge
+                            (lsp-configuration-section "pyright")
+                            (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -4631,14 +4638,14 @@ This file is specified in `counsel-projectile-default-file'."
                     (lambda
                       (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
   (advice-add #'lsp-completion--regex-fuz :override #'identity))
 
 (bind-keys :package lsp-mode
-           ("M-." . lsp-find-definition)
+           ("M-."     . lsp-find-definition)
            ("C-c l d" . lsp-find-declaration)
            ("C-c l i" . lsp-goto-implementation)
            ("C-c l t" . lsp-goto-type-definition)
@@ -4673,7 +4680,7 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-ui-mode-map)
   (bind-keys :package lsp-ui :map lsp-ui-mode-map
              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-             ([remap xref-find-references] . lsp-ui-peek-find-references)))
+             ([remap xref-find-references]  . lsp-ui-peek-find-references)))
 
 
 ;; Sync workspace folders and treemacs projects
@@ -4767,7 +4774,7 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-keys :package cc-mode :map c-mode-base-map
            ("C-c c a" . c-beginning-of-defun)
            ("C-c c e" . c-end-of-defun)
-           ("M-q" . c-fill-paragraph))
+           ("M-q"     . c-fill-paragraph))
 
 
 (with-eval-after-load 'c++-mode
@@ -4796,7 +4803,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'c++-mode)
   (autoload #'c++-mode "cuda-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.cu\\'"  . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.cuh\\'" . c++-mode))
 
 
@@ -4810,8 +4817,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'cmake-mode "cmake-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-
+(add-to-list 'auto-mode-alist '("\\.cmake\\'"         . cmake-mode))
 
 (add-hook 'cmake-mode-hook #'lsp-deferred)
 
@@ -4875,13 +4881,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 (defvar python-mode-map)
 (bind-keys :package python :map python-mode-map
-           ("M-[" . python-nav-backward-block)
-           ("M-]" . python-nav-forward-block)
+           ("M-["   . python-nav-backward-block)
+           ("M-]"   . python-nav-forward-block)
            ("C-c <" . python-indent-shift-left)
            ("C-c >" . python-indent-shift-right)
            ;; FIXME: `[' is treated as `meta'
            ;; ("C-\[" . python-indent-shift-left)
-           ;; ("C-]" . python-indent-shift-right)
+           ;; ("C-]"  . python-indent-shift-right)
            )
 
 
@@ -4927,8 +4933,8 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'py-isort-before-save)
     (autoload #'py-isort-before-save "py-isort" nil t))
 
-  ;; (add-hook 'python-mode-hook #'(lambda nil
-  ;;                                 (add-hook 'before-save-hook #'py-isort-before-save)))
+  (add-hook 'python-mode-hook (lambda nil
+                                (add-hook 'before-save-hook #'py-isort-before-save)))
 
   (with-eval-after-load 'py-isort
     (defvar py-isort-options)
@@ -4938,9 +4944,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'pip-requirements-mode)
   (autoload #'pip-requirements-mode "pip-requirements" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.pip\\'" . pip-requirements-mode))
+(add-to-list 'auto-mode-alist '("\\.pip\\'"                    . pip-requirements-mode))
 (add-to-list 'auto-mode-alist '("requirements[^z-a]*\\.txt\\'" . pip-requirements-mode))
-(add-to-list 'auto-mode-alist '("requirements\\.in" . pip-requirements-mode))
+(add-to-list 'auto-mode-alist '("requirements\\.in"            . pip-requirements-mode))
 
 
 (when (eq sb/python-langserver 'mspyls)
@@ -4987,8 +4993,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 (when (and (eq sb/python-langserver 'jedi)
            (executable-find "jedi-language-server"))
-  (add-hook 'python-mode-hook #'(lambda nil
-                                  (require 'lsp-jedi)))
+  (add-hook 'python-mode-hook (lambda nil
+                                (require 'lsp-jedi)))
 
   (defvar lsp-jedi-diagnostics-enable)
   (setq lsp-jedi-diagnostics-enable t)
@@ -5096,8 +5102,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'sh-mode)
   (autoload #'sh-mode "sh-script" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+(add-to-list 'auto-mode-alist '("\\.zsh\\'"   . sh-mode))
 (add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
+
 (add-hook 'sh-mode-hook #'lsp-deferred)
 
 (with-eval-after-load 'sh-script
@@ -5110,10 +5117,11 @@ This file is specified in `counsel-projectile-default-file'."
         sh-indent-comment t)
 
   ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+
   ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
   ;; FIXME: `lsp' is the first checker, chain the other checkers
   ;; https://github.com/flycheck/flycheck/issues/1762
-  ;; (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
+  (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
 
   )
 
@@ -5121,7 +5129,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'fish-mode)
   (autoload #'fish-mode "fish-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.fish\\'" . fish-mode))
+(add-to-list 'auto-mode-alist '("\\.fish\\'"  . fish-mode))
 (add-to-list 'interpreter-mode-alist '("fish" . fish-mode))
 
 (unless (fboundp 'fish_indent-before-save)
@@ -5149,8 +5157,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-(add-hook 'find-file-hook #'vc-refresh-state)
-;; (remove-hook 'find-file-hook #'vc-refresh-state))
+;; (add-hook 'find-file-hook #'vc-refresh-state)
+(remove-hook 'find-file-hook #'vc-refresh-state)
 
 
 (declare-function transient-bind-q-to-quit "transient")
@@ -5189,9 +5197,9 @@ This file is specified in `counsel-projectile-default-file'."
         ;; Suppress the message about "Turning on magit-auto-revert-mode" when loading Magit
         magit-no-message '("Turning on magit-auto-revert-mode...")
         ;; https://irreal.org/blog/?p=8877
-        magit-section-initial-visibility-alist '((stashes . show)
+        magit-section-initial-visibility-alist '((stashes   . show)
                                                  (untracked . show)
-                                                 (unpushed . show)))
+                                                 (unpushed  . show)))
 
   ;; These give a performance boost to magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
@@ -5227,7 +5235,7 @@ This file is specified in `counsel-projectile-default-file'."
   (setq ediff-split-window-function #'split-window-horizontally))
 
 (bind-keys :package magit
-           ("C-x g" . magit-status)
+           ("C-x g"   . magit-status)
            ("C-c M-g" . magit-file-dispatch)
            ("C-x M-g" . magit-dispatch))
 
@@ -5235,25 +5243,25 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'gitignore-mode)
   (autoload #'gitignore-mode "gitignore-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("/\\.gitignore\\'" . gitignore-mode))
+(add-to-list 'auto-mode-alist '("/\\.gitignore\\'"        . gitignore-mode))
 (add-to-list 'auto-mode-alist '("/\\.git/info/exclude\\'" . gitignore-mode))
-(add-to-list 'auto-mode-alist '("/git/ignore\\'" . gitignore-mode))
+(add-to-list 'auto-mode-alist '("/git/ignore\\'"          . gitignore-mode))
 
 
 (unless (fboundp 'gitattributes-mode)
   (autoload #'gitattributes-mode "gitattributes-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("/\\.gitattributes\\'" . gitattributes-mode))
+(add-to-list 'auto-mode-alist '("/\\.gitattributes\\'"       . gitattributes-mode))
 (add-to-list 'auto-mode-alist '("/\\.git/info/attributes\\'" . gitattributes-mode))
-(add-to-list 'auto-mode-alist '("/git/attributes\\'" . gitattributes-mode))
+(add-to-list 'auto-mode-alist '("/git/attributes\\'"         . gitattributes-mode))
 
 
 (unless (fboundp 'gitconfig-mode)
   (autoload #'gitconfig-mode "gitconfig-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("/\\.gitconfig\\'" . gitconfig-mode))
+(add-to-list 'auto-mode-alist '("/\\.gitconfig\\'"  . gitconfig-mode))
 (add-to-list 'auto-mode-alist '("/\\.git/config\\'" . gitconfig-mode))
-(add-to-list 'auto-mode-alist '("/git/config\\'" . gitconfig-mode))
+(add-to-list 'auto-mode-alist '("/git/config\\'"    . gitconfig-mode))
 (add-to-list 'auto-mode-alist '("/\\.gitmodules\\'" . gitconfig-mode))
 
 
@@ -5295,6 +5303,8 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Diff-hl looks nicer than `git-gutter', based on `vc'
 (declare-function diff-hl-magit-pre-refresh "diff-hl")
 (declare-function diff-hl-magit-post-refresh "diff-hl")
+(declare-function diff-hl-dired-mode-unless-remote "diff-hl")
+(declare-function global-diff-hl-mode "diff-hl")
 
 (unless (fboundp 'diff-hl-magit-post-refresh)
   (autoload #'diff-hl-magit-post-refresh "diff-hl" nil t))
@@ -5411,24 +5421,24 @@ This file is specified in `counsel-projectile-default-file'."
 
 (defvar smerge-mode-map)
 (bind-keys :package smerge-mode :map smerge-mode-map
-           ("M-g n" . smerge-next)
-           ("M-g p" . smerge-prev)
+           ("M-g n"   . smerge-next)
+           ("M-g p"   . smerge-prev)
            ("M-g k c" . smerge-keep-current)
            ("M-g k m" . smerge-keep-upper)
            ("M-g k o" . smerge-keep-lower)
            ("M-g k b" . smerge-keep-base)
            ("M-g k a" . smerge-keep-all)
-           ("M-g e" . smerge-ediff)
-           ("M-g K" . smerge-kill-current)
-           ("M-g m" . smerge-context-menu)
-           ("M-g M" . smerge-popup-context-menu))
+           ("M-g e"   . smerge-ediff)
+           ("M-g K"   . smerge-kill-current)
+           ("M-g m"   . smerge-context-menu)
+           ("M-g M"   . smerge-popup-context-menu))
 
 
 (unless (fboundp 'yaml-mode)
   (autoload #'yaml-mode "yaml-mode" nil t))
 
 (add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
-(add-to-list 'auto-mode-alist '(".clang-tidy" . yaml-mode))
+(add-to-list 'auto-mode-alist '(".clang-tidy"   . yaml-mode))
 
 (add-hook 'yaml-mode-hook (lambda ()
                             (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
@@ -5451,15 +5461,15 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'web-mode)
   (autoload #'web-mode "web-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.hb\\.html\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'"      . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'"     . web-mode))
+(add-to-list 'auto-mode-alist '("\\.phtml\\'"      . web-mode))
+(add-to-list 'auto-mode-alist '("\\.hb\\.html\\'"  . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'"  . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'"    . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'"    . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'"        . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'"   . web-mode))
 (add-to-list 'auto-mode-alist '("\\.handlebars\\'" . web-mode))
 
 (add-hook 'web-mode-hook #'lsp-deferred)
@@ -5510,10 +5520,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-hook 'nxml-mode-hook #'lsp-deferred)
 
-(add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.xsd\\'" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.xml\\'"  . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.xsd\\'"  . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xslt\\'" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.pom$" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.pom$"    . nxml-mode))
 
 (with-eval-after-load 'nxml-mode
   (fset 'xml-mode 'nxml-mode)
@@ -5876,6 +5886,7 @@ Ignore if no file is found."
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex" ())
+
 (defun sb/save-buffer-and-run-latexmk ()
   "Save the current buffer and run LaTeXMk also."
   (interactive)
@@ -5976,7 +5987,7 @@ Ignore if no file is found."
   (autoload #'jsonc-mode "json-mode" nil t))
 
 (add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
-(add-to-list 'auto-mode-alist '("User/settings.json$" . jsonc-mode))
+(add-to-list 'auto-mode-alist '("User/settings.json$"         . jsonc-mode))
 
 (dolist (hook '(json-mode-hook jsonc-mode-hook))
   (add-hook hook (lambda nil
@@ -5990,6 +6001,7 @@ Ignore if no file is found."
   (autoload #'less-css-mode "less-css-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
+
 (add-hook 'less-css-mode-hook #'lsp-deferred)
 
 
@@ -5997,6 +6009,7 @@ Ignore if no file is found."
   (autoload #'scss-mode "scss-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+
 (add-hook 'scss-mode-hook #'lsp-deferred)
 
 
@@ -6004,17 +6017,19 @@ Ignore if no file is found."
   (autoload #'sass-mode "sass-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
+
 (add-hook 'sass-mode-hook #'lsp-deferred)
 
 
 (declare-function bazel-mode "bazel-mode")
+
 (unless (fboundp 'bazel-mode)
   (autoload #'bazel-mode "bazel-mode" nil t))
 (unless (fboundp 'bazelrc-mode)
   (autoload #'bazelrc-mode "bazel-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.bzl$" . bazel-mode))
-(add-to-list 'auto-mode-alist '("\\BUILD\\'" . bazel-mode))
+(add-to-list 'auto-mode-alist '("\\.bzl$"       . bazel-mode))
+(add-to-list 'auto-mode-alist '("\\BUILD\\'"    . bazel-mode))
 (add-to-list 'auto-mode-alist '("\\.bazelrc\\'" . bazelrc-mode))
 
 (unless (fboundp 'flycheck-mode)
@@ -6139,6 +6154,7 @@ Ignore if no file is found."
   (autoload #'lsp "rust-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+
 (add-hook 'rust-mode-hook #'lsp)
 
 (with-eval-after-load 'rust-mode
