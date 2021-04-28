@@ -158,7 +158,7 @@ This location is used for temporary installations and files.")
 
 (add-to-list 'load-path sb/extras-directory)
 (defvar sb/core-packages)
-(setq sb/core-packages '())
+
 (package-initialize)
 ;; (debug-on-entry 'package-initialize)
 
@@ -312,7 +312,7 @@ This location is used for temporary installations and files.")
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
       ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start,
       ;; but I use *scratch* for composing emails.
-      ;; initial-major-mode 'text-mode
+      initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
@@ -1085,9 +1085,9 @@ SAVE-FN with non-nil ARGS."
 
 (with-eval-after-load 'bufler
   (bufler-mode 1)
+
   (when (fboundp 'diminish)
     (diminish 'bufler-workspace-mode)))
-
 
 
 (declare-function dired-next-line "dired")
@@ -2856,7 +2856,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
 ;; derived from `text-mode'
 (add-hook 'text-mode-hook #'flycheck-mode)
-(add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
+(add-hook 'prog-mode-hook #'flycheck-mode)
 
 (with-eval-after-load 'flycheck
   (defvar flycheck-check-syntax-automatically)
@@ -2971,20 +2971,22 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 
-;; (unless (fboundp 'global-whitespace-cleanup-mode)
-;;   (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
+(unless (fboundp 'global-whitespace-cleanup-mode)
+  (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
+(unless (fboundp 'whitespace-cleanup-mode)
+  (autoload #'whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
 
 ;; (add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
 
-;; (with-eval-after-load 'whitespace-cleanup-mode
-;;      (defvar whitespace-cleanup-mode-preserve-point)
-;;      (defvar whitespace-cleanup-mode-ignore-modes)
+(with-eval-after-load 'whitespace-cleanup-mode
+  (defvar whitespace-cleanup-mode-preserve-point)
+  (defvar whitespace-cleanup-mode-ignore-modes)
 
-;;      (setq whitespace-cleanup-mode-preserve-point t)
-;;      (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+  (setq whitespace-cleanup-mode-preserve-point t)
+  (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
 
-;;      (when (fboundp 'diminish)
-;;          (diminish 'whitespace-cleanup-mode)))
+  (when (fboundp 'diminish)
+    (diminish 'whitespace-cleanup-mode)))
 
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -3134,6 +3136,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
+
+(declare-function tramp-cleanup-connection "tramp")
+(bind-key "C-S-q" #'tramp-cleanup-connection)
 
 (declare-function sb/sshlist "private")
 
@@ -3622,6 +3627,8 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (bound-and-true-p sb/use-no-littering)
     (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
 
+
+;; crux-smart-open-line-above, crux-smart-open-line, crux-smart-kill-line
 (unless (fboundp 'crux-sudo-edit)
   (autoload #'crux-sudo-edit "crux" nil t))
 (unless (fboundp 'crux-kill-other-buffers)
@@ -4642,8 +4649,20 @@ This file is specified in `counsel-projectile-default-file'."
                          (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
-  (advice-add #'lsp-completion--regex-fuz :override #'identity))
+  (advice-add #'lsp-completion--regex-fuz :override #'identity)
 
+  (with-eval-after-load 'ivy-mode
+    (unless (fboundp 'lsp-ivy-global-workspace-symbol)
+      (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
+    (unless (fboundp 'lsp-ivy-workspace-symbol)
+      (autoload #'lsp-ivy-workspace-symbol "lsp-ivy" nil t))
+
+    (bind-keys :package lsp-ivy
+               ("C-c l g" . lsp-ivy-global-workspace-symbol)
+               ("C-c l w" . lsp-ivy-workspace-symbol))))
+
+;; lsp-imenu-create-categorised-index - sorts the items by kind.
+;; lsp-imenu-create-uncategorized-index - will have the items sorted by position.
 (bind-keys :package lsp-mode
            ("M-."     . lsp-find-definition)
            ("C-c l d" . lsp-find-declaration)
@@ -4667,7 +4686,7 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'lsp-ui-doc-mode "lsp-ui-doc" nil t))
 
   (lsp-ui-mode 1)
-  (lsp-ui-doc-mode 1)
+  (lsp-ui-doc-mode -1)
 
   (defvar lsp-ui-doc-enable)
   (defvar lsp-ui-imenu-auto-refresh)
@@ -4698,26 +4717,14 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'origami-toggle-node)
   (autoload #'origami-toggle-node "origami" nil t))
 
-(dolist (hook '(python-mode-hook java-mode-hook c-mode-hook c++-mode-hook))
-  (add-hook hook #'global-origami-mode))
+;; (dolist (hook '(python-mode-hook java-mode-hook c-mode-hook c++-mode-hook))
+;;   (add-hook hook #'global-origami-mode))
 
 (with-eval-after-load 'origami
   (unless (fboundp 'lsp-origami-mode)
     (autoload #'lsp-origami-mode "lsp-origami" nil t))
 
   (lsp-origami-mode 1))
-
-
-(with-eval-after-load 'ivy-mode
-  (with-eval-after-load 'lsp-mode
-    (unless (fboundp 'lsp-ivy-global-workspace-symbol)
-      (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
-    (unless (fboundp 'lsp-ivy-workspace-symbol)
-      (autoload #'lsp-ivy-workspace-symbol "lsp-ivy" nil t))
-
-    (bind-keys :package lsp-ivy
-               ("C-c l g" . lsp-ivy-global-workspace-symbol)
-               ("C-c l w" . lsp-ivy-workspace-symbol))))
 
 
 ;; (setq url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data)))
@@ -4938,7 +4945,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (with-eval-after-load 'py-isort
     (defvar py-isort-options)
-    (setq py-isort-options '("--lines=100"))))
+    (setq py-isort-options '("-l 100"))))
 
 
 (unless (fboundp 'pip-requirements-mode)
@@ -5518,7 +5525,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'nxml-mode)
   (autoload #'nxml-mode "nxml-mode" nil t))
 
-(add-hook 'nxml-mode-hook #'lsp-deferred)
+(add-hook 'nxml-mode-hook (lambda()
+                            (spell-fu-mode -1)
+                            (lsp-deferred)))
 
 (add-to-list 'auto-mode-alist '("\\.xml\\'"  . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xsd\\'"  . nxml-mode))
@@ -5533,14 +5542,6 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq nxml-auto-insert-xml-declaration-flag t
         nxml-slash-auto-complete-flag t))
-
-;; FIXME: Open `.classpath' file with LSP support
-;; (setq auto-mode-alist (append '(("\\.classpath\\'" . xml-mode))
-;;                               auto-mode-alist))
-
-;; (with-eval-after-load 'lsp-mode
-;;   (add-to-list 'lsp-language-id-configuration '("\\.classpath$" . "xml"))
-;;   (add-to-list 'lsp-language-id-configuration '(nxml-mode . "xml")))
 
 
 ;; The advantage with flycheck-grammarly is that you need not set up lsp support, so you can use it
@@ -5822,13 +5823,19 @@ Ignore if no file is found."
   (defvar reftex-save-parse-info)
   (defvar reftex-toc-follow-mode)
   (defvar reftex-use-multiple-selection-buffers)
+  (defvar reftex-toc-split-windows-horizontally)
+  (defvar reftex-toc-split-windows-fraction)
 
   (setq reftex-enable-partial-scans t
         reftex-highlight-selection 'both
         reftex-plug-into-AUCTeX t
         reftex-save-parse-info t
         reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-        reftex-use-multiple-selection-buffers t)
+        reftex-use-multiple-selection-buffers t
+        ;; Make the toc displayed on the left
+        reftex-toc-split-windows-horizontally t
+        ;; Adjust the fraction
+        reftex-toc-split-windows-fraction 0.3)
 
   (sb/reftex-try-add-all-bibitems-from-bibtex)
 
@@ -5937,8 +5944,9 @@ Ignore if no file is found."
 (unless (fboundp 'js2-imenu-extras-mode)
   (autoload #'js2-imenu-extras-mode "js2-mode" nil t))
 
-(add-hook 'js2-mode-hook #'lsp-deferred)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+(add-hook 'js2-mode-hook #'lsp-deferred)
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
 
 (with-eval-after-load 'js2-mode
@@ -6032,13 +6040,12 @@ Ignore if no file is found."
 (add-to-list 'auto-mode-alist '("\\BUILD\\'"    . bazel-mode))
 (add-to-list 'auto-mode-alist '("\\.bazelrc\\'" . bazelrc-mode))
 
-(unless (fboundp 'flycheck-mode)
-  (autoload #'flycheck-mode "flycheck" nil t))
 (add-hook 'bazel-mode-hook #'flycheck-mode)
 
 
 (unless (fboundp 'protobuf-mode)
   (autoload #'protobuf-mode "protobuf-mode" nil t))
+
 (add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
 
 (unless (fboundp 'flycheck-mode)
@@ -6155,7 +6162,7 @@ Ignore if no file is found."
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
-(add-hook 'rust-mode-hook #'lsp)
+(add-hook 'rust-mode-hook #'lsp-deferred)
 
 (with-eval-after-load 'rust-mode
   (defvar rust-format-on-save)

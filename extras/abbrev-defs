@@ -806,6 +806,7 @@
     ("lookupts" "lookups" nil :count 1)
     ("maintenence" "maintenance" nil :count 0)
     ("makeing" "making" nil :count 0)
+    ("manadatory" "mandatory" nil :count 0)
     ("managment" "management" nil :count 0)
     ("mantain" "maintain" nil :count 0)
     ("marraige" "marriage" nil :count 0)
