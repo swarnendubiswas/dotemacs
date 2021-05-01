@@ -43,6 +43,13 @@
                (set
                 (make-local-variable 'projectile-globally-ignored-files)
                 (push "SOME-VALUE" projectile-globally-ignored-files)))
+
+         ;; Ignore all `.md' files from projectile operations
+         (eval . (set (make-local-variable 'projectile-globally-ignored-files)
+                      (append projectile-globally-ignored-files
+                              (f-entries (projectile-project-root)
+                                         (lambda (f)
+                                           (string-match "\\.md$" f)) t))))
          ))
 
  (fundamental-mode . (

@@ -43,7 +43,7 @@
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
+  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t))
 
 ;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
 (push '(tool-bar-lines . 0) default-frame-alist)
@@ -70,14 +70,10 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames
 (add-to-list 'initial-frame-alist '(fullscreen . maximized)) ; Maximize all frames
 
-(let (
-      (file-name-handler-alist-orig file-name-handler-alist)
-      )
+(let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)
-  (add-hook 'after-init-hook
-            (lambda ()
-              (setq file-name-handler-alist file-name-handler-alist-orig)))
-  )
+  (add-hook 'after-init-hook (lambda ()
+                               (setq file-name-handler-alist file-name-handler-alist-orig))))
 
 (provide 'early-init)
 

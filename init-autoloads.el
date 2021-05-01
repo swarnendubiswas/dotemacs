@@ -25,12 +25,6 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/temp-directory
-  (expand-file-name "tmp" user-emacs-directory)
-  "Storage location for various configuration files."
-  :type 'string
-  :group 'sb/emacs)
-
 (defcustom sb/theme
   'modus-operandi
   "Specify which Emacs theme to use."
@@ -52,7 +46,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'moody
+  'powerline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -115,13 +109,13 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
 
 (when (bound-and-true-p sb/debug-init-file)
-  (setq garbage-collection-messages t
+  (setq garbage-collection-messages nil
         debug-on-error t))
 
 (defconst sb/user-home
@@ -184,14 +178,22 @@ This location is used for temporary installations and files.")
 (when (file-exists-p sb/private-file)
   (load sb/private-file 'noerror))
 
+(defcustom sb/temp-directory
+  (expand-file-name "tmp" user-emacs-directory)
+  "Storage location for various configuration files."
+  :type 'string
+  :group 'sb/emacs)
+
 (unless (and (bound-and-true-p sb/use-no-littering)
              (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
+
 
 (defconst sb/EMACS27+ (> emacs-major-version 26))
 (defconst sb/EMACS28+ (> emacs-major-version 27))
 (defconst sb/IS-LINUX (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+
 
 (defconst sb/emacs-1MB (* 1 1000 1000))
 (defconst sb/emacs-4MB (* 4 1000 1000))
@@ -217,7 +219,7 @@ This location is used for temporary installations and files.")
   "Restore garbage collection."
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/emacs-100MB))
+        gc-cons-threshold sb/emacs-200MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
@@ -258,7 +260,8 @@ This location is used for temporary installations and files.")
 
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"))
+        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
+                                         "LANG" "LC_CTYPE"))
 
   (exec-path-from-shell-initialize))
 
@@ -271,6 +274,7 @@ This location is used for temporary installations and files.")
       apropos-do-all t ; Make `apropos' search more extensively
       auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
       auto-save-no-message t
+      auto-save-interval 0 ; Disable autosaving based on number of characters typed
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
       case-fold-search t ; Searches and matches should ignore case
@@ -292,6 +296,8 @@ This location is used for temporary installations and files.")
       enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
+      ;; Expand truncated information (ellipsis:suspension points) in the echo area
+      eval-expression-print-length 500
       ;; Disable the warning "X and Y are the same file" in case of symlinks
       find-file-suppress-same-file-warnings t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
@@ -343,6 +349,7 @@ This location is used for temporary installations and files.")
       vc-handled-backends nil ; Disabling vc improves performance, alternate option '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
+      window-resize-pixelwise t
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-underline-at-descent-line t ; Underline looks a bit better when drawn lower
       )
@@ -370,11 +377,14 @@ This location is used for temporary installations and files.")
 
 (dolist (exts '(;; Extensions
                 ".aux"
+                ".dll"
                 ".exe"
                 ".fls"
                 ".lof"
+                ".o"
                 ".rel"
                 ".rip"
+                ".so"
                 ".toc"
                 "__init__.py"
                 ;; Directories
@@ -429,13 +439,13 @@ This location is used for temporary installations and files.")
         auto-revert-remote-files t
         auto-revert-use-notify nil
         auto-revert-verbose t
-        global-auto-revert-non-file-buffers t)
+        ;; Revert dired buffers if the contents of the "main" directory changes
+        global-auto-revert-non-file-buffers nil)
 
-  (when (fboundp 'diminish)
-    (diminish 'auto-revert-mode)))
+  (diminish 'auto-revert-mode))
 
-;; Revert PDF files without asking
-(setq revert-without-query '("\\.pdf"))
+;; Revert all (e.g., PDF) files without asking
+(setq revert-without-query '("\\.*"))
 
 
 ;; Remember cursor position in files
@@ -446,6 +456,7 @@ This location is used for temporary installations and files.")
 
 (with-eval-after-load 'saveplace
   (defvar save-place-file)
+
   (unless (bound-and-true-p sb/use-no-littering)
     (setq save-place-file (expand-file-name "places" sb/temp-directory))))
 
@@ -497,8 +508,7 @@ This location is used for temporary installations and files.")
 (add-hook 'prog-mode-hook #'subword-mode)
 
 (with-eval-after-load 'subword
-  (when (fboundp 'diminish)
-    (diminish 'subword-mode)))
+  (diminish 'subword-mode))
 
 
 ;; Looks better than the default
@@ -543,11 +553,17 @@ SAVE-FN with non-nil ARGS."
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently)
 
-  (when (fboundp 'diminish)
-    (diminish 'abbrev-mode)))
+  (diminish 'abbrev-mode))
 
 
-;; Moved to `early-init.el'
+;; The following snippets have been moved to `early-init-file'.
+
+;; Maximize Emacs on startup, moved I am not sure which one of the following is better or faster.
+;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
+;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+
 ;; (when (display-graphic-p) ; `window-system' is deprecated
 ;;   (progn
 ;;     (menu-bar-mode -1)
@@ -573,16 +589,17 @@ SAVE-FN with non-nil ARGS."
                 global-hl-line-mode
                 global-visual-line-mode ; Wrap lines
                 minibuffer-depth-indicate-mode
-                outline-minor-mode
+                ;; outline-minor-mode
                 ;; Enable visual feedback on selections, mark follows the point
-                transient-mark-mode))
+                ;; transient-mark-mode
+                ))
   (when (fboundp mode)
     (funcall mode 1)))
 
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)
 (diminish 'visual-line-mode)
-(diminish 'outline-minor-mode)
+;; (diminish 'outline-minor-mode)
 
 
 ;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
@@ -591,6 +608,7 @@ SAVE-FN with non-nil ARGS."
 ;; Native from Emacs 27+
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 
+(add-hook 'prog-mode-hook #'goto-address-prog-mode)
 
 ;; This puts the buffer in read-only mode and disables font locking
 (unless (fboundp 'global-so-long-mode)
@@ -601,14 +619,7 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load 'so-long
   (defvar so-long-threshold)
 
-  (setq so-long-threshold 800))
-
-
-;; Maximize Emacs on startup, moved to `early-init-file'. I am not sure which one of the following
-;; is better or faster.
-;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
-;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
-;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  (setq so-long-threshold 500))
 
 
 (when (display-graphic-p)
@@ -616,21 +627,22 @@ SAVE-FN with non-nil ARGS."
     (autoload #'all-the-icons-install-fonts "all-the-icons" nil t))
 
   ;; Install fonts with `M-x all-the-icons-install-fonts'
+  ;; https://github.com/domtronn/all-the-icons.el/issues/120
   (eval-and-compile
     (defun sb/font-installed-p (font-name)
       "Check if font with FONT-NAME is available."
-      (if (find-font
-           (font-spec :name font-name))
-          t nil)))
+      (if (find-font (font-spec :name font-name))
+          t
+        nil)))
 
   (with-eval-after-load 'all-the-icons
-    ;; https://github.com/domtronn/all-the-icons.el/issues/120
     (unless (sb/font-installed-p "all-the-icons")
       (all-the-icons-install-fonts t))
 
     (defvar all-the-icons-scale-factor)
 
-    (setq all-the-icons-scale-factor 1.2)))
+    (setq all-the-icons-scale-factor 1.1
+          all-the-icons-color-icons nil)))
 
 
 (when (eq sb/theme 'leuven)
@@ -686,7 +698,8 @@ SAVE-FN with non-nil ARGS."
   (load-theme 'monokai t))
 
 
-(when (eq sb/theme 'modus-operandi)
+(when (or (eq sb/theme 'modus-operandi)
+          (eq sb/theme 'modus-vivendi))
   (defvar modus-themes-completions)
   (defvar modus-themes-fringes)
   (defvar modus-themes-intense-hl-line)
@@ -706,8 +719,9 @@ SAVE-FN with non-nil ARGS."
     (setq modus-themes-mode-line 'accented-3d))
 
   (when (eq sb/modeline-theme 'moody)
-    (setq modus-themes-mode-line 'borderless-moody))
+    (setq modus-themes-mode-line 'borderless-moody)))
 
+(when (eq sb/theme 'modus-operandi)
   (load-theme 'modus-operandi t)
 
   ;; :custom-face
@@ -721,26 +735,6 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (eq sb/theme 'modus-vivendi)
-  (defvar modus-themes-completions)
-  (defvar modus-themes-fringes)
-  (defvar modus-themes-intense-hl-line)
-  (defvar modus-themes-mode-line)
-  (defvar modus-themes-scale-headings)
-  (defvar modus-themes-variable-pitch-headings)
-
-  (setq modus-themes-completions 'opinionated
-        modus-themes-fringes 'subtle
-        modus-themes-intense-hl-line t
-        modus-themes-mode-line 'accented-3d
-        modus-themes-scale-headings nil
-        modus-themes-variable-pitch-headings nil)
-
-  (when (eq sb/modeline-theme 'default)
-    (setq modus-themes-mode-line 'accented-3d))
-
-  (when (eq sb/modeline-theme 'moody)
-    (setq modus-themes-mode-line 'borderless-moody))
-
   (load-theme 'modus-vivendi t))
 
 
@@ -862,12 +856,14 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'after-init-hook #'awesome-tray-mode)
 
   (defvar awesome-tray-active-modules)
+
   (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
 
-  (custom-set-faces (backquote
-                     (awesome-tray-default-face
-                      ((t
-                        (:inherit default :height 0.8))))))
+  (custom-set-faces
+   (backquote
+    (awesome-tray-default-face
+     ((t
+       (:inherit default :height 0.8))))))
   (custom-set-faces
    (backquote
     (awesome-tray-module-awesome-tab-face
@@ -958,7 +954,7 @@ SAVE-FN with non-nil ARGS."
   (defvar centaur-tabs-icon-scale-factor)
 
   (setq centaur-tabs-cycle-scope 'tabs
-        centaur-tabs-icon-scale-factor 0.8
+        centaur-tabs-icon-scale-factor 0.7
         centaur-tabs-set-close-button nil
         centaur-tabs-set-icons t
         centaur-tabs-set-modified-marker t)
@@ -1028,14 +1024,13 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'beacon-mode)
   (autoload #'beacon-mode "beacon") nil t)
 
-(add-hook 'after-init-mode beacon-mode)
+(add-hook 'after-init-mode #'beacon-mode)
 
 
 (unless (fboundp 'ibuffer)
   (autoload #'ibuffer "ibuffer" nil t))
 
-(with-eval-after-load 'ibuffer
-  (defalias 'list-buffers 'ibuffer))
+(defalias 'list-buffers 'ibuffer)
 
 (bind-keys :package ibuffer
            ("C-x C-b" . ibuffer))
@@ -1045,11 +1040,13 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'ibuffer-auto-mode)
   (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 
-(add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+;; FIXME: profiler says this is expensive
+;; (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
 (with-eval-after-load 'ibuffer-ext
   ;; Do not show filter groups if there are no buffers in that group
   (defvar ibuffer-show-empty-filter-groups)
+
   (setq ibuffer-show-empty-filter-groups nil))
 
 
@@ -1086,8 +1083,7 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load 'bufler
   (bufler-mode 1)
 
-  (when (fboundp 'diminish)
-    (diminish 'bufler-workspace-mode)))
+  (diminish 'bufler-workspace-mode))
 
 
 (declare-function dired-next-line "dired")
@@ -1155,7 +1151,8 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp #'diredfl-mode)
     (autoload #'diredfl-mode "diredfl" nil t))
 
-  (add-hook 'dired-mode-hook #'diredfl-mode))
+  ;; (add-hook 'dired-mode-hook #'diredfl-mode)
+  )
 
 (defvar dired-mode-map)
 (bind-keys :package dired :map dired-mode-map
@@ -1179,8 +1176,9 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
   (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
 
-(add-hook 'dired-mode-hook (lambda ()
-                             (diredp-toggle-find-file-reuse-dir 1)))
+;; (add-hook 'dired-mode-hook (lambda ()
+;;                              (diredp-toggle-find-file-reuse-dir 1)))
+
 (with-eval-after-load 'dired+
   (defvar diredp-hide-details-initially-flag)
   (defvar diredp-hide-details-propagate-flag)
@@ -1219,8 +1217,7 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'dired-mode-hook #'dired-async-mode)
 
 (with-eval-after-load 'dired-async
-  (when (fboundp 'diminish)
-    (diminish 'dired-async-mode)))
+  (diminish 'dired-async-mode))
 
 
 (when (display-graphic-p)
@@ -1230,8 +1227,7 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
 
   (with-eval-after-load 'all-the-icons-dired
-    (when (fboundp 'diminish)
-      (diminish 'all-the-icons-dired-mode))))
+    (diminish 'all-the-icons-dired-mode)))
 
 
 (when (display-graphic-p)
@@ -1356,7 +1352,7 @@ SAVE-FN with non-nil ARGS."
           treemacs-show-hidden-files nil
           treemacs-silent-filewatch t
           treemacs-silent-refresh t
-          treemacs-width 22)
+          treemacs-width 18)
 
     (unless (bound-and-true-p sb/use-no-littering)
       (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
@@ -1401,15 +1397,15 @@ SAVE-FN with non-nil ARGS."
 
     (treemacs-load-theme "all-the-icons")
 
-    (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.9)
-    (set-face-attribute 'treemacs-directory-face nil :height 0.9)
-    (set-face-attribute 'treemacs-file-face nil :height 0.9)
     (set-face-attribute 'treemacs-root-face nil :height 0.9)
-    (set-face-attribute 'treemacs-tags-face nil :height 0.9)
+    (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
+    (set-face-attribute 'treemacs-directory-face nil :height 0.8)
+    (set-face-attribute 'treemacs-file-face nil :height 0.8)
+    (set-face-attribute 'treemacs-tags-face nil :height 0.8)
     (set-face-attribute 'treemacs-git-ignored-face nil :height 0.8)
-    (set-face-attribute 'treemacs-git-untracked-face nil :height 0.9)
-    (set-face-attribute 'treemacs-git-modified-face nil :height 0.9)
-    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.9)
+    (set-face-attribute 'treemacs-git-untracked-face nil :height 0.8)
+    (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
+    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.8)
 
     (treemacs-resize-icons 16))
 
@@ -1487,8 +1483,7 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'org-mode-hook #'org-indent-mode)
   (add-hook 'org-mode-hook #'prettify-symbols-mode)
 
-  (when (fboundp 'diminish)
-    (diminish 'org-indent-mode)))
+  (diminish 'org-indent-mode))
 
 
 (unless (fboundp 'org-bullets-mode)
@@ -1503,6 +1498,8 @@ SAVE-FN with non-nil ARGS."
   (autoload #'isearch-forward-regexp "isearch" nil t))
 (unless (fboundp 'isearch-repeat-forward)
   (autoload #'isearch-repeat-forward "isearch" nil t))
+(unless (fboundp 'isearch-occur)
+  (autoload #'isearch-occur "isearch" nil t))
 
 (with-eval-after-load 'isearch
   (setq search-highlight t) ; Highlight incremental search
@@ -1535,8 +1532,7 @@ SAVE-FN with non-nil ARGS."
   ;; (unless (eq sb/theme 'leuven)
   ;;   (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'light))
 
-  (when (fboundp 'diminish)
-    (diminish 'anzu-mode)))
+  (diminish 'anzu-mode))
 
 ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
 (bind-keys :package isearch
@@ -1545,13 +1541,13 @@ SAVE-FN with non-nil ARGS."
            :map isearch-mode-map
            ("C-s")
            ;; ("C-f" . isearch-repeat-forward)
-           )
+           ("C-c C-o" . isearch-occur))
 
 
-(unless (fboundp 'swiper-isearch)
-  (autoload #'swiper-isearch "swiper" nil t))
 (unless (fboundp 'swiper)
   (autoload #'swiper "swiper" nil t))
+(unless (fboundp 'swiper-isearch)
+  (autoload #'swiper-isearch "swiper" nil t))
 
 (with-eval-after-load 'swiper
   (defvar swiper-action-recenter)
@@ -1572,6 +1568,7 @@ SAVE-FN with non-nil ARGS."
         grep-scroll-output t)
 
   (add-to-list 'grep-find-ignored-directories ".cache")
+  (add-to-list 'grep-find-ignored-directories "node_modules")
   (add-to-list 'grep-find-ignored-directories "vendor"))
 
 
@@ -1676,12 +1673,13 @@ SAVE-FN with non-nil ARGS."
                           ".*\\.gz\\'"
                           ".*\\.xz\\'"
                           ".*\\.zip\\'"
-                          ".*-autoloads.el\\'"
+                          ;; ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'"
                           "[/\\]\\.loaddefs\\.el\\'"
                           "[/\\]tmp/.*"
                           ".*/recentf\\'"
                           ".*/recentf-save.el\\'"
+                          ".*/init.el\\'"
                           "~$"
                           "/.autosaves/"
                           ".*/TAGS\\'"
@@ -1701,9 +1699,14 @@ SAVE-FN with non-nil ARGS."
     (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
     (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
 
+  ;; (setq recentf-auto-cleanup-timer (run-with-idle-timer 60 t 'recentf-save-list))
   ;; (run-at-time 5 (* 5 60) 'recentf-save-list)
+  (run-at-time nil (* 5 60) 'recentf-save-list)
+
   ;; (run-at-time 5 (* 10 60) 'recentf-cleanup)
-  )
+
+  ;; `recentf-save-list' is called on Emacs exit
+  (add-hook 'kill-emacs-hook #'recentf-cleanup))
 
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1713,6 +1716,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Hide the "Wrote to recentf" message which is irritating
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
+
 
 ;; TODO: Is this causing tramp to fail? I have disabled it to test.
 ;; Hide the "Wrote ..." message which is irritating
@@ -1740,6 +1744,7 @@ SAVE-FN with non-nil ARGS."
   (autoload #'sb/quit-company-save-buffer "company" nil t))
 (unless (fboundp 'company-abort)
   (autoload #'company-abort "company" nil t))
+
 (add-hook 'after-init-hook #'global-company-mode)
 
 (eval-and-compile
@@ -1772,7 +1777,8 @@ SAVE-FN with non-nil ARGS."
         company-selection-wrap-around t
         company-show-numbers t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t)
+        company-tooltip-align-annotations t
+        company-format-margin-function #'company-vscode-light-icons-margin)
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -1786,26 +1792,28 @@ SAVE-FN with non-nil ARGS."
 
   ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
   ;; https://github.com/company-mode/company-mode/issues/1010
-  ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 
   (unless (fboundp 'company-posframe-mode)
     (autoload #'company-posframe-mode "company-posframe" nil t))
+
+  ;; The width of the frame popup is often not enough and the right side gets cut off.
   (company-posframe-mode 1)
 
   (defvar company-posframe-show-metadata)
   (defvar company-posframe-show-indicator)
 
-  ;; (setq company-posframe-show-metadata nil
-  ;;       company-posframe-show-indicator nil)
+  (setq company-posframe-show-metadata nil
+        company-posframe-show-indicator nil
+        company-posframe-quickhelp-show-header nil)
 
-  (if (fboundp 'diminish)
-      (diminish 'company-posframe-mode))
+  (diminish 'company-posframe-mode)
 
 
   (unless (fboundp 'company-quickhelp-mode)
     (autoload #'company-quickhelp-mode "company-quickhelp" nil t))
 
-  (add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
+  ;; (add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
+  (add-hook 'after-init-hook #'company-quickhelp-mode)
 
 
   (when (display-graphic-p)
@@ -1813,18 +1821,18 @@ SAVE-FN with non-nil ARGS."
       (autoload #'company-box-mode "company-box" nil t))
 
     ;; FIXME: This is not working.
-    (company-box-mode 1)
+    ;; (company-box-mode 1)
 
-    (defvar company-box-icons-alist)
-    (defvar company-box-show-single-candidate)
-    (defvar company-frontends)
+    (with-eval-after-load 'company-box
+      (defvar company-box-icons-alist)
+      (defvar company-box-show-single-candidate)
+      (defvar company-frontends)
 
-    (setq company-box-icons-alist 'company-box-icons-all-the-icons
-          company-box-show-single-candidate t
-          company-frontends '(company-box-frontend))
+      (setq company-box-icons-alist 'company-box-icons-all-the-icons
+            company-box-show-single-candidate t
+            company-frontends '(company-box-frontend)))
 
-    (if (fboundp 'diminish)
-        (diminish 'company-box-mode))
+    (diminish 'company-box-mode)
 
     ;; (set-face-background 'company-box-background "cornsilk")
     ;; (set-face-background 'company-box-selection "light blue")
@@ -1839,6 +1847,7 @@ SAVE-FN with non-nil ARGS."
 (bind-keys :package company :map company-active-map
            ("C-n"      . company-select-next)
            ("C-p"      . company-select-previous)
+           ;; Insert the common part of all candidates, or select the next one.
            ("<tab>"    . company-complete-common-or-cycle)
            ("C-s"      . sb/quit-company-save-buffer)
            ("<escape>" . company-abort))
@@ -1866,8 +1875,7 @@ SAVE-FN with non-nil ARGS."
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
         yas-verbosity 1)
 
-  (when (fboundp 'diminish)
-    (diminish 'yas-minor-mode))
+  (diminish 'yas-minor-mode)
 
   (unless (fboundp 'yasnippet-snippets-initialize)
     (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
@@ -1936,22 +1944,21 @@ SAVE-FN with non-nil ARGS."
   (defvar ivy-truncate-lines)
   (defvar ivy-wrap)
 
-  (setq ;; completion-in-region-function #'ivy-completion-in-region
-   ;; ivy-initial-inputs-alist nil ; Do not start completion with `^'
-   ivy-case-fold-search 'always ; Always ignore case while searching
-   ivy-count-format "(%d/%d) " ; Help identify wrap around
-   ivy-extra-directories nil ; Hide . and ..
-   ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
-   ;; Make the height of the minibuffer proportionate to the screen
-   ;; ivy-height-alist '((t
-   ;;                      lambda (_caller)
-   ;;                      (/ (frame-height) 2)))
-   ;; We update this after loading `orderless'
-   ;; ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
-   ;;                         (counsel-find-file . ivy--regex-fuzzy)
-   ;;                         (t . ivy--regex-ignore-order))
-   ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
-   ivy-wrap t)
+  (setq ivy-case-fold-search 'always ; Always ignore case while searching
+        ;; ivy-initial-inputs-alist nil ; Do not start completion with `^'
+        ivy-count-format "(%d/%d) " ; Help identify wrap around
+        ivy-extra-directories nil ; Hide . and ..
+        ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+        ;; Make the height of the minibuffer proportionate to the screen
+        ;; ivy-height-alist '((t
+        ;;                      lambda (_caller)
+        ;;                      (/ (frame-height) 2)))
+        ;; We update this after loading `orderless'
+        ;; ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
+        ;;                         (counsel-find-file . ivy--regex-fuzzy)
+        ;;                         (t . ivy--regex-ignore-order))
+        ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
+        ivy-wrap t)
 
   (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
   (defalias 'occur 'ivy-occur)
@@ -1960,15 +1967,14 @@ SAVE-FN with non-nil ARGS."
            '("TAGS" "magit-process"
              ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
              ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-             ;; "*flycheck-posframe-buffer*" "*emacs*" "^\\*prettier" "^\\*json*"
-             ;; "^\\*texlab*" "^\\*clangd*" "^\\*shfmt*" "*company-documentation*" "*xref*"
+             ;; "*flycheck-posframe-buffer*" "*emacs*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
+             ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*" "*xref*"
              ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
 
-  (when (fboundp 'diminish)
-    (diminish 'ivy-mode))
+  (diminish 'ivy-mode)
 
   (with-eval-after-load 'hydra
     (require 'ivy-hydra nil nil)))
@@ -1976,13 +1982,15 @@ SAVE-FN with non-nil ARGS."
 (defvar ivy-minibuffer-map)
 (bind-keys :package ivy
            ("C-c r" . ivy-resume)
-           ("<f3>" . ivy-switch-buffer)
+           ("<f3>"  . ivy-switch-buffer)
            :map ivy-minibuffer-map
            ("<return>" . ivy-alt-done)
-           ("<left>" . ivy-previous-line)
-           ("<right>" . ivy-next-line))
+           ("<left>"   . ivy-previous-line)
+           ("<right>"  . ivy-next-line))
 
 
+(unless (fboundp 'counsel-mode)
+  (autoload #'counsel-mode "counsel" nil t))
 (unless (fboundp 'counsel-M-x)
   (autoload #'counsel-M-x "counsel" nil t))
 (unless (fboundp 'counsel-company)
@@ -2015,8 +2023,6 @@ SAVE-FN with non-nil ARGS."
   (autoload #'counsel-yank-pop "counsel" nil t))
 (unless (fboundp 'counsel-imenu)
   (autoload #'counsel-imenu "counsel" nil t))
-(unless (fboundp 'counsel-mode)
-  (autoload #'counsel-mode "counsel" nil t))
 
 (add-hook 'ivy-mode-hook #'counsel-mode)
 
@@ -2069,7 +2075,7 @@ SAVE-FN with non-nil ARGS."
                                          "\\|.lof$"
                                          "\\|.lot$"
                                          "\\|.o$"
-                                         "\\|.out$"
+                                         ;; "\\|.out$"
                                          "\\|.ppt$"
                                          "\\|.pptx$"
                                          "\\|.pyc$"
@@ -2106,35 +2112,34 @@ SAVE-FN with non-nil ARGS."
   ;; (add-to-list 'ivy-display-functions-alist
   ;;   '(counsel-company . ivy-display-function-overlay))
 
-  (when (fboundp 'diminish)
-    (diminish 'counsel-mode)))
+  (diminish 'counsel-mode))
 
 (bind-keys* :package counsel
             ("C-c C-j" . counsel-imenu))
 
 (bind-keys :package counsel
            ([remap execute-extended-command] . counsel-M-x)
-           ("<f1>" . counsel-M-x)
-           ([remap completion-at-point] . counsel-company)
-           ([remap describe-bindings] . counsel-descbinds)
-           ([remap dired] . counsel-dired)
-           ([remap find-file] . counsel-find-file)
-           ("<f2>" . counsel-find-file)
-           ("C-c s g" . counsel-git-grep)
-           ("C-<f9>" . sb/counsel-goto-recent-directory)
-           ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
-           ([remap load-library] . counsel-load-library)
-           ([remap load-theme] . counsel-load-theme)
-           ("C-c d m" . counsel-minor)
-           ([remap recentf-open-files] . counsel-recentf)
-           ("<f9>" . counsel-recentf)
-           ("C-c s r" . counsel-rg)
-           ("C-c C-m" . counsel-mark-ring)
-           ([remap yank-pop] . counsel-yank-pop)
+           ([remap completion-at-point]      . counsel-company)
+           ([remap describe-bindings]        . counsel-descbinds)
+           ([remap dired]                    . counsel-dired)
+           ([remap find-file]                . counsel-find-file)
+           ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
+           ([remap load-library]             . counsel-load-library)
+           ([remap load-theme]               . counsel-load-theme)
+           ([remap recentf-open-files]       . counsel-recentf)
+           ([remap yank-pop]                 . counsel-yank-pop)
            ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
            ;; ([remap flycheck-list-errors]  . counsel-flycheck)
+           ("<f1>"    . counsel-M-x)
+           ("<f2>"    . counsel-find-file)
+           ("C-c s g" . counsel-git-grep)
+           ("C-<f9>"  . sb/counsel-goto-recent-directory)
+           ("C-c d m" . counsel-minor)
+           ("<f9>"    . counsel-recentf)
+           ("C-c s r" . counsel-rg)
+           ("C-c C-m" . counsel-mark-ring)
            ;; Enabling preview can make switching over remote buffers slow
-           ;; ("<f3>"                        . counsel-switch-buffer)
+           ;; ("<f3>" . counsel-switch-buffer)
            )
 
 
@@ -2156,6 +2161,7 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
+;; FIXME: This is expensive.
 ;; (with-eval-after-load 'ivy
 ;;   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
@@ -2166,11 +2172,15 @@ SAVE-FN with non-nil ARGS."
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
 
-(with-eval-after-load 'company
-  (unless (fboundp 'company-prescient-mode)
-    (autoload #'company-prescient-mode "company-prescient" nil t))
+;; (with-eval-after-load 'company
+;;   (unless (fboundp 'company-prescient-mode)
+;;     (autoload #'company-prescient-mode "company-prescient" nil t))
 
-  (company-prescient-mode 1))
+;;   ;; We want `capf' sort for programming modes, not with recency. This breaks the support for the
+;;   ;; `:separate' keyword in `company'
+;;   (company-prescient-mode 1)
+;;   (add-hook 'prog-mode-hook (lambda ()
+;;                               (company-prescient-mode -1))))
 
 
 (with-eval-after-load 'ivy
@@ -2214,7 +2224,7 @@ SAVE-FN with non-nil ARGS."
           ispell-silently-savep t)
 
     ;; Skip regions in Org-mode
-    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
     (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
 
     ;; Hide the "Starting new Ispell process" message
@@ -2305,8 +2315,7 @@ SAVE-FN with non-nil ARGS."
           flyspell-issue-message-flag nil
           flyspell-issue-welcome-flag nil)
 
-    (when (fboundp 'diminish)
-      (diminish 'flyspell-mode))
+    (diminish 'flyspell-mode)
 
     ;; Flyspell popup is more efficient. Ivy-completion does not show the Save option in a few cases.
     (unless (fboundp 'flyspell-popup-correct)
@@ -2415,13 +2424,12 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'highlight-indentation-mode)
   (autoload #'highlight-indentation-mode "highlight-indentation" nil t))
 
-(add-hook 'yaml-mode-hook #'highlight-indentation-mode)
-(add-hook 'python-mode-hook #'highlight-indentation-mode)
+(dolist (hook '(yaml-mode-hook python-mode-hook))
+  (add-hook hook #'highlight-indentation-mode))
 
 (with-eval-after-load 'highlight-indentation
-  (when (fboundp 'diminish)
-    (diminish 'highlight-indentation-mode)
-    (diminish 'highlight-indentation-current-column-mode)))
+  (diminish 'highlight-indentation-mode)
+  (diminish 'highlight-indentation-current-column-mode))
 
 
 ;; Claims to be better than `electric-indent-mode'
@@ -2439,8 +2447,7 @@ SAVE-FN with non-nil ARGS."
         ;; Never use `electric-indent-mode'
         aggressive-indent-dont-electric-modes t)
 
-  (when (fboundp 'diminish)
-    (diminish 'aggressive-indent-mode)))
+  (diminish 'aggressive-indent-mode))
 
 
 (unless (fboundp 'show-paren-mode)
@@ -2461,13 +2468,14 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'electric-pair-mode)
   (autoload #'electric-pair-mode "elec-pair" nil t))
 
-(add-hook 'after-init-hook #'electric-pair-mode) ; Enable autopairing, smartparens seems slow
+(add-hook 'after-init-hook #'electric-pair-mode) ; Enable autopairing, `smartparens' seems slow
 
 (with-eval-after-load 'electric-pair-mode
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
   (defvar electric-pair-pairs)
   (defvar electric-pair-text-pairs)
+  (defvar electric-pair-preserve-balance)
 
   (declare-function sb/add-markdown-pairs "init")
 
@@ -2475,9 +2483,9 @@ SAVE-FN with non-nil ARGS."
     "Add custom pairs to `markdown-mode'."
     (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
     (setq-local electric-pair-text-pairs electric-pair-pairs))
+
   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-  (defvar electric-pair-preserve-balance)
   (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
 
   ;; Disable pairs when entering minibuffer
@@ -2740,12 +2748,13 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar counsel-projectile-sort-buffers)
   (defvar counsel-projectile-sort-projects)
 
+  ;; Setting these to `t' can be slow for large projects
   (setq counsel-projectile-remove-current-buffer t
-        counsel-projectile-sort-directories t
-        ;; counsel-projectile-find-file-more-chars 3
-        counsel-projectile-sort-buffers t
-        counsel-projectile-sort-projects t
-        counsel-projectile-sort-files t)
+        counsel-projectile-sort-directories nil
+        counsel-projectile-find-file-more-chars 0
+        counsel-projectile-sort-buffers nil
+        counsel-projectile-sort-projects nil
+        counsel-projectile-sort-files nil)
 
   (counsel-projectile-mode 1)
 
@@ -2826,6 +2835,8 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function flycheck-disable-checker "flycheck")
 (declare-function flycheck-add-mode "flycheck")
 
+(unless (fboundp 'global-flycheck-mode)
+  (autoload #'global-flycheck-mode "flycheck" nil t))
 (unless (fboundp 'flycheck-mode)
   (autoload #'flycheck-mode "flycheck" nil t))
 (unless (fboundp 'flycheck-add-next-checker)
@@ -2855,8 +2866,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
 ;; derived from `text-mode'
-(add-hook 'text-mode-hook #'flycheck-mode)
-(add-hook 'prog-mode-hook #'flycheck-mode)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+;; (add-hook 'text-mode-hook #'flycheck-mode)
+;; (add-hook 'prog-mode-hook #'flycheck-mode)
 
 (with-eval-after-load 'flycheck
   (defvar flycheck-check-syntax-automatically)
@@ -2867,13 +2879,16 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar flycheck-mode-line)
   (defvar flycheck-textlint-plugin-alist)
   (defvar flycheck-hooks-alist)
+  (defvar flycheck-display-errors-function)
 
-  (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change new-line
-                                                   mode-enabled)
+  ;; Remove newline checks, since they would trigger an immediate check when we want the
+  ;; idle-change-delay to be in effect while editing.
+  (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled)
         flycheck-checker-error-threshold 500
         flycheck-idle-buffer-switch-delay 5 ; Increase the time to allow for quick transitions
         flycheck-idle-change-delay 5 ; Increase the time to allow for edits
-        flycheck-emacs-lisp-load-path 'inherit)
+        flycheck-emacs-lisp-load-path 'inherit
+        flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
 
   ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
   (when (or (eq sb/modeline-theme 'spaceline)
@@ -2957,12 +2972,9 @@ This file is specified in `counsel-projectile-default-file'."
         whitespace-line-column sb/fill-column
         whitespace-style '(face lines-tail trailing))
 
-  (when (fboundp 'diminish)
-    (diminish 'global-whitespace-mode))
-  (when (fboundp 'diminish)
-    (diminish 'whitespace-mode))
-  (when (fboundp 'diminish)
-    (diminish 'whitespace-newline-mode)))
+  (diminish 'global-whitespace-mode)
+  (diminish 'whitespace-mode)
+  (diminish 'whitespace-newline-mode))
 
 
 ;; This is different from `whitespace-cleanup' since this is unconditional
@@ -2985,8 +2997,7 @@ This file is specified in `counsel-projectile-default-file'."
   (setq whitespace-cleanup-mode-preserve-point t)
   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
 
-  (when (fboundp 'diminish)
-    (diminish 'whitespace-cleanup-mode)))
+  (diminish 'whitespace-cleanup-mode))
 
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -2996,8 +3007,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'prog-mode-hook #'ws-butler-mode)
 
 (with-eval-after-load 'ws-butler
-  (when (fboundp 'diminish)
-    (diminish 'ws-butler-mode)))
+  (diminish 'ws-butler-mode))
 
 
 ;; Highlight symbol under point
@@ -3009,12 +3019,11 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'symbol-overlay-jump-next)
   (autoload #'symbol-overlay-jump-next "symbol-overlay" nil t))
 
-(dolist (hook '(prog-mode-hook html-mode-hook yaml-mode-hook))
+(dolist (hook '(prog-mode-hook html-mode-hook yaml-mode-hook conf-mode-hook))
   (add-hook hook #'symbol-overlay-mode))
 
 (with-eval-after-load 'symbol-overlay
-  (when (fboundp 'diminish)
-    (diminish 'symbol-overlay-mode)))
+  (diminish 'symbol-overlay-mode))
 
 (bind-keys :package symbol-overlay
            ("M-p" . symbol-overlay-jump-prev)
@@ -3068,8 +3077,7 @@ This file is specified in `counsel-projectile-default-file'."
         number-separator-ignore-threshold 4
         number-separator-decimal-char ".")
 
-  (when (fboundp 'diminish)
-    (diminish 'number-sepator-mode)))
+  (diminish 'number-sepator-mode))
 
 
 (unless (fboundp 'hes-mode)
@@ -3092,6 +3100,15 @@ This file is specified in `counsel-projectile-default-file'."
            ("C-<"     . mc/mark-previous-like-this)
            ("C->"     . mc/mark-next-like-this)
            ("C-c C-<" . mc/mark-all-like-this))
+
+
+(unless (fboundp 'global-page-break-lines-mode)
+  (autoload #'global-page-break-lines-mode "page-break-lines" nil t))
+
+(add-hook 'after-init-hook #'global-page-break-lines-mode)
+
+(with-eval-after-load 'page-break-lines
+  (diminish 'page-break-lines-mode))
 
 
 ;; Edit remote file: `/method:user@host#port:filename'. Shortcut /ssh:: will connect to default
@@ -3272,8 +3289,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     (setq counsel-gtags-auto-update t)
 
-    (when (fboundp 'diminish)
-      (diminish 'counsel-gtags-mode))
+    (diminish 'counsel-gtags-mode)
 
     ;; Make xref and gtags work together
     (require 'global-tags nil nil)
@@ -3387,8 +3403,7 @@ This file is specified in `counsel-projectile-default-file'."
                                    (hungry-delete-mode -1)))
 
 (with-eval-after-load 'hungry-delete
-  (when (fboundp 'diminish)
-    (diminish 'hungry-delete-mode)))
+  (diminish 'hungry-delete-mode))
 
 
 ;; Move lines with `M-<up>' and `M-<down>'
@@ -3521,6 +3536,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'after-init-hook #'smart-mark-mode)
 
 
+;; Cut/copy the current line if no region is active
 (unless (fboundp 'whole-line-or-region-global-mode)
   (autoload #'whole-line-or-region-global-mode "whole-line-or-region" nil t))
 (unless (fboundp 'whole-line-or-region-local-mode)
@@ -3529,9 +3545,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'after-init-hook #'whole-line-or-region-global-mode)
 
 (with-eval-after-load 'whole-line-or-region
-  (when (boundp 'diminish)
-    (diminish 'whole-line-or-region-local-mode)
-    (diminish 'whole-line-or-region-global-mode)))
+  (diminish 'whole-line-or-region-local-mode))
 
 
 (unless (fboundp 'goto-last-change)
@@ -3575,8 +3589,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (global-undo-tree-mode 1)
 
-  (when (fboundp 'diminish)
-    (diminish 'undo-tree-mode)))
+  (diminish 'undo-tree-mode))
 
 (bind-keys :package undo-tree
            ("C-x u" . undo-tree-visualize))
@@ -3596,8 +3609,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'session-initialize)
   (autoload #'session-initialize "session" nil t))
 
-;; (add-hook 'after-init-hook (lambda nil
-;;                              (session-initialize)))
+;; (add-hook 'after-init-hook #'session-initialize)
 
 (with-eval-after-load 'session
   (defvar session-save-file)
@@ -3648,8 +3660,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'after-init-hook #'global-disable-mouse-mode)
 
 (with-eval-after-load 'disable-mouse
-  (when (fboundp 'diminish)
-    (diminish 'disable-mouse-global-mode)))
+  (diminish 'disable-mouse-global-mode))
 
 
 (when (display-graphic-p)
@@ -3747,8 +3758,7 @@ This file is specified in `counsel-projectile-default-file'."
   (setq super-save-remote-files nil) ; Ignore remote files
   (add-to-list 'super-save-triggers 'ace-window)
 
-  (when (fboundp 'diminish)
-    (diminish 'super-save-mode)))
+  (diminish 'super-save-mode))
 
 
 ;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
@@ -3763,16 +3773,12 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar avy-highlight-first)
   (defvar avy-style)
 
-  (setq avy-indent-line-overlay nil
-        avy-background t
-        avy-highlight-first t
-        avy-style 'at)
-
   (avy-setup-default))
 
 (bind-keys :package avy
            ("M-b" . avy-goto-word-1)
-           ("C-'" . avy-goto-char)
+           ;; ("C-" . avy-goto-char)
+           ("C-'" . avy-goto-char-timer)
            ("C-/" . avy-goto-line))
 
 
@@ -3864,8 +3870,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'explain-pause-top "explain-pause-mode" nil t))
 
 (with-eval-after-load 'explain-pause-mode
-  (when (fboundp 'diminish)
-    (diminish 'explain-pause-mode)))
+  (diminish 'explain-pause-mode))
 
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
@@ -3875,10 +3880,53 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 (with-eval-after-load 'flycheck
+  (require 'flycheck-aspell nil nil)
+  (add-to-list 'flycheck-checkers 'tex-aspell-dynamic t)
+  (add-to-list 'flycheck-checkers 'markdown-aspell-dynamic t)
+
+  ;; SB: We prefer to use only grammarly, and not `proselint' and `textlint'.
+  ;; The advantage with flycheck-grammarly is that you need not set up lsp support, so you can use it
+  ;; anywhere.
+  (require 'flycheck-grammarly nil nil)
+
+  (defvar flycheck-grammarly-check-time)
+  (defvar flycheck-checkers)
+
+  (setq flycheck-grammarly-check-time 3
+        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+        flycheck-checkers (delete 'grammarly flycheck-checkers))
+
+  (add-to-list 'flycheck-checkers 'grammarly t)
+
   (add-hook 'text-mode-hook
             (lambda ()
+              ;; (flycheck-add-next-checker 'grammarly 'tex-aspell-dynamic)
               ;; Add `proselint', then `textlint'
-              (flycheck-add-next-checker 'proselint 'textlint))))
+              ;; (flycheck-add-next-checker 'proselint 'textlint))
+              ))
+
+  (add-hook 'markdown-mode-hook
+            (lambda()
+              ;; (make-local-variable 'flycheck-error-list-minimum-level)
+              ;; (setq flycheck-error-list-minimum-level 'warning
+              ;; flycheck-navigation-minimum-level 'warning)
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
+              (flycheck-add-next-checker 'grammarly 'markdown-aspell-dynamic)))
+
+  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+    (add-hook hook
+              (lambda()
+                (flycheck-add-next-checker 'grammarly 'tex-aspell-dynamic))))
+
+  (add-hook 'html-mode-hook
+            (lambda()
+              (flycheck-add-next-checker 'grammarly 'html-aspell-dynamic))))
+
+;; We need to enable lsp workspace to allow `lsp-grammarly' to work
+;; (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+;; (add-hook 'text-mode-hook #'(lambda nil
+;;                               (require 'lsp-grammarly)
+;;                               (lsp-deferred)))
 
 
 ;; Identify weasel words, passive voice, and duplicate words
@@ -4112,8 +4160,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Binds `C-c /' to `pandoc-main-hydra/body'.
   ;; (unbind-key "C-c /" pandoc-mode-map))
 
-  (when (fboundp 'diminish)
-    (diminish 'pandoc-mode)))
+  (diminish 'pandoc-mode))
 
 
 (when (executable-find "grip")
@@ -4198,6 +4245,9 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
 (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
 
+;; Use normal tabs in makefiles
+(add-hook 'makefile-mode-hook #'indent-tabs-mode)
+
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
 (when (symbol-value 'sb/IS-LINUX)
@@ -4212,8 +4262,7 @@ This file is specified in `counsel-projectile-default-file'."
     ;; itself unexpectedly when point is on a variable with a multiline docstring.
     (setq eldoc-echo-area-use-multiline-p nil)
 
-    (when (fboundp 'diminish)
-      (diminish 'eldoc-mode))))
+    (diminish 'eldoc-mode)))
 
 
 (declare-function eldoc-box-hover-mode "eldoc-box")
@@ -4229,9 +4278,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (with-eval-after-load 'eldoc-box
   (defvar eldoc-box-clear-with-C-g)
+
   (setq eldoc-box-clear-with-C-g t)
-  (if (fboundp 'diminish)
-      (diminish 'eldoc-box-hover-mode)))
+
+  (diminish 'eldoc-box-hover-mode))
 
 
 (unless (fboundp 'c-turn-on-eldoc-mode)
@@ -4421,6 +4471,8 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-xml-jar-file)
   (defvar lsp-yaml-print-width)
   (defvar lsp-session-file)
+  (defvar lsp-completion-show-detail)
+  (defvar lsp-eldoc-enable-hover)
 
   (setq lsp-clients-clangd-args '("-j=2"
                                   "--background-index"
@@ -4431,6 +4483,8 @@ This file is specified in `counsel-projectile-default-file'."
                                   "--log=error")
         lsp-completion-enable-additional-text-edit t
         lsp-completion-provider :none
+        lsp-completion-show-detail nil
+        lsp-eldoc-enable-hover t
         lsp-enable-dap-auto-configure nil
         lsp-enable-file-watchers nil
         lsp-enable-folding nil
@@ -4447,10 +4501,10 @@ This file is specified in `counsel-projectile-default-file'."
         lsp-keep-workspace-alive nil
         lsp-log-io nil ; `texlab' communication is huge
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
-        lsp-signature-auto-activate nil
-        lsp-signature-render-documentation nil
+        lsp-signature-auto-activate t ; Manually request via `lsp-signature-activate'
+        lsp-signature-render-documentation t
         lsp-xml-logs-client nil
-        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.15.0-uber.jar"
+        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.16.0-uber.jar"
                                            sb/extras-directory)
         lsp-yaml-print-width sb/fill-column)
 
@@ -4691,10 +4745,12 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-ui-doc-enable)
   (defvar lsp-ui-imenu-auto-refresh)
   (defvar lsp-ui-sideline-enable)
+  (defvar lsp-ui-modeline-code-actions-enable)
 
-  (setq lsp-ui-doc-enable nil
+  (setq lsp-ui-doc-enable nil ; Disable on-hover dialogs
         lsp-ui-imenu-auto-refresh 'after-save
-        lsp-ui-sideline-enable nil)
+        lsp-ui-sideline-enable nil
+        lsp-ui-modeline-code-actions-enable t)
 
   (defvar lsp-ui-mode-map)
   (bind-keys :package lsp-ui :map lsp-ui-mode-map
@@ -4716,9 +4772,17 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'global-origami-mode "origami" nil t))
 (unless (fboundp 'origami-toggle-node)
   (autoload #'origami-toggle-node "origami" nil t))
+(unless (fboundp 'origami-recursively-toggle-node)
+  (autoload #'origami-recursively-toggle-node "origami" nil t))
+(unless (fboundp 'origami-toggle-all-nodes)
+  (autoload #'origami-toggle-all-node "origami" nil t))
 
 ;; (dolist (hook '(python-mode-hook java-mode-hook c-mode-hook c++-mode-hook))
 ;;   (add-hook hook #'global-origami-mode))
+
+(bind-keys :package origami :map origami-mode-map
+           ("C-c l t" . origami-recursively-toggle-node)
+           ("C-c l n" . origami-toggle-all-nodes))
 
 (with-eval-after-load 'origami
   (unless (fboundp 'lsp-origami-mode)
@@ -4790,8 +4854,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (modern-c++-font-lock-mode 1)
 
-  (when (fboundp 'diminish)
-    (diminish 'modern-c++-font-lock-mode)))
+  (diminish 'modern-c++-font-lock-mode))
 
 
 (with-eval-after-load 'cc-mode
@@ -4882,8 +4945,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (python-docstring-mode 1)
 
-  (when (fboundp 'diminish)
-    (diminish 'python-docstring-mode)))
+  (diminish 'python-docstring-mode))
 
 
 (defvar python-mode-map)
@@ -4930,8 +4992,7 @@ This file is specified in `counsel-projectile-default-file'."
                                       (lambda nil
                                         (setq python-shell-interpreter "python3"))))
 
-  (when (fboundp 'diminish)
-    (diminish 'pyvenv-mode)))
+  (diminish 'pyvenv-mode))
 
 
 ;; FIXME: Leads to errors over tramp and possibly blocks Emacs
@@ -5027,8 +5088,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'python-mode-hook #'yapf-mode)
 
   (with-eval-after-load 'yapfify
-    (when (fboundp 'diminish)
-      (diminish 'yapf-mode))))
+    (diminish 'yapf-mode)))
 
 
 (unless (fboundp 'ein:ipynb-mode)
@@ -5072,10 +5132,16 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-java-inhibit-message)
   (defvar lsp-java-java-path)
   (defvar lsp-java-save-actions-organize-imports)
+  (defvar lsp-java-format-settings-url)
+  (defvar lsp-java-format-settings-profile)
 
   (setq lsp-java-inhibit-message t
         lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" ; Requires Java 11
-        lsp-java-save-actions-organize-imports t))
+        lsp-java-save-actions-organize-imports t
+        lsp-java-format-settings-profile "Swarnendu"
+        lsp-java-format-settings-url (expand-file-name
+                                      "github/dotfiles/java/eclipse-format-swarnendu.xml"
+                                      sb/user-home)))
 
 
 (unless (fboundp 'ant)
@@ -5103,6 +5169,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
 (add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))
+
+
+;; SVG
+(add-to-list 'auto-mode-alist '("\\.svg$" . image-mode))
 
 
 ;; Shell script mode
@@ -5206,7 +5276,8 @@ This file is specified in `counsel-projectile-default-file'."
         ;; https://irreal.org/blog/?p=8877
         magit-section-initial-visibility-alist '((stashes   . show)
                                                  (untracked . show)
-                                                 (unpushed  . show)))
+                                                 (unpushed  . show)
+                                                 (unpulled  . show)))
 
   ;; These give a performance boost to magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
@@ -5227,8 +5298,7 @@ This file is specified in `counsel-projectile-default-file'."
         magit-diff-paint-whitespace nil)
 
   (with-eval-after-load 'with-editor
-    (if (fboundp 'diminish)
-        (diminish 'with-editor-mode)))
+    (diminish 'with-editor-mode))
 
   (require 'ediff nil nil)
 
@@ -5299,8 +5369,7 @@ This file is specified in `counsel-projectile-default-file'."
         ;; https://github.com/syohex/emacs-git-gutter/issues/24
         git-gutter:disabled-modes '(fundamental-mode org-mode))
 
-  (when (fboundp 'diminish)
-    (diminish 'git-gutter-mode)))
+  (diminish 'git-gutter-mode))
 
 (bind-keys :package git-gutter
            ("C-x p" . git-gutter:previous-hunk)
@@ -5515,8 +5584,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook hook #'rainbow-mode))
 
 (with-eval-after-load 'rainbow-mode
-  (when (fboundp 'diminish)
-    (diminish 'rainbow-mode)))
+  (diminish 'rainbow-mode))
 
 
 (add-hook 'php-mode-hook #'lsp-deferred)
@@ -5842,8 +5910,7 @@ Ignore if no file is found."
   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
   ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
 
-  (when (fboundp 'diminish)
-    (diminish 'reftex-mode)))
+  (diminish 'reftex-mode))
 
 (bind-keys :package reftex
            ("C-c [" . reftex-citation)
@@ -5876,8 +5943,7 @@ Ignore if no file is found."
   (defvar bib-cite-use-reftex-view-crossref)
   (setq bib-cite-use-reftex-view-crossref t)
 
-  (when (fboundp 'diminish)
-    (diminish 'bib-cite-minor-mode)))
+  (diminish 'bib-cite-minor-mode))
 
 (defvar bib-cite-minor-mode-map)
 (bind-keys :package bib-cite :map bib-cite-minor-mode-map
@@ -5955,6 +6021,7 @@ Ignore if no file is found."
   (defvar js-indent-level)
   (defvar js2-basic-offset)
 
+  ;; TODO: Are the two variables aliased?
   (setq js-indent-level 2
         js2-basic-offset 2)
 
@@ -5963,20 +6030,20 @@ Ignore if no file is found."
 
   (js2-refactor-mode 1)
 
-  (when (fboundp 'diminish)
-    (diminish 'js2-refactor-mode)))
+  (diminish 'js2-refactor-mode))
 
 
-(unless (fboundp 'xref-js2-xref-backend)
-  (autoload #'xref-js2-xref-backend "xref-js2" nil t))
+(when (executable-find "rg")
+  (unless (fboundp 'xref-js2-xref-backend)
+    (autoload #'xref-js2-xref-backend "xref-js2" nil t))
 
-(add-hook 'js2-mode-hook (lambda ()
-                           (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+  (add-hook 'js2-mode-hook (lambda ()
+                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
-(with-eval-after-load 'xref-js2
-  (defvar xref-js2-search-program)
+  (with-eval-after-load 'xref-js2
+    (defvar xref-js2-search-program)
 
-  (setq xref-js2-search-program 'rg))
+    (setq xref-js2-search-program 'rg)))
 
 ;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
 ;; (define-key js-mode-map (kbd "M-.") nil)
@@ -6019,6 +6086,10 @@ Ignore if no file is found."
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 
 (add-hook 'scss-mode-hook #'lsp-deferred)
+
+(with-eval-after-load 'scss-mode
+  (defvar scss-compile-at-save)
+  (setq scss-compile-at-save t))
 
 
 (unless (fboundp 'sass-mode)
@@ -6094,21 +6165,20 @@ Ignore if no file is found."
 (unless (fboundp 'tree-sitter-hl-mode)
   (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
 
-(dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook css-mode-hook html-mode-hook
-                             java-mode-hook js-mode-hook js2-mode-hook json-mode-hook
-                             jsonc-mode-hook php-mode-hook python-mode-hook typescript-mode-hook))
-  (add-hook hook (lambda nil
-                   (require 'tree-sitter)
-                   (require 'tree-sitter-langs)
-                   (require 'tree-sitter-hl)
+;; (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook css-mode-hook html-mode-hook
+;;                              java-mode-hook js-mode-hook js2-mode-hook json-mode-hook
+;;                              jsonc-mode-hook php-mode-hook python-mode-hook typescript-mode-hook))
+;;   (add-hook hook (lambda nil
+;;                    (require 'tree-sitter)
+;;                    (require 'tree-sitter-langs)
+;;                    (require 'tree-sitter-hl)
 
-                   (global-tree-sitter-mode 1))))
+;;                    (global-tree-sitter-mode 1))))
 
 (with-eval-after-load 'tree-sitter
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
-  (when (fboundp 'diminish)
-    (diminish 'tree-sitter-mode)))
+  (diminish 'tree-sitter-mode))
 
 
 (unless (fboundp 'adoc-mode)
@@ -6122,8 +6192,7 @@ Ignore if no file is found."
     (autoload #'editorconfig-mode "editorconfig" nil t))
 
   (with-eval-after-load 'editorconfig
-    (when (fboundp 'diminish)
-      (diminish 'editorconfig-mode))))
+    (diminish 'editorconfig-mode)))
 
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
@@ -6157,8 +6226,6 @@ Ignore if no file is found."
 
 (unless (fboundp 'rust-mode)
   (autoload #'rust-mode "rust-mode" nil t))
-(unless (fboundp 'lsp)
-  (autoload #'lsp "rust-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
@@ -6170,14 +6237,32 @@ Ignore if no file is found."
   (setq rust-format-on-save t))
 
 
-(declare-function ansi-color-apply-on-region "ansi-color")
-(defun sb/colorize-compilation-buffer ()
-  "Colorize compile mode output."
+;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
+(with-eval-after-load 'compile
   (require 'ansi-color)
-  (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region (point-min) (point-max))))
+  (defvar compilation-filter-start)
 
-(add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
+  (defun sanityinc/colourise-compilation-buffer ()
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
+  (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
+
+;; (declare-function ansi-color-apply-on-region "ansi-color")
+;; (defun sb/colorize-compilation-buffer ()
+;;   "Colorize compile mode output."
+;;   (require 'ansi-color)
+;;   (let ((inhibit-read-only t))
+;;     (ansi-color-apply-on-region (point-min) (point-max))))
+
+;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
+
+
+(unless (fboundp 'info-colors-fontify-node)
+  (autoload #'info-colors-fontify-node "info-colors") nil t)
+
+(with-eval-after-load 'info
+  (add-hook 'Info-selection-hook #'info-colors-fontify-node))
 
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
@@ -6198,7 +6283,7 @@ Ignore if no file is found."
   (defvar company-minimum-prefix-length)
   (defvar company-backends)
 
-  ;; Slightly larger value to have more precise matches
+  ;; Slightly larger value to have more precise matches and so that the popup does not block
   (setq-local company-minimum-prefix-length 3)
   (set (make-local-variable 'company-backends)
        '((
@@ -6211,8 +6296,7 @@ Ignore if no file is found."
           ))))
 
 (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
-  (add-hook hook (lambda ()
-                   (sb/company-text-mode))))
+  (add-hook hook #'sb/company-text-mode))
 
 
 (defun sb/company-xml-mode ()
@@ -6299,6 +6383,7 @@ Ignore if no file is found."
 
   (require 'company-shell nil nil)
   (setq company-shell-delete-duplictes t)
+
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
@@ -6722,8 +6807,7 @@ mode is not in `sb/skippable-modes'."
 
   (which-key-setup-side-window-right-bottom)
 
-  (when (fboundp 'diminish)
-    (diminish 'which-key-mode)))
+  (diminish 'which-key-mode))
 
 
 ;; The posframe has a lower contrast
