@@ -152,6 +152,8 @@ This location is used for temporary installations and files.")
 (add-to-list 'load-path sb/extras-directory)
 (defvar sb/core-packages)
 
+;; An option is to construct the `load-path' manually
+;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
 (package-initialize)
 ;; (debug-on-entry 'package-initialize)
 
@@ -425,7 +427,8 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'turn-on-auto-revert-mode)
   (autoload #'turn-on-auto-revert-mode "autorevert" nil t))
 
-(add-hook 'after-init-hook #'global-auto-revert-mode)
+;; (add-hook 'after-init-hook #'global-auto-revert-mode)
+(run-at-time 5 nil #'global-auto-revert-mode)
 
 (with-eval-after-load 'autorevert
   (defvar auto-revert-interval)
@@ -451,7 +454,8 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'save-place-mode)
   (autoload #'save-place-mode "saveplace" nil t))
 
-(add-hook 'after-init-hook #'save-place-mode)
+;; (add-hook 'after-init-hook #'save-place-mode)
+(run-at-time 5 nil #'save-place-mode)
 
 (with-eval-after-load 'saveplace
   (defvar save-place-file)
@@ -464,7 +468,9 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'savehist-mode)
   (autoload #'savehist-mode "savehist" nil t))
 
-(add-hook 'after-init-hook #'savehist-mode)
+;; (add-hook 'after-init-hook #'savehist-mode)
+(run-at-time 5 nil #'savehist-mode)
+
 
 (with-eval-after-load 'savehist
   (defvar savehist-additional-variables)
@@ -615,7 +621,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'global-so-long-mode)
   (autoload #'global-so-long-mode "so-long" nil t))
 
-(add-hook 'after-init-hook #'global-so-long-mode)
+;; (add-hook 'after-init-hook #'global-so-long-mode)
+(run-at-time 5 nil #'global-so-long-mode)
 
 (with-eval-after-load 'so-long
   (defvar so-long-threshold)
@@ -939,8 +946,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'adob--rescan-windows)
   (autoload #'adob--rescan-windows "auto-dim-other-buffers" nil t))
 
-(add-hook 'after-init-hook #'auto-dim-other-buffers-mode)
-
+;; (add-hook 'after-init-hook #'auto-dim-other-buffers-mode)
+(run-at-time 5 nil #'auto-dim-other-buffers-mode)
 
 (declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
 
@@ -1668,6 +1675,8 @@ SAVE-FN with non-nil ARGS."
   (autoload #'recentf-save-file "recentf" nil t))
 (unless (fboundp 'recentf-cleanup)
   (autoload #'recentf-cleanup "recentf" nil t))
+(unless (fboundp 'recentf-save-list)
+  (autoload #'recentf-save-list "recentf" nil t))
 
 (add-hook 'after-init-hook #'recentf-mode)
 
@@ -1711,13 +1720,12 @@ SAVE-FN with non-nil ARGS."
     (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
     (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
 
+  ;; `recentf-save-list' is called on Emacs exit
   ;; (setq recentf-auto-cleanup-timer (run-with-idle-timer 60 t 'recentf-save-list))
   ;; (run-at-time 5 (* 5 60) 'recentf-save-list)
-  (run-at-time nil (* 5 60) 'recentf-save-list)
+  (run-with-idle-timer 60 t 'recentf-save-list)
 
   ;; (run-at-time 5 (* 10 60) 'recentf-cleanup)
-
-  ;; `recentf-save-list' is called on Emacs exit
   (add-hook 'kill-emacs-hook #'recentf-cleanup))
 
 
@@ -1825,8 +1833,8 @@ SAVE-FN with non-nil ARGS."
     (autoload #'company-quickhelp-mode "company-quickhelp" nil t))
 
   ;; (add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
-  (add-hook 'after-init-hook #'company-quickhelp-mode)
-
+  ;; (add-hook 'after-init-hook #'company-quickhelp-mode)
+  (run-at-time 5 nil #'company-quickhelp-mode)
 
   (when (display-graphic-p)
     (unless (fboundp 'company-box-mode)
@@ -2392,30 +2400,30 @@ SAVE-FN with non-nil ARGS."
       (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
     (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory))))
 
-(add-hook 'text-mode-hook (lambda ()
-                            (setq spell-fu-faces-exclude '(org-block
-                                                           org-block-begin-line
-                                                           org-block-end-line
-                                                           org-code
-                                                           org-date
-                                                           org-formula
-                                                           org-latex-and-related
-                                                           org-link
-                                                           org-meta-line
-                                                           org-property-value
-                                                           org-ref-cite-face
-                                                           org-special-keyword
-                                                           org-tag
-                                                           org-todo
-                                                           org-todo-keyword-done
-                                                           org-todo-keyword-habt
-                                                           org-todo-keyword-kill
-                                                           org-todo-keyword-outd
-                                                           org-todo-keyword-todo
-                                                           org-todo-keyword-wait
-                                                           org-verbatim
-                                                           hl-line))
-                            (spell-fu-mode)))
+(add-hook 'org-mode-hook (lambda ()
+                           (setq spell-fu-faces-exclude '(org-block
+                                                          org-block-begin-line
+                                                          org-block-end-line
+                                                          org-code
+                                                          org-date
+                                                          org-formula
+                                                          org-latex-and-related
+                                                          org-link
+                                                          org-meta-line
+                                                          org-property-value
+                                                          org-ref-cite-face
+                                                          org-special-keyword
+                                                          org-tag
+                                                          org-todo
+                                                          org-todo-keyword-done
+                                                          org-todo-keyword-habt
+                                                          org-todo-keyword-kill
+                                                          org-todo-keyword-outd
+                                                          org-todo-keyword-todo
+                                                          org-todo-keyword-wait
+                                                          org-verbatim
+                                                          hl-line))
+                           (spell-fu-mode)))
 
 (add-hook 'text-mode-hook (lambda ()
                             (setq spell-fu-faces-exclude '(hl-line
@@ -2482,7 +2490,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'show-paren-mode)
   (autoload #'show-paren-mode "paren" nil t))
 
-(add-hook 'after-init-hook #'show-paren-mode)
+;; (add-hook 'after-init-hook #'show-paren-mode)
+(run-at-time 5 nil #'show-paren-mode)
 
 (with-eval-after-load 'show-paren-mode
   (defvar show-paren-style)
@@ -3873,11 +3882,9 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'kill-buffer-hook #'bm-buffer-save)
 (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
 
-(add-hook 'find-file-hook #'bm-buffer-restore)
 (add-hook 'after-revert-hook #'bm-buffer-restore)
-
+(add-hook 'find-file-hook #'bm-buffer-restore)
 (add-hook 'after-init-hook #'bm-repository-load)
-;; (run-at-time 5 nil #'bm-repository-load)
 
 (with-eval-after-load 'bm
   (defvar bm-repository-file)
@@ -5748,7 +5755,7 @@ This file is specified in `counsel-projectile-default-file'."
         TeX-save-query nil ; Save buffers automatically when compiling
         TeX-source-correlate-method 'synctex
         ;; Do not start the emacs server when correlating sources
-        TeX-source-correlate-start-server nil
+        TeX-source-correlate-start-server t
         TeX-syntactic-comment t
         TeX-view-program-selection '((output-pdf "PDF Tools"))
         TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
@@ -5773,12 +5780,12 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   ;; (unbind-key "C-c ;" LaTeX-mode-map)
-
   )
 
 
 (with-eval-after-load 'tex-mode
   (declare-function auctex-latexmk "auctex-latexmk")
+
   (unless (fboundp 'auctex-latexmk)
     (autoload #'auctex-latexmk "auctex-latexmk" nil t))
 
@@ -6336,13 +6343,11 @@ Ignore if no file is found."
   (defvar company-backends)
 
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf :separate
-           company-yasnippet
-           company-dabbrev-code
-           ))))
+  (setq company-backends '((company-capf :separate
+                                         company-yasnippet
+                                         company-dabbrev-code)
+                           company-files
+                           )))
 
 (dolist (hook '(nxml-mode-hook))
   (add-hook hook (lambda ()
@@ -6357,13 +6362,12 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev-code
-           company-dabbrev
-           ))))
+        '((company-capf :separate
+                        company-yasnippet
+                        company-dabbrev-code)
+          company-files
+          company-dabbrev
+          )))
 
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
@@ -6375,13 +6379,12 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev
-           ))))
+  (setq company-backends '((company-capf :separate
+                                         company-yasnippet
+                                         company-dabbrev-code)
+                           company-files
+                           company-dabbrev
+                           )))
 
 (add-hook 'java-mode-hook #'sb/company-java-mode)
 
@@ -6393,16 +6396,14 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           ;; company-dabbrev-code
-           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-           ;; company-clang ; This can be slow
-           company-dabbrev
-           ))))
+  (setq company-backends '((company-capf :separate
+                                         company-yasnippet
+                                         company-dabbrev-code)
+                           company-files
+                           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+                           ;; company-clang ; This can be slow
+                           company-dabbrev
+                           )))
 
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
@@ -6417,17 +6418,15 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '(
-          company-files
-          company-capf
-          company-shell
-          company-shell-env
-          company-fish-shell
-          company-yasnippet
-          ;; company-dabbrev-code
-          company-dabbrev
-          )))
+  (setq company-backends '((company-capf :separate
+                                         company-yasnippet
+                                         company-dabbrev-code)
+                           company-files
+                           company-shell
+                           company-shell-env
+                           company-fish-shell
+                           company-dabbrev
+                           )))
 
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
@@ -6439,13 +6438,11 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends '((
-                            company-files
-                            company-capf ; Prefer `company-capf' over the old `company-elisp'
-                            ;; company-dabbrev-code
-                            company-yasnippet
-                            company-dabbrev
-                            ))))
+  (setq company-backends '((company-capf :separate
+                                         company-yasnippet
+                                         company-dabbrev-code)
+                           company-files
+                           company-dabbrev)))
 
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
@@ -6457,15 +6454,13 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '(
-          ;; Grouping the backends will show popups from all
-          company-files
-          company-capf
-          company-yasnippet
-          ;; company-dabbrev-code ; CAPF support with LSP is sufficient
-          company-dabbrev
-          )))
+  ;; Grouping the backends will show popups from all. Merge completions of the three backends, give
+  ;; priority to `company-capf'. `company-dabbrev-code' is useful for variable names.
+  (setq company-backends '((company-capf :separate
+                                         company-yasnippet
+                                         company-dabbrev-code)
+                           company-files
+                           company-dabbrev)))
 
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
@@ -6829,7 +6824,8 @@ mode is not in `sb/skippable-modes'."
 (unless (fboundp 'which-key-mode)
   (autoload #'which-key-mode nil t))
 
-(add-hook 'after-init-hook #'which-key-mode)
+;; (add-hook 'after-init-hook #'which-key-mode)
+(run-at-time 5 nil #'which-key-mode)
 
 (with-eval-after-load 'which-key
   ;; Allow C-h to trigger which-key before it is done automatically
