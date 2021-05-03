@@ -8,9 +8,9 @@
 ;; Created: Fri Mar 19 15:58:58 1999
 ;; Version: 2020.12.01
 ;; Package-Requires: ()
-;; Last-Updated: Sat Mar 20 16:12:06 2021 (-0700)
+;; Last-Updated: Tue Apr 20 13:24:32 2021 (-0700)
 ;;           By: dradams
-;;     Update #: 12939
+;;     Update #: 12964
 ;; URL: https://www.emacswiki.org/emacs/download/dired%2b.el
 ;; Doc URL: https://www.emacswiki.org/emacs/DiredPlus
 ;; Keywords: unix, mouse, directories, diredp, dired
@@ -789,6 +789,7 @@
 ;;  `dired-mark-pop-up'       - Delete the window or frame popped up,
 ;;                              afterward, and bury its buffer. Do not
 ;;                              show a menu bar for pop-up frame.
+;;  `dired-move-to-filename'  - Made it a command.
 ;;  `dired-other-frame'       - Handle non-positive prefix arg.
 ;;  `dired-other-window'      - Handle non-positive prefix arg.
 ;;  `dired-pop-to-buffer'     - Put window point at bob (bug #12281).
@@ -874,6 +875,10 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2021/04/20 dadams
+;;     Added: dired-move-to-filename, and made it a command.
+;; 2021/04/14 dadams
+;;     diredp-menu-bar-dir-menu: Added dired-undo.
 ;; 2021/03/20 dadams
 ;;     Added: diredp--dired-recent-files-1.
 ;;     diredp-recent-files-buffer is for dirs also now.
@@ -3340,13 +3345,12 @@ Report in the echo area and display a log buffer."
 If on a subdir line, redisplay that subdirectory.  In that case,
 a prefix arg lets you edit the `ls' switches used for the new listing.
 
-Dired remembers switches specified with a prefix arg, so that reverting
-the buffer will not reset them.  However, using `dired-undo' to re-insert
-or delete subdirectories can bypass this machinery.  Hence, you sometimes
-may have to reset some subdirectory switches after a `dired-undo'.
-You can reset all subdirectory switches to the default using
-\\<dired-mode-map>\\[dired-reset-subdir-switches].
-See Info node `(emacs)Subdir switches' for more details."
+Dired remembers switches specified with a prefix arg, so reverting the
+buffer does not reset them.  However, you might sometimes need to
+reset some subdirectory switches after using \\<dired-mode-map>`\\[dired-undo]'.  You can reset all
+subdirectory switches to the default value using
+`\\[dired-reset-subdir-switches]'.
+See Info node `(emacs) Subdir switches' for more details."
     ;; Moves point if the next ARG files are redisplayed.
     (interactive "P\np")
     (if (and test-for-subdir  (dired-get-subdir))
@@ -10425,13 +10429,12 @@ With a prefix arg, you can edit the `ls' switches used for this
 listing.  Add `R' to the switches to expand the directory tree under a
 subdirectory.
 
-Dired remembers the switches you specify with a prefix arg, so
-reverting the buffer does not reset them.  However, you might
-sometimes need to reset some subdirectory switches after a
-`dired-undo'.  You can reset all subdirectory switches to the
-default value using \\<dired-mode-map>\\[dired-reset-subdir-switches].  See \
-Info node
-`(emacs)Subdir switches' for more details."
+Dired remembers switches specified with a prefix arg, so reverting the
+buffer does not reset them.  However, you might sometimes need to
+reset some subdirectory switches after using \\<dired-mode-map>`\\[dired-undo]'.  You can reset all
+subdirectory switches to the default value using
+`\\[dired-reset-subdir-switches]'.
+See Info node `(emacs) Subdir switches' for more details."
   (interactive (list (diredp-this-subdir)
                      (and current-prefix-arg
                           (read-string "Switches for listing: "
@@ -11711,6 +11714,33 @@ Otherwise, an error occurs in these cases."
 
 ;; REPLACE ORIGINAL in `dired.el'.
 ;;
+;; 1. Made it a command.
+;; 2. Use `forward-line' instead of `beginning-of-line'.
+;;
+(defun dired-move-to-filename (&optional raise-error eol)
+  "Move to the beginning of the file name on the current line.
+Return the position of the file-name beginning, or nil if none found.
+
+Non-nil RAISE-ERROR means raise an error if no file name is found.
+Non-nil EOL is the search limit.  Default: `line-end-position'."
+  (interactive)
+  (unless eol (setq eol  (line-end-position)))
+  (forward-line 0)
+  (let ((change (next-single-property-change (point) 'dired-filename nil eol)))
+    (cond ((and change (< change eol))
+           (goto-char change))
+          ((re-search-forward directory-listing-before-filename-regexp eol t)
+           (goto-char (match-end 0)))
+          ((re-search-forward dired-permission-flags-regexp eol t)
+           ;; There *is* a file.  Our regexp-from-hell just failed to find it.
+           (when raise-error (error "Unrecognized line!  Check `directory-listing-before-filename-regexp'"))
+           (beginning-of-line)
+           nil)
+          (raise-error (error "No file on this line")))))
+
+
+;; REPLACE ORIGINAL in `dired.el'.
+;;
 ;; 1. Fixes Emacs bug #7126: Did not work with arbitrary file list (cons arg to `dired').
 ;; 2. Remove `/' from directory name before comparing with BASE.
 ;;
@@ -12743,20 +12773,20 @@ Optional arg MARK-CHAR is the type of mark to check.
 (put 'diredp-mark 'interactive-only t)
 ;;;###autoload
 (defun diredp-mark (arg &optional char) ; Bound to `m', `* m'
-  "Mark current line, lines in active region, or lines in subdir listing.
+  "Mark current line, lines in active region, or lines in a listing.
 If the region is active and nonempty:
  * Mark the lines in the region.
  * With a prefix arg, you are prompted for the CHAR to mark with.
 
-If cursor is on a subdir line:
- * Mark all lines in the subdir listing except dirs `.' and `..'.
+If cursor is on a listing header line (main dir or a subdir):
+ * Mark all lines in that listing except dirs `.' and `..'.
  * With a prefix arg, you are prompted for the CHAR to mark with.
 
 Otherwise, with numeric prefix arg N, mark the next N lines.
 
 Use \\<dired-mode-map>`\\[dired-unmark-all-files]' to remove marks everywhere, \
-or `\\[dired-unmark]' on a subdir line to
-remove marks in the subdir listing."
+or `\\[dired-unmark]' on a listing header
+line to remove marks in the listing."
   (interactive "P")
   (let ((dired-marker-char  dired-marker-char))
     (cond ((diredp-nonempty-region-p)
@@ -15635,6 +15665,8 @@ If no one is selected, symmetric encryption will be performed.  "
 (define-key diredp-menu-bar-dir-menu [insert]
   '(menu-item "Insert/Move-To This Subdir" dired-maybe-insert-subdir
     :help "Move to subdirectory line or listing"))
+(define-key diredp-menu-bar-dir-menu [dired-undo]
+  '(menu-item "Undo" dired-undo :help "Undo changes: marks, killed lines, and subdir listings"))
 (define-key diredp-menu-bar-dir-menu [revert]
   '(menu-item "Refresh (Sync \& Show All)" revert-buffer :help "Update directory contents"))
 (define-key diredp-menu-bar-dir-menu [create-directory] ; Moved from "Immediate".

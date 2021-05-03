@@ -9,7 +9,6 @@
 
 ;; Load built-in libraries
 (require 'cl-lib)
-;; (require 'map)
 (require 'subr-x)
 
 (declare-function ht-merge "ht")
@@ -472,7 +471,8 @@ This location is used for temporary installations and files.")
   (defvar savehist-file)
   (defvar savehist-save-minibuffer-history)
 
-  (setq savehist-additional-variables '(extended-command-history kill-ring search-ring)
+  (setq savehist-additional-variables '(extended-command-history
+                                        kill-ring search-ring regexp-search-ring)
         savehist-save-minibuffer-history t)
 
   (unless (bound-and-true-p sb/use-no-littering)
@@ -584,6 +584,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Enable the following modes
 (dolist (mode '(auto-compression-mode
+                auto-save-visited-mode
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 global-hl-line-mode
@@ -922,9 +923,13 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; The icons do not look good.
-;; (when (eq sb/modeline-theme 'powerline)
-;;   (require 'mode-icons)
-;;   (mode-icons-mode 1))
+(if nil
+    (progn
+      (unless (fboundp 'mode-icons-mode)
+        (autoload #'mode-icons-mode "mode-icons" nil t))
+
+      (mode-icons-mode 1)
+      ))
 
 
 (declare-function adob--rescan-windows "auto-dim-other-buffers")
@@ -997,28 +1002,34 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
 
-;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
-;; useful information
-;; (add-hook 'emacs-startup-hook (lambda ()
-;;                                 (setq resize-mini-windows nil)))
+(if nil
+    (progn
+      ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
+      ;; useful information
+      (add-hook 'emacs-startup-hook (lambda ()
+                                      (setq resize-mini-windows nil)))
+      ))
 
 
-(declare-function circadian-setup "circadian")
-(unless (fboundp 'circadian-setup)
-  (autoload #'circadian-setup "circadian" nil t))
+(if  nil
+    (progn
+      (declare-function circadian-setup "circadian")
+      (unless (fboundp 'circadian-setup)
+        (autoload #'circadian-setup "circadian" nil t))
 
-(with-eval-after-load 'circadian
-  (require 'solar nil nil)
+      (with-eval-after-load 'circadian
+        (require 'solar nil nil)
 
-  (defvar calendar-latitude)
-  (defvar calendar-longitude)
-  (defvar circadian-themes)
+        (defvar calendar-latitude)
+        (defvar calendar-longitude)
+        (defvar circadian-themes)
 
-  ;; Kanpur, UP
-  (setq calendar-latitude 26.50
-        calendar-longitude 80.23
-        circadian-themes '((:sunrise . modus-operandi)
-                           (:sunset  . modus-operandi))))
+        ;; Kanpur, UP
+        (setq calendar-latitude 26.50
+              calendar-longitude 80.23
+              circadian-themes '((:sunrise . modus-operandi)
+                                 (:sunset  . modus-operandi))))
+      ))
 
 
 (unless (fboundp 'beacon-mode)
@@ -1152,7 +1163,23 @@ SAVE-FN with non-nil ARGS."
     (autoload #'diredfl-mode "diredfl" nil t))
 
   ;; (add-hook 'dired-mode-hook #'diredfl-mode)
-  )
+
+  (defvar dired-efap-initial-filename-selection)
+
+  (setq dired-efap-initial-filename-selection nil)
+
+  (unless (fboundp 'dired-efap)
+    (autoload #'dired-efap "dired-efap" nil t))
+
+  (bind-keys* :package dired-efap :map dired-mode-map
+              ("r" . dired-efap))
+
+  ;; Narrow dired to match filter
+  (unless (fboundp 'dired-narrow)
+    (autoload #'dired-narrow "dired-narrow" nil t))
+
+  (bind-keys :package dired-narrow :map dired-mode-map
+             ("/" . dired-narrow)))
 
 (defvar dired-mode-map)
 (bind-keys :package dired :map dired-mode-map
@@ -1176,8 +1203,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
   (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
 
-;; (add-hook 'dired-mode-hook (lambda ()
-;;                              (diredp-toggle-find-file-reuse-dir 1)))
+(add-hook 'dired-mode-hook (lambda ()
+                             (diredp-toggle-find-file-reuse-dir 1)))
 
 (with-eval-after-load 'dired+
   (defvar diredp-hide-details-initially-flag)
@@ -1187,23 +1214,7 @@ SAVE-FN with non-nil ARGS."
         diredp-hide-details-propagate-flag nil)
 
   ;; (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
-
-  (defvar dired-efap-initial-filename-selection)
-
-  (setq dired-efap-initial-filename-selection nil)
-
-  (unless (fboundp 'dired-efap)
-    (autoload #'dired-efap "dired-efap" nil t))
-
-  (bind-keys* :package dired-efap :map dired-mode-map
-              ("r" . dired-efap))
-
-  ;; Narrow dired to match filter
-  (unless (fboundp 'dired-narrow)
-    (autoload #'dired-narrow "dired-narrow" nil t))
-
-  (bind-keys :package dired-narrow :map dired-mode-map
-             ("/" . dired-narrow)))
+  )
 
 
 (unless (fboundp 'async-bytecomp-package-mode)
@@ -1476,12 +1487,13 @@ SAVE-FN with non-nil ARGS."
         ;; Render subscripts and superscripts in org buffers
         org-pretty-entities-include-sub-superscripts t)
 
-  ;;   (unbind-key "M-<up>" org-mode-map)
-  ;;   (unbind-key "M-<down>" org-mode-map))
+  (unbind-key "M-<left>" org-mode-map)
+  (unbind-key "M-<right>" org-mode-map)
 
-  (add-hook 'org-mode-hook #'visual-line-mode)
-  (add-hook 'org-mode-hook #'org-indent-mode)
-  (add-hook 'org-mode-hook #'prettify-symbols-mode)
+  (add-hook 'org-mode-hook (lambda ()
+                             (visual-line-mode 1)
+                             (org-indent-mode 1)
+                             (prettify-symbols-mode 1)))
 
   (diminish 'org-indent-mode))
 
@@ -2337,13 +2349,15 @@ SAVE-FN with non-nil ARGS."
              ("C-,"     . sb/flyspell-goto-previous-error)))
 
 
-;; FIXME: Is this any good?
-;; (unless (fboundp 'flyspell-correct-wrapper)
-;;   (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
+(if nil
+    (progn
+      ;; FIXME: Is this any good?
+      (unless (fboundp 'flyspell-correct-wrapper)
+        (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
 
-;; (bind-keys :package flyspell-correct-ivy
-;;            ("C-;" . flyspell-correct-wrapper))
-
+      (bind-keys :package flyspell-correct-ivy
+                 ("C-;" . flyspell-correct-wrapper))
+      ))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
@@ -2361,59 +2375,74 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'spell-fu-word-add)
   (autoload #'spell-fu-word-add "spell-fu" nil t))
 
-(add-hook 'text-mode-hook #'spell-fu-mode)
-
-(with-eval-after-load 'spell-fu
+(with-eval-after-load 'spell-fu-mode
   (defvar spell-fu-faces-exclude)
   (defvar spell-fu-directory)
   (defvar no-littering-var-directory)
 
   ;; `nxml-mode' is derived from `text-mode'
-  (setq spell-fu-faces-exclude '(font-latex-math-face
-                                 font-latex-sedate-face
-                                 font-lock-function-name-face
+  (setq spell-fu-faces-exclude '(font-lock-function-name-face
                                  font-lock-keyword-face
                                  font-lock-string-face
                                  font-lock-variable-name-face
                                  hl-line
-                                 lsp-face-highlight-read
-                                 markdown-blockquote-face
-                                 markdown-code-face
-                                 markdown-html-attr-name-face
-                                 markdown-html-attr-value-face
-                                 markdown-html-tag-name-face
-                                 markdown-inline-code-face
-                                 markdown-link-face
-                                 markdown-markup-face
-                                 markdown-plain-url-face
-                                 markdown-reference-face
-                                 markdown-url-face
-                                 nxml-attribute-local-name
-                                 org-block
-                                 org-block-begin-line
-                                 org-block-end-line
-                                 org-code
-                                 org-date
-                                 org-formula
-                                 org-latex-and-related
-                                 org-link
-                                 org-meta-line
-                                 org-property-value
-                                 org-ref-cite-face
-                                 org-special-keyword
-                                 org-tag
-                                 org-todo
-                                 org-todo-keyword-done
-                                 org-todo-keyword-habt
-                                 org-todo-keyword-kill
-                                 org-todo-keyword-outd
-                                 org-todo-keyword-todo
-                                 org-todo-keyword-wait
-                                 org-verbatim))
+                                 lsp-face-highlight-read))
 
   (if (bound-and-true-p sb/use-no-littering)
       (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
     (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory))))
+
+(add-hook 'text-mode-hook (lambda ()
+                            (setq spell-fu-faces-exclude '(org-block
+                                                           org-block-begin-line
+                                                           org-block-end-line
+                                                           org-code
+                                                           org-date
+                                                           org-formula
+                                                           org-latex-and-related
+                                                           org-link
+                                                           org-meta-line
+                                                           org-property-value
+                                                           org-ref-cite-face
+                                                           org-special-keyword
+                                                           org-tag
+                                                           org-todo
+                                                           org-todo-keyword-done
+                                                           org-todo-keyword-habt
+                                                           org-todo-keyword-kill
+                                                           org-todo-keyword-outd
+                                                           org-todo-keyword-todo
+                                                           org-todo-keyword-wait
+                                                           org-verbatim
+                                                           hl-line))
+                            (spell-fu-mode)))
+
+(add-hook 'text-mode-hook (lambda ()
+                            (setq spell-fu-faces-exclude '(hl-line
+                                                           nxml-attribute-local-name))
+                            (spell-fu-mode)))
+
+(add-hook 'markdown-mode-hook (lambda ()
+                                (setq spell-fu-faces-exclude '(markdown-blockquote-face
+                                                               markdown-code-face
+                                                               markdown-html-attr-name-face
+                                                               markdown-html-attr-value-face
+                                                               markdown-html-tag-name-face
+                                                               markdown-inline-code-face
+                                                               markdown-link-face
+                                                               markdown-markup-face
+                                                               markdown-plain-url-face
+                                                               markdown-reference-face
+                                                               markdown-url-face
+                                                               hl-line))
+                                (spell-fu-mode)))
+
+(dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+  (add-hook hook (lambda ()
+                   (setq spell-fu-faces-exclude '(font-latex-math-face
+                                                  font-latex-sedate-face
+                                                  hl-line))
+                   (spell-fu-mode))))
 
 (bind-keys :package spell-fu
            ("C-c f n" . spell-fu-goto-next-error)
@@ -2610,7 +2639,7 @@ SAVE-FN with non-nil ARGS."
         projectile-mode-line-prefix ""
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
-        projectile-sort-order 'access-time
+        projectile-sort-order 'default ; No sorting, should be faster
         projectile-verbose nil)
 
   (unless (bound-and-true-p sb/use-no-littering)
@@ -2787,7 +2816,7 @@ This file is specified in `counsel-projectile-default-file'."
   (with-eval-after-load 'all-the-icons-ivy-rich-mode
     (defvar all-the-icons-ivy-rich-icon-size)
 
-    (setq all-the-icons-ivy-rich-icon-size 0.9)))
+    (setq all-the-icons-ivy-rich-icon-size 0.8)))
 
 
 (declare-function ivy-rich-modify-column "ivy-rich")
@@ -2809,7 +2838,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Increase the width to see the major mode clearly
   ;; FIXME: `ivy-rich-modify-column' is not taking effect.
   (ivy-rich-modify-column 'ivy-switch-buffer 'ivy-rich-switch-buffer-major-mode
-                          '(:width 18 :face warning)))
+                          '(:width 24 :face warning)))
 
 
 (when (executable-find "fd")
@@ -2865,7 +2894,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'flycheck-manual "flycheck" nil t))
 
 ;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
-;; derived from `text-mode'
+;; derived from `text-mode'.
 (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; (add-hook 'text-mode-hook #'flycheck-mode)
 ;; (add-hook 'prog-mode-hook #'flycheck-mode)
@@ -2888,7 +2917,10 @@ This file is specified in `counsel-projectile-default-file'."
         flycheck-idle-buffer-switch-delay 5 ; Increase the time to allow for quick transitions
         flycheck-idle-change-delay 5 ; Increase the time to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
-        flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
+        ;; Show error messages only if the error list is not already visible
+        flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
+        ;; `chktex' errors are often not very helpful, and `csv-mode' does not have a checker yet.
+        flycheck-global-modes '(not LaTeX-mode latex-mode csv-mode))
 
   ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
   (when (or (eq sb/modeline-theme 'spaceline)
@@ -2922,15 +2954,15 @@ This file is specified in `counsel-projectile-default-file'."
   )
 
 
-;; Does not display popup under TTY, check possible workarounds at
-;; https://github.com/flycheck/flycheck-popup-tip
-(when (display-graphic-p)
-  (unless (fboundp 'flycheck-pos-tip-mode)
-    (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
+;; ;; Does not display popup under TTY, check possible workarounds at
+;; ;; https://github.com/flycheck/flycheck-popup-tip
+;; (when (display-graphic-p)
+;;   (unless (fboundp 'flycheck-pos-tip-mode)
+;;     (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
 
-  ;; This should be handy only for `emacs-lisp-mode', lsp has `lsp-ui-mode'
-  ;; (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
-  )
+;;   ;; This should be handy only for `emacs-lisp-mode', lsp has `lsp-ui-mode'
+;;   (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
+;;   )
 
 
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
@@ -2977,7 +3009,7 @@ This file is specified in `counsel-projectile-default-file'."
   (diminish 'whitespace-newline-mode))
 
 
-;; This is different from `whitespace-cleanup' since this is unconditional
+;; This is different from `whitespace-cleanup-mode' since this is unconditional
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
   (setq delete-trailing-lines t) ; `M-x delete-trailing-whitespace' deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
@@ -3039,19 +3071,19 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar hl-todo-highlight-punctuation)
   (defvar hl-todo-keyword-faces)
 
-  (setq hl-todo-highlight-punctuation ":")
-
-  (add-to-list 'hl-todo-keyword-faces '("LATER"    . "#d0bf8f"))
-  (add-to-list 'hl-todo-keyword-faces '("ISSUE"    . "#ff8c00"))
-  (add-to-list 'hl-todo-keyword-faces '("DEBUG"    . "#ff8c00"))
-  (add-to-list 'hl-todo-keyword-faces '("TEST"     . "tomato"))
-  (add-to-list 'hl-todo-keyword-faces '("WARNING"  . "#cc0000"))
-  (add-to-list 'hl-todo-keyword-faces '("BEWARE"   . "#aa0000"))
-  (add-to-list 'hl-todo-keyword-faces '("REFACTOR" . "#cc9393"))
-  ;; (add-to-list 'hl-todo-keyword-faces '("DEPRECATED" . "#aa0000"))
-  ;; (add-to-list 'hl-todo-keyword-faces '("DONE" . "#44bc44"))
-  ;; (add-to-list 'hl-todo-keyword-faces '("REVIEW" . "#6ae4b9"))
-  )
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
+                                        ("ISSUE"    . "#ff8c00")
+                                        ("DEBUG"    . "#ff8c00")
+                                        ("TEST"     . "tomato")
+                                        ("WARNING"  . "#cc0000")
+                                        ("BEWARE"   . "#aa0000")
+                                        ("REFACTOR" . "#cc9393")
+                                        ;; ("DEPRECATED" . "#aa0000")
+                                        ;; ("DONE" . "#44bc44")
+                                        ;; ("REVIEW" . "#6ae4b9")
+                                        )
+                                      hl-todo-keyword-faces)))
 
 
 (unless (fboundp 'highlight-numbers-mode)
@@ -3147,9 +3179,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Disable backup
 (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
 
-;; ;; Include this directory in $PATH on remote
-;; (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
-;; (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+(with-eval-after-load 'tramp
+  ;; Include this directory in $PATH on remote
+  (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
@@ -3604,18 +3637,21 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Avoid the "Overwrite old session file (not loaded)?" warning
-(declare-function session-initialize "session")
+(if nil
+    (progn
+      (declare-function session-initialize "session")
 
-(unless (fboundp 'session-initialize)
-  (autoload #'session-initialize "session" nil t))
+      (unless (fboundp 'session-initialize)
+        (autoload #'session-initialize "session" nil t))
 
-;; (add-hook 'after-init-hook #'session-initialize)
+      ;; (add-hook 'after-init-hook #'session-initialize)
 
-(with-eval-after-load 'session
-  (defvar session-save-file)
+      (with-eval-after-load 'session
+        (defvar session-save-file)
 
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq session-save-file (expand-file-name "session" sb/temp-directory))))
+        (unless (bound-and-true-p sb/use-no-littering)
+          (setq session-save-file (expand-file-name "session" sb/temp-directory))))
+      ))
 
 
 (unless (fboundp 'immortal-scratch-mode)
@@ -3700,28 +3736,30 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
 
 
-(declare-function pomidor-quit "pomidor")
-(declare-function pomidor-break "pomidor")
-(declare-function pomidor-reset "pomidor")
-(declare-function pomidor-stop "pomidor")
-(declare-function pomidor-hold "pomidor")
-(declare-function pomidor-unhold "pomidor")
+(if nil
+    (progn
+      (declare-function pomidor-quit "pomidor")
+      (declare-function pomidor-break "pomidor")
+      (declare-function pomidor-reset "pomidor")
+      (declare-function pomidor-stop "pomidor")
+      (declare-function pomidor-hold "pomidor")
+      (declare-function pomidor-unhold "pomidor")
 
-(unless (fboundp 'pomidor-quit)
-  (autoload #'pomidor-quit "pomidor" nil t))
-(unless (fboundp 'pomidor-break)
-  (autoload #'pomidor-break "pomidor" nil t))
-(unless (fboundp 'pomidor-reset)
-  (autoload #'pomidor-reset "pomidor" nil t))
-(unless (fboundp 'pomidor-stop)
-  (autoload #'pomidor-stop "pomidor" nil t))
-(unless (fboundp 'pomidor-hold)
-  (autoload #'pomidor-hold "pomidor" nil t))
-(unless (fboundp 'pomidor-unhold)
-  (autoload #'pomidor-unhold "pomidor" nil t))
-(unless (fboundp 'pomidor)
-  (autoload #'pomidor "pomidor" nil t))
-
+      (unless (fboundp 'pomidor-quit)
+        (autoload #'pomidor-quit "pomidor" nil t))
+      (unless (fboundp 'pomidor-break)
+        (autoload #'pomidor-break "pomidor" nil t))
+      (unless (fboundp 'pomidor-reset)
+        (autoload #'pomidor-reset "pomidor" nil t))
+      (unless (fboundp 'pomidor-stop)
+        (autoload #'pomidor-stop "pomidor" nil t))
+      (unless (fboundp 'pomidor-hold)
+        (autoload #'pomidor-hold "pomidunlessor" nil t))
+      (unless (fboundp 'pomidor-unhold)
+        (autoload #'pomidor-unhold "pomidor" nil t))
+      ((fboundp 'pomidor)
+       (autoload #'pomidor "pomidor" nil t))
+      ))
 
 (unless (fboundp 'ace-window)
   (autoload #'ace-window "ace-window" nil t))
@@ -3806,6 +3844,10 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function bm-repository-load "bm")
 (declare-function bm-repository-save "bm")
 
+;; Must be set before `bm' is loaded
+(defvar bm-restore-repository-on-load)
+(setq bm-restore-repository-on-load t)
+
 (unless (fboundp 'bm-buffer-save)
   (autoload #'bm-buffer-save "bm" nil t))
 (unless (fboundp 'bm-buffer-restore)
@@ -3823,19 +3865,18 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'bm-repository-save)
   (autoload #'bm-repository-save "bm" nil t))
 
-;; Must be set before `bm' is loaded
-(defvar bm-restore-repository-on-load)
-(setq bm-restore-repository-on-load t)
-
+;; `kill-buffer-hook' is not called when Emacs is killed
 (add-hook 'kill-emacs-hook (lambda ()
                              (bm-buffer-save-all)
                              (bm-repository-save)))
 (add-hook 'after-save-hook #'bm-buffer-save)
 (add-hook 'kill-buffer-hook #'bm-buffer-save)
+(add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+
 (add-hook 'find-file-hook #'bm-buffer-restore)
 (add-hook 'after-revert-hook #'bm-buffer-restore)
 
-;; (add-hook 'after-init-hook #'bm-repository-load)
+(add-hook 'after-init-hook #'bm-repository-load)
 ;; (run-at-time 5 nil #'bm-repository-load)
 
 (with-eval-after-load 'bm
@@ -3971,13 +4012,15 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'define-word-at-point)
   (autoload #'define-word-at-point "define-word" nil t))
 
+(if nil
+    (progn
+      (unless (fboundp 'emojify-mode)
+        (autoload #'emojify-mode "emojify" nil t))
+      (unless (fboundp 'global-emojify-mode)
+        (autoload #'global-emojify-mode "emojify" nil t))
 
-(unless (fboundp 'emojify-mode)
-  (autoload #'emojify-mode "emojify" nil t))
-(unless (fboundp 'global-emojify-mode)
-  (autoload #'global-emojify-mode "emojify" nil t))
-
-(add-hook 'markdown-mode-hook #'emojify-mode)
+      (add-hook 'markdown-mode-hook #'emojify-mode)
+      ))
 
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
@@ -4023,15 +4066,15 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
-  (add-hook 'pdf-view-mode #'pdf-links-minor-mode)
-  (add-hook 'pdf-view-mode #'pdf-isearch-minor-mode)
-  (add-hook 'pdf-view-mode #'pdf-outline-minor-mode)
-  (add-hook 'pdf-view-mode #'pdf-history-minor-mode)
+  (add-hook 'pdf-view-mode-hook (lambda()
+                                  (pdf-links-minor-mode 1)
+                                  (pdf-isearch-minor-mode 1)
+                                  (pdf-outline-minor-mode 1)
+                                  (pdf-history-minor-mode 1)
+                                  ;; (setq header-line-format nil)
+                                  ))
 
-  ;; (add-hook 'pdf-view-mode-hook (lambda ()
-  ;;                                 (setq header-line-format nil)))
-
-  )
+  (require 'saveplace-pdf-view nil nil))
 
 (defvar pdf-view-mode-map)
 (bind-keys :package pdf-tools :map pdf-view-mode-map
@@ -4039,11 +4082,6 @@ This file is specified in `counsel-projectile-default-file'."
            ("d"   . pdf-annot-delete)
            ("h"   . pdf-annot-add-highlight-markup-annotation)
            ("t"   . pdf-annot-add-text-annotation))
-
-
-(with-eval-after-load 'saveplace
-  (with-eval-after-load 'pdf-tools
-    (require 'saveplace-pdf-view nil nil)))
 
 
 (unless (fboundp 'logview-mode)
@@ -4089,6 +4127,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
+
 (unless (fboundp 'autodisass-llvm-bitcode)
   (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
 
@@ -4129,7 +4168,7 @@ This file is specified in `counsel-projectile-default-file'."
         markdown-split-window-direction 'horizontal)
 
   ;; `markdown-mode' is derived from `text-mode'
-  (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)
+  ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)
   ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
 
   (require 'markdown-mode+ nil nil)
@@ -4265,39 +4304,47 @@ This file is specified in `counsel-projectile-default-file'."
     (diminish 'eldoc-mode)))
 
 
-(declare-function eldoc-box-hover-mode "eldoc-box")
-(declare-function eldoc-box-hover-at-point-mode "eldoc-box")
+(if nil
+    (progn
+      (declare-function eldoc-box-hover-mode "eldoc-box")
+      (declare-function eldoc-box-hover-at-point-mode "eldoc-box")
 
-(unless (fboundp 'eldoc-box-hover-mode)
-  (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
-(unless (fboundp 'eldoc-box-hover-at-point-mode)
-  (autoload #'eldoc-box-hover-at-point-mode "eldoc-box" nil t))
+      (unless (fboundp 'eldoc-box-hover-mode)
+        (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
+      (unless (fboundp 'eldoc-box-hover-at-point-mode)
+        (autoload #'eldoc-box-hover-at-point-mode "eldoc-box" nil t))
 
-;; (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
-;; (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
+      (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
+      (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
 
-(with-eval-after-load 'eldoc-box
-  (defvar eldoc-box-clear-with-C-g)
+      (with-eval-after-load 'eldoc-box
+        (defvar eldoc-box-clear-with-C-g)
 
-  (setq eldoc-box-clear-with-C-g t)
+        (setq eldoc-box-clear-with-C-g t)
 
-  (diminish 'eldoc-box-hover-mode))
+        (diminish 'eldoc-box-hover-mode))
+      ))
 
-
-(unless (fboundp 'c-turn-on-eldoc-mode)
-  (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
 
 ;; We use LSP
-;; (add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
+(if nil
+    (progn
+      (unless (fboundp 'c-turn-on-eldoc-mode)
+        (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
+
+      (add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
+      ))
 
 
-(with-eval-after-load 'css-mode
-  (unless (fboundp 'css-eldoc-enable)
-    (autoload #'css-eldoc-enable "css-eldoc" nil t))
+;; We use LSP
+(if nil
+    (progn
+      (with-eval-after-load 'css-mode
+        (unless (fboundp 'css-eldoc-enable)
+          (autoload #'css-eldoc-enable "css-eldoc" nil t))
 
-  ;; We use LSP
-  ;; (css-eldoc-enable)
-  )
+        (css-eldoc-enable))
+      ))
 
 
 (unless (fboundp 'matlab-mode)
@@ -5077,15 +5124,16 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Initiate the lsp server after all the language server code has been processed
 (add-hook 'python-mode-hook #'lsp-deferred)
 
-;; Py-yapf works on a temporary file (placed in `/tmp'). Therefore it does not pick up on any
-;; project specific YAPF styles. Yapfify works on the original file, so that any project settings
-;; supported by YAPF itself are used.
+
+;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
+;; used.
 (when (and (eq sb/python-langserver 'pyright)
            (executable-find "yapf"))
   (unless (fboundp 'yapf-mode)
     (autoload #'yapf-mode "yapfify" nil t))
 
-  (add-hook 'python-mode-hook #'yapf-mode)
+  ;; FIXME: The cursor loses its position after formatting, which is annoying
+  ;; (add-hook 'python-mode-hook #'yapf-mode)
 
   (with-eval-after-load 'yapfify
     (diminish 'yapf-mode)))
@@ -5612,30 +5660,6 @@ This file is specified in `counsel-projectile-default-file'."
         nxml-slash-auto-complete-flag t))
 
 
-;; The advantage with flycheck-grammarly is that you need not set up lsp support, so you can use it
-;; anywhere
-
-(with-eval-after-load 'flycheck
-  (defvar flycheck-grammarly-check-time)
-  (defvar flycheck-checkers)
-
-  (require 'flycheck-grammarly nil nil)
-
-  (setq flycheck-grammarly-check-time 3
-        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-        flycheck-checkers (delete 'grammarly flycheck-checkers))
-
-  (add-to-list 'flycheck-checkers 'grammarly t)
-  (flycheck-add-next-checker 'textlint 'grammarly))
-
-
-;; We need to enable lsp workspace to allow `lsp-grammarly' to work
-;; (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
-;; (add-hook 'text-mode-hook #'(lambda nil
-;;                               (require 'lsp-grammarly)
-;;                               (lsp-deferred)))
-
-
 ;; Texlab seems to have high overhead
 
 ;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
@@ -6153,32 +6177,39 @@ Ignore if no file is found."
 (eval-and-compile
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
+    (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
+                                         bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
 (run-with-idle-timer 2 nil #'sb/enable-format-all)
 
 
-(unless (fboundp 'global-tree-sitter-mode)
-  (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
-(unless (fboundp 'tree-sitter-hl-mode)
-  (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
+(if nil
+    (progn
+      (unless (fboundp 'global-tree-sitter-mode)
+        (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
+      (unless (fboundp 'tree-sitter-hl-mode)
+        (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
 
-;; (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook css-mode-hook html-mode-hook
-;;                              java-mode-hook js-mode-hook js2-mode-hook json-mode-hook
-;;                              jsonc-mode-hook php-mode-hook python-mode-hook typescript-mode-hook))
-;;   (add-hook hook (lambda nil
-;;                    (require 'tree-sitter)
-;;                    (require 'tree-sitter-langs)
-;;                    (require 'tree-sitter-hl)
+      (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
+                                   css-mode-hook html-mode-hook
+                                   java-mode-hook js-mode-hook
+                                   js2-mode-hook json-mode-hook
+                                   jsonc-mode-hook php-mode-hook
+                                   python-mode-hook
+                                   typescript-mode-hook))
+        (add-hook hook (lambda nil
+                         (require 'tree-sitter)
+                         (require 'tree-sitter-langs)
+                         (require 'tree-sitter-hl)
 
-;;                    (global-tree-sitter-mode 1))))
+                         (global-tree-sitter-mode 1))))
 
-(with-eval-after-load 'tree-sitter
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+      (with-eval-after-load 'tree-sitter
+        (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
-  (diminish 'tree-sitter-mode))
+        (diminish 'tree-sitter-mode))))
 
 
 (unless (fboundp 'adoc-mode)
@@ -6824,8 +6855,12 @@ mode is not in `sb/skippable-modes'."
 
 ;; Hydras
 
-(defhydra sb/hydra-spelling (:color blue)
-  "
+(unless (fboundp 'defhydra)
+  (autoload #'defhydra "hydra" nil t))
+
+(with-eval-after-load 'hydra
+  (defhydra sb/hydra-spelling (:color blue)
+    "
   ^
   ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
   ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
@@ -6834,32 +6869,32 @@ mode is not in `sb/skippable-modes'."
   ^^                  _f_ check           _m_ mode              _a_ add word
   ^^                  ^^                  ^^                    ^^
   "
-  ("q" nil)
-  ("<" flyspell-correct-previous :color pink)
-  (">" flyspell-correct-next :color pink)
-  ("c" ispell)
-  ("d" ispell-change-dictionary)
-  ("f" flyspell-buffer)
-  ("m" flyspell-mode)
-  ("n" spell-fu-goto-next-error)
-  ("p" spell-fu-goto-previous-error)
-  ("a" spell-fu-word-add))
+    ("q" nil)
+    ("<" flyspell-correct-previous :color pink)
+    (">" flyspell-correct-next :color pink)
+    ("c" ispell)
+    ("d" ispell-change-dictionary)
+    ("f" flyspell-buffer)
+    ("m" flyspell-mode)
+    ("n" spell-fu-goto-next-error)
+    ("p" spell-fu-goto-previous-error)
+    ("a" spell-fu-word-add))
 
-(defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
-  "Zoom the text"
-  ("i" default-text-scale-increase "in")
-  ("o" default-text-scale-decrease "out"))
+  (defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
+    "Zoom the text"
+    ("i" default-text-scale-increase "in")
+    ("o" default-text-scale-decrease "out"))
 
-(defhydra sb/hydra-error (global-map "C-c h e")
-  "goto-error"
-  ("h" first-error "first")
-  ("j" next-error "next")
-  ("k" previous-error "prev")
-  ("v" recenter-top-bottom "recenter")
-  ("q" nil "quit"))
+  (defhydra sb/hydra-error (global-map "C-c h e")
+    "goto-error"
+    ("h" first-error "first")
+    ("j" next-error "next")
+    ("k" previous-error "prev")
+    ("v" recenter-top-bottom "recenter")
+    ("q" nil "quit"))
 
-(defhydra sb/hydra-projectile (:color teal :hint nil)
-  "
+  (defhydra sb/hydra-projectile (:color teal :hint nil)
+    "
      PROJECTILE: %(projectile-project-root)
 
      Find File            Search/Tags          Buffers                Cache
@@ -6870,30 +6905,30 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   _r_: recent file                                               ^^^^_z_: cache current
   _d_: dir
 "
-  ("b"   projectile-switch-to-buffer)
-  ("c"   projectile-invalidate-cache)
-  ("d"   projectile-find-dir)
-  ("s-f" projectile-find-file)
-  ("ff"  projectile-find-file-dwim)
-  ("fd"  projectile-find-file-in-directory)
-  ("i"   projectile-ibuffer)
-  ("K"   projectile-kill-buffers)
-  ("s-k" projectile-kill-buffers)
-  ("m"   projectile-multi-occur)
-  ("o"   projectile-multi-occur)
-  ("s-p" projectile-switch-project "switch project")
-  ("p"   projectile-switch-project)
-  ("s"   projectile-switch-project)
-  ("r"   projectile-recentf)
-  ("x"   projectile-remove-known-project)
-  ("X"   projectile-cleanup-known-projects)
-  ("z"   projectile-cache-current-file)
-  ("a"   projectile-ag)
-  ("g"   projectile-find-tag)
-  ("q"   nil "cancel" :color blue))
+    ("b"   projectile-switch-to-buffer)
+    ("c"   projectile-invalidate-cache)
+    ("d"   projectile-find-dir)
+    ("s-f" projectile-find-file)
+    ("ff"  projectile-find-file-dwim)
+    ("fd"  projectile-find-file-in-directory)
+    ("i"   projectile-ibuffer)
+    ("K"   projectile-kill-buffers)
+    ("s-k" projectile-kill-buffers)
+    ("m"   projectile-multi-occur)
+    ("o"   projectile-multi-occur)
+    ("s-p" projectile-switch-project "switch project")
+    ("p"   projectile-switch-project)
+    ("s"   projectile-switch-project)
+    ("r"   projectile-recentf)
+    ("x"   projectile-remove-known-project)
+    ("X"   projectile-cleanup-known-projects)
+    ("z"   projectile-cache-current-file)
+    ("a"   projectile-ag)
+    ("g"   projectile-find-tag)
+    ("q"   nil "cancel" :color blue))
 
-(defhydra sb/hydra-flycheck (:color blue)
-  "
+  (defhydra sb/hydra-flycheck (:color blue)
+    "
   ^
   ^Flycheck^          ^Errors^            ^Checker^
   ^────────^──────────^──────^────────────^───────^─────
@@ -6903,27 +6938,27 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ^^                  _l_ list            _s_ select
   ^^                  ^^                  ^^
   "
-  ("q" nil)
-  ("<" flycheck-previous-error :color pink)
-  (">" flycheck-next-error :color pink)
-  ("?" flycheck-describe-checker)
-  ("M" flycheck-manual)
-  ("d" flycheck-disable-checker)
-  ("f" flycheck-buffer)
-  ("l" flycheck-list-errors)
-  ("m" flycheck-mode)
-  ("s" flycheck-select-checker)
-  ("v" flycheck-verify-setup))
+    ("q" nil)
+    ("<" flycheck-previous-error :color pink)
+    (">" flycheck-next-error :color pink)
+    ("?" flycheck-describe-checker)
+    ("M" flycheck-manual)
+    ("d" flycheck-disable-checker)
+    ("f" flycheck-buffer)
+    ("l" flycheck-list-errors)
+    ("m" flycheck-mode)
+    ("s" flycheck-select-checker)
+    ("v" flycheck-verify-setup))
 
-(with-eval-after-load 'python
-  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
-    "Adjust Python indentation."
-    (">" python-indent-shift-right "right")
-    ("<" python-indent-shift-left "left")))
+  (with-eval-after-load 'python
+    (defhydra sb/hydra-python-indent (python-mode-map "C-c")
+      "Adjust Python indentation."
+      (">" python-indent-shift-right "right")
+      ("<" python-indent-shift-left "left")))
 
-(defhydra sb/smerge-hydra
-  (:color pink :hint nil :post (smerge-auto-leave))
-  "
+  (defhydra sb/smerge-hydra
+    (:color pink :hint nil :post (smerge-auto-leave))
+    "
 ^Move^       ^Keep^               ^Diff^                 ^Other^
 ^^-----------^^-------------------^^---------------------^^-------
 _n_ext       _b_ase               _<_: upper/base        _C_ombine
@@ -6932,23 +6967,24 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ^^           _a_ll                _R_efine
 ^^           _RET_: current       _E_diff
 "
-  ("n" smerge-next)
-  ("p" smerge-prev)
-  ("b" smerge-keep-base)
-  ("u" smerge-keep-upper)
-  ("l" smerge-keep-lower)
-  ("a" smerge-keep-all)
-  ("RET" smerge-keep-current)
-  ("\C-m" smerge-keep-current)
-  ("<" smerge-diff-base-upper)
-  ("=" smerge-diff-upper-lower)
-  (">" smerge-diff-base-lower)
-  ("R" smerge-refine)
-  ("E" smerge-ediff)
-  ("C" smerge-combine-with-next)
-  ("r" smerge-resolve)
-  ("k" smerge-kill-current)
-  ("q" nil "cancel" :color blue))
+    ("n" smerge-next)
+    ("p" smerge-prev)
+    ("b" smerge-keep-base)
+    ("u" smerge-keep-upper)
+    ("l" smerge-keep-lower)
+    ("a" smerge-keep-all)
+    ("RET" smerge-keep-current)
+    ("\C-m" smerge-keep-current)
+    ("<" smerge-diff-base-upper)
+    ("=" smerge-diff-upper-lower)
+    (">" smerge-diff-base-lower)
+    ("R" smerge-refine)
+    ("E" smerge-ediff)
+    ("C" smerge-combine-with-next)
+    ("r" smerge-resolve)
+    ("k" smerge-kill-current)
+    ("q" nil "cancel" :color blue))
+  )
 
 ;; Mark safe variables
 
