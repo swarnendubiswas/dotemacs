@@ -18,7 +18,8 @@ t;; To evaluate an sexp, use `C-x C-e'. Use `C-M-x' to evaluate the current top-
 ;; -*- mode: MODENAME; VAR: VALUE; ... -*-
 
 ;; Good articles and reference configurations
-;; https://protesilaos.com/dotemacs
+
+;; [[[[https://protesilaos.com/dotemacs]]]]
 ;; https://github.com/CSRaghunandan/.emacs.d
 ;; https://github.com/purcell/emacs.d
 ;; https://github.com/MatthewZMD/.emacs.d
@@ -35,7 +36,8 @@ t;; To evaluate an sexp, use `C-x C-e'. Use `C-M-x' to evaluate the current top-
 ;; https://github.com/magnars/.emacs.d
 ;; https://github.com/kaushalmodi/.emacs.d
 ;; https://luca.cambiaghi.me/vanilla-emacs/readme.html
-
+;; https://sachachua.com/dotemacs/
+;; https://emacs.nasy.moe/
 
 ** Useful Information 
 

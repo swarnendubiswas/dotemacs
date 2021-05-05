@@ -115,7 +115,8 @@ whitespaces."
 
 (when (bound-and-true-p sb/debug-init-file)
   (setq garbage-collection-messages nil
-        debug-on-error t))
+        debug-on-error t
+        debug-on-event 'sigusr2))
 
 (defconst sb/user-home
   (getenv "HOME")
@@ -228,6 +229,20 @@ This location is used for temporary installations and files.")
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
 
+(unless (fboundp 'gcmh-mode)
+  (autoload #'gcmh-mode "gcmh" nil t))
+(unless (fboundp 'gcmh-idle-garbage-collect)
+  (autoload #'gcmh-idle-garbage-collect "gcmh" nil t))
+
+(add-hook 'after-init-hook #'gcmh-mode)
+
+(with-eval-after-load 'gcmh
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq gcmh-verbose nil))
+
+  (diminish 'gcmh-mode))
+
+
 (unless (fboundp 'paradox-list-packages)
   (autoload #'paradox-list-packages "paradox" nil t))
 (unless (fboundp 'paradox-upgrade-packages)
@@ -282,8 +297,7 @@ This location is used for temporary installations and files.")
       comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
       compilation-ask-about-save nil
-      ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
-      ;; error
+      ;; Automatically scroll the buffer as output appears, but stop at the first error
       compilation-scroll-output 'first-error
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
@@ -338,7 +352,7 @@ This location is used for temporary installations and files.")
       ;; Enable use of system clipboard across Emacs and other applications
       select-enable-clipboard t
       sentence-end-double-space nil
-      ;; set-mark-command-repeat-pop t
+      set-mark-command-repeat-pop t
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       standard-indent 2
       suggest-key-bindings t
@@ -347,7 +361,7 @@ This location is used for temporary installations and files.")
       use-dialog-box nil
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
-      vc-handled-backends nil ; Disabling vc improves performance, alternate option '(Git)
+      vc-handled-backends '(Git) ; Disabling vc improves performance, alternate option '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       window-resize-pixelwise t
@@ -424,10 +438,7 @@ This location is used for temporary installations and files.")
 
 (unless (fboundp 'global-auto-revert-mode)
   (autoload #'global-auto-revert-mode "autorevert" nil t))
-(unless (fboundp 'turn-on-auto-revert-mode)
-  (autoload #'turn-on-auto-revert-mode "autorevert" nil t))
 
-;; (add-hook 'after-init-hook #'global-auto-revert-mode)
 (run-at-time 5 nil #'global-auto-revert-mode)
 
 (with-eval-after-load 'autorevert
@@ -438,9 +449,10 @@ This location is used for temporary installations and files.")
   (defvar global-auto-revert-non-file-buffers)
 
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        auto-revert-remote-files t
+        auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and tramp
         auto-revert-use-notify nil
         auto-revert-verbose t
+        auto-revert-check-vc-info nil ; Should improve performance
         ;; Revert dired buffers if the contents of the "main" directory changes
         global-auto-revert-non-file-buffers nil)
 
@@ -454,7 +466,6 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'save-place-mode)
   (autoload #'save-place-mode "saveplace" nil t))
 
-;; (add-hook 'after-init-hook #'save-place-mode)
 (run-at-time 5 nil #'save-place-mode)
 
 (with-eval-after-load 'saveplace
@@ -468,17 +479,15 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'savehist-mode)
   (autoload #'savehist-mode "savehist" nil t))
 
-;; (add-hook 'after-init-hook #'savehist-mode)
 (run-at-time 5 nil #'savehist-mode)
-
 
 (with-eval-after-load 'savehist
   (defvar savehist-additional-variables)
   (defvar savehist-file)
   (defvar savehist-save-minibuffer-history)
 
-  (setq savehist-additional-variables '(extended-command-history
-                                        kill-ring search-ring regexp-search-ring)
+  (setq savehist-additional-variables '(extended-command-history kill-ring search-ring
+                                                                 regexp-search-ring)
         savehist-save-minibuffer-history t)
 
   (unless (bound-and-true-p sb/use-no-littering)
@@ -505,6 +514,7 @@ This location is used for temporary installations and files.")
                                          try-complete-lisp-symbol-partially
                                          try-complete-lisp-symbol)
       hippie-expand-verbose nil)
+
 (bind-key "M-/" #'hippie-expand)
 
 
@@ -547,13 +557,16 @@ This location is used for temporary installations and files.")
 SAVE-FN with non-nil ARGS."
   (ignore args)
   (apply save-fn '(t)))
+
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
 
 (unless (fboundp 'abbrev-mode)
   (autoload #'abbrev-mode "abbrev" nil t))
 
-(add-hook 'text-mode-hook #'abbrev-mode)
+(run-at-time 5 nil (lambda ()
+                     (add-hook 'text-mode-hook #'abbrev-mode)))
+
 
 (with-eval-after-load 'abbrev
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
@@ -624,10 +637,10 @@ SAVE-FN with non-nil ARGS."
 ;; (add-hook 'after-init-hook #'global-so-long-mode)
 (run-at-time 5 nil #'global-so-long-mode)
 
-(with-eval-after-load 'so-long
-  (defvar so-long-threshold)
+;; (with-eval-after-load 'so-long
+;;   (defvar so-long-threshold)
 
-  (setq so-long-threshold 500))
+;;   (setq so-long-threshold 500))
 
 
 (when (display-graphic-p)
@@ -1573,8 +1586,8 @@ SAVE-FN with non-nil ARGS."
 
   (setq swiper-action-recenter t))
 
-(bind-keys :package swiper
-           ("<f4>" . swiper))
+;; (bind-keys :package swiper
+;;            ("<f4>" . swiper))
 
 
 (with-eval-after-load 'grep
@@ -1797,8 +1810,14 @@ SAVE-FN with non-nil ARGS."
         company-selection-wrap-around t
         company-show-numbers t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t
-        company-format-margin-function #'company-vscode-light-icons-margin)
+        company-tooltip-align-annotations t)
+
+  (when (eq sb/theme 'modus-operandi)
+    (setq company-format-margin-function #'company-vscode-light-icons-margin))
+
+  (when (eq sb/theme 'modus-vivendi)
+    (setq company-format-margin-function #'company-vscode-dark-icons-margin))
+
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -2043,6 +2062,8 @@ SAVE-FN with non-nil ARGS."
   (autoload #'counsel-yank-pop "counsel" nil t))
 (unless (fboundp 'counsel-imenu)
   (autoload #'counsel-imenu "counsel" nil t))
+(unless (fboundp 'counsel-grep-or-swiper)
+  (autoload #'counsel-grep-or-swiper "counsel" nil t))
 
 (add-hook 'ivy-mode-hook #'counsel-mode)
 
@@ -2160,7 +2181,7 @@ SAVE-FN with non-nil ARGS."
            ("C-c C-m" . counsel-mark-ring)
            ;; Enabling preview can make switching over remote buffers slow
            ;; ("<f3>" . counsel-switch-buffer)
-           )
+           ("<f4>"    . counsel-grep-or-swiper))
 
 
 (declare-function prescient-persist-mode "prescient")
@@ -2506,7 +2527,9 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'electric-pair-mode)
   (autoload #'electric-pair-mode "elec-pair" nil t))
 
-(add-hook 'after-init-hook #'electric-pair-mode) ; Enable autopairing, `smartparens' seems slow
+;; Enable autopairing, `smartparens' seems slow
+;; (add-hook 'after-init-hook #'electric-pair-mode)
+(run-at-time 5 nil #'electric-pair-mode)
 
 (with-eval-after-load 'electric-pair-mode
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
@@ -2802,16 +2825,17 @@ This file is specified in `counsel-projectile-default-file'."
 
   )
 
-(bind-keys :package counsel-projectile
-           ("<f6>" . counsel-projectile-find-file)
-           ("<f5>" . counsel-projectile-switch-project)
-           ;; ("<f7>" . counsel-projectile-rg)
-           ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
-           ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
-           ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
-           ;; ([remap projectile-grep]             . counsel-projectile-grep)
-           ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
-           )
+;; The `counsel' actions seem to be slower than base `projectile'
+;; (bind-keys :package counsel-projectile
+;;            ("<f6>" . counsel-projectile-find-file)
+;;            ("<f5>" . counsel-projectile-switch-project)
+;;            ;; ("<f7>" . counsel-projectile-rg)
+;;            ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
+;;            ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
+;;            ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
+;;            ;; ([remap projectile-grep]             . counsel-projectile-grep)
+;;            ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
+;;            )
 
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
@@ -2904,9 +2928,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
 ;; derived from `text-mode'.
-(add-hook 'after-init-hook #'global-flycheck-mode)
-;; (add-hook 'text-mode-hook #'flycheck-mode)
-;; (add-hook 'prog-mode-hook #'flycheck-mode)
+(run-at-time 2 nil #'global-flycheck-mode)
 
 (with-eval-after-load 'flycheck
   (defvar flycheck-check-syntax-automatically)
@@ -2960,7 +2982,36 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; FIXME: Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
-  )
+
+
+  ;; SB: We prefer to use only grammarly, and not `proselint' and `textlint'. The advantage with
+  ;; `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp support, so you can
+  ;; use it anywhere.
+
+  (require 'flycheck-grammarly nil nil)
+
+  (defvar flycheck-grammarly-check-time)
+  (defvar flycheck-checkers)
+
+  (setq flycheck-grammarly-check-time 3
+        ;; LATER: Can we combine the three delete operations?
+        flycheck-checkers (delete 'proselint flycheck-checkers)
+        flycheck-checkers (delete 'textlint flycheck-checkers)
+        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+        flycheck-checkers (delete 'grammarly flycheck-checkers))
+
+  (add-to-list 'flycheck-checkers 'grammarly t)
+
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (flycheck-select-checker 'grammarly)))
+
+  (add-hook 'markdown-mode-hook
+            (lambda()
+              ;; (make-local-variable 'flycheck-error-list-minimum-level)
+              ;; (setq flycheck-error-list-minimum-level 'warning
+              ;; flycheck-navigation-minimum-level 'warning)
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))))
 
 
 ;; ;; Does not display popup under TTY, check possible workarounds at
@@ -3074,7 +3125,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-hl-todo-mode)
   (autoload #'global-hl-todo-mode "hl-todo" nil t))
 
-(add-hook 'after-init-hook #'global-hl-todo-mode)
+;; (add-hook 'after-init-hook #'global-hl-todo-mode)
+(run-at-time 5 nil #'global-hl-todo-mode)
 
 (with-eval-after-load 'hl-todo
   (defvar hl-todo-highlight-punctuation)
@@ -3146,7 +3198,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-page-break-lines-mode)
   (autoload #'global-page-break-lines-mode "page-break-lines" nil t))
 
-(add-hook 'after-init-hook #'global-page-break-lines-mode)
+;; (add-hook 'after-init-hook #'global-page-break-lines-mode)
+(run-at-time 5 nil #'global-page-break-lines-mode)
 
 (with-eval-after-load 'page-break-lines
   (diminish 'page-break-lines-mode))
@@ -3600,7 +3653,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'beginend-global-mode)
   (autoload #'beginend-global-mode "beginend" nil t))
 
-(add-hook 'after-init-hook #'beginend-global-mode)
+;; (add-hook 'after-init-hook #'beginend-global-mode)
+(run-at-time 5 nil #'beginend-global-mode)
 
 (with-eval-after-load 'beginend
   (defvar beginend-modes)
@@ -3666,14 +3720,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'immortal-scratch-mode)
   (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
 
-(add-hook 'after-init-hook #'immortal-scratch-mode)
-
+(run-at-time 3 nil #'immortal-scratch-mode)
 
 ;; I use the *scratch* buffer for taking notes, it helps to make the data persist
 (unless (fboundp 'persistent-scratch-setup-default)
   (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
 
-(add-hook 'after-init-hook #'persistent-scratch-setup-default)
+(run-at-time 3 nil #'persistent-scratch-setup-default)
 
 (with-eval-after-load 'persistent-scratch
   (defvar persistent-scratch-autosave-interval)
@@ -3724,7 +3777,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'rainbow-delimiters-mode)
   (autoload #'rainbow-delimiters-mode "rainbow-delimiters" nil t))
 
-(dolist (hook '(prog-mode-hook latex-mode-hook LaTex-mode-hook))
+(dolist (hook '(prog-mode-hook latex-mode-hook LaTex-mode-hook org-src-mode-hook))
   (add-hook hook #'rainbow-delimiters-mode))
 
 
@@ -3809,7 +3862,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
-;; one of the currently visible isearch candidates using `avy'.
+;; one of the currently visible `isearch' candidates using `avy'.
 
 (unless (fboundp 'avy-setup-default)
   (autoload #'avy-setup-default "avy" nil t))
@@ -3830,14 +3883,13 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; This package adds a "C-'" binding to Ivy minibuffer that uses Avy
-(with-eval-after-load 'avy
-  (with-eval-after-load 'ivy
-    (declare-function ivy-avy "ivy-avy")
-    (unless (fboundp 'ivy-avy)
-      (autoload #'ivy-avy "ivy-avy" nil t))
+(with-eval-after-load 'ivy
+  (declare-function ivy-avy "ivy-avy")
+  (unless (fboundp 'ivy-avy)
+    (autoload #'ivy-avy "ivy-avy" nil t))
 
-    (bind-keys :package ivy-avy :map ivy-minibuffer-map
-               ("C-'" . ivy-avy))))
+  (bind-keys :package ivy-avy :map ivy-minibuffer-map
+             ("C-'" . ivy-avy)))
 
 
 (with-eval-after-load 'bookmark
@@ -3874,17 +3926,21 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'bm-repository-save)
   (autoload #'bm-repository-save "bm" nil t))
 
-;; `kill-buffer-hook' is not called when Emacs is killed
-(add-hook 'kill-emacs-hook (lambda ()
-                             (bm-buffer-save-all)
-                             (bm-repository-save)))
-(add-hook 'after-save-hook #'bm-buffer-save)
-(add-hook 'kill-buffer-hook #'bm-buffer-save)
-(add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+(defun sb/bm-setup ()
+  "Wrapper function to help call with a timer."
+  ;; `kill-buffer-hook' is not called when Emacs is killed
+  (add-hook 'kill-emacs-hook (lambda ()
+                               (bm-buffer-save-all)
+                               (bm-repository-save)))
+  (add-hook 'after-save-hook #'bm-buffer-save)
+  (add-hook 'kill-buffer-hook #'bm-buffer-save)
+  (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
 
-(add-hook 'after-revert-hook #'bm-buffer-restore)
-(add-hook 'find-file-hook #'bm-buffer-restore)
-(add-hook 'after-init-hook #'bm-repository-load)
+  (add-hook 'after-revert-hook #'bm-buffer-restore)
+  (add-hook 'find-file-hook #'bm-buffer-restore)
+  (add-hook 'after-init-hook #'bm-repository-load))
+
+(run-at-time 5 nil #'sb/bm-setup)
 
 (with-eval-after-load 'bm
   (defvar bm-repository-file)
@@ -3903,22 +3959,23 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'esup "esup" nil t))
 
 
-(unless (fboundp 'bug-hunter-file)
-  (autoload #'bug-hunter-file "bug-hunter" nil t))
-(unless (fboundp 'bug-hunter-init-file)
-  (autoload #'bug-hunter-init-file "bug-hunter" nil t))
+(when sb/debug-init-file
+  (unless (fboundp 'bug-hunter-file)
+    (autoload #'bug-hunter-file "bug-hunter" nil t))
+  (unless (fboundp 'bug-hunter-init-file)
+    (autoload #'bug-hunter-init-file "bug-hunter" nil t))
 
 
-(declare-function explain-pause-mode "explain-pause-mode")
-(declare-function explain-pause-top "explain-pause-mode")
+  (declare-function explain-pause-mode "explain-pause-mode")
+  (declare-function explain-pause-top "explain-pause-mode")
 
-(unless (fboundp 'explain-pause-mode)
-  (autoload #'explain-pause-mode "explain-pause-mode" nil t))
-(unless (fboundp 'explain-pause-top)
-  (autoload #'explain-pause-top "explain-pause-mode" nil t))
+  (unless (fboundp 'explain-pause-mode)
+    (autoload #'explain-pause-mode "explain-pause-mode" nil t))
+  (unless (fboundp 'explain-pause-top)
+    (autoload #'explain-pause-top "explain-pause-mode" nil t))
 
-(with-eval-after-load 'explain-pause-mode
-  (diminish 'explain-pause-mode))
+  (with-eval-after-load 'explain-pause-mode
+    (diminish 'explain-pause-mode)))
 
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
@@ -3926,49 +3983,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; https://www.emacswiki.org/emacs/AutoFillMode
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
-
-(with-eval-after-load 'flycheck
-  (require 'flycheck-aspell nil nil)
-  (add-to-list 'flycheck-checkers 'tex-aspell-dynamic t)
-  (add-to-list 'flycheck-checkers 'markdown-aspell-dynamic t)
-
-  ;; SB: We prefer to use only grammarly, and not `proselint' and `textlint'.
-  ;; The advantage with flycheck-grammarly is that you need not set up lsp support, so you can use it
-  ;; anywhere.
-  (require 'flycheck-grammarly nil nil)
-
-  (defvar flycheck-grammarly-check-time)
-  (defvar flycheck-checkers)
-
-  (setq flycheck-grammarly-check-time 3
-        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-        flycheck-checkers (delete 'grammarly flycheck-checkers))
-
-  (add-to-list 'flycheck-checkers 'grammarly t)
-
-  (add-hook 'text-mode-hook
-            (lambda ()
-              ;; (flycheck-add-next-checker 'grammarly 'tex-aspell-dynamic)
-              ;; Add `proselint', then `textlint'
-              ;; (flycheck-add-next-checker 'proselint 'textlint))
-              ))
-
-  (add-hook 'markdown-mode-hook
-            (lambda()
-              ;; (make-local-variable 'flycheck-error-list-minimum-level)
-              ;; (setq flycheck-error-list-minimum-level 'warning
-              ;; flycheck-navigation-minimum-level 'warning)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
-              (flycheck-add-next-checker 'grammarly 'markdown-aspell-dynamic)))
-
-  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-    (add-hook hook
-              (lambda()
-                (flycheck-add-next-checker 'grammarly 'tex-aspell-dynamic))))
-
-  (add-hook 'html-mode-hook
-            (lambda()
-              (flycheck-add-next-checker 'grammarly 'html-aspell-dynamic))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work
 ;; (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
@@ -4018,6 +4032,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'define-word "define-word" nil t))
 (unless (fboundp 'define-word-at-point)
   (autoload #'define-word-at-point "define-word" nil t))
+
 
 (if nil
     (progn
@@ -4219,21 +4234,23 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; LATER: Prettier times out setting up the process on a remote machine
-(when (executable-find "prettier")
-  (unless (fboundp 'prettier-mode)
-    (autoload #'prettier-mode "prettier" nil t))
+;; https://github.com/jscheid/prettier.el/issues/84
+(if nil
+    (when (executable-find "prettier")
+      (unless (fboundp 'prettier-mode)
+        (autoload #'prettier-mode "prettier" nil t))
 
-  ;; Should work with `gfm-mode', `css-mode', and `html-mode'
-  (dolist (hook '(markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook))
-    (add-hook hook (lambda ()
-                     (when (and buffer-file-name
-                                (not (file-remote-p buffer-file-name)))
-                       (prettier-mode 1)))))
+      ;; Should work with `gfm-mode', `css-mode', and `html-mode'
+      (dolist (hook '(markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook))
+        (add-hook hook (lambda ()
+                         (when (and buffer-file-name
+                                    (not (file-remote-p buffer-file-name)))
+                           (prettier-mode 1)))))
 
-  (with-eval-after-load 'prettier
-    (defvar prettier-lighter)
+      (with-eval-after-load 'prettier
+        (defvar prettier-lighter)
 
-    (setq prettier-lighter nil)))
+        (setq prettier-lighter nil))))
 
 
 ;; Align fields with `C-c C-a'
@@ -4241,6 +4258,9 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'csv-mode "csv-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+
+(add-hook 'csv-mode-hook (lambda()
+                           (flycheck-mode -1)))
 
 (with-eval-after-load 'csv-mode
   (defvar csv-separators)
@@ -5422,7 +5442,8 @@ This file is specified in `counsel-projectile-default-file'."
         git-gutter:update-interval 1
         ;; https://github.com/syl20bnr/spacemacs/issues/10555
         ;; https://github.com/syohex/emacs-git-gutter/issues/24
-        git-gutter:disabled-modes '(fundamental-mode org-mode))
+        git-gutter:disabled-modes '(fundamental-mode org-mode
+                                                     image-mode doc-view-mode pdf-view-mode))
 
   (diminish 'git-gutter-mode))
 
@@ -5799,7 +5820,6 @@ This file is specified in `counsel-projectile-default-file'."
         TeX-command-default "LatexMk"))
 
 
-(add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
 ;; (add-hook 'bibtex-mode-hook #'lsp-deferred) ;; LATER: LaTeX LS is not good yet
 
 (with-eval-after-load 'bibtex
@@ -6150,8 +6170,6 @@ Ignore if no file is found."
 
 (add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
 
-(unless (fboundp 'flycheck-mode)
-  (autoload #'flycheck-mode "flycheck" nil t))
 (add-hook 'protobuf-mode-hook #'flycheck-mode)
 
 
@@ -6185,7 +6203,10 @@ Ignore if no file is found."
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
     (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
-                                         bazel-mode-hook latex-mode-hook LaTeX-mode-hook))
+                                         markdown-mode-hook
+                                         bazel-mode-hook
+                                         latex-mode-hook
+                                         LaTeX-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
@@ -6239,7 +6260,7 @@ Ignore if no file is found."
 (unless (fboundp 'fasd-find-file)
   (autoload #'fasd-find-file "fasd" nil t))
 
-(add-hook 'emacs-startup-hook #'global-fasd-mode)
+(run-at-time 5 nil #'global-fasd-mode)
 
 (with-eval-after-load 'fasd
   (defvar fasd-enable-initial-prompt)
@@ -6346,8 +6367,7 @@ Ignore if no file is found."
   (setq company-backends '((company-capf :separate
                                          company-yasnippet
                                          company-dabbrev-code)
-                           company-files
-                           )))
+                           company-files)))
 
 (dolist (hook '(nxml-mode-hook))
   (add-hook hook (lambda ()
@@ -6366,8 +6386,7 @@ Ignore if no file is found."
                         company-yasnippet
                         company-dabbrev-code)
           company-files
-          company-dabbrev
-          )))
+          company-dabbrev)))
 
 (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
@@ -6383,12 +6402,13 @@ Ignore if no file is found."
                                          company-yasnippet
                                          company-dabbrev-code)
                            company-files
-                           company-dabbrev
-                           )))
+                           company-dabbrev)))
 
 (add-hook 'java-mode-hook #'sb/company-java-mode)
 
 
+;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; `company-clang' is slow
 (defun sb/company-c-mode ()
   "Add backends for C/C++ completion in company mode."
   (defvar company-minimum-prefix-length)
@@ -6400,12 +6420,10 @@ Ignore if no file is found."
                                          company-yasnippet
                                          company-dabbrev-code)
                            company-files
-                           ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-                           ;; company-clang ; This can be slow
-                           company-dabbrev
-                           )))
+                           company-dabbrev)))
 
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
+
 
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
@@ -6419,14 +6437,13 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends '((company-capf :separate
+                                         company-shell
+                                         company-shell-env
+                                         company-fish-shell
                                          company-yasnippet
                                          company-dabbrev-code)
                            company-files
-                           company-shell
-                           company-shell-env
-                           company-fish-shell
-                           company-dabbrev
-                           )))
+                           company-dabbrev)))
 
 (add-hook 'sh-mode-hook #'sb/company-sh-mode)
 
@@ -6479,22 +6496,19 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '((
-           company-files
-           company-bibtex
-           company-math-symbols-latex
-           company-latex-commands
-           company-math-symbols-unicode
-           company-reftex-labels
-           company-reftex-citations
-           company-auctex-labels
-           company-auctex-bibs
-           company-capf
-           company-yasnippet
-           company-dabbrev
-           company-ispell
-           ))))
+  (setq company-backends '((company-files
+                            company-bibtex
+                            company-math-symbols-latex
+                            company-latex-commands
+                            company-math-symbols-unicode
+                            company-reftex-labels
+                            company-reftex-citations
+                            company-auctex-labels
+                            company-auctex-bibs
+                            company-capf
+                            company-yasnippet
+                            company-dabbrev
+                            company-ispell))))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
@@ -6506,13 +6520,12 @@ Ignore if no file is found."
 
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((
-           company-files
-           company-capf
-           company-yasnippet
-           company-dabbrev
-           company-ispell
-           ))))
+        '((company-capf :separate
+                        company-yasnippet
+                        company-dabbrev-code)
+          company-files
+          company-dabbrev
+          company-ispell)))
 
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))

@@ -1,27 +1,4 @@
-personal_ws-1.1 en 242
-Pingala
-linearizability
-linearizable
-livelocks
-microarchitectural
-microbenchmarks
-Vikash
-nonblocking
-nonpreemptive
-precimonious
-centroid
-preemptions
-privatizable
-subexpression
-unordered
-Verma
-uninstrumented
-tradeoff
-resubmission
-Keshav
-vectorization
-customizable
-optimizations
+personal_ws-1.1 en 232 
 Arnab
 Ashutosh
 Bandyopadhyay
@@ -62,6 +39,7 @@ Nath
 Nitin
 OpenMP
 Parallelize
+Pingala
 Prafulla
 Preeti
 Pretrained
@@ -113,6 +91,7 @@ centroid
 centroids
 combinational
 covariance
+customizable
 customizations
 cybersecurity
 dataset
@@ -121,6 +100,7 @@ declaratively
 deoptimization
 deoptimized
 dependences
+deregister
 deterministically
 dimensionality
 downsampling
@@ -138,10 +118,14 @@ invertible
 irreflexive
 iteratively
 latencies
+linearizability
+linearizable
 linearized
+livelocks
 liveness
 locksteps
 metadata
+microarchitectural
 microbenchmark
 microbenchmarks
 microcontroller
@@ -155,7 +139,9 @@ multicore
 multilayer
 multithreaded
 multithreading
+nonblocking
 nondeterminism
+nonpreemptive
 observability
 octants
 optimality
@@ -174,7 +160,9 @@ polyhedra
 polymorphism
 posteriori
 precimonious
+preemptions
 preprocessing
+privatizable
 probabilistically
 profiler
 programmability
@@ -206,6 +194,7 @@ scalability
 scalable
 serializability
 serializable
+subexpression
 suboptimal
 summarization
 swarnendu
@@ -227,6 +216,7 @@ unoptimized
 unordered
 unscalable
 unserializable
+unsynchronized
 untracked
 unutilized
 vectorization
