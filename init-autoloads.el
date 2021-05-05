@@ -45,7 +45,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'powerline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -1191,9 +1191,6 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'dired-efap)
     (autoload #'dired-efap "dired-efap" nil t))
 
-  (bind-keys* :package dired-efap :map dired-mode-map
-              ("r" . dired-efap))
-
   ;; Narrow dired to match filter
   (unless (fboundp 'dired-narrow)
     (autoload #'dired-narrow "dired-narrow" nil t))
@@ -1207,6 +1204,9 @@ SAVE-FN with non-nil ARGS."
            ("i" . find-file)
            ("M-<up>" . sb/dired-jump-to-top)
            ("M-<down>" . sb/dired-jump-to-bottom))
+
+(bind-keys* :package dired-efap :map dired-mode-map
+            ("r" . dired-efap))
 
 (with-eval-after-load 'dired-x
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
@@ -1810,7 +1810,8 @@ SAVE-FN with non-nil ARGS."
         company-selection-wrap-around t
         company-show-numbers t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t)
+        company-tooltip-align-annotations t
+        company-text-icons-add-background t)
 
   (when (eq sb/theme 'modus-operandi)
     (setq company-format-margin-function #'company-vscode-light-icons-margin))
@@ -2926,8 +2927,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'flycheck-manual)
   (autoload #'flycheck-manual "flycheck" nil t))
 
-;; There are no checkers for modes like `csv-mode', and many program modes use `lsp'. `yaml-mode' is
-;; derived from `text-mode'.
 (run-at-time 2 nil #'global-flycheck-mode)
 
 (with-eval-after-load 'flycheck
@@ -2973,16 +2972,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Workaround for `eslint' loading slow
-  ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
-  ;; (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))
-
-  ;; (dolist (hook '(js-mode js2-mode typescript-mode))
-  ;;   (setq-local flycheck-checker 'javascript-eslint))
-
   ;; FIXME: Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
-
 
   ;; SB: We prefer to use only grammarly, and not `proselint' and `textlint'. The advantage with
   ;; `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp support, so you can
@@ -2995,8 +2986,8 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq flycheck-grammarly-check-time 3
         ;; LATER: Can we combine the three delete operations?
-        flycheck-checkers (delete 'proselint flycheck-checkers)
-        flycheck-checkers (delete 'textlint flycheck-checkers)
+        ;; flycheck-checkers (delete 'proselint flycheck-checkers)
+        ;; flycheck-checkers (delete 'textlint flycheck-checkers)
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
@@ -3004,14 +2995,17 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'text-mode-hook
             (lambda ()
-              (flycheck-select-checker 'grammarly)))
+              ;; Add `proselint', then `textlint', then `grammarly'
+              (flycheck-add-next-checker 'proselint 'textlint)
+              (flycheck-add-next-checker 'textlint 'grammarly)))
 
+  ;; `markdown-mode' is derived from `text-mode'
   (add-hook 'markdown-mode-hook
             (lambda()
               ;; (make-local-variable 'flycheck-error-list-minimum-level)
               ;; (setq flycheck-error-list-minimum-level 'warning
               ;; flycheck-navigation-minimum-level 'warning)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))))
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint))))
 
 
 ;; ;; Does not display popup under TTY, check possible workarounds at
@@ -4189,10 +4183,6 @@ This file is specified in `counsel-projectile-default-file'."
         ;; markdown-make-gfm-checkboxes-buttons nil
         markdown-split-window-direction 'horizontal)
 
-  ;; `markdown-mode' is derived from `text-mode'
-  ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)
-  ;; TODO: How about `(flycheck-add-mode 'proselint 'markdown-mode)'?
-
   (require 'markdown-mode+ nil nil)
 
   (unless (fboundp 'markdown-toc-refresh-toc)
@@ -4258,9 +4248,6 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'csv-mode "csv-mode" nil t))
 
 (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
-
-(add-hook 'csv-mode-hook (lambda()
-                           (flycheck-mode -1)))
 
 (with-eval-after-load 'csv-mode
   (defvar csv-separators)
@@ -4498,15 +4485,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 (dolist (hooks '(css-mode-hook less-mode-hook sgml-mode-hook typescript-mode-hook))
   (add-hook hooks #'lsp-deferred))
-(add-hook 'lsp-mode-hook #'lsp-modeline-code-actions-mode)
-(add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-(add-hook 'lsp-managed-mode-hook #'lsp-modeline-diagnostics-mode)
 
 (dolist (hooks '(c++-mode-hook java-mode-hook nxml-mode-hook))
   (add-hook hooks (lambda ()
                     (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 (with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+
   (defvar lsp-pyls-configuration-sources)
   (defvar lsp-pyls-plugins-autopep8-enable)
   (defvar lsp-pyls-plugins-mccabe-enabled)
@@ -5273,9 +5259,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
   ;; FIXME: `lsp' is the first checker, chain the other checkers
   ;; https://github.com/flycheck/flycheck/issues/1762
-  (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
-
-  )
+  (flycheck-add-next-checker 'sh-bash 'sh-shellcheck))
 
 
 (unless (fboundp 'fish-mode)
@@ -5327,6 +5311,7 @@ This file is specified in `counsel-projectile-default-file'."
           transient-levels-file (expand-file-name "transient/levels.el" sb/temp-directory)
           transient-values-file (expand-file-name "transient/values.el" sb/temp-directory)))
 
+  (setq transient-display-buffer-action '(display-buffer-below-selected))
   ;; Allow using `q' to quit out of popups, in addition to `C-g'
   (transient-bind-q-to-quit))
 
@@ -6206,7 +6191,8 @@ Ignore if no file is found."
                                          markdown-mode-hook
                                          bazel-mode-hook
                                          latex-mode-hook
-                                         LaTeX-mode-hook))
+                                         LaTeX-mode-hook
+                                         json-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
