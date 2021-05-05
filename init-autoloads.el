@@ -3010,15 +3010,14 @@ This file is specified in `counsel-projectile-default-file'."
               (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint))))
 
 
-;; ;; Does not display popup under TTY, check possible workarounds at
-;; ;; https://github.com/flycheck/flycheck-popup-tip
+;; Does not display popup under TTY, check possible workarounds at
+;; https://github.com/flycheck/flycheck-popup-tip
+
 ;; (when (display-graphic-p)
 ;;   (unless (fboundp 'flycheck-pos-tip-mode)
 ;;     (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
 
-;;   ;; This should be handy only for `emacs-lisp-mode', lsp has `lsp-ui-mode'
-;;   (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode)
-;;   )
+;;   (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
 
 
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
@@ -3121,7 +3120,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-hl-todo-mode)
   (autoload #'global-hl-todo-mode "hl-todo" nil t))
 
-;; (add-hook 'after-init-hook #'global-hl-todo-mode)
 (run-at-time 5 nil #'global-hl-todo-mode)
 
 (with-eval-after-load 'hl-todo
@@ -3194,7 +3192,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-page-break-lines-mode)
   (autoload #'global-page-break-lines-mode "page-break-lines" nil t))
 
-;; (add-hook 'after-init-hook #'global-page-break-lines-mode)
 (run-at-time 5 nil #'global-page-break-lines-mode)
 
 (with-eval-after-load 'page-break-lines
@@ -3416,9 +3413,10 @@ This file is specified in `counsel-projectile-default-file'."
   (with-eval-after-load 'counsel-etags
     (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-    (add-hook 'prog-mode-hook (lambda nil
-                                (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags
-                                          'append 'local)))
+    (add-hook 'prog-mode-hook
+              (lambda nil
+                (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags
+                          'append 'local)))
 
     (defvar counsel-etags-ignore-directories)
     (defvar counsel-etags-ignore-filenames)
@@ -3489,9 +3487,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-hungry-delete-mode)
   (autoload #'global-hungry-delete-mode "hungry-delete" nil t))
 
-(add-hook 'after-init-hook #'global-hungry-delete-mode)
-(add-hook 'minibuffer-setup-hook (lambda nil
-                                   (hungry-delete-mode -1)))
+(defun sb/setup-hungry-delete
+    (lambda ()
+      (add-hook 'after-init-hook #'global-hungry-delete-mode)
+      (add-hook 'minibuffer-setup-hook (lambda nil
+                                         (hungry-delete-mode -1)))))
+
+(run-at-time 5 nil #'sb/setup-hungry-delete)
 
 (with-eval-after-load 'hungry-delete
   (diminish 'hungry-delete-mode))
@@ -3624,7 +3626,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'smart-mark-mode)
   (autoload #'smart-mark-mode "smart-mark" nil t))
 
-(add-hook 'after-init-hook #'smart-mark-mode)
+(run-at-time 5 nil #'smart-mark-mode)
 
 
 ;; Cut/copy the current line if no region is active
@@ -3633,7 +3635,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'whole-line-or-region-local-mode)
   (autoload #'whole-line-or-region-local-mode "whole-line-or-region" nil t))
 
-(add-hook 'after-init-hook #'whole-line-or-region-global-mode)
+(run-at-time 5 nil #'whole-line-or-region-global-mode)
 
 (with-eval-after-load 'whole-line-or-region
   (diminish 'whole-line-or-region-local-mode))
@@ -3649,7 +3651,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'beginend-global-mode)
   (autoload #'beginend-global-mode "beginend" nil t))
 
-;; (add-hook 'after-init-hook #'beginend-global-mode)
 (run-at-time 5 nil #'beginend-global-mode)
 
 (with-eval-after-load 'beginend
@@ -3716,13 +3717,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'immortal-scratch-mode)
   (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
 
-(run-at-time 3 nil #'immortal-scratch-mode)
+(run-at-time 5 nil #'immortal-scratch-mode)
 
 ;; I use the *scratch* buffer for taking notes, it helps to make the data persist
 (unless (fboundp 'persistent-scratch-setup-default)
   (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
 
-(run-at-time 3 nil #'persistent-scratch-setup-default)
+(run-at-time 2 nil #'persistent-scratch-setup-default)
 
 (with-eval-after-load 'persistent-scratch
   (defvar persistent-scratch-autosave-interval)
@@ -3788,10 +3789,12 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-hook 'ssh-config-mode-hook #'turn-on-font-lock)
 
-(add-to-list 'auto-mode-alist '("/\\.ssh/config\\'"     . ssh-config-mode))
-(add-to-list 'auto-mode-alist '("/sshd?_config\\'"      . ssh-config-mode))
-(add-to-list 'auto-mode-alist '("/known_hosts\\'"       . ssh-known-hosts-mode))
-(add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+(setq auto-mode-alist (append
+                       '(("/\\.ssh/config\\'"     . ssh-config-mode)
+                         ("/sshd?_config\\'"      . ssh-config-mode)
+                         ("/known_hosts\\'"       . ssh-known-hosts-mode)
+                         ("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+                       auto-mode-alist))
 
 
 (if nil
@@ -3819,12 +3822,13 @@ This file is specified in `counsel-projectile-default-file'."
        (autoload #'pomidor "pomidor" nil t))
       ))
 
+
 (unless (fboundp 'ace-window)
   (autoload #'ace-window "ace-window" nil t))
 
 (bind-keys :package ace-window
            ([remap other-window] . ace-window)
-           ("<f10>" . ace-window))
+           ("<f10>"              . ace-window))
 
 
 ;; `Shift + direction' arrows
@@ -3845,7 +3849,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'super-save-mode)
   (autoload #'super-save-mode "super-save" nil t))
 
-(add-hook 'find-file-hook #'super-save-mode)
+(run-at-time 5 nil #'super-save-mode)
 
 (with-eval-after-load 'super-save
   (defvar super-save-remote-files)
@@ -3873,7 +3877,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (bind-keys :package avy
            ("M-b" . avy-goto-word-1)
-           ;; ("C-" . avy-goto-char)
+           ;; ("C-'" . avy-goto-char)
            ("C-'" . avy-goto-char-timer)
            ("C-/" . avy-goto-line))
 
