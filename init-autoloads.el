@@ -1184,13 +1184,6 @@ SAVE-FN with non-nil ARGS."
 
   ;; (add-hook 'dired-mode-hook #'diredfl-mode)
 
-  (defvar dired-efap-initial-filename-selection)
-
-  (setq dired-efap-initial-filename-selection nil)
-
-  (unless (fboundp 'dired-efap)
-    (autoload #'dired-efap "dired-efap" nil t))
-
   ;; Narrow dired to match filter
   (unless (fboundp 'dired-narrow)
     (autoload #'dired-narrow "dired-narrow" nil t))
@@ -1204,9 +1197,6 @@ SAVE-FN with non-nil ARGS."
            ("i" . find-file)
            ("M-<up>" . sb/dired-jump-to-top)
            ("M-<down>" . sb/dired-jump-to-bottom))
-
-(bind-keys* :package dired-efap :map dired-mode-map
-            ("r" . dired-efap))
 
 (with-eval-after-load 'dired-x
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
@@ -1233,8 +1223,20 @@ SAVE-FN with non-nil ARGS."
   (setq diredp-hide-details-initially-flag nil
         diredp-hide-details-propagate-flag nil)
 
-  ;; (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
-  )
+  ;; Bound to `diredp-rename-this-file', prefer `dired-efap'
+  (unbind-key "r" dired-mode-map)
+
+  ;; SB: Not sure, but this binding only works if we load after `dired+' and not `dired', even with
+  ;; `bind-keys*'
+  (defvar dired-efap-initial-filename-selection)
+
+  (setq dired-efap-initial-filename-selection nil)
+
+  (unless (fboundp 'dired-efap)
+    (autoload #'dired-efap "dired-efap" nil t))
+
+  (bind-keys* :package dired-efap :map dired-mode-map
+              ("r" . dired-efap)))
 
 
 (unless (fboundp 'async-bytecomp-package-mode)
