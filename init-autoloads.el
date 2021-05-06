@@ -969,7 +969,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'centaur-tabs-group-by-projectile-project)
   (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
 
-(add-hook 'after-init-hook #'centaur-tabs-mode)
+;; (add-hook 'after-init-hook #'centaur-tabs-mode)
 
 (with-eval-after-load 'centaur-tabs
   (defvar centaur-tabs-cycle-scope)
@@ -3487,13 +3487,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-hungry-delete-mode)
   (autoload #'global-hungry-delete-mode "hungry-delete" nil t))
 
-(defun sb/setup-hungry-delete
-    (lambda ()
-      (add-hook 'after-init-hook #'global-hungry-delete-mode)
-      (add-hook 'minibuffer-setup-hook (lambda nil
-                                         (hungry-delete-mode -1)))))
-
-(run-at-time 5 nil #'sb/setup-hungry-delete)
+(add-hook 'after-init-hook #'global-hungry-delete-mode)
+(add-hook 'minibuffer-setup-hook (lambda nil
+                                   (hungry-delete-mode -1)))
 
 (with-eval-after-load 'hungry-delete
   (diminish 'hungry-delete-mode))
@@ -3940,7 +3936,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'find-file-hook #'bm-buffer-restore)
   (add-hook 'after-init-hook #'bm-repository-load))
 
-(run-at-time 5 nil #'sb/bm-setup)
+(run-at-time 3 nil #'sb/bm-setup)
 
 (with-eval-after-load 'bm
   (defvar bm-repository-file)
@@ -4569,6 +4565,7 @@ This file is specified in `counsel-projectile-default-file'."
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
         lsp-signature-auto-activate t ; Manually request via `lsp-signature-activate'
         lsp-signature-render-documentation t
+        lsp-signature-function 'lsp-signature-posframe
         lsp-xml-logs-client nil
         lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.16.0-uber.jar"
                                            sb/extras-directory)
