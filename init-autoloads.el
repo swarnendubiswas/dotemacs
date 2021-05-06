@@ -6365,6 +6365,17 @@ Ignore if no file is found."
 ;; Merge completions of all the backends, give priority to `company-xxx'
 ;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
 
+(unless (fboundp 'company-dabbrev)
+  (autoload #'company-dabbrev "company-dabbrev" nil t))
+(unless (fboundp 'company-capf)
+  (autoload #'company-capf "company-capf" nil t))
+(unless (fboundp 'company-files)
+  (autoload #'company-files "company-files" nil t))
+(unless (fboundp 'company-ispell)
+  (autoload #'company-ispell "company-ispell" nil t))
+(unless (fboundp 'company-yasnippet)
+  (autoload #'company-yasnippet "company-yasnippet" nil t))
+
 (defun sb/company-text-mode ()
   "Add backends for text completion in company mode."
   (defvar company-minimum-prefix-length)
