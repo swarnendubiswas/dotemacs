@@ -4999,10 +4999,6 @@ This file is specified in `counsel-projectile-default-file'."
                            ("SConscript\\'" . python-mode))
                          auto-mode-alist))
 
-  ;; FIXME: `lsp' is the first checker, chain the other checkers
-  ;; https://github.com/flycheck/flycheck/issues/1762
-  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
-
   (unless (fboundp 'python-docstring-mode)
     (autoload #'python-docstring-mode "python-docstring" nil t))
 
@@ -5260,8 +5256,6 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
 
   ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
-  ;; FIXME: `lsp' is the first checker, chain the other checkers
-  ;; https://github.com/flycheck/flycheck/issues/1762
   (flycheck-add-next-checker 'sh-bash 'sh-shellcheck))
 
 
@@ -6312,6 +6306,44 @@ Ignore if no file is found."
 (with-eval-after-load 'info
   (add-hook 'Info-selection-hook #'info-colors-fontify-node))
 
+
+(with-eval-after-load 'flycheck
+  ;; FIXME: `lsp' is the first checker, chain the other checkers
+  ;; https://github.com/flycheck/flycheck/issues/1762
+  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
+
+  (defvar-local sb/flycheck-local-cache nil)
+
+  (defun sb/flycheck-checker-get (fn checker property)
+    (or (alist-get property (alist-get checker sb/flycheck-local-cache))
+        (funcall fn checker property)))
+
+  (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
+
+  (add-hook 'lsp-managed-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'python-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
+
+              (when (derived-mode-p 'sh-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-bash)))))))
+
+              (when (derived-mode-p 'c++-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-clang-tidy)))))))
+
+              (when (derived-mode-p 'css-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
+
+              (when (derived-mode-p 'html-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
+
+              (when (derived-mode-p 'xml-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
+
+              (when (derived-mode-p 'yaml-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
+              ))
+  )
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
