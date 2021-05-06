@@ -339,7 +339,7 @@ This location is used for temporary installations and files.")
       kill-whole-line t
       make-backup-files nil ; Stop making backup `~' files
       mouse-drag-copy-region nil ; Mouse is disabled
-      mouse-yank-at-point t ; Yank at point instead of at click
+      mouse-yank-at-point t ; Yank at point with mouse instead of at click
       pop-up-frames nil ; Avoid making separate frames
       ;; pop-up-windows nil ; Disallow creating new windows
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
@@ -1047,6 +1047,7 @@ SAVE-FN with non-nil ARGS."
         ;; Kanpur, UP
         (setq calendar-latitude 26.50
               calendar-longitude 80.23
+              calendar-location-name "Kanpur, UP, India"
               circadian-themes '((:sunrise . modus-operandi)
                                  (:sunset  . modus-operandi))))
       ))
@@ -3745,16 +3746,16 @@ This file is specified in `counsel-projectile-default-file'."
            ("C-c d s" . crux-sudo-edit))
 
 
-(unless (fboundp 'global-disable-mouse-mode)
-  (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
+(when (display-mouse-p)
+  (unless (fboundp 'global-disable-mouse-mode)
+    (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
 
-(add-hook 'after-init-hook #'global-disable-mouse-mode)
+  (add-hook 'after-init-hook #'global-disable-mouse-mode)
 
-(with-eval-after-load 'disable-mouse
-  (diminish 'disable-mouse-global-mode))
+  (with-eval-after-load 'disable-mouse
+    (diminish 'disable-mouse-global-mode))
 
 
-(when (display-graphic-p)
   (unless (fboundp 'mouse-avoidance-mode)
     (autoload #'mouse-avoidance-mode "avoid" nil t))
 
@@ -5703,6 +5704,8 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function TeX-command-menu "tex")
 (declare-function TeX-revert-document-buffer "tex")
 
+(unless (fboundp 'tex-site)
+  (autoload 'tex-site "tex-site.el" nil t))
 (unless (fboundp 'LaTeX-mode)
   (autoload #'LaTeX-mode "tex" nil t))
 (unless (fboundp 'LaTeX-math-mode)
@@ -5725,9 +5728,10 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
 
 (dolist (hook '(LaTex-mode-hook latex-mode-hook))
-  (add-hook hook #'LaTeX-math-mode)
-  (add-hook hook #'TeX-PDF-mode) ; Use `pdflatex'
-  (add-hook hook #'TeX-source-correlate-mode))
+  (add-hook hook (lambda()
+                   (LaTeX-math-mode)
+                   (TeX-PDF-mode) ; Use `pdflatex'
+                   (TeX-source-correlate-mode))))
 
 (with-eval-after-load 'tex
   (defvar TeX-auto-save)
@@ -6342,6 +6346,9 @@ Ignore if no file is found."
 
               (when (derived-mode-p 'yaml-mode)
                 (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
+
+              (when (derived-mode-p 'json-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
               ))
   )
 
@@ -6826,6 +6833,8 @@ mode is not in `sb/skippable-modes'."
 (unbind-key "C-x s") ; Bound to save-some-buffers
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
+
+(unbind-key "C-j") ; Interferes with imenu `C-c C-j'
 
 (when sb/EMACS27+
   (bind-key "C-c d p" #'package-quickstart-refresh))
