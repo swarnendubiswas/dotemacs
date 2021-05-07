@@ -1822,7 +1822,6 @@ SAVE-FN with non-nil ARGS."
   (when (eq sb/theme 'modus-vivendi)
     (setq company-format-margin-function #'company-vscode-dark-icons-margin))
 
-
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if (lambda (c)
@@ -1832,6 +1831,7 @@ SAVE-FN with non-nil ARGS."
   ;; We set `company-backends' as a local variable
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
   ;;   (delq backends company-backends))
+
 
   ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
   ;; https://github.com/company-mode/company-mode/issues/1010
@@ -2682,8 +2682,8 @@ SAVE-FN with non-nil ARGS."
     (setq  projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
            projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
                                                             sb/temp-directory)))
-  (when (eq sb/modeline-theme 'doom-modeline)
-    (setq projectile-dynamic-mode-line nil))
+  ;; (when (eq sb/modeline-theme 'doom-modeline)
+  ;;   (setq projectile-dynamic-mode-line nil))
 
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and sb/IS-WINDOWS (executable-find "tr"))
@@ -2953,7 +2953,7 @@ This file is specified in `counsel-projectile-default-file'."
         ;; Show error messages only if the error list is not already visible
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         ;; `chktex' errors are often not very helpful, and `csv-mode' does not have a checker yet.
-        flycheck-global-modes '(not LaTeX-mode latex-mode csv-mode))
+        flycheck-global-modes '(not csv-mode))
 
   ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
   (when (or (eq sb/modeline-theme 'spaceline)
@@ -3008,7 +3008,11 @@ This file is specified in `counsel-projectile-default-file'."
               ;; (make-local-variable 'flycheck-error-list-minimum-level)
               ;; (setq flycheck-error-list-minimum-level 'warning
               ;; flycheck-navigation-minimum-level 'warning)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint))))
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)))
+
+  (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+    (add-hook hook (lambda ()
+                     (flycheck-add-next-checker 'tex-chktex 'textlint)))))
 
 
 ;; Does not display popup under TTY, check possible workarounds at
@@ -3276,7 +3280,8 @@ This file is specified in `counsel-projectile-default-file'."
         ;; `nil' implies no sorting or listing by position in the buffer
         imenu-sort-function nil)
 
-  (require 'imenu-anywhere nil nil))
+  ;; (require 'imenu-anywhere nil nil)
+  )
 
 
 (defvar tags-revert-without-query)
@@ -6404,8 +6409,8 @@ Ignore if no file is found."
 
   (make-local-variable 'company-backends)
   (setq company-backends '((company-capf :separate
-                                         company-yasnippet
-                                         company-dabbrev-code)
+                                         company-dabbrev-code
+                                         company-yasnippet)
                            company-files)))
 
 (dolist (hook '(nxml-mode-hook))
@@ -6422,8 +6427,8 @@ Ignore if no file is found."
   (make-local-variable 'company-backends)
   (setq company-backends
         '((company-capf :separate
-                        company-yasnippet
-                        company-dabbrev-code)
+                        company-dabbrev-code
+                        company-yasnippet)
           company-files
           company-dabbrev)))
 
@@ -6438,8 +6443,8 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends '((company-capf :separate
-                                         company-yasnippet
-                                         company-dabbrev-code)
+                                         company-dabbrev-code
+                                         company-yasnippet)
                            company-files
                            company-dabbrev)))
 
@@ -6456,8 +6461,8 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends '((company-capf :separate
-                                         company-yasnippet
-                                         company-dabbrev-code)
+                                         company-dabbrev-code
+                                         company-yasnippet)
                            company-files
                            company-dabbrev)))
 
@@ -6479,8 +6484,8 @@ Ignore if no file is found."
                                          company-shell
                                          company-shell-env
                                          company-fish-shell
-                                         company-yasnippet
-                                         company-dabbrev-code)
+                                         company-dabbrev-code
+                                         company-yasnippet)
                            company-files
                            company-dabbrev)))
 
@@ -6495,8 +6500,8 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends '((company-capf :separate
-                                         company-yasnippet
-                                         company-dabbrev-code)
+                                         company-dabbrev-code
+                                         company-yasnippet)
                            company-files
                            company-dabbrev)))
 
@@ -6513,8 +6518,8 @@ Ignore if no file is found."
   ;; Grouping the backends will show popups from all. Merge completions of the three backends, give
   ;; priority to `company-capf'. `company-dabbrev-code' is useful for variable names.
   (setq company-backends '((company-capf :separate
-                                         company-yasnippet
-                                         company-dabbrev-code)
+                                         company-dabbrev-code
+                                         company-yasnippet)
                            company-files
                            company-dabbrev)))
 

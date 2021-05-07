@@ -795,6 +795,7 @@
     ("liekd" "liked" nil :count 0)
     ("lieutenent" "lieutenant" nil :count 0)
     ("liev" "live" nil :count 0)
+    ("lightweigt" "lightweight" nil :count 0)
     ("likly" "likely" nil :count 0)
     ("lineearly" "linearly" nil :count 1)
     ("lisense" "license" nil :count 0)
