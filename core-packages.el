@@ -12,15 +12,12 @@
 (setq sb/core-packages '(ace-window
                          adoc-mode
                          aggressive-indent
-                         airline-themes
-                         alert
                          all-the-icons
                          all-the-icons-dired
                          all-the-icons-ibuffer
                          all-the-icons-ivy
                          all-the-icons-ivy-rich
                          amx
-                         anaphora
                          ant
                          anzu
                          apt-sources-list
@@ -28,27 +25,19 @@
                          auctex
                          auctex-latexmk
                          auto-dim-other-buffers
-                         auto-package-update
                          autodisass-java-bytecode
                          autodisass-llvm-bitcode
                          avy
                          bazel-mode
                          beacon
                          beginend
-                         biblio
-                         biblio-core
                          bibtex-completion
                          bibtex-utils
-                         bind-chord
                          bind-key
                          bison-mode
                          bm
                          boogie-friends
                          bug-hunter
-                         bui
-                         c-eldoc
-                         centaur-tabs
-                         cfrs
                          clang-format
                          clang-format+
                          cmake-font-lock
@@ -56,41 +45,27 @@
                          company
                          company-auctex
                          company-bibtex
-                         company-box
                          company-math
                          company-posframe
-                         company-prescient
                          company-quickhelp
-                         company-quickhelp-terminal
                          company-reftex
                          company-shell
-                         company-tabnine
                          counsel
-                         counsel-etags
                          counsel-fd
-                         counsel-gtags
-                         counsel-projectile
                          crux
-                         css-eldoc
                          csv-mode
                          ctrlf
                          cuda-mode
                          cython-mode
                          dap-mode
-                         dash
-                         dash-functional
-                         datetime
                          deadgrep
                          default-text-scale
-                         deferred
                          define-word
                          diff-hl
                          diminish
                          dired+
                          dired-efap
-                         dired-hacks-utils
                          dired-narrow
-                         diredfl
                          disable-mouse
                          discover-my-major
                          doom-modeline
@@ -98,20 +73,14 @@
                          dotenv-mode
                          dumb-jump
                          duplicate-thing
-                         eclipse-theme
                          editorconfig
                          ein
-                         elisp-refs
                          emmet-mode
-                         emojify
-                         epl
                          ess
                          ess-smart-underscore
                          esup
                          exec-path-from-shell
                          expand-region
-                         extmap
-                         f
                          fasd
                          fish-mode
                          flycheck
@@ -122,7 +91,6 @@
                          flyspell-correct-ivy
                          flyspell-popup
                          format-all
-                         frame-local
                          free-keys
                          gcmh
                          git-commit
@@ -130,8 +98,6 @@
                          gitattributes-mode
                          gitconfig-mode
                          gitignore-mode
-                         global-tags
-                         gntp
                          gnuplot
                          goto-last-change
                          grammarly
@@ -146,17 +112,14 @@
                          highlight-indentation
                          highlight-numbers
                          hl-todo
-                         ht hungry-delete
+                         hungry-delete
                          hydra
                          ibuffer-projectile
                          iedit
-                         imenu-anywhere
                          immortal-scratch
-                         inheritenv
                          ini-mode
                          isearch-dabbrev
                          isearch-symbol-at-point
-                         iter2
                          ivy
                          ivy-avy
                          ivy-bibtex
@@ -172,77 +135,53 @@
                          json-snatcher
                          key-chord
                          langtool
-                         language-id
-                         leuven-theme
-                         log4e
                          logview
                          lsp-ivy
                          lsp-java
-                         lsp-jedi
                          lsp-mode
-                         lsp-origami
                          lsp-pyright
-                         lsp-python-ms
                          lsp-treemacs
                          lsp-ui
-                         lv
                          magit
-                         magit-section
-                         makey
                          manage-minor-mode
                          markdown-mode
                          markdown-mode+
                          markdown-preview-mode
                          markdown-toc
-                         markup-faces
                          math-preview
                          math-symbol-lists
                          matlab-mode
-                         memoize
-                         mode-icons
                          modern-cpp-font-lock
                          modus-themes
-                         monokai-theme
                          moody
                          move-text
                          multiple-cursors
-                         names
                          nix-mode
                          no-littering
                          nvm
                          opencl-mode
                          orderless
                          org-bullets
-                         origami
                          pandoc-mode
                          paradox
-                         parent-mode
-                         parsebib
                          pdf-tools
                          persistent-scratch
-                         pfuture
                          php-mode
                          pip-requirements
                          pkg-info
                          pkgbuild-mode
-                         polymode
-                         pomidor
                          popup
                          popwin
                          pos-tip
                          posframe
                          powerline
                          prescient
-                         prettier
-                         pretty-hydra
-                         project
                          projectile
                          protobuf-mode
                          py-isort
                          pylint
                          python-docstring
                          pyvenv
-                         quelpa
                          rainbow-delimiters
                          rainbow-mode
                          reformatter
@@ -254,46 +193,27 @@
                          saveplace-pdf-view
                          scss-mode
                          shfmt
-                         shrink-path
                          smart-mark
-                         smart-mode-line
-                         solarized-theme
-                         spaceline
-                         spaceline-all-the-icons
-                         spacemacs-theme
                          spell-fu
                          ssh-config-mode
                          super-save
                          swiper
                          symbol-overlay
-                         system-packages
-                         tablist
                          toml-mode
-                         tree-sitter
-                         tree-sitter-langs
                          treemacs
                          treemacs-all-the-icons
                          treemacs-magit
                          treemacs-projectile
-                         tsc
                          undo-tree
-                         unicode-escape
-                         use-package
-                         use-package-chords
-                         use-package-ensure-system-package
-                         use-package-hydra
                          visual-regexp
                          vlf
                          wc-mode
                          web-mode
-                         web-server
-                         websocket
                          wgrep
                          which-key
                          which-key-posframe
                          whitespace-cleanup-mode
                          whole-line-or-region
-                         with-editor
                          writegood-mode
                          ws-butler
                          xref
@@ -304,12 +224,14 @@
                          yapfify
                          yasnippet
                          yasnippet-snippets
-                         z3-mode
-                         zenburn-theme))
+                         z3-mode))
 
-(when (cl-find-if-not #'package-installed-p sb/core-packages)
-  (package-refresh-contents)
-  (mapc #'package-install sb/core-packages))
+(defun sb/install-packages ()
+  "Install the listed packages."
+  (interactive)
+  (when (cl-find-if-not #'package-installed-p sb/core-packages)
+    (package-refresh-contents)
+    (mapc #'package-install sb/core-packages)))
 
 (provide 'core-packages)
 ;;; core-packages.el ends here

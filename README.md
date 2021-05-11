@@ -80,22 +80,6 @@ sudo npm install npm eslint js-yaml less jsonlint bash-language-server vscode-ht
 
 Install `textlint` separately so that the installation is shared by other editors.
 
-```Bash
-cd $HOME/tmp; mkdir textlint-workspace; cd textlint-workspace;
-```
-
-```Bash
-npm init --yes; npm install textlint
-```
-
-```Bash
-npm install textlint-rule-no-todo textlint-rule-no-start-duplicated-conjunction textlint-rule-max-number-of-lines textlint-rule-max-comma textlint-rule-no-empty-section textlint-rule-terminology textlint-rule-period-in-list-item textlint-rule-ginger  textlint-rule-en-capitalization textlint-rule-no-surrogate-pair textlint-rule-spelling textlint-rule-common-misspellings textlint-rule-write-good textlint-rule-apostrophe textlint-rule-diacritics textlint-rule-stop-words textlint-rule-sentence-length textlint-rule/textlint-rule-no-invalid-control-character textlint-rule/textlint-rule-no-unmatched-pair textlint-rule/textlint-rule-proselint textlint-rule-terminology textlint-filter-rule-comments textlint-rule-unexpanded-acronym textlint-rule-abbr-within-parentheses textlint-rule-no-dead-link
-```
-
-```Bash
-npm install textlint-plugin-latex textlint-plugin-latex2e textlint-plugin-rst textlint-plugin-json textlint-plugin-html
-```
-
 > Uninstall `nvm`
 
 - `rm -rf "$NVM_DIR"`

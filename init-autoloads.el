@@ -439,7 +439,7 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'global-auto-revert-mode)
   (autoload #'global-auto-revert-mode "autorevert" nil t))
 
-(run-at-time 5 nil #'global-auto-revert-mode)
+(run-with-idle-timer 2 nil #'global-auto-revert-mode)
 
 (with-eval-after-load 'autorevert
   (defvar auto-revert-interval)
@@ -546,10 +546,11 @@ This location is used for temporary installations and files.")
   (setq split-height-threshold nil
         split-width-threshold 0))
 
-;; Make use of wider screens
-;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-;;   (split-window-right))
-
+(if nil
+    ;; Make use of wider screens
+    (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+      (split-window-right))
+  )
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -959,8 +960,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'adob--rescan-windows)
   (autoload #'adob--rescan-windows "auto-dim-other-buffers" nil t))
 
-;; (add-hook 'after-init-hook #'auto-dim-other-buffers-mode)
-(run-at-time 5 nil #'auto-dim-other-buffers-mode)
+(run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
 
 (declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
 
@@ -1376,7 +1376,7 @@ SAVE-FN with non-nil ARGS."
     (setq treemacs-collapse-dirs 2
           treemacs-follow-after-init t
           treemacs-indentation 1
-          ;; Prevents treemacs from being selected with `other-window`
+          ;; Prevents treemacs from being selected with `other-window'
           treemacs-is-never-other-window nil
           treemacs-no-png-images nil
           treemacs-position 'right
@@ -1431,15 +1431,15 @@ SAVE-FN with non-nil ARGS."
 
     (treemacs-load-theme "all-the-icons")
 
-    (set-face-attribute 'treemacs-root-face nil :height 0.9)
-    (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
-    (set-face-attribute 'treemacs-directory-face nil :height 0.8)
-    (set-face-attribute 'treemacs-file-face nil :height 0.8)
-    (set-face-attribute 'treemacs-tags-face nil :height 0.8)
-    (set-face-attribute 'treemacs-git-ignored-face nil :height 0.8)
-    (set-face-attribute 'treemacs-git-untracked-face nil :height 0.8)
-    (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
-    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.8)
+    (set-face-attribute 'treemacs-root-face nil :height 0.8)
+    (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
+    (set-face-attribute 'treemacs-directory-face nil :height 0.7)
+    (set-face-attribute 'treemacs-file-face nil :height 0.7)
+    (set-face-attribute 'treemacs-tags-face nil :height 0.7)
+    (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
+    (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
+    (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
+    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7)
 
     (treemacs-resize-icons 16))
 
@@ -1451,13 +1451,14 @@ SAVE-FN with non-nil ARGS."
 
 (with-eval-after-load 'treemacs
   ;; Allows to quickly add projectile projects to the treemacs workspace
-  (with-eval-after-load 'projectile
-    (unless (fboundp 'treemacs-projectile)
-      (autoload #'treemacs-projectile "treemacs-projectile" nil t)))
+  (unless (fboundp 'treemacs-projectile)
+    (autoload #'treemacs-projectile "treemacs-projectile" nil t))
 
+  ;; (add-hook 'projectile-after-switch-project-hook (lambda ()
+  ;;                                                   (treemacs-add-and-display-current-project)
+  ;;                                                   (other-window 1)))
 
-  (with-eval-after-load 'magit
-    (require 'treemacs-magit nil nil)))
+  (require 'treemacs-magit nil nil))
 
 
 (declare-function org-indent-mode "org-indent")
@@ -1739,10 +1740,11 @@ SAVE-FN with non-nil ARGS."
   ;; `recentf-save-list' is called on Emacs exit
   ;; (setq recentf-auto-cleanup-timer (run-with-idle-timer 60 t 'recentf-save-list))
   ;; (run-at-time 5 (* 5 60) 'recentf-save-list)
-  (run-with-idle-timer 60 t 'recentf-save-list)
+  (run-with-idle-timer 30 t 'recentf-save-list)
 
-  ;; (run-at-time 5 (* 10 60) 'recentf-cleanup)
-  (add-hook 'kill-emacs-hook #'recentf-cleanup))
+  (run-with-idle-timer 30 t 'recentf-cleanup)
+  ;; (add-hook 'kill-emacs-hook #'recentf-cleanup)
+  )
 
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1832,6 +1834,7 @@ SAVE-FN with non-nil ARGS."
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
   ;;   (delq backends company-backends))
 
+  (remove-hook 'kill-emacs-hook #'company-clang-set-prefix)
 
   ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
   ;; https://github.com/company-mode/company-mode/issues/1010
@@ -1845,7 +1848,7 @@ SAVE-FN with non-nil ARGS."
   (defvar company-posframe-show-metadata)
   (defvar company-posframe-show-indicator)
 
-  (setq company-posframe-show-metadata nil
+  (setq company-posframe-show-metadata t
         company-posframe-show-indicator nil
         company-posframe-quickhelp-show-header nil)
 
@@ -1859,32 +1862,46 @@ SAVE-FN with non-nil ARGS."
   ;; (add-hook 'after-init-hook #'company-quickhelp-mode)
   (run-at-time 5 nil #'company-quickhelp-mode)
 
-  (when (display-graphic-p)
-    (unless (fboundp 'company-box-mode)
-      (autoload #'company-box-mode "company-box" nil t))
+  ;; Company now has in-built support for completion icons
+  (if nil
+      (progn
+        (when (display-graphic-p)
+          (unless (fboundp 'company-box-mode)
+            (autoload #'company-box-mode "company-box" nil t))
 
-    ;; FIXME: This is not working.
-    ;; (company-box-mode 1)
+          ;; FIXME: This is not working.
+          (company-box-mode 1)
 
-    (with-eval-after-load 'company-box
-      (defvar company-box-icons-alist)
-      (defvar company-box-show-single-candidate)
-      (defvar company-frontends)
+          (with-eval-after-load 'company-box
+            (defvar company-box-icons-alist)
+            (defvar company-box-show-single-candidate)
+            (defvar company-frontends)
 
-      (setq company-box-icons-alist 'company-box-icons-all-the-icons
-            company-box-show-single-candidate t
-            company-frontends '(company-box-frontend)))
+            (setq company-box-icons-alist 'company-box-icons-all-the-icons
+                  company-box-show-single-candidate t
+                  company-frontends '(company-box-frontend)))
 
-    (diminish 'company-box-mode)
+          (diminish 'company-box-mode)
 
-    ;; (set-face-background 'company-box-background "cornsilk")
-    ;; (set-face-background 'company-box-selection "light blue")
-    )
+          ;; (set-face-background 'company-box-background "cornsilk")
+          ;; (set-face-background 'company-box-selection "light blue")
+          )))
 
   ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
   ;; computationally expensive. Completions seem to be laggy with TabNine enabled.
 
-  )
+  (unless (fboundp 'company-fuzzy-mode)
+    (autoload #'company-fuzzy-mode "company-fuzzy" nil t))
+  (unless (fboundp 'global-company-fuzzy-mode)
+    (autoload #'global-company-fuzzy-mode "company-fuzzy" nil t))
+
+  ;; LATER: Nice but slows completions
+  ;; (global-company-fuzzy-mode 1)
+
+  (diminish 'company-fuzzy-mode)
+
+  (setq company-fuzzy-show-annotation t
+        company-fuzzy-sorting-backend 'flx))
 
 (defvar company-active-map)
 (bind-keys :package company :map company-active-map
@@ -1895,8 +1912,10 @@ SAVE-FN with non-nil ARGS."
            ("C-s"      . sb/quit-company-save-buffer)
            ("<escape>" . company-abort))
 
+
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+;; Hide the "Starting new Ispell process" message
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
@@ -2270,10 +2289,7 @@ SAVE-FN with non-nil ARGS."
 
     ;; Skip regions in Org-mode
     (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
-    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
-
-    ;; Hide the "Starting new Ispell process" message
-    (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))))
 
 
 (when (symbol-value 'sb/IS-LINUX)
@@ -2978,10 +2994,8 @@ This file is specified in `counsel-projectile-default-file'."
   ;; FIXME: Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
 
-  ;; SB: We prefer to use only grammarly, and not `proselint' and `textlint'. The advantage with
-  ;; `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp support, so you can
-  ;; use it anywhere.
-
+  ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
+  ;; support, so you can use it anywhere.
   (require 'flycheck-grammarly nil nil)
 
   (defvar flycheck-grammarly-check-time)
@@ -2989,17 +3003,16 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq flycheck-grammarly-check-time 3
         ;; LATER: Can we combine the three delete operations?
-        ;; flycheck-checkers (delete 'proselint flycheck-checkers)
-        ;; flycheck-checkers (delete 'textlint flycheck-checkers)
+        flycheck-checkers (delete 'proselint flycheck-checkers)
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'grammarly t)
 
+  ;; SB: We prefer to use `textlint' and `grammarly', `proselint' is not maintained.
   (add-hook 'text-mode-hook
             (lambda ()
-              ;; Add `proselint', then `textlint', then `grammarly'
-              (flycheck-add-next-checker 'proselint 'textlint)
+              ;; Add `textlint', then `grammarly'
               (flycheck-add-next-checker 'textlint 'grammarly)))
 
   ;; `markdown-mode' is derived from `text-mode'
@@ -3015,30 +3028,34 @@ This file is specified in `counsel-projectile-default-file'."
                      (flycheck-add-next-checker 'tex-chktex 'textlint)))))
 
 
-;; Does not display popup under TTY, check possible workarounds at
-;; https://github.com/flycheck/flycheck-popup-tip
+(if nil
+    (progn
+      ;; Does not display popup under TTY, check possible workarounds at
+      ;; https://github.com/flycheck/flycheck-popup-tip
 
-;; (when (display-graphic-p)
-;;   (unless (fboundp 'flycheck-pos-tip-mode)
-;;     (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
+      (when (display-graphic-p)
+        (unless (fboundp 'flycheck-pos-tip-mode)
+          (autoload #'flycheck-pos-tip-mode "flycheck-pos-tip" nil t))
 
-;;   (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
+        (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
+      ))
 
+(if nil
+    (progn
+      ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 
-;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
+      (when (display-graphic-p)
+        (unless (fboundp 'flycheck-posframe-mode)
+          (autoload #'flycheck-posframe-mode "flycheck-posframe" nil t))
+        (unless (fboundp 'flycheck-posframe-configure-pretty-defaults)
+          (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
+        (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
 
-;; (when (display-graphic-p)
-;;   (unless (fboundp 'flycheck-posframe-mode)
-;;     (autoload #'flycheck-posframe-mode "flycheck-posframe" nil t))
-;;   (unless (fboundp 'flycheck-posframe-configure-pretty-defaults)
-;;     (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
-;;   (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
-
-;;   (with-eval-after-load 'flycheck-posframe
-;;        (defvar flycheck-posframe-position)
-;;        (setq flycheck-posframe-position 'point-bottom-left-corner)
-;;        (flycheck-posframe-configure-pretty-defaults)))
-
+        (with-eval-after-load 'flycheck-posframe
+          (defvar flycheck-posframe-position)
+          (setq flycheck-posframe-position 'point-bottom-left-corner)
+          (flycheck-posframe-configure-pretty-defaults)))
+      ))
 
 (declare-function whitespace-buffer "whitespace")
 (declare-function whitespace-turn-off "whitespace")
@@ -3075,11 +3092,14 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 
+;; Call `whitespace-cleanup' only if the initial buffer was clean
 (unless (fboundp 'global-whitespace-cleanup-mode)
   (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
 (unless (fboundp 'whitespace-cleanup-mode)
   (autoload #'whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
 
+;; To enable it for an entire project, set `whitespace-cleanup-mode' to `t' in your `.dir-locals.el'
+;; file.
 ;; (add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
 
 (with-eval-after-load 'whitespace-cleanup-mode
@@ -3719,7 +3739,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'immortal-scratch-mode)
   (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
 
-(run-at-time 5 nil #'immortal-scratch-mode)
+(run-with-idle-timer 3 nil #'immortal-scratch-mode)
 
 ;; I use the *scratch* buffer for taking notes, it helps to make the data persist
 (unless (fboundp 'persistent-scratch-setup-default)
@@ -3851,7 +3871,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'super-save-mode)
   (autoload #'super-save-mode "super-save" nil t))
 
-(run-at-time 5 nil #'super-save-mode)
+(run-with-idle-timer 3 nil #'super-save-mode)
 
 (with-eval-after-load 'super-save
   (defvar super-save-remote-files)
@@ -3942,7 +3962,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'find-file-hook #'bm-buffer-restore)
   (add-hook 'after-init-hook #'bm-repository-load))
 
-(run-at-time 3 nil #'sb/bm-setup)
+(run-with-idle-timer 2 nil #'sb/bm-setup)
 
 (with-eval-after-load 'bm
   (defvar bm-repository-file)
@@ -5415,7 +5435,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-git-gutter-mode)
   (autoload #'global-git-gutter-mode "git-gutter" nil t))
 
-(add-hook 'after-init-hook #'global-git-gutter-mode)
+;; (add-hook 'after-init-hook #'global-git-gutter-mode)
 
 (with-eval-after-load 'git-gutter
   (defvar git-gutter:added-sign)
@@ -5455,10 +5475,10 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'global-diff-hl-mode)
   (autoload #'global-diff-hl-mode "diff-hl" nil t))
 
-;; (add-hook 'after-init-hook #'global-diff-hl-mode)
-;; (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
-;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-;; (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
+(add-hook 'after-init-hook #'global-diff-hl-mode)
+(add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+(add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+(add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
 
 (with-eval-after-load 'diff-hl
   (defvar diff-hl-draw-borders)
@@ -5676,6 +5696,7 @@ This file is specified in `counsel-projectile-default-file'."
         nxml-slash-auto-complete-flag t))
 
 
+;; https://github.com/ROCKTAKEY/lsp-latex/issues/26
 ;; Texlab seems to have high overhead
 
 ;; (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
@@ -6193,12 +6214,9 @@ Ignore if no file is found."
 (eval-and-compile
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(emacs-lisp-mode-hook lisp-mode-hook
-                                         markdown-mode-hook
-                                         bazel-mode-hook
-                                         latex-mode-hook
-                                         LaTeX-mode-hook
-                                         json-mode-hook))
+    (dolist (hook '(lisp-mode-hook markdown-mode-hook
+                                   bazel-mode-hook latex-mode-hook
+                                   LaTeX-mode-hook json-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
@@ -6252,7 +6270,7 @@ Ignore if no file is found."
 (unless (fboundp 'fasd-find-file)
   (autoload #'fasd-find-file "fasd" nil t))
 
-(run-at-time 5 nil #'global-fasd-mode)
+(run-with-idle-timer 3 nil #'global-fasd-mode)
 
 (with-eval-after-load 'fasd
   (defvar fasd-enable-initial-prompt)
@@ -6499,6 +6517,7 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
+  ;; Merge completions of the three backends, give priority to `company-capf'.
   (setq company-backends '((company-capf :separate
                                          company-dabbrev-code
                                          company-yasnippet)
@@ -6515,12 +6534,12 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  ;; Grouping the backends will show popups from all. Merge completions of the three backends, give
-  ;; priority to `company-capf'. `company-dabbrev-code' is useful for variable names.
-  (setq company-backends '((company-capf :separate
-                                         company-dabbrev-code
-                                         company-yasnippet)
+  ;; Grouping the backends will show popups from all. `company-dabbrev-code' is useful for variable
+  ;; names.
+  (setq company-backends '(company-capf
+                           company-yasnippet
                            company-files
+                           company-dabbrev-code
                            company-dabbrev)))
 
 (add-hook 'python-mode-hook #'sb/company-python-mode)
@@ -6883,8 +6902,7 @@ mode is not in `sb/skippable-modes'."
 (unless (fboundp 'which-key-mode)
   (autoload #'which-key-mode nil t))
 
-;; (add-hook 'after-init-hook #'which-key-mode)
-(run-at-time 5 nil #'which-key-mode)
+(run-with-idle-timer 3 nil #'which-key-mode)
 
 (with-eval-after-load 'which-key
   ;; Allow C-h to trigger which-key before it is done automatically
@@ -6914,6 +6932,7 @@ mode is not in `sb/skippable-modes'."
   (autoload #'defhydra "hydra" nil t))
 
 (with-eval-after-load 'hydra
+  ;; `:exit t' will quit the hydra
   (defhydra sb/hydra-spelling (:color blue)
     "
   ^
@@ -6924,7 +6943,7 @@ mode is not in `sb/skippable-modes'."
   ^^                  _f_ check           _m_ mode              _a_ add word
   ^^                  ^^                  ^^                    ^^
   "
-    ("q" nil)
+    ("q" nil "quit")
     ("<" flyspell-correct-previous :color pink)
     (">" flyspell-correct-next :color pink)
     ("c" ispell)
@@ -6935,10 +6954,11 @@ mode is not in `sb/skippable-modes'."
     ("p" spell-fu-goto-previous-error)
     ("a" spell-fu-word-add))
 
-  (defhydra sb/hydra-text-scale-zoom (global-map "C-c h z")
+  (defhydra sb/hydra-text-scale-zoom ()
     "Zoom the text"
     ("i" default-text-scale-increase "in")
-    ("o" default-text-scale-decrease "out"))
+    ("o" default-text-scale-decrease "out")
+    ("q" nil "quit"))
 
   (defhydra sb/hydra-error (global-map "C-c h e")
     "goto-error"
@@ -6947,6 +6967,27 @@ mode is not in `sb/skippable-modes'."
     ("k" previous-error "prev")
     ("v" recenter-top-bottom "recenter")
     ("q" nil "quit"))
+
+  ;; https://github.com/abo-abo/hydra/wiki/avy
+  (defhydra sb/hydra-avy (:exit t :hint nil)
+    "
+ Line^^       Region^^        Goto
+----------------------------------------------------------
+ [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
+ [_m_] move   [_M_] move      [_w_] word        [_W_] any word
+ [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
+    ("c" avy-goto-char-timer)
+    ("C" avy-goto-char)
+    ("w" avy-goto-word-1)
+    ("W" avy-goto-word-0)
+    ("l" avy-goto-line)
+    ("L" avy-goto-end-of-line)
+    ("m" avy-move-line)
+    ("M" avy-move-region)
+    ("k" avy-kill-whole-line)
+    ("K" avy-kill-region)
+    ("y" avy-copy-line)
+    ("Y" avy-copy-region))
 
   (defhydra sb/hydra-projectile (:color teal :hint nil)
     "
