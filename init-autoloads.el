@@ -138,7 +138,6 @@ This location is used for temporary installations and files.")
   "Choose the Python Language Server implementation."
   :type '(radio
           (const :tag "pyls" pyls)
-          (const :tag "mspyls" mspyls)
           (const :tag "pyright" pyright)
           (const :tag "jedi" jedi)
           (const :tag "none" none))
@@ -1076,7 +1075,7 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 
 ;; FIXME: profiler says this is expensive
-;; (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+(add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
 (with-eval-after-load 'ibuffer-ext
   ;; Do not show filter groups if there are no buffers in that group
@@ -2408,9 +2407,9 @@ SAVE-FN with non-nil ARGS."
              ("C-,"     . sb/flyspell-goto-previous-error)))
 
 
+;; The package does not add any extra functionality.
 (if nil
     (progn
-      ;; FIXME: Is this any good?
       (unless (fboundp 'flyspell-correct-wrapper)
         (autoload #'flyspell-correct-wrapper "flyspell-correct-ivy" nil t))
 
@@ -2958,6 +2957,15 @@ This file is specified in `counsel-projectile-default-file'."
 
 (run-at-time 2 nil #'global-flycheck-mode)
 
+;; Exclude directories and files from being checked
+;; https://github.com/flycheck/flycheck/issues/1745
+
+(defun sb/flycheck-may-check-automatically (&rest _conditions)
+  (or (null buffer-file-name)
+      (let ((bufname (file-truename buffer-file-name)))
+        (not (seq-some (lambda (re) (string-match-p re bufname))
+                       sb/excluded-directory-regexps)))))
+
 (with-eval-after-load 'flycheck
   (defvar flycheck-check-syntax-automatically)
   (defvar flycheck-checker-error-threshold)
@@ -3003,6 +3011,12 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; FIXME: Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
+
+  (defvar sb/excluded-directory-regexps
+    '(".git/" ".elpa/"))
+
+  (advice-add 'flycheck-may-check-automatically
+              :after-while #'sb/flycheck-may-check-automatically)
 
   ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
   ;; support, so you can use it anywhere.
@@ -4600,6 +4614,9 @@ This file is specified in `counsel-projectile-default-file'."
         lsp-imenu-sort-methods '(position)
         lsp-keep-workspace-alive nil
         lsp-log-io nil ; `texlab' communication is huge
+        ;; We already have `flycheck' error summary listed on the modeline, but the `lsp' server may
+        ;; report additional errors
+        lsp-modeline-diagnostics-enable t
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
         lsp-signature-auto-activate t ; Manually request via `lsp-signature-activate'
         lsp-signature-render-documentation t
@@ -4652,14 +4669,6 @@ This file is specified in `counsel-projectile-default-file'."
                       :major-modes
                       '(python-mode)
                       :remote\? t :server-id 'pyls-remote)))
-
-  (when (eq sb/python-langserver 'mspyls)
-    (lsp-register-client
-     (make-lsp-client :new-connection
-                      (lsp-tramp-connection "mspyls")
-                      :major-modes
-                      '(python-mode)
-                      :remote\? t :server-id 'mspyls-remote)))
 
   (when (eq sb/python-langserver 'pyright)
     (lsp-register-client
@@ -4829,9 +4838,10 @@ This file is specified in `counsel-projectile-default-file'."
            ("C-c l r" . lsp-find-references))
 
 
-(when (or (eq sb/python-langserver 'pyls) (eq sb/python-langserver 'mspyls))
-  (add-hook 'python-mode-hook (lambda ()
-                                (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+(when (eq sb/python-langserver 'pyls)
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 
 (with-eval-after-load 'lsp-mode
@@ -5060,16 +5070,6 @@ This file is specified in `counsel-projectile-default-file'."
            )
 
 
-;; (with-eval-after-load 'lsp-mode
-;;   (when (and (eq sb/python-langserver 'pyls) (executable-find "pyls"))
-;;     (progn
-;;       (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
-;;         (add-to-list 'lsp-disabled-clients ls))
-;;       (add-to-list 'lsp-enabled-clients 'pyls)
-;;       (add-to-list 'lsp-enabled-clients 'pyls-remote))))
-
-
-
 (unless (fboundp 'pyvenv-mode)
   (autoload #'pyvenv-mode "pyvenv" nil t))
 
@@ -5117,23 +5117,6 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("requirements\\.in"            . pip-requirements-mode))
 
 
-(when (eq sb/python-langserver 'mspyls)
-  (add-hook 'python-mode-hook (lambda nil
-                                (require 'lsp-python-ms)))
-
-  (defvar lsp-python-ms-python-executable-cmd)
-  (defvar lsp-python-ms-auto-install-server)
-
-  (setq lsp-python-ms-python-executable-cmd "python3")
-  (setq lsp-python-ms-auto-install-server t)
-
-  ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-  ;;   (add-to-list 'lsp-disabled-clients ls))
-  ;; (add-to-list 'lsp-enabled-clients 'mspyls)
-  ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
-  )
-
-
 ;; `pyright --createstub pandas'
 (declare-function lsp-pyright-locate-python "lsp-pyright")
 (declare-function lsp-pyright-locate-venv "lsp-pyright")
@@ -5149,14 +5132,7 @@ This file is specified in `counsel-projectile-default-file'."
                                 (require 'lsp-pyright)))
 
   (defvar lsp-pyright-python-executable-cmd)
-  (setq lsp-pyright-python-executable-cmd "python3")
-
-  ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-  ;;   (add-to-list 'lsp-disabled-clients ls))
-  ;; (add-to-list 'lsp-enabled-clients 'pyright)
-  ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
-
-  )
+  (setq lsp-pyright-python-executable-cmd "python3"))
 
 
 (when (and (eq sb/python-langserver 'jedi)
@@ -5165,21 +5141,16 @@ This file is specified in `counsel-projectile-default-file'."
                                 (require 'lsp-jedi)))
 
   (defvar lsp-jedi-diagnostics-enable)
-  (setq lsp-jedi-diagnostics-enable t)
-
-  ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-  ;;   (add-to-list 'lsp-disabled-clients ls))
-  ;; (add-to-list 'lsp-enabled-clients 'jedi)
-  ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
-
-  )
+  (setq lsp-jedi-diagnostics-enable t))
 
 ;; Initiate the lsp server after all the language server code has been processed
 (add-hook 'python-mode-hook
           (lambda()
             (lsp-deferred)
-            ;; We already have `flycheck' error summary listed on the modeline
-            (lsp-modeline-diagnostics-mode -1)))
+            ;; We already have `flycheck' error summary listed on the modeline, but it seems `lsp'
+            ;; may report additional errors
+            ;; (lsp-modeline-diagnostics-mode -1)
+            ))
 
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
@@ -5199,15 +5170,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'ein:ipynb-mode)
   (autoload #'ein:ipynb-mode "ein" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.ipynb\\'" . ein:ipynb-mode))
-
 
 (unless (fboundp 'cython-mode)
   (autoload #'cython-mode "cython-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.pyx\\'" . cython-mode))
-(add-to-list 'auto-mode-alist '("\\.pxd\\'" . cython-mode))
-(add-to-list 'auto-mode-alist '("\\.pxi\\'" . cython-mode))
 
 
 (unless (fboundp 'jinja2-mode)
@@ -6047,8 +6012,10 @@ Ignore if no file is found."
   (interactive)
   (require 'tex)
   (require 'tex-buf)
-  (let ((process (TeX-active-process))) (if process (delete-process process)))
-  (let ((TeX-save-query nil)) (TeX-save-document ""))
+  (let ((process (TeX-active-process)))
+    (if process (delete-process process)))
+  (let ((TeX-save-query nil))
+    (TeX-save-document ""))
   (TeX-command-menu "LaTeXMk"))
 
 ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
@@ -6058,14 +6025,10 @@ Ignore if no file is found."
 ;;                         (lambda ()
 ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
 
-(defvar latex-mode-map)
-(defvar LaTeX-mode-map)
-
 (with-eval-after-load 'latex
-  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map)
-  ;; FIXME: void variable latex-mode-map error
-  ;; (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map)
-  )
+  (defvar LaTeX-mode-map)
+
+  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
 
 
 (unless (fboundp 'math-preview-all)
@@ -6084,6 +6047,7 @@ Ignore if no file is found."
 (unless (fboundp 'texinfo-mode)
   (autoload #'texinfo-mode "texinfo" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode))
 
 
@@ -6092,6 +6056,7 @@ Ignore if no file is found."
 (unless (fboundp 'js2-imenu-extras-mode)
   (autoload #'js2-imenu-extras-mode "js2-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
 (add-hook 'js2-mode-hook #'lsp-deferred)
@@ -6119,8 +6084,9 @@ Ignore if no file is found."
   (unless (fboundp 'xref-js2-xref-backend)
     (autoload #'xref-js2-xref-backend "xref-js2" nil t))
 
-  (add-hook 'js2-mode-hook (lambda ()
-                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
   (with-eval-after-load 'xref-js2
     (defvar xref-js2-search-program)
@@ -6137,13 +6103,14 @@ Ignore if no file is found."
 
 (unless (fboundp 'json-mode)
   (autoload #'json-mode "json-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
-
 (unless (fboundp 'jsonc-mode)
   (autoload #'jsonc-mode "json-mode" nil t))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("User/settings.json$"         . jsonc-mode))
 
 (dolist (hook '(json-mode-hook jsonc-mode-hook))
@@ -6154,18 +6121,8 @@ Ignore if no file is found."
                    (lsp-deferred))))
 
 
-(unless (fboundp 'less-css-mode)
-  (autoload #'less-css-mode "less-css-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.less\\'" . less-css-mode))
-
-(add-hook 'less-css-mode-hook #'lsp-deferred)
-
-
 (unless (fboundp 'scss-mode)
   (autoload #'scss-mode "scss-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 
 (add-hook 'scss-mode-hook #'lsp-deferred)
 
@@ -6177,8 +6134,6 @@ Ignore if no file is found."
 (unless (fboundp 'sass-mode)
   (autoload #'sass-mode "sass-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.sass\\'" . sass-mode))
-
 (add-hook 'sass-mode-hook #'lsp-deferred)
 
 
@@ -6189,16 +6144,13 @@ Ignore if no file is found."
 (unless (fboundp 'bazelrc-mode)
   (autoload #'bazelrc-mode "bazel-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.bzl$"       . bazel-mode))
-(add-to-list 'auto-mode-alist '("\\BUILD\\'"    . bazel-mode))
-(add-to-list 'auto-mode-alist '("\\.bazelrc\\'" . bazelrc-mode))
-
 (add-hook 'bazel-mode-hook #'flycheck-mode)
 
 
 (unless (fboundp 'protobuf-mode)
   (autoload #'protobuf-mode "protobuf-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
 
 (add-hook 'protobuf-mode-hook #'flycheck-mode)
@@ -6225,6 +6177,7 @@ Ignore if no file is found."
 
 ;; Use for major modes which do not provide a formatter
 (declare-function format-all-ensure-formatter "format-all")
+
 (unless (fboundp 'format-all-ensure-formatter)
   (autoload #'format-all-ensure-formatter "format-all" nil t))
 (unless (fboundp 'format-all-buffer)
@@ -6233,9 +6186,9 @@ Ignore if no file is found."
 (eval-and-compile
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(lisp-mode-hook markdown-mode-hook
-                                   bazel-mode-hook latex-mode-hook
-                                   LaTeX-mode-hook json-mode-hook))
+    (dolist (hook '(markdown-mode-hook bazel-mode-hook
+                                       latex-mode-hook LaTeX-mode-hook
+                                       json-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
@@ -6272,6 +6225,7 @@ Ignore if no file is found."
 (unless (fboundp 'adoc-mode)
   (autoload #'adoc-mode "adoc-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
 
 
@@ -6284,38 +6238,33 @@ Ignore if no file is found."
 
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
-(unless (fboundp 'global-fasd-mode)
-  (autoload #'global-fasd-mode "fasd" nil t))
-(unless (fboundp 'fasd-find-file)
-  (autoload #'fasd-find-file "fasd" nil t))
+(when (executable-find "fasd")
+  (unless (fboundp 'global-fasd-mode)
+    (autoload #'global-fasd-mode "fasd" nil t))
+  (unless (fboundp 'fasd-find-file)
+    (autoload #'fasd-find-file "fasd" nil t))
 
-(run-with-idle-timer 3 nil #'global-fasd-mode)
+  (run-with-idle-timer 3 nil #'global-fasd-mode)
 
-(with-eval-after-load 'fasd
-  (defvar fasd-enable-initial-prompt)
+  (with-eval-after-load 'fasd
+    (defvar fasd-enable-initial-prompt)
 
-  (setq fasd-enable-initial-prompt nil))
+    (setq fasd-enable-initial-prompt nil))
 
-(bind-keys :package fasd
-           ("C-c /" . fasd-find-file))
+  (bind-keys :package fasd
+             ("C-c /" . fasd-find-file)))
 
 
 (unless (fboundp 'toml-mode)
   (autoload #'toml-mode "toml-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-mode))
-
 
 (unless (fboundp 'nix-mode)
   (autoload #'nix-mode "nix-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
-
 
 (unless (fboundp 'rust-mode)
   (autoload #'rust-mode "rust-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
 (add-hook 'rust-mode-hook #'lsp-deferred)
 
@@ -6354,7 +6303,6 @@ Ignore if no file is found."
 
 
 (with-eval-after-load 'flycheck
-  ;; FIXME: `lsp' is the first checker, chain the other checkers
   ;; https://github.com/flycheck/flycheck/issues/1762
   ;; (flycheck-add-next-checker 'lsp 'python-pylint)
 
@@ -6393,6 +6341,7 @@ Ignore if no file is found."
                 (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
               ))
   )
+
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'.
@@ -6916,10 +6865,11 @@ mode is not in `sb/skippable-modes'."
 
 
 ;; Show help popups for prefix keys
-(unless (fboundp 'which-key-setup-side-window-right-bottom)
-  (autoload #'which-key-setup-side-window-right-bottom nil t))
+
 (unless (fboundp 'which-key-mode)
   (autoload #'which-key-mode nil t))
+(unless (fboundp 'which-key-setup-side-window-right-bottom)
+  (autoload #'which-key-setup-side-window-right-bottom nil t))
 
 (run-with-idle-timer 3 nil #'which-key-mode)
 
@@ -6930,19 +6880,20 @@ mode is not in `sb/skippable-modes'."
 
   (which-key-setup-side-window-right-bottom)
 
-  (diminish 'which-key-mode))
+  (diminish 'which-key-mode)
 
+  (unless (fboundp 'which-key-posframe-mode)
+    (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
 
-;; The posframe has a lower contrast
-(unless (fboundp 'which-key-posframe-mode)
-  (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
+  (which-key-posframe-mode 1)
 
-(add-hook 'which-key-mode-hook #'which-key-posframe-mode)
+  ;; The posframe has a lower contrast
+  (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
-(with-eval-after-load 'which-key-posframe
-  (defvar which-key-posframe-border-width)
+  ;; (defvar which-key-posframe-border-width)
 
-  (setq which-key-posframe-border-width 2))
+  ;; (setq which-key-posframe-border-width 2)
+  )
 
 
 ;; Hydras
@@ -7100,6 +7051,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     ("k" smerge-kill-current)
     ("q" nil "cancel" :color blue))
   )
+
 
 ;; Mark safe variables
 
