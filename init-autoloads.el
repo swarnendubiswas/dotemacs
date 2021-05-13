@@ -45,7 +45,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -66,7 +66,7 @@ This depends on the orientation of the display."
           ;; Split into two windows one above the other (`split-window-below')
           (const :tag "vertical" vertical)
           ;; Split into two side-by-side windows (`split-window-right')
-          (const :tag "horizontal" horizontal)) ;
+          (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
 
 ;; Large values make reading difficult when the window is split
@@ -200,19 +200,17 @@ This location is used for temporary installations and files.")
 (defconst sb/emacs-1MB (* 1 1000 1000))
 (defconst sb/emacs-4MB (* 4 1000 1000))
 (defconst sb/emacs-8MB (* 8 1000 1000))
-(defconst sb/emacs-50MB (* 50 1000 1000))
 (defconst sb/emacs-64MB (* 64 1000 1000))
-(defconst sb/emacs-100MB (* 100 1000 1000))
 (defconst sb/emacs-128MB (* 128 1000 1000))
-(defconst sb/emacs-200MB (* 200 1000 1000))
-(defconst sb/emacs-500MB (* 500 1000 1000))
+(defconst sb/emacs-256MB (* 256 1000 1000))
+(defconst sb/emacs-512MB (* 512 1000 1000))
 
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
   (setq gc-cons-percentage 0.1
-        gc-cons-threshold sb/emacs-200MB))
+        gc-cons-threshold sb/emacs-512MB))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
@@ -221,7 +219,7 @@ This location is used for temporary installations and files.")
   "Restore garbage collection."
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/emacs-200MB))
+        gc-cons-threshold sb/emacs-256MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook'
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
@@ -403,8 +401,9 @@ This location is used for temporary installations and files.")
                 ".toc"
                 "__init__.py"
                 ;; Directories
-                "__pycache__/"
-                "eln-cache"))
+                "__pycache__"
+                "eln-cache"
+                "typings"))
   (add-to-list 'completion-ignored-extensions exts))
 
 ;; Activate utf-8
@@ -431,6 +430,7 @@ This location is used for temporary installations and files.")
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
+
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -1056,7 +1056,10 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'beacon-mode)
   (autoload #'beacon-mode "beacon") nil t)
 
-(add-hook 'after-init-mode #'beacon-mode)
+(run-with-idle-timer 3 nil #'beacon-mode)
+
+(with-eval-after-load 'beacon
+  (diminish 'beacon-mode))
 
 
 (unless (fboundp 'ibuffer)
@@ -1168,7 +1171,8 @@ SAVE-FN with non-nil ARGS."
 
   (setq dired-auto-revert-buffer t
         dired-dwim-target t ; Guess a default target directory
-        dired-listing-switches "-ABhl --si --group-directories-first" ; Check `ls' for additional options
+        ;; Check `ls' for additional options
+        dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-recursive-copies 'always ; Single prompt for all n directories
         ;; Single prompt for all n directories
@@ -1742,9 +1746,9 @@ SAVE-FN with non-nil ARGS."
   ;; (run-at-time 5 (* 5 60) 'recentf-save-list)
   (run-with-idle-timer 30 t 'recentf-save-list)
 
-  (run-with-idle-timer 30 t 'recentf-cleanup)
+  ;; Adding many functions to `kill-emacs-hook' will slow down Emacs exit
   ;; (add-hook 'kill-emacs-hook #'recentf-cleanup)
-  )
+  (run-with-idle-timer 60 t 'recentf-cleanup))
 
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1901,7 +1905,13 @@ SAVE-FN with non-nil ARGS."
   (diminish 'company-fuzzy-mode)
 
   (setq company-fuzzy-show-annotation t
-        company-fuzzy-sorting-backend 'flx))
+        company-fuzzy-sorting-backend 'flx)
+
+
+  ;; Company statistics
+  (unless (fboundp 'company-statistics-mode)
+    (autoload #'company-statistics-mode "company-statistics" nil t))
+  (company-statistics-mode 1))
 
 (defvar company-active-map)
 (bind-keys :package company :map company-active-map
@@ -4521,6 +4531,8 @@ This file is specified in `counsel-projectile-default-file'."
 (with-eval-after-load 'lsp-mode
   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
 
+  (diminish 'lsp-mode)
+
   (defvar lsp-pyls-configuration-sources)
   (defvar lsp-pyls-plugins-autopep8-enable)
   (defvar lsp-pyls-plugins-mccabe-enabled)
@@ -5025,10 +5037,13 @@ This file is specified in `counsel-projectile-default-file'."
                            ("SConscript\\'" . python-mode))
                          auto-mode-alist))
 
+
   (unless (fboundp 'python-docstring-mode)
     (autoload #'python-docstring-mode "python-docstring" nil t))
+  (unless (fboundp 'python-docstring-install)
+    (autoload #'python-docstring-install "python-docstring" nil t))
 
-  (python-docstring-mode 1)
+  (python-docstring-install)
 
   (diminish 'python-docstring-mode))
 
@@ -5160,7 +5175,11 @@ This file is specified in `counsel-projectile-default-file'."
   )
 
 ;; Initiate the lsp server after all the language server code has been processed
-(add-hook 'python-mode-hook #'lsp-deferred)
+(add-hook 'python-mode-hook
+          (lambda()
+            (lsp-deferred)
+            ;; We already have `flycheck' error summary listed on the modeline
+            (lsp-modeline-diagnostics-mode -1)))
 
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are

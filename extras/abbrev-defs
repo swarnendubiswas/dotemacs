@@ -1439,6 +1439,7 @@
 
 (define-abbrev-table 'python-mode-abbrev-table
   '(
+    ("reporesented" "represented" nil :count 0)
     ("temperory" "temporary" nil :count 0)
    ))
 
