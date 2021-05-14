@@ -5178,13 +5178,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'jinja2-mode)
   (autoload #'jinja2-mode "jinja2-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.jinja\\'" . jinja2-mode))
-
 
 (unless (fboundp 'cperl-mode)
   (autoload #'cperl-mode "cperl-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("latexmkrc\\'" . cperl-mode))
+
 (add-hook 'cperl-mode-hook #'lsp-deferred)
 
 (with-eval-after-load 'cperl-mode
@@ -5230,6 +5230,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'autodisass-java-bytecode)
   (autoload #'autodisass-java-bytecode "autodisass-java-bytecode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.class\\'" . autodisass-java-bytecode))
 
 
@@ -5237,11 +5238,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'groovy-mode)
   (autoload #'groovy-mode "groovy-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
-(add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))
-
 
 ;; SVG
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.svg$" . image-mode))
 
 
@@ -5249,7 +5248,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'sh-mode)
   (autoload #'sh-mode "sh-script" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.zsh\\'"   . sh-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
 
 (add-hook 'sh-mode-hook #'lsp-deferred)
@@ -5272,14 +5273,12 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'fish-mode)
   (autoload #'fish-mode "fish-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.fish\\'"  . fish-mode))
-(add-to-list 'interpreter-mode-alist '("fish" . fish-mode))
-
 (unless (fboundp 'fish_indent-before-save)
   (autoload #'fish_indent-before-save "fish-mode" nil t))
 
-(add-hook 'fish-mode-hook #'(lambda nil
-                              (add-hook 'before-save-hook #'fish_indent-before-save)))
+(add-hook 'fish-mode-hook
+          (lambda nil
+            (add-hook 'before-save-hook #'fish_indent-before-save)))
 
 
 (unless (fboundp 'shfmt-on-save-mode)
@@ -5300,8 +5299,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-;; (add-hook 'find-file-hook #'vc-refresh-state)
-(remove-hook 'find-file-hook #'vc-refresh-state)
+(if (boundp 'vc-handled-backends)
+    (add-hook 'find-file-hook #'vc-refresh-state)
+  (remove-hook 'find-file-hook #'vc-refresh-state))
 
 
 (declare-function transient-bind-q-to-quit "transient")
@@ -5387,87 +5387,76 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'gitignore-mode)
   (autoload #'gitignore-mode "gitignore-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("/\\.gitignore\\'"        . gitignore-mode))
-(add-to-list 'auto-mode-alist '("/\\.git/info/exclude\\'" . gitignore-mode))
-(add-to-list 'auto-mode-alist '("/git/ignore\\'"          . gitignore-mode))
-
 
 (unless (fboundp 'gitattributes-mode)
   (autoload #'gitattributes-mode "gitattributes-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("/\\.gitattributes\\'"       . gitattributes-mode))
-(add-to-list 'auto-mode-alist '("/\\.git/info/attributes\\'" . gitattributes-mode))
-(add-to-list 'auto-mode-alist '("/git/attributes\\'"         . gitattributes-mode))
 
 
 (unless (fboundp 'gitconfig-mode)
   (autoload #'gitconfig-mode "gitconfig-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("/\\.gitconfig\\'"  . gitconfig-mode))
-(add-to-list 'auto-mode-alist '("/\\.git/config\\'" . gitconfig-mode))
-(add-to-list 'auto-mode-alist '("/git/config\\'"    . gitconfig-mode))
-(add-to-list 'auto-mode-alist '("/\\.gitmodules\\'" . gitconfig-mode))
 
+(unless (boundp 'vc-handled-backends)
+  (declare-function git-gutter:previous-hunk "git-gutter")
+  (declare-function git-gutter:next-hunk "git-gutter")
 
-(declare-function git-gutter:previous-hunk "git-gutter")
-(declare-function git-gutter:next-hunk "git-gutter")
+  (unless (fboundp 'git-gutter:previous-hunk)
+    (autoload #'git-gutter:previous-hunk "git-gutter" nil t))
+  (unless (fboundp 'git-gutter:next-hunk)
+    (autoload #'git-gutter:next-hunk "git-gutter" nil t))
+  (unless (fboundp 'global-git-gutter-mode)
+    (autoload #'global-git-gutter-mode "git-gutter" nil t))
 
-(unless (fboundp 'git-gutter:previous-hunk)
-  (autoload #'git-gutter:previous-hunk "git-gutter" nil t))
-(unless (fboundp 'git-gutter:next-hunk)
-  (autoload #'git-gutter:next-hunk "git-gutter" nil t))
-(unless (fboundp 'global-git-gutter-mode)
-  (autoload #'global-git-gutter-mode "git-gutter" nil t))
+  (add-hook 'after-init-hook #'global-git-gutter-mode)
 
-;; (add-hook 'after-init-hook #'global-git-gutter-mode)
+  (with-eval-after-load 'git-gutter
+    (defvar git-gutter:added-sign)
+    (defvar git-gutter:deleted-sign)
+    (defvar git-gutter:modified-sign)
+    (defvar git-gutter:update-interval)
+    (defvar git-gutter:disabled-modes)
 
-(with-eval-after-load 'git-gutter
-  (defvar git-gutter:added-sign)
-  (defvar git-gutter:deleted-sign)
-  (defvar git-gutter:modified-sign)
-  (defvar git-gutter:update-interval)
-  (defvar git-gutter:disabled-modes)
+    (setq git-gutter:added-sign " "
+          git-gutter:deleted-sign " "
+          git-gutter:modified-sign " "
+          git-gutter:update-interval 1
+          ;; https://github.com/syl20bnr/spacemacs/issues/10555
+          ;; https://github.com/syohex/emacs-git-gutter/issues/24
+          git-gutter:disabled-modes '(fundamental-mode org-mode
+                                                       image-mode doc-view-mode pdf-view-mode))
 
-  (setq git-gutter:added-sign " "
-        git-gutter:deleted-sign " "
-        git-gutter:modified-sign " "
-        git-gutter:update-interval 1
-        ;; https://github.com/syl20bnr/spacemacs/issues/10555
-        ;; https://github.com/syohex/emacs-git-gutter/issues/24
-        git-gutter:disabled-modes '(fundamental-mode org-mode
-                                                     image-mode doc-view-mode pdf-view-mode))
+    (diminish 'git-gutter-mode))
 
-  (diminish 'git-gutter-mode))
-
-(bind-keys :package git-gutter
-           ("C-x p" . git-gutter:previous-hunk)
-           ("C-x n" . git-gutter:next-hunk))
+  (bind-keys :package git-gutter
+             ("C-x p" . git-gutter:previous-hunk)
+             ("C-x n" . git-gutter:next-hunk)))
 
 
 ;; Diff-hl looks nicer than `git-gutter', based on `vc'
-(declare-function diff-hl-magit-pre-refresh "diff-hl")
-(declare-function diff-hl-magit-post-refresh "diff-hl")
-(declare-function diff-hl-dired-mode-unless-remote "diff-hl")
-(declare-function global-diff-hl-mode "diff-hl")
+(when (boundp 'vc-handled-backends)
+  (declare-function diff-hl-magit-pre-refresh "diff-hl")
+  (declare-function diff-hl-magit-post-refresh "diff-hl")
+  (declare-function diff-hl-dired-mode-unless-remote "diff-hl")
+  (declare-function global-diff-hl-mode "diff-hl")
 
-(unless (fboundp 'diff-hl-magit-post-refresh)
-  (autoload #'diff-hl-magit-post-refresh "diff-hl" nil t))
-(unless (fboundp 'diff-hl-magit-pre-refresh)
-  (autoload #'diff-hl-magit-pre-refresh "diff-hl" nil t))
-(unless (fboundp 'diff-hl-dired-mode-unless-remote)
-  (autoload #'diff-hl-dired-mode-unless-remote "diff-hl" nil t))
-(unless (fboundp 'global-diff-hl-mode)
-  (autoload #'global-diff-hl-mode "diff-hl" nil t))
+  (unless (fboundp 'diff-hl-magit-post-refresh)
+    (autoload #'diff-hl-magit-post-refresh "diff-hl" nil t))
+  (unless (fboundp 'diff-hl-magit-pre-refresh)
+    (autoload #'diff-hl-magit-pre-refresh "diff-hl" nil t))
+  (unless (fboundp 'diff-hl-dired-mode-unless-remote)
+    (autoload #'diff-hl-dired-mode-unless-remote "diff-hl" nil t))
+  (unless (fboundp 'global-diff-hl-mode)
+    (autoload #'global-diff-hl-mode "diff-hl" nil t))
 
-(add-hook 'after-init-hook #'global-diff-hl-mode)
-(add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
-(add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-(add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
+  (add-hook 'after-init-hook #'global-diff-hl-mode)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
 
-(with-eval-after-load 'diff-hl
-  (defvar diff-hl-draw-borders)
-  ;; Highlight without a border looks nicer
-  (setq diff-hl-draw-borders nil))
+  (with-eval-after-load 'diff-hl
+    (defvar diff-hl-draw-borders)
+    ;; Highlight without a border looks nicer
+    (setq diff-hl-draw-borders nil)))
 
 
 (declare-function git-commit-turn-on-flyspell "git-commit")
@@ -5581,7 +5570,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'yaml-mode)
   (autoload #'yaml-mode "yaml-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '(".clang-tidy"   . yaml-mode))
 
 (add-hook 'yaml-mode-hook (lambda ()
@@ -5598,23 +5589,20 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'bat-mode)
   (autoload #'bat-mode "bat-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode))
 
 
 (unless (fboundp 'web-mode)
   (autoload #'web-mode "web-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.html?\\'"      . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'"     . web-mode))
-(add-to-list 'auto-mode-alist '("\\.phtml\\'"      . web-mode))
-(add-to-list 'auto-mode-alist '("\\.hb\\.html\\'"  . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'"  . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'"    . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'"    . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'"        . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'"   . web-mode))
-(add-to-list 'auto-mode-alist '("\\.handlebars\\'" . web-mode))
+;;;###autoload
+(dolist (pattern '("\\.html?\\'" "\\.djhtml\\'" "\\.phtml\\'" "\\.hb\\.html\\'"
+                   "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'" "\\.erb\\'"
+                   "\\.mustache\\'" "\\.handlebars\\'"))
+  (add-to-list 'auto-mode-alist (cons pattern 'web-mode)))
 
 (add-hook 'web-mode-hook #'lsp-deferred)
 
@@ -5633,9 +5621,7 @@ This file is specified in `counsel-projectile-default-file'."
         web-mode-enable-block-face t
         web-mode-enable-css-colorization t
         web-mode-enable-current-element-highlight t
-        web-mode-enable-current-column-highlight t)
-
-  (flycheck-add-mode 'javascript-eslint 'web-mode))
+        web-mode-enable-current-column-highlight t))
 
 
 (unless (fboundp 'emmet-mode)
@@ -5665,10 +5651,9 @@ This file is specified in `counsel-projectile-default-file'."
                             (spell-fu-mode -1)
                             (lsp-deferred)))
 
-(add-to-list 'auto-mode-alist '("\\.xml\\'"  . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.xsd\\'"  . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.xslt\\'" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.pom$"    . nxml-mode))
+;;;###autoload
+(dolist (pattern '("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$"))
+  (add-to-list 'auto-mode-alist (cons pattern 'nxml-mode)))
 
 (with-eval-after-load 'nxml-mode
   (fset 'xml-mode 'nxml-mode)
