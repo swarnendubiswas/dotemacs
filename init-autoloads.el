@@ -2434,67 +2434,70 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'spell-fu-word-add)
   (autoload #'spell-fu-word-add "spell-fu" nil t))
 
-(with-eval-after-load 'spell-fu-mode
-  (defvar spell-fu-faces-exclude)
-  (defvar spell-fu-directory)
-  (defvar no-littering-var-directory)
+(defvar spell-fu-faces-exclude)
+(defvar spell-fu-directory)
+(defvar no-littering-var-directory)
 
-  ;; `nxml-mode' is derived from `text-mode'
-  (setq spell-fu-faces-exclude '(font-lock-function-name-face
-                                 font-lock-keyword-face
-                                 font-lock-string-face
-                                 font-lock-variable-name-face
-                                 hl-line
-                                 lsp-face-highlight-read))
+;; ;; `nxml-mode' is derived from `text-mode'
+;; (setq spell-fu-faces-exclude '(font-lock-function-name-face
+;;                                font-lock-keyword-face
+;;                                font-lock-string-face
+;;                                font-lock-variable-name-face
+;;                                hl-line
+;;                                lsp-face-highlight-read))
 
-  (if (bound-and-true-p sb/use-no-littering)
-      (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
-    (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory))))
+(if (bound-and-true-p sb/use-no-littering)
+    (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+  (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
 
-(add-hook 'org-mode-hook (lambda ()
-                           (setq spell-fu-faces-exclude '(org-block
-                                                          org-block-begin-line
-                                                          org-block-end-line
-                                                          org-code
-                                                          org-date
-                                                          org-formula
-                                                          org-latex-and-related
-                                                          org-link
-                                                          org-meta-line
-                                                          org-property-value
-                                                          org-ref-cite-face
-                                                          org-special-keyword
-                                                          org-tag
-                                                          org-todo
-                                                          org-todo-keyword-done
-                                                          org-todo-keyword-habt
-                                                          org-todo-keyword-kill
-                                                          org-todo-keyword-outd
-                                                          org-todo-keyword-todo
-                                                          org-todo-keyword-wait
-                                                          org-verbatim
-                                                          hl-line))
-                           (spell-fu-mode)))
+(add-hook 'text-mode-hook
+          (lambda ()
+            (setq spell-fu-faces-exclude '(hl-line
+                                           nxml-attribute-local-name))
+            (spell-fu-mode)))
 
-(add-hook 'text-mode-hook (lambda ()
-                            (setq spell-fu-faces-exclude '(hl-line
-                                                           nxml-attribute-local-name))
-                            (spell-fu-mode)))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq spell-fu-faces-exclude '(org-block
+                                           org-block-begin-line
+                                           org-block-end-line
+                                           org-code
+                                           org-date
+                                           org-formula
+                                           org-latex-and-related
+                                           org-link
+                                           org-meta-line
+                                           org-property-value
+                                           org-ref-cite-face
+                                           org-special-keyword
+                                           org-tag
+                                           org-todo
+                                           org-todo-keyword-done
+                                           org-todo-keyword-habt
+                                           org-todo-keyword-kill
+                                           org-todo-keyword-outd
+                                           org-todo-keyword-todo
+                                           org-todo-keyword-wait
+                                           org-verbatim
+                                           hl-line))
+            (spell-fu-mode)))
 
-(add-hook 'markdown-mode-hook (lambda ()
-                                (setq spell-fu-faces-exclude '(markdown-blockquote-face
-                                                               markdown-code-face
-                                                               markdown-html-attr-name-face
-                                                               markdown-html-attr-value-face
-                                                               markdown-html-tag-name-face
-                                                               markdown-inline-code-face
-                                                               markdown-link-face
-                                                               markdown-markup-face
-                                                               markdown-plain-url-face
-                                                               markdown-reference-face
-                                                               markdown-url-face
-                                                               hl-line))
-                                (spell-fu-mode)))
+
+(add-hook 'markdown-mode-hook
+          (lambda ()
+            (setq spell-fu-faces-exclude '(markdown-blockquote-face
+                                           markdown-code-face
+                                           markdown-html-attr-name-face
+                                           markdown-html-attr-value-face
+                                           markdown-html-tag-name-face
+                                           markdown-inline-code-face
+                                           markdown-link-face
+                                           markdown-markup-face
+                                           markdown-plain-url-face
+                                           markdown-reference-face
+                                           markdown-url-face
+                                           hl-line))
+            (spell-fu-mode)))
 
 (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
   (add-hook hook (lambda ()
