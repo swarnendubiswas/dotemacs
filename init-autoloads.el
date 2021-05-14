@@ -4825,8 +4825,8 @@ This file is specified in `counsel-projectile-default-file'."
                ("C-c l g" . lsp-ivy-global-workspace-symbol)
                ("C-c l w" . lsp-ivy-workspace-symbol))))
 
-;; lsp-imenu-create-categorised-index - sorts the items by kind.
-;; lsp-imenu-create-uncategorized-index - will have the items sorted by position.
+;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
+;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
 (bind-keys :package lsp-mode
            ("M-."     . lsp-find-definition)
            ("C-c l d" . lsp-find-declaration)
@@ -4879,27 +4879,28 @@ This file is specified in `counsel-projectile-default-file'."
   (lsp-treemacs-sync-mode 1))
 
 
-(unless (fboundp 'global-origami-mode)
-  (autoload #'global-origami-mode "origami" nil t))
-(unless (fboundp 'origami-toggle-node)
-  (autoload #'origami-toggle-node "origami" nil t))
-(unless (fboundp 'origami-recursively-toggle-node)
-  (autoload #'origami-recursively-toggle-node "origami" nil t))
-(unless (fboundp 'origami-toggle-all-nodes)
-  (autoload #'origami-toggle-all-node "origami" nil t))
+(when nil
+  (unless (fboundp 'global-origami-mode)
+    (autoload #'global-origami-mode "origami" nil t))
+  (unless (fboundp 'origami-toggle-node)
+    (autoload #'origami-toggle-node "origami" nil t))
+  (unless (fboundp 'origami-recursively-toggle-node)
+    (autoload #'origami-recursively-toggle-node "origami" nil t))
+  (unless (fboundp 'origami-toggle-all-nodes)
+    (autoload #'origami-toggle-all-node "origami" nil t))
 
-;; (dolist (hook '(python-mode-hook java-mode-hook c-mode-hook c++-mode-hook))
-;;   (add-hook hook #'global-origami-mode))
+  (dolist (hook '(python-mode-hook java-mode-hook c-mode-hook c++-mode-hook))
+    (add-hook hook #'global-origami-mode))
 
-(bind-keys :package origami :map origami-mode-map
-           ("C-c l t" . origami-recursively-toggle-node)
-           ("C-c l n" . origami-toggle-all-nodes))
+  (bind-keys :package origami :map origami-mode-map
+             ("C-c l t" . origami-recursively-toggle-node)
+             ("C-c l n" . origami-toggle-all-nodes))
 
-(with-eval-after-load 'origami
-  (unless (fboundp 'lsp-origami-mode)
-    (autoload #'lsp-origami-mode "lsp-origami" nil t))
+  (with-eval-after-load 'origami
+    (unless (fboundp 'lsp-origami-mode)
+      (autoload #'lsp-origami-mode "lsp-origami" nil t))
 
-  (lsp-origami-mode 1))
+    (lsp-origami-mode 1)))
 
 
 ;; (setq url-cookie-file (expand-file-name (format "%s/emacs/url/cookies/" xdg-data)))
@@ -4921,8 +4922,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'c-fill-paragraph)
   (autoload #'c-fill-paragraph "cc-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.c\\'" . c++-mode))
+;;;###autoload
+(dolist (pattern '("\\.h\\'" "\\.c\\'"))
+  (add-to-list 'auto-mode-alist (cons pattern 'c++-mode)))
 
 (add-hook 'c++-mode-hook #'lsp-deferred)
 
@@ -4968,37 +4970,31 @@ This file is specified in `counsel-projectile-default-file'."
   (diminish 'modern-c++-font-lock-mode))
 
 
-(with-eval-after-load 'cc-mode
-  (with-eval-after-load 'flycheck
-    (unless (fboundp 'flycheck-clang-analyzer-setup)
-      (autoload #'flycheck-clang-analyzer-setup "flycheck-clang-analyzer" nil t))
+(with-eval-after-load 'flycheck
+  (unless (fboundp 'flycheck-clang-analyzer-setup)
+    (autoload #'flycheck-clang-analyzer-setup "flycheck-clang-analyzer" nil t))
 
-    (flycheck-clang-analyzer-setup)
+  (flycheck-clang-analyzer-setup)
 
-    (unless (fboundp 'flycheck-clang-tidy-setup)
-      (autoload #'flycheck-clang-tidy-setup "flycheck-clang-tidy" nil t))
+  (unless (fboundp 'flycheck-clang-tidy-setup)
+    (autoload #'flycheck-clang-tidy-setup "flycheck-clang-tidy" nil t))
 
-    (flycheck-clang-tidy-setup)))
+  (flycheck-clang-tidy-setup))
 
 
-(unless (fboundp 'c++-mode)
-  (autoload #'c++-mode "cuda-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.cu\\'"  . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.cuh\\'" . c++-mode))
+(unless (fboundp 'cuda-mode)
+  (autoload #'cuda-mode "cuda-mode" nil t))
 
 
 (unless (fboundp 'opencl-mode)
   (autoload #'opencl-mode "opencl-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.cl\\'" . opencl-mode))
 
 
 (unless (fboundp 'cmake-mode)
   (autoload #'cmake-mode "cmake-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'"         . cmake-mode))
 
 (add-hook 'cmake-mode-hook #'lsp-deferred)
 
@@ -5057,7 +5053,6 @@ This file is specified in `counsel-projectile-default-file'."
 
   (diminish 'python-docstring-mode))
 
-
 (defvar python-mode-map)
 (bind-keys :package python :map python-mode-map
            ("M-["   . python-nav-backward-block)
@@ -5101,8 +5096,9 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'py-isort-before-save)
     (autoload #'py-isort-before-save "py-isort" nil t))
 
-  (add-hook 'python-mode-hook (lambda nil
-                                (add-hook 'before-save-hook #'py-isort-before-save)))
+  (add-hook 'python-mode-hook
+            (lambda nil
+              (add-hook 'before-save-hook #'py-isort-before-save)))
 
   (with-eval-after-load 'py-isort
     (defvar py-isort-options)
@@ -5111,10 +5107,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (unless (fboundp 'pip-requirements-mode)
   (autoload #'pip-requirements-mode "pip-requirements" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.pip\\'"                    . pip-requirements-mode))
-(add-to-list 'auto-mode-alist '("requirements[^z-a]*\\.txt\\'" . pip-requirements-mode))
-(add-to-list 'auto-mode-alist '("requirements\\.in"            . pip-requirements-mode))
 
 
 ;; `pyright --createstub pandas'
