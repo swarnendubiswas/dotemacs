@@ -1108,16 +1108,17 @@ SAVE-FN with non-nil ARGS."
            ("C-x C-b" . ibuffer))
 
 
-;; IBuffer works well enough for me
-(unless (fboundp 'bufler)
-  (autoload #'bufler "bufler" nil t))
-(unless (fboundp 'bufler-mode)
-  (autoload #'bufler-mode "bufler" nil t))
+(when nil
+  ;; IBuffer works well enough for me
+  (unless (fboundp 'bufler)
+    (autoload #'bufler "bufler" nil t))
+  (unless (fboundp 'bufler-mode)
+    (autoload #'bufler-mode "bufler" nil t))
 
-(with-eval-after-load 'bufler
-  (bufler-mode 1)
+  (with-eval-after-load 'bufler
+    (bufler-mode 1)
 
-  (diminish 'bufler-workspace-mode))
+    (diminish 'bufler-workspace-mode)))
 
 
 (declare-function dired-next-line "dired")
@@ -1182,11 +1183,12 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'dired-mode-hook #'auto-revert-mode)
   (add-hook 'dired-mode-hook #'dired-omit-mode)
 
-  ;; More detailed colors, but can be jarring with certain themes
-  (unless (fboundp #'diredfl-mode)
-    (autoload #'diredfl-mode "diredfl" nil t))
+  (when nil
+    ;; More detailed colors, but can be jarring with certain themes
+    (unless (fboundp #'diredfl-mode)
+      (autoload #'diredfl-mode "diredfl" nil t))
 
-  ;; (add-hook 'dired-mode-hook #'diredfl-mode)
+    (add-hook 'dired-mode-hook #'diredfl-mode))
 
   ;; Narrow dired to match filter
   (unless (fboundp 'dired-narrow)
@@ -1457,9 +1459,10 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'treemacs-projectile)
     (autoload #'treemacs-projectile "treemacs-projectile" nil t))
 
-  ;; (add-hook 'projectile-after-switch-project-hook (lambda ()
-  ;;                                                   (treemacs-add-and-display-current-project)
-  ;;                                                   (other-window 1)))
+  ;; (add-hook 'projectile-after-switch-project-hook
+  ;;           (lambda ()
+  ;;             (treemacs-add-and-display-current-project)
+  ;;             (other-window 1)))
 
   (require 'treemacs-magit nil nil))
 
@@ -1593,9 +1596,6 @@ SAVE-FN with non-nil ARGS."
 
   (setq swiper-action-recenter t))
 
-;; (bind-keys :package swiper
-;;            ("<f4>" . swiper))
-
 
 (with-eval-after-load 'grep
   (defvar grep-highlight-matches)
@@ -1653,6 +1653,10 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ripgrep-regexp "ripgrep" nil t))
 
 
+(unless (fboundp 'ctrlf-mode)
+  (autoload #'ctrlf-mode "ctrlf" nil t))
+(unless (fboundp 'ctrlf-local-mode)
+  (autoload #'ctrlf-local-mode "ctrlf" nil t))
 (unless (fboundp 'ctrlf-forward-literal)
   (autoload #'ctrlf-forward-literal "ctrlf" nil t))
 (unless (fboundp 'ctrlf-backward-literal)
@@ -1661,16 +1665,13 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ctrlf-forward-regexp "ctrlf" nil t))
 (unless (fboundp 'ctrlf-backward-regexp)
   (autoload #'ctrlf-backward-regexp "ctrlf" nil t))
-(unless (fboundp 'ctrlf-mode)
-  (autoload #'ctrlf-mode "ctrlf" nil t))
-(unless (fboundp 'ctrlf-local-mode)
-  (autoload #'ctrlf-local-mode "ctrlf" nil t))
 
 (with-eval-after-load 'ctrlf
   (ctrlf-mode 1)
 
-  (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
-                                           (ctrlf-local-mode -1))))
+  (add-hook 'pdf-isearch-minor-mode-hook
+            (lambda ()
+              (ctrlf-local-mode -1))))
 
 (bind-keys :package ctrlf
            ("C-f"   . ctrlf-forward-literal)
@@ -1714,7 +1715,6 @@ SAVE-FN with non-nil ARGS."
                           ".*\\.gz\\'"
                           ".*\\.xz\\'"
                           ".*\\.zip\\'"
-                          ;; ".*-autoloads.el\\'"
                           "[/\\]archive-contents\\'"
                           "[/\\]\\.loaddefs\\.el\\'"
                           "[/\\]tmp/.*"
@@ -2025,9 +2025,9 @@ SAVE-FN with non-nil ARGS."
         ;;                      lambda (_caller)
         ;;                      (/ (frame-height) 2)))
         ;; We update this after loading `orderless'
-        ;; ivy-re-builders-alist '((counsel-M-x . ivy--regex-fuzzy)
+        ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
         ;;                         (counsel-find-file . ivy--regex-fuzzy)
-        ;;                         (t . ivy--regex-ignore-order))
+        ;;                         (t                 . ivy--regex-ignore-order))
         ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
         ivy-wrap t)
 
@@ -2035,11 +2035,11 @@ SAVE-FN with non-nil ARGS."
   (defalias 'occur 'ivy-occur)
 
   (dolist (buffer
-           '("TAGS" "magit-process"
+           '("TAGS" "magit-process" "*emacs*" "*xref*"
              ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
              ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-             ;; "*flycheck-posframe-buffer*" "*emacs*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
-             ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*" "*xref*"
+             ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*" "^\\*clangd*"
+             ;; "^\\*shfmt*" "*company-documentation*"
              ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
@@ -2148,7 +2148,6 @@ SAVE-FN with non-nil ARGS."
                                          "\\|.lof$"
                                          "\\|.lot$"
                                          "\\|.o$"
-                                         ;; "\\|.out$"
                                          "\\|.ppt$"
                                          "\\|.pptx$"
                                          "\\|.pyc$"
@@ -2261,6 +2260,7 @@ SAVE-FN with non-nil ARGS."
     (autoload #'all-the-icons-ivy-setup "all-the-icons-ivy" nil t))
 
   (all-the-icons-ivy-setup)
+
 
   (require 'orderless nil nil)
 
@@ -2387,7 +2387,8 @@ SAVE-FN with non-nil ARGS."
 
     (diminish 'flyspell-mode)
 
-    ;; Flyspell popup is more efficient. Ivy-completion does not show the Save option in a few cases.
+    ;; Flyspell popup is more efficient. Ivy completion does not show the "Save" option in a few
+    ;; cases.
     (unless (fboundp 'flyspell-popup-correct)
       (autoload #'flyspell-popup-correct "flyspell-popup" nil t))
 
@@ -2540,8 +2541,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'show-paren-mode)
   (autoload #'show-paren-mode "paren" nil t))
 
-;; (add-hook 'after-init-hook #'show-paren-mode)
-(run-at-time 5 nil #'show-paren-mode)
+(run-at-time 3 nil #'show-paren-mode)
 
 (with-eval-after-load 'show-paren-mode
   (defvar show-paren-style)
@@ -2557,8 +2557,7 @@ SAVE-FN with non-nil ARGS."
   (autoload #'electric-pair-mode "elec-pair" nil t))
 
 ;; Enable autopairing, `smartparens' seems slow
-;; (add-hook 'after-init-hook #'electric-pair-mode)
-(run-at-time 5 nil #'electric-pair-mode)
+(run-at-time 3 nil #'electric-pair-mode)
 
 (with-eval-after-load 'electric-pair-mode
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
@@ -2707,8 +2706,6 @@ SAVE-FN with non-nil ARGS."
     (setq  projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
            projectile-known-projects-file (expand-file-name "projectile-known-projects.eld"
                                                             sb/temp-directory)))
-  ;; (when (eq sb/modeline-theme 'doom-modeline)
-  ;;   (setq projectile-dynamic-mode-line nil))
 
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and sb/IS-WINDOWS (executable-find "tr"))
@@ -2781,91 +2778,91 @@ SAVE-FN with non-nil ARGS."
            ("A"    . projectile-add-known-project))
 
 
-(declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
+(when nil
+  (declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
 
-(unless (fboundp 'counsel-projectile-find-file)
-  (autoload #'counsel-projectile-find-file "counsel-projectile" nil t))
-(unless (fboundp 'counsel-projectile-switch-project)
-  (autoload #'counsel-projectile-switch-project "counsel-projectile" nil t))
-(unless (fboundp 'counsel-projectile-switch-project-by-name)
-  (autoload #'counsel-projectile-switch-project-by-name "counsel-projectile" nil t))
-(unless (fboundp 'counsel-projectile-mode)
-  (autoload #'counsel-projectile-mode "counsel-projectile" nil t))
+  (unless (fboundp 'counsel-projectile-find-file)
+    (autoload #'counsel-projectile-find-file "counsel-projectile" nil t))
+  (unless (fboundp 'counsel-projectile-switch-project)
+    (autoload #'counsel-projectile-switch-project "counsel-projectile" nil t))
+  (unless (fboundp 'counsel-projectile-switch-project-by-name)
+    (autoload #'counsel-projectile-switch-project-by-name "counsel-projectile" nil t))
+  (unless (fboundp 'counsel-projectile-mode)
+    (autoload #'counsel-projectile-mode "counsel-projectile" nil t))
 
-(eval-and-compile
-  (defun sb/counsel-projectile-switch-project-magit (project)
-    "Open Magit for the PROJECT."
-    (let
-        ((projectile-switch-project-action 'magit-status))
-      (counsel-projectile-switch-project-by-name project)))
+  (eval-and-compile
+    (defun sb/counsel-projectile-switch-project-magit (project)
+      "Open Magit for the PROJECT."
+      (let
+          ((projectile-switch-project-action 'magit-status))
+        (counsel-projectile-switch-project-by-name project)))
 
-  (defun sb/counsel-projectile-open-default-file nil
-    "Open the current project's default file.
+    (defun sb/counsel-projectile-open-default-file nil
+      "Open the current project's default file.
 This file is specified in `counsel-projectile-default-file'."
-    (interactive)
-    (defvar counsel-projectile-default-file)
-    (let
-        ((file counsel-projectile-default-file))
-      (if
-          (and file
-               (setq file
-                     (projectile-expand-root file))
-               (file-exists-p file))
-          (find-file file)
-        (message "File %s doesn't exist." file))))
+      (interactive)
+      (defvar counsel-projectile-default-file)
+      (let
+          ((file counsel-projectile-default-file))
+        (if
+            (and file
+                 (setq file
+                       (projectile-expand-root file))
+                 (file-exists-p file))
+            (find-file file)
+          (message "File %s doesn't exist." file))))
 
-  (defun sb/counsel-projectile-switch-project-action-default-file (project)
-    "Open PROJECT's default file.
+    (defun sb/counsel-projectile-switch-project-action-default-file (project)
+      "Open PROJECT's default file.
 This file is specified in `counsel-projectile-default-file'."
-    (let
-        ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
-      (counsel-projectile-switch-project-by-name project)))
+      (let
+          ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
+        (counsel-projectile-switch-project-by-name project)))
 
-  ;; Set `counsel-projectile-switch-project-action' to the following action
-  ;;   (defun sb/counsel-projectile-switch-project-action-default-file (project)
-  ;;     "Open PROJECT's default file.
-  ;; This file is specified in `counsel-projectile-default-file'."
-  ;;     (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
-  ;;       (counsel-projectile-switch-project-by-name project)))
+    ;; Set `counsel-projectile-switch-project-action' to the following action
+    ;;   (defun sb/counsel-projectile-switch-project-action-default-file (project)
+    ;;     "Open PROJECT's default file.
+    ;; This file is specified in `counsel-projectile-default-file'."
+    ;;     (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
+    ;;       (counsel-projectile-switch-project-by-name project)))
 
+    )
+
+  (with-eval-after-load 'counsel-projectile
+    (defvar counsel-projectile-remove-current-buffer)
+    (defvar counsel-projectile-sort-directories)
+    (defvar counsel-projectile-sort-files)
+    (defvar counsel-projectile-find-file-more-chars)
+    (defvar counsel-projectile-sort-buffers)
+    (defvar counsel-projectile-sort-projects)
+
+    ;; Setting these to `t' can be slow for large projects
+    (setq counsel-projectile-remove-current-buffer t
+          counsel-projectile-sort-directories nil
+          counsel-projectile-find-file-more-chars 0
+          counsel-projectile-sort-buffers nil
+          counsel-projectile-sort-projects nil
+          counsel-projectile-sort-files nil)
+
+    (counsel-projectile-mode 1)
+
+    ;; (counsel-projectile-modify-action
+    ;;  'counsel-projectile-switch-project-action
+    ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
+
+    )
+
+  ;; The `counsel' actions seem to be slower than base `projectile'
+  (bind-keys :package counsel-projectile
+             ("<f6>" . counsel-projectile-find-file)
+             ("<f5>" . counsel-projectile-switch-project)
+             ;; ("<f7>" . counsel-projectile-rg)
+             ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
+             ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
+             ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
+             ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
+             )
   )
-
-(with-eval-after-load 'counsel-projectile
-  (defvar counsel-projectile-remove-current-buffer)
-  (defvar counsel-projectile-sort-directories)
-  (defvar counsel-projectile-sort-files)
-  (defvar counsel-projectile-find-file-more-chars)
-  (defvar counsel-projectile-sort-buffers)
-  (defvar counsel-projectile-sort-projects)
-
-  ;; Setting these to `t' can be slow for large projects
-  (setq counsel-projectile-remove-current-buffer t
-        counsel-projectile-sort-directories nil
-        counsel-projectile-find-file-more-chars 0
-        counsel-projectile-sort-buffers nil
-        counsel-projectile-sort-projects nil
-        counsel-projectile-sort-files nil)
-
-  (counsel-projectile-mode 1)
-
-  ;; (counsel-projectile-modify-action
-  ;;  'counsel-projectile-switch-project-action
-  ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
-
-  )
-
-;; The `counsel' actions seem to be slower than base `projectile'
-;; (bind-keys :package counsel-projectile
-;;            ("<f6>" . counsel-projectile-find-file)
-;;            ("<f5>" . counsel-projectile-switch-project)
-;;            ;; ("<f7>" . counsel-projectile-rg)
-;;            ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
-;;            ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
-;;            ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
-;;            ;; ([remap projectile-grep]             . counsel-projectile-grep)
-;;            ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
-;;            )
-
 
 ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
 ;; Enable before `ivy-rich-mode' for better performance
@@ -2878,7 +2875,7 @@ This file is specified in `counsel-projectile-default-file'."
   (with-eval-after-load 'all-the-icons-ivy-rich-mode
     (defvar all-the-icons-ivy-rich-icon-size)
 
-    (setq all-the-icons-ivy-rich-icon-size 0.8)))
+    (setq all-the-icons-ivy-rich-icon-size 0.7)))
 
 
 (declare-function ivy-rich-modify-column "ivy-rich")
@@ -2957,15 +2954,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 (run-at-time 2 nil #'global-flycheck-mode)
 
-;; Exclude directories and files from being checked
-;; https://github.com/flycheck/flycheck/issues/1745
-
-(defun sb/flycheck-may-check-automatically (&rest _conditions)
-  (or (null buffer-file-name)
-      (let ((bufname (file-truename buffer-file-name)))
-        (not (seq-some (lambda (re) (string-match-p re bufname))
-                       sb/excluded-directory-regexps)))))
-
 (with-eval-after-load 'flycheck
   (defvar flycheck-check-syntax-automatically)
   (defvar flycheck-checker-error-threshold)
@@ -3009,11 +2997,17 @@ This file is specified in `counsel-projectile-default-file'."
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; FIXME: Exclude directories and files from being checked
+  ;; Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
 
   (defvar sb/excluded-directory-regexps
     '(".git/" ".elpa/"))
+
+  (defun sb/flycheck-may-check-automatically (&rest _conditions)
+    (or (null buffer-file-name)
+        (let ((bufname (file-truename buffer-file-name)))
+          (not (seq-some (lambda (re) (string-match-p re bufname))
+                         sb/excluded-directory-regexps)))))
 
   (advice-add 'flycheck-may-check-automatically
               :after-while #'sb/flycheck-may-check-automatically)
@@ -3026,17 +3020,17 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar flycheck-checkers)
 
   (setq flycheck-grammarly-check-time 3
-        ;; LATER: Can we combine the three delete operations?
+        ;; LATER: Can we combine the delete operations?
         flycheck-checkers (delete 'proselint flycheck-checkers)
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'grammarly t)
 
-  ;; SB: We prefer to use `textlint' and `grammarly', `proselint' is not maintained.
+  ;; We prefer to use `textlint' and `grammarly', `proselint' is not maintained. Add `textlint',
+  ;; then `grammarly'.
   (add-hook 'text-mode-hook
             (lambda ()
-              ;; Add `textlint', then `grammarly'
               (flycheck-add-next-checker 'textlint 'grammarly)))
 
   ;; `markdown-mode' is derived from `text-mode'
@@ -3044,8 +3038,8 @@ This file is specified in `counsel-projectile-default-file'."
             (lambda()
               ;; (make-local-variable 'flycheck-error-list-minimum-level)
               ;; (setq flycheck-error-list-minimum-level 'warning
-              ;; flycheck-navigation-minimum-level 'warning)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'proselint)))
+              ;;       flycheck-navigation-minimum-level 'warning)
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint)))
 
   (dolist (hook '(LaTex-mode-hook latex-mode-hook))
     (add-hook hook (lambda ()
@@ -3182,11 +3176,7 @@ This file is specified in `counsel-projectile-default-file'."
                                         ("TEST"     . "tomato")
                                         ("WARNING"  . "#cc0000")
                                         ("BEWARE"   . "#aa0000")
-                                        ("REFACTOR" . "#cc9393")
-                                        ;; ("DEPRECATED" . "#aa0000")
-                                        ;; ("DONE" . "#44bc44")
-                                        ;; ("REVIEW" . "#6ae4b9")
-                                        )
+                                        ("REFACTOR" . "#cc9393"))
                                       hl-todo-keyword-faces)))
 
 
@@ -3304,13 +3294,6 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-key "C-c d t" #'sb/counsel-tramp)
 
 
-;; (eval-after-load 'markdown-mode
-;;   (require 'imenu nil nil))
-;; (eval-after-load 'yaml-mode
-;;   (require 'imenu nil nil))
-;; (eval-after-load 'prog-mode
-;;   (require 'imenu))
-
 (with-eval-after-load 'imenu
   (defvar imenu-auto-rescan)
   (defvar imenu-max-items)
@@ -3322,10 +3305,7 @@ This file is specified in `counsel-projectile-default-file'."
         imenu-max-item-length 100
         imenu-use-popup-menu t ; `t' will use a popup menu rather than a minibuffer prompt
         ;; `nil' implies no sorting or listing by position in the buffer
-        imenu-sort-function nil)
-
-  ;; (require 'imenu-anywhere nil nil)
-  )
+        imenu-sort-function nil))
 
 
 (defvar tags-revert-without-query)
@@ -3583,13 +3563,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'jgraph-mode)
   (autoload #'jgraph-mode "jgraph-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.jgr\\'" . jgraph-mode))
-
 
 (unless (fboundp 'graphviz-dot-mode)
   (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.dot\\'" . graphviz-dot-mode))
 
 
 (declare-function gnuplot "gnuplot")
@@ -3599,8 +3575,10 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'gnuplot-mode)
   (autoload #'gnuplot-mode "gnuplot" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot))
 
+;;;###autoload
 (add-to-list 'interpreter-mode-alist '("gnuplot" . gnuplot-mode))
 
 
@@ -3743,27 +3721,28 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Avoid the "Overwrite old session file (not loaded)?" warning
-(if nil
-    (progn
-      (declare-function session-initialize "session")
+(when nil
+  (progn
+    (declare-function session-initialize "session")
 
-      (unless (fboundp 'session-initialize)
-        (autoload #'session-initialize "session" nil t))
+    (unless (fboundp 'session-initialize)
+      (autoload #'session-initialize "session" nil t))
 
-      ;; (add-hook 'after-init-hook #'session-initialize)
+    ;; (add-hook 'after-init-hook #'session-initialize)
 
-      (with-eval-after-load 'session
-        (defvar session-save-file)
+    (with-eval-after-load 'session
+      (defvar session-save-file)
 
-        (unless (bound-and-true-p sb/use-no-littering)
-          (setq session-save-file (expand-file-name "session" sb/temp-directory))))
-      ))
+      (unless (bound-and-true-p sb/use-no-littering)
+        (setq session-save-file (expand-file-name "session" sb/temp-directory))))
+    ))
 
 
 (unless (fboundp 'immortal-scratch-mode)
   (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
 
 (run-with-idle-timer 3 nil #'immortal-scratch-mode)
+
 
 ;; I use the *scratch* buffer for taking notes, it helps to make the data persist
 (unless (fboundp 'persistent-scratch-setup-default)
@@ -3814,8 +3793,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'apt-sources-list-mode)
   (autoload #'apt-sources-list-mode "apt-sources-list" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.list\\'" . apt-sources-list-mode))
-
 
 (unless (fboundp 'rainbow-delimiters-mode)
   (autoload #'rainbow-delimiters-mode "rainbow-delimiters" nil t))
@@ -3834,13 +3811,6 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'turn-on-font-lock "ssh-config-mode" nil t))
 
 (add-hook 'ssh-config-mode-hook #'turn-on-font-lock)
-
-(setq auto-mode-alist (append
-                       '(("/\\.ssh/config\\'"     . ssh-config-mode)
-                         ("/sshd?_config\\'"      . ssh-config-mode)
-                         ("/known_hosts\\'"       . ssh-known-hosts-mode)
-                         ("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
-                       auto-mode-alist))
 
 
 (if nil
@@ -3907,9 +3877,8 @@ This file is specified in `counsel-projectile-default-file'."
   (diminish 'super-save-mode))
 
 
-;; It will bind, for example, `avy-isearch' to `C-'' in `isearch-mode-map', so that you can select
-;; one of the currently visible `isearch' candidates using `avy'.
-
+;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
+;; select one of the currently visible `isearch' candidates using `avy'.
 (unless (fboundp 'avy-setup-default)
   (autoload #'avy-setup-default "avy" nil t))
 
@@ -3917,9 +3886,7 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar avy-indent-line-overlay)
   (defvar avy-background)
   (defvar avy-highlight-first)
-  (defvar avy-style)
-
-  (avy-setup-default))
+  (defvar avy-style))
 
 (bind-keys :package avy
            ("M-b" . avy-goto-word-1)
@@ -4031,11 +3998,12 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work
-;; (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
-;; (add-hook 'text-mode-hook #'(lambda nil
-;;                               (require 'lsp-grammarly)
-;;                               (lsp-deferred)))
-
+(when nil
+  (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+  (add-hook 'text-mode-hook (lambda nil
+                              (require 'lsp-grammarly)
+                              (lsp-deferred)))
+  )
 
 ;; Identify weasel words, passive voice, and duplicate words
 (declare-function writegood-mode "writegood-mode")
@@ -4065,8 +4033,8 @@ This file is specified in `counsel-projectile-default-file'."
                                   "EN_UNPAIRED_BRACKETS"
                                   "UPPERCASE_SENTENCE_START"
                                   "WHITESPACE_RULE")
-        langtool-language-tool-jar (expand-file-name "languagetool-5.1-commandline.jar"
-                                                     no-littering-etc-directory)))
+        langtool-language-tool-jar (expand-file-name "languagetool-5.3-commandline.jar"
+                                                     sb/extras-directory)))
 
 
 (unless (fboundp 'wc-mode)
@@ -4119,6 +4087,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
 
 (with-eval-after-load 'pdf-tools
@@ -4134,13 +4103,12 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
-  (add-hook 'pdf-view-mode-hook (lambda()
-                                  (pdf-links-minor-mode 1)
-                                  (pdf-isearch-minor-mode 1)
-                                  (pdf-outline-minor-mode 1)
-                                  (pdf-history-minor-mode 1)
-                                  ;; (setq header-line-format nil)
-                                  ))
+  (add-hook 'pdf-view-mode-hook
+            (lambda()
+              (pdf-links-minor-mode 1)
+              (pdf-isearch-minor-mode 1)
+              (pdf-outline-minor-mode 1)
+              (pdf-history-minor-mode 1)))
 
   (require 'saveplace-pdf-view nil nil))
 
@@ -4155,8 +4123,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'logview-mode)
   (autoload #'logview-mode "logview" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.log\\'" . logview-mode))
-
 (with-eval-after-load 'logview
   (defvar logview-cache-filename)
 
@@ -4167,14 +4133,14 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'antlr-mode)
   (autoload #'antlr-mode "antlr-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
 
 
 (unless (fboundp 'bison-mode)
   (autoload #'bison-mode "bison-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.y\\'"     . bison-mode))
-(add-to-list 'auto-mode-alist '("\\.l\\'"     . bison-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode))
 
 
@@ -4183,24 +4149,21 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'llvm-mode)
   (autoload #'llvm-mode "llvm-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
-
 
 (declare-function tablegen-mode "tablegen-mode")
 
 (unless (fboundp 'tablegen-mode)
   (autoload #'tablegen-mode "tablegen-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.td\\'" . tablegen-mode))
 
+(when nil
+  (declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
 
-(declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
+  (unless (fboundp 'autodisass-llvm-bitcode)
+    (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
 
-(unless (fboundp 'autodisass-llvm-bitcode)
-  (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
-
-(add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
-
+  (add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
+  )
 
 (unless (fboundp 'markdown-mode)
   (autoload #'markdown-mode "markdown-mode" nil t))
@@ -4208,8 +4171,11 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'gfm-mode "markdown-mode" nil t))
 
 ;; The order is important to associate "README.md" with `gfm-mode'
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.md\\'"       . markdown-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
 (with-eval-after-load 'markdown-mode
@@ -4299,8 +4265,6 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'csv-mode)
   (autoload #'csv-mode "csv-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
-
 (with-eval-after-load 'csv-mode
   (defvar csv-separators)
 
@@ -4317,6 +4281,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'rst-mode)
   (autoload #'rst-mode "rst" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode))
 
 
@@ -4329,6 +4294,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'z3-smt2-mode)
   (autoload #'z3-smt2-mode "boogie-friends" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.smt\\'" . z3-smt2-mode))
 
 
@@ -4346,8 +4312,10 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'makefile-gmake-mode)
   (autoload #'makefile-gmake-mode "make-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
 ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
+;;;###autoload
 (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
 
 ;; Use normal tabs in makefiles
@@ -4416,6 +4384,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'matlab-mode)
   (autoload #'matlab-mode "matlab-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.m$" . matlab-mode))
 
 
@@ -4443,16 +4412,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'ini-mode)
   (autoload #'ini-mode "ini-mode" nil t))
 
-(add-to-list 'auto-mode-alist '("\\.ini\\'" . ini-mode))
 
-
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
 
 (unless (fboundp 'pkgbuild-mode)
   (autoload #'pkgbuild-mode "pkgbuild-mode" nil t))
-
-(add-to-list 'auto-mode-alist '("PKGBUILD" . pkgbuild-mode))
 
 
 (unless (fboundp 'emacs-lisp-mode)
@@ -4460,7 +4426,9 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'elisp-byte-code-mode)
   (autoload #'elisp-byte-code-mode "elisp-mode" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.el\\'"  . emacs-lisp-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.elc\\'" . elisp-byte-code-mode))
 
 (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
