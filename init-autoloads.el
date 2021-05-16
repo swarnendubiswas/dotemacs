@@ -28,7 +28,6 @@
   'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
-          (const :tag "eclipse" eclipse)
           (const :tag "leuven" leuven)
           (const :tag "solarized-light" solarized-light)
           (const :tag "solarized-dark" solarized-dark)
@@ -51,7 +50,6 @@
           (const :tag "powerline" powerline)
           (const :tag "smart-mode-line" sml)
           (const :tag "spaceline" spaceline)
-          (const :tag "airline" airline)
           (const :tag "doom-modeline" doom-modeline)
           (const :tag "awesome-tray" awesome-tray)
           (const :tag "moody" moody)
@@ -286,8 +284,12 @@ This location is used for temporary installations and files.")
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
       auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
-      auto-save-no-message t
+      ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
+      ;; file and runs all save-related hooks
+      auto-save-default nil ; Disable `auto-save-mode', prefer `auto-save-visited-mode' instead
+      auto-save-no-message t ; Allow for debugging frequent autosave triggers
       auto-save-interval 0 ; Disable autosaving based on number of characters typed
+      auto-save-visited-interval 30 ; Default of 5s is too frequent
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
       case-fold-search t ; Searches and matches should ignore case
@@ -603,7 +605,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Enable the following modes
 (dolist (mode '(auto-compression-mode
-                auto-save-visited-mode
+                auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 global-hl-line-mode
@@ -668,13 +670,6 @@ SAVE-FN with non-nil ARGS."
 
 (when (eq sb/theme 'leuven)
   (load-theme 'leuven t))
-
-
-(when (eq sb/theme 'eclipse)
-  (load-theme 'eclipse t)
-  (set-background-color "white")
-  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
 
 
 (when (eq sb/theme 'spacemacs-light)
@@ -834,16 +829,6 @@ SAVE-FN with non-nil ARGS."
   (declare-function spaceline-all-the-icons-theme "spaceline-all-the-icons")
 
   (spaceline-all-the-icons-theme))
-
-
-(when (eq sb/modeline-theme 'airline)
-  (defvar airline-eshell-colors)
-  (defvar airline-hide-eyebrowse-on-inactive-buffers)
-
-  (setq airline-eshell-colors nil
-        airline-hide-eyebrowse-on-inactive-buffers t)
-
-  (load-theme 'airline-cool t))
 
 
 (when (eq sb/modeline-theme 'doom-modeline)
@@ -2754,7 +2739,7 @@ SAVE-FN with non-nil ARGS."
                       (expand-file-name "plass-workspace/.metadata" sb/user-home)))
     (add-to-list 'projectile-ignored-projects prjs))
 
-  ;; Filtering does not work with `alien' indexing
+  ;; Filtering works with `alien' indexing
   (dolist (dirs '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders"
                   ".svn" ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
     (add-to-list 'projectile-globally-ignored-directories dirs))
@@ -2779,6 +2764,9 @@ SAVE-FN with non-nil ARGS."
            ("<f5>" . projectile-switch-project)
            :map projectile-command-map
            ("A"    . projectile-add-known-project))
+
+;; Use idle timer in case we open a project file without enabling projectile via bind-keys
+(run-with-idle-timer 5 nil #'projectile-mode)
 
 
 (when nil
@@ -4503,8 +4491,6 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'lsp-configuration-section "lsp-mode" nil t))
 (unless (fboundp 'lsp-package-ensure)
   (autoload #'lsp-package-ensure "lsp-mode" nil t))
-(unless (fboundp 'ht-merge)
-  (autoload #'ht-merge "lsp-mode" nil t))
 
 (dolist (hooks '(css-mode-hook less-mode-hook sgml-mode-hook typescript-mode-hook))
   (add-hook hooks #'lsp-deferred))
@@ -4567,8 +4553,10 @@ This file is specified in `counsel-projectile-default-file'."
                                   "--fallback-style=LLVM"
                                   "--log=error")
         lsp-completion-enable-additional-text-edit t
-        lsp-completion-provider :none
+        lsp-completion-provider :none ; Enable integration with company
+        ;; Disable completion metadata
         lsp-completion-show-detail nil
+        lsp-completion-show-kind nil
         lsp-eldoc-enable-hover t
         lsp-enable-dap-auto-configure nil
         lsp-enable-file-watchers nil
@@ -4589,8 +4577,8 @@ This file is specified in `counsel-projectile-default-file'."
         ;; report additional errors
         lsp-modeline-diagnostics-enable t
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
-        lsp-signature-auto-activate t ; Manually request via `lsp-signature-activate'
-        lsp-signature-render-documentation t
+        lsp-signature-auto-activate nil ; Manually request via `lsp-signature-activate'
+        lsp-signature-render-documentation nil ; Disable function documentation
         lsp-signature-function 'lsp-signature-posframe
         lsp-xml-logs-client nil
         lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.16.0-uber.jar"
@@ -4659,10 +4647,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge
-                            (lsp-configuration-section "pyright")
-                            (lsp-configuration-section "python")))))
+                                            (lsp--set-configuration
+                                             (ht-merge
+                                              (lsp-configuration-section "pyright")
+                                              (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -4780,11 +4768,12 @@ This file is specified in `counsel-projectile-default-file'."
                     (lambda
                       (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
-  (advice-add #'lsp-completion--regex-fuz :override #'identity)
+  ;; TODO: What is utility of this?
+  ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
 
   (with-eval-after-load 'ivy-mode
     (unless (fboundp 'lsp-ivy-global-workspace-symbol)
@@ -4829,9 +4818,15 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-ui-sideline-enable)
   (defvar lsp-ui-modeline-code-actions-enable)
 
+  ;; https://github.com/emacs-lsp/lsp-ui/issues/578
+  (add-hook 'minibuffer-setup-hook
+            (lambda ()
+              (lsp-ui-doc--hide-frame)))
+
   (setq lsp-ui-doc-enable nil ; Disable on-hover dialogs
         lsp-ui-imenu-auto-refresh 'after-save
-        lsp-ui-sideline-enable nil
+        lsp-ui-sideline-enable nil ; Disable whole sideline
+        lsp-ui-sideline-show-diagnostics nil ; Do not show diagnostics when typing
         lsp-ui-modeline-code-actions-enable t)
 
   (defvar lsp-ui-mode-map)
@@ -5124,7 +5119,7 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'yapf-mode "yapfify" nil t))
 
   ;; FIXME: The cursor loses its position after formatting, which is annoying
-  ;; (add-hook 'python-mode-hook #'yapf-mode)
+  (add-hook 'python-mode-hook #'yapf-mode)
 
   (with-eval-after-load 'yapfify
     (diminish 'yapf-mode)))
