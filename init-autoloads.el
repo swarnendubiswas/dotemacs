@@ -13,10 +13,12 @@
 
 (declare-function ht-merge "ht")
 
+
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
   :group 'local)
+
 
 (defcustom sb/extras-directory
   (expand-file-name "extras" user-emacs-directory)
@@ -24,24 +26,21 @@
   :type 'string
   :group 'sb/emacs)
 
+
 (defcustom sb/theme
   'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
-          (const :tag "solarized-light" solarized-light)
-          (const :tag "solarized-dark" solarized-dark)
-          (const :tag "spacemacs-light" spacemacs-light)
-          (const :tag "tangotango" tangotango)
-          (const :tag "zenburn" zenburn)
           (const :tag "doom-molokai" doom-molokai)
           (const :tag "doom-one-light" doom-one-light)
           (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
-          (const :tag "customized" sb/default)
+          (const :tag "customized" sb/default) ; Customizations over the default theme
           (const :tag "none" none))
   :group 'sb/emacs)
+
 
 (defcustom sb/modeline-theme
   'powerline
@@ -56,6 +55,7 @@
           (const :tag "default" default))
   :group 'sb/emacs)
 
+
 (defcustom sb/window-split
   'horizontal
   "Specify the direction in which the windows should be split.
@@ -67,12 +67,14 @@ This depends on the orientation of the display."
           (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
 
+
 ;; Large values make reading difficult when the window is split
 (defcustom sb/fill-column
   100
   "Column beyond which lines should not extend."
   :type 'number
   :group 'sb/emacs)
+
 
 (defcustom sb/delete-trailing-whitespace-p
   nil
@@ -83,6 +85,7 @@ whitespaces."
   :type 'boolean
   :group 'sb/emacs)
 
+
 (defcustom sb/tags-scheme
   'none ; We use `lsp-mode' and `dumb-jump'
   "Choose whether to use gtags or ctags."
@@ -92,17 +95,20 @@ whitespaces."
           (const :tag "none" none))
   :group 'sb/emacs)
 
+
 (defcustom sb/ctags-path
   "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
   :type 'string
   :group 'sb/emacs)
 
+
 (defcustom sb/gtags-path
   "/usr/local/bin/gtags"
   "Absolute path to GNU Global executable."
   :type 'string
   :group 'sb/emacs)
+
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
@@ -111,19 +117,25 @@ whitespaces."
   :type 'boolean
   :group 'sb/emacs)
 
+
 (when (bound-and-true-p sb/debug-init-file)
   (setq garbage-collection-messages nil
         debug-on-error t
-        debug-on-event 'sigusr2))
+        debug-on-event 'sigusr2)
+  ;; (debug-on-entry 'package-initialize)
+  )
+
 
 (defconst sb/user-home
   (getenv "HOME")
   "User HOME directory.")
 
+
 (defconst sb/user-tmp
   (expand-file-name "tmp" sb/user-home)
   "User temp directory.
 This location is used for temporary installations and files.")
+
 
 (defcustom sb/textlint-home
   (expand-file-name "textlint-workspace" sb/user-tmp)
@@ -141,6 +153,7 @@ This location is used for temporary installations and files.")
           (const :tag "none" none))
   :group 'sb/emacs)
 
+
 (defcustom sb/use-no-littering
   t
   "Use the `no-littering' package to keep `.emacs.d' clean."
@@ -150,13 +163,15 @@ This location is used for temporary installations and files.")
 (add-to-list 'load-path sb/extras-directory)
 (defvar sb/core-packages)
 
-;; An option is to construct the `load-path' manually
+
+;; Another option is to construct the `load-path' manually
 ;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
 (package-initialize)
-;; (debug-on-entry 'package-initialize)
+
 
 (when (bound-and-true-p sb/use-no-littering)
   (require 'no-littering nil nil))
+
 
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
@@ -164,11 +179,13 @@ This location is used for temporary installations and files.")
   :type 'string
   :group 'sb/emacs)
 
+
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
   :type 'string
   :group 'sb/emacs)
+
 
 (setq custom-file sb/custom-file)
 (when (file-exists-p custom-file)
@@ -177,27 +194,28 @@ This location is used for temporary installations and files.")
 (when (file-exists-p sb/private-file)
   (load sb/private-file 'noerror))
 
+
 (defcustom sb/temp-directory
   (expand-file-name "tmp" user-emacs-directory)
   "Storage location for various configuration files."
   :type 'string
   :group 'sb/emacs)
 
-(unless (and (bound-and-true-p sb/use-no-littering)
-             (file-exists-p sb/temp-directory))
+(unless (or (bound-and-true-p sb/use-no-littering)
+            (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
 
 
-(defconst sb/EMACS27+ (> emacs-major-version 26))
-(defconst sb/EMACS28+ (> emacs-major-version 27))
-(defconst sb/IS-LINUX (eq system-type 'gnu/linux))
+(defconst sb/EMACS27+   (> emacs-major-version 26))
+(defconst sb/EMACS28+   (> emacs-major-version 27))
+(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
 
-(defconst sb/emacs-1MB (* 1 1000 1000))
-(defconst sb/emacs-4MB (* 4 1000 1000))
-(defconst sb/emacs-8MB (* 8 1000 1000))
-(defconst sb/emacs-64MB (* 64 1000 1000))
+(defconst sb/emacs-1MB   (*   1 1000 1000))
+(defconst sb/emacs-4MB   (*   4 1000 1000))
+(defconst sb/emacs-8MB   (*   8 1000 1000))
+(defconst sb/emacs-64MB  (*  64 1000 1000))
 (defconst sb/emacs-128MB (* 128 1000 1000))
 (defconst sb/emacs-256MB (* 256 1000 1000))
 (defconst sb/emacs-512MB (* 512 1000 1000))
@@ -233,7 +251,7 @@ This location is used for temporary installations and files.")
 
 (with-eval-after-load 'gcmh
   (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose nil))
+    (setq gcmh-verbose t))
 
   (diminish 'gcmh-mode))
 
@@ -295,22 +313,23 @@ This location is used for temporary installations and files.")
       case-fold-search t ; Searches and matches should ignore case
       comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
-      compilation-ask-about-save nil
+      compilation-ask-about-save nil ; Save all modified buffers without asking
       ;; Automatically scroll the buffer as output appears, but stop at the first error
       compilation-scroll-output 'first-error
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
-      confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
+      confirm-kill-processes nil ; Prevent "Active processes exist" warning when you quit Emacs
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
-      enable-local-variables :all ; Avoid "defvar" warnings
+      ;; echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      ;; enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
-      ;; Expand truncated information (ellipsis:suspension points) in the echo area
+      ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
+      ;; information
       eval-expression-print-length 500
       ;; Disable the warning "X and Y are the same file" in case of symlinks
       find-file-suppress-same-file-warnings t
@@ -318,7 +337,7 @@ This location is used for temporary installations and files.")
       ;; Avoid resizing the frame when the font is larger (or smaller) than the system default
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t
-      frame-title-format (list '(buffer-file-name "%f" "%b"))
+      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name "@" system-name)
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
@@ -385,8 +404,7 @@ This location is used for temporary installations and files.")
               truncate-lines nil)
 
 ;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
-(setq-default bidi-display-reordering 'left-to-right
-              bidi-inhibit-bpa t
+(setq-default bidi-inhibit-bpa t ; Disabling BPA makes redisplay faster
               bidi-paragraph-direction 'left-to-right)
 
 (dolist (exts '(;; Extensions
@@ -452,7 +470,7 @@ This location is used for temporary installations and files.")
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
         auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and tramp
         auto-revert-use-notify nil
-        auto-revert-verbose t
+        auto-revert-verbose nil
         auto-revert-check-vc-info nil ; Should improve performance
         ;; Revert dired buffers if the contents of the "main" directory changes
         global-auto-revert-non-file-buffers nil)
@@ -467,7 +485,8 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'save-place-mode)
   (autoload #'save-place-mode "saveplace" nil t))
 
-(run-at-time 5 nil #'save-place-mode)
+;; We may open a file immediately after starting Emacs, hence using a hook instead of a timer.
+(add-hook 'after-init-hook #'save-place-mode)
 
 (with-eval-after-load 'saveplace
   (defvar save-place-file)
@@ -529,11 +548,12 @@ This location is used for temporary installations and files.")
 
 
 ;; Looks better than the default
-(setq window-divider-default-places t
+(setq window-divider-default-places t ; Show dividers on the bottom and on the right of each window
       window-divider-default-bottom-width 1
       window-divider-default-right-width 1)
 
-(window-divider-mode)
+;; FIXME: What is the benefit of this?
+;; (window-divider-mode)
 
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
@@ -547,11 +567,12 @@ This location is used for temporary installations and files.")
   (setq split-height-threshold nil
         split-width-threshold 0))
 
-(if nil
-    ;; Make use of wider screens
-    (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-      (split-window-right))
+(when nil
+  ;; Make use of wider screens
+  (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+    (split-window-right))
   )
+
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
 (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -566,9 +587,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'abbrev-mode)
   (autoload #'abbrev-mode "abbrev" nil t))
 
-(run-at-time 5 nil (lambda ()
+(run-at-time 3 nil (lambda ()
                      (add-hook 'text-mode-hook #'abbrev-mode)))
-
 
 (with-eval-after-load 'abbrev
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
@@ -594,8 +614,8 @@ SAVE-FN with non-nil ARGS."
 
 ;; Disable the following modes
 (dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
-                desktop-save-mode
-                global-prettify-symbols-mode ; Makes it difficult to edit the buffer
+                ;; desktop-save-mode
+                ;; global-prettify-symbols-mode ; Makes it difficult to edit the buffer
                 shell-dirtrack-mode
                 size-indication-mode
                 tooltip-mode))
@@ -604,7 +624,7 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; Enable the following modes
-(dolist (mode '(auto-compression-mode
+(dolist (mode '(;; auto-compression-mode
                 auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
@@ -636,7 +656,6 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'global-so-long-mode)
   (autoload #'global-so-long-mode "so-long" nil t))
 
-;; (add-hook 'after-init-hook #'global-so-long-mode)
 (run-at-time 5 nil #'global-so-long-mode)
 
 ;; (with-eval-after-load 'so-long
@@ -664,32 +683,12 @@ SAVE-FN with non-nil ARGS."
 
     (defvar all-the-icons-scale-factor)
 
-    (setq all-the-icons-scale-factor 1.1
+    (setq all-the-icons-scale-factor 1.0
           all-the-icons-color-icons nil)))
 
 
 (when (eq sb/theme 'leuven)
   (load-theme 'leuven t))
-
-
-(when (eq sb/theme 'spacemacs-light)
-  (load-theme 'spacemacs-light t)
-  ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
-  )
-
-
-(when (eq sb/theme 'zenburn)
-  (load-theme 'zenburn t))
-
-
-(when (eq sb/theme 'solarized-light)
-  (defvar solarized-distinct-fringe-background)
-  (setq solarized-distinct-fringe-background t)
-  (load-theme 'solarized-light t))
-
-
-(when (eq sb/theme 'solarized-dark)
-  (load-theme 'solarized-dark t))
 
 
 (when (eq sb/theme 'doom-molokai)
@@ -724,12 +723,12 @@ SAVE-FN with non-nil ARGS."
   (defvar modus-themes-prompts)
   (defvar modus-themes-variable-pitch-headings)
 
-  (setq modus-themes-completions 'opinionated
-        modus-themes-fringes 'subtle
-        modus-themes-intense-hl-line nil
-        modus-themes-scale-headings nil
-        modus-themes-prompts 'intense-accented
-        modus-themes-variable-pitch-headings nil)
+  ;; (setq modus-themes-completions 'opinionated
+  ;;       modus-themes-fringes 'subtle
+  ;;       modus-themes-intense-hl-line nil
+  ;;       modus-themes-scale-headings nil
+  ;;       modus-themes-prompts 'intense-accented
+  ;;       modus-themes-variable-pitch-headings nil)
 
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -774,12 +773,11 @@ SAVE-FN with non-nil ARGS."
   (defvar powerline-gui-use-vcs-glyph)
   (defvar powerline-height)
 
-  (setq powerline-default-separator 'box
-        powerline-display-buffer-size nil
-        powerline-display-hud nil
-        powerline-display-mule-info nil
-        powerline-gui-use-vcs-glyph t
-        powerline-height 17)
+  (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
+        powerline-display-mule-info nil ; File encoding information is not useful
+        ;; powerline-default-separator 'box
+        ;; powerline-display-buffer-size nil
+        powerline-height 20)
 
   (when (eq sb/theme 'leuven)
     (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
@@ -946,6 +944,7 @@ SAVE-FN with non-nil ARGS."
 
 (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
 
+
 (declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
 
 (unless (fboundp 'centaur-tabs-mode)
@@ -971,8 +970,10 @@ SAVE-FN with non-nil ARGS."
   (centaur-tabs-group-by-projectile-project))
 
 
-(unless (fboundp 'hide-mode-line-mode)
-  (autoload #'hide-mode-line-mode "hide-mode-line" nil t))
+(when nil
+  (unless (fboundp 'hide-mode-line-mode)
+    (autoload #'hide-mode-line-mode "hide-mode-line" nil t))
+  )
 
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -1006,35 +1007,36 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
 
 
-(if nil
-    (progn
-      ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
-      ;; useful information
-      (add-hook 'emacs-startup-hook (lambda ()
-                                      (setq resize-mini-windows nil)))
-      ))
+(when nil
+  (progn
+    ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to
+    ;; see useful information
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (setq resize-mini-windows nil)))
+    ))
 
 
-(if  nil
-    (progn
-      (declare-function circadian-setup "circadian")
-      (unless (fboundp 'circadian-setup)
-        (autoload #'circadian-setup "circadian" nil t))
+(when nil
+  (progn
+    (declare-function circadian-setup "circadian")
+    (unless (fboundp 'circadian-setup)
+      (autoload #'circadian-setup "circadian" nil t))
 
-      (with-eval-after-load 'circadian
-        (require 'solar nil nil)
+    (with-eval-after-load 'circadian
+      (require 'solar nil nil)
 
-        (defvar calendar-latitude)
-        (defvar calendar-longitude)
-        (defvar circadian-themes)
+      (defvar calendar-latitude)
+      (defvar calendar-longitude)
+      (defvar circadian-themes)
 
-        ;; Kanpur, UP
-        (setq calendar-latitude 26.50
-              calendar-longitude 80.23
-              calendar-location-name "Kanpur, UP, India"
-              circadian-themes '((:sunrise . modus-operandi)
-                                 (:sunset  . modus-operandi))))
-      ))
+      ;; Kanpur, UP
+      (setq calendar-latitude 26.50
+            calendar-longitude 80.23
+            calendar-location-name "Kanpur, UP, India"
+            circadian-themes '((:sunrise . modus-operandi)
+                               (:sunset  . modus-operandi))))
+    ))
 
 
 (unless (fboundp 'beacon-mode)
@@ -1059,7 +1061,6 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'ibuffer-auto-mode)
   (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 
-;; FIXME: profiler says this is expensive
 (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
 (with-eval-after-load 'ibuffer-ext
@@ -1087,7 +1088,7 @@ SAVE-FN with non-nil ARGS."
     (defvar all-the-icons-ibuffer-icon-size)
 
     (setq all-the-icons-ibuffer-human-readable-size t
-          all-the-icons-ibuffer-icon-size 0.8)))
+          all-the-icons-ibuffer-icon-size 0.9)))
 
 (bind-keys :package ibuffer
            ("C-x C-b" . ibuffer))
@@ -1185,11 +1186,14 @@ SAVE-FN with non-nil ARGS."
 (defvar dired-mode-map)
 (bind-keys :package dired :map dired-mode-map
            ("M-<home>" . sb/dired-go-home)
-           ("i" . find-file)
-           ("M-<up>" . sb/dired-jump-to-top)
+           ("i"        . find-file)
+           ("M-<up>"   . sb/dired-jump-to-top)
            ("M-<down>" . sb/dired-jump-to-bottom))
 
 (with-eval-after-load 'dired-x
+  ;; FIXME: Fix the regexp
+  (setq dired-omit-files (concat dired-omit-files "\\.git$\\|__pycache__$"))
+
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Remove 'Omit' from the modeline."
@@ -1214,11 +1218,6 @@ SAVE-FN with non-nil ARGS."
   (setq diredp-hide-details-initially-flag nil
         diredp-hide-details-propagate-flag nil)
 
-  ;; Bound to `diredp-rename-this-file', prefer `dired-efap'
-  (unbind-key "r" dired-mode-map)
-
-  ;; SB: Not sure, but this binding only works if we load after `dired+' and not `dired', even with
-  ;; `bind-keys*'
   (defvar dired-efap-initial-filename-selection)
 
   (setq dired-efap-initial-filename-selection nil)
@@ -1226,6 +1225,8 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'dired-efap)
     (autoload #'dired-efap "dired-efap" nil t))
 
+  ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
+  ;; after `dired+' and not `dired', even with `bind-keys*'.
   (bind-keys* :package dired-efap :map dired-mode-map
               ("r" . dired-efap)))
 
@@ -1564,10 +1565,10 @@ SAVE-FN with non-nil ARGS."
 ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
 (bind-keys :package isearch
            ("C-s")
-           ;; ("C-f" . isearch-forward-regexp)
+           ("C-f"     . isearch-forward-regexp)
            :map isearch-mode-map
            ("C-s")
-           ;; ("C-f" . isearch-repeat-forward)
+           ("C-f"     . isearch-repeat-forward)
            ("C-c C-o" . isearch-occur))
 
 
@@ -1591,9 +1592,8 @@ SAVE-FN with non-nil ARGS."
         grep-highlight-matches t
         grep-scroll-output t)
 
-  (add-to-list 'grep-find-ignored-directories ".cache")
-  (add-to-list 'grep-find-ignored-directories "node_modules")
-  (add-to-list 'grep-find-ignored-directories "vendor"))
+  (dolist (dirs '(".cache" "node_modules" "vendor*"))
+    (add-to-list 'grep-find-ignored-directories dirs)))
 
 
 ;; When the *grep* buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
@@ -1638,31 +1638,33 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ripgrep-regexp "ripgrep" nil t))
 
 
-(unless (fboundp 'ctrlf-mode)
-  (autoload #'ctrlf-mode "ctrlf" nil t))
-(unless (fboundp 'ctrlf-local-mode)
-  (autoload #'ctrlf-local-mode "ctrlf" nil t))
-(unless (fboundp 'ctrlf-forward-literal)
-  (autoload #'ctrlf-forward-literal "ctrlf" nil t))
-(unless (fboundp 'ctrlf-backward-literal)
-  (autoload #'ctrlf-backward-literal "ctrlf" nil t))
-(unless (fboundp 'ctrlf-forward-regexp)
-  (autoload #'ctrlf-forward-regexp "ctrlf" nil t))
-(unless (fboundp 'ctrlf-backward-regexp)
-  (autoload #'ctrlf-backward-regexp "ctrlf" nil t))
+;; LATER: Do I have a convincing reason to not use `isearch'?
+(when nil
+  (unless (fboundp 'ctrlf-mode)
+    (autoload #'ctrlf-mode "ctrlf" nil t))
+  (unless (fboundp 'ctrlf-local-mode)
+    (autoload #'ctrlf-local-mode "ctrlf" nil t))
+  (unless (fboundp 'ctrlf-forward-literal)
+    (autoload #'ctrlf-forward-literal "ctrlf" nil t))
+  (unless (fboundp 'ctrlf-backward-literal)
+    (autoload #'ctrlf-backward-literal "ctrlf" nil t))
+  (unless (fboundp 'ctrlf-forward-regexp)
+    (autoload #'ctrlf-forward-regexp "ctrlf" nil t))
+  (unless (fboundp 'ctrlf-backward-regexp)
+    (autoload #'ctrlf-backward-regexp "ctrlf" nil t))
 
-(with-eval-after-load 'ctrlf
-  (ctrlf-mode 1)
+  (with-eval-after-load 'ctrlf
+    (ctrlf-mode 1)
 
-  (add-hook 'pdf-isearch-minor-mode-hook
-            (lambda ()
-              (ctrlf-local-mode -1))))
+    (add-hook 'pdf-isearch-minor-mode-hook
+              (lambda ()
+                (ctrlf-local-mode -1))))
 
-(bind-keys :package ctrlf
-           ("C-f"   . ctrlf-forward-literal)
-           ("C-r"   . ctrlf-backward-literal)
-           ("C-M-s" . ctrlf-forward-regexp)
-           ("C-M-r" . ctrlf-backward-regexp))
+  (bind-keys :package ctrlf
+             ("C-f"   . ctrlf-forward-literal)
+             ("C-r"   . ctrlf-backward-literal)
+             ("C-M-s" . ctrlf-forward-regexp)
+             ("C-M-r" . ctrlf-backward-regexp)))
 
 
 (unless (fboundp 'vr/query-replace)
@@ -1684,6 +1686,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'recentf-save-list)
   (autoload #'recentf-save-list "recentf" nil t))
 
+;; Load immediately after start since I use it often
 (add-hook 'after-init-hook #'recentf-mode)
 
 (with-eval-after-load 'recentf
@@ -1711,9 +1714,11 @@ SAVE-FN with non-nil ARGS."
                           ".*/TAGS\\'"
                           "*.cache")
         ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-        ;; recentf-keep '(file-remote-p file-readable-p)
-        recentf-max-saved-items 250
-        recentf-menu-filter 'recentf-sort-descending)
+        ;; Keep remote file without testing if they still exist
+        recentf-keep '(file-remote-p file-readable-p)
+        recentf-max-saved-items 250 ; Larger values help in lookup
+        ;; recentf-menu-filter 'recentf-sort-descending
+        )
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
@@ -1725,13 +1730,12 @@ SAVE-FN with non-nil ARGS."
     (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
     (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
 
-  ;; `recentf-save-list' is called on Emacs exit
-  ;; (setq recentf-auto-cleanup-timer (run-with-idle-timer 60 t 'recentf-save-list))
-  ;; (run-at-time 5 (* 5 60) 'recentf-save-list)
+  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
+  ;; after idling for 30 seconds
   (run-with-idle-timer 30 t 'recentf-save-list)
 
-  ;; Adding many functions to `kill-emacs-hook' will slow down Emacs exit
-  ;; (add-hook 'kill-emacs-hook #'recentf-cleanup)
+  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
+  ;; timers
   (run-with-idle-timer 60 t 'recentf-cleanup))
 
 
@@ -1793,9 +1797,9 @@ SAVE-FN with non-nil ARGS."
   (defvar company-transformers)
   (defvar company-dabbrev-downcase)
 
-  (setq company-dabbrev-other-buffers nil ; Search in other buffers with same major mode
-        company-dabbrev-downcase nil
-        company-idle-delay 0.1 ; Decrease the delay before the popup is shown
+  (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
+        company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
+        company-dabbrev-other-buffers t ; Search in other buffers with the same major mode
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
         company-minimum-prefix-length 3 ; Small words are faster to type
@@ -1803,14 +1807,14 @@ SAVE-FN with non-nil ARGS."
         company-selection-wrap-around t
         company-show-numbers t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t
-        company-text-icons-add-background t)
+        company-tooltip-align-annotations t)
 
-  (when (eq sb/theme 'modus-operandi)
-    (setq company-format-margin-function #'company-vscode-light-icons-margin))
+  ;; Company should pick up the correct versions automatically
+  ;; (when (eq sb/theme 'modus-operandi)
+  ;;   (setq company-format-margin-function #'company-vscode-light-icons-margin))
 
-  (when (eq sb/theme 'modus-vivendi)
-    (setq company-format-margin-function #'company-vscode-dark-icons-margin))
+  ;; (when (eq sb/theme 'modus-vivendi)
+  ;;   (setq company-format-margin-function #'company-vscode-dark-icons-margin))
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -2304,8 +2308,9 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'flyspell-correct-next)
     (autoload #'flyspell-correct-next "flyspell" nil t))
 
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-  (add-hook 'conf-mode-hook #'flyspell-prog-mode)
+  ;; FIXME: Am I missing out?
+  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  ;; (add-hook 'conf-mode-hook #'flyspell-prog-mode)
   (add-hook 'text-mode-hook #'flyspell-mode)
 
   ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
@@ -4318,7 +4323,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'turn-on-eldoc-mode)
     (autoload #'turn-on-eldoc-mode "eldoc" nil t))
 
-  (dolist (hook '(lisp-mode-hook lisp-interaction-mode-hook emacs-lisp-mode-hook))
+  (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
     (add-hook hook #'turn-on-eldoc-mode))
 
   (with-eval-after-load 'eldoc
@@ -4772,7 +4777,7 @@ This file is specified in `counsel-projectile-default-file'."
                                            (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
-  ;; TODO: What is utility of this?
+  ;; TODO: What is the utility of this?
   ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
 
   (with-eval-after-load 'ivy-mode
@@ -5023,12 +5028,10 @@ This file is specified in `counsel-projectile-default-file'."
 (bind-keys :package python :map python-mode-map
            ("M-["   . python-nav-backward-block)
            ("M-]"   . python-nav-forward-block)
+           ;; Assigning a keybinding such as "C-[" is involved
+           ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
            ("C-c <" . python-indent-shift-left)
-           ("C-c >" . python-indent-shift-right)
-           ;; FIXME: `[' is treated as `meta'
-           ;; ("C-\[" . python-indent-shift-left)
-           ;; ("C-]"  . python-indent-shift-right)
-           )
+           ("C-c >" . python-indent-shift-right))
 
 
 (unless (fboundp 'pyvenv-mode)
@@ -6749,6 +6752,8 @@ mode is not in `sb/skippable-modes'."
 ;; Other variants:
 ;; `(global-set-key (kbd "RET") 'newline-and-indent)'
 ;; `(define-key global-map (kbd "RET") 'newline-and-indent)'
+
+;; https://www.masteringemacs.org/article/mastering-key-bindings-emacs
 
 (bind-keys
  ("RET"       . newline-and-indent)
