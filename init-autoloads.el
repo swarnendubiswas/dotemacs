@@ -2007,14 +2007,15 @@ SAVE-FN with non-nil ARGS."
 
   (setq ivy-case-fold-search 'always ; Always ignore case while searching
         ;; ivy-initial-inputs-alist nil ; Do not start completion with `^'
-        ivy-count-format "(%d/%d) " ; Help identify wrap around
+        ivy-count-format "(%d/%d) " ; Helps identify wrap around
         ivy-extra-directories nil ; Hide . and ..
         ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
-        ;; Make the height of the minibuffer proportionate to the screen
+        ;; Make the height of the minibuffer proportionate to the screen, but it requires more
+        ;; processing
         ;; ivy-height-alist '((t
         ;;                      lambda (_caller)
         ;;                      (/ (frame-height) 2)))
-        ;; We update this after loading `orderless'
+        ;; Set this after loading `orderless'
         ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
         ;;                         (counsel-find-file . ivy--regex-fuzzy)
         ;;                         (t                 . ivy--regex-ignore-order))
@@ -2035,15 +2036,12 @@ SAVE-FN with non-nil ARGS."
 
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
 
-  (diminish 'ivy-mode)
-
-  (with-eval-after-load 'hydra
-    (require 'ivy-hydra nil nil)))
+  (diminish 'ivy-mode))
 
 (defvar ivy-minibuffer-map)
 (bind-keys :package ivy
-           ("C-c r" . ivy-resume)
-           ("<f3>"  . ivy-switch-buffer)
+           ("C-c r"    . ivy-resume)
+           ("<f3>"     . ivy-switch-buffer)
            :map ivy-minibuffer-map
            ("<return>" . ivy-alt-done)
            ("<left>"   . ivy-previous-line)
@@ -2162,17 +2160,11 @@ SAVE-FN with non-nil ARGS."
         counsel-preselect-current-file t
         counsel-switch-buffer-preview-virtual-buffers nil
         counsel-yank-pop-preselect-last t
-        counsel-yank-pop-separator "\n-------------------------\n")
+        counsel-yank-pop-separator "\n------------------------------------------\n")
 
   ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
   ;; argument error
   ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
-  ;; (defalias 'load-library 'counsel-load-library)
-  ;; (defalias load-theme 'counsel-load-theme)
-  ;; (defalias 'yank-pop 'counsel-yank-pop)
-
-  ;; (add-to-list 'ivy-display-functions-alist
-  ;;   '(counsel-company . ivy-display-function-overlay))
 
   (diminish 'counsel-mode))
 
@@ -2182,14 +2174,7 @@ SAVE-FN with non-nil ARGS."
 (bind-keys :package counsel
            ([remap execute-extended-command] . counsel-M-x)
            ([remap completion-at-point]      . counsel-company)
-           ([remap describe-bindings]        . counsel-descbinds)
-           ([remap dired]                    . counsel-dired)
            ([remap find-file]                . counsel-find-file)
-           ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
-           ([remap load-library]             . counsel-load-library)
-           ([remap load-theme]               . counsel-load-theme)
-           ([remap recentf-open-files]       . counsel-recentf)
-           ([remap yank-pop]                 . counsel-yank-pop)
            ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
            ;; ([remap flycheck-list-errors]  . counsel-flycheck)
            ("<f1>"    . counsel-M-x)
@@ -2215,8 +2200,6 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load 'prescient
   (defvar prescient-history-length)
   (defvar prescient-save-file)
-
-  (setq prescient-history-length 500)
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory))))
@@ -2257,8 +2240,7 @@ SAVE-FN with non-nil ARGS."
   (defvar orderless-component-separator)
   (defvar ivy-re-builders-alist)
 
-  (setq completion-styles '(orderless)
-        orderless-component-separator "[ &]")
+  (setq completion-styles '(orderless))
 
   (declare-function sb/just-one-face "init")
 
