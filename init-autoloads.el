@@ -1841,8 +1841,8 @@ SAVE-FN with non-nil ARGS."
   (defvar company-posframe-show-indicator)
 
   (setq company-posframe-show-metadata t
-        company-posframe-show-indicator nil
-        company-posframe-quickhelp-show-header nil)
+        company-posframe-show-indicator t
+        company-posframe-quickhelp-delay nil)
 
   (diminish 'company-posframe-mode)
 
@@ -1850,9 +1850,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'company-quickhelp-mode)
     (autoload #'company-quickhelp-mode "company-quickhelp" nil t))
 
-  ;; (add-hook 'emacs-lisp-mode-hook #'company-quickhelp-mode)
-  ;; (add-hook 'after-init-hook #'company-quickhelp-mode)
-  (run-at-time 5 nil #'company-quickhelp-mode)
+  (run-at-time 3 nil #'company-quickhelp-mode)
 
   ;; Company now has in-built support for completion icons
   (if nil
@@ -1861,7 +1859,7 @@ SAVE-FN with non-nil ARGS."
           (unless (fboundp 'company-box-mode)
             (autoload #'company-box-mode "company-box" nil t))
 
-          ;; FIXME: This is not working.
+          ;; LATER: This is not working.
           (company-box-mode 1)
 
           (with-eval-after-load 'company-box
@@ -1882,18 +1880,19 @@ SAVE-FN with non-nil ARGS."
   ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
   ;; computationally expensive. Completions seem to be laggy with TabNine enabled.
 
-  (unless (fboundp 'company-fuzzy-mode)
-    (autoload #'company-fuzzy-mode "company-fuzzy" nil t))
-  (unless (fboundp 'global-company-fuzzy-mode)
-    (autoload #'global-company-fuzzy-mode "company-fuzzy" nil t))
-
   ;; LATER: Nice but slows completions
-  ;; (global-company-fuzzy-mode 1)
+  (when nil
+    (unless (fboundp 'company-fuzzy-mode)
+      (autoload #'company-fuzzy-mode "company-fuzzy" nil t))
+    (unless (fboundp 'global-company-fuzzy-mode)
+      (autoload #'global-company-fuzzy-mode "company-fuzzy" nil t))
 
-  (diminish 'company-fuzzy-mode)
+    (global-company-fuzzy-mode 1)
 
-  (setq company-fuzzy-show-annotation t
-        company-fuzzy-sorting-backend 'flx)
+    (diminish 'company-fuzzy-mode)
+
+    (setq company-fuzzy-show-annotation t
+          company-fuzzy-sorting-backend 'flx))
 
 
   ;; Company statistics
@@ -1939,6 +1938,8 @@ SAVE-FN with non-nil ARGS."
 
   (unless (fboundp 'yasnippet-snippets-initialize)
     (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
+
+  (yasnippet-snippets-initialize)
 
   (with-eval-after-load 'ivy
     (unless (fboundp 'ivy-yasnippet)
