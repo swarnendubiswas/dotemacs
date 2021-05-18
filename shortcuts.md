@@ -78,9 +78,19 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 
 ## Treemacs
 
-- `C-j` - Initialize or toggle treemacs (`treemacs`)
+- `C-j` - Initialize or toggle Treemacs (`treemacs`)
 - `n/p` - Navigate between same-level nodes (``)
 - `u` - Go to parent folder (``)
+- `j` - (``)
+- `k` - (``)
+- `h` - (`treemacs-COLLAPSE-action`)
+- `l` - (``)
+- `n` - (`treemacs-next-line`)
+- `p` - (`treemacs-previous-line`)
+- `C-n` - (``)
+- `C-p` - (``)
+- `C-c C-w` - (`treemacs-edit-workspaces`)
+- `C-c C-c` - (`treemacs-finish-edit`)
 
 ## Ibuffer
 

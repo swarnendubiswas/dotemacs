@@ -236,7 +236,8 @@ This location is used for temporary installations and files.")
         ;; https://github.com/emacs-lsp/lsp-mode#performance
         gc-cons-threshold sb/emacs-256MB))
 
-;; `emacs-startup-hook' runs later than the `after-init-hook'
+;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
+;; customizations
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
@@ -1063,7 +1064,7 @@ SAVE-FN with non-nil ARGS."
 
 (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
-(with-eval-after-load 'ibuffer-ext
+(with-eval-after-load 'ibuf-ext
   ;; Do not show filter groups if there are no buffers in that group
   (defvar ibuffer-show-empty-filter-groups)
 
@@ -1367,58 +1368,61 @@ SAVE-FN with non-nil ARGS."
     (setq treemacs-collapse-dirs 2
           treemacs-follow-after-init t
           treemacs-indentation 1
+          treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
           ;; Prevents treemacs from being selected with `other-window'
           treemacs-is-never-other-window nil
-          treemacs-no-png-images nil
-          treemacs-position 'right
+          ;; treemacs-no-png-images nil
+          ;; treemacs-position 'right
           treemacs-project-follow-cleanup t
           treemacs-recenter-after-file-follow 'on-distance
           treemacs-recenter-after-tag-follow 'on-distance
           treemacs-show-hidden-files nil
           treemacs-silent-filewatch t
           treemacs-silent-refresh t
-          treemacs-width 18)
+          treemacs-width 20
+          ;; Hide the mode-line in the Treemacs buffer
+          treemacs-user-mode-line-format 'none)
 
     (unless (bound-and-true-p sb/use-no-littering)
       (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
 
     (treemacs-filewatch-mode 1)
-    (treemacs-follow-mode 1)
-    (treemacs-git-mode 'extended)
+    (treemacs-follow-mode 1) ; Following tags is noisy
+    (treemacs-git-mode 'deferred)
 
-    ;; `always' is implied in the absence of arguments
+    ;; Always show the file indicator
     (treemacs-fringe-indicator-mode 'always)
-
-    ;; Disables `treemacs-follow-mode', focuses the tag
-    ;; (add-hook 'prog-mode-hook (lambda ()
-    ;;                             (treemacs-tag-follow-mode 1)))
 
     (require 'treemacs-all-the-icons nil nil)
 
     ;; https://github.com/Alexander-Miller/treemacs/issues/735
-    (treemacs-create-theme "Default-Tighter" :extends "Default" :config
-                           (let ((icons (treemacs-theme->gui-icons theme)))
-                             (maphash (lambda
-                                        (ext icon)
-                                        (puthash ext
-                                                 (concat
-                                                  (substring icon 0 1)
-                                                  (propertize " " 'display
-                                                              '(space :width 0.5)))
-                                                 icons))
-                                      icons)))
+    (treemacs-create-theme "Default-Tighter"
+      :extends "Default"
+      :config
+      (let ((icons (treemacs-theme->gui-icons theme)))
+        (maphash (lambda
+                   (ext icon)
+                   (puthash ext
+                            (concat
+                             (substring icon 0 1)
+                             (propertize " " 'display
+                                         '(space . (:width 0.5))))
+                            icons))
+                 icons)))
 
-    (treemacs-create-theme "all-the-icons-tighter" :extends "all-the-icons" :config
-                           (let ((icons (treemacs-theme->gui-icons theme)))
-                             (maphash (lambda
-                                        (ext icon)
-                                        (puthash ext
-                                                 (concat
-                                                  (substring icon 0 1)
-                                                  (propertize " " 'display
-                                                              '(space :width 0.5)))
-                                                 icons))
-                                      icons)))
+    (treemacs-create-theme "all-the-icons-tighter"
+      :extends "all-the-icons"
+      :config
+      (let ((icons (treemacs-theme->gui-icons theme)))
+        (maphash (lambda
+                   (ext icon)
+                   (puthash ext
+                            (concat
+                             (substring icon 0 1)
+                             (propertize " " 'display
+                                         '(space . (:width 0.5))))
+                            icons))
+                 icons)))
 
     (treemacs-load-theme "all-the-icons")
 
@@ -1430,15 +1434,26 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
     (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
     (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
-    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7)
+    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
 
-    (treemacs-resize-icons 16))
+  (bind-keys* :package treemacs
+              ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
+              ("M-0" . treemacs-select-window)))
 
-  ;; Interferes with `dired-jump'
-  ;; (bind-keys* :package treemacs
-  ;;             ("C-j" . treemacs))
-  )
+(add-hook 'emacs-startup-hook (lambda()
+                                (treemacs)
+                                (other-window 1)))
 
+;; Starts Treemacs automatically with Emacsclient
+;; https://github.com/Alexander-Miller/treemacs/issues/624
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (run-with-timer
+             1 nil
+             (lambda ()
+               (with-selected-frame frame
+                 (save-selected-window
+                   (treemacs-select-window)))))))
 
 (with-eval-after-load 'treemacs
   ;; Allows to quickly add projectile projects to the treemacs workspace
@@ -2500,7 +2515,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'aggressive-indent-mode)
   (autoload #'aggressive-indent-mode "aggressive-indent" nil t))
 
-(dolist (hook '(lisp-interaction-mode-hook lisp-mode-hook emacs-lisp-mode-hook))
+(dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
   (add-hook hook #'aggressive-indent-mode))
 
 (with-eval-after-load 'aggressive-indent
@@ -2519,7 +2534,7 @@ SAVE-FN with non-nil ARGS."
 
 (run-at-time 3 nil #'show-paren-mode)
 
-(with-eval-after-load 'show-paren-mode
+(with-eval-after-load 'paren
   (defvar show-paren-style)
   (defvar show-paren-when-point-inside-paren)
   (defvar show-paren-when-point-in-periphery)
@@ -2535,7 +2550,7 @@ SAVE-FN with non-nil ARGS."
 ;; Enable autopairing, `smartparens' seems slow
 (run-at-time 3 nil #'electric-pair-mode)
 
-(with-eval-after-load 'electric-pair-mode
+(with-eval-after-load 'elec-pair
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
   (defvar electric-pair-pairs)
@@ -2687,6 +2702,7 @@ SAVE-FN with non-nil ARGS."
   (when (and sb/IS-WINDOWS (executable-find "tr"))
     (setq projectile-indexing-method 'alien))
 
+  ;; Disable computing the project type that is shown on the modeline
   (defun projectile-default-mode-line nil
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
@@ -2735,9 +2751,8 @@ SAVE-FN with non-nil ARGS."
   (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"))
     (add-to-list 'projectile-globally-ignored-files items))
 
-  (dolist (exts '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".djvu" ".doc" ".docx" ".elc" ".gif"
-                  ".jar" ".jpeg" ".jpg" ".o" ".odt" ".png" ".ppt" ".pptx" ".pt" ".pyc" ".rel"
-                  ".rip" ".rpm" ".so" ".svg" ".tar.gz" ".tar.xz" ".xls" ".xlsx" ".zip" "~$"))
+  (dolist (exts '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" ".elc" ".o" ".odt"
+                  ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
   (projectile-mode 1)
@@ -2754,8 +2769,9 @@ SAVE-FN with non-nil ARGS."
            ("A"    . projectile-add-known-project))
 
 ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
-(run-with-idle-timer 5 nil #'projectile-mode)
+(run-with-idle-timer 3 nil #'projectile-mode)
 
+(add-hook 'projectile-after-switch-project-hook #'treemacs-display-current-project-exclusively)
 
 (when nil
   (declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
@@ -2851,7 +2867,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
 
-  (with-eval-after-load 'all-the-icons-ivy-rich-mode
+  (with-eval-after-load 'all-the-icons-ivy-rich
     (defvar all-the-icons-ivy-rich-icon-size)
 
     (setq all-the-icons-ivy-rich-icon-size 0.7)))
@@ -2945,11 +2961,11 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar flycheck-display-errors-function)
 
   ;; Remove newline checks, since they would trigger an immediate check when we want the
-  ;; idle-change-delay to be in effect while editing.
-  (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change mode-enabled)
+  ;; `flycheck-idle-change-delay' to be in effect while editing.
+  (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
         flycheck-checker-error-threshold 500
         flycheck-idle-buffer-switch-delay 5 ; Increase the time to allow for quick transitions
-        flycheck-idle-change-delay 5 ; Increase the time to allow for edits
+        flycheck-idle-change-delay 5 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
         ;; Show error messages only if the error list is not already visible
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
@@ -2980,7 +2996,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; https://github.com/flycheck/flycheck/issues/1745
 
   (defvar sb/excluded-directory-regexps
-    '(".git/" ".elpa/"))
+    '(".git/" "elpa/"))
 
   (defun sb/flycheck-may-check-automatically (&rest _conditions)
     (or (null buffer-file-name)
@@ -3089,14 +3105,15 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 
+;; LATER: What is the difference between `whitespace-cleanup-mode' and `ws-butler-mode'?
 ;; Call `whitespace-cleanup' only if the initial buffer was clean
 (unless (fboundp 'global-whitespace-cleanup-mode)
   (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
 (unless (fboundp 'whitespace-cleanup-mode)
   (autoload #'whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
 
-;; To enable it for an entire project, set `whitespace-cleanup-mode' to `t' in your `.dir-locals.el'
-;; file.
+;; To enable it for an entire project, set `whitespace-cleanup-mode' to `t' in your
+;; `.dir-locals.el' file.
 ;; (add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
 
 (with-eval-after-load 'whitespace-cleanup-mode
@@ -4763,7 +4780,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; TODO: What is the utility of this?
   ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
 
-  (with-eval-after-load 'ivy-mode
+  (with-eval-after-load 'ivy
     (unless (fboundp 'lsp-ivy-global-workspace-symbol)
       (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
     (unless (fboundp 'lsp-ivy-workspace-symbol)
