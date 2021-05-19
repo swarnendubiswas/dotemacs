@@ -548,13 +548,8 @@ This location is used for temporary installations and files.")
   (diminish 'subword-mode))
 
 
-;; Looks better than the default
-(setq window-divider-default-places t ; Show dividers on the bottom and on the right of each window
-      window-divider-default-bottom-width 1
-      window-divider-default-right-width 1)
-
-;; FIXME: What is the benefit of this?
-;; (window-divider-mode)
+;; Show dividers on the right of each window, more prominent than the default
+(window-divider-mode)
 
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
@@ -1440,10 +1435,6 @@ SAVE-FN with non-nil ARGS."
               ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
               ("M-0" . treemacs-select-window)))
 
-(add-hook 'emacs-startup-hook (lambda()
-                                (treemacs)
-                                (other-window 1)))
-
 ;; Starts Treemacs automatically with Emacsclient
 ;; https://github.com/Alexander-Miller/treemacs/issues/624
 (add-hook 'after-make-frame-functions
@@ -1460,12 +1451,11 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'treemacs-projectile)
     (autoload #'treemacs-projectile "treemacs-projectile" nil t))
 
-  ;; (add-hook 'projectile-after-switch-project-hook
-  ;;           (lambda ()
-  ;;             (treemacs-add-and-display-current-project)
-  ;;             (other-window 1)))
-
   (require 'treemacs-magit nil nil))
+
+;; (add-hook 'emacs-startup-hook (lambda()
+;;                                 (treemacs)
+;;                                 (other-window 1)))
 
 
 (declare-function org-indent-mode "org-indent")
@@ -1653,7 +1643,6 @@ SAVE-FN with non-nil ARGS."
   (autoload #'ripgrep-regexp "ripgrep" nil t))
 
 
-;; LATER: Do I have a convincing reason to not use `isearch'?
 (when nil
   (unless (fboundp 'ctrlf-mode)
     (autoload #'ctrlf-mode "ctrlf" nil t))
@@ -1895,7 +1884,7 @@ SAVE-FN with non-nil ARGS."
   ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
   ;; computationally expensive. Completions seem to be laggy with TabNine enabled.
 
-  ;; LATER: Nice but slows completions
+  ;; Nice but slows completions
   (when nil
     (unless (fboundp 'company-fuzzy-mode)
       (autoload #'company-fuzzy-mode "company-fuzzy" nil t))
@@ -2306,9 +2295,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'flyspell-correct-next)
     (autoload #'flyspell-correct-next "flyspell" nil t))
 
-  ;; FIXME: Am I missing out?
-  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-  ;; (add-hook 'conf-mode-hook #'flyspell-prog-mode)
+  ;; Enabling `flyspell-prog-mode' does not seem to be very useful
   (add-hook 'text-mode-hook #'flyspell-mode)
 
   ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
@@ -2577,7 +2564,8 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
-;; FIXME: Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
+
+;; Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 
 ;; (unless (fboundp 'sp-beginning-of-sexp)
@@ -4237,8 +4225,10 @@ This file is specified in `counsel-projectile-default-file'."
              ("g" . grip-mode)))
 
 
-;; LATER: Prettier times out setting up the process on a remote machine
+;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
+;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
+
 (if nil
     (when (executable-find "prettier")
       (unless (fboundp 'prettier-mode)
@@ -6043,7 +6033,7 @@ Ignore if no file is found."
 ;; (define-key js-mode-map (kbd "M-.") nil)
 
 
-;; LATER: The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
+;; The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
 (declare-function json-mode "json")
 (declare-function jsonc-mode "json")
 
