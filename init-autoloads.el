@@ -418,12 +418,7 @@ This location is used for temporary installations and files.")
                 ".rel"
                 ".rip"
                 ".so"
-                ".toc"
-                "__init__.py"
-                ;; Directories
-                "__pycache__"
-                "eln-cache"
-                "typings"))
+                ".toc"))
   (add-to-list 'completion-ignored-extensions exts))
 
 ;; Activate utf-8
@@ -469,7 +464,7 @@ This location is used for temporary installations and files.")
   (defvar global-auto-revert-non-file-buffers)
 
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and tramp
+        auto-revert-remote-files t ; Emacs seems to hang with auto-revert and tramp
         auto-revert-use-notify nil
         auto-revert-verbose nil
         auto-revert-check-vc-info nil ; Should improve performance
@@ -1312,6 +1307,8 @@ SAVE-FN with non-nil ARGS."
     (autoload #'treemacs-select-window "treemacs" nil t))
   (unless (fboundp 'treemacs-add-and-display-current-project)
     (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
+  (unless (fboundp 'treemacs-display-current-project-exclusively)
+    (autoload #'treemacs-display-current-project-exclusively "treemac" nil t))
 
   (eval-and-compile
     (defun sb/setup-treemacs-quick nil
@@ -1319,7 +1316,7 @@ SAVE-FN with non-nil ARGS."
       (interactive)
       (when (projectile-project-p)
         (treemacs-add-and-display-current-project)
-        (ace-window)))
+        (other-window 1)))
 
     (defun sb/setup-treemacs-detailed (args)
       "Setup treemacs."
@@ -1374,7 +1371,7 @@ SAVE-FN with non-nil ARGS."
           treemacs-show-hidden-files nil
           treemacs-silent-filewatch t
           treemacs-silent-refresh t
-          treemacs-width 20
+          treemacs-width 18
           ;; Hide the mode-line in the Treemacs buffer
           treemacs-user-mode-line-format 'none)
 
@@ -2678,7 +2675,7 @@ SAVE-FN with non-nil ARGS."
         projectile-mode-line-prefix ""
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
-        projectile-sort-order 'default ; No sorting, should be faster
+        projectile-sort-order 'recentf ; No sorting should be faster
         projectile-verbose nil)
 
   (unless (bound-and-true-p sb/use-no-littering)
@@ -2748,18 +2745,31 @@ SAVE-FN with non-nil ARGS."
   (defvar projectile-mode-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
+(eval-and-compile
+  (defun sb/projectile-kill ()
+    (interactive)
+    (projectile-kill-buffers)
+    (treemacs)))
+
 ;; Set these in case `counsel-projectile' is disabled
 (defvar projectile-command-map)
 (bind-keys :package projectile
            ("<f6>" . projectile-find-file)
            ("<f5>" . projectile-switch-project)
            :map projectile-command-map
-           ("A"    . projectile-add-known-project))
+           ("A"    . projectile-add-known-project)
+           ;; ("k"    . sb/projectile-kill)
+           )
 
 ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
 (run-with-idle-timer 3 nil #'projectile-mode)
 
-(add-hook 'projectile-after-switch-project-hook #'treemacs-display-current-project-exclusively)
+(add-hook 'projectile-after-switch-project-hook
+          (lambda ()
+            (interactive)
+            (treemacs-add-and-display-current-project)
+            (treemacs-display-current-project-exclusively)
+            (other-window 1)))
 
 (when nil
   (declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
@@ -4820,6 +4830,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq lsp-ui-doc-enable nil ; Disable on-hover dialogs
         lsp-ui-imenu-auto-refresh 'after-save
+        lsp-ui-imenu-window-width 16
         lsp-ui-sideline-enable nil ; Disable whole sideline
         lsp-ui-sideline-show-diagnostics nil ; Do not show diagnostics when typing
         lsp-ui-modeline-code-actions-enable t)
@@ -5400,6 +5411,7 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'global-diff-hl-mode "diff-hl" nil t))
 
   (add-hook 'after-init-hook #'global-diff-hl-mode)
+  (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode)
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
   (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
@@ -6043,11 +6055,10 @@ Ignore if no file is found."
   (autoload #'jsonc-mode "json-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("User/settings.json$"         . jsonc-mode))
+(progn
+  (add-to-list 'auto-mode-alist '("\\.json\\'"                  . json-mode))
+  (add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
+  (add-to-list 'auto-mode-alist '("User/settings.json$"         . jsonc-mode)))
 
 (dolist (hook '(json-mode-hook jsonc-mode-hook))
   (add-hook hook (lambda nil
@@ -6064,6 +6075,7 @@ Ignore if no file is found."
 
 (with-eval-after-load 'scss-mode
   (defvar scss-compile-at-save)
+
   (setq scss-compile-at-save t))
 
 
@@ -6240,8 +6252,6 @@ Ignore if no file is found."
 
 (with-eval-after-load 'flycheck
   ;; https://github.com/flycheck/flycheck/issues/1762
-  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
-
   (defvar-local sb/flycheck-local-cache nil)
 
   (defun sb/flycheck-checker-get (fn checker property)
@@ -6292,6 +6302,10 @@ Ignore if no file is found."
 ;; Merge completions of all the backends, give priority to `company-xxx'
 ;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
 
+;; If the group contains keyword `:with', the backends listed after this keyword are ignored for
+;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
+;; that come from different backends are sorted separately in the combined list.
+
 (unless (fboundp 'company-dabbrev)
   (autoload #'company-dabbrev "company-dabbrev" nil t))
 (unless (fboundp 'company-capf)
@@ -6311,14 +6325,13 @@ Ignore if no file is found."
   ;; Slightly larger value to have more precise matches and so that the popup does not block
   (setq-local company-minimum-prefix-length 3)
   (set (make-local-variable 'company-backends)
-       '((
-          company-files
-          company-yasnippet ; Works everywhere
-          company-ispell ; Uses an English dictionary
-          ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
-          ;; strings or comments). That is why it is better to put it at the end.
-          company-dabbrev
-          ))))
+       '(company-files
+         ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
+         ;; strings or comments). That is why it is better to put it at the end.
+         (company-dabbrev :separate
+                          ;; Uses an English dictionary
+                          company-ispell)
+         )))
 
 (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
   (add-hook hook #'sb/company-text-mode))
@@ -6330,10 +6343,11 @@ Ignore if no file is found."
   (defvar company-backends)
 
   (make-local-variable 'company-backends)
-  (setq company-backends '((company-capf :separate
-                                         company-dabbrev-code
-                                         company-yasnippet)
-                           company-files)))
+  (setq company-backends '(company-capf
+                           company-files
+                           company-yasnippet
+                           company-dabbrev-code
+                           company-dabbrev)))
 
 (dolist (hook '(nxml-mode-hook))
   (add-hook hook (lambda ()
@@ -6348,13 +6362,13 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((company-capf :separate
-                        company-dabbrev-code
-                        company-yasnippet)
+        '(company-capf
           company-files
+          company-yasnippet
+          company-dabbrev-code
           company-dabbrev)))
 
-(add-hook 'prog-mode-hook #'sb/company-prog-mode)
+;; (add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 
 (defun sb/company-java-mode ()
@@ -6364,10 +6378,10 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends '((company-capf :separate
-                                         company-dabbrev-code
-                                         company-yasnippet)
+  (setq company-backends '(company-capf
                            company-files
+                           company-yasnippet
+                           company-dabbrev-code
                            company-dabbrev)))
 
 (add-hook 'java-mode-hook #'sb/company-java-mode)
@@ -6382,10 +6396,10 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends '((company-capf :separate
-                                         company-dabbrev-code
-                                         company-yasnippet)
+  (setq company-backends '(company-capf
                            company-files
+                           company-yasnippet
+                           company-dabbrev-code
                            company-dabbrev)))
 
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
@@ -6422,10 +6436,10 @@ Ignore if no file is found."
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   ;; Merge completions of the three backends, give priority to `company-capf'.
-  (setq company-backends '((company-capf :separate
-                                         company-dabbrev-code
-                                         company-yasnippet)
+  (setq company-backends '(company-capf
                            company-files
+                           company-yasnippet
+                           company-dabbrev-code
                            company-dabbrev)))
 
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
@@ -6441,8 +6455,8 @@ Ignore if no file is found."
   ;; Grouping the backends will show popups from all. `company-dabbrev-code' is useful for variable
   ;; names.
   (setq company-backends '(company-capf
-                           company-yasnippet
                            company-files
+                           company-yasnippet
                            company-dabbrev-code
                            company-dabbrev)))
 
@@ -6463,19 +6477,19 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
-  (setq company-backends '((company-files
-                            company-bibtex
-                            company-math-symbols-latex
-                            company-latex-commands
-                            company-math-symbols-unicode
-                            company-reftex-labels
-                            company-reftex-citations
-                            company-auctex-labels
-                            company-auctex-bibs
-                            company-capf
-                            company-yasnippet
-                            company-dabbrev
-                            company-ispell))))
+  (setq company-backends '(company-files
+                           company-bibtex
+                           company-math-symbols-latex
+                           company-latex-commands
+                           company-math-symbols-unicode
+                           company-reftex-labels
+                           company-reftex-citations
+                           company-auctex-labels
+                           company-auctex-bibs
+                           company-capf
+                           company-yasnippet
+                           company-dabbrev
+                           company-ispell)))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
@@ -6487,10 +6501,9 @@ Ignore if no file is found."
 
   (make-local-variable 'company-backends)
   (setq company-backends
-        '((company-capf :separate
-                        company-yasnippet
-                        company-dabbrev-code)
+        '(company-capf
           company-files
+          company-yasnippet
           company-dabbrev
           company-ispell)))
 
@@ -6805,16 +6818,15 @@ mode is not in `sb/skippable-modes'."
 ;; Show help popups for prefix keys
 
 (unless (fboundp 'which-key-mode)
-  (autoload #'which-key-mode nil t))
+  (autoload #'which-key-mode "which-key" nil t))
 (unless (fboundp 'which-key-setup-side-window-right-bottom)
-  (autoload #'which-key-setup-side-window-right-bottom nil t))
+  (autoload #'which-key-setup-side-window-right-bottom "which-key" nil t))
 
 (run-with-idle-timer 3 nil #'which-key-mode)
 
 (with-eval-after-load 'which-key
   ;; Allow C-h to trigger which-key before it is done automatically
   (defvar which-key-show-early-on-C-h)
-  (setq which-key-show-early-on-C-h t)
 
   (which-key-setup-side-window-right-bottom)
 
@@ -6825,13 +6837,10 @@ mode is not in `sb/skippable-modes'."
 
   (which-key-posframe-mode 1)
 
-  ;; The posframe has a lower contrast
+  ;; The posframe has a low contrast
   (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
-  ;; (defvar which-key-posframe-border-width)
-
-  ;; (setq which-key-posframe-border-width 2)
-  )
+  (defvar which-key-posframe-border-width))
 
 
 ;; Hydras
