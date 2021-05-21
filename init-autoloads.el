@@ -4939,15 +4939,11 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (with-eval-after-load 'flycheck
-  (unless (fboundp 'flycheck-clang-analyzer-setup)
-    (autoload #'flycheck-clang-analyzer-setup "flycheck-clang-analyzer" nil t))
+  (require 'flycheck-clang-analyzer)
 
   (flycheck-clang-analyzer-setup)
 
-  (unless (fboundp 'flycheck-clang-tidy-setup)
-    (autoload #'flycheck-clang-tidy-setup "flycheck-clang-tidy" nil t))
-
-  (flycheck-clang-tidy-setup))
+  (flycheck-add-next-checker 'c/c++-cppcheck 'clang-analyzer))
 
 
 (unless (fboundp 'cuda-mode)
@@ -6265,7 +6261,7 @@ Ignore if no file is found."
                 (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-bash)))))))
 
               (when (derived-mode-p 'c++-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-clang-tidy)))))))
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
 
               (when (derived-mode-p 'css-mode)
                 (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
@@ -6816,6 +6812,9 @@ mode is not in `sb/skippable-modes'."
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
 (unbind-key "C-j") ; Interferes with imenu `C-c C-j'
+
+(unless (fboundp 'package-quickstart-refresh)
+  (autoload #'package-quickstart-refresh "package" nil t))
 
 (when sb/EMACS27+
   (bind-key "C-c d p" #'package-quickstart-refresh))
