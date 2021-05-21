@@ -149,6 +149,8 @@
                          markdown-preview-mode
                          markdown-toc
                          math-preview
+                         math-symbols
+                         ;; Required by `ac-math' and `company-math'
                          math-symbol-lists
                          matlab-mode
                          modern-cpp-font-lock

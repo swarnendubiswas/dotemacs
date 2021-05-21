@@ -147,7 +147,6 @@ This location is used for temporary installations and files.")
   'pyright
   "Choose the Python Language Server implementation."
   :type '(radio
-          (const :tag "pyls" pyls)
           (const :tag "pyright" pyright)
           (const :tag "jedi" jedi)
           (const :tag "none" none))
@@ -1810,13 +1809,6 @@ SAVE-FN with non-nil ARGS."
         ;; Align additional metadata, like type signatures, to the right-hand side
         company-tooltip-align-annotations t)
 
-  ;; Company should pick up the correct versions automatically
-  ;; (when (eq sb/theme 'modus-operandi)
-  ;;   (setq company-format-margin-function #'company-vscode-light-icons-margin))
-
-  ;; (when (eq sb/theme 'modus-vivendi)
-  ;;   (setq company-format-margin-function #'company-vscode-dark-icons-margin))
-
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if (lambda (c)
@@ -1841,8 +1833,8 @@ SAVE-FN with non-nil ARGS."
   (defvar company-posframe-show-metadata)
   (defvar company-posframe-show-indicator)
 
-  (setq company-posframe-show-metadata t
-        company-posframe-show-indicator t
+  (setq company-posframe-show-metadata nil ; Difficult to distinguish and distracting
+        company-posframe-show-indicator nil
         company-posframe-quickhelp-delay nil)
 
   (diminish 'company-posframe-mode)
@@ -1852,6 +1844,7 @@ SAVE-FN with non-nil ARGS."
     (autoload #'company-quickhelp-mode "company-quickhelp" nil t))
 
   (run-at-time 3 nil #'company-quickhelp-mode)
+
 
   ;; Company now has in-built support for completion icons
   (if nil
@@ -1899,6 +1892,7 @@ SAVE-FN with non-nil ARGS."
   ;; Company statistics
   (unless (fboundp 'company-statistics-mode)
     (autoload #'company-statistics-mode "company-statistics" nil t))
+
   (company-statistics-mode 1))
 
 (defvar company-active-map)
@@ -1923,6 +1917,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'yas-global-mode)
   (autoload #'yas-global-mode "yasnippet" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("/\\.emacs\\.d/snippets/" . snippet-mode))
 
 (add-hook 'text-mode-hook #'yas-global-mode)
@@ -1940,14 +1935,15 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'yasnippet-snippets-initialize)
     (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
 
-  (yasnippet-snippets-initialize)
+  (yasnippet-snippets-initialize))
 
-  (with-eval-after-load 'ivy
-    (unless (fboundp 'ivy-yasnippet)
-      (autoload #'ivy-yasnippet "ivy-yasnippet" nil t))
 
-    (bind-keys :package ivy-yasnippet
-               ("C-M-y" . ivy-yasnippet))))
+(with-eval-after-load 'ivy
+  (unless (fboundp 'ivy-yasnippet)
+    (autoload #'ivy-yasnippet "ivy-yasnippet" nil t))
+
+  (bind-keys :package ivy-yasnippet
+             ("C-M-y" . ivy-yasnippet)))
 
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
@@ -5534,9 +5530,9 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'yaml-mode "yaml-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '(".clang-tidy"   . yaml-mode))
+(progn
+  (add-to-list 'auto-mode-alist '(".clang-format" . yaml-mode))
+  (add-to-list 'auto-mode-alist '(".clang-tidy"   . yaml-mode)))
 
 (add-hook 'yaml-mode-hook (lambda ()
                             (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
@@ -5553,9 +5549,9 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'bat-mode "bat-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode))
+(progn
+  (add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
+  (add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode)))
 
 
 (unless (fboundp 'web-mode)
@@ -6463,35 +6459,66 @@ Ignore if no file is found."
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 
+(unless (fboundp 'company-bibtex)
+  (autoload #'company-bibtex "company-bibtex" nil t))
+(unless (fboundp 'company-math-symbols-latex)
+  (autoload #'company-math-symbols-latex "company-math" nil t))
+(unless (fboundp 'company-math-symbols-unicode)
+  (autoload #'company-math-symbols-unicode "company-math" nil t))
+(unless (fboundp 'company-latex-commands)
+  (autoload #'company-latex-commands "company-math" nil t))
+(unless (fboundp 'company-reftex-labels)
+  (autoload #'company-reftex-labels "company-reftex" nil t))
+(unless (fboundp 'company-reftex-citations)
+  (autoload #'company-reftex-citations "company-reftex" nil t))
+(unless (fboundp 'company-auctex-labels)
+  (autoload #'company-auctex-labels "company-auctex" nil t))
+(unless (fboundp 'company-auctex-bibs)
+  (autoload #'company-auctex-bibs "company-auctex" nil t))
+(unless (fboundp 'company-auctex-init)
+  (autoload #'company-auctex-init "company-auctex" nil t))
+(unless (fboundp 'company-auctex-macros)
+  (autoload #'company-auctex-macros "company-auctex" nil t))
+(unless (fboundp 'company-auctex-symbols)
+  (autoload #'company-auctex-symbols "company-auctex" nil t))
+(unless (fboundp 'company-auctex-environments)
+  (autoload #'company-auctex-environments "company-auctex" nil t))
+
 (defun sb/company-latex-mode ()
   "Add backends for latex completion in company mode."
-  (require 'company-auctex nil nil)
-  (company-auctex-init)
-  (require 'math-symbol-lists nil nil) ; Required by `ac-math' and `company-math'
-  (require 'company-math nil nil)
-  (require 'company-reftex nil nil)
-  (require 'company-bibtex nil nil)
-
   (defvar company-minimum-prefix-length)
   (defvar company-backends)
 
   (setq-local company-minimum-prefix-length 3)
   (make-local-variable 'company-backends)
-  (setq company-backends '(company-files
-                           company-bibtex
-                           company-math-symbols-latex
-                           company-latex-commands
-                           company-math-symbols-unicode
-                           company-reftex-labels
-                           company-reftex-citations
-                           company-auctex-labels
-                           company-auctex-bibs
-                           company-capf
-                           company-yasnippet
-                           company-dabbrev
-                           company-ispell)))
 
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook))
+  ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+  ;; labels and citations
+
+  (setq company-backends '((:separate
+                            company-files
+                            company-reftex-citations
+                            company-reftex-labels
+                            company-auctex-environments
+                            company-auctex-macros
+
+                            company-latex-commands
+                            company-math-symbols-latex
+                            company-math-symbols-unicode
+
+                            ;; company-auctex-symbols
+                            ;; company-auctex-bibs
+                            ;; company-auctex-labels
+
+                            ;; company-bibtex
+
+                            ;; company-capf
+                            )
+
+                           (:separate company-dabbrev
+                                      company-ispell))))
+
+(dolist (hook '(latex-mode-hook LaTeX-mode-hook tex-mode-hook TeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
 
 
@@ -6840,7 +6867,9 @@ mode is not in `sb/skippable-modes'."
   ;; The posframe has a low contrast
   (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
-  (defvar which-key-posframe-border-width))
+  (defvar which-key-posframe-border-width)
+
+  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
 
 
 ;; Hydras
