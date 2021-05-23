@@ -37,8 +37,8 @@
                     "blur")))
          ;; https://emacs.stackexchange.com/questions/42463/load-package-in-dir-locals
          (eval . (use-package smart-tabs
-                   :ensure t
-                   :config ()))
+                              :ensure t
+                              :config ()))
          (eval .
                (set
                 (make-local-variable 'projectile-globally-ignored-files)
@@ -177,6 +177,10 @@
                 (sh-indentation . 2)
                 ))
  )
+
+(dired-mode . (
+               (dired-omit-mode . t)
+               ))
 
 (eval-after-load 'flycheck
   '(progn

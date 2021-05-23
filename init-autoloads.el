@@ -43,7 +43,7 @@
 
 
 (defcustom sb/modeline-theme
-  'powerline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -122,8 +122,7 @@ whitespaces."
   (setq garbage-collection-messages nil
         debug-on-error t
         debug-on-event 'sigusr2)
-  ;; (debug-on-entry 'package-initialize)
-  )
+  (debug-on-entry 'projectile-remove-known-project))
 
 
 (defconst sb/user-home
@@ -143,6 +142,7 @@ This location is used for temporary installations and files.")
   :type 'string
   :group 'sb/emacs)
 
+
 (defcustom sb/python-langserver
   'pyright
   "Choose the Python Language Server implementation."
@@ -159,6 +159,7 @@ This location is used for temporary installations and files.")
   :type 'boolean
   :group 'sb/emacs)
 
+
 (add-to-list 'load-path sb/extras-directory)
 (defvar sb/core-packages)
 
@@ -169,7 +170,7 @@ This location is used for temporary installations and files.")
 
 
 (when (bound-and-true-p sb/use-no-littering)
-  (require 'no-littering nil nil))
+  (require 'no-littering))
 
 
 (defcustom sb/custom-file
@@ -287,6 +288,7 @@ This location is used for temporary installations and files.")
   (defvar exec-path-from-shell-check-startup-files)
   (defvar exec-path-from-shell-variables)
 
+  ;; "-i" is expensive but Tramp is unable to find executables without the option
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
@@ -342,7 +344,7 @@ This location is used for temporary installations and files.")
       history-delete-duplicates t
       ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
       ;; from 0.5s
-      idle-update-delay 1.0
+      ;; idle-update-delay 1.0
       indicate-buffer-boundaries nil
       inhibit-compacting-font-caches t ; Do not compact font caches during GC
       ;; Disable loading of `default.el' at startup, inhibits site default settings
@@ -1152,9 +1154,7 @@ SAVE-FN with non-nil ARGS."
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-recursive-copies 'always ; Single prompt for all n directories
         ;; Single prompt for all n directories
-        dired-recursive-deletes 'always
-        ;; Do not show messages when omitting files
-        dired-omit-verbose nil)
+        dired-recursive-deletes 'always)
 
   (add-hook 'dired-mode-hook #'auto-revert-mode)
   (add-hook 'dired-mode-hook #'dired-omit-mode)
@@ -1181,8 +1181,20 @@ SAVE-FN with non-nil ARGS."
            ("M-<down>" . sb/dired-jump-to-bottom))
 
 (with-eval-after-load 'dired-x
-  ;; FIXME: Fix the regexp
-  (setq dired-omit-files (concat dired-omit-files "\\.git$\\|__pycache__$"))
+  ;; Do not show messages when omitting files
+  (setq dired-omit-verbose nil)
+
+  ;; (setq dired-omit-files
+  ;;       (concat dired-omit-files
+  ;;               "\\|^.DS_Store\\'"
+  ;;               "\\|^.project\\(?:ile\\)?\\'"
+  ;;               "\\|^.\\(svn\\|git\\)\\'"
+  ;;               "\\|^.ccls-cache\\'"
+  ;;               ;; FIXME: Fix the regexp
+  ;;               ;; "\\|__pycache__"
+  ;;               "\\|\\(?:\\.js\\)?\\.meta\\'"
+  ;;               "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+
 
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
@@ -1750,7 +1762,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; TODO: Is this causing tramp to fail? I have disabled it to test.
 ;; Hide the "Wrote ..." message which is irritating
-;; (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
@@ -2975,6 +2987,7 @@ This file is specified in `counsel-projectile-default-file'."
                                                                             sb/user-home)
                 flycheck-pylintrc (expand-file-name ".config/pylintrc" sb/user-home)
                 flycheck-python-pylint-executable "python3"
+                ;; Shellcheck is a resource hog for `$HOME/.bash*' files
                 flycheck-shellcheck-follow-sources nil
                 flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
                 flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
@@ -3293,7 +3306,9 @@ This file is specified in `counsel-projectile-default-file'."
   (setq imenu-auto-rescan t
         imenu-max-items 500
         imenu-max-item-length 100
-        imenu-use-popup-menu t ; `t' will use a popup menu rather than a minibuffer prompt
+        ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful
+        ;; with mouse support enabled
+        imenu-use-popup-menu nil
         ;; `nil' implies no sorting or listing by position in the buffer
         imenu-sort-function nil))
 
@@ -3330,7 +3345,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'xref-etags-mode "xref" nil t))
 
 (with-eval-after-load 'xref
-  (xref-etags-mode)
+  ;; (xref-etags-mode)
 
   (with-eval-after-load 'ivy
     (defvar xref-show-definitions-function)
@@ -3850,12 +3865,13 @@ This file is specified in `counsel-projectile-default-file'."
   (setq windmove-wrap-around t))
 
 
-;; Save buffers when Emacs loses focus. This causes additional saves which leads to auto-formatters
-;; being invoked more frequently.
+;; Save buffers when Emacs loses focus.
 (unless (fboundp 'super-save-mode)
   (autoload #'super-save-mode "super-save" nil t))
 
-(run-with-idle-timer 3 nil #'super-save-mode)
+;; This causes additional saves which triggers the `after-save-hook' and leads to auto-formatters
+;; being invoked more frequently.
+;; (run-with-idle-timer 3 nil #'super-save-mode)
 
 (with-eval-after-load 'super-save
   (defvar super-save-remote-files)
@@ -4089,10 +4105,11 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
         ;; Fine-grained zoom factor of 10%
-        pdf-view-resize-factor 1.1)
+        pdf-view-resize-factor 1.2)
 
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
+  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
   (add-hook 'pdf-view-mode-hook
             (lambda()
               (pdf-links-minor-mode 1)
@@ -5220,7 +5237,6 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
 
-  ;; FIXME: Shellcheck is a resource hog for `$HOME/.bash*' files
   (flycheck-add-next-checker 'sh-bash 'sh-shellcheck))
 
 
@@ -5675,6 +5691,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'TeX-revert-document-buffer)
   (autoload #'TeX-revert-document-buffer "tex" nil t))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
 
 (dolist (hook '(LaTex-mode-hook latex-mode-hook))
@@ -6184,7 +6201,7 @@ Ignore if no file is found."
   (unless (fboundp 'fasd-find-file)
     (autoload #'fasd-find-file "fasd" nil t))
 
-  (run-with-idle-timer 3 nil #'global-fasd-mode)
+  (run-with-idle-timer 2 nil #'global-fasd-mode)
 
   (with-eval-after-load 'fasd
     (defvar fasd-enable-initial-prompt)
@@ -6226,6 +6243,7 @@ Ignore if no file is found."
   (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
 
 ;; (declare-function ansi-color-apply-on-region "ansi-color")
+
 ;; (defun sb/colorize-compilation-buffer ()
 ;;   "Colorize compile mode output."
 ;;   (require 'ansi-color)
@@ -6282,11 +6300,13 @@ Ignore if no file is found."
 
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
-;; `company-ispell', and `company-dabbrev'.
+;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
+;; context (major mode, inside strings or comments). That is why it is better to put it at the end.
+
 ;; https://tychoish.com/post/better-company/
 ;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
-
 ;; https://emacs.stackexchange.com/questions/64038/how-to-use-multiple-backends-in-priority-for-company-mode
+
 ;; Try completion backends in order till there is a non-empty completion list
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 ;; Merge completions of all the backends
@@ -6316,13 +6336,12 @@ Ignore if no file is found."
 
   ;; Slightly larger value to have more precise matches and so that the popup does not block
   (setq-local company-minimum-prefix-length 3)
+  ;; Give priority to dabbrev completions over ispell
   (set (make-local-variable 'company-backends)
        '(company-files
-         ;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode, inside
-         ;; strings or comments). That is why it is better to put it at the end.
-         (company-dabbrev :separate
-                          ;; Uses an English dictionary
-                          company-ispell)
+         (:separate
+          company-dabbrev
+          company-ispell)
          )))
 
 (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
@@ -6353,14 +6372,13 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '(company-capf
-          company-files
-          company-yasnippet
-          company-dabbrev-code
-          company-dabbrev)))
+  (setq company-backends '(company-capf
+                           company-files
+                           company-yasnippet
+                           company-dabbrev-code
+                           company-dabbrev)))
 
-;; (add-hook 'prog-mode-hook #'sb/company-prog-mode)
+(add-hook 'prog-mode-hook #'sb/company-prog-mode)
 
 
 (defun sb/company-java-mode ()
@@ -6397,23 +6415,30 @@ Ignore if no file is found."
 (add-hook 'c-mode-common-hook #'sb/company-c-mode)
 
 
+(unless (fboundp 'company-shell)
+  (autoload #'company-shell "company-shell" nil t))
+(unless (fboundp 'company-shell-env)
+  (autoload #'company-shell-env "company-shell" nil t))
+(unless (fboundp 'company-fish-shell)
+  (autoload #'company-fish-shell "company-shell" nil t))
+
 (defun sb/company-sh-mode ()
   "Add backends for shell script completion in company mode."
   (defvar company-minimum-prefix-length)
   (defvar company-backends)
   (defvar company-shell-delete-duplictes)
 
-  (require 'company-shell nil nil)
   (setq company-shell-delete-duplictes t)
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  (setq company-backends '((company-capf :separate
-                                         company-shell
-                                         company-shell-env
-                                         company-fish-shell
-                                         company-dabbrev-code
-                                         company-yasnippet)
+  (setq company-backends '((:separate
+                            company-capf
+                            company-shell
+                            company-shell-env
+                            company-fish-shell
+                            company-dabbrev-code)
+                           company-yasnippet
                            company-files
                            company-dabbrev)))
 
@@ -6427,12 +6452,12 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  ;; Merge completions of the three backends, give priority to `company-capf'.
   (setq company-backends '(company-capf
                            company-files
                            company-yasnippet
                            company-dabbrev-code
-                           company-dabbrev)))
+                           company-dabbrev
+                           company-ispell)))
 
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
@@ -6444,8 +6469,7 @@ Ignore if no file is found."
 
   (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
-  ;; Grouping the backends will show popups from all. `company-dabbrev-code' is useful for variable
-  ;; names.
+  ;; `company-dabbrev-code' is useful for variable names.
   (setq company-backends '(company-capf
                            company-files
                            company-yasnippet
@@ -6497,7 +6521,6 @@ Ignore if no file is found."
                             company-reftex-labels
                             company-auctex-environments
                             company-auctex-macros
-
                             company-latex-commands
                             company-math-symbols-latex
                             company-math-symbols-unicode
@@ -6505,14 +6528,12 @@ Ignore if no file is found."
                             ;; company-auctex-symbols
                             ;; company-auctex-bibs
                             ;; company-auctex-labels
-
                             ;; company-bibtex
-
                             ;; company-capf
                             )
-
-                           (:separate company-dabbrev
-                                      company-ispell))))
+                           (:separate
+                            company-dabbrev
+                            company-ispell))))
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook tex-mode-hook TeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
@@ -6523,12 +6544,11 @@ Ignore if no file is found."
   (defvar company-backends)
 
   (make-local-variable 'company-backends)
-  (setq company-backends
-        '(company-capf
-          company-files
-          company-yasnippet
-          company-dabbrev
-          company-ispell)))
+  (setq company-backends '(company-capf
+                           company-files
+                           company-yasnippet
+                           company-dabbrev
+                           company-ispell)))
 
 (dolist (hook '(web-mode-hook))
   (add-hook hook #'sb/company-web-mode))

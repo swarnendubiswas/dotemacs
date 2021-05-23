@@ -9,6 +9,7 @@
 
 (defvar sb/core-packages)
 
+;; Check number of installed packages with `(length package-alist)'
 (setq sb/core-packages '(ace-window
                          adoc-mode
                          aggressive-indent
