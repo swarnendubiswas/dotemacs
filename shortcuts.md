@@ -1,6 +1,6 @@
-# Useful keyboard shortcuts
+# Useful Keyboard Shortcuts
 
-This file lists useful keyboard shortcuts. Most keybindings are from a default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am maintaining this for **my** ease of reference. Suggestions are welcome.
+This file lists useful keyboard shortcuts and describes how to deal with common use cases. Most keybindings are from a default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am maintaining this for my ease of reference.
 
 Use `M-x describe-personal-keybindings` to see personal keybindings defined using `bind-key`. Use `C-h m (describe-mode)` to view documentation for the current major mode, including a list of its key bindings.
 
@@ -15,10 +15,10 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `M-c` - Capitalize the following word (`capitalize-word`)
 - `M-u` - Convert following word to upper case (`upcase-word`)
 - `C-t` - Transpose two characters (`transpose-chars`)
+- `M-t` - Transpose words (`transpose-words` or `subword-transpose`)
 - `C-x r t` - Prepend the selected region with characters (`string-rectangle`)
 - `M-k` - Kill forward to the end of the sentence (`kill-sentence`)
-- `M-t` - Transpose words (`transpose-words` or `subword-transpose`)
-- `M-;` - Invoke comment-dwim (`comment-dwim`)
+- `M-;` - Invoke `comment-dwim` (`comment-dwim`)
 - `M-/` - Try to expand text before point (`hippie-expand`)
 - `C-M-\` - Indent all the lines in the region (`indent-region`)
 - `M-q` - Fill paragraph at or after point (`fill-paragraph`)
@@ -69,28 +69,23 @@ Use `M-x describe-personal-keybindings` to see personal keybindings defined usin
 - `r` - Rename the specified file at point (`dired-efap`)
 - `i` - Find file (`counsel-find-file`)
 - `/` - Filter files (`dired-narrow`)
-- `M-<home>` - Go to HOME directory (`dired-go-home`)
+- `M-<home>` - Go to `HOME` directory (`dired-go-home`)
 - `M-<up>` - Go to the first file/directory (`dired-jump-to-top`)
 - `M-<down>` - Go the last file/directory (`dired-jump-to-bottom`)
-- `q` - Kill dired buffer (`quit-window`)
-- `C-u q` - Kill dired buffer (`universal-argument quit-window`)
-- `C-x C-j` - Open dired with cursor right on the file you are editing (`dired-jump`)
+- `q` - Kill `dired` buffer (`quit-window`)
+- `C-u q` - Kill `dired` buffer (`universal-argument quit-window`)
+- `C-x C-j` - Open `dired` with cursor right on the file you are editing (`dired-jump`)
 
 ## Treemacs
 
 - `C-j` - Initialize or toggle Treemacs (`treemacs`)
 - `n/p` - Navigate between same-level nodes (``)
-- `u` - Go to parent folder (``)
-- `j` - (``)
-- `k` - (``)
-- `h` - (`treemacs-COLLAPSE-action`)
-- `l` - (``)
-- `n` - (`treemacs-next-line`)
-- `p` - (`treemacs-previous-line`)
-- `C-n` - (``)
-- `C-p` - (``)
-- `C-c C-w` - (`treemacs-edit-workspaces`)
-- `C-c C-c` - (`treemacs-finish-edit`)
+- `u` - Go to parent folder (`treemacs-goto-parent-node`)
+- `h` - Run the appropriate COLLAPSE action (`treemacs-COLLAPSE-action`)
+- `l` - Run the appropriate RET action (``)
+- `n` - Go to next line (`treemacs-next-line`)
+- `p` - Go to previous line (`treemacs-previous-line`)
+- `C-c C-w e` - Edit workspaces and projects as an `org-mode` file (`treemacs-edit-workspaces`)
 
 ## Ibuffer
 
@@ -148,14 +143,14 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 - `C-c p g` - Jump to files using completion based on context (`projectile-find-file-dwim`)
 - `C-c p d` - Display a list of all directories in the project (`projectile-find-dir`)
 - `C-c p b` - List buffers local to current project (`projectile-switch-to-buffer`)
-- `C-c p e` - Jump to recently visited files in project (`projectile-recentf`)
+- `C-c p e` - Jump to recently-visited files in project (`projectile-recentf`)
 - `C-c p r` - Simple refactoring with text replace in current project (`projectile-replace`)
 - `C-c p S` - Save all project buffers (`projectile-save-project-buffers`)
-- `C-c p a` - Switch between .h and .c or .cpp files, useful for C/C++ projects (`projectile-find-other-file`)
+- `C-c p a` - Switch between `.h` and `.c` or `.cpp` files, useful for C/C++ projects (`projectile-find-other-file`)
 - `C-c p i` - Invalidate the project cache (if existing) (`projectile-invalidate-cache`)
 - `<f5>` - Switch project (`counsel-projectile-switch-project`)
 - `<f6>` - Find file (`counsel-projectile-find-file`)
-- `<f7>` - Run an ag search in the project (`counsel-projectile-rg`)
+- `<f7>` - Run an `rg` search in the project (`counsel-projectile-rg`)
 - `C-c p s g` - Grep in project (`counsel-projectile-grep`)
 - `C-c p v` - Run `vc-dir` on the project root (`projectile-vc`)
 - `C-c p k` - Kill all project buffers (`projectile-kill-buffers`)
@@ -214,9 +209,9 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 
 ## Web mode
 
-- `C-c C-n` - Jump to opening/closing blocks/tags (``)
-- `C-c C-f` - Fold code for code blocks (``)
-- `C-c C-i` - Indent entire buffer (``)
+- `C-c C-n` - Jump to opening/closing blocks/tags (`web-mode-navigate`)
+- `C-c C-f` - Fold code for code blocks (`web-mode-fold-or-unfold`)
+- `C-c C-i` - Indent entire buffer (`web-mode-buffer-indent`)
 
 ## Tags
 
@@ -230,20 +225,6 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `<tab>` - Quit _xref_ buffer, then jump to xref on current line (`xref-quit-and-goto-xref`)
 - `r` - Perform interactive replacement of FROM with TO in all displayed xrefs (`xref-query-replace-in-results`)
 
-### Counsel Gtags
-
-- `M-.` - Jump to tag underneath cursor (`find-tags`)
-- `M-*` - Pop back to where you previously invoked `M-.` ()
-- `C-c g c` - Create tags (``)
-- `C-c g u` - Update tags (``)
-- `C-c g s` - Find other symbol (``)
-- `C-c g r` - Find reference (``)
-
-### Counsel Etags
-
-- ``
-- ``
-
 ## Programming
 
 - `C-M-a` - Jump backward to the beginning of the current function (`c-beginning-of-defun`)
@@ -253,20 +234,10 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `C-M-j` - Select a tag to jump to from tags defined in current directory (`moo-jump-directory`)
 - `C-M-i` - Complete symbol at point (`complete-symbol`)
 
-### Python with Elpy
+## Python with LSP
 
-- `C-c C-d` - Get object or function docs (`elpy-doc`)
-- `M-<left>` - (`elpy-nav-indent-shift-left`)
-- `M-<right>` -
 - `M-e` - Jump to the next block (`python-nav-forward-block`)
 - `M-a` - Jump to the previous block (`python-nav-backward-block`)
-- `C-c C-o` - Overview of the definitions in the current file
-- `M-.` - Jump to the definition of a function or class (`elpy-goto-definition`)
-- `C-<up>` - Move up along lines with same indentation as the current line (`elpy-nav-backward-block`)
-- `C-<down>` - Go down along lines with same indentation as the current line (`elpy-nav-forward-block`)
-
-### Python with LSP
-
 - `C-c <` - Indent left (`python-indent-shift-left`)
 - `C-c >` - Indent right (`python-indent-shift-right`)
 - `` - Navigate to the previous function (`python-nav-backward-defun`)
@@ -274,9 +245,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `M-]` - Jump to the forward block (`python-nav-forward-block`)
 - `M-[` - Jump to the backward block (`python-nav-backward-block`)
 
-### C/C++
-
-#### RTags
+## C/C++ with LSP
 
 - `M-.` - Jump to tag underneath cursor (``)
 - `M-,` - Pop stack location (``)
@@ -300,9 +269,7 @@ Within the error list the following key bindings are available:
 - ``
 - ``
 
-## Version control systems
-
-### Git with Magit
+## Git with Magit
 
 Use `magit-status` to display information about the current Git repository, and `magit-dispatch-popup` to see help with keybindings.
 
@@ -335,17 +302,7 @@ Use `magit-status` to display information about the current Git repository, and 
 - `y` - List and compare references (`magit-show-references`)
 - `i` - Instruct Git to ignore a file (`magit-gitignore`)
 
-### Svn
-
-- `g` - Refresh status of files (``)
-- `m` - Mark file at point (``)
-- `u` - Unmark file at point (``)
-- `c` - Commit marked files or file at point (``)
-- `l` - Display log for marked files or file at point (``)
-- `=` - Run diff on the marked files or file at point (``)
-- `U` - Update files for currently examined repository (``)
-
-### SMerge
+## SMerge
 
 - `C-c v u` - (`smerge-keep-upper`)
 - `C-c v l` - (`smerge-keep-lower`)
@@ -371,21 +328,22 @@ Use `magit-status` to display information about the current Git repository, and 
 
 - Run `M-x rgrep` to find the string
 - Run `M-x wgrep` or use `C-s C-p`
-- Edit the rgrep results, you can use `iedit-mode`
-- Use `C-x C-s` to commit wgrep
+- Edit the `rgrep` results, you can use `iedit-mode`
+- Use `C-x C-s` to commit `wgrep`
 - Use `C-x s !` to save the changed files
 
-- <http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open>
-- <https://emacsbliss.com/post/emacs-search-replace/>
+- References
+  - <http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open>
+  - <https://emacsbliss.com/post/emacs-search-replace/>
 
 ### Search for the symbol at point
 
 - `isearch` - Traditional incremental forward search for regular expression with `C-f`
-- `counsel-grep-or-swiper` - Use `swiper` (with overview of lines) for small buffers and `counsel-grep` for large files with `<f4>`
+- `counsel-grep-or-swiper` - Use `swiper` (with overview of lines) for small buffers and `counsel-grep` for large files
 - `rgrep` - Recursively grep for REGEXP in FILES in directory tree rooted at DIR
-- `deadgrep` - Start a ripgrep search for SEARCH-TERM (`<f8>`)
+- `deadgrep` - Start a ripgrep search for SEARCH-TERM
 - `counsel-rg` - Grep for a string in the current directory using rg (`C-c s r`)
-- `counsel-projectile-rg` - Perform incremental search in the current project with rg (`<f7>`)
+- `counsel-projectile-rg` - Perform incremental search in the current project with rg
 
 #### Isearch
 
