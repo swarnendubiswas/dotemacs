@@ -56,6 +56,13 @@
 (setq frame-inhibit-implied-resize t)
 
 ;; Disable UI elements before being initialized
+
+;; (when (display-graphic-p) ; `window-system' is deprecated
+;;   (progn
+;;     (menu-bar-mode -1)
+;;     (scroll-bar-mode -1)
+;;     (tool-bar-mode -1)))
+
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode)
@@ -65,6 +72,10 @@
 
 ;; (customize-set-variable 'menu-bar-mode nil)
 ;; (customize-set-variable 'tool-bar-mode nil)
+
+;; Maximize Emacs on startup, I am not sure which one of the following is better.
+;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames

@@ -28,7 +28,7 @@
 
 
 (defcustom sb/theme
-  'modus-operandi
+  'sb/default
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -43,7 +43,7 @@
 
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -411,11 +411,14 @@ This location is used for temporary installations and files.")
 
 (dolist (exts '(;; Extensions
                 ".aux"
+                ".class"
                 ".dll"
+                ".elc"
                 ".exe"
                 ".fls"
                 ".lof"
                 ".o"
+                ".pyc"
                 ".rel"
                 ".rip"
                 ".so"
@@ -496,7 +499,7 @@ This location is used for temporary installations and files.")
 (unless (fboundp 'savehist-mode)
   (autoload #'savehist-mode "savehist" nil t))
 
-(run-at-time 5 nil #'savehist-mode)
+(run-with-idle-timer 5 nil #'savehist-mode)
 
 (with-eval-after-load 'savehist
   (defvar savehist-additional-variables)
@@ -559,11 +562,10 @@ This location is used for temporary installations and files.")
   (setq split-height-threshold nil
         split-width-threshold 0))
 
+;; Make use of wider screens
 (when nil
-  ;; Make use of wider screens
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-    (split-window-right))
-  )
+    (split-window-right)))
 
 
 ;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
@@ -579,29 +581,14 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'abbrev-mode)
   (autoload #'abbrev-mode "abbrev" nil t))
 
-(run-at-time 3 nil (lambda ()
-                     (add-hook 'text-mode-hook #'abbrev-mode)))
+;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' quickly can be useful
+(add-hook 'text-mode-hook #'abbrev-mode)
 
 (with-eval-after-load 'abbrev
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently)
 
   (diminish 'abbrev-mode))
-
-
-;; The following snippets have been moved to `early-init-file'.
-
-;; Maximize Emacs on startup, moved I am not sure which one of the following is better or faster.
-;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
-;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
-;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-
-;; (when (display-graphic-p) ; `window-system' is deprecated
-;;   (progn
-;;     (menu-bar-mode -1)
-;;     (scroll-bar-mode -1)
-;;     (tool-bar-mode -1)))
 
 
 ;; Disable the following modes
@@ -1034,7 +1021,8 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'beacon-mode)
   (autoload #'beacon-mode "beacon") nil t)
 
-(run-with-idle-timer 3 nil #'beacon-mode)
+;; LATER: Check the impact on performance, do I really need it?
+;; (run-with-idle-timer 3 nil #'beacon-mode)
 
 (with-eval-after-load 'beacon
   (diminish 'beacon-mode))
@@ -1042,8 +1030,6 @@ SAVE-FN with non-nil ARGS."
 
 (unless (fboundp 'ibuffer)
   (autoload #'ibuffer "ibuffer" nil t))
-
-(defalias 'list-buffers 'ibuffer)
 
 (bind-keys :package ibuffer
            ("C-x C-b" . ibuffer))
@@ -1081,9 +1067,6 @@ SAVE-FN with non-nil ARGS."
 
     (setq all-the-icons-ibuffer-human-readable-size t
           all-the-icons-ibuffer-icon-size 0.9)))
-
-(bind-keys :package ibuffer
-           ("C-x C-b" . ibuffer))
 
 
 (when nil
@@ -1436,8 +1419,14 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'treemacs-tags-face nil :height 0.7)
     (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
     (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
-    (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
-    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
+
+    (when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
+      (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
+      (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
+
+    (when (eq sb/theme 'sb/default)
+      (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
+      (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0)))
 
   (bind-keys* :package treemacs
               ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
@@ -1762,7 +1751,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; TODO: Is this causing tramp to fail? I have disabled it to test.
 ;; Hide the "Wrote ..." message which is irritating
-(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+;; (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
@@ -1968,6 +1957,8 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load 'amx
   (defvar amx-save-file)
 
+  (setq amx-auto-update-interval 2) ; Update the command list every 2 minutes
+
   (unless (bound-and-true-p sb/use-no-littering)
     (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory))))
 
@@ -2030,9 +2021,6 @@ SAVE-FN with non-nil ARGS."
         ;;                         (t                 . ivy--regex-ignore-order))
         ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
         ivy-wrap t)
-
-  (defalias 'wgrep-change-to-wgrep-mode 'ivy-wgrep-change-to-wgrep-mode)
-  (defalias 'occur 'ivy-occur)
 
   (dolist (buffer
            '("TAGS" "magit-process" "*emacs*" "*xref*"
@@ -2136,6 +2124,7 @@ SAVE-FN with non-nil ARGS."
                                          "\\|__pycache__"
                                          "\\|.cb$"
                                          "\\|.cb2$"
+                                         "\\|.class$"
                                          "\\|.djvu$"
                                          "\\|.doc$"
                                          "\\|.docx$"
@@ -2300,15 +2289,17 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'flyspell-correct-next)
     (autoload #'flyspell-correct-next "flyspell" nil t))
 
-  ;; Enabling `flyspell-prog-mode' does not seem to be very useful
+  ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
+  ;; language-specific words
   (add-hook 'text-mode-hook #'flyspell-mode)
 
   ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
 
   ;; `find-file-hook' will not work for buffers with no associated files
-  (add-hook 'after-init-hook (lambda nil
-                               (when (string= (buffer-name) "*scratch*")
-                                 (flyspell-mode 1))))
+  (add-hook 'after-init-hook
+            (lambda nil
+              (when (string= (buffer-name) "*scratch*")
+                (flyspell-mode 1))))
 
   (eval-and-compile
     ;; Move point to previous error
@@ -2540,7 +2531,7 @@ SAVE-FN with non-nil ARGS."
   (autoload #'electric-pair-mode "elec-pair" nil t))
 
 ;; Enable autopairing, `smartparens' seems slow
-(run-at-time 3 nil #'electric-pair-mode)
+(run-at-time 2 nil #'electric-pair-mode)
 
 (with-eval-after-load 'elec-pair
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
@@ -3091,7 +3082,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'whitespace-turn-off)
   (autoload #'whitespace-turn-off "whitespace" nil t))
 
-(add-hook 'markdown-mode-hook #'whitespace-mode)
+(unless (eq sb/theme 'sb/default)
+  (add-hook 'markdown-mode-hook #'whitespace-mode))
 
 (with-eval-after-load 'whitespace
   (defvar whitespace-line-column)
@@ -3262,8 +3254,8 @@ This file is specified in `counsel-projectile-default-file'."
         tramp-persistency-file-name (expand-file-name "tramp" sb/temp-directory)))
 
 (setq tramp-completion-reread-directory-timeout nil
-      tramp-default-method "ssh" ; SSH is faster than the default SCP
-      tramp-default-remote-shell "/bin/bash"
+      ;; tramp-default-method "ssh" ; SSH is faster than the default SCP
+      ;; tramp-default-remote-shell "/bin/bash"
       tramp-default-user "swarnendu"
       remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
       tramp-verbose 1
@@ -3753,7 +3745,8 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'persistent-scratch-setup-default)
   (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
 
-(run-at-time 2 nil #'persistent-scratch-setup-default)
+;; Delaying loading contents in the `*scratch*' buffer does not look good
+(add-hook 'after-init-hook #'persistent-scratch-setup-default)
 
 (with-eval-after-load 'persistent-scratch
   (defvar persistent-scratch-autosave-interval)
@@ -4105,7 +4098,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
         ;; Fine-grained zoom factor of 10%
-        pdf-view-resize-factor 1.2)
+        pdf-view-resize-factor 1.1)
 
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
@@ -4117,14 +4110,14 @@ This file is specified in `counsel-projectile-default-file'."
               (pdf-outline-minor-mode 1)
               (pdf-history-minor-mode 1)))
 
-  (require 'saveplace-pdf-view nil nil))
+  ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
+  (require 'saveplace-pdf-view))
 
 (defvar pdf-view-mode-map)
 (bind-keys :package pdf-tools :map pdf-view-mode-map
-           ("C-s" . isearch-forward)
+           ("t"   . pdf-annot-add-text-annotation)
            ("d"   . pdf-annot-delete)
-           ("h"   . pdf-annot-add-highlight-markup-annotation)
-           ("t"   . pdf-annot-add-text-annotation))
+           ("h"   . pdf-annot-add-highlight-markup-annotation))
 
 
 (unless (fboundp 'logview-mode)
@@ -4179,11 +4172,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; The order is important to associate "README.md" with `gfm-mode'
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.md\\'"       . markdown-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+(progn
+  (add-to-list 'auto-mode-alist '("\\.md\\'"       . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode)))
 
 (with-eval-after-load 'markdown-mode
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
@@ -4518,8 +4510,6 @@ This file is specified in `counsel-projectile-default-file'."
                     (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 (with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-
   (diminish 'lsp-mode)
 
   (defvar lsp-pyls-configuration-sources)
@@ -4582,6 +4572,7 @@ This file is specified in `counsel-projectile-default-file'."
         lsp-enable-on-type-formatting nil
         lsp-enable-semantic-tokens t
         lsp-enable-snippet t
+        lsp-enable-which-key-integration t
         lsp-headerline-breadcrumb-enable nil
         lsp-headerline-breadcrumb-enable-diagnostics nil
         lsp-html-format-wrap-line-length sb/fill-column
@@ -4955,14 +4946,6 @@ This file is specified in `counsel-projectile-default-file'."
   (diminish 'modern-c++-font-lock-mode))
 
 
-(with-eval-after-load 'flycheck
-  (require 'flycheck-clang-analyzer)
-
-  (flycheck-clang-analyzer-setup)
-
-  (flycheck-add-next-checker 'c/c++-cppcheck 'clang-analyzer))
-
-
 (unless (fboundp 'cuda-mode)
   (autoload #'cuda-mode "cuda-mode" nil t))
 
@@ -5259,8 +5242,7 @@ This file is specified in `counsel-projectile-default-file'."
 (with-eval-after-load 'shfmt
   (defvar shfmt-arguments)
 
-  (setq shfmt-arguments '("-i" "4" "-p" "-ci"))
-  (shfmt-on-save-mode 1))
+  (setq shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
@@ -6533,7 +6515,16 @@ Ignore if no file is found."
                             )
                            (:separate
                             company-dabbrev
-                            company-ispell))))
+                            company-ispell)))
+
+  ;; (setq company-backends '((:separate
+  ;;                           company-capf
+  ;;                           ;; company-latex-commands
+  ;;                           company-files
+  ;;                           company-yasnippet
+  ;;                           company-dabbrev
+  ;;                           company-ispell)))
+  )
 
 (dolist (hook '(latex-mode-hook LaTeX-mode-hook tex-mode-hook TeX-mode-hook))
   (add-hook hook #'sb/company-latex-mode))
