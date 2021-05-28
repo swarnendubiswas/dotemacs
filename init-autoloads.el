@@ -28,7 +28,7 @@
 
 
 (defcustom sb/theme
-  'sb/default
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "leuven" leuven)
@@ -43,7 +43,7 @@
 
 
 (defcustom sb/modeline-theme
-  'powerline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -143,6 +143,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 
+;; `pyls' and `mspyls' are not actively maintained, the progress of `py-lsp' is slow
 (defcustom sb/python-langserver
   'pyright
   "Choose the Python Language Server implementation."
@@ -234,7 +235,7 @@ This location is used for temporary installations and files.")
   "Restore garbage collection."
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/emacs-256MB))
+        gc-cons-threshold sb/emacs-64MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
 ;; customizations
@@ -243,6 +244,7 @@ This location is used for temporary installations and files.")
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
 
+;; Allow gc to happen after a period of idle time
 (unless (fboundp 'gcmh-mode)
   (autoload #'gcmh-mode "gcmh" nil t))
 (unless (fboundp 'gcmh-idle-garbage-collect)
@@ -386,8 +388,10 @@ This location is used for temporary installations and files.")
       visible-bell nil
       window-resize-pixelwise t
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
-      x-underline-at-descent-line t ; Underline looks a bit better when drawn lower
-      )
+      ;; Always trigger an immediate resize of the child frame
+      x-gtk-resize-child-frames 'resize-mode
+      ;; Underline looks a bit better when drawn lower
+      x-underline-at-descent-line t)
 
 (unless (bound-and-true-p sb/use-no-littering)
   (setq auto-save-list-file-prefix (expand-file-name "auto-save" sb/temp-directory)))
@@ -455,63 +459,68 @@ This location is used for temporary installations and files.")
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
 
-(unless (fboundp 'global-auto-revert-mode)
-  (autoload #'global-auto-revert-mode "autorevert" nil t))
+(progn
+  (unless (fboundp 'global-auto-revert-mode)
+    (autoload #'global-auto-revert-mode "autorevert" nil t))
 
-(run-with-idle-timer 2 nil #'global-auto-revert-mode)
+  (run-with-idle-timer 2 nil #'global-auto-revert-mode)
 
-(with-eval-after-load 'autorevert
-  (defvar auto-revert-interval)
-  (defvar auto-revert-remote-files)
-  (defvar auto-revert-use-notify)
-  (defvar auto-revert-verbose)
-  (defvar global-auto-revert-non-file-buffers)
+  (with-eval-after-load 'autorevert
+    (defvar auto-revert-interval)
+    (defvar auto-revert-remote-files)
+    (defvar auto-revert-use-notify)
+    (defvar auto-revert-verbose)
+    (defvar global-auto-revert-non-file-buffers)
 
-  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        auto-revert-remote-files t ; Emacs seems to hang with auto-revert and tramp
-        auto-revert-use-notify nil
-        auto-revert-verbose nil
-        auto-revert-check-vc-info nil ; Should improve performance
-        ;; Revert dired buffers if the contents of the "main" directory changes
-        global-auto-revert-non-file-buffers nil)
+    (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+          auto-revert-remote-files t ; Emacs seems to hang with auto-revert and tramp
+          auto-revert-use-notify nil
+          auto-revert-verbose nil
+          auto-revert-check-vc-info nil ; Should improve performance
+          ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
+          ;; contents of the "main" directory changes
+          global-auto-revert-non-file-buffers nil)
 
-  (diminish 'auto-revert-mode))
+    (diminish 'auto-revert-mode))
 
-;; Revert all (e.g., PDF) files without asking
-(setq revert-without-query '("\\.*"))
+  ;; Revert all (e.g., PDF) files without asking
+  (setq revert-without-query '("\\.*")))
 
 
 ;; Remember cursor position in files
-(unless (fboundp 'save-place-mode)
-  (autoload #'save-place-mode "saveplace" nil t))
+(progn
+  (unless (fboundp 'save-place-mode)
+    (autoload #'save-place-mode "saveplace" nil t))
 
-;; We may open a file immediately after starting Emacs, hence using a hook instead of a timer.
-(add-hook 'after-init-hook #'save-place-mode)
+  ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
+  ;; timer.
+  (add-hook 'after-init-hook #'save-place-mode)
 
-(with-eval-after-load 'saveplace
-  (defvar save-place-file)
+  (with-eval-after-load 'saveplace
+    (defvar save-place-file)
 
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq save-place-file (expand-file-name "places" sb/temp-directory))))
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq save-place-file (expand-file-name "places" sb/temp-directory)))))
 
 
 ;; Save minibuffer history across sessions
-(unless (fboundp 'savehist-mode)
-  (autoload #'savehist-mode "savehist" nil t))
+(progn
+  (unless (fboundp 'savehist-mode)
+    (autoload #'savehist-mode "savehist" nil t))
 
-(run-with-idle-timer 5 nil #'savehist-mode)
+  (run-with-idle-timer 3 nil #'savehist-mode)
 
-(with-eval-after-load 'savehist
-  (defvar savehist-additional-variables)
-  (defvar savehist-file)
-  (defvar savehist-save-minibuffer-history)
+  (with-eval-after-load 'savehist
+    (defvar savehist-additional-variables)
+    (defvar savehist-file)
+    (defvar savehist-save-minibuffer-history)
 
-  (setq savehist-additional-variables '(extended-command-history kill-ring search-ring
-                                                                 regexp-search-ring)
-        savehist-save-minibuffer-history t)
+    (setq savehist-additional-variables '(extended-command-history kill-ring search-ring
+                                                                   regexp-search-ring)
+          savehist-save-minibuffer-history t)
 
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq savehist-file (expand-file-name "savehist" sb/temp-directory))))
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq savehist-file (expand-file-name "savehist" sb/temp-directory)))))
 
 
 (setq uniquify-after-kill-buffer-p t
@@ -522,29 +531,31 @@ This location is used for temporary installations and files.")
 
 
 ;; Replace `dabbrev-exp' with `hippie-expand', use `C-M-/' for `dabbrev-completion'
-(defvar hippie-expand-verbose)
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-all-abbrevs
-                                         try-expand-list
-                                         try-expand-line
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol)
-      hippie-expand-verbose nil)
+(progn
+  (defvar hippie-expand-verbose)
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                           try-expand-dabbrev-all-buffers
+                                           try-expand-dabbrev-from-kill
+                                           try-complete-file-name-partially
+                                           try-complete-file-name
+                                           try-expand-all-abbrevs
+                                           try-expand-list
+                                           try-expand-line
+                                           try-complete-lisp-symbol-partially
+                                           try-complete-lisp-symbol)
+        hippie-expand-verbose nil)
 
-(bind-key "M-/" #'hippie-expand)
+  (bind-key "M-/" #'hippie-expand))
 
 
-(unless (fboundp 'subword-mode)
-  (autoload #'subword-mode "subword" nil t))
+(progn
+  (unless (fboundp 'subword-mode)
+    (autoload #'subword-mode "subword" nil t))
 
-(add-hook 'prog-mode-hook #'subword-mode)
+  (add-hook 'prog-mode-hook #'subword-mode)
 
-(with-eval-after-load 'subword
-  (diminish 'subword-mode))
+  (with-eval-after-load 'subword
+    (diminish 'subword-mode)))
 
 
 ;; Show dividers on the right of each window, more prominent than the default
@@ -578,17 +589,18 @@ SAVE-FN with non-nil ARGS."
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
 
-(unless (fboundp 'abbrev-mode)
-  (autoload #'abbrev-mode "abbrev" nil t))
+(progn
+  (unless (fboundp 'abbrev-mode)
+    (autoload #'abbrev-mode "abbrev" nil t))
 
-;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' quickly can be useful
-(add-hook 'text-mode-hook #'abbrev-mode)
+  ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' quickly can be useful
+  (add-hook 'text-mode-hook #'abbrev-mode)
 
-(with-eval-after-load 'abbrev
-  (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
-        save-abbrevs 'silently)
+  (with-eval-after-load 'abbrev
+    (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
+          save-abbrevs 'silently)
 
-  (diminish 'abbrev-mode))
+    (diminish 'abbrev-mode)))
 
 
 ;; Disable the following modes
@@ -631,16 +643,19 @@ SAVE-FN with non-nil ARGS."
 
 (add-hook 'prog-mode-hook #'goto-address-prog-mode)
 
-;; This puts the buffer in read-only mode and disables font locking
-(unless (fboundp 'global-so-long-mode)
-  (autoload #'global-so-long-mode "so-long" nil t))
 
-(run-at-time 5 nil #'global-so-long-mode)
+(progn
+  ;; This puts the buffer in read-only mode and disables font locking
+  (unless (fboundp 'global-so-long-mode)
+    (autoload #'global-so-long-mode "so-long" nil t))
 
-;; (with-eval-after-load 'so-long
-;;   (defvar so-long-threshold)
+  (run-with-idle-timer 3 nil #'global-so-long-mode)
 
-;;   (setq so-long-threshold 500))
+  ;; (with-eval-after-load 'so-long
+  ;;   (defvar so-long-threshold)
+
+  ;;   (setq so-long-threshold 500))
+  )
 
 
 (when (display-graphic-p)
@@ -914,39 +929,42 @@ SAVE-FN with non-nil ARGS."
       ))
 
 
-(declare-function adob--rescan-windows "auto-dim-other-buffers")
+(progn
+  (declare-function adob--rescan-windows "auto-dim-other-buffers")
 
-(unless (fboundp 'auto-dim-other-buffers-mode)
-  (autoload #'auto-dim-other-buffers-mode "auto-dim-other-buffers" nil t))
-(unless (fboundp 'adob--rescan-windows)
-  (autoload #'adob--rescan-windows "auto-dim-other-buffers" nil t))
+  (unless (fboundp 'auto-dim-other-buffers-mode)
+    (autoload #'auto-dim-other-buffers-mode "auto-dim-other-buffers" nil t))
+  (unless (fboundp 'adob--rescan-windows)
+    (autoload #'adob--rescan-windows "auto-dim-other-buffers" nil t))
 
-(run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
+  (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode))
 
 
-(declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
+(if nil
+    (progn
+      (declare-function centaur-tabs-group-by-projectile-project "centaur-tabs")
 
-(unless (fboundp 'centaur-tabs-mode)
-  (autoload #'centaur-tabs-mode "centaur-tabs" nil t))
-(unless (fboundp 'centaur-tabs-group-by-projectile-project)
-  (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
+      (unless (fboundp 'centaur-tabs-mode)
+        (autoload #'centaur-tabs-mode "centaur-tabs" nil t))
+      (unless (fboundp 'centaur-tabs-group-by-projectile-project)
+        (autoload #'centaur-tabs-group-by-projectile-project "centaur-tabs" nil t))
 
-;; (add-hook 'after-init-hook #'centaur-tabs-mode)
+      (add-hook 'after-init-hook #'centaur-tabs-mode)
 
-(with-eval-after-load 'centaur-tabs
-  (defvar centaur-tabs-cycle-scope)
-  (defvar centaur-tabs-set-close-button)
-  (defvar centaur-tabs-set-icons)
-  (defvar centaur-tabs-set-modified-marker)
-  (defvar centaur-tabs-icon-scale-factor)
+      (with-eval-after-load 'centaur-tabs
+        (defvar centaur-tabs-cycle-scope)
+        (defvar centaur-tabs-set-close-button)
+        (defvar centaur-tabs-set-icons)
+        (defvar centaur-tabs-set-modified-marker)
+        (defvar centaur-tabs-icon-scale-factor)
 
-  (setq centaur-tabs-cycle-scope 'tabs
-        centaur-tabs-icon-scale-factor 0.7
-        centaur-tabs-set-close-button nil
-        centaur-tabs-set-icons t
-        centaur-tabs-set-modified-marker t)
+        (setq centaur-tabs-cycle-scope 'tabs
+              centaur-tabs-icon-scale-factor 0.7
+              centaur-tabs-set-close-button nil
+              centaur-tabs-set-icons t
+              centaur-tabs-set-modified-marker t)
 
-  (centaur-tabs-group-by-projectile-project))
+        (centaur-tabs-group-by-projectile-project))))
 
 
 (when nil
@@ -977,13 +995,16 @@ SAVE-FN with non-nil ARGS."
 (set-face-attribute 'mode-line nil :height 110)
 (set-face-attribute 'mode-line-inactive nil :height 110)
 
-;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
-(defun sb/minibuffer-font-setup ()
-  "Customize minibuffer font."
-  (set (make-local-variable 'face-remapping-alist)
-       '((default :height 0.90))))
 
-(add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup)
+;; Decrease minibuffer font
+;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
+(progn
+  (defun sb/minibuffer-font-setup ()
+    "Customize minibuffer font."
+    (set (make-local-variable 'face-remapping-alist)
+         '((default :height 0.90))))
+
+  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
 
 
 (when nil
@@ -1003,7 +1024,7 @@ SAVE-FN with non-nil ARGS."
       (autoload #'circadian-setup "circadian" nil t))
 
     (with-eval-after-load 'circadian
-      (require 'solar nil nil)
+      (require 'solar)
 
       (defvar calendar-latitude)
       (defvar calendar-longitude)
@@ -1018,41 +1039,44 @@ SAVE-FN with non-nil ARGS."
     ))
 
 
-(unless (fboundp 'beacon-mode)
-  (autoload #'beacon-mode "beacon") nil t)
-
 ;; LATER: Check the impact on performance, do I really need it?
-;; (run-with-idle-timer 3 nil #'beacon-mode)
+(when nil
+  (progn
+    (unless (fboundp 'beacon-mode)
+      (autoload #'beacon-mode "beacon") nil t)
 
-(with-eval-after-load 'beacon
-  (diminish 'beacon-mode))
+    (run-with-idle-timer 3 nil #'beacon-mode)
 
-
-(unless (fboundp 'ibuffer)
-  (autoload #'ibuffer "ibuffer" nil t))
-
-(bind-keys :package ibuffer
-           ("C-x C-b" . ibuffer))
+    (with-eval-after-load 'beacon
+      (diminish 'beacon-mode))))
 
 
-(declare-function ibuffer-auto-mode "ibuffer-ext")
-(unless (fboundp 'ibuffer-auto-mode)
-  (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
+(progn
+  (unless (fboundp 'ibuffer)
+    (autoload #'ibuffer "ibuffer" nil t))
 
-(add-hook 'ibuffer-hook #'ibuffer-auto-mode)
-
-(with-eval-after-load 'ibuf-ext
-  ;; Do not show filter groups if there are no buffers in that group
-  (defvar ibuffer-show-empty-filter-groups)
-
-  (setq ibuffer-show-empty-filter-groups nil))
+  (bind-keys :package ibuffer
+             ("C-x C-b" . ibuffer))
 
 
-;; Group buffers by projectile project
-(unless (fboundp 'ibuffer-projectile-set-filter-groups)
-  (autoload #'ibuffer-projectile-set-filter-groups "ibuffer-projectile" nil t))
+  (declare-function ibuffer-auto-mode "ibuffer-ext")
+  (unless (fboundp 'ibuffer-auto-mode)
+    (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 
-(add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups)
+  (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+
+  (with-eval-after-load 'ibuf-ext
+    ;; Do not show filter groups if there are no buffers in that group
+    (defvar ibuffer-show-empty-filter-groups)
+
+    (setq ibuffer-show-empty-filter-groups nil))
+
+
+  ;; Group buffers by projectile project
+  (unless (fboundp 'ibuffer-projectile-set-filter-groups)
+    (autoload #'ibuffer-projectile-set-filter-groups "ibuffer-projectile" nil t))
+
+  (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 
 (when (display-graphic-p)
@@ -1240,197 +1264,214 @@ SAVE-FN with non-nil ARGS."
     (diminish 'all-the-icons-dired-mode)))
 
 
-(when (display-graphic-p)
-  (declare-function treemacs-git-mode "treemacs")
-  (declare-function treemacs-follow-mode "treemacs")
-  (declare-function treemacs-current-workspace "treemacs")
-  (declare-function treemacs-fringe-indicator-mode "treemacs")
-  (declare-function treemacs-goto-file-node "treemacs")
-  (declare-function treemacs-find-file-node "treemacs")
-  (declare-function treemacs-filewatch-mode "treemacs")
-  (declare-function treemacs-create-theme "treemacs")
-  (declare-function treemacs-load-theme "treemacs")
-  (declare-function treemacs-canonical-path "treemacs")
-  (declare-function treemacs-add-project-to-workspace "treemacs")
-  (declare-function treemacs-do-add-project-to-workspace "treemacs")
-  (declare-function treemacs-scope->current-scope "treemacs")
-  (declare-function treemacs--restore-eldoc-after-log "treemacs")
-  (declare-function treemacs--filename "treemacs")
-  (declare-function treemacs--find-workspace "treemacs")
-  (declare-function treemacs-workspace->is-empty "treemacs")
-  (declare-function treemacs-pulse-on-success "treemacs")
-  (declare-function treemacs-is-path "treemacs")
-  (declare-function treemacs-theme->gui-icons "treemacs")
-  (declare-function treemacs--find-current-user-project "treemacs")
-  (declare-function treemacs--propagate-new-icons "treemacs")
-  (declare-function treemacs-workspace->is-empty? "treemacs")
+(if nil
+    (progn
+      (when (display-graphic-p)
+        (declare-function treemacs-git-mode "treemacs")
+        (declare-function treemacs-follow-mode "treemacs")
+        (declare-function treemacs-current-workspace "treemacs")
+        (declare-function treemacs-fringe-indicator-mode "treemacs")
+        (declare-function treemacs-goto-file-node "treemacs")
+        (declare-function treemacs-find-file-node "treemacs")
+        (declare-function treemacs-filewatch-mode "treemacs")
+        (declare-function treemacs-create-theme "treemacs")
+        (declare-function treemacs-load-theme "treemacs")
+        (declare-function treemacs-canonical-path "treemacs")
+        (declare-function treemacs-add-project-to-workspace "treemacs")
+        (declare-function treemacs-do-add-project-to-workspace "treemacs")
+        (declare-function treemacs-scope->current-scope "treemacs")
+        (declare-function treemacs--restore-eldoc-after-log "treemacs")
+        (declare-function treemacs--filename "treemacs")
+        (declare-function treemacs--find-workspace "treemacs")
+        (declare-function treemacs-workspace->is-empty "treemacs")
+        (declare-function treemacs-pulse-on-success "treemacs")
+        (declare-function treemacs-is-path "treemacs")
+        (declare-function treemacs-theme->gui-icons "treemacs")
+        (declare-function treemacs--find-current-user-project "treemacs")
+        (declare-function treemacs--propagate-new-icons "treemacs")
+        (declare-function treemacs-workspace->is-empty? "treemacs")
 
-  (unless (fboundp 'treemacs)
-    (autoload #'treemacs "treemacs" nil t))
-  (unless (fboundp 'treemacs-current-workspace)
-    (autoload #'treemacs-current-workspace "treemacs" nil t))
-  (unless (fboundp 'treemacs--find-current-user-project)
-    (autoload #'treemacs--find-current-user-project "treemacs" nil t))
-  (unless (fboundp 'treemacs-do-add-project-to-workspace)
-    (autoload #'treemacs-do-add-project-to-workspace "treemacs" nil t))
-  (unless (fboundp 'treemacs-add-project-to-workspace)
-    (autoload #'treemacs-add-project-to-workspace "treemacs" nil t))
-  (unless (fboundp 'treemacs-git-mode)
-    (autoload #'treemacs-git-mode "treemacs" nil t))
-  (unless (fboundp 'treemacs-follow-mode)
-    (autoload #'treemacs-follow-mode "treemacs" nil t))
-  (unless (fboundp 'treemacs-fringe-indicator-mode)
-    (autoload #'treemacs-fringe-indicator-mode "treemacs" nil t))
-  (unless (fboundp 'treemacs-filewatch-mode)
-    (autoload #'treemacs-filewatch-mode "treemacs" nil t))
-  (unless (fboundp 'treemacs-goto-file-node)
-    (autoload #'treemacs-goto-file-node "treemacs" nil t))
-  (unless (fboundp 'treemacs--propagate-new-icons)
-    (autoload #'treemacs--propagate-new-icons "treemacs" nil t))
-  (unless (fboundp 'treemacs-scope->current-scope)
-    (autoload #'treemacs-scope->current-scope "treemacs" nil t))
-  (unless (fboundp 'treemacs--restore-eldoc-after-log)
-    (autoload #'treemacs--restore-eldoc-after-log "treemacs" nil t))
-  (unless (fboundp 'treemacs-load-theme)
-    (autoload #'treemacs-load-theme "treemacs" nil t))
-  (unless (fboundp 'treemacs-find-file-node)
-    (autoload #'treemacs-find-file-node "treemacs" nil t))
-  (unless (fboundp 'treemacs-resize-icons)
-    (autoload #'treemacs-resize-icons "treemacs" nil t))
-  (unless (fboundp 'treemacs-select-window)
-    (autoload #'treemacs-select-window "treemacs" nil t))
-  (unless (fboundp 'treemacs-add-and-display-current-project)
-    (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
-  (unless (fboundp 'treemacs-display-current-project-exclusively)
-    (autoload #'treemacs-display-current-project-exclusively "treemac" nil t))
+        (unless (fboundp 'treemacs)
+          (autoload #'treemacs "treemacs" nil t))
+        (unless (fboundp 'treemacs-current-workspace)
+          (autoload #'treemacs-current-workspace "treemacs" nil t))
+        (unless (fboundp 'treemacs--find-current-user-project)
+          (autoload #'treemacs--find-current-user-project "treemacs" nil t))
+        (unless (fboundp 'treemacs-do-add-project-to-workspace)
+          (autoload #'treemacs-do-add-project-to-workspace "treemacs" nil t))
+        (unless (fboundp 'treemacs-add-project-to-workspace)
+          (autoload #'treemacs-add-project-to-workspace "treemacs" nil t))
+        (unless (fboundp 'treemacs-git-mode)
+          (autoload #'treemacs-git-mode "treemacs" nil t))
+        (unless (fboundp 'treemacs-follow-mode)
+          (autoload #'treemacs-follow-mode "treemacs" nil t))
+        (unless (fboundp 'treemacs-fringe-indicator-mode)
+          (autoload #'treemacs-fringe-indicator-mode "treemacs" nil t))
+        (unless (fboundp 'treemacs-filewatch-mode)
+          (autoload #'treemacs-filewatch-mode "treemacs" nil t))
+        (unless (fboundp 'treemacs-goto-file-node)
+          (autoload #'treemacs-goto-file-node "treemacs" nil t))
+        (unless (fboundp 'treemacs--propagate-new-icons)
+          (autoload #'treemacs--propagate-new-icons "treemacs" nil t))
+        (unless (fboundp 'treemacs-scope->current-scope)
+          (autoload #'treemacs-scope->current-scope "treemacs" nil t))
+        (unless (fboundp 'treemacs--restore-eldoc-after-log)
+          (autoload #'treemacs--restore-eldoc-after-log "treemacs" nil t))
+        (unless (fboundp 'treemacs-load-theme)
+          (autoload #'treemacs-load-theme "treemacs" nil t))
+        (unless (fboundp 'treemacs-find-file-node)
+          (autoload #'treemacs-find-file-node "treemacs" nil t))
+        (unless (fboundp 'treemacs-resize-icons)
+          (autoload #'treemacs-resize-icons "treemacs" nil t))
+        (unless (fboundp 'treemacs-select-window)
+          (autoload #'treemacs-select-window "treemacs" nil t))
+        (unless (fboundp 'treemacs-add-and-display-current-project)
+          (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
+        (unless (fboundp 'treemacs-display-current-project-exclusively)
+          (autoload #'treemacs-display-current-project-exclusively "treemacs" nil t))
 
-  (eval-and-compile
-    (defun sb/setup-treemacs-quick nil
-      "Setup treemacs."
-      (interactive)
-      (when (projectile-project-p)
-        (treemacs-add-and-display-current-project)
-        (other-window 1)))
+        (eval-and-compile
+          (defun sb/setup-treemacs-quick nil
+            "Setup treemacs."
+            (interactive)
+            (when (projectile-project-p)
+              (treemacs-add-and-display-current-project)
+              (other-window 1)))
 
-    (defun sb/setup-treemacs-detailed (args)
-      "Setup treemacs."
-      (let* ((root (treemacs--find-current-user-project))
-             (path (treemacs-canonical-path root))
-             (name (treemacs--filename path)))
-        (unless (treemacs-current-workspace)
-          (treemacs--find-workspace))
-        (if (treemacs-workspace->is-empty\?)
-            (progn
-              (treemacs-do-add-project-to-workspace path name)
-              (treemacs-select-window)
-              (treemacs-pulse-on-success)
-              (other-window 1)
-              (when (featurep 'auto-dim-other-buffers)
-                (adob--rescan-windows)))
-          (treemacs-select-window)
-          (if (treemacs-is-path path :in-workspace)
-              (treemacs-goto-file-node path)
-            (treemacs-add-project-to-workspace path name))
-          (other-window 1)
-          (when (featurep 'auto-dim-other-buffers)
-            (adob--rescan-windows))))))
+          (defun sb/setup-treemacs-detailed (args)
+            "Setup treemacs."
+            (let* ((root (treemacs--find-current-user-project))
+                   (path (treemacs-canonical-path root))
+                   (name (treemacs--filename path)))
+              (unless (treemacs-current-workspace)
+                (treemacs--find-workspace))
+              (if (treemacs-workspace->is-empty\?)
+                  (progn
+                    (treemacs-do-add-project-to-workspace path name)
+                    (treemacs-select-window)
+                    (treemacs-pulse-on-success)
+                    (other-window 1)
+                    (when (featurep 'auto-dim-other-buffers)
+                      (adob--rescan-windows)))
+                (treemacs-select-window)
+                (if (treemacs-is-path path :in-workspace)
+                    (treemacs-goto-file-node path)
+                  (treemacs-add-project-to-workspace path name))
+                (other-window 1)
+                (when (featurep 'auto-dim-other-buffers)
+                  (adob--rescan-windows))))))
 
-  (with-eval-after-load 'treemacs
-    (defvar treemacs-collapse-dirs)
-    (defvar treemacs-follow-after-init)
-    (defvar treemacs-indentation)
-    (defvar treemacs-is-never-other-window)
-    (defvar treemacs-no-png-images)
-    (defvar treemacs-position)
-    (defvar treemacs-project-follow-cleanup)
-    (defvar treemacs-recenter-after-file-follow)
-    (defvar treemacs-recenter-after-tag-follow)
-    (defvar treemacs-show-hidden-files)
-    (defvar treemacs-silent-filewatch)
-    (defvar treemacs-silent-refresh)
-    (defvar treemacs-width)
-    (defvar treemacs-persist-file)
+        (with-eval-after-load 'treemacs
+          (defvar treemacs-collapse-dirs)
+          (defvar treemacs-follow-after-init)
+          (defvar treemacs-indentation)
+          (defvar treemacs-is-never-other-window)
+          (defvar treemacs-no-png-images)
+          (defvar treemacs-position)
+          (defvar treemacs-project-follow-cleanup)
+          (defvar treemacs-recenter-after-file-follow)
+          (defvar treemacs-recenter-after-tag-follow)
+          (defvar treemacs-show-hidden-files)
+          (defvar treemacs-silent-filewatch)
+          (defvar treemacs-silent-refresh)
+          (defvar treemacs-width)
+          (defvar treemacs-persist-file)
 
-    (setq treemacs-collapse-dirs 2
-          treemacs-follow-after-init t
-          treemacs-indentation 1
-          treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
-          ;; Prevents treemacs from being selected with `other-window'
-          treemacs-is-never-other-window nil
-          ;; treemacs-no-png-images nil
-          ;; treemacs-position 'right
-          treemacs-project-follow-cleanup t
-          treemacs-recenter-after-file-follow 'on-distance
-          treemacs-recenter-after-tag-follow 'on-distance
-          treemacs-show-hidden-files nil
-          treemacs-silent-filewatch t
-          treemacs-silent-refresh t
-          treemacs-width 18
-          ;; Hide the mode-line in the Treemacs buffer
-          treemacs-user-mode-line-format 'none)
+          (setq treemacs-collapse-dirs 2
+                treemacs-follow-after-init t
+                treemacs-indentation 1
+                treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
+                ;; Prevents treemacs from being selected with `other-window'
+                treemacs-is-never-other-window nil
+                ;; treemacs-no-png-images nil
+                ;; treemacs-position 'right
+                treemacs-project-follow-cleanup t
+                treemacs-recenter-after-file-follow 'on-distance
+                treemacs-recenter-after-tag-follow 'on-distance
+                treemacs-show-hidden-files nil
+                treemacs-silent-filewatch t
+                treemacs-silent-refresh t
+                treemacs-width 18
+                ;; Hide the mode-line in the Treemacs buffer
+                treemacs-user-mode-line-format 'none)
 
-    (unless (bound-and-true-p sb/use-no-littering)
-      (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
+          (unless (bound-and-true-p sb/use-no-littering)
+            (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
 
-    (treemacs-filewatch-mode 1)
-    (treemacs-follow-mode 1) ; Following tags is noisy
-    (treemacs-git-mode 'deferred)
+          (treemacs-filewatch-mode 1)
+          (treemacs-follow-mode 1) ; Following tags is noisy
+          (treemacs-git-mode 'deferred)
 
-    ;; Always show the file indicator
-    (treemacs-fringe-indicator-mode 'always)
+          ;; Always show the file indicator
+          (treemacs-fringe-indicator-mode 'always)
 
-    (require 'treemacs-all-the-icons nil nil)
+          (require 'treemacs-all-the-icons)
 
-    ;; https://github.com/Alexander-Miller/treemacs/issues/735
-    (treemacs-create-theme "Default-Tighter"
-      :extends "Default"
-      :config
-      (let ((icons (treemacs-theme->gui-icons theme)))
-        (maphash (lambda
-                   (ext icon)
-                   (puthash ext
-                            (concat
-                             (substring icon 0 1)
-                             (propertize " " 'display
-                                         '(space . (:width 0.5))))
-                            icons))
-                 icons)))
+          ;; https://github.com/Alexander-Miller/treemacs/issues/735
+          (treemacs-create-theme "Default-Tighter"
+            :extends "Default"
+            :config
+            (let ((icons (treemacs-theme->gui-icons theme)))
+              (maphash (lambda
+                         (ext icon)
+                         (puthash ext
+                                  (concat
+                                   (substring icon 0 1)
+                                   (propertize " " 'display
+                                               '(space . (:width 0.5))))
+                                  icons))
+                       icons)))
 
-    (treemacs-create-theme "all-the-icons-tighter"
-      :extends "all-the-icons"
-      :config
-      (let ((icons (treemacs-theme->gui-icons theme)))
-        (maphash (lambda
-                   (ext icon)
-                   (puthash ext
-                            (concat
-                             (substring icon 0 1)
-                             (propertize " " 'display
-                                         '(space . (:width 0.5))))
-                            icons))
-                 icons)))
+          (treemacs-create-theme "all-the-icons-tighter"
+            :extends "all-the-icons"
+            :config
+            (let ((icons (treemacs-theme->gui-icons theme)))
+              (maphash (lambda
+                         (ext icon)
+                         (puthash ext
+                                  (concat
+                                   (substring icon 0 1)
+                                   (propertize " " 'display
+                                               '(space . (:width 0.5))))
+                                  icons))
+                       icons)))
 
-    (treemacs-load-theme "all-the-icons")
+          (treemacs-load-theme "all-the-icons")
 
-    (set-face-attribute 'treemacs-root-face nil :height 0.8)
-    (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
-    (set-face-attribute 'treemacs-directory-face nil :height 0.7)
-    (set-face-attribute 'treemacs-file-face nil :height 0.7)
-    (set-face-attribute 'treemacs-tags-face nil :height 0.7)
-    (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
-    (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
+          (set-face-attribute 'treemacs-root-face nil :height 0.8)
+          (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
+          (set-face-attribute 'treemacs-directory-face nil :height 0.7)
+          (set-face-attribute 'treemacs-file-face nil :height 0.7)
+          (set-face-attribute 'treemacs-tags-face nil :height 0.7)
+          (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
+          (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
 
-    (when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
-      (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
-      (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
+          (when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
+            (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
+            (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
 
-    (when (eq sb/theme 'sb/default)
-      (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
-      (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0)))
+          (when (eq sb/theme 'sb/default)
+            (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
+            (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0)))
 
-  (bind-keys* :package treemacs
-              ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
-              ("M-0" . treemacs-select-window)))
+        ;; (defun sb/treemacs-ignore-files (filename absolute-path)
+        ;;   (or (string-equal filename "foo")
+        ;;       (string-prefix-p "/x/y/z/" absolute-path)))
+
+        ;; (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-files)
+
+
+        ;; Allows to quickly add projectile projects to the treemacs workspace
+        (unless (fboundp 'treemacs-projectile)
+          (autoload #'treemacs-projectile "treemacs-projectile" nil t))
+
+        (require 'treemacs-magit)
+
+
+        (bind-keys* :package treemacs
+                    ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
+                    ("M-0" . treemacs-select-window)))
+      ))
 
 ;; Starts Treemacs automatically with Emacsclient
 ;; https://github.com/Alexander-Miller/treemacs/issues/624
@@ -1442,13 +1483,6 @@ SAVE-FN with non-nil ARGS."
                (with-selected-frame frame
                  (save-selected-window
                    (treemacs-select-window)))))))
-
-(with-eval-after-load 'treemacs
-  ;; Allows to quickly add projectile projects to the treemacs workspace
-  (unless (fboundp 'treemacs-projectile)
-    (autoload #'treemacs-projectile "treemacs-projectile" nil t))
-
-  (require 'treemacs-magit nil nil))
 
 ;; (add-hook 'emacs-startup-hook (lambda()
 ;;                                 (treemacs)
@@ -1872,8 +1906,10 @@ SAVE-FN with non-nil ARGS."
           ;; (set-face-background 'company-box-selection "light blue")
           )))
 
+
   ;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
   ;; computationally expensive. Completions seem to be laggy with TabNine enabled.
+
 
   ;; Nice but slows completions
   (when nil
@@ -1890,11 +1926,14 @@ SAVE-FN with non-nil ARGS."
           company-fuzzy-sorting-backend 'flx))
 
 
-  ;; Company statistics
-  (unless (fboundp 'company-statistics-mode)
-    (autoload #'company-statistics-mode "company-statistics" nil t))
+  ;; Company statistics, we are currently trying out `company-prescient'
+  (if nil
+      (progn
+        (unless (fboundp 'company-statistics-mode)
+          (autoload #'company-statistics-mode "company-statistics" nil t))
 
-  (company-statistics-mode 1))
+        (company-statistics-mode 1))
+    ))
 
 (defvar company-active-map)
 (bind-keys :package company :map company-active-map
@@ -1957,7 +1996,7 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load 'amx
   (defvar amx-save-file)
 
-  (setq amx-auto-update-interval 2) ; Update the command list every 2 minutes
+  (setq amx-auto-update-interval 5) ; Update the command list every n minutes
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory))))
@@ -2031,6 +2070,7 @@ SAVE-FN with non-nil ARGS."
              ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
+  ;; Ignore `dired' buffers from `ivy-switch-buffer'
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
 
   (diminish 'ivy-mode))
@@ -2215,15 +2255,17 @@ SAVE-FN with non-nil ARGS."
 ;;  '(read-file-name-internal . ivy--sort-files-by-date))
 
 
-;; (with-eval-after-load 'company
-;;   (unless (fboundp 'company-prescient-mode)
-;;     (autoload #'company-prescient-mode "company-prescient" nil t))
+(with-eval-after-load 'company
+  (unless (fboundp 'company-prescient-mode)
+    (autoload #'company-prescient-mode "company-prescient" nil t))
 
-;;   ;; We want `capf' sort for programming modes, not with recency. This breaks the support for the
-;;   ;; `:separate' keyword in `company'
-;;   (company-prescient-mode 1)
-;;   (add-hook 'prog-mode-hook (lambda ()
-;;                               (company-prescient-mode -1))))
+  ;; We want `capf' sort for programming modes, not with recency. This breaks the support for the
+  ;; `:separate' keyword in `company'
+  (company-prescient-mode 1)
+
+  ;; (add-hook 'prog-mode-hook (lambda ()
+  ;;                             (company-prescient-mode -1)))
+  )
 
 
 (with-eval-after-load 'ivy
@@ -2233,7 +2275,7 @@ SAVE-FN with non-nil ARGS."
   (all-the-icons-ivy-setup)
 
 
-  (require 'orderless nil nil)
+  (require 'orderless)
 
   (defvar orderless-component-separator)
   (defvar ivy-re-builders-alist)
@@ -2675,7 +2717,11 @@ SAVE-FN with non-nil ARGS."
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
         projectile-sort-order 'recentf ; No sorting should be faster
-        projectile-verbose nil)
+        projectile-verbose nil
+        ;; This can help reduce the overhead with large projects, but then recent files information
+        ;; may be incomplete
+        ;; projectile-switch-project-action 'projectile-recentf
+        )
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq  projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
@@ -2763,12 +2809,19 @@ SAVE-FN with non-nil ARGS."
 ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
 (run-with-idle-timer 3 nil #'projectile-mode)
 
-(add-hook 'projectile-after-switch-project-hook
-          (lambda ()
-            (interactive)
-            (treemacs-add-and-display-current-project)
-            (treemacs-display-current-project-exclusively)
-            (other-window 1)))
+;; https://github.com/Alexander-Miller/treemacs/issues/660
+;; (add-hook 'projectile-after-switch-project-hook
+;;           (lambda ()
+;;             (interactive)
+;;             (treemacs-add-and-display-current-project)
+;;             (treemacs-display-current-project-exclusively)
+;;             (other-window 1)))
+
+;; (add-hook 'projectile-after-switch-project-hook
+;;           (lambda ()
+;;             (treemacs-display-current-project-exclusively)
+;;             (other-window 1)))
+
 
 (when nil
   (declare-function counsel-projectile-switch-project-by-name "counsel-projectile")
@@ -2899,7 +2952,8 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'counsel-fd-dired-jump "counsel-fd" nil t))
 
   (bind-keys :package counsel-fd
-             ("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
+             ;; Jump to a directory below the current directory
+             ("C-x d" . counsel-fd-dired-jump)
              ("C-x f" . counsel-fd-file-jump)))
 
 
@@ -3007,7 +3061,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
   ;; support, so you can use it anywhere.
-  (require 'flycheck-grammarly nil nil)
+  (require 'flycheck-grammarly)
 
   (defvar flycheck-grammarly-check-time)
   (defvar flycheck-checkers)
@@ -3051,6 +3105,7 @@ This file is specified in `counsel-projectile-default-file'."
         (add-hook 'flycheck-mode-hook #'flycheck-pos-tip-mode))
       ))
 
+
 (if nil
     (progn
       ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
@@ -3060,6 +3115,7 @@ This file is specified in `counsel-projectile-default-file'."
           (autoload #'flycheck-posframe-mode "flycheck-posframe" nil t))
         (unless (fboundp 'flycheck-posframe-configure-pretty-defaults)
           (autoload #'flycheck-posframe-configure-pretty-defaults "flycheck-posframe" nil t))
+
         (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
 
         (with-eval-after-load 'flycheck-posframe
@@ -3067,6 +3123,7 @@ This file is specified in `counsel-projectile-default-file'."
           (setq flycheck-posframe-position 'point-bottom-left-corner)
           (flycheck-posframe-configure-pretty-defaults)))
       ))
+
 
 (declare-function whitespace-buffer "whitespace")
 (declare-function whitespace-turn-off "whitespace")
@@ -3082,8 +3139,7 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'whitespace-turn-off)
   (autoload #'whitespace-turn-off "whitespace" nil t))
 
-(unless (eq sb/theme 'sb/default)
-  (add-hook 'markdown-mode-hook #'whitespace-mode))
+;; (add-hook 'markdown-mode-hook #'whitespace-mode)
 
 (with-eval-after-load 'whitespace
   (defvar whitespace-line-column)
@@ -3104,7 +3160,6 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 
-;; LATER: What is the difference between `whitespace-cleanup-mode' and `ws-butler-mode'?
 ;; Call `whitespace-cleanup' only if the initial buffer was clean
 (unless (fboundp 'global-whitespace-cleanup-mode)
   (autoload #'global-whitespace-cleanup-mode "whitespace-cleanup-mode" nil t))
@@ -3182,23 +3237,26 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook hook #'highlight-numbers-mode))
 
 
-(declare-function number-separator-mode "number-separator")
+(if nil
+    (progn
+      (declare-function number-separator-mode "number-separator")
 
-(unless (fboundp 'number-separator-mode)
-  (autoload #'number-separator-mode "number-separator" nil t))
+      (unless (fboundp 'number-separator-mode)
+        (autoload #'number-separator-mode "number-separator" nil t))
 
-(with-eval-after-load 'number-separator
-  (defvar number-separator)
-  (defvar number-separator-interval)
-  (defvar number-separator-ignore-threshold)
-  (defvar number-separator-decimal-char)
+      (with-eval-after-load 'number-separator
+        (defvar number-separator)
+        (defvar number-separator-interval)
+        (defvar number-separator-ignore-threshold)
+        (defvar number-separator-decimal-char)
 
-  (setq number-separator ","
-        number-separator-interval 3
-        number-separator-ignore-threshold 4
-        number-separator-decimal-char ".")
+        (setq number-separator ","
+              number-separator-interval 3
+              number-separator-ignore-threshold 4
+              number-separator-decimal-char ".")
 
-  (diminish 'number-sepator-mode))
+        (diminish 'number-sepator-mode))
+      ))
 
 
 (unless (fboundp 'hes-mode)
@@ -3207,20 +3265,23 @@ This file is specified in `counsel-projectile-default-file'."
 (add-hook 'prog-mode-hook #'hes-mode)
 
 
-;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
-;; an active region that spans multiple lines.
+(if nil
+    (progn
+      ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each
+      ;; line in an active region that spans multiple lines.
 
-(unless (fboundp 'mc/mark-previous-like-this)
-  (autoload #'mc/mark-previous-like-this "multiple-cursors" nil t))
-(unless (fboundp 'mc/mark-next-like-this)
-  (autoload #'mc/mark-next-like-this "multiple-cursors" nil t))
-(unless (fboundp 'mc/mark-all-like-this)
-  (autoload #'mc/mark-all-like-this "multiple-cursors" nil t))
+      (unless (fboundp 'mc/mark-previous-like-this)
+        (autoload #'mc/mark-previous-like-this "multiple-cursors" nil t))
+      (unless (fboundp 'mc/mark-next-like-this)
+        (autoload #'mc/mark-next-like-this "multiple-cursors" nil t))
+      (unless (fboundp 'mc/mark-all-like-this)
+        (autoload #'mc/mark-all-like-this "multiple-cursors" nil t))
 
-(bind-keys :package multiple-cursor
-           ("C-<"     . mc/mark-previous-like-this)
-           ("C->"     . mc/mark-next-like-this)
-           ("C-c C-<" . mc/mark-all-like-this))
+      (bind-keys :package multiple-cursor
+                 ("C-<"     . mc/mark-previous-like-this)
+                 ("C->"     . mc/mark-next-like-this)
+                 ("C-c C-<" . mc/mark-all-like-this))
+      ))
 
 
 (unless (fboundp 'global-page-break-lines-mode)
@@ -3346,7 +3407,7 @@ This file is specified in `counsel-projectile-default-file'."
     (setq xref-show-definitions-function #'ivy-xref-show-defs
           xref-show-xrefs-function #'ivy-xref-show-xrefs)
 
-    (require 'ivy-xref nil nil))
+    (require 'ivy-xref))
 
   (unless (fboundp 'dump-jump-xref-activate)
     (autoload #'dumb-jump-xref-activate "dumb-jump" nil t))
@@ -3407,7 +3468,7 @@ This file is specified in `counsel-projectile-default-file'."
     (diminish 'counsel-gtags-mode)
 
     ;; Make xref and gtags work together
-    (require 'global-tags nil nil)
+    (require 'global-tags)
 
     (add-to-list 'xref-backend-functions 'global-tags-xref-backend))
 
@@ -3483,15 +3544,16 @@ This file is specified in `counsel-projectile-default-file'."
 ;; functions only, so `helpful-callable' as a drop-in replacement.
 (defvar helpful-mode-map)
 (bind-keys :package helpful
-           ([remap describe-variable] . helpful-variable)
-           ([remap describe-key]      . helpful-key)
-           ([remap describe-function] . helpful-callable)
-           ([remap describe-symbol]   . helpful-symbol)
+           ;; ([remap describe-variable] . helpful-variable)
+           ;; ([remap describe-key]      . helpful-key)
+           ;; ([remap describe-function] . helpful-callable)
+           ;; ([remap describe-symbol]   . helpful-symbol)
            ("C-h v" . helpful-variable)
            ("C-h k" . helpful-key)
            ("C-h f" . helpful-callable)
            ("C-h c" . helpful-command)
            ("C-h p" . helpful-at-point)
+           ("C-h o" . helpful-symbol)
            :map helpful-mode-map
            ("q"     . helpful-kill-buffers))
 
@@ -3505,7 +3567,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (setq vlf-application 'dont-ask)
 
-  (require 'vlf-setup nil nil))
+  (require 'vlf-setup))
 
 
 ;; Erase all consecutive white space characters in a given direction
@@ -4197,10 +4259,12 @@ This file is specified in `counsel-projectile-default-file'."
         markdown-fontify-code-blocks-natively t
         markdown-indent-on-enter 'indent-and-new-item
         markdown-list-indent-width 2
-        ;; markdown-make-gfm-checkboxes-buttons nil
         markdown-split-window-direction 'horizontal)
 
-  (require 'markdown-mode+ nil nil)
+  ;; Additional commands to export markdown file to other formats
+  (require 'markdown-mode+)
+
+  ;; Generate TOC with `markdown-toc-generate-toc'
 
   (unless (fboundp 'markdown-toc-refresh-toc)
     (autoload #'markdown-toc-refresh-toc "markdown-toc" nil t))
@@ -4209,6 +4273,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'markdown-toc-generate-or-refresh-toc)
     (autoload #'markdown-toc-generate-or-refresh-toc "markdown-toc" nil t))
 
+  ;; Open preview of markdown file in a browser
   (unless (fboundp 'markdown-preview-mode)
     (autoload #'markdown-preview-mode "markdown-preview-mode" nil t)))
 
@@ -4220,6 +4285,7 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'pandoc-mode "pandoc-mode" nil t))
 (unless (fboundp 'pandoc-load-default-settings)
   (autoload #'pandoc-load-default-settings "pandoc-mode" nil t))
+
 (add-hook 'markdown-mode-hook #'pandoc-mode)
 
 (with-eval-after-load 'pandoc-mode
@@ -4231,6 +4297,7 @@ This file is specified in `counsel-projectile-default-file'."
   (diminish 'pandoc-mode))
 
 
+;; Run `M-x grip-mode` to preview the markdown file with the default browser.
 (when (executable-find "grip")
   (unless (fboundp 'grip-mode)
     (autoload #'grip-mode "grip-mode" nil t))
@@ -4314,10 +4381,10 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'makefile-gmake-mode "make-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
-;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-;;;###autoload
-(add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))
+(progn
+  (add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
+  ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
+  (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
 
 ;; Use normal tabs in makefiles
 (add-hook 'makefile-mode-hook #'indent-tabs-mode)
@@ -4336,29 +4403,28 @@ This file is specified in `counsel-projectile-default-file'."
     ;; itself unexpectedly when point is on a variable with a multiline docstring.
     (setq eldoc-echo-area-use-multiline-p nil)
 
-    (diminish 'eldoc-mode)))
+    (diminish 'eldoc-mode))
 
 
-(if nil
-    (progn
-      (declare-function eldoc-box-hover-mode "eldoc-box")
-      (declare-function eldoc-box-hover-at-point-mode "eldoc-box")
+  (progn
+    (declare-function eldoc-box-hover-mode "eldoc-box")
+    (declare-function eldoc-box-hover-at-point-mode "eldoc-box")
 
-      (unless (fboundp 'eldoc-box-hover-mode)
-        (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
-      (unless (fboundp 'eldoc-box-hover-at-point-mode)
-        (autoload #'eldoc-box-hover-at-point-mode "eldoc-box" nil t))
+    (unless (fboundp 'eldoc-box-hover-mode)
+      (autoload #'eldoc-box-hover-mode "eldoc-box" nil t))
+    (unless (fboundp 'eldoc-box-hover-at-point-mode)
+      (autoload #'eldoc-box-hover-at-point-mode "eldoc-box" nil t))
 
-      (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
-      (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
+    (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
+    (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
 
-      (with-eval-after-load 'eldoc-box
-        (defvar eldoc-box-clear-with-C-g)
+    (with-eval-after-load 'eldoc-box
+      (defvar eldoc-box-clear-with-C-g)
 
-        (setq eldoc-box-clear-with-C-g t)
+      (setq eldoc-box-clear-with-C-g t
+            eldoc-box-fringe-use-same-bg nil)
 
-        (diminish 'eldoc-box-hover-mode))
-      ))
+      (diminish 'eldoc-box-hover-mode))))
 
 
 ;; We use LSP
@@ -4395,7 +4461,7 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
 
 (with-eval-after-load 'R-mode
-  (require 'ess-smart-underscore nil nil))
+  (require 'ess-smart-underscore))
 
 
 (with-eval-after-load 'ess
@@ -4407,7 +4473,7 @@ This file is specified in `counsel-projectile-default-file'."
         ess-indent-offset 4
         inferior-R-args "--quiet --no-restore-history --no-save")
 
-  (require 'ess-smart-underscore nil nil))
+  (require 'ess-smart-underscore))
 
 
 (unless (fboundp 'ini-mode)
@@ -4656,10 +4722,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge
-                                              (lsp-configuration-section "pyright")
-                                              (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge
+                            (lsp-configuration-section "pyright")
+                            (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -4777,8 +4843,8 @@ This file is specified in `counsel-projectile-default-file'."
                     (lambda
                       (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
   ;; TODO: What is the utility of this?
@@ -4846,13 +4912,14 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Sync workspace folders and treemacs projects
-(unless (fboundp 'lsp-treemacs-errors-list)
-  (autoload #'lsp-treemacs-errors-list "lsp-treemacs" nil t))
-(unless (fboundp 'lsp-treemacs-sync-mode)
-  (autoload #'lsp-treemacs-sync-mode "lsp-treemacs" nil t))
+(when nil
+  (unless (fboundp 'lsp-treemacs-errors-list)
+    (autoload #'lsp-treemacs-errors-list "lsp-treemacs" nil t))
+  (unless (fboundp 'lsp-treemacs-sync-mode)
+    (autoload #'lsp-treemacs-sync-mode "lsp-treemacs" nil t))
 
-(with-eval-after-load 'lsp-treemacs
-  (lsp-treemacs-sync-mode 1))
+  (with-eval-after-load 'lsp-treemacs
+    (lsp-treemacs-sync-mode 1)))
 
 
 (when nil
@@ -5133,17 +5200,18 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'jinja2-mode "jinja2-mode" nil t))
 
 
-(unless (fboundp 'cperl-mode)
-  (autoload #'cperl-mode "cperl-mode" nil t))
+(progn
+  (unless (fboundp 'cperl-mode)
+    (autoload #'cperl-mode "cperl-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("latexmkrc\\'" . cperl-mode))
+  (add-to-list 'auto-mode-alist '("latexmkrc\\'" . cperl-mode))
 
-(add-hook 'cperl-mode-hook #'lsp-deferred)
+  (add-hook 'cperl-mode-hook #'lsp-deferred)
 
-(with-eval-after-load 'cperl-mode
-  ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode))
+  (with-eval-after-load 'cperl-mode
+    ;; Prefer CPerl mode to Perl mode
+    (fset 'perl-mode 'cperl-mode)))
 
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
@@ -5247,6 +5315,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line
+(unless (fboundp 'executable-make-buffer-file-executable-if-script-p)
+  (autoload #'executable-make-buffer-file-executable-if-script-p "executable" nil t))
+
 (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
 
 
@@ -5254,6 +5325,10 @@ This file is specified in `counsel-projectile-default-file'."
 (if (boundp 'vc-handled-backends)
     (add-hook 'find-file-hook #'vc-refresh-state)
   (remove-hook 'find-file-hook #'vc-refresh-state))
+
+
+(with-eval-after-load 'with-editor
+  (diminish 'with-editor-mode))
 
 
 (declare-function transient-bind-q-to-quit "transient")
@@ -5306,7 +5381,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
 
-  (require 'magit-diff nil nil)
+  (require 'magit-diff)
 
   (defvar magit-diff-refine-hunk)
   (defvar magit-diff-paint-whitespace)
@@ -5316,10 +5391,7 @@ This file is specified in `counsel-projectile-default-file'."
         magit-diff-highlight-trailing nil
         magit-diff-paint-whitespace nil)
 
-  (with-eval-after-load 'with-editor
-    (diminish 'with-editor-mode))
-
-  (require 'ediff nil nil)
+  (require 'ediff)
 
   (defvar ediff-window-setup-function)
   (defvar ediff-split-window-function)
@@ -5764,7 +5836,7 @@ This file is specified in `counsel-projectile-default-file'."
   (setq bibtex-align-at-equal-sign t
         bibtex-maintain-sorted-entries t)
 
-  (require 'bibtex-utils nil nil))
+  (require 'bibtex-utils))
 
 
 (unless (fboundp 'ivy-bibtex)
@@ -5774,7 +5846,7 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar ivy-bibtex-default-action)
   (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
-  (require 'bibtex-completion nil nil)
+  (require 'bibtex-completion)
 
   (defvar bibtex-completion-cite-default-as-initial-input)
   (defvar bibtex-completion-cite-prompt-for-optional-arguments)
@@ -6114,7 +6186,8 @@ Ignore if no file is found."
   (setq clang-format+-always-enable t))
 
 
-;; Use for major modes which do not provide a formatter
+;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
+;; background process but does not support tramp and supports fewer formatters.
 (declare-function format-all-ensure-formatter "format-all")
 
 (unless (fboundp 'format-all-ensure-formatter)
@@ -6125,9 +6198,8 @@ Ignore if no file is found."
 (eval-and-compile
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(markdown-mode-hook bazel-mode-hook
-                                       latex-mode-hook LaTeX-mode-hook
-                                       json-mode-hook))
+    (dolist (hook '(bazel-mode-hook latex-mode-hook
+                                    LaTeX-mode-hook json-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 

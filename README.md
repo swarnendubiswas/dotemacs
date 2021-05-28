@@ -384,6 +384,5 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
   - <https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/>
 - Resolve xml lsp over tramp, not working
 - Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
-- Try `https://github.com/Kungsgeten/selected.el`
 - Cursor loses its place after formatting with YAPF
-- Integrate `company-yasnippet' and assign a key to `yas-expand-all'
+- Integrate `company-yasnippet` and assign a key to `yas-expand-all`
