@@ -30,7 +30,7 @@
                          ;; autodisass-llvm-bitcode
                          avy
                          ;; bazel-mode
-                         beacon
+                         ;; beacon
                          beginend
                          bibtex-completion
                          bibtex-utils
@@ -102,7 +102,7 @@
                          ;; gnuplot
                          goto-last-change
                          grammarly
-                         graphviz-dot-mode
+                         ;; graphviz-dot-mode
                          grip-mode
                          groovy-mode
                          helpful
@@ -127,7 +127,7 @@
                          ivy-rich
                          ivy-xref
                          ivy-yasnippet
-                         jgraph-mode
+                         ;; jgraph-mode
                          ;; jinja2-mode
                          ;; js2-mode
                          ;; js2-refactor
@@ -140,12 +140,11 @@
                          lsp-java
                          lsp-mode
                          lsp-pyright
-                         lsp-treemacs
+                         ;; lsp-treemacs
                          lsp-ui
                          magit
                          manage-minor-mode
                          markdown-mode
-                         markdown-mode+
                          markdown-preview-mode
                          markdown-toc
                          math-preview

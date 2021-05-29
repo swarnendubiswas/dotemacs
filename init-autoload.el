@@ -246,6 +246,8 @@ This location is used for temporary installations and files.")
 
 ;; Allow gc to happen after a period of idle time
 (progn
+  (declare-function gcmh-idle-garbage-collect "gcmh")
+
   (unless (fboundp 'gcmh-mode)
     (autoload #'gcmh-mode "gcmh" nil t))
   (unless (fboundp 'gcmh-idle-garbage-collect)
@@ -255,6 +257,8 @@ This location is used for temporary installations and files.")
 
   (with-eval-after-load 'gcmh
     (when (bound-and-true-p sb/debug-init-file)
+      (defvar gcmh-verbose)
+
       (setq gcmh-verbose t))
 
     (diminish 'gcmh-mode)))
@@ -343,7 +347,8 @@ This location is used for temporary installations and files.")
       ;; Avoid resizing the frame when the font is larger (or smaller) than the system default
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t
-      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name "@" system-name)
+      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name "@"
+                               (system-name))
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
@@ -473,6 +478,7 @@ This location is used for temporary installations and files.")
     (defvar auto-revert-use-notify)
     (defvar auto-revert-verbose)
     (defvar global-auto-revert-non-file-buffers)
+    (defvar auto-revert-check-vc-info)
 
     (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
           auto-revert-remote-files t ; Emacs seems to hang with auto-revert and tramp
@@ -678,6 +684,7 @@ SAVE-FN with non-nil ARGS."
       (all-the-icons-install-fonts t))
 
     (defvar all-the-icons-scale-factor)
+    (defvar all-the-icons-color-icons)
 
     (setq all-the-icons-scale-factor 1.0
           all-the-icons-color-icons nil)))
@@ -784,6 +791,8 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (eq sb/modeline-theme 'sml)
+  (declare-function sml/setup "smart-mode-line")
+
   (unless (fboundp 'sml/setup)
     (autoload #'sml/setup "smart-mode-line" nil t))
 
@@ -1167,6 +1176,14 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'dired-mode-hook #'auto-revert-mode)
   (add-hook 'dired-mode-hook #'dired-omit-mode)
 
+  (defvar dired-mode-map)
+
+  (bind-keys :package dired :map dired-mode-map
+             ("M-<home>" . sb/dired-go-home)
+             ("i"        . find-file)
+             ("M-<up>"   . sb/dired-jump-to-top)
+             ("M-<down>" . sb/dired-jump-to-bottom))
+
   (when nil
     ;; More detailed colors, but can be jarring with certain themes
     (unless (fboundp #'diredfl-mode)
@@ -1178,18 +1195,15 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'dired-narrow)
     (autoload #'dired-narrow "dired-narrow" nil t))
 
+  (defvar dired-mode-map)
+
   (bind-keys :package dired-narrow :map dired-mode-map
              ("/" . dired-narrow)))
 
-(defvar dired-mode-map)
-(bind-keys :package dired :map dired-mode-map
-           ("M-<home>" . sb/dired-go-home)
-           ("i"        . find-file)
-           ("M-<up>"   . sb/dired-jump-to-top)
-           ("M-<down>" . sb/dired-jump-to-bottom))
-
 (with-eval-after-load 'dired-x
   ;; Do not show messages when omitting files
+  (defvar dired-omit-verbose)
+
   (setq dired-omit-verbose nil)
 
   ;; (setq dired-omit-files
@@ -1215,6 +1229,8 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; Do not create multiple dired buffers
+(declare-function diredp-toggle-find-file-reuse-dir "dired+")
+
 (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
   (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
 
@@ -1237,6 +1253,8 @@ SAVE-FN with non-nil ARGS."
 
   ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
   ;; after `dired+' and not `dired', even with `bind-keys*'.
+  (defvar dired-mode-map)
+
   (bind-keys* :package dired-efap :map dired-mode-map
               ("r" . dired-efap)))
 
@@ -1540,6 +1558,7 @@ SAVE-FN with non-nil ARGS."
         ;; Render subscripts and superscripts in org buffers
         org-pretty-entities-include-sub-superscripts t)
 
+  (defvar org-mode-map)
   (unbind-key "M-<left>" org-mode-map)
   (unbind-key "M-<right>" org-mode-map)
 
@@ -1711,6 +1730,7 @@ SAVE-FN with non-nil ARGS."
 
 
 (declare-function recentf-save-file "recentf")
+(declare-function recentf-save-list "recentf")
 (declare-function recentf-cleanup "recentf")
 
 (unless (fboundp 'recentf-mode)
@@ -1731,6 +1751,7 @@ SAVE-FN with non-nil ARGS."
   (defvar recentf-max-saved-items)
   (defvar recentf-menu-filter)
   (defvar recentf-save-file)
+  (defvar recentf-keep)
 
   (setq recentf-auto-cleanup 'never ; Do not stat remote files
         ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
@@ -1797,6 +1818,7 @@ SAVE-FN with non-nil ARGS."
 (declare-function company-select-previous "company")
 (declare-function company-complete-common-or-cycle "company")
 (declare-function company-abort "company")
+(declare-function company-clang-set-prefix "company-clang")
 
 (unless (fboundp 'global-company-mode)
   (autoload #'global-company-mode "company" nil t))
@@ -1832,6 +1854,7 @@ SAVE-FN with non-nil ARGS."
   (defvar company-tooltip-align-annotations)
   (defvar company-transformers)
   (defvar company-dabbrev-downcase)
+  (defvar company-dabbrev-ignore-case)
 
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -1868,6 +1891,7 @@ SAVE-FN with non-nil ARGS."
 
   (defvar company-posframe-show-metadata)
   (defvar company-posframe-show-indicator)
+  (defvar company-posframe-quickhelp-delay)
 
   (setq company-posframe-show-metadata nil ; Difficult to distinguish and distracting
         company-posframe-show-indicator nil
@@ -1996,6 +2020,7 @@ SAVE-FN with non-nil ARGS."
 
 (with-eval-after-load 'amx
   (defvar amx-save-file)
+  (defvar amx-auto-update-interval)
 
   (setq amx-auto-update-interval 5) ; Update the command list every n minutes
 
@@ -2969,6 +2994,7 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function flycheck-list-errors "flycheck")
 (declare-function flycheck-disable-checker "flycheck")
 (declare-function flycheck-add-mode "flycheck")
+(declare-function flycheck-display-error-messages-unless-error-list "flycheck")
 
 (unless (fboundp 'global-flycheck-mode)
   (autoload #'global-flycheck-mode "flycheck" nil t))
@@ -3011,6 +3037,7 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar flycheck-textlint-plugin-alist)
   (defvar flycheck-hooks-alist)
   (defvar flycheck-display-errors-function)
+  (defvar flycheck-global-modes)
 
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
@@ -3047,6 +3074,8 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
+
+  (declare-function sb/flycheck-may-check-automatically "init-autoload.el")
 
   (defvar sb/excluded-directory-regexps
     '(".git/" "elpa/"))
@@ -3444,6 +3473,13 @@ This file is specified in `counsel-projectile-default-file'."
 (when (and (eq system-type 'gnu/linux)
            (eq sb/tags-scheme 'gtags))
   (declare-function counsel-gtags-dwim "counsel-gtags")
+  (declare-function counsel-gtags-mode "counsel-gtags")
+  (declare-function counsel-gtags-go-backward "counsel-gtags")
+  (declare-function counsel-gtags-find-reference "counsel-gtags")
+  (declare-function counsel-gtags-find-symbol "counsel-gtags")
+  (declare-function counsel-gtags-find-definition "counsel-gtags")
+  (declare-function counsel-gtags-create-tags "counsel-gtags")
+  (declare-function counsel-gtags-update-tags "counsel-gtags")
 
   (unless (fboundp 'counsel-gtags-mode)
     (autoload #'counsel-gtags-mode "counsel-gtags" nil t))
@@ -3491,6 +3527,11 @@ This file is specified in `counsel-projectile-default-file'."
 (when (and (eq system-type 'gnu/linux)
            (eq sb/tags-scheme 'ctags))
   (declare-function counsel-etags-find-symbol-at-point "counsel-etags")
+  (declare-function counsel-etags-find-tag-at-point "counsel-etags")
+  (declare-function counsel-etags-find-tag "counsel-etags")
+  (declare-function counsel-etags-list-tag "counsel-etags")
+  (declare-function counsel-etags-scan-code "counsel-etags")
+  (declare-function counsel-etags-virtual-update-tags "counsel-etags")
 
   (unless (fboundp 'counsel-etags-find-tag-at-point)
     (autoload #'counsel-etags-find-tag-at-point "counsel-etags" nil t))
@@ -3629,12 +3670,14 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'manage-minor-mode "manage-minor-mode" nil t))
 
 
-(unless (fboundp 'jgraph-mode)
-  (autoload #'jgraph-mode "jgraph-mode" nil t))
+(when nil
+  (unless (fboundp 'jgraph-mode)
+    (autoload #'jgraph-mode "jgraph-mode" nil t)))
 
 
-(unless (fboundp 'graphviz-dot-mode)
-  (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t))
+(when nil
+  (unless (fboundp 'graphviz-dot-mode)
+    (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t)))
 
 
 (when nil
@@ -3923,8 +3966,8 @@ This file is specified in `counsel-projectile-default-file'."
       (autoload #'pomidor-hold "pomidunlessor" nil t))
     (unless (fboundp 'pomidor-unhold)
       (autoload #'pomidor-unhold "pomidor" nil t))
-    ((fboundp 'pomidor)
-     (autoload #'pomidor "pomidor" nil t))
+    (unless (fboundp 'pomidor)
+      (autoload #'pomidor "pomidor" nil t))
     ))
 
 
@@ -4072,6 +4115,9 @@ This file is specified in `counsel-projectile-default-file'."
 
 (when sb/debug-init-file
   (progn
+    (declare-function bug-hunter-file "bug-hunter")
+    (declare-function bug-hunter-init-file "bug-hunter")
+
     (unless (fboundp 'bug-hunter-file)
       (autoload #'bug-hunter-file "bug-hunter" nil t))
     (unless (fboundp 'bug-hunter-init-file)
@@ -4317,9 +4363,6 @@ This file is specified in `counsel-projectile-default-file'."
           markdown-list-indent-width 2
           markdown-split-window-direction 'horizontal)
 
-    ;; Additional commands to export markdown file to other formats
-    (require 'markdown-mode+)
-
     ;; Generate TOC with `markdown-toc-generate-toc'
 
     (unless (fboundp 'markdown-toc-refresh-toc)
@@ -4449,10 +4492,7 @@ This file is specified in `counsel-projectile-default-file'."
   (progn
     (add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-    (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
-
-  ;; Use normal tabs in makefiles
-  (add-hook 'makefile-mode-hook #'indent-tabs-mode))
+    (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode))))
 
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
@@ -4486,6 +4526,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     (with-eval-after-load 'eldoc-box
       (defvar eldoc-box-clear-with-C-g)
+      (defvar eldoc-box-fringe-use-same-bg)
 
       (setq eldoc-box-clear-with-C-g t
             eldoc-box-fringe-use-same-bg nil)
@@ -4583,6 +4624,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; LSP support
 
+(declare-function lsp-find-definition "lsp-mode")
 (declare-function lsp-find-declaration "lsp-mode")
 (declare-function lsp-goto-implementation "lsp-mode")
 (declare-function lsp-goto-type-definition "lsp-mode")
@@ -4591,7 +4633,7 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function lsp-format-buffer "lsp-mode")
 (declare-function lsp-find-references "lsp-mode")
 (declare-function lsp--set-configuration "lsp-mode")
-(declare-function lsp-completion--regex-fuz "lsp-mode")
+(declare-function lsp-completion--regex-fuz "lsp-completion")
 (declare-function lsp-register-client "lsp-mode")
 (declare-function lsp-tramp-connection "lsp-mode")
 (declare-function make-lsp-client "lsp-mode")
@@ -4599,11 +4641,7 @@ This file is specified in `counsel-projectile-default-file'."
 (declare-function lsp-package-ensure "lsp-mode")
 (declare-function with-lsp-workspace "lsp-mode")
 (declare-function lsp-ht "lsp-mode")
-(declare-function lsp-ui-doc-mode "lsp-mode")
-(declare-function lsp-ui-peek-find-definitions "lsp-mode")
-(declare-function lsp-ui-peek-find-references "lsp-mode")
 (declare-function lsp-enable-which-key-integration "lsp-mode")
-(declare-function lsp-find-definition "lsp-mode")
 
 (unless (fboundp 'lsp-deferred)
   (autoload #'lsp-deferred "lsp-mode" nil t))
@@ -4694,6 +4732,10 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-session-file)
   (defvar lsp-completion-show-detail)
   (defvar lsp-eldoc-enable-hover)
+  (defvar lsp-signature-function)
+  (defvar lsp-completion-show-kind)
+  (defvar lsp-modeline-diagnostics-enable)
+  (defvar lsp-enable-which-key-integration)
 
   (setq lsp-clients-clangd-args '("-j=2"
                                   "--background-index"
@@ -4956,6 +4998,11 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (with-eval-after-load 'lsp-mode
+  (declare-function lsp-ui-doc-mode "lsp-ui-doc")
+  (declare-function lsp-ui-peek-find-definitions "lsp-ui-peek")
+  (declare-function lsp-ui-peek-find-references "lsp-ui-peek")
+  (declare-function lsp-ui-doc--hide-frame "lsp-ui-doc")
+
   (unless (fboundp 'lsp-ui-mode)
     (autoload #'lsp-ui-mode "lsp-ui" nil t))
   (unless (fboundp 'lsp-ui-doc-mode)
@@ -4968,6 +5015,8 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-ui-imenu-auto-refresh)
   (defvar lsp-ui-sideline-enable)
   (defvar lsp-ui-modeline-code-actions-enable)
+  (defvar lsp-ui-imenu-window-width)
+  (defvar lsp-ui-sideline-show-diagnostics)
 
   ;; https://github.com/emacs-lsp/lsp-ui/issues/578
   (add-hook 'minibuffer-setup-hook
@@ -5419,6 +5468,7 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar transient-history-file)
   (defvar transient-levels-file)
   (defvar transient-values-file)
+  (defvar transient-display-buffer-action)
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
@@ -5503,12 +5553,13 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (boundp 'vc-handled-backends)
   (declare-function git-gutter:previous-hunk "git-gutter")
   (declare-function git-gutter:next-hunk "git-gutter")
+  (declare-function global-git-gutter-mode "git-gutter")
 
   (unless (fboundp 'git-gutter:previous-hunk)
     (autoload #'git-gutter:previous-hunk "git-gutter" nil t))
   (unless (fboundp 'git-gutter:next-hunk)
     (autoload #'git-gutter:next-hunk "git-gutter" nil t))
-  (unless (fboundp 'global-git-gutter-mode)
+  (unless (fboundp 'global-gitg-gutter-mode)
     (autoload #'global-git-gutter-mode "git-gutter" nil t))
 
   (add-hook 'after-init-hook #'global-git-gutter-mode)
@@ -6391,6 +6442,8 @@ Ignore if no file is found."
 
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
+(declare-function ansi-color-apply-on-region "ansi-color")
+
 (with-eval-after-load 'compile
   (require 'ansi-color)
   (defvar compilation-filter-start)
@@ -6401,7 +6454,6 @@ Ignore if no file is found."
 
   (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
 
-;; (declare-function ansi-color-apply-on-region "ansi-color")
 
 ;; (defun sb/colorize-compilation-buffer ()
 ;;   "Colorize compile mode output."
@@ -6477,6 +6529,8 @@ Ignore if no file is found."
 ;; If the group contains keyword `:with', the backends listed after this keyword are ignored for
 ;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
 ;; that come from different backends are sorted separately in the combined list.
+
+(declare-function company-capf "company-capf")
 
 (unless (fboundp 'company-dabbrev)
   (autoload #'company-dabbrev "company-dabbrev" nil t))
@@ -7015,6 +7069,9 @@ mode is not in `sb/skippable-modes'."
 (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
 (with-eval-after-load 'centaur-tabs
+  (declare-function centaur-tabs-forward "centaur-tabs")
+  (declare-function centaur-tabs-backward "centaur-tabs")
+
   (global-set-key [remap next-buffer] #'centaur-tabs-forward)
   (global-set-key [remap previous-buffer] #'centaur-tabs-backward))
 
@@ -7061,6 +7118,7 @@ mode is not in `sb/skippable-modes'."
     (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
     (defvar which-key-posframe-border-width)
+    (defvar which-key-posframe-poshandler)
 
     (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)))
 
@@ -7255,4 +7313,4 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
                      (emacs-init-time) gcs-done)))
 
 (provide 'init-autoloads)
-;;; init-autoloads.el ends here
+;;; init-autoload.el ends here
