@@ -69,8 +69,8 @@
                          dired-narrow
                          disable-mouse
                          discover-my-major
-                         doom-modeline
-                         doom-themes
+                         ;; doom-modeline
+                         ;; doom-themes
                          dotenv-mode
                          dumb-jump
                          duplicate-thing
@@ -154,7 +154,7 @@
                          ;; matlab-mode
                          modern-cpp-font-lock
                          modus-themes
-                         moody
+                         ;; moody
                          move-text
                          multiple-cursors
                          ;; nix-mode

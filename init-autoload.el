@@ -28,13 +28,13 @@
 
 
 (defcustom sb/theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type '(radio
-          (const :tag "leuven" leuven)
-          (const :tag "doom-molokai" doom-molokai)
-          (const :tag "doom-one-light" doom-one-light)
-          (const :tag "monokai" monokai)
+          ;; (const :tag "leuven" leuven)
+          ;; (const :tag "doom-molokai" doom-molokai)
+          ;; (const :tag "doom-one-light" doom-one-light)
+          ;; (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
           (const :tag "customized" sb/default) ; Customizations over the default theme
@@ -43,7 +43,7 @@
 
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -297,7 +297,7 @@ This location is used for temporary installations and files.")
   (defvar exec-path-from-shell-variables)
 
   ;; "-i" is expensive but Tramp is unable to find executables without the option
-  (setq exec-path-from-shell-arguments '("-l" "-i")
+  (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
                                          "LANG" "LC_CTYPE"))
@@ -690,30 +690,58 @@ SAVE-FN with non-nil ARGS."
           all-the-icons-color-icons nil)))
 
 
-(when (eq sb/theme 'leuven)
-  (load-theme 'leuven t))
+(when t
+  (progn
+    (require 'solar)
+
+    (declare-function circadian-setup "circadian")
+    (unless (fboundp 'circadian-setup)
+      (autoload #'circadian-setup "circadian" nil t))
+
+    (defvar calendar-latitude)
+    (defvar calendar-longitude)
+    (defvar circadian-themes)
+    (defvar calendar-location-name)
+
+    ;; Kanpur, UP
+    (setq calendar-latitude 26.50
+          calendar-longitude 80.23
+          calendar-location-name "Kanpur, UP, India"
+          circadian-themes '((:sunrise . modus-operandi)
+                             (:sunset  . modus-vivendi)))
+
+    (circadian-setup)
+    ))
 
 
-(when (eq sb/theme 'doom-molokai)
-  (load-theme 'doom-molokai t)
-  (set-face-attribute 'font-lock-comment-face nil
-                      ;; :foreground "#cccccc"
-                      ;; :foreground "#b2b2b2"
-                      :foreground "#999999")
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification
-  (doom-themes-org-config))
+(when nil
+  (when (eq sb/theme 'leuven)
+    (load-theme 'leuven t)))
 
 
-(when (eq sb/theme 'doom-one-light)
-  (load-theme 'doom-one-light t)
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification
-  (doom-themes-org-config))
+(when nil
+  (when (eq sb/theme 'doom-molokai)
+    (load-theme 'doom-molokai t)
+    (set-face-attribute 'font-lock-comment-face nil
+                        ;; :foreground "#cccccc"
+                        ;; :foreground "#b2b2b2"
+                        :foreground "#999999")
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification
+    (doom-themes-org-config)))
 
 
-(when (eq sb/theme 'monokai)
-  (load-theme 'monokai t))
+(when nil
+  (when (eq sb/theme 'doom-one-light)
+    (load-theme 'doom-one-light t)
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification
+    (doom-themes-org-config)))
+
+
+(when nil
+  (when (eq sb/theme 'monokai)
+    (load-theme 'monokai t)))
 
 
 (when (or (eq sb/theme 'modus-operandi)
@@ -790,154 +818,158 @@ SAVE-FN with non-nil ARGS."
   (powerline-default-theme))
 
 
-(when (eq sb/modeline-theme 'sml)
-  (declare-function sml/setup "smart-mode-line")
+(when nil
+  (when (eq sb/modeline-theme 'sml)
+    (declare-function sml/setup "smart-mode-line")
 
-  (unless (fboundp 'sml/setup)
-    (autoload #'sml/setup "smart-mode-line" nil t))
+    (unless (fboundp 'sml/setup)
+      (autoload #'sml/setup "smart-mode-line" nil t))
 
-  (require 'smart-mode-line-powerline-theme)
+    (require 'smart-mode-line-powerline-theme)
 
-  (defvar sml/theme)
-  (defvar sml/mode-width)
-  (defvar sml/no-confirm-load-theme)
-  (defvar sml/shorten-modes)
-  (defvar sml/shorten-directory)
+    (defvar sml/theme)
+    (defvar sml/mode-width)
+    (defvar sml/no-confirm-load-theme)
+    (defvar sml/shorten-modes)
+    (defvar sml/shorten-directory)
 
-  (setq sml/theme 'light
-        sml/mode-width 'full
-        sml/no-confirm-load-theme t
-        sml/shorten-modes t
-        sml/shorten-directory t)
+    (setq sml/theme 'light
+          sml/mode-width 'full
+          sml/no-confirm-load-theme t
+          sml/shorten-modes t
+          sml/shorten-directory t)
 
-  (sml/setup))
-
-
-(when (eq sb/modeline-theme 'spaceline)
-  (require 'spaceline-config)
-  (require 'spaceline-all-the-icons)
-
-  (defvar spaceline-hud-p)
-  (defvar spaceline-input-method-p)
-  (defvar spaceline-persp-name-p)
-  (defvar spaceline-selection-info-p)
-  (defvar spaceline-version-control-p)
-
-  (setq spaceline-hud-p nil
-        spaceline-input-method-p nil
-        spaceline-persp-name-p nil
-        spaceline-selection-info-p nil
-        spaceline-version-control-p t)
-
-  (declare-function spaceline-all-the-icons-theme "spaceline-all-the-icons")
-
-  (spaceline-all-the-icons-theme))
+    (sml/setup)))
 
 
-(when (eq sb/modeline-theme 'doom-modeline)
-  (unless (fboundp 'doom-modeline-mode)
-    (autoload #'doom-modeline-mode "doom-modeline" nil t))
+(when nil
+  (when (eq sb/modeline-theme 'spaceline)
+    (require 'spaceline-config)
+    (require 'spaceline-all-the-icons)
 
-  (defvar doom-modeline-buffer-encoding)
-  (defvar doom-modeline-checker-simple-format)
-  (defvar doom-modeline-indent-info)
-  (defvar doom-modeline-lsp)
-  (defvar doom-modeline-minor-modes)
+    (defvar spaceline-hud-p)
+    (defvar spaceline-input-method-p)
+    (defvar spaceline-persp-name-p)
+    (defvar spaceline-selection-info-p)
+    (defvar spaceline-version-control-p)
 
-  ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
-  (setq doom-modeline-buffer-encoding nil
-        doom-modeline-checker-simple-format t
-        doom-modeline-indent-info nil
-        doom-modeline-lsp nil
-        doom-modeline-minor-modes t)
+    (setq spaceline-hud-p nil
+          spaceline-input-method-p nil
+          spaceline-persp-name-p nil
+          spaceline-selection-info-p nil
+          spaceline-version-control-p t)
 
-  (doom-modeline-mode 1)
+    (declare-function spaceline-all-the-icons-theme "spaceline-all-the-icons")
 
-  ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
-  )
-
-
-(when (eq sb/modeline-theme 'awesome-tray)
-  (declare-function awesome-tray-mode "awesome-tray")
-
-  (unless (fboundp 'awesome-tray-mode)
-    (autoload #'awesome-tray-mode "awesome-tray" nil t))
-  (add-hook 'after-init-hook #'awesome-tray-mode)
-
-  (defvar awesome-tray-active-modules)
-
-  (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
-
-  (custom-set-faces
-   (backquote
-    (awesome-tray-default-face
-     ((t
-       (:inherit default :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-awesome-tab-face
-     ((t
-       (:foreground "#b83059" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-buffer-name-face
-     ((t
-       (:foreground "#cc7700" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-date-face
-     ((t
-       (:foreground "#717175" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-file-path-face
-     ((t
-       (:foreground "#5e8e2e" :weight normal :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-git-face
-     ((t
-       (:foreground "#cc2444" :weight normal :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-last-command-face
-     ((t
-       (:foreground "#0061cc" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-location-face
-     ((t
-       (:foreground "#cc7700" :weight normal :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-mode-name-face
-     ((t
-       (:foreground "#00a400" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-parent-dir-face
-     ((t
-       (:foreground "#5e8e2e" :weight bold :height 0.8)))))))
+    (spaceline-all-the-icons-theme)))
 
 
-(when (eq sb/modeline-theme 'moody)
-  (unless (fboundp 'moody-replace-vc-mode)
-    (autoload #'moody-replace-vc-mode "moody" nil t))
-  (unless (fboundp 'moody-replace-mode-line-buffer-identification)
-    (autoload #'moody-replace-mode-line-buffer-identification "moody" nil t))
+(when nil
+  (when (eq sb/modeline-theme 'doom-modeline)
+    (unless (fboundp 'doom-modeline-mode)
+      (autoload #'doom-modeline-mode "doom-modeline" nil t))
 
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
+    (defvar doom-modeline-buffer-encoding)
+    (defvar doom-modeline-checker-simple-format)
+    (defvar doom-modeline-indent-info)
+    (defvar doom-modeline-lsp)
+    (defvar doom-modeline-minor-modes)
+
+    ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
+    (setq doom-modeline-buffer-encoding nil
+          doom-modeline-checker-simple-format t
+          doom-modeline-indent-info nil
+          doom-modeline-lsp nil
+          doom-modeline-minor-modes t)
+
+    (doom-modeline-mode 1)
+
+    ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
+    ))
+
+
+(when nil
+  (when (eq sb/modeline-theme 'awesome-tray)
+    (declare-function awesome-tray-mode "awesome-tray")
+
+    (unless (fboundp 'awesome-tray-mode)
+      (autoload #'awesome-tray-mode "awesome-tray" nil t))
+    (add-hook 'after-init-hook #'awesome-tray-mode)
+
+    (defvar awesome-tray-active-modules)
+
+    (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
+
+    (custom-set-faces
+     (backquote
+      (awesome-tray-default-face
+       ((t
+         (:inherit default :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-awesome-tab-face
+       ((t
+         (:foreground "#b83059" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-buffer-name-face
+       ((t
+         (:foreground "#cc7700" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-date-face
+       ((t
+         (:foreground "#717175" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-file-path-face
+       ((t
+         (:foreground "#5e8e2e" :weight normal :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-git-face
+       ((t
+         (:foreground "#cc2444" :weight normal :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-last-command-face
+       ((t
+         (:foreground "#0061cc" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-location-face
+       ((t
+         (:foreground "#cc7700" :weight normal :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-mode-name-face
+       ((t
+         (:foreground "#00a400" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-parent-dir-face
+       ((t
+         (:foreground "#5e8e2e" :weight bold :height 0.8))))))))
+
+(when nil
+  (when (eq sb/modeline-theme 'moody)
+    (unless (fboundp 'moody-replace-vc-mode)
+      (autoload #'moody-replace-vc-mode "moody" nil t))
+    (unless (fboundp 'moody-replace-mode-line-buffer-identification)
+      (autoload #'moody-replace-mode-line-buffer-identification "moody" nil t))
+
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode)))
 
 
 ;; The icons do not look good.
-(if nil
-    (progn
-      (unless (fboundp 'mode-icons-mode)
-        (autoload #'mode-icons-mode "mode-icons" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'mode-icons-mode)
+      (autoload #'mode-icons-mode "mode-icons" nil t))
 
-      (mode-icons-mode 1)
-      ))
+    (mode-icons-mode 1)
+    ))
 
 
 (progn
@@ -1024,28 +1056,6 @@ SAVE-FN with non-nil ARGS."
     (add-hook 'emacs-startup-hook
               (lambda ()
                 (setq resize-mini-windows nil)))
-    ))
-
-
-(when nil
-  (progn
-    (declare-function circadian-setup "circadian")
-    (unless (fboundp 'circadian-setup)
-      (autoload #'circadian-setup "circadian" nil t))
-
-    (with-eval-after-load 'circadian
-      (require 'solar)
-
-      (defvar calendar-latitude)
-      (defvar calendar-longitude)
-      (defvar circadian-themes)
-
-      ;; Kanpur, UP
-      (setq calendar-latitude 26.50
-            calendar-longitude 80.23
-            calendar-location-name "Kanpur, UP, India"
-            circadian-themes '((:sunrise . modus-operandi)
-                               (:sunset  . modus-operandi))))
     ))
 
 
@@ -1472,6 +1482,8 @@ SAVE-FN with non-nil ARGS."
         (when (eq sb/theme 'sb/default)
           (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
           (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0)))
+
+      ;; Ignore files
 
       ;; (defun sb/treemacs-ignore-files (filename absolute-path)
       ;;   (or (string-equal filename "foo")
@@ -4532,7 +4544,11 @@ This file is specified in `counsel-projectile-default-file'."
       (setq eldoc-box-clear-with-C-g t
             eldoc-box-fringe-use-same-bg nil)
 
-      (set-face-background 'eldoc-box-body "cornsilk")
+      ;; (when (eq sb/theme 'modus-operandi)
+      ;;   (set-face-background 'eldoc-box-body "cornsilk"))
+
+      ;; (when (eq sb/theme 'modus-vivendi)
+      ;;   (set-face-background 'eldoc-box-body "gray"))
 
       (diminish 'eldoc-box-hover-mode))))
 
@@ -4841,10 +4857,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge
-                            (lsp-configuration-section "pyright")
-                            (lsp-configuration-section "python")))))
+                                            (lsp--set-configuration
+                                             (ht-merge
+                                              (lsp-configuration-section "pyright")
+                                              (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -4962,8 +4978,8 @@ This file is specified in `counsel-projectile-default-file'."
                     (lambda
                       (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
   ;; TODO: What is the utility of this?
