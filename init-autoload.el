@@ -1283,229 +1283,229 @@ SAVE-FN with non-nil ARGS."
     (diminish 'all-the-icons-dired-mode)))
 
 
-(if nil
-    (progn
-      (when (display-graphic-p)
-        (declare-function treemacs-git-mode "treemacs")
-        (declare-function treemacs-follow-mode "treemacs")
-        (declare-function treemacs-current-workspace "treemacs")
-        (declare-function treemacs-fringe-indicator-mode "treemacs")
-        (declare-function treemacs-goto-file-node "treemacs")
-        (declare-function treemacs-find-file-node "treemacs")
-        (declare-function treemacs-filewatch-mode "treemacs")
-        (declare-function treemacs-create-theme "treemacs")
-        (declare-function treemacs-load-theme "treemacs")
-        (declare-function treemacs-canonical-path "treemacs")
-        (declare-function treemacs-add-project-to-workspace "treemacs")
-        (declare-function treemacs-do-add-project-to-workspace "treemacs")
-        (declare-function treemacs-scope->current-scope "treemacs")
-        (declare-function treemacs--restore-eldoc-after-log "treemacs")
-        (declare-function treemacs--filename "treemacs")
-        (declare-function treemacs--find-workspace "treemacs")
-        (declare-function treemacs-workspace->is-empty "treemacs")
-        (declare-function treemacs-pulse-on-success "treemacs")
-        (declare-function treemacs-is-path "treemacs")
-        (declare-function treemacs-theme->gui-icons "treemacs")
-        (declare-function treemacs--find-current-user-project "treemacs")
-        (declare-function treemacs--propagate-new-icons "treemacs")
-        (declare-function treemacs-workspace->is-empty? "treemacs")
+(when nil
+  (progn
+    (when (display-graphic-p)
+      (declare-function treemacs-git-mode "treemacs")
+      (declare-function treemacs-follow-mode "treemacs")
+      (declare-function treemacs-current-workspace "treemacs")
+      (declare-function treemacs-fringe-indicator-mode "treemacs")
+      (declare-function treemacs-goto-file-node "treemacs")
+      (declare-function treemacs-find-file-node "treemacs")
+      (declare-function treemacs-filewatch-mode "treemacs")
+      (declare-function treemacs-create-theme "treemacs")
+      (declare-function treemacs-load-theme "treemacs")
+      (declare-function treemacs-canonical-path "treemacs")
+      (declare-function treemacs-add-project-to-workspace "treemacs")
+      (declare-function treemacs-do-add-project-to-workspace "treemacs")
+      (declare-function treemacs-scope->current-scope "treemacs")
+      (declare-function treemacs--restore-eldoc-after-log "treemacs")
+      (declare-function treemacs--filename "treemacs")
+      (declare-function treemacs--find-workspace "treemacs")
+      (declare-function treemacs-workspace->is-empty "treemacs")
+      (declare-function treemacs-pulse-on-success "treemacs")
+      (declare-function treemacs-is-path "treemacs")
+      (declare-function treemacs-theme->gui-icons "treemacs")
+      (declare-function treemacs--find-current-user-project "treemacs")
+      (declare-function treemacs--propagate-new-icons "treemacs")
+      (declare-function treemacs-workspace->is-empty? "treemacs")
 
-        (unless (fboundp 'treemacs)
-          (autoload #'treemacs "treemacs" nil t))
-        (unless (fboundp 'treemacs-current-workspace)
-          (autoload #'treemacs-current-workspace "treemacs" nil t))
-        (unless (fboundp 'treemacs--find-current-user-project)
-          (autoload #'treemacs--find-current-user-project "treemacs" nil t))
-        (unless (fboundp 'treemacs-do-add-project-to-workspace)
-          (autoload #'treemacs-do-add-project-to-workspace "treemacs" nil t))
-        (unless (fboundp 'treemacs-add-project-to-workspace)
-          (autoload #'treemacs-add-project-to-workspace "treemacs" nil t))
-        (unless (fboundp 'treemacs-git-mode)
-          (autoload #'treemacs-git-mode "treemacs" nil t))
-        (unless (fboundp 'treemacs-follow-mode)
-          (autoload #'treemacs-follow-mode "treemacs" nil t))
-        (unless (fboundp 'treemacs-fringe-indicator-mode)
-          (autoload #'treemacs-fringe-indicator-mode "treemacs" nil t))
-        (unless (fboundp 'treemacs-filewatch-mode)
-          (autoload #'treemacs-filewatch-mode "treemacs" nil t))
-        (unless (fboundp 'treemacs-goto-file-node)
-          (autoload #'treemacs-goto-file-node "treemacs" nil t))
-        (unless (fboundp 'treemacs--propagate-new-icons)
-          (autoload #'treemacs--propagate-new-icons "treemacs" nil t))
-        (unless (fboundp 'treemacs-scope->current-scope)
-          (autoload #'treemacs-scope->current-scope "treemacs" nil t))
-        (unless (fboundp 'treemacs--restore-eldoc-after-log)
-          (autoload #'treemacs--restore-eldoc-after-log "treemacs" nil t))
-        (unless (fboundp 'treemacs-load-theme)
-          (autoload #'treemacs-load-theme "treemacs" nil t))
-        (unless (fboundp 'treemacs-find-file-node)
-          (autoload #'treemacs-find-file-node "treemacs" nil t))
-        (unless (fboundp 'treemacs-resize-icons)
-          (autoload #'treemacs-resize-icons "treemacs" nil t))
-        (unless (fboundp 'treemacs-select-window)
-          (autoload #'treemacs-select-window "treemacs" nil t))
-        (unless (fboundp 'treemacs-add-and-display-current-project)
-          (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
-        (unless (fboundp 'treemacs-display-current-project-exclusively)
-          (autoload #'treemacs-display-current-project-exclusively "treemacs" nil t))
+      (unless (fboundp 'treemacs)
+        (autoload #'treemacs "treemacs" nil t))
+      (unless (fboundp 'treemacs-current-workspace)
+        (autoload #'treemacs-current-workspace "treemacs" nil t))
+      (unless (fboundp 'treemacs--find-current-user-project)
+        (autoload #'treemacs--find-current-user-project "treemacs" nil t))
+      (unless (fboundp 'treemacs-do-add-project-to-workspace)
+        (autoload #'treemacs-do-add-project-to-workspace "treemacs" nil t))
+      (unless (fboundp 'treemacs-add-project-to-workspace)
+        (autoload #'treemacs-add-project-to-workspace "treemacs" nil t))
+      (unless (fboundp 'treemacs-git-mode)
+        (autoload #'treemacs-git-mode "treemacs" nil t))
+      (unless (fboundp 'treemacs-follow-mode)
+        (autoload #'treemacs-follow-mode "treemacs" nil t))
+      (unless (fboundp 'treemacs-fringe-indicator-mode)
+        (autoload #'treemacs-fringe-indicator-mode "treemacs" nil t))
+      (unless (fboundp 'treemacs-filewatch-mode)
+        (autoload #'treemacs-filewatch-mode "treemacs" nil t))
+      (unless (fboundp 'treemacs-goto-file-node)
+        (autoload #'treemacs-goto-file-node "treemacs" nil t))
+      (unless (fboundp 'treemacs--propagate-new-icons)
+        (autoload #'treemacs--propagate-new-icons "treemacs" nil t))
+      (unless (fboundp 'treemacs-scope->current-scope)
+        (autoload #'treemacs-scope->current-scope "treemacs" nil t))
+      (unless (fboundp 'treemacs--restore-eldoc-after-log)
+        (autoload #'treemacs--restore-eldoc-after-log "treemacs" nil t))
+      (unless (fboundp 'treemacs-load-theme)
+        (autoload #'treemacs-load-theme "treemacs" nil t))
+      (unless (fboundp 'treemacs-find-file-node)
+        (autoload #'treemacs-find-file-node "treemacs" nil t))
+      (unless (fboundp 'treemacs-resize-icons)
+        (autoload #'treemacs-resize-icons "treemacs" nil t))
+      (unless (fboundp 'treemacs-select-window)
+        (autoload #'treemacs-select-window "treemacs" nil t))
+      (unless (fboundp 'treemacs-add-and-display-current-project)
+        (autoload #'treemacs-add-and-display-current-project "treemacs" nil t))
+      (unless (fboundp 'treemacs-display-current-project-exclusively)
+        (autoload #'treemacs-display-current-project-exclusively "treemacs" nil t))
 
-        (eval-and-compile
-          (defun sb/setup-treemacs-quick nil
-            "Setup treemacs."
-            (interactive)
-            (when (projectile-project-p)
-              (treemacs-add-and-display-current-project)
-              (other-window 1)))
+      (eval-and-compile
+        (defun sb/setup-treemacs-quick nil
+          "Setup treemacs."
+          (interactive)
+          (when (projectile-project-p)
+            (treemacs-add-and-display-current-project)
+            (other-window 1)))
 
-          (defun sb/setup-treemacs-detailed (args)
-            "Setup treemacs."
-            (let* ((root (treemacs--find-current-user-project))
-                   (path (treemacs-canonical-path root))
-                   (name (treemacs--filename path)))
-              (unless (treemacs-current-workspace)
-                (treemacs--find-workspace))
-              (if (treemacs-workspace->is-empty\?)
-                  (progn
-                    (treemacs-do-add-project-to-workspace path name)
-                    (treemacs-select-window)
-                    (treemacs-pulse-on-success)
-                    (other-window 1)
-                    (when (featurep 'auto-dim-other-buffers)
-                      (adob--rescan-windows)))
-                (treemacs-select-window)
-                (if (treemacs-is-path path :in-workspace)
-                    (treemacs-goto-file-node path)
-                  (treemacs-add-project-to-workspace path name))
-                (other-window 1)
-                (when (featurep 'auto-dim-other-buffers)
-                  (adob--rescan-windows))))))
+        (defun sb/setup-treemacs-detailed (args)
+          "Setup treemacs."
+          (let* ((root (treemacs--find-current-user-project))
+                 (path (treemacs-canonical-path root))
+                 (name (treemacs--filename path)))
+            (unless (treemacs-current-workspace)
+              (treemacs--find-workspace))
+            (if (treemacs-workspace->is-empty\?)
+                (progn
+                  (treemacs-do-add-project-to-workspace path name)
+                  (treemacs-select-window)
+                  (treemacs-pulse-on-success)
+                  (other-window 1)
+                  (when (featurep 'auto-dim-other-buffers)
+                    (adob--rescan-windows)))
+              (treemacs-select-window)
+              (if (treemacs-is-path path :in-workspace)
+                  (treemacs-goto-file-node path)
+                (treemacs-add-project-to-workspace path name))
+              (other-window 1)
+              (when (featurep 'auto-dim-other-buffers)
+                (adob--rescan-windows))))))
 
-        (with-eval-after-load 'treemacs
-          (defvar treemacs-collapse-dirs)
-          (defvar treemacs-follow-after-init)
-          (defvar treemacs-indentation)
-          (defvar treemacs-is-never-other-window)
-          (defvar treemacs-no-png-images)
-          (defvar treemacs-position)
-          (defvar treemacs-project-follow-cleanup)
-          (defvar treemacs-recenter-after-file-follow)
-          (defvar treemacs-recenter-after-tag-follow)
-          (defvar treemacs-show-hidden-files)
-          (defvar treemacs-silent-filewatch)
-          (defvar treemacs-silent-refresh)
-          (defvar treemacs-width)
-          (defvar treemacs-persist-file)
+      (with-eval-after-load 'treemacs
+        (defvar treemacs-collapse-dirs)
+        (defvar treemacs-follow-after-init)
+        (defvar treemacs-indentation)
+        (defvar treemacs-is-never-other-window)
+        (defvar treemacs-no-png-images)
+        (defvar treemacs-position)
+        (defvar treemacs-project-follow-cleanup)
+        (defvar treemacs-recenter-after-file-follow)
+        (defvar treemacs-recenter-after-tag-follow)
+        (defvar treemacs-show-hidden-files)
+        (defvar treemacs-silent-filewatch)
+        (defvar treemacs-silent-refresh)
+        (defvar treemacs-width)
+        (defvar treemacs-persist-file)
 
-          (setq treemacs-collapse-dirs 2
-                treemacs-follow-after-init t
-                treemacs-indentation 1
-                treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
-                ;; Prevents treemacs from being selected with `other-window'
-                treemacs-is-never-other-window nil
-                ;; treemacs-no-png-images nil
-                ;; treemacs-position 'right
-                treemacs-project-follow-cleanup t
-                treemacs-recenter-after-file-follow 'on-distance
-                treemacs-recenter-after-tag-follow 'on-distance
-                treemacs-show-hidden-files nil
-                treemacs-silent-filewatch t
-                treemacs-silent-refresh t
-                treemacs-width 18
-                ;; Hide the mode-line in the Treemacs buffer
-                treemacs-user-mode-line-format 'none)
+        (setq treemacs-collapse-dirs 2
+              treemacs-follow-after-init t
+              treemacs-indentation 1
+              treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
+              ;; Prevents treemacs from being selected with `other-window'
+              treemacs-is-never-other-window nil
+              ;; treemacs-no-png-images nil
+              ;; treemacs-position 'right
+              treemacs-project-follow-cleanup t
+              treemacs-recenter-after-file-follow 'on-distance
+              treemacs-recenter-after-tag-follow 'on-distance
+              treemacs-show-hidden-files nil
+              treemacs-silent-filewatch t
+              treemacs-silent-refresh t
+              treemacs-width 18
+              ;; Hide the mode-line in the Treemacs buffer
+              treemacs-user-mode-line-format 'none)
 
-          (unless (bound-and-true-p sb/use-no-littering)
-            (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
+        (unless (bound-and-true-p sb/use-no-littering)
+          (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
 
-          (treemacs-filewatch-mode 1)
-          (treemacs-follow-mode 1) ; Following tags is noisy
-          (treemacs-git-mode 'deferred)
+        (treemacs-filewatch-mode 1)
+        (treemacs-follow-mode 1) ; Following tags is noisy
+        (treemacs-git-mode 'deferred)
 
-          ;; Always show the file indicator
-          (treemacs-fringe-indicator-mode 'always)
+        ;; Always show the file indicator
+        (treemacs-fringe-indicator-mode 'always)
 
-          (require 'treemacs-all-the-icons)
+        (require 'treemacs-all-the-icons)
 
-          ;; https://github.com/Alexander-Miller/treemacs/issues/735
-          (treemacs-create-theme "Default-Tighter"
-            :extends "Default"
-            :config
-            (let ((icons (treemacs-theme->gui-icons theme)))
-              (maphash (lambda
-                         (ext icon)
-                         (puthash ext
-                                  (concat
-                                   (substring icon 0 1)
-                                   (propertize " " 'display
-                                               '(space . (:width 0.5))))
-                                  icons))
-                       icons)))
+        ;; https://github.com/Alexander-Miller/treemacs/issues/735
+        (treemacs-create-theme "Default-Tighter"
+                               :extends "Default"
+                               :config
+                               (let ((icons (treemacs-theme->gui-icons theme)))
+                                 (maphash (lambda
+                                            (ext icon)
+                                            (puthash ext
+                                                     (concat
+                                                      (substring icon 0 1)
+                                                      (propertize " " 'display
+                                                                  '(space . (:width 0.5))))
+                                                     icons))
+                                          icons)))
 
-          (treemacs-create-theme "all-the-icons-tighter"
-            :extends "all-the-icons"
-            :config
-            (let ((icons (treemacs-theme->gui-icons theme)))
-              (maphash (lambda
-                         (ext icon)
-                         (puthash ext
-                                  (concat
-                                   (substring icon 0 1)
-                                   (propertize " " 'display
-                                               '(space . (:width 0.5))))
-                                  icons))
-                       icons)))
+        (treemacs-create-theme "all-the-icons-tighter"
+                               :extends "all-the-icons"
+                               :config
+                               (let ((icons (treemacs-theme->gui-icons theme)))
+                                 (maphash (lambda
+                                            (ext icon)
+                                            (puthash ext
+                                                     (concat
+                                                      (substring icon 0 1)
+                                                      (propertize " " 'display
+                                                                  '(space . (:width 0.5))))
+                                                     icons))
+                                          icons)))
 
-          (treemacs-load-theme "all-the-icons")
+        (treemacs-load-theme "all-the-icons")
 
-          (set-face-attribute 'treemacs-root-face nil :height 0.8)
-          (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
-          (set-face-attribute 'treemacs-directory-face nil :height 0.7)
-          (set-face-attribute 'treemacs-file-face nil :height 0.7)
-          (set-face-attribute 'treemacs-tags-face nil :height 0.7)
-          (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
-          (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
+        (set-face-attribute 'treemacs-root-face nil :height 0.8)
+        (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.7)
+        (set-face-attribute 'treemacs-directory-face nil :height 0.7)
+        (set-face-attribute 'treemacs-file-face nil :height 0.7)
+        (set-face-attribute 'treemacs-tags-face nil :height 0.7)
+        (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
+        (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
 
-          (when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
-            (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
-            (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
+        (when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
+          (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
+          (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
 
-          (when (eq sb/theme 'sb/default)
-            (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
-            (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0)))
+        (when (eq sb/theme 'sb/default)
+          (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
+          (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0)))
 
-        ;; (defun sb/treemacs-ignore-files (filename absolute-path)
-        ;;   (or (string-equal filename "foo")
-        ;;       (string-prefix-p "/x/y/z/" absolute-path)))
+      ;; (defun sb/treemacs-ignore-files (filename absolute-path)
+      ;;   (or (string-equal filename "foo")
+      ;;       (string-prefix-p "/x/y/z/" absolute-path)))
 
-        ;; (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-files)
-
-
-        ;; Allows to quickly add projectile projects to the treemacs workspace
-        (unless (fboundp 'treemacs-projectile)
-          (autoload #'treemacs-projectile "treemacs-projectile" nil t))
-
-        (require 'treemacs-magit)
+      ;; (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-files)
 
 
-        (bind-keys* :package treemacs
-                    ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
-                    ("M-0" . treemacs-select-window)))
-      ))
+      ;; Allows to quickly add projectile projects to the treemacs workspace
+      (unless (fboundp 'treemacs-projectile)
+        (autoload #'treemacs-projectile "treemacs-projectile" nil t))
 
-;; Starts Treemacs automatically with Emacsclient
-;; https://github.com/Alexander-Miller/treemacs/issues/624
-(add-hook 'after-make-frame-functions
-          (lambda (frame)
-            (run-with-timer
-             1 nil
-             (lambda ()
-               (with-selected-frame frame
-                 (save-selected-window
-                   (treemacs-select-window)))))))
+      (require 'treemacs-magit)
 
-;; (add-hook 'emacs-startup-hook (lambda()
-;;                                 (treemacs)
-;;                                 (other-window 1)))
+      (bind-keys* :package treemacs
+                  ;; ("C-j" . treemacs) ; Interferes with `dired-jump'
+                  ("M-0" . treemacs-select-window)))
+
+    ;; Starts Treemacs automatically with Emacsclient
+    ;; https://github.com/Alexander-Miller/treemacs/issues/624
+
+    ;; (add-hook 'after-make-frame-functions
+    ;;           (lambda (frame)
+    ;;             (run-with-timer
+    ;;              1 nil
+    ;;              (lambda ()
+    ;;                (with-selected-frame frame
+    ;;                  (save-selected-window
+    ;;                    (treemacs-select-window)))))))
+
+    ;; (add-hook 'emacs-startup-hook (lambda()
+    ;;                                 (treemacs)
+    ;;                                 (other-window 1)))
+    ))
 
 
 (declare-function org-indent-mode "org-indent")
@@ -2816,11 +2816,12 @@ SAVE-FN with non-nil ARGS."
   (defvar projectile-mode-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
-(eval-and-compile
-  (defun sb/projectile-kill ()
-    (interactive)
-    (projectile-kill-buffers)
-    (treemacs)))
+(when nil
+  (eval-and-compile
+    (defun sb/projectile-kill ()
+      (interactive)
+      (projectile-kill-buffers)
+      (treemacs))))
 
 ;; Set these in case `counsel-projectile' is disabled
 (defvar projectile-command-map)
@@ -4774,7 +4775,7 @@ This file is specified in `counsel-projectile-default-file'."
         lsp-signature-render-documentation nil ; Disable function documentation
         lsp-signature-function 'lsp-signature-posframe
         lsp-xml-logs-client nil
-        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.16.0-uber.jar"
+        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.16.2-uber.jar"
                                            sb/extras-directory)
         lsp-yaml-print-width sb/fill-column)
 
@@ -4927,7 +4928,7 @@ This file is specified in `counsel-projectile-default-file'."
    (make-lsp-client :new-connection
                     (lsp-tramp-connection '("java" "-jar"
                                             (expand-file-name
-                                             "org.eclipse.lemminx-0.15.0-uber.jar"
+                                             "org.eclipse.lemminx-0.16.2-uber.jar"
                                              sb/extras-directory)))
                     :major-modes
                     '(xml-mode nxml-mode)
