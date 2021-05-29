@@ -245,41 +245,43 @@ This location is used for temporary installations and files.")
 
 
 ;; Allow gc to happen after a period of idle time
-(unless (fboundp 'gcmh-mode)
-  (autoload #'gcmh-mode "gcmh" nil t))
-(unless (fboundp 'gcmh-idle-garbage-collect)
-  (autoload #'gcmh-idle-garbage-collect "gcmh" nil t))
+(progn
+  (unless (fboundp 'gcmh-mode)
+    (autoload #'gcmh-mode "gcmh" nil t))
+  (unless (fboundp 'gcmh-idle-garbage-collect)
+    (autoload #'gcmh-idle-garbage-collect "gcmh" nil t))
 
-(add-hook 'after-init-hook #'gcmh-mode)
+  (add-hook 'after-init-hook #'gcmh-mode)
 
-(with-eval-after-load 'gcmh
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose t))
+  (with-eval-after-load 'gcmh
+    (when (bound-and-true-p sb/debug-init-file)
+      (setq gcmh-verbose t))
 
-  (diminish 'gcmh-mode))
+    (diminish 'gcmh-mode)))
 
 
-(unless (fboundp 'paradox-list-packages)
-  (autoload #'paradox-list-packages "paradox" nil t))
-(unless (fboundp 'paradox-upgrade-packages)
-  (autoload #'paradox-upgrade-packages "paradox" nil t))
-(unless (fboundp 'paradox-enable)
-  (autoload #'paradox-enable "paradox" nil t))
+(progn
+  (unless (fboundp 'paradox-list-packages)
+    (autoload #'paradox-list-packages "paradox" nil t))
+  (unless (fboundp 'paradox-upgrade-packages)
+    (autoload #'paradox-upgrade-packages "paradox" nil t))
+  (unless (fboundp 'paradox-enable)
+    (autoload #'paradox-enable "paradox" nil t))
 
-(with-eval-after-load 'paradox
-  (defvar paradox-display-star-count)
-  (defvar paradox-execute-asynchronously)
-  (defvar paradox-github-token)
+  (with-eval-after-load 'paradox
+    (defvar paradox-display-star-count)
+    (defvar paradox-execute-asynchronously)
+    (defvar paradox-github-token)
 
-  (setq paradox-display-star-count nil
-        paradox-execute-asynchronously t
-        paradox-github-token t)
+    (setq paradox-display-star-count nil
+          paradox-execute-asynchronously t
+          paradox-github-token t)
 
-  (paradox-enable))
+    (paradox-enable))
 
-(bind-keys :package paradox
-           ("C-c d l" . paradox-list-packages)
-           ("C-c d u" . paradox-upgrade-packages))
+  (bind-keys :package paradox
+             ("C-c d l" . paradox-list-packages)
+             ("C-c d u" . paradox-upgrade-packages)))
 
 
 (when (or (daemonp) (memq window-system '(x ns)))
@@ -969,8 +971,7 @@ SAVE-FN with non-nil ARGS."
 
 (when nil
   (unless (fboundp 'hide-mode-line-mode)
-    (autoload #'hide-mode-line-mode "hide-mode-line" nil t))
-  )
+    (autoload #'hide-mode-line-mode "hide-mode-line" nil t)))
 
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -3181,53 +3182,55 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(unless (fboundp 'ws-butler-mode)
-  (autoload #'ws-butler-mode "ws-butler" nil t))
+(progn
+  (unless (fboundp 'ws-butler-mode)
+    (autoload #'ws-butler-mode "ws-butler" nil t))
 
-(add-hook 'prog-mode-hook #'ws-butler-mode)
+  (add-hook 'prog-mode-hook #'ws-butler-mode)
 
-(with-eval-after-load 'ws-butler
-  (diminish 'ws-butler-mode))
+  (with-eval-after-load 'ws-butler
+    (diminish 'ws-butler-mode)))
 
 
 ;; Highlight symbol under point
+(progn
+  (unless (fboundp 'symbol-overlay-mode)
+    (autoload #'symbol-overlay-mode "symbol-overlay" nil t))
+  (unless (fboundp 'symbol-overlay-jump-prev)
+    (autoload #'symbol-overlay-jump-prev "symbol-overlay" nil t))
+  (unless (fboundp 'symbol-overlay-jump-next)
+    (autoload #'symbol-overlay-jump-next "symbol-overlay" nil t))
 
-(unless (fboundp 'symbol-overlay-mode)
-  (autoload #'symbol-overlay-mode "symbol-overlay" nil t))
-(unless (fboundp 'symbol-overlay-jump-prev)
-  (autoload #'symbol-overlay-jump-prev "symbol-overlay" nil t))
-(unless (fboundp 'symbol-overlay-jump-next)
-  (autoload #'symbol-overlay-jump-next "symbol-overlay" nil t))
+  (dolist (hook '(prog-mode-hook html-mode-hook yaml-mode-hook conf-mode-hook))
+    (add-hook hook #'symbol-overlay-mode))
 
-(dolist (hook '(prog-mode-hook html-mode-hook yaml-mode-hook conf-mode-hook))
-  (add-hook hook #'symbol-overlay-mode))
+  (with-eval-after-load 'symbol-overlay
+    (diminish 'symbol-overlay-mode))
 
-(with-eval-after-load 'symbol-overlay
-  (diminish 'symbol-overlay-mode))
-
-(bind-keys :package symbol-overlay
-           ("M-p" . symbol-overlay-jump-prev)
-           ("M-n" . symbol-overlay-jump-next))
+  (bind-keys :package symbol-overlay
+             ("M-p" . symbol-overlay-jump-prev)
+             ("M-n" . symbol-overlay-jump-next)))
 
 
-(unless (fboundp 'global-hl-todo-mode)
-  (autoload #'global-hl-todo-mode "hl-todo" nil t))
+(progn
+  (unless (fboundp 'global-hl-todo-mode)
+    (autoload #'global-hl-todo-mode "hl-todo" nil t))
 
-(run-at-time 5 nil #'global-hl-todo-mode)
+  (run-at-time 5 nil #'global-hl-todo-mode)
 
-(with-eval-after-load 'hl-todo
-  (defvar hl-todo-highlight-punctuation)
-  (defvar hl-todo-keyword-faces)
+  (with-eval-after-load 'hl-todo
+    (defvar hl-todo-highlight-punctuation)
+    (defvar hl-todo-keyword-faces)
 
-  (setq hl-todo-highlight-punctuation ":"
-        hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
-                                        ("ISSUE"    . "#ff8c00")
-                                        ("DEBUG"    . "#ff8c00")
-                                        ("TEST"     . "tomato")
-                                        ("WARNING"  . "#cc0000")
-                                        ("BEWARE"   . "#aa0000")
-                                        ("REFACTOR" . "#cc9393"))
-                                      hl-todo-keyword-faces)))
+    (setq hl-todo-highlight-punctuation ":"
+          hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
+                                          ("ISSUE"    . "#ff8c00")
+                                          ("DEBUG"    . "#ff8c00")
+                                          ("TEST"     . "tomato")
+                                          ("WARNING"  . "#cc0000")
+                                          ("BEWARE"   . "#aa0000")
+                                          ("REFACTOR" . "#cc9393"))
+                                        hl-todo-keyword-faces))))
 
 
 (unless (fboundp 'highlight-numbers-mode)
@@ -3237,60 +3240,62 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook hook #'highlight-numbers-mode))
 
 
-(if nil
-    (progn
-      (declare-function number-separator-mode "number-separator")
+(when nil
+  (progn
+    (declare-function number-separator-mode "number-separator")
 
-      (unless (fboundp 'number-separator-mode)
-        (autoload #'number-separator-mode "number-separator" nil t))
+    (unless (fboundp 'number-separator-mode)
+      (autoload #'number-separator-mode "number-separator" nil t))
 
-      (with-eval-after-load 'number-separator
-        (defvar number-separator)
-        (defvar number-separator-interval)
-        (defvar number-separator-ignore-threshold)
-        (defvar number-separator-decimal-char)
+    (with-eval-after-load 'number-separator
+      (defvar number-separator)
+      (defvar number-separator-interval)
+      (defvar number-separator-ignore-threshold)
+      (defvar number-separator-decimal-char)
 
-        (setq number-separator ","
-              number-separator-interval 3
-              number-separator-ignore-threshold 4
-              number-separator-decimal-char ".")
+      (setq number-separator ","
+            number-separator-interval 3
+            number-separator-ignore-threshold 4
+            number-separator-decimal-char ".")
 
-        (diminish 'number-sepator-mode))
-      ))
-
-
-(unless (fboundp 'hes-mode)
-  (autoload #'hes-mode "highlight-escape-sequences" nil t))
-
-(add-hook 'prog-mode-hook #'hes-mode)
+      (diminish 'number-sepator-mode))
+    ))
 
 
-(if nil
-    (progn
-      ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each
-      ;; line in an active region that spans multiple lines.
+(progn
+  (unless (fboundp 'hes-mode)
+    (autoload #'hes-mode "highlight-escape-sequences" nil t))
 
-      (unless (fboundp 'mc/mark-previous-like-this)
-        (autoload #'mc/mark-previous-like-this "multiple-cursors" nil t))
-      (unless (fboundp 'mc/mark-next-like-this)
-        (autoload #'mc/mark-next-like-this "multiple-cursors" nil t))
-      (unless (fboundp 'mc/mark-all-like-this)
-        (autoload #'mc/mark-all-like-this "multiple-cursors" nil t))
-
-      (bind-keys :package multiple-cursor
-                 ("C-<"     . mc/mark-previous-like-this)
-                 ("C->"     . mc/mark-next-like-this)
-                 ("C-c C-<" . mc/mark-all-like-this))
-      ))
+  (add-hook 'prog-mode-hook #'hes-mode))
 
 
-(unless (fboundp 'global-page-break-lines-mode)
-  (autoload #'global-page-break-lines-mode "page-break-lines" nil t))
+(when nil
+  (progn
+    ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each
+    ;; line in an active region that spans multiple lines.
 
-(run-at-time 5 nil #'global-page-break-lines-mode)
+    (unless (fboundp 'mc/mark-previous-like-this)
+      (autoload #'mc/mark-previous-like-this "multiple-cursors" nil t))
+    (unless (fboundp 'mc/mark-next-like-this)
+      (autoload #'mc/mark-next-like-this "multiple-cursors" nil t))
+    (unless (fboundp 'mc/mark-all-like-this)
+      (autoload #'mc/mark-all-like-this "multiple-cursors" nil t))
 
-(with-eval-after-load 'page-break-lines
-  (diminish 'page-break-lines-mode))
+    (bind-keys :package multiple-cursor
+               ("C-<"     . mc/mark-previous-like-this)
+               ("C->"     . mc/mark-next-like-this)
+               ("C-c C-<" . mc/mark-all-like-this))
+    ))
+
+
+(progn
+  (unless (fboundp 'global-page-break-lines-mode)
+    (autoload #'global-page-break-lines-mode "page-break-lines" nil t))
+
+  (run-at-time 5 nil #'global-page-break-lines-mode)
+
+  (with-eval-after-load 'page-break-lines
+    (diminish 'page-break-lines-mode)))
 
 
 ;; Edit remote file: `/method:user@host#port:filename'. Shortcut /ssh:: will connect to default
@@ -3523,95 +3528,100 @@ This file is specified in `counsel-projectile-default-file'."
              ("C-c g c" . counsel-etags-scan-code)))
 
 
-(declare-function helpful-kill-buffers "helpful")
+(progn
+  (declare-function helpful-kill-buffers "helpful")
 
-(unless (fboundp 'helpful-variable)
-  (autoload #'helpful-variable "helpful" nil t))
-(unless (fboundp 'helpful-key)
-  (autoload #'helpful-key "helpful" nil t))
-(unless (fboundp 'helpful-callable)
-  (autoload #'helpful-callable "helpful" nil t))
-(unless (fboundp 'helpful-symbol)
-  (autoload #'helpful-symbol "helpful" nil t))
-(unless (fboundp 'helpful-command)
-  (autoload #'helpful-command "helpful" nil t))
-(unless (fboundp 'helpful-at-point)
-  (autoload #'helpful-at-point "helpful" nil t))
-(unless (fboundp 'helpful-kill-buffers)
-  (autoload #'helpful-kill-buffers "helpful" nil t))
+  (unless (fboundp 'helpful-variable)
+    (autoload #'helpful-variable "helpful" nil t))
+  (unless (fboundp 'helpful-key)
+    (autoload #'helpful-key "helpful" nil t))
+  (unless (fboundp 'helpful-callable)
+    (autoload #'helpful-callable "helpful" nil t))
+  (unless (fboundp 'helpful-symbol)
+    (autoload #'helpful-symbol "helpful" nil t))
+  (unless (fboundp 'helpful-command)
+    (autoload #'helpful-command "helpful" nil t))
+  (unless (fboundp 'helpful-at-point)
+    (autoload #'helpful-at-point "helpful" nil t))
+  (unless (fboundp 'helpful-kill-buffers)
+    (autoload #'helpful-kill-buffers "helpful" nil t))
 
-;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
-;; functions only, so `helpful-callable' as a drop-in replacement.
-(defvar helpful-mode-map)
-(bind-keys :package helpful
-           ;; ([remap describe-variable] . helpful-variable)
-           ;; ([remap describe-key]      . helpful-key)
-           ;; ([remap describe-function] . helpful-callable)
-           ;; ([remap describe-symbol]   . helpful-symbol)
-           ("C-h v" . helpful-variable)
-           ("C-h k" . helpful-key)
-           ("C-h f" . helpful-callable)
-           ("C-h c" . helpful-command)
-           ("C-h p" . helpful-at-point)
-           ("C-h o" . helpful-symbol)
-           :map helpful-mode-map
-           ("q"     . helpful-kill-buffers))
+  ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
+  ;; functions only, so `helpful-callable' as a drop-in replacement.
+  (defvar helpful-mode-map)
+  (bind-keys :package helpful
+             ;; ([remap describe-variable] . helpful-variable)
+             ;; ([remap describe-key]      . helpful-key)
+             ;; ([remap describe-function] . helpful-callable)
+             ;; ([remap describe-symbol]   . helpful-symbol)
+             ("C-h v" . helpful-variable)
+             ("C-h k" . helpful-key)
+             ("C-h f" . helpful-callable)
+             ("C-h c" . helpful-command)
+             ("C-h p" . helpful-at-point)
+             ("C-h o" . helpful-symbol)
+             :map helpful-mode-map
+             ("q"     . helpful-kill-buffers)))
 
 
 ;; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
-(unless (fboundp 'vlf)
-  (autoload #'vlf "vlf" nil t))
+(progn
+  (unless (fboundp 'vlf)
+    (autoload #'vlf "vlf" nil t))
 
-(with-eval-after-load 'vlf
-  (defvar vlf-application)
+  (with-eval-after-load 'vlf
+    (defvar vlf-application)
 
-  (setq vlf-application 'dont-ask)
+    (setq vlf-application 'dont-ask)
 
-  (require 'vlf-setup))
+    (require 'vlf-setup)))
 
 
 ;; Erase all consecutive white space characters in a given direction
-(unless (fboundp 'hungry-delete-mode)
-  (autoload #'hungry-delete-mode "hungry-delete" nil t))
-(unless (fboundp 'global-hungry-delete-mode)
-  (autoload #'global-hungry-delete-mode "hungry-delete" nil t))
+(progn
+  (unless (fboundp 'hungry-delete-mode)
+    (autoload #'hungry-delete-mode "hungry-delete" nil t))
+  (unless (fboundp 'global-hungry-delete-mode)
+    (autoload #'global-hungry-delete-mode "hungry-delete" nil t))
 
-(add-hook 'after-init-hook #'global-hungry-delete-mode)
-(add-hook 'minibuffer-setup-hook (lambda nil
-                                   (hungry-delete-mode -1)))
+  (add-hook 'after-init-hook #'global-hungry-delete-mode)
+  (add-hook 'minibuffer-setup-hook (lambda nil
+                                     (hungry-delete-mode -1)))
 
-(with-eval-after-load 'hungry-delete
-  (diminish 'hungry-delete-mode))
+  (with-eval-after-load 'hungry-delete
+    (diminish 'hungry-delete-mode)))
 
 
 ;; Move lines with `M-<up>' and `M-<down>'
-(unless (fboundp 'move-text-up)
-  (autoload #'move-text-up "move-text" nil t))
-(unless (fboundp 'move-text-down)
-  (autoload #'move-text-down "move-text" nil t))
-(unless (fboundp 'move-text-default-bindings)
-  (autoload #'move-text-default-bindings "move-text" nil t))
+(progn
+  (unless (fboundp 'move-text-up)
+    (autoload #'move-text-up "move-text" nil t))
+  (unless (fboundp 'move-text-down)
+    (autoload #'move-text-down "move-text" nil t))
+  (unless (fboundp 'move-text-default-bindings)
+    (autoload #'move-text-default-bindings "move-text" nil t))
 
-(move-text-default-bindings)
+  (move-text-default-bindings))
 
 
-(unless (fboundp 'duplicate-thing)
-  (autoload #'duplicate-thing "duplicate-thing" nil t))
+(progn
+  (unless (fboundp 'duplicate-thing)
+    (autoload #'duplicate-thing "duplicate-thing" nil t))
 
-(bind-keys* :package duplicate-thing
-            ("C-c C-d" . duplicate-thing))
+  (bind-keys* :package duplicate-thing
+              ("C-c C-d" . duplicate-thing)))
 
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
+(progn
+  (unless (fboundp 'discover-my-major)
+    (autoload #'discover-my-major "discover-my-major" nil t))
+  (unless (fboundp 'discover-my-mode)
+    (autoload #'discover-my-mode "discover-my-major" nil t))
 
-(unless (fboundp 'discover-my-major)
-  (autoload #'discover-my-major "discover-my-major" nil t))
-(unless (fboundp 'discover-my-mode)
-  (autoload #'discover-my-mode "discover-my-major" nil t))
-
-(bind-keys :package discover-my-major
-           ("C-h C-m" . discover-my-major)
-           ("C-h M-m" . discover-my-mode))
+  (bind-keys :package discover-my-major
+             ("C-h C-m" . discover-my-major)
+             ("C-h M-m" . discover-my-mode)))
 
 
 ;; Manage minor-mode on the dedicated interface buffer
@@ -3627,53 +3637,58 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'graphviz-dot-mode "graphviz-dot-mode" nil t))
 
 
-(declare-function gnuplot "gnuplot")
+(when nil
+  (progn
+    (declare-function gnuplot "gnuplot")
 
-(unless (fboundp 'gnuplot)
-  (autoload #'gnuplot "gnuplot" nil t))
-(unless (fboundp 'gnuplot-mode)
-  (autoload #'gnuplot-mode "gnuplot" nil t))
+    (unless (fboundp 'gnuplot)
+      (autoload #'gnuplot "gnuplot" nil t))
+    (unless (fboundp 'gnuplot-mode)
+      (autoload #'gnuplot-mode "gnuplot" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot))
+    (add-to-list 'auto-mode-alist '("\\.gp\\'" . gnuplot))
 
 ;;;###autoload
-(add-to-list 'interpreter-mode-alist '("gnuplot" . gnuplot-mode))
+    (add-to-list 'interpreter-mode-alist '("gnuplot" . gnuplot-mode))))
 
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
-(unless (fboundp 'popwin-mode)
-  (autoload #'popwin-mode "popwin" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'popwin-mode)
+      (autoload #'popwin-mode "popwin" nil t))
 
-;; (add-hook 'after-init-hook #'popwin-mode)
+    (add-hook 'after-init-hook #'popwin-mode)
 
-(with-eval-after-load 'popwin
-  (defvar popwin:special-display-config)
+    (with-eval-after-load 'popwin
+      (defvar popwin:special-display-config)
 
-  (push '("*Help*" :noselect t) popwin:special-display-config)
-  (push '(compilation-mode :noselect t) popwin:special-display-config)
-  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
-  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-  (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
-  (push '("*Selection Ring:") popwin:special-display-config)
-  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
-  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
-  (push '("^*magit:.+*$" :noselect nil) popwin:special-display-config)
-  (push '("*xref*" :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode :noselect t) popwin:special-display-config)
-  (push "*Shell Command Output*" popwin:special-display-config)
-  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-  (add-to-list 'popwin:special-display-config '("*lsp session*")))
+      (push '("*Help*" :noselect t) popwin:special-display-config)
+      (push '(compilation-mode :noselect t) popwin:special-display-config)
+      (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
+      (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
+      (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
+      (push '("*Selection Ring:") popwin:special-display-config)
+      (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+      (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+      (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
+      (push '("^*magit:.+*$" :noselect nil) popwin:special-display-config)
+      (push '("*xref*" :noselect nil) popwin:special-display-config)
+      (push '(helpful-mode :noselect t) popwin:special-display-config)
+      (push "*Shell Command Output*" popwin:special-display-config)
+      (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+      (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+      (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+      (add-to-list 'popwin:special-display-config '("*Apropos*"))
+      (add-to-list 'popwin:special-display-config '("*Warnings*"))
+      (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+      (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+      (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+      (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+      (add-to-list 'popwin:special-display-config '("*lsp session*")))
+    ))
 
 ;; Learn about display actions, see [[info:elisp#Display Action Functions]]
 ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
@@ -3698,85 +3713,92 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Expand region by semantic units
-(unless (fboundp 'er/expand-region)
-  (autoload #'er/expand-region "expand-region" nil t))
+(progn
+  (unless (fboundp 'er/expand-region)
+    (autoload #'er/expand-region "expand-region" nil t))
 
-(bind-keys :package er/expand-region
-           ("C-=" . er/expand-region))
+  (bind-keys :package er/expand-region
+             ("C-=" . er/expand-region)))
 
 
 ;; Restore point to the initial location with `C-g' after marking a region
-(unless (fboundp 'smart-mark-mode)
-  (autoload #'smart-mark-mode "smart-mark" nil t))
+(progn
+  (unless (fboundp 'smart-mark-mode)
+    (autoload #'smart-mark-mode "smart-mark" nil t))
 
-(run-at-time 5 nil #'smart-mark-mode)
+  (run-at-time 5 nil #'smart-mark-mode))
 
 
 ;; Cut/copy the current line if no region is active
-(unless (fboundp 'whole-line-or-region-global-mode)
-  (autoload #'whole-line-or-region-global-mode "whole-line-or-region" nil t))
-(unless (fboundp 'whole-line-or-region-local-mode)
-  (autoload #'whole-line-or-region-local-mode "whole-line-or-region" nil t))
+(progn
+  (unless (fboundp 'whole-line-or-region-global-mode)
+    (autoload #'whole-line-or-region-global-mode "whole-line-or-region" nil t))
+  (unless (fboundp 'whole-line-or-region-local-mode)
+    (autoload #'whole-line-or-region-local-mode "whole-line-or-region" nil t))
 
-(run-at-time 5 nil #'whole-line-or-region-global-mode)
+  (run-at-time 5 nil #'whole-line-or-region-global-mode)
 
-(with-eval-after-load 'whole-line-or-region
-  (diminish 'whole-line-or-region-local-mode))
-
-
-(unless (fboundp 'goto-last-change)
-  (autoload #'goto-last-change "goto-last-change" nil t))
-
-(bind-keys :package goto-last-change
-           ("C-x C-\\" . goto-last-change))
+  (with-eval-after-load 'whole-line-or-region
+    (diminish 'whole-line-or-region-local-mode)))
 
 
-(unless (fboundp 'beginend-global-mode)
-  (autoload #'beginend-global-mode "beginend" nil t))
+(progn
+  (unless (fboundp 'goto-last-change)
+    (autoload #'goto-last-change "goto-last-change" nil t))
 
-(run-at-time 5 nil #'beginend-global-mode)
-
-(with-eval-after-load 'beginend
-  (defvar beginend-modes)
-
-  (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
-    (diminish mode)))
+  (bind-keys :package goto-last-change
+             ("C-x C-\\" . goto-last-change)))
 
 
-(declare-function undo-tree-visualize "undo-tree")
+(progn
+  (unless (fboundp 'beginend-global-mode)
+    (autoload #'beginend-global-mode "beginend" nil t))
 
-(unless (fboundp 'undo-tree-visualize)
-  (autoload #'undo-tree-visualize "undo-tree" nil t))
-(unless (fboundp 'global-undo-tree-mode)
-  (autoload #'global-undo-tree-mode "undo-tree" nil t))
+  (run-at-time 5 nil #'beginend-global-mode)
 
-(with-eval-after-load 'undo-tree
-  (defvar undo-tree-auto-save-history)
-  (defvar undo-tree-mode-lighter)
-  (defvar undo-tree-visualizer-diff)
-  (defvar undo-tree-visualizer-relative-timestamps)
-  (defvar undo-tree-visualizer-timestamps)
+  (with-eval-after-load 'beginend
+    (defvar beginend-modes)
 
-  (setq undo-tree-auto-save-history t
-        undo-tree-mode-lighter ""
-        undo-tree-visualizer-diff t
-        undo-tree-visualizer-relative-timestamps t
-        undo-tree-visualizer-timestamps t)
+    (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
+      (diminish mode))))
 
-  (global-undo-tree-mode 1)
 
-  (diminish 'undo-tree-mode))
+(progn
+  (declare-function undo-tree-visualize "undo-tree")
 
-(bind-keys :package undo-tree
-           ("C-x u" . undo-tree-visualize))
+  (unless (fboundp 'undo-tree-visualize)
+    (autoload #'undo-tree-visualize "undo-tree" nil t))
+  (unless (fboundp 'global-undo-tree-mode)
+    (autoload #'global-undo-tree-mode "undo-tree" nil t))
+
+  (with-eval-after-load 'undo-tree
+    (defvar undo-tree-auto-save-history)
+    (defvar undo-tree-mode-lighter)
+    (defvar undo-tree-visualizer-diff)
+    (defvar undo-tree-visualizer-relative-timestamps)
+    (defvar undo-tree-visualizer-timestamps)
+
+    (setq undo-tree-auto-save-history t
+          undo-tree-mode-lighter ""
+          undo-tree-visualizer-diff t
+          undo-tree-visualizer-relative-timestamps t
+          undo-tree-visualizer-timestamps t)
+
+    (global-undo-tree-mode 1)
+
+    (diminish 'undo-tree-mode))
+
+  (bind-keys :package undo-tree
+             ("C-x u" . undo-tree-visualize)))
 
 
 ;; Edit multiple regions in the same way simultaneously
-(unless (fboundp 'iedit-mode)
-  (autoload #'iedit-mode "iedit" nil t))
+(progn
+  (unless (fboundp 'iedit-mode)
+    (autoload #'iedit-mode "iedit" nil t))
 
-(bind-keys* :package iedit
-            ("C-." . iedit-mode))
+  (bind-keys* :package iedit
+              ("C-." . iedit-mode)))
 
 
 ;; Avoid the "Overwrite old session file (not loaded)?" warning
@@ -3787,7 +3809,7 @@ This file is specified in `counsel-projectile-default-file'."
     (unless (fboundp 'session-initialize)
       (autoload #'session-initialize "session" nil t))
 
-    ;; (add-hook 'after-init-hook #'session-initialize)
+    (add-hook 'after-init-hook #'session-initialize)
 
     (with-eval-after-load 'session
       (defvar session-save-file)
@@ -3797,236 +3819,251 @@ This file is specified in `counsel-projectile-default-file'."
     ))
 
 
-(unless (fboundp 'immortal-scratch-mode)
-  (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
+(progn
+  (unless (fboundp 'immortal-scratch-mode)
+    (autoload #'immortal-scratch-mode "immortal-scratch" nil t))
 
-(run-with-idle-timer 3 nil #'immortal-scratch-mode)
+  (run-with-idle-timer 3 nil #'immortal-scratch-mode))
 
 
 ;; I use the *scratch* buffer for taking notes, it helps to make the data persist
-(unless (fboundp 'persistent-scratch-setup-default)
-  (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
+(progn
+  (unless (fboundp 'persistent-scratch-setup-default)
+    (autoload #'persistent-scratch-setup-default "persistent-scratch" nil t))
 
-;; Delaying loading contents in the `*scratch*' buffer does not look good
-(add-hook 'after-init-hook #'persistent-scratch-setup-default)
+  ;; Delaying loading contents in the `*scratch*' buffer does not look good
+  (add-hook 'after-init-hook #'persistent-scratch-setup-default)
 
-(with-eval-after-load 'persistent-scratch
-  (defvar persistent-scratch-autosave-interval)
-  (defvar persistent-scratch-save-file)
+  (with-eval-after-load 'persistent-scratch
+    (defvar persistent-scratch-autosave-interval)
+    (defvar persistent-scratch-save-file)
 
-  (setq persistent-scratch-autosave-interval 300)
+    (setq persistent-scratch-autosave-interval 300)
 
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq persistent-scratch-save-file (expand-file-name "persistent-scratch"
+                                                           sb/temp-directory)))))
 
 
 ;; crux-smart-open-line-above, crux-smart-open-line, crux-smart-kill-line
-(unless (fboundp 'crux-sudo-edit)
-  (autoload #'crux-sudo-edit "crux" nil t))
-(unless (fboundp 'crux-kill-other-buffers)
-  (autoload #'crux-kill-other-buffers "crux" nil t))
-(unless (fboundp 'crux-ispell-word-then-abbrev)
-  (autoload #'crux-ispell-word-then-abbrev "crux" nil t))
+(progn
+  (unless (fboundp 'crux-sudo-edit)
+    (autoload #'crux-sudo-edit "crux" nil t))
+  (unless (fboundp 'crux-kill-other-buffers)
+    (autoload #'crux-kill-other-buffers "crux" nil t))
+  (unless (fboundp 'crux-ispell-word-then-abbrev)
+    (autoload #'crux-ispell-word-then-abbrev "crux" nil t))
 
-(bind-keys :package crux
-           ("C-c d i" . crux-ispell-word-then-abbrev)
-           ("<f12>"   . crux-kill-other-buffers)
-           ("C-c d s" . crux-sudo-edit))
-
-
-(when (display-mouse-p)
-  (unless (fboundp 'global-disable-mouse-mode)
-    (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
-
-  (add-hook 'after-init-hook #'global-disable-mouse-mode)
-
-  (with-eval-after-load 'disable-mouse
-    (diminish 'disable-mouse-global-mode))
+  (bind-keys :package crux
+             ("C-c d i" . crux-ispell-word-then-abbrev)
+             ("<f12>"   . crux-kill-other-buffers)
+             ("C-c d s" . crux-sudo-edit)))
 
 
-  (unless (fboundp 'mouse-avoidance-mode)
-    (autoload #'mouse-avoidance-mode "avoid" nil t))
+(progn
+  (when (display-mouse-p)
+    (unless (fboundp 'global-disable-mouse-mode)
+      (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
 
-  (mouse-avoidance-mode 'banish))
+    (add-hook 'after-init-hook #'global-disable-mouse-mode)
+
+    (with-eval-after-load 'disable-mouse
+      (diminish 'disable-mouse-global-mode))
+
+
+    (unless (fboundp 'mouse-avoidance-mode)
+      (autoload #'mouse-avoidance-mode "avoid" nil t))
+
+    (mouse-avoidance-mode 'banish)))
 
 
 (unless (fboundp 'apt-sources-list-mode)
   (autoload #'apt-sources-list-mode "apt-sources-list" nil t))
 
 
-(unless (fboundp 'rainbow-delimiters-mode)
-  (autoload #'rainbow-delimiters-mode "rainbow-delimiters" nil t))
+(progn
+  (unless (fboundp 'rainbow-delimiters-mode)
+    (autoload #'rainbow-delimiters-mode "rainbow-delimiters" nil t))
 
-(dolist (hook '(prog-mode-hook latex-mode-hook LaTex-mode-hook org-src-mode-hook))
-  (add-hook hook #'rainbow-delimiters-mode))
-
-
-(unless (fboundp 'ssh-config-mode)
-  (autoload #'ssh-config-mode "ssh-config-mode" nil t))
-(unless (fboundp 'ssh-known-hosts-mode)
-  (autoload #'ssh-known-hosts-mode "ssh-config-mode" nil t))
-(unless (fboundp 'ssh-authorized-keys-mode)
-  (autoload #'ssh-authorized-keys-mode "ssh-config-mode" nil t))
-(unless (fboundp 'turn-on-font-lock)
-  (autoload #'turn-on-font-lock "ssh-config-mode" nil t))
-
-(add-hook 'ssh-config-mode-hook #'turn-on-font-lock)
+  (dolist (hook '(prog-mode-hook latex-mode-hook LaTex-mode-hook org-src-mode-hook))
+    (add-hook hook #'rainbow-delimiters-mode)))
 
 
-(if nil
-    (progn
-      (declare-function pomidor-quit "pomidor")
-      (declare-function pomidor-break "pomidor")
-      (declare-function pomidor-reset "pomidor")
-      (declare-function pomidor-stop "pomidor")
-      (declare-function pomidor-hold "pomidor")
-      (declare-function pomidor-unhold "pomidor")
+(progn
+  (unless (fboundp 'ssh-config-mode)
+    (autoload #'ssh-config-mode "ssh-config-mode" nil t))
+  (unless (fboundp 'ssh-known-hosts-mode)
+    (autoload #'ssh-known-hosts-mode "ssh-config-mode" nil t))
+  (unless (fboundp 'ssh-authorized-keys-mode)
+    (autoload #'ssh-authorized-keys-mode "ssh-config-mode" nil t))
+  (unless (fboundp 'turn-on-font-lock)
+    (autoload #'turn-on-font-lock "ssh-config-mode" nil t))
 
-      (unless (fboundp 'pomidor-quit)
-        (autoload #'pomidor-quit "pomidor" nil t))
-      (unless (fboundp 'pomidor-break)
-        (autoload #'pomidor-break "pomidor" nil t))
-      (unless (fboundp 'pomidor-reset)
-        (autoload #'pomidor-reset "pomidor" nil t))
-      (unless (fboundp 'pomidor-stop)
-        (autoload #'pomidor-stop "pomidor" nil t))
-      (unless (fboundp 'pomidor-hold)
-        (autoload #'pomidor-hold "pomidunlessor" nil t))
-      (unless (fboundp 'pomidor-unhold)
-        (autoload #'pomidor-unhold "pomidor" nil t))
-      ((fboundp 'pomidor)
-       (autoload #'pomidor "pomidor" nil t))
-      ))
+  (add-hook 'ssh-config-mode-hook #'turn-on-font-lock))
 
 
-(unless (fboundp 'ace-window)
-  (autoload #'ace-window "ace-window" nil t))
+(when nil
+  (progn
+    (declare-function pomidor-quit "pomidor")
+    (declare-function pomidor-break "pomidor")
+    (declare-function pomidor-reset "pomidor")
+    (declare-function pomidor-stop "pomidor")
+    (declare-function pomidor-hold "pomidor")
+    (declare-function pomidor-unhold "pomidor")
 
-(bind-keys :package ace-window
-           ([remap other-window] . ace-window)
-           ("<f10>"              . ace-window))
+    (unless (fboundp 'pomidor-quit)
+      (autoload #'pomidor-quit "pomidor" nil t))
+    (unless (fboundp 'pomidor-break)
+      (autoload #'pomidor-break "pomidor" nil t))
+    (unless (fboundp 'pomidor-reset)
+      (autoload #'pomidor-reset "pomidor" nil t))
+    (unless (fboundp 'pomidor-stop)
+      (autoload #'pomidor-stop "pomidor" nil t))
+    (unless (fboundp 'pomidor-hold)
+      (autoload #'pomidor-hold "pomidunlessor" nil t))
+    (unless (fboundp 'pomidor-unhold)
+      (autoload #'pomidor-unhold "pomidor" nil t))
+    ((fboundp 'pomidor)
+     (autoload #'pomidor "pomidor" nil t))
+    ))
+
+
+(progn
+  (unless (fboundp 'ace-window)
+    (autoload #'ace-window "ace-window" nil t))
+
+  (bind-keys :package ace-window
+             ([remap other-window] . ace-window)
+             ("<f10>"              . ace-window)))
 
 
 ;; `Shift + direction' arrows
-(unless (fboundp 'windmove-default-keybindings)
-  (autoload #'windmove-default-keybindings "windmove" nil t))
+(progn
+  (unless (fboundp 'windmove-default-keybindings)
+    (autoload #'windmove-default-keybindings "windmove" nil t))
 
-(windmove-default-keybindings)
+  (windmove-default-keybindings)
 
-(with-eval-after-load 'windmove
-  (defvar windmove-wrap-around)
+  (with-eval-after-load 'windmove
+    (defvar windmove-wrap-around)
 
-  ;; Wrap around at edges
-  (setq windmove-wrap-around t))
+    ;; Wrap around at edges
+    (setq windmove-wrap-around t)))
 
 
 ;; Save buffers when Emacs loses focus.
-(unless (fboundp 'super-save-mode)
-  (autoload #'super-save-mode "super-save" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'super-save-mode)
+      (autoload #'super-save-mode "super-save" nil t))
 
-;; This causes additional saves which triggers the `after-save-hook' and leads to auto-formatters
-;; being invoked more frequently.
-;; (run-with-idle-timer 3 nil #'super-save-mode)
+    ;; This causes additional saves which triggers the `after-save-hook' and leads to auto-formatters
+    ;; being invoked more frequently.
+    (run-with-idle-timer 3 nil #'super-save-mode)
 
-(with-eval-after-load 'super-save
-  (defvar super-save-remote-files)
-  (defvar super-save-triggers)
+    (with-eval-after-load 'super-save
+      (defvar super-save-remote-files)
+      (defvar super-save-triggers)
 
-  (setq super-save-remote-files nil) ; Ignore remote files
-  (add-to-list 'super-save-triggers 'ace-window)
+      (setq super-save-remote-files nil) ; Ignore remote files
+      (add-to-list 'super-save-triggers 'ace-window)
 
-  (diminish 'super-save-mode))
+      (diminish 'super-save-mode))))
 
 
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
-(unless (fboundp 'avy-setup-default)
-  (autoload #'avy-setup-default "avy" nil t))
+(progn
+  (unless (fboundp 'avy-setup-default)
+    (autoload #'avy-setup-default "avy" nil t))
 
-(with-eval-after-load 'avy
-  (defvar avy-indent-line-overlay)
-  (defvar avy-background)
-  (defvar avy-highlight-first)
-  (defvar avy-style))
+  (with-eval-after-load 'avy
+    (defvar avy-indent-line-overlay)
+    (defvar avy-background)
+    (defvar avy-highlight-first)
+    (defvar avy-style))
 
-(bind-keys :package avy
-           ("M-b" . avy-goto-word-1)
-           ;; ("C-'" . avy-goto-char)
-           ("C-'" . avy-goto-char-timer)
-           ("C-/" . avy-goto-line))
+  (bind-keys :package avy
+             ("M-b" . avy-goto-word-1)
+             ;; ("C-'" . avy-goto-char)
+             ("C-'" . avy-goto-char-timer)
+             ("C-/" . avy-goto-line)))
 
 
 ;; This package adds a "C-'" binding to Ivy minibuffer that uses Avy
-(with-eval-after-load 'ivy
-  (declare-function ivy-avy "ivy-avy")
-  (unless (fboundp 'ivy-avy)
-    (autoload #'ivy-avy "ivy-avy" nil t))
+(progn
+  (with-eval-after-load 'ivy
+    (declare-function ivy-avy "ivy-avy")
+    (unless (fboundp 'ivy-avy)
+      (autoload #'ivy-avy "ivy-avy" nil t))
 
-  (bind-keys :package ivy-avy :map ivy-minibuffer-map
-             ("C-'" . ivy-avy)))
-
-
-(with-eval-after-load 'bookmark
-  (defvar bookmark-default-file)
-
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory))))
+    (bind-keys :package ivy-avy :map ivy-minibuffer-map
+               ("C-'" . ivy-avy))))
 
 
-(declare-function bm-buffer-save "bm")
-(declare-function bm-buffer-restore "bm")
-(declare-function bm-buffer-save-all "bm")
-(declare-function bm-repository-load "bm")
-(declare-function bm-repository-save "bm")
+(progn
+  (with-eval-after-load 'bookmark
+    (defvar bookmark-default-file)
 
-;; Must be set before `bm' is loaded
-(defvar bm-restore-repository-on-load)
-(setq bm-restore-repository-on-load t)
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq bookmark-default-file (expand-file-name "bookmarks" sb/temp-directory)))))
 
-(unless (fboundp 'bm-buffer-save)
-  (autoload #'bm-buffer-save "bm" nil t))
-(unless (fboundp 'bm-buffer-restore)
-  (autoload #'bm-buffer-restore "bm" nil t))
-(unless (fboundp 'bm-repository-load)
-  (autoload #'bm-repository-load "bm" nil t))
-(unless (fboundp 'bm-toggle)
-  (autoload #'bm-toggle "bm" nil t))
-(unless (fboundp 'bm-next)
-  (autoload #'bm-next "bm" nil t))
-(unless (fboundp 'bm-previous)
-  (autoload #'bm-previous "bm" nil t))
-(unless (fboundp 'bm-buffer-save-all)
-  (autoload #'bm-buffer-save-all "bm" nil t))
-(unless (fboundp 'bm-repository-save)
-  (autoload #'bm-repository-save "bm" nil t))
 
-(defun sb/bm-setup ()
-  "Wrapper function to help call with a timer."
-  ;; `kill-buffer-hook' is not called when Emacs is killed
-  (add-hook 'kill-emacs-hook (lambda ()
-                               (bm-buffer-save-all)
-                               (bm-repository-save)))
-  (add-hook 'after-save-hook #'bm-buffer-save)
-  (add-hook 'kill-buffer-hook #'bm-buffer-save)
-  (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+(progn
+  (declare-function bm-buffer-save "bm")
+  (declare-function bm-buffer-restore "bm")
+  (declare-function bm-buffer-save-all "bm")
+  (declare-function bm-repository-load "bm")
+  (declare-function bm-repository-save "bm")
 
-  (add-hook 'after-revert-hook #'bm-buffer-restore)
-  (add-hook 'find-file-hook #'bm-buffer-restore)
-  (add-hook 'after-init-hook #'bm-repository-load))
+  ;; Must be set before `bm' is loaded
+  (defvar bm-restore-repository-on-load)
+  (setq bm-restore-repository-on-load t)
 
-(run-with-idle-timer 2 nil #'sb/bm-setup)
+  (unless (fboundp 'bm-buffer-save)
+    (autoload #'bm-buffer-save "bm" nil t))
+  (unless (fboundp 'bm-buffer-restore)
+    (autoload #'bm-buffer-restore "bm" nil t))
+  (unless (fboundp 'bm-repository-load)
+    (autoload #'bm-repository-load "bm" nil t))
+  (unless (fboundp 'bm-toggle)
+    (autoload #'bm-toggle "bm" nil t))
+  (unless (fboundp 'bm-next)
+    (autoload #'bm-next "bm" nil t))
+  (unless (fboundp 'bm-previous)
+    (autoload #'bm-previous "bm" nil t))
+  (unless (fboundp 'bm-buffer-save-all)
+    (autoload #'bm-buffer-save-all "bm" nil t))
+  (unless (fboundp 'bm-repository-save)
+    (autoload #'bm-repository-save "bm" nil t))
 
-(with-eval-after-load 'bm
-  (defvar bm-repository-file)
+  (defun sb/bm-setup ()
+    "Wrapper function to help call with a timer."
+    ;; `kill-buffer-hook' is not called when Emacs is killed
+    (add-hook 'kill-emacs-hook (lambda ()
+                                 (bm-buffer-save-all)
+                                 (bm-repository-save)))
+    (add-hook 'after-save-hook #'bm-buffer-save)
+    (add-hook 'kill-buffer-hook #'bm-buffer-save)
+    (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
 
-  (setq-default bm-buffer-persistence t)
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory))))
+    (add-hook 'after-revert-hook #'bm-buffer-restore)
+    (add-hook 'find-file-hook #'bm-buffer-restore)
+    (add-hook 'after-init-hook #'bm-repository-load))
 
-(bind-keys :package bm
-           ("C-<f1>" . bm-toggle)
-           ("C-<f2>" . bm-next)
-           ("C-<f3>" . bm-previous))
+  (run-with-idle-timer 2 nil #'sb/bm-setup)
+
+  (with-eval-after-load 'bm
+    (defvar bm-repository-file)
+
+    (setq-default bm-buffer-persistence t)
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory))))
+
+  (bind-keys :package bm
+             ("C-<f1>" . bm-toggle)
+             ("C-<f2>" . bm-next)
+             ("C-<f3>" . bm-previous)))
 
 
 (unless (fboundp 'esup)
@@ -4034,22 +4071,24 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when sb/debug-init-file
-  (unless (fboundp 'bug-hunter-file)
-    (autoload #'bug-hunter-file "bug-hunter" nil t))
-  (unless (fboundp 'bug-hunter-init-file)
-    (autoload #'bug-hunter-init-file "bug-hunter" nil t))
+  (progn
+    (unless (fboundp 'bug-hunter-file)
+      (autoload #'bug-hunter-file "bug-hunter" nil t))
+    (unless (fboundp 'bug-hunter-init-file)
+      (autoload #'bug-hunter-init-file "bug-hunter" nil t))
 
 
-  (declare-function explain-pause-mode "explain-pause-mode")
-  (declare-function explain-pause-top "explain-pause-mode")
+    (declare-function explain-pause-mode "explain-pause-mode")
+    (declare-function explain-pause-top "explain-pause-mode")
 
-  (unless (fboundp 'explain-pause-mode)
-    (autoload #'explain-pause-mode "explain-pause-mode" nil t))
-  (unless (fboundp 'explain-pause-top)
-    (autoload #'explain-pause-top "explain-pause-mode" nil t))
+    (unless (fboundp 'explain-pause-mode)
+      (autoload #'explain-pause-mode "explain-pause-mode" nil t))
+    (unless (fboundp 'explain-pause-top)
+      (autoload #'explain-pause-top "explain-pause-mode" nil t))
 
-  (with-eval-after-load 'explain-pause-mode
-    (diminish 'explain-pause-mode)))
+    (with-eval-after-load 'explain-pause-mode
+      (diminish 'explain-pause-mode))
+    ))
 
 
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
@@ -4060,42 +4099,46 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work
 (when nil
-  (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
-  (add-hook 'text-mode-hook (lambda nil
-                              (require 'lsp-grammarly)
-                              (lsp-deferred)))
-  )
+  (progn
+    (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
+    (add-hook 'text-mode-hook (lambda nil
+                                (require 'lsp-grammarly)
+                                (lsp-deferred)))
+    ))
+
 
 ;; Identify weasel words, passive voice, and duplicate words
-(declare-function writegood-mode "writegood-mode")
+(progn
+  (declare-function writegood-mode "writegood-mode")
 
-(unless (fboundp 'writegood-mode)
-  (autoload #'writegood-mode "writegood-mode" nil t))
+  (unless (fboundp 'writegood-mode)
+    (autoload #'writegood-mode "writegood-mode" nil t))
 
-(with-eval-after-load 'writegood-mode
-  (when (fboundp 'writegood-mode)
-    (diminish 'writegood-mode)))
+  (with-eval-after-load 'writegood-mode
+    (when (fboundp 'writegood-mode)
+      (diminish 'writegood-mode))))
 
 
-(with-eval-after-load 'text-mode
-  (unless (fboundp 'langtool-check)
-    (autoload #'langtool-check "langtool" nil t))
+(progn
+  (with-eval-after-load 'text-mode
+    (unless (fboundp 'langtool-check)
+      (autoload #'langtool-check "langtool" nil t))
 
-  (defvar langtool-default-language)
-  (defvar langtool-disabled-rules)
-  (defvar langtool-language-tool-jar)
-  (defvar no-littering-etc-directory)
+    (defvar langtool-default-language)
+    (defvar langtool-disabled-rules)
+    (defvar langtool-language-tool-jar)
+    (defvar no-littering-etc-directory)
 
-  (setq langtool-default-language "en"
-        langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
-                                  "COPYRIGHT"
-                                  "DASH_RULE"
-                                  "EN_QUOTES"
-                                  "EN_UNPAIRED_BRACKETS"
-                                  "UPPERCASE_SENTENCE_START"
-                                  "WHITESPACE_RULE")
-        langtool-language-tool-jar (expand-file-name "languagetool-5.3-commandline.jar"
-                                                     sb/extras-directory)))
+    (setq langtool-default-language "en"
+          langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
+                                    "COPYRIGHT"
+                                    "DASH_RULE"
+                                    "EN_QUOTES"
+                                    "EN_UNPAIRED_BRACKETS"
+                                    "UPPERCASE_SENTENCE_START"
+                                    "WHITESPACE_RULE")
+          langtool-language-tool-jar (expand-file-name "languagetool-5.3-commandline.jar"
+                                                       sb/extras-directory))))
 
 
 (unless (fboundp 'wc-mode)
@@ -4109,192 +4152,206 @@ This file is specified in `counsel-projectile-default-file'."
   (autoload #'define-word-at-point "define-word" nil t))
 
 
-(if nil
-    (progn
-      (unless (fboundp 'emojify-mode)
-        (autoload #'emojify-mode "emojify" nil t))
-      (unless (fboundp 'global-emojify-mode)
-        (autoload #'global-emojify-mode "emojify" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'emojify-mode)
+      (autoload #'emojify-mode "emojify" nil t))
+    (unless (fboundp 'global-emojify-mode)
+      (autoload #'global-emojify-mode "emojify" nil t))
 
-      (add-hook 'markdown-mode-hook #'emojify-mode)
-      ))
+    (add-hook 'markdown-mode-hook #'emojify-mode)))
 
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
-;; Use `isearch', `swiper' will not work
+;; Use `isearch', `swiper' does not work
 
-(declare-function pdf-view-mode "pdf-tools")
-(declare-function pdf-annot-delete "pdf-tools")
-(declare-function pdf-annot-add-highlight-markup-annotation "pdf-tools")
-(declare-function pdf-annot-add-text-annotation "pdf-tools")
+(progn
+  (declare-function pdf-view-mode "pdf-tools")
+  (declare-function pdf-annot-delete "pdf-tools")
+  (declare-function pdf-annot-add-highlight-markup-annotation "pdf-tools")
+  (declare-function pdf-annot-add-text-annotation "pdf-tools")
 
-(unless (fboundp 'pdf-view-mode)
-  (autoload #'pdf-view-mode "pdf-tools" nil t))
-(unless (fboundp 'isearch-forward)
-  (autoload #'isearch-forward "pdf-tools" nil t))
-(unless (fboundp 'pdf-annot-delete)
-  (autoload #'pdf-annot-delete "pdf-tools" nil t))
-(unless (fboundp 'pdf-annot-add-highlight-markup-annotation)
-  (autoload #'pdf-annot-add-highlight-markup-annotation "pdf-tools" nil t))
-(unless (fboundp 'pdf-annot-add-text-annotation)
-  (autoload #'pdf-annot-add-text-annotation "pdf-tools" nil t))
-(unless (fboundp 'pdf-tools-install)
-  (autoload #'pdf-tools-install "pdf-tools" nil t))
-(unless (fboundp 'pdf-loader-install)
-  (autoload #'pdf-loader-install "pdf-tools" nil t))
+  (unless (fboundp 'pdf-view-mode)
+    (autoload #'pdf-view-mode "pdf-tools" nil t))
+  (unless (fboundp 'isearch-forward)
+    (autoload #'isearch-forward "pdf-tools" nil t))
+  (unless (fboundp 'pdf-annot-delete)
+    (autoload #'pdf-annot-delete "pdf-tools" nil t))
+  (unless (fboundp 'pdf-annot-add-highlight-markup-annotation)
+    (autoload #'pdf-annot-add-highlight-markup-annotation "pdf-tools" nil t))
+  (unless (fboundp 'pdf-annot-add-text-annotation)
+    (autoload #'pdf-annot-add-text-annotation "pdf-tools" nil t))
+  (unless (fboundp 'pdf-tools-install)
+    (autoload #'pdf-tools-install "pdf-tools" nil t))
+  (unless (fboundp 'pdf-loader-install)
+    (autoload #'pdf-loader-install "pdf-tools" nil t))
 
-;; Expensive to load
-(run-with-idle-timer 2 nil #'require 'pdf-tools nil t)
+  ;; Expensive to load
+  (run-with-idle-timer 2 nil #'require 'pdf-tools nil t)
 
-(add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
-
-(with-eval-after-load 'pdf-tools
-  ;; (pdf-tools-install :no-query)
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
-
-  (defvar pdf-annot-activate-created-annotations)
-  (defvar pdf-view-resize-factor)
-
-  (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
-        ;; Fine-grained zoom factor of 10%
-        pdf-view-resize-factor 1.1)
-
-  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
-
-  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-  (add-hook 'pdf-view-mode-hook
-            (lambda()
-              (pdf-links-minor-mode 1)
-              (pdf-isearch-minor-mode 1)
-              (pdf-outline-minor-mode 1)
-              (pdf-history-minor-mode 1)))
-
-  ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
-  (require 'saveplace-pdf-view))
-
-(defvar pdf-view-mode-map)
-(bind-keys :package pdf-tools :map pdf-view-mode-map
-           ("t"   . pdf-annot-add-text-annotation)
-           ("d"   . pdf-annot-delete)
-           ("h"   . pdf-annot-add-highlight-markup-annotation))
-
-
-(unless (fboundp 'logview-mode)
-  (autoload #'logview-mode "logview" nil t))
-
-(with-eval-after-load 'logview
-  (defvar logview-cache-filename)
-
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory))))
-
-
-(unless (fboundp 'antlr-mode)
-  (autoload #'antlr-mode "antlr-mode" nil t))
+  (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
+  (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
+
+  (with-eval-after-load 'pdf-tools
+    ;; (pdf-tools-install :no-query)
+    (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
+
+    (defvar pdf-annot-activate-created-annotations)
+    (defvar pdf-view-resize-factor)
+
+    (setq pdf-annot-activate-created-annotations t ; Automatically annotate highlights
+          ;; Fine-grained zoom factor of 10%
+          pdf-view-resize-factor 1.1)
+
+    (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+
+    ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
+    (add-hook 'pdf-view-mode-hook
+              (lambda()
+                (pdf-links-minor-mode 1)
+                (pdf-isearch-minor-mode 1)
+                (pdf-outline-minor-mode 1)
+                (pdf-history-minor-mode 1)))
+
+    ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
+    (require 'saveplace-pdf-view))
+
+  (defvar pdf-view-mode-map)
+  (bind-keys :package pdf-tools :map pdf-view-mode-map
+             ("t"   . pdf-annot-add-text-annotation)
+             ("d"   . pdf-annot-delete)
+             ("h"   . pdf-annot-add-highlight-markup-annotation)))
 
 
-(unless (fboundp 'bison-mode)
-  (autoload #'bison-mode "bison-mode" nil t))
+(progn
+  (unless (fboundp 'logview-mode)
+    (autoload #'logview-mode "logview" nil t))
+
+  (with-eval-after-load 'logview
+    (defvar logview-cache-filename)
+
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq logview-cache-filename (expand-file-name "logview-cache.extmap"
+                                                     sb/temp-directory)))))
+
+
+(progn
+  (unless (fboundp 'antlr-mode)
+    (autoload #'antlr-mode "antlr-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode))
+  (add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode)))
 
 
-(declare-function llvm-mode "llvm-mode")
+(progn
+  (unless (fboundp 'bison-mode)
+    (autoload #'bison-mode "bison-mode" nil t))
 
-(unless (fboundp 'llvm-mode)
-  (autoload #'llvm-mode "llvm-mode" nil t))
-
-
-(declare-function tablegen-mode "tablegen-mode")
-
-(unless (fboundp 'tablegen-mode)
-  (autoload #'tablegen-mode "tablegen-mode" nil t))
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.bison\\'" . bison-mode)))
 
 
 (when nil
-  (declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
+  (progn
+    (declare-function llvm-mode "llvm-mode")
 
-  (unless (fboundp 'autodisass-llvm-bitcode)
-    (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
+    (unless (fboundp 'llvm-mode)
+      (autoload #'llvm-mode "llvm-mode" nil t))
+    ))
 
-  (add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
-  )
 
-(unless (fboundp 'markdown-mode)
-  (autoload #'markdown-mode "markdown-mode" nil t))
-(unless (fboundp 'gfm-mode)
-  (autoload #'gfm-mode "markdown-mode" nil t))
+(when nil
+  (progn
+    (declare-function tablegen-mode "tablegen-mode")
 
-;; The order is important to associate "README.md" with `gfm-mode'
-;;;###autoload
+    (unless (fboundp 'tablegen-mode)
+      (autoload #'tablegen-mode "tablegen-mode" nil t))
+    ))
+
+
+(when nil
+  (progn
+    (declare-function autodisass-llvm-bitcode "autodisass-llvm-bitcode")
+
+    (unless (fboundp 'autodisass-llvm-bitcode)
+      (autoload #'autodisass-llvm-bitcode "autodisass-llvm-bitcode" nil t))
+
+    (add-to-list 'auto-mode-alist '("\\.bc\\'" . autodisass-llvm-bitcode))
+    ))
+
+
 (progn
-  (add-to-list 'auto-mode-alist '("\\.md\\'"       . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode)))
+  (unless (fboundp 'markdown-mode)
+    (autoload #'markdown-mode "markdown-mode" nil t))
+  (unless (fboundp 'gfm-mode)
+    (autoload #'gfm-mode "markdown-mode" nil t))
 
-(with-eval-after-load 'markdown-mode
-  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
-  ;; (setq-default markdown-hide-markup t)
+  ;; The order is important to associate "README.md" with `gfm-mode'
+;;;###autoload
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.md\\'"       . markdown-mode))
+    (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+    (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode)))
 
-  (defvar markdown-command)
-  (defvar markdown-enable-math)
-  (defvar markdown-enable-wiki-links)
-  (defvar markdown-fontify-code-blocks-natively)
-  (defvar markdown-indent-on-enter)
-  (defvar markdown-list-indent-width)
-  (defvar markdown-split-window-direction)
+  (with-eval-after-load 'markdown-mode
+    ;; Looks good, but hiding markup makes it difficult to be consistent while editing
+    ;; (setq-default markdown-hide-markup t)
 
-  (setq markdown-command
-        "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
-        markdown-enable-math t ; Syntax highlight for LaTeX fragments
-        markdown-enable-wiki-links t
-        ;;   https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
-        markdown-fontify-code-blocks-natively t
-        markdown-indent-on-enter 'indent-and-new-item
-        markdown-list-indent-width 2
-        markdown-split-window-direction 'horizontal)
+    (defvar markdown-command)
+    (defvar markdown-enable-math)
+    (defvar markdown-enable-wiki-links)
+    (defvar markdown-fontify-code-blocks-natively)
+    (defvar markdown-indent-on-enter)
+    (defvar markdown-list-indent-width)
+    (defvar markdown-split-window-direction)
 
-  ;; Additional commands to export markdown file to other formats
-  (require 'markdown-mode+)
+    (setq markdown-command
+          "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
+          markdown-enable-math t ; Syntax highlight for LaTeX fragments
+          markdown-enable-wiki-links t
+          ;;   https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
+          markdown-fontify-code-blocks-natively t
+          markdown-indent-on-enter 'indent-and-new-item
+          markdown-list-indent-width 2
+          markdown-split-window-direction 'horizontal)
 
-  ;; Generate TOC with `markdown-toc-generate-toc'
+    ;; Additional commands to export markdown file to other formats
+    (require 'markdown-mode+)
 
-  (unless (fboundp 'markdown-toc-refresh-toc)
-    (autoload #'markdown-toc-refresh-toc "markdown-toc" nil t))
-  (unless (fboundp 'markdown-toc-generate-toc)
-    (autoload #'markdown-toc-generate-toc "markdown-toc" nil t))
-  (unless (fboundp 'markdown-toc-generate-or-refresh-toc)
-    (autoload #'markdown-toc-generate-or-refresh-toc "markdown-toc" nil t))
+    ;; Generate TOC with `markdown-toc-generate-toc'
 
-  ;; Open preview of markdown file in a browser
-  (unless (fboundp 'markdown-preview-mode)
-    (autoload #'markdown-preview-mode "markdown-preview-mode" nil t)))
+    (unless (fboundp 'markdown-toc-refresh-toc)
+      (autoload #'markdown-toc-refresh-toc "markdown-toc" nil t))
+    (unless (fboundp 'markdown-toc-generate-toc)
+      (autoload #'markdown-toc-generate-toc "markdown-toc" nil t))
+    (unless (fboundp 'markdown-toc-generate-or-refresh-toc)
+      (autoload #'markdown-toc-generate-or-refresh-toc "markdown-toc" nil t))
+
+    ;; Open preview of markdown file in a browser
+    (unless (fboundp 'markdown-preview-mode)
+      (autoload #'markdown-preview-mode "markdown-preview-mode" nil t))))
 
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
-(declare-function pandoc-load-default-settings "pandoc-mode")
+(progn
+  (declare-function pandoc-load-default-settings "pandoc-mode")
 
-(unless (fboundp 'pandoc-mode)
-  (autoload #'pandoc-mode "pandoc-mode" nil t))
-(unless (fboundp 'pandoc-load-default-settings)
-  (autoload #'pandoc-load-default-settings "pandoc-mode" nil t))
+  (unless (fboundp 'pandoc-mode)
+    (autoload #'pandoc-mode "pandoc-mode" nil t))
+  (unless (fboundp 'pandoc-load-default-settings)
+    (autoload #'pandoc-load-default-settings "pandoc-mode" nil t))
 
-(add-hook 'markdown-mode-hook #'pandoc-mode)
+  (add-hook 'markdown-mode-hook #'pandoc-mode)
 
-(with-eval-after-load 'pandoc-mode
-  (pandoc-load-default-settings)
+  (with-eval-after-load 'pandoc-mode
+    (pandoc-load-default-settings)
 
-  ;; Binds `C-c /' to `pandoc-main-hydra/body'.
-  ;; (unbind-key "C-c /" pandoc-mode-map))
+    ;; Binds `C-c /' to `pandoc-main-hydra/body'.
+    ;; (unbind-key "C-c /" pandoc-mode-map))
 
-  (diminish 'pandoc-mode))
+    (diminish 'pandoc-mode)))
 
 
 ;; Run `M-x grip-mode` to preview the markdown file with the default browser.
@@ -4311,8 +4368,9 @@ This file is specified in `counsel-projectile-default-file'."
 ;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
 
-(if nil
-    (when (executable-find "prettier")
+(when nil
+  (when (executable-find "prettier")
+    (progn
       (unless (fboundp 'prettier-mode)
         (autoload #'prettier-mode "prettier" nil t))
 
@@ -4326,84 +4384,92 @@ This file is specified in `counsel-projectile-default-file'."
       (with-eval-after-load 'prettier
         (defvar prettier-lighter)
 
-        (setq prettier-lighter nil))))
+        (setq prettier-lighter nil)))))
 
 
 ;; Align fields with `C-c C-a'
-(unless (fboundp 'csv-mode)
-  (autoload #'csv-mode "csv-mode" nil t))
-
-(with-eval-after-load 'csv-mode
-  (defvar csv-separators)
-
-  (setq csv-separators '("," ";" "|" " ")))
-
-
-(unless (fboundp 'highlight-doxygen-global-mode)
-  (autoload #'highlight-doxygen-global-mode "highlight-doxygen" nil t))
-
-(with-eval-after-load 'highlight-doxygen
-  (highlight-doxygen-global-mode))
-
-
-(unless (fboundp 'rst-mode)
-  (autoload #'rst-mode "rst" nil t))
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode))
-
-
-(unless (fboundp 'xref-rst-mode)
-  (autoload #'xref-rst-mode "xref-rst" nil t))
-
-(add-hook 'rst-mode-hook #'xref-rst-mode)
-
-
-(unless (fboundp 'z3-smt2-mode)
-  (autoload #'z3-smt2-mode "boogie-friends" nil t))
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.smt\\'" . z3-smt2-mode))
-
-
-(unless (fboundp 'z3-mode)
-  (autoload #'z3-mode "z3-mode" nil t))
-
-(with-eval-after-load 'z3-mode
-  (defvar z3-solver-cmd)
-
-  (setq z3-solver-cmd "z3"))
-
-
-(unless (fboundp 'makefile-mode)
-  (autoload #'makefile-mode "make-mode" nil t))
-(unless (fboundp 'makefile-gmake-mode)
-  (autoload #'makefile-gmake-mode "make-mode" nil t))
-
-;;;###autoload
 (progn
-  (add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
-  ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-  (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
+  (unless (fboundp 'csv-mode)
+    (autoload #'csv-mode "csv-mode" nil t))
 
-;; Use normal tabs in makefiles
-(add-hook 'makefile-mode-hook #'indent-tabs-mode)
+  (with-eval-after-load 'csv-mode
+    (defvar csv-separators)
+
+    (setq csv-separators '("," ";" "|" " "))))
+
+
+(progn
+  (unless (fboundp 'highlight-doxygen-global-mode)
+    (autoload #'highlight-doxygen-global-mode "highlight-doxygen" nil t))
+
+  (with-eval-after-load 'highlight-doxygen
+    (highlight-doxygen-global-mode)))
+
+
+(when nil
+  (progn
+    (unless (fboundp 'rst-mode)
+      (autoload #'rst-mode "rst" nil t))
+
+;;;###autoload
+    (add-to-list 'auto-mode-alist '("\\.rst\\'" . rst-mode))
+
+
+    (unless (fboundp 'xref-rst-mode)
+      (autoload #'xref-rst-mode "xref-rst" nil t))
+
+    (add-hook 'rst-mode-hook #'xref-rst-mode)))
+
+
+(when nil
+  (progn
+    (unless (fboundp 'z3-smt2-mode)
+      (autoload #'z3-smt2-mode "boogie-friends" nil t))
+
+;;;###autoload
+    (add-to-list 'auto-mode-alist '("\\.smt\\'" . z3-smt2-mode))
+
+
+    (unless (fboundp 'z3-mode)
+      (autoload #'z3-mode "z3-mode" nil t))
+
+    (with-eval-after-load 'z3-mode
+      (defvar z3-solver-cmd)
+
+      (setq z3-solver-cmd "z3"))))
+
+
+(progn
+  (unless (fboundp 'makefile-mode)
+    (autoload #'makefile-mode "make-mode" nil t))
+  (unless (fboundp 'makefile-gmake-mode)
+    (autoload #'makefile-gmake-mode "make-mode" nil t))
+
+;;;###autoload
+  (progn
+    (add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
+    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
+    (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
+
+  ;; Use normal tabs in makefiles
+  (add-hook 'makefile-mode-hook #'indent-tabs-mode))
 
 
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
 (when (symbol-value 'sb/IS-LINUX)
-  (unless (fboundp 'turn-on-eldoc-mode)
-    (autoload #'turn-on-eldoc-mode "eldoc" nil t))
+  (progn
+    (unless (fboundp 'turn-on-eldoc-mode)
+      (autoload #'turn-on-eldoc-mode "eldoc" nil t))
 
-  (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
-    (add-hook hook #'turn-on-eldoc-mode))
+    (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
+      (add-hook hook #'turn-on-eldoc-mode))
 
-  (with-eval-after-load 'eldoc
-    ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
-    ;; itself unexpectedly when point is on a variable with a multiline docstring.
-    (setq eldoc-echo-area-use-multiline-p nil)
+    (with-eval-after-load 'eldoc
+      ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
+      ;; itself unexpectedly when point is on a variable with a multiline docstring.
+      (setq eldoc-echo-area-use-multiline-p nil)
 
-    (diminish 'eldoc-mode))
+      (diminish 'eldoc-mode)))
 
 
   (progn
@@ -4424,56 +4490,64 @@ This file is specified in `counsel-projectile-default-file'."
       (setq eldoc-box-clear-with-C-g t
             eldoc-box-fringe-use-same-bg nil)
 
+      (set-face-background 'eldoc-box-body "cornsilk")
+
       (diminish 'eldoc-box-hover-mode))))
 
 
 ;; We use LSP
-(if nil
-    (progn
-      (unless (fboundp 'c-turn-on-eldoc-mode)
-        (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'c-turn-on-eldoc-mode)
+      (autoload #'c-turn-on-eldoc-mode "c-eldoc" nil t))
 
-      (add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
-      ))
+    (add-hook 'c-mode-common-hook #'c-turn-on-eldoc-mode)
+    ))
 
 
 ;; We use LSP
-(if nil
-    (progn
-      (with-eval-after-load 'css-mode
-        (unless (fboundp 'css-eldoc-enable)
-          (autoload #'css-eldoc-enable "css-eldoc" nil t))
+(when nil
+  (progn
+    (with-eval-after-load 'css-mode
+      (unless (fboundp 'css-eldoc-enable)
+        (autoload #'css-eldoc-enable "css-eldoc" nil t))
 
-        (css-eldoc-enable))
-      ))
+      (css-eldoc-enable))
+    ))
 
 
-(unless (fboundp 'matlab-mode)
-  (autoload #'matlab-mode "matlab-mode" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'matlab-mode)
+      (autoload #'matlab-mode "matlab-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.m$" . matlab-mode))
+    (add-to-list 'auto-mode-alist '("\\.m$" . matlab-mode))))
 
 
-(unless (fboundp 'R-mode)
-  (autoload #'R-mode "ess" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'R-mode)
+      (autoload #'R-mode "ess" nil t))
 
-(add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
+    (add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
 
-(with-eval-after-load 'R-mode
-  (require 'ess-smart-underscore))
+    (with-eval-after-load 'R-mode
+      (require 'ess-smart-underscore))))
 
 
-(with-eval-after-load 'ess
-  (defvar ess-indent-offset)
-  (defvar ess-indent-from-lhs)
-  (defvar inferior-R-args)
+(when nil
+  (progn
+    (with-eval-after-load 'ess
+      (defvar ess-indent-offset)
+      (defvar ess-indent-from-lhs)
+      (defvar inferior-R-args)
 
-  (setq ess-indent-from-lhs 4
-        ess-indent-offset 4
-        inferior-R-args "--quiet --no-restore-history --no-save")
+      (setq ess-indent-from-lhs 4
+            ess-indent-offset 4
+            inferior-R-args "--quiet --no-restore-history --no-save")
 
-  (require 'ess-smart-underscore))
+      (require 'ess-smart-underscore))))
 
 
 (unless (fboundp 'ini-mode)
@@ -4484,25 +4558,27 @@ This file is specified in `counsel-projectile-default-file'."
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
 
-(unless (fboundp 'pkgbuild-mode)
-  (autoload #'pkgbuild-mode "pkgbuild-mode" nil t))
+(when nil
+  (unless (fboundp 'pkgbuild-mode)
+    (autoload #'pkgbuild-mode "pkgbuild-mode" nil t)))
 
 
-(unless (fboundp 'emacs-lisp-mode)
-  (autoload #'emacs-lisp-mode "elisp-mode" nil t))
-(unless (fboundp 'elisp-byte-code-mode)
-  (autoload #'elisp-byte-code-mode "elisp-mode" nil t))
+(progn
+  (unless (fboundp 'emacs-lisp-mode)
+    (autoload #'emacs-lisp-mode "elisp-mode" nil t))
+  (unless (fboundp 'elisp-byte-code-mode)
+    (autoload #'elisp-byte-code-mode "elisp-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.el\\'"  . emacs-lisp-mode))
+  (add-to-list 'auto-mode-alist '("\\.el\\'"  . emacs-lisp-mode))
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.elc\\'" . elisp-byte-code-mode))
+  (add-to-list 'auto-mode-alist '("\\.elc\\'" . elisp-byte-code-mode))
 
-(dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
-  (add-hook hook (lambda ()
-                   (when buffer-file-name
-                     (add-hook 'after-save-hook #'check-parens nil t)
-                     (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc)))))
+  (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
+    (add-hook hook (lambda ()
+                     (when buffer-file-name
+                       (add-hook 'after-save-hook #'check-parens nil t)
+                       (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc))))))
 
 
 ;; LSP support
@@ -5134,8 +5210,9 @@ This file is specified in `counsel-projectile-default-file'."
     (setq py-isort-options '("-l 100"))))
 
 
-(unless (fboundp 'pip-requirements-mode)
-  (autoload #'pip-requirements-mode "pip-requirements" nil t))
+(when nil
+  (unless (fboundp 'pip-requirements-mode)
+    (autoload #'pip-requirements-mode "pip-requirements" nil t)))
 
 
 ;; `pyright --createstub pandas'
@@ -5188,16 +5265,19 @@ This file is specified in `counsel-projectile-default-file'."
     (diminish 'yapf-mode)))
 
 
-(unless (fboundp 'ein:ipynb-mode)
-  (autoload #'ein:ipynb-mode "ein" nil t))
+(when nil
+  (unless (fboundp 'ein:ipynb-mode)
+    (autoload #'ein:ipynb-mode "ein" nil t)))
 
 
-(unless (fboundp 'cython-mode)
-  (autoload #'cython-mode "cython-mode" nil t))
+(when nil
+  (unless (fboundp 'cython-mode)
+    (autoload #'cython-mode "cython-mode" nil t)))
 
 
-(unless (fboundp 'jinja2-mode)
-  (autoload #'jinja2-mode "jinja2-mode" nil t))
+(when nil
+  (unless (fboundp 'jinja2-mode)
+    (autoload #'jinja2-mode "jinja2-mode" nil t)))
 
 
 (progn
@@ -5666,28 +5746,30 @@ This file is specified in `counsel-projectile-default-file'."
   (diminish 'rainbow-mode))
 
 
-(add-hook 'php-mode-hook #'lsp-deferred)
+(when nil
+  (add-hook 'php-mode-hook #'lsp-deferred))
 
 
-(unless (fboundp 'nxml-mode)
-  (autoload #'nxml-mode "nxml-mode" nil t))
+(progn
+  (unless (fboundp 'nxml-mode)
+    (autoload #'nxml-mode "nxml-mode" nil t))
 
-(add-hook 'nxml-mode-hook (lambda()
-                            (spell-fu-mode -1)
-                            (lsp-deferred)))
+  (add-hook 'nxml-mode-hook (lambda()
+                              (spell-fu-mode -1)
+                              (lsp-deferred)))
 
 ;;;###autoload
-(dolist (pattern '("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$"))
-  (add-to-list 'auto-mode-alist (cons pattern 'nxml-mode)))
+  (dolist (pattern '("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$"))
+    (add-to-list 'auto-mode-alist (cons pattern 'nxml-mode)))
 
-(with-eval-after-load 'nxml-mode
-  (fset 'xml-mode 'nxml-mode)
+  (with-eval-after-load 'nxml-mode
+    (fset 'xml-mode 'nxml-mode)
 
-  (defvar nxml-auto-insert-xml-declaration-flag)
-  (defvar nxml-slash-auto-complete-flag)
+    (defvar nxml-auto-insert-xml-declaration-flag)
+    (defvar nxml-slash-auto-complete-flag)
 
-  (setq nxml-auto-insert-xml-declaration-flag t
-        nxml-slash-auto-complete-flag t))
+    (setq nxml-auto-insert-xml-declaration-flag t
+          nxml-slash-auto-complete-flag t)))
 
 
 ;; https://github.com/ROCKTAKEY/lsp-latex/issues/26
@@ -6062,227 +6144,250 @@ Ignore if no file is found."
 (add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode))
 
 
-(unless (fboundp 'js2-mode)
-  (autoload #'js2-mode "js2-mode" nil t))
-(unless (fboundp 'js2-imenu-extras-mode)
-  (autoload #'js2-imenu-extras-mode "js2-mode" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'js2-mode)
+      (autoload #'js2-mode "js2-mode" nil t))
+    (unless (fboundp 'js2-imenu-extras-mode)
+      (autoload #'js2-imenu-extras-mode "js2-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
-(add-hook 'js2-mode-hook #'lsp-deferred)
-(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+    (add-hook 'js2-mode-hook #'lsp-deferred)
+    (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
 
-(with-eval-after-load 'js2-mode
-  (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
+    (with-eval-after-load 'js2-mode
+      (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
 
-  (defvar js-indent-level)
-  (defvar js2-basic-offset)
+      (defvar js-indent-level)
+      (defvar js2-basic-offset)
 
-  ;; TODO: Are the two variables aliased?
-  (setq js-indent-level 2
-        js2-basic-offset 2)
+      ;; TODO: Are the two variables aliased?
+      (setq js-indent-level 2
+            js2-basic-offset 2)
 
-  (unless (fboundp 'js2-refactor-mode)
-    (autoload #'js2-refactor-mode "js2-refactor" nil t))
+      (unless (fboundp 'js2-refactor-mode)
+        (autoload #'js2-refactor-mode "js2-refactor" nil t))
 
-  (js2-refactor-mode 1)
+      (js2-refactor-mode 1)
 
-  (diminish 'js2-refactor-mode))
+      (diminish 'js2-refactor-mode))
 
 
-(when (executable-find "rg")
-  (unless (fboundp 'xref-js2-xref-backend)
-    (autoload #'xref-js2-xref-backend "xref-js2" nil t))
+    (when (executable-find "rg")
+      (unless (fboundp 'xref-js2-xref-backend)
+        (autoload #'xref-js2-xref-backend "xref-js2" nil t))
 
-  (add-hook 'js2-mode-hook
-            (lambda ()
-              (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
+      (add-hook 'js2-mode-hook
+                (lambda ()
+                  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
-  (with-eval-after-load 'xref-js2
-    (defvar xref-js2-search-program)
+      (with-eval-after-load 'xref-js2
+        (defvar xref-js2-search-program)
 
-    (setq xref-js2-search-program 'rg)))
+        (setq xref-js2-search-program 'rg)))
 
-;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
-;; (define-key js-mode-map (kbd "M-.") nil)
+    ;; LATER: `js-mode' (which js2 is based on) binds `M-.' which conflicts with `xref', so unbind it
+    ;; (define-key js-mode-map (kbd "M-.") nil)
+    ))
 
 
 ;; The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
-(declare-function json-mode "json")
-(declare-function jsonc-mode "json")
-
-(unless (fboundp 'json-mode)
-  (autoload #'json-mode "json-mode" nil t))
-(unless (fboundp 'jsonc-mode)
-  (autoload #'jsonc-mode "json-mode" nil t))
-
-;;;###autoload
 (progn
-  (add-to-list 'auto-mode-alist '("\\.json\\'"                  . json-mode))
-  (add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
-  (add-to-list 'auto-mode-alist '("User/settings.json$"         . jsonc-mode)))
+  (declare-function json-mode "json")
+  (declare-function jsonc-mode "json")
 
-(dolist (hook '(json-mode-hook jsonc-mode-hook))
-  (add-hook hook (lambda nil
-                   (defvar js-indent-level)
-                   (make-local-variable 'js-indent-level)
-                   (setq js-indent-level 2)
-                   (lsp-deferred))))
-
-
-(unless (fboundp 'scss-mode)
-  (autoload #'scss-mode "scss-mode" nil t))
-
-(add-hook 'scss-mode-hook #'lsp-deferred)
-
-(with-eval-after-load 'scss-mode
-  (defvar scss-compile-at-save)
-
-  (setq scss-compile-at-save t))
-
-
-(unless (fboundp 'sass-mode)
-  (autoload #'sass-mode "sass-mode" nil t))
-
-(add-hook 'sass-mode-hook #'lsp-deferred)
-
-
-(declare-function bazel-mode "bazel-mode")
-
-(unless (fboundp 'bazel-mode)
-  (autoload #'bazel-mode "bazel-mode" nil t))
-(unless (fboundp 'bazelrc-mode)
-  (autoload #'bazelrc-mode "bazel-mode" nil t))
-
-(add-hook 'bazel-mode-hook #'flycheck-mode)
-
-
-(unless (fboundp 'protobuf-mode)
-  (autoload #'protobuf-mode "protobuf-mode" nil t))
+  (unless (fboundp 'json-mode)
+    (autoload #'json-mode "json-mode" nil t))
+  (unless (fboundp 'jsonc-mode)
+    (autoload #'jsonc-mode "json-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.json\\'"                  . json-mode))
+    (add-to-list 'auto-mode-alist '(".*/\\.vscode/settings.json$" . jsonc-mode))
+    (add-to-list 'auto-mode-alist '("User/settings.json$"         . jsonc-mode)))
 
-(add-hook 'protobuf-mode-hook #'flycheck-mode)
+  (dolist (hook '(json-mode-hook jsonc-mode-hook))
+    (add-hook hook (lambda nil
+                     (defvar js-indent-level)
+                     (make-local-variable 'js-indent-level)
+                     (setq js-indent-level 2)
+                     (lsp-deferred)))))
 
 
-(with-eval-after-load 'mlir-mode
-  (unless (fboundp 'clang-format)
-    (autoload #'clang-format "clang-format" nil t))
-  (unless (fboundp 'clang-format-buffer)
-    (autoload #'clang-format-buffer "clang-format" nil t))
-  (unless (fboundp 'clang-format-region)
-    (autoload #'clang-format-region "clang-format" nil t)))
+(when nil
+  (progn
+    (unless (fboundp 'scss-mode)
+      (autoload #'scss-mode "scss-mode" nil t))
 
-(unless (fboundp 'clang-format+-mode)
-  (autoload #'clang-format+-mode "clang-format+" nil t))
+    (add-hook 'scss-mode-hook #'lsp-deferred)
 
-(add-hook 'mlir-mode-hook #'clang-format+-mode)
+    (with-eval-after-load 'scss-mode
+      (defvar scss-compile-at-save)
 
-(with-eval-after-load 'clang-format+-mode
-  (defvar clang-format+-always-enable)
+      (setq scss-compile-at-save t))))
 
-  (setq clang-format+-always-enable t))
 
+(when nil
+  (progn
+    (unless (fboundp 'sass-mode)
+      (autoload #'sass-mode "sass-mode" nil t))
+
+    (add-hook 'sass-mode-hook #'lsp-deferred)))
+
+
+(when nil
+  (progn
+    (declare-function bazel-mode "bazel-mode")
+
+    (unless (fboundp 'bazel-mode)
+      (autoload #'bazel-mode "bazel-mode" nil t))
+    (unless (fboundp 'bazelrc-mode)
+      (autoload #'bazelrc-mode "bazel-mode" nil t))
+
+    (add-hook 'bazel-mode-hook #'flycheck-mode)))
+
+
+(when nil
+  (progn
+    (unless (fboundp 'protobuf-mode)
+      (autoload #'protobuf-mode "protobuf-mode" nil t))
+
+;;;###autoload
+    (add-to-list 'auto-mode-alist '("\\.proto$" . protobuf-mode))
+
+    (add-hook 'protobuf-mode-hook #'flycheck-mode)))
+
+
+(when nil
+  (progn
+    (with-eval-after-load 'mlir-mode
+      (unless (fboundp 'clang-format)
+        (autoload #'clang-format "clang-format" nil t))
+      (unless (fboundp 'clang-format-buffer)
+        (autoload #'clang-format-buffer "clang-format" nil t))
+      (unless (fboundp 'clang-format-region)
+        (autoload #'clang-format-region "clang-format" nil t)))
+
+    (unless (fboundp 'clang-format+-mode)
+      (autoload #'clang-format+-mode "clang-format+" nil t))
+
+    (add-hook 'mlir-mode-hook #'clang-format+-mode)
+
+    (with-eval-after-load 'clang-format+-mode
+      (defvar clang-format+-always-enable)
+
+      (setq clang-format+-always-enable t))
+    ))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support tramp and supports fewer formatters.
-(declare-function format-all-ensure-formatter "format-all")
+(progn
+  (declare-function format-all-ensure-formatter "format-all")
 
-(unless (fboundp 'format-all-ensure-formatter)
-  (autoload #'format-all-ensure-formatter "format-all" nil t))
-(unless (fboundp 'format-all-buffer)
-  (autoload #'format-all-buffer "format-all" nil t))
+  (unless (fboundp 'format-all-ensure-formatter)
+    (autoload #'format-all-ensure-formatter "format-all" nil t))
+  (unless (fboundp 'format-all-buffer)
+    (autoload #'format-all-buffer "format-all" nil t))
 
-(eval-and-compile
-  (defun sb/enable-format-all ()
-    "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(bazel-mode-hook latex-mode-hook
-                                    LaTeX-mode-hook json-mode-hook))
-      (add-hook hook #'format-all-mode))
-    (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
+  (eval-and-compile
+    (defun sb/enable-format-all ()
+      "Delay enabling format-all to avoid slowing down Emacs startup."
+      (dolist (hook '(bazel-mode-hook latex-mode-hook LaTeX-mode-hook json-mode-hook))
+        (add-hook hook #'format-all-mode))
+      (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
-(run-with-idle-timer 2 nil #'sb/enable-format-all)
-
-
-(if nil
-    (progn
-      (unless (fboundp 'global-tree-sitter-mode)
-        (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
-      (unless (fboundp 'tree-sitter-hl-mode)
-        (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
-
-      (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
-                                   css-mode-hook html-mode-hook
-                                   java-mode-hook js-mode-hook
-                                   js2-mode-hook json-mode-hook
-                                   jsonc-mode-hook php-mode-hook
-                                   python-mode-hook
-                                   typescript-mode-hook))
-        (add-hook hook (lambda nil
-                         (require 'tree-sitter)
-                         (require 'tree-sitter-langs)
-                         (require 'tree-sitter-hl)
-
-                         (global-tree-sitter-mode 1))))
-
-      (with-eval-after-load 'tree-sitter
-        (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-
-        (diminish 'tree-sitter-mode))))
+  (run-with-idle-timer 2 nil #'sb/enable-format-all))
 
 
-(unless (fboundp 'adoc-mode)
-  (autoload #'adoc-mode "adoc-mode" nil t))
+(when nil
+  (progn
+    (unless (fboundp 'global-tree-sitter-mode)
+      (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
+    (unless (fboundp 'tree-sitter-hl-mode)
+      (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
+
+    (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
+                                 css-mode-hook html-mode-hook
+                                 java-mode-hook js-mode-hook
+                                 js2-mode-hook json-mode-hook
+                                 jsonc-mode-hook php-mode-hook
+                                 python-mode-hook
+                                 typescript-mode-hook))
+      (add-hook hook (lambda nil
+                       (require 'tree-sitter)
+                       (require 'tree-sitter-langs)
+                       (require 'tree-sitter-hl)
+
+                       (global-tree-sitter-mode 1))))
+
+    (with-eval-after-load 'tree-sitter
+      (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+      (diminish 'tree-sitter-mode))))
+
+
+(when nil
+  (progn
+    (unless (fboundp 'adoc-mode)
+      (autoload #'adoc-mode "adoc-mode" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
+    (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))))
 
 
-(when (executable-find "editorconfig")
-  (unless (fboundp 'editorconfig-mode)
-    (autoload #'editorconfig-mode "editorconfig" nil t))
+(when nil
+  (when (executable-find "editorconfig")
+    (progn
+      (unless (fboundp 'editorconfig-mode)
+        (autoload #'editorconfig-mode "editorconfig" nil t))
 
-  (with-eval-after-load 'editorconfig
-    (diminish 'editorconfig-mode)))
+      (with-eval-after-load 'editorconfig
+        (diminish 'editorconfig-mode)))))
 
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (when (executable-find "fasd")
-  (unless (fboundp 'global-fasd-mode)
-    (autoload #'global-fasd-mode "fasd" nil t))
-  (unless (fboundp 'fasd-find-file)
-    (autoload #'fasd-find-file "fasd" nil t))
+  (progn
+    (unless (fboundp 'global-fasd-mode)
+      (autoload #'global-fasd-mode "fasd" nil t))
+    (unless (fboundp 'fasd-find-file)
+      (autoload #'fasd-find-file "fasd" nil t))
 
-  (run-with-idle-timer 2 nil #'global-fasd-mode)
+    (run-with-idle-timer 2 nil #'global-fasd-mode)
 
-  (with-eval-after-load 'fasd
-    (defvar fasd-enable-initial-prompt)
+    (with-eval-after-load 'fasd
+      (defvar fasd-enable-initial-prompt)
 
-    (setq fasd-enable-initial-prompt nil))
+      (setq fasd-enable-initial-prompt nil))
 
-  (bind-keys :package fasd
-             ("C-c /" . fasd-find-file)))
-
-
-(unless (fboundp 'toml-mode)
-  (autoload #'toml-mode "toml-mode" nil t))
+    (bind-keys :package fasd
+               ("C-c /" . fasd-find-file))))
 
 
-(unless (fboundp 'nix-mode)
-  (autoload #'nix-mode "nix-mode" nil t))
+(when nil
+  (unless (fboundp 'toml-mode)
+    (autoload #'toml-mode "toml-mode" nil t)))
 
 
-(unless (fboundp 'rust-mode)
-  (autoload #'rust-mode "rust-mode" nil t))
+(when nil
+  (unless (fboundp 'nix-mode)
+    (autoload #'nix-mode "nix-mode" nil t)))
 
-(add-hook 'rust-mode-hook #'lsp-deferred)
 
-(with-eval-after-load 'rust-mode
-  (defvar rust-format-on-save)
+(when nil
+  (progn
+    (unless (fboundp 'rust-mode)
+      (autoload #'rust-mode "rust-mode" nil t))
 
-  (setq rust-format-on-save t))
+    (add-hook 'rust-mode-hook #'lsp-deferred)
+
+    (with-eval-after-load 'rust-mode
+      (defvar rust-format-on-save)
+
+      (setq rust-format-on-save t))))
 
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
@@ -6314,43 +6419,44 @@ Ignore if no file is found."
   (add-hook 'Info-selection-hook #'info-colors-fontify-node))
 
 
-(with-eval-after-load 'flycheck
-  ;; https://github.com/flycheck/flycheck/issues/1762
-  (defvar-local sb/flycheck-local-cache nil)
+(progn
+  (with-eval-after-load 'flycheck
+    ;; https://github.com/flycheck/flycheck/issues/1762
+    (defvar-local sb/flycheck-local-cache nil)
 
-  (defun sb/flycheck-checker-get (fn checker property)
-    (or (alist-get property (alist-get checker sb/flycheck-local-cache))
-        (funcall fn checker property)))
+    (defun sb/flycheck-checker-get (fn checker property)
+      (or (alist-get property (alist-get checker sb/flycheck-local-cache))
+          (funcall fn checker property)))
 
-  (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
+    (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
-  (add-hook 'lsp-managed-mode-hook
-            (lambda ()
-              (when (derived-mode-p 'python-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
+    (add-hook 'lsp-managed-mode-hook
+              (lambda ()
+                (when (derived-mode-p 'python-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
 
-              (when (derived-mode-p 'sh-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-bash)))))))
+                (when (derived-mode-p 'sh-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-bash)))))))
 
-              (when (derived-mode-p 'c++-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
+                (when (derived-mode-p 'c++-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
 
-              (when (derived-mode-p 'css-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
+                (when (derived-mode-p 'css-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
 
-              (when (derived-mode-p 'html-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
+                (when (derived-mode-p 'html-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
 
-              (when (derived-mode-p 'xml-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
+                (when (derived-mode-p 'xml-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
 
-              (when (derived-mode-p 'yaml-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
+                (when (derived-mode-p 'yaml-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
 
-              (when (derived-mode-p 'json-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
-              ))
-  )
+                (when (derived-mode-p 'json-mode)
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
+                ))
+    ))
 
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
@@ -6533,88 +6639,90 @@ Ignore if no file is found."
 (add-hook 'python-mode-hook #'sb/company-python-mode)
 
 
-(unless (fboundp 'company-bibtex)
-  (autoload #'company-bibtex "company-bibtex" nil t))
-(unless (fboundp 'company-math-symbols-latex)
-  (autoload #'company-math-symbols-latex "company-math" nil t))
-(unless (fboundp 'company-math-symbols-unicode)
-  (autoload #'company-math-symbols-unicode "company-math" nil t))
-(unless (fboundp 'company-latex-commands)
-  (autoload #'company-latex-commands "company-math" nil t))
-(unless (fboundp 'company-reftex-labels)
-  (autoload #'company-reftex-labels "company-reftex" nil t))
-(unless (fboundp 'company-reftex-citations)
-  (autoload #'company-reftex-citations "company-reftex" nil t))
-(unless (fboundp 'company-auctex-labels)
-  (autoload #'company-auctex-labels "company-auctex" nil t))
-(unless (fboundp 'company-auctex-bibs)
-  (autoload #'company-auctex-bibs "company-auctex" nil t))
-(unless (fboundp 'company-auctex-init)
-  (autoload #'company-auctex-init "company-auctex" nil t))
-(unless (fboundp 'company-auctex-macros)
-  (autoload #'company-auctex-macros "company-auctex" nil t))
-(unless (fboundp 'company-auctex-symbols)
-  (autoload #'company-auctex-symbols "company-auctex" nil t))
-(unless (fboundp 'company-auctex-environments)
-  (autoload #'company-auctex-environments "company-auctex" nil t))
+(progn
+  ;; (unless (fboundp 'company-bibtex)
+  ;;   (autoload #'company-bibtex "company-bibtex" nil t))
+  (unless (fboundp 'company-math-symbols-latex)
+    (autoload #'company-math-symbols-latex "company-math" nil t))
+  (unless (fboundp 'company-math-symbols-unicode)
+    (autoload #'company-math-symbols-unicode "company-math" nil t))
+  (unless (fboundp 'company-latex-commands)
+    (autoload #'company-latex-commands "company-math" nil t))
+  (unless (fboundp 'company-reftex-labels)
+    (autoload #'company-reftex-labels "company-reftex" nil t))
+  (unless (fboundp 'company-reftex-citations)
+    (autoload #'company-reftex-citations "company-reftex" nil t))
+  (unless (fboundp 'company-auctex-labels)
+    (autoload #'company-auctex-labels "company-auctex" nil t))
+  (unless (fboundp 'company-auctex-bibs)
+    (autoload #'company-auctex-bibs "company-auctex" nil t))
+  (unless (fboundp 'company-auctex-init)
+    (autoload #'company-auctex-init "company-auctex" nil t))
+  (unless (fboundp 'company-auctex-macros)
+    (autoload #'company-auctex-macros "company-auctex" nil t))
+  (unless (fboundp 'company-auctex-symbols)
+    (autoload #'company-auctex-symbols "company-auctex" nil t))
+  (unless (fboundp 'company-auctex-environments)
+    (autoload #'company-auctex-environments "company-auctex" nil t))
 
-(defun sb/company-latex-mode ()
-  "Add backends for latex completion in company mode."
-  (defvar company-minimum-prefix-length)
-  (defvar company-backends)
+  (defun sb/company-latex-mode ()
+    "Add backends for latex completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-  (setq-local company-minimum-prefix-length 3)
-  (make-local-variable 'company-backends)
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
 
-  ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-  ;; labels and citations
+    ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+    ;; labels and citations
 
-  (setq company-backends '((:separate
-                            company-files
-                            company-reftex-citations
-                            company-reftex-labels
-                            company-auctex-environments
-                            company-auctex-macros
-                            company-latex-commands
-                            company-math-symbols-latex
-                            company-math-symbols-unicode
+    (setq company-backends '((:separate
+                              company-files
+                              company-reftex-citations
+                              company-reftex-labels
+                              company-auctex-environments
+                              company-auctex-macros
+                              company-latex-commands
+                              company-math-symbols-latex
+                              company-math-symbols-unicode
 
-                            ;; company-auctex-symbols
-                            ;; company-auctex-bibs
-                            ;; company-auctex-labels
-                            ;; company-bibtex
-                            ;; company-capf
-                            )
-                           (:separate
-                            company-dabbrev
-                            company-ispell)))
+                              ;; company-auctex-symbols
+                              ;; company-auctex-bibs
+                              ;; company-auctex-labels
+                              ;; company-bibtex
+                              ;; company-capf
+                              )
+                             (:separate
+                              company-dabbrev
+                              company-ispell)))
 
-  ;; (setq company-backends '((:separate
-  ;;                           company-capf
-  ;;                           ;; company-latex-commands
-  ;;                           company-files
-  ;;                           company-yasnippet
-  ;;                           company-dabbrev
-  ;;                           company-ispell)))
-  )
+    ;; (setq company-backends '((:separate
+    ;;                           company-capf
+    ;;                           ;; company-latex-commands
+    ;;                           company-files
+    ;;                           company-yasnippet
+    ;;                           company-dabbrev
+    ;;                           company-ispell)))
+    )
 
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook tex-mode-hook TeX-mode-hook))
-  (add-hook hook #'sb/company-latex-mode))
+  (dolist (hook '(latex-mode-hook LaTeX-mode-hook tex-mode-hook TeX-mode-hook))
+    (add-hook hook #'sb/company-latex-mode)))
 
 
-(defun sb/company-web-mode ()
-  "Add backends for web completion in company mode."
-  (defvar company-backends)
+(progn
+  (defun sb/company-web-mode ()
+    "Add backends for web completion in company mode."
+    (defvar company-backends)
 
-  (make-local-variable 'company-backends)
-  (setq company-backends '(company-capf
-                           company-files
-                           company-yasnippet
-                           company-dabbrev
-                           company-ispell)))
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev
+                             company-ispell)))
 
-(dolist (hook '(web-mode-hook))
-  (add-hook hook #'sb/company-web-mode))
+  (dolist (hook '(web-mode-hook))
+    (add-hook hook #'sb/company-web-mode)))
 
 
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
@@ -6896,11 +7004,12 @@ mode is not in `sb/skippable-modes'."
 
 (unbind-key "C-j") ; Interferes with imenu `C-c C-j'
 
-(unless (fboundp 'package-quickstart-refresh)
-  (autoload #'package-quickstart-refresh "package" nil t))
+(progn
+  (unless (fboundp 'package-quickstart-refresh)
+    (autoload #'package-quickstart-refresh "package" nil t))
 
-(when sb/EMACS27+
-  (bind-key "C-c d p" #'package-quickstart-refresh))
+  (when sb/EMACS27+
+    (bind-key "C-c d p" #'package-quickstart-refresh)))
 
 (global-set-key [remap next-buffer] #'sb/next-buffer)
 (global-set-key [remap previous-buffer] #'sb/previous-buffer)
@@ -6910,14 +7019,15 @@ mode is not in `sb/skippable-modes'."
   (global-set-key [remap previous-buffer] #'centaur-tabs-backward))
 
 
-(unless (fboundp 'default-text-scale-increase)
-  (autoload #'default-text-scale-increase "default-text-scale" nil t))
-(unless (fboundp 'default-text-scale-decrease)
-  (autoload #'default-text-scale-decrease "default-text-scale" nil t))
+(progn
+  (unless (fboundp 'default-text-scale-increase)
+    (autoload #'default-text-scale-increase "default-text-scale" nil t))
+  (unless (fboundp 'default-text-scale-decrease)
+    (autoload #'default-text-scale-decrease "default-text-scale" nil t))
 
-(bind-keys :package default-text-scale
-           ("C-M-+" . default-text-scale-increase)
-           ("C-M--" . default-text-scale-decrease))
+  (bind-keys :package default-text-scale
+             ("C-M-+" . default-text-scale-increase)
+             ("C-M--" . default-text-scale-decrease)))
 
 
 (unless (fboundp 'free-keys)
@@ -6926,32 +7036,33 @@ mode is not in `sb/skippable-modes'."
 
 ;; Show help popups for prefix keys
 
-(unless (fboundp 'which-key-mode)
-  (autoload #'which-key-mode "which-key" nil t))
-(unless (fboundp 'which-key-setup-side-window-right-bottom)
-  (autoload #'which-key-setup-side-window-right-bottom "which-key" nil t))
+(progn
+  (unless (fboundp 'which-key-mode)
+    (autoload #'which-key-mode "which-key" nil t))
+  (unless (fboundp 'which-key-setup-side-window-right-bottom)
+    (autoload #'which-key-setup-side-window-right-bottom "which-key" nil t))
 
-(run-with-idle-timer 3 nil #'which-key-mode)
+  (run-with-idle-timer 3 nil #'which-key-mode)
 
-(with-eval-after-load 'which-key
-  ;; Allow C-h to trigger which-key before it is done automatically
-  (defvar which-key-show-early-on-C-h)
+  (with-eval-after-load 'which-key
+    ;; Allow C-h to trigger which-key before it is done automatically
+    (defvar which-key-show-early-on-C-h)
 
-  (which-key-setup-side-window-right-bottom)
+    (which-key-setup-side-window-right-bottom)
 
-  (diminish 'which-key-mode)
+    (diminish 'which-key-mode)
 
-  (unless (fboundp 'which-key-posframe-mode)
-    (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
+    (unless (fboundp 'which-key-posframe-mode)
+      (autoload #'which-key-posframe-mode "which-key-posframe" nil t))
 
-  (which-key-posframe-mode 1)
+    (which-key-posframe-mode 1)
 
-  ;; The posframe has a low contrast
-  (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
+    ;; The posframe has a low contrast
+    (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
-  (defvar which-key-posframe-border-width)
+    (defvar which-key-posframe-border-width)
 
-  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
+    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)))
 
 
 ;; Hydras
