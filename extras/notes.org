@@ -39,6 +39,8 @@
 ;; https://sachachua.com/dotemacs/
 ;; https://emacs.nasy.moe/
 ;; https://github.com/milkypostman/dotemacs
+;; https://github.com/tecosaur/emacs-config
+;; https://github.com/wdenton/.emacs.d
 
 ** Useful Information 
 

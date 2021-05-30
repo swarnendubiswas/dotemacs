@@ -334,7 +334,7 @@ This location is used for temporary installations and files.")
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      ;; echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
@@ -356,7 +356,9 @@ This location is used for temporary installations and files.")
       ;; idle-update-delay 1.0
       indicate-buffer-boundaries nil
       inhibit-compacting-font-caches t ; Do not compact font caches during GC
-      ;; Disable loading of `default.el' at startup, inhibits site default settings
+      ;; The run-time load order is: (1) file described by `site-run-file', if non-nil; (2)
+      ;; `user-init-file'; (3) default.el. Disable loading of `default.el' at startup, inhibits site
+      ;; default settings.
       inhibit-default-init t
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
@@ -639,8 +641,12 @@ SAVE-FN with non-nil ARGS."
 
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)
-(diminish 'visual-line-mode)
-;; (diminish 'outline-minor-mode)
+
+(with-eval-after-load "simple"
+  (diminish 'visual-line-mode))
+
+(with-eval-after-load "outline"
+  (diminish 'outline-minor-mode))
 
 
 ;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
@@ -690,11 +696,16 @@ SAVE-FN with non-nil ARGS."
           all-the-icons-color-icons nil)))
 
 
+;; Make the cursor a thin horizontal bar, not a block
+(set-default 'cursor-type '(bar . 4))
+
+
 (when t
   (progn
     (require 'solar)
 
     (declare-function circadian-setup "circadian")
+
     (unless (fboundp 'circadian-setup)
       (autoload #'circadian-setup "circadian" nil t))
 
@@ -1867,6 +1878,7 @@ SAVE-FN with non-nil ARGS."
   (defvar company-transformers)
   (defvar company-dabbrev-downcase)
   (defvar company-dabbrev-ignore-case)
+  (defvar company-tooltip-limit)
 
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -1878,7 +1890,8 @@ SAVE-FN with non-nil ARGS."
         company-selection-wrap-around t
         company-show-numbers t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t)
+        company-tooltip-align-annotations t
+        company-tooltip-limit 15)
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -2348,7 +2361,10 @@ SAVE-FN with non-nil ARGS."
 
     ;; Skip regions in Org-mode
     (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
-    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+    (add-to-list 'ispell-skip-region-alist '("~" "~"))
+    (add-to-list 'ispell-skip-region-alist '("=" "="))
+    ))
 
 
 (when (symbol-value 'sb/IS-LINUX)
@@ -4365,6 +4381,7 @@ This file is specified in `counsel-projectile-default-file'."
     (defvar markdown-indent-on-enter)
     (defvar markdown-list-indent-width)
     (defvar markdown-split-window-direction)
+    (defvar markdown-hide-urls)
 
     (setq markdown-command
           "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
@@ -4374,7 +4391,8 @@ This file is specified in `counsel-projectile-default-file'."
           markdown-fontify-code-blocks-natively t
           markdown-indent-on-enter 'indent-and-new-item
           markdown-list-indent-width 2
-          markdown-split-window-direction 'horizontal)
+          markdown-split-window-direction 'horizontal
+          markdown-hide-urls t)
 
     ;; Generate TOC with `markdown-toc-generate-toc'
 
@@ -5937,7 +5955,7 @@ This file is specified in `counsel-projectile-default-file'."
         TeX-syntactic-comment t
         TeX-view-program-selection '((output-pdf "PDF Tools"))
         TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-        LaTeX-item-indent 0 ; Two spaces + Extra indentation
+        LaTeX-item-indent 0 ; Indent lists by two spaces
         LaTeX-syntactic-comments t
         LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
         tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts

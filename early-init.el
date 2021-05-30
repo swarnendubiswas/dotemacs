@@ -15,7 +15,9 @@
                             user-emacs-directory)))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
-(setq byte-compile-warnings '(cl-functions))
+;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
+                                  cl-functions interactive-only))
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following
@@ -34,6 +36,10 @@
       package-user-dir (expand-file-name "elpa" user-emacs-directory)
       package-quickstart t ; Populate one big autoloads file
       package-quickstart-file (expand-file-name "var/package-quickstart.el" user-emacs-directory))
+
+;; The run-time load order is: (1) file described by `site-run-file', if non-nil; (2)
+;; `user-init-file'; (3) default.el. Disable site-wide run-time initializations.
+(setq site-run-file nil)
 
 ;; (customize-set-variable
 ;;  'package-quickstart-file
