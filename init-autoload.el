@@ -697,7 +697,7 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; Make the cursor a thin horizontal bar, not a block
-(set-default 'cursor-type '(bar . 4))
+;; (set-default 'cursor-type '(bar . 4))
 
 
 (when t
@@ -2244,16 +2244,13 @@ SAVE-FN with non-nil ARGS."
                                          "\\|tramp"
                                          "\\|.clangd"
                                          "\\|.metadata"
-                                         "\\|.recommenders")
+                                         "\\|.recommenders"
+                                         "\\|typings")
         counsel-mode-override-describe-bindings t
         counsel-preselect-current-file t
         counsel-switch-buffer-preview-virtual-buffers nil
         counsel-yank-pop-preselect-last t
         counsel-yank-pop-separator "\n------------------------------------------\n")
-
-  ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
-  ;; argument error
-  ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
 
   (diminish 'counsel-mode))
 
@@ -2295,15 +2292,15 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
-;; FIXME: This is expensive.
+;; LATER: This is expensive, we can possibly reduce the size of the list. But we can also search
+;; easily with `ivy', so maybe sorting is not very important given the overhead.
 ;; (with-eval-after-load 'ivy
 ;;   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
-;; (setq ivy-sort-matches-functions-alist
-;;       '((t . ivy--prefix-sort)))
-;; (add-to-list
-;;  'ivy-sort-matches-functions-alist
-;;  '(read-file-name-internal . ivy--sort-files-by-date))
+;; (setq ivy-sort-matches-functions-alist '((t . ivy--prefix-sort)))
+
+;; (add-to-list 'ivy-sort-matches-functions-alist
+;;              '(read-file-name-internal . ivy--sort-files-by-date))
 
 
 (with-eval-after-load 'company
@@ -6223,11 +6220,12 @@ Ignore if no file is found."
   (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp)))
 
 
-(unless (fboundp 'texinfo-mode)
-  (autoload #'texinfo-mode "texinfo" nil t))
+(progn
+  (unless (fboundp 'texinfo-mode)
+    (autoload #'texinfo-mode "texinfo" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode))
+  (add-to-list 'auto-mode-alist '("\\.texi\\'" . texinfo-mode)))
 
 
 (when nil
@@ -6348,6 +6346,11 @@ Ignore if no file is found."
 
 
 (when nil
+  (unless (fboundp 'mlir-mode)
+    (autoload #'mlir-mode "mlir-mode")))
+
+
+(when nil
   (progn
     (with-eval-after-load 'mlir-mode
       (unless (fboundp 'clang-format)
@@ -6367,6 +6370,7 @@ Ignore if no file is found."
 
       (setq clang-format+-always-enable t))
     ))
+
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support tramp and supports fewer formatters.
@@ -6523,7 +6527,7 @@ Ignore if no file is found."
                   (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
 
                 (when (derived-mode-p 'sh-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-bash)))))))
+                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
 
                 (when (derived-mode-p 'c++-mode)
                   (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
@@ -6585,9 +6589,9 @@ Ignore if no file is found."
 
   ;; Slightly larger value to have more precise matches and so that the popup does not block
   (setq-local company-minimum-prefix-length 3)
-  ;; Give priority to dabbrev completions over ispell
   (set (make-local-variable 'company-backends)
        '(company-files
+         ;; Give priority to dabbrev completions over ispell
          (:separate
           company-dabbrev
           company-ispell)
@@ -6602,6 +6606,7 @@ Ignore if no file is found."
   (defvar company-minimum-prefix-length)
   (defvar company-backends)
 
+  (setq-local company-minimum-prefix-length 2)
   (make-local-variable 'company-backends)
   (setq company-backends '(company-capf
                            company-files
