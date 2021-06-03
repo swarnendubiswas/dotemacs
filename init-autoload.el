@@ -334,7 +334,7 @@ This location is used for temporary installations and files.")
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      echo-keystrokes 0.5 ; Show current key sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
@@ -1531,11 +1531,6 @@ SAVE-FN with non-nil ARGS."
     ))
 
 
-(declare-function org-indent-mode "org-indent")
-
-(unless (fboundp 'org-indent-mode)
-  (autoload #'org-indent-mode "org-indent" nil t))
-
 (with-eval-after-load 'org
   (defvar org-fontify-done-headline)
   (defvar org-fontify-whole-heading-line)
@@ -1587,41 +1582,63 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'org-mode-hook (lambda ()
                              (visual-line-mode 1)
-                             (org-indent-mode 1)
-                             (prettify-symbols-mode 1)))
-
-  (diminish 'org-indent-mode))
+                             (prettify-symbols-mode 1))))
 
 
-(unless (fboundp 'org-bullets-mode)
-  (autoload #'org-bullets-mode "org-bullets" nil t))
+(progn
+  (declare-function org-indent-mode "org-indent")
 
-(add-hook 'org-mode-hook #'org-bullets-mode)
+  (unless (fboundp 'org-indent-mode)
+    (autoload #'org-indent-mode "org-indent"))
+
+  (add-hook 'org-mode-hook #'org-indent-mode)
+
+  (with-eval-after-load 'org-indent
+    (diminish 'org-indent-mode)))
+
+
+(progn
+  (unless (fboundp 'org-bullets-mode)
+    (autoload #'org-bullets-mode "org-bullets" nil t))
+
+  (add-hook 'org-mode-hook #'org-bullets-mode))
 
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; isearch candidates
-(unless (fboundp 'isearch-forward-regexp)
-  (autoload #'isearch-forward-regexp "isearch" nil t))
-(unless (fboundp 'isearch-repeat-forward)
-  (autoload #'isearch-repeat-forward "isearch" nil t))
-(unless (fboundp 'isearch-occur)
-  (autoload #'isearch-occur "isearch" nil t))
+(progn
+  (unless (fboundp 'isearch-forward-regexp)
+    (autoload #'isearch-forward-regexp "isearch" nil t))
+  (unless (fboundp 'isearch-repeat-forward)
+    (autoload #'isearch-repeat-forward "isearch" nil t))
+  (unless (fboundp 'isearch-occur)
+    (autoload #'isearch-occur "isearch" nil t))
 
-(with-eval-after-load 'isearch
-  (setq search-highlight t) ; Highlight incremental search
+  (with-eval-after-load 'isearch
+    (setq search-highlight t) ; Highlight incremental search
 
-  (unless (fboundp 'isearch-symbol-at-point)
-    (autoload #'isearch-symbol-at-point "isearch-symbol-at-point" nil t))
-  (unless (fboundp 'isearch-backward-symbol-at-point)
-    (autoload #'isearch-backward-symbol-at-point "isearch-symbol-at-point" nil t))
+    (unless (fboundp 'isearch-symbol-at-point)
+      (autoload #'isearch-symbol-at-point "isearch-symbol-at-point" nil t))
+    (unless (fboundp 'isearch-backward-symbol-at-point)
+      (autoload #'isearch-backward-symbol-at-point "isearch-symbol-at-point" nil t))
 
-  (unless (fboundp 'isearch-dabbrev-expand)
-    (autoload #'isearch-dabbrev-expand "isearch-dabbrev" nil t))
+    (unless (fboundp 'isearch-dabbrev-expand)
+      (autoload #'isearch-dabbrev-expand "isearch-dabbrev" nil t))
 
-  (bind-keys :package isearch-dabbrev :map isearch-mode-map
-             ("<tab>" . isearch-dabbrev-expand))
+    (bind-keys :package isearch-dabbrev :map isearch-mode-map
+               ("<tab>" . isearch-dabbrev-expand)))
 
+  ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
+  (bind-keys :package isearch
+             ("C-s")
+             ("C-f"     . isearch-forward-regexp)
+             :map isearch-mode-map
+             ("C-s")
+             ("C-f"     . isearch-repeat-forward)
+             ("C-c C-o" . isearch-occur)))
+
+
+(progn
   (unless (fboundp 'global-anzu-mode)
     (autoload #'global-anzu-mode "anzu" nil t))
 
@@ -1640,15 +1657,6 @@ SAVE-FN with non-nil ARGS."
   ;;   (set-face-attribute 'anzu-mode-line nil :foreground "blue" :weight 'light))
 
   (diminish 'anzu-mode))
-
-;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
-(bind-keys :package isearch
-           ("C-s")
-           ("C-f"     . isearch-forward-regexp)
-           :map isearch-mode-map
-           ("C-s")
-           ("C-f"     . isearch-repeat-forward)
-           ("C-c C-o" . isearch-occur))
 
 
 (unless (fboundp 'swiper)
@@ -2002,55 +2010,58 @@ SAVE-FN with non-nil ARGS."
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 
-(unless (fboundp 'snippet-mode)
-  (autoload #'snippet-mode "yasnippet" nil t))
-(unless (fboundp 'yas-global-mode)
-  (autoload #'yas-global-mode "yasnippet" nil t))
+(progn
+  (unless (fboundp 'snippet-mode)
+    (autoload #'snippet-mode "yasnippet" nil t))
+  (unless (fboundp 'yas-global-mode)
+    (autoload #'yas-global-mode "yasnippet" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("/\\.emacs\\.d/snippets/" . snippet-mode))
+  (add-to-list 'auto-mode-alist '("/\\.emacs\\.d/snippets/" . snippet-mode))
 
-(add-hook 'text-mode-hook #'yas-global-mode)
-(add-hook 'prog-mode-hook #'yas-global-mode)
+  (add-hook 'text-mode-hook #'yas-global-mode)
+  (add-hook 'prog-mode-hook #'yas-global-mode)
 
-(with-eval-after-load 'yasnippet
-  (defvar yas-snippet-dirs)
-  (defvar yas-verbosity)
+  (with-eval-after-load 'yasnippet
+    (defvar yas-snippet-dirs)
+    (defvar yas-verbosity)
 
-  (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
-        yas-verbosity 1)
+    (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
+          yas-verbosity 1)
 
-  (diminish 'yas-minor-mode)
+    (diminish 'yas-minor-mode)
 
-  (unless (fboundp 'yasnippet-snippets-initialize)
-    (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
+    (unless (fboundp 'yasnippet-snippets-initialize)
+      (autoload #'yasnippet-snippets-initialize "yasnippet-snippets" nil t))
 
-  (yasnippet-snippets-initialize))
+    (yasnippet-snippets-initialize)))
 
 
-(with-eval-after-load 'ivy
-  (unless (fboundp 'ivy-yasnippet)
-    (autoload #'ivy-yasnippet "ivy-yasnippet" nil t))
+(progn
+  (with-eval-after-load 'ivy
+    (unless (fboundp 'ivy-yasnippet)
+      (autoload #'ivy-yasnippet "ivy-yasnippet" nil t))
 
-  (bind-keys :package ivy-yasnippet
-             ("C-M-y" . ivy-yasnippet)))
+    (bind-keys :package ivy-yasnippet
+               ("C-M-y" . ivy-yasnippet))))
 
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
-(unless (fboundp 'amx-mode)
-  (autoload #'amx-mode "amx" nil t))
+(progn
+  (unless (fboundp 'amx-mode)
+    (autoload #'amx-mode "amx" nil t))
 
-(add-hook 'after-init-hook #'amx-mode)
+  (add-hook 'after-init-hook #'amx-mode)
 
-(with-eval-after-load 'amx
-  (defvar amx-save-file)
-  (defvar amx-auto-update-interval)
+  (with-eval-after-load 'amx
+    (defvar amx-save-file)
+    (defvar amx-auto-update-interval)
 
-  (setq amx-auto-update-interval 5) ; Update the command list every n minutes
+    (setq amx-auto-update-interval 5) ; Update the command list every n minutes
 
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory))))
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory)))))
 
 
 (declare-function ivy-alt-done "ivy")
@@ -2263,32 +2274,33 @@ SAVE-FN with non-nil ARGS."
            ([remap find-file]                . counsel-find-file)
            ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
            ;; ([remap flycheck-list-errors]  . counsel-flycheck)
-           ("<f1>"    . counsel-M-x)
-           ("<f2>"    . counsel-find-file)
-           ("C-c s g" . counsel-git-grep)
-           ("C-<f9>"  . sb/counsel-goto-recent-directory)
-           ("C-c d m" . counsel-minor)
-           ("<f9>"    . counsel-recentf)
-           ("C-c s r" . counsel-rg)
-           ("C-c C-m" . counsel-mark-ring)
+           ("<f1>"                           . counsel-M-x)
+           ("<f2>"                           . counsel-find-file)
+           ("C-c s g"                        . counsel-git-grep)
+           ("C-<f9>"                         . sb/counsel-goto-recent-directory)
+           ("C-c d m"                        . counsel-minor)
+           ("<f9>"                           . counsel-recentf)
+           ("C-c s r"                        . counsel-rg)
+           ("C-c C-m"                        . counsel-mark-ring)
            ;; Enabling preview can make switching over remote buffers slow
-           ;; ("<f3>" . counsel-switch-buffer)
-           ("<f4>"    . counsel-grep-or-swiper))
+           ;; ("<f3>"                        . counsel-switch-buffer)
+           ("<f4>"                           . counsel-grep-or-swiper))
 
 
-(declare-function prescient-persist-mode "prescient")
+(progn
+  (declare-function prescient-persist-mode "prescient")
 
-(unless (fboundp 'prescient-persist-mode)
-  (autoload #'prescient-persist-mode "prescient" nil t))
+  (unless (fboundp 'prescient-persist-mode)
+    (autoload #'prescient-persist-mode "prescient" nil t))
 
-(add-hook 'after-init-hook #'prescient-persist-mode)
+  (add-hook 'after-init-hook #'prescient-persist-mode)
 
-(with-eval-after-load 'prescient
-  (defvar prescient-history-length)
-  (defvar prescient-save-file)
+  (with-eval-after-load 'prescient
+    (defvar prescient-history-length)
+    (defvar prescient-save-file)
 
-  (unless (bound-and-true-p sb/use-no-littering)
-    (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory))))
+    (unless (bound-and-true-p sb/use-no-littering)
+      (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory)))))
 
 
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
@@ -4406,6 +4418,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
+;; Convert `markdown' to `org': `pandoc -f markdown -t org -o output-file.org input-file.md'
 (progn
   (declare-function pandoc-load-default-settings "pandoc-mode")
 
@@ -4439,16 +4452,17 @@ This file is specified in `counsel-projectile-default-file'."
 ;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
 
-(when nil
+(when t
   (when (executable-find "prettier")
     (progn
       (unless (fboundp 'prettier-mode)
         (autoload #'prettier-mode "prettier" nil t))
 
-      ;; Should work with `gfm-mode', `css-mode', and `html-mode'
-      (dolist (hook '(markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook))
+      ;; Should work with `gfm-mode', `css-mode', and `html-mode' as they are derived modes
+      (dolist (hook '(markdown-mode-hook web-mode-hook
+                                         json-mode-hook jsonc-mode-hook js2-mode-hook))
         (add-hook hook (lambda ()
-                         (when (and buffer-file-name
+                         (when (and buffer-file-name ; Returns `nil' if not visiting a file
                                     (not (file-remote-p buffer-file-name)))
                            (prettier-mode 1)))))
 
@@ -4769,6 +4783,8 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-modeline-diagnostics-enable)
   (defvar lsp-enable-which-key-integration)
 
+  ;; We can add "--compile-commands-dir=build" option to indicate the directory where
+  ;; `compile_commands.json' reside
   (setq lsp-clients-clangd-args '("-j=2"
                                   "--background-index"
                                   "--clang-tidy"
@@ -6582,23 +6598,25 @@ Ignore if no file is found."
 (unless (fboundp 'company-yasnippet)
   (autoload #'company-yasnippet "company-yasnippet" nil t))
 
-(defun sb/company-text-mode ()
-  "Add backends for text completion in company mode."
-  (defvar company-minimum-prefix-length)
-  (defvar company-backends)
 
-  ;; Slightly larger value to have more precise matches and so that the popup does not block
-  (setq-local company-minimum-prefix-length 3)
-  (set (make-local-variable 'company-backends)
-       '(company-files
-         ;; Give priority to dabbrev completions over ispell
-         (:separate
-          company-dabbrev
-          company-ispell)
-         )))
+(progn
+  (defun sb/company-text-mode ()
+    "Add backends for text completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-(dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
-  (add-hook hook #'sb/company-text-mode))
+    ;; Slightly larger value to have more precise matches and so that the popup does not block
+    (setq-local company-minimum-prefix-length 3)
+    (set (make-local-variable 'company-backends)
+         '(company-files
+           ;; Give priority to dabbrev completions over ispell
+           (:separate
+            company-dabbrev
+            company-ispell)
+           )))
+
+  (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
+    (add-hook hook #'sb/company-text-mode)))
 
 
 (defun sb/company-xml-mode ()
@@ -6619,54 +6637,57 @@ Ignore if no file is found."
                    (sb/company-xml-mode))))
 
 
-(defun sb/company-prog-mode ()
-  "Add backends for program completion in company mode."
-  (defvar company-minimum-prefix-length)
-  (defvar company-backends)
+(progn
+  (defun sb/company-prog-mode ()
+    "Add backends for program completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  (setq company-backends '(company-capf
-                           company-files
-                           company-yasnippet
-                           company-dabbrev-code
-                           company-dabbrev)))
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)))
 
-(add-hook 'prog-mode-hook #'sb/company-prog-mode)
+  (add-hook 'prog-mode-hook #'sb/company-prog-mode))
 
 
-(defun sb/company-java-mode ()
-  "Add backends for Java completion in company mode."
-  (defvar company-minimum-prefix-length)
-  (defvar company-backends)
+(progn
+  (defun sb/company-java-mode ()
+    "Add backends for Java completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  (setq company-backends '(company-capf
-                           company-files
-                           company-yasnippet
-                           company-dabbrev-code
-                           company-dabbrev)))
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)))
 
-(add-hook 'java-mode-hook #'sb/company-java-mode)
+  (add-hook 'java-mode-hook #'sb/company-java-mode))
 
 
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
 ;; `company-clang' is slow
-(defun sb/company-c-mode ()
-  "Add backends for C/C++ completion in company mode."
-  (defvar company-minimum-prefix-length)
-  (defvar company-backends)
+(progn
+  (defun sb/company-c-mode ()
+    "Add backends for C/C++ completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  (setq company-backends '(company-capf
-                           company-files
-                           company-yasnippet
-                           company-dabbrev-code
-                           company-dabbrev)))
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)))
 
-(add-hook 'c-mode-common-hook #'sb/company-c-mode)
+  (add-hook 'c-mode-common-hook #'sb/company-c-mode))
 
 
 (unless (fboundp 'company-shell)
@@ -6716,21 +6737,22 @@ Ignore if no file is found."
 (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode)
 
 
-(defun sb/company-python-mode ()
-  "Add backends for Python completion in company mode."
-  (defvar company-minimum-prefix-length)
-  (defvar company-backends)
+(progn
+  (defun sb/company-python-mode ()
+    "Add backends for Python completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-  (setq-local company-minimum-prefix-length 2)
-  (make-local-variable 'company-backends)
-  ;; `company-dabbrev-code' is useful for variable names.
-  (setq company-backends '(company-capf
-                           company-files
-                           company-yasnippet
-                           company-dabbrev-code
-                           company-dabbrev)))
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    ;; `company-dabbrev-code' is useful for variable names.
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)))
 
-(add-hook 'python-mode-hook #'sb/company-python-mode)
+  (add-hook 'python-mode-hook #'sb/company-python-mode))
 
 
 (progn
@@ -6961,10 +6983,9 @@ Increase the line spacing to help readability. Increase line spacing by two line
 ;; used.
 (defcustom sb/skippable-buffers
   '(
-    "TAGS"
-    ;; "*Backtrace*"
+    "TAGS" "*Messages*" "*Backtrace*"
     ;; "*company-documentation*" ; Major mode is `python-mode'
-    ;; "*Messages*" "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
+    ;; "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
     ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
     ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"
     ;; "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*"

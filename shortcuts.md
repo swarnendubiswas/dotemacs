@@ -133,6 +133,9 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 
 ## Org mode
 
+- `M-ret` - Insert a new heading or wrap a region in a table (`org-meta-return`)
+- `C-c C-l` - Insert a link (`org-insert-link`). When the cursor is on a link, then edit the invisible link and the description.
+- `C-c C-o` - Open link at point (`org-open-at-point`)
 - `C-u C-c .` - Insert date and time (`org-time-stamp`)
 - `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`)
 - `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`)
