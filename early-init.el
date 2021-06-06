@@ -84,8 +84,9 @@
 ;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
-(add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames
-(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ; Maximize all frames
+;; Maximize all frames
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)
