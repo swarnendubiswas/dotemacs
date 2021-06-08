@@ -77,7 +77,7 @@ This depends on the orientation of the display."
 
 
 (defcustom sb/selection
-  'selectrum
+  'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "ivy" ivy)
@@ -265,7 +265,7 @@ This location is used for temporary installations and files.")
 
   (add-hook 'after-init-hook #'gcmh-mode)
 
-  (with-eval-after-load 'gcmh
+  (with-eval-after-load "gcmh"
     (when (bound-and-true-p sb/debug-init-file)
       (defvar gcmh-verbose)
 
@@ -282,7 +282,7 @@ This location is used for temporary installations and files.")
   (unless (fboundp 'paradox-enable)
     (autoload #'paradox-enable "paradox" nil t))
 
-  (with-eval-after-load 'paradox
+  (with-eval-after-load "paradox"
     (defvar paradox-display-star-count)
     (defvar paradox-execute-asynchronously)
     (defvar paradox-github-token)
@@ -484,7 +484,7 @@ This location is used for temporary installations and files.")
 
   (run-with-idle-timer 2 nil #'global-auto-revert-mode)
 
-  (with-eval-after-load 'autorevert
+  (with-eval-after-load "autorevert"
     (defvar auto-revert-interval)
     (defvar auto-revert-remote-files)
     (defvar auto-revert-use-notify)
@@ -516,7 +516,7 @@ This location is used for temporary installations and files.")
   ;; timer.
   (add-hook 'after-init-hook #'save-place-mode)
 
-  (with-eval-after-load 'saveplace
+  (with-eval-after-load "saveplace"
     (defvar save-place-file)
 
     (unless (bound-and-true-p sb/use-no-littering)
@@ -530,7 +530,7 @@ This location is used for temporary installations and files.")
 
   (run-with-idle-timer 3 nil #'savehist-mode)
 
-  (with-eval-after-load 'savehist
+  (with-eval-after-load "savehist"
     (defvar savehist-additional-variables)
     (defvar savehist-file)
     (defvar savehist-save-minibuffer-history)
@@ -574,7 +574,7 @@ This location is used for temporary installations and files.")
 
   (add-hook 'prog-mode-hook #'subword-mode)
 
-  (with-eval-after-load 'subword
+  (with-eval-after-load "subword"
     (diminish 'subword-mode)))
 
 
@@ -616,7 +616,7 @@ SAVE-FN with non-nil ARGS."
   ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' quickly can be useful
   (add-hook 'text-mode-hook #'abbrev-mode)
 
-  (with-eval-after-load 'abbrev
+  (with-eval-after-load "abbrev"
     (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
           save-abbrevs 'silently)
 
@@ -675,7 +675,7 @@ SAVE-FN with non-nil ARGS."
 
   (run-with-idle-timer 3 nil #'global-so-long-mode)
 
-  ;; (with-eval-after-load 'so-long
+  ;; (with-eval-after-load "so-long"
   ;;   (defvar so-long-threshold)
 
   ;;   (setq so-long-threshold 500))
@@ -695,7 +695,7 @@ SAVE-FN with non-nil ARGS."
           t
         nil)))
 
-  (with-eval-after-load 'all-the-icons
+  (with-eval-after-load "all-the-icons"
     (unless (sb/font-installed-p "all-the-icons")
       (all-the-icons-install-fonts t))
 
@@ -1015,7 +1015,7 @@ SAVE-FN with non-nil ARGS."
 
       (add-hook 'after-init-hook #'centaur-tabs-mode)
 
-      (with-eval-after-load 'centaur-tabs
+      (with-eval-after-load "centaur-tabs"
         (defvar centaur-tabs-cycle-scope)
         (defvar centaur-tabs-set-close-button)
         (defvar centaur-tabs-set-icons)
@@ -1088,7 +1088,7 @@ SAVE-FN with non-nil ARGS."
 
     (run-with-idle-timer 3 nil #'beacon-mode)
 
-    (with-eval-after-load 'beacon
+    (with-eval-after-load "beacon"
       (diminish 'beacon-mode))))
 
 
@@ -1106,7 +1106,7 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
 
-  (with-eval-after-load 'ibuf-ext
+  (with-eval-after-load "ibuf-ext"
     ;; Do not show filter groups if there are no buffers in that group
     (defvar ibuffer-show-empty-filter-groups)
 
@@ -1126,7 +1126,7 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'ibuffer-mode-hook #'all-the-icons-ibuffer-mode)
 
-  (with-eval-after-load 'all-the-icons-ibuffer
+  (with-eval-after-load "all-the-icons-ibuffer"
     (defvar all-the-icons-ibuffer-human-readable-size)
     (defvar all-the-icons-ibuffer-icon-size)
 
@@ -1141,7 +1141,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'bufler-mode)
     (autoload #'bufler-mode "bufler" nil t))
 
-  (with-eval-after-load 'bufler
+  (with-eval-after-load "bufler"
     (bufler-mode 1)
 
     (diminish 'bufler-workspace-mode)))
@@ -1187,7 +1187,7 @@ SAVE-FN with non-nil ARGS."
      (point-max))
     (dired-next-line -1)))
 
-(with-eval-after-load 'dired
+(with-eval-after-load "dired"
   (defvar dired-auto-revert-buffer)
   (defvar dired-dwim-target)
   (defvar dired-ls-F-marks-symlinks)
@@ -1231,7 +1231,7 @@ SAVE-FN with non-nil ARGS."
   (bind-keys :package dired-narrow :map dired-mode-map
              ("/" . dired-narrow)))
 
-(with-eval-after-load 'dired-x
+(with-eval-after-load "dired-x"
   ;; Do not show messages when omitting files
   (defvar dired-omit-verbose)
 
@@ -1268,7 +1268,7 @@ SAVE-FN with non-nil ARGS."
 (add-hook 'dired-mode-hook (lambda ()
                              (diredp-toggle-find-file-reuse-dir 1)))
 
-(with-eval-after-load 'dired+
+(with-eval-after-load "dired+"
   (defvar diredp-hide-details-initially-flag)
   (defvar diredp-hide-details-propagate-flag)
 
@@ -1300,7 +1300,7 @@ SAVE-FN with non-nil ARGS."
 
 (add-hook 'dired-mode-hook #'dired-async-mode)
 
-(with-eval-after-load 'dired-async
+(with-eval-after-load "dired-async"
   (diminish 'dired-async-mode))
 
 
@@ -1310,7 +1310,7 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
 
-  (with-eval-after-load 'all-the-icons-dired
+  (with-eval-after-load "all-the-icons-dired"
     (diminish 'all-the-icons-dired-mode)))
 
 
@@ -1411,7 +1411,7 @@ SAVE-FN with non-nil ARGS."
               (when (featurep 'auto-dim-other-buffers)
                 (adob--rescan-windows))))))
 
-      (with-eval-after-load 'treemacs
+      (with-eval-after-load "treemacs"
         (defvar treemacs-collapse-dirs)
         (defvar treemacs-follow-after-init)
         (defvar treemacs-indentation)
@@ -1541,7 +1541,7 @@ SAVE-FN with non-nil ARGS."
     ))
 
 
-(with-eval-after-load 'org
+(with-eval-after-load "org"
   (defvar org-fontify-done-headline)
   (defvar org-fontify-whole-heading-line)
   (defvar org-hide-emphasis-markers)
@@ -1560,6 +1560,7 @@ SAVE-FN with non-nil ARGS."
   (defvar org-src-strip-leading-and-trailing-blank-lines)
   (defvar org-pretty-entities)
   (defvar org-pretty-entities-include-sub-superscripts)
+  (defvar org-footnote-auto-adjust)
 
   (setq org-fontify-done-headline t
         org-fontify-whole-heading-line t
@@ -1584,11 +1585,20 @@ SAVE-FN with non-nil ARGS."
         ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
         org-pretty-entities t
         ;; Render subscripts and superscripts in org buffers
-        org-pretty-entities-include-sub-superscripts t)
+        org-pretty-entities-include-sub-superscripts t
+        ;; Automatically sorted and renumbered whenever I insert a new one
+        org-footnote-auto-adjust t
+        )
 
   (defvar org-mode-map)
-  (unbind-key "M-<left>" org-mode-map)
-  (unbind-key "M-<right>" org-mode-map)
+  ;; (unbind-key "M-<left>" org-mode-map)
+  ;; (unbind-key "M-<right>" org-mode-map)
+
+  (bind-keys :package org :map org-mode-map
+             ("M-<left>")
+             ("M-<right>")
+             ("<tab>"      . org-indent-item)
+             ("<backtab>"  . org-outdent-item))
 
   (add-hook 'org-mode-hook (lambda ()
                              (visual-line-mode 1)
@@ -1597,13 +1607,15 @@ SAVE-FN with non-nil ARGS."
 
 (progn
   (declare-function org-indent-mode "org-indent")
+  (declare-function org-indent-item "org-indent")
+  (declare-function org-outdent-item "org-indent")
 
   (unless (fboundp 'org-indent-mode)
     (autoload #'org-indent-mode "org-indent"))
 
   (add-hook 'org-mode-hook #'org-indent-mode)
 
-  (with-eval-after-load 'org-indent
+  (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode)))
 
 
@@ -1627,7 +1639,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'isearch-occur)
     (autoload #'isearch-occur "isearch" nil t))
 
-  (with-eval-after-load 'isearch
+  (with-eval-after-load "isearch"
     (setq search-highlight t) ; Highlight incremental search
 
     (unless (fboundp 'isearch-symbol-at-point)
@@ -1678,14 +1690,14 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'swiper-isearch)
     (autoload #'swiper-isearch "swiper" nil t))
 
-  (with-eval-after-load 'swiper
+  (with-eval-after-load "swiper"
     (defvar swiper-action-recenter)
 
     (setq swiper-action-recenter t)))
 
 
 (progn
-  (with-eval-after-load 'grep
+  (with-eval-after-load "grep"
     (defvar grep-highlight-matches)
     (defvar grep-scroll-output)
     (defvar grep-find-ignored-directories)
@@ -1715,7 +1727,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'wgrep-change-to-wgrep-mode)
     (autoload #'wgrep-change-to-wgrep-mode "wgrep" nil t))
 
-  (with-eval-after-load 'wgrep
+  (with-eval-after-load "wgrep"
     (defvar wgrep-auto-save-buffer)
 
     (setq wgrep-auto-save-buffer t))
@@ -1755,7 +1767,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'ctrlf-backward-regexp)
     (autoload #'ctrlf-backward-regexp "ctrlf" nil t))
 
-  (with-eval-after-load 'ctrlf
+  (with-eval-after-load "ctrlf"
     (ctrlf-mode 1)
 
     (add-hook 'pdf-isearch-minor-mode-hook
@@ -1768,6 +1780,11 @@ SAVE-FN with non-nil ARGS."
              ("C-M-s" . ctrlf-forward-regexp)
              ("C-M-r" . ctrlf-backward-regexp)))
 
+
+(progn
+  (defvar reb-re-syntax)
+
+  (setq reb-re-syntax 'string))
 
 (progn
   (unless (fboundp 'vr/query-replace)
@@ -1794,7 +1811,7 @@ SAVE-FN with non-nil ARGS."
   ;; Load immediately after start since I use it often
   (add-hook 'after-init-hook #'recentf-mode)
 
-  (with-eval-after-load 'recentf
+  (with-eval-after-load "recentf"
     (defvar recentf-auto-cleanup)
     (defvar recentf-exclude)
     (defvar recentf-max-saved-items)
@@ -1891,7 +1908,7 @@ SAVE-FN with non-nil ARGS."
       (company-abort)
       (save-buffer)))
 
-  (with-eval-after-load 'company
+  (with-eval-after-load "company"
     (defvar company-dabbrev-other-buffers)
     (defvar company-idle-delay)
     (defvar company-ispell-available)
@@ -1967,7 +1984,7 @@ SAVE-FN with non-nil ARGS."
           ;; LATER: This is not working.
           (company-box-mode 1)
 
-          (with-eval-after-load 'company-box
+          (with-eval-after-load "company-box"
             (defvar company-box-icons-alist)
             (defvar company-box-show-single-candidate)
             (defvar company-frontends)
@@ -2040,7 +2057,7 @@ SAVE-FN with non-nil ARGS."
   (add-hook 'text-mode-hook #'yas-global-mode)
   (add-hook 'prog-mode-hook #'yas-global-mode)
 
-  (with-eval-after-load 'yasnippet
+  (with-eval-after-load "yasnippet"
     (defvar yas-snippet-dirs)
     (defvar yas-verbosity)
 
@@ -2056,7 +2073,7 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (eq sb/selection 'ivy)
-  (with-eval-after-load 'ivy
+  (with-eval-after-load "ivy"
     (progn
       (declare-function ivy-yasnippet "ivy-yasnippet")
 
@@ -2075,7 +2092,7 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'after-init-hook #'amx-mode)
 
-  (with-eval-after-load 'amx
+  (with-eval-after-load "amx"
     (defvar amx-save-file)
     (defvar amx-auto-update-interval)
 
@@ -2119,7 +2136,7 @@ SAVE-FN with non-nil ARGS."
           (and buf (eq (buffer-local-value 'major-mode buf)
                        'dired-mode)))))
 
-    (with-eval-after-load 'ivy
+    (with-eval-after-load "ivy"
       (defvar ivy-initial-inputs-alist)
       (defvar ivy-case-fold-search)
       (defvar ivy-count-format)
@@ -2172,7 +2189,7 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (eq sb/selection 'ivy)
-  (with-eval-after-load 'ivy
+  (with-eval-after-load "ivy"
     (progn
       (unless (fboundp 'counsel-mode)
         (autoload #'counsel-mode "counsel" nil t))
@@ -2233,7 +2250,7 @@ SAVE-FN with non-nil ARGS."
                        "\n" t))))))
             (ivy-read "Directories:" collection :action 'dired))))
 
-      (with-eval-after-load 'counsel
+      (with-eval-after-load "counsel"
         (defvar counsel-describe-function-function)
         (defvar counsel-describe-variable-function)
         (defvar counsel-find-file-at-point)
@@ -2323,7 +2340,7 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'after-init-hook #'prescient-persist-mode)
 
-  (with-eval-after-load 'prescient
+  (with-eval-after-load "prescient"
     (defvar prescient-history-length)
     (defvar prescient-save-file)
 
@@ -2334,7 +2351,7 @@ SAVE-FN with non-nil ARGS."
 ;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
 ;; LATER: This is expensive, we can possibly reduce the size of the list. But we can also search
 ;; easily with `ivy', so maybe sorting is not very important given the overhead.
-;; (with-eval-after-load 'ivy
+;; (with-eval-after-load "ivy"
 ;;   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
 
 ;; (setq ivy-sort-matches-functions-alist '((t . ivy--prefix-sort)))
@@ -2343,7 +2360,7 @@ SAVE-FN with non-nil ARGS."
 ;;              '(read-file-name-internal . ivy--sort-files-by-date))
 
 
-(with-eval-after-load 'company
+(with-eval-after-load "company"
   (unless (fboundp 'company-prescient-mode)
     (autoload #'company-prescient-mode "company-prescient" nil t))
 
@@ -2357,7 +2374,7 @@ SAVE-FN with non-nil ARGS."
 
 
 (when (eq sb/selection 'ivy)
-  (with-eval-after-load 'ivy
+  (with-eval-after-load "ivy"
     (progn
       (unless (fboundp 'all-the-icons-ivy-setup)
         (autoload #'all-the-icons-ivy-setup "all-the-icons-ivy" nil t))
@@ -2383,14 +2400,14 @@ SAVE-FN with non-nil ARGS."
   ;; (advice-add 'company-capf--candidates :around #'sb/just-one-face)
 
   (when (eq sb/selection 'ivy)
-    (with-eval-after-load 'ivy
+    (with-eval-after-load "ivy"
       (defvar ivy-re-builders-alist)
       (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))))
   )
 
 
 (when (symbol-value 'sb/IS-LINUX)
-  (with-eval-after-load 'ispell
+  (with-eval-after-load "ispell"
     (defvar ispell-dictionary)
     (defvar ispell-extra-args)
     (defvar ispell-local-dictionary)
@@ -2487,7 +2504,7 @@ SAVE-FN with non-nil ARGS."
                 (setq arg 0))
             (forward-word))))))
 
-  (with-eval-after-load 'flyspell
+  (with-eval-after-load "flyspell"
     (defvar flyspell-abbrev-p)
     (defvar flyspell-issue-message-flag)
     (defvar flyspell-issue-welcome-flag)
@@ -2631,7 +2648,7 @@ SAVE-FN with non-nil ARGS."
   (dolist (hook '(yaml-mode-hook python-mode-hook))
     (add-hook hook #'highlight-indentation-mode))
 
-  (with-eval-after-load 'highlight-indentation
+  (with-eval-after-load "highlight-indentation"
     (diminish 'highlight-indentation-mode)
     (diminish 'highlight-indentation-current-column-mode)))
 
@@ -2644,7 +2661,7 @@ SAVE-FN with non-nil ARGS."
   (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
     (add-hook hook #'aggressive-indent-mode))
 
-  (with-eval-after-load 'aggressive-indent
+  (with-eval-after-load "aggressive-indent"
     (defvar aggressive-indent-comments-too)
     (defvar aggressive-indent-dont-electric-modes)
 
@@ -2661,7 +2678,7 @@ SAVE-FN with non-nil ARGS."
 
   (run-at-time 3 nil #'show-paren-mode)
 
-  (with-eval-after-load 'paren
+  (with-eval-after-load "paren"
     (defvar show-paren-style)
     (defvar show-paren-when-point-inside-paren)
     (defvar show-paren-when-point-in-periphery)
@@ -2678,7 +2695,7 @@ SAVE-FN with non-nil ARGS."
   ;; Enable autopairing, `smartparens' seems slow
   (run-at-time 2 nil #'electric-pair-mode)
 
-  (with-eval-after-load 'elec-pair
+  (with-eval-after-load "elec-pair"
     ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
     (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
     (defvar electric-pair-pairs)
@@ -2794,7 +2811,7 @@ SAVE-FN with non-nil ARGS."
 (unless (fboundp 'projectile-mode)
   (autoload #'projectile-mode "projectile" nil t))
 
-(with-eval-after-load 'projectile
+(with-eval-after-load "projectile"
   (defvar projectile-auto-discover)
   (defvar projectile-enable-caching)
   (defvar projectile-file-exists-remote-cache-expire)
@@ -2819,7 +2836,7 @@ SAVE-FN with non-nil ARGS."
         projectile-mode-line-prefix ""
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
-        projectile-sort-order 'recentf ; No sorting should be faster
+        projectile-sort-order 'recently-active ; No sorting should be faster
         projectile-verbose nil
         ;; This can help reduce the overhead with large projects, but then recent files information
         ;; may be incomplete
@@ -2977,7 +2994,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     )
 
-  (with-eval-after-load 'counsel-projectile
+  (with-eval-after-load "counsel-projectile"
     (defvar counsel-projectile-remove-current-buffer)
     (defvar counsel-projectile-sort-directories)
     (defvar counsel-projectile-sort-files)
@@ -3003,8 +3020,8 @@ This file is specified in `counsel-projectile-default-file'."
 
   ;; The `counsel' actions seem to be slower than base `projectile'
   (bind-keys :package counsel-projectile
-             ("<f6>" . counsel-projectile-find-file)
              ("<f5>" . counsel-projectile-switch-project)
+             ("<f6>" . counsel-projectile-find-file)
              ;; ("<f7>" . counsel-projectile-rg)
              ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
              ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
@@ -3024,7 +3041,7 @@ This file is specified in `counsel-projectile-default-file'."
 
       (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
 
-      (with-eval-after-load 'all-the-icons-ivy-rich
+      (with-eval-after-load "all-the-icons-ivy-rich"
         (defvar all-the-icons-ivy-rich-icon-size)
 
         (setq all-the-icons-ivy-rich-icon-size 0.7))))
@@ -3040,7 +3057,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-hook 'ivy-mode-hook #'ivy-rich-mode)
 
-    (with-eval-after-load 'ivy-rich
+    (with-eval-after-load "ivy-rich"
       (defvar ivy-rich-parse-remote-buffer)
       (defvar ivy-format-functions-alist)
 
@@ -3055,7 +3072,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (and (eq sb/selection 'ivy) (executable-find "fd"))
-  (with-eval-after-load 'counsel
+  (with-eval-after-load "counsel"
     (progn
       (unless (fboundp 'counsel-fd-file-jump)
         (autoload #'counsel-fd-file-jump "counsel-fd" nil t))
@@ -3114,7 +3131,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (run-at-time 2 nil #'global-flycheck-mode)
 
-  (with-eval-after-load 'flycheck
+  (with-eval-after-load "flycheck"
     (defvar flycheck-check-syntax-automatically)
     (defvar flycheck-checker-error-threshold)
     (defvar flycheck-idle-buffer-switch-delay)
@@ -3233,7 +3250,7 @@ This file is specified in `counsel-projectile-default-file'."
 
       (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
 
-      (with-eval-after-load 'flycheck-posframe
+      (with-eval-after-load "flycheck-posframe"
         (defvar flycheck-posframe-position)
         (defvar flycheck-posframe-border-width)
 
@@ -3262,7 +3279,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-hook 'markdown-mode-hook #'whitespace-mode)
 
-    (with-eval-after-load 'whitespace
+    (with-eval-after-load "whitespace"
       (defvar whitespace-line-column)
       (defvar whitespace-style)
 
@@ -3294,7 +3311,7 @@ This file is specified in `counsel-projectile-default-file'."
     ;; `.dir-locals.el' file.
     ;; (add-hook 'after-init-hook #'global-whitespace-cleanup-mode)
 
-    (with-eval-after-load 'whitespace-cleanup-mode
+    (with-eval-after-load "whitespace-cleanup-mode"
       (defvar whitespace-cleanup-mode-preserve-point)
       (defvar whitespace-cleanup-mode-ignore-modes)
 
@@ -3312,7 +3329,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'prog-mode-hook #'ws-butler-mode)
 
-  (with-eval-after-load 'ws-butler
+  (with-eval-after-load "ws-butler"
     (diminish 'ws-butler-mode)))
 
 
@@ -3328,7 +3345,7 @@ This file is specified in `counsel-projectile-default-file'."
   (dolist (hook '(prog-mode-hook html-mode-hook yaml-mode-hook conf-mode-hook))
     (add-hook hook #'symbol-overlay-mode))
 
-  (with-eval-after-load 'symbol-overlay
+  (with-eval-after-load "symbol-overlay"
     (diminish 'symbol-overlay-mode))
 
   (bind-keys :package symbol-overlay
@@ -3342,7 +3359,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (run-at-time 5 nil #'global-hl-todo-mode)
 
-  (with-eval-after-load 'hl-todo
+  (with-eval-after-load "hl-todo"
     (defvar hl-todo-highlight-punctuation)
     (defvar hl-todo-keyword-faces)
 
@@ -3372,7 +3389,7 @@ This file is specified in `counsel-projectile-default-file'."
     (unless (fboundp 'number-separator-mode)
       (autoload #'number-separator-mode "number-separator" nil t))
 
-    (with-eval-after-load 'number-separator
+    (with-eval-after-load "number-separator"
       (defvar number-separator)
       (defvar number-separator-interval)
       (defvar number-separator-ignore-threshold)
@@ -3419,7 +3436,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (run-at-time 5 nil #'global-page-break-lines-mode)
 
-  (with-eval-after-load 'page-break-lines
+  (with-eval-after-load "page-break-lines"
     (diminish 'page-break-lines-mode)))
 
 
@@ -3459,7 +3476,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; Disable backup
 (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
 
-(with-eval-after-load 'tramp
+(with-eval-after-load "tramp"
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
@@ -3496,7 +3513,7 @@ This file is specified in `counsel-projectile-default-file'."
     (bind-key "C-c d t" #'sb/selectrum-tramp)))
 
 
-(with-eval-after-load 'imenu
+(with-eval-after-load "imenu"
   (defvar imenu-auto-rescan)
   (defvar imenu-max-items)
   (defvar imenu-max-item-length)
@@ -3543,11 +3560,11 @@ This file is specified in `counsel-projectile-default-file'."
 (unless (fboundp 'xref-etags-mode)
   (autoload #'xref-etags-mode "xref" nil t))
 
-(with-eval-after-load 'xref
+(with-eval-after-load "xref"
   ;; (xref-etags-mode)
 
   (when (eq sb/selection 'ivy)
-    (with-eval-after-load 'ivy
+    (with-eval-after-load "ivy"
       (require 'ivy-xref)
 
       (defvar xref-show-definitions-function)
@@ -3620,7 +3637,7 @@ This file is specified in `counsel-projectile-default-file'."
   (dolist (hook '(prog-mode-hook protobuf-mode-hook LaTex-mode-hook latex-mode-hook))
     (add-hook hook #'counsel-gtags-mode))
 
-  (with-eval-after-load 'counsel-gtags
+  (with-eval-after-load "counsel-gtags"
     (defvar counsel-gtags-auto-update)
 
     (setq counsel-gtags-auto-update t)
@@ -3663,7 +3680,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'counsel-etags-scan-code)
     (autoload #'counsel-etags-scan-code "counsel-etags" nil t))
 
-  (with-eval-after-load 'counsel-etags
+  (with-eval-after-load "counsel-etags"
     (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
     (add-hook 'prog-mode-hook
@@ -3729,7 +3746,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'vlf)
     (autoload #'vlf "vlf" nil t))
 
-  (with-eval-after-load 'vlf
+  (with-eval-after-load "vlf"
     (defvar vlf-application)
 
     (setq vlf-application 'dont-ask)
@@ -3748,7 +3765,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'minibuffer-setup-hook (lambda nil
                                      (hungry-delete-mode -1)))
 
-  (with-eval-after-load 'hungry-delete
+  (with-eval-after-load "hungry-delete"
     (diminish 'hungry-delete-mode)))
 
 
@@ -3825,7 +3842,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-hook 'after-init-hook #'popwin-mode)
 
-    (with-eval-after-load 'popwin
+    (with-eval-after-load "popwin"
       (defvar popwin:special-display-config)
 
       (push '("*Help*" :noselect t) popwin:special-display-config)
@@ -3877,11 +3894,16 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; Expand region by semantic units
 (progn
+  (declare-function er/contract-region "expand-region")
+
   (unless (fboundp 'er/expand-region)
     (autoload #'er/expand-region "expand-region" nil t))
+  (unless (fboundp 'er/contract-region)
+    (autoload #'er/contract-region "expand-region" nil t))
 
   (bind-keys :package er/expand-region
-             ("C-=" . er/expand-region)))
+             ("C-="   . er/expand-region)
+             ("C-M-=" . er/contract-region)))
 
 
 ;; Restore point to the initial location with `C-g' after marking a region
@@ -3901,7 +3923,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (run-at-time 5 nil #'whole-line-or-region-global-mode)
 
-  (with-eval-after-load 'whole-line-or-region
+  (with-eval-after-load "whole-line-or-region"
     (diminish 'whole-line-or-region-local-mode)))
 
 
@@ -3919,7 +3941,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (run-at-time 5 nil #'beginend-global-mode)
 
-  (with-eval-after-load 'beginend
+  (with-eval-after-load "beginend"
     (defvar beginend-modes)
 
     (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
@@ -3934,7 +3956,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'global-undo-tree-mode)
     (autoload #'global-undo-tree-mode "undo-tree" nil t))
 
-  (with-eval-after-load 'undo-tree
+  (with-eval-after-load "undo-tree"
     (defvar undo-tree-auto-save-history)
     (defvar undo-tree-mode-lighter)
     (defvar undo-tree-visualizer-diff)
@@ -3974,7 +3996,7 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-hook 'after-init-hook #'session-initialize)
 
-    (with-eval-after-load 'session
+    (with-eval-after-load "session"
       (defvar session-save-file)
 
       (unless (bound-and-true-p sb/use-no-littering)
@@ -3997,7 +4019,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Delaying loading contents in the `*scratch*' buffer does not look good
   (add-hook 'after-init-hook #'persistent-scratch-setup-default)
 
-  (with-eval-after-load 'persistent-scratch
+  (with-eval-after-load "persistent-scratch"
     (defvar persistent-scratch-autosave-interval)
     (defvar persistent-scratch-save-file)
 
@@ -4023,21 +4045,23 @@ This file is specified in `counsel-projectile-default-file'."
              ("C-c d s" . crux-sudo-edit)))
 
 
-(progn
-  (when (display-mouse-p)
-    (unless (fboundp 'global-disable-mouse-mode)
-      (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
+;; TODO: Is this causing the mouse-movement error and breaking out of key bindings?
+(when nil
+  (progn
+    (when (display-mouse-p)
+      (unless (fboundp 'global-disable-mouse-mode)
+        (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
 
-    (add-hook 'after-init-hook #'global-disable-mouse-mode)
+      (add-hook 'after-init-hook #'global-disable-mouse-mode)
 
-    (with-eval-after-load 'disable-mouse
-      (diminish 'disable-mouse-global-mode))
+      (with-eval-after-load "disable-mouse"
+        (diminish 'disable-mouse-global-mode))
 
 
-    (unless (fboundp 'mouse-avoidance-mode)
-      (autoload #'mouse-avoidance-mode "avoid" nil t))
+      (unless (fboundp 'mouse-avoidance-mode)
+        (autoload #'mouse-avoidance-mode "avoid" nil t))
 
-    (mouse-avoidance-mode 'banish)))
+      (mouse-avoidance-mode 'banish))))
 
 
 (unless (fboundp 'apt-sources-list-mode)
@@ -4107,7 +4131,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (windmove-default-keybindings)
 
-  (with-eval-after-load 'windmove
+  (with-eval-after-load "windmove"
     (defvar windmove-wrap-around)
 
     ;; Wrap around at edges
@@ -4124,7 +4148,7 @@ This file is specified in `counsel-projectile-default-file'."
     ;; being invoked more frequently.
     (run-with-idle-timer 3 nil #'super-save-mode)
 
-    (with-eval-after-load 'super-save
+    (with-eval-after-load "super-save"
       (defvar super-save-remote-files)
       (defvar super-save-triggers)
 
@@ -4140,7 +4164,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'avy-setup-default)
     (autoload #'avy-setup-default "avy" nil t))
 
-  (with-eval-after-load 'avy
+  (with-eval-after-load "avy"
     (defvar avy-indent-line-overlay)
     (defvar avy-background)
     (defvar avy-highlight-first)
@@ -4156,7 +4180,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; This package adds a "C-'" binding to Ivy minibuffer that uses Avy
 (when (eq sb/selection 'ivy)
   (progn
-    (with-eval-after-load 'ivy
+    (with-eval-after-load "ivy"
       (declare-function ivy-avy "ivy-avy")
       (unless (fboundp 'ivy-avy)
         (autoload #'ivy-avy "ivy-avy" nil t))
@@ -4169,7 +4193,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (progn
-  (with-eval-after-load 'bookmark
+  (with-eval-after-load "bookmark"
     (defvar bookmark-default-file)
 
     (unless (bound-and-true-p sb/use-no-littering)
@@ -4220,7 +4244,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (run-with-idle-timer 2 nil #'sb/bm-setup)
 
-  (with-eval-after-load 'bm
+  (with-eval-after-load "bm"
     (defvar bm-repository-file)
 
     (setq-default bm-buffer-persistence t)
@@ -4256,7 +4280,7 @@ This file is specified in `counsel-projectile-default-file'."
     (unless (fboundp 'explain-pause-top)
       (autoload #'explain-pause-top "explain-pause-mode" nil t))
 
-    (with-eval-after-load 'explain-pause-mode
+    (with-eval-after-load "explain-pause-mode"
       (diminish 'explain-pause-mode))
     ))
 
@@ -4284,13 +4308,13 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'writegood-mode)
     (autoload #'writegood-mode "writegood-mode" nil t))
 
-  (with-eval-after-load 'writegood-mode
+  (with-eval-after-load "writegood-mode"
     (when (fboundp 'writegood-mode)
       (diminish 'writegood-mode))))
 
 
 (progn
-  (with-eval-after-load 'text-mode
+  (with-eval-after-load "text-mode"
     (unless (fboundp 'langtool-check)
       (autoload #'langtool-check "langtool" nil t))
 
@@ -4365,7 +4389,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;;;###autoload
   (add-to-list 'auto-mode-alist '("\\.pdf\\'" . pdf-view-mode))
 
-  (with-eval-after-load 'pdf-tools
+  (with-eval-after-load "pdf-tools"
     ;; (pdf-tools-install :no-query)
     (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
 
@@ -4400,7 +4424,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'logview-mode)
     (autoload #'logview-mode "logview" nil t))
 
-  (with-eval-after-load 'logview
+  (with-eval-after-load "logview"
     (defvar logview-cache-filename)
 
     (unless (bound-and-true-p sb/use-no-littering)
@@ -4466,7 +4490,7 @@ This file is specified in `counsel-projectile-default-file'."
     (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode)))
 
-  (with-eval-after-load 'markdown-mode
+  (with-eval-after-load "markdown-mode"
     ;; Looks good, but hiding markup makes it difficult to be consistent while editing
     ;; (setq-default markdown-hide-markup t)
 
@@ -4516,7 +4540,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'markdown-mode-hook #'pandoc-mode)
 
-  (with-eval-after-load 'pandoc-mode
+  (with-eval-after-load "pandoc-mode"
     (pandoc-load-default-settings)
 
     ;; Binds `C-c /' to `pandoc-main-hydra/body'.
@@ -4564,7 +4588,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'csv-mode)
     (autoload #'csv-mode "csv-mode" nil t))
 
-  (with-eval-after-load 'csv-mode
+  (with-eval-after-load "csv-mode"
     (defvar csv-separators)
 
     (setq csv-separators '("," ";" "|" " "))))
@@ -4574,7 +4598,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'highlight-doxygen-global-mode)
     (autoload #'highlight-doxygen-global-mode "highlight-doxygen" nil t))
 
-  (with-eval-after-load 'highlight-doxygen
+  (with-eval-after-load "highlight-doxygen"
     (highlight-doxygen-global-mode)))
 
 
@@ -4605,7 +4629,7 @@ This file is specified in `counsel-projectile-default-file'."
     (unless (fboundp 'z3-mode)
       (autoload #'z3-mode "z3-mode" nil t))
 
-    (with-eval-after-load 'z3-mode
+    (with-eval-after-load "z3-mode"
       (defvar z3-solver-cmd)
 
       (setq z3-solver-cmd "z3"))))
@@ -4633,7 +4657,7 @@ This file is specified in `counsel-projectile-default-file'."
     (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
       (add-hook hook #'turn-on-eldoc-mode))
 
-    (with-eval-after-load 'eldoc
+    (with-eval-after-load "eldoc"
       ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing
       ;; itself unexpectedly when point is on a variable with a multiline docstring.
       (setq eldoc-echo-area-use-multiline-p nil)
@@ -4653,7 +4677,7 @@ This file is specified in `counsel-projectile-default-file'."
     (add-hook 'eldoc-mode-hook #'eldoc-box-hover-mode)
     (add-hook 'eldoc-mode-hook #'eldoc-box-hover-at-point-mode)
 
-    (with-eval-after-load 'eldoc-box
+    (with-eval-after-load "eldoc-box"
       (defvar eldoc-box-clear-with-C-g)
       (defvar eldoc-box-fringe-use-same-bg)
 
@@ -4682,7 +4706,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; We use LSP
 (when nil
   (progn
-    (with-eval-after-load 'css-mode
+    (with-eval-after-load "css-mode"
       (unless (fboundp 'css-eldoc-enable)
         (autoload #'css-eldoc-enable "css-eldoc" nil t))
 
@@ -4706,13 +4730,13 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-to-list 'auto-mode-alist '("/R/.*\\.q\\'" . R-mode))
 
-    (with-eval-after-load 'R-mode
+    (with-eval-after-load "R-mode"
       (require 'ess-smart-underscore))))
 
 
 (when nil
   (progn
-    (with-eval-after-load 'ess
+    (with-eval-after-load "ess"
       (defvar ess-indent-offset)
       (defvar ess-indent-from-lhs)
       (defvar inferior-R-args)
@@ -4822,7 +4846,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook hooks (lambda ()
                     (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
-(with-eval-after-load 'lsp-mode
+(with-eval-after-load "lsp-mode"
   (diminish 'lsp-mode)
 
   (defvar lsp-pyls-configuration-sources)
@@ -5119,7 +5143,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (eq sb/selection 'ivy)
-  (with-eval-after-load 'ivy
+  (with-eval-after-load "ivy"
     (unless (fboundp 'lsp-ivy-global-workspace-symbol)
       (autoload #'lsp-ivy-global-workspace-symbol "lsp-ivy" nil t))
     (unless (fboundp 'lsp-ivy-workspace-symbol)
@@ -5131,7 +5155,10 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (eq sb/selection 'selectrum)
-  (with-eval-after-load 'selectrum
+  (with-eval-after-load "selectrum"
+    (declare-function consult-lsp-symbols "consult-lsp")
+    (declare-function consult-lsp-diagnostics "consult-lsp")
+
     (unless (fboundp 'consult-lsp-symbols)
       (autoload #'consult-lsp-symbols "consult-lsp"))
     (unless (fboundp 'consult-lsp-diagnostics)
@@ -5146,7 +5173,7 @@ This file is specified in `counsel-projectile-default-file'."
               (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
 
-(with-eval-after-load 'lsp-mode
+(with-eval-after-load "lsp-mode"
   (declare-function lsp-ui-doc-mode "lsp-ui-doc")
   (declare-function lsp-ui-peek-find-definitions "lsp-ui-peek")
   (declare-function lsp-ui-peek-find-references "lsp-ui-peek")
@@ -5158,7 +5185,7 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'lsp-ui-doc-mode "lsp-ui-doc" nil t))
 
   (lsp-ui-mode 1)
-  (lsp-ui-doc-mode -1)
+  (lsp-ui-doc-mode 1)
 
   (defvar lsp-ui-doc-enable)
   (defvar lsp-ui-imenu-auto-refresh)
@@ -5166,18 +5193,35 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar lsp-ui-modeline-code-actions-enable)
   (defvar lsp-ui-imenu-window-width)
   (defvar lsp-ui-sideline-show-diagnostics)
+  (defvar lsp-ui-doc-max-width)
+  (defvar lsp-ui-doc-max-height)
+  (defvar lsp-ui-doc-include-signature)
+  (defvar lsp-ui-peek-enable)
 
   ;; https://github.com/emacs-lsp/lsp-ui/issues/578
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (lsp-ui-doc--hide-frame)))
 
-  (setq lsp-ui-doc-enable nil ; Disable on-hover dialogs
+  (setq lsp-ui-doc-enable t ; Enable on-hover dialogs
+        lsp-ui-doc-max-width 60
+        lsp-ui-doc-max-height 8
+        lsp-ui-doc-include-signature t
         lsp-ui-imenu-auto-refresh 'after-save
         lsp-ui-imenu-window-width 16
         lsp-ui-sideline-enable nil ; Disable whole sideline
         lsp-ui-sideline-show-diagnostics nil ; Do not show diagnostics when typing
         lsp-ui-modeline-code-actions-enable t)
+
+  (when (not (display-graphic-p))
+    (setq lsp-ui-doc-enable nil
+          lsp-ui-peek-enable nil))
+
+  (add-hook 'lsp-managed-mode-hook
+            (lambda ()
+              (eldoc-box-hover-mode -1)
+              (eldoc-box-hover-at-point-mode -1)
+              (eldoc-mode -1)))
 
   (defvar lsp-ui-mode-map)
 
@@ -5194,7 +5238,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'lsp-treemacs-sync-mode)
     (autoload #'lsp-treemacs-sync-mode "lsp-treemacs" nil t))
 
-  (with-eval-after-load 'lsp-treemacs
+  (with-eval-after-load "lsp-treemacs"
     (lsp-treemacs-sync-mode 1)))
 
 
@@ -5215,7 +5259,7 @@ This file is specified in `counsel-projectile-default-file'."
              ("C-c l t" . origami-recursively-toggle-node)
              ("C-c l n" . origami-toggle-all-nodes))
 
-  (with-eval-after-load 'origami
+  (with-eval-after-load "origami"
     (unless (fboundp 'lsp-origami-mode)
       (autoload #'lsp-origami-mode "lsp-origami" nil t))
 
@@ -5247,7 +5291,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'c++-mode-hook #'lsp-deferred)
 
-  (with-eval-after-load 'cc-mode
+  (with-eval-after-load "cc-mode"
     (defvar c-electric-indent)
     (defvar c-set-style)
     (defvar c-basic-offset)
@@ -5280,7 +5324,7 @@ This file is specified in `counsel-projectile-default-file'."
              ("M-q"     . c-fill-paragraph))
 
 
-  (with-eval-after-load 'c++-mode
+  (with-eval-after-load "c++-mode"
     (unless (fboundp 'modern-c++-font-lock-mode)
       (autoload #'modern-c++-font-lock-mode "modern-cpp-font-lock" nil t))
 
@@ -5307,7 +5351,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'cmake-mode-hook #'lsp-deferred)
 
-  (with-eval-after-load 'cmake-mode
+  (with-eval-after-load "cmake-mode"
     (unless (fboundp 'cmake-font-lock-activate)
       (autoload #'cmake-font-lock-activate "cmake-font-lock" nil t))
 
@@ -5329,7 +5373,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'python-indent-shift-right)
     (autoload #'python-indent-shift-right "python" nil t))
 
-  (with-eval-after-load 'python
+  (with-eval-after-load "python"
     (setenv "PYTHONPATH" "python3")
 
     (defvar python-shell-completion-native-enable)
@@ -5379,7 +5423,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'python-mode-hook #'pyvenv-mode)
 
-  (with-eval-after-load 'pyvenv
+  (with-eval-after-load "pyvenv"
     (defvar pyvenv-mode-line-indicator)
     (defvar pyvenv-post-activate-hooks)
     (defvar pyvenv-post-deactivate-hooks)
@@ -5409,7 +5453,7 @@ This file is specified in `counsel-projectile-default-file'."
             (lambda nil
               (add-hook 'before-save-hook #'py-isort-before-save)))
 
-  (with-eval-after-load 'py-isort
+  (with-eval-after-load "py-isort"
     (defvar py-isort-options)
     (setq py-isort-options '("-l 100"))))
 
@@ -5467,7 +5511,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; FIXME: The cursor loses its position after formatting, which is annoying
   (add-hook 'python-mode-hook #'yapf-mode)
 
-  (with-eval-after-load 'yapfify
+  (with-eval-after-load "yapfify"
     (diminish 'yapf-mode)))
 
 
@@ -5495,7 +5539,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'cperl-mode-hook #'lsp-deferred)
 
-  (with-eval-after-load 'cperl-mode
+  (with-eval-after-load "cperl-mode"
     ;; Prefer CPerl mode to Perl mode
     (fset 'perl-mode 'cperl-mode)))
 
@@ -5507,7 +5551,7 @@ This file is specified in `counsel-projectile-default-file'."
                                             c-set-style "java")
                               (lsp-deferred)))
 
-  (with-eval-after-load 'lsp-java
+  (with-eval-after-load "lsp-java"
     (defvar lsp-java-inhibit-message)
     (defvar lsp-java-java-path)
     (defvar lsp-java-save-actions-organize-imports)
@@ -5567,7 +5611,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'sh-mode-hook #'lsp-deferred)
 
-  (with-eval-after-load 'sh-script
+  (with-eval-after-load "sh-script"
     (defvar sh-basic-offset)
     (defvar sh-indent-comment)
     (defvar sh-indent-after-continuation)
@@ -5599,7 +5643,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'sh-mode-hook #'shfmt-on-save-mode)
 
-  (with-eval-after-load 'shfmt
+  (with-eval-after-load "shfmt"
     (defvar shfmt-arguments)
 
     (setq shfmt-arguments '("-i" "4" "-p" "-ci"))))
@@ -5620,7 +5664,7 @@ This file is specified in `counsel-projectile-default-file'."
   (remove-hook 'find-file-hook #'vc-refresh-state))
 
 
-(with-eval-after-load 'with-editor
+(with-eval-after-load "with-editor"
   (diminish 'with-editor-mode))
 
 
@@ -5629,7 +5673,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'transient-bind-q-to-quit)
     (autoload #'transient-bind-q-to-quit "transient" nil t))
 
-  (with-eval-after-load 'transient
+  (with-eval-after-load "transient"
     (defvar transient-history-file)
     (defvar transient-levels-file)
     (defvar transient-values-file)
@@ -5655,7 +5699,7 @@ This file is specified in `counsel-projectile-default-file'."
   (unless (fboundp 'magit-dispatch)
     (autoload #'magit-dispatch "magit" nil t))
 
-  (with-eval-after-load 'magit
+  (with-eval-after-load "magit"
     (defvar magit-display-buffer-function)
     (defvar magit-no-message)
     (defvar magit-section-initial-visibility-alist)
@@ -5730,7 +5774,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'after-init-hook #'global-git-gutter-mode)
 
-  (with-eval-after-load 'git-gutter
+  (with-eval-after-load "git-gutter"
     (defvar git-gutter:added-sign)
     (defvar git-gutter:deleted-sign)
     (defvar git-gutter:modified-sign)
@@ -5775,7 +5819,7 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
 
-  (with-eval-after-load 'diff-hl
+  (with-eval-after-load "diff-hl"
     (defvar diff-hl-draw-borders)
     ;; Highlight without a border looks nicer
     (setq diff-hl-draw-borders nil)))
@@ -5788,7 +5832,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'git-commit-setup-hook #'git-commit-turn-on-flyspell)
 
-  (with-eval-after-load 'git-commit
+  (with-eval-after-load "git-commit"
     (defvar git-commit-summary-max-length)
     (setq git-commit-summary-max-length 50)))
 
@@ -5903,7 +5947,7 @@ This file is specified in `counsel-projectile-default-file'."
                               (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
                               (lsp-deferred)))
 
-  (with-eval-after-load 'yaml-mode
+  (with-eval-after-load "yaml-mode"
     (unless (fboundp 'yaml-imenu-enable)
       (autoload #'yaml-imenu-enable "yaml-imenu" nil t))
 
@@ -5932,7 +5976,7 @@ This file is specified in `counsel-projectile-default-file'."
 
   (add-hook 'web-mode-hook #'lsp-deferred)
 
-  (with-eval-after-load 'web-mode
+  (with-eval-after-load "web-mode"
     (defvar web-mode-enable-auto-closing)
     (defvar web-mode-enable-auto-pairing)
     (defvar web-mode-enable-auto-quoting)
@@ -5965,7 +6009,7 @@ This file is specified in `counsel-projectile-default-file'."
   (dolist (hook '(html-mode-hook css-mode-hook sass-mode-hook))
     (add-hook hook #'rainbow-mode))
 
-  (with-eval-after-load 'rainbow-mode
+  (with-eval-after-load "rainbow-mode"
     (diminish 'rainbow-mode)))
 
 
@@ -5985,7 +6029,7 @@ This file is specified in `counsel-projectile-default-file'."
   (dolist (pattern '("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$"))
     (add-to-list 'auto-mode-alist (cons pattern 'nxml-mode)))
 
-  (with-eval-after-load 'nxml-mode
+  (with-eval-after-load "nxml-mode"
     (fset 'xml-mode 'nxml-mode)
 
     (defvar nxml-auto-insert-xml-declaration-flag)
@@ -6004,7 +6048,7 @@ This file is specified in `counsel-projectile-default-file'."
                        (require 'lsp-latex)
                        (lsp-deferred))))
 
-    (with-eval-after-load 'lsp-latex
+    (with-eval-after-load "lsp-latex"
       (defvar lsp-latex-bibtex-formatting-formatter)
       (defvar lsp-latex-bibtex-formatting-line-length)
       (defvar lsp-latex-build-on-save)
@@ -6061,7 +6105,7 @@ This file is specified in `counsel-projectile-default-file'."
                    (TeX-PDF-mode) ; Use `pdflatex'
                    (TeX-source-correlate-mode))))
 
-(with-eval-after-load 'tex
+(with-eval-after-load "tex"
   (defvar TeX-auto-save)
   (defvar TeX-auto-untabify)
   (defvar TeX-clean-confirm)
@@ -6118,7 +6162,7 @@ This file is specified in `counsel-projectile-default-file'."
   )
 
 
-(with-eval-after-load 'tex-mode
+(with-eval-after-load "tex-mode"
   (declare-function auctex-latexmk "auctex-latexmk")
 
   (unless (fboundp 'auctex-latexmk)
@@ -6137,7 +6181,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; (add-hook 'bibtex-mode-hook #'lsp-deferred) ;; LATER: LaTeX LS is not good yet
 
 
-(with-eval-after-load 'bibtex
+(with-eval-after-load "bibtex"
   (defvar bibtex-align-at-equal-sign)
   (defvar bibtex-maintain-sorted-entries)
 
@@ -6154,7 +6198,7 @@ This file is specified in `counsel-projectile-default-file'."
     (unless (fboundp 'ivy-bibtex)
       (autoload #'ivy-bibtex "ivy-bibtex" nil t))
 
-    (with-eval-after-load 'ivy-bibtex
+    (with-eval-after-load "ivy-bibtex"
       (defvar ivy-bibtex-default-action)
       (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
@@ -6254,7 +6298,7 @@ Ignore if no file is found."
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list))))))
 
-(with-eval-after-load 'reftex
+(with-eval-after-load "reftex"
   (defvar reftex-enable-partial-scans)
   (defvar reftex-highlight-selection)
   (defvar reftex-plug-into-AUCTeX)
@@ -6310,7 +6354,7 @@ Ignore if no file is found."
     (add-hook hook (lambda nil
                      (bib-cite-minor-mode 1))))
 
-  (with-eval-after-load 'bib-cite
+  (with-eval-after-load "bib-cite"
     (defvar bib-cite-use-reftex-view-crossref)
     (setq bib-cite-use-reftex-view-crossref t)
 
@@ -6349,7 +6393,7 @@ Ignore if no file is found."
 ;;                         (lambda ()
 ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
 
-(with-eval-after-load 'latex
+(with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
 
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
@@ -6363,7 +6407,7 @@ Ignore if no file is found."
   (unless (fboundp 'math-preview-region)
     (autoload #'math-preview-region "math-preview" nil t))
 
-  (with-eval-after-load 'math-preview
+  (with-eval-after-load "math-preview"
     (defvar math-preview-command)
 
     (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp))))
@@ -6390,7 +6434,7 @@ Ignore if no file is found."
     (add-hook 'js2-mode-hook #'lsp-deferred)
     (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
 
-    (with-eval-after-load 'js2-mode
+    (with-eval-after-load "js2-mode"
       (defalias 'javascript-mode 'js2-mode "`js2-mode' is aliased to `javascript' mode")
 
       (defvar js-indent-level)
@@ -6416,7 +6460,7 @@ Ignore if no file is found."
                 (lambda ()
                   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 
-      (with-eval-after-load 'xref-js2
+      (with-eval-after-load "xref-js2"
         (defvar xref-js2-search-program)
 
         (setq xref-js2-search-program 'rg)))
@@ -6457,7 +6501,7 @@ Ignore if no file is found."
 
     (add-hook 'scss-mode-hook #'lsp-deferred)
 
-    (with-eval-after-load 'scss-mode
+    (with-eval-after-load "scss-mode"
       (defvar scss-compile-at-save)
 
       (setq scss-compile-at-save t))))
@@ -6501,7 +6545,7 @@ Ignore if no file is found."
 
 (when nil
   (progn
-    (with-eval-after-load 'mlir-mode
+    (with-eval-after-load "mlir-mode"
       (unless (fboundp 'clang-format)
         (autoload #'clang-format "clang-format" nil t))
       (unless (fboundp 'clang-format-buffer)
@@ -6514,7 +6558,7 @@ Ignore if no file is found."
 
     (add-hook 'mlir-mode-hook #'clang-format+-mode)
 
-    (with-eval-after-load 'clang-format+-mode
+    (with-eval-after-load "clang-format+-mode"
       (defvar clang-format+-always-enable)
 
       (setq clang-format+-always-enable t))
@@ -6562,7 +6606,7 @@ Ignore if no file is found."
 
                        (global-tree-sitter-mode 1))))
 
-    (with-eval-after-load 'tree-sitter
+    (with-eval-after-load "tree-sitter"
       (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
       (diminish 'tree-sitter-mode))))
@@ -6583,7 +6627,7 @@ Ignore if no file is found."
       (unless (fboundp 'editorconfig-mode)
         (autoload #'editorconfig-mode "editorconfig" nil t))
 
-      (with-eval-after-load 'editorconfig
+      (with-eval-after-load "editorconfig"
         (diminish 'editorconfig-mode)))))
 
 
@@ -6597,7 +6641,7 @@ Ignore if no file is found."
 
     (run-with-idle-timer 2 nil #'global-fasd-mode)
 
-    (with-eval-after-load 'fasd
+    (with-eval-after-load "fasd"
       (defvar fasd-enable-initial-prompt)
 
       (setq fasd-enable-initial-prompt nil))
@@ -6623,7 +6667,7 @@ Ignore if no file is found."
 
     (add-hook 'rust-mode-hook #'lsp-deferred)
 
-    (with-eval-after-load 'rust-mode
+    (with-eval-after-load "rust-mode"
       (defvar rust-format-on-save)
 
       (setq rust-format-on-save t))))
@@ -6632,7 +6676,7 @@ Ignore if no file is found."
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (declare-function ansi-color-apply-on-region "ansi-color")
 
-(with-eval-after-load 'compile
+(with-eval-after-load "compile"
   (require 'ansi-color)
   (defvar compilation-filter-start)
 
@@ -6656,12 +6700,12 @@ Ignore if no file is found."
   (unless (fboundp 'info-colors-fontify-node)
     (autoload #'info-colors-fontify-node "info-colors") nil t)
 
-  (with-eval-after-load 'info
+  (with-eval-after-load "info"
     (add-hook 'Info-selection-hook #'info-colors-fontify-node)))
 
 
 (progn
-  (with-eval-after-load 'flycheck
+  (with-eval-after-load "flycheck"
     ;; https://github.com/flycheck/flycheck/issues/1762
     (defvar-local sb/flycheck-local-cache nil)
 
@@ -6997,21 +7041,25 @@ Ignore if no file is found."
 
 (when (eq sb/selection 'selectrum)
   (progn
+    (declare-function selectrum-mode "selectrum")
+
     (unless (fboundp 'selectrum-mode)
       (autoload #'selectrum-mode "selectrum" nil t))
 
     (add-hook 'after-init-hook #'selectrum-mode)
 
-    (with-eval-after-load 'selectrum
+    (with-eval-after-load "selectrum"
       (defvar selectrum-fix-vertical-window-height)
 
       (setq selectrum-fix-vertical-window-height t))
 
     (bind-keys
-     ("<f3>"   . switch-to-buffer))
+     ("<f3>" . switch-to-buffer))
 
 
     ;; Enable richer annotations in the minibuffer
+    (declare-function marginalia-mode "marginalia")
+
     (unless (fboundp 'marginalia-mode)
       (autoload #'marginalia-mode "marginalia" nil t))
 
@@ -7021,6 +7069,26 @@ Ignore if no file is found."
     (declare-function consult-error "consult")
     (declare-function consult-customize "consult")
     (declare-function consult-rg "consult")
+    (declare-function consult-yank-pop "consult")
+    (declare-function consult-flycheck "consult-flycheck")
+    (declare-function consult-xref "consult")
+    (declare-function consult-recent-file "consult")
+    (declare-function consult-grep "consult")
+    (declare-function consult-git-grep "consult")
+    (declare-function consult-line "consult")
+    (declare-function consult-outline "consult")
+    (declare-function consult-apropos "consult")
+    (declare-function consult-buffer "consult")
+    (declare-function consult-bookmark "consult")
+    (declare-function consult-goto-line "consult")
+    (declare-function consult-project-imenu "consult")
+    (declare-function consult-find "consult")
+    (declare-function consult-locate "consult")
+    (declare-function consult-ripgrep "consult")
+    (declare-function consult-isearch "consult")
+    (declare-function consult-multi-occur "consult")
+    (declare-function consult-mode-command "consult")
+    (declare-function consult-imenu "consult")
 
     (unless (fboundp 'consult-imenu)
       (autoload #'consult-imenu "consult"))
@@ -7118,6 +7186,8 @@ Ignore if no file is found."
                ("M-y"        . consult-yank-pop))
 
 
+    (declare-function selectrum-prescient-mode "selectrum-prescient")
+
     (unless (fboundp 'selectrum-prescient-mode)
       (autoload #'selectrum-prescient-mode "selectrum-prescient" nil t))
 
@@ -7126,6 +7196,8 @@ Ignore if no file is found."
     (defvar selectrum-is-active)
     (defvar selectrum-highlight-candidates-function)
     (defvar magit-completing-read-function)
+
+    (declare-function selectrum-completing-read "selectrum")
 
     (setq file-name-shadow-properties '(invisible t)
           completion-styles '(orderless)
@@ -7426,7 +7498,7 @@ mode is not in `sb/skippable-modes'."
 (global-set-key [remap next-buffer] #'sb/next-buffer)
 (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
-(with-eval-after-load 'centaur-tabs
+(with-eval-after-load "centaur-tabs"
   (declare-function centaur-tabs-forward "centaur-tabs")
   (declare-function centaur-tabs-backward "centaur-tabs")
 
@@ -7459,7 +7531,7 @@ mode is not in `sb/skippable-modes'."
 
   (run-with-idle-timer 3 nil #'which-key-mode)
 
-  (with-eval-after-load 'which-key
+  (with-eval-after-load "which-key"
     ;; Allow C-h to trigger which-key before it is done automatically
     (defvar which-key-show-early-on-C-h)
 
@@ -7486,7 +7558,7 @@ mode is not in `sb/skippable-modes'."
 (unless (fboundp 'defhydra)
   (autoload #'defhydra "hydra" nil t))
 
-(with-eval-after-load 'hydra
+(with-eval-after-load "hydra"
   ;; `:exit t' will quit the hydra
   (defhydra sb/hydra-spelling (:color blue)
     "
@@ -7601,7 +7673,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
     ("s" flycheck-select-checker)
     ("v" flycheck-verify-setup))
 
-  (with-eval-after-load 'python
+  (with-eval-after-load "python"
     (defhydra sb/hydra-python-indent (python-mode-map "C-c")
       "Adjust Python indentation."
       (">" python-indent-shift-right "right")
