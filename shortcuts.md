@@ -133,6 +133,9 @@ Specify extra flags to the search commands with `C-u` (`universal-argument`) bef
 
 ## Org mode
 
+- `M-ret` - Insert a new heading or wrap a region in a table (`org-meta-return`)
+- `C-c C-l` - Insert a link (`org-insert-link`). When the cursor is on a link, then edit the invisible link and the description.
+- `C-c C-o` - Open link at point (`org-open-at-point`)
 - `C-u C-c .` - Insert date and time (`org-time-stamp`)
 - `C-c C-d` - Insert "DEADLINE" keyword along with a timestamp (`org-deadline`)
 - `C-c C-s` - Insert "SCHEDULED" keyword along with a timestamp (`org-schedule`)
@@ -311,6 +314,21 @@ Use `magit-status` to display information about the current Git repository, and 
 - `C-c v n` - (`smerge-next`)
 - `C-c v p` - (`smerge-prev`)
 - `C-c v E` - (`smerge-ediff`)
+
+## PDF View
+
+- `=` - Enlarge text by `pdf-view-resize-factor` (`pdf-view-enlarge`)
+- `+` - Enlarge text by `pdf-view-resize-factor` (`pdf-view-enlarge`)
+- `-` - Shrink text by `pdf-view-resize-factor` (`pdf-view-shrink`)
+- `0` - (`pdf-view-scale-reset`)
+- `n` - (`pdf-view-next-page-command`)
+- `p` - (`pdf-view-previous-page-command`)
+- `C-l` - (`pdf-view-goto-page`)
+- `M->` - (`pdf-view-last-page`)
+- `M-<` - (`pdf-view-first-page`)
+- `H` - (`pdf-view-fit-height-to-window`)
+- `W` - (`pdf-view-fit-width-to-window`)
+- `P` - (`pdf-view-fit-page-to-window`)
 
 ## Use Cases
 

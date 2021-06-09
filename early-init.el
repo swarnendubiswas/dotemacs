@@ -15,7 +15,9 @@
                             user-emacs-directory)))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
-(setq byte-compile-warnings '(cl-functions))
+;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
+                                  cl-functions interactive-only))
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following
@@ -34,6 +36,10 @@
       package-user-dir (expand-file-name "elpa" user-emacs-directory)
       package-quickstart t ; Populate one big autoloads file
       package-quickstart-file (expand-file-name "var/package-quickstart.el" user-emacs-directory))
+
+;; The run-time load order is: (1) file described by `site-run-file', if non-nil; (2)
+;; `user-init-file'; (3) default.el. Disable site-wide run-time initializations.
+(setq site-run-file nil)
 
 ;; (customize-set-variable
 ;;  'package-quickstart-file
@@ -56,6 +62,13 @@
 (setq frame-inhibit-implied-resize t)
 
 ;; Disable UI elements before being initialized
+
+;; (when (display-graphic-p) ; `window-system' is deprecated
+;;   (progn
+;;     (menu-bar-mode -1)
+;;     (scroll-bar-mode -1)
+;;     (tool-bar-mode -1)))
+
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode)
@@ -66,9 +79,14 @@
 ;; (customize-set-variable 'menu-bar-mode nil)
 ;; (customize-set-variable 'tool-bar-mode nil)
 
+;; Maximize Emacs on startup, I am not sure which one of the following is better.
+;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
+;; (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
+
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
-(add-to-list 'default-frame-alist '(fullscreen . maximized)) ; Maximize all frames
-(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ; Maximize all frames
+;; Maximize all frames
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)

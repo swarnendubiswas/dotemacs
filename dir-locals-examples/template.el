@@ -1,6 +1,6 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pdf$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.tar.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
+         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
          (compile-command . "make")
          (compile-command . "gradle compileTestJava")
          (lsp-enabled-clients . (pyls msplys pyright jedi))
@@ -107,28 +107,46 @@
  (c++-mode . (
               (flycheck-gcc-language-standard . "c++11")
               (flycheck-clang-language-standard . "c++11")
-              (eval add-hook 'hack-local-variables-hook (lambda () (when (string= major-mode 'c++-mode) (lsp))))
+              (eval add-hook 'hack-local-variables-hook
+                    (lambda ()
+                      (when (string= major-mode 'c++-mode)
+                        (lsp))))
               (eval add-hook 'before-save-hook #'clang-format-buffer nil t)
               ;; https://stackoverflow.com/questions/33063008/define-new-variable-in-dir-locals-el
               (eval . (let (
-                            (clang-args (list
-                                         "-std=c++11"
-                                         (concat "-I" (expand-file-name "tdebug-llvm/llvm/include" (projectile-project-root)))
-                                         (concat "-I" (expand-file-name "tdebug-llvm/clang/include" (projectile-project-root)))
-                                         (concat "-I" (expand-file-name "tdebug-lib/include" (projectile-project-root)))
-                                         (concat "-I" (expand-file-name "spd3-lib/include" (projectile-project-root)))
-                                         (concat "-I" (expand-file-name "fasttrack/include" (projectile-project-root)))
-                                         (concat "-I" (expand-file-name "newfasttrack/include" (projectile-project-root)))
-                                         (concat "-I" (expand-file-name "new_algo/include" (projectile-project-root)))
-                                         ))
+                            (clang-args
+                             (list
+                              "-std=c++11"
+                              (concat "-I" (expand-file-name "tdebug-llvm/llvm/include"
+                                                             (projectile-project-root)))
+                              (concat "-I" (expand-file-name "tdebug-llvm/clang/include"
+                                                             (projectile-project-root)))
+                              (concat "-I" (expand-file-name "tdebug-lib/include"
+                                                             (projectile-project-root)))
+                              (concat "-I" (expand-file-name "spd3-lib/include"
+                                                             (projectile-project-root)))
+                              (concat "-I" (expand-file-name "fasttrack/include"
+                                                             (projectile-project-root)))
+                              (concat "-I" (expand-file-name "newfasttrack/include"
+                                                             (projectile-project-root)))
+                              (concat "-I" (expand-file-name "new_algo/include"
+                                                             (projectile-project-root)))
+                              ))
                             (include-path (list
-                                           (expand-file-name "tdebug-llvm/llvm/include" (projectile-project-root))
-                                           (expand-file-name "tdebug-llvm/clang/include" (projectile-project-root))
-                                           (expand-file-name "tdebug-lib/include" (projectile-project-root))
-                                           (expand-file-name "spd3-lib/include" (projectile-project-root))
-                                           (expand-file-name "fasttrack/include" (projectile-project-root))
-                                           (expand-file-name "newfasttrack/include" (projectile-project-root))
-                                           (expand-file-name "new_algo/include" (projectile-project-root))
+                                           (expand-file-name "tdebug-llvm/llvm/include"
+                                                             (projectile-project-root))
+                                           (expand-file-name "tdebug-llvm/clang/include"
+                                                             (projectile-project-root))
+                                           (expand-file-name "tdebug-lib/include"
+                                                             (projectile-project-root))
+                                           (expand-file-name "spd3-lib/include"
+                                                             (projectile-project-root))
+                                           (expand-file-name "fasttrack/include"
+                                                             (projectile-project-root))
+                                           (expand-file-name "newfasttrack/include"
+                                                             (projectile-project-root))
+                                           (expand-file-name "new_algo/include"
+                                                             (projectile-project-root))
                                            ))
                             (clangd-args (list
                                           "-j=2"
