@@ -37,7 +37,8 @@
           ;; (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
-          (const :tag "customized" sb/default) ; Customizations over the default theme
+          ;; Customizations over the default theme
+          (const :tag "customized" sb/default)
           (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -122,7 +123,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -307,14 +308,14 @@ This location is used for temporary installations and files.")
   (defvar exec-path-from-shell-variables)
 
   ;; "-i" is expensive but Tramp is unable to find executables without the option
-  (setq exec-path-from-shell-arguments '("-l")
+  (setq exec-path-from-shell-arguments '("-l") ; "-i"
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
                                          "LANG" "LC_CTYPE"))
 
   (exec-path-from-shell-initialize))
 
-
+;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
@@ -334,17 +335,17 @@ This location is used for temporary installations and files.")
       comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
       compilation-ask-about-save nil ; Save all modified buffers without asking
-      ;; Automatically scroll the buffer as output appears, but stop at the first error
+      ;; Automatically scroll the *Compilation*  buffer as output appears, but stop at the first error
       compilation-scroll-output 'first-error
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
-      confirm-kill-processes nil ; Prevent "Active processes exist" warning when you quit Emacs
+      confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      echo-keystrokes 0.5 ; Show current key sequence in minibuffer
+      echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
@@ -393,7 +394,7 @@ This location is used for temporary installations and files.")
       ;; Enable use of system clipboard across Emacs and other applications
       select-enable-clipboard t
       sentence-end-double-space nil
-      set-mark-command-repeat-pop t
+      ;; set-mark-command-repeat-pop t
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       standard-indent 2
       suggest-key-bindings t
@@ -3030,7 +3031,7 @@ This file is specified in `counsel-projectile-default-file'."
   ;; Enable before `ivy-rich-mode' for better performance
   ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
   ;; The new transformers (file permissions) seem more of an overkill and buggy
-  (when nil
+  (when t
     (progn
       (when (display-graphic-p)
         (unless (fboundp 'all-the-icons-ivy-rich-mode)
@@ -4053,7 +4054,7 @@ This file is specified in `counsel-projectile-default-file'."
     (with-eval-after-load "disable-mouse"
       (diminish 'disable-mouse-global-mode))))
 
-(when nil
+(when t
   (progn
     (unless (fboundp 'mouse-avoidance-mode)
       (autoload #'mouse-avoidance-mode "avoid" nil t))
@@ -4571,12 +4572,13 @@ This file is specified in `counsel-projectile-default-file'."
       ;; Should work with `gfm-mode', `css-mode', and `html-mode' as they are derived modes
       (dolist (hook '(markdown-mode-hook web-mode-hook
                                          json-mode-hook jsonc-mode-hook js2-mode-hook))
-        (add-hook hook (lambda ()
-                         (when (and buffer-file-name ; Returns `nil' if not visiting a file
-                                    (not (file-remote-p buffer-file-name)))
-                           (prettier-mode 1)))))
+        ;; (add-hook hook (lambda ()
+        ;;                  (when (and buffer-file-name ; Returns `nil' if not visiting a file
+        ;;                             (not (file-remote-p buffer-file-name)))
+        ;;                    (prettier-mode 1))))
+        (add-hook hook #'prettier-mode))
 
-      (with-eval-after-load 'prettier
+      (with-eval-after-load "prettier"
         (defvar prettier-lighter)
 
         (setq prettier-lighter nil)))))
@@ -6189,9 +6191,7 @@ This file is specified in `counsel-projectile-default-file'."
   (defvar bibtex-maintain-sorted-entries)
 
   (setq bibtex-align-at-equal-sign t
-        bibtex-maintain-sorted-entries t)
-
-  (require 'bibtex-utils))
+        bibtex-maintain-sorted-entries t))
 
 
 (when (eq sb/selection 'ivy)
@@ -7551,7 +7551,7 @@ mode is not in `sb/skippable-modes'."
     (which-key-posframe-mode 1)
 
     ;; The posframe has a low contrast
-    (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
+    ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
     (defvar which-key-posframe-border-width)
     (defvar which-key-posframe-poshandler)

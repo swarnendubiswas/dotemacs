@@ -66,7 +66,6 @@
                          define-word
                          diff-hl
                          diminish
-                         dired+
                          dired-efap
                          dired-narrow
                          disable-mouse

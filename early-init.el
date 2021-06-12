@@ -48,7 +48,7 @@
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+  ;; (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t))
 
 ;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.

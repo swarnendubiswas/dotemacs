@@ -5,72 +5,27 @@
 
 ;;; Commentary:
 
-;; To evaluate an sexp, use `C-x C-e'. Use `C-M-x' to evaluate the current top-level s-expression.
-;; Use `M-:' to evaluate a Emacs Lisp expression and print the result.
-;; Only an interactive function can be invoked with `M-x' or a key binding.
-
-;; Init file should not ideally contain calls to `load' or `require', since they cause eager loading
-;; and are expensive, a cheaper alternative is to use `autoload'.
-
-;; Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
-;; all equivalent: `(lambda (x) (* x x))', `(function (lambda (x) (* x x)))',
-;; `#'(lambda (x) (* x x))'
-
-;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
-;; https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
-;; Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
-;; `(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))
-
-;; A local variable specification takes the following form:
-;; -*- mode: MODENAME; VAR: VALUE; ... -*-
-
-;; Good articles and reference configurations
-;; https://protesilaos.com/dotemacs
-;; https://github.com/CSRaghunandan/.emacs.d
-;; https://github.com/purcell/emacs.d
-;; https://github.com/MatthewZMD/.emacs.d
-;; https://github.com/redguardtoo/emacs.d
-;; https://github.com/jwiegley/dot-emacs
-;; https://github.com/d12frosted/environment/tree/master/emacs
-;; https://github.com/raxod502/radian/tree/develop/emacs
-;; https://github.com/dholm/dotemacs
-;; https://tychoish.com/post/towards-faster-emacs-start-times/
-;; https://github.com/wandersoncferreira/dotfiles
-;; https://github.com/rememberYou/.emacs.d
-;; https://github.com/seagle0128/.emacs.d/
-;; https://github.com/Gleek/emacs.d/
-;; https://github.com/magnars/.emacs.d
-;; https://github.com/kaushalmodi/.emacs.d
-;; https://luca.cambiaghi.me/vanilla-emacs/readme.html
-
 ;;; Code:
-
-;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
-;; decrease this. If you experience stuttering, increase this.
 
 ;; Load built-in libraries
 (require 'cl-lib)
-(require 'map)
 (require 'subr-x)
 
-(defgroup sb/emacs nil
+(defgroup sb/emacs
+  nil
   "Personal configuration for dotemacs."
   :group 'local)
 
-(defcustom sb/extras-directory (expand-file-name "extras"
-                                                 user-emacs-directory)
+
+(defcustom sb/extras-directory
+  (expand-file-name "extras" user-emacs-directory)
   "Path for third-party packages and files."
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/temp-directory (expand-file-name "tmp"
-                                               user-emacs-directory)
-  "Storage location for various configuration files."
-  :type 'string
-  :group 'sb/emacs)
 
 (defcustom sb/theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -85,10 +40,11 @@
           (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
+          ;; Customizations over the default theme
           (const :tag "customized" sb/default)
-          (const :tag "none" none)
-          )
+          (const :tag "none" none))
   :group 'sb/emacs)
+
 
 (defcustom sb/modeline-theme
   'powerline
@@ -104,6 +60,7 @@
           (const :tag "default" default))
   :group 'sb/emacs)
 
+
 (defcustom sb/window-split
   'horizontal
   "Specify the direction in which the windows should be split.
@@ -112,14 +69,27 @@ This depends on the orientation of the display."
           ;; Split into two windows one above the other (`split-window-below')
           (const :tag "vertical" vertical)
           ;; Split into two side-by-side windows (`split-window-right')
-          (const :tag "horizontal" horizontal)) ;
+          (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
 
+
 ;; Large values make reading difficult when the window is split
-(defcustom sb/fill-column 100
+(defcustom sb/fill-column
+  100
   "Column beyond which lines should not extend."
   :type 'number
   :group 'sb/emacs)
+
+
+(defcustom sb/selection
+  'ivy
+  "Choose the framework to use for narrowing and selection."
+  :type '(radio
+          (const :tag "ivy" ivy)
+          (const :tag "selectrum" selectrum)
+          (const :tag "none" none))
+  :group 'dotemacs)
+
 
 (defcustom sb/delete-trailing-whitespace-p
   nil
@@ -130,9 +100,9 @@ whitespaces."
   :type 'boolean
   :group 'sb/emacs)
 
-;; We use lsp and dumb-jump
+
 (defcustom sb/tags-scheme
-  'none
+  'none ; We use `lsp-mode' and `dumb-jump'
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
@@ -140,11 +110,13 @@ whitespaces."
           (const :tag "none" none))
   :group 'sb/emacs)
 
+
 (defcustom sb/ctags-path
   "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
   :type 'string
   :group 'sb/emacs)
+
 
 (defcustom sb/gtags-path
   "/usr/local/bin/gtags"
@@ -152,21 +124,32 @@ whitespaces."
   :type 'string
   :group 'sb/emacs)
 
+
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
+
+
+(when (bound-and-true-p sb/debug-init-file)
+  (setq garbage-collection-messages nil
+        debug-on-error t
+        debug-on-event 'sigusr2)
+  (debug-on-entry 'projectile-remove-known-project))
+
 
 (defconst sb/user-home
   (getenv "HOME")
   "User HOME directory.")
 
+
 (defconst sb/user-tmp
   (expand-file-name "tmp" sb/user-home)
   "User temp directory.
 This location is used for temporary installations and files.")
+
 
 (defcustom sb/textlint-home
   (expand-file-name "textlint-workspace" sb/user-tmp)
@@ -174,16 +157,17 @@ This location is used for temporary installations and files.")
   :type 'string
   :group 'sb/emacs)
 
+
+;; `pyls' and `mspyls' are not actively maintained, the progress of `py-lsp' is slow
 (defcustom sb/python-langserver
   'pyright
   "Choose the Python Language Server implementation."
   :type '(radio
-          (const :tag "pyls" pyls)
-          (const :tag "mspyls" mspyls)
           (const :tag "pyright" pyright)
           (const :tag "jedi" jedi)
           (const :tag "none" none))
   :group 'sb/emacs)
+
 
 (defcustom sb/use-no-littering
   t
@@ -191,50 +175,89 @@ This location is used for temporary installations and files.")
   :type 'boolean
   :group 'sb/emacs)
 
-(unless (or (file-exists-p sb/temp-directory)
-            (bound-and-true-p sb/use-no-littering))
+
+(add-to-list 'load-path sb/extras-directory)
+(defvar sb/core-packages)
+
+
+;; Another option is to construct the `load-path' manually
+;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
+(package-initialize)
+
+
+(when (bound-and-true-p sb/use-no-littering)
+  (require 'no-littering))
+
+
+(defcustom sb/custom-file
+  (no-littering-expand-etc-file-name "custom.el")
+  "File to write Emacs customizations."
+  :type 'string
+  :group 'sb/emacs)
+
+
+(defcustom sb/private-file
+  (no-littering-expand-etc-file-name "private.el")
+  "File to include private information."
+  :type 'string
+  :group 'sb/emacs)
+
+
+(setq custom-file sb/custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
+
+(when (file-exists-p sb/private-file)
+  (load sb/private-file 'noerror))
+
+
+(defcustom sb/temp-directory
+  (expand-file-name "tmp" user-emacs-directory)
+  "Storage location for various configuration files."
+  :type 'string
+  :group 'sb/emacs)
+
+(unless (or (bound-and-true-p sb/use-no-littering)
+            (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
 
-(defconst sb/dotemacs-emacs27+ (> emacs-major-version 26))
-(defconst sb/dotemacs-emacs28+ (> emacs-major-version 27))
-(defconst sb/dotemacs-is-linux (eq system-type 'gnu/linux))
-(defconst sb/dotemacs-is-windows (eq system-type 'windows-nt))
 
-;; (debug-on-entry 'package-initialize)
+(defconst sb/EMACS27+   (> emacs-major-version 26))
+(defconst sb/EMACS28+   (> emacs-major-version 27))
+(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
+(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
-(defconst sb/dotemacs-1MB (* 1 1000 1000))
-(defconst sb/dotemacs-4MB (* 4 1000 1000))
-(defconst sb/dotemacs-8MB (* 8 1000 1000))
-(defconst sb/dotemacs-50MB (* 50 1000 1000))
-(defconst sb/dotemacs-64MB (* 64 1000 1000))
-(defconst sb/dotemacs-100MB (* 100 1000 1000))
-(defconst sb/dotemacs-128MB (* 128 1000 1000))
-(defconst sb/dotemacs-200MB (* 200 1000 1000))
-(defconst sb/dotemacs-500MB (* 500 1000 1000))
+
+(defconst sb/emacs-1MB   (*   1 1000 1000))
+(defconst sb/emacs-4MB   (*   4 1000 1000))
+(defconst sb/emacs-8MB   (*   8 1000 1000))
+(defconst sb/emacs-64MB  (*  64 1000 1000))
+(defconst sb/emacs-128MB (* 128 1000 1000))
+(defconst sb/emacs-256MB (* 256 1000 1000))
+(defconst sb/emacs-512MB (* 512 1000 1000))
+
+;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
+;; decrease this. If you experience stuttering, increase this.
+(defun sb/defer-garbage-collection ()
+  "Defer garbage collection."
+  (setq gc-cons-percentage 0.1
+        gc-cons-threshold sb/emacs-512MB))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
 ;; permanently.
-
-(defun sb/defer-garbage-collection ()
-  "Defer garbage collection."
-  (setq gc-cons-percentage 0.1
-        gc-cons-threshold sb/dotemacs-200MB))
-
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq garbage-collection-messages nil))
   (setq gc-cons-percentage 0.1
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/dotemacs-100MB))
+        gc-cons-threshold sb/emacs-64MB))
 
-;; `emacs-startup-hook' runs later than the `after-init-hook'
+;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
+;; customizations
 (add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
-(package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -329,33 +352,19 @@ This location is used for temporary installations and files.")
   :disabled t
   :demand t)
 
-;; Put this early in the `user-init-file'
-(use-package no-littering
-  :if (bound-and-true-p sb/use-no-littering)
-  :demand t)
-
 ;; This is not a great idea, but I expect most warnings will arise from third-party packages
 (use-package warnings
   :custom (warning-minimum-level :emergency))
 
-(defcustom sb/custom-file
-  (no-littering-expand-etc-file-name "custom.el")
-  "File to write Emacs customizations."
-  :type 'string
-  :group 'sb/emacs)
+;; Allow gc to happen after a period of idle time
+(use-package gcmh
+  :diminish
+  :commands (gcmh-mode gcmh-idle-garbage-collect)
+  :hook (after-init . gcmh-mode)
+  :config
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq gcmh-verbose nil)))
 
-(defcustom sb/private-file
-  (no-littering-expand-etc-file-name "private.el")
-  "File to include private information."
-  :type 'string
-  :group 'sb/emacs)
-
-(setq custom-file sb/custom-file)
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror))
-
-(when (file-exists-p sb/private-file)
-  (load sb/private-file 'noerror))
 
 (use-package paradox
   :commands (paradox-list-packages paradox-upgrade-packages paradox-enable)
@@ -397,13 +406,18 @@ This location is used for temporary installations and files.")
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
       auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
-      auto-save-no-message t
+      ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
+      ;; file and runs all save-related hooks
+      auto-save-default nil ; Disable `auto-save-mode', prefer `auto-save-visited-mode' instead
+      auto-save-no-message t ; Allow for debugging frequent autosave triggers
+      auto-save-interval 0 ; Disable autosaving based on number of characters typed
+      auto-save-visited-interval 30 ; Default of 5s is too frequent
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
       case-fold-search t ; Searches and matches should ignore case
       comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
-      compilation-ask-about-save nil
+      compilation-ask-about-save nil ; Save all modified buffers without asking
       ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
       ;; error
       compilation-scroll-output 'first-error
@@ -416,36 +430,42 @@ This location is used for temporary installations and files.")
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
       echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
-      enable-local-variables :all ; Avoid "defvar" warnings
+      ;; enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
       enable-remote-dir-locals t
+      ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
+      ;; information
+      eval-expression-print-length 500
       ;; Disable the warning "X and Y are the same file" in case of symlinks
       find-file-suppress-same-file-warnings t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       ;; Avoid resizing the frame when the font is larger (or smaller) than the system default
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t
-      frame-title-format (list '(buffer-file-name "%f" "%b"))
+      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name "@"
+                               (system-name))
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
       ;; from 0.5s
-      idle-update-delay 1.0
+      ;; idle-update-delay 1.0
       indicate-buffer-boundaries nil
       inhibit-compacting-font-caches t ; Do not compact font caches during GC
-      ;; Disable loading of `default.el' at startup, inhibits site default settings
+      ;; The run-time load order is: (1) file described by `site-run-file', if non-nil; (2)
+      ;; `user-init-file'; (3) default.el. Disable loading of `default.el' at startup, inhibits site
+      ;; default settings.
       inhibit-default-init t
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
-      ;; *scratch* is in `lisp-interaction-mode' by default, use `text-mode'. `text-mode' is more
-      ;; expensive to start, but I use *scratch* for composing emails.
+      ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start,
+      ;; but I use *scratch* for composing emails.
       initial-major-mode 'text-mode
       initial-scratch-message nil
       kill-do-not-save-duplicates t
       kill-whole-line t
       make-backup-files nil ; Stop making backup `~' files
       mouse-drag-copy-region nil ; Mouse is disabled
-      mouse-yank-at-point t ; Yank at point instead of at click
+      mouse-yank-at-point t ; Yank at point with mouse instead of at click
       pop-up-frames nil ; Avoid making separate frames
       ;; pop-up-windows nil ; Disallow creating new windows
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
@@ -470,13 +490,15 @@ This location is used for temporary installations and files.")
       vc-handled-backends '(Git) ; Disabling vc improves performance, alternate option '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
+      window-resize-pixelwise t
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
-      x-underline-at-descent-line t ; Underline looks a bit better when drawn lower
-      )
+      ;; Always trigger an immediate resize of the child frame
+      x-gtk-resize-child-frames 'resize-mode
+      ;; Underline looks a bit better when drawn lower
+      x-underline-at-descent-line t)
 
 (unless (bound-and-true-p sb/use-no-littering)
-  (setq auto-save-list-file-prefix (expand-file-name "auto-save"
-                                                     sb/temp-directory)))
+  (setq auto-save-list-file-prefix (expand-file-name "auto-save" sb/temp-directory)))
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
@@ -492,34 +514,25 @@ This location is used for temporary installations and files.")
               truncate-lines nil)
 
 ;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
-(setq-default bidi-display-reordering 'left-to-right
-              bidi-inhibit-bpa t
+(setq-default bidi-inhibit-bpa t ; Disabling BPA makes redisplay faster
               bidi-paragraph-direction 'left-to-right)
 
 (dolist (exts '(;; Extensions
                 ".aux"
+                ".class"
+                ".dll"
+                ".elc"
                 ".exe"
                 ".fls"
                 ".lof"
+                ".o"
+                ".pyc"
                 ".rel"
                 ".rip"
-                ".toc"
-                "__init__.py"
-                ;; Directories
-                "__pycache__/"
-                "eln-cache"))
+                ".so"
+                ".toc"))
   (add-to-list 'completion-ignored-extensions exts))
 
-;; During normal use a high GC threshold is set. When idling GC is triggered and a low threshold is
-;; set.
-;; TODO: LSP mode generates lots of objects, which causes a problem with gcmh mode.
-(use-package gcmh
-  :diminish
-  :commands (gcmh-mode gcmh-idle-garbage-collect)
-  :hook (after-init . gcmh-mode)
-  :config
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose nil)))
 
 (use-package request
   :config
@@ -550,6 +563,7 @@ This location is used for temporary installations and files.")
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
+
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -648,6 +662,7 @@ This location is used for temporary installations and files.")
 SAVE-FN with non-nil ARGS."
   (ignore args)
   (apply save-fn '(t)))
+
 (advice-add 'do-auto-save :around #'sb/auto-save-wrapper)
 
 (use-package abbrev
@@ -3265,9 +3280,9 @@ This file is specified in `counsel-projectile-default-file'."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge (lsp-configuration-section "pyright")
-                                     (lsp-configuration-section "python")))))
+                                            (lsp--set-configuration
+                                             (ht-merge (lsp-configuration-section "pyright")
+                                                       (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -3385,8 +3400,8 @@ This file is specified in `counsel-projectile-default-file'."
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-remote))
 
