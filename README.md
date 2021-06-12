@@ -338,7 +338,7 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
 ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 make -j2 NATIVE_FULL_AOT=1
-make install
+sudo make install
 ```
 
 Evaluate the following to test that both fast JSON and native compilation are working.
@@ -376,7 +376,7 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 ## Profile startup time
 
-`emacs -Q -l /home/swarnendu/github/dotemacs-27/extras/profile-dotemacs.el -f profile-dotemacs`
+`emacs -Q -l /home/swarnendu/github/dotemacs-28/extras/profile-dotemacs.el -f profile-dotemacs`
 
 ## TODO
 
@@ -386,4 +386,3 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 - Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - Cursor loses its place after formatting with YAPF
 - Integrate `company-yasnippet` and assign a key to `yas-expand-all`
-

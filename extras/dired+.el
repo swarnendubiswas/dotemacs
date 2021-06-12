@@ -6,11 +6,11 @@
 ;; Maintainer: Drew Adams (concat "drew.adams" "@" "oracle" ".com")
 ;; Copyright (C) 1999-2021, Drew Adams, all rights reserved.
 ;; Created: Fri Mar 19 15:58:58 1999
-;; Version: 2020.12.01
+;; Version: 2021.06.07
 ;; Package-Requires: ()
-;; Last-Updated: Mon May 10 09:08:06 2021 (-0700)
+;; Last-Updated: Mon Jun  7 09:19:56 2021 (-0700)
 ;;           By: dradams
-;;     Update #: 12975
+;;     Update #: 12983
 ;; URL: https://www.emacswiki.org/emacs/download/dired%2b.el
 ;; Doc URL: https://www.emacswiki.org/emacs/DiredPlus
 ;; Keywords: unix, mouse, directories, diredp, dired
@@ -801,6 +801,7 @@
 ;;; ;;                              `dired-insert-directory'.  (Emacs 23+,
 ;;; ;;                              and only for MS Windows)
 ;;
+;;  `dired-repeat-over-lines' - Skip dir header line (bug #48883).
 ;;  `dired-revert'            - Reset `mode-line-process' to nil.
 ;;  `dired-sort-set-mode-line' - Respect `diredp-switches-in-mode-line'.
 ;;  `dired-switches-escape-p' - Made compatible with Emacs 20, 21.
@@ -876,6 +877,8 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2021/06/07 dadams
+;;     Added redefinitions of dired-repeat-over-lines and dired-toggle-marks (bug #48883).
 ;; 2021/05/10 dadams
 ;;     diredp-copy-filename-as-kill-recursive: use diredp-filename-separator, not SPC.
 ;;     dired-copy-filename-as-kill, diredp-yank-files: Mention diredp-filename-separator in doc string.
@@ -12018,6 +12021,60 @@ FUNCTION should not manipulate the files.  It should just read input
             (error nil)))
         (bury-buffer buffer-or-name)))
     result))
+
+
+;; REPLACE ORIGINAL in `dired.el':
+;;
+;; Do not mark dir header line (see bug #48883).
+;;
+;;;###autoload
+(defun dired-repeat-over-lines (arg function)
+  "Repeat FUNCTION over this line and the next ARG lines.
+\(Negative ARG means previous, not next.)
+Non-file lines are skipped."
+  (let ((pos  (make-marker)))
+    (beginning-of-line)
+    (while (and (> arg 0)  (not (eobp)))
+      (setq arg  (1- arg))
+      (beginning-of-line)
+      (while (and (not (eobp)) (dired-between-files)) (forward-line 1))
+      (save-excursion
+	(forward-line 1)
+	(move-marker pos (1+ (point))))
+      (save-excursion (funcall function))
+      ;; Advance to the next line--actually, to the line that *was* next.
+      ;; (If FUNCTION inserted some new lines in between, skip them.)
+      (goto-char pos))
+    (while (and (< arg 0)  (not (bobp)))
+      (setq arg  (1+ arg))
+      (forward-line -1)
+      (while (and (not (bobp))  (dired-between-files)) (forward-line -1))
+      (beginning-of-line)
+      (when (dired-get-filename nil t) (save-excursion (funcall function))))
+    (move-marker pos nil)
+    (dired-move-to-filename)))
+
+
+;; REPLACE ORIGINAL in `dired.el':
+;;
+;; Toggle also `.' and `..'.  See bug #48883.
+;;
+(defun dired-toggle-marks ()
+  "Toggle marks: marked files become unmarked, and vice versa.
+Files marked with other marks (such as `D') are not affected.
+Hidden subdirs are also not affected."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((inhibit-read-only  t))
+      (while (not (eobp))
+        (or (dired-between-files)
+            ;; Use subst instead of insdel because it does not move the gap and thus should be faster and because
+            ;; other characters are left alone automatically
+            (apply 'subst-char-in-region (point) (1+ (point)) (if (eq ?\   (following-char)) ; SPC
+                                                                  (list ?\   dired-marker-char)
+                                                                (list dired-marker-char ?\  ))))
+        (forward-line 1)))))
 
 
 ;; REPLACE ORIGINAL in `dired.el':

@@ -39,6 +39,7 @@
                          bm
                          ;; boogie-friends
                          ;; bug-hunter
+                         circadian
                          ;; clang-format
                          ;; clang-format+
                          cmake-font-lock
@@ -48,6 +49,7 @@
                          ;; company-bibtex
                          company-math
                          company-posframe
+                         company-prescient
                          company-quickhelp
                          company-reftex
                          company-shell
@@ -69,17 +71,18 @@
                          dired-narrow
                          disable-mouse
                          discover-my-major
-                         ;; doom-modeline
-                         ;; doom-themes
+                         doom-modeline
+                         doom-themes
                          dotenv-mode
                          dumb-jump
                          duplicate-thing
                          ;; editorconfig
                          ;; ein
+                         eldoc-box
                          emmet-mode
                          ;; ess
                          ;; ess-smart-underscore
-                         esup
+                         ;; esup
                          exec-path-from-shell
                          expand-region
                          fasd
@@ -87,6 +90,7 @@
                          flycheck
                          ;; flycheck-clang-analyzer
                          ;; flycheck-clang-tidy
+                         flycheck-posframe
                          flycheck-grammarly
                          flyspell-correct
                          flyspell-correct-ivy
@@ -118,8 +122,8 @@
                          iedit
                          immortal-scratch
                          ini-mode
-                         isearch-dabbrev
-                         isearch-symbol-at-point
+                         ;; isearch-dabbrev
+                         ;; isearch-symbol-at-point
                          ivy
                          ivy-avy
                          ivy-bibtex
@@ -140,7 +144,7 @@
                          lsp-java
                          lsp-mode
                          lsp-pyright
-                         ;; lsp-treemacs
+                         lsp-treemacs
                          lsp-ui
                          magit
                          manage-minor-mode
@@ -163,6 +167,7 @@
                          opencl-mode
                          orderless
                          org-bullets
+                         page-break-lines
                          pandoc-mode
                          paradox
                          pdf-tools
@@ -185,9 +190,9 @@
                          pyvenv
                          rainbow-delimiters
                          rainbow-mode
-                         reformatter
+                         ;; reformatter
                          request
-                         rich-minority
+                         ;; rich-minority
                          ripgrep
                          ;; rust-mode
                          ;; sass-mode

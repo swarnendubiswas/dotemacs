@@ -639,8 +639,8 @@ SAVE-FN with non-nil ARGS."
                 auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
-                global-hl-line-mode
-                global-visual-line-mode ; Wrap lines
+                ;; global-hl-line-mode
+                ;; global-visual-line-mode ; Wrap lines
                 minibuffer-depth-indicate-mode
                 ;; outline-minor-mode
                 ;; Enable visual feedback on selections, mark follows the point
@@ -1597,6 +1597,7 @@ SAVE-FN with non-nil ARGS."
   (bind-keys :package org :map org-mode-map
              ("M-<left>")
              ("M-<right>")
+             ("C-'")
              ("<tab>"      . org-indent-item)
              ("<backtab>"  . org-outdent-item))
 
@@ -1818,6 +1819,7 @@ SAVE-FN with non-nil ARGS."
     (defvar recentf-menu-filter)
     (defvar recentf-save-file)
     (defvar recentf-keep)
+    (defvar recentf-filename-handlers)
 
     (setq recentf-auto-cleanup 'never ; Do not stat remote files
           ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
@@ -1841,7 +1843,8 @@ SAVE-FN with non-nil ARGS."
           recentf-keep '(file-remote-p file-readable-p)
           recentf-max-saved-items 250 ; Larger values help in lookup
           ;; recentf-menu-filter 'recentf-sort-descending
-          )
+          recentf-filename-handlers (append '(abbreviate-file-name)
+                                            recentf-filename-handlers))
 
     (unless (bound-and-true-p sb/use-no-littering)
       (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
@@ -1933,8 +1936,7 @@ SAVE-FN with non-nil ARGS."
           company-selection-wrap-around t
           company-show-numbers t ; Speed up completion
           ;; Align additional metadata, like type signatures, to the right-hand side
-          company-tooltip-align-annotations t
-          company-tooltip-limit 12)
+          company-tooltip-align-annotations t)
 
     ;; Ignore matches that consist solely of numbers from `company-dabbrev'
     ;; https://github.com/company-mode/company-mode/issues/358
@@ -2567,20 +2569,13 @@ SAVE-FN with non-nil ARGS."
   (defvar spell-fu-directory)
   (defvar no-littering-var-directory)
 
-  ;; ;; `nxml-mode' is derived from `text-mode'
-  ;; (setq spell-fu-faces-exclude '(font-lock-function-name-face
-  ;;                                font-lock-keyword-face
-  ;;                                font-lock-string-face
-  ;;                                font-lock-variable-name-face
-  ;;                                hl-line
-  ;;                                lsp-face-highlight-read))
-
   (if (bound-and-true-p sb/use-no-littering)
       (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
     (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
 
   (add-hook 'text-mode-hook
             (lambda ()
+              ;; `nxml-mode' is derived from `text-mode'
               (setq spell-fu-faces-exclude '(hl-line
                                              nxml-attribute-local-name))
               (spell-fu-mode)))
@@ -3032,19 +3027,21 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (when (eq sb/selection 'ivy)
-  (progn
-    ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
-    ;; Enable before `ivy-rich-mode' for better performance
-    (when (display-graphic-p)
-      (unless (fboundp 'all-the-icons-ivy-rich-mode)
-        (autoload #'all-the-icons-ivy-rich-mode "all-the-icons-ivy-rich" nil t))
+  ;; Enable before `ivy-rich-mode' for better performance
+  ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
+  ;; The new transformers (file permissions) seem more of an overkill and buggy
+  (when nil
+    (progn
+      (when (display-graphic-p)
+        (unless (fboundp 'all-the-icons-ivy-rich-mode)
+          (autoload #'all-the-icons-ivy-rich-mode "all-the-icons-ivy-rich" nil t))
 
-      (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
+        (add-hook 'ivy-mode-hook #'all-the-icons-ivy-rich-mode)
 
-      (with-eval-after-load "all-the-icons-ivy-rich"
-        (defvar all-the-icons-ivy-rich-icon-size)
+        (with-eval-after-load "all-the-icons-ivy-rich"
+          (defvar all-the-icons-ivy-rich-icon-size)
 
-        (setq all-the-icons-ivy-rich-icon-size 0.7))))
+          (setq all-the-icons-ivy-rich-icon-size 0.7)))))
 
 
   (progn
@@ -4046,22 +4043,22 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 ;; TODO: Is this causing the mouse-movement error and breaking out of key bindings?
+(progn
+  (when (display-mouse-p)
+    (unless (fboundp 'global-disable-mouse-mode)
+      (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
+
+    (add-hook 'after-init-hook #'global-disable-mouse-mode)
+
+    (with-eval-after-load "disable-mouse"
+      (diminish 'disable-mouse-global-mode))))
+
 (when nil
   (progn
-    (when (display-mouse-p)
-      (unless (fboundp 'global-disable-mouse-mode)
-        (autoload #'global-disable-mouse-mode "disable-mouse" nil t))
+    (unless (fboundp 'mouse-avoidance-mode)
+      (autoload #'mouse-avoidance-mode "avoid" nil t))
 
-      (add-hook 'after-init-hook #'global-disable-mouse-mode)
-
-      (with-eval-after-load "disable-mouse"
-        (diminish 'disable-mouse-global-mode))
-
-
-      (unless (fboundp 'mouse-avoidance-mode)
-        (autoload #'mouse-avoidance-mode "avoid" nil t))
-
-      (mouse-avoidance-mode 'banish))))
+    (mouse-avoidance-mode 'banish)))
 
 
 (unless (fboundp 'apt-sources-list-mode)
@@ -4257,8 +4254,11 @@ This file is specified in `counsel-projectile-default-file'."
              ("C-<f3>" . bm-previous)))
 
 
-(unless (fboundp 'esup)
-  (autoload #'esup "esup" nil t))
+(progn
+  (declare-function esup "esup")
+
+  (unless (fboundp 'esup)
+    (autoload #'esup "esup" nil t)))
 
 
 (when sb/debug-init-file
@@ -4289,9 +4289,10 @@ This file is specified in `counsel-projectile-default-file'."
 ;; get run for all modes derived from a basic mode such as `text-mode'.
 
 ;; https://www.emacswiki.org/emacs/AutoFillMode
-;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-;; We need to enable lsp workspace to allow `lsp-grammarly' to work
+;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
+;; temporary text files
 (when nil
   (progn
     (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode))
@@ -4359,7 +4360,6 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' does not work
-
 (progn
   (declare-function pdf-view-mode "pdf-tools")
   (declare-function pdf-annot-delete "pdf-tools")
@@ -4562,7 +4562,6 @@ This file is specified in `counsel-projectile-default-file'."
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
-
 (when t
   (when (executable-find "prettier")
     (progn
@@ -4595,6 +4594,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (progn
+  (declare-function highlight-doxygen-global-mode "highlight-doxygen")
+
   (unless (fboundp 'highlight-doxygen-global-mode)
     (autoload #'highlight-doxygen-global-mode "highlight-doxygen" nil t))
 
@@ -5338,6 +5339,8 @@ This file is specified in `counsel-projectile-default-file'."
 
 
 (progn
+  (declare-function opencl-mode "opencl-mode")
+
   (unless (fboundp 'opencl-mode)
     (autoload #'opencl-mode "opencl-mode" nil t))
 
@@ -6041,7 +6044,7 @@ This file is specified in `counsel-projectile-default-file'."
 
 ;; https://github.com/ROCKTAKEY/lsp-latex/issues/26
 ;; Texlab seems to have high overhead
-(when nil
+(when t
   (progn
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook hook (lambda nil
@@ -6697,8 +6700,10 @@ Ignore if no file is found."
 
 
 (progn
+  (declare-function info-colors-fontify-node "info-colors")
+
   (unless (fboundp 'info-colors-fontify-node)
-    (autoload #'info-colors-fontify-node "info-colors") nil t)
+    (autoload #'info-colors-fontify-node "info-colors" nil t))
 
   (with-eval-after-load "info"
     (add-hook 'Info-selection-hook #'info-colors-fontify-node)))
@@ -6991,6 +6996,7 @@ Ignore if no file is found."
     ;; labels and citations
 
     (setq company-backends '((:separate
+                              company-capf
                               company-files
                               company-reftex-citations
                               company-reftex-labels
