@@ -169,57 +169,9 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 
-(defcustom sb/use-no-littering
-  t
-  "Use the `no-littering' package to keep `.emacs.d' clean."
-  :type 'boolean
-  :group 'sb/emacs)
-
-
-(add-to-list 'load-path sb/extras-directory)
-(defvar sb/core-packages)
-
-
 ;; Another option is to construct the `load-path' manually
 ;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
 (package-initialize)
-
-
-(when (bound-and-true-p sb/use-no-littering)
-  (require 'no-littering))
-
-
-(defcustom sb/custom-file
-  (no-littering-expand-etc-file-name "custom.el")
-  "File to write Emacs customizations."
-  :type 'string
-  :group 'sb/emacs)
-
-
-(defcustom sb/private-file
-  (no-littering-expand-etc-file-name "private.el")
-  "File to include private information."
-  :type 'string
-  :group 'sb/emacs)
-
-
-(setq custom-file sb/custom-file)
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror))
-
-(when (file-exists-p sb/private-file)
-  (load sb/private-file 'noerror))
-
-
-(defcustom sb/temp-directory
-  (expand-file-name "tmp" user-emacs-directory)
-  "Storage location for various configuration files."
-  :type 'string
-  :group 'sb/emacs)
-
-(unless (or (bound-and-true-p sb/use-no-littering)
-            (file-exists-p sb/temp-directory))
-  (make-directory sb/temp-directory))
 
 
 (defconst sb/EMACS27+   (> emacs-major-version 26))
@@ -336,6 +288,55 @@ This location is used for temporary installations and files.")
 
 (use-package use-package-chords
   :config (key-chord-mode 1))
+
+(defcustom sb/use-no-littering
+  t
+  "Use the `no-littering' package to keep `.emacs.d' clean."
+  :type 'boolean
+  :group 'sb/emacs)
+
+
+(add-to-list 'load-path sb/extras-directory)
+(defvar sb/core-packages)
+
+
+(use-package no-littering
+  :if (bound-and-true-p sb/use-no-littering)
+  :demand t)
+
+
+(defcustom sb/custom-file
+  (no-littering-expand-etc-file-name "custom.el")
+  "File to write Emacs customizations."
+  :type 'string
+  :group 'sb/emacs)
+
+
+(defcustom sb/private-file
+  (no-littering-expand-etc-file-name "private.el")
+  "File to include private information."
+  :type 'string
+  :group 'sb/emacs)
+
+
+(setq custom-file sb/custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror))
+
+(when (file-exists-p sb/private-file)
+  (load sb/private-file 'noerror))
+
+
+(defcustom sb/temp-directory
+  (expand-file-name "tmp" user-emacs-directory)
+  "Storage location for various configuration files."
+  :type 'string
+  :group 'sb/emacs)
+
+(unless (or (bound-and-true-p sb/use-no-littering)
+            (file-exists-p sb/temp-directory))
+  (make-directory sb/temp-directory))
+
 
 (unless (package-installed-p 'quelpa)
   (package-refresh-contents)

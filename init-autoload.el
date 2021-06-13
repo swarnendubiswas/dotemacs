@@ -44,7 +44,7 @@
 
 
 (defcustom sb/modeline-theme
-  'powerline
+  'none
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -123,7 +123,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -308,12 +308,16 @@ This location is used for temporary installations and files.")
   (defvar exec-path-from-shell-variables)
 
   ;; "-i" is expensive but Tramp is unable to find executables without the option
-  (setq exec-path-from-shell-arguments '("-l") ; "-i"
+  (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
                                          "LANG" "LC_CTYPE"))
 
   (exec-path-from-shell-initialize))
+
+;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
+;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
+
 
 ;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
@@ -711,7 +715,7 @@ SAVE-FN with non-nil ARGS."
 ;; (set-default 'cursor-type '(bar . 4))
 
 
-(when t
+(when nil
   (progn
     (require 'solar)
 
@@ -1460,32 +1464,32 @@ SAVE-FN with non-nil ARGS."
 
         ;; https://github.com/Alexander-Miller/treemacs/issues/735
         (treemacs-create-theme "Default-Tighter"
-                               :extends "Default"
-                               :config
-                               (let ((icons (treemacs-theme->gui-icons theme)))
-                                 (maphash (lambda
-                                            (ext icon)
-                                            (puthash ext
-                                                     (concat
-                                                      (substring icon 0 1)
-                                                      (propertize " " 'display
-                                                                  '(space . (:width 0.5))))
-                                                     icons))
-                                          icons)))
+          :extends "Default"
+          :config
+          (let ((icons (treemacs-theme->gui-icons theme)))
+            (maphash (lambda
+                       (ext icon)
+                       (puthash ext
+                                (concat
+                                 (substring icon 0 1)
+                                 (propertize " " 'display
+                                             '(space . (:width 0.5))))
+                                icons))
+                     icons)))
 
         (treemacs-create-theme "all-the-icons-tighter"
-                               :extends "all-the-icons"
-                               :config
-                               (let ((icons (treemacs-theme->gui-icons theme)))
-                                 (maphash (lambda
-                                            (ext icon)
-                                            (puthash ext
-                                                     (concat
-                                                      (substring icon 0 1)
-                                                      (propertize " " 'display
-                                                                  '(space . (:width 0.5))))
-                                                     icons))
-                                          icons)))
+          :extends "all-the-icons"
+          :config
+          (let ((icons (treemacs-theme->gui-icons theme)))
+            (maphash (lambda
+                       (ext icon)
+                       (puthash ext
+                                (concat
+                                 (substring icon 0 1)
+                                 (propertize " " 'display
+                                             '(space . (:width 0.5))))
+                                icons))
+                     icons)))
 
         (treemacs-load-theme "all-the-icons")
 
@@ -5002,10 +5006,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge
-                                              (lsp-configuration-section "pyright")
-                                              (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge
+                            (lsp-configuration-section "pyright")
+                            (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -5425,6 +5429,9 @@ This file is specified in `counsel-projectile-default-file'."
 (progn
   (unless (fboundp 'pyvenv-mode)
     (autoload #'pyvenv-mode "pyvenv" nil t))
+  (unless (fboundp 'pyvenv-tracking-mode)
+    (autoload #'pyvenv-tracking-mode "pyvenv" nil t))
+
 
   (add-hook 'python-mode-hook #'pyvenv-mode)
 
@@ -5436,11 +5443,11 @@ This file is specified in `counsel-projectile-default-file'."
     (defvar python-shell-interpreter)
 
     (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name
-                                       ("[venv:" pyvenv-virtual-env-name "]"))
+                                       (" [venv:" pyvenv-virtual-env-name "] "))
           pyvenv-post-activate-hooks (list
                                       (lambda nil
                                         (setq python-shell-interpreter
-                                              (concat pyvenv-virtual-env "bin/python3"))))
+                                              (concat pyvenv-virtual-env "bin/python"))))
           pyvenv-post-deactivate-hooks (list
                                         (lambda nil
                                           (setq python-shell-interpreter "python3"))))
@@ -5824,10 +5831,10 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
 
-  (with-eval-after-load "diff-hl"
-    (defvar diff-hl-draw-borders)
-    ;; Highlight without a border looks nicer
-    (setq diff-hl-draw-borders nil)))
+;;   (with-eval-after-load "diff-hl"
+;;     (defvar diff-hl-draw-borders)
+;;     ;; Highlight without a border looks nicer
+;;     (setq diff-hl-draw-borders nil)))
 
 
 (progn
@@ -6720,32 +6727,33 @@ Ignore if no file is found."
 
     (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
-    (add-hook 'lsp-managed-mode-hook
-              (lambda ()
-                (when (derived-mode-p 'python-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
+    ;; Use per-project directory local variables
+    ;; (add-hook 'lsp-managed-mode-hook
+    ;;           (lambda ()
+    ;;             (when (derived-mode-p 'python-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
 
-                (when (derived-mode-p 'sh-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
+    ;;             (when (derived-mode-p 'sh-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
 
-                (when (derived-mode-p 'c++-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
+    ;;             (when (derived-mode-p 'c++-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
 
-                (when (derived-mode-p 'css-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
+    ;;             (when (derived-mode-p 'css-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
 
-                (when (derived-mode-p 'html-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
+    ;;             (when (derived-mode-p 'html-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
 
-                (when (derived-mode-p 'xml-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
+    ;;             (when (derived-mode-p 'xml-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
 
-                (when (derived-mode-p 'yaml-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
+    ;;             (when (derived-mode-p 'yaml-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
 
-                (when (derived-mode-p 'json-mode)
-                  (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
-                ))
+    ;;             (when (derived-mode-p 'json-mode)
+    ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
+    ;;             ))
     ))
 
 
