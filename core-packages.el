@@ -11,7 +11,7 @@
 
 ;; Check number of installed packages with `(length package-alist)'
 (setq sb/core-packages '(ace-window
-                         ;; adoc-mode
+                         adoc-mode
                          aggressive-indent
                          all-the-icons
                          all-the-icons-dired
@@ -26,27 +26,27 @@
                          auctex
                          auctex-latexmk
                          auto-dim-other-buffers
-                         ;; autodisass-java-bytecode
-                         ;; autodisass-llvm-bitcode
+                         autodisass-java-bytecode
+                         autodisass-llvm-bitcode
                          avy
-                         ;; bazel-mode
-                         ;; beacon
+                         bazel
+                         beacon
                          beginend
                          bibtex-completion
                          bibtex-utils
                          bind-key
                          bison-mode
                          bm
-                         ;; boogie-friends
-                         ;; bug-hunter
+                         boogie-friends
+                         bug-hunter
                          circadian
-                         ;; clang-format
-                         ;; clang-format+
+                         clang-format
+                         clang-format+
                          cmake-font-lock
                          cmake-mode
                          company
                          company-auctex
-                         ;; company-bibtex
+                         company-bibtex
                          company-math
                          company-posframe
                          company-prescient
@@ -57,9 +57,9 @@
                          counsel-fd
                          crux
                          csv-mode
-                         ;; ctrlf
+                         ctrlf
                          cuda-mode
-                         ;; cython-mode
+                         cython-mode
                          dap-mode
                          deadgrep
                          default-text-scale
@@ -75,20 +75,20 @@
                          dotenv-mode
                          dumb-jump
                          duplicate-thing
-                         ;; editorconfig
-                         ;; ein
+                         editorconfig
+                         ein
                          eldoc-box
                          emmet-mode
-                         ;; ess
-                         ;; ess-smart-underscore
-                         ;; esup
+                         ess
+                         ess-smart-underscore
+                         esup
                          exec-path-from-shell
                          expand-region
                          fasd
                          fish-mode
                          flycheck
-                         ;; flycheck-clang-analyzer
-                         ;; flycheck-clang-tidy
+                         flycheck-clang-analyzer
+                         flycheck-clang-tidy
                          flycheck-posframe
                          flycheck-grammarly
                          flyspell-correct
@@ -102,14 +102,14 @@
                          gitattributes-mode
                          gitconfig-mode
                          gitignore-mode
-                         ;; gnuplot
+                         gnuplot
                          goto-last-change
                          grammarly
-                         ;; graphviz-dot-mode
+                         graphviz-dot-mode
                          grip-mode
                          groovy-mode
                          helpful
-                         ;; hide-mode-line
+                         hide-mode-line
                          highlight-doxygen
                          highlight-escape-sequences
                          highlight-indentation
@@ -121,8 +121,8 @@
                          iedit
                          immortal-scratch
                          ini-mode
-                         ;; isearch-dabbrev
-                         ;; isearch-symbol-at-point
+                         isearch-dabbrev
+                         isearch-symbol-at-point
                          ivy
                          ivy-avy
                          ivy-bibtex
@@ -130,10 +130,10 @@
                          ivy-rich
                          ivy-xref
                          ivy-yasnippet
-                         ;; jgraph-mode
-                         ;; jinja2-mode
-                         ;; js2-mode
-                         ;; js2-refactor
+                         jgraph-mode
+                         jinja2-mode
+                         js2-mode
+                         js2-refactor
                          json-reformat
                          json-snatcher
                          key-chord
@@ -154,13 +154,13 @@
                          math-symbols
                          ;; Required by `ac-math' and `company-math'
                          math-symbol-lists
-                         ;; matlab-mode
+                         matlab-mode
                          modern-cpp-font-lock
                          modus-themes
-                         ;; moody
+                         moody
                          move-text
                          multiple-cursors
-                         ;; nix-mode
+                         nix-mode
                          no-littering
                          nvm
                          opencl-mode
@@ -171,44 +171,45 @@
                          paradox
                          pdf-tools
                          persistent-scratch
-                         ;; php-mode
-                         ;; pip-requirements
-                         ;; pkg-info
-                         ;; pkgbuild-mode
+                         php-mode
+                         pip-requirements
+                         pkg-info
+                         pkgbuild-mode
                          popup
-                         ;; popwin
+                         popwin
                          pos-tip
                          posframe
                          powerline
                          prescient
                          projectile
-                         ;; protobuf-mode
+                         protobuf-mode
                          py-isort
                          pylint
                          python-docstring
                          pyvenv
                          rainbow-delimiters
                          rainbow-mode
-                         ;; reformatter
+                         reformatter
                          request
-                         ;; rich-minority
+                         rich-minority
                          ripgrep
-                         ;; rust-mode
-                         ;; sass-mode
+                         rust-mode
+                         sass-mode
                          saveplace-pdf-view
-                         ;; scss-mode
+                         scss-mode
+                         selectrum
                          shfmt
                          smart-mark
                          spell-fu
                          ssh-config-mode
-                         ;; super-save
+                         super-save
                          swiper
                          symbol-overlay
-                         ;; toml-mode
-                         ;; treemacs
-                         ;; treemacs-all-the-icons
-                         ;; treemacs-magit
-                         ;; treemacs-projectile
+                         toml-mode
+                         treemacs
+                         treemacs-all-the-icons
+                         treemacs-magit
+                         treemacs-projectile
                          undo-tree
                          visual-regexp
                          vlf
@@ -222,14 +223,14 @@
                          writegood-mode
                          ws-butler
                          xref
-                         ;; xref-js2
-                         ;; xref-rst
+                         xref-js2
+                         xref-rst
                          yaml-imenu
                          yaml-mode
                          yapfify
                          yasnippet
                          yasnippet-snippets
-                         ;; z3-mode
+                         z3-mode
                          ))
 
 (defun sb/install-packages ()

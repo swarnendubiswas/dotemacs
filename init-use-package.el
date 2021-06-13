@@ -1854,7 +1854,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ispell
   :ensure nil
-  :if sb/dotemacs-is-linux
+  :if sb/IS-LINUX
   :custom
   (ispell-dictionary "en_US")
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
@@ -1871,7 +1871,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package flyspell
   :ensure nil
-  :if sb/dotemacs-is-linux
+  :if sb/IS-LINUX
   :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
   :preface
   ;; Move point to previous error
@@ -2123,7 +2123,7 @@ SAVE-FN with non-nil ARGS."
     (setq projectile-dynamic-mode-line nil))
 
   ;; https://github.com/MatthewZMD/.emacs.d
-  (when (and sb/dotemacs-is-windows
+  (when (and sb/IS-WINDOWS
              (executable-find "tr"))
     (setq projectile-indexing-method 'alien))
 
@@ -3056,7 +3056,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; The variable-height minibuffer and extra eldoc buffers are distracting
 (use-package eldoc
   :ensure nil
-  :if sb/dotemacs-is-linux
+  :if sb/IS-LINUX
   :diminish
   :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
   :custom
@@ -4248,7 +4248,7 @@ Ignore if no file is found."
   :mode "\\.sass\\'"
   :hook (sass-mode . lsp-deferred))
 
-(use-package bazel-mode
+(use-package bazel
   :mode
   (("\\.bzl$"       . bazel-mode)
    ("\\BUILD\\'"    . bazel-mode)
@@ -4774,7 +4774,7 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-key "C-x s" #'sb/switch-to-scratch)
 (bind-key "C-x j" #'sb/counsel-all-files-recursively)
 
-(when sb/dotemacs-emacs28+
+(when sb/EMACS28+
   (bind-key "C-c d p" #'package-quickstart-refresh))
 
 (global-set-key [remap next-buffer] #'sb/next-buffer)

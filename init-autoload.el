@@ -5831,10 +5831,10 @@ This file is specified in `counsel-projectile-default-file'."
   (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
 
-;;   (with-eval-after-load "diff-hl"
-;;     (defvar diff-hl-draw-borders)
-;;     ;; Highlight without a border looks nicer
-;;     (setq diff-hl-draw-borders nil)))
+  (with-eval-after-load "diff-hl"
+    (defvar diff-hl-draw-borders)
+    ;; Highlight without a border looks nicer
+    (setq diff-hl-draw-borders nil)))
 
 
 (progn
