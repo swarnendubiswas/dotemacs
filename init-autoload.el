@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-autoload.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
 ;;; no-byte-compile: nil; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -31,20 +31,19 @@
   'none
   "Specify which Emacs theme to use."
   :type '(radio
-          ;; (const :tag "leuven" leuven)
-          ;; (const :tag "doom-molokai" doom-molokai)
-          ;; (const :tag "doom-one-light" doom-one-light)
-          ;; (const :tag "monokai" monokai)
+          (const :tag "leuven" leuven)
+          (const :tag "doom-molokai" doom-molokai)
+          (const :tag "doom-one-light" doom-one-light)
+          (const :tag "monokai" monokai)
           (const :tag "modus-operandi" modus-operandi)
           (const :tag "modus-vivendi" modus-vivendi)
-          ;; Customizations over the default theme
-          (const :tag "customized" sb/default)
+          (const :tag "customized" sb/default) ; Customizations over the default theme
           (const :tag "none" none))
   :group 'sb/emacs)
 
 
 (defcustom sb/modeline-theme
-  'none
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type '(radio
           (const :tag "powerline" powerline)
@@ -69,7 +68,7 @@ This depends on the orientation of the display."
   :group 'sb/emacs)
 
 
-;; Large values make reading difficult when the window is split
+;; Large values make reading difficult when the window is split side-by-side
 (defcustom sb/fill-column
   100
   "Column beyond which lines should not extend."
@@ -97,8 +96,9 @@ whitespaces."
   :group 'sb/emacs)
 
 
+;; We use `lsp-mode' and `dumb-jump' for jumping to tags and browsing source code
 (defcustom sb/tags-scheme
-  'none ; We use `lsp-mode' and `dumb-jump'
+  'none
   "Choose whether to use gtags or ctags."
   :type '(radio
           (const :tag "ctags" ctags)
@@ -141,6 +141,7 @@ whitespaces."
   "User HOME directory.")
 
 
+;; We use this location for shared installations like `textlint'
 (defconst sb/user-tmp
   (expand-file-name "tmp" sb/user-home)
   "User temp directory.
@@ -154,7 +155,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 
-;; `pyls' and `mspyls' are not actively maintained, the progress of `py-lsp' is slow
+;; `pyls' and `mspyls' are not actively maintained, and improvements to `py-lsp' is slow
 (defcustom sb/python-langserver
   'pyright
   "Choose the Python Language Server implementation."
@@ -165,20 +166,23 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 
-(defcustom sb/use-no-littering
-  t
-  "Use the `no-littering' package to keep `.emacs.d' clean."
-  :type 'boolean
-  :group 'sb/emacs)
-
-
 (add-to-list 'load-path sb/extras-directory)
-(defvar sb/core-packages)
+
+;; Install required packages with `M-x sb/install-packages', you will need to edit the
+;; `package-archives' before that
+(load "core-packages")
 
 
 ;; Another option is to construct the `load-path' manually
 ;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
 (package-initialize)
+
+
+(defcustom sb/use-no-littering
+  t
+  "Use the `no-littering' package to keep `.emacs.d' clean."
+  :type 'boolean
+  :group 'sb/emacs)
 
 
 (when (bound-and-true-p sb/use-no-littering)
@@ -213,6 +217,7 @@ This location is used for temporary installations and files.")
   :type 'string
   :group 'sb/emacs)
 
+;; We do not need this with `no-littering'
 (unless (or (bound-and-true-p sb/use-no-littering)
             (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
@@ -255,7 +260,7 @@ This location is used for temporary installations and files.")
 (add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
 
 
-;; Allow gc to happen after a period of idle time
+;; Allow GC to happen after a period of idle time
 (progn
   (declare-function gcmh-idle-garbage-collect "gcmh")
 
@@ -315,6 +320,7 @@ This location is used for temporary installations and files.")
 
   (exec-path-from-shell-initialize))
 
+;; LATER: Doing the following to avoid "-i" to `exec-path-from-shell' does not help.
 ;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
 ;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
 
@@ -437,8 +443,7 @@ This location is used for temporary installations and files.")
 (setq-default bidi-inhibit-bpa t ; Disabling BPA makes redisplay faster
               bidi-paragraph-direction 'left-to-right)
 
-(dolist (exts '(;; Extensions
-                ".aux"
+(dolist (exts '(".aux"
                 ".class"
                 ".dll"
                 ".elc"
@@ -715,7 +720,7 @@ SAVE-FN with non-nil ARGS."
 ;; (set-default 'cursor-type '(bar . 4))
 
 
-(when nil
+(when t
   (progn
     (require 'solar)
 
@@ -819,6 +824,7 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'region nil :background "gainsboro")))
 
 
+;; The Python virtualenv information is not shown
 (when (eq sb/modeline-theme 'powerline)
   (unless (fboundp 'powerline-default-theme)
     (autoload #'powerline-default-theme "powerline" nil t))
@@ -844,7 +850,7 @@ SAVE-FN with non-nil ARGS."
   (powerline-default-theme))
 
 
-(when nil
+(when t
   (when (eq sb/modeline-theme 'sml)
     (declare-function sml/setup "smart-mode-line")
 
@@ -868,7 +874,7 @@ SAVE-FN with non-nil ARGS."
     (sml/setup)))
 
 
-(when nil
+(when t
   (when (eq sb/modeline-theme 'spaceline)
     (require 'spaceline-config)
     (require 'spaceline-all-the-icons)
@@ -890,7 +896,7 @@ SAVE-FN with non-nil ARGS."
     (spaceline-all-the-icons-theme)))
 
 
-(when nil
+(when t
   (when (eq sb/modeline-theme 'doom-modeline)
     (unless (fboundp 'doom-modeline-mode)
       (autoload #'doom-modeline-mode "doom-modeline" nil t))
@@ -977,7 +983,7 @@ SAVE-FN with non-nil ARGS."
        ((t
          (:foreground "#5e8e2e" :weight bold :height 0.8))))))))
 
-(when nil
+(when t
   (when (eq sb/modeline-theme 'moody)
     (unless (fboundp 'moody-replace-vc-mode)
       (autoload #'moody-replace-vc-mode "moody" nil t))
@@ -1319,7 +1325,7 @@ SAVE-FN with non-nil ARGS."
     (diminish 'all-the-icons-dired-mode)))
 
 
-(when nil
+(when t
   (progn
     (when (display-graphic-p)
       (declare-function treemacs-git-mode "treemacs")
@@ -1431,6 +1437,8 @@ SAVE-FN with non-nil ARGS."
         (defvar treemacs-silent-refresh)
         (defvar treemacs-width)
         (defvar treemacs-persist-file)
+        (defvar treemacs-indentation-string)
+        (defvar treemacs-user-mode-line-format)
 
         (setq treemacs-collapse-dirs 2
               treemacs-follow-after-init t
@@ -1955,9 +1963,10 @@ SAVE-FN with non-nil ARGS."
 
     (remove-hook 'kill-emacs-hook #'company-clang-set-prefix)
 
+    (diminish 'company-mode)
+
     ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
     ;; https://github.com/company-mode/company-mode/issues/1010
-
     (unless (fboundp 'company-posframe-mode)
       (autoload #'company-posframe-mode "company-posframe" nil t))
 
@@ -3034,8 +3043,9 @@ This file is specified in `counsel-projectile-default-file'."
 (when (eq sb/selection 'ivy)
   ;; Enable before `ivy-rich-mode' for better performance
   ;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
-  ;; The new transformers (file permissions) seem more of an overkill and buggy
-  (when t
+  ;; The new transformers (file permissions) seem more of an overkill and buggy, and it hides the
+  ;; file names
+  (when nil
     (progn
       (when (display-graphic-p)
         (unless (fboundp 'all-the-icons-ivy-rich-mode)
@@ -3046,30 +3056,32 @@ This file is specified in `counsel-projectile-default-file'."
         (with-eval-after-load "all-the-icons-ivy-rich"
           (defvar all-the-icons-ivy-rich-icon-size)
 
-          (setq all-the-icons-ivy-rich-icon-size 0.7)))))
+          (setq all-the-icons-ivy-rich-icon-size 1.0)))))
 
 
-  (progn
-    (declare-function ivy-rich-modify-column "ivy-rich")
+  (when nil
+    (progn
+      (declare-function ivy-rich-modify-column "ivy-rich")
 
-    (unless (fboundp 'ivy-rich-mode)
-      (autoload #'ivy-rich-mode "ivy-rich" nil t))
-    (unless (fboundp 'ivy-rich-modify-column)
-      (autoload #'ivy-rich-modify-column "ivy-rich" nil t))
+      (unless (fboundp 'ivy-rich-mode)
+        (autoload #'ivy-rich-mode "ivy-rich" nil t))
+      (unless (fboundp 'ivy-rich-modify-column)
+        (autoload #'ivy-rich-modify-column "ivy-rich" nil t))
 
-    (add-hook 'ivy-mode-hook #'ivy-rich-mode)
+      (add-hook 'ivy-mode-hook #'ivy-rich-mode)
 
-    (with-eval-after-load "ivy-rich"
-      (defvar ivy-rich-parse-remote-buffer)
-      (defvar ivy-format-functions-alist)
+      (with-eval-after-load "ivy-rich"
+        (defvar ivy-rich-parse-remote-buffer)
+        (defvar ivy-format-functions-alist)
 
-      (setq ivy-rich-parse-remote-buffer nil)
-      (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+        (setq ivy-rich-parse-remote-buffer nil)
+        (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 
-      ;; Increase the width to see the major mode clearly
-      ;; FIXME: `ivy-rich-modify-column' is not taking effect.
-      (ivy-rich-modify-column 'ivy-switch-buffer 'ivy-rich-switch-buffer-major-mode
-                              '(:width 24 :face warning))))
+        ;; Increase the width to see the major mode clearly
+        ;; FIXME: `ivy-rich-modify-column' is not taking effect.
+        (ivy-rich-modify-column 'ivy-switch-buffer 'ivy-rich-switch-buffer-major-mode
+                                '(:width 24 :face warning)))
+      ))
   )
 
 
@@ -3210,11 +3222,19 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-to-list 'flycheck-checkers 'grammarly t)
 
+    (require 'flycheck-languagetool)
+
+    (defvar flycheck-languagetool-commandline-jar)
+
+    (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
+                                                 "languagetool-5.3-commandline.jar"))
+
     ;; We prefer to use `textlint' and `grammarly', `proselint' is not maintained. Add `textlint',
     ;; then `grammarly'.
     (add-hook 'text-mode-hook
               (lambda ()
-                (flycheck-add-next-checker 'textlint 'grammarly)))
+                (flycheck-add-next-checker 'textlint 'grammarly)
+                (flycheck-add-next-checker 'grammarly 'languagetool)))
 
     ;; `markdown-mode' is derived from `text-mode'
     (add-hook 'markdown-mode-hook
@@ -4293,8 +4313,9 @@ This file is specified in `counsel-projectile-default-file'."
 ;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
 ;; get run for all modes derived from a basic mode such as `text-mode'.
 
-;; https://www.emacswiki.org/emacs/AutoFillMode
-(add-hook 'text-mode-hook #'turn-on-auto-fill)
+;; Enabling `autfill-mode' makes it difficult to include long instructions verbatim, since they get
+;; wrapped around automatically.
+;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files
@@ -4337,8 +4358,8 @@ This file is specified in `counsel-projectile-default-file'."
                                     "EN_UNPAIRED_BRACKETS"
                                     "UPPERCASE_SENTENCE_START"
                                     "WHITESPACE_RULE")
-          langtool-language-tool-jar (expand-file-name "languagetool-5.3-commandline.jar"
-                                                       sb/extras-directory))))
+          langtool-language-tool-jar (no-littering-expand-etc-file-name
+                                      "languagetool-5.3-commandline.jar"))))
 
 
 (unless (fboundp 'wc-mode)
@@ -4906,10 +4927,11 @@ This file is specified in `counsel-projectile-default-file'."
   (setq lsp-clients-clangd-args '("-j=2"
                                   "--background-index"
                                   "--clang-tidy"
-                                  "--pch-storage=memory"
-                                  "--header-insertion=never"
                                   "--fallback-style=LLVM"
-                                  "--log=error")
+                                  "--header-insertion=never"
+                                  "--log=error"
+                                  "--pch-storage=memory"
+                                  "--pretty")
         lsp-completion-enable-additional-text-edit t
         lsp-completion-provider :none ; Enable integration with company
         ;; Disable completion metadata
@@ -5781,7 +5803,7 @@ This file is specified in `counsel-projectile-default-file'."
     (autoload #'git-gutter:previous-hunk "git-gutter" nil t))
   (unless (fboundp 'git-gutter:next-hunk)
     (autoload #'git-gutter:next-hunk "git-gutter" nil t))
-  (unless (fboundp 'global-gitg-gutter-mode)
+  (unless (fboundp 'global-git-gutter-mode)
     (autoload #'global-git-gutter-mode "git-gutter" nil t))
 
   (add-hook 'after-init-hook #'global-git-gutter-mode)
@@ -7366,9 +7388,9 @@ Increase the line spacing to help readability. Increase line spacing by two line
 ;; used.
 (defcustom sb/skippable-buffers
   '(
-    "TAGS" "*Messages*" "*Backtrace*"
+    "TAGS" "*Messages*" "*Backtrace*" "*scratch*"
     ;; "*company-documentation*" ; Major mode is `python-mode'
-    ;; "*scratch*" "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
+    ;; "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
     ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
     ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"
     ;; "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*"
@@ -7756,5 +7778,5 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
             (message "Emacs is ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
 
-(provide 'init-autoloads)
+(provide 'init-autoload)
 ;;; init-autoload.el ends here

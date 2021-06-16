@@ -11,7 +11,7 @@
 
 ;; Check number of installed packages with `(length package-alist)'
 (setq sb/core-packages '(ace-window
-                         adoc-mode
+                         ;; adoc-mode
                          aggressive-indent
                          all-the-icons
                          all-the-icons-dired
@@ -26,8 +26,8 @@
                          auctex
                          auctex-latexmk
                          auto-dim-other-buffers
-                         autodisass-java-bytecode
-                         autodisass-llvm-bitcode
+			             ;; autodisass-java-bytecode
+                         ;; autodisass-llvm-bitcode
                          avy
                          bazel
                          beacon
@@ -142,6 +142,7 @@
                          lsp-ivy
                          lsp-java
                          lsp-mode
+                         lsp-origami
                          lsp-pyright
                          lsp-treemacs
                          lsp-ui
@@ -150,13 +151,15 @@
                          markdown-mode
                          markdown-preview-mode
                          markdown-toc
+                         markup-faces
                          math-preview
                          math-symbols
                          ;; Required by `ac-math' and `company-math'
                          math-symbol-lists
-                         matlab-mode
+                         ;; matlab-mode
                          modern-cpp-font-lock
                          modus-themes
+                         monokai-theme
                          moody
                          move-text
                          multiple-cursors
@@ -165,28 +168,36 @@
                          nvm
                          opencl-mode
                          orderless
+                         origami
                          org-bullets
                          page-break-lines
                          pandoc-mode
                          paradox
+                         parsebib
+                         parent-mode
                          pdf-tools
                          persistent-scratch
                          php-mode
                          pip-requirements
                          pkg-info
                          pkgbuild-mode
+                         pomidor
+                         polymode
                          popup
                          popwin
                          pos-tip
                          posframe
                          powerline
                          prescient
+                         prettier
+                         pretty-hydra
                          projectile
                          protobuf-mode
                          py-isort
                          pylint
                          python-docstring
                          pyvenv
+                         quelpa
                          rainbow-delimiters
                          rainbow-mode
                          reformatter
@@ -199,27 +210,46 @@
                          scss-mode
                          selectrum
                          shfmt
+                         shrink-path
                          smart-mark
+                         smart-mode-line
+                         solarized-theme
+                         spacemacs-theme
+                         spaceline
                          spell-fu
+                         spinner
                          ssh-config-mode
                          super-save
                          swiper
                          symbol-overlay
+                         system-packages
+                         tablist
                          toml-mode
+                         transient
+                         treesitter
+                         treesitter-langs
                          treemacs
                          treemacs-all-the-icons
                          treemacs-magit
                          treemacs-projectile
+                         tsc
                          undo-tree
+                         use-package
+                         use-package-chords
+                         use-package-ensure-system-package
+                         use-package-hydra
                          visual-regexp
                          vlf
                          wc-mode
                          web-mode
+                         web-server
+                         websocket
                          wgrep
                          which-key
                          which-key-posframe
                          whitespace-cleanup-mode
                          whole-line-or-region
+                         with-editor
                          writegood-mode
                          ws-butler
                          xref
@@ -231,6 +261,7 @@
                          yasnippet
                          yasnippet-snippets
                          z3-mode
+                         zenburn-theme
                          ))
 
 (defun sb/install-packages ()

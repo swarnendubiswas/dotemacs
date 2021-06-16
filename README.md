@@ -341,6 +341,8 @@ make -j2 NATIVE_FULL_AOT=1
 sudo make install
 ```
 
+Try the [following](https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html) if the build fails: `make bootstrap` or `rm lisp/loaddefs.el; make;`
+
 Evaluate the following to test that both fast JSON and native compilation are working.
 
 ```emacs-lisp

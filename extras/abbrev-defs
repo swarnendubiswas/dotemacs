@@ -1451,6 +1451,7 @@
 (define-abbrev-table 'org-mode-abbrev-table
   '(
     ("discssion" "discussion" nil :count 0)
+    ("optimisation" "optimization" nil :count 0)
    ))
 
 (define-abbrev-table 'python-mode-abbrev-table
