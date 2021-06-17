@@ -196,6 +196,7 @@ To enforce reparsing, call any of the commands described above with a raw `C-u` 
 - `C-c C-s s` - Insert markup to make a region or word strikethrough (`markdown-insert-strike-through`)
 - `C-c C-s p` - Insert pre-formatted code blocks (`markdown-insert-p`)
 - `C-c C-s b` - Insert markup to make a region or word bold (`markdown-insert-bold`)
+- `C-c C-s C` - Insert GFM code block for a given language (`markdown-insert-gfm-code-block`)
 - `C-c -` - Insert a horizontal rule (`markdown-insert-hr`)
 - `C-c C-c v` - Export the file and view in a browser (`markdown-export-and-preview`)
 - `C-c C-c m` - Compile the file and show in another buffer (`markdown-other-window`)

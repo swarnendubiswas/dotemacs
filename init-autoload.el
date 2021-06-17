@@ -560,7 +560,8 @@ This location is used for temporary installations and files.")
       uniquify-strip-common-suffix t)
 
 
-;; Replace `dabbrev-exp' with `hippie-expand', use `C-M-/' for `dabbrev-completion'
+;; Replace `dabbrev-exp' with `hippie-expand'. Use `C-M-/' for `dabbrev-completion' which finds all
+;; expansions in the current buffer and presents suggestions for completion.
 (progn
   (defvar hippie-expand-verbose)
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev
@@ -1271,34 +1272,35 @@ SAVE-FN with non-nil ARGS."
 
 
 ;; Do not create multiple dired buffers
-(declare-function diredp-toggle-find-file-reuse-dir "dired+")
+(progn
+  (declare-function diredp-toggle-find-file-reuse-dir "dired+")
 
-(unless (fboundp 'diredp-toggle-find-file-reuse-dir)
-  (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
+  (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
+    (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
 
-(add-hook 'dired-mode-hook (lambda ()
-                             (diredp-toggle-find-file-reuse-dir 1)))
+  (add-hook 'dired-mode-hook (lambda ()
+                               (diredp-toggle-find-file-reuse-dir 1)))
 
-(with-eval-after-load "dired+"
-  (defvar diredp-hide-details-initially-flag)
-  (defvar diredp-hide-details-propagate-flag)
+  (with-eval-after-load "dired+"
+    (defvar diredp-hide-details-initially-flag)
+    (defvar diredp-hide-details-propagate-flag)
 
-  (setq diredp-hide-details-initially-flag nil
-        diredp-hide-details-propagate-flag nil)
+    (setq diredp-hide-details-initially-flag nil
+          diredp-hide-details-propagate-flag nil)
 
-  (defvar dired-efap-initial-filename-selection)
+    (unless (fboundp 'dired-efap)
+      (autoload #'dired-efap "dired-efap" nil t))
 
-  (setq dired-efap-initial-filename-selection nil)
+    (defvar dired-efap-initial-filename-selection)
 
-  (unless (fboundp 'dired-efap)
-    (autoload #'dired-efap "dired-efap" nil t))
+    (setq dired-efap-initial-filename-selection nil)
 
-  ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
-  ;; after `dired+' and not `dired', even with `bind-keys*'.
-  (defvar dired-mode-map)
+    ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
+    ;; after `dired+' and not `dired', even with `bind-keys*'.
+    (defvar dired-mode-map)
 
-  (bind-keys* :package dired-efap :map dired-mode-map
-              ("r" . dired-efap)))
+    (bind-keys* :package dired-efap :map dired-mode-map
+                ("r" . dired-efap))))
 
 
 (unless (fboundp 'async-bytecomp-package-mode)
@@ -1871,11 +1873,11 @@ SAVE-FN with non-nil ARGS."
 
     ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
     ;; after idling for 30 seconds.
-    (run-with-idle-timer 30 t 'recentf-save-list)
+    (run-with-idle-timer 30 t #'recentf-save-list)
 
     ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using
     ;; idle timers.
-    (run-with-idle-timer 60 t 'recentf-cleanup)))
+    (run-with-idle-timer 60 t #'recentf-cleanup)))
 
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -2341,7 +2343,7 @@ SAVE-FN with non-nil ARGS."
                  ("C-c d m"                        . counsel-minor)
                  ("<f9>"                           . counsel-recentf)
                  ("C-c s r"                        . counsel-rg)
-                 ("C-c C-m"                        . counsel-mark-ring)
+                 ("C-c RET"                        . counsel-mark-ring)
                  ;; Enabling preview can make switching over remote buffers slow
                  ;; ("<f3>"                        . counsel-switch-buffer)
                  ("<f4>"                           . counsel-grep-or-swiper))
@@ -3059,7 +3061,7 @@ This file is specified in `counsel-projectile-default-file'."
           (setq all-the-icons-ivy-rich-icon-size 1.0)))))
 
 
-  (when nil
+  (when t
     (progn
       (declare-function ivy-rich-modify-column "ivy-rich")
 
@@ -3085,7 +3087,8 @@ This file is specified in `counsel-projectile-default-file'."
   )
 
 
-(when (and (eq sb/selection 'ivy) (executable-find "fd"))
+(when (and (eq sb/selection 'ivy)
+           (executable-find "fd"))
   (with-eval-after-load "counsel"
     (progn
       (unless (fboundp 'counsel-fd-file-jump)
@@ -3096,7 +3099,8 @@ This file is specified in `counsel-projectile-default-file'."
       (bind-keys :package counsel-fd
                  ;; Jump to a directory below the current directory
                  ("C-x d" . counsel-fd-dired-jump)
-                 ("C-x f" . counsel-fd-file-jump))))
+                 ("C-x f" . counsel-fd-file-jump))
+      ))
   )
 
 
@@ -3222,19 +3226,22 @@ This file is specified in `counsel-projectile-default-file'."
 
     (add-to-list 'flycheck-checkers 'grammarly t)
 
-    (require 'flycheck-languagetool)
+    (when nil
+      (progn
+        (require 'flycheck-languagetool)
 
-    (defvar flycheck-languagetool-commandline-jar)
+        (defvar flycheck-languagetool-commandline-jar)
 
-    (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
-                                                 "languagetool-5.3-commandline.jar"))
+        (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
+                                                     "languagetool-5.3-commandline.jar"))))
 
     ;; We prefer to use `textlint' and `grammarly', `proselint' is not maintained. Add `textlint',
     ;; then `grammarly'.
     (add-hook 'text-mode-hook
               (lambda ()
                 (flycheck-add-next-checker 'textlint 'grammarly)
-                (flycheck-add-next-checker 'grammarly 'languagetool)))
+                ;; (flycheck-add-next-checker 'grammarly 'languagetool)
+                ))
 
     ;; `markdown-mode' is derived from `text-mode'
     (add-hook 'markdown-mode-hook
@@ -4588,7 +4595,7 @@ This file is specified in `counsel-projectile-default-file'."
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
-(when t
+(when nil
   (when (executable-find "prettier")
     (progn
       (unless (fboundp 'prettier-mode)
@@ -4597,10 +4604,10 @@ This file is specified in `counsel-projectile-default-file'."
       ;; Should work with `gfm-mode', `css-mode', and `html-mode' as they are derived modes
       (dolist (hook '(markdown-mode-hook web-mode-hook
                                          json-mode-hook jsonc-mode-hook js2-mode-hook))
-        ;; (add-hook hook (lambda ()
-        ;;                  (when (and buffer-file-name ; Returns `nil' if not visiting a file
-        ;;                             (not (file-remote-p buffer-file-name)))
-        ;;                    (prettier-mode 1))))
+        (add-hook hook (lambda ()
+                         (when (and buffer-file-name ; Returns `nil' if not visiting a file
+                                    (not (file-remote-p buffer-file-name)))
+                           (prettier-mode 1))))
         (add-hook hook #'prettier-mode))
 
       (with-eval-after-load "prettier"
@@ -5028,10 +5035,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge
-                            (lsp-configuration-section "pyright")
-                            (lsp-configuration-section "python")))))
+                                            (lsp--set-configuration
+                                             (ht-merge
+                                              (lsp-configuration-section "pyright")
+                                              (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -6610,7 +6617,8 @@ Ignore if no file is found."
   (eval-and-compile
     (defun sb/enable-format-all ()
       "Delay enabling format-all to avoid slowing down Emacs startup."
-      (dolist (hook '(bazel-mode-hook latex-mode-hook LaTeX-mode-hook json-mode-hook))
+      (dolist (hook '(bazel-mode-hook latex-mode-hook LaTeX-mode-hook json-mode-hook
+                                      markdown-mode-hook gfm-mode-hook))
         (add-hook hook #'format-all-mode))
       (add-hook 'format-all-mode-hook #'format-all-ensure-formatter)))
 
@@ -7558,7 +7566,6 @@ mode is not in `sb/skippable-modes'."
 
 
 ;; Show help popups for prefix keys
-
 (progn
   (unless (fboundp 'which-key-mode)
     (autoload #'which-key-mode "which-key" nil t))

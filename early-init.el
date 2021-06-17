@@ -10,9 +10,8 @@
 ;;; Code:
 
 (when (boundp 'comp-eln-load-path)
-  (setcar comp-eln-load-path
-          (expand-file-name (convert-standard-filename "var/eln-cache/")
-                            user-emacs-directory)))
+  (setcar comp-eln-load-path (expand-file-name (convert-standard-filename "var/eln-cache/")
+                                               user-emacs-directory)))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
 ;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
