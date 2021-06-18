@@ -127,7 +127,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -256,6 +256,7 @@ This location is used for temporary installations and files.")
 
 ;; Installation is one-time, so avoid the overhead of run-time checks
 (use-package system-packages
+  :disabled t
   :commands (system-packages-ensure system-packages-install)
   :config (setq system-packages-use-sudo t))
 
@@ -340,15 +341,17 @@ This location is used for temporary installations and files.")
   (make-directory sb/temp-directory))
 
 
-(unless (package-installed-p 'quelpa)
-  (package-refresh-contents)
-  (package-install 'quelpa))
-(defvar quelpa-update-melpa-p)
-(defvar quelpa-upgrade-interval)
-(defvar quelpa-self-upgrade-p)
-(setq quelpa-self-upgrade-p nil
-      quelpa-update-melpa-p nil
-      quelpa-upgrade-interval 30)
+(when nil
+  (progn
+    (unless (package-installed-p 'quelpa)
+      (package-refresh-contents)
+      (package-install 'quelpa))
+    (defvar quelpa-update-melpa-p)
+    (defvar quelpa-upgrade-interval)
+    (defvar quelpa-self-upgrade-p)
+    (setq quelpa-self-upgrade-p nil
+          quelpa-update-melpa-p nil
+          quelpa-upgrade-interval 30)))
 
 ;; Using quelpa is convenient but slow
 (use-package quelpa-use-package
@@ -381,6 +384,7 @@ This location is used for temporary installations and files.")
   (paradox-enable))
 
 (use-package auto-package-update ; Default update interval is 7 days
+  :disabled t
   :commands (auto-package-update-now auto-package-update-maybe)
   :config
   (setq auto-package-update-delete-old-versions t
@@ -789,6 +793,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package eclipse-theme
   :if (eq sb/theme 'eclipse)
+  :disabled t
   :init
   (load-theme 'eclipse t)
   (set-background-color "white")
@@ -797,6 +802,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package spacemacs-common
   :ensure spacemacs-theme
+  :disabled t
   :if (eq sb/theme 'spacemacs-light)
   :init
   (load-theme 'spacemacs-light t)
@@ -805,10 +811,12 @@ SAVE-FN with non-nil ARGS."
 
 (use-package zenburn-theme
   :if (eq sb/theme 'zenburn)
+  :disabled t
   :init (load-theme 'zenburn t))
 
 (use-package solarized-light-theme
   :ensure solarized-theme
+  :disabled t
   :if (eq sb/theme 'solarized-light)
   :init
   (setq solarized-distinct-fringe-background t)
@@ -816,6 +824,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package solarized-dark-theme
   :ensure solarized-theme
+  :disabled t
   :if (eq sb/theme 'solarized-dark)
   :init (load-theme 'solarized-dark t))
 
@@ -843,6 +852,7 @@ SAVE-FN with non-nil ARGS."
   (doom-themes-org-config))
 
 (use-package monokai-theme
+  :disabled t
   :if (eq sb/theme 'monokai)
   :init (load-theme 'monokai t))
 
@@ -923,6 +933,7 @@ SAVE-FN with non-nil ARGS."
   (powerline-default-theme))
 
 (use-package smart-mode-line
+  :disabled t
   :if (eq sb/modeline-theme 'sml)
   :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
                       sml/shorten-modes sml/shorten-directory)
@@ -939,6 +950,7 @@ SAVE-FN with non-nil ARGS."
   (sml/setup))
 
 (use-package spaceline
+  :disabled t
   :if (eq sb/modeline-theme 'spaceline)
   :defines (spaceline-hud-p
             spaceline-selection-info-p
@@ -960,6 +972,7 @@ SAVE-FN with non-nil ARGS."
     :config (spaceline-all-the-icons-theme)))
 
 (use-package airline-themes
+  :disabled t
   :if (eq sb/modeline-theme 'airline)
   :init
   (require 'airline-themes)
@@ -987,6 +1000,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package awesome-tray
   :ensure nil
+  :disabled t
   :if (eq sb/modeline-theme 'awesome-tray)
   :load-path "extras"
   ;; :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
@@ -1034,6 +1048,7 @@ SAVE-FN with non-nil ARGS."
   (centaur-tabs-group-by-projectile-project))
 
 (use-package hide-mode-line
+  :disabled t
   :commands (hide-mode-line-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -1112,6 +1127,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; IBuffer works well enough for me
 (use-package bufler
+  :disabled t
   :commands bufler-mode
   ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
   ;;                 :files (:defaults (:exclude "helm-bufler.el")))
@@ -1706,6 +1722,7 @@ SAVE-FN with non-nil ARGS."
   :init (run-at-time 3 nil #'company-quickhelp-mode))
 
 (use-package company-quickhelp-terminal
+  :disabled t
   :unless (display-graphic-p)
   :after company-quickhelp
   :demand t
@@ -1747,6 +1764,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; We are currently trying out `company-prescient'
 (use-package company-statistics
+  :disabled t
   :after company
   :commands company-statistics-mode
   :config (company-statistics-mode 1))
@@ -2794,6 +2812,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Gtags is less maintained than `universal-ctags'
 (use-package counsel-gtags
+  :disabled t
   :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'gtags))
   :diminish
   ;; :ensure-system-package global
@@ -2815,6 +2834,7 @@ SAVE-FN with non-nil ARGS."
         ("C-c g u" . counsel-gtags-update-tags)))
 
 (use-package global-tags ; Make xref and gtags work together
+  :disabled t
   :after counsel-gtags
   :demand t
   :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend))
@@ -2840,6 +2860,7 @@ SAVE-FN with non-nil ARGS."
 (use-package counsel-etags
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'ctags))
+  :disabled t
   :bind
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -2915,12 +2936,15 @@ SAVE-FN with non-nil ARGS."
   :commands manage-minor-mode)
 
 (use-package jgraph-mode
+  :disabled t
   :commands jgraph-mode)
 
 (use-package graphviz-dot-mode
+  :disabled t
   :commands graphviz-dot-mode)
 
 (use-package gnuplot
+  :disabled t
   :commands (gnuplot-mode gnuplot)
   :mode "\\.gp\\'"
   :interpreter ("gnuplot" . gnuplot-mode))
@@ -3074,6 +3098,7 @@ SAVE-FN with non-nil ARGS."
   :hook (ssh-config-mode . turn-on-font-lock))
 
 (use-package pomidor
+  :disabled t
   :commands (pomidor-quit pomidor-break pomidor-reset
                           pomidor-stop pomidor-hold pomidor-unhold pomidor))
 
@@ -3154,10 +3179,12 @@ SAVE-FN with non-nil ARGS."
    ("C-<f3>" . bm-previous)))
 
 (use-package esup
+  :disabled t
   :commands esup
   :if (bound-and-true-p sb/debug-init-file))
 
 (use-package bug-hunter
+  :disabled t
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
 
@@ -3289,6 +3316,7 @@ SAVE-FN with non-nil ARGS."
   :commands tablegen-mode)
 
 (use-package autodisass-llvm-bitcode
+  :disabled t
   :commands autodisass-llvm-bitcode
   :mode "\\.bc\\'")
 
@@ -3387,13 +3415,16 @@ SAVE-FN with non-nil ARGS."
   :mode ("\\.rst\\'" . rst-mode))
 
 (use-package xref-rst
+  :disabled t
   :commands xref-rst-mode
   :hook (rst-mode . xref-rst-mode))
 
 (use-package boogie-friends
+  :disabled t
   :mode ("\\.smt\\'" . z3-smt2-mode))
 
 (use-package z3-mode
+  :disabled t
   :commands z3-mode
   :config (setq z3-solver-cmd "z3"))
 
@@ -3444,12 +3475,15 @@ SAVE-FN with non-nil ARGS."
   :diminish eldoc-box-hover-mode)
 
 (use-package octave
-  :ensure nil)
+  :ensure nil
+  :disabled t)
 
 (use-package matlab-mode
+  :disabled t
   :mode ("\\.m$" . matlab-mode))
 
 (use-package ess
+  :disabled t
   :mode ("/R/.*\\.q\\'" . R-mode)
   :config
   (setq ess-indent-from-lhs 4
@@ -3457,6 +3491,7 @@ SAVE-FN with non-nil ARGS."
         inferior-R-args "--quiet --no-restore-history --no-save"))
 
 (use-package ess-smart-underscore
+  :disabled t
   :after (:any R-mode ess)
   :demand t)
 
@@ -3467,7 +3502,8 @@ SAVE-FN with non-nil ARGS."
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
 (use-package pkgbuild-mode
-  :commands pkgbuild-mode)
+  :commands pkgbuild-mode
+  :disabled t)
 
 (use-package elisp-mode
   :ensure nil
@@ -3658,9 +3694,9 @@ SAVE-FN with non-nil ARGS."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge (lsp-configuration-section "pyright")
-                                                       (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge (lsp-configuration-section "pyright")
+                                     (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -3768,8 +3804,8 @@ SAVE-FN with non-nil ARGS."
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-remote))
 
@@ -3850,6 +3886,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package lsp-origami
   :after origami
+  :disabled t
   :functions lsp-origami-mode
   :commands lsp-origami-mode
   :demand t
@@ -3862,6 +3899,7 @@ SAVE-FN with non-nil ARGS."
    ("C-c l w" . lsp-ivy-workspace-symbol)))
 
 (use-package consult-lsp
+  :disabled
   :if (eq sb/selection 'selectrum)
   :commands (consult-lsp-diagnostics consult-lsp-symbols))
 
@@ -3909,12 +3947,14 @@ SAVE-FN with non-nil ARGS."
 
 (use-package flycheck-clang-analyzer
   :after (flycheck cc-mode)
+  :disabled t
   :demand t
   :commands flycheck-clang-analyzer-setup
   :config (flycheck-clang-analyzer-setup))
 
 (use-package flycheck-clang-tidy
   :after (flycheck cc-mode)
+  :disabled t
   :demand t
   :commands flycheck-clang-tidy-setup
   :config (flycheck-clang-tidy-setup))
@@ -3987,6 +4027,7 @@ SAVE-FN with non-nil ARGS."
   :config (python-docstring-install))
 
 (use-package pip-requirements
+  :disabled t
   :commands pip-requirements-mode)
 
 (use-package pyvenv
@@ -4014,6 +4055,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package lsp-python-ms
   :if (eq sb/python-langserver 'mspyls)
+  :disabled t
   :after (lsp-mode python)
   :init (setq lsp-python-ms-auto-install-server t)
   :hook
@@ -4079,6 +4121,7 @@ SAVE-FN with non-nil ARGS."
   :disabled t)
 
 (use-package jinja2-mode
+  :disabled t
   :commands jinjia2-mode
   :disabled t)
 
@@ -4110,6 +4153,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Can disassemble `.class' files from within jars
 (use-package autodisass-java-bytecode
+  :disabled t
   :commands autodisass-java-bytecode
   :mode "\\.class\\'")
 
@@ -4228,6 +4272,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package git-gutter
   :if (unless (boundp 'vc-handled-backends))
+  :disabled t
   :diminish
   :bind
   (("C-x p" . git-gutter:previous-hunk)
@@ -4669,6 +4714,7 @@ Ignore if no file is found."
   :config (js2-refactor-mode 1))
 
 (use-package xref-js2
+  :disabled t
   :if (executable-find "rg")
   :commands xref-js2-xref-backend
   :hook
@@ -4704,19 +4750,23 @@ Ignore if no file is found."
   :after json-mode)
 
 (use-package scss-mode
+  :disabled t
   :commands scss-mode
   :hook (scss-mode . lsp-deferred)
   :config (setq scss-compile-at-save t))
 
 (use-package sass-mode
+  :disabled t
   :commands sass-mode
   :hook (sass-mode . lsp-deferred))
 
 (use-package bazel
+  :disabled t
   :commands (bazel-mode bazelrc-mode)
   :hook (bazel-mode . flycheck-mode))
 
 (use-package protobuf-mode
+  :disabled t
   :commands protobuf-mode
   :mode "\\.proto$"
   :hook (protobuf-mode . flycheck-mode))
@@ -4755,6 +4805,7 @@ Ignore if no file is found."
   :init (run-with-idle-timer 2 nil #'sb/enable-format-all))
 
 (use-package tree-sitter
+  :disabled t
   :ensure tree-sitter-langs
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
@@ -4774,15 +4825,18 @@ Ignore if no file is found."
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (use-package adoc-mode
+  :disabled t
   :mode "\\.adoc\\'")
 
 (use-package editorconfig
+  :disabled t
   :if (executable-find "editorconfig")
   :diminish editorconfig-mode
   :commands editorconfig-mode)
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
+  :disabled t
   :if (executable-find "fasd")
   :commands (global-fasd-mode fasd-find-file)
   :init (run-with-idle-timer 2 nil #'global-fasd-mode)
@@ -4792,12 +4846,15 @@ Ignore if no file is found."
 (use-package dotenv-mode)
 
 (use-package toml-mode
+  :disabled t
   :commands toml-mode)
 
 (use-package nix-mode
+  :disabled t
   :commands nix-mode)
 
 (use-package rust-mode
+  :disabled t
   :commands rust-mode
   :hook (rust-mode . lsp-deferred)
   :config (setq rust-format-on-save t))
@@ -5631,6 +5688,7 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
                      (emacs-init-time) gcs-done)))
 
 (use-package selectrum
+  :disabled t
   :defines selectrum-fix-vertical-window-height
   :if (eq sb/selection 'selectrum)
   :commands selectrum-mode
@@ -5646,10 +5704,12 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 
 ;; Enable richer annotations in the minibuffer
 (use-package marginalia
+  :disabled t
   :commands marginalia
   :hook (selectrum-mode . marginalia-mode))
 
 (use-package consult
+  :disabled t
   :commands
   (consult-imenu consult-outline consult-apropos consult-buffer  consult-bookmark
                  consult-outline consult-goto-line consult-imenu
@@ -5687,10 +5747,12 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 
 (use-package consult-flycheck
   :if (eq sb/selection 'selectrum)
+  :disabled t
   :commands consult-flycheck)
 
 (use-package selectrum-prescient
   :if (eq sb/selection 'selectrum)
+  :disabled t
   :commands selectrum-prescient-mode
   :hook (selectrum-mode . selectrum-prescient-mode))
 

@@ -141,7 +141,7 @@ whitespaces."
   "User HOME directory.")
 
 
-;; We use this location for shared installations like `textlint'
+;; We use this location for shared installations like `textlint' and virtualenvs
 (defconst sb/user-tmp
   (expand-file-name "tmp" sb/user-home)
   "User temp directory.
@@ -168,14 +168,15 @@ This location is used for temporary installations and files.")
 
 (add-to-list 'load-path sb/extras-directory)
 
-;; Install required packages with `M-x sb/install-packages', you will need to edit the
-;; `package-archives' before that
-(load "core-packages")
-
 
 ;; Another option is to construct the `load-path' manually
 ;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
 (package-initialize)
+
+
+;; Install required packages with `M-x sb/install-packages', you will need to evalaute the
+;; `package-archives' before that.
+(load "core-packages")
 
 
 (defcustom sb/use-no-littering
@@ -1159,162 +1160,173 @@ SAVE-FN with non-nil ARGS."
     (diminish 'bufler-workspace-mode)))
 
 
-(declare-function dired-next-line "dired")
+(progn
+  (declare-function dired-next-line "dired")
+  (declare-function dired-jump "dired")
 
-(unless (fboundp 'sb/dired-go-home)
-  (autoload #'sb/dired-go-home "dired" nil t))
-(unless (fboundp 'find-file)
-  (autoload #'find-file "dired" nil t))
-(unless (fboundp 'sb/dired-jump-to-top)
-  (autoload #'sb/dired-jump-to-top "dired" nil t))
-(unless (fboundp 'sb/dired-jump-to-bottom)
-  (autoload #'sb/dired-jump-to-bottom "dired" nil t))
-(unless (fboundp 'auto-revert-mode)
-  (autoload #'auto-revert-mode "dired" nil t))
-(unless (fboundp 'dired-next-line)
-  (autoload #'dired-next-line "dired" nil t))
+  (unless (fboundp 'sb/dired-go-home)
+    (autoload #'sb/dired-go-home "init-autoload" nil t))
+  (unless (fboundp 'find-file)
+    (autoload #'find-file "dired" nil t))
+  (unless (fboundp 'sb/dired-jump-to-top)
+    (autoload #'sb/dired-jump-to-top "init-autoload" nil t))
+  (unless (fboundp 'sb/dired-jump-to-bottom)
+    (autoload #'sb/dired-jump-to-bottom "init-autoload" nil t))
+  (unless (fboundp 'auto-revert-mode)
+    (autoload #'auto-revert-mode "dired" nil t))
+  (unless (fboundp 'dired-next-line)
+    (autoload #'dired-next-line "dired" nil t))
+  (unless (fboundp 'dired-jump)
+    (autoload #'dired-jump "dired" nil t))
 
-(declare-function dired-jump "dired-x")
-(declare-function dired-omit-mode "dired-x")
+  (eval-and-compile
+    (defun sb/dired-go-home nil
+      (interactive)
+      (dired sb/user-home))
 
-(unless (fboundp 'dired-jump)
-  (autoload #'dired-jump "dired-x" nil t))
-(unless (fboundp 'dired-omit-mode)
-  (autoload #'dired-omit-mode "dired-x" nil t))
+    (defun sb/dired-jump-to-top nil
+      (interactive)
+      (goto-char
+       (point-min))
+      (dired-next-line 2))
 
-(eval-and-compile
-  (defun sb/dired-go-home nil
-    (interactive)
-    (dired sb/user-home))
+    (defun sb/dired-jump-to-bottom nil
+      (interactive)
+      (goto-char
+       (point-max))
+      (dired-next-line -1)))
 
-  (defun sb/dired-jump-to-top nil
-    (interactive)
-    (goto-char
-     (point-min))
-    (dired-next-line 2))
+  (with-eval-after-load "dired"
+    (defvar dired-auto-revert-buffer)
+    (defvar dired-dwim-target)
+    (defvar dired-ls-F-marks-symlinks)
+    (defvar dired-recursive-copies)
+    (defvar dired-recursive-deletes)
+    (defvar dired-omit-verbose)
 
-  (defun sb/dired-jump-to-bottom nil
-    (interactive)
-    (goto-char
-     (point-max))
-    (dired-next-line -1)))
+    (setq dired-auto-revert-buffer t
+          dired-dwim-target t ; Guess a default target directory
+          ;; Check `ls' for additional options
+          dired-listing-switches "-ABhl --si --group-directories-first"
+          dired-ls-F-marks-symlinks t ; -F marks links with @
+          dired-recursive-copies 'always ; Single prompt for all n directories
+          ;; Single prompt for all n directories
+          dired-recursive-deletes 'always)
 
-(with-eval-after-load "dired"
-  (defvar dired-auto-revert-buffer)
-  (defvar dired-dwim-target)
-  (defvar dired-ls-F-marks-symlinks)
-  (defvar dired-recursive-copies)
-  (defvar dired-recursive-deletes)
-  (defvar dired-omit-verbose)
+    (add-hook 'dired-mode-hook #'auto-revert-mode)
+    (add-hook 'dired-mode-hook #'dired-omit-mode)
 
-  (setq dired-auto-revert-buffer t
-        dired-dwim-target t ; Guess a default target directory
-        ;; Check `ls' for additional options
-        dired-listing-switches "-ABhl --si --group-directories-first"
-        dired-ls-F-marks-symlinks t ; -F marks links with @
-        dired-recursive-copies 'always ; Single prompt for all n directories
-        ;; Single prompt for all n directories
-        dired-recursive-deletes 'always)
+    (defvar dired-mode-map)
 
-  (add-hook 'dired-mode-hook #'auto-revert-mode)
-  (add-hook 'dired-mode-hook #'dired-omit-mode)
+    (bind-keys :package dired
+               ("C-x C-j" . dired-jump))
 
-  (defvar dired-mode-map)
+    (bind-keys :package dired :map dired-mode-map
+               ("M-<home>" . sb/dired-go-home)
+               ("i"        . find-file)
+               ("M-<up>"   . sb/dired-jump-to-top)
+               ("M-<down>" . sb/dired-jump-to-bottom))
 
-  (bind-keys :package dired :map dired-mode-map
-             ("M-<home>" . sb/dired-go-home)
-             ("i"        . find-file)
-             ("M-<up>"   . sb/dired-jump-to-top)
-             ("M-<down>" . sb/dired-jump-to-bottom))
+    (when nil
+      ;; More detailed colors, but can be jarring with certain themes
+      (unless (fboundp #'diredfl-mode)
+        (autoload #'diredfl-mode "diredfl" nil t))
 
-  (when nil
-    ;; More detailed colors, but can be jarring with certain themes
-    (unless (fboundp #'diredfl-mode)
-      (autoload #'diredfl-mode "diredfl" nil t))
+      (add-hook 'dired-mode-hook #'diredfl-mode))
 
-    (add-hook 'dired-mode-hook #'diredfl-mode))
+    ;; Narrow dired to match filter
+    (unless (fboundp 'dired-narrow)
+      (autoload #'dired-narrow "dired-narrow" nil t))
 
-  ;; Narrow dired to match filter
-  (unless (fboundp 'dired-narrow)
-    (autoload #'dired-narrow "dired-narrow" nil t))
+    (defvar dired-mode-map)
 
-  (defvar dired-mode-map)
-
-  (bind-keys :package dired-narrow :map dired-mode-map
-             ("/" . dired-narrow)))
-
-(with-eval-after-load "dired-x"
-  ;; Do not show messages when omitting files
-  (defvar dired-omit-verbose)
-
-  (setq dired-omit-verbose nil)
-
-  ;; (setq dired-omit-files
-  ;;       (concat dired-omit-files
-  ;;               "\\|^.DS_Store\\'"
-  ;;               "\\|^.project\\(?:ile\\)?\\'"
-  ;;               "\\|^.\\(svn\\|git\\)\\'"
-  ;;               "\\|^.ccls-cache\\'"
-  ;;               ;; FIXME: Fix the regexp
-  ;;               ;; "\\|__pycache__"
-  ;;               "\\|\\(?:\\.js\\)?\\.meta\\'"
-  ;;               "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+    (bind-keys :package dired-narrow :map dired-mode-map
+               ("/" . dired-narrow))))
 
 
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Remove 'Omit' from the modeline."
-    (diminish 'dired-omit-mode)
-    dired-mode-map))
+(when t
+  (progn
+    (declare-function dired-omit-mode "dired-x")
 
-(bind-keys :package dired-x
-           ("C-x C-j" . dired-jump))
+    (unless (fboundp 'dired-omit-mode)
+      (autoload #'dired-omit-mode "dired-x" nil t))
+
+    (with-eval-after-load "dired-x"
+      ;; Do not show messages when omitting files
+      (defvar dired-omit-verbose)
+
+      (setq dired-omit-verbose nil)
+
+      ;; (setq dired-omit-files
+      ;;       (concat dired-omit-files
+      ;;               "\\|^.DS_Store\\'"
+      ;;               "\\|^.project\\(?:ile\\)?\\'"
+      ;;               "\\|^.\\(svn\\|git\\)\\'"
+      ;;               "\\|^.ccls-cache\\'"
+      ;;               ;; FIXME: Fix the regexp
+      ;;               ;; "\\|__pycache__"
+      ;;               "\\|\\(?:\\.js\\)?\\.meta\\'"
+      ;;               "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+
+
+      ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+      (defadvice dired-omit-startup (after diminish-dired-omit activate)
+        "Remove 'Omit' from the modeline."
+        (diminish 'dired-omit-mode)
+        dired-mode-map))
+    ))
 
 
 ;; Do not create multiple dired buffers
+(when nil
+  (progn
+    (declare-function diredp-toggle-find-file-reuse-dir "dired+")
+
+    (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
+      (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
+
+    (add-hook 'dired-mode-hook (lambda ()
+                                 (diredp-toggle-find-file-reuse-dir 1)))
+
+    (with-eval-after-load "dired+"
+      (defvar diredp-hide-details-initially-flag)
+      (defvar diredp-hide-details-propagate-flag)
+
+      (setq diredp-hide-details-initially-flag nil
+            diredp-hide-details-propagate-flag nil)
+
+      )))
+
+
 (progn
-  (declare-function diredp-toggle-find-file-reuse-dir "dired+")
+  (unless (fboundp 'dired-efap)
+    (autoload #'dired-efap "dired-efap" nil t))
 
-  (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
-    (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
+  (defvar dired-efap-initial-filename-selection)
 
-  (add-hook 'dired-mode-hook (lambda ()
-                               (diredp-toggle-find-file-reuse-dir 1)))
+  (setq dired-efap-initial-filename-selection nil)
 
-  (with-eval-after-load "dired+"
-    (defvar diredp-hide-details-initially-flag)
-    (defvar diredp-hide-details-propagate-flag)
+  ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
+  ;; after `dired+' and not `dired', even with `bind-keys*'.
+  (defvar dired-mode-map)
 
-    (setq diredp-hide-details-initially-flag nil
-          diredp-hide-details-propagate-flag nil)
-
-    (unless (fboundp 'dired-efap)
-      (autoload #'dired-efap "dired-efap" nil t))
-
-    (defvar dired-efap-initial-filename-selection)
-
-    (setq dired-efap-initial-filename-selection nil)
-
-    ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
-    ;; after `dired+' and not `dired', even with `bind-keys*'.
-    (defvar dired-mode-map)
-
-    (bind-keys* :package dired-efap :map dired-mode-map
-                ("r" . dired-efap))))
+  (bind-keys* :package dired-efap :map dired-mode-map
+              ("r" . dired-efap)))
 
 
-(unless (fboundp 'async-bytecomp-package-mode)
-  (autoload #'async-bytecomp-package-mode "async" nil t))
+(progn
+  (unless (fboundp 'async-bytecomp-package-mode)
+    (autoload #'async-bytecomp-package-mode "async" nil t))
 
-(async-bytecomp-package-mode 1)
+  (async-bytecomp-package-mode 1)
 
-(unless (fboundp 'dired-async-mode)
-  (autoload #'dired-async-mode "dired-async" nil t))
+  (unless (fboundp 'dired-async-mode)
+    (autoload #'dired-async-mode "dired-async" nil t))
 
-(add-hook 'dired-mode-hook #'dired-async-mode)
+  (add-hook 'dired-mode-hook #'dired-async-mode)
 
-(with-eval-after-load "dired-async"
-  (diminish 'dired-async-mode))
+  (with-eval-after-load "dired-async"
+    (diminish 'dired-async-mode)))
 
 
 (when (display-graphic-p)
@@ -1913,7 +1925,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'company-complete-common-or-cycle)
     (autoload #'company-complete-common-or-cycle "company" nil t))
   (unless (fboundp 'sb/quit-company-save-buffer)
-    (autoload #'sb/quit-company-save-buffer "company" nil t))
+    (autoload #'sb/quit-company-save-buffer "init-autoload" nil t))
   (unless (fboundp 'company-abort)
     (autoload #'company-abort "company" nil t))
 
@@ -2224,7 +2236,7 @@ SAVE-FN with non-nil ARGS."
       (unless (fboundp 'counsel-git-grep)
         (autoload #'counsel-git-grep "counsel" nil t))
       (unless (fboundp 'sb/counsel-goto-recent-directory)
-        (autoload #'sb/counsel-goto-recent-directory "counsel" nil t))
+        (autoload #'sb/counsel-goto-recent-directory "init-autoload" nil t))
       (unless (fboundp 'counsel-info-lookup-symbol)
         (autoload #'counsel-info-lookup-symbol "counsel" nil t))
       (unless (fboundp 'counsel-load-library)
@@ -2456,7 +2468,7 @@ SAVE-FN with non-nil ARGS."
   (unless (fboundp 'flyspell-buffer)
     (autoload #'flyspell-buffer "flyspell" nil t))
   (unless (fboundp 'sb/flyspell-goto-previous-error)
-    (autoload #'sb/flyspell-goto-previous-error "flyspell" nil t))
+    (autoload #'sb/flyspell-goto-previous-error "init-autoload" nil t))
   (unless (fboundp 'flyspell-overlay-p)
     (autoload #'flyspell-overlay-p "flyspell" nil t))
   (unless (fboundp 'flyspell-correct-previous)
@@ -5035,10 +5047,10 @@ This file is specified in `counsel-projectile-default-file'."
                       (lambda
                         (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge
-                                              (lsp-configuration-section "pyright")
-                                              (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge
+                            (lsp-configuration-section "pyright")
+                            (lsp-configuration-section "python")))))
                       :download-server-fn
                       (lambda
                         (_client callback error-callback _update\?)
@@ -5156,8 +5168,8 @@ This file is specified in `counsel-projectile-default-file'."
                     (lambda
                       (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
                     :priority -1 :server-id 'perlls-remote))
 
   ;; TODO: What is the utility of this?
@@ -7769,7 +7781,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (put 'lsp-clients-clangd-args 'safe-local-variable #'listp)
 (put 'lsp-latex-root-directory 'safe-local-variable #'stringp)
 (put 'lsp-pyright-extra-paths 'safe-local-variable #'listp)
-(put 'lsp-python-ms-extra-paths 'safe-local-variable #'listp)
 (put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
