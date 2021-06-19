@@ -12,6 +12,7 @@
          (projectile-project-run-cmd . "cd bin\\Debug && .\\shiolink.exe && E:\\nanika\\ssp.exe")
          (projectile-project-name . "your-project-name-here")
          (show-trailing-whitespace . t)
+         (mode . prettier)
          (eval . (progn BODY))
          (eval . (setq projectile-project-root
                        (locate-dominating-file buffer-file-name
@@ -37,8 +38,8 @@
                     "blur")))
          ;; https://emacs.stackexchange.com/questions/42463/load-package-in-dir-locals
          (eval . (use-package smart-tabs
-                              :ensure t
-                              :config ()))
+                   :ensure t
+                   :config ()))
          (eval .
                (set
                 (make-local-variable 'projectile-globally-ignored-files)

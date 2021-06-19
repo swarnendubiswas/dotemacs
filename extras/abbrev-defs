@@ -1439,6 +1439,7 @@
     ("operatoins" "operations" nil :count 0)
     ("paritioning" "partitioning" nil :count 0)
     ("personnaly" "Personally" nil :count 0)
+    ("processig" "Processing" nil :count 0)
     ("proessing" "processing" nil :count 0)
     ("recompiliation" "recompilation" nil :count 0)
     ("sceptical" "skeptical" nil :count 0)

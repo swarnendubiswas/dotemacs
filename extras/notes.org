@@ -1,6 +1,6 @@
 * Good References
 
-To evaluate an sexp, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
+To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
 ~M-:~ to evaluate a Emacs Lisp expression and print the result. Only an interactive function can be
 invoked with ~M-x~ or a key binding.
 
@@ -78,4 +78,29 @@ The equivalent version with ~with-eval-after-load~ would be:
 (with-eval-after-load "foo"
   (setq foo 42)
   (setq bar 17))
+#+END_SRC
+
+*** Enable major mode per-project via directory-local variables 
+
+[[https://www.reddit.com/r/emacs/comments/o2zeek/how_do_you_enable_prettiermode_and_other/][Reddit post]]
+
+#+BEGIN_SRC emacs-lisp
+;; Per-project .dir-locals.el
+((nil . ((sb/prettier-p . t))))
+
+(use-package prettier
+  :preface
+  (defvar-local sb/prettier-p nil "Should prettier be enabled?")
+  :hook
+  (web-mode . me/prettier-mode-maybe)
+  :config
+  (put 'sb/prettier-p 'safe-local-variable #'booleanp))
+
+(defun sb/prettier-mode-maybe ()
+  "Enable `prettier-mode' according to the `sb/prettier-p' directory-local variable."
+  (add-hook 'hack-local-variables-hook
+            (lambda () 
+              (when sb/prettier-p 
+                 (prettier-mode)))
+            nil t))
 #+END_SRC
