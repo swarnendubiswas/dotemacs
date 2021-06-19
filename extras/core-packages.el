@@ -19,9 +19,9 @@
                          all-the-icons-ivy
                          all-the-icons-ivy-rich
                          amx
-                         ant
+                         ;; ant
                          anzu
-                         apt-sources-list
+                         ;; apt-sources-list
                          async
                          auctex
                          auctex-latexmk
@@ -46,7 +46,7 @@
                          cmake-mode
                          company
                          company-auctex
-                         company-bibtex
+                         ;; company-bibtex
                          company-math
                          company-posframe
                          company-prescient
@@ -71,7 +71,7 @@
                          disable-mouse
                          discover-my-major
                          doom-modeline
-                         doom-themes
+                         ;; doom-themes
                          dotenv-mode
                          dumb-jump
                          duplicate-thing
@@ -99,8 +99,8 @@
                          gcmh
                          git-commit
                          ;; git-gutter
-                         gitattributes-mode
-                         gitconfig-mode
+                         ;; gitattributes-mode
+                         ;; gitconfig-mode
                          gitignore-mode
                          ;; gnuplot
                          goto-last-change
@@ -132,8 +132,8 @@
                          ivy-yasnippet
                          ;; jgraph-mode
                          ;; jinja2-mode
-                         js2-mode
-                         js2-refactor
+                         ;; js2-mode
+                         ;; js2-refactor
                          json-reformat
                          json-snatcher
                          key-chord
@@ -177,14 +177,14 @@
                          parent-mode
                          pdf-tools
                          persistent-scratch
-                         php-mode
+                         ;; php-mode
                          ;; pip-requirements
                          pkg-info
                          ;; pkgbuild-mode
                          ;; pomidor
                          polymode
                          popup
-                         popwin
+                         ;; popwin
                          pos-tip
                          posframe
                          powerline
