@@ -601,7 +601,7 @@ This location is used for temporary installations and files.")
   :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
   :config
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        auto-revert-remote-files t ; Emacs seems to hang with auto-revert and tramp
+        auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and tramp
         auto-revert-use-notify nil
         auto-revert-verbose nil
         auto-revert-check-vc-info nil ; Should improve performance
@@ -1349,18 +1349,18 @@ SAVE-FN with non-nil ARGS."
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
-    :extends "Default"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash (lambda
-                 (ext icon)
-                 (puthash ext
-                          (concat
-                           (substring icon 0 1)
-                           (propertize " " 'display
-                                       '(space . (:width 0.5))))
-                          icons))
-               icons)))
+                         :extends "Default"
+                         :config
+                         (let ((icons (treemacs-theme->gui-icons theme)))
+                           (maphash (lambda
+                                      (ext icon)
+                                      (puthash ext
+                                               (concat
+                                                (substring icon 0 1)
+                                                (propertize " " 'display
+                                                            '(space . (:width 0.5))))
+                                               icons))
+                                    icons)))
 
   (treemacs-create-theme "all-the-icons-tighter"
     :extends "all-the-icons"
@@ -1427,10 +1427,12 @@ SAVE-FN with non-nil ARGS."
 ;; Allows to quickly add projectile projects to the treemacs workspace
 (use-package treemacs-projectile
   :after (treemacs projectile)
-  :commands treemacs-projectile)
+  :commands treemacs-projectile
+  :disabled t)
 
 (use-package treemacs-magit
   :after (treemacs magit)
+  :disabled t
   :demand t)
 
 (use-package org
@@ -1508,10 +1510,12 @@ SAVE-FN with non-nil ARGS."
 
 (use-package isearch-symbol-at-point
   :after isearch
+  :disabled t
   :commands (isearch-symbol-at-point isearch-backward-symbol-at-point))
 
 (use-package isearch-dabbrev
   :after isearch
+  :disabled t
   :bind (:map isearch-mode-map
               ("<tab>" . isearch-dabbrev-expand)))
 
@@ -1567,7 +1571,8 @@ SAVE-FN with non-nil ARGS."
   :bind ("C-c s d" . deadgrep))
 
 (use-package ripgrep
-  :commands ripgrep-regexp)
+  :commands ripgrep-regexp
+  :disabled t)
 
 (use-package ctrlf
   :disabled t
@@ -2025,6 +2030,7 @@ SAVE-FN with non-nil ARGS."
 (use-package all-the-icons-ivy
   :after ivy
   :demand t
+  :disabled t
   :commands all-the-icons-ivy-setup
   :config (all-the-icons-ivy-setup))
 
@@ -2732,6 +2738,7 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :load-path "extras"
   :commands number-separator-mode
+  :disabled t
   ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
   ;;                            :files ("number-separator.el")))
   :diminish
@@ -3122,7 +3129,7 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :commands mouse-avoidance-mode
   :if (display-mouse-p)
-  :config (mouse-avoidance-mode 'banish))
+  :init (mouse-avoidance-mode 'banish))
 
 (use-package apt-sources-list
   :disabled t
@@ -3234,6 +3241,7 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :if (bound-and-true-p sb/debug-init-file)
   :load-path "extras"
+  :disabled t
   ;; Generates the following warning with `quelpa'
   ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file"
   ;; :quelpa ((explain-pause-mode :fetcher github :repo "lastquestion/explain-pause-mode"))
@@ -3308,10 +3316,12 @@ SAVE-FN with non-nil ARGS."
   ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
   (add-hook 'pdf-view-mode-hook
             (lambda()
-              (pdf-links-minor-mode 1)
-              (pdf-isearch-minor-mode 1)
-              (pdf-outline-minor-mode 1)
-              (pdf-history-minor-mode 1)))
+              ;; (pdf-links-minor-mode 1)
+              ;; (pdf-isearch-minor-mode 1)
+              ;; (pdf-outline-minor-mode 1)
+              ;; (pdf-history-minor-mode 1)
+              (pdf-tools-enable-minor-modes)
+              ))
   :bind
   (:map pdf-view-mode-map
         ("C-s" . isearch-forward)
@@ -3327,6 +3337,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package logview
   :commands logview-mode
+  :disabled t
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory))))
@@ -3346,7 +3357,8 @@ SAVE-FN with non-nil ARGS."
   ;; This will clone the llvm project
   ;; :quelpa ((llvm-mode :fetcher github :repo "llvm/llvm-project"
   ;;                     :files ("llvm/utils/emacs/llvm-mode.el")))
-  :commands llvm-mode)
+  :commands llvm-mode
+  :disabled t)
 
 (use-package tablegen-mode
   :ensure nil
@@ -3356,7 +3368,8 @@ SAVE-FN with non-nil ARGS."
   ;; This will clone the llvm project
   ;; :quelpa ((tablegen-mode :fetcher github :repo "llvm/llvm-project"
   ;;                         :files ("llvm/utils/emacs/tablegen-mode.el")))
-  :commands tablegen-mode)
+  :commands tablegen-mode
+  :disabled t)
 
 (use-package autodisass-llvm-bitcode
   :disabled t
@@ -3431,6 +3444,7 @@ SAVE-FN with non-nil ARGS."
 ;; https://github.com/jscheid/prettier.el/issues/84
 (use-package prettier
   :if (executable-find "prettier")
+  :disabled t
   :commands prettier-mode
   :hook
   ;; Should work with `gfm-mode', `css-mode', and `html-mode' as they are derived modes
@@ -3493,6 +3507,7 @@ SAVE-FN with non-nil ARGS."
   :hook (c-mode-common . c-turn-on-eldoc-mode))
 
 (use-package css-mode
+  :commands css-mode
   :config (setq css-indent-offset 2))
 
 (use-package css-eldoc
@@ -4124,6 +4139,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package lsp-jedi
   :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
+  :disabled t
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-jedi)
@@ -4216,7 +4232,8 @@ SAVE-FN with non-nil ARGS."
 
 ;; Syntax highlighting for Gradle files
 (use-package groovy-mode
-  :commands groovy-mode )
+  :commands groovy-mode
+  :disabled t)
 
 ;; SVG
 ;;;###autoload
@@ -4284,6 +4301,7 @@ SAVE-FN with non-nil ARGS."
   :diminish with-editor-mode)
 
 (use-package magit
+  :disabled t
   :commands magit-display-buffer-fullframe-status-v1
   :bind
   (("C-x g"   . magit-status)
@@ -4474,8 +4492,11 @@ SAVE-FN with non-nil ARGS."
         web-mode-enable-auto-quoting t
         web-mode-enable-block-face t
         web-mode-enable-css-colorization t
-        web-mode-enable-current-element-highlight t
-        web-mode-enable-current-column-highlight t))
+        web-mode-enable-current-element-highlight t ; Highlight the element under the cursor
+        web-mode-enable-current-column-highlight t
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-style-padding 2))
 
 (use-package emmet-mode
   :commands emmet-mode
@@ -4525,7 +4546,8 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
                                                "languagetool-5.3-commandline.jar")
-        flycheck-checkers (delete 'languagetool flycheck-checkers))
+        flycheck-checkers (delete 'languagetool flycheck-checkers)
+        flycheck-languagetool-check-time 3)
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
@@ -4632,6 +4654,7 @@ SAVE-FN with non-nil ARGS."
   ;; (unbind-key "C-c ;" LaTeX-mode-map)
   )
 
+;; We can disable this once `lsp-latex-build' works well
 (use-package auctex-latexmk
   :after tex-mode
   :demand t
@@ -4740,6 +4763,7 @@ Ignore if no file is found."
 
 (use-package bib-cite
   :ensure nil
+  :disabled t
   :diminish bib-cite-minor-mode
   :commands bib-cite-minor-mode
   :hook ((LaTeX-mode latex-mode) . bib-cite-minor-mode )
@@ -4828,7 +4852,7 @@ Ignore if no file is found."
   :ensure json-reformat
   :ensure json-snatcher
   :load-path "extras"
-  :commands (json-mode jsonc-mode)
+  :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
    (".*/\\.vscode/settings.json$" . jsonc-mode)
@@ -4876,15 +4900,18 @@ Ignore if no file is found."
   ;; This will clone the llvm project
   ;; :quelpa ((mlir-mode :fetcher github :repo "llvm/llvm-project"
   ;;                     :files ("mlir/utils/emacs/mlir-mode.el")))
-  :mode "\\.mlir\\'")
+  :mode "\\.mlir\\'"
+  :disabled t)
 
 (use-package clang-format
   :after (mlir-mode)
-  :commands (clang-format clang-format-buffer clang-format-region))
+  :commands (clang-format clang-format-buffer clang-format-region)
+  :disabled t)
 
 (use-package clang-format+
   :ensure clang-format
   :ensure t
+  :disabled t
   :hook (mlir-mode . clang-format+-mode)
   :config (setq clang-format+-always-enable t))
 

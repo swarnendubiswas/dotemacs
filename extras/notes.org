@@ -104,3 +104,6 @@ The equivalent version with ~with-eval-after-load~ would be:
                  (prettier-mode)))
             nil t))
 #+END_SRC
+
+*** [[https://occasionallycogent.com/emacs_advice/index.html][Using Emacs advice]]
+
