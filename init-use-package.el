@@ -797,7 +797,8 @@ SAVE-FN with non-nil ARGS."
 
 (use-package leuven-theme
   :if (eq sb/theme 'leuven)
-  :init (load-theme 'leuven t))
+  :init (load-theme 'leuven t)
+  :disabled t)
 
 (use-package eclipse-theme
   :if (eq sb/theme 'eclipse)
@@ -867,7 +868,7 @@ SAVE-FN with non-nil ARGS."
   :init (load-theme 'monokai t))
 
 (use-package modus-operandi-theme
-  :ensure moody
+  ;;  :ensure moody
   :ensure modus-themes
   :if (eq sb/theme 'modus-operandi)
   :init
@@ -896,7 +897,7 @@ SAVE-FN with non-nil ARGS."
   )
 
 (use-package modus-vivendi-theme
-  :ensure moody
+  ;; :ensure moody
   :ensure modus-themes
   :if (eq sb/theme 'modus-vivendi)
   :init
@@ -1000,7 +1001,8 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
-        doom-modeline-height 20)
+        doom-modeline-height 20
+        doom-modeline-buffer-file-name-style 'relative-to-project)
   (doom-modeline-mode 1)
   ;; :custom-face
   ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
@@ -1491,6 +1493,15 @@ SAVE-FN with non-nil ARGS."
   :commands org-bullets-mode
   :hook (org-mode . org-bullets-mode))
 
+;; Make invisible parts of Org elements appear visible
+(use-package org-appear
+  :commands org-appear-mode
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autosubmarkers t
+        org-appear-autoentities t
+        org-appear-autolinks t))
+
 ;; TODO: Use `C-c o' as the binding for `org-mode-map'
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
@@ -1971,6 +1982,7 @@ SAVE-FN with non-nil ARGS."
 (use-package ivy-hydra
   :after (ivy hydra)
   :demand t
+  :disabled t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (use-package ivy-posframe
@@ -3270,6 +3282,7 @@ SAVE-FN with non-nil ARGS."
 (use-package langtool
   :after text-mode
   :commands langtool-check
+  :disabled t
   :config
   (setq langtool-default-language "en"
         langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
@@ -3287,7 +3300,8 @@ SAVE-FN with non-nil ARGS."
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
-  :commands (define-word define-word-at-point))
+  :commands (define-word define-word-at-point)
+  :disabled t)
 
 (use-package emojify
   :disabled t
@@ -3404,6 +3418,7 @@ SAVE-FN with non-nil ARGS."
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
   :after markdown-mode
+  :disabled t
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
                                       markdown-toc-generate-or-refresh-toc))
 
@@ -3416,8 +3431,7 @@ SAVE-FN with non-nil ARGS."
   :hook (markdown-mode . pandoc-mode)
   :config
   (pandoc-load-default-settings)
-  ;; Binds `C-c /' to `pandoc-main-hydra/body'.
-  ;; (unbind-key "C-c /" pandoc-mode-map)
+  ;; (unbind-key "C-c /" pandoc-mode-map) ; Binds `C-c /' to `pandoc-main-hydra/body'
   )
 
 (use-package grip-mode
@@ -3428,6 +3442,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
+  :disabled t
   :commands markdown-preview-mode)
 
 ;; Search the current buffer's parent directories for `node_modules/.bin'. Traverse the directory
@@ -3748,9 +3763,9 @@ SAVE-FN with non-nil ARGS."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge (lsp-configuration-section "pyright")
-                                     (lsp-configuration-section "python")))))
+                                            (lsp--set-configuration
+                                             (ht-merge (lsp-configuration-section "pyright")
+                                                       (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -4270,11 +4285,9 @@ SAVE-FN with non-nil ARGS."
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line
-(progn
-  (unless (fboundp 'executable-make-buffer-file-executable-if-script-p)
-    (autoload #'executable-make-buffer-file-executable-if-script-p "executable" nil t))
-
-  (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p))
+(use-package executable
+  :commands (executable-make-buffer-file-executable-if-script-p)
+  :hook (after-save . executable-make-buffer-file-executable-if-script-p))
 
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
 (use-package vc
@@ -4286,6 +4299,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package transient
   :commands transient-bind-q-to-quit
+  :defines transient-display-buffer-action
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq transient-history-file (expand-file-name "transient/history.el" sb/temp-directory)
@@ -4301,7 +4315,6 @@ SAVE-FN with non-nil ARGS."
   :diminish with-editor-mode)
 
 (use-package magit
-  :disabled t
   :commands magit-display-buffer-fullframe-status-v1
   :bind
   (("C-x g"   . magit-status)
@@ -4528,6 +4541,8 @@ SAVE-FN with non-nil ARGS."
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere.
 (use-package flycheck-grammarly
+  :ensure websocket
+  :ensure grammarly
   :after flycheck
   :demand t
   :config
@@ -4588,9 +4603,12 @@ SAVE-FN with non-nil ARGS."
                                (lsp-deferred)))
   :config
   (setq lsp-latex-bibtex-formatter "latexindent"
-        lsp-latex-bibtex-formatting-line-length sb/fill-column
+        lsp-latex-latex-formatter "latexindent"
+        lsp-latex-bibtex-formatter-line-length sb/fill-column
         lsp-latex-chktex-on-open-and-save t
-        lsp-latex-build-is-continuous t)
+        lsp-latex-build-is-continuous t
+        ;; Delay time in milliseconds before reporting diagnostics
+        lsp-latex-diagnostics-delay 2000)
 
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc"))

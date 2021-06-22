@@ -1,3 +1,14 @@
+#+TITLE: Emacs Notes
+#+AUTHOR: Swarnendu Biswas
+#+DATE: <21-06-2021>
+#+EMAIL: swarnendu@cse.iitk.ac.in
+#+CREATOR: Emacs 28 (Org mode 9.4)
+#+STARTUP: showall indent
+#+OPTIONS: H:4 num:3 author:nil date:nil toc:nil tags:nil TeX:t LaTeX:t
+#+LaTeX_CLASS_OPTIONS: [10pt]
+#+LATEX_HEADER: \usepackage{palatino}
+#+LATEX_HEADER: \usepackage[letterpaper]{geometry}
+
 * Good References
 
 To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use

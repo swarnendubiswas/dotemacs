@@ -7,8 +7,8 @@ This file lists useful keyboard shortcuts and describes how to deal with common 
 keybindings are from a default installation of GNU Emacs, so the keybindings listed here should also
 be available in the reference cards. I am maintaining this for my ease of reference.
 
-Use =M-x describe-personal-keybindings (C-c d k)= to see personal keybindings defined using =bind-key=.
-Use =C-h m (describe-mode)= to view documentation for the current major mode, including a list of its
+Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings defined using ~bind-key~.
+Use ~C-h m (describe-mode)~ to view documentation for the current major mode, including a list of its
 key bindings.
 
 ** Emacs Window
@@ -16,8 +16,9 @@ key bindings.
    :CUSTOM_ID: emacs-window
    :END:
 
-- =C-x C-+= - Increase font size by one step (=text-scale-adjust=)
-- =C-x C--= - Decrease font size by one step (=text-scale-adjust=)
+- ~C-x C-+~  — Increase font size by one step (~text-scale-adjust~)
+- ~C-x C--~  — Decrease font size by one step (~text-scale-adjust~)
+- ~Ctrl-x +~ - Make all visible windows approximately equal height (~balance-windows~)
 
 ** Text Manipulation
    :PROPERTIES:
@@ -60,19 +61,22 @@ key bindings.
    :CUSTOM_ID: key-motion
    :END:
 
-- =C-M-n= - Move forward over a parenthetical group (=forward-list=)
-- =C-M-p= - Move backward over a parenthetical group (=backward-list=)
-- =C-M-u= - Move up in parenthesis structure (=backward-up-list=)
-- =C-M-d= - Move down in parenthesis structure (=down-list=)
-- =C-M-f= - Move forward over a balanced expression (=forward-sexp=)
-- =C-M-b= - Move backward over a balanced expression (=backward-sexp=)
-- =C-M-k= - Kill balanced expression forward (=kill-sexp=)
-- =C-M-a= - Go to the start of a function (=beginning-of-defun=)
-- =C-M-e= - Go to the end of a function (=end-of-defun=)
+- ~C-M-n~ - Move forward over a parenthetical group (~forward-list~)
+- ~C-M-p~ - Move backward over a parenthetical group (~backward-list~)
+- ~C-M-u~ - Move up in parenthesis structure (~backward-up-list~)
+- ~C-M-d~ - Move down in parenthesis structure (~down-list~)
+- ~C-M-f~ - Move forward over a balanced expression (~forward-sexp~)
+- ~C-M-b~ - Move backward over a balanced expression (~backward-sexp~)
+- ~C-M-k~ - Kill balanced expression forward (~kill-sexp~)
+- ~C-M-a~ - Go to the start of a function (~beginning-of-defun~)
+- ~C-M-e~ - Go to the end of a function (~end-of-defun~)
 - =M-a= - Move back to the beginning of the sentence (=backward-sentence=)
 - =M-e= - Move forward to the end of the sentence (=forward-sentence=)
 - =M-{= - Move back to the previous paragraph beginning (=backward-paragraph=)
 - =M-}= - Move forward to the next paragraph end (=markdown-forward-paragraph=)
+- ~C-up~ - Move forward to end of paragraph paragraph (~forward-paragraph~)
+- ~C-down~ - Move backward to start of paragraph (~backward-paragraph~)
+- ~M-r~ - Without a prefix argument, position the cursor at the center of the window (~move-to-window-line-top-bottom~)
 
 ** Dired
    :PROPERTIES:
@@ -187,6 +191,7 @@ Specify extra flags to the search commands with =C-u= (=universal-argument=) bef
 - =C-u C-c .= - Insert date and time (=org-time-stamp=)
 - =C-c C-d= - Insert "DEADLINE" keyword along with a timestamp (=org-deadline=)
 - =C-c C-s= - Insert "SCHEDULED" keyword along with a timestamp (=org-schedule=)
+- ~C-c C-,~ - Insert a block structure from a list (~org-insert-structure-template~)
 
 ** Projectile
    :PROPERTIES:
