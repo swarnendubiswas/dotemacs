@@ -2357,8 +2357,7 @@ SAVE-FN with non-nil ARGS."
       (projectile-kill-buffers)
       (treemacs)))
   :config
-  (setq projectile-auto-discover nil ; Do not discover projects
-        projectile-enable-caching t ; Caching will not watch for new files automatically
+  (setq projectile-enable-caching t ; Caching will not watch for new files automatically
         projectile-file-exists-remote-cache-expire nil
         projectile-indexing-method 'alien
         projectile-mode-line-prefix ""
@@ -2403,17 +2402,19 @@ SAVE-FN with non-nil ARGS."
                                         "configure.in"))
 
 
-  ;; Avoid search when `projectile-mode' is enabled for faster startup
-  ;; (setq projectile-project-search-path (list
-  ;;                                       (concat `,(getenv "HOME") "/bitbucket")
-  ;;                                       (expand-file-name "github" sb/user-home)
-  ;;                                       (expand-file-name "iitk-workspace" sb/user-home)
-  ;;                                       (expand-file-name "iitkgp-workspace" sb/user-home)
-  ;;                                       (expand-file-name "iss-workspace" sb/user-home)
-  ;;                                       (expand-file-name "plass-workspace" sb/user-home)
-  ;;                                       (expand-file-name "prospar-workspace" sb/user-home)
-  ;;                                       (expand-file-name "research" sb/user-home)
-  ;;                                       ))
+  ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
+  ;; projects is disabled for faster startup
+  (setq projectile-auto-discover nil
+        projectile-project-search-path (list
+                                        (concat `,(getenv "HOME") "/bitbucket")
+                                        (expand-file-name "github" sb/user-home)
+                                        (expand-file-name "iitk-workspace" sb/user-home)
+                                        (expand-file-name "iitkgp-workspace" sb/user-home)
+                                        (expand-file-name "iss-workspace" sb/user-home)
+                                        (expand-file-name "plass-workspace" sb/user-home)
+                                        (expand-file-name "prospar-workspace" sb/user-home)
+                                        (expand-file-name "research" sb/user-home)
+                                        ))
 
   (dolist (prjs (list
                  (expand-file-name sb/user-home) ; Do not consider $HOME as a project
@@ -2832,6 +2833,12 @@ SAVE-FN with non-nil ARGS."
       (find-file (completing-read "Remote Tramp targets: " (sb/sshlist))))
 
     (bind-key "C-c d t" #'sb/selectrum-tramp)))
+
+;; TODO: SSH into Gcloud
+;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
+;; Make sure you've set your default project with:
+;; gcloud config set project <project-name>
+;; C-x C-f /gcssh:compute-instance:/path/to/filename.clj
 
 (use-package imenu
   :ensure nil
@@ -4325,10 +4332,10 @@ SAVE-FN with non-nil ARGS."
         ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
         magit-no-message '("Turning on magit-auto-revert-mode...")
         ;; https://irreal.org/blog/?p=8877
-        magit-section-initial-visibility-alist '((stashes . show)
+        magit-section-initial-visibility-alist '((stashes   . show)
                                                  (untracked . show)
-                                                 (unpushed . show)
-                                                 (unpulled . show)))
+                                                 (unpushed  . show)
+                                                 (unpulled  . show)))
 
   ;; These give a performance boost to magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
@@ -4345,14 +4352,6 @@ SAVE-FN with non-nil ARGS."
     (setq magit-diff-refine-hunk t
           magit-diff-highlight-trailing nil
           magit-diff-paint-whitespace nil)))
-
-(use-package ediff
-  :after magit
-  :config
-  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
-  ;; Split windows horizontally in ediff (instead of vertically)
-  (setq ediff-split-window-function #'split-window-horizontally))
 
 (use-package gitignore-mode
   :commands gitignore-mode)
@@ -4451,7 +4450,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ediff
   :ensure nil
-  :after (magit)
+  :after magit
   :demand t
   :defines ediff-window-setup-function
   :commands ediff-setup-windows-plain
@@ -4459,7 +4458,8 @@ SAVE-FN with non-nil ARGS."
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
   (setq ediff-window-setup-function #'ediff-setup-windows-plain)
   ;; Split windows horizontally in ediff (instead of vertically)
-  (setq ediff-split-window-function #'split-window-horizontally))
+  (setq ediff-split-window-function #'split-window-horizontally)
+  (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 (use-package yaml-mode
   :commands yaml-mode
@@ -4549,6 +4549,7 @@ SAVE-FN with non-nil ARGS."
   (setq flycheck-grammarly-check-time 3
         ;; LATER: Can we combine the delete operations?
         flycheck-checkers (delete 'proselint flycheck-checkers)
+        flycheck-checkers (delete 'textlint flycheck-checkers)
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
@@ -4556,6 +4557,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package flycheck-languagetool
   :after flycheck
+  :disabled t
   :defines flycheck-languagetool-commandline-jar
   :demand t
   :config
@@ -4570,8 +4572,10 @@ SAVE-FN with non-nil ARGS."
 ;; then `grammarly'.
 (add-hook 'text-mode-hook
           (lambda ()
-            (flycheck-add-next-checker 'textlint 'grammarly)
-            (flycheck-add-next-checker 'grammarly 'languagetool)))
+            (when (featurep 'flycheck-grammarly)
+              (flycheck-add-next-checker 'textlint 'grammarly))
+            (when (featurep 'flycheck-languagetool)
+              (flycheck-add-next-checker 'grammarly 'languagetool))))
 
 ;; `markdown-mode' is derived from `text-mode'
 (add-hook 'markdown-mode-hook
@@ -4579,11 +4583,11 @@ SAVE-FN with non-nil ARGS."
             ;; (make-local-variable 'flycheck-error-list-minimum-level)
             ;; (setq flycheck-error-list-minimum-level 'warning
             ;;       flycheck-navigation-minimum-level 'warning)
-            (flycheck-add-next-checker 'markdown-markdownlint-cli 'textlint)))
+            (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)))
 
 (dolist (hook '(LaTex-mode-hook latex-mode-hook))
   (add-hook hook (lambda ()
-                   (flycheck-add-next-checker 'tex-chktex 'textlint))))
+                   (flycheck-add-next-checker 'tex-chktex 'grammarly))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files
