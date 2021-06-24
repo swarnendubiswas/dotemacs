@@ -27,7 +27,7 @@
 
 
 (defcustom sb/theme
-  'none
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type '(radio
           (const :tag "eclipse" eclipse)
@@ -785,6 +785,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package circadian
   :commands circadian-setup
+  :disabled t
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
@@ -872,12 +873,13 @@ SAVE-FN with non-nil ARGS."
   :ensure modus-themes
   :if (eq sb/theme 'modus-operandi)
   :init
-  ;; (setq modus-themes-completions 'opinionated
-  ;;       modus-themes-fringes 'subtle
-  ;;       modus-themes-intense-hl-line nil
-  ;;       modus-themes-scale-headings nil
-  ;;       modus-themes-prompts 'intense-accented
-  ;;       modus-themes-variable-pitch-headings nil)
+  (setq modus-themes-completions 'opinionated
+        modus-themes-fringes 'subtle
+        modus-themes-intense-hl-line nil
+        modus-themes-scale-headings nil
+        modus-themes-prompts 'intense-accented
+        modus-themes-variable-pitch-headings nil
+        modus-themes-org-blocks 'tinted-background)
 
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -900,6 +902,7 @@ SAVE-FN with non-nil ARGS."
   ;; :ensure moody
   :ensure modus-themes
   :if (eq sb/theme 'modus-vivendi)
+  :disabled t
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -922,7 +925,8 @@ SAVE-FN with non-nil ARGS."
     ;; (setq frame-background-mode 'light)
     ;; (set-background-color "#ffffff")
     (set-foreground-color "#333333")
-    (set-face-attribute 'hl-line nil :background "light yellow")
+    (with-eval-after-load 'hl-line
+      (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
 
 ;; The Python virtualenv information is not shown
@@ -1501,6 +1505,10 @@ SAVE-FN with non-nil ARGS."
   (setq org-appear-autosubmarkers t
         org-appear-autoentities t
         org-appear-autolinks t))
+
+(use-package ox-gfm
+  :demand t
+  :after org)
 
 ;; TODO: Use `C-c o' as the binding for `org-mode-map'
 
@@ -2549,6 +2557,7 @@ SAVE-FN with non-nil ARGS."
                           '(:width 18 :face warning)))
 
 (use-package counsel-fd
+  :disabled t
   :if (and (eq sb/selection 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
@@ -2768,6 +2777,7 @@ SAVE-FN with non-nil ARGS."
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
+  :disabled t
   :bind
   (("C-<"     . mc/mark-previous-like-this)
    ("C->"     . mc/mark-next-like-this)
@@ -3090,6 +3100,7 @@ SAVE-FN with non-nil ARGS."
     (diminish mode)))
 
 (use-package undo-tree
+  :disabled t
   :defines undo-tree-map
   :commands (global-undo-tree-mode)
   :config
@@ -3368,6 +3379,7 @@ SAVE-FN with non-nil ARGS."
   :mode "\\.g4\\'")
 
 (use-package bison-mode
+  :disabled t
   :mode ("\\.bison\\'"))
 
 (use-package llvm-mode
@@ -3443,6 +3455,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package grip-mode
   :if (executable-find "grip")
+  ;; :hook ((markdown-mode org-mode) . grip-mode)
+  :diminish
+  :config
+  (setq grip-preview-use-webkit nil) ; Do not use the embedded webkit for preview
   :bind
   (:map markdown-mode-command-map
         ("g" . grip-mode)))
@@ -3664,6 +3680,7 @@ SAVE-FN with non-nil ARGS."
                                   "--clang-tidy"
                                   "--fallback-style=LLVM"
                                   "--header-insertion=never"
+                                  "--header-insertion-decorators=0"
                                   "--log=error"
                                   "--pch-storage=memory"
                                   ;; "--suggest-missing-includes"
@@ -3765,6 +3782,7 @@ SAVE-FN with non-nil ARGS."
       :remote? t
       :server-id 'pyright-remote
       :multi-root t
+      :priority 3
       :initialization-options (lambda ()
                                 (ht-merge (lsp-configuration-section "pyright")
                                           (lsp-configuration-section "python")))
@@ -5575,6 +5593,7 @@ or the major mode is not in `sb/skippable-modes'."
   (setq which-key-show-early-on-C-h t))
 
 (use-package which-key-posframe
+  :disabled t
   :commands which-key-posframe-mode
   :hook (which-key-mode . which-key-posframe-mode)
   :config

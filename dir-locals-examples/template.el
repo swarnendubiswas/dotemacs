@@ -12,6 +12,8 @@
          (projectile-project-run-cmd . "cd bin\\Debug && .\\shiolink.exe && E:\\nanika\\ssp.exe")
          (projectile-project-name . "your-project-name-here")
          (show-trailing-whitespace . t)
+         (flycheck-checker . c/c++-gcc)
+         (flycheck-disabled-checker . c/c++-clang)
          (mode . prettier)
          (eval . (progn BODY))
          (eval . (setq projectile-project-root
@@ -154,11 +156,13 @@
                                           "--background-index"
                                           "--clang-tidy"
                                           "--fallback-style=LLVM"
-                                          "--pch-storage=memory"
-                                          "--suggest-missing-includes"
+                                          "--header-insertion=never"
+                                          "--header-insertion-decorators=0"
                                           "--log=error"
+                                          "--pch-storage=memory"
+                                          ;; "--suggest-missing-includes"
                                           "--compile-commands-dir=build"
-                                          ))
+                                          "--pretty"))
                             )
                         (setq-local company-clang-arguments clang-args
                                     flycheck-clang-args clang-args
@@ -195,11 +199,23 @@
                 (sh-basic-offset . 2)
                 (sh-indentation . 2)
                 ))
+
+ (dired-mode . (
+                (dired-omit-mode . t)
+                ))
  )
 
-(dired-mode . (
-               (dired-omit-mode . t)
-               ))
+;; suppose project root folder is ~/project-root
+;; path of compile_commands.json for this project is ~/project-root/build-dir/compile_commands.json
+;; one can put following in ~/project-root/.dir-locals.el file
+
+((nil . ((eval .
+               (setq lsp-clients-clangd-args
+                     (concat "--compile-commands-dir=" (concat
+                                                        (locate-dominating-file
+                                                         default-directory
+                                                         dir-locals-file)
+                                                        "build-dir")))))))
 
 (eval-after-load 'flycheck
   '(progn

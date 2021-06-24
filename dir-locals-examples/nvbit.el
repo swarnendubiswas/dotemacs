@@ -27,7 +27,8 @@
                                     flycheck-clang-args clang-args
                                     flycheck-gcc-args clang-args
                                     flycheck-gcc-include-path include-path
-                                    flycheck-clang-include-path include-path)
+                                    flycheck-clang-include-path include-path
+                                    flycheck-cuda-include-path include-path)
                         ))
               ;; (eval add-hook 'before-save-hook #'lsp-format-buffer nil t)
               ))
