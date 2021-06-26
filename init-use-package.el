@@ -1355,18 +1355,18 @@ SAVE-FN with non-nil ARGS."
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/735
   (treemacs-create-theme "Default-Tighter"
-                         :extends "Default"
-                         :config
-                         (let ((icons (treemacs-theme->gui-icons theme)))
-                           (maphash (lambda
-                                      (ext icon)
-                                      (puthash ext
-                                               (concat
-                                                (substring icon 0 1)
-                                                (propertize " " 'display
-                                                            '(space . (:width 0.5))))
-                                               icons))
-                                    icons)))
+    :extends "Default"
+    :config
+    (let ((icons (treemacs-theme->gui-icons theme)))
+      (maphash (lambda
+                 (ext icon)
+                 (puthash ext
+                          (concat
+                           (substring icon 0 1)
+                           (propertize " " 'display
+                                       '(space . (:width 0.5))))
+                          icons))
+               icons)))
 
   (treemacs-create-theme "all-the-icons-tighter"
     :extends "all-the-icons"
@@ -1688,14 +1688,14 @@ SAVE-FN with non-nil ARGS."
 (use-package company
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
-                           company-capf company-dabbrev-code company-clang-set-prefix
-                           global-company-mode
-                           )
+                           company-capf company-dabbrev-code
+                           company-clang-set-prefix
+                           global-company-mode)
   :defines (company-dabbrev-downcase company-dabbrev-ignore-case
                                      company-dabbrev-other-buffers
                                      company-ispell-available
                                      company-ispell-dictionary)
-  :diminish
+  ;; :diminish
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
@@ -1716,7 +1716,7 @@ SAVE-FN with non-nil ARGS."
         ;; Align additional metadata, like type signatures, to the right-hand side
         company-tooltip-align-annotations t)
 
-  ;; We set `company-backends' as a local variable
+  ;; We set `company-backends' as a local variable, so it is not important to delete backends
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
   ;;   (delq backends company-backends))
 
@@ -1732,7 +1732,7 @@ SAVE-FN with non-nil ARGS."
   :bind (:map company-active-map
               ("C-n"      . company-select-next)
               ("C-p"      . company-select-previous)
-              ;; Insert the common part of all candidates, or select the next one.
+              ;; Insert the common part of all candidates, or select the next one
               ("<tab>"    . company-complete-common-or-cycle)
               ;; ("C-M-/" . company-other-backend) ; Was bound to `dabbrev-completion'
               ("C-s"      . sb/quit-company-save-buffer)
@@ -2065,7 +2065,7 @@ SAVE-FN with non-nil ARGS."
     (defvar ivy-re-builders-alist)
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-  (setq completion-styles '(orderless)
+  (setq completion-styles '(orderless initials basic partial-completion emacs22)
         orderless-component-separator 'orderless-escapable-split-on-space)
 
   ;; (declare-function sb/just-one-face "init-autoload")
@@ -3622,6 +3622,7 @@ SAVE-FN with non-nil ARGS."
             lsp-perl-language-server-client-version
             lsp-completion--regex-fuz
             lsp-clients-clangd-args
+            lsp-clients-clangd-executable
             lsp-completion-enable-additional-text-edit
             lsp-completion-show-detail
             lsp-completion-provider
@@ -3676,7 +3677,7 @@ SAVE-FN with non-nil ARGS."
   :config
   ;; We can add "--compile-commands-dir=build" option to indicate the directory where
   ;; `compile_commands.json' reside
-  (setq lsp-clients-clangd-args '("-j=2"
+  (setq lsp-clients-clangd-args '("-j=4"
                                   "--background-index"
                                   "--clang-tidy"
                                   "--fallback-style=LLVM"
@@ -3686,6 +3687,7 @@ SAVE-FN with non-nil ARGS."
                                   "--pch-storage=memory"
                                   ;; "--suggest-missing-includes"
                                   "--pretty")
+        lsp-clients-clangd-executable "clangd-12"
         lsp-completion-enable-additional-text-edit t
         lsp-completion-provider :none ; Enable integration with `company'
         lsp-completion-show-detail nil ; Disable completion metadata
@@ -3789,9 +3791,9 @@ SAVE-FN with non-nil ARGS."
                                           (lsp-configuration-section "python")))
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge (lsp-configuration-section "pyright")
-                                                       (lsp-configuration-section "python")))))
+                          (lsp--set-configuration
+                           (ht-merge (lsp-configuration-section "pyright")
+                                     (lsp-configuration-section "python")))))
       :download-server-fn (lambda (_client callback error-callback _update?)
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
@@ -5072,6 +5074,11 @@ Ignore if no file is found."
 ;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
 ;; that come from different backends are sorted separately in the combined list.
 
+;; LATER: I do not understand the difference between the following two, and the explanation.
+;; (add-to-list 'company-backends '(company-capf company-dabbrev))
+;; (add-to-list 'company-backends '(company-capf :with company-dabbrev))
+
+
 (progn
   (defun sb/company-text-mode ()
     "Add backends for text completion in company mode."
@@ -5117,10 +5124,11 @@ Ignore if no file is found."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-files
-                             company-yasnippet
-                             company-dabbrev-code
+
+    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+    (setq company-backends '((company-capf :with company-yasnippet)
+                             (company-files :with company-yasnippet)
+                             (company-dabbrev-code :with company-yasnippet)
                              company-dabbrev)))
 
   (add-hook 'prog-mode-hook #'sb/company-prog-mode))
@@ -5133,10 +5141,9 @@ Ignore if no file is found."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-files
-                             company-yasnippet
-                             company-dabbrev-code
+    (setq company-backends '((company-capf :with company-yasnippet)
+                             (company-files : with company-yasnippet)
+                             (company-dabbrev-code :with company-yasnippet)
                              company-dabbrev)))
 
   (add-hook 'java-mode-hook #'sb/company-java-mode))
@@ -5152,11 +5159,11 @@ Ignore if no file is found."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-files
-                             company-yasnippet
-                             company-dabbrev-code
-                             company-dabbrev)))
+    (setq company-backends '((company-capf :with company-yasnippet)
+                             (company-files :with company-yasnippet)
+                             (company-dabbrev-code :with company-yasnippet)
+                             company-dabbrev
+                             company-ispell)))
 
   (add-hook 'c-mode-common-hook #'sb/company-c-mode))
 
@@ -5217,10 +5224,9 @@ Ignore if no file is found."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-files
-                             company-yasnippet
-                             company-dabbrev-code
+    (setq company-backends '((company-capf :with company-yasnippet)
+                             (company-files :with company-yasnippet)
+                             (company-dabbrev-code :with company-yasnippet)
                              company-dabbrev
                              company-ispell)))
 
