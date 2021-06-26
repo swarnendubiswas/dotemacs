@@ -1897,6 +1897,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package counsel
   :ensure amx
+  :ensure t
   ;; :ensure-system-package fasd
   :commands counsel-mode
   :preface
@@ -4561,6 +4562,7 @@ SAVE-FN with non-nil ARGS."
 (use-package flycheck-grammarly
   :ensure websocket
   :ensure grammarly
+  :ensure t
   :after flycheck
   :demand t
   :config

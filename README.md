@@ -1,6 +1,6 @@
 # GNU Emacs
 
-I use GNU Emacs as my primary editor on a GNU/Linux platform. This repository lists my preferred customizations. The setup should work on a GNU/Linux platform.
+This repository lists my preferred customizations for GNU Emacs, which is my primary editor. The setup should work on a GNU/Linux platform.
 
 Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
