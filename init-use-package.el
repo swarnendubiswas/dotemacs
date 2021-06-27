@@ -1005,7 +1005,7 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
-        doom-modeline-height 20
+        ;; doom-modeline-height 20
         doom-modeline-buffer-file-name-style 'relative-to-project)
   (doom-modeline-mode 1)
   ;; :custom-face
@@ -1084,7 +1084,7 @@ SAVE-FN with non-nil ARGS."
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "swarnendu-Inspiron-7572")
-  (set-face-attribute 'default nil :height 150)
+  (set-face-attribute 'default nil :height 170)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
@@ -1099,7 +1099,7 @@ SAVE-FN with non-nil ARGS."
   (defun sb/minibuffer-font-setup ()
     "Customize minibuffer font."
     (set (make-local-variable 'face-remapping-alist)
-         '((default :height 0.90))))
+         '((default :height 0.95))))
 
   (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
 
@@ -1231,8 +1231,8 @@ SAVE-FN with non-nil ARGS."
   (dired-mode . (lambda ()
                   (diredp-toggle-find-file-reuse-dir 1))))
 
-;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load
-;; after `dired+' and not `dired', even with `bind-keys*'.
+;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load after
+;; `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
   :after dired+
   :defines dired-efap-initial-filename-selection
@@ -1639,7 +1639,8 @@ SAVE-FN with non-nil ARGS."
                           "~$"
                           "/.autosaves/"
                           ".*/TAGS\\'"
-                          "*.cache")
+                          "*.cache"
+                          ".*/treemacs/persist.org")
         ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
         ;; Keep remote file without testing if they still exist
         recentf-keep '(file-remote-p file-readable-p)
@@ -2069,7 +2070,7 @@ SAVE-FN with non-nil ARGS."
   (setq completion-styles '(orderless initials basic partial-completion emacs22)
         orderless-component-separator 'orderless-escapable-split-on-space)
 
-  ;; (declare-function sb/just-one-face "init-autoload")
+  ;; (declare-function sb/just-one-face "init-use-package")
 
   ;; (defun just-one-face (fn &rest args)
   ;;   (let ((orderless-match-faces [completions-common-part]))
@@ -2292,7 +2293,7 @@ SAVE-FN with non-nil ARGS."
   (defvar electric-pair-text-pairs)
   (defvar electric-pair-preserve-balance)
 
-  (declare-function sb/add-markdown-pairs "init-autoload")
+  (declare-function sb/add-markdown-pairs "init-use-package")
 
   (defun sb/add-markdown-pairs ()
     "Add custom pairs to `markdown-mode'."
@@ -2579,7 +2580,8 @@ SAVE-FN with non-nil ARGS."
                                        flycheck-next-error
                                        flycheck-disable-checker
                                        flycheck-add-mode
-                                       flycheck-manual)
+                                       flycheck-manual
+                                       flycheck-display-error-messages-unless-error-list)
   :init
   ;; There are no checkers for modes like `csv-mode', and many program modes use lsp `yaml-mode' is
   ;; derived from `text-mode'
@@ -2620,7 +2622,7 @@ SAVE-FN with non-nil ARGS."
   ;; Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
 
-  (declare-function sb/flycheck-may-check-automatically "init-autoload.el")
+  (declare-function sb/flycheck-may-check-automatically "init-use-package.el")
 
   (defvar sb/excluded-directory-regexps
     '(".git/" "elpa/"))
@@ -2826,7 +2828,7 @@ SAVE-FN with non-nil ARGS."
 
 (when (eq sb/selection 'ivy)
   (progn
-    (declare-function sb/ivy-tramp "init-autoload")
+    (declare-function sb/ivy-tramp "init-use-package")
 
     (defun sb/ivy-tramp ()
       "Invoke remote hosts with ivy and tramp."
@@ -2837,7 +2839,7 @@ SAVE-FN with non-nil ARGS."
 
 (when (eq sb/selection 'selectrum)
   (progn
-    (declare-function sb/selectrum-tramp "init-autoload")
+    (declare-function sb/selectrum-tramp "init-use-package")
 
     (defun sb/selectrum-tramp ()
       "Invoke remote hosts with selectrum and tramp."
@@ -4475,7 +4477,7 @@ SAVE-FN with non-nil ARGS."
   :after magit
   :demand t
   :defines ediff-window-setup-function
-  :commands ediff-setup-windows-plain
+  :commands (ediff-setup-windows-plain ediff-set-diff-options)
   :config
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
   (setq ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -4652,7 +4654,8 @@ SAVE-FN with non-nil ARGS."
   :defines (tex-fontify-script font-latex-fontify-script
                                font-latex-fontify-sectioning
                                TeX-syntactic-comment TeX-save-query
-                               LaTeX-item-indent LaTeX-syntactic-comments)
+                               LaTeX-item-indent LaTeX-syntactic-comments
+                               LaTeX-fill-break-at-separators)
   :functions TeX-active-process
   :commands (TeX-active-process TeX-save-document tex-site LaTeX-mode LaTeX-math-mode TeX-PDF-mode
                                 TeX-source-correlate-mode TeX-active-process
@@ -5033,6 +5036,7 @@ Ignore if no file is found."
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (use-package ansi-color
+  :commands ansi-color-apply-on-region
   :preface
   (defun sb/colorize-compilation-buffer ()
     "Colorize compile mode output."
@@ -5047,14 +5051,9 @@ Ignore if no file is found."
   ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
   (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
 
-(progn
-  (declare-function info-colors-fontify-node "info-colors")
-
-  (unless (fboundp 'info-colors-fontify-node)
-    (autoload #'info-colors-fontify-node "info-colors" nil t))
-
-  (with-eval-after-load "info"
-    (add-hook 'Info-selection-hook #'info-colors-fontify-node)))
+(use-package info-colors
+  :commands info-colors-fontify-node
+  :hook (Info-selection . info-colors-fontify-node))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
@@ -5579,10 +5578,6 @@ or the major mode is not in `sb/skippable-modes'."
 
 (global-set-key [remap next-buffer] #'sb/next-buffer)
 (global-set-key [remap previous-buffer] #'sb/previous-buffer)
-
-(with-eval-after-load 'centaur-tabs
-  (global-set-key [remap next-buffer] #'centaur-tabs-forward)
-  (global-set-key [remap previous-buffer] #'centaur-tabs-backward))
 
 (use-package default-text-scale
   :bind
