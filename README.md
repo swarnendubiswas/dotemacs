@@ -45,7 +45,7 @@ sudo snap install shellcheck --edge
 #### Python Packages
 
 ```Bash
-python3 -m pip install --upgrade pip proselint Sphinx pygments yapf jedi pylint python-language-server importmagic pyls-isort setuptools configparser yamllint cmake-language-server grip jedi-language-server data-science-types cpplint --user
+python3 -m pip install --upgrade pip Sphinx pygments yapf jedi pylint importmagic setuptools configparser yamllint cmake-language-server grip data-science-types cpplint --user
 ```
 
 #### Other Packages
@@ -73,7 +73,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash;
 ```Bash
 cd $HOME/tmp; cd ;
 npm init --yes
-sudo npm install npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
+sudo npm install npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense prettier write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
 ```
 
 `npm install git+https://gitlab.com/matsievskiysv/math-preview`
@@ -94,7 +94,7 @@ cd; sudo apt update; sudo snap refresh; sudo gem update; cd $HOME/tmp; composer 
 > Update node packages.
 
 ```Bash
-sudo npm update npm eslint js-yaml less jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense stylelint prettier write-good htmlhint javascript-typescript-langserver pyright tree-sitter-cli jshint unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
+sudo npm update npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense prettier write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
 ```
 
 #### Edit Bash files

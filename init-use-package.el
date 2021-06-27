@@ -1084,13 +1084,14 @@ SAVE-FN with non-nil ARGS."
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "swarnendu-Inspiron-7572")
-  (set-face-attribute 'default nil :height 140))
+  (set-face-attribute 'default nil :height 150)
+  (set-face-attribute 'mode-line nil :height 120)
+  (set-face-attribute 'mode-line-inactive nil :height 120))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil :height 140))
-
-(set-face-attribute 'mode-line nil :height 110)
-(set-face-attribute 'mode-line-inactive nil :height 110)
+  (set-face-attribute 'default nil :height 140)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
