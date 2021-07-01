@@ -6,4 +6,21 @@
                      ;; directory, not in any subdirectories.
                      (subdirs . nil)
                      ))
+
+ (nil . (
+         (eval . (add-hook 'lsp-managed-mode-hook
+                           (lambda ()
+                             (when (derived-mode-p 'markdown-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
+
+                             (when (derived-mode-p 'gfm-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
+
+                             (when (derived-mode-p 'sh-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
+
+                             (when (derived-mode-p 'json-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
+                             )))
+         ))
  )

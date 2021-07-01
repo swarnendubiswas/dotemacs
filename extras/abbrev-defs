@@ -289,6 +289,7 @@
     ("claerly" "clearly" nil :count 0)
     ("cliant" "client" nil :count 0)
     ("cliche" "cliche" nil :count 0)
+    ("clulstering" "clustering" nil :count 0)
     ("cna" "can" nil :count 1)
     ("cnosistency" "Consistency" nil :count 1)
     ("coflicting" "conflicting" nil :count 1)
@@ -1429,6 +1430,7 @@
     ("progrms" "programs" nil :count 0)
     ("quizes" "quizzes" nil :count 0)
     ("trainign" "training" nil :count 0)
+    ("tunned" "tuned" nil :count 0)
    ))
 
 (define-abbrev-table 'markdown-mode-abbrev-table
@@ -1471,6 +1473,7 @@
   '(
     ("apir" "pair" nil :count 0)
     ("atend" "Attend" nil :count 0)
+    ("atomocity" "atomicity" nil :count 0)
     ("beging" "being" nil :count 0)
     ("buget" "budget" nil :count 0)
     ("candidats" "candidates" nil :count 0)
@@ -1485,6 +1488,7 @@
     ("explainiation" "explanation" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
     ("hueristically" "heuristically" nil :count 0)
+    ("informatino" "information" nil :count 0)
     ("inititation" "initiation" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("profilign" "Profiling" nil :count 0)

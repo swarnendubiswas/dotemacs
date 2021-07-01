@@ -136,7 +136,7 @@ whitespaces."
 
 
 (when (bound-and-true-p sb/debug-init-file)
-  (setq garbage-collection-messages nil
+  (setq garbage-collection-messages t
         debug-on-error t
         debug-on-event 'sigusr2)
   (debug-on-entry 'projectile-remove-known-project))
@@ -209,9 +209,9 @@ This location is used for temporary installations and files.")
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
 ;; customizations
-(add-hook 'emacs-startup-hook #'sb/restore-garbage-collection)
+(add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-(add-hook 'minibuffer-exit-hook #'sb/restore-garbage-collection)
+(add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -239,7 +239,7 @@ This location is used for temporary installations and files.")
 ;; of loading the package. https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer t
-        use-package-always-ensure t
+        use-package-always-ensure nil
         use-package-compute-statistics nil
         ;; Avoid printing errors and warnings since the configuration is known to work
         use-package-expand-minimally t
@@ -363,6 +363,7 @@ This location is used for temporary installations and files.")
 
 ;; This is not a great idea, but I expect most warnings will arise from third-party packages
 (use-package warnings
+  :demand t
   :config (setq warning-minimum-level :emergency))
 
 ;; Allow GC to happen after a period of idle time
@@ -395,9 +396,8 @@ This location is used for temporary installations and files.")
         auto-package-update-prompt-before-update t)
   (auto-package-update-maybe))
 
-;; FIXME: Improve startup
-;; Check the PATH with `(getenv "PATH")'
-;; (setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))
+;; Get PATH with `(getenv "PATH")'
+;; Set PATH with `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
@@ -583,17 +583,6 @@ This location is used for temporary installations and files.")
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
-;; SB: I do not use the following commands so it is fine to keep them disabled
-
-;; Do not disable narrowing commands
-;; (put 'narrow-to-region 'disabled nil)
-;; (put 'narrow-to-page 'disabled nil)
-;; (put 'narrow-to-defun 'disabled nil)
-
-;; Do not disable case-change functions
-;; (put 'upcase-region 'disabled nil)
-;; (put 'downcase-region 'disabled nil)
-
 (use-package autorevert ; Auto-refresh all buffers
   :ensure nil
   :commands global-auto-revert-mode
@@ -601,7 +590,7 @@ This location is used for temporary installations and files.")
   :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
   :config
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and tramp
+        auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and Tramp
         auto-revert-use-notify nil
         auto-revert-verbose nil
         auto-revert-check-vc-info nil ; Should improve performance
@@ -719,15 +708,14 @@ SAVE-FN with non-nil ARGS."
   (when (fboundp mode)
     (funcall mode -1)))
 
-(with-eval-after-load 'hl-line
-  (declare-function hl-line-highlight "hl-line"))
+(use-package hl-line
+  :hook (after-init . global-hl-line-mode))
 
 ;; Enable the following modes
 (dolist (mode '(;; auto-compression-mode
                 auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
-                ;; global-hl-line-mode
                 ;; Soft wraps, Wrap lines without the ugly continuation marks
                 global-visual-line-mode
                 minibuffer-depth-indicate-mode
@@ -925,7 +913,7 @@ SAVE-FN with non-nil ARGS."
     ;; (setq frame-background-mode 'light)
     ;; (set-background-color "#ffffff")
     (set-foreground-color "#333333")
-    (with-eval-after-load 'hl-line
+    (with-eval-after-load "hl-line"
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
 
@@ -1084,7 +1072,7 @@ SAVE-FN with non-nil ARGS."
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "swarnendu-Inspiron-7572")
-  (set-face-attribute 'default nil :height 170)
+  (set-face-attribute 'default nil :height 160)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
@@ -1099,7 +1087,7 @@ SAVE-FN with non-nil ARGS."
   (defun sb/minibuffer-font-setup ()
     "Customize minibuffer font."
     (set (make-local-variable 'face-remapping-alist)
-         '((default :height 0.95))))
+         '((default :height 0.90))))
 
   (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
 
@@ -2412,7 +2400,6 @@ SAVE-FN with non-nil ARGS."
                                         "configure.ac"
                                         "configure.in"))
 
-
   ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
   ;; projects is disabled for faster startup
   (setq projectile-auto-discover nil
@@ -2424,7 +2411,6 @@ SAVE-FN with non-nil ARGS."
                                         (expand-file-name "iss-workspace" sb/user-home)
                                         (expand-file-name "plass-workspace" sb/user-home)
                                         (expand-file-name "prospar-workspace" sb/user-home)
-                                        (expand-file-name "research" sb/user-home)
                                         ))
 
   (dolist (prjs (list
@@ -2597,7 +2583,8 @@ SAVE-FN with non-nil ARGS."
         ;; Show error messages only if the error list is not already visible
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         ;; `chktex' errors are often not very helpful, and `csv-mode' does not have a checker yet.
-        flycheck-global-modes '(not csv-mode))
+        flycheck-global-modes '(not csv-mode)
+        flycheck-chktexrc "chktexrc")
 
   ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
   (when (or (eq sb/modeline-theme 'spaceline)
@@ -3289,12 +3276,6 @@ SAVE-FN with non-nil ARGS."
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-(with-eval-after-load 'flycheck
-  (add-hook 'text-mode-hook
-            (lambda ()
-              ;; Add `proselint', then `textlint'
-              (flycheck-add-next-checker 'proselint 'textlint))))
-
 (use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
   :disabled t ; `textlint' includes writegood
   :commands writegood-mode
@@ -3395,7 +3376,7 @@ SAVE-FN with non-nil ARGS."
   ;; :quelpa ((llvm-mode :fetcher github :repo "llvm/llvm-project"
   ;;                     :files ("llvm/utils/emacs/llvm-mode.el")))
   :commands llvm-mode
-  :disabled t)
+  :mode "\\.ll\\'")
 
 (use-package tablegen-mode
   :ensure nil
@@ -3406,7 +3387,8 @@ SAVE-FN with non-nil ARGS."
   ;; :quelpa ((tablegen-mode :fetcher github :repo "llvm/llvm-project"
   ;;                         :files ("llvm/utils/emacs/tablegen-mode.el")))
   :commands tablegen-mode
-  :disabled t)
+  :disabled t
+  :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
   :disabled t
@@ -3616,7 +3598,7 @@ SAVE-FN with non-nil ARGS."
                                    (when buffer-file-name
                                      (add-hook 'after-save-hook #'check-parens nil t)
                                      (flycheck-add-next-checker 'emacs-lisp
-                                                                'emacs-lisp-checkdoc))
+                                                                'emacs-lisp-checkdoc 'append))
                                    (outline-minor-mode))))
 
 (use-package lsp-mode
@@ -4102,7 +4084,7 @@ SAVE-FN with non-nil ARGS."
         python-shell-exec-path "python3"
         python-shell-interpreter "python3")
 
-  ;; (with-eval-after-load 'lsp-mode
+  ;; (with-eval-after-load "lsp-mode"
   ;;   (when (and (eq sb/python-langserver 'pyls) (executable-find "pyls"))
   ;;     (progn
   ;;       (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
@@ -4112,12 +4094,7 @@ SAVE-FN with non-nil ARGS."
 
   (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
-                                auto-mode-alist))
-
-  ;; FIXME: `lsp' is the first checker, chain the other checkers
-  ;; https://github.com/flycheck/flycheck/issues/1762
-  ;; (flycheck-add-next-checker 'lsp 'python-pylint)
-  )
+                                auto-mode-alist)))
 
 (use-package python-docstring
   :after python-mode
@@ -4296,9 +4273,7 @@ SAVE-FN with non-nil ARGS."
   (setq sh-basic-offset 2
         sh-indent-after-continuation 'always
         ;; Indent comments as a regular line
-        sh-indent-comment t)
-
-  (flycheck-add-next-checker 'sh-bash 'sh-shellcheck))
+        sh-indent-comment t))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -4567,65 +4542,90 @@ SAVE-FN with non-nil ARGS."
 (use-package flycheck-grammarly
   :ensure websocket
   :ensure grammarly
+  :ensure keytar
   :ensure t
   :after flycheck
+  :disabled t
   :demand t
   :config
   (setq flycheck-grammarly-check-time 3
         ;; LATER: Can we combine the delete operations?
         flycheck-checkers (delete 'proselint flycheck-checkers)
-        flycheck-checkers (delete 'textlint flycheck-checkers)
+        ;; flycheck-checkers (delete 'textlint flycheck-checkers)
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'grammarly t))
 
+;; https://languagetool.org/download/
 (use-package flycheck-languagetool
   :after flycheck
-  :disabled t
-  :defines flycheck-languagetool-commandline-jar
+  :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :demand t
+  :disabled t
   :config
   (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
-                                               "languagetool-5.3-commandline.jar")
-        flycheck-checkers (delete 'languagetool flycheck-checkers)
+                                               "languagetool-commandline.jar")
+        flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
+                                          "languagetool-server.jar")
+        ;; flycheck-checkers (delete 'languagetool flycheck-checkers)
         flycheck-languagetool-check-time 3)
 
-  (add-to-list 'flycheck-checkers 'languagetool t))
+  ;; (add-to-list 'flycheck-checkers 'languagetool t)
+  )
 
 ;; We prefer to use `textlint' and `grammarly', `proselint' is not maintained. Add `textlint',
 ;; then `grammarly'.
-(add-hook 'text-mode-hook
-          (lambda ()
-            (when (featurep 'flycheck-grammarly)
-              (flycheck-add-next-checker 'textlint 'grammarly))
-            (when (featurep 'flycheck-languagetool)
-              (flycheck-add-next-checker 'grammarly 'languagetool))))
+;; (add-hook 'text-mode-hook
+;;           (lambda ()
+;;             (when (featurep 'flycheck-grammarly)
+;;               (flycheck-add-next-checker 'textlint 'grammarly 'append))
+;;             (when (featurep 'flycheck-languagetool)
+;;               (flycheck-add-next-checker 'grammarly 'languagetool 'append))))
 
 ;; `markdown-mode' is derived from `text-mode'
-(add-hook 'markdown-mode-hook
-          (lambda()
-            ;; (make-local-variable 'flycheck-error-list-minimum-level)
-            ;; (setq flycheck-error-list-minimum-level 'warning
-            ;;       flycheck-navigation-minimum-level 'warning)
-            (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)))
+;; (add-hook 'markdown-mode-hook
+;;           (lambda()
+;;             (when (featurep 'flycheck-grammarly)
+;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
+;;               ;; (setq flycheck-error-list-minimum-level 'warning
+;;               ;;       flycheck-navigation-minimum-level 'warning)
+;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
+;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly 'append))
+;;             (when (featurep 'flycheck-languagetool)
+;;               (flycheck-add-next-checker 'grammarly 'languagetool))))
 
-(dolist (hook '(LaTex-mode-hook latex-mode-hook))
-  (add-hook hook (lambda ()
-                   (flycheck-add-next-checker 'tex-chktex 'grammarly))))
+;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+;;   (add-hook hook (lambda ()
+;;                    ;; (flycheck-add-next-checker 'tex-chktex 'textlint 'append)
+;;                    (when (featurep 'flycheck-grammarly)
+;;                      (flycheck-add-next-checker 'textlint 'grammarly 'append))
+;;                    (when (featurep 'flycheck-languagetool)
+;;                      (flycheck-add-next-checker 'grammarly 'languagetool)))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files
 (use-package lsp-grammarly
-  :disabled t
+  :ensure keytar
   :hook
-  (text-mode . (lambda ()
-                 (require 'lsp-grammarly)
-                 (lsp-deferred)))
+  ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
+                                                                         (require 'lsp-grammarly)
+                                                                         (lsp-deferred)))
   :config
-  (setq lsp-grammarly-modes '(text-mode latex-mode org-mode markdown-mode gfm-mode)))
+  (setq lsp-grammarly-active-modes '(text-mode latex-mode
+                                               LaTeX-mode org-mode markdown-mode gfm-mode)))
+
+(use-package lsp-ltex
+  :hook
+  ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
+                                                                         (require 'lsp-ltex)
+                                                                         (lsp-deferred)))
+  :config
+  (setq lsp-ltex-version "12.2.0"
+        lsp-ltex-enabled t))
 
 (use-package lsp-latex
+  :disabled t
   :hook
   ((latex-mode LaTeX-mode) . (lambda()
                                (require 'lsp-latex)
@@ -4845,9 +4845,13 @@ Ignore if no file is found."
 ;;                         (lambda ()
 ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
 
-(defvar latex-mode-map)
-(with-eval-after-load 'latex
+(with-eval-after-load "tex-mode"
+  (defvar latex-mode-map)
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map))
+
+(with-eval-after-load "latex"
+  (defvar LaTeX-mode-map)
+  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
 
 (use-package math-preview
   :commands (math-preview-all math-preview-at-point math-preview-region)
@@ -5242,75 +5246,73 @@ Ignore if no file is found."
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
     ;; `company-dabbrev-code' is useful for variable names
-    (setq company-backends '(company-capf
-                             company-files
-                             company-yasnippet
-                             company-dabbrev-code
+    (setq company-backends '((company-capf :with company-yasnippet)
+                             (company-files :with company-yasnippet)
+                             (company-dabbrev-code :with company-yasnippet)
                              company-dabbrev)))
 
   (add-hook 'python-mode-hook #'sb/company-python-mode))
 
 
-(defun sb/company-latex-mode ()
-  "Add backends for latex completion in company mode."
-  (use-package company-auctex
-    :demand t
-    :commands (company-auctex-init company-auctex-labels
-                                   company-auctex-bibs company-auctex-macros
-                                   company-auctex-symbols company-auctex-environments)
-    :config (company-auctex-init))
-  (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
-    :demand t)
-  (use-package company-math
-    :demand t
-    :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-  (use-package company-reftex
-    :demand t
-    :commands (company-reftex-labels company-reftex-citations))
-  (use-package company-bibtex
-    :disabled t
-    :demand t
-    :commands company-bibtex)
+(progn
+  (defun sb/company-latex-mode ()
+    "Add backends for latex completion in company mode."
+    (use-package company-auctex
+      :demand t
+      :commands (company-auctex-init company-auctex-labels
+                                     company-auctex-bibs company-auctex-macros
+                                     company-auctex-symbols company-auctex-environments)
+      :config (company-auctex-init))
+    (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
+      :demand t)
+    (use-package company-math
+      :demand t
+      :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+    (use-package company-reftex
+      :demand t
+      :commands (company-reftex-labels company-reftex-citations))
+    (use-package company-bibtex
+      :disabled t
+      :demand t
+      :commands company-bibtex)
 
-  (setq-local company-minimum-prefix-length 3)
-  (make-local-variable 'company-backends)
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
 
-  ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-  ;; labels and citations
+    ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+    ;; labels and citations
 
-  (setq company-backends '((:separate
-                            company-capf
-                            company-files
-                            company-reftex-citations
-                            company-reftex-labels
-                            company-auctex-environments
-                            company-auctex-macros
-                            company-latex-commands
-                            company-math-symbols-latex
-                            company-math-symbols-unicode
+    (setq company-backends '((:separate
+                              company-capf
+                              company-files
+                              company-reftex-citations
+                              company-reftex-labels
+                              company-auctex-environments
+                              company-auctex-macros
+                              company-latex-commands
+                              company-math-symbols-latex
+                              company-math-symbols-unicode
 
-                            ;; company-auctex-symbols
-                            ;; company-auctex-bibs
-                            ;; company-auctex-labels
-                            ;; company-bibtex
-                            ;; company-capf
-                            )
-                           (:separate
-                            company-dabbrev
-                            company-ispell)))
+                              ;; company-auctex-symbols
+                              ;; company-auctex-bibs
+                              ;; company-auctex-labels
+                              ;; company-bibtex
+                              ;; company-capf
+                              )
+                             company-dabbrev
+                             company-ispell))
 
+    ;; (setq company-backends '((:separate
+    ;;                           company-capf
+    ;;                           ;; company-latex-commands
+    ;;                           company-files
+    ;;                           company-yasnippet
+    ;;                           company-dabbrev
+    ;;                           company-ispell)))
+    )
 
-  ;; (setq company-backends '((:separate
-  ;;                           company-capf
-  ;;                           ;; company-latex-commands
-  ;;                           company-files
-  ;;                           company-yasnippet
-  ;;                           company-dabbrev
-  ;;                           company-ispell)))
-  )
-
-(dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))
-  (add-hook hook #'sb/company-latex-mode))
+  (dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))
+    (add-hook hook #'sb/company-latex-mode)))
 
 (progn
   (defun sb/company-web-mode ()
@@ -5326,9 +5328,12 @@ Ignore if no file is found."
     (add-hook hook #'sb/company-web-mode)))
 
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
-;; (use-package server
-;;   :unless (string-equal "root" (getenv "USER")) ; Only start server mode if not root
-;;   :config (unless (server-running-p) (server-start)))
+(use-package server
+  :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
+  :commands server-running-p
+  :init
+  (unless (server-running-p)
+    (server-start)))
 
 ;; Function definitions
 
@@ -5447,11 +5452,11 @@ Increase line spacing by two line height."
   '(
     "TAGS" "*Messages*" "*Backtrace*" "*scratch*"
     ;; "*company-documentation*" ; Major mode is `python-mode'
-    ;; "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*"
-    ;; "*Compile-Log* *lsp-log*" "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*"
-    ;; "*perl-language-server*" "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*"
-    ;; "*xmlls*" "*xmlls::stderr*" "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*"
-    ;; "*jdtls::stderr*" "*clangd::stderr*" "*shfmt errors*"
+    ;; "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*" "*Compile-Log* *lsp-log*"
+    ;; "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*" "*perl-language-server*"
+    ;; "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*"
+    ;; "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*"
+    ;; "*clangd::stderr*" "*shfmt errors*"
     )
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type '(repeat string))
@@ -5567,8 +5572,8 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-S-s" . sb/save-all-buffers))
 
 (unbind-key "C-x s") ; Bound to save-some-buffers
-(bind-key "C-x s" #'sb/switch-to-scratch)
-(bind-key "C-x j" #'sb/counsel-all-files-recursively)
+(bind-key   "C-x s" #'sb/switch-to-scratch)
+(bind-key   "C-x j" #'sb/counsel-all-files-recursively)
 
 (unbind-key "C-j") ; Interferes with imenu `C-c C-j'
 
@@ -5576,7 +5581,7 @@ or the major mode is not in `sb/skippable-modes'."
   :if sb/EMACS27+
   :bind ("C-c d p" . package-quickstart-refresh))
 
-(global-set-key [remap next-buffer] #'sb/next-buffer)
+(global-set-key [remap next-buffer]     #'sb/next-buffer)
 (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
 (use-package default-text-scale
@@ -5722,7 +5727,7 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ("s" flycheck-select-checker)
   ("v" flycheck-verify-setup))
 
-(with-eval-after-load 'python
+(with-eval-after-load "python"
   (defhydra sb/hydra-python-indent (python-mode-map "C-c")
     "Adjust Python indentation."
     (">" python-indent-shift-right "right")
@@ -5765,10 +5770,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (put 'bibtex-completion-bibliography 'safe-local-variable #'listp)
 (put 'company-bibtex-bibliography 'safe-local-variable #'listp)
 (put 'company-clang-arguments 'safe-local-variable #'listp)
-(put 'counsel-etags-project-root 'safe-local-variable #'stringp)
 (put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
-(put 'counsel-projectile-default-file 'safe-local-variable #'stringp)
-(put 'dotemacs-projectile-default-file 'safe-local-variable #'stringp)
 (put 'flycheck-checker 'safe-local-variable #'listp)
 (put 'flycheck-clang-include-path 'safe-local-variable #'listp)
 (put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
@@ -5776,76 +5778,12 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (put 'lsp-clients-clangd-args 'safe-local-variable #'listp)
 (put 'lsp-latex-root-directory 'safe-local-variable #'stringp)
 (put 'lsp-pyright-extra-paths 'safe-local-variable #'listp)
-(put 'lsp-python-ms-extra-paths 'safe-local-variable #'listp)
 (put 'projectile-enable-caching 'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
 (put 'projectile-project-root 'safe-local-variable #'stringp)
 (put 'pyvenv-activate 'safe-local-variable #'stringp)
 (put 'reftex-default-bibliography 'safe-local-variable #'listp)
 (put 'tags-table-list 'safe-local-variable #'listp)
-
-;; Test functions
-
-(defun sb/open-local-file-projectile (directory)
-  "Open projectile file within DIRECTORY.
-Specify by the keyword projectile-default-file define in `dir-locals-file'"
-  (let ((default-file
-          (f-join directory
-                  (nth 1
-                       (car (-tree-map (lambda (node)
-                                         (when (eq (car node)
-                                                   'dotemacs-projectile-default-file)
-                                           (format "%s" (cdr node))))
-                                       (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                                        directory))))))))
-    (if (f-exists? default-file)
-        (counsel-find-file default-file)
-      (message "The file %s doesn't exist in the select project" default-file))))
-
-(defun sb/open-project-default-file1 (filepath)
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (let ((liststring (with-temp-buffer
-                      (insert-file-contents filepath)
-                      (split-string (buffer-string) "\n"))))
-    (mapcar (lambda (str)
-              (when (cl-search "dotemacs-projectile-default-file" str)
-                (let ((x (substring str (+
-                                         13 (length "dotemacs-projectile-default-file")) (length
-                                         str))))
-                  (let ((default-file (expand-file-name (substring
-                                                         x 1 -2) (projectile-project-root))))
-                    (when (f-exists? default-file)
-                      (let ((new-buffer (get-buffer-create default-file)))
-                        (switch-to-buffer new-buffer)
-                        (insert-file-contents default-file)))))))
-            liststring)))
-;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
-
-(defun sb/open-project-default-file2 ()
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (interactive)
-  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                 (projectile-project-root)))))
-    (mapcar (lambda (node)
-              (when (eq (car node) nil)
-                (let ((nillist (cdr node)))
-                  (mapcar (lambda (elem)
-                            (when (eq (car elem) 'dotemacs-projectile-default-file)
-                              (let ((default-file (expand-file-name (cdr elem)
-                                                                    (projectile-project-root))))
-                                (when (f-exists? default-file)
-                                  ;; (let ((new-buffer (get-buffer-create default-file)))
-                                  ;;   (switch-to-buffer new-buffer)
-                                  ;;   (insert-file-contents default-file))
-                                  (find-file default-file)))))
-                          nillist))))
-            mylist)))
-;; (sb/open-project-default-file2)
-
-;; (with-eval-after-load "counsel-projectile" (add-to-list 'counsel-projectile-action '("d"
-;;   sb/open-project-default-file2 "open default file") t))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
