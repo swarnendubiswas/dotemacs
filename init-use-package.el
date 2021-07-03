@@ -766,11 +766,10 @@ SAVE-FN with non-nil ARGS."
   (setq all-the-icons-scale-factor 1.0
         all-the-icons-color-icons nil))
 
-;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
-
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
 
+;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
   :commands circadian-setup
   :disabled t
@@ -917,7 +916,7 @@ SAVE-FN with non-nil ARGS."
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
 
-;; The Python virtualenv information is not shown
+;; The Python virtualenv information is not shown on the modeline
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
   :commands powerline-default-theme
@@ -1030,7 +1029,7 @@ SAVE-FN with non-nil ARGS."
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 
-(use-package mode-icons ; The icons do not look good.
+(use-package mode-icons ; The icons do not look good
   :disabled t
   :init (mode-icons-mode 1))
 
@@ -1136,7 +1135,7 @@ SAVE-FN with non-nil ARGS."
   (setq all-the-icons-ibuffer-human-readable-size t
         all-the-icons-ibuffer-icon-size 0.9))
 
-(use-package bufler ; IBuffer works well
+(use-package bufler ; IBuffer works well, I do not understand the advantages of this package
   :disabled t
   :commands bufler-mode
   ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
@@ -3707,8 +3706,8 @@ SAVE-FN with non-nil ARGS."
         lsp-keep-workspace-alive nil
         lsp-log-io nil ; Texlab communication is huge
         ;; We already have `flycheck' error summary listed on the modeline, but the `lsp' server may
-        ;; report additional errors
-        lsp-modeline-diagnostics-enable t
+        ;; report additional errors. However, the modeline is getting too congested.
+        lsp-modeline-diagnostics-enable nil
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
         ;; Sudden changes in the height of the echo area causes the cursor to lose position,
         ;; manually request via `lsp-signature-activate'
@@ -3716,7 +3715,7 @@ SAVE-FN with non-nil ARGS."
         lsp-signature-render-documentation nil ; Disable function documentation
         lsp-signature-function 'lsp-signature-posframe
         lsp-xml-logs-client nil
-        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.16.2-uber.jar"
+        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.17.1-uber.jar"
                                            sb/extras-directory)
         lsp-yaml-print-width sb/fill-column)
 
@@ -4538,7 +4537,8 @@ SAVE-FN with non-nil ARGS."
         nxml-slash-auto-complete-flag t))
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
-;; support, so you can use it anywhere.
+;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
+;; account.
 (use-package flycheck-grammarly
   :ensure websocket
   :ensure grammarly
@@ -4568,43 +4568,43 @@ SAVE-FN with non-nil ARGS."
                                                "languagetool-commandline.jar")
         flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool-server.jar")
-        ;; flycheck-checkers (delete 'languagetool flycheck-checkers)
+        flycheck-checkers (delete 'languagetool flycheck-checkers)
         flycheck-languagetool-check-time 3)
 
-  ;; (add-to-list 'flycheck-checkers 'languagetool t)
-  )
+  (add-to-list 'flycheck-checkers 'languagetool t))
 
 ;; We prefer to use `textlint' and `grammarly', `proselint' is not maintained. Add `textlint',
 ;; then `grammarly'.
-;; (add-hook 'text-mode-hook
-;;           (lambda ()
-;;             (when (featurep 'flycheck-grammarly)
-;;               (flycheck-add-next-checker 'textlint 'grammarly 'append))
-;;             (when (featurep 'flycheck-languagetool)
-;;               (flycheck-add-next-checker 'grammarly 'languagetool 'append))))
+(add-hook 'text-mode-hook
+          (lambda ()
+            (when (featurep 'flycheck-grammarly)
+              (flycheck-add-next-checker 'textlint 'grammarly 'append))
+            (when (featurep 'flycheck-languagetool)
+              (flycheck-add-next-checker 'grammarly 'languagetool 'append))))
 
 ;; `markdown-mode' is derived from `text-mode'
-;; (add-hook 'markdown-mode-hook
-;;           (lambda()
-;;             (when (featurep 'flycheck-grammarly)
-;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
-;;               ;; (setq flycheck-error-list-minimum-level 'warning
-;;               ;;       flycheck-navigation-minimum-level 'warning)
-;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
-;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly 'append))
-;;             (when (featurep 'flycheck-languagetool)
-;;               (flycheck-add-next-checker 'grammarly 'languagetool))))
+(add-hook 'markdown-mode-hook
+          (lambda()
+            (when (featurep 'flycheck-grammarly)
+              ;; (make-local-variable 'flycheck-error-list-minimum-level)
+              ;; (setq flycheck-error-list-minimum-level 'warning
+              ;;       flycheck-navigation-minimum-level 'warning)
+              ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly 'append))
+            (when (featurep 'flycheck-languagetool)
+              (flycheck-add-next-checker 'grammarly 'languagetool))))
 
-;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
-;;   (add-hook hook (lambda ()
-;;                    ;; (flycheck-add-next-checker 'tex-chktex 'textlint 'append)
-;;                    (when (featurep 'flycheck-grammarly)
-;;                      (flycheck-add-next-checker 'textlint 'grammarly 'append))
-;;                    (when (featurep 'flycheck-languagetool)
-;;                      (flycheck-add-next-checker 'grammarly 'languagetool)))))
+(dolist (hook '(LaTex-mode-hook latex-mode-hook))
+  (add-hook hook (lambda ()
+                   ;; (flycheck-add-next-checker 'tex-chktex 'textlint 'append)
+                   (when (featurep 'flycheck-grammarly)
+                     (flycheck-add-next-checker 'textlint 'grammarly 'append))
+                   (when (featurep 'flycheck-languagetool)
+                     (flycheck-add-next-checker 'grammarly 'languagetool)))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
-;; temporary text files
+;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
+;; failures, then try logging out of Grammarly and logging in again.
 (use-package lsp-grammarly
   :ensure keytar
   :hook
@@ -4622,7 +4622,8 @@ SAVE-FN with non-nil ARGS."
                                                                          (lsp-deferred)))
   :config
   (setq lsp-ltex-version "12.2.0"
-        lsp-ltex-enabled t))
+        lsp-ltex-enabled t
+        lsp-ltex-check-frequency "save"))
 
 (use-package lsp-latex
   :disabled t
