@@ -83,7 +83,7 @@ Install `textlint` separately so that the installation is shared by other editor
 > Uninstall `nvm`
 
 - `rm -rf "$NVM_DIR"`
-- Edit `$HOME/.bashrc` (or other shell resource config) and remove related lines
+- Edit `$HOME/.bashrc` (or other shell resource configuration files) and remove related lines
 
 #### Update helper packages
 

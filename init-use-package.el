@@ -18,79 +18,72 @@
   "Personal configuration for dotemacs."
   :group 'local)
 
-
 (defcustom sb/extras-directory
   (expand-file-name "extras" user-emacs-directory)
   "Path for third-party packages and files."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
-
 
 (defcustom sb/theme
   'modus-operandi
   "Specify which Emacs theme to use."
-  :type '(radio
-          (const :tag "eclipse" eclipse)
-          (const :tag "leuven" leuven)
-          (const :tag "solarized-light" solarized-light)
-          (const :tag "solarized-dark" solarized-dark)
-          (const :tag "spacemacs-light" spacemacs-light)
-          (const :tag "tangotango" tangotango)
-          (const :tag "zenburn" zenburn)
-          (const :tag "doom-molokai" doom-molokai)
-          (const :tag "doom-one-light" doom-one-light)
-          (const :tag "monokai" monokai)
-          (const :tag "modus-operandi" modus-operandi)
-          (const :tag "modus-vivendi" modus-vivendi)
-          (const :tag "customized" sb/default) ; Customizations over the default theme
-          (const :tag "none" none))
+  :type  '(radio
+           (const :tag "eclipse"         eclipse)
+           (const :tag "leuven"          leuven)
+           (const :tag "solarized-light" solarized-light)
+           (const :tag "solarized-dark"  solarized-dark)
+           (const :tag "spacemacs-light" spacemacs-light)
+           (const :tag "tangotango"      tangotango)
+           (const :tag "zenburn"         zenburn)
+           (const :tag "doom-molokai"    doom-molokai)
+           (const :tag "doom-one-light"  doom-one-light)
+           (const :tag "monokai"         monokai)
+           (const :tag "modus-operandi"  modus-operandi)
+           (const :tag "modus-vivendi"   modus-vivendi)
+           (const :tag "customized"      sb/default) ; Customizations over the default theme
+           (const :tag "none"            none))
   :group 'sb/emacs)
-
 
 (defcustom sb/modeline-theme
   'doom-modeline
   "Specify the mode-line theme to use."
-  :type '(radio
-          (const :tag "powerline" powerline)
-          (const :tag "smart-mode-line" sml)
-          (const :tag "spaceline" spaceline)
-          (const :tag "airline" airline)
-          (const :tag "doom-modeline" doom-modeline)
-          (const :tag "awesome-tray" awesome-tray)
-          (const :tag "moody" moody)
-          (const :tag "default" default))
+  :type  '(radio
+           (const :tag "powerline"       powerline)
+           (const :tag "smart-mode-line" sml)
+           (const :tag "spaceline"       spaceline)
+           (const :tag "airline"         airline)
+           (const :tag "doom-modeline"   doom-modeline)
+           (const :tag "awesome-tray"    awesome-tray)
+           (const :tag "moody"           moody)
+           (const :tag "default"         default))
   :group 'sb/emacs)
-
 
 (defcustom sb/window-split
   'horizontal
   "Specify the direction in which the windows should be split.
 This depends on the orientation of the display."
-  :type '(radio
-          ;; Split into two windows one above the other (`split-window-below')
-          (const :tag "vertical" vertical)
-          ;; Split into two side-by-side windows (`split-window-right')
-          (const :tag "horizontal" horizontal))
+  :type  '(radio
+           ;; Split into two windows one above the other (`split-window-below')
+           (const :tag "vertical"   vertical)
+           ;; Split into two side-by-side windows (`split-window-right')
+           (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
-
 
 ;; Large values make reading difficult when the window is split side-by-side
 (defcustom sb/fill-column
   100
   "Column beyond which lines should not extend."
-  :type 'number
+  :type  'number
   :group 'sb/emacs)
-
 
 (defcustom sb/selection
   'ivy
   "Choose the framework to use for narrowing and selection."
-  :type '(radio
-          (const :tag "ivy" ivy)
-          (const :tag "selectrum" selectrum)
-          (const :tag "none" none))
+  :type  '(radio
+           (const :tag "ivy"       ivy)
+           (const :tag "selectrum" selectrum)
+           (const :tag "none"      none))
   :group 'dotemacs)
-
 
 (defcustom sb/delete-trailing-whitespace-p
   nil
@@ -98,42 +91,37 @@ This depends on the orientation of the display."
 Control whether the trailing whitespace should be deleted or not.
 Sometimes we do not want to unnecessarily add differences due to
 whitespaces."
-  :type 'boolean
+  :type  'boolean
   :group 'sb/emacs)
-
 
 ;; We use `lsp-mode' and `dumb-jump' for jumping to tags and browsing source code
 (defcustom sb/tags-scheme
   'none
   "Choose whether to use gtags or ctags."
-  :type '(radio
-          (const :tag "ctags" ctags)
-          (const :tag "gtags" gtags)
-          (const :tag "none" none))
+  :type  '(radio
+           (const :tag "ctags" ctags)
+           (const :tag "gtags" gtags)
+           (const :tag "none"  none))
   :group 'sb/emacs)
-
 
 (defcustom sb/ctags-path
   "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
-
 
 (defcustom sb/gtags-path
   "/usr/local/bin/gtags"
   "Absolute path to GNU Global executable."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
-
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
   nil
   "Enable features to debug errors and performance bottlenecks."
-  :type 'boolean
+  :type  'boolean
   :group 'sb/emacs)
-
 
 (when (bound-and-true-p sb/debug-init-file)
   (setq garbage-collection-messages t
@@ -141,41 +129,35 @@ whitespaces."
         debug-on-event 'sigusr2)
   (debug-on-entry 'projectile-remove-known-project))
 
-
 (defconst sb/user-home
   (getenv "HOME")
   "User HOME directory.")
-
 
 (defconst sb/user-tmp
   (expand-file-name "tmp" sb/user-home)
   "User temp directory.
 This location is used for temporary installations and files.")
 
-
 (defcustom sb/textlint-home
   (expand-file-name "textlint-workspace" sb/user-tmp)
   "Absolute path to textlint workspace."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
-
 
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `py-lsp' is slow
 (defcustom sb/python-langserver
   'pyright
   "Choose the Python Language Server implementation."
-  :type '(radio
-          (const :tag "pyright" pyright)
-          (const :tag "jedi" jedi)
-          (const :tag "none" none))
+  :type  '(radio
+           (const :tag "pyright" pyright)
+           (const :tag "jedi"    jedi)
+           (const :tag "none"    none))
   :group 'sb/emacs)
-
 
 ;; Another option is to construct the `load-path' manually
 ;; (add-to-list 'load-path sb/extras-directory)
 ;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
 (package-initialize)
-
 
 (defconst sb/EMACS27+   (> emacs-major-version 26))
 (defconst sb/EMACS28+   (> emacs-major-version 27))
@@ -301,28 +283,21 @@ This location is used for temporary installations and files.")
   :type 'boolean
   :group 'sb/emacs)
 
-
-(add-to-list 'load-path sb/extras-directory)
-
-
 (use-package no-littering
   :if (bound-and-true-p sb/use-no-littering)
   :demand t)
 
-
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
   "File to write Emacs customizations."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
-
 
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
-
 
 (setq custom-file sb/custom-file)
 (when (file-exists-p custom-file)
@@ -331,18 +306,16 @@ This location is used for temporary installations and files.")
 (when (file-exists-p sb/private-file)
   (load sb/private-file 'noerror))
 
-
 (defcustom sb/temp-directory
   (expand-file-name "tmp" user-emacs-directory)
   "Storage location for various configuration files."
-  :type 'string
+  :type  'string
   :group 'sb/emacs)
 
 ;; We do not need this with `no-littering'
 (unless (or (bound-and-true-p sb/use-no-littering)
             (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
-
 
 (when nil
   (progn
@@ -374,7 +347,6 @@ This location is used for temporary installations and files.")
   :config
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
-
 
 (use-package paradox
   :commands (paradox-enable)
@@ -408,7 +380,6 @@ This location is used for temporary installations and files.")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
                                          "LANG" "LC_CTYPE"))
-
   (exec-path-from-shell-initialize))
 
 ;; LATER: Doing the following to avoid "-i" to `exec-path-from-shell' does not help.
@@ -549,7 +520,6 @@ This location is used for temporary installations and files.")
                 ".toc"))
   (add-to-list 'completion-ignored-extensions exts))
 
-
 (use-package request
   :if (unless (bound-and-true-p sb/use-no-littering))
   :init (setq request-storage-directory (expand-file-name "request" no-littering-var-directory)))
@@ -578,7 +548,6 @@ This location is used for temporary installations and files.")
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
-
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -1523,8 +1492,9 @@ SAVE-FN with non-nil ARGS."
 (use-package isearch-dabbrev
   :after isearch
   :disabled t
-  :bind (:map isearch-mode-map
-              ("<tab>" . isearch-dabbrev-expand)))
+  :bind
+  (:map isearch-mode-map
+        ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package anzu
   :diminish anzu-mode
@@ -1647,8 +1617,8 @@ SAVE-FN with non-nil ARGS."
   ;; after idling for 30 seconds.
   (run-with-idle-timer 30 t #'recentf-save-list)
 
-  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using
-  ;; idle timers.
+  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
+  ;; timers.
   (run-with-idle-timer 60 t #'recentf-cleanup)
   :hook
   ;; Load immediately after start since I use it often
@@ -1717,25 +1687,26 @@ SAVE-FN with non-nil ARGS."
         company-transformers)
 
   (remove-hook 'kill-emacs-hook #'company-clang-set-prefix)
-
-  :bind (:map company-active-map
-              ("C-n"      . company-select-next)
-              ("C-p"      . company-select-previous)
-              ;; Insert the common part of all candidates, or select the next one
-              ("<tab>"    . company-complete-common-or-cycle)
-              ;; ("C-M-/" . company-other-backend) ; Was bound to `dabbrev-completion'
-              ("C-s"      . sb/quit-company-save-buffer)
-              ("<escape>" . company-abort)))
+  :bind
+  (:map company-active-map
+        ("C-n"      . company-select-next)
+        ("C-p"      . company-select-previous)
+        ;; Insert the common part of all candidates, or select the next one
+        ("<tab>"    . company-complete-common-or-cycle)
+        ;; ("C-M-/" . company-other-backend) ; Was bound to `dabbrev-completion'
+        ("C-s"      . sb/quit-company-save-buffer)
+        ("<escape>" . company-abort)))
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+
 ;; Hide the "Starting new Ispell process" message
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
-;; https://github.com/company-mode/company-mode/issues/1010
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
+;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
   :after company
   :demand t
@@ -1968,9 +1939,8 @@ SAVE-FN with non-nil ARGS."
         counsel-yank-pop-preselect-last t
         counsel-yank-pop-separator "\n------------------------------------------\n")
 
-
-  ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an
-  ;; argument error
+  ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an argument
+  ;; error
   ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
 
   ;; (add-to-list 'ivy-display-functions-alist
@@ -1995,7 +1965,7 @@ SAVE-FN with non-nil ARGS."
           (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
           (t               . ivy-posframe-display))
         ivy-display-function #'ivy-posframe-display-at-frame-center
-        ivy-posframe-parameters '((left-fringe . 4)
+        ivy-posframe-parameters '((left-fringe  . 4)
                                   (right-fringe . 4)))
   (ivy-posframe-mode 1))
 
@@ -2079,7 +2049,7 @@ SAVE-FN with non-nil ARGS."
         ispell-silently-savep t)
 
   ;; Skip regions in Org-mode
-  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
   (add-to-list 'ispell-skip-region-alist '("=" "=")))
@@ -2601,6 +2571,57 @@ SAVE-FN with non-nil ARGS."
 
   (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
   (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
+
+  ;; Add support for `org-lint' as a checker
+  (defconst flycheck-org-lint-form
+    (flycheck-prepare-emacs-lisp-form
+      (require 'org)
+      (require 'org-attach)
+      (let ((source (car command-line-args-left))
+            (process-default-directory default-directory))
+        (with-temp-buffer
+          (insert-file-contents source 'visit)
+          (setq buffer-file-name source)
+          (setq default-directory process-default-directory)
+          (delay-mode-hooks (org-mode))
+          (setq delayed-mode-hooks nil)
+          (dolist (err (org-lint))
+            (let ((inf (cl-second err)))
+              (princ (elt inf 0))
+              (princ ": ")
+              (princ (elt inf 2))
+              (terpri)))))))
+
+  (defconst flycheck-org-lint-variables
+    '(org-directory
+      org-id-locations
+      org-id-locations-file
+      org-attach-id-dir
+      org-attach-use-inheritance
+      org-attach-id-to-path-function-list)
+    "Variables inherited by the org-lint subprocess.")
+
+  (defun flycheck-org-lint-variables-form ()
+    (require 'org-attach)  ; Needed to make variables available
+    `(progn
+       ,@(seq-map (lambda (opt) `(setq-default ,opt ',(symbol-value opt)))
+                  (seq-filter #'boundp flycheck-org-lint-variables))))
+
+  (flycheck-define-checker org-lint
+    "Org buffer checker using `org-lint'."
+    :command ("emacs" (eval flycheck-emacs-args)
+              "--eval" (eval (concat "(add-to-list 'load-path \""
+                                     (file-name-directory (locate-library "org"))
+                                     "\")"))
+              "--eval" (eval (flycheck-sexp-to-string
+                              (flycheck-org-lint-variables-form)))
+              "--eval" (eval flycheck-org-lint-form)
+              "--" source)
+    :error-patterns
+    ((error line-start line ": " (message) line-end))
+    :modes (org-mode))
+
+  (add-to-list 'flycheck-checkers 'org-lint t)
 
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
@@ -3140,6 +3161,7 @@ SAVE-FN with non-nil ARGS."
 ;; TODO: Is this causing the mouse-movement error and breaking out of key bindings?
 (use-package disable-mouse
   :if (display-mouse-p)
+  :disabled t
   :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
@@ -3905,7 +3927,8 @@ SAVE-FN with non-nil ARGS."
    ("C-c l r" . lsp-rename)
    ("C-c l h" . lsp-symbol-highlight)
    ("C-c l f" . lsp-format-buffer)
-   ("C-c l r" . lsp-find-references)))
+   ("C-c l r" . lsp-find-references)
+   ("C-c l a" . lsp-execute-code-action)))
 
 (use-package lsp-ui
   :defines lsp-ui-modeline-code-actions-enable
@@ -4573,34 +4596,55 @@ SAVE-FN with non-nil ARGS."
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
-;; We prefer to use `textlint' and `grammarly', `proselint' is not maintained. Add `textlint',
-;; then `grammarly'.
+;; org -> grammarly -> languagetool
+(add-hook 'org-mode-hook
+          (lambda ()
+            (flycheck-select-checker 'org-lint)
+            (when (featurep 'flycheck-grammarly)
+              (flycheck-add-next-checker 'org-lint 'grammarly))
+            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+              (flycheck-add-next-checker 'grammarly 'languagetool))
+            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+              (flycheck-add-next-checker 'org-lint 'languagetool))))
+
+;; We prefer not to use `textlint' and `proselint', `proselint' is not maintained.
+;; grammarly -> languagetool
 (add-hook 'text-mode-hook
           (lambda ()
             (when (featurep 'flycheck-grammarly)
-              (flycheck-add-next-checker 'textlint 'grammarly 'append))
-            (when (featurep 'flycheck-languagetool)
-              (flycheck-add-next-checker 'grammarly 'languagetool 'append))))
+              (flycheck-select-checker 'grammarly))
+            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+              (flycheck-add-next-checker 'grammarly 'languagetool))
+            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+              (flycheck-select-checker 'languagetool))))
 
 ;; `markdown-mode' is derived from `text-mode'
+;; markdown-markdownlint-cli -> grammarly -> languagetool
 (add-hook 'markdown-mode-hook
           (lambda()
+            (flycheck-select-checker 'markdown-markdownlint-cli)
             (when (featurep 'flycheck-grammarly)
               ;; (make-local-variable 'flycheck-error-list-minimum-level)
               ;; (setq flycheck-error-list-minimum-level 'warning
               ;;       flycheck-navigation-minimum-level 'warning)
               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly 'append))
-            (when (featurep 'flycheck-languagetool)
-              (flycheck-add-next-checker 'grammarly 'languagetool))))
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
+            (when (featurep 'flycheck-grammarly)
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
+            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+              (flycheck-add-next-checker 'grammarly 'languagetool))
+            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+              (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))))
 
 (dolist (hook '(LaTex-mode-hook latex-mode-hook))
   (add-hook hook (lambda ()
-                   ;; (flycheck-add-next-checker 'tex-chktex 'textlint 'append)
+                   (flycheck-select-checker 'tex-chktex)
                    (when (featurep 'flycheck-grammarly)
-                     (flycheck-add-next-checker 'textlint 'grammarly 'append))
-                   (when (featurep 'flycheck-languagetool)
-                     (flycheck-add-next-checker 'grammarly 'languagetool)))))
+                     (flycheck-add-next-checker 'tex-chktex 'grammarly))
+                   (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+                     (flycheck-add-next-checker 'grammarly 'languagetool))
+                   (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+                     (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
@@ -5534,8 +5578,9 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
-;; Generic keybindings, package-specific are usually in their own modules. Use `C-h b' to see
-;; available bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
+;; Generic keybindings, package-specific are usually in their own modules. The `C-c' binding is
+;; reserved for the user. Use `C-h b' to see available bindings in a buffer. Use `M-x
+;; describe-personal-keybindings' to see modifications.
 
 ;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd` macro is not required with
 ;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
