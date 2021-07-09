@@ -71,9 +71,17 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash;
 > Install node packages
 
 ```Bash
-cd $HOME/tmp; cd ;
-npm init --yes
+cd $HOME/tmp; cd;
+npm init --yes;
 sudo npm install npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense prettier write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
+```
+
+You can install the packages locally with the following commands.
+
+```Bash
+cd $HOME/tmp; cd ;
+npm init --yes;
+npm install --save-dev npm less jsonlint bash-language-server
 ```
 
 `npm install git+https://gitlab.com/matsievskiysv/math-preview`

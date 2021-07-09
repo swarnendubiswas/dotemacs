@@ -888,6 +888,7 @@ SAVE-FN with non-nil ARGS."
 ;; The Python virtualenv information is not shown on the modeline
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
+  :disabled t
   :commands powerline-default-theme
   :init
   (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
@@ -2536,7 +2537,8 @@ SAVE-FN with non-nil ARGS."
                                        flycheck-disable-checker
                                        flycheck-add-mode
                                        flycheck-manual
-                                       flycheck-display-error-messages-unless-error-list)
+                                       flycheck-display-error-messages-unless-error-list
+                                       flycheck-sexp-to-string)
   :init
   ;; There are no checkers for modes like `csv-mode', and many program modes use lsp `yaml-mode' is
   ;; derived from `text-mode'
@@ -2807,10 +2809,9 @@ SAVE-FN with non-nil ARGS."
     (setq tramp-auto-save-directory (expand-file-name "tramp-auto-save" sb/temp-directory)
           tramp-persistency-file-name (expand-file-name "tramp" sb/temp-directory)))
 
-  (setq tramp-completion-reread-directory-timeout nil
+  (setq tramp-default-user "swarnendu"
         ;; tramp-default-method "ssh" ; SSH is faster than the default SCP
         ;; tramp-default-remote-shell "/bin/bash"
-        tramp-default-user "swarnendu"
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         tramp-verbose 1
         ;; Disable version control
@@ -3669,10 +3670,10 @@ SAVE-FN with non-nil ARGS."
   (
    ;; https://github.com/emacs-lsp/lsp-mode/issues/2598#issuecomment-776506077
    ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
-   ;; FIXME: Registering `lsp-format-buffer' makes sense only if the server is active
-   ((c++-mode java-mode nxml-mode) . (lambda ()
-                                       (add-hook 'before-save-hook #'lsp-format-buffer
-                                                 nil t)))
+   ;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active
+   ((c++-mode java-mode nxml-mode yaml-mode) . (lambda ()
+                                                 (add-hook 'before-save-hook #'lsp-format-buffer
+                                                           nil t)))
    )
   :custom-face
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
@@ -3912,6 +3913,49 @@ SAVE-FN with non-nil ARGS."
     :priority -1
     :server-id 'perlls-remote))
 
+  ;; (defvar lsp-grammarly-active-modes)
+
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-stdio-connection #'lsp-grammarly--server-command)
+  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+  ;;   :priority -1
+  ;;   :remote? t
+  ;;   :add-on? t
+  ;;   :server-id 'grammarly-ls-remote
+  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
+  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
+  ;;   :after-open-fn #'lsp-grammarly--init
+  ;;   :async-request-handlers
+  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+  ;;       ("$/getToken" #'lsp-grammarly--get-token)
+  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
+  ;;       ("$/showError" #'lsp-grammarly--show-error)
+  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
+
+  ;; (defvar lsp-ltex-active-modes)
+
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-stdio-connection
+  ;;                    #'lsp-ltex--server-command
+  ;;                    (lambda () (f-exists? (lsp-ltex--extension-root))))
+  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+  ;;   :priority -2
+  ;;   :add-on? t
+  ;;   :remote? t
+  ;;   :server-id 'ltex-ls-remote
+  ;;   :download-server-fn
+  ;;   (lambda (_client _callback error-callback _update?)
+  ;;     (lsp-package-ensure
+  ;;      'ltex-ls
+  ;;      (lambda ()
+  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+  ;;                                     "-C" dest)
+  ;;            (error "Error during the unzip process: tar"))))
+  ;;      error-callback))))
+
   ;; Disable fuzzy matching, TODO: What is the utility of this?
   ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
 
@@ -3937,8 +3981,8 @@ SAVE-FN with non-nil ARGS."
   :demand t
   :config
   (setq lsp-ui-doc-enable t ; Enable on-hover dialogs
-        lsp-ui-doc-max-width 60
-        lsp-ui-doc-max-height 8
+        lsp-ui-doc-max-width 80
+        lsp-ui-doc-max-height 10
         lsp-ui-doc-include-signature t
         lsp-ui-imenu-auto-refresh 'after-save
         lsp-ui-imenu-window-width 16
@@ -4657,7 +4701,9 @@ SAVE-FN with non-nil ARGS."
                                                                          (lsp-deferred)))
   :config
   (setq lsp-grammarly-active-modes '(text-mode latex-mode
-                                               LaTeX-mode org-mode markdown-mode gfm-mode)))
+                                               LaTeX-mode org-mode markdown-mode gfm-mode)
+        lsp-grammarly-user-words '(
+                                   )))
 
 (use-package lsp-ltex
   :hook
@@ -4899,6 +4945,7 @@ Ignore if no file is found."
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
 
 (use-package math-preview
+  :disabled t
   :commands (math-preview-all math-preview-at-point math-preview-region)
   :config
   (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"

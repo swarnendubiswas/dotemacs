@@ -19,8 +19,23 @@
                              (when (derived-mode-p 'sh-mode)
                                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
 
+                             (when (derived-mode-p 'yaml-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
+
                              (when (derived-mode-p 'json-mode)
                                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
+
+                             (when (derived-mode-p 'python-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
+
+                             (when (derived-mode-p 'c++-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
+
+                             (when (derived-mode-p 'html-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
+
+                             (when (derived-mode-p 'xml-mode)
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
                              )))
          ))
  )
