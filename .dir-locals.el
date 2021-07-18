@@ -11,10 +11,12 @@
          (eval . (add-hook 'lsp-managed-mode-hook
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
-                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (markdown-markdownlint-cli))))))
+                               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
 
                              (when (derived-mode-p 'gfm-mode)
-                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
+                               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (markdown-markdownlint-cli))))))
+                               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
 
                              (when (derived-mode-p 'sh-mode)
                                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))

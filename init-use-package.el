@@ -1041,7 +1041,7 @@ SAVE-FN with non-nil ARGS."
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "swarnendu-Inspiron-7572")
-  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'default nil :height 170)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
@@ -1672,7 +1672,7 @@ SAVE-FN with non-nil ARGS."
         company-minimum-prefix-length 3 ; Small words are faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
-        company-show-numbers t ; Speed up completion
+        company-show-quick-access t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
         company-tooltip-align-annotations t)
 
@@ -3727,7 +3727,7 @@ SAVE-FN with non-nil ARGS."
         lsp-html-format-max-preserve-new-lines nil
         lsp-imenu-sort-methods '(position)
         lsp-keep-workspace-alive nil
-        lsp-log-io nil ; Texlab communication is huge
+        lsp-log-io nil ; Increases memory usage because of JSON parsing if enabled
         ;; We already have `flycheck' error summary listed on the modeline, but the `lsp' server may
         ;; report additional errors. However, the modeline is getting too congested.
         lsp-modeline-diagnostics-enable nil
@@ -4612,7 +4612,6 @@ SAVE-FN with non-nil ARGS."
   :ensure keytar
   :ensure t
   :after flycheck
-  :disabled t
   :demand t
   :config
   (setq flycheck-grammarly-check-time 3
@@ -4692,9 +4691,11 @@ SAVE-FN with non-nil ARGS."
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
-;; failures, then try logging out of Grammarly and logging in again.
+;; failures, then try logging out of Grammarly and logging in again. But it does not solve the issue
+;; for me, so I have disabled the package and I am again trying `flycheck-grammarly'.
 (use-package lsp-grammarly
   :ensure keytar
+  :disabled t
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-grammarly)
@@ -4710,10 +4711,11 @@ SAVE-FN with non-nil ARGS."
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-ltex)
                                                                          (lsp-deferred)))
-  :config
-  (setq lsp-ltex-version "12.2.0"
+  :init
+  (setq lsp-ltex-version "12.3.0"
         lsp-ltex-enabled t
-        lsp-ltex-check-frequency "save"))
+        lsp-ltex-check-frequency "save"
+        lsp-ltex-dictionary '("microbenchmarks")))
 
 (use-package lsp-latex
   :disabled t
