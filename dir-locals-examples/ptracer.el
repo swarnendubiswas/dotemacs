@@ -39,7 +39,9 @@
                                     flycheck-gcc-include-path include-path
                                     flycheck-clang-include-path include-path)
                         ))
-
-              ;; (eval add-hook 'before-save-hook #'lsp-format-buffer nil t)
               ))
  )
+
+;; Local Variables:
+;; eval: (flycheck-mode -1)
+;; End:

@@ -21,10 +21,20 @@
 
  (latex-mode . (
                 (eval . (setq TeX-master (expand-file-name "main.tex" (projectile-project-root))
-                              reftex-default-bibliography (expand-file-name "references/references.bib" (projectile-project-root))
-                              company-bibtex-bibliography (expand-file-name "references/references.bib" (projectile-project-root))
-                              bibtex-completion-bibliography (expand-file-name "references/references.bib" (projectile-project-root))
+                              reftex-default-bibliography (expand-file-name
+                                                           "references/references.bib"
+                                                           (projectile-project-root))
+                              company-bibtex-bibliography (expand-file-name
+                                                           "references/references.bib"
+                                                           (projectile-project-root))
+                              bibtex-completion-bibliography (expand-file-name
+                                                              "references/references.bib"
+                                                              (projectile-project-root))
                               lsp-latex-root-directory (expand-file-name (projectile-project-root))
                               ))
                 ))
  )
+
+;; Local Variables:
+;; flycheck-mode: nil
+;; End:

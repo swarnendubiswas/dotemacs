@@ -4533,6 +4533,7 @@ SAVE-FN with non-nil ARGS."
    (".clang-tidy"   . yaml-mode))
   :hook
   (yaml-mode . (lambda ()
+                 (setq-local lsp-ltex-enabled nil)
                  (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
                  (lsp-deferred))))
 
@@ -4712,10 +4713,10 @@ SAVE-FN with non-nil ARGS."
                                                                          (require 'lsp-ltex)
                                                                          (lsp-deferred)))
   :init
-  (setq lsp-ltex-version "12.3.0"
-        lsp-ltex-enabled t
+  (setq lsp-ltex-enabled t
         lsp-ltex-check-frequency "save"
-        lsp-ltex-dictionary '("microbenchmarks")))
+        lsp-ltex-dictionary '("microbenchmarks")
+        lsp-ltex-java-path "/usr/lib/jvm/java-13-openjdk-amd64"))
 
 (use-package lsp-latex
   :disabled t

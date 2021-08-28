@@ -1,4 +1,3 @@
-
 (
  (nil . (
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.o$\\|.clangd\\|.recommenders")
@@ -30,6 +29,9 @@
                                     flycheck-clang-include-path include-path
                                     flycheck-cuda-include-path include-path)
                         ))
-              ;; (eval add-hook 'before-save-hook #'lsp-format-buffer nil t)
               ))
  )
+
+;; Local Variables:
+;; eval: (flycheck-mode -1)
+;; End:

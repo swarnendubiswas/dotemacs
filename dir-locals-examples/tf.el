@@ -41,3 +41,7 @@
                                     flycheck-clang-include-path include-path)))
               ))
  )
+
+;; Local Variables:
+;; eval: (flycheck-mode -1)
+;; End:

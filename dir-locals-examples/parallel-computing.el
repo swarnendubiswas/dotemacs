@@ -60,3 +60,7 @@
                  (python-shell-interpreter . "/usr/bin/python3")
                  ))
  )
+
+;; Local Variables:
+;; eval: (flycheck-mode -1)
+;; End:
