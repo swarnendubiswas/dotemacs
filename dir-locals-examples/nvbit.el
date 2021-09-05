@@ -1,6 +1,5 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.o$\\|.clangd\\|.recommenders")
          (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "build" "obj"))
          (projectile-enable-caching . t)
          ))

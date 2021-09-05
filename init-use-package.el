@@ -1040,10 +1040,10 @@ SAVE-FN with non-nil ARGS."
 ;; (cond ((member "Inconsolata" (font-family-list))
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
-(when (string= (system-name) "swarnendu-Inspiron-7572")
+(when (string= (system-name) "inspiron-7572")
   (set-face-attribute 'default nil :height 170)
-  (set-face-attribute 'mode-line nil :height 120)
-  (set-face-attribute 'mode-line-inactive nil :height 120))
+  (set-face-attribute 'mode-line nil :height 100)
+  (set-face-attribute 'mode-line-inactive nil :height 100))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
   (set-face-attribute 'default nil :height 140)
@@ -4527,6 +4527,7 @@ SAVE-FN with non-nil ARGS."
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 (use-package yaml-mode
+  :defines lsp-ltex-enabled
   :commands yaml-mode
   :mode
   ((".clang-format" . yaml-mode)
@@ -4598,7 +4599,9 @@ SAVE-FN with non-nil ARGS."
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook (nxml-mode . (lambda ()
                        (spell-fu-mode -1)
-                       (lsp-deferred)))
+                       (lsp-deferred)
+                       (setq-local lsp-ltex-enabled nil)
+                       ))
   :config
   (fset 'xml-mode 'nxml-mode)
   (setq nxml-auto-insert-xml-declaration-flag t
@@ -4614,6 +4617,7 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :after flycheck
   :demand t
+  :disabled t
   :config
   (setq flycheck-grammarly-check-time 3
         ;; LATER: Can we combine the delete operations?
@@ -4707,7 +4711,9 @@ SAVE-FN with non-nil ARGS."
         lsp-grammarly-user-words '(
                                    )))
 
+;; FIXME: This package is not working as intended
 (use-package lsp-ltex
+  :disabled t
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-ltex)
@@ -5153,6 +5159,79 @@ Ignore if no file is found."
 (use-package info-colors
   :commands info-colors-fontify-node
   :hook (Info-selection . info-colors-fontify-node))
+
+(use-package selectrum
+  :disabled t
+  :defines selectrum-fix-vertical-window-height
+  :if (eq sb/selection 'selectrum)
+  :commands selectrum-mode
+  :hook (after-init . selectrum-mode)
+  :config
+  (setq selectrum-fix-vertical-window-height t
+        file-name-shadow-properties '(invisible t)
+        completion-styles '(orderless)
+        orderless-skip-highlighting (lambda () selectrum-is-active)
+        selectrum-highlight-candidates-function #'orderless-highlight-matches
+        magit-completing-read-function #'selectrum-completing-read)
+  :bind ("<f3>" . switch-to-buffer))
+
+;; Enable richer annotations in the minibuffer
+(use-package marginalia
+  :disabled t
+  :commands marginalia
+  :hook (selectrum-mode . marginalia-mode))
+
+(use-package consult
+  :disabled t
+  :commands
+  (consult-imenu consult-outline consult-apropos consult-buffer  consult-bookmark
+                 consult-outline consult-goto-line consult-imenu
+                 consult-project-imenu consult-error consult-find
+                 consult-locate consult-grep consult-git-grep
+                 consult-ripgrep consult-line consult-multi-occur
+                 consult-isearch consult-yank-pop consult-mode-command
+                 consult-bookmark consult-apropos consult-customize)
+  :config
+  (setq consult-project-root-function #'projectile-project-root
+        ;; Use Consult to select xref locations with preview
+        xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-file consult--source-project-file consult--source-bookmark
+   :preview-key (kbd "M-."))
+  :bind
+  (("<f1>"       . amx)
+   ("<f2>"       . find-file)
+   ("<f4>"       . consult-line)
+   ("C-c s g"    . consult-git-grep)
+   ("<f9>"       . consult-recent-file)
+   ("C-c s r"    . consult-rg)
+   ("M-y"        . consult-yank-pop)))
+
+(use-package consult-flycheck
+  :if (eq sb/selection 'selectrum)
+  :disabled t
+  :commands consult-flycheck)
+
+(use-package selectrum-prescient
+  :if (eq sb/selection 'selectrum)
+  :disabled t
+  :commands selectrum-prescient-mode
+  :hook (selectrum-mode . selectrum-prescient-mode))
+
+(use-package corfu
+  :disabled t
+  :hook (after-init . corfu-global-mode))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
@@ -5886,78 +5965,5 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
           (lambda ()
             (message "Emacs is ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
-
-(use-package selectrum
-  :disabled t
-  :defines selectrum-fix-vertical-window-height
-  :if (eq sb/selection 'selectrum)
-  :commands selectrum-mode
-  :hook (after-init . selectrum-mode)
-  :config
-  (setq selectrum-fix-vertical-window-height t
-        file-name-shadow-properties '(invisible t)
-        completion-styles '(orderless)
-        orderless-skip-highlighting (lambda () selectrum-is-active)
-        selectrum-highlight-candidates-function #'orderless-highlight-matches
-        magit-completing-read-function #'selectrum-completing-read)
-  :bind ("<f3>" . switch-to-buffer))
-
-;; Enable richer annotations in the minibuffer
-(use-package marginalia
-  :disabled t
-  :commands marginalia
-  :hook (selectrum-mode . marginalia-mode))
-
-(use-package consult
-  :disabled t
-  :commands
-  (consult-imenu consult-outline consult-apropos consult-buffer  consult-bookmark
-                 consult-outline consult-goto-line consult-imenu
-                 consult-project-imenu consult-error consult-find
-                 consult-locate consult-grep consult-git-grep
-                 consult-ripgrep consult-line consult-multi-occur
-                 consult-isearch consult-yank-pop consult-mode-command
-                 consult-bookmark consult-apropos consult-customize)
-  :config
-  (setq consult-project-root-function #'projectile-project-root
-        ;; Use Consult to select xref locations with preview
-        xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-file consult--source-project-file consult--source-bookmark
-   :preview-key (kbd "M-."))
-  :bind
-  (("<f1>"       . amx)
-   ("<f2>"       . find-file)
-   ("<f4>"       . consult-line)
-   ("C-c s g"    . consult-git-grep)
-   ("<f9>"       . consult-recent-file)
-   ("C-c s r"    . consult-rg)
-   ("M-y"        . consult-yank-pop)))
-
-(use-package consult-flycheck
-  :if (eq sb/selection 'selectrum)
-  :disabled t
-  :commands consult-flycheck)
-
-(use-package selectrum-prescient
-  :if (eq sb/selection 'selectrum)
-  :disabled t
-  :commands selectrum-prescient-mode
-  :hook (selectrum-mode . selectrum-prescient-mode))
-
-(use-package corfu
-  :disabled t
-  :hook (after-init . corfu-global-mode))
 
 ;;; init-use-package.el ends here

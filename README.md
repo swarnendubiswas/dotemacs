@@ -66,9 +66,8 @@ sudo cpanm Perl::LanguageServer
 cd $HOME/tmp; cd;
 npm init --yes;
 npm install --save-dev npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli yaml-language-server vscode-json-languageserver intelephense prettier write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
+`npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev`
 ```
-
-`npm install git+https://gitlab.com/matsievskiysv/math-preview`
 
 Install `textlint` separately so that the installation is shared by other editors.
 
