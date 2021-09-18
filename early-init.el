@@ -9,9 +9,9 @@
 
 ;;; Code:
 
-(when (boundp 'comp-eln-load-path)
-  (setcar comp-eln-load-path (expand-file-name (convert-standard-filename "var/eln-cache/")
-                                               user-emacs-directory)))
+;; (when (boundp 'comp-eln-load-path)
+;;   (setcar comp-eln-load-path (expand-file-name (convert-standard-filename "var/eln-cache/")
+;;                                                user-emacs-directory)))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
 ;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
@@ -30,7 +30,7 @@
 
 (setq load-prefer-newer t ; Prefer new files to avoid loading stable bytecode
       ;; Avoid loading packages twice, this is set during `(package-initialize)'
-      package-enable-at-startup nil
+      package-enable-at-startup t
       ;; package-native-compile t ; Defined from Emacs 28+
       package-user-dir (expand-file-name "elpa" user-emacs-directory)
       package-quickstart t ; Populate one big autoloads file

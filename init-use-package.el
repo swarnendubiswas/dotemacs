@@ -118,7 +118,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -163,7 +163,6 @@ This location is used for temporary installations and files.")
 (defconst sb/EMACS28+   (> emacs-major-version 27))
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
-
 
 (defconst sb/emacs-1MB   (*   1 1000 1000))
 (defconst sb/emacs-4MB   (*   4 1000 1000))
@@ -317,6 +316,7 @@ This location is used for temporary installations and files.")
             (file-exists-p sb/temp-directory))
   (make-directory sb/temp-directory))
 
+;; Using quelpa is convenient but slow
 (when nil
   (progn
     (unless (package-installed-p 'quelpa)
@@ -329,15 +329,15 @@ This location is used for temporary installations and files.")
           quelpa-update-melpa-p nil
           quelpa-upgrade-interval 30)))
 
-;; Using quelpa is convenient but slow
 (use-package quelpa-use-package
   :disabled t
   :demand t)
 
-;; This is not a great idea, but I expect most warnings will arise from third-party packages
 (use-package warnings
   :demand t
-  :config (setq warning-minimum-level :emergency))
+  :config
+  ;; This is not a great idea, but I expect most warnings will arise from third-party packages
+  (setq warning-minimum-level :emergency))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -559,10 +559,10 @@ This location is used for temporary installations and files.")
   :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
   :config
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        auto-revert-remote-files nil ; Emacs seems to hang with auto-revert and Tramp
-        auto-revert-use-notify nil
+        ;; FIXME: Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if
+        ;; we only use Emacs
+        auto-revert-remote-files nil
         auto-revert-verbose nil
-        auto-revert-check-vc-info nil ; Should improve performance
         ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
         ;; contents of the "main" directory changes
         global-auto-revert-non-file-buffers nil))
@@ -657,22 +657,23 @@ SAVE-FN with non-nil ARGS."
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' quickly can be useful
 (use-package abbrev
   :ensure nil
   :commands abbrev-mode
   :diminish
-  :hook (text-mode . abbrev-mode)
+  :hook
+  ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
+  (after-init . abbrev-mode)
   :config
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently))
 
-;; Disable the following modes
+;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
 (dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
                 ;; desktop-save-mode
                 ;; global-prettify-symbols-mode ; Makes it difficult to edit the buffer
-                shell-dirtrack-mode
-                size-indication-mode
+                ;; shell-dirtrack-mode
+                ;; size-indication-mode
                 tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
@@ -681,15 +682,14 @@ SAVE-FN with non-nil ARGS."
   :hook (after-init . global-hl-line-mode))
 
 ;; Enable the following modes
-(dolist (mode '(;; auto-compression-mode
-                auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
+(dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 ;; Soft wraps, Wrap lines without the ugly continuation marks
                 global-visual-line-mode
                 minibuffer-depth-indicate-mode
-                ;; outline-minor-mode
-                ;; Enable visual feedback on selections, mark follows the point
+                ;; Enable visual feedback on selections, mark follows the point, it is enabled by
+                ;; default on start
                 ;; transient-mark-mode
                 ))
   (when (fboundp mode)
@@ -705,6 +705,9 @@ SAVE-FN with non-nil ARGS."
   (diminish 'outline-minor-mode))
 
 ;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
+
+(use-package outline
+  :hook ((prog-mode text-mode) . outline-minor-mode))
 
 ;; Native from Emacs 27+
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
@@ -749,7 +752,6 @@ SAVE-FN with non-nil ARGS."
         calendar-longitude 80.23
         circadian-themes '((:sunrise . modus-operandi)
                            (:sunset  . modus-vivendi)))
-
   (circadian-setup))
 
 (use-package leuven-theme
@@ -770,10 +772,7 @@ SAVE-FN with non-nil ARGS."
   :ensure spacemacs-theme
   :disabled t
   :if (eq sb/theme 'spacemacs-light)
-  :init
-  (load-theme 'spacemacs-light t)
-  ;; (add-to-list 'default-frame-alist '(background-color . "#fbf8ef"))
-  )
+  :init (load-theme 'spacemacs-light t))
 
 (use-package zenburn-theme
   :if (eq sb/theme 'zenburn)
@@ -800,10 +799,7 @@ SAVE-FN with non-nil ARGS."
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (load-theme 'doom-molokai t)
-  (set-face-attribute 'font-lock-comment-face nil
-                      ;; :foreground "#cccccc"
-                      ;; :foreground "#b2b2b2"
-                      :foreground "#999999")
+  (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -825,7 +821,7 @@ SAVE-FN with non-nil ARGS."
   :init (load-theme 'monokai t))
 
 (use-package modus-operandi-theme
-  ;;  :ensure moody
+  :ensure moody
   :ensure modus-themes
   :if (eq sb/theme 'modus-operandi)
   :init
@@ -855,7 +851,7 @@ SAVE-FN with non-nil ARGS."
   )
 
 (use-package modus-vivendi-theme
-  ;; :ensure moody
+  :ensure moody
   :ensure modus-themes
   :if (eq sb/theme 'modus-vivendi)
   :disabled t
@@ -930,7 +926,7 @@ SAVE-FN with non-nil ARGS."
                             spaceline-persp-name-p)
   :functions spaceline-emacs-theme
   :init
-  ;; (require 'spaceline-config)
+  (require 'spaceline-config)
   (setq spaceline-hud-p nil
         spaceline-input-method-p nil
         spaceline-persp-name-p nil
@@ -962,12 +958,8 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
-        ;; doom-modeline-height 20
         doom-modeline-buffer-file-name-style 'relative-to-project)
-  (doom-modeline-mode 1)
-  ;; :custom-face
-  ;; (doom-modeline-bar ((t (:inherit default :height 0.8))))
-  )
+  (doom-modeline-mode 1))
 
 (use-package awesome-tray
   :ensure nil
@@ -1005,7 +997,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package auto-dim-other-buffers
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
-  :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode))
+  :init (run-with-idle-timer 5 nil #'auto-dim-other-buffers-mode))
 
 (use-package centaur-tabs
   :disabled t
@@ -1055,8 +1047,7 @@ SAVE-FN with non-nil ARGS."
 (progn
   (defun sb/minibuffer-font-setup ()
     "Customize minibuffer font."
-    (set (make-local-variable 'face-remapping-alist)
-         '((default :height 0.90))))
+    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
 
   (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
 
@@ -1068,7 +1059,6 @@ SAVE-FN with non-nil ARGS."
                                     (setq resize-mini-windows nil)))
     ))
 
-;; LATER: Check the impact on performance, do I really need it?
 (use-package beacon
   :commands beacon-mode
   :diminish
@@ -1102,10 +1092,10 @@ SAVE-FN with non-nil ARGS."
   :commands all-the-icons-ibuffer-mode
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :config
-  (setq all-the-icons-ibuffer-human-readable-size t
-        all-the-icons-ibuffer-icon-size 0.9))
+  (setq all-the-icons-ibuffer-icon-size 0.9))
 
-(use-package bufler ; IBuffer works well, I do not understand the advantages of this package
+;; IBuffer works well, I do not understand the advantages of this package
+(use-package bufler
   :disabled t
   :commands bufler-mode
   ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
@@ -1198,7 +1188,7 @@ SAVE-FN with non-nil ARGS."
   (:map dired-mode-map
         ("r" . dired-efap)))
 
-(use-package dired-narrow ; Narrow dired to match filter
+(use-package dired-narrow ; Narrow `dired' to match filter
   :after dired
   :bind
   (:map dired-mode-map
@@ -1278,21 +1268,16 @@ SAVE-FN with non-nil ARGS."
           (adob--rescan-windows)))))
 
   :config
-  (setq treemacs-collapse-dirs 2
-        treemacs-follow-after-init t
+  (setq treemacs-follow-after-init t
         treemacs-indentation 1
         treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
-        ;; Prevents treemacs from being selected with `other-window'
+        ;; Prevents Treemacs from being selected with `other-window' if non-nil, but it hurts easy
+        ;; navigability
         treemacs-is-never-other-window nil
-        ;; treemacs-no-png-images nil
-        ;; treemacs-position 'right
-        treemacs-project-follow-cleanup t
         treemacs-recenter-after-file-follow 'on-distance
         treemacs-recenter-after-tag-follow 'on-distance
-        treemacs-show-hidden-files nil
-        treemacs-silent-filewatch t
-        treemacs-silent-refresh t
-        treemacs-width 20
+        treemacs-silent-refresh t ; Silence all refresh messages including from file watches
+        treemacs-width 22
         ;; Hide the mode-line in the Treemacs buffer
         treemacs-user-mode-line-format 'none)
 
@@ -1300,13 +1285,11 @@ SAVE-FN with non-nil ARGS."
     (setq treemacs-persist-file (expand-file-name "treemacs-persist" sb/temp-directory)))
 
   (treemacs-filewatch-mode 1)
+  ;; `treemacs-tag-follow-mode' disables `treemacs-follow-mode', focuses the tag, but following tags
+  ;; in noisy
   (treemacs-follow-mode 1)
   (treemacs-git-mode 'deferred)
   (treemacs-fringe-indicator-mode 'always) ; Always show the file indicator
-
-  ;; Disables `treemacs-follow-mode', focuses the tag, but following tags in noisy
-  ;; (add-hook 'prog-mode-hook (lambda ()
-  ;;                             (treemacs-tag-follow-mode 1)))
 
   (use-package treemacs-all-the-icons
     :demand t)
@@ -1369,7 +1352,8 @@ SAVE-FN with non-nil ARGS."
   ;; (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-files)
 
   :bind*
-  (;; ("C-j" . treemacs) ; Interferes with `dired-jump'
+  (;; The keybinding interferes with `dired-jump'
+   ("C-j" . treemacs-display-current-project-exclusively)
    ("M-0" . treemacs-select-window)))
 
 ;; Starts Treemacs automatically with Emacsclient
@@ -1385,7 +1369,7 @@ SAVE-FN with non-nil ARGS."
 ;;                    (treemacs-select-window)))))))
 
 ;; (add-hook 'emacs-startup-hook (lambda()
-;;                                 (treemacs)
+;;                                 (treemacs-display-current-project-exclusively)
 ;;                                 (other-window 1)))
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
@@ -1487,8 +1471,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package isearch-symbol-at-point
   :after isearch
-  :disabled t
-  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point))
+  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point)
+  :bind
+  (("C-f" . isearch-symbol-at-point)
+   ("C-r" . isearch-backward-symbol-at-point)))
 
 (use-package isearch-dabbrev
   :after isearch
@@ -1602,10 +1588,11 @@ SAVE-FN with non-nil ARGS."
         ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
         ;; Keep remote file without testing if they still exist
         recentf-keep '(file-remote-p file-readable-p)
-        recentf-max-saved-items 250 ; Larger values help in lookup
+        ;; Larger values help in lookup but takes more time to check if the files exist
+        recentf-max-saved-items 100
         ;; recentf-menu-filter 'recentf-sort-descending
-        recentf-filename-handlers (append '(abbreviate-file-name)
-                                          recentf-filename-handlers))
+        ;; Abbreviate the file name to make it easy to read the actual file name
+        recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq recentf-save-file (expand-file-name "recentf" sb/temp-directory)))
@@ -1694,7 +1681,7 @@ SAVE-FN with non-nil ARGS."
         ("C-p"      . company-select-previous)
         ;; Insert the common part of all candidates, or select the next one
         ("<tab>"    . company-complete-common-or-cycle)
-        ;; ("C-M-/" . company-other-backend) ; Was bound to `dabbrev-completion'
+        ;; ("C-M-/" . company-other-backend) ; Is bound to `dabbrev-completion'
         ("C-s"      . sb/quit-company-save-buffer)
         ("<escape>" . company-abort)))
 
@@ -1714,9 +1701,9 @@ SAVE-FN with non-nil ARGS."
   :commands company-posframe-mode
   :diminish
   :config
-  (setq company-posframe-show-metadata nil ; Difficult to distinguish and distracting
-        company-posframe-show-indicator nil
-        company-posframe-quickhelp-delay nil)
+  (setq company-posframe-show-metadata t ; Difficult to distinguish and distracting
+        company-posframe-show-indicator nil ; Hide the backends
+        company-posframe-quickhelp-delay nil) ; Disable showing the help frame
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
@@ -1781,7 +1768,7 @@ SAVE-FN with non-nil ARGS."
   :hook ((text-mode prog-mode) . yas-global-mode)
   :config
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
-        yas-verbosity 1)
+        yas-verbosity 0)
   (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package yasnippet-snippets
@@ -1801,7 +1788,7 @@ SAVE-FN with non-nil ARGS."
   :commands amx-mode
   :hook (after-init . amx-mode)
   :config
-  (setq amx-auto-update-interval 5) ; Update the command list every n minutes
+  (setq amx-auto-update-interval 10) ; Update the command list every n minutes
   (unless (bound-and-true-p sb/use-no-littering)
     (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory))))
 
@@ -1828,7 +1815,7 @@ SAVE-FN with non-nil ARGS."
         ;; ivy-height-alist '((t
         ;;                      lambda (_caller)
         ;;                      (/ (frame-height) 2)))
-        ;; We update this after loading `orderless'
+        ;; We update `ivy-re-builders-alist' after loading `orderless'
         ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
         ;;                         (counsel-find-file . ivy--regex-fuzzy)
         ;;                         (t                 . ivy--regex-ignore-order))
@@ -1938,15 +1925,7 @@ SAVE-FN with non-nil ARGS."
         counsel-preselect-current-file t
         counsel-switch-buffer-preview-virtual-buffers nil
         counsel-yank-pop-preselect-last t
-        counsel-yank-pop-separator "\n------------------------------------------\n")
-
-  ;; `counsel-flycheck' shows less information than `flycheck-list-errors', and there is an argument
-  ;; error
-  ;; (defalias 'flycheck-list-errors 'counsel-flycheck)
-
-  ;; (add-to-list 'ivy-display-functions-alist
-  ;;              '(counsel-company . ivy-display-function-overlay))
-  )
+        counsel-yank-pop-separator "\n------------------------------------------\n"))
 
 (use-package ivy-hydra
   :after (ivy hydra)
@@ -1975,8 +1954,7 @@ SAVE-FN with non-nil ARGS."
   :hook (after-init . prescient-persist-mode)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq prescient-save-file (expand-file-name "prescient-save.el"
-                                                sb/temp-directory))))
+    (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory))))
 
 ;; https://github.com/raxod502/prescient.el/issues/65
 (use-package ivy-prescient
@@ -2006,12 +1984,13 @@ SAVE-FN with non-nil ARGS."
   :after company
   :demand t
   :commands company-prescient-mode
-  :config (company-prescient-mode 1))
+  :config
+  (setq company-prescient-sort-length-enable nil)
+  (company-prescient-mode 1))
 
 (use-package all-the-icons-ivy
   :after ivy
   :demand t
-  :disabled t
   :commands all-the-icons-ivy-setup
   :config (all-the-icons-ivy-setup))
 
@@ -2019,18 +1998,21 @@ SAVE-FN with non-nil ARGS."
   :after ivy
   :demand t
   :defines orderless-component-separator
-  :functions just-one-face
+  :functions sb/just-one-face
   :config
   (when (eq sb/selection 'ivy)
     (defvar ivy-re-builders-alist)
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
   (setq completion-styles '(orderless initials basic partial-completion emacs22)
-        orderless-component-separator 'orderless-escapable-split-on-space)
+        orderless-component-separator 'orderless-escapable-split-on-space
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion))
+    				                    (minibuffer (initials))))
 
   ;; (declare-function sb/just-one-face "init-use-package")
 
-  ;; (defun just-one-face (fn &rest args)
+  ;; (defun sb/just-one-face (fn &rest args)
   ;;   (let ((orderless-match-faces [completions-common-part]))
   ;;     (apply fn args)))
 
@@ -2054,9 +2036,6 @@ SAVE-FN with non-nil ARGS."
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
   (add-to-list 'ispell-skip-region-alist '("=" "=")))
-
-;; Hide the "Starting new Ispell process" message
-(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 
 (use-package flyspell
   :ensure nil
@@ -2238,12 +2217,11 @@ SAVE-FN with non-nil ARGS."
         show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t))
 
+;; Enable autopairing, `smartparens' seems slow
 (use-package elec-pair
   :ensure nil
   :commands (electric-pair-mode)
-  :init
-  ;; Enable autopairing, `smartparens' seems slow
-  (run-at-time 2 nil #'electric-pair-mode)
+  :init (run-at-time 2 nil #'electric-pair-mode)
   :config
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
@@ -2260,7 +2238,8 @@ SAVE-FN with non-nil ARGS."
 
   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-  (setq electric-pair-preserve-balance nil) ; Avoid balancing parentheses
+  ;; Avoid balancing parentheses since they can be both irritating and slow
+  (setq electric-pair-preserve-balance nil)
 
   ;; Disable pairs when entering minibuffer
   (add-hook 'minibuffer-setup-hook (lambda ()
@@ -2435,7 +2414,7 @@ SAVE-FN with non-nil ARGS."
    :map projectile-command-map
    ("A"    . projectile-add-known-project)))
 
-
+;; I am unsure how does this package advance `projectile'.
 (use-package counsel-projectile
   :disabled t
   :defines counsel-projectile-default-file
@@ -2495,7 +2474,6 @@ SAVE-FN with non-nil ARGS."
 (use-package all-the-icons-ivy-rich
   :ensure t
   :ensure ivy-rich
-  :disabled t
   :commands all-the-icons-ivy-rich-mode
   :if (and (eq sb/selection 'ivy) (display-graphic-p))
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
@@ -2516,7 +2494,6 @@ SAVE-FN with non-nil ARGS."
                           '(:width 18 :face warning)))
 
 (use-package counsel-fd
-  :disabled t
   :if (and (eq sb/selection 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
@@ -2867,12 +2844,12 @@ SAVE-FN with non-nil ARGS."
   :after (:any markdown-mode yaml-mode prog-mode)
   :config
   (setq imenu-auto-rescan t
-        imenu-max-items 500
-        imenu-max-item-length 100
+        imenu-max-items 1000
+        ;; imenu-max-item-length 100
         ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful
         ;; with mouse support enabled
         imenu-use-popup-menu nil
-        ;; `nil' implies no sorting or listing by position in the buffer
+        ;; `nil' implies no sorting, and will list by position in the buffer
         imenu-sort-function nil))
 
 ;; `imenu-anywhere' provides navigation for imenu tags across all buffers that satisfy grouping
@@ -2940,8 +2917,9 @@ SAVE-FN with non-nil ARGS."
 
 (use-package counsel-etags
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
+  :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
+  :commands counsel-etags-virtual-update-tags
   :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'ctags))
-  :disabled t
   :bind
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -2951,14 +2929,13 @@ SAVE-FN with non-nil ARGS."
   :config
   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-  (add-hook 'prog-mode-hook
+  (add-hook 'emacs-lisp-mode-hook
             (lambda ()
-              (add-hook 'after-save-hook
-                        #'counsel-etags-virtual-update-tags 'append
-                        'local)))
+              (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local)))
 
   (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
+
   (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
@@ -2967,9 +2944,7 @@ SAVE-FN with non-nil ARGS."
   :demand t
   :commands dumb-jump-xref-activate
   :config
-  (setq dumb-jump-force-searcher 'rg
-        dumb-jump-prefer-searcher 'rg
-        dumb-jump-quiet t)
+  (setq dumb-jump-quiet t)
 
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
@@ -3112,12 +3087,10 @@ SAVE-FN with non-nil ARGS."
     (diminish mode)))
 
 (use-package undo-tree
-  :disabled t
   :defines undo-tree-map
   :commands (global-undo-tree-mode)
   :config
   (setq undo-tree-auto-save-history t
-        undo-tree-mode-lighter ""
         undo-tree-visualizer-diff t
         undo-tree-visualizer-relative-timestamps t
         undo-tree-visualizer-timestamps t)
@@ -3129,14 +3102,14 @@ SAVE-FN with non-nil ARGS."
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
 
-;; Avoid the "Overwrite old session file (not loaded)?" warning
+;; Avoid the "Overwrite old session file (not loaded)?" warning by loading the `session' package
 (use-package session
   :disabled t
   :commands (session-initialize)
+  :hook (after-init . session-initialize)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq session-save-file (expand-file-name "session" sb/temp-directory)))
-  :hook (after-init . session-initialize))
+    (setq session-save-file (expand-file-name "session" sb/temp-directory))))
 
 (use-package immortal-scratch
   :commands immortal-scratch-mode
@@ -3147,19 +3120,15 @@ SAVE-FN with non-nil ARGS."
   :commands persistent-scratch-setup-default
   :hook (after-init . persistent-scratch-setup-default)
   :config
-  (setq persistent-scratch-autosave-interval 300)
-
   (unless (bound-and-true-p sb/use-no-littering)
     (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
 
-;; `crux-smart-open-line-above', `crux-smart-open-line', `crux-smart-kill-line'
 (use-package crux
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
    ("C-c d s" . crux-sudo-edit)))
 
-;; TODO: Is this causing the mouse-movement error and breaking out of key bindings?
 (use-package disable-mouse
   :if (display-mouse-p)
   :disabled t
@@ -3167,7 +3136,6 @@ SAVE-FN with non-nil ARGS."
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
 
-;; TODO: Is this causing the mouse-movement error and breaking out of key bindings?
 (use-package avoid
   :ensure nil
   :commands mouse-avoidance-mode
@@ -3175,7 +3143,6 @@ SAVE-FN with non-nil ARGS."
   :init (mouse-avoidance-mode 'banish))
 
 (use-package apt-sources-list
-  :disabled t
   :commands apt-sources-list-mode)
 
 (use-package rainbow-delimiters
@@ -3193,9 +3160,7 @@ SAVE-FN with non-nil ARGS."
                           pomidor-unhold pomidor))
 
 (use-package ace-window
-  :bind
-  (([remap other-window] . ace-window)
-   ("<f10>"              . ace-window)))
+  :bind ([remap other-window] . ace-window))
 
 (use-package windmove ; `Shift + direction' arrows
   :ensure nil
@@ -3208,12 +3173,12 @@ SAVE-FN with non-nil ARGS."
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
 (use-package super-save
+  :defines (super-save-remote-files super-save-triggers)
   :commands super-save-mode
-  :disabled t
   :diminish
   :init (run-with-idle-timer 3 nil #'super-save-mode)
   :config
-  (setq super-save-remote-files nil) ; Ignore remote files
+  (setq super-save-remote-files t) ; Ignore remote files
   (add-to-list 'super-save-triggers 'ace-window))
 
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
@@ -3252,17 +3217,17 @@ SAVE-FN with non-nil ARGS."
     (add-hook 'after-save-hook #'bm-buffer-save)
     (add-hook 'kill-buffer-hook #'bm-buffer-save)
     (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
-
     (add-hook 'after-revert-hook #'bm-buffer-restore)
     (add-hook 'find-file-hook #'bm-buffer-restore)
     (add-hook 'after-init-hook #'bm-repository-load))
   :init
   ;; Must be set before `bm' is loaded
   (setq bm-restore-repository-on-load t)
-  (run-with-idle-timer 2 nil #'sb/bm-setup)
+  ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
+  ;; usability
+  (run-with-idle-timer 3 nil #'sb/bm-setup)
   :config
   (setq-default bm-buffer-persistence t)
-
   (unless (bound-and-true-p sb/use-no-littering)
     (setq bm-repository-file (expand-file-name "bm-bookmarks" sb/temp-directory)))
   :bind
@@ -3271,7 +3236,6 @@ SAVE-FN with non-nil ARGS."
    ("C-<f3>" . bm-previous)))
 
 (use-package esup
-  :disabled t
   :commands esup
   :if (bound-and-true-p sb/debug-init-file))
 
@@ -3318,15 +3282,14 @@ SAVE-FN with non-nil ARGS."
                                   "UPPERCASE_SENTENCE_START"
                                   "WHITESPACE_RULE")
         langtool-language-tool-jar (no-littering-expand-etc-file-name
-                                    "languagetool-5.3-commandline.jar")))
+                                    "languagetool-commandline.jar")))
 
 (use-package wc-mode
   :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
-  :commands (define-word define-word-at-point)
-  :disabled t)
+  :commands (define-word define-word-at-point))
 
 (use-package emojify
   :disabled t
@@ -3342,10 +3305,9 @@ SAVE-FN with non-nil ARGS."
                                pdf-annot-add-text-annotation)
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
-  :init (run-with-idle-timer 2 nil #'require 'pdf-tools nil t) ; Expensive to load
+  :init (run-with-idle-timer 3 nil #'require 'pdf-tools nil t) ; Expensive to load
   :config
-  ;; (pdf-tools-install :no-query)
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install)'
+  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
@@ -3413,7 +3375,6 @@ SAVE-FN with non-nil ARGS."
   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
-  :disabled t
   :commands autodisass-llvm-bitcode
   :mode "\\.bc\\'")
 
@@ -3432,7 +3393,6 @@ SAVE-FN with non-nil ARGS."
         "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
         markdown-enable-math t ; Syntax highlight for LaTeX fragments
         markdown-enable-wiki-links t
-        ;;   https://emacs.stackexchange.com/questions/13189/github-flavored-markdown-mode-syntax-highlight-code-blocks/33497
         markdown-fontify-code-blocks-natively t
         markdown-indent-on-enter 'indent-and-new-item
         markdown-list-indent-width 2
@@ -3445,7 +3405,6 @@ SAVE-FN with non-nil ARGS."
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
   :after markdown-mode
-  :disabled t
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
                                       markdown-toc-generate-or-refresh-toc))
 
@@ -3463,13 +3422,13 @@ SAVE-FN with non-nil ARGS."
 
 (use-package grip-mode
   :if (executable-find "grip")
-  ;; :hook ((markdown-mode org-mode) . grip-mode)
+  :after (:any markdown-mode org-mode)
   :diminish
   :config
   (setq grip-preview-use-webkit nil) ; Do not use the embedded webkit for preview
   :bind
   (:map markdown-mode-command-map
-        ("g" . grip-mode)))
+        ("C-g" . grip-mode)))
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
@@ -3536,17 +3495,19 @@ SAVE-FN with non-nil ARGS."
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode)))
 
-;; The variable-height minibuffer and extra eldoc buffers are distracting
 (use-package eldoc
   :ensure nil
   :if (symbol-value 'sb/IS-LINUX)
   :commands turn-on-eldoc-mode
   :diminish
-  :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode) . turn-on-eldoc-mode)
+  :hook (prog-mode . turn-on-eldoc-mode)
   :config
-  ;; Always truncate ElDoc messages to one line. This prevents the echo area from resizing itself
-  ;; unexpectedly when point is on a variable with a multiline docstring.
-  (setq eldoc-echo-area-use-multiline-p nil))
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
+  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
+  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
+  ;; useful information.
+  ;; (setq eldoc-echo-area-use-multiline-p nil)
+  )
 
 (use-package c-eldoc
   :disabled t ;; We use LSP
@@ -3623,6 +3584,7 @@ SAVE-FN with non-nil ARGS."
                                                                 'emacs-lisp-checkdoc 'append))
                                    (outline-minor-mode))))
 
+;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active
 (use-package lsp-mode
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -3667,14 +3629,8 @@ SAVE-FN with non-nil ARGS."
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
   :hook
-  (
-   ;; https://github.com/emacs-lsp/lsp-mode/issues/2598#issuecomment-776506077
-   ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
-   ;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active
-   ((c++-mode java-mode nxml-mode yaml-mode) . (lambda ()
-                                                 (add-hook 'before-save-hook #'lsp-format-buffer
-                                                           nil t)))
-   )
+  ;; https://github.com/emacs-lsp/lsp-mode/issues/2598#issuecomment-776506077
+  ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
   :custom-face
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
                                                font-lock-doc-face :weight bold :height 0.9))))
@@ -3732,6 +3688,7 @@ SAVE-FN with non-nil ARGS."
         ;; report additional errors. However, the modeline is getting too congested.
         lsp-modeline-diagnostics-enable nil
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
+        lsp-modeline-workspace-status-enable nil
         ;; Sudden changes in the height of the echo area causes the cursor to lose position,
         ;; manually request via `lsp-signature-activate'
         lsp-signature-auto-activate nil
@@ -4063,7 +4020,11 @@ SAVE-FN with non-nil ARGS."
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode ("\\.h\\'" . c++-mode)
   :mode ("\\.c\\'" . c++-mode)
-  :hook (c++-mode . lsp-deferred)
+  :hook
+  (c++-mode . (lambda ()
+                (add-hook 'before-save-hook #'lsp-format-buffer
+                          nil t)
+                (lsp-deferred)))
   :config
   (setq c-set-style "cc-mode"
         c-basic-offset 2)
@@ -4120,7 +4081,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package cmake-mode
   :commands cmake-mode
-  :hook (cmake-mode . lsp-deferred))
+  :hook
+  (cmake-mode . (lambda ()
+                  (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                  (lsp-deferred))))
 
 (use-package cmake-font-lock
   :after cmake-mode
@@ -4296,10 +4260,13 @@ SAVE-FN with non-nil ARGS."
                                        lsp-java-create-local
                                        lsp-java-extract-method
                                        lsp-java-add-import)
-  :hook (java-mode . (lambda ()
-                       (setq-default c-basic-offset 4
-                                     c-set-style "java")
-                       (lsp-deferred)))
+  :hook
+  (java-mode . (lambda ()
+                 (setq-default c-basic-offset 4
+                               c-set-style "java")
+                 (add-hook 'before-save-hook #'lsp-format-buffer
+                           nil t)
+                 (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
         lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" ; Requires Java 11
@@ -4536,6 +4503,8 @@ SAVE-FN with non-nil ARGS."
   (yaml-mode . (lambda ()
                  (setq-local lsp-ltex-enabled nil)
                  (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
+                 (add-hook 'before-save-hook #'lsp-format-buffer
+                           nil t)
                  (lsp-deferred))))
 
 (use-package yaml-imenu
@@ -4597,11 +4566,13 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :commands nxml-mode
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
-  :hook (nxml-mode . (lambda ()
-                       (spell-fu-mode -1)
-                       (lsp-deferred)
-                       (setq-local lsp-ltex-enabled nil)
-                       ))
+  :hook
+  (nxml-mode . (lambda ()
+                 (spell-fu-mode -1)
+                 (setq-local lsp-ltex-enabled nil)
+                 (add-hook 'before-save-hook #'lsp-format-buffer
+                           nil t)
+                 (lsp-deferred)))
   :config
   (fset 'xml-mode 'nxml-mode)
   (setq nxml-auto-insert-xml-declaration-flag t
@@ -5247,6 +5218,8 @@ Ignore if no file is found."
 ;; (setq company-backends '((company-xxx company-yyy company-zzz)))
 ;; Merge completions of all the backends, give priority to `company-xxx'
 ;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
+;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
+;; what `prefix' returns.
 
 ;; If the group contains keyword `:with', the backends listed after this keyword are ignored for
 ;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
