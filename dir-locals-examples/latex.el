@@ -35,6 +35,3 @@
                 ))
  )
 
-;; Local Variables:
-;; flycheck-mode: nil
-;; End:

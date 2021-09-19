@@ -6,17 +6,9 @@
 ;;                   (text-mode)
 ;;                   (set-auto-mode)))
 
-;;             (eval add-hook 'hack-local-variables-hook (lambda ()
-;;                                                         (when (string= (file-name-directory (buffer-name)) "wordlist")
-;;                                                           (message "Second eval form")
-;;                                                           (text-mode))))
-;;             ))
-;;  )
-
-;; ((nil
-;;   (eval
-;;    (lambda ()
-;;      (when (string= (file-name-nondirectory buffer-file-name)
-;;                     "wordlist")
-;;        (message "Third eval form")
-;;        (text-mode))))))
+((nil
+  (eval
+   (lambda ()
+     (when (string= (file-name-nondirectory buffer-file-name)
+                    "wordlist.5")
+       (text-mode))))))

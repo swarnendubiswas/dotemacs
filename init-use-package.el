@@ -399,7 +399,7 @@ This location is used for temporary installations and files.")
       auto-save-default nil ; Disable `auto-save-mode', prefer `auto-save-visited-mode' instead
       auto-save-no-message t ; Allow for debugging frequent autosave triggers
       auto-save-interval 0 ; Disable autosaving based on number of characters typed
-      auto-save-visited-interval 30 ; Default of 5s is too frequent
+      auto-save-visited-interval 60 ; Default of 5s is too frequent for `auto-save-visited-mode'
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
       case-fold-search t ; Searches and matches should ignore case
@@ -420,6 +420,8 @@ This location is used for temporary installations and files.")
       echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       enable-recursive-minibuffers t
+      ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
+      ;; variables, but I edit files over Tramp a lot.
       enable-remote-dir-locals t
       ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
       ;; information
@@ -954,7 +956,7 @@ SAVE-FN with non-nil ARGS."
   :commands doom-modeline-mode
   :init
   (setq doom-modeline-buffer-encoding nil
-        doom-modeline-checker-simple-format t
+        doom-modeline-checker-simple-format nil
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
@@ -1093,15 +1095,6 @@ SAVE-FN with non-nil ARGS."
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
   :config
   (setq all-the-icons-ibuffer-icon-size 0.9))
-
-;; IBuffer works well, I do not understand the advantages of this package
-(use-package bufler
-  :disabled t
-  :commands bufler-mode
-  ;; :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
-  ;;                 :files (:defaults (:exclude "helm-bufler.el")))
-  :diminish bufler-workspace-mode
-  :config (bufler-mode 1))
 
 (use-package dired
   :ensure nil
@@ -1622,7 +1615,14 @@ SAVE-FN with non-nil ARGS."
 
 ;; TODO: Is this causing tramp to fail? I have disabled it to test.
 ;; Hide the "Wrote ..." message which is irritating
-;; (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+
+;; LATER: Can we shorten long Tramp file names?
+;; (add-to-list 'directory-abbrev-alist
+;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
+;; (add-to-list 'directory-abbrev-alist
+;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
+
 
 ;; The module does not specify an `autoload'
 (use-package company-capf
@@ -1719,40 +1719,18 @@ SAVE-FN with non-nil ARGS."
   :commands company-quickhelp-terminal-mode
   :config (company-quickhelp-terminal-mode 1))
 
-;; Company now has in-built support for completion icons
-(use-package company-box
-  :if (display-graphic-p)
-  :disabled t
-  :after company
-  :demand t
-  :commands company-box-mode
-  :diminish
-  :config
-  (setq company-box-icons-alist 'company-box-icons-all-the-icons
-        company-box-show-single-candidate t
-        company-frontends '(company-box-frontend))
-
-  ;; (set-face-background 'company-box-background "cornsilk")
-  ;; (set-face-background 'company-box-selection "light blue")
-
-  (company-box-mode 1))
-
-;; Typing `TabNine::config' in any buffer should open the extension settings, deep local mode is
-;; computationally expensive. Completions seem to be laggy with TabNine enabled.
-(use-package company-tabnine
-  :after company
-  :disabled t)
-
 ;; Nice but slows completions
 (use-package company-fuzzy
+  :ensure flx
+  :ensure t
   :after company
-  :disabled t
   :diminish
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :hook (company-mode . global-company-fuzzy-mode)
   :config
   (setq company-fuzzy-show-annotation t
-        company-fuzzy-sorting-backend 'flx))
+        company-fuzzy-sorting-backend 'flx
+        company-fuzzy-prefix-on-top t))
 
 ;; We are currently trying out `company-prescient'
 (use-package company-statistics
@@ -2104,29 +2082,34 @@ SAVE-FN with non-nil ARGS."
    ("C-,"     . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
-(or
- (use-package flyspell-popup
-   :bind ("C-;" . flyspell-popup-correct)
-   :config (setq flyspell-popup-correct-delay 0.2))
+(use-package flyspell-popup
+  :disabled t
+  :bind ("C-;" . flyspell-popup-correct)
+  :config (setq flyspell-popup-correct-delay 0.1))
 
- (use-package flyspell-correct-ivy
-   :ensure flyspell-correct
-   :disabled t
-   :if (eq sb/selection 'ivy)
-   :ensure t
-   :bind ("C-;" . flyspell-correct-wrapper)))
+(use-package flyspell-correct
+  :after flyspell
+  :bind
+  (:map flyspell-mode-map
+        ("C-;" . flyspell-correct-wrapper)))
+
+(use-package flyspell-correct-ivy
+  :ensure flyspell-correct
+  :ensure t
+  :if (eq sb/selection 'ivy)
+  :disabled t
+  :after flyspell-correct)
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
   :defines spell-fu-directory
   :commands spell-fu-mode
-  :hook (text-mode . spell-fu-mode)
   :config
   (if (bound-and-true-p sb/use-no-littering)
       (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
     (setq spell-fu-directory (expand-file-name "spell-fu" sb/temp-directory)))
-
+  :init
   (add-hook 'text-mode-hook
             (lambda ()
               ;; `nxml-mode' is derived from `text-mode'
@@ -2253,9 +2236,9 @@ SAVE-FN with non-nil ARGS."
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens-config
   :ensure smartparens
-  :disabled t
   ;; :diminish (smartparens-global-mode smartparens-mode
   ;;                                    show-smartparens-mode show-smartparens-global-mode)
+  :commands sp-local-pair
   :hook
   (((latex-mode LaTeX-mode) . (lambda ()
                                 (require 'smartparens-latex)))
@@ -2398,10 +2381,10 @@ SAVE-FN with non-nil ARGS."
   ;;             (treemacs-display-current-project-exclusively)
   ;;             (other-window 1)))
 
-  ;; (add-hook 'projectile-after-switch-project-hook
-  ;;           (lambda ()
-  ;;             (treemacs-display-current-project-exclusively)
-  ;;             (other-window 1)))
+  (add-hook 'projectile-after-switch-project-hook
+            (lambda ()
+              (treemacs-display-current-project-exclusively)
+              (other-window 1)))
 
   :bind-keymap ("C-c p" . projectile-command-map)
   :init
@@ -2467,13 +2450,13 @@ SAVE-FN with non-nil ARGS."
    ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
    ))
 
-;; https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-ivy.el
-;; Enable before `ivy-rich-mode' for better performance
-;; The new transformers (file permissions) seem more of an overkill and buggy, and it hides the
-;; file names
+;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
+;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
   :ensure t
   :ensure ivy-rich
+  :after ivy
+  :disabled t
   :commands all-the-icons-ivy-rich-mode
   :if (and (eq sb/selection 'ivy) (display-graphic-p))
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
@@ -2482,7 +2465,8 @@ SAVE-FN with non-nil ARGS."
 (use-package ivy-rich
   :if (eq sb/selection 'ivy)
   :commands ivy-rich-modify-column
-  :hook (ivy-mode . ivy-rich-mode)
+  :after (ivy all-the-icons-ivy-rich)
+  :init (ivy-rich-mode 1)
   :config
   (setq ivy-rich-parse-remote-buffer nil)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
@@ -2491,7 +2475,7 @@ SAVE-FN with non-nil ARGS."
   ;; FIXME: `ivy-rich-modify-column' is not taking effect.
   (ivy-rich-modify-column 'ivy-switch-buffer
                           'ivy-rich-switch-buffer-major-mode
-                          '(:width 18 :face warning)))
+                          '(:width 20 :face error)))
 
 (use-package counsel-fd
   :if (and (eq sb/selection 'ivy) (executable-find "fd"))
@@ -2516,21 +2500,19 @@ SAVE-FN with non-nil ARGS."
                                        flycheck-manual
                                        flycheck-display-error-messages-unless-error-list
                                        flycheck-sexp-to-string)
-  :init
-  ;; There are no checkers for modes like `csv-mode', and many program modes use lsp `yaml-mode' is
-  ;; derived from `text-mode'
-  (run-at-time 2 nil #'global-flycheck-mode)
+  :hook (after-init . global-flycheck-mode)
   :config
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
         flycheck-checker-error-threshold 500
-        flycheck-idle-buffer-switch-delay 5 ; Increase the time to allow for quick transitions
+        flycheck-idle-buffer-switch-delay 5 ; Increase the time (s) to allow for quick transitions
         flycheck-idle-change-delay 5 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
         ;; Show error messages only if the error list is not already visible
         flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        ;; `chktex' errors are often not very helpful, and `csv-mode' does not have a checker yet.
+        ;; There are no checkers for modes like `csv-mode', and many program modes use lsp.
+        ;; `yaml-mode' is derived from `text-mode'. `chktex' errors are often not very helpful.
         flycheck-global-modes '(not csv-mode)
         flycheck-chktexrc "chktexrc")
 
@@ -2541,7 +2523,7 @@ SAVE-FN with non-nil ARGS."
 
   (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                             sb/user-home)
-                flycheck-pylintrc (expand-file-name ".config/pylintrc" sb/user-home)
+                flycheck-pylintrc '("setup.cfg" "pylintrc")
                 flycheck-python-pylint-executable "python3"
                 flycheck-shellcheck-follow-sources nil
                 flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
@@ -2632,32 +2614,32 @@ SAVE-FN with non-nil ARGS."
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
   ;; Use per-project directory local variables
-  ;; (add-hook 'lsp-managed-mode-hook
-  ;;           (lambda ()
-  ;;             (when (derived-mode-p 'python-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
+  (add-hook 'lsp-managed-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'python-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
 
-  ;;             (when (derived-mode-p 'sh-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
+              (when (derived-mode-p 'sh-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
 
-  ;;             (when (derived-mode-p 'c++-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
+              (when (derived-mode-p 'c++-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
 
-  ;;             (when (derived-mode-p 'css-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
+              (when (derived-mode-p 'css-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
 
-  ;;             (when (derived-mode-p 'html-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
+              (when (derived-mode-p 'html-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
 
-  ;;             (when (derived-mode-p 'xml-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
+              (when (derived-mode-p 'xml-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
 
-  ;;             (when (derived-mode-p 'yaml-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
+              (when (derived-mode-p 'yaml-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
 
-  ;;             (when (derived-mode-p 'json-mode)
-  ;;               (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
-  ;;             ))
+              (when (derived-mode-p 'json-mode)
+                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
+              ))
 
   )
 
@@ -3171,14 +3153,16 @@ SAVE-FN with non-nil ARGS."
   (setq windmove-wrap-around t))
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
-;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
+;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
+;; given that we have `auto-save-visited-mode' enabled.
 (use-package super-save
   :defines (super-save-remote-files super-save-triggers)
   :commands super-save-mode
-  :diminish
+  :disabled t
+  ;; :diminish
   :init (run-with-idle-timer 3 nil #'super-save-mode)
   :config
-  (setq super-save-remote-files t) ; Ignore remote files
+  (setq super-save-remote-files nil) ; Ignore remote files, can cause Emacs to hang
   (add-to-list 'super-save-triggers 'ace-window))
 
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
@@ -3467,7 +3451,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package highlight-doxygen
   :commands highlight-doxygen-global-mode
-  :config (highlight-doxygen-global-mode))
+  :init (highlight-doxygen-global-mode))
 
 (use-package rst
   :ensure nil

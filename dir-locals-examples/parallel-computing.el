@@ -38,7 +38,6 @@
                                           "--header-insertion-decorators=0"
                                           "--log=error"
                                           "--pch-storage=memory"
-                                          ;; "--suggest-missing-includes"
                                           "--pretty"
                                           ))
                             )
@@ -61,6 +60,3 @@
                  ))
  )
 
-;; Local Variables:
-;; eval: (flycheck-mode -1)
-;; End:

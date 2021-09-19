@@ -1,3 +1,5 @@
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html
+
 (
  (nil . (
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.aux$\\|.bbl$\\|.blg$\\|.cb$\\|.cb2$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.jar$\\|.lof$\\|.lot$\\|.o$\\|.out$\\|.pyc$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
@@ -236,6 +238,3 @@
   )
  )
 
-;; Local Variables:
-;; eval: (flycheck-mode -1)
-;; End:

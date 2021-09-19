@@ -214,6 +214,19 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c <~ - Outdent the region (~markdown-outdent-region~)
 - ~C-c >~ - Indent the region (~markdown-indent-region~)
 
+
+** Outline 
+
+- ~C-c @ C-t~ - Hide all of buffer except headings
+- ~C-c @ C-a~ - Show all of the text in the buffer
+- ~C-c @ C-q~	- Hide everything but top levels headers
+- ~C-c @ TAB~ - Show all direct subheadings of this heading
+- ~C-c @ C-k~	- Show all subheadings, but not bodies
+- ~M-x outline-previous-heading~ - Go to previous heading
+- ~M-x outline-next-heading~ - Go to next heading
+- ~C-c @ C-p~	- Go to previous visible heading
+- ~C-c @ C-n~	- Go to next visible heading
+
 ** JSON
 
 - ~C-c C-f~ - Format the region/buffer (~json-reformat-region~)

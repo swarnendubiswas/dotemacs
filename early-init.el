@@ -9,9 +9,9 @@
 
 ;;; Code:
 
-;; (when (boundp 'comp-eln-load-path)
-;;   (setcar comp-eln-load-path (expand-file-name (convert-standard-filename "var/eln-cache/")
-;;                                                user-emacs-directory)))
+(when (boundp 'comp-eln-load-path)
+  (setcar comp-eln-load-path (expand-file-name (convert-standard-filename "var/eln-cache/")
+                                               user-emacs-directory)))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
 ;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
@@ -47,7 +47,7 @@
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  ;; (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t))
 
 ;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
