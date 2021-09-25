@@ -59,6 +59,7 @@ A local variable specification takes the following form:
 - https://github.com/milkypostman/dotemacs
 - https://github.com/tecosaur/emacs-config
 - https://github.com/wdenton/.emacs.d
+- https://github.com/tshu-w/.emacs.d
 
 ** Useful Information
 

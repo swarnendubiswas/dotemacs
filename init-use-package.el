@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "eclipse"         eclipse)
@@ -118,7 +118,7 @@ whitespaces."
 
 ;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -149,6 +149,7 @@ This location is used for temporary installations and files.")
   'pyright
   "Choose the Python Language Server implementation."
   :type  '(radio
+           (const :tag "pylsp" pylsp)
            (const :tag "pyright" pyright)
            (const :tag "jedi"    jedi)
            (const :tag "none"    none))
@@ -432,8 +433,7 @@ This location is used for temporary installations and files.")
       ;; Avoid resizing the frame when the font is larger (or smaller) than the system default
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t
-      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name "@"
-                               (system-name))
+      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
@@ -465,6 +465,7 @@ This location is used for temporary installations and files.")
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound when spacing backspace
       save-interprogram-paste-before-kill t
+      save-silently t ; Error messages will still be printed
       ;; Enable use of system clipboard across Emacs and other applications
       select-enable-clipboard t
       sentence-end-double-space nil
@@ -746,7 +747,6 @@ SAVE-FN with non-nil ARGS."
 ;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
   :commands circadian-setup
-  :disabled t
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
@@ -856,7 +856,6 @@ SAVE-FN with non-nil ARGS."
   :ensure moody
   :ensure modus-themes
   :if (eq sb/theme 'modus-vivendi)
-  :disabled t
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -1234,7 +1233,7 @@ SAVE-FN with non-nil ARGS."
     "Setup treemacs."
     (interactive)
     (when (projectile-project-p)
-      (treemacs-add-and-display-current-project)
+      (treemacs-display-current-project-exclusively)
       (other-window 1)))
 
   (defun sb/setup-treemacs-detailed (args)
@@ -1346,7 +1345,7 @@ SAVE-FN with non-nil ARGS."
 
   :bind*
   (;; The keybinding interferes with `dired-jump'
-   ("C-j" . treemacs-display-current-project-exclusively)
+   ("C-j" . sb/setup-treemacs-quick)
    ("M-0" . treemacs-select-window)))
 
 ;; Starts Treemacs automatically with Emacsclient
@@ -1641,12 +1640,12 @@ SAVE-FN with non-nil ARGS."
   :defines (company-dabbrev-downcase company-dabbrev-ignore-case
                                      company-dabbrev-other-buffers
                                      company-ispell-available
-                                     company-ispell-dictionary)
+                                     company-ispell-dictionary
+                                     company-clang-insert-arguments)
   ;; :diminish
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
-    (interactive)
     (company-abort)
     (save-buffer))
   :hook (after-init . global-company-mode)
@@ -1661,7 +1660,9 @@ SAVE-FN with non-nil ARGS."
         company-selection-wrap-around t
         company-show-quick-access t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t)
+        company-tooltip-align-annotations t
+        ;; Disable insertion of arguments
+        company-clang-insert-arguments nil)
 
   ;; We set `company-backends' as a local variable, so it is not important to delete backends
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake))
@@ -1726,11 +1727,8 @@ SAVE-FN with non-nil ARGS."
   :after company
   :diminish
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
-  :hook (company-mode . global-company-fuzzy-mode)
-  :config
-  (setq company-fuzzy-show-annotation t
-        company-fuzzy-sorting-backend 'flx
-        company-fuzzy-prefix-on-top t))
+  :hook (text-mode . company-fuzzy-mode)
+  :config (setq company-fuzzy-sorting-backend 'flx))
 
 ;; We are currently trying out `company-prescient'
 (use-package company-statistics
@@ -2156,7 +2154,8 @@ SAVE-FN with non-nil ARGS."
                                              markdown-plain-url-face
                                              markdown-reference-face
                                              markdown-url-face
-                                             hl-line))
+                                             hl-line
+                                             pandoc-citation-key-face))
               (spell-fu-mode)))
 
   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
@@ -2184,7 +2183,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
-  :diminish
+  ;; :diminish
   :commands aggressive-indent-mode
   :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
   :config
@@ -2281,25 +2280,17 @@ SAVE-FN with non-nil ARGS."
                                   projectile-expand-root
                                   projectile-project-root
                                   projectile-mode)
-  :preface
-  (eval-and-compile
-    (defun sb/projectile-kill ()
-      (interactive)
-      (projectile-kill-buffers)
-      (treemacs)))
   :config
-  (setq projectile-enable-caching t ; Caching will not watch for new files automatically
+  (setq projectile-enable-caching nil ; Caching will not watch for file system changes
         projectile-file-exists-remote-cache-expire nil
         projectile-indexing-method 'alien
-        projectile-mode-line-prefix ""
+        ;; projectile-mode-line-prefix ""
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
-        projectile-sort-order 'recently-active ; No sorting should be faster
-        projectile-verbose nil
-        ;; This can help reduce the overhead with large projects, but then recent files information
-        ;; may be incomplete
-        ;; projectile-switch-project-action 'projectile-recentf
-        )
+        ;; No sorting should be faster, note that files are not sorted if
+        ;; `projectile-indexing-method' is set to 'alien'.
+        projectile-sort-order 'recently-active
+        projectile-verbose nil)
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq projectile-cache-file (expand-file-name "projectile.cache" sb/temp-directory)
@@ -2374,6 +2365,8 @@ SAVE-FN with non-nil ARGS."
   (projectile-mode 1)
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/660
+  ;; TODO: These do not acheive what I want.
+
   ;; (add-hook 'projectile-after-switch-project-hook
   ;;           (lambda ()
   ;;             (interactive)
@@ -2381,10 +2374,10 @@ SAVE-FN with non-nil ARGS."
   ;;             (treemacs-display-current-project-exclusively)
   ;;             (other-window 1)))
 
-  (add-hook 'projectile-after-switch-project-hook
-            (lambda ()
-              (treemacs-display-current-project-exclusively)
-              (other-window 1)))
+  ;; (add-hook 'projectile-after-switch-project-hook
+  ;;           (lambda ()
+  ;;             (treemacs-display-current-project-exclusively)
+  ;;             (other-window 1)))
 
   :bind-keymap ("C-c p" . projectile-command-map)
   :init
@@ -2455,8 +2448,6 @@ SAVE-FN with non-nil ARGS."
 (use-package all-the-icons-ivy-rich
   :ensure t
   :ensure ivy-rich
-  :after ivy
-  :disabled t
   :commands all-the-icons-ivy-rich-mode
   :if (and (eq sb/selection 'ivy) (display-graphic-p))
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
@@ -2465,17 +2456,54 @@ SAVE-FN with non-nil ARGS."
 (use-package ivy-rich
   :if (eq sb/selection 'ivy)
   :commands ivy-rich-modify-column
-  :after (ivy all-the-icons-ivy-rich)
-  :init (ivy-rich-mode 1)
+  :after (ivy counsel all-the-icons-ivy-rich)
+  :preface
+  ;; Adapted from
+  ;; https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
+  (defun sb/ivy-rich-file-size (candidate)
+    "Displays the file size of the candidate for ivy-rich."
+    (let ((candidate (expand-file-name candidate ivy--directory)))
+      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
+          ""
+        (let ((size (file-attribute-size (file-attributes candidate))))
+          (cond
+           ((> size 1000000) (format "%.1fM " (/ size 1000000.0)))
+           ((> size 1000) (format "%.1fk " (/ size 1000.0)))
+           (t (format "%d " size)))))))
+
+  (defun sb/ivy-rich-file-user (candidate)
+    "Displays the file user of the candidate for ivy-rich."
+    (let ((candidate (expand-file-name candidate ivy--directory)))
+      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
+          ""
+        (let* ((user-id (file-attribute-user-id (file-attributes candidate)))
+               (user-name (user-login-name user-id)))
+          (format "%s" user-name)))))
+  :init
+  (ivy-rich-mode 1)
+  (ivy-rich-project-root-cache-mode)
   :config
   (setq ivy-rich-parse-remote-buffer nil)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 
+  (ivy-rich-set-columns 'counsel-find-file
+                        '((all-the-icons-ivy-rich-file-icon)
+                          (ivy-rich-candidate    (:width 0.70))
+                          (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
+                          (sb/ivy-rich-file-size (:width 10 :align right
+                                                         :face font-lock-doc-face))))
+
   ;; Increase the width to see the major mode clearly
-  ;; FIXME: `ivy-rich-modify-column' is not taking effect.
-  (ivy-rich-modify-column 'ivy-switch-buffer
-                          'ivy-rich-switch-buffer-major-mode
-                          '(:width 20 :face error)))
+  ;; (ivy-rich-modify-column 'ivy-switch-buffer
+  ;;                         'ivy-rich-switch-buffer-major-mode '(:width 20 :face error))
+
+  (ivy-rich-modify-columns 'ivy-switch-buffer
+                           '((ivy-rich-switch-buffer-size (:align right))
+                             (ivy-rich-switch-buffer-major-mode (:width 20 :face error))))
+
+  (ivy-rich-set-columns 'counsel-recentf
+                        '((file-name-nondirectory (:width 0.25 :face warning))
+                          (ivy-rich-candidate (:width 0.90)))))
 
 (use-package counsel-fd
   :if (and (eq sb/selection 'ivy) (executable-find "fd"))
@@ -2509,20 +2537,19 @@ SAVE-FN with non-nil ARGS."
         flycheck-idle-buffer-switch-delay 5 ; Increase the time (s) to allow for quick transitions
         flycheck-idle-change-delay 5 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
-        ;; Show error messages only if the error list is not already visible
-        flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
+        ;; ;; Show error messages only if the error list is not already visible
+        ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         ;; There are no checkers for modes like `csv-mode', and many program modes use lsp.
         ;; `yaml-mode' is derived from `text-mode'. `chktex' errors are often not very helpful.
-        flycheck-global-modes '(not csv-mode)
-        flycheck-chktexrc "chktexrc")
+        flycheck-global-modes '(not csv-mode))
 
-  ;; TODO: Is this the reason why `flycheck' and `doom-modeline' does not work well?
   (when (or (eq sb/modeline-theme 'spaceline)
             (eq sb/modeline-theme 'doom-modeline))
     (setq flycheck-mode-line nil))
 
   (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
                                                                             sb/user-home)
+                flycheck-chktexrc "chktexrc"
                 flycheck-pylintrc '("setup.cfg" "pylintrc")
                 flycheck-python-pylint-executable "python3"
                 flycheck-shellcheck-follow-sources nil
@@ -2694,17 +2721,20 @@ SAVE-FN with non-nil ARGS."
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
   :commands ws-butler-mode
-  :diminish
+  ;; :diminish
   :hook (prog-mode . ws-butler-mode))
 
 ;; Highlight symbol under point
 (use-package symbol-overlay
   :commands (symbol-overlay-mode)
-  :diminish
+  ;; :diminish
   :hook ((prog-mode html-mode yaml-mode conf-mode) . symbol-overlay-mode)
   :bind
   (("M-p" . symbol-overlay-jump-prev)
-   ("M-n" . symbol-overlay-jump-next)))
+   ("M-n" . symbol-overlay-jump-next))
+  :config
+  ;; Delay highlighting to avoid transient cursor placements
+  (setq symbol-overlay-idle-time 1))
 
 (use-package hl-todo
   :commands global-hl-todo-mode
@@ -3097,7 +3127,7 @@ SAVE-FN with non-nil ARGS."
   :commands immortal-scratch-mode
   :init (run-with-idle-timer 3 nil #'immortal-scratch-mode))
 
-;; I use the *scratch* buffer for taking notes, it helps to make the data persist
+;; I use the *scratch* buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
   :commands persistent-scratch-setup-default
   :hook (after-init . persistent-scratch-setup-default)
@@ -3105,12 +3135,15 @@ SAVE-FN with non-nil ARGS."
   (unless (bound-and-true-p sb/use-no-littering)
     (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
 
+(advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun)
+
 (use-package crux
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
    ("C-c d s" . crux-sudo-edit)))
 
+;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
   :if (display-mouse-p)
   :disabled t
@@ -3118,6 +3151,7 @@ SAVE-FN with non-nil ARGS."
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
 
+;; Move the cursor from the line of view
 (use-package avoid
   :ensure nil
   :commands mouse-avoidance-mode
@@ -3299,14 +3333,7 @@ SAVE-FN with non-nil ARGS."
         pdf-view-resize-factor 1.1) ; Fine-grained zoom factor of 10%
 
   ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-  (add-hook 'pdf-view-mode-hook
-            (lambda()
-              ;; (pdf-links-minor-mode 1)
-              ;; (pdf-isearch-minor-mode 1)
-              ;; (pdf-outline-minor-mode 1)
-              ;; (pdf-history-minor-mode 1)
-              (pdf-tools-enable-minor-modes)
-              ))
+  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes)
   :bind
   (:map pdf-view-mode-map
         ("C-s" . isearch-forward)
@@ -3397,17 +3424,17 @@ SAVE-FN with non-nil ARGS."
 (use-package pandoc-mode
   ;; :ensure-system-package pandoc
   :commands (pandoc-load-default-settings pandoc-mode)
-  :diminish
   :hook (markdown-mode . pandoc-mode)
   :config
   (pandoc-load-default-settings)
   ;; (unbind-key "C-c /" pandoc-mode-map) ; Binds `C-c /' to `pandoc-main-hydra/body'
   )
 
+;; Preview with `grip-mode' is better than `markdown-live-preview-mode' but there is a limit on the
+;; number of API requests to GitHub without authentication
 (use-package grip-mode
   :if (executable-find "grip")
   :after (:any markdown-mode org-mode)
-  :diminish
   :config
   (setq grip-preview-use-webkit nil) ; Do not use the embedded webkit for preview
   :bind
@@ -3589,6 +3616,7 @@ SAVE-FN with non-nil ARGS."
             lsp-html-format-max-preserve-new-lines
             lsp-xml-logs-client
             lsp-xml-jar-file
+            lsp-xml-jar-version
             lsp-yaml-print-width
             lsp-headerline-breadcrumb-enable-diagnostics
             lsp-modeline-diagnostics-scope)
@@ -3613,8 +3641,8 @@ SAVE-FN with non-nil ARGS."
   ;;  (yaml-language-server . "npm install -g yaml-language-server")
   ;;  (tsc . "npm install -g typescript"))
   :hook
-  ;; https://github.com/emacs-lsp/lsp-mode/issues/2598#issuecomment-776506077
-  ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred)
+  ((lsp-mode . lsp-enable-which-key-integration)
+   ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred))
   :custom-face
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
                                                font-lock-doc-face :weight bold :height 0.9))))
@@ -3746,9 +3774,9 @@ SAVE-FN with non-nil ARGS."
                             (lsp-package-ensure 'pyright callback error-callback))
       :notification-handlers
       (lsp-ht
-       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+       ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
        ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-       ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+       ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
   (when (eq sb/python-langserver 'jedi)
     (lsp-register-client
@@ -3821,8 +3849,7 @@ SAVE-FN with non-nil ARGS."
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
-                     '("java" "-jar" (expand-file-name "org.eclipse.lemminx-0.16.2-uber.jar"
-                                                       sb/extras-directory)))
+                     '("java" "-jar" (expand-file-name lsp-xml-jar-name sb/extras-directory)))
     :major-modes '(xml-mode nxml-mode)
     :remote? t
     :server-id 'xmlls-remote))
@@ -4098,14 +4125,6 @@ SAVE-FN with non-nil ARGS."
         python-shell-exec-path "python3"
         python-shell-interpreter "python3")
 
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (when (and (eq sb/python-langserver 'pyls) (executable-find "pyls"))
-  ;;     (progn
-  ;;       (dolist (ls '(pyright pyright-remote mspyls mspyls-remote jedi jedils-remote))
-  ;;         (add-to-list 'lsp-disabled-clients ls))
-  ;;       (add-to-list 'lsp-enabled-clients 'pyls)
-  ;;       (add-to-list 'lsp-enabled-clients 'pyls-remote))))
-
   (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
                                 auto-mode-alist)))
@@ -4122,7 +4141,7 @@ SAVE-FN with non-nil ARGS."
   :commands pip-requirements-mode)
 
 (use-package pyvenv
-  :diminish
+  ;; :diminish
   :commands (pyvenv-mode pyvenv-tracking-mode)
   :hook (python-mode . pyvenv-mode)
   :config
@@ -4166,40 +4185,26 @@ SAVE-FN with non-nil ARGS."
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode . (lambda ()
-                   (require 'lsp-pyright)
-                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote jedi jedils-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'pyright)
-                   ;; (add-to-list 'lsp-enabled-clients 'pyright-remote)
-                   ))
+                   (require 'lsp-pyright)))
   :config (setq lsp-pyright-python-executable-cmd "python3"))
 
 (use-package lsp-jedi
+  :defines lsp-jedi-diagnostics-enable
   :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
-  :disabled t
   :hook
   (python-mode . (lambda ()
-                   (require 'lsp-jedi)
-                   ;; (dolist (ls '(pyls pyls-remote mspyls mspyls-remote pyright pyright-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'jedi)
-                   ;; (add-to-list 'lsp-enabled-clients 'jedils-remote)
-                   ))
+                   (require 'lsp-jedi)))
   :config (setq lsp-jedi-diagnostics-enable t))
 
 ;; Initiate the lsp server after all the language server code has been processed
 (add-hook 'python-mode-hook
           (lambda()
-            (lsp-deferred)
-            ;; We already have `flycheck' error summary listed on the modeline, but it seems `lsp'
-            ;; may report additional errors
-            ;; (lsp-modeline-diagnostics-mode -1)
-            ))
+            (lsp-deferred)))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
-  :diminish yapf-mode
+  ;; :diminish yapf-mode
   :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
   :commands yapf-mode
   :hook (python-mode . yapf-mode))
@@ -4487,8 +4492,8 @@ SAVE-FN with non-nil ARGS."
   (yaml-mode . (lambda ()
                  (setq-local lsp-ltex-enabled nil)
                  (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
-                 (add-hook 'before-save-hook #'lsp-format-buffer
-                           nil t)
+                 (flyspell-mode -1)
+                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                  (lsp-deferred))))
 
 (use-package yaml-imenu
@@ -4554,8 +4559,7 @@ SAVE-FN with non-nil ARGS."
   (nxml-mode . (lambda ()
                  (spell-fu-mode -1)
                  (setq-local lsp-ltex-enabled nil)
-                 (add-hook 'before-save-hook #'lsp-format-buffer
-                           nil t)
+                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                  (lsp-deferred)))
   :config
   (fset 'xml-mode 'nxml-mode)
@@ -4938,7 +4942,6 @@ Ignore if no file is found."
   :disabled t
   :demand t
   :commands js2-refactor-mode
-  :diminish
   :config (js2-refactor-mode 1))
 
 (use-package xref-js2
@@ -4963,6 +4966,7 @@ Ignore if no file is found."
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
+   (".*/vscode/settings.json$"    . jsonc-mode)
    (".*/\\.vscode/settings.json$" . jsonc-mode)
    ("User/settings.json$"         . jsonc-mode))
   :hook
@@ -5008,18 +5012,16 @@ Ignore if no file is found."
   ;; This will clone the llvm project
   ;; :quelpa ((mlir-mode :fetcher github :repo "llvm/llvm-project"
   ;;                     :files ("mlir/utils/emacs/mlir-mode.el")))
-  :mode "\\.mlir\\'"
-  :disabled t)
+  :mode "\\.mlir\\'")
 
 (use-package clang-format
   :after (mlir-mode)
-  :commands (clang-format clang-format-buffer clang-format-region)
-  :disabled t)
+  :commands (clang-format clang-format-buffer clang-format-region))
 
 (use-package clang-format+
   :ensure clang-format
   :ensure t
-  :disabled t
+  :defines clang-format+-always-enable
   :hook (mlir-mode . clang-format+-mode)
   :config (setq clang-format+-always-enable t))
 
@@ -5062,14 +5064,12 @@ Ignore if no file is found."
   :mode "\\.adoc\\'")
 
 (use-package editorconfig
-  :disabled t
   :if (executable-find "editorconfig")
-  :diminish editorconfig-mode
   :commands editorconfig-mode)
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
-  :disabled t
+  :defines fasd-enable-initial-prompt
   :if (executable-find "fasd")
   :commands (global-fasd-mode fasd-find-file)
   :init (run-with-idle-timer 2 nil #'global-fasd-mode)

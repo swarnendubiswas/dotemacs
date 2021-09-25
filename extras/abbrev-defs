@@ -35,6 +35,7 @@
 
 (define-abbrev-table 'c++-mode-abbrev-table
   '(
+    ("comopression" "compression" nil :count 0)
     ("initalization" "Initialization" nil :count 0)
    ))
 
@@ -280,7 +281,7 @@
     ("charecter" "character" nil :count 0)
     ("charector" "character" nil :count 0)
     ("cheif" "chief" nil :count 0)
-    ("chekc" "check" nil :count 0)
+    ("chekc" "check" nil :count 1)
     ("chnage" "change" nil :count 0)
     ("cieling" "ceiling" nil :count 0)
     ("circut" "circuit" nil :count 0)
@@ -1443,6 +1444,7 @@
     ("conrol" "control" nil :count 0)
     ("currenly" "currently" nil :count 0)
     ("jin" "join" nil :count 0)
+    ("migratnig" "migrating" nil :count 0)
     ("occuring" "occurring" nil :count 0)
     ("operatiosn" "operations" nil :count 0)
     ("operatoins" "operations" nil :count 0)
