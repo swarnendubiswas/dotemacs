@@ -389,6 +389,7 @@ This location is used for temporary installations and files.")
 
 ;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
+(defvar bookmark-save-flag)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
 
@@ -403,6 +404,7 @@ This location is used for temporary installations and files.")
       auto-save-visited-interval 60 ; Default of 5s is too frequent for `auto-save-visited-mode'
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
+      bookmark-save-flag 1 ; Save bookmark after every edit and also when Emacs is killed
       case-fold-search t ; Searches and matches should ignore case
       comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
@@ -558,13 +560,13 @@ This location is used for temporary installations and files.")
 (use-package autorevert ; Auto-refresh all buffers
   :ensure nil
   :commands global-auto-revert-mode
-  :diminish auto-revert-mode
+  ;; :diminish auto-revert-mode
   :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
   :config
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        ;; FIXME: Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if
-        ;; we only use Emacs
-        auto-revert-remote-files nil
+        ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
+        ;; use Emacs
+        auto-revert-remote-files t
         auto-revert-verbose nil
         ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
         ;; contents of the "main" directory changes
@@ -663,7 +665,7 @@ SAVE-FN with non-nil ARGS."
 (use-package abbrev
   :ensure nil
   :commands abbrev-mode
-  :diminish
+  ;; :diminish
   :hook
   ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
   (after-init . abbrev-mode)
@@ -715,6 +717,8 @@ SAVE-FN with non-nil ARGS."
 ;; Native from Emacs 27+
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 
+;; Highlight and allow to open http link at point in programming buffers. `goto-address-prog-mode'
+;; only highlights links in strings and comments.
 (add-hook 'prog-mode-hook #'goto-address-prog-mode)
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
@@ -1227,7 +1231,8 @@ SAVE-FN with non-nil ARGS."
                                         treemacs-resize-icons
                                         treemacs-select-window
                                         treemacs-add-and-display-current-project
-                                        treemacs-display-current-project-exclusively)
+                                        treemacs-display-current-project-exclusively
+                                        projectile-project-p)
   :preface
   (defun sb/setup-treemacs-quick ()
     "Setup treemacs."
@@ -1421,7 +1426,6 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :commands (org-indent-mode org-indent-item org-outdent-item)
   :hook (org-mode . org-indent-mode)
-  :diminish
   :bind
   (:map org-mode-map
         ("<tab>"     . org-indent-item)
@@ -1476,7 +1480,7 @@ SAVE-FN with non-nil ARGS."
         ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package anzu
-  :diminish anzu-mode
+  ;; :diminish anzu-mode
   :commands global-anzu-mode
   :init
   (setq anzu-search-threshold 10000
@@ -1738,7 +1742,7 @@ SAVE-FN with non-nil ARGS."
   :config (company-statistics-mode 1))
 
 (use-package yasnippet
-  :diminish yas-minor-mode
+  ;; :diminish yas-minor-mode
   :commands (yas-global-mode snippet-mode)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode prog-mode) . yas-global-mode)
@@ -2063,15 +2067,16 @@ SAVE-FN with non-nil ARGS."
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
   :hook
-  ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
-  ;; language-specific words
   ((text-mode  . flyspell-mode)
+   ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
+   ;; language-specific words
+   (prog-mode . flyspell-prog-mode)
    ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; `find-file-hook' will not work for buffers with no associated files
    (after-init . (lambda ()
                    (when (string= (buffer-name) "*scratch*")
                      (flyspell-mode 1)))))
-  :diminish
+  ;; :diminish
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
@@ -2169,17 +2174,10 @@ SAVE-FN with non-nil ARGS."
    ("C-c f p" . spell-fu-goto-previous-error)
    ("C-c f a" . spell-fu-word-add)))
 
-(or
- (use-package highlight-indentation
-   :commands highlight-indentation-mode
-   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-   :hook ((yaml-mode python-mode) . highlight-indentation-mode))
-
- (use-package highlight-indent-guides
-   :disabled t
-   :diminish
-   :hook ((yaml-mode python-mode) . highlight-indent-guides-mode)
-   :config (setq highlight-indent-guides-method 'character)))
+(use-package highlight-indentation
+  :commands highlight-indentation-mode
+  ;; :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :hook ((yaml-mode python-mode) . highlight-indentation-mode))
 
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
@@ -2274,8 +2272,35 @@ SAVE-FN with non-nil ARGS."
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
+(use-package project
+  :commands (project-switch-project project-current
+                                    project-find-file project-execute-extended-command
+                                    project-known-project-roots
+                                    project-remove-known-project
+                                    project-remember-project
+                                    project-kill-buffers
+                                    project-switch-to-buffer
+                                    project-search
+                                    project-compile)
+  :bind
+  (:map project-prefix-map
+        ("f"    . project-find-file)
+        ("<f6>" . project-find-file)
+        ("F"    . project-or-external-find-file)
+        ("b"    . project-switch-to-buffer)
+        ("d"    . project-dired)
+        ("v"    . project-vc-dir)
+        ("c"    . project-compile)
+        ("k"    . project-kill-buffers)
+        ("p"    . project-switch-project)
+        ("<f5>" . project-switch-project)
+        ("g"    . project-find-regexp)
+        ("<f7>" . project-find-regexp)
+        ("r"    . project-query-replace-regexp)))
+
 (use-package projectile
   ;; :ensure-system-package fd
+  :disabled t
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
@@ -2455,7 +2480,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ivy-rich
   :if (eq sb/selection 'ivy)
-  :commands ivy-rich-modify-column
+  :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
   :after (ivy counsel all-the-icons-ivy-rich)
   :preface
   ;; Adapted from
@@ -2695,7 +2720,7 @@ SAVE-FN with non-nil ARGS."
   :commands (whitespace-mode global-whitespace-mode
                              whitespace-buffer whitespace-cleanup
                              whitespace-turn-off)
-  :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
   :hook (markdown-mode . whitespace-mode)
   :config
   (setq show-trailing-whitespace t
@@ -3086,7 +3111,7 @@ SAVE-FN with non-nil ARGS."
 ;; Cut/copy the current line if no region is active
 (use-package whole-line-or-region
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
-  :diminish (whole-line-or-region-local-mode)
+  ;; :diminish (whole-line-or-region-local-mode)
   :init (run-at-time 5 nil #'whole-line-or-region-global-mode))
 
 (use-package goto-last-change
@@ -3108,7 +3133,7 @@ SAVE-FN with non-nil ARGS."
         undo-tree-visualizer-timestamps t)
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
-  :diminish
+  ;; :diminish
   :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -3501,10 +3526,12 @@ SAVE-FN with non-nil ARGS."
 
 (use-package make-mode
   :ensure nil
+  :commands indent-tabs-mode
   :mode
   (("\\Makefile\\'"       . makefile-mode)
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-   ("makefile\\.rules\\'" . makefile-gmake-mode)))
+   ("makefile\\.rules\\'" . makefile-gmake-mode))
+  :config (add-hook 'makefile-mode-hook #'indent-tabs-mode))
 
 (use-package eldoc
   :ensure nil
@@ -4186,7 +4213,35 @@ SAVE-FN with non-nil ARGS."
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-pyright)))
-  :config (setq lsp-pyright-python-executable-cmd "python3"))
+  :config
+  (setq lsp-pyright-python-executable-cmd "python3")
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (cons "pyright-langserver"
+                             lsp-pyright-langserver-command-args)))
+    :major-modes '(python-mode)
+    :remote? t
+    :server-id 'pyright-remote
+    :multi-root lsp-pyright-multi-root
+    :priority 3
+    :initialization-options (lambda ()
+                              (ht-merge (lsp-configuration-section "pyright")
+                                        (lsp-configuration-section "python")))
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'pyright callback error-callback))
+    :notification-handlers
+    (lsp-ht
+     ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
+     ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+     ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
 (use-package lsp-jedi
   :defines lsp-jedi-diagnostics-enable
@@ -4194,7 +4249,15 @@ SAVE-FN with non-nil ARGS."
   :hook
   (python-mode . (lambda ()
                    (require 'lsp-jedi)))
-  :config (setq lsp-jedi-diagnostics-enable t))
+  :config
+  (setq lsp-jedi-diagnostics-enable t)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "jedi-language-server")
+    :major-modes '(python-mode)
+    :remote? t
+    :server-id 'jedils-remote)))
 
 ;; Initiate the lsp server after all the language server code has been processed
 (add-hook 'python-mode-hook
@@ -4537,18 +4600,17 @@ SAVE-FN with non-nil ARGS."
         web-mode-style-padding 2))
 
 (use-package emmet-mode
-  :commands emmet-mode
   :defines emmet-move-cursor-between-quote
+  :commands emmet-mode
   :hook ((web-mode sgml-mode css-mode html-mode) . emmet-mode)
   :config (setq emmet-move-cursor-between-quote t))
 
 (use-package rainbow-mode
-  :diminish
+  ;; :diminish
   :commands rainbow-mode
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
 (use-package php-mode
-  :disabled t
   :hook (php-mode . lsp-deferred))
 
 (use-package nxml-mode

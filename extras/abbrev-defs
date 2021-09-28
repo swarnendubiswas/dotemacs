@@ -1458,6 +1458,7 @@
     ("sequenes" "sequence" nil :count 0)
     ("serializaation" "serialization" nil :count 0)
     ("severse" "severe" nil :count 0)
+    ("sschedule" "Schedule" nil :count 0)
     ("wih" "with" nil :count 0)
    ))
 
