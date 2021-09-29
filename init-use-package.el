@@ -1169,10 +1169,13 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq diredp-hide-details-initially-flag nil
         diredp-hide-details-propagate-flag nil)
-  (unbind-key "r" dired-mode-map) ; Bound to `diredp-rename-this-file'
   :hook
   (dired-mode . (lambda ()
-                  (diredp-toggle-find-file-reuse-dir 1))))
+                  (diredp-toggle-find-file-reuse-dir 1)))
+  :bind
+  (:map dired-mode-map
+        ;; Bound to `diredp-rename-this-file'
+        ("r" . nil)))
 
 ;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load after
 ;; `dired+' and not `dired', even with `bind-keys*'.
