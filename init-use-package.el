@@ -96,7 +96,7 @@ whitespaces."
 
 ;; We use `lsp-mode' and `dumb-jump' for jumping to tags and browsing source code
 (defcustom sb/tags-scheme
-  'none
+  'ctags
   "Choose whether to use gtags or ctags."
   :type  '(radio
            (const :tag "ctags" ctags)
@@ -889,7 +889,6 @@ SAVE-FN with non-nil ARGS."
 ;; The Python virtualenv information is not shown on the modeline
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
-  :disabled t
   :commands powerline-default-theme
   :init
   (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
@@ -1465,12 +1464,10 @@ SAVE-FN with non-nil ARGS."
    ("C-f"     . isearch-repeat-forward)
    ("C-c C-o" . isearch-occur)))
 
+;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
   :after isearch
-  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point)
-  :bind
-  (("C-f" . isearch-symbol-at-point)
-   ("C-r" . isearch-backward-symbol-at-point)))
+  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point))
 
 (use-package isearch-dabbrev
   :after isearch
@@ -1480,7 +1477,7 @@ SAVE-FN with non-nil ARGS."
         ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package anzu
-  ;; :diminish anzu-mode
+  :diminish anzu-mode
   :commands global-anzu-mode
   :init
   (setq anzu-search-threshold 10000
@@ -1706,7 +1703,7 @@ SAVE-FN with non-nil ARGS."
   :commands company-posframe-mode
   :diminish
   :config
-  (setq company-posframe-show-metadata t ; Difficult to distinguish and distracting
+  (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
         company-posframe-show-indicator nil ; Hide the backends
         company-posframe-quickhelp-delay nil) ; Disable showing the help frame
   (company-posframe-mode 1))
@@ -1715,14 +1712,6 @@ SAVE-FN with non-nil ARGS."
   :after company
   :commands company-quickhelp-mode
   :init (run-at-time 3 nil #'company-quickhelp-mode))
-
-(use-package company-quickhelp-terminal
-  :disabled t
-  :unless (display-graphic-p)
-  :after company-quickhelp
-  :demand t
-  :commands company-quickhelp-terminal-mode
-  :config (company-quickhelp-terminal-mode 1))
 
 ;; Nice but slows completions
 (use-package company-fuzzy
@@ -2285,7 +2274,6 @@ SAVE-FN with non-nil ARGS."
   :bind
   (:map project-prefix-map
         ("f"    . project-find-file)
-        ("<f6>" . project-find-file)
         ("F"    . project-or-external-find-file)
         ("b"    . project-switch-to-buffer)
         ("d"    . project-dired)
@@ -2293,14 +2281,11 @@ SAVE-FN with non-nil ARGS."
         ("c"    . project-compile)
         ("k"    . project-kill-buffers)
         ("p"    . project-switch-project)
-        ("<f5>" . project-switch-project)
         ("g"    . project-find-regexp)
-        ("<f7>" . project-find-regexp)
         ("r"    . project-query-replace-regexp)))
 
 (use-package projectile
   ;; :ensure-system-package fd
-  :disabled t
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
@@ -2750,10 +2735,10 @@ SAVE-FN with non-nil ARGS."
   :hook (prog-mode . ws-butler-mode))
 
 ;; Highlight symbol under point
+;; LATER: Compare the performance benefits with https://gitlab.com/ideasman42/emacs-idle-highlight-mode
 (use-package symbol-overlay
   :commands (symbol-overlay-mode)
-  ;; :diminish
-  :hook ((prog-mode html-mode yaml-mode conf-mode) . symbol-overlay-mode)
+  :hook (prog-mode . symbol-overlay-mode)
   :bind
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next))
@@ -2961,12 +2946,12 @@ SAVE-FN with non-nil ARGS."
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
    ("C-c g f" . counsel-etags-find-tag)
-   ("C-c g l" .  counsel-etags-list-tag)
+   ("C-c g l" . counsel-etags-list-tag)
    ("C-c g c" . counsel-etags-scan-code))
   :config
   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-  (add-hook 'emacs-lisp-mode-hook
+  (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local)))
 
@@ -5055,7 +5040,6 @@ Ignore if no file is found."
   :hook (sass-mode . lsp-deferred))
 
 (use-package bazel
-  :disabled t
   :commands (bazel-mode bazelrc-mode)
   :hook (bazel-mode . flycheck-mode))
 
