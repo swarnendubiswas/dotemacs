@@ -1165,6 +1165,7 @@ SAVE-FN with non-nil ARGS."
   ;; :quelpa ((dired+ :fetcher github :repo "emacsmirror/dired-plus"
   ;;                  :files (dired+.el)))
   :commands diredp-toggle-find-file-reuse-dir
+  :init (setq diredp-bind-problematic-terminal-keys nil)
   :config
   (setq diredp-hide-details-initially-flag nil
         diredp-hide-details-propagate-flag nil)
@@ -2813,7 +2814,7 @@ SAVE-FN with non-nil ARGS."
         ;; tramp-default-remote-shell "/bin/bash"
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         tramp-verbose 1
-        ;; Disable version control
+        ;; Disable version control for remote files to improve performance
         vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
                                      vc-ignore-dir-regexp tramp-file-name-regexp))
 
@@ -3511,12 +3512,12 @@ SAVE-FN with non-nil ARGS."
 
 (use-package make-mode
   :ensure nil
-  :commands indent-tabs-mode
   :mode
   (("\\Makefile\\'"       . makefile-mode)
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :config (add-hook 'makefile-mode-hook #'indent-tabs-mode))
+  :config (add-hook 'makefile-mode-hook (lambda()
+                                          (setq-local indent-tabs-mode t))))
 
 (use-package eldoc
   :ensure nil
@@ -4145,7 +4146,7 @@ SAVE-FN with non-nil ARGS."
   :after python-mode
   :demand t
   :commands (python-docstring-mode python-docstring-install)
-  :diminish
+  ;; :diminish
   :config (python-docstring-install))
 
 (use-package pip-requirements
@@ -4706,6 +4707,7 @@ SAVE-FN with non-nil ARGS."
 ;; for me, so I have disabled the package and I am again trying `flycheck-grammarly'.
 (use-package lsp-grammarly
   :ensure keytar
+  :ensure t
   :disabled t
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
@@ -5654,7 +5656,8 @@ Increase line spacing by two line height."
                                            magit-process-mode
                                            magit-diff-mode
                                            tags-table-mode
-                                           compilation-mode)
+                                           compilation-mode
+                                           flycheck-verify-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string))
 
