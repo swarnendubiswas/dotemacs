@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/theme
-  'none
+  'modus-vivendi ; Looks good on the TUI
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "eclipse"         eclipse)
@@ -750,6 +750,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
+  :if (display-graphic-p)
   :commands circadian-setup
   :init
   (require 'solar)
@@ -2113,8 +2114,8 @@ SAVE-FN with non-nil ARGS."
   :init
   (add-hook 'text-mode-hook
             (lambda ()
-              ;; `nxml-mode' is derived from `text-mode'
               (setq spell-fu-faces-exclude '(hl-line
+                                             ;; `nxml-mode' is derived from `text-mode'
                                              nxml-attribute-local-name))
               (spell-fu-mode)))
 
@@ -3106,7 +3107,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Restore point to the initial location with `C-g' after marking a region
 (use-package smart-mark
-  :init (run-at-time 5 nil #'smart-mark-mode))
+  :init (run-at-idle-time 3 nil #'smart-mark-mode))
 
 ;; Cut/copy the current line if no region is active
 (use-package whole-line-or-region
@@ -3117,8 +3118,10 @@ SAVE-FN with non-nil ARGS."
 (use-package goto-last-change
   :bind ("C-x C-\\" . goto-last-change))
 
+;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
+;; pressing the keys `M-<' and `M->' keys again.
 (use-package beginend
-  :init (run-at-time 5 nil #'beginend-global-mode)
+  :init (run-at-idle-time 3 nil #'beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
