@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/theme
-  'modus-vivendi ; Looks good on the TUI
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "eclipse"         eclipse)
@@ -857,6 +857,7 @@ SAVE-FN with non-nil ARGS."
   ;;                                      :height 0.8))))
   )
 
+;; Looks good on the TUI
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
@@ -1721,13 +1722,14 @@ SAVE-FN with non-nil ARGS."
 (use-package company-quickhelp
   :after company
   :commands company-quickhelp-mode
-  :init (run-at-time 3 nil #'company-quickhelp-mode))
+  :init (run-with-idle-timer 3 nil #'company-quickhelp-mode))
 
 ;; Nice but slows completions
 (use-package company-fuzzy
   :ensure flx
   :ensure t
   :after company
+  :disabled t
   :diminish
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :hook (text-mode . company-fuzzy-mode)
@@ -2190,7 +2192,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package paren
   :ensure nil
-  :init (run-at-time 3 nil #'show-paren-mode)
+  :init (run-with-idle-timer 2 nil #'show-paren-mode)
   :config
   (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
         show-paren-when-point-inside-paren t
@@ -2200,7 +2202,8 @@ SAVE-FN with non-nil ARGS."
 (use-package elec-pair
   :ensure nil
   :commands (electric-pair-mode)
-  :init (run-at-time 2 nil #'electric-pair-mode)
+  :disabled t
+  :init (run-with-idle-timer 2 nil #'electric-pair-mode)
   :config
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
@@ -2300,6 +2303,11 @@ SAVE-FN with non-nil ARGS."
                                   projectile-expand-root
                                   projectile-project-root
                                   projectile-mode)
+  :preface
+  (defun sb/close-treemacs-with-projectile (orig-fun &rest args)
+    (let ((res (apply orig-fun args)))
+      (treemacs)
+      res))
   :config
   (setq projectile-enable-caching nil ; Caching will not watch for file system changes
         projectile-file-exists-remote-cache-expire nil
@@ -2348,11 +2356,11 @@ SAVE-FN with non-nil ARGS."
   (setq projectile-auto-discover nil
         projectile-project-search-path (list
                                         (concat `,(getenv "HOME") "/bitbucket")
-                                        (expand-file-name "github" sb/user-home)
-                                        (expand-file-name "iitk-workspace" sb/user-home)
-                                        (expand-file-name "iitkgp-workspace" sb/user-home)
-                                        (expand-file-name "iss-workspace" sb/user-home)
-                                        (expand-file-name "plass-workspace" sb/user-home)
+                                        (expand-file-name "github"            sb/user-home)
+                                        (expand-file-name "iitk-workspace"    sb/user-home)
+                                        (expand-file-name "iitkgp-workspace"  sb/user-home)
+                                        (expand-file-name "iss-workspace"     sb/user-home)
+                                        (expand-file-name "plass-workspace"   sb/user-home)
                                         (expand-file-name "prospar-workspace" sb/user-home)
                                         ))
 
@@ -2360,9 +2368,9 @@ SAVE-FN with non-nil ARGS."
                  (expand-file-name sb/user-home) ; Do not consider $HOME as a project
                  "~/" ; Do not consider $HOME as a project
                  (expand-file-name "/tmp")
-                 (expand-file-name "bitbucket/.metadata" sb/user-home)
-                 (expand-file-name "github/.metadata" sb/user-home)
-                 (expand-file-name "iitk-workspace/.metadata" sb/user-home)
+                 (expand-file-name "bitbucket/.metadata"       sb/user-home)
+                 (expand-file-name "github/.metadata"          sb/user-home)
+                 (expand-file-name "iitk-workspace/.metadata"  sb/user-home)
                  (expand-file-name "plass-workspace/.metadata" sb/user-home)
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
@@ -2396,8 +2404,11 @@ SAVE-FN with non-nil ARGS."
 
   ;; (add-hook 'projectile-after-switch-project-hook
   ;;           (lambda ()
+  ;;             (treemacs)
   ;;             (treemacs-display-current-project-exclusively)
   ;;             (other-window 1)))
+
+  ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
 
   :bind-keymap ("C-c p" . projectile-command-map)
   :init
@@ -2410,7 +2421,8 @@ SAVE-FN with non-nil ARGS."
    :map projectile-command-map
    ("A"    . projectile-add-known-project)))
 
-;; I am unsure how does this package advance `projectile'.
+;; I am unsure how does this package advances `projectile' in terms of usability.
+;; Set a default landing file: https://github.com/ericdanan/counsel-projectile/issues/172
 (use-package counsel-projectile
   :disabled t
   :defines counsel-projectile-default-file
@@ -2520,9 +2532,6 @@ SAVE-FN with non-nil ARGS."
                                                            :face font-lock-doc-face)))))
 
   ;; Increase the width to see the major mode clearly
-  ;; (ivy-rich-modify-column 'ivy-switch-buffer
-  ;;                         'ivy-rich-switch-buffer-major-mode '(:width 20 :face error))
-
   (ivy-rich-modify-columns 'ivy-switch-buffer
                            '((ivy-rich-switch-buffer-size (:align right))
                              (ivy-rich-switch-buffer-major-mode (:width 20 :face error))))
@@ -2693,7 +2702,6 @@ SAVE-FN with non-nil ARGS."
               (when (derived-mode-p 'json-mode)
                 (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
               ))
-
   )
 
 (or
@@ -2764,7 +2772,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package hl-todo
   :commands global-hl-todo-mode
-  :init (run-at-time 5 nil #'global-hl-todo-mode)
+  :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
   :config
   (setq hl-todo-highlight-punctuation ":"
         hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
@@ -2782,7 +2790,7 @@ SAVE-FN with non-nil ARGS."
 (use-package page-break-lines
   :diminish
   :commands (global-page-break-lines-mode page-break-lines-mode)
-  :init (run-at-time 5 nil #'global-page-break-lines-mode))
+  :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode))
 
 (use-package number-separator
   :ensure nil
@@ -3088,7 +3096,7 @@ SAVE-FN with non-nil ARGS."
 (add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*deadgrep*"               display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*deadgrep*"            display-buffer-same-window))
 ;; Open shell in same window.
 (add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
@@ -3107,13 +3115,13 @@ SAVE-FN with non-nil ARGS."
 
 ;; Restore point to the initial location with `C-g' after marking a region
 (use-package smart-mark
-  :init (run-at-idle-time 3 nil #'smart-mark-mode))
+  :init (run-with-idle-timer 3 nil #'smart-mark-mode))
 
-;; Cut/copy the current line if no region is active
+;; Operate on the current line if no region is active
 (use-package whole-line-or-region
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
-  ;; :diminish (whole-line-or-region-local-mode)
-  :init (run-at-time 5 nil #'whole-line-or-region-global-mode))
+  :diminish (whole-line-or-region-local-mode)
+  :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode))
 
 (use-package goto-last-change
   :bind ("C-x C-\\" . goto-last-change))
@@ -3121,7 +3129,7 @@ SAVE-FN with non-nil ARGS."
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys `M-<' and `M->' keys again.
 (use-package beginend
-  :init (run-at-idle-time 3 nil #'beginend-global-mode)
+  :init (run-with-idle-timer 3 nil #'beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
@@ -3153,7 +3161,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package immortal-scratch
   :commands immortal-scratch-mode
-  :init (run-with-idle-timer 3 nil #'immortal-scratch-mode))
+  :init (run-with-idle-timer 2 nil #'immortal-scratch-mode))
 
 ;; I use the *scratch* buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
@@ -3832,7 +3840,7 @@ SAVE-FN with non-nil ARGS."
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
-                     '("java" "-jar" (expand-file-name lsp-xml-jar-name sb/extras-directory)))
+                     '("java" "-jar" lsp-xml-jar-file))
     :major-modes '(xml-mode nxml-mode)
     :remote? t
     :server-id 'xmlls-remote))
@@ -3931,7 +3939,7 @@ SAVE-FN with non-nil ARGS."
   :after lsp-mode
   :demand t
   :config
-  (setq lsp-ui-doc-enable t ; Enable on-hover dialogs
+  (setq lsp-ui-doc-enable nil ; Enable on-hover dialogs
         lsp-ui-doc-max-width 80
         lsp-ui-doc-max-height 10
         lsp-ui-doc-include-signature t
@@ -3946,18 +3954,18 @@ SAVE-FN with non-nil ARGS."
           lsp-ui-peek-enable nil))
 
   (lsp-ui-mode 1)
-  (lsp-ui-doc-mode 1)
+  (lsp-ui-doc-mode -1)
 
   ;; https://github.com/emacs-lsp/lsp-ui/issues/578
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (lsp-ui-doc--hide-frame)))
 
-  (add-hook 'lsp-managed-mode-hook
-            (lambda ()
-              (eldoc-box-hover-mode -1)
-              (eldoc-box-hover-at-point-mode -1)
-              (eldoc-mode -1)))
+  ;; (add-hook 'lsp-managed-mode-hook
+  ;;           (lambda ()
+  ;;             ;; (eldoc-box-hover-mode -1)
+  ;;             ;; (eldoc-box-hover-at-point-mode -1)
+  ;;             (eldoc-mode -1)))
   :bind
   ;; FIXME: Bind only if the server has launched successfully
   (:map lsp-ui-mode-map
@@ -4359,7 +4367,8 @@ SAVE-FN with non-nil ARGS."
   (transient-bind-q-to-quit))
 
 (use-package with-editor
-  :diminish with-editor-mode)
+  ;; :diminish with-editor-mode
+  )
 
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1
@@ -4593,8 +4602,8 @@ SAVE-FN with non-nil ARGS."
   :ensure keytar
   :ensure t
   :after flycheck
-  :demand t
   :disabled t
+  :demand t
   :config
   (setq flycheck-grammarly-check-time 3
         ;; LATER: Can we combine the delete operations?
@@ -4691,7 +4700,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: This package is not working as intended
 (use-package lsp-ltex
-  :disabled t
+  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary)
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-ltex)
@@ -5249,7 +5258,7 @@ Ignore if no file is found."
             company-ispell)
            )))
 
-  (dolist (hook '(text-mode-hook)) ; Extends to `markdown-mode' and `org-mode'
+  (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook hook #'sb/company-text-mode)))
 
 (progn
@@ -5378,8 +5387,8 @@ Ignore if no file is found."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
-    (setq company-backends '((company-capf :with company-yasnippet)
-                             (company-files :with company-yasnippet)
+    (setq company-backends '(company-capf
+                             company-files
                              (company-dabbrev-code :with company-yasnippet)
                              company-dabbrev
                              company-ispell)))
