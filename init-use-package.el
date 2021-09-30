@@ -1046,6 +1046,11 @@ SAVE-FN with non-nil ARGS."
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
+(when (string= (system-name) "vindhya")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
@@ -1290,39 +1295,40 @@ SAVE-FN with non-nil ARGS."
   (treemacs-git-mode 'deferred)
   (treemacs-fringe-indicator-mode 'always) ; Always show the file indicator
 
-  (use-package treemacs-all-the-icons
-    :demand t)
+  (when (display-graphic-p)
+    (use-package treemacs-all-the-icons
+      :demand t)
 
-  ;; https://github.com/Alexander-Miller/treemacs/issues/735
-  (treemacs-create-theme "Default-Tighter"
-    :extends "Default"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash (lambda
-                 (ext icon)
-                 (puthash ext
-                          (concat
-                           (substring icon 0 1)
-                           (propertize " " 'display
-                                       '(space . (:width 0.5))))
-                          icons))
-               icons)))
+    ;; https://github.com/Alexander-Miller/treemacs/issues/735
+    (treemacs-create-theme "Default-Tighter"
+                           :extends "Default"
+                           :config
+                           (let ((icons (treemacs-theme->gui-icons theme)))
+                             (maphash (lambda
+                                        (ext icon)
+                                        (puthash ext
+                                                 (concat
+                                                  (substring icon 0 1)
+                                                  (propertize " " 'display
+                                                              '(space . (:width 0.5))))
+                                                 icons))
+                                      icons)))
 
-  (treemacs-create-theme "all-the-icons-tighter"
-    :extends "all-the-icons"
-    :config
-    (let ((icons (treemacs-theme->gui-icons theme)))
-      (maphash (lambda
-                 (ext icon)
-                 (puthash ext
-                          (concat
-                           (substring icon 0 1)
-                           (propertize " " 'display
-                                       '(space . (:width 0.5))))
-                          icons))
-               icons)))
+    (treemacs-create-theme "all-the-icons-tighter"
+                           :extends "all-the-icons"
+                           :config
+                           (let ((icons (treemacs-theme->gui-icons theme)))
+                             (maphash (lambda
+                                        (ext icon)
+                                        (puthash ext
+                                                 (concat
+                                                  (substring icon 0 1)
+                                                  (propertize " " 'display
+                                                              '(space . (:width 0.5))))
+                                                 icons))
+                                      icons)))
 
-  (treemacs-load-theme "all-the-icons")
+    (treemacs-load-theme "all-the-icons"))
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
   (set-face-attribute 'treemacs-directory-face nil :height 0.7)
@@ -1352,7 +1358,7 @@ SAVE-FN with non-nil ARGS."
 
   :bind*
   (;; The keybinding interferes with `dired-jump'
-   ("C-j" . sb/setup-treemacs-quick)
+   ("C-j" . treemacs)
    ("M-0" . treemacs-select-window)))
 
 ;; Starts Treemacs automatically with Emacsclient
@@ -2469,7 +2475,7 @@ SAVE-FN with non-nil ARGS."
 (use-package ivy-rich
   :if (eq sb/selection 'ivy)
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
-  :after (ivy counsel all-the-icons-ivy-rich)
+  :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
   :preface
   ;; Adapted from
   ;; https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
@@ -2499,12 +2505,18 @@ SAVE-FN with non-nil ARGS."
   (setq ivy-rich-parse-remote-buffer nil)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 
-  (ivy-rich-set-columns 'counsel-find-file
-                        '((all-the-icons-ivy-rich-file-icon)
-                          (ivy-rich-candidate    (:width 0.70))
-                          (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
-                          (sb/ivy-rich-file-size (:width 10 :align right
-                                                         :face font-lock-doc-face))))
+  (if (display-graphic-p)
+      (ivy-rich-set-columns 'counsel-find-file
+                            '((all-the-icons-ivy-rich-file-icon)
+                              (ivy-rich-candidate    (:width 0.70))
+                              (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
+                              (sb/ivy-rich-file-size (:width 10 :align right
+                                                             :face font-lock-doc-face))))
+    (ivy-rich-set-columns 'counsel-find-file
+                          '((ivy-rich-candidate    (:width 0.70))
+                            (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
+                            (sb/ivy-rich-file-size (:width 10 :align right
+                                                           :face font-lock-doc-face)))))
 
   ;; Increase the width to see the major mode clearly
   ;; (ivy-rich-modify-column 'ivy-switch-buffer
@@ -2515,8 +2527,8 @@ SAVE-FN with non-nil ARGS."
                              (ivy-rich-switch-buffer-major-mode (:width 20 :face error))))
 
   (ivy-rich-set-columns 'counsel-recentf
-                        '((file-name-nondirectory (:width 0.25 :face warning))
-                          (ivy-rich-candidate (:width 0.90)))))
+                        '((file-name-nondirectory (:width 0.24 :face warning))
+                          (ivy-rich-candidate (:width 0.75)))))
 
 (use-package counsel-fd
   :if (and (eq sb/selection 'ivy) (executable-find "fd"))
