@@ -1216,7 +1216,6 @@ SAVE-FN with non-nil ARGS."
   :hook (dired-mode . all-the-icons-dired-mode))
 
 (use-package treemacs
-  :if (display-graphic-p)
   :functions treemacs-tag-follow-mode
   :commands (treemacs-current-workspace treemacs--find-current-user-project
                                         treemacs-do-add-project-to-workspace
@@ -3676,131 +3675,84 @@ SAVE-FN with non-nil ARGS."
                                   "--header-insertion-decorators=0"
                                   "--log=error"
                                   "--pch-storage=memory"
-                                  ;; "--suggest-missing-includes"
                                   "--pretty")
-        lsp-clients-clangd-executable "clangd-12"
-        lsp-completion-enable-additional-text-edit t
+        lsp-clients-clangd-executable "clangd"
         lsp-completion-provider :none ; Enable integration with `company'
-        lsp-completion-show-detail nil ; Disable completion metadata
-        lsp-completion-show-kind nil
-        lsp-eldoc-enable-hover t
+        lsp-completion-show-detail nil ; Disable completion metadata since they can be very long
+        ;; lsp-completion-show-kind nil
+        ;; lsp-eldoc-enable-hover nil
         lsp-enable-dap-auto-configure nil
-        lsp-enable-file-watchers nil ; Could be a directory-local variable
-        lsp-enable-folding nil
         lsp-enable-on-type-formatting nil
-        lsp-enable-semantic-tokens t
-        lsp-enable-snippet t ; Autocomplete parentheses
-        ;; lsp-enabled-clients '(clangd clangd-remote jsts-ls flow-ls
-        ;;                               ts-ls eslint json-ls
-        ;;                               jsonls-remote cmakels
-        ;;                               cmakels-remote html-ls
-        ;;                               htmlls-remote angular-ls texlab
-        ;;                               texlab-remote jdtls bash-ls
-        ;;                               bashls-remote typescript-remote
-        ;;                               css-ls cssls-remote
-        ;;                               intelephense-remote
-        ;;                               perl-language-server
-        ;;                               perlls-remote php-ls xmlls
-        ;;                               xmlls-remote yamlls yamlls-remote)
-        lsp-enable-which-key-integration t
+        lsp-semantic-tokens-enable t
+        ;; lsp-enable-snippet t ; Autocomplete parentheses
         lsp-headerline-breadcrumb-enable nil ; Breadcrumb is not useful for all modes
         lsp-headerline-breadcrumb-enable-diagnostics nil
         lsp-html-format-wrap-line-length sb/fill-column
         lsp-html-format-end-with-newline t
         lsp-html-format-indent-inner-html t
-        lsp-html-format-max-preserve-new-lines nil
         lsp-imenu-sort-methods '(position)
-        lsp-keep-workspace-alive nil
+        ;; lsp-keep-workspace-alive nil
         lsp-log-io nil ; Increases memory usage because of JSON parsing if enabled
         ;; We already have `flycheck' error summary listed on the modeline, but the `lsp' server may
-        ;; report additional errors. However, the modeline is getting too congested.
-        lsp-modeline-diagnostics-enable nil
+        ;; report additional errors. However, the modeline can get too congested.
+        ;; lsp-modeline-diagnostics-enable nil
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
-        lsp-modeline-workspace-status-enable nil
+        ;; lsp-modeline-workspace-status-enable nil
         ;; Sudden changes in the height of the echo area causes the cursor to lose position,
         ;; manually request via `lsp-signature-activate'
-        lsp-signature-auto-activate nil
-        lsp-signature-render-documentation nil ; Disable function documentation
-        lsp-signature-function 'lsp-signature-posframe
+        ;; lsp-signature-auto-activate nil
+        ;; Disable showing function documentation with `eldoc'
+        ;; lsp-signature-render-documentation nil
+        ;; lsp-signature-function 'lsp-signature-posframe
         lsp-xml-logs-client nil
-        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.17.1-uber.jar"
+        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.18.0-uber.jar"
                                            sb/extras-directory)
         lsp-yaml-print-width sb/fill-column)
 
   (unless (bound-and-true-p sb/use-no-littering)
     (setq lsp-session-file (expand-file-name "lsp-session" sb/temp-directory)))
 
-  (defvar lsp-pyls-configuration-sources)
-  (defvar lsp-pyls-plugins-autopep8-enable)
-  (defvar lsp-pyls-plugins-mccabe-enabled)
-  (defvar lsp-pyls-plugins-pycodestyle-enabled)
-  (defvar lsp-pyls-plugins-pycodestyle-max-line-length)
-  (defvar lsp-pyls-plugins-pydocstyle-convention)
-  (defvar lsp-pyls-plugins-pydocstyle-enabled)
-  (defvar lsp-pyls-plugins-pydocstyle-ignore)
-  (defvar lsp-pyls-plugins-pyflakes-enabled)
-  (defvar lsp-pyls-plugins-pylint-args)
-  (defvar lsp-pyls-plugins-pylint-enabled)
-  (defvar lsp-pyls-plugins-yapf-enabled)
+  (defvar lsp-pylsp-configuration-sources)
+  (defvar lsp-pylsp-plugins-autopep8-enable)
+  (defvar lsp-pylsp-plugins-mccabe-enabled)
+  (defvar lsp-pylsp-plugins-pycodestyle-enabled)
+  (defvar lsp-pylsp-plugins-pycodestyle-max-line-length)
+  (defvar lsp-pylsp-plugins-pydocstyle-convention)
+  (defvar lsp-pylsp-plugins-pydocstyle-enabled)
+  (defvar lsp-pylsp-plugins-pydocstyle-ignore)
+  (defvar lsp-pylsp-plugins-pyflakes-enabled)
+  (defvar lsp-pylsp-plugins-pylint-args)
+  (defvar lsp-pylsp-plugins-pylint-enabled)
+  (defvar lsp-pylsp-plugins-yapf-enabled)
   (defvar lsp-pyright-langserver-command-args)
 
-  (when (eq sb/python-langserver 'pyls)
-    (setq lsp-pyls-configuration-sources []
-          lsp-pyls-plugins-autopep8-enable nil
+  (when (eq sb/python-langserver 'pylsp)
+    (setq lsp-pylsp-configuration-sources []
+          lsp-pylsp-plugins-autopep8-enable nil
           ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
-          ;; lsp-pyls-plugins-jedi-completion-fuzzy nil
-          lsp-pyls-plugins-mccabe-enabled nil
+          ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
+          lsp-pylsp-plugins-mccabe-enabled nil
           ;; Set this per-project
-          ;; lsp-pyls-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"]
-          lsp-pyls-plugins-pycodestyle-enabled nil
-          lsp-pyls-plugins-pycodestyle-max-line-length sb/fill-column
-          lsp-pyls-plugins-pydocstyle-convention "pep257"
-          lsp-pyls-plugins-pydocstyle-enabled nil
-          lsp-pyls-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-          lsp-pyls-plugins-pyflakes-enabled nil
-          lsp-pyls-plugins-pylint-args (vconcat
-                                        (list "-j 2"
-                                              (concat "--rcfile="
-                                                      (expand-file-name ".config/pylintrc"
-                                                                        sb/user-home))))
-          lsp-pyls-plugins-pylint-enabled t ; Pylint can be expensive
-          lsp-pyls-plugins-yapf-enabled t))
+          ;; lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"]
+          lsp-pylsp-plugins-pycodestyle-enabled nil
+          lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
+          lsp-pylsp-plugins-pydocstyle-convention "pep257"
+          lsp-pylsp-plugins-pydocstyle-enabled nil
+          lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+          lsp-pylsp-plugins-pyflakes-enabled nil
+          lsp-pylsp-plugins-pylint-args (vconcat
+                                         (list "-j 2"
+                                               (concat "--rcfile="
+                                                       (expand-file-name ".config/pylintrc"
+                                                                         sb/user-home))))
+          lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
+          lsp-pylsp-plugins-yapf-enabled t))
 
-  (when (eq sb/python-langserver 'pyright)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       (lambda ()
-                         (cons "pyright-langserver"
-                               lsp-pyright-langserver-command-args)))
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'pyright-remote
-      :multi-root t
-      :priority 3
-      :initialization-options (lambda ()
-                                (ht-merge (lsp-configuration-section "pyright")
-                                          (lsp-configuration-section "python")))
-      :initialized-fn (lambda (workspace)
-                        (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (ht-merge (lsp-configuration-section "pyright")
-                                     (lsp-configuration-section "python")))))
-      :download-server-fn (lambda (_client callback error-callback _update?)
-                            (lsp-package-ensure 'pyright callback error-callback))
-      :notification-handlers
-      (lsp-ht
-       ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
-       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-       ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
+  ;; We have `flycheck' error summary listed on the modeline, but `lsp' may report
+  ;; additional errors
+  ;; (lsp-modeline-diagnostics-mode -1)
 
-  (when (eq sb/python-langserver 'jedi)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection "jedi-language-server")
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'jedils-remote)))
+  ;; Tramp support
 
   (lsp-register-client
    (make-lsp-client
@@ -4079,7 +4031,7 @@ SAVE-FN with non-nil ARGS."
   :after c++-mode
   :demand t
   :commands modern-c++-font-lock-mode
-  :diminish modern-c++-font-lock-mode
+  ;; :diminish modern-c++-font-lock-mode
   :config (modern-c++-font-lock-mode 1))
 
 (use-package flycheck-clang-analyzer
@@ -4857,7 +4809,7 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :commands (reftex-get-bibfile-list bibtex-parse-keys reftex-mode
                                      reftex-default-bibliography)
-  :diminish
+  ;; :diminish
   :hook ((LaTeX-mode latex-mode) . reftex-mode)
   :bind
   (("C-c [" . reftex-citation)
@@ -5272,10 +5224,11 @@ Ignore if no file is found."
     (defvar company-backends)
 
     ;; Slightly larger value to have more precise matches and so that the popup does not block
-    (setq-local company-minimum-prefix-length 3)
+    (setq-local company-minimum-prefix-length 2)
     (set (make-local-variable 'company-backends)
          '(company-files
            ;; Give priority to dabbrev completions over ispell
+           ;; FIXME: Delete duplicates
            (:separate
             company-dabbrev
             company-ispell)
@@ -5345,11 +5298,11 @@ Ignore if no file is found."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
-    (setq company-backends '((company-capf :with company-yasnippet)
-                             (company-files :with company-yasnippet)
+    (setq company-backends '(company-capf
+                             company-files
                              (company-dabbrev-code :with company-yasnippet)
-                             company-dabbrev
-                             company-ispell)))
+                             (company-dabbrev
+                              company-ispell))))
 
   (add-hook 'c-mode-common-hook #'sb/company-c-mode))
 
