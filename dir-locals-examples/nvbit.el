@@ -1,7 +1,6 @@
 (
  (nil . (
          (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "build" "obj"))
-         (projectile-enable-caching . t)
          ))
 
  (c++-mode . (

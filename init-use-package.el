@@ -383,7 +383,6 @@ This location is used for temporary installations and files.")
                                          "LANG" "LC_CTYPE"))
   (exec-path-from-shell-initialize))
 
-;; LATER: Doing the following to avoid "-i" to `exec-path-from-shell' does not help.
 ;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
 ;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
 
@@ -1142,13 +1141,17 @@ SAVE-FN with non-nil ARGS."
   :hook (dired-mode . auto-revert-mode) ;; Auto refresh dired when files change
   :config
   (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
-        dired-dwim-target t ; Guess a default target directory
+        ;; Guess a default target directory. When there are two dired buffers, Emacs will select
+        ;; another buffer as the target (e.g., target for copying files).
+        dired-dwim-target t
         ;; Check `ls' for additional options
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-recursive-copies 'always ; Single prompt for all n directories
         ;; Single prompt for all n directories
-        dired-recursive-deletes 'always))
+        dired-recursive-deletes 'always
+        ;; Do not ask whether to kill buffers visiting deleted files
+        dired-clean-confirm-killing-deleted-buffers nil))
 
 (use-package dired-x
   :ensure nil
@@ -1210,11 +1213,6 @@ SAVE-FN with non-nil ARGS."
   (:map dired-mode-map
         ("/" . dired-narrow)))
 
-(use-package diredfl ; More detailed colors, but can be jarring with certain themes
-  :disabled t
-  :commands (diredfl-mode diredfl-global-mode)
-  :hook (dired-mode . diredfl-mode))
-
 ;; Byte compile asynchronously packages installed with `package.el'
 (use-package async
   :functions async-bytecomp-package-mode
@@ -1230,7 +1228,12 @@ SAVE-FN with non-nil ARGS."
   :commands all-the-icons-dired-mode
   :diminish
   :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  ;; Icons are not aligned after renaming a file.
+  ;; https://github.com/jtbm37/all-the-icons-dired/issues/34
+  (advice-add 'dired-add-entry :around #'all-the-icons-dired--refresh-advice)
+  (advice-add 'dired-remove-entry :around #'all-the-icons-dired--refresh-advice))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
@@ -2312,7 +2315,8 @@ SAVE-FN with non-nil ARGS."
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
-                                  projectile-mode)
+                                  projectile-mode
+                                  projectile-compile-project)
   :preface
   (defun sb/close-treemacs-with-projectile (orig-fun &rest args)
     (let ((res (apply orig-fun args)))
@@ -2547,7 +2551,7 @@ SAVE-FN with non-nil ARGS."
                              (ivy-rich-switch-buffer-major-mode (:width 20 :face error))))
 
   (ivy-rich-set-columns 'counsel-recentf
-                        '((file-name-nondirectory (:width 0.24 :face warning))
+                        '((file-name-nondirectory (:width 0.24 :face success))
                           (ivy-rich-candidate (:width 0.75)))))
 
 (use-package counsel-fd
@@ -3987,28 +3991,20 @@ SAVE-FN with non-nil ARGS."
   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
   :config (lsp-treemacs-sync-mode 1))
 
-(use-package origami
-  :disabled t
-  :commands (global-origami-mode origami-toggle-node
-                                 origami-recursively-toggle-node origami-toggle-all-nodes)
-  :hook ((java-mode python-mode c-mode c++-mode) . global-origami-mode)
-  :bind
-  (("C-c l t" . origami-recursively-toggle-node)
-   ("C-c l n" . origami-toggle-all-nodes)))
-
-(use-package lsp-origami
-  :after origami
-  :disabled t
-  :functions lsp-origami-mode
-  :commands lsp-origami-mode
-  :demand t
-  :config (lsp-origami-mode 1))
-
 (use-package lsp-ivy
-  :after (lsp-mode ivy-mode)
   :bind
   (("C-c l g" . lsp-ivy-global-workspace-symbol)
    ("C-c l w" . lsp-ivy-workspace-symbol)))
+
+;; Enable code folding, which is useful for browsing large files. This module is part of Emacs, and
+;; is better maintained than other alternatives like `origami'.
+(use-package hideshow
+  :ensure nil
+  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+  :hook
+  (prog-mode . (lambda ()
+                 (hs-minor-mode 1)
+                 (hs-hide-initial-comment-block))))
 
 (use-package consult-lsp
   :disabled
@@ -4102,7 +4098,7 @@ SAVE-FN with non-nil ARGS."
   :after cmake-mode
   :demand t
   :commands cmake-font-lock-activate
-  :config (cmake-font-lock-activate))
+  :hook (cmake-mode . cmake-font-lock-activate))
 
 (use-package python
   :ensure nil
@@ -4448,8 +4444,10 @@ SAVE-FN with non-nil ARGS."
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh
                                        diff-hl-dired-mode-unless-remote global-diff-hl-mode)
   :config
-  ;; Highlight without a border looks nicer
-  (setq diff-hl-draw-borders nil)
+  (setq diff-hl-draw-borders nil) ; Highlight without a border looks nicer
+  ;; Display margin since the fringe is unavailable in tty
+  (unless (display-graphic-p)
+    (diff-hl-margin-mode 1))
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
    (magit-pre-refresh  . diff-hl-magit-pre-refresh)
@@ -4460,11 +4458,14 @@ SAVE-FN with non-nil ARGS."
 (use-package git-commit
   :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
-  :config (setq git-commit-summary-max-length 50))
+  :config
+  (setq git-commit-summary-max-length 50
+        git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
   :ensure nil
+  :after hydra
   :commands (smerge-next smerge-prev smerge-auto-leave
                          smerge-keep-base smerge-keep-upper
                          smerge-keep-lower smerge-keep-all
@@ -4581,7 +4582,6 @@ SAVE-FN with non-nil ARGS."
   :config (setq emmet-move-cursor-between-quote t))
 
 (use-package rainbow-mode
-  ;; :diminish
   :commands rainbow-mode
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
@@ -5053,7 +5053,8 @@ Ignore if no file is found."
 
 (use-package clang-format
   :after (mlir-mode)
-  :commands (clang-format clang-format-buffer clang-format-region))
+  :commands (clang-format clang-format-buffer clang-format-region)
+  :config (setq clang-format-style "file"))
 
 (use-package clang-format+
   :ensure clang-format
@@ -5095,11 +5096,6 @@ Ignore if no file is found."
   :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
-(use-package adoc-mode
-  :disabled t
-  :commands adoc-mode
-  :mode "\\.adoc\\'")
-
 (use-package editorconfig
   :if (executable-find "editorconfig")
   :commands editorconfig-mode)
@@ -5116,14 +5112,6 @@ Ignore if no file is found."
 (use-package dotenv-mode
   :mode "\\.env\\'"
   :mode "\\.env\\.example\\'")
-
-(use-package toml-mode
-  :disabled t
-  :commands toml-mode)
-
-(use-package nix-mode
-  :disabled t
-  :commands nix-mode)
 
 (use-package rust-mode
   :disabled t
@@ -5258,7 +5246,8 @@ Ignore if no file is found."
     (defvar company-backends)
 
     ;; Slightly larger value to have more precise matches and so that the popup does not block
-    (setq-local company-minimum-prefix-length 2)
+    (setq-local company-minimum-prefix-length 2
+                company-transformers '(delete-dups))
     (set (make-local-variable 'company-backends)
          '(company-files
            ;; Give priority to dabbrev completions over ispell
@@ -5938,23 +5927,23 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ;; (add-to-list 'safe-local-variable-values '(auto-fill-function . nil))
 ;; (add-to-list 'safe-local-eval-forms '(visual-line-mode +1))
 
-(put 'bibtex-completion-bibliography 'safe-local-variable #'listp)
-(put 'company-bibtex-bibliography 'safe-local-variable #'listp)
-(put 'company-clang-arguments 'safe-local-variable #'listp)
-(put 'counsel-find-file-ignore-regexp 'safe-local-variable #'stringp)
-(put 'flycheck-checker 'safe-local-variable #'listp)
-(put 'flycheck-clang-include-path 'safe-local-variable #'listp)
-(put 'flycheck-gcc-include-path 'safe-local-variable #'listp)
-(put 'flycheck-python-pylint-executable 'safe-local-variable #'stringp)
-(put 'lsp-clients-clangd-args 'safe-local-variable #'listp)
-(put 'lsp-latex-root-directory 'safe-local-variable #'stringp)
-(put 'lsp-pyright-extra-paths 'safe-local-variable #'listp)
-(put 'projectile-enable-caching 'safe-local-variable #'stringp)
+(put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
+(put 'company-bibtex-bibliography             'safe-local-variable #'listp)
+(put 'company-clang-arguments                 'safe-local-variable #'listp)
+(put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
+(put 'flycheck-checker                        'safe-local-variable #'listp)
+(put 'flycheck-clang-include-path             'safe-local-variable #'listp)
+(put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
+(put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
+(put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
+(put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
+(put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
+(put 'projectile-enable-caching               'safe-local-variable #'stringp)
 (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
-(put 'projectile-project-root 'safe-local-variable #'stringp)
-(put 'pyvenv-activate 'safe-local-variable #'stringp)
-(put 'reftex-default-bibliography 'safe-local-variable #'listp)
-(put 'tags-table-list 'safe-local-variable #'listp)
+(put 'projectile-project-root                 'safe-local-variable #'stringp)
+(put 'pyvenv-activate                         'safe-local-variable #'stringp)
+(put 'reftex-default-bibliography             'safe-local-variable #'listp)
+(put 'tags-table-list                         'safe-local-variable #'listp)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook

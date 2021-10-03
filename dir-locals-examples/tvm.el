@@ -1,8 +1,7 @@
 (
  (nil . (
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.metadata\\|.clangd")
-         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "build" "built"))
-         (projectile-enable-caching . t)
+         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "/build" "/built"))
          ))
 
  (python-mode . (

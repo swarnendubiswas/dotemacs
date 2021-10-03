@@ -1479,6 +1479,7 @@
 
 (define-abbrev-table 'text-mode-abbrev-table
   '(
+    ("anwer" "ANSWER" nil :count 0)
     ("apir" "pair" nil :count 0)
     ("atend" "Attend" nil :count 0)
     ("atomocity" "atomicity" nil :count 0)
