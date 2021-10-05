@@ -1921,10 +1921,10 @@ SAVE-FN with non-nil ARGS."
         counsel-yank-pop-preselect-last t
         counsel-yank-pop-separator "\n------------------------------------------\n"))
 
+;; Additional keybindings for `ivy'
 (use-package ivy-hydra
   :after (ivy hydra)
   :demand t
-  :disabled t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (use-package ivy-posframe
@@ -2252,7 +2252,16 @@ SAVE-FN with non-nil ARGS."
   ;;                                    show-smartparens-mode show-smartparens-global-mode)
   :commands sp-local-pair
   :hook
-  (((latex-mode LaTeX-mode) . (lambda ()
+  (((html-mode css-mode) . (lambda ()
+                             (require 'smartparens-html)))
+   (python-mode . (lambda ()
+                    (require 'smartparens-python)))
+   (org-mode . (lambda ()
+                 (require 'smartparens-org)))
+   ((markdown-mode gfm-mode) . (lambda ()
+                                 (require 'smartparens-markdown)))
+
+   ((latex-mode LaTeX-mode) . (lambda ()
                                 (require 'smartparens-latex)))
    (after-init . (lambda ()
                    (smartparens-global-mode 1)
@@ -2261,7 +2270,7 @@ SAVE-FN with non-nil ARGS."
   (setq sp-show-pair-from-inside t
         sp-autoskip-closing-pair 'always)
 
-  ;; (smartparens-strict-mode -1)
+  (smartparens-strict-mode -1)
 
   ;; Stop pairing single quotes in elisp
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
