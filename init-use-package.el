@@ -349,7 +349,9 @@ This location is used for temporary installations and files.")
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
 
+;; We can do `package-list-packages', then press `U' and `x'.
 (use-package paradox
+  :disabled t
   :commands (paradox-enable)
   :bind
   (("C-c d l" . paradox-list-packages)
@@ -1117,6 +1119,7 @@ SAVE-FN with non-nil ARGS."
 (use-package dired
   :ensure nil
   :commands (dired-next-line dired-jump)
+  :defines dired-clean-confirm-killing-deleted-buffers
   :preface
   (defun sb/dired-go-home ()
     (interactive)
@@ -1225,7 +1228,7 @@ SAVE-FN with non-nil ARGS."
   :hook (dired-mode . dired-async-mode))
 
 (use-package all-the-icons-dired
-  :commands all-the-icons-dired-mode
+  :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
   :if (display-graphic-p)
   :hook (dired-mode . all-the-icons-dired-mode)
