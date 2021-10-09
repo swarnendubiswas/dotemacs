@@ -76,15 +76,6 @@ This depends on the orientation of the display."
   :type  'number
   :group 'sb/emacs)
 
-(defcustom sb/selection
-  'ivy
-  "Choose the framework to use for narrowing and selection."
-  :type  '(radio
-           (const :tag "ivy"       ivy)
-           (const :tag "selectrum" selectrum)
-           (const :tag "none"      none))
-  :group 'dotemacs)
-
 (defcustom sb/delete-trailing-whitespace-p
   nil
   "Delete trailing whitespace.
@@ -94,25 +85,9 @@ whitespaces."
   :type  'boolean
   :group 'sb/emacs)
 
-;; We use `lsp-mode' and `dumb-jump' for jumping to tags and browsing source code
-(defcustom sb/tags-scheme
-  'ctags
-  "Choose whether to use gtags or ctags."
-  :type  '(radio
-           (const :tag "ctags" ctags)
-           (const :tag "gtags" gtags)
-           (const :tag "none"  none))
-  :group 'sb/emacs)
-
 (defcustom sb/ctags-path
   "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
-  :type  'string
-  :group 'sb/emacs)
-
-(defcustom sb/gtags-path
-  "/usr/local/bin/gtags"
-  "Absolute path to GNU Global executable."
   :type  'string
   :group 'sb/emacs)
 
@@ -1775,7 +1750,6 @@ SAVE-FN with non-nil ARGS."
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
-  :if (eq sb/selection 'ivy)
   :after (yasnippet ivy)
   :bind ("C-M-y" . ivy-yasnippet))
 
@@ -1790,7 +1764,6 @@ SAVE-FN with non-nil ARGS."
     (setq amx-save-file (expand-file-name "amx-items" sb/temp-directory))))
 
 (use-package ivy
-  :if (eq sb/selection 'ivy)
   :functions ivy-format-function-line
   :commands (ivy-read ivy-mode)
   :preface
@@ -1997,9 +1970,8 @@ SAVE-FN with non-nil ARGS."
   :defines orderless-component-separator
   :functions sb/just-one-face
   :config
-  (when (eq sb/selection 'ivy)
-    (defvar ivy-re-builders-alist)
-    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+  (defvar ivy-re-builders-alist)
+  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
 
   (setq completion-styles '(orderless initials basic partial-completion emacs22)
         orderless-component-separator 'orderless-escapable-split-on-space
@@ -2116,7 +2088,6 @@ SAVE-FN with non-nil ARGS."
 (use-package flyspell-correct-ivy
   :ensure flyspell-correct
   :ensure t
-  :if (eq sb/selection 'ivy)
   :disabled t
   :after flyspell-correct)
 
@@ -2507,12 +2478,11 @@ SAVE-FN with non-nil ARGS."
   :ensure t
   :ensure ivy-rich
   :commands all-the-icons-ivy-rich-mode
-  :if (and (eq sb/selection 'ivy) (display-graphic-p))
+  :if (display-graphic-p)
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
   :config (setq all-the-icons-ivy-rich-icon-size 1.0))
 
 (use-package ivy-rich
-  :if (eq sb/selection 'ivy)
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
   :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
   :preface
@@ -2567,7 +2537,7 @@ SAVE-FN with non-nil ARGS."
                           (ivy-rich-candidate (:width 0.75)))))
 
 (use-package counsel-fd
-  :if (and (eq sb/selection 'ivy) (executable-find "fd"))
+  :if (executable-find "fd")
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
    ;; Jump to a file below the current directory
@@ -2883,27 +2853,15 @@ SAVE-FN with non-nil ARGS."
 
 (declare-function sb/sshlist "private")
 
-(when (eq sb/selection 'ivy)
-  (progn
-    (declare-function sb/ivy-tramp "init-use-package")
+(progn
+  (declare-function sb/ivy-tramp "init-use-package")
 
-    (defun sb/ivy-tramp ()
-      "Invoke remote hosts with ivy and tramp."
-      (interactive)
-      (counsel-find-file (ivy-read "Remote Tramp targets: " (sb/sshlist))))
+  (defun sb/ivy-tramp ()
+    "Invoke remote hosts with ivy and tramp."
+    (interactive)
+    (counsel-find-file (ivy-read "Remote Tramp targets: " (sb/sshlist))))
 
-    (bind-key "C-c d t" #'sb/ivy-tramp)))
-
-(when (eq sb/selection 'selectrum)
-  (progn
-    (declare-function sb/selectrum-tramp "init-use-package")
-
-    (defun sb/selectrum-tramp ()
-      "Invoke remote hosts with selectrum and tramp."
-      (interactive)
-      (find-file (completing-read "Remote Tramp targets: " (sb/sshlist))))
-
-    (bind-key "C-c d t" #'sb/selectrum-tramp)))
+  (bind-key "C-c d t" #'sb/ivy-tramp))
 
 ;; TODO: SSH into Gcloud
 ;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
@@ -2939,35 +2897,6 @@ SAVE-FN with non-nil ARGS."
       ;; Do not ask before rereading the `TAGS' files if they have changed
       tags-revert-without-query t)
 
-;; Gtags is less maintained than `universal-ctags'
-(use-package counsel-gtags
-  :disabled t
-  :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'gtags))
-  :diminish
-  ;; :ensure-system-package global
-  ;; :init
-  ;; (add-hook 'c-mode-common-hook
-  ;;           (lambda ()
-  ;;             (when (derived-mode-p 'c-mode 'c++-mode)
-  ;;               (counsel-gtags-mode 1))))
-  :hook ((prog-mode protobuf-mode latex-mode LaTeX-mode) . counsel-gtags-mode)
-  :config (setq counsel-gtags-auto-update t)
-  :bind
-  (:map counsel-gtags-mode-map
-        ("M-'"     . counsel-gtags-dwim)
-        ("M-,"     . counsel-gtags-go-backward)
-        ("M-?"     . counsel-gtags-find-reference)
-        ("C-c g s" . counsel-gtags-find-symbol)
-        ("C-c g d" . counsel-gtags-find-definition)
-        ("C-c g c" . counsel-gtags-create-tags)
-        ("C-c g u" . counsel-gtags-update-tags)))
-
-(use-package global-tags ; Make xref and gtags work together
-  :disabled t
-  :after counsel-gtags
-  :demand t
-  :config (add-to-list 'xref-backend-functions 'global-tags-xref-backend))
-
 (use-package xref
   :commands xref-etags-mode
   :bind
@@ -2982,7 +2911,6 @@ SAVE-FN with non-nil ARGS."
 
 (use-package ivy-xref
   :after (ivy xref)
-  :if (eq sb/selection 'ivy)
   :config
   (setq xref-show-definitions-function #'ivy-xref-show-defs
         xref-show-xrefs-function #'ivy-xref-show-xrefs))
@@ -2991,7 +2919,7 @@ SAVE-FN with non-nil ARGS."
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
-  :if (and (eq system-type 'gnu/linux) (eq sb/tags-scheme 'ctags))
+  :if (eq system-type 'gnu/linux)
   :bind
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -3272,7 +3200,6 @@ SAVE-FN with non-nil ARGS."
 
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
 (use-package ivy-avy
-  :if (eq sb/selection 'ivy)
   :after (ivy avy)
   :bind
   (:map ivy-minibuffer-map
@@ -3370,11 +3297,6 @@ SAVE-FN with non-nil ARGS."
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
   :commands (define-word define-word-at-point))
-
-(use-package emojify
-  :disabled t
-  :commands (global-emojify-mode emojify-mode)
-  :hook (markdown-mode . emojify-mode))
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
@@ -4017,11 +3939,6 @@ SAVE-FN with non-nil ARGS."
   (prog-mode . (lambda ()
                  (hs-minor-mode 1)
                  (hs-hide-initial-comment-block))))
-
-(use-package consult-lsp
-  :disabled
-  :if (eq sb/selection 'selectrum)
-  :commands (consult-lsp-diagnostics consult-lsp-symbols))
 
 (use-package dap-mode
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
@@ -4837,7 +4754,6 @@ SAVE-FN with non-nil ARGS."
   :demand t)
 
 (use-package ivy-bibtex
-  :if (eq sb/selection 'ivy)
   :bind ("C-c x b" . ivy-bibtex)
   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
@@ -5152,79 +5068,6 @@ Ignore if no file is found."
   :commands info-colors-fontify-node
   :hook (Info-selection . info-colors-fontify-node))
 
-(use-package selectrum
-  :disabled t
-  :defines selectrum-fix-vertical-window-height
-  :if (eq sb/selection 'selectrum)
-  :commands selectrum-mode
-  :hook (after-init . selectrum-mode)
-  :config
-  (setq selectrum-fix-vertical-window-height t
-        file-name-shadow-properties '(invisible t)
-        completion-styles '(orderless)
-        orderless-skip-highlighting (lambda () selectrum-is-active)
-        selectrum-highlight-candidates-function #'orderless-highlight-matches
-        magit-completing-read-function #'selectrum-completing-read)
-  :bind ("<f3>" . switch-to-buffer))
-
-;; Enable richer annotations in the minibuffer
-(use-package marginalia
-  :disabled t
-  :commands marginalia
-  :hook (selectrum-mode . marginalia-mode))
-
-(use-package consult
-  :disabled t
-  :commands
-  (consult-imenu consult-outline consult-apropos consult-buffer  consult-bookmark
-                 consult-outline consult-goto-line consult-imenu
-                 consult-project-imenu consult-error consult-find
-                 consult-locate consult-grep consult-git-grep
-                 consult-ripgrep consult-line consult-multi-occur
-                 consult-isearch consult-yank-pop consult-mode-command
-                 consult-bookmark consult-apropos consult-customize)
-  :config
-  (setq consult-project-root-function #'projectile-project-root
-        ;; Use Consult to select xref locations with preview
-        xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-file consult--source-project-file consult--source-bookmark
-   :preview-key (kbd "M-."))
-  :bind
-  (("<f1>"       . amx)
-   ("<f2>"       . find-file)
-   ("<f4>"       . consult-line)
-   ("C-c s g"    . consult-git-grep)
-   ("<f9>"       . consult-recent-file)
-   ("C-c s r"    . consult-rg)
-   ("M-y"        . consult-yank-pop)))
-
-(use-package consult-flycheck
-  :if (eq sb/selection 'selectrum)
-  :disabled t
-  :commands consult-flycheck)
-
-(use-package selectrum-prescient
-  :if (eq sb/selection 'selectrum)
-  :disabled t
-  :commands selectrum-prescient-mode
-  :hook (selectrum-mode . selectrum-prescient-mode))
-
-(use-package corfu
-  :disabled t
-  :hook (after-init . corfu-global-mode))
-
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
 ;; context (major mode, inside strings or comments). That is why it is better to put it at the end.
@@ -5250,7 +5093,6 @@ Ignore if no file is found."
 ;; (add-to-list 'company-backends '(company-capf company-dabbrev))
 ;; (add-to-list 'company-backends '(company-capf :with company-dabbrev))
 
-
 (progn
   (defun sb/company-text-mode ()
     "Add backends for text completion in company mode."
@@ -5262,8 +5104,8 @@ Ignore if no file is found."
                 company-transformers '(delete-dups))
     (set (make-local-variable 'company-backends)
          '(company-files
-           ;; Give priority to dabbrev completions over ispell
-           ;; FIXME: Delete duplicates
+           ;; Give priority to dabbrev completions over ispell. Delete duplicates with a special
+           ;; company transformer
            (:separate
             company-dabbrev
             company-ispell)
@@ -5598,12 +5440,6 @@ Increase line spacing by two line height."
   (interactive "DDirectory: ")
   (shell-command
    (format "%s -f TAGS -eR %s" sb/ctags-path (directory-file-name dir-name))))
-
-(defun sb/create-gtags (dir-name)
-  "Create tags file with gtags in DIR-NAME."
-  (interactive "DDirectory: ")
-  (shell-command
-   (format "%s -cv --gtagslabel=new-ctags %s" sb/gtags-path (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)

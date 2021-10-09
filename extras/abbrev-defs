@@ -52,6 +52,7 @@
     ("icludes" "includes" nil :count 0)
     ("initialise" "Initialize" nil :count 0)
     ("requiest" "request" nil :count 0)
+    ("sepcial" "special" nil :count 0)
    ))
 
 (define-abbrev-table 'gfm-mode-abbrev-table
