@@ -837,7 +837,7 @@ SAVE-FN with non-nil ARGS."
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
-  :if (eq sb/theme 'modus-vivendi)
+  :if (or (eq sb/theme 'modus-vivendi) (not (display-graphic-p)))
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -2309,7 +2309,7 @@ SAVE-FN with non-nil ARGS."
   (setq projectile-enable-caching nil ; Caching will not watch for file system changes
         projectile-file-exists-remote-cache-expire nil
         projectile-indexing-method 'alien
-        ;; projectile-mode-line-prefix ""
+        projectile-mode-line-prefix "PRJ"
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
         ;; No sorting should be faster, note that files are not sorted if
@@ -2331,7 +2331,7 @@ SAVE-FN with non-nil ARGS."
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
-      (format " %s [%s] "
+      (format " [%s: %s]"
               projectile-mode-line-prefix
               (or project-name "-"))))
 
@@ -3194,16 +3194,19 @@ SAVE-FN with non-nil ARGS."
 (use-package avy
   :commands avy-setup-default
   :bind
-  (("M-b" . avy-goto-word-1)
-   ("C-'" . avy-goto-char-timer)
-   ("C-/" . avy-goto-line)))
+  (("M-b"   . avy-goto-word-1)
+   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI
+   ("M-g c"   . avy-goto-char-timer)
+   ("C-/"   . avy-goto-line) ; Does not work with TUI
+   ("M-g l" . avy-goto-line)))
 
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
 (use-package ivy-avy
   :after (ivy avy)
   :bind
   (:map ivy-minibuffer-map
-        ("C-'" . ivy-avy)))
+        ("C-'" . ivy-avy) ; Does not work with TUI
+        ("M-g l" . ivy-avy)))
 
 (use-package bookmark
   :ensure nil
@@ -3955,8 +3958,9 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
-  :mode ("\\.h\\'" . c++-mode)
-  :mode ("\\.c\\'" . c++-mode)
+  :mode
+  (("\\.h\\'" . c++-mode)
+   ("\\.c\\'" . c++-mode))
   :hook
   (c++-mode . (lambda ()
                 (add-hook 'before-save-hook #'lsp-format-buffer
@@ -4639,7 +4643,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: This package is not working as intended
 (use-package lsp-ltex
-  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary)
+  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-ltex)
@@ -5038,8 +5042,7 @@ Ignore if no file is found."
   :bind ("C-c /" . fasd-find-file))
 
 (use-package dotenv-mode
-  :mode "\\.env\\'"
-  :mode "\\.env\\.example\\'")
+  :mode "\\.env\\'")
 
 (use-package rust-mode
   :disabled t
@@ -5567,7 +5570,9 @@ or the major mode is not in `sb/skippable-modes'."
  ("M-u"       . upcase-dwim)
  ("M-l"       . downcase-dwim)
  ("<f7>"      . previous-error)
- ("<f8>"      . next-error))
+ ("<f8>"      . next-error)
+ ;; The default keybinding `C-S-backspace' does not work with TUI
+ ("M-k"       . kill-whole-line))
 
 ;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
