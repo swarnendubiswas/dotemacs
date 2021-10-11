@@ -11,8 +11,6 @@
 (require 'cl-lib)
 (require 'subr-x)
 
-(declare-function ht-merge "ht")
-
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
@@ -30,8 +28,6 @@
   :type  '(radio
            (const :tag "eclipse"         eclipse)
            (const :tag "leuven"          leuven)
-           (const :tag "solarized-light" solarized-light)
-           (const :tag "solarized-dark"  solarized-dark)
            (const :tag "spacemacs-light" spacemacs-light)
            (const :tag "tangotango"      tangotango)
            (const :tag "zenburn"         zenburn)
@@ -761,20 +757,6 @@ SAVE-FN with non-nil ARGS."
   :if (eq sb/theme 'zenburn)
   :disabled t
   :init (load-theme 'zenburn t))
-
-(use-package solarized-light-theme
-  :ensure solarized-theme
-  :disabled t
-  :if (eq sb/theme 'solarized-light)
-  :init
-  (setq solarized-distinct-fringe-background t)
-  (load-theme 'solarized-light t))
-
-(use-package solarized-dark-theme
-  :ensure solarized-theme
-  :disabled t
-  :if (eq sb/theme 'solarized-dark)
-  :init (load-theme 'solarized-dark t))
 
 (use-package doom-themes
   :disabled t
@@ -3584,6 +3566,8 @@ SAVE-FN with non-nil ARGS."
                                      (flycheck-add-next-checker 'emacs-lisp
                                                                 'emacs-lisp-checkdoc 'append))
                                    (outline-minor-mode))))
+
+(declare-function ht-merge "ht")
 
 ;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active
 (use-package lsp-mode
