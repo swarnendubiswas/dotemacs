@@ -1339,7 +1339,8 @@ SAVE-FN with non-nil ARGS."
     (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0))
 
-  (treemacs-resize-icons 16)
+  (when (display-graphic-p)
+    (treemacs-resize-icons 16))
 
   ;; Ignore files
 
