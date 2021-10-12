@@ -192,7 +192,8 @@ This location is used for temporary installations and files.")
 ;; of loading the package. https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer t
-        ;; I need to manually set this to true whenever I modify package installations
+        ;; I need to manually set this to true whenever I modify package installations, so it is
+        ;; better to set this true always
         use-package-always-ensure t
         use-package-compute-statistics nil
         ;; Avoid printing errors and warnings since the configuration is known to work
@@ -3733,21 +3734,6 @@ SAVE-FN with non-nil ARGS."
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
-                     '("bash-language-server" "start"))
-    :major-modes '(sh-mode)
-    :remote? t
-    :server-id 'bashls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "texlab")
-    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-    :remote? t
-    :server-id 'texlab-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
                      '("vscode-json-languageserver" "--stdio"))
     :major-modes '(json-mode jsonc-mode)
     :remote? t
@@ -4242,7 +4228,15 @@ SAVE-FN with non-nil ARGS."
   (setq sh-basic-offset 2
         sh-indent-after-continuation 'always
         ;; Indent comments as a regular line
-        sh-indent-comment t))
+        sh-indent-comment t)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("bash-language-server" "start"))
+    :major-modes '(sh-mode)
+    :remote? t
+    :server-id 'bashls-remote)))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -4658,7 +4652,14 @@ SAVE-FN with non-nil ARGS."
         lsp-latex-diagnostics-delay 2000)
 
   (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc"))
+  (add-to-list 'lsp-latex-build-args "-pvc")
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "texlab")
+    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+    :remote? t
+    :server-id 'texlab-remote)))
 
 ;; (use-package tex-site
 ;;   :ensure nil
