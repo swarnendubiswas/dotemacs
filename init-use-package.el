@@ -2896,7 +2896,7 @@ SAVE-FN with non-nil ARGS."
   :after (ivy xref)
   :config
   (setq xref-show-definitions-function #'ivy-xref-show-defs
-        xref-show-xrefs-function #'ivy-xref-show-xrefs))
+        xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
   ;; :ensure-system-package (ctags . "snap install universal-ctags")
@@ -3000,19 +3000,19 @@ SAVE-FN with non-nil ARGS."
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
 
-  (push '("*Help*" :noselect t) popwin:special-display-config)
-  (push '(compilation-mode :noselect t) popwin:special-display-config)
-  (push '("*Compile-Log*" :noselect t) popwin:special-display-config)
-  (push '("*manage-minor-mode*" :noselect t) popwin:special-display-config)
-  (push '("*Paradox Report*" :noselect t) popwin:special-display-config)
-  (push '("*Selection Ring:") popwin:special-display-config)
-  (push '("*Flycheck errors*" :noselect nil) popwin:special-display-config)
+  (push '("*Help*"              :noselect t)   popwin:special-display-config)
+  (push '(compilation-mode      :noselect t)   popwin:special-display-config)
+  (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
+  (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
+  (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
+  (push '("*Selection Ring:")                  popwin:special-display-config)
+  (push '("*Flycheck errors*"   :noselect nil) popwin:special-display-config)
   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  (push '("*ripgrep-search*" :noselect nil) popwin:special-display-config)
-  (push '("^\*magit:.+\*$" :noselect nil) popwin:special-display-config)
-  (push '("*xref*" :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode :noselect t) popwin:special-display-config)
-  (push "*Shell Command Output*" popwin:special-display-config)
+  (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
+  (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
+  (push '("*xref*"              :noselect nil) popwin:special-display-config)
+  (push '(helpful-mode          :noselect t)   popwin:special-display-config)
+  (push "*Shell Command Output*"               popwin:special-display-config)
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
