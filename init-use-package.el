@@ -81,13 +81,13 @@ whitespaces."
   :type  'boolean
   :group 'sb/emacs)
 
+;; Use the snap installation of universal-ctags
 (defcustom sb/ctags-path
-  "/usr/local/bin/ctags"
+  "/snap/bin/ctags"
   "Absolute path to Universal Ctags executable."
   :type  'string
   :group 'sb/emacs)
 
-;; Keep enabled until the configuration is stable
 (defcustom sb/debug-init-file
   nil
   "Enable features to debug errors and performance bottlenecks."
@@ -120,7 +120,7 @@ This location is used for temporary installations and files.")
   'pyright
   "Choose the Python Language Server implementation."
   :type  '(radio
-           (const :tag "pylsp" pylsp)
+           (const :tag "pylsp"   pylsp)
            (const :tag "pyright" pyright)
            (const :tag "jedi"    jedi)
            (const :tag "none"    none))
@@ -192,7 +192,8 @@ This location is used for temporary installations and files.")
 ;; of loading the package. https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer t
-        use-package-always-ensure nil
+        ;; I need to manually set this to true whenever I modify package installations
+        use-package-always-ensure t
         use-package-compute-statistics nil
         ;; Avoid printing errors and warnings since the configuration is known to work
         use-package-expand-minimally t
@@ -320,7 +321,8 @@ This location is used for temporary installations and files.")
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
 
-;; We can do `package-list-packages', then press `U' and `x'.
+;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox is
+;; `paradox-upgrade-packages' in a single command.
 (use-package paradox
   :disabled t
   :commands (paradox-enable)
@@ -3711,6 +3713,14 @@ SAVE-FN with non-nil ARGS."
   ;; additional errors
   ;; (lsp-modeline-diagnostics-mode -1)
 
+  (add-to-list 'lsp-file-watch-ignored-directories "/\\.git\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "/\\.cache\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "/\\.clangd\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "/\\.log\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "/node_modules\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "/build\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "/__pycache__\\'")
+
   ;; Tramp support
 
   (lsp-register-client
@@ -3727,20 +3737,6 @@ SAVE-FN with non-nil ARGS."
     :major-modes '(sh-mode)
     :remote? t
     :server-id 'bashls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "intelephense")
-    :major-modes '(php-mode)
-    :remote? t
-    :server-id 'intelephense-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "cmake-language-server")
-    :major-modes '(cmake-mode)
-    :remote? t
-    :server-id 'cmakels-remote))
 
   (lsp-register-client
    (make-lsp-client
@@ -4010,11 +4006,16 @@ SAVE-FN with non-nil ARGS."
   :hook
   (cmake-mode . (lambda ()
                   (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-                  (lsp-deferred))))
+                  (lsp-deferred)))
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "cmake-language-server")
+    :major-modes '(cmake-mode)
+    :remote? t
+    :server-id 'cmakels-remote)))
 
 (use-package cmake-font-lock
-  :after cmake-mode
-  :demand t
   :commands cmake-font-lock-activate
   :hook (cmake-mode . cmake-font-lock-activate))
 
@@ -4147,11 +4148,6 @@ SAVE-FN with non-nil ARGS."
     :remote? t
     :server-id 'jedils-remote)))
 
-;; Initiate the lsp server after all the language server code has been processed
-(add-hook 'python-mode-hook
-          (lambda()
-            (lsp-deferred)))
-
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
@@ -4209,7 +4205,7 @@ SAVE-FN with non-nil ARGS."
                  (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
-        lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java" ; Requires Java 11
+        lsp-java-java-path "/usr/lib/jvm/java-13-openjdk-amd64/bin/java" ; Requires Java 11
         lsp-java-save-actions-organize-imports t
         lsp-java-format-settings-profile "Swarnendu"
         lsp-java-format-settings-url (expand-file-name
@@ -4504,7 +4500,14 @@ SAVE-FN with non-nil ARGS."
   :hook ((css-mode html-mode sass-mode) . rainbow-mode))
 
 (use-package php-mode
-  :hook (php-mode . lsp-deferred))
+  :hook (php-mode . lsp-deferred)
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "intelephense")
+    :major-modes '(php-mode)
+    :remote? t
+    :server-id 'intelephense-remote)))
 
 (use-package nxml-mode
   :ensure nil
