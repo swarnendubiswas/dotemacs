@@ -65,8 +65,10 @@ sudo cpanm Perl::LanguageServer
 ```Bash
 cd $HOME/tmp; cd;
 npm init --yes;
-npm install --save-dev npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli  markdownlint-cli2 yaml-language-server vscode-json-languageserver intelephense prettier write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
+npm install --save-dev npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli  markdownlint-cli2 yaml-language-server vscode-json-languageserver intelephense write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
 ```
+
+`npm install --save-dev prettier @prettier/plugin-lua @prettier/plugin-php prettier-plugin-solidity prettier-plugin-svelte prettier-plugin-toml`
 
 `npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev`
 

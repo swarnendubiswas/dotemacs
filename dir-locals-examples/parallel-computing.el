@@ -4,10 +4,15 @@
          (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "build"))
          ))
 
+ (java-mode . (
+               (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+               ))
+
  (c++-mode . (
               (flycheck-gcc-language-standard   . "c++11")
               (flycheck-clang-language-standard . "c++11")
               (flycheck-gcc-openmp . t)
+              (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
 
               ;; (eval add-hook 'hack-local-variables-hook (lambda () (when (string= major-mode 'c++-mode) (lsp))))
 
@@ -57,6 +62,7 @@
                  (lsp-pyright-venv-path . ["./src"])
                  (python-shell-exec-path . "/usr/bin/python3")
                  (python-shell-interpreter . "/usr/bin/python3")
+                 (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
                  ))
  )
 

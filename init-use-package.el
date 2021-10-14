@@ -3572,7 +3572,8 @@ SAVE-FN with non-nil ARGS."
 
 (declare-function ht-merge "ht")
 
-;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active
+;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active, plus we may not
+;; always want to format files (e.g., commented YAML files in out-of-project locations)
 (use-package lsp-mode
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -3930,8 +3931,7 @@ SAVE-FN with non-nil ARGS."
    ("\\.c\\'" . c++-mode))
   :hook
   (c++-mode . (lambda ()
-                (add-hook 'before-save-hook #'lsp-format-buffer
-                          nil t)
+                (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                 (lsp-deferred)))
   :config
   (setq c-set-style "cc-mode"
@@ -4186,8 +4186,7 @@ SAVE-FN with non-nil ARGS."
   (java-mode . (lambda ()
                  (setq-default c-basic-offset 4
                                c-set-style "java")
-                 (add-hook 'before-save-hook #'lsp-format-buffer
-                           nil t)
+                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                  (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
@@ -5532,9 +5531,13 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
-;; Generic keybindings, package-specific are usually in their own modules. The `C-c' binding is
-;; reserved for the user. Use `C-h b' to see available bindings in a buffer. Use `M-x
-;; describe-personal-keybindings' to see modifications.
+;; Generic keybindings, package-specific are usually in their own modules. The `C-x' keymap is for
+;; global bindings that are expected to work regardless of the active modes. The `C-c' binding
+;; followed by a control character or a digit are reserved for major modes. The sequence of `C-c'
+;; followed by any other ASCII punctuation or symbol character are allocated for minor modes.
+;; Sequences consisting of `C-c' and a letter (either upper or lower case) are reserved for users.
+;; Check the "Key Binding Conventions" in the Emacs manual (`C-h i'). Use `C-h b' to see available
+;; bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
 
 ;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd` macro is not required with
 ;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
