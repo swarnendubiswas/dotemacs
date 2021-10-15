@@ -3,7 +3,6 @@
          (fill-column . 79)
          (indent-tabs-mode . nil)
          (projectile-enable-caching . t)
-         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "/build$" "/\\.cache$"))
          ))
 
  (c++-mode . (
@@ -24,7 +23,7 @@
               ;;                     (access-label . -2)
               ;;                     (innamespace . 0)))
 
-              (flycheck-gcc-language-standard . "c++11")
+              (flycheck-gcc-language-standard   . "c++11")
               (flycheck-clang-language-standard . "c++11")
 
               (eval . (let (

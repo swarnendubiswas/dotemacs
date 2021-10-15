@@ -1,9 +1,4 @@
 (
- (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.metadata\\|.clangd")
-         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "/build" "/built"))
-         ))
-
  (python-mode . (
                  (pyvenv-activate . "/home/swarnendu/tmp/virtualenvs/flextensor-venv")
                  (eval . (let (
@@ -17,10 +12,14 @@
                                           (expand-file-name "tvm/python/tvm" (projectile-project-root))
                                           ))))
                            (setq lsp-pyright-extra-paths paths)))
+                 (eval . (progn
+                           (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                           (add-hook 'before-save-hook #'lsp-organize-imports nil t)
+                           ))
                  ))
 
  (c++-mode . (
-              (flycheck-gcc-language-standard . "c++11")
+              (flycheck-gcc-language-standard   . "c++11")
               (flycheck-clang-language-standard . "c++11")
               (eval . (let (
                             (clang-args (list
@@ -31,10 +30,10 @@
                                            (expand-file-name "" (projectile-project-root))
                                            ))
                             )
-                        (setq-local company-clang-arguments clang-args
-                                    flycheck-clang-args clang-args
-                                    flycheck-gcc-args clang-args
-                                    flycheck-gcc-include-path include-path
+                        (setq-local company-clang-arguments     clang-args
+                                    flycheck-clang-args         clang-args
+                                    flycheck-gcc-args           clang-args
+                                    flycheck-gcc-include-path   include-path
                                     flycheck-clang-include-path include-path)
                         ))
               ))

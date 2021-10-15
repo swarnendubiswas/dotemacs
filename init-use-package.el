@@ -1876,7 +1876,8 @@ SAVE-FN with non-nil ARGS."
                                          "\\|.clangd"
                                          "\\|.metadata"
                                          "\\|.recommenders"
-                                         "\\|typings")
+                                         "\\|typings"
+                                         "\\|__pycache__")
         counsel-mode-override-describe-bindings t
         counsel-preselect-current-file t
         counsel-switch-buffer-preview-virtual-buffers nil
@@ -3501,7 +3502,15 @@ SAVE-FN with non-nil ARGS."
 
 (use-package css-mode
   :commands css-mode
-  :config (setq css-indent-offset 2))
+  :config
+  (setq css-indent-offset 2)
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+    :major-modes '(css-mode less-mode sass-mode scss-mode)
+    :remote? t
+    :server-id 'cssls-remote)))
 
 (use-package css-eldoc
   :disabled t ;; We use LSP
@@ -3572,8 +3581,9 @@ SAVE-FN with non-nil ARGS."
 
 (declare-function ht-merge "ht")
 
-;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active, plus we may not
-;; always want to format files (e.g., commented YAML files in out-of-project locations)
+;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active. We may not always
+;; want to format unrelated files and buffers (e.g., commented YAML files in out-of-project
+;; locations).
 (use-package lsp-mode
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -3727,53 +3737,6 @@ SAVE-FN with non-nil ARGS."
 
   (lsp-register-client
    (make-lsp-client
-    :new-connection (lsp-tramp-connection "clangd")
-    :major-modes '(c-mode c++-mode)
-    :remote? t
-    :server-id 'clangd-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("vscode-json-languageserver" "--stdio"))
-    :major-modes '(json-mode jsonc-mode)
-    :remote? t
-    :server-id 'jsonls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("css-languageserver" "--stdio"))
-    :major-modes '(css-mode less-mode sass-mode scss-mode)
-    :remote? t
-    :server-id 'cssls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("html-languageserver" "--stdio"))
-    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
-    :remote? t
-    :server-id 'htmlls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("java" "-jar" lsp-xml-jar-file))
-    :major-modes '(xml-mode nxml-mode)
-    :remote? t
-    :server-id 'xmlls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("yaml-language-server" "--stdio"))
-    :major-modes '(yaml-mode)
-    :remote? t
-    :server-id 'yamlls-remote))
-
-  (lsp-register-client
-   (make-lsp-client
     :new-connection (lsp-tramp-connection
                      (lambda ()
                        (list lsp-perl-language-server-path
@@ -3790,49 +3753,6 @@ SAVE-FN with non-nil ARGS."
                          (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-remote))
-
-  ;; (defvar lsp-grammarly-active-modes)
-
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-stdio-connection #'lsp-grammarly--server-command)
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-  ;;   :priority -1
-  ;;   :remote? t
-  ;;   :add-on? t
-  ;;   :server-id 'grammarly-ls-remote
-  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
-  ;;   :after-open-fn #'lsp-grammarly--init
-  ;;   :async-request-handlers
-  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
-  ;;       ("$/getToken" #'lsp-grammarly--get-token)
-  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
-  ;;       ("$/showError" #'lsp-grammarly--show-error)
-  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
-
-  ;; (defvar lsp-ltex-active-modes)
-
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-stdio-connection
-  ;;                    #'lsp-ltex--server-command
-  ;;                    (lambda () (f-exists? (lsp-ltex--extension-root))))
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-  ;;   :priority -2
-  ;;   :add-on? t
-  ;;   :remote? t
-  ;;   :server-id 'ltex-ls-remote
-  ;;   :download-server-fn
-  ;;   (lambda (_client _callback error-callback _update?)
-  ;;     (lsp-package-ensure
-  ;;      'ltex-ls
-  ;;      (lambda ()
-  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-  ;;                                     "-C" dest)
-  ;;            (error "Error during the unzip process: tar"))))
-  ;;      error-callback))))
 
   ;; Disable fuzzy matching, TODO: What is the utility of this?
   ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
@@ -3929,10 +3849,7 @@ SAVE-FN with non-nil ARGS."
   :mode
   (("\\.h\\'" . c++-mode)
    ("\\.c\\'" . c++-mode))
-  :hook
-  (c++-mode . (lambda ()
-                (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-                (lsp-deferred)))
+  :hook (c++-mode . lsp-deferred)
   :config
   (setq c-set-style "cc-mode"
         c-basic-offset 2)
@@ -3950,6 +3867,13 @@ SAVE-FN with non-nil ARGS."
                           c-syntactic-indentation nil)))
 
   (unbind-key "C-M-a" c-mode-map)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "clangd")
+    :major-modes '(c-mode c++-mode)
+    :remote? t
+    :server-id 'clangd-remote))
   :bind
   (:map c-mode-base-map
         ("C-c c a" . c-beginning-of-defun)
@@ -3989,10 +3913,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package cmake-mode
   :commands cmake-mode
-  :hook
-  (cmake-mode . (lambda ()
-                  (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-                  (lsp-deferred)))
+  :hook (cmake-mode . lsp-deferred)
   :config
   (lsp-register-client
    (make-lsp-client
@@ -4186,7 +4107,6 @@ SAVE-FN with non-nil ARGS."
   (java-mode . (lambda ()
                  (setq-default c-basic-offset 4
                                c-set-style "java")
-                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                  (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
@@ -4439,8 +4359,15 @@ SAVE-FN with non-nil ARGS."
                  (setq-local lsp-ltex-enabled nil)
                  (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
                  (flyspell-mode -1)
-                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-                 (lsp-deferred))))
+                 (lsp-deferred)))
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("yaml-language-server" "--stdio"))
+    :major-modes '(yaml-mode)
+    :remote? t
+    :server-id 'yamlls-remote)))
 
 (use-package yaml-imenu
   :after yaml-mode
@@ -4480,7 +4407,15 @@ SAVE-FN with non-nil ARGS."
         web-mode-enable-current-column-highlight t
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
-        web-mode-style-padding 2))
+        web-mode-style-padding 2)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("html-languageserver" "--stdio"))
+    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
+    :remote? t
+    :server-id 'htmlls-remote)))
 
 (use-package emmet-mode
   :defines emmet-move-cursor-between-quote
@@ -4510,12 +4445,19 @@ SAVE-FN with non-nil ARGS."
   (nxml-mode . (lambda ()
                  (spell-fu-mode -1)
                  (setq-local lsp-ltex-enabled nil)
-                 (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                  (lsp-deferred)))
   :config
   (fset 'xml-mode 'nxml-mode)
   (setq nxml-auto-insert-xml-declaration-flag t
-        nxml-slash-auto-complete-flag t))
+        nxml-slash-auto-complete-flag t)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("java" "-jar" lsp-xml-jar-file))
+    :major-modes '(xml-mode nxml-mode)
+    :remote? t
+    :server-id 'xmlls-remote)))
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
@@ -4620,7 +4562,29 @@ SAVE-FN with non-nil ARGS."
   (setq lsp-grammarly-active-modes '(text-mode latex-mode
                                                LaTeX-mode org-mode markdown-mode gfm-mode)
         lsp-grammarly-user-words '(
-                                   )))
+                                   ))
+
+  ;; (defvar lsp-grammarly-active-modes)
+
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-stdio-connection #'lsp-grammarly--server-command)
+  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+  ;;   :priority -1
+  ;;   :remote? t
+  ;;   :add-on? t
+  ;;   :server-id 'grammarly-ls-remote
+  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
+  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
+  ;;   :after-open-fn #'lsp-grammarly--init
+  ;;   :async-request-handlers
+  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+  ;;       ("$/getToken" #'lsp-grammarly--get-token)
+  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
+  ;;       ("$/showError" #'lsp-grammarly--show-error)
+  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
+
+  )
 
 ;; FIXME: This package is not working as intended
 (use-package lsp-ltex
@@ -4633,7 +4597,32 @@ SAVE-FN with non-nil ARGS."
   (setq lsp-ltex-enabled t
         lsp-ltex-check-frequency "save"
         lsp-ltex-dictionary '("microbenchmarks")
-        lsp-ltex-java-path "/usr/lib/jvm/java-13-openjdk-amd64"))
+        lsp-ltex-java-path "/usr/lib/jvm/java-13-openjdk-amd64")
+  :config
+  ;; (defvar lsp-ltex-active-modes)
+
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-stdio-connection
+  ;;                    #'lsp-ltex--server-command
+  ;;                    (lambda () (f-exists? (lsp-ltex--extension-root))))
+  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+  ;;   :priority -2
+  ;;   :add-on? t
+  ;;   :remote? t
+  ;;   :server-id 'ltex-ls-remote
+  ;;   :download-server-fn
+  ;;   (lambda (_client _callback error-callback _update?)
+  ;;     (lsp-package-ensure
+  ;;      'ltex-ls
+  ;;      (lambda ()
+  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+  ;;                                     "-C" dest)
+  ;;            (error "Error during the unzip process: tar"))))
+  ;;      error-callback))))
+
+  )
 
 (use-package lsp-latex
   :disabled t
@@ -4931,7 +4920,15 @@ Ignore if no file is found."
   ((json-mode jsonc-mode) . (lambda ()
                               (make-local-variable 'js-indent-level)
                               (setq js-indent-level 2)
-                              (lsp-deferred))))
+                              (lsp-deferred)))
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("vscode-json-languageserver" "--stdio"))
+    :major-modes '(json-mode jsonc-mode)
+    :remote? t
+    :server-id 'jsonls-remote)))
 
 (use-package json-reformat
   :after json-mode)
@@ -4943,12 +4940,29 @@ Ignore if no file is found."
   :disabled t
   :commands scss-mode
   :hook (scss-mode . lsp-deferred)
-  :config (setq scss-compile-at-save t))
+  :config
+  (setq scss-compile-at-save t)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+    :major-modes '(css-mode less-mode sass-mode scss-mode)
+    :remote? t
+    :server-id 'cssls-remote)))
 
 (use-package sass-mode
   :disabled t
   :commands sass-mode
-  :hook (sass-mode . lsp-deferred))
+  :hook (sass-mode . lsp-deferred)
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+    :major-modes '(css-mode less-mode sass-mode scss-mode)
+    :remote? t
+    :server-id 'cssls-remote)))
 
 (use-package bazel
   :commands (bazel-mode bazelrc-mode)

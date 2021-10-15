@@ -40,4 +40,17 @@
                                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
                              )))
          ))
+
+ (sh-mode . (
+             (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+             ))
+
+ (json-mode . (
+               (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+               ))
+
+ (jsonc-mode . (
+                (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+                ))
+
  )

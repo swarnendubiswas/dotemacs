@@ -20,9 +20,9 @@
               (eval . (let (
                             (clang-args (list
                                          "-std=c++11"
-                                         (concat "-I" "/usr/include")
-                                         (concat "-I" "/usr/include/linux")
-                                         (concat "-I" "/usr/include/boost")
+                                         "-I/usr/include"
+                                         "-I/usr/include/linux"
+                                         "-I/usr/include/boost"
                                          (concat "-I" "/usr/lib/llvm-12/include")
                                          (concat "-I" (expand-file-name "." (projectile-project-root)))
                                          ))
@@ -38,7 +38,7 @@
                                           "--background-index"
                                           "--clang-tidy"
                                           "--fallback-style=LLVM"
-                                          "--compile-commands-dir=build"
+                                          "--compile-commands-dir=./build"
                                           "--header-insertion=never"
                                           "--header-insertion-decorators=0"
                                           "--log=error"
@@ -46,23 +46,27 @@
                                           "--pretty"
                                           ))
                             )
-                        (setq-local company-clang-arguments clang-args
-                                    flycheck-clang-args clang-args
-                                    flycheck-gcc-args clang-args
-                                    flycheck-gcc-include-path include-path
-                                    flycheck-clang-include-path include-path
+                        (setq-local company-clang-arguments        clang-args
+                                    flycheck-clang-args            clang-args
+                                    flycheck-gcc-args              clang-args
+                                    lsp-clients-clangd-args        clangd-args
+                                    flycheck-gcc-include-path      include-path
+                                    flycheck-clang-include-path    include-path
                                     flycheck-cppcheck-include-path include-path
-                                    lsp-clients-clangd-args clangd-args)
+                                    )
                         ))
               ))
 
  (python-mode . (
-                 (flycheck-pylintrc . "setup.cfg")
-                 (lsp-pyright-extra-paths . ["./src"])
-                 (lsp-pyright-venv-path . ["./src"])
-                 (python-shell-exec-path . "/usr/bin/python3")
+                 (flycheck-pylintrc        . "setup.cfg")
+                 (lsp-pyright-extra-paths  . ["./src"])
+                 (lsp-pyright-venv-path    . ["./src"])
+                 (python-shell-exec-path   . "/usr/bin/python3")
                  (python-shell-interpreter . "/usr/bin/python3")
-                 (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+                 (eval . (progn
+                           (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+                           (add-hook 'before-save-hook #'lsp-organize-imports nil t)
+                           ))
                  ))
  )
 
