@@ -26,7 +26,6 @@
   'none
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "eclipse"         eclipse)
            (const :tag "leuven"          leuven)
            (const :tag "spacemacs-light" spacemacs-light)
            (const :tag "tangotango"      tangotango)
@@ -47,7 +46,6 @@
            (const :tag "powerline"       powerline)
            (const :tag "smart-mode-line" sml)
            (const :tag "spaceline"       spaceline)
-           (const :tag "airline"         airline)
            (const :tag "doom-modeline"   doom-modeline)
            (const :tag "awesome-tray"    awesome-tray)
            (const :tag "moody"           moody)
@@ -211,12 +209,6 @@ This location is used for temporary installations and files.")
 ;;   (x-mode . second)
 ;;   (x-mode . first))
 
-;; Installation is one-time, so avoid the overhead of run-time checks
-(use-package system-packages
-  :disabled t
-  :commands (system-packages-ensure system-packages-install)
-  :config (setq system-packages-use-sudo t))
-
 (use-package use-package-ensure-system-package
   :disabled t)
 
@@ -242,13 +234,6 @@ This location is used for temporary installations and files.")
   :commands (hydra-default-pre hydra-keyboard-quit defhydra
                                hydra-show-hint hydra-set-transient-map
                                hydra--call-interactively-remap-maybe))
-
-(use-package use-package-hydra
-  :disabled t)
-
-(use-package use-package-chords
-  :disabled t
-  :config (key-chord-mode 1))
 
 (defcustom sb/use-no-littering
   t
@@ -301,20 +286,18 @@ This location is used for temporary installations and files.")
     (defvar quelpa-self-upgrade-p)
     (setq quelpa-self-upgrade-p nil
           quelpa-update-melpa-p nil
-          quelpa-upgrade-interval 30)))
+          quelpa-upgrade-interval 30))
 
-(use-package quelpa-use-package
-  :disabled t
-  :demand t)
+  (use-package quelpa-use-package
+    :disabled t
+    :demand t))
 
 (use-package warnings
-  :demand t
-  :config
+  :init
   ;; This is not a great idea, but I expect most warnings will arise from third-party packages
   (setq warning-minimum-level :emergency))
 
-;; Allow GC to happen after a period of idle time
-(use-package gcmh
+(use-package gcmh ; Allow GC to happen after a period of idle time
   :diminish
   :commands (gcmh-mode gcmh-idle-garbage-collect)
   :hook (after-init . gcmh-mode)
@@ -336,17 +319,8 @@ This location is used for temporary installations and files.")
         paradox-github-token t)
   (paradox-enable))
 
-(use-package auto-package-update ; Default update interval is 7 days
-  :disabled t
-  :commands (auto-package-update-now auto-package-update-maybe)
-  :config
-  (setq auto-package-update-delete-old-versions t
-        auto-package-update-hide-results t
-        auto-package-update-prompt-before-update t)
-  (auto-package-update-maybe))
-
-;; Get PATH with `(getenv "PATH")'
-;; Set PATH with `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'
+;; Get PATH with `(getenv "PATH")'. Set PATH with
+;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
@@ -413,9 +387,6 @@ This location is used for temporary installations and files.")
       frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
-      ;; Doom Emacs: Emacs updates its UI more often than it needs to, so we slow it down slightly
-      ;; from 0.5s
-      ;; idle-update-delay 1.0
       indicate-buffer-boundaries nil
       inhibit-compacting-font-caches t ; Do not compact font caches during GC
       ;; The run-time load order is: (1) file described by `site-run-file', if non-nil; (2)
@@ -434,7 +405,6 @@ This location is used for temporary installations and files.")
       mouse-drag-copy-region nil ; Mouse is disabled
       mouse-yank-at-point t ; Yank at point with mouse instead of at click
       pop-up-frames nil ; Avoid making separate frames
-      ;; pop-up-windows nil ; Disallow creating new windows
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       ;; Ignore case when reading a file name completion
       read-file-name-completion-ignore-case t
@@ -443,15 +413,13 @@ This location is used for temporary installations and files.")
       ring-bell-function 'ignore ; Disable beeping sound when spacing backspace
       save-interprogram-paste-before-kill t
       save-silently t ; Error messages will still be printed
-      ;; Enable use of system clipboard across Emacs and other applications
+      ;; Enable use of system clipboard across Emacs and other applications, does not work on TUI
       select-enable-clipboard t
       sentence-end-double-space nil
-      ;; set-mark-command-repeat-pop t
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       standard-indent 2
       suggest-key-bindings t
       switch-to-buffer-preserve-window-point t
-      ;; truncate-partial-width-windows nil
       use-dialog-box nil
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
@@ -650,10 +618,6 @@ SAVE-FN with non-nil ARGS."
 
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
 (dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
-                ;; desktop-save-mode
-                ;; global-prettify-symbols-mode ; Makes it difficult to edit the buffer
-                ;; shell-dirtrack-mode
-                ;; size-indication-mode
                 tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
@@ -665,13 +629,9 @@ SAVE-FN with non-nil ARGS."
 (dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
-                ;; Soft wraps, Wrap lines without the ugly continuation marks
+                ;; Soft wraps, wrap lines without the ugly continuation marks
                 global-visual-line-mode
-                minibuffer-depth-indicate-mode
-                ;; Enable visual feedback on selections, mark follows the point, it is enabled by
-                ;; default on start
-                ;; transient-mark-mode
-                ))
+                minibuffer-depth-indicate-mode))
   (when (fboundp mode)
     (funcall mode 1)))
 
@@ -684,17 +644,32 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load "outline"
   (diminish 'outline-minor-mode))
 
-;; (fringe-mode '(10 . 10)) ; Default is 8 pixels
+;; Default is 8 pixels, we have increased it to look good on TUI
+(fringe-mode '(10 . 10))
 
-(use-package outline
+;; Make the cursor a thin horizontal bar, not a block
+;; (set-default 'cursor-type '(bar . 4))
+
+(use-package outline ; Edit outlines
   :hook ((prog-mode text-mode) . outline-minor-mode))
 
-;; Native from Emacs 27+
-(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
+;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
+(use-package hideshow
+  :ensure nil
+  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+  :hook
+  (prog-mode . (lambda ()
+                 (hs-minor-mode 1)
+                 (hs-hide-initial-comment-block))))
 
-;; Highlight and allow to open http link at point in programming buffers. `goto-address-prog-mode'
-;; only highlights links in strings and comments.
-(add-hook 'prog-mode-hook #'goto-address-prog-mode)
+(add-hook 'prog-mode-hook
+          (lambda ()
+            ;; Highlight and allow to open http link at point in programming buffers.
+            ;; `goto-address-prog-mode' only highlights links in strings and comments.
+            (goto-address-prog-mode 1)
+            (display-fill-column-indicator-mode 1) ; Native from Emacs 27+
+            ))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
 (use-package so-long
@@ -720,9 +695,6 @@ SAVE-FN with non-nil ARGS."
   (setq all-the-icons-scale-factor 1.0
         all-the-icons-color-icons nil))
 
-;; Make the cursor a thin horizontal bar, not a block
-;; (set-default 'cursor-type '(bar . 4))
-
 ;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
   :if (display-graphic-p)
@@ -738,31 +710,18 @@ SAVE-FN with non-nil ARGS."
 
 (use-package leuven-theme
   :if (eq sb/theme 'leuven)
-  :init (load-theme 'leuven t)
-  :disabled t)
-
-(use-package eclipse-theme
-  :if (eq sb/theme 'eclipse)
-  :disabled t
-  :init
-  (load-theme 'eclipse t)
-  (set-background-color "white")
-  (set-face-attribute 'region nil :background "LemonChiffon" :foreground "black")
-  (set-face-attribute 'mode-line nil :background "grey88" :foreground "black" :box nil))
+  :init (load-theme 'leuven t))
 
 (use-package spacemacs-common
   :ensure spacemacs-theme
-  :disabled t
   :if (eq sb/theme 'spacemacs-light)
   :init (load-theme 'spacemacs-light t))
 
 (use-package zenburn-theme
   :if (eq sb/theme 'zenburn)
-  :disabled t
   :init (load-theme 'zenburn t))
 
 (use-package doom-themes
-  :disabled t
   :if (eq sb/theme 'doom-molokai)
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
@@ -774,7 +733,6 @@ SAVE-FN with non-nil ARGS."
   (doom-themes-org-config))
 
 (use-package doom-themes
-  :disabled t
   :if (eq sb/theme 'doom-one-light)
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init (load-theme 'doom-one-light t)
@@ -784,7 +742,6 @@ SAVE-FN with non-nil ARGS."
   (doom-themes-org-config))
 
 (use-package monokai-theme
-  :disabled t
   :if (eq sb/theme 'monokai)
   :init (load-theme 'monokai t))
 
@@ -869,7 +826,6 @@ SAVE-FN with non-nil ARGS."
   (powerline-default-theme))
 
 (use-package smart-mode-line
-  :disabled t
   :if (eq sb/modeline-theme 'sml)
   :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
                       sml/shorten-modes sml/shorten-directory)
@@ -886,7 +842,6 @@ SAVE-FN with non-nil ARGS."
   (sml/setup))
 
 (use-package spaceline
-  :disabled t
   :if (eq sb/modeline-theme 'spaceline)
   :defines (spaceline-hud-p spaceline-selection-info-p
                             spaceline-version-control-p spaceline-input-method-p
@@ -903,15 +858,6 @@ SAVE-FN with non-nil ARGS."
   (use-package spaceline-all-the-icons
     :commands spaceline-all-the-icons-theme
     :init (spaceline-all-the-icons-theme)))
-
-(use-package airline-themes
-  :disabled t
-  :if (eq sb/modeline-theme 'airline)
-  :init
-  (require 'airline-themes)
-  (setq airline-eshell-colors nil
-        airline-hide-eyebrowse-on-inactive-buffers t)
-  (load-theme 'airline-cool t))
 
 (use-package doom-modeline
   ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
@@ -952,15 +898,10 @@ SAVE-FN with non-nil ARGS."
 
 (use-package moody
   :if (eq sb/modeline-theme 'moody)
-  :disabled t
   :commands (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
   :init
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
-
-(use-package mode-icons ; The icons do not look good
-  :disabled t
-  :init (mode-icons-mode 1))
 
 (use-package auto-dim-other-buffers
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
@@ -981,10 +922,6 @@ SAVE-FN with non-nil ARGS."
   :bind
   (([remap next-buffer]     . centaur-tabs-forward)
    ([remap previous-buffer] . centaur-tabs-backward)))
-
-(use-package hide-mode-line
-  :disabled t
-  :commands (hide-mode-line-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
@@ -1050,9 +987,7 @@ SAVE-FN with non-nil ARGS."
   :ensure nil
   :config
   (defalias 'list-buffers 'ibuffer)
-  ;; (setq ibuffer-default-sorting-mode 'alphabetic
-  ;;       ibuffer-display-summary nil
-  ;;       ibuffer-use-header-line t)
+  (setq ibuffer-display-summary nil)
   :bind ("C-x C-b" . ibuffer))
 
 (use-package ibuf-ext
@@ -1073,8 +1008,7 @@ SAVE-FN with non-nil ARGS."
   :if (display-graphic-p)
   :commands all-the-icons-ibuffer-mode
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-  :config
-  (setq all-the-icons-ibuffer-icon-size 0.9))
+  :config (setq all-the-icons-ibuffer-icon-size 0.9))
 
 (use-package dired
   :ensure nil
@@ -1360,11 +1294,10 @@ SAVE-FN with non-nil ARGS."
 (use-package treemacs-projectile
   :after (treemacs projectile)
   :commands treemacs-projectile
-  :disabled t)
+  :demand t)
 
 (use-package treemacs-magit
   :after (treemacs magit)
-  :disabled t
   :demand t)
 
 (use-package org
@@ -1455,11 +1388,12 @@ SAVE-FN with non-nil ARGS."
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
   :after isearch
-  :commands (isearch-symbol-at-point isearch-backward-symbol-at-point))
+  :commands (isearch-symbol-at-point
+             isearch-forward-symbol-at-point ; `M-s .'
+             isearch-backward-symbol-at-point))
 
 (use-package isearch-dabbrev
   :after isearch
-  :disabled t
   :bind
   (:map isearch-mode-map
         ("<tab>" . isearch-dabbrev-expand)))
@@ -1515,10 +1449,6 @@ SAVE-FN with non-nil ARGS."
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
-(use-package ripgrep
-  :commands ripgrep-regexp
-  :disabled t)
-
 (use-package ctrlf
   :disabled t
   :commands (ctrlf-mode ctrlf-local-mode)
@@ -1571,7 +1501,6 @@ SAVE-FN with non-nil ARGS."
         recentf-keep '(file-remote-p file-readable-p)
         ;; Larger values help in lookup but takes more time to check if the files exist
         recentf-max-saved-items 100
-        ;; recentf-menu-filter 'recentf-sort-descending
         ;; Abbreviate the file name to make it easy to read the actual file name
         recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
@@ -1601,7 +1530,6 @@ SAVE-FN with non-nil ARGS."
 ;; Hide the "Wrote to recentf" message which is irritating
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
 
-;; TODO: Is this causing tramp to fail? I have disabled it to test.
 ;; Hide the "Wrote ..." message which is irritating
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
@@ -1610,7 +1538,6 @@ SAVE-FN with non-nil ARGS."
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
-
 
 ;; The module does not specify an `autoload'
 (use-package company-capf
@@ -1631,7 +1558,6 @@ SAVE-FN with non-nil ARGS."
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
-  ;; :diminish
   :preface
   (defun sb/quit-company-save-buffer ()
     "Quit company popup and save the buffer."
@@ -1720,7 +1646,6 @@ SAVE-FN with non-nil ARGS."
   :config (company-statistics-mode 1))
 
 (use-package yasnippet
-  ;; :diminish yas-minor-mode
   :commands (yas-global-mode snippet-mode)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode prog-mode) . yas-global-mode)
@@ -1890,50 +1815,12 @@ SAVE-FN with non-nil ARGS."
   :demand t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
-(use-package ivy-posframe
-  :after ivy
-  :disabled t ; The width is narrow and the text at the end gets cut off
-  :diminish
-  :config
-  ;; Different command can use different display function.
-  (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-posframe-display-at-window-bottom-left)
-          (complete-symbol . ivy-posframe-display-at-point)
-          (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-          (t               . ivy-posframe-display))
-        ivy-display-function #'ivy-posframe-display-at-frame-center
-        ivy-posframe-parameters '((left-fringe  . 4)
-                                  (right-fringe . 4)))
-  (ivy-posframe-mode 1))
-
 (use-package prescient
   :commands prescient-persist-mode
   :hook (after-init . prescient-persist-mode)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq prescient-save-file (expand-file-name "prescient-save.el" sb/temp-directory))))
-
-;; https://github.com/raxod502/prescient.el/issues/65
-(use-package ivy-prescient
-  :disabled t ; No longer maintained
-  :hook (counsel-mode . ivy-prescient-mode)
-  :config
-  (setq ivy-prescient-enable-sorting nil ; Allow prescient to override sorting logic
-        ivy-prescient-sort-function '(not swiper swiper-isearch
-                                          ivy-switch-buffer
-                                          counsel-recentf counsel-grep
-                                          flyspell-correct-ivy )))
-
-;; https://www.reddit.com/r/emacs/comments/9o6inu/sort_ivys_counselrecentf_results_by_timestamp/e7ze1c8/
-;; LATER: This is expensive, we can possibly reduce the size of the list. But we can also search
-;; easily with `ivy', so maybe sorting is not very important given the overhead.
-;; (with-eval-after-load "ivy"
-;;   (add-to-list 'ivy-sort-functions-alist '(counsel-recentf . file-newer-than-file-p)))
-
-;; (setq ivy-sort-matches-functions-alist '((t . ivy--prefix-sort)))
-
-;; (add-to-list 'ivy-sort-matches-functions-alist
-;;              '(read-file-name-internal . ivy--sort-files-by-date))
 
 ;; We want `capf' sort for programming modes, not with recency. This breaks the support for the
 ;; `:separate' keyword in `company'
@@ -2039,7 +1926,7 @@ SAVE-FN with non-nil ARGS."
               (setq arg 0))
           (forward-word)))))
   :config
-  (setq flyspell-abbrev-p t
+  (setq flyspell-abbrev-p           t
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
   :hook
@@ -2052,7 +1939,6 @@ SAVE-FN with non-nil ARGS."
    (after-init . (lambda ()
                    (when (string= (buffer-name) "*scratch*")
                      (flyspell-mode 1)))))
-  ;; :diminish
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
@@ -2156,7 +2042,6 @@ SAVE-FN with non-nil ARGS."
 
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
-  ;; :diminish
   :commands aggressive-indent-mode
   :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
   :config
