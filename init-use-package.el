@@ -3594,17 +3594,27 @@ SAVE-FN with non-nil ARGS."
   ;; FIXME: Bind only if the server has launched successfully
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references]  . lsp-ui-peek-find-references)))
+        ([remap xref-find-references]  . lsp-ui-peek-find-references)
+        :map lsp-command-map
+        ("D" . lsp-ui-doc-mode)))
 
 ;; Sync workspace folders and treemacs projects
 (use-package lsp-treemacs
   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
-  :config (lsp-treemacs-sync-mode 1))
+  :config (lsp-treemacs-sync-mode 1)
+  :bind
+  (:map lsp-command-map
+        ("T" . lsp-treemacs-sync-mode)
+        ("H" . lsp-treemacs-call-hierarchy)
+        ("E" . lsp-treemacs-errors-list)))
 
 (use-package lsp-ivy
+  :after lsp-mode
+  :demand t
   :bind
-  (("C-c l g" . lsp-ivy-global-workspace-symbol)
-   ("C-c l w" . lsp-ivy-workspace-symbol)))
+  (:map lsp-command-map
+        ("G" . lsp-ivy-global-workspace-symbol)
+        ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
