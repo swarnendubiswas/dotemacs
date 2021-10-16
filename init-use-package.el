@@ -209,9 +209,6 @@ This location is used for temporary installations and files.")
 ;;   (x-mode . second)
 ;;   (x-mode . first))
 
-(use-package use-package-ensure-system-package
-  :disabled t)
-
 ;; `C-h b' lists all the bindings available in a buffer. `C-h m' shows the keybindings for the major
 ;; and the minor modes.
 (use-package bind-key
@@ -1727,7 +1724,6 @@ SAVE-FN with non-nil ARGS."
 (use-package counsel
   :ensure amx
   :ensure t
-  ;; :ensure-system-package fasd
   :commands counsel-mode
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
@@ -2092,24 +2088,13 @@ SAVE-FN with non-nil ARGS."
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
 ;; Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
-(use-package smartparens-config
-  :ensure smartparens
+(use-package smartparens
   ;; :diminish (smartparens-global-mode smartparens-mode
   ;;                                    show-smartparens-mode show-smartparens-global-mode)
-  :commands sp-local-pair
+  :commands (sp-pair sp-local-pair)
   :hook
-  (((html-mode css-mode) . (lambda ()
-                             (require 'smartparens-html)))
-   (python-mode . (lambda ()
-                    (require 'smartparens-python)))
-   (org-mode . (lambda ()
-                 (require 'smartparens-org)))
-   ((markdown-mode gfm-mode) . (lambda ()
-                                 (require 'smartparens-markdown)))
-
-   ((latex-mode LaTeX-mode) . (lambda ()
-                                (require 'smartparens-latex)))
-   (after-init . (lambda ()
+  ((after-init . (lambda ()
+                   (require 'smartparens-config)
                    (smartparens-global-mode 1)
                    (show-smartparens-global-mode 1))))
   :config
@@ -2119,15 +2104,16 @@ SAVE-FN with non-nil ARGS."
   (smartparens-strict-mode -1)
 
   ;; Stop pairing single quotes in elisp
-  (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
+  ;; (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
 
   (sp-local-pair 'markdown-mode "<" ">")
 
   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
-  ;; (sp-pair "(" nil :unless '(sp-point-before-word-p))
-  ;; (sp-pair "[" nil :unless '(sp-point-before-word-p))
-  ;; (sp-pair "{" nil :unless '(sp-point-before-word-p))
-  ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
+  (sp-pair "(" nil :unless '(sp-point-before-word-p))
+  (sp-pair "[" nil :unless '(sp-point-before-word-p))
+  (sp-pair "{" nil :unless '(sp-point-before-word-p))
+
+  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
   :bind
   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
    ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
@@ -2142,6 +2128,8 @@ SAVE-FN with non-nil ARGS."
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
+;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; yet.
 (use-package project
   :commands (project-switch-project project-current
                                     project-find-file project-execute-extended-command
@@ -2166,7 +2154,6 @@ SAVE-FN with non-nil ARGS."
         ("r"    . project-query-replace-regexp)))
 
 (use-package projectile
-  ;; :ensure-system-package fd
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
@@ -2195,7 +2182,7 @@ SAVE-FN with non-nil ARGS."
                                                            sb/temp-directory)))
 
   ;; https://github.com/MatthewZMD/.emacs.d
-  (when (and sb/IS-WINDOWS
+  (when (and (symbol-value 'sb/IS-WINDOWS)
              (executable-find "tr"))
     (setq projectile-indexing-method 'alien))
 
@@ -2262,7 +2249,7 @@ SAVE-FN with non-nil ARGS."
   (projectile-mode 1)
 
   ;; https://github.com/Alexander-Miller/treemacs/issues/660
-  ;; TODO: These do not acheive what I want.
+  ;; TODO: These do not achieve what I want.
 
   ;; (add-hook 'projectile-after-switch-project-hook
   ;;           (lambda ()
@@ -2379,9 +2366,7 @@ SAVE-FN with non-nil ARGS."
         (let* ((user-id (file-attribute-user-id (file-attributes candidate)))
                (user-name (user-login-name user-id)))
           (format "%s" user-name)))))
-  :init
-  (ivy-rich-mode 1)
-  (ivy-rich-project-root-cache-mode)
+  :init (ivy-rich-mode 1)
   :config
   (setq ivy-rich-parse-remote-buffer nil)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
@@ -2405,7 +2390,7 @@ SAVE-FN with non-nil ARGS."
                              (ivy-rich-switch-buffer-major-mode (:width 20 :face error))))
 
   (ivy-rich-set-columns 'counsel-recentf
-                        '((file-name-nondirectory (:width 0.24 :face success))
+                        '((file-name-nondirectory (:width 0.24))
                           (ivy-rich-candidate (:width 0.75)))))
 
 (use-package counsel-fd
@@ -2436,14 +2421,14 @@ SAVE-FN with non-nil ARGS."
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
-        flycheck-checker-error-threshold 500
+        flycheck-checker-error-threshold  500
         flycheck-idle-buffer-switch-delay 5 ; Increase the time (s) to allow for quick transitions
-        flycheck-idle-change-delay 5 ; Increase the time (s) to allow for edits
-        flycheck-emacs-lisp-load-path 'inherit
+        flycheck-idle-change-delay        5 ; Increase the time (s) to allow for edits
+        flycheck-emacs-lisp-load-path     'inherit
         ;; ;; Show error messages only if the error list is not already visible
         ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        ;; There are no checkers for modes like `csv-mode', and many program modes use lsp.
-        ;; `yaml-mode' is derived from `text-mode'. `chktex' errors are often not very helpful.
+        ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
+        ;; derived from `text-mode'. `chktex' errors are often not very helpful.
         flycheck-global-modes '(not csv-mode))
 
   (when (or (eq sb/modeline-theme 'spaceline)
@@ -2534,45 +2519,30 @@ SAVE-FN with non-nil ARGS."
   (advice-add 'flycheck-may-check-automatically
               :after-while #'sb/flycheck-may-check-automatically)
 
+  ;; Chain flycheck checkers with lsp, we can also use per-project directory local variables
   ;; https://github.com/flycheck/flycheck/issues/1762
-  (defvar-local sb/flycheck-local-cache nil)
+
+  (defvar-local sb/flycheck-local-checkers nil)
 
   (defun sb/flycheck-checker-get (fn checker property)
-    (or (alist-get property (alist-get checker sb/flycheck-local-cache))
+    (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
         (funcall fn checker property)))
 
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
-  ;; Use per-project directory local variables
-  (add-hook 'lsp-managed-mode-hook
-            (lambda ()
-              (when (derived-mode-p 'python-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (python-pylint)))))))
-
-              (when (derived-mode-p 'sh-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (sh-shellcheck)))))))
-
-              (when (derived-mode-p 'c++-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
-
-              (when (derived-mode-p 'css-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (css-stylelint)))))))
-
-              (when (derived-mode-p 'html-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (html-tidy)))))))
-
-              (when (derived-mode-p 'xml-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (xml-xmllint)))))))
-
-              (when (derived-mode-p 'yaml-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (yaml-yamllint)))))))
-
-              (when (derived-mode-p 'json-mode)
-                (setq sb/flycheck-local-cache '((lsp . ((next-checkers . (json-jsonlint)))))))
-              ))
+  ;; (add-hook 'lsp-managed-mode-hook
+  ;;           (lambda ()
+  ;;             (when (derived-mode-p 'python-mode)
+  ;;               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint)))))))
+  ;;             ))
   )
 
 (or
+ (use-package flycheck-popup-tip ; Show error messages in popups
+   :ensure t
+   :unless (display-graphic-p)
+   :hook (flycheck-mode . flycheck-popup-tip-mode))
+
  ;; Does not display popup under TTY, check possible workarounds at
  ;; https://github.com/flycheck/flycheck-popup-tip
  (use-package flycheck-pos-tip
@@ -2609,8 +2579,8 @@ SAVE-FN with non-nil ARGS."
   (setq delete-trailing-lines t) ; `M-x delete-trailing-whitespace' deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-;; Call `whitespace-cleanup' only if the initial buffer was clean
-;; To enable it for an entire project, set `whitespace-cleanup-mode' to `t' in your
+;; Call `whitespace-cleanup' only if the initial buffer was clean. But this mode works on the entire
+;; file. To enable it for an entire project, set `whitespace-cleanup-mode' to `t' in your
 ;; `.dir-locals.el' file.
 (use-package whitespace-cleanup-mode
   :diminish
@@ -2651,6 +2621,7 @@ SAVE-FN with non-nil ARGS."
                                         ("BEWARE"   . "#aa0000")
                                         ("REFACTOR" . "#cc9393"))
                                       hl-todo-keyword-faces)))
+
 (use-package highlight-numbers
   :commands highlight-numbers-mode
   :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
@@ -2681,7 +2652,6 @@ SAVE-FN with non-nil ARGS."
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
-  :disabled t
   :bind
   (("C-<"     . mc/mark-previous-like-this)
    ("C->"     . mc/mark-next-like-this)
@@ -2726,7 +2696,7 @@ SAVE-FN with non-nil ARGS."
 (declare-function sb/sshlist "private")
 
 (progn
-  (declare-function sb/ivy-tramp "init-use-package")
+  ;; (declare-function sb/ivy-tramp "init-use-package")
 
   (defun sb/ivy-tramp ()
     "Invoke remote hosts with ivy and tramp."
@@ -2747,22 +2717,14 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq imenu-auto-rescan t
         imenu-max-items 1000
-        ;; imenu-max-item-length 100
         ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful
         ;; with mouse support enabled
         imenu-use-popup-menu nil
         ;; `nil' implies no sorting, and will list by position in the buffer
         imenu-sort-function nil))
 
-;; `imenu-anywhere' provides navigation for imenu tags across all buffers that satisfy grouping
-;; criteria. Available criteria include - all buffers with the same major mode, same project buffers
-;; and user defined list of friendly mode buffers.
-(use-package imenu-anywhere
-  :after imenu
-  :demand t
-  :disabled t)
-
 (defvar tags-revert-without-query)
+
 (setq large-file-warning-threshold (* 500 1024 1024) ; MB
       tags-add-tables nil
       tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
@@ -2788,10 +2750,9 @@ SAVE-FN with non-nil ARGS."
         xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
-  ;; :ensure-system-package (ctags . "snap install universal-ctags")
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
-  :if (eq system-type 'gnu/linux)
+  :if (symbol-value 'sb/IS-LINUX)
   :bind
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -2867,15 +2828,12 @@ SAVE-FN with non-nil ARGS."
   :commands manage-minor-mode)
 
 (use-package jgraph-mode
-  :disabled t
   :commands jgraph-mode)
 
 (use-package graphviz-dot-mode
-  :disabled t
   :commands graphviz-dot-mode)
 
 (use-package gnuplot
-  :disabled t
   :commands (gnuplot-mode gnuplot)
   :mode "\\.gp\\'"
   :interpreter ("gnuplot" . gnuplot-mode))
@@ -2964,13 +2922,12 @@ SAVE-FN with non-nil ARGS."
   :defines undo-tree-map
   :commands (global-undo-tree-mode)
   :config
-  (setq undo-tree-auto-save-history t
-        undo-tree-visualizer-diff t
+  (setq undo-tree-auto-save-history              t
+        undo-tree-visualizer-diff                t
         undo-tree-visualizer-relative-timestamps t
-        undo-tree-visualizer-timestamps t)
+        undo-tree-visualizer-timestamps          t)
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
-  ;; :diminish
   :bind ("C-x u" . undo-tree-visualize))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -2995,9 +2952,9 @@ SAVE-FN with non-nil ARGS."
   :hook (after-init . persistent-scratch-setup-default)
   :config
   (unless (bound-and-true-p sb/use-no-littering)
-    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory))))
+    (setq persistent-scratch-save-file (expand-file-name "persistent-scratch" sb/temp-directory)))
 
-(advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun)
+  (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package crux
   :bind
@@ -3031,12 +2988,6 @@ SAVE-FN with non-nil ARGS."
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode turn-on-font-lock)
   :hook (ssh-config-mode . turn-on-font-lock))
 
-(use-package pomidor
-  :disabled t
-  :commands (pomidor-quit pomidor-break pomidor-reset
-                          pomidor-stop pomidor-hold
-                          pomidor-unhold pomidor))
-
 (use-package ace-window
   :bind ([remap other-window] . ace-window))
 
@@ -3067,18 +3018,20 @@ SAVE-FN with non-nil ARGS."
   :commands avy-setup-default
   :bind
   (("M-b"   . avy-goto-word-1)
-   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI
-   ("M-g c"   . avy-goto-char-timer)
-   ("C-/"   . avy-goto-line) ; Does not work with TUI
-   ("M-g l" . avy-goto-line)))
+   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
+   ;; ("M-g c" . avy-goto-char-timer)
+   ("C-/"   . avy-goto-line) ; Does not work with TUI, but works with Alacritty
+   ;; ("M-g l" . avy-goto-line)
+   ))
 
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
 (use-package ivy-avy
   :after (ivy avy)
   :bind
   (:map ivy-minibuffer-map
-        ("C-'" . ivy-avy) ; Does not work with TUI
-        ("M-g l" . ivy-avy)))
+        ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
+        ;; ("M-g l" . ivy-avy)
+        ))
 
 (use-package bookmark
   :ensure nil
@@ -3096,12 +3049,12 @@ SAVE-FN with non-nil ARGS."
     (add-hook 'kill-emacs-hook (lambda ()
                                  (bm-buffer-save-all)
                                  (bm-repository-save)))
-    (add-hook 'after-save-hook #'bm-buffer-save)
-    (add-hook 'kill-buffer-hook #'bm-buffer-save)
+    (add-hook 'after-save-hook        #'bm-buffer-save)
+    (add-hook 'kill-buffer-hook       #'bm-buffer-save)
     (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
-    (add-hook 'after-revert-hook #'bm-buffer-restore)
-    (add-hook 'find-file-hook #'bm-buffer-restore)
-    (add-hook 'after-init-hook #'bm-repository-load))
+    (add-hook 'after-revert-hook      #'bm-buffer-restore)
+    (add-hook 'find-file-hook         #'bm-buffer-restore)
+    (add-hook 'after-init-hook        #'bm-repository-load))
   :init
   ;; Must be set before `bm' is loaded
   (setq bm-restore-repository-on-load t)
@@ -3137,15 +3090,15 @@ SAVE-FN with non-nil ARGS."
   :commands (explain-pause-mode explain-pause-top)
   :diminish)
 
-;; `text-mode' is a basic mode for `LaTeX-mode' and `org-mode', and so any hooks defined will also
-;; get run for all modes derived from a basic mode such as `text-mode'.
+;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
+;; also get run for all modes derived from a basic mode such as `text-mode'.
 
 ;; Enabling `autfill-mode' makes it difficult to include long instructions verbatim, since they get
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-(use-package writegood-mode ; Identify weasel words, passive voice, and duplicate words
-  :disabled t ; `textlint' includes writegood
+;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood
+(use-package writegood-mode
   :commands writegood-mode
   :diminish
   :hook (text-mode . writegood-mode))
@@ -3208,7 +3161,6 @@ SAVE-FN with non-nil ARGS."
 
 (use-package logview
   :commands logview-mode
-  :disabled t
   :config
   (unless (bound-and-true-p sb/use-no-littering)
     (setq logview-cache-filename (expand-file-name "logview-cache.extmap" sb/temp-directory))))
@@ -3218,7 +3170,6 @@ SAVE-FN with non-nil ARGS."
   :mode "\\.g4\\'")
 
 (use-package bison-mode
-  :disabled t
   :mode ("\\.bison\\'"))
 
 (use-package llvm-mode
@@ -3281,7 +3232,6 @@ SAVE-FN with non-nil ARGS."
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 ;; Convert `markdown' to `org': `pandoc -f markdown -t org -o output-file.org input-file.md'
 (use-package pandoc-mode
-  ;; :ensure-system-package pandoc
   :commands (pandoc-load-default-settings pandoc-mode)
   :hook (markdown-mode . pandoc-mode)
   :config
@@ -3339,25 +3289,6 @@ SAVE-FN with non-nil ARGS."
   :commands highlight-doxygen-global-mode
   :init (highlight-doxygen-global-mode))
 
-(use-package rst
-  :ensure nil
-  :disabled t
-  :mode ("\\.rst\\'" . rst-mode))
-
-(use-package xref-rst
-  :disabled t
-  :commands xref-rst-mode
-  :hook (rst-mode . xref-rst-mode))
-
-(use-package boogie-friends
-  :disabled t
-  :mode ("\\.smt\\'" . z3-smt2-mode))
-
-(use-package z3-mode
-  :disabled t
-  :commands z3-mode
-  :config (setq z3-solver-cmd "z3"))
-
 (use-package make-mode
   :ensure nil
   :mode
@@ -3373,7 +3304,7 @@ SAVE-FN with non-nil ARGS."
   :commands turn-on-eldoc-mode
   :diminish
   :hook (prog-mode . turn-on-eldoc-mode)
-  :config
+  ;; :config
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
   ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
   ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
@@ -3389,6 +3320,9 @@ SAVE-FN with non-nil ARGS."
   :commands css-mode
   :config
   (setq css-indent-offset 2)
+
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (css-stylelint))))))
+
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -3420,36 +3354,11 @@ SAVE-FN with non-nil ARGS."
   ;;   (set-face-background 'eldoc-box-body "gray"))
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
-(use-package octave
-  :ensure nil
-  :disabled t)
-
-(use-package matlab-mode
-  :disabled t
-  :mode ("\\.m$" . matlab-mode))
-
-(use-package ess
-  :disabled t
-  :mode ("/R/.*\\.q\\'" . R-mode)
-  :config
-  (setq ess-indent-from-lhs 4
-        ess-indent-offset 4
-        inferior-R-args "--quiet --no-restore-history --no-save"))
-
-(use-package ess-smart-underscore
-  :disabled t
-  :after (:any R-mode ess)
-  :demand t)
-
 (use-package ini-mode
   :commands ini-mode)
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
-
-(use-package pkgbuild-mode
-  :commands pkgbuild-mode
-  :disabled t)
 
 (use-package elisp-mode
   :ensure nil
@@ -3507,16 +3416,11 @@ SAVE-FN with non-nil ARGS."
                                     lsp-modeline-code-actions-mode
                                     lsp-symbol-highlight ht-merge
                                     lsp-completion--regex-fuz)
-  ;; https://justin.abrah.ms/dotfiles/emacs.html
-  ;; :ensure-system-package
-  ;; ((typescript-language-server . "npm install -g typescript-language-server")
-  ;;  (javascript-typescript-langserver . "npm install -g javascript-typescript-langserver")
-  ;;  (yaml-language-server . "npm install -g yaml-language-server")
-  ;;  (tsc . "npm install -g typescript"))
   :hook
   ((lsp-mode . lsp-enable-which-key-integration)
    ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred))
   :custom-face
+  ;; Reduce the height
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
                                                font-lock-doc-face :weight bold :height 0.9))))
   (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
@@ -3606,8 +3510,7 @@ SAVE-FN with non-nil ARGS."
           lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
           lsp-pylsp-plugins-yapf-enabled t))
 
-  ;; We have `flycheck' error summary listed on the modeline, but `lsp' may report
-  ;; additional errors
+  ;; We have `flycheck' error summary listed on the modeline, but `lsp' may report additional errors
   ;; (lsp-modeline-diagnostics-mode -1)
 
   (add-to-list 'lsp-file-watch-ignored-directories "/\\.git\\'")
@@ -3618,44 +3521,41 @@ SAVE-FN with non-nil ARGS."
   (add-to-list 'lsp-file-watch-ignored-directories "/build\\'")
   (add-to-list 'lsp-file-watch-ignored-directories "/__pycache__\\'")
 
-  ;; Tramp support
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     (lambda ()
-                       (list lsp-perl-language-server-path
-                             "-MPerl::LanguageServer" "-e"
-                             "Perl::LanguageServer::run" "--"
-                             (format "--port %d --version %s"
-                                     lsp-perl-language-server-port
-                                     lsp-perl-language-server-client-version))))
-    :major-modes '(perl-mode cperl-mode)
-    :remote? t
-    :initialized-fn (lambda (workspace)
-                      (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
-    :priority -1
-    :server-id 'perlls-remote))
-
   ;; Disable fuzzy matching, TODO: What is the utility of this?
   ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
 
-  ;; :bind-keymap ("C-c l" . lsp-keymap-prefix)
+  :bind-keymap ("C-c l" . lsp-command-map)
 
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
   ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
   (("M-."     . lsp-find-definition)
-   ("C-c l d" . lsp-find-declaration)
-   ("C-c l i" . lsp-goto-implementation)
-   ("C-c l t" . lsp-goto-type-definition)
-   ("C-c l r" . lsp-rename)
-   ("C-c l h" . lsp-symbol-highlight)
-   ("C-c l f" . lsp-format-buffer)
-   ("C-c l r" . lsp-find-references)
-   ("C-c l a" . lsp-execute-code-action)))
+   :map lsp-command-map
+   ("=" . nil)
+   ("w" . nil)
+   ("g" . nil)
+   ("G" . nil)
+   ("a" . nil)
+   ("F" . nil)
+   ("q" . lsp-disconnect)
+   ("Q" . lsp-workspace-shutdown)
+   ("H" . lsp-describe-session)
+   ("R" . lsp-workspace-restart)
+   ("d" . lsp-find-declaration)
+   ("e" . lsp-find-definition)
+   ("r" . lsp-find-references)
+   ("i" . lsp-find-implementation)
+   ("I" . lsp-goto-implementation)
+   ("t" . lsp-goto-type-definition)
+   ("r" . lsp-rename)
+   ("h" . lsp-symbol-highlight)
+   ("f" . lsp-format-buffer)
+   ("l" . lsp-execute-code-action)
+   ("c" . lsp-imenu-create-categorised-index)
+   ("u" . lsp-imenu-create-uncategorised-index)
+   ("a" . lsp-workspace-folders-add)
+   ("v" . lsp-workspace-folders-remove)
+   ("b" . lsp-workspace-blacklist-remove)))
 
 (use-package lsp-ui
   :defines lsp-ui-modeline-code-actions-enable
@@ -3706,16 +3606,6 @@ SAVE-FN with non-nil ARGS."
   (("C-c l g" . lsp-ivy-global-workspace-symbol)
    ("C-c l w" . lsp-ivy-workspace-symbol)))
 
-;; Enable code folding, which is useful for browsing large files. This module is part of Emacs, and
-;; is better maintained than other alternatives like `origami'.
-(use-package hideshow
-  :ensure nil
-  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-  :hook
-  (prog-mode . (lambda ()
-                 (hs-minor-mode 1)
-                 (hs-hide-initial-comment-block))))
-
 (use-package dap-mode
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
 
@@ -3752,6 +3642,8 @@ SAVE-FN with non-nil ARGS."
                           c-syntactic-indentation nil)))
 
   (unbind-key "C-M-a" c-mode-map)
+
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (c/c++-cppcheck))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -3835,7 +3727,9 @@ SAVE-FN with non-nil ARGS."
 
   (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
-                                auto-mode-alist)))
+                                auto-mode-alist))
+
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint)))))))
 
 (use-package python-docstring
   :after python-mode
@@ -3966,7 +3860,26 @@ SAVE-FN with non-nil ARGS."
   :hook (cperl-mode . lsp-deferred)
   :config
   ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode))
+  (fset 'perl-mode 'cperl-mode)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (list lsp-perl-language-server-path
+                             "-MPerl::LanguageServer" "-e"
+                             "Perl::LanguageServer::run" "--"
+                             (format "--port %d --version %s"
+                                     lsp-perl-language-server-port
+                                     lsp-perl-language-server-client-version))))
+    :major-modes '(perl-mode cperl-mode)
+    :remote? t
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
+    :priority -1
+    :server-id 'perlls-remote)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -4033,6 +3946,8 @@ SAVE-FN with non-nil ARGS."
         sh-indent-after-continuation 'always
         ;; Indent comments as a regular line
         sh-indent-comment t)
+
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (sh-shellcheck))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4246,6 +4161,8 @@ SAVE-FN with non-nil ARGS."
                  (flyspell-mode -1)
                  (lsp-deferred)))
   :config
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (yaml-yamllint))))))
+
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4283,16 +4200,18 @@ SAVE-FN with non-nil ARGS."
   :config
   (flycheck-add-mode 'javascript-eslint 'web-mode)
 
-  (setq web-mode-enable-auto-closing t
-        web-mode-enable-auto-pairing t
-        web-mode-enable-auto-quoting t
-        web-mode-enable-block-face t
-        web-mode-enable-css-colorization t
+  (setq web-mode-enable-auto-closing              t
+        web-mode-enable-auto-pairing              t
+        web-mode-enable-auto-quoting              t
+        web-mode-enable-block-face                t
+        web-mode-enable-css-colorization          t
         web-mode-enable-current-element-highlight t ; Highlight the element under the cursor
-        web-mode-enable-current-column-highlight t
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-style-padding 2)
+        web-mode-enable-current-column-highlight  t
+        web-mode-css-indent-offset                2
+        web-mode-code-indent-offset               2
+        web-mode-style-padding                    2)
+
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (html-tidy))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4335,6 +4254,8 @@ SAVE-FN with non-nil ARGS."
   (fset 'xml-mode 'nxml-mode)
   (setq nxml-auto-insert-xml-declaration-flag t
         nxml-slash-auto-complete-flag t)
+
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (xml-xmllint))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4807,6 +4728,8 @@ Ignore if no file is found."
                               (setq js-indent-level 2)
                               (lsp-deferred)))
   :config
+  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (json-jsonlint))))))
+
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection

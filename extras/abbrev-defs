@@ -47,6 +47,7 @@
 
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
+    ("acheive" "achieve" nil :count 0)
     ("complextion" "completion" nil :count 0)
     ("handly" "handy" nil :count 0)
     ("icludes" "includes" nil :count 0)

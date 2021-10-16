@@ -106,13 +106,13 @@ esac
 
 # Check if LLVM is installed
 
-LLVM_VERSION="-11"
+LLVM_VERSION="-13"
 
 case "$DIST_VERSION" in
     Ubuntu_16.04) REPO_NAME="deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial$LLVM_VERSION  main" ;;
     Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
     Ubuntu_19.04) REPO_NAME="deb http://apt.llvm.org/disco/    llvm-toolchain-disco$LLVM_VERSION   main" ;;
-    Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal$LLVM_VERSION    main" ;;
+    Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal$LLVM_VERSION   main" ;;
     *)
         echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
         exit 2
