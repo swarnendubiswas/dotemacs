@@ -16,12 +16,13 @@
                                            (expand-file-name "core/utils" (projectile-project-root))
                                            (expand-file-name "." (projectile-project-root))
                                            )))
-                        (setq-local company-clang-arguments     clang-args
-                                    flycheck-clang-args         clang-args
-                                    flycheck-gcc-args           clang-args
-                                    flycheck-gcc-include-path   include-path
-                                    flycheck-clang-include-path include-path
-                                    flycheck-cuda-include-path  include-path)
+                        (setq-local company-clang-arguments        clang-args
+                                    flycheck-gcc-args              clang-args
+                                    flycheck-gcc-include-path      include-path
+                                    flycheck-clang-args            clang-args
+                                    flycheck-clang-include-path    include-path
+                                    flycheck-cuda-include-path     include-path
+                                    flycheck-cppcheck-include-path include-path)
                         ))
               ))
  )

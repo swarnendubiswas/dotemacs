@@ -31,9 +31,9 @@
                                     flycheck-cppcheck-include-path include-path)
                         ))
               (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
-              (eval . (add-to-list 'lsp-clients-clangd-args (concat "--compile-commands-dir="
-                                                                    (concat "."
-                                                                            (projectile-project-root)))
+              (eval . (add-to-list 'lsp-clients-clangd-args
+                                   (concat "--compile-commands-dir="
+                                           (concat "." (projectile-project-root)))
                                    'append))
               ))
  )

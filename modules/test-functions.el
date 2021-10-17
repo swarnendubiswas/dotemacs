@@ -1,4 +1,18 @@
+;;; test-functions.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; Test functions
+
+(declare-function -tree-map              "dash")
+(declare-function f-join                  "f")
+(declare-function f-exists?               "f")
+(declare-function projectile-project-root "projectile")
 
 (defun sb/open-local-file-projectile (directory)
   "Open projectile file within DIRECTORY.
@@ -56,8 +70,13 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
                                   (find-file default-file)))))
                           nillist))))
             mylist)))
+
 ;; (sb/open-project-default-file2)
 
 ;; (with-eval-after-load "counsel-projectile"
 ;;   (add-to-list 'counsel-projectile-action '("d"
-;;                                             sb/open-project-default-file2 "open default file") t))
+;;     sb/open-project-default-file2 "open default file") t))
+
+(provide 'test-functions)
+
+;;; test-functions.el ends here

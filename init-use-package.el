@@ -302,19 +302,26 @@ This location is used for temporary installations and files.")
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
 
-;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox is
-;; `paradox-upgrade-packages' in a single command.
-(use-package paradox
-  :disabled t
-  :commands (paradox-enable)
-  :bind
-  (("C-c d l" . paradox-list-packages)
-   ("C-c d u" . paradox-upgrade-packages))
-  :config
-  (setq paradox-display-star-count nil
-        paradox-execute-asynchronously t
-        paradox-github-token t)
-  (paradox-enable))
+;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
+;; is `paradox-upgrade-packages' in a single command.
+(or
+ (use-package package
+   :if sb/EMACS27+
+   :bind
+   (("C-c d p" . package-quickstart-refresh)
+    ("C-c d l" . package-list-packages)))
+
+ (use-package paradox
+   :disabled t
+   :commands (paradox-enable)
+   :bind
+   (("C-c d l" . paradox-list-packages)
+    ("C-c d u" . paradox-upgrade-packages))
+   :config
+   (setq paradox-display-star-count nil
+         paradox-execute-asynchronously t
+         paradox-github-token t)
+   (paradox-enable)))
 
 ;; Get PATH with `(getenv "PATH")'. Set PATH with
 ;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'
@@ -694,7 +701,6 @@ SAVE-FN with non-nil ARGS."
 
 ;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
-  :if (display-graphic-p)
   :commands circadian-setup
   :init
   (require 'solar)
@@ -747,13 +753,13 @@ SAVE-FN with non-nil ARGS."
   :ensure modus-themes
   :if (eq sb/theme 'modus-operandi)
   :init
-  (setq modus-themes-completions 'opinionated
-        modus-themes-fringes 'subtle
-        modus-themes-intense-hl-line nil
-        modus-themes-scale-headings nil
-        modus-themes-prompts 'intense-accented
-        modus-themes-variable-pitch-headings nil
-        modus-themes-org-blocks 'tinted-background)
+  ;; (setq modus-themes-completions 'opinionated
+  ;;       modus-themes-fringes 'subtle
+  ;;       modus-themes-hl-line '(underline accented)
+  ;;       modus-themes-scale-headings nil
+  ;;       modus-themes-prompts 'intense-accented
+  ;;       modus-themes-variable-pitch-headings nil
+  ;;       modus-themes-org-blocks 'tinted-background)
 
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -761,22 +767,13 @@ SAVE-FN with non-nil ARGS."
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
 
-  (load-theme 'modus-operandi t)
-
-  ;; :custom-face
-  ;; (mode-line ((t (:background "#d7d7d7" :foreground "#0a0a0a"
-  ;;                             :box (:line-width 1 :color "#505050")
-  ;;                             :height 0.8))))
-  ;; (mode-line-inactive ((t (:background "#efefef" :foreground "#404148"
-  ;;                                      :box (:line-width 1 :color "#bcbcbc")
-  ;;                                      :height 0.8))))
-  )
+  (load-theme 'modus-operandi t))
 
 ;; Looks good on the TUI
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
-  :if (or (eq sb/theme 'modus-vivendi) (not (display-graphic-p)))
+  :if (eq sb/theme 'modus-vivendi)
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -1210,32 +1207,32 @@ SAVE-FN with non-nil ARGS."
 
     ;; https://github.com/Alexander-Miller/treemacs/issues/735
     (treemacs-create-theme "Default-Tighter"
-                           :extends "Default"
-                           :config
-                           (let ((icons (treemacs-theme->gui-icons theme)))
-                             (maphash (lambda
-                                        (ext icon)
-                                        (puthash ext
-                                                 (concat
-                                                  (substring icon 0 1)
-                                                  (propertize " " 'display
-                                                              '(space . (:width 0.5))))
-                                                 icons))
-                                      icons)))
+      :extends "Default"
+      :config
+      (let ((icons (treemacs-theme->gui-icons theme)))
+        (maphash (lambda
+                   (ext icon)
+                   (puthash ext
+                            (concat
+                             (substring icon 0 1)
+                             (propertize " " 'display
+                                         '(space . (:width 0.5))))
+                            icons))
+                 icons)))
 
     (treemacs-create-theme "all-the-icons-tighter"
-                           :extends "all-the-icons"
-                           :config
-                           (let ((icons (treemacs-theme->gui-icons theme)))
-                             (maphash (lambda
-                                        (ext icon)
-                                        (puthash ext
-                                                 (concat
-                                                  (substring icon 0 1)
-                                                  (propertize " " 'display
-                                                              '(space . (:width 0.5))))
-                                                 icons))
-                                      icons)))
+      :extends "all-the-icons"
+      :config
+      (let ((icons (treemacs-theme->gui-icons theme)))
+        (maphash (lambda
+                   (ext icon)
+                   (puthash ext
+                            (concat
+                             (substring icon 0 1)
+                             (propertize " " 'display
+                                         '(space . (:width 0.5))))
+                            icons))
+                 icons)))
 
     (treemacs-load-theme "all-the-icons"))
 
@@ -3318,6 +3315,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package css-mode
   :commands css-mode
+  :defines sb/flycheck-local-checkers
   :config
   (setq css-indent-offset 2)
 
@@ -3817,9 +3815,9 @@ SAVE-FN with non-nil ARGS."
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (ht-merge (lsp-configuration-section "pyright")
-                                                     (lsp-configuration-section "python")))))
+                        (lsp--set-configuration
+                         (ht-merge (lsp-configuration-section "pyright")
+                                   (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -5170,434 +5168,14 @@ Ignore if no file is found."
   (unless (server-running-p)
     (server-start)))
 
+(add-to-list 'load-path (concat user-emacs-directory "modules"))
+
 ;; Function definitions
+(require 'defuns)
+(require 'test-functions)
 
-;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
-(defun sb/save-all-buffers ()
-  "Save all modified buffers without prompting."
-  (interactive)
-  (save-some-buffers t))
-
-;; http://endlessparentheses.com/implementing-comment-line.html
-(defun sb/comment-line (n)
-  "Comment or uncomment current line and leave point after it.
-With positive prefix, apply to N lines including current one.
-With negative prefix, apply to -N lines above.
-If region is active, apply to active region instead."
-  (interactive "p")
-  (if (use-region-p)
-      (comment-or-uncomment-region
-       (region-beginning) (region-end))
-    (let ((range
-           (list (line-beginning-position)
-                 (goto-char (line-end-position n)))))
-      (comment-or-uncomment-region
-       (apply #'min range)
-       (apply #'max range)))
-    (forward-line 1)
-    (back-to-indentation)))
-
-;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
-(defun sb/toggle-line-spacing ()
-  "Toggle line spacing.  Increase the line spacing to help readability.
-Increase line spacing by two line height."
-  (interactive)
-  (if (eq line-spacing nil)
-      (setq line-spacing 2)
-    (setq line-spacing nil))
-  (redraw-frame (selected-frame)))
-
-(defun sb/byte-compile-current-file ()
-  "Byte compile the current file."
-  (interactive)
-  (byte-compile-file buffer-file-name))
-
-;; http://emacsredux.com/blog/2013/06/25/boost-performance-by-leveraging-byte-compilation/
-(defun sb/byte-compile-init-dir ()
-  "Byte-compile all elisp files in the user init directory."
-  (interactive)
-  (byte-recompile-directory user-emacs-directory 0))
-
-;; https://github.com/thomasf/dotfiles-thomasf-emacs/blob/e14a7e857a89b7488ba5bdae54877abdc77fa9e6/emacs.d/init.el
-(defun sb/switch-to-minibuffer ()
-  "Switch to minibuffer window."
-  (interactive)
-  (if (active-minibuffer-window)
-      (select-window (active-minibuffer-window))
-    (error "Minibuffer is not active")))
-
-(defun sb/switch-to-scratch ()
-  "Switch to the *scratch* buffer."
-  (interactive)
-  (switch-to-buffer "*scratch*"))
-
-;; https://www.emacswiki.org/emacs/InsertDate
-(defun sb/insert-date (arg)
-  "Insert today's date.  With prefix argument ARG, use a different format."
-  (interactive "P")
-  (insert (if arg
-              (format-time-string "%d.%m.%Y")
-            (format-time-string "%\"Mmmm\" %d, %Y"))))
-
-;; http://zck.me/emacs-move-file
-(defun sb/move-file (new-location)
-  "Write this file to NEW-LOCATION, and delete the old one."
-  (interactive (list (if buffer-file-name
-                         (read-file-name "Move file to: ")
-                       (read-file-name "Move file to: "
-                                       default-directory
-                                       (expand-file-name (file-name-nondirectory (buffer-name))
-                                                         default-directory)))))
-  (when (file-exists-p new-location)
-    (delete-file new-location))
-  (let ((old-location (buffer-file-name)))
-    (write-file new-location t)
-    (when (and old-location
-               (file-exists-p new-location)
-               (not (string-equal old-location new-location)))
-      (delete-file old-location))))
-
-;; https://www.emacswiki.org/emacs/BuildTags
-(defun sb/create-ctags (dir-name)
-  "Create tags file with ctags in DIR-NAME."
-  (interactive "DDirectory: ")
-  (shell-command
-   (format "%s -f TAGS -eR %s" sb/ctags-path (directory-file-name dir-name))))
-
-;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
-(defun sb/counsel-all-files-recursively (dir-name)
-  "List all files recursively in DIR-NAME."
-  (interactive "DDirectory: ")
-  (let* ((cands (split-string
-                 (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
-    (ivy-read "File: " cands
-              :action #'find-file
-              :caller 'sb/counsel-all-files-recursively)))
-
-;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
-;; You need to check for either major modes or buffer names, since a few major modes are commonly
-;; used.
-(defcustom sb/skippable-buffers
-  '(
-    "TAGS" "*Messages*" "*Backtrace*" "*scratch*"
-    ;; "*company-documentation*" ; Major mode is `python-mode'
-    ;; "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*" "*Compile-Log* *lsp-log*"
-    ;; "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*" "*perl-language-server*"
-    ;; "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*"
-    ;; "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*"
-    ;; "*clangd::stderr*" "*shfmt errors*"
-    )
-  "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
-  :type '(repeat string))
-
-;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
-(defun sb/get-buffer-major-mode (buffer-or-string)
-  "Return the major mode associated with BUFFER-OR-STRING."
-  (with-current-buffer buffer-or-string
-    major-mode))
-
-(defcustom sb/skippable-modes '(dired-mode fundamental-mode
-                                           helpful-mode
-                                           special-mode
-                                           paradox-menu-mode
-                                           lsp-log-io-mode
-                                           help-mode
-                                           magit-status-mode
-                                           magit-process-mode
-                                           magit-diff-mode
-                                           tags-table-mode
-                                           compilation-mode
-                                           flycheck-verify-mode)
-  "List of major modes to skip over when calling `change-buffer'."
-  :type '(repeat string))
-
-(defun sb/change-buffer (change-buffer)
-  "Call CHANGE-BUFFER.
-Keep trying until current buffer is not in `sb/skippable-buffers'
-or the major mode is not in `sb/skippable-modes'."
-  (let ((initial (current-buffer)))
-    (funcall change-buffer)
-    (let ((first-change (current-buffer)))
-      (catch 'loop
-        (while (or (member (buffer-name) sb/skippable-buffers)
-                   (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
-          (funcall change-buffer)
-          (when (eq (current-buffer) first-change)
-            (switch-to-buffer initial)
-            (throw 'loop t)))))))
-
-(defun sb/next-buffer ()
-  "Variant of `next-buffer' that skips `sb/skippable-buffers'."
-  (interactive)
-  (sb/change-buffer 'next-buffer))
-
-(defun sb/previous-buffer ()
-  "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
-  (interactive)
-  (sb/change-buffer 'previous-buffer))
-
-;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
-(defun sb/reinstall-package (package)
-  "Reinstall PACKAGE without restarting Emacs."
-  (interactive)
-  (unload-feature package)
-  (package-reinstall package)
-  (require package))
-
-;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
-(defun sb/get-derived-modes (mode)
-  "Return a list of the ancestor modes that MODE is derived from."
-  (let ((modes ())
-        (parent nil))
-    (while (setq parent (get mode 'derived-mode-parent))
-      (push parent modes)
-      (setq mode parent))
-    (setq modes (nreverse modes))))
-
-(defun sb/goto-line-with-feedback ()
-  "Show line numbers temporarily, while prompting for the line number input."
-  (interactive)
-  (unwind-protect
-      (progn
-        (linum-mode 1)
-        (forward-line (read-number "Goto line: ")))
-    (linum-mode -1)))
-
-;; Generic keybindings, package-specific are usually in their own modules. The `C-x' keymap is for
-;; global bindings that are expected to work regardless of the active modes. The `C-c' binding
-;; followed by a control character or a digit are reserved for major modes. The sequence of `C-c'
-;; followed by any other ASCII punctuation or symbol character are allocated for minor modes.
-;; Sequences consisting of `C-c' and a letter (either upper or lower case) are reserved for users.
-;; Check the "Key Binding Conventions" in the Emacs manual (`C-h i'). Use `C-h b' to see available
-;; bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
-
-;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd` macro is not required with
-;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
-
-;; Other variants:
-;; `(global-set-key (kbd "RET") 'newline-and-indent)'
-;; `(define-key global-map (kbd "RET") 'newline-and-indent)'
-
-;; https://www.masteringemacs.org/article/mastering-key-bindings-emacs
-
-(bind-keys
- ("RET"       . newline-and-indent)
- ("C-l"       . goto-line)
- ("C-c z"     . repeat)
- ("C-z"       . undo)
- ("<f11>"     . delete-other-windows)
- ("C-x k"     . kill-this-buffer)
- ("M-<left>"  . previous-buffer)
- ("M-<right>" . next-buffer)
- ("C-c d f"   . auto-fill-mode)
- ("M-c"       . capitalize-dwim)
- ("M-u"       . upcase-dwim)
- ("M-l"       . downcase-dwim)
- ("<f7>"      . previous-error)
- ("<f8>"      . next-error)
- ;; The default keybinding `C-S-backspace' does not work with TUI
- ("M-k"       . kill-whole-line))
-
-;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
-;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
-(bind-keys*
- ("C-c n" . comment-region)
- ("C-c m" . uncomment-region)
- ("C-c ;" . sb/comment-line)
- ("C-c b" . comment-box)
- ("C-s"   . save-buffer)
- ("C-S-s" . sb/save-all-buffers))
-
-(unbind-key "C-x s") ; Bound to save-some-buffers
-(bind-key   "C-x s" #'sb/switch-to-scratch)
-(bind-key   "C-x j" #'sb/counsel-all-files-recursively)
-
-(unbind-key "C-j") ; Interferes with imenu `C-c C-j'
-
-(use-package package
-  :if sb/EMACS27+
-  :bind ("C-c d p" . package-quickstart-refresh))
-
-(global-set-key [remap next-buffer]     #'sb/next-buffer)
-(global-set-key [remap previous-buffer] #'sb/previous-buffer)
-
-(use-package default-text-scale
-  :bind
-  (("C-M-+" . default-text-scale-increase)
-   ("C-M--" . default-text-scale-decrease)))
-
-(use-package free-keys
-  :commands free-keys)
-
-(use-package which-key ; Show help popups for prefix keys
-  :diminish
-  :commands (which-key-mode which-key-setup-side-window-right-bottom)
-  :init (run-with-idle-timer 3 nil #'which-key-mode)
-  :config
-  (which-key-setup-side-window-right-bottom)
-  ;; Allow C-h to trigger which-key before it is done automatically
-  (setq which-key-show-early-on-C-h t))
-
-(use-package which-key-posframe
-  :disabled t
-  :commands which-key-posframe-mode
-  :hook (which-key-mode . which-key-posframe-mode)
-  :config
-  ;; The posframe has a low contrast
-  ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
-  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
-
-;; Hydras
-
-;; `:exit t' will quit the hydra
-(defhydra sb/hydra-spelling (:color blue)
-  "
-  ^
-  ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
-  ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
-  _q_ quit            _<_ previous        _c_ correction        _n_ next error
-  ^^                  _>_ next            _d_ dictionary        _p_ previous error
-  ^^                  _f_ check           _m_ mode              _a_ add word
-  ^^                  ^^                  ^^                    ^^
-  "
-  ("q" nil "quit")
-  ("<" flyspell-correct-previous :color pink)
-  (">" flyspell-correct-next :color pink)
-  ("c" ispell)
-  ("d" ispell-change-dictionary)
-  ("f" flyspell-buffer)
-  ("m" flyspell-mode)
-  ("n" spell-fu-goto-next-error)
-  ("p" spell-fu-goto-previous-error)
-  ("a" spell-fu-word-add))
-
-(defhydra sb/hydra-text-scale-zoom ()
-  "Zoom the text"
-  ("i" default-text-scale-increase "in")
-  ("o" default-text-scale-decrease "out")
-  ("q" nil "quit"))
-
-(defhydra sb/hydra-error (global-map "C-c h e")
-  "goto-error"
-  ("h" first-error "first")
-  ("j" next-error "next")
-  ("k" previous-error "prev")
-  ("v" recenter-top-bottom "recenter")
-  ("q" nil "quit"))
-
-;; https://github.com/abo-abo/hydra/wiki/avy
-(defhydra sb/hydra-avy (:exit t :hint nil)
-  "
- Line^^       Region^^        Goto
-----------------------------------------------------------
- [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
- [_m_] move   [_M_] move      [_w_] word        [_W_] any word
- [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
-  ("c" avy-goto-char-timer)
-  ("C" avy-goto-char)
-  ("w" avy-goto-word-1)
-  ("W" avy-goto-word-0)
-  ("l" avy-goto-line)
-  ("L" avy-goto-end-of-line)
-  ("m" avy-move-line)
-  ("M" avy-move-region)
-  ("k" avy-kill-whole-line)
-  ("K" avy-kill-region)
-  ("y" avy-copy-line)
-  ("Y" avy-copy-region))
-
-(defhydra sb/hydra-projectile (:color teal :hint nil)
-  "
-     PROJECTILE: %(projectile-project-root)
-
-     Find File            Search/Tags          Buffers                Cache
-------------------------------------------------------------------------------------------
-_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
- _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
- _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-  _r_: recent file                                               ^^^^_z_: cache current
-  _d_: dir
-"
-  ("b"   projectile-switch-to-buffer)
-  ("c"   projectile-invalidate-cache)
-  ("d"   projectile-find-dir)
-  ("s-f" projectile-find-file)
-  ("ff"  projectile-find-file-dwim)
-  ("fd"  projectile-find-file-in-directory)
-  ("i"   projectile-ibuffer)
-  ("K"   projectile-kill-buffers)
-  ("s-k" projectile-kill-buffers)
-  ("m"   projectile-multi-occur)
-  ("o"   projectile-multi-occur)
-  ("s-p" projectile-switch-project "switch project")
-  ("p"   projectile-switch-project)
-  ("s"   projectile-switch-project)
-  ("r"   projectile-recentf)
-  ("x"   projectile-remove-known-project)
-  ("X"   projectile-cleanup-known-projects)
-  ("z"   projectile-cache-current-file)
-  ("a"   projectile-ag)
-  ("g"   projectile-find-tag)
-  ("q"   nil "cancel" :color blue))
-
-
-(defhydra sb/hydra-flycheck (:color blue)
-  "
-  ^
-  ^Flycheck^          ^Errors^            ^Checker^
-  ^────────^──────────^──────^────────────^───────^─────
-  _q_ quit            _<_ previous        _?_ describe
-  _M_ manual          _>_ next            _d_ disable
-  _v_ verify setup    _f_ check           _m_ mode
-  ^^                  _l_ list            _s_ select
-  ^^                  ^^                  ^^
-  "
-  ("q" nil)
-  ("<" flycheck-previous-error :color pink)
-  (">" flycheck-next-error :color pink)
-  ("?" flycheck-describe-checker)
-  ("M" flycheck-manual)
-  ("d" flycheck-disable-checker)
-  ("f" flycheck-buffer)
-  ("l" flycheck-list-errors)
-  ("m" flycheck-mode)
-  ("s" flycheck-select-checker)
-  ("v" flycheck-verify-setup))
-
-(with-eval-after-load "python"
-  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
-    "Adjust Python indentation."
-    (">" python-indent-shift-right "right")
-    ("<" python-indent-shift-left "left")))
-
-(defhydra sb/smerge-hydra
-  (:color pink :hint nil :post (smerge-auto-leave))
-  "
-^Move^       ^Keep^               ^Diff^                 ^Other^
-^^-----------^^-------------------^^---------------------^^-------
-_n_ext       _b_ase               _<_: upper/base        _C_ombine
-_p_rev       _u_pper              _=_: upper/lower       _r_esolve
-^^           _l_ower              _>_: base/lower        _k_ill current
-^^           _a_ll                _R_efine
-^^           _RET_: current       _E_diff
-"
-  ("n" smerge-next)
-  ("p" smerge-prev)
-  ("b" smerge-keep-base)
-  ("u" smerge-keep-upper)
-  ("l" smerge-keep-lower)
-  ("a" smerge-keep-all)
-  ("RET" smerge-keep-current)
-  ("\C-m" smerge-keep-current)
-  ("<" smerge-diff-base-upper)
-  ("=" smerge-diff-upper-lower)
-  (">" smerge-diff-base-lower)
-  ("R" smerge-refine)
-  ("E" smerge-ediff)
-  ("C" smerge-combine-with-next)
-  ("r" smerge-resolve)
-  ("k" smerge-kill-current)
-  ("q" nil "cancel" :color blue))
+;; Keybindings
+(require 'keybindings)
 
 ;; Mark safe variables
 
