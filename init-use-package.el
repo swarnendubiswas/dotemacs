@@ -178,16 +178,17 @@ This location is used for temporary installations and files.")
 
 (setq use-package-enable-imenu-support t)
 (when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error nil
-        use-package-always-ensure t
+  (setq debug-on-error                 nil
+        use-package-always-ensure      t
         use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-        use-package-expand-minimally nil
-        use-package-verbose t))
+        use-package-expand-minimally   nil
+        use-package-verbose            t))
 
 ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
 ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
 ;; using `:after' and always deferring loading, because then we will need to specifiy alternate ways
-;; of loading the package. https://github.com/jwiegley/use-package#notes-about-lazy-loading
+;; of loading the package.
+;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer t
         ;; I need to manually set this to true whenever I modify package installations, so it is
@@ -217,12 +218,6 @@ This location is used for temporary installations and files.")
 
 (use-package diminish)
 
-(use-package dash
-  :commands (-tree-map --remove))
-
-(use-package f
-  :commands (f-join f-exists? f-glob))
-
 (use-package s
   :commands s-starts-with?)
 
@@ -235,7 +230,7 @@ This location is used for temporary installations and files.")
 (defcustom sb/use-no-littering
   t
   "Use the `no-littering' package to keep `.emacs.d' clean."
-  :type 'boolean
+  :type  'boolean
   :group 'sb/emacs)
 
 (use-package no-littering
@@ -281,8 +276,8 @@ This location is used for temporary installations and files.")
     (defvar quelpa-update-melpa-p)
     (defvar quelpa-upgrade-interval)
     (defvar quelpa-self-upgrade-p)
-    (setq quelpa-self-upgrade-p nil
-          quelpa-update-melpa-p nil
+    (setq quelpa-self-upgrade-p   nil
+          quelpa-update-melpa-p   nil
           quelpa-upgrade-interval 30))
 
   (use-package quelpa-use-package
@@ -4540,7 +4535,7 @@ SAVE-FN with non-nil ARGS."
   ((bibtex-mode . turn-on-auto-revert-mode)
    (bibtex-mode . lsp-deferred))
   :config
-  (setq bibtex-align-at-equal-sign t
+  (setq bibtex-align-at-equal-sign     t
         bibtex-maintain-sorted-entries t))
 
 (use-package bibtex-utils
@@ -4795,7 +4790,7 @@ Ignore if no file is found."
   :commands mlir-mode
   :load-path "extras"
   ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file [3 times]"
+  ;; "Warning (package): Unnecessary call to `package-initialize' in init file [3 times]"
   ;; This will clone the llvm project
   ;; :quelpa ((mlir-mode :fetcher github :repo "llvm/llvm-project"
   ;;                     :files ("mlir/utils/emacs/mlir-mode.el")))
@@ -4855,18 +4850,12 @@ Ignore if no file is found."
   :defines fasd-enable-initial-prompt
   :if (executable-find "fasd")
   :commands (global-fasd-mode fasd-find-file)
-  :init (run-with-idle-timer 2 nil #'global-fasd-mode)
+  :init (run-with-idle-timer 3 nil #'global-fasd-mode)
   :config (setq fasd-enable-initial-prompt nil)
   :bind ("C-c /" . fasd-find-file))
 
 (use-package dotenv-mode
   :mode "\\.env\\'")
-
-(use-package rust-mode
-  :disabled t
-  :commands rust-mode
-  :hook (rust-mode . lsp-deferred)
-  :config (setq rust-format-on-save t))
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (use-package ansi-color
