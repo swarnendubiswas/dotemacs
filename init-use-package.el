@@ -488,7 +488,7 @@ This location is used for temporary installations and files.")
       ;; especially slow in larger files during large-scale scrolling commands. If kept over 100,
       ;; the window is never automatically recentered.
       scroll-conservatively 101
-      scroll-margin 0
+      scroll-margin 2 ; Add margin lines when scrolling vertically to have a sense of continuity
       scroll-preserve-screen-position t
       ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
       auto-window-vscroll nil
@@ -660,7 +660,8 @@ SAVE-FN with non-nil ARGS."
   :hook
   (prog-mode . (lambda ()
                  (hs-minor-mode 1)
-                 (hs-hide-initial-comment-block))))
+                 (hs-hide-initial-comment-block)))
+  :config (setq hs-isearch-open t))
 
 (add-hook 'prog-mode-hook
           (lambda ()
@@ -697,6 +698,7 @@ SAVE-FN with non-nil ARGS."
 ;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
   :commands circadian-setup
+  :if (display-graphic-p)
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
@@ -764,11 +766,11 @@ SAVE-FN with non-nil ARGS."
 
   (load-theme 'modus-operandi t))
 
-;; Looks good on the TUI
+;; A dark theme looks good on the TUI
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
-  :if (eq sb/theme 'modus-vivendi)
+  :if (or (eq sb/theme 'modus-vivendi) (not (display-graphic-p)))
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -1202,32 +1204,32 @@ SAVE-FN with non-nil ARGS."
 
     ;; https://github.com/Alexander-Miller/treemacs/issues/735
     (treemacs-create-theme "Default-Tighter"
-      :extends "Default"
-      :config
-      (let ((icons (treemacs-theme->gui-icons theme)))
-        (maphash (lambda
-                   (ext icon)
-                   (puthash ext
-                            (concat
-                             (substring icon 0 1)
-                             (propertize " " 'display
-                                         '(space . (:width 0.5))))
-                            icons))
-                 icons)))
+                           :extends "Default"
+                           :config
+                           (let ((icons (treemacs-theme->gui-icons theme)))
+                             (maphash (lambda
+                                        (ext icon)
+                                        (puthash ext
+                                                 (concat
+                                                  (substring icon 0 1)
+                                                  (propertize " " 'display
+                                                              '(space . (:width 0.5))))
+                                                 icons))
+                                      icons)))
 
     (treemacs-create-theme "all-the-icons-tighter"
-      :extends "all-the-icons"
-      :config
-      (let ((icons (treemacs-theme->gui-icons theme)))
-        (maphash (lambda
-                   (ext icon)
-                   (puthash ext
-                            (concat
-                             (substring icon 0 1)
-                             (propertize " " 'display
-                                         '(space . (:width 0.5))))
-                            icons))
-                 icons)))
+                           :extends "all-the-icons"
+                           :config
+                           (let ((icons (treemacs-theme->gui-icons theme)))
+                             (maphash (lambda
+                                        (ext icon)
+                                        (puthash ext
+                                                 (concat
+                                                  (substring icon 0 1)
+                                                  (propertize " " 'display
+                                                              '(space . (:width 0.5))))
+                                                 icons))
+                                      icons)))
 
     (treemacs-load-theme "all-the-icons"))
 
@@ -1516,10 +1518,12 @@ SAVE-FN with non-nil ARGS."
   (let ((inhibit-message t))
     (apply orig-fun args)))
 
-;; Hide the "Wrote to recentf" message which is irritating
+;; Hide the "Wrote to recentf" message
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
+;; Hide the "Cleaning up the recentf list...done" message
+(advice-add 'recentf-cleanup   :around #'sb/inhibit-message-call-orig-fun)
 
-;; Hide the "Wrote ..." message which is irritating
+;; Hide the "Wrote ..." message
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 ;; LATER: Can we shorten long Tramp file names?
@@ -3091,6 +3095,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood
 (use-package writegood-mode
+  :disabled t
   :commands writegood-mode
   :diminish
   :hook (text-mode . writegood-mode))
@@ -3711,8 +3716,8 @@ SAVE-FN with non-nil ARGS."
   :hook (python-mode . lsp-deferred)
   :bind
   (:map python-mode-map
-        ("M-["   . python-nav-backward-block)
-        ("M-]"   . python-nav-forward-block)
+        ("M-a"   . python-nav-backward-block)
+        ("M-e"   . python-nav-forward-block)
         ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
         ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
         ("C-c <" . python-indent-shift-left)
@@ -3810,9 +3815,9 @@ SAVE-FN with non-nil ARGS."
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (ht-merge (lsp-configuration-section "pyright")
-                                   (lsp-configuration-section "python")))))
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -3879,8 +3884,8 @@ SAVE-FN with non-nil ARGS."
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-remote)))
 
@@ -4129,8 +4134,8 @@ SAVE-FN with non-nil ARGS."
         ("M-g n"   . smerge-next)
         ("M-g p"   . smerge-prev)
         ("M-g k c" . smerge-keep-current)
-        ("M-g k m" . smerge-keep-upper)
-        ("M-g k o" . smerge-keep-lower)
+        ("M-g k u" . smerge-keep-upper)
+        ("M-g k l" . smerge-keep-lower)
         ("M-g k b" . smerge-keep-base)
         ("M-g k a" . smerge-keep-all)
         ("M-g e"   . smerge-ediff)
@@ -4159,8 +4164,9 @@ SAVE-FN with non-nil ARGS."
    (".clang-tidy"   . yaml-mode))
   :hook
   (yaml-mode . (lambda ()
+                 ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking
                  (setq-local lsp-ltex-enabled nil)
-                 (spell-fu-mode -1) ; `yaml-mode' is derived from `text-mode'
+                 (spell-fu-mode -1)
                  (flyspell-mode -1)
                  (lsp-deferred)))
   :config
@@ -4201,7 +4207,8 @@ SAVE-FN with non-nil ARGS."
    ("\\.handlebars\\'" . web-mode))
   :hook (web-mode . lsp-deferred)
   :config
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  ;; ESLint need to be configured properly for this to work
+  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
 
   (setq web-mode-enable-auto-closing              t
         web-mode-enable-auto-pairing              t
@@ -4397,6 +4404,7 @@ SAVE-FN with non-nil ARGS."
 
 ;; FIXME: This package is not working as intended
 (use-package lsp-ltex
+  :disabled t
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
@@ -4742,10 +4750,12 @@ Ignore if no file is found."
     :server-id 'jsonls-remote)))
 
 (use-package json-reformat
-  :after json-mode)
+  :after json-mode
+  :demand t)
 
 (use-package json-snatcher
-  :after json-mode)
+  :after json-mode
+  :demand t)
 
 (use-package scss-mode
   :disabled t
@@ -4780,7 +4790,6 @@ Ignore if no file is found."
   :hook (bazel-mode . flycheck-mode))
 
 (use-package protobuf-mode
-  :disabled t
   :commands protobuf-mode
   :mode "\\.proto$"
   :hook (protobuf-mode . flycheck-mode))
@@ -4809,7 +4818,7 @@ Ignore if no file is found."
   :config (setq clang-format+-always-enable t))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
-;; background process but does not support tramp and supports fewer formatters.
+;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
   :commands (format-all-ensure-formatter format-all-buffer)
   :preface
@@ -5146,10 +5155,11 @@ Ignore if no file is found."
                              company-yasnippet
                              company-dabbrev
                              company-ispell)))
+
   (dolist (hook '(web-mode-hook))
     (add-hook hook #'sb/company-web-mode)))
 
-;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
+;; Use `emacsclient -c -nw' to start a new frame.
 (use-package server
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
   :commands server-running-p
@@ -5159,17 +5169,11 @@ Ignore if no file is found."
 
 (add-to-list 'load-path (concat user-emacs-directory "modules"))
 
-;; Function definitions
 (require 'defuns)
 (require 'test-functions)
-
-;; Keybindings
 (require 'keybindings)
 
 ;; Mark safe variables
-
-;; (add-to-list 'safe-local-variable-values '(auto-fill-function . nil))
-;; (add-to-list 'safe-local-eval-forms '(visual-line-mode +1))
 
 (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
 (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
