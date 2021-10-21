@@ -1867,7 +1867,9 @@ SAVE-FN with non-nil ARGS."
         ispell-silently-savep t)
 
   ;; Skip regions in Org-mode
+  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_EXAMPLE" . "#\\+END_EXAMPLE"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
   (add-to-list 'ispell-skip-region-alist '("=" "=")))
@@ -3716,10 +3718,10 @@ SAVE-FN with non-nil ARGS."
   :hook (python-mode . lsp-deferred)
   :bind
   (:map python-mode-map
-        ("M-a"   . python-nav-backward-block)
-        ("M-e"   . python-nav-forward-block)
         ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
         ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
+        ("M-{"   . python-nav-backward-block)
+        ("M-}"   . python-nav-forward-block)
         ("C-c <" . python-indent-shift-left)
         ("C-c >" . python-indent-shift-right))
   :config
@@ -4043,16 +4045,8 @@ SAVE-FN with non-nil ARGS."
           magit-diff-highlight-trailing nil
           magit-diff-paint-whitespace nil)))
 
-(use-package gitignore-mode
-  :commands gitignore-mode)
-
-(use-package gitattributes-mode
-  :disabled t
-  :commands gitattributes-mode)
-
-(use-package gitconfig-mode
-  :disabled t
-  :commands gitconfig-mode)
+(use-package git-modes
+  :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
 (use-package git-gutter
   :if (unless (boundp 'vc-handled-backends))
@@ -4402,18 +4396,17 @@ SAVE-FN with non-nil ARGS."
 
   )
 
-;; FIXME: This package is not working as intended
 (use-package lsp-ltex
-  :disabled t
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :hook
+  ;; TODO: Is specifying `gfm-mode' needed?
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-ltex)
                                                                          (lsp-deferred)))
   :init
-  (setq lsp-ltex-enabled t
-        lsp-ltex-check-frequency "save"
-        lsp-ltex-dictionary '("microbenchmarks")
+  (setq lsp-ltex-check-frequency "save"
+        lsp-ltex-version "14.1.0"
+        ;; lsp-ltex-dictionary ("microbenchmarks")
         lsp-ltex-java-path "/usr/lib/jvm/java-13-openjdk-amd64")
   :config
   ;; (defvar lsp-ltex-active-modes)
