@@ -147,7 +147,8 @@ Increase line spacing by two line height."
                                            magit-diff-mode
                                            tags-table-mode
                                            compilation-mode
-                                           flycheck-verify-mode)
+                                           flycheck-verify-mode
+                                           ibuffer-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type  '(repeat string)
   :group 'sb/emacs)

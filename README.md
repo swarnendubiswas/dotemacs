@@ -8,7 +8,7 @@ Most of the included customizations are from the internet. Suggestions and pull 
 
 You might want to back up your contents if your `.emacs.d` directory is not empty. Then, use the following command to check out the source.
 
-```Bash
+```shell
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 ```
 
@@ -18,8 +18,8 @@ You can use the following instructions to install third-party applications. Add 
 
 #### Ubuntu 18.04 Packages
 
-```Bash
-export LLVM_VERSION="-12"
+```shell
+export LLVM_VERSION="-13"
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
 sudo dpkg -i fd_8.2.1_amd64.deb
@@ -28,7 +28,7 @@ sudo dpkg -i fd_8.2.1_amd64.deb
 #### Ubuntu 20.04 Packages
 
 ```Bash
-export LLVM_VERSION="-12"
+export LLVM_VERSION="-13"
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev
 wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
 sudo dpkg -i fd_8.2.1_amd64.deb
@@ -50,7 +50,7 @@ python3 -m pip install --upgrade pip Sphinx pygments yapf jedi pylint importmagi
 
 #### Other Packages
 
-```Bash
+```shell
 sudo gem install scss_lint
 composer require jetbrains/phpstorm-stubs:dev-master
 composer require felixfbecker/language-server
@@ -62,7 +62,7 @@ sudo cpanm Perl::LanguageServer
 
 > Install node packages locally
 
-```Bash
+```shell
 cd $HOME/tmp; cd;
 npm init --yes;
 npm install --save-dev npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli  markdownlint-cli2 yaml-language-server vscode-json-languageserver intelephense write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli
@@ -76,7 +76,7 @@ Install `textlint` separately so that the installation is shared by other editor
 
 #### Update helper packages
 
-```Bash
+```shell
 cd; sudo apt update; sudo snap refresh; sudo gem update; cd $HOME/tmp; composer update; npm update; cd textlint-workspace; npm update; cd;
 ```
 
@@ -84,7 +84,7 @@ cd; sudo apt update; sudo snap refresh; sudo gem update; cd $HOME/tmp; composer 
 
 Add the following definitions to `$HOME/.bashrc`.
 
-```Bash
+```shell
 echo "export TERM=xterm-256color # Improve Emacs colors in the terminal" >> $HOME/.bashrc
 echo "export ALTERNATE_EDITOR=emacs EDITOR=emacs VISUAL=emacs" >> $HOME/.bashrc
 echo "export NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
@@ -94,7 +94,7 @@ echo "export NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
 
 The setup supports using both Universal Ctags (or `ctags`) and GNU Global (or `gtags`).
 
-```Bash
+```shell
 git clone git@github.com:universal-ctags/ctags.git universal-ctags
 cd universal-ctags
 ./autogen.sh; ./configure; make; sudo make install;
@@ -102,7 +102,7 @@ cd universal-ctags
 
 #### GNU Global
 
-```Bash
+```shell
 wget http://tamacom.com/global/global-6.6.4.tar.gz
 tar -xzvf global-6.6.4.tar.gz
 cd global-6.6.4
@@ -115,25 +115,25 @@ The setup uses the following configuration files.
 
 > `markdownlint-cli`
 
-```Bash
+```shell
 ln -nsf $HOME/github/dotfiles/markdown/dotmarkdownlint.json $HOME/.markdownlint.json;
 ```
 
 > `prettier`
 
-```bash
+```shell
 ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc
 ```
 
 > `pylint`
 
-```bash
+```shell
 ln -nsf $HOME/github/dotfiles/dotconfig/pylintrc $HOME/.config/pylintrc
 ```
 
 > `yapf`
 
-```bash
+```shell
 ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf
 ```
 
@@ -168,25 +168,25 @@ Use GNU Global with `counsel-gtags`: `gtags -cv --gtagslabel=new-ctags`
 
 > **C/C++**
 
-```Bash
+```shell
 find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -cv --gtagslabel=new-ctags -f -
 ```
 
 > **Python**
 
-```Bash
+```shell
 find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
 ```
 
 > **LaTeX**
 
-```Bash
+```shell
 find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
 ```
 
 > **TensorFlow**
 
-```Bash
+```shell
 find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
 ```
 
@@ -210,29 +210,29 @@ For more commands, see the Tags topic in the Emacs info document.
 
 > **TensorFlow**
 
-```Bash
+```shell
 ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt
 ```
 
 > **C/C++ projects**
 
-```Bash
+```shell
 ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=doc --exclude=PTRacer-solver
 ```
 
 > **Ignore directories and files**
 
-```Bash
+```shell
 ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/'
 ```
 
 > **Use an ignore file**
 
-```Bash
+```shell
 ctags -eR --exclude=@.ctagsignore .
 ```
 
-```Bash
+```shell
 $ cat .ctagsignore
 dir1
 dir2
@@ -241,7 +241,7 @@ dir3
 
 > **Parse only Python files**
 
-```Bash
+```shell
 ctags -eR --languages=Python
 ```
 
@@ -302,7 +302,7 @@ Keywords=Text;Editor;
 
 ## Build GNU Emacs from source
 
-```Bash
+```shell
 sudo apt install -y texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin
 git clone git://git.sv.gnu.org/emacs.git
 ./configure --without-makeinfo --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
@@ -312,7 +312,7 @@ sudo make install
 
 ## Setup GCCEmacs
 
-```Bash
+```shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
 sudo apt install gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
 git clone git://git.sv.gnu.org/emacs.git gccemacs

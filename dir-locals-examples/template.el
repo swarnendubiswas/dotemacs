@@ -55,6 +55,9 @@
                               (f-entries (projectile-project-root)
                                          (lambda (f)
                                            (string-match "\\.md$" f)) t))))
+
+         (eval add-to-list 'lsp-file-watch-ignored-directories ".direnv")
+
          ))
 
  (fundamental-mode . (

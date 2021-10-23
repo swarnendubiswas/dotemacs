@@ -1,8 +1,4 @@
 (
- (nil . (
-         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "bin" "log" "/\\.cache$"))
-         ))
-
  (c++-mode . (
               (flycheck-gcc-language-standard   . "c11")
               (flycheck-clang-language-standard . "c11")
