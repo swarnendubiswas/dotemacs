@@ -1,7 +1,5 @@
 (
  (nil . (
-         ;; Use `eval add-to-list' idiom
-
          (projectile-enable-caching . t)
          (eval . (progn
                    (setq-local counsel-etags-project-root (projectile-project-root)
