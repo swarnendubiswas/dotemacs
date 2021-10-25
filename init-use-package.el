@@ -7,10 +7,6 @@
 
 ;;; Code:
 
-;; Load built-in libraries
-(require 'cl-lib)
-(require 'subr-x)
-
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
@@ -28,10 +24,8 @@
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "spacemacs-light" spacemacs-light)
-           (const :tag "tangotango"      tangotango)
            (const :tag "zenburn"         zenburn)
            (const :tag "doom-molokai"    doom-molokai)
-           (const :tag "doom-one-light"  doom-one-light)
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
@@ -705,7 +699,7 @@ SAVE-FN with non-nil ARGS."
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
         circadian-themes '((:sunrise . modus-operandi)
-                           (:sunset  . modus-vivendi)))
+                           (:sunset  . doom-molokai)))
   (circadian-setup))
 
 (use-package leuven-theme
@@ -727,15 +721,6 @@ SAVE-FN with non-nil ARGS."
   :init
   (load-theme 'doom-molokai t)
   (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
-  :config
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification
-  (doom-themes-org-config))
-
-(use-package doom-themes
-  :if (eq sb/theme 'doom-one-light)
-  :commands (doom-themes-org-config doom-themes-treemacs-config)
-  :init (load-theme 'doom-one-light t)
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -3430,12 +3415,17 @@ SAVE-FN with non-nil ARGS."
   ;; We can add "--compile-commands-dir=build" option to indicate the directory where
   ;; `compile_commands.json' reside
   (setq lsp-clients-clangd-args '("-j=4"
+                                  "--all-scopes-completion"
                                   "--background-index"
                                   "--clang-tidy"
+                                  "--completion-style=detailed"
+                                  "--cross-file-rename"
                                   "--fallback-style=LLVM"
                                   "--header-insertion=never"
-                                  "--header-insertion-decorators=0"
+                                  "--header-insertion-decorators"
                                   "--log=error"
+                                  "--malloc-trim"
+                                  ;; Increases memory usage but can improve performance
                                   "--pch-storage=memory"
                                   "--pretty")
         lsp-clients-clangd-executable "clangd"
@@ -3993,7 +3983,6 @@ SAVE-FN with non-nil ARGS."
   (if (boundp 'vc-handled-backends)
       (add-hook 'find-file-hook #'vc-refresh-state)
     (remove-hook 'find-file-hook #'vc-refresh-state)))
-
 
 (use-package transient
   :commands transient-bind-q-to-quit
