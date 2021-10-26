@@ -54,11 +54,11 @@
  ("C-s"   . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
 
-(unbind-key "C-x s") ; Bound to save-some-buffers
+(unbind-key "C-]") ; Bound to `abort-recursive-edit'
+
+(unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 (bind-key   "C-x j" #'sb/counsel-all-files-recursively)
-
-(unbind-key "C-j") ; Interferes with imenu `C-c C-j'
 
 (global-set-key [remap next-buffer]     #'sb/next-buffer)
 (global-set-key [remap previous-buffer] #'sb/previous-buffer)

@@ -18,7 +18,7 @@
   :type  'string
   :group 'sb/emacs)
 
-(defcustom sb/theme
+(defcustom sb/gui-theme
   'none
   "Specify which Emacs theme to use."
   :type  '(radio
@@ -26,6 +26,22 @@
            (const :tag "spacemacs-light" spacemacs-light)
            (const :tag "zenburn"         zenburn)
            (const :tag "doom-molokai"    doom-molokai)
+           (const :tag "doom-gruvbox"    doom-gruvbox)
+           (const :tag "monokai"         monokai)
+           (const :tag "modus-operandi"  modus-operandi)
+           (const :tag "modus-vivendi"   modus-vivendi)
+           (const :tag "customized"      sb/default) ; Customizations over the default theme
+           (const :tag "none"            none))
+  :group 'sb/emacs)
+
+(defcustom sb/tui-theme
+  'modus-vivendi
+  "Specify which Emacs theme to use."
+  :type  '(radio
+           (const :tag "leuven"          leuven)
+           (const :tag "zenburn"         zenburn)
+           (const :tag "doom-molokai"    doom-molokai)
+           (const :tag "doom-gruvbox"    doom-gruvbox)
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
@@ -38,8 +54,6 @@
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
-           (const :tag "smart-mode-line" sml)
-           (const :tag "spaceline"       spaceline)
            (const :tag "doom-modeline"   doom-modeline)
            (const :tag "awesome-tray"    awesome-tray)
            (const :tag "moody"           moody)
@@ -689,7 +703,7 @@ SAVE-FN with non-nil ARGS."
   (setq all-the-icons-scale-factor 1.0
         all-the-icons-color-icons nil))
 
-;; Set `sb/theme' to `none' if you use this package
+;; Set `sb/gui-theme' to `none' if you use this package
 (use-package circadian
   :commands circadian-setup
   :if (display-graphic-p)
@@ -703,20 +717,35 @@ SAVE-FN with non-nil ARGS."
   (circadian-setup))
 
 (use-package leuven-theme
-  :if (eq sb/theme 'leuven)
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'leuven))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'leuven)))
   :init (load-theme 'leuven t))
 
 (use-package spacemacs-common
   :ensure spacemacs-theme
-  :if (eq sb/theme 'spacemacs-light)
+  :if (and (display-graphic-p) (eq sb/gui-theme 'spacemacs-light))
   :init (load-theme 'spacemacs-light t))
 
 (use-package zenburn-theme
-  :if (eq sb/theme 'zenburn)
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'zenburn))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'zenburn)))
   :init (load-theme 'zenburn t))
 
 (use-package doom-themes
-  :if (eq sb/theme 'doom-molokai)
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'doom-molokai))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-molokai)))
+  :commands (doom-themes-org-config doom-themes-treemacs-config)
+  :init
+  (load-theme 'doom-molokai t)
+  (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
+  :config
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification
+  (doom-themes-org-config))
+
+(use-package doom-themes
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'doom-gruvbox))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-gruvbox)))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (load-theme 'doom-molokai t)
@@ -727,13 +756,15 @@ SAVE-FN with non-nil ARGS."
   (doom-themes-org-config))
 
 (use-package monokai-theme
-  :if (eq sb/theme 'monokai)
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'monokai))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'monokai)))
   :init (load-theme 'monokai t))
 
 (use-package modus-operandi-theme
   :ensure moody
   :ensure modus-themes
-  :if (eq sb/theme 'modus-operandi)
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'modus-operandi))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'modus-operandi)))
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -755,7 +786,8 @@ SAVE-FN with non-nil ARGS."
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
-  :if (or (eq sb/theme 'modus-vivendi) (not (display-graphic-p)))
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'modus-vivendi))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'modus-vivendi)))
   :init
   ;; (setq modus-themes-completions 'opinionated
   ;;       modus-themes-fringes 'subtle
@@ -772,7 +804,7 @@ SAVE-FN with non-nil ARGS."
 
   (load-theme 'modus-vivendi t))
 
-(when (and (eq sb/theme 'sb/default)
+(when (and (eq sb/gui-theme 'sb/default)
            (display-graphic-p))
   (progn
     ;; (setq frame-background-mode 'light)
@@ -794,46 +826,12 @@ SAVE-FN with non-nil ARGS."
         powerline-gui-use-vcs-glyph t
         powerline-height 20)
 
-  (when (eq sb/theme 'leuven)
+  (when (eq sb/gui-theme 'leuven)
     (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
     (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
                         :foreground "black" :background "gray88"))
 
   (powerline-default-theme))
-
-(use-package smart-mode-line
-  :if (eq sb/modeline-theme 'sml)
-  :defines (sml/theme sml/mode-width sml/no-confirm-load-theme
-                      sml/shorten-modes sml/shorten-directory)
-  :commands sml/setup
-  :init
-  (use-package smart-mode-line-powerline-theme
-    :demand t)
-  (setq sml/theme 'light
-        sml/mode-width 'full
-        sml/no-confirm-load-theme t
-        sml/shorten-modes t
-        sml/shorten-directory t)
-
-  (sml/setup))
-
-(use-package spaceline
-  :if (eq sb/modeline-theme 'spaceline)
-  :defines (spaceline-hud-p spaceline-selection-info-p
-                            spaceline-version-control-p spaceline-input-method-p
-                            spaceline-persp-name-p)
-  :functions spaceline-emacs-theme
-  :init
-  (require 'spaceline-config)
-  (setq spaceline-hud-p nil
-        spaceline-input-method-p nil
-        spaceline-persp-name-p nil
-        spaceline-selection-info-p nil
-        spaceline-version-control-p t)
-
-  (use-package spaceline-all-the-icons
-    :commands spaceline-all-the-icons-theme
-    :init (spaceline-all-the-icons-theme)))
 
 (use-package doom-modeline
   ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
@@ -1226,11 +1224,11 @@ SAVE-FN with non-nil ARGS."
   (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
   (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
 
-  (when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
+  (when (or (eq sb/gui-theme 'modus-operandi) (eq sb/gui-theme 'modus-vivendi))
     (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
 
-  (when (eq sb/theme 'sb/default)
+  (when (eq sb/gui-theme 'sb/default)
     (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0))
 
@@ -1246,7 +1244,7 @@ SAVE-FN with non-nil ARGS."
   ;; (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-files)
 
   :bind*
-  (;; The keybinding interferes with `dired-jump'
+  (;; The keybinding interferes with `dired-jump' and imenu `C-c C-j'
    ("C-j" . treemacs)
    ("M-0" . treemacs-select-window)))
 
@@ -1355,6 +1353,7 @@ SAVE-FN with non-nil ARGS."
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
+   ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp'
    ("C-f"     . isearch-forward-regexp)
    :map isearch-mode-map
    ("C-s"     . nil)
@@ -1383,7 +1382,7 @@ SAVE-FN with non-nil ARGS."
 
   ;; (when (eq sb/modeline-theme 'spaceline)
   ;;   (setq anzu-cons-mode-line-p nil))
-  ;; (unless (eq sb/theme 'leuven)
+  ;; (unless (eq sb/gui-theme 'leuven)
   ;;   (set-face-attribute 'anzu-mode-line nil
   ;;                       :foreground "blue"
   ;;                       :weight 'light))
@@ -3306,7 +3305,7 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq css-indent-offset 2)
 
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (css-stylelint))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (css-stylelint))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -3332,10 +3331,10 @@ SAVE-FN with non-nil ARGS."
   (setq eldoc-box-clear-with-C-g t
         eldoc-box-fringe-use-same-bg nil)
 
-  ;; (when (eq sb/theme 'modus-operandi)
+  ;; (when (eq sb/gui-theme 'modus-operandi)
   ;;   (set-face-background 'eldoc-box-body "cornsilk"))
 
-  ;; (when (eq sb/theme 'modus-vivendi)
+  ;; (when (eq sb/gui-theme 'modus-vivendi)
   ;;   (set-face-background 'eldoc-box-body "gray"))
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
@@ -3643,7 +3642,7 @@ SAVE-FN with non-nil ARGS."
 
   (unbind-key "C-M-a" c-mode-map)
 
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (c/c++-cppcheck))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (c/c++-cppcheck))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -3725,11 +3724,11 @@ SAVE-FN with non-nil ARGS."
         python-shell-exec-path "python3"
         python-shell-interpreter "python3")
 
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
+
   (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
                                   ("SConscript\\'" . python-mode))
-                                auto-mode-alist))
-
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint)))))))
+                                auto-mode-alist)))
 
 (use-package python-docstring
   :after python-mode
@@ -3876,8 +3875,8 @@ SAVE-FN with non-nil ARGS."
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-remote)))
 
@@ -3947,7 +3946,7 @@ SAVE-FN with non-nil ARGS."
         ;; Indent comments as a regular line
         sh-indent-comment t)
 
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (sh-shellcheck))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (sh-shellcheck))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4153,7 +4152,7 @@ SAVE-FN with non-nil ARGS."
                  (flyspell-mode -1)
                  (lsp-deferred)))
   :config
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (yaml-yamllint))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (yaml-yamllint))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4204,7 +4203,7 @@ SAVE-FN with non-nil ARGS."
         web-mode-code-indent-offset               2
         web-mode-style-padding                    2)
 
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (html-tidy))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (html-tidy))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4248,7 +4247,7 @@ SAVE-FN with non-nil ARGS."
   (setq nxml-auto-insert-xml-declaration-flag t
         nxml-slash-auto-complete-flag t)
 
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (xml-xmllint))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (xml-xmllint))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4721,7 +4720,7 @@ Ignore if no file is found."
                               (setq js-indent-level 2)
                               (lsp-deferred)))
   :config
-  (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (json-jsonlint))))))
+  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (json-jsonlint))))))
 
   (lsp-register-client
    (make-lsp-client
