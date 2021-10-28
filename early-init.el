@@ -38,7 +38,7 @@
       package-quickstart-file (expand-file-name "var/package-quickstart.el" user-emacs-directory))
 
 ;; The run-time load order is: (1) file described by `site-run-file', if non-nil; (2)
-;; `user-init-file'; (3) default.el. Disable site-wide run-time initializations.
+;; `user-init-file'; (3) `default.el'. Disable site-wide run-time initializations.
 (setq site-run-file nil)
 
 ;; (customize-set-variable

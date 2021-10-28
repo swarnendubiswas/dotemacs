@@ -47,6 +47,11 @@
                              (when (derived-mode-p 'xml-mode)
                                (setq sb/flycheck-local-checkers
                                      '((lsp . ((next-checkers . (xml-xmllint)))))))
+
+                             ;; Chktex can report lot of errors
+                             ;; (when (derived-mode-p 'latex-mode)
+                             ;;   (setq sb/flycheck-local-checkers
+                             ;;         '((lsp . ((next-checkers . (tex-chktex)))))))
                              )))
          ))
 
@@ -62,8 +67,6 @@
                 (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
                 ))
  )
-
-
 
 ;; Local Variables:
 ;; eval: (flycheck-mode -1)

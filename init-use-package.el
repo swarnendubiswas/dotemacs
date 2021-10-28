@@ -35,7 +35,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -665,6 +665,7 @@ SAVE-FN with non-nil ARGS."
 (use-package hideshow
   :ensure nil
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+  :diminish hs-minor-mode
   :hook
   (prog-mode . (lambda ()
                  (hs-minor-mode 1)
@@ -713,7 +714,7 @@ SAVE-FN with non-nil ARGS."
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
         circadian-themes '((:sunrise . modus-operandi)
-                           (:sunset  . doom-molokai)))
+                           (:sunset  . modus-operandi)))
   (circadian-setup))
 
 (use-package leuven-theme
@@ -2071,9 +2072,8 @@ SAVE-FN with non-nil ARGS."
 ;; Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens
-  ;; :diminish (smartparens-global-mode smartparens-mode
-  ;;                                    show-smartparens-mode show-smartparens-global-mode)
   :commands (sp-pair sp-local-pair)
+  :diminish
   :hook
   ((after-init . (lambda ()
                    (require 'smartparens-config)
@@ -2575,12 +2575,13 @@ SAVE-FN with non-nil ARGS."
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
   :commands ws-butler-mode
-  ;; :diminish
+  :diminish
   :hook (prog-mode . ws-butler-mode))
 
 ;; Highlight symbol under point
 ;; LATER: Compare the performance benefits with https://gitlab.com/ideasman42/emacs-idle-highlight-mode
 (use-package symbol-overlay
+  :diminish
   :commands (symbol-overlay-mode)
   :hook (prog-mode . symbol-overlay-mode)
   :bind
@@ -2823,7 +2824,6 @@ SAVE-FN with non-nil ARGS."
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-  :disabled t
   :commands popwin-mode
   :hook (after-init . popwin-mode)
   :config
@@ -2903,6 +2903,7 @@ SAVE-FN with non-nil ARGS."
 (use-package undo-tree
   :defines undo-tree-map
   :commands (global-undo-tree-mode)
+  :diminish
   :config
   (setq undo-tree-auto-save-history              t
         undo-tree-visualizer-diff                t
@@ -3001,10 +3002,9 @@ SAVE-FN with non-nil ARGS."
   :bind
   (("M-b"   . avy-goto-word-1)
    ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
-   ;; ("M-g c" . avy-goto-char-timer)
+   ("M-g c" . avy-goto-char-timer)
    ("C-/"   . avy-goto-line) ; Does not work with TUI, but works with Alacritty
-   ;; ("M-g l" . avy-goto-line)
-   ))
+   ("M-g l" . avy-goto-line)))
 
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
 (use-package ivy-avy
@@ -3012,8 +3012,7 @@ SAVE-FN with non-nil ARGS."
   :bind
   (:map ivy-minibuffer-map
         ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
-        ;; ("M-g l" . ivy-avy)
-        ))
+        ("M-g l" . ivy-avy)))
 
 (use-package bookmark
   :ensure nil
@@ -3085,22 +3084,6 @@ SAVE-FN with non-nil ARGS."
   :commands writegood-mode
   :diminish
   :hook (text-mode . writegood-mode))
-
-(use-package langtool
-  :after text-mode
-  :commands langtool-check
-  :disabled t
-  :config
-  (setq langtool-default-language "en"
-        langtool-disabled-rules '("COMMA_PARENTHESIS_WHITESPACE"
-                                  "COPYRIGHT"
-                                  "DASH_RULE"
-                                  "EN_QUOTES"
-                                  "EN_UNPAIRED_BRACKETS"
-                                  "UPPERCASE_SENTENCE_START"
-                                  "WHITESPACE_RULE")
-        langtool-language-tool-jar (no-littering-expand-etc-file-name
-                                    "languagetool-commandline.jar")))
 
 (use-package wc-mode
   :commands wc-mode)
@@ -3238,15 +3221,6 @@ SAVE-FN with non-nil ARGS."
   :disabled t
   :commands markdown-preview-mode)
 
-;; Search the current buffer's parent directories for `node_modules/.bin'. Traverse the directory
-;; structure up, until reaching the user's home directory, or hitting `add-node-modules-max-depth'.
-;; Any path found is added to the `exec-path'.
-(use-package add-node-modules-path
-  :disabled t
-  :init
-  (dolist (mode '(typescript-mode js-mode js2-mode coffee-mode))
-    (add-hook (derived-mode-hook-name mode) #'add-node-modules-path)))
-
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
@@ -3305,8 +3279,6 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq css-indent-offset 2)
 
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (css-stylelint))))))
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -3330,12 +3302,6 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq eldoc-box-clear-with-C-g t
         eldoc-box-fringe-use-same-bg nil)
-
-  ;; (when (eq sb/gui-theme 'modus-operandi)
-  ;;   (set-face-background 'eldoc-box-body "cornsilk"))
-
-  ;; (when (eq sb/gui-theme 'modus-vivendi)
-  ;;   (set-face-background 'eldoc-box-body "gray"))
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package ini-mode
@@ -3642,8 +3608,6 @@ SAVE-FN with non-nil ARGS."
 
   (unbind-key "C-M-a" c-mode-map)
 
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (c/c++-cppcheck))))))
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection "clangd")
@@ -3738,7 +3702,6 @@ SAVE-FN with non-nil ARGS."
   :config (python-docstring-install))
 
 (use-package pip-requirements
-  :disabled t
   :commands pip-requirements-mode)
 
 (use-package pyvenv
@@ -3763,22 +3726,6 @@ SAVE-FN with non-nil ARGS."
   (python-mode . (lambda ()
                    (add-hook 'before-save-hook #'py-isort-before-save)))
   :config (setq py-isort-options '("-l 100")))
-
-(use-package lsp-python-ms
-  :if (eq sb/python-langserver 'mspyls)
-  :disabled t
-  :after (lsp-mode python)
-  :init (setq lsp-python-ms-auto-install-server t)
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-python-ms)
-                   ;; (dolist (ls '(pyls pyls-remote pyright pyright-remote jedi jedils-remote))
-                   ;;   (add-to-list 'lsp-disabled-clients ls))
-                   ;; (add-to-list 'lsp-enabled-clients 'mspyls)
-                   ;; (add-to-list 'lsp-enabled-clients 'mspyls-remote)
-                   ))
-  :config
-  (setq lsp-python-ms-python-executable-cmd "python3"))
 
 ;; `pyright --createstub pandas'
 (use-package lsp-pyright
@@ -3841,16 +3788,8 @@ SAVE-FN with non-nil ARGS."
   :commands yapf-mode
   :hook (python-mode . yapf-mode))
 
-(use-package ein
-  :commands ein:ipynb-mode
-  :disabled t)
-
 (use-package cython-mode
   :commands cython-mode
-  :disabled t)
-
-(use-package jinja2-mode
-  :commands jinjia2-mode
   :disabled t)
 
 (use-package cperl-mode
@@ -3907,7 +3846,8 @@ SAVE-FN with non-nil ARGS."
                  (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
-        lsp-java-java-path "/usr/lib/jvm/java-13-openjdk-amd64/bin/java" ; Requires Java 11
+        ;; Requires Java 11+
+        lsp-java-java-path "/usr/lib/jvm/java-13-openjdk-amd64/bin/java"
         lsp-java-save-actions-organize-imports t
         lsp-java-format-settings-profile "Swarnendu"
         lsp-java-format-settings-url (expand-file-name
@@ -3945,8 +3885,6 @@ SAVE-FN with non-nil ARGS."
         sh-indent-after-continuation 'always
         ;; Indent comments as a regular line
         sh-indent-comment t)
-
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (sh-shellcheck))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4029,9 +3967,9 @@ SAVE-FN with non-nil ARGS."
     :ensure nil
     :demand t
     :config
-    (setq magit-diff-refine-hunk t
+    (setq magit-diff-refine-hunk        t
           magit-diff-highlight-trailing nil
-          magit-diff-paint-whitespace nil)))
+          magit-diff-paint-whitespace   nil)))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
@@ -4046,9 +3984,9 @@ SAVE-FN with non-nil ARGS."
    ("C-x n" . git-gutter:next-hunk))
   :hook (after-init . global-git-gutter-mode)
   :config
-  (setq git-gutter:added-sign " "
-        git-gutter:deleted-sign " "
-        git-gutter:modified-sign " "
+  (setq git-gutter:added-sign      " "
+        git-gutter:deleted-sign    " "
+        git-gutter:modified-sign   " "
         git-gutter:update-interval 1)
 
   ;; https://github.com/syl20bnr/spacemacs/issues/10555
@@ -4152,8 +4090,6 @@ SAVE-FN with non-nil ARGS."
                  (flyspell-mode -1)
                  (lsp-deferred)))
   :config
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (yaml-yamllint))))))
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4189,9 +4125,6 @@ SAVE-FN with non-nil ARGS."
    ("\\.handlebars\\'" . web-mode))
   :hook (web-mode . lsp-deferred)
   :config
-  ;; ESLint need to be configured properly for this to work
-  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
-
   (setq web-mode-enable-auto-closing              t
         web-mode-enable-auto-pairing              t
         web-mode-enable-auto-quoting              t
@@ -4202,8 +4135,6 @@ SAVE-FN with non-nil ARGS."
         web-mode-css-indent-offset                2
         web-mode-code-indent-offset               2
         web-mode-style-padding                    2)
-
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (html-tidy))))))
 
   (lsp-register-client
    (make-lsp-client
@@ -4247,8 +4178,6 @@ SAVE-FN with non-nil ARGS."
   (setq nxml-auto-insert-xml-declaration-flag t
         nxml-slash-auto-complete-flag t)
 
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (xml-xmllint))))))
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4266,7 +4195,7 @@ SAVE-FN with non-nil ARGS."
   :ensure keytar
   :ensure t
   :after flycheck
-  :disabled t
+  :defines flycheck-grammarly-check-time
   :demand t
   :config
   (setq flycheck-grammarly-check-time 3
@@ -4351,7 +4280,6 @@ SAVE-FN with non-nil ARGS."
 (use-package lsp-grammarly
   :ensure keytar
   :ensure t
-  :disabled t
   :hook
   ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
                                                                          (require 'lsp-grammarly)
@@ -4423,7 +4351,6 @@ SAVE-FN with non-nil ARGS."
   )
 
 (use-package lsp-latex
-  :disabled t
   :hook
   ((latex-mode LaTeX-mode) . (lambda()
                                (require 'lsp-latex)
@@ -4553,9 +4480,11 @@ SAVE-FN with non-nil ARGS."
   ;; :diminish
   :hook ((LaTeX-mode latex-mode) . reftex-mode)
   :bind
-  (("C-c [" . reftex-citation)
-   ("C-c )" . reftex-reference)
-   ("C-c (" . reftex-label))
+  (("C-c ["   . reftex-citation)
+   ("C-c )"   . reftex-reference)
+   ("C-c ("   . reftex-label)
+   ("C-c ="   . reftex-toc)
+   ("C-c C-j" . reftex-toc))
   :preface
   (defun sb/get-bibtex-keys (file)
     (with-current-buffer (find-file-noselect file)
@@ -4737,34 +4666,6 @@ Ignore if no file is found."
 (use-package json-snatcher
   :after json-mode
   :demand t)
-
-(use-package scss-mode
-  :disabled t
-  :commands scss-mode
-  :hook (scss-mode . lsp-deferred)
-  :config
-  (setq scss-compile-at-save t)
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("css-languageserver" "--stdio"))
-    :major-modes '(css-mode less-mode sass-mode scss-mode)
-    :remote? t
-    :server-id 'cssls-remote)))
-
-(use-package sass-mode
-  :disabled t
-  :commands sass-mode
-  :hook (sass-mode . lsp-deferred)
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("css-languageserver" "--stdio"))
-    :major-modes '(css-mode less-mode sass-mode scss-mode)
-    :remote? t
-    :server-id 'cssls-remote)))
 
 (use-package bazel
   :commands (bazel-mode bazelrc-mode)

@@ -119,3 +119,7 @@ The equivalent version with ~with-eval-after-load~ would be:
 
 *** [[https://occasionallycogent.com/emacs_advice/index.html][Using Emacs advice]]
 
+
+*** Difference between ~~setq~ and ~custom~
+
+https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variables/

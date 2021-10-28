@@ -1426,6 +1426,7 @@
   '(
     ("acccesses" "accesses" nil :count 0)
     ("additionaly" "Additionally" nil :count 0)
+    ("analaysis" "Analysis" nil :count 0)
     ("analyse" "analyze" nil :count 0)
     ("analysed" "analyzed" nil :count 0)
     ("chosing" "Choosing" nil :count 0)
