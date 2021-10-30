@@ -23,7 +23,6 @@
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
-           (const :tag "spacemacs-light" spacemacs-light)
            (const :tag "zenburn"         zenburn)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
@@ -722,11 +721,6 @@ SAVE-FN with non-nil ARGS."
           (and (not (display-graphic-p)) (eq sb/tui-theme 'leuven)))
   :init (load-theme 'leuven t))
 
-(use-package spacemacs-common
-  :ensure spacemacs-theme
-  :if (and (display-graphic-p) (eq sb/gui-theme 'spacemacs-light))
-  :init (load-theme 'spacemacs-light t))
-
 (use-package zenburn-theme
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'zenburn))
           (and (not (display-graphic-p)) (eq sb/tui-theme 'zenburn)))
@@ -882,22 +876,6 @@ SAVE-FN with non-nil ARGS."
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
   :init (run-with-idle-timer 5 nil #'auto-dim-other-buffers-mode))
 
-(use-package centaur-tabs
-  :disabled t
-  :commands (centaur-tabs-group-by-projectile-project centaur-tabs-mode)
-  :hook (after-init . centaur-tabs-mode)
-  :config
-  (setq centaur-tabs-cycle-scope 'tabs
-        centaur-tabs-icon-scale-factor 0.7
-        centaur-tabs-set-close-button nil
-        centaur-tabs-set-icons t
-        centaur-tabs-set-modified-marker t)
-
-  (centaur-tabs-group-by-projectile-project)
-  :bind
-  (([remap next-buffer]     . centaur-tabs-forward)
-   ([remap previous-buffer] . centaur-tabs-backward)))
-
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 ;; (set-frame-font "Roboto Mono")
@@ -966,10 +944,8 @@ SAVE-FN with non-nil ARGS."
   :bind ("C-x C-b" . ibuffer))
 
 (use-package ibuf-ext
-  :load-path "extras"
+  :ensure nil
   :commands ibuffer-auto-mode
-  ;; :quelpa ((ibuf-ext :fetcher github :repo "emacs-mirror/emacs"
-  ;;                    :files ("lisp/ibuf-ext.el")))
   :config
   ;; Do not show filter groups if there are no buffers in that group
   (setq ibuffer-show-empty-filter-groups nil)
@@ -1367,12 +1343,6 @@ SAVE-FN with non-nil ARGS."
   :commands (isearch-symbol-at-point
              isearch-forward-symbol-at-point ; `M-s .'
              isearch-backward-symbol-at-point))
-
-(use-package isearch-dabbrev
-  :after isearch
-  :bind
-  (:map isearch-mode-map
-        ("<tab>" . isearch-dabbrev-expand)))
 
 (use-package anzu
   :diminish anzu-mode
@@ -2607,7 +2577,7 @@ SAVE-FN with non-nil ARGS."
 
 (use-package highlight-numbers
   :commands highlight-numbers-mode
-  :hook ((prog-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
+  :hook ((prog-mode yaml-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
 (use-package page-break-lines
   :diminish
@@ -3394,7 +3364,8 @@ SAVE-FN with non-nil ARGS."
                                   "--pch-storage=memory"
                                   "--pretty")
         lsp-clients-clangd-executable "clangd"
-        lsp-completion-provider :none ; Enable integration with `company'
+        ;; Enable integration of custom backends other than `capf' with `company'
+        lsp-completion-provider :none
         lsp-completion-show-detail nil ; Disable completion metadata since they can be very long
         ;; lsp-completion-show-kind nil
         ;; lsp-eldoc-enable-hover nil
@@ -3788,10 +3759,6 @@ SAVE-FN with non-nil ARGS."
   :commands yapf-mode
   :hook (python-mode . yapf-mode))
 
-(use-package cython-mode
-  :commands cython-mode
-  :disabled t)
-
 (use-package cperl-mode
   :ensure nil
   :mode ("latexmkrc\\'")
@@ -3864,14 +3831,13 @@ SAVE-FN with non-nil ARGS."
   :commands autodisass-java-bytecode
   :mode "\\.class\\'")
 
-;; Syntax highlighting for Gradle files
-(use-package groovy-mode
-  :commands groovy-mode
-  :disabled t)
+(use-package groovy-mode ; Syntax highlighting for Gradle files
+  :commands groovy-mode)
 
-;; SVG
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.svg$" . image-mode))
+(use-package image-mode
+  :ensure nil
+  :mode "\\.svg$"
+  :hook (image-mode . show-image-dimensions-in-mode-line))
 
 (use-package sh-script ; Shell script mode
   :ensure nil
