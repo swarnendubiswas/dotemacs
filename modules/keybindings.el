@@ -92,6 +92,9 @@
 
 ;; Hydras
 
+(declare-function spell-fu-goto-next-error "spell-fu")
+(declare-function spell-fu-goto-previous-error "spell-fu")
+
 ;; `:exit t' will quit the hydra
 (defhydra sb/hydra-spelling (:color blue)
   "
@@ -184,6 +187,15 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ("q"   nil "cancel" :color blue))
 
 
+(declare-function flycheck-verify-setup "flycheck")
+(declare-function flycheck-previous-error "flycheck")
+(declare-function flycheck-next-error "flycheck")
+(declare-function flycheck-list-errors "flycheck")
+(declare-function flycheck-select-checker "flycheck")
+(declare-function flycheck-describe-checker "flycheck")
+(declare-function flycheck-disable-checker "flycheck")
+(declare-function flycheck-buffer "flycheck")
+
 (defhydra sb/hydra-flycheck (:color blue)
   "
   ^
@@ -206,6 +218,8 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ("m" flycheck-mode)
   ("s" flycheck-select-checker)
   ("v" flycheck-verify-setup))
+
+(defvar python-mode-map)
 
 (with-eval-after-load "python"
   (defhydra sb/hydra-python-indent (python-mode-map "C-c")
