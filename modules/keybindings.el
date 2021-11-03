@@ -9,15 +9,16 @@
 
 ;; Keybindings
 
-;; Generic keybindings, package-specific are usually in their own modules. The `C-x' keymap is for
-;; global bindings that are expected to work regardless of the active modes. The `C-c' binding
-;; followed by a control character or a digit are reserved for major modes. The sequence of `C-c'
-;; followed by any other ASCII punctuation or symbol character are allocated for minor modes.
-;; Sequences consisting of `C-c' and a letter (either upper or lower case) are reserved for users.
-;; Check the "Key Binding Conventions" in the Emacs manual (`C-h i'). Use `C-h b' to see available
-;; bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
+;; Generic keybindings, package-specific keybindings are in their package declaration.
 
-;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd` macro is not required with
+;; The `C-x' keymap is for global bindings that are expected to work regardless of the active modes.
+;; The `C-c' binding followed by a control character or a digit are reserved for major modes. The
+;; sequence of `C-c' followed by any other ASCII punctuation or symbol character are allocated for
+;; minor modes. Sequences consisting of `C-c' and a letter (either upper or lower case) are reserved
+;; for users. Check the "Key Binding Conventions" in the Emacs manual (`C-h i'). Use `C-h b' to see
+;; available bindings in a buffer. Use `M-x describe-personal-keybindings' to see modifications.
+
+;; `bind-key*', `bind*' overrides all minor mode bindings. The `kbd' macro is not required with
 ;; `bind-key' variants. With `bind-key', you do not need an explicit `(kbd ...)'.
 
 ;; Other variants:

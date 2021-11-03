@@ -17,7 +17,7 @@
 (require 'package)
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'
-(setq package-enable-at-startup t
+(setq package-enable-at-startup nil
       package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
 (with-eval-after-load 'package
@@ -73,7 +73,7 @@
 ;; The run-time load order is: (1) file described by `site-run-file', if non-nil, (2)
 ;; `user-init-file', and (3) `default.el'.
 (setq site-run-file nil ; Disable site-wide run-time initialization
-      ;; Disable loading of `default.el' at startup, inhibits site
+      ;; Disable loading of `default.el' at startup
       inhibit-default-init t)
 
 ;; Do not resize the frame at this early stage. Resizing the Emacs frame can be a terribly expensive
@@ -81,20 +81,18 @@
 ;; larger than the system default.
 (setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t
-      ;; Do not compact font caches during GC
-      inhibit-compacting-font-caches t
+      window-resize-pixelwise t
+      inhibit-compacting-font-caches t ; Do not compact font caches during GC
       inhibit-startup-echo-area-message t
-      ;; `inhibit-splash-screen' is an alias
-      inhibit-startup-screen t
-      ;; Prefer new files to avoid loading stable bytecode
-      load-prefer-newer t
+      inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
+      load-prefer-newer t ; Prefer new files to avoid loading stable bytecode
       ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start,
       ;; but I use *scratch* for composing emails.
       initial-major-mode 'text-mode
       initial-scratch-message nil)
 
-;; Disable UI elements before being initialized. Use `display-graphic-p', `window-system' is
-;; deprecated
+;; Disable UI elements early before being initialized. Use `display-graphic-p', `window-system' is
+;; deprecated.
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode)
@@ -102,25 +100,21 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
-;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
-;; (customize-set-variable 'menu-bar-mode nil)
-
 (push '(tool-bar-lines . 0)   default-frame-alist)
 (push '(menu-bar-lines . 0)   default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 
-
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 
+;; Applied only to the initial (startup) Emacs frame
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+;; Applied to every Emacs frame
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 ;; Maximize Emacs on startup, append to the hook instead of prepending, this means it will run after
 ;; other hooks that might fiddle with the frame size
-;; (add-hook 'window-setup-hook 'toggle-frame-maximized t)
-
-;; Applied to every Emacs frame
-;; (add-to-list 'default-frame-alist '(maximized . maximized))
-;; Applied only to the initial (startup) Emacs frame
-;; (add-to-list 'initial-frame-alist '(maximized . maximized))
+;; (add-hook 'emacs-startup-hook #'toggle-frame-maximized t)
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)

@@ -1,4 +1,5 @@
 #+TITLE: Emacs Notes
+
 #+AUTHOR: Swarnendu Biswas
 #+DATE: <21-06-2021>
 #+EMAIL: swarnendu@cse.iitk.ac.in
@@ -9,14 +10,18 @@
 #+LATEX_HEADER: \usepackage{palatino}
 #+LATEX_HEADER: \usepackage[letterpaper]{geometry}
 
-* Good References
+* Notes about Emacs 
+
+Emacs searches for the init files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
 To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
-~M-:~ to evaluate a Emacs Lisp expression and print the result. Only an interactive function can be
+~M-:~ to evaluate an Emacs Lisp expression and print the result. Only an interactive function can be
 invoked with ~M-x~ or a key binding.
 
 The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~, since they cause eager loading and
-are expensive, a cheaper alternative is to use ~autoload~.
+are expensive. A cheaper alternative is to use ~autoload~.
+
+* Notes about Elisp
 
 Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
 all equivalent.
@@ -27,7 +32,7 @@ all equivalent.
 - https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
 - https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
 
-Backquote constructs allow you to quote a list, but selectively evaluate elements of that list.
+Backquote constructs allow you to quote a list but selectively evaluate elements of that list.
 
 ~(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))~
 
@@ -35,31 +40,6 @@ A local variable specification takes the following form:
 
 ~;; -*- mode: MODENAME; VAR: VALUE; ... -*-~
 
-** Reference Configurations
-
-- https://protesilaos.com/dotemacs
-- https://github.com/CSRaghunandan/.emacs.d
-- https://github.com/purcell/emacs.d
-- https://github.com/MatthewZMD/.emacs.d
-- https://github.com/redguardtoo/emacs.d
-- https://github.com/jwiegley/dot-emacs
-- https://github.com/d12frosted/environment/tree/master/emacs
-- https://github.com/raxod502/radian/tree/develop/emacs
-- https://github.com/dholm/dotemacs
-- https://tychoish.com/post/towards-faster-emacs-start-times/
-- https://github.com/wandersoncferreira/dotfiles
-- https://github.com/rememberYou/.emacs.d
-- https://github.com/seagle0128/.emacs.d/
-- https://github.com/Gleek/emacs.d/
-- https://github.com/magnars/.emacs.d
-- https://github.com/kaushalmodi/.emacs.d
-- https://luca.cambiaghi.me/vanilla-emacs/readme.html
-- https://sachachua.com/dotemacs/
-- https://emacs.nasy.moe/
-- https://github.com/milkypostman/dotemacs
-- https://github.com/tecosaur/emacs-config
-- https://github.com/wdenton/.emacs.d
-- https://github.com/tshu-w/.emacs.d
 
 ** Useful Information
 
@@ -75,7 +55,7 @@ http://ergoemacs.org/emacs/elisp_check_defined.html
 
 *** Difference between ~eval-after-load~ and ~with-eval-after-load~
 
-~eval-after-load~ is considered ill-behaved because it is a function, not a macro, and thus requires the code inside it to be quoted, which means that it cannot be byte-compiled. It also accepts only one form, so if you have more than one, you need to use ~progn~. For example:
+      ~eval-after-load~ is considered ill-behaved because it is a function, not a macro, and thus requires the code inside it to be quoted, which means that it cannot be byte-compiled. It also accepts only one form. If we have more than one, you need to use ~progn~. For example:
 
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "foo"
@@ -123,3 +103,29 @@ The equivalent version with ~with-eval-after-load~ would be:
 *** Difference between ~~setq~ and ~custom~
 
 https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variables/
+
+* Reference Configurations
+
+- https://protesilaos.com/dotemacs
+- https://github.com/CSRaghunandan/.emacs.d
+- https://github.com/purcell/emacs.d
+- https://github.com/MatthewZMD/.emacs.d
+- https://github.com/redguardtoo/emacs.d
+- https://github.com/jwiegley/dot-emacs
+- https://github.com/d12frosted/environment/tree/master/emacs
+- https://github.com/raxod502/radian/tree/develop/emacs
+- https://github.com/dholm/dotemacs
+- https://tychoish.com/post/towards-faster-emacs-start-times/
+- https://github.com/wandersoncferreira/dotfiles
+- https://github.com/rememberYou/.emacs.d
+- https://github.com/seagle0128/.emacs.d/
+- https://github.com/Gleek/emacs.d/
+- https://github.com/magnars/.emacs.d
+- https://github.com/kaushalmodi/.emacs.d
+- https://luca.cambiaghi.me/vanilla-emacs/readme.html
+- https://sachachua.com/dotemacs/
+- https://emacs.nasy.moe/
+- https://github.com/milkypostman/dotemacs
+- https://github.com/tecosaur/emacs-config
+- https://github.com/wdenton/.emacs.d
+- https://github.com/tshu-w/.emacs.d

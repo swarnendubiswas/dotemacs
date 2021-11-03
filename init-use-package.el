@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'none
+  'doom-gruvbox
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -100,16 +100,10 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
-
-(when (bound-and-true-p sb/debug-init-file)
-  (setq garbage-collection-messages t
-        debug-on-error t
-        debug-on-event 'sigusr2)
-  (debug-on-entry 'projectile-remove-known-project))
 
 (defconst sb/user-home
   (getenv "HOME")
@@ -180,12 +174,16 @@ This location is used for temporary installations and files.")
 (defvar use-package-verbose)
 
 (setq use-package-enable-imenu-support t)
+
 (when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error                 nil
+  (setq debug-on-error                 t
+        debug-on-event 'sigusr2
+        garbage-collection-messages t
         use-package-always-ensure      t
         use-package-compute-statistics t ; Use `M-x use-package-report' to see results
         use-package-expand-minimally   nil
-        use-package-verbose            t))
+        use-package-verbose            t)
+  (debug-on-entry 'projectile-remove-known-project))
 
 ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
 ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
@@ -194,8 +192,7 @@ This location is used for temporary installations and files.")
 ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer t
-        ;; I need to manually set this to true whenever I modify package installations, so it is
-        ;; better to set this true always
+        ;; Avoid manual modifications whenever I modify package installations
         use-package-always-ensure t
         use-package-compute-statistics nil
         ;; Avoid printing errors and warnings since the configuration is known to work
@@ -224,7 +221,7 @@ This location is used for temporary installations and files.")
 (use-package s
   :commands s-starts-with?)
 
-;; Use `C-c h' consistently for invoking a hydra
+;; TODO: Learn how to use hydras better
 (use-package hydra
   :commands (hydra-default-pre hydra-keyboard-quit defhydra
                                hydra-show-hint hydra-set-transient-map
@@ -330,10 +327,12 @@ This location is used for temporary installations and files.")
       auto-save-default nil ; Disable `auto-save-mode', prefer `auto-save-visited-mode' instead
       auto-save-no-message t ; Allow for debugging frequent autosave triggers if `nil'
       auto-save-interval 0 ; Disable autosaving based on number of characters typed
-      auto-save-visited-interval 60 ; Default of 5s is too frequent for `auto-save-visited-mode'
+      ;; Save buffer after idling for some time, the default of 5s is too frequent
+      ;; `auto-save-visited-mode'
+      auto-save-visited-interval 30
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
-      bookmark-save-flag 1 ; Save bookmark after every edit and also when Emacs is killed
+      bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
       case-fold-search t ; Searches and matches should ignore case
       comment-auto-fill-only-comments t
       compilation-always-kill t ; Kill a compilation process before starting a new one
@@ -349,7 +348,7 @@ This location is used for temporary installations and files.")
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       ;; enable-recursive-minibuffers t
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
@@ -368,15 +367,15 @@ This location is used for temporary installations and files.")
       kill-do-not-save-duplicates t
       kill-whole-line t
       make-backup-files nil ; Stop making backup `~' files
-      mouse-drag-copy-region nil ; Mouse is disabled
-      mouse-yank-at-point t ; Yank at point with mouse instead of at click
+      ;; mouse-drag-copy-region nil ; Mouse is disabled
+      ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
       ;; pop-up-frames nil ; Avoid making separate frames
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       ;; Ignore case when reading a file name completion
       read-file-name-completion-ignore-case t
       read-process-output-max (* 1024 1024) ; 1 MB
       require-final-newline t ; Always end a file with a newline
-      ring-bell-function 'ignore ; Disable beeping sound when spacing backspace
+      ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
       save-silently t ; Error messages will still be printed
       ;; Enable use of system clipboard across Emacs and other applications, does not work on TUI
@@ -385,14 +384,13 @@ This location is used for temporary installations and files.")
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       standard-indent 2
       ;; suggest-key-bindings t
-      switch-to-buffer-preserve-window-point t
+      ;; switch-to-buffer-preserve-window-point t
       use-dialog-box nil
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
       vc-handled-backends '(Git) ; Disabling vc improves performance, alternate option '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
-      window-resize-pixelwise t
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       ;; Always trigger an immediate resize of the child frame
       x-gtk-resize-child-frames 'resize-mode
@@ -401,8 +399,8 @@ This location is used for temporary installations and files.")
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
-(setq-default electric-indent-inhibit nil
-              fill-column sb/fill-column
+(setq-default fill-column sb/fill-column
+              ;; electric-indent-inhibit nil
               indent-tabs-mode nil ; Spaces instead of tabs
               indicate-empty-lines nil
               major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
@@ -413,7 +411,7 @@ This location is used for temporary installations and files.")
               truncate-lines nil)
 
 ;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
-(setq-default bidi-inhibit-bpa t ; Disabling BPA makes redisplay faster
+(setq-default bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
               bidi-paragraph-direction 'left-to-right)
 
 (dolist (exts '(".aux"
@@ -431,23 +429,19 @@ This location is used for temporary installations and files.")
                 ".toc"))
   (add-to-list 'completion-ignored-extensions exts))
 
-;; (use-package request
-;;   :if (unless (bound-and-true-p sb/use-no-littering))
-;;   :init (setq request-storage-directory (expand-file-name "request" no-littering-var-directory)))
-
 ;; Activate utf-8
-(setq locale-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-language-environment 'utf-8)
-(set-selection-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
+;; (setq locale-coding-system 'utf-8)
+;; (prefer-coding-system 'utf-8)
+;; (set-default-coding-systems 'utf-8)
+;; (set-keyboard-coding-system 'utf-8)
+;; (set-language-environment 'utf-8)
+;; (set-selection-coding-system 'utf-8)
+;; (set-terminal-coding-system 'utf-8)
 
 ;; Scroll settings from Doom Emacs
 (setq scroll-margin 2 ; Add margin lines when scrolling vertically to have a sense of continuity
       ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N
-      ;; lines past window edges (where N is the setting of `scroll-conservatively'). This is
+      ;; lines past window edges, where N is the setting of `scroll-conservatively'. This is
       ;; especially slow in larger files during large-scale scrolling commands. If kept over 100,
       ;; the window is never automatically recentered.
       scroll-conservatively 101
@@ -467,7 +461,7 @@ This location is used for temporary installations and files.")
   :diminish auto-revert-mode
   :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
   :config
-  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+  (setq auto-revert-interval 10 ; Faster (seconds) would mean less likely to use stale data
         ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
         ;; use Emacs, but enabling auto-revert is always safe.
         auto-revert-remote-files t
@@ -494,9 +488,7 @@ This location is used for temporary installations and files.")
   (setq savehist-additional-variables '(extended-command-history
                                         kill-ring
                                         regexp-search-ring
-                                        search-ring)
-        ;; savehist-save-minibuffer-history t
-        ))
+                                        search-ring)))
 
 (use-package uniquify
   :ensure nil
@@ -512,8 +504,7 @@ This location is used for temporary installations and files.")
 (use-package hippie-exp
   :ensure nil
   :config
-  (setq hippie-expand-try-functions-list '(;;yas-hippie-try-expand
-                                           try-expand-dabbrev
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                            try-expand-dabbrev-all-buffers
                                            try-expand-dabbrev-from-kill
                                            try-complete-file-name-partially
@@ -532,8 +523,11 @@ This location is used for temporary installations and files.")
   :diminish
   :hook (prog-mode . subword-mode))
 
-;; Show dividers on the right of each window, more prominent than the default
-(window-divider-mode)
+(use-package frame
+  :ensure nil
+  :config
+  ;; Show dividers on the right of each window, more prominent than the default
+  (window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
@@ -555,7 +549,7 @@ This location is used for temporary installations and files.")
 (progn
   (defun sb/auto-save-wrapper (save-fn &rest args)
     "Hide 'Auto-saving...done' messages by calling the method.
-SAVE-FN with non-nil ARGS."
+  SAVE-FN with non-nil ARGS."
     (ignore args)
     (apply save-fn '(t)))
 
@@ -569,7 +563,7 @@ SAVE-FN with non-nil ARGS."
   ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
   (after-init . abbrev-mode)
   :config
-  ;; The `abbrev-file-name' is under version control
+  ;; The "abbrev-defs" file is under version control
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently))
 
@@ -600,17 +594,15 @@ SAVE-FN with non-nil ARGS."
 (with-eval-after-load "simple"
   (diminish 'visual-line-mode))
 
-(with-eval-after-load "outline"
-  (diminish 'outline-minor-mode))
-
 ;; Default is 8 pixels, we have increased it to look good on TUI
 (fringe-mode '(10 . 10))
 
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
 
-;; (use-package outline ; Edit outlines
-;;   :hook ((prog-mode text-mode) . outline-minor-mode))
+(use-package outline ; Edit outlines
+  :hook (prog-mode . outline-minor-mode)
+  :diminish outline-minor-mode)
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
@@ -623,14 +615,6 @@ SAVE-FN with non-nil ARGS."
                  (hs-minor-mode 1)
                  (hs-hide-initial-comment-block)))
   :config (setq hs-isearch-open t))
-
-(add-hook 'prog-mode-hook
-          (lambda ()
-            ;; Highlight and allow to open http link at point in programming buffers.
-            ;; `goto-address-prog-mode' only highlights links in strings and comments.
-            (goto-address-prog-mode 1)
-            (display-fill-column-indicator-mode 1) ; Native from Emacs 27+
-            ))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
 (use-package so-long
@@ -653,11 +637,12 @@ SAVE-FN with non-nil ARGS."
   :init
   (unless (sb/font-installed-p "all-the-icons")
     (all-the-icons-install-fonts t))
-  (setq all-the-icons-scale-factor 1.0
+  (setq all-the-icons-scale-factor 0.9
         all-the-icons-color-icons nil))
 
 ;; Set `sb/gui-theme' to `none' if you use this package
 (use-package circadian
+  :disabled t
   :commands circadian-setup
   :if (display-graphic-p)
   :init
@@ -665,8 +650,8 @@ SAVE-FN with non-nil ARGS."
   (setq calendar-latitude 26.50
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
-        circadian-themes '((:sunrise . modus-operandi)
-                           (:sunset  . modus-operandi)))
+        circadian-themes '((:sunrise . doom-gruvbox)
+                           (:sunset  . doom-gruvbox)))
   (circadian-setup))
 
 (use-package leuven-theme
@@ -696,7 +681,7 @@ SAVE-FN with non-nil ARGS."
           (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-gruvbox)))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
-  (load-theme 'doom-molokai t)
+  (load-theme 'doom-gruvbox t)
   (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
   :config
   (doom-themes-treemacs-config)
@@ -769,7 +754,7 @@ SAVE-FN with non-nil ARGS."
   :init
   (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
         ;; powerline-default-separator 'box
-        ;; powerline-display-buffer-size nil
+        powerline-display-buffer-size nil
         powerline-display-mule-info nil ; File encoding information is not useful
         powerline-gui-use-vcs-glyph t
         powerline-height 20)
@@ -793,10 +778,11 @@ SAVE-FN with non-nil ARGS."
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
+        ;; Reduce space on the modeline
         doom-modeline-buffer-file-name-style 'file-name)
   (doom-modeline-mode 1))
 
-(use-package awesome-tray
+(use-package awesome-tray ; Minimal modeline information
   :ensure nil
   :commands awesome-tray-mode
   :if (eq sb/modeline-theme 'awesome-tray)
@@ -804,7 +790,9 @@ SAVE-FN with non-nil ARGS."
   ;; :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
   :hook (after-init . awesome-tray-mode)
   :config
-  (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
+  (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
+        awesome-tray-git-update-duration 30 ; seconds
+        awesome-tray-file-path-full-dirname-levels 1)
   :custom-face
   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
@@ -841,6 +829,15 @@ SAVE-FN with non-nil ARGS."
 ;; (cond ((member "Inconsolata" (font-family-list))
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
+;; Decrease minibuffer font
+;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
+(progn
+  (defun sb/minibuffer-font-setup ()
+    "Customize minibuffer font."
+    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
+
+  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
+
 (when (string= (system-name) "inspiron-7572")
   (set-face-attribute 'default nil :height 170)
   (set-face-attribute 'mode-line nil :height 120)
@@ -866,14 +863,20 @@ SAVE-FN with non-nil ARGS."
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
-;; Decrease minibuffer font
-;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
-(progn
-  (defun sb/minibuffer-font-setup ()
-    "Customize minibuffer font."
-    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
+(when (string= (system-name) "satpura")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
 
-  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
+(when (string= (system-name) "nilgiri")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "sivalik")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information
@@ -938,7 +941,7 @@ SAVE-FN with non-nil ARGS."
    ("M-<up>"   . sb/dired-jump-to-top)
    ("M-<down>" . sb/dired-jump-to-bottom)
    ("i"        . find-file))
-  :hook (dired-mode . auto-revert-mode) ;; Auto refresh dired when files change
+  :hook (dired-mode . auto-revert-mode) ; Auto refresh dired when files change
   :config
   (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
         ;; Guess a default target directory. When there are two dired buffers, Emacs will select
@@ -959,7 +962,8 @@ SAVE-FN with non-nil ARGS."
   :hook (dired-mode . dired-omit-mode)
   :config
   (setq dired-cleanup-buffers-too t
-        dired-omit-verbose nil) ; Do not show messages when omitting files
+        ;; Do not show messages when omitting files
+        dired-omit-verbose nil)
 
   ;; (setq dired-omit-files
   ;;       (concat dired-omit-files
@@ -978,6 +982,12 @@ SAVE-FN with non-nil ARGS."
     "Remove 'Omit' from the modeline."
     (diminish 'dired-omit-mode) dired-mode-map))
 
+(use-package dired-narrow ; Narrow `dired' to match filter
+  :after dired
+  :bind
+  (:map dired-mode-map
+        ("/" . dired-narrow)))
+
 ;; Do not create multiple dired buffers
 (use-package dired+
   :load-path "extras"
@@ -992,8 +1002,8 @@ SAVE-FN with non-nil ARGS."
   (dired-mode . (lambda ()
                   (diredp-toggle-find-file-reuse-dir 1))))
 
-;; Bound to `diredp-rename-this-file', prefer `dired-efap'. This binding only works if we load after
-;; `dired+' and not `dired', even with `bind-keys*'.
+;; `r' is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
+;; we load after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
   :after dired+
   :defines dired-efap-initial-filename-selection
@@ -1001,12 +1011,6 @@ SAVE-FN with non-nil ARGS."
   :bind*
   (:map dired-mode-map
         ("r" . dired-efap)))
-
-(use-package dired-narrow ; Narrow `dired' to match filter
-  :after dired
-  :bind
-  (:map dired-mode-map
-        ("/" . dired-narrow)))
 
 ;; Asynchronously byte compile packages installed with `package.el'
 (use-package async
@@ -1051,6 +1055,7 @@ SAVE-FN with non-nil ARGS."
                                         treemacs-display-current-project-exclusively
                                         projectile-project-p)
   :preface
+  ;; The problem is there is no toggle support.
   (defun sb/setup-treemacs-quick ()
     "Setup treemacs."
     (interactive)
@@ -1084,16 +1089,19 @@ SAVE-FN with non-nil ARGS."
   :config
   (setq treemacs-follow-after-init t
         treemacs-indentation 1
-        treemacs-indentation-string (propertize " ⫶ " 'face 'font-lock-comment-face)
         ;; Prevents Treemacs from being selected with `other-window' if non-nil, but it hurts easy
-        ;; navigability
-        treemacs-is-never-other-window nil
+        ;; navigability. Use `treemacs-select-window'.
+        treemacs-is-never-other-window t
         treemacs-recenter-after-file-follow 'on-distance
         treemacs-recenter-after-tag-follow 'on-distance
-        treemacs-silent-refresh t ; Silence all refresh messages including from file watches
-        treemacs-width 22
+        treemacs-silent-refresh t ; Silence all refresh messages including file watches
+        treemacs-width 20
         ;; Hide the mode-line in the Treemacs buffer
         treemacs-user-mode-line-format 'none)
+
+  (if (display-graphic-p)
+      (setq treemacs-indentation-string (propertize "⫶" 'face 'font-lock-comment-face))
+    (setq treemacs-indentation-string (propertize "|" 'face 'font-lock-comment-face)))
 
   (treemacs-filewatch-mode 1)
   ;; `treemacs-tag-follow-mode' disables `treemacs-follow-mode', focuses the tag, but following tags
@@ -1145,11 +1153,14 @@ SAVE-FN with non-nil ARGS."
   (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
   (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
 
-  (when (or (eq sb/gui-theme 'modus-operandi) (eq sb/gui-theme 'modus-vivendi))
+  (when (or (eq sb/gui-theme 'modus-operandi)
+            (eq sb/gui-theme 'modus-vivendi)
+            (eq sb/gui-theme 'doom-gruvbox))
     (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
 
-  (when (eq sb/gui-theme 'sb/default)
+  (when (or (eq sb/gui-theme 'sb/default)
+            (eq sb/gui-theme 'none))
     (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0))
 
@@ -1199,15 +1210,13 @@ SAVE-FN with non-nil ARGS."
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
-  :hook
-  ((org-mode . visual-line-mode)
-   (org-mode . prettify-symbols-mode))
+  :hook (org-mode . visual-line-mode)
   :config
-  (setq org-fontify-done-headline t
-        org-fontify-whole-heading-line t
-        org-hide-emphasis-markers t
-        org-hide-leading-stars t
-        org-hide-leading-stars-before-indent-mode t
+  (setq org-fontify-done-headline      nil
+        org-fontify-whole-heading-line nil
+        ;; org-hide-emphasis-markers      t
+        ;; org-hide-leading-stars         t
+        ;; org-hide-leading-stars-before-indent-mode t
         ;; Code block fontification using the major-mode of the code
         org-src-fontify-natively t
         org-src-preserve-indentation t
@@ -1266,7 +1275,7 @@ SAVE-FN with non-nil ARGS."
 ;; TODO: Use `C-c o' as the binding for `org-mode-map'
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
-;; isearch candidates
+;; `isearch' candidates
 (use-package isearch
   :ensure nil
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
@@ -1274,7 +1283,7 @@ SAVE-FN with non-nil ARGS."
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
-   ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp'
+   ("C-M-f"   . nil) ;; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
    ("C-f"     . isearch-forward-regexp)
    :map isearch-mode-map
    ("C-s"     . nil)
@@ -1320,29 +1329,29 @@ SAVE-FN with non-nil ARGS."
 ;; minutes.
 (use-package wgrep ; Writable grep
   :bind
+  ;; These keybindings are also defined in `wgrep-mode-map'
   (:map grep-mode-map
-        ("C-c C-c" . wgrep-finish-edit)
+        ("C-x C-p" . wgrep-change-to-wgrep-mode)
         ("C-x C-s" . wgrep-finish-edit)
-        ("C-x C-q" . wgrep-exit)
-        ("C-c C-k" . wgrep-abort-changes)
-        ("C-x C-p" . wgrep-change-to-wgrep-mode))
+        ("C-x C-k" . wgrep-abort-changes)
+        ("C-x C-q" . wgrep-exit))
   :config (setq wgrep-auto-save-buffer t))
 
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
-(use-package ctrlf
-  :disabled t
-  :commands (ctrlf-mode ctrlf-local-mode)
-  :config
-  (ctrlf-mode 1)
-  (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
-                                           (ctrlf-local-mode -1)))
-  :bind
-  (("C-f"   . ctrlf-forward-literal)
-   ("C-r"   . ctrlf-backward-literal)
-   ("C-M-s" . ctrlf-forward-regexp)
-   ("C-M-r" . ctrlf-backward-regexp)))
+;; (use-package ctrlf
+;;   :disabled t
+;;   :commands (ctrlf-mode ctrlf-local-mode)
+;;   :config
+;;   (ctrlf-mode 1)
+;;   (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
+;;                                            (ctrlf-local-mode -1)))
+;;   :bind
+;;   (("C-f"   . ctrlf-forward-literal)
+;;    ("C-r"   . ctrlf-backward-literal)
+;;    ("C-M-s" . ctrlf-forward-regexp)
+;;    ("C-M-r" . ctrlf-backward-regexp)))
 
 (progn
   (defvar reb-re-syntax)
@@ -1386,9 +1395,10 @@ SAVE-FN with non-nil ARGS."
         ;; Abbreviate the file name to make it easy to read the actual file name
         recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
-  (when (bound-and-true-p sb/use-no-littering)
-    (add-to-list 'recentf-exclude (file-truename no-littering-etc-directory))
-    (add-to-list 'recentf-exclude (file-truename no-littering-var-directory)))
+  ;; Use the true file name and not the symlink name
+  (dolist (exclude `(,(file-truename no-littering-etc-directory)
+                     ,(file-truename no-littering-var-directory)))
+    (add-to-list 'recentf-exclude exclude))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
   ;; after idling for 30 seconds.
@@ -1397,12 +1407,12 @@ SAVE-FN with non-nil ARGS."
   ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
   ;; timers.
   (run-with-idle-timer 60 t #'recentf-cleanup)
-  :hook
-  ;; Load immediately after start since I use it often
-  (after-init . recentf-mode))
+  :hook (after-init . recentf-mode))
 
+;; Load immediately after start since I use it often
 (use-package init-open-recentf
   :after recentf
+  :demand t
   :config (init-open-recentf))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1418,16 +1428,10 @@ SAVE-FN with non-nil ARGS."
 ;; Hide the "Wrote ..." message
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
-;; LATER: Can we shorten long Tramp file names?
-;; (add-to-list 'directory-abbrev-alist
-;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
-;; (add-to-list 'directory-abbrev-alist
-;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
-
-;; The module does not specify an `autoload'
-(use-package company-capf
-  :ensure company
-  :commands company-capf)
+;; ;; The module does not specify an `autoload'
+;; (use-package company-capf
+;;   :ensure company
+;;   :commands company-capf)
 
 ;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
 ;; company-complete-common' when there are no completions. Use `C-M-i' for `complete-symbol' with
@@ -1456,7 +1460,7 @@ SAVE-FN with non-nil ARGS."
         company-dabbrev-other-buffers t ; Search in other buffers with the same major mode
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 3 ; Small words are faster to type
+        company-minimum-prefix-length 2 ; Small words can be faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
         company-show-quick-access t ; Speed up completion
@@ -1532,12 +1536,13 @@ SAVE-FN with non-nil ARGS."
   :config (company-statistics-mode 1))
 
 (use-package yasnippet
-  :commands (yas-global-mode snippet-mode)
+  :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode prog-mode) . yas-global-mode)
   :config
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
         yas-verbosity 0)
+  (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand)
   (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package yasnippet-snippets
@@ -1547,7 +1552,6 @@ SAVE-FN with non-nil ARGS."
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
-  :after (yasnippet ivy)
   :bind ("C-M-y" . ivy-yasnippet))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
@@ -1566,7 +1570,7 @@ SAVE-FN with non-nil ARGS."
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
     "Return non-nil if STR names a Dired buffer.
-    This function is intended for use with `ivy-ignore-buffers'."
+  This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :hook (after-init . ivy-mode)
@@ -1683,6 +1687,7 @@ SAVE-FN with non-nil ARGS."
                                          "\\|GTAGS"
                                          "\\|tramp"
                                          "\\|.clangd"
+                                         "\\|.cache"
                                          "\\|.metadata"
                                          "\\|.recommenders"
                                          "\\|typings"
@@ -1811,7 +1816,7 @@ SAVE-FN with non-nil ARGS."
               (setq arg 0))
           (forward-word)))))
   :config
-  (setq flyspell-abbrev-p           t
+  (setq flyspell-abbrev-p           t ; Add corrections to abbreviation table
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
   :hook
@@ -2419,7 +2424,7 @@ SAVE-FN with non-nil ARGS."
 
 (or
  (use-package flycheck-popup-tip ; Show error messages in popups
-   :ensure t
+   ;; :ensure t
    :unless (display-graphic-p)
    :hook (flycheck-mode . flycheck-popup-tip-mode))
 
@@ -2586,6 +2591,12 @@ SAVE-FN with non-nil ARGS."
 ;; gcloud config set project <project-name>
 ;; C-x C-f /gcssh:compute-instance:/path/to/filename.clj
 
+;; LATER: Can we shorten long Tramp file names?
+;; (add-to-list 'directory-abbrev-alist
+;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
+;; (add-to-list 'directory-abbrev-alist
+;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
+
 (use-package imenu
   :ensure nil
   :after (:any markdown-mode yaml-mode prog-mode)
@@ -2701,17 +2712,6 @@ SAVE-FN with non-nil ARGS."
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
   :commands manage-minor-mode)
-
-(use-package jgraph-mode
-  :commands jgraph-mode)
-
-(use-package graphviz-dot-mode
-  :commands graphviz-dot-mode)
-
-(use-package gnuplot
-  :commands (gnuplot-mode gnuplot)
-  :mode "\\.gp\\'"
-  :interpreter ("gnuplot" . gnuplot-mode))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
@@ -3186,6 +3186,14 @@ SAVE-FN with non-nil ARGS."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
+(add-hook 'prog-mode-hook
+          (lambda ()
+            ;; Highlight and allow to open http link at point in programming buffers.
+            ;; `goto-address-prog-mode' only highlights links in strings and comments.
+            (goto-address-prog-mode 1)
+            ;; Native from Emacs 27+
+            (display-fill-column-indicator-mode 1)))
+
 (use-package elisp-mode
   :ensure nil
   :mode
@@ -3196,8 +3204,7 @@ SAVE-FN with non-nil ARGS."
                                    (when buffer-file-name
                                      (add-hook 'after-save-hook #'check-parens nil t)
                                      (flycheck-add-next-checker 'emacs-lisp
-                                                                'emacs-lisp-checkdoc 'append))
-                                   (outline-minor-mode))))
+                                                                'emacs-lisp-checkdoc 'append)))))
 
 (declare-function ht-merge "ht")
 
@@ -4851,6 +4858,7 @@ Ignore if no file is found."
 
 ;; Use `emacsclient -c -nw' to start a new frame.
 (use-package server
+  :disabled t
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
   :commands server-running-p
   :init

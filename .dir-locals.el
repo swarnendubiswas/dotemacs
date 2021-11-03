@@ -1,4 +1,8 @@
 (
+ (dired-mode . (
+                (dired-omit-files . "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'")
+                ))
+
  (emacs-lisp-mode . (
                      (eval . (format-all-mode 1))
                      ;; The special `subdirs' element is not a variable, but a special keyword which
