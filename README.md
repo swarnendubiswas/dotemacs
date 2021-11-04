@@ -361,11 +361,31 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 `emacs -Q -l /home/swarnendu/github/dotemacs-28/extras/profile-dotemacs.el -f profile-dotemacs`
 
+## Emacs in a Terminal
+
+```Bash
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+
+# Check whether xterm files are present
+ll /lib/terminfo/x/*
+ll /usr/share/terminfo/*
+mkdir -p $HOME/.terminfo/x
+```
+
+Use the following steps from either of the links. 
+
+- <https://pisquare.osisoft.com/s/Blog-Detail/a8r1I000000GvXBQA0/console-things-getting-24bit-color-working-in-terminals>
+- <https://github.com/syl20bnr/spacemacs/wiki/Terminal>
+- <https://titanwolf.org/Network/Articles/Article?AID=58f275e6-08c4-43e5-b561-89dc3c343e6c>
+
+```Bash
+export TERM=xterm-24bit
+```
+
 ## TODO
 
-- Use custom major modes for files by names without using file-local variables
-  - <https://stackoverflow.com/questions/63578123/setting-a-mode-for-a-particular-file-using-dir-locals-el/>
 - Resolve xml lsp over tramp, not working
-- Flycheck not working with `.el` files with `no-byte-compile` in `.dir-locals.el`
 - Cursor loses its place after formatting with YAPF
 - Integrate `company-yasnippet` and assign a key to `yas-expand-all`

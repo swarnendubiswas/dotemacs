@@ -439,7 +439,7 @@ This location is used for temporary installations and files.")
 ;; (set-terminal-coding-system 'utf-8)
 
 ;; Scroll settings from Doom Emacs
-(setq scroll-margin 2 ; Add margin lines when scrolling vertically to have a sense of continuity
+(setq scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
       ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N
       ;; lines past window edges, where N is the setting of `scroll-conservatively'. This is
       ;; especially slow in larger files during large-scale scrolling commands. If kept over 100,
@@ -1820,15 +1820,15 @@ This location is used for temporary installations and files.")
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
   :hook
-  ((text-mode  . flyspell-mode)
+  (;; (before-save . flyspell-buffer) ; Saving files will be slow
    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
    ;; language-specific words
    (prog-mode . flyspell-prog-mode)
-   ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; `find-file-hook' will not work for buffers with no associated files
    (after-init . (lambda ()
                    (when (string= (buffer-name) "*scratch*")
-                     (flyspell-mode 1)))))
+                     (flyspell-mode 1))))
+   (text-mode . flyspell-mode))
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
@@ -1925,7 +1925,7 @@ This location is used for temporary installations and files.")
 
 (use-package highlight-indentation
   :commands highlight-indentation-mode
-  ;; :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook ((yaml-mode python-mode) . highlight-indentation-mode))
 
 ;; Claims to be better than `electric-indent-mode'
@@ -1945,7 +1945,7 @@ This location is used for temporary installations and files.")
         show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t))
 
-;; Enable autopairing, `smartparens' seems slow
+;; Enable autopairing
 (use-package elec-pair
   :ensure nil
   :commands (electric-pair-mode)
@@ -1977,9 +1977,9 @@ This location is used for temporary installations and files.")
   (add-hook 'minibuffer-exit-hook (lambda ()
                                     (electric-pair-mode 1))))
 
+;; `sp-cheat-sheet' will show you all the commands available, with examples. Seems to have
+;; performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
-;; Seems to have performance issue with `latex-mode', `markdown-mode', and large JSON files.
-;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens
   :commands (sp-pair sp-local-pair)
   :diminish
@@ -1993,9 +1993,6 @@ This location is used for temporary installations and files.")
         sp-autoskip-closing-pair 'always)
 
   (smartparens-strict-mode -1)
-
-  ;; Stop pairing single quotes in elisp
-  ;; (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil)
 
   (sp-local-pair 'markdown-mode "<" ">")
 
@@ -3214,6 +3211,7 @@ This location is used for temporary installations and files.")
 (use-package lsp-mode
   :ensure spinner
   :diminish "LSP"
+  :diminish lsp-lens-mode
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -3429,7 +3427,6 @@ This location is used for temporary installations and files.")
   ;;             ;; (eldoc-box-hover-at-point-mode -1)
   ;;             (eldoc-mode -1)))
   :bind
-  ;; FIXME: Bind only if the server has launched successfully
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
         ([remap xref-find-references]  . lsp-ui-peek-find-references)
@@ -3581,7 +3578,6 @@ This location is used for temporary installations and files.")
         (list (lambda ()
                 (setq python-shell-interpreter "python3")))))
 
-;; FIXME: Leads to errors over tramp and possibly blocks Emacs
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :commands py-isort-before-save
@@ -4521,8 +4517,7 @@ Ignore if no file is found."
   :preface
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(bazel-mode-hook latex-mode-hook LaTeX-mode-hook json-mode-hook
-                                    markdown-mode-hook gfm-mode-hook))
+    (dolist (hook '(bazel-mode-hook LaTeX-mode-hook markdown-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
   :init (run-with-idle-timer 2 nil #'sb/enable-format-all))
