@@ -829,15 +829,6 @@ This location is used for temporary installations and files.")
 ;; (cond ((member "Inconsolata" (font-family-list))
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
-;; Decrease minibuffer font
-;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
-(progn
-  (defun sb/minibuffer-font-setup ()
-    "Customize minibuffer font."
-    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
-
-  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
-
 (when (string= (system-name) "inspiron-7572")
   (set-face-attribute 'default nil :height 170)
   (set-face-attribute 'mode-line nil :height 120)
@@ -877,6 +868,15 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'default nil :height 160)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
+
+;; Decrease minibuffer font
+;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
+(progn
+  (defun sb/minibuffer-font-setup ()
+    "Customize minibuffer font."
+    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
+
+  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information
@@ -1428,12 +1428,15 @@ This location is used for temporary installations and files.")
 ;; Hide the "Wrote ..." message
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
-;; ;; The module does not specify an `autoload'
-;; (use-package company-capf
-;;   :ensure company
-;;   :commands company-capf)
+;; The module does not specify an `autoload'. So we get the following error without the following
+;; declaration.
+;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
+;; function company-capf"
+(use-package company-capf
+  :ensure company
+  :commands company-capf)
 
-;; Use `M-x company-diag' or the modeline status to see the backend used. Try `M-x
+;; Use "M-x company-diag" or the modeline status to see the backend used. Try `M-x
 ;; company-complete-common' when there are no completions. Use `C-M-i' for `complete-symbol' with
 ;; regex search.
 (use-package company
@@ -2000,6 +2003,7 @@ This location is used for temporary installations and files.")
   (sp-pair "(" nil :unless '(sp-point-before-word-p))
   (sp-pair "[" nil :unless '(sp-point-before-word-p))
   (sp-pair "{" nil :unless '(sp-point-before-word-p))
+  (sp-pair "\"" nil :unless '(sp-point-before-word-p))
 
   (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
   :bind
@@ -2011,6 +2015,7 @@ This location is used for temporary installations and files.")
    ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
    ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
    ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
+   ;; TODO: The keybindings are not properly supported yet in terminal Emacs
    ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
    ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
    ;; "(foo bar)" -> "foo bar"
@@ -2055,14 +2060,17 @@ This location is used for temporary installations and files.")
   :config
   (setq projectile-enable-caching nil ; Caching will not watch for file system changes
         projectile-file-exists-remote-cache-expire nil
-        projectile-indexing-method 'alien
         projectile-mode-line-prefix "PRJ"
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
+        projectile-indexing-method 'alien
         ;; No sorting should be faster, note that files are not sorted if
         ;; `projectile-indexing-method' is set to 'alien'.
         projectile-sort-order 'recently-active
         projectile-verbose nil)
+
+  ;; See Git status after switching to a project
+  ;; (setq projectile-switch-project-action #'magit-status)
 
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and (symbol-value 'sb/IS-WINDOWS)
@@ -2161,7 +2169,6 @@ This location is used for temporary installations and files.")
    ("A"    . projectile-add-known-project)))
 
 ;; I am unsure how does this package advances `projectile' in terms of usability.
-;; Set a default landing file: https://github.com/ericdanan/counsel-projectile/issues/172
 (use-package counsel-projectile
   :disabled t
   :defines counsel-projectile-default-file
@@ -2172,6 +2179,7 @@ This location is used for temporary installations and files.")
     (let ((projectile-switch-project-action 'magit-status))
       (counsel-projectile-switch-project-by-name project)))
 
+  ;; Set a default landing file: https://github.com/ericdanan/counsel-projectile/issues/172
   (defun sb/counsel-projectile-open-default-file ()
     "Open the current project's default file.
         This file is specified in `counsel-projectile-default-file'."
@@ -2222,7 +2230,7 @@ This location is used for temporary installations and files.")
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-  :config (setq all-the-icons-ivy-rich-icon-size 1.0))
+  :config (setq all-the-icons-ivy-rich-icon-size 0.9))
 
 (use-package ivy-rich
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
@@ -2421,7 +2429,6 @@ This location is used for temporary installations and files.")
 
 (or
  (use-package flycheck-popup-tip ; Show error messages in popups
-   ;; :ensure t
    :unless (display-graphic-p)
    :hook (flycheck-mode . flycheck-popup-tip-mode))
 
@@ -2461,13 +2468,13 @@ This location is used for temporary installations and files.")
   (setq delete-trailing-lines t) ; `M-x delete-trailing-whitespace' deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-;; Call `whitespace-cleanup' only if the initial buffer was clean. But this mode works on the entire
-;; file. To enable it for an entire project, set `whitespace-cleanup-mode' to `t' in your
-;; `.dir-locals.el' file.
+;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
+;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
+;; to `t' in the `.dir-locals.el' file.
 (use-package whitespace-cleanup-mode
+  :disabled t
   :diminish
   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
-  ;; :hook (after-init . global-whitespace-cleanup-mode)
   :config
   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
   (setq whitespace-cleanup-mode-preserve-point t))
@@ -2487,8 +2494,8 @@ This location is used for temporary installations and files.")
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next))
   :config
-  ;; Delay highlighting to avoid transient cursor placements
-  (setq symbol-overlay-idle-time 1))
+  ;; Delay highlighting to allow for transient cursor placements
+  (setq symbol-overlay-idle-time 2))
 
 (use-package hl-todo
   :commands global-hl-todo-mode
@@ -2508,7 +2515,7 @@ This location is used for temporary installations and files.")
   :commands highlight-numbers-mode
   :hook ((prog-mode yaml-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
 
-(use-package page-break-lines
+(use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :diminish
   :commands (global-page-break-lines-mode page-break-lines-mode)
   :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode))
@@ -2539,16 +2546,26 @@ This location is used for temporary installations and files.")
    ("C->"     . mc/mark-next-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
 
-;; Edit remote file: `/method:user@host#port:filename'. Shortcut /ssh:: will connect to default
-;; user@host#port.
-;; Edit local file with sudo: `C-x C-f /sudo::/etc/hosts'.
-;; Open a remote file with ssh + sudo: `C-x C-f /ssh:host|sudo:root:/etc/passwd'.
+;; Edit remote file: "/method:user@host#port:filename". Shortcut "/ssh::" will connect to default
+;; "user@host#port".
+;; Edit local file with sudo: "C-x C-f /sudo::/etc/hosts".
+;; Open a remote file with ssh + sudo: "C-x C-f /ssh:host|sudo:root:/etc/passwd".
+;; Multihop syntax: C-x C-f /ssh:bird@bastion|ssh:you@remotehost:/path
+;; Multihop with sudo: "C-x C-f /ssh:you@remotehost|sudo:remotehost:/path/to/file"
+;; Multihop with sudo with custom user: "C-x C-f
+;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
+
+;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/
 ;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
-;; bookmark with `bookmark-set'. To revisit that bookmark, use `bookmark-jump'.
+;; bookmark with `bookmark-set' (C-x r m). To revisit that bookmark, use `bookmark-jump' (C-x r b)
+;; or `bookmark-bmenu-list' (C-x r l). Rename the bookmarked location in `bookmark-bmenu-mode' with
+;; `R'.
 (use-package tramp
   :config
   (setq tramp-default-user "swarnendu"
-        ;; tramp-default-method "ssh" ; SSH is faster than the default SCP
+        ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
+        ;; files which is faster than SSH.
+        ;; tramp-default-method "ssh"
         ;; tramp-default-remote-shell "/bin/bash"
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         tramp-verbose 1
@@ -2900,6 +2917,7 @@ This location is used for temporary installations and files.")
 (use-package bookmark
   :ensure nil)
 
+;; FIXME: The package is not saving and restoring bookmarks.
 (use-package bm
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
                                 bm-repository-load bm-buffer-save bm-buffer-restore)
@@ -4199,6 +4217,8 @@ This location is used for temporary installations and files.")
 
   )
 
+;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
+;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'.
 (use-package lsp-latex
   :hook
   ((latex-mode LaTeX-mode) . (lambda()
@@ -4444,10 +4464,9 @@ Ignore if no file is found."
 
 ;; The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
 (use-package json-mode
-  :ensure nil
+  :ensure t
   :ensure json-reformat
   :ensure json-snatcher
-  :load-path "extras"
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
@@ -4471,11 +4490,11 @@ Ignore if no file is found."
     :server-id 'jsonls-remote)))
 
 (use-package json-reformat
-  :after json-mode
+  :after (:any json-mode jsonc-mode)
   :demand t)
 
 (use-package json-snatcher
-  :after json-mode
+  :after (:any json-mode jsonc-mode)
   :demand t)
 
 (use-package bazel
