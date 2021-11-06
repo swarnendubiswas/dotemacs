@@ -1392,7 +1392,8 @@ This location is used for temporary installations and files.")
         recentf-keep '(file-remote-p file-readable-p)
         ;; Larger values help in lookup but takes more time to check if the files exist
         recentf-max-saved-items 100
-        ;; Abbreviate the file name to make it easy to read the actual file name
+        ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
+        ;; `abbreviate-file-name' abbreviates home directory to "~/" in the file list.
         recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
   ;; Use the true file name and not the symlink name
@@ -1545,7 +1546,8 @@ This location is used for temporary installations and files.")
   :config
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
         yas-verbosity 0)
-  (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand)
+  (with-eval-after-load "hippie-expand"
+    (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
   (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package yasnippet-snippets
@@ -1578,13 +1580,10 @@ This location is used for temporary installations and files.")
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :hook (after-init . ivy-mode)
   :config
-  (setq ivy-case-fold-search 'always ; Always ignore case while searching
-        ;; ivy-initial-inputs-alist nil ; Do not start completion with `^'
-        ivy-count-format "(%d/%d) " ; Helps identify wrap around
+  (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
         ivy-extra-directories nil ; Hide . and ..
         ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
-        ;; Make the height of the minibuffer proportionate to the screen, but it requires more
-        ;; processing
+        ;; Make the height of the minibuffer proportionate to the screen
         ;; ivy-height-alist '((t
         ;;                      lambda (_caller)
         ;;                      (/ (frame-height) 2)))
@@ -1606,7 +1605,6 @@ This location is used for temporary installations and files.")
 
   ;; Ignore `dired' buffers from `ivy-switch-buffer'
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
-
   :diminish
   :bind
   (("C-c r"    . ivy-resume)
@@ -1617,8 +1615,8 @@ This location is used for temporary installations and files.")
    ("<right>"  . ivy-next-line)))
 
 (use-package counsel
-  :ensure amx
   :ensure t
+  :ensure amx ; `counsel' makes use of `amx' if installed
   :commands counsel-mode
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
@@ -1635,6 +1633,7 @@ This location is used for temporary installations and files.")
   :bind
   (([remap execute-extended-command] . counsel-M-x)
    ([remap completion-at-point]      . counsel-company)
+   ("C-M-i"                          . counsel-company)
    ([remap find-file]                . counsel-find-file)
    ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
    ;; ([remap flycheck-list-errors]  . counsel-flycheck)
@@ -1647,7 +1646,7 @@ This location is used for temporary installations and files.")
    ("C-c s r"                        . counsel-rg)
    ("C-c C-m"                        . counsel-mark-ring)
    ;; Enabling preview can make switching over remote buffers slow
-   ;; ("<f3>"                        . counsel-switch-buffer)
+   ("S-<f3>"                        . counsel-switch-buffer)
    ("<f4>"                           . counsel-grep-or-swiper))
   :bind* ("C-c C-j"                  . counsel-imenu)
   :diminish
@@ -1659,7 +1658,6 @@ This location is used for temporary installations and files.")
         counsel-find-file-ignore-regexp (concat
                                          "\\(?:\\`[#.]\\)"
                                          "\\|\\(?:\\`.+?[#~]\\'\\)"
-                                         "\\|__pycache__"
                                          "\\|.cb$"
                                          "\\|.cb2$"
                                          "\\|.class$"
@@ -1697,12 +1695,11 @@ This location is used for temporary installations and files.")
                                          "\\|__pycache__")
         counsel-mode-override-describe-bindings t
         counsel-preselect-current-file t
-        counsel-switch-buffer-preview-virtual-buffers nil
+        counsel-switch-buffer-preview-virtual-buffers nil ; Removes recent files and bookmarks
         counsel-yank-pop-preselect-last t
         counsel-yank-pop-separator "\n------------------------------------------\n"))
 
-;; Additional keybindings for `ivy'
-(use-package ivy-hydra
+(use-package ivy-hydra ; Additional keybindings for `ivy'
   :after (ivy hydra)
   :demand t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
@@ -1712,13 +1709,13 @@ This location is used for temporary installations and files.")
   :hook (after-init . prescient-persist-mode)
   :config (setq prescient-sort-full-matches-first t))
 
-;; We want `capf' sort for programming modes, not with recency. This breaks the support for the
-;; `:separate' keyword in `company'
 (use-package company-prescient
   :after company
   :demand t
   :commands company-prescient-mode
   :config
+  ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
+  ;; `:separate' keyword in `company'.
   (setq company-prescient-sort-length-enable nil)
   (company-prescient-mode 1))
 
@@ -2003,7 +2000,7 @@ This location is used for temporary installations and files.")
   (sp-pair "(" nil :unless '(sp-point-before-word-p))
   (sp-pair "[" nil :unless '(sp-point-before-word-p))
   (sp-pair "{" nil :unless '(sp-point-before-word-p))
-  (sp-pair "\"" nil :unless '(sp-point-before-word-p))
+  (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
   (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
   :bind
@@ -2035,16 +2032,16 @@ This location is used for temporary installations and files.")
                                     project-compile)
   :bind
   (:map project-prefix-map
-        ("f"    . project-find-file)
-        ("F"    . project-or-external-find-file)
-        ("b"    . project-switch-to-buffer)
-        ("d"    . project-dired)
-        ("v"    . project-vc-dir)
-        ("c"    . project-compile)
-        ("k"    . project-kill-buffers)
-        ("p"    . project-switch-project)
-        ("g"    . project-find-regexp)
-        ("r"    . project-query-replace-regexp)))
+        ("f" . project-find-file)
+        ("F" . project-or-external-find-file)
+        ("b" . project-switch-to-buffer)
+        ("d" . project-dired)
+        ("v" . project-vc-dir)
+        ("c" . project-compile)
+        ("k" . project-kill-buffers)
+        ("p" . project-switch-project)
+        ("g" . project-find-regexp)
+        ("r" . project-query-replace-regexp)))
 
 (use-package projectile
   :commands (projectile-project-p projectile-project-name
@@ -2160,7 +2157,7 @@ This location is used for temporary installations and files.")
   :bind-keymap ("C-c p" . projectile-command-map)
   :init
   ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
-  (run-with-idle-timer 3 nil #'projectile-mode)
+  (run-with-idle-timer 2 nil #'projectile-mode)
   :bind
   ;; Set these in case `counsel-projectile' is disabled
   (("<f5>" . projectile-switch-project)
@@ -2590,8 +2587,6 @@ This location is used for temporary installations and files.")
 (declare-function sb/sshlist "private")
 
 (progn
-  ;; (declare-function sb/ivy-tramp "init-use-package")
-
   (defun sb/ivy-tramp ()
     "Invoke remote hosts with ivy and tramp."
     (interactive)
@@ -2605,7 +2600,7 @@ This location is used for temporary installations and files.")
 ;; gcloud config set project <project-name>
 ;; C-x C-f /gcssh:compute-instance:/path/to/filename.clj
 
-;; LATER: Can we shorten long Tramp file names?
+;; LATER: Can we shorten long Tramp file names? This does not work with Tramp.
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
 ;; (add-to-list 'directory-abbrev-alist
@@ -2645,6 +2640,7 @@ This location is used for temporary installations and files.")
 
 (use-package ivy-xref
   :after (ivy xref)
+  :demand t
   :config
   (setq xref-show-definitions-function #'ivy-xref-show-defs
         xref-show-xrefs-function       #'ivy-xref-show-xrefs))
@@ -2666,7 +2662,7 @@ This location is used for temporary installations and files.")
             (lambda ()
               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local)))
 
-  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd"))
+  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd" ".cache"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
 
   (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
@@ -2682,7 +2678,7 @@ This location is used for temporary installations and files.")
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
-;; functions only, so `helpful-callable' as a drop-in replacement.
+;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
   :bind
   (("C-h v" . helpful-variable)
@@ -2694,7 +2690,7 @@ This location is used for temporary installations and files.")
    :map helpful-mode-map
    ("q"     . helpful-kill-buffers)))
 
-(use-package vlf ; Speed up Emacs for large files: `M-x vlf <PATH-TO-FILE>'
+(use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
   :commands vlf
   :defines vlf-application
   :config
@@ -2902,8 +2898,9 @@ This location is used for temporary installations and files.")
   :bind
   (("M-b"   . avy-goto-word-1)
    ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
-   ("M-g c" . avy-goto-char-timer)
+   ("M-g c" . avy-goto-char-timer) ; TODO: Reuse the keybinding
    ("C-/"   . avy-goto-line) ; Does not work with TUI, but works with Alacritty
+   ;; TODO: Reuse the keybinding
    ("M-g l" . avy-goto-line)))
 
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
@@ -2917,7 +2914,6 @@ This location is used for temporary installations and files.")
 (use-package bookmark
   :ensure nil)
 
-;; FIXME: The package is not saving and restoring bookmarks.
 (use-package bm
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
                                 bm-repository-load bm-buffer-save bm-buffer-restore)
@@ -2939,7 +2935,7 @@ This location is used for temporary installations and files.")
   (setq bm-restore-repository-on-load t)
   ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
   ;; usability
-  (run-with-idle-timer 3 nil #'sb/bm-setup)
+  (run-with-idle-timer 2 nil #'sb/bm-setup)
   :config (setq-default bm-buffer-persistence t)
   :bind
   (("C-<f1>" . bm-toggle)
@@ -2973,7 +2969,8 @@ This location is used for temporary installations and files.")
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood
+;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood. I
+;; prefer `grammarly' and `lsp-ltex'.
 (use-package writegood-mode
   :disabled t
   :commands writegood-mode
@@ -3012,12 +3009,12 @@ This location is used for temporary installations and files.")
         ("C-s" . isearch-forward)
         ("d"   . pdf-annot-delete)
         ("h"   . pdf-annot-add-highlight-markup-annotation)
-        ("t"   . pdf-annot-add-text-annotation)))
+        ("t"   . pdf-annot-add-text-annotation)
+        ("M" . pdf-view-midnight-minor-mode)))
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
 (use-package saveplace-pdf-view
-  :after pdf-tools
-  :after saveplace
+  :after (pdf-tools saveplace)
   :demand t)
 
 (use-package logview
@@ -3719,7 +3716,7 @@ This location is used for temporary installations and files.")
                  (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
-        ;; Requires Java 11+
+        ;; Requires Java 11+, Java 11 is the LTS
         lsp-java-java-path "/usr/lib/jvm/java-13-openjdk-amd64/bin/java"
         lsp-java-save-actions-organize-imports t
         lsp-java-format-settings-profile "Swarnendu"
