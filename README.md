@@ -363,6 +363,12 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 ## Emacs in a Terminal
 
+Use the steps mentioned in the following links. 
+
+- <https://pisquare.osisoft.com/s/Blog-Detail/a8r1I000000GvXBQA0/console-things-getting-24bit-color-working-in-terminals>
+- <https://github.com/syl20bnr/spacemacs/wiki/Terminal>
+- <https://titanwolf.org/Network/Articles/Article?AID=58f275e6-08c4-43e5-b561-89dc3c343e6c>
+
 ```Bash
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -372,17 +378,10 @@ export LANGUAGE=en_US.UTF-8
 ll /lib/terminfo/x/*
 ll /usr/share/terminfo/*
 mkdir -p $HOME/.terminfo/x
-```
-
-Use the following steps from either of the links. 
-
-- <https://pisquare.osisoft.com/s/Blog-Detail/a8r1I000000GvXBQA0/console-things-getting-24bit-color-working-in-terminals>
-- <https://github.com/syl20bnr/spacemacs/wiki/Terminal>
-- <https://titanwolf.org/Network/Articles/Article?AID=58f275e6-08c4-43e5-b561-89dc3c343e6c>
-
-```Bash
 export TERM=xterm-24bit
 ```
+
+This many lead to failures when accessing remote systems. In such cases, we can fallback to "TERM=xterm-256color ssh -X <remote-path>".
 
 ## TODO
 

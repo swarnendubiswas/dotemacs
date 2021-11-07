@@ -3227,7 +3227,6 @@ This location is used for temporary installations and files.")
 (use-package lsp-mode
   :ensure spinner
   :diminish "LSP"
-  :diminish lsp-lens-mode
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -3265,7 +3264,9 @@ This location is used for temporary installations and files.")
                                     lsp-modeline-code-actions-mode
                                     lsp-symbol-highlight ht-merge
                                     lsp-completion--regex-fuz)
-  :hook (lsp-mode . lsp-enable-which-key-integration)
+  :hook
+  ((lsp-mode . lsp-enable-which-key-integration)
+   (lsp-mode . lsp-lens-mode))
   :custom-face
   ;; Reduce the height
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
@@ -3373,6 +3374,8 @@ This location is used for temporary installations and files.")
                          ))
     (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
+  (with-eval-after-load "lsp-lens"
+    (diminish 'lsp-lens-mode))
   :bind-keymap ("C-c l" . lsp-command-map)
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
