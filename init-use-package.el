@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-gruvbox
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -3165,6 +3165,7 @@ This location is used for temporary installations and files.")
 (use-package css-mode
   :commands css-mode
   :defines sb/flycheck-local-checkers
+  :hook (css-mode . lsp-deferred)
   :config
   (setq css-indent-offset 2)
 
@@ -3172,7 +3173,7 @@ This location is used for temporary installations and files.")
    (make-lsp-client
     :new-connection (lsp-tramp-connection
                      '("css-languageserver" "--stdio"))
-    :major-modes '(css-mode less-mode sass-mode scss-mode)
+    :major-modes '(css-mode)
     :remote? t
     :server-id 'cssls-remote)))
 
@@ -3183,7 +3184,7 @@ This location is used for temporary installations and files.")
   :commands css-eldoc-enable
   :config (css-eldoc-enable))
 
-;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point
+;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
   :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
   :hook (eldoc-mode . eldoc-box-hover-mode)
@@ -3264,9 +3265,7 @@ This location is used for temporary installations and files.")
                                     lsp-modeline-code-actions-mode
                                     lsp-symbol-highlight ht-merge
                                     lsp-completion--regex-fuz)
-  :hook
-  ((lsp-mode . lsp-enable-which-key-integration)
-   ((css-mode less-mode sgml-mode typescript-mode) . lsp-deferred))
+  :hook (lsp-mode . lsp-enable-which-key-integration)
   :custom-face
   ;; Reduce the height
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
@@ -3275,8 +3274,8 @@ This location is used for temporary installations and files.")
   (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
                                                                :weight bold :height 0.9))))
   :config
-  ;; We can add "--compile-commands-dir=build" option to indicate the directory where
-  ;; `compile_commands.json' reside
+  ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
+  ;; "compile_commands.json" reside
   (setq lsp-clients-clangd-args '("-j=4"
                                   "--all-scopes-completion"
                                   "--background-index"
@@ -3291,7 +3290,7 @@ This location is used for temporary installations and files.")
                                   ;; Increases memory usage but can improve performance
                                   "--pch-storage=memory"
                                   "--pretty")
-        lsp-clients-clangd-executable "clangd"
+        ;; lsp-clients-clangd-executable "clangd"
         ;; Enable integration of custom backends other than `capf' with `company'
         lsp-completion-provider :none
         lsp-completion-show-detail nil ; Disable completion metadata since they can be very long
@@ -3321,7 +3320,7 @@ This location is used for temporary installations and files.")
         ;; lsp-signature-render-documentation nil
         ;; lsp-signature-function 'lsp-signature-posframe
         lsp-xml-logs-client nil
-        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.18.0-uber.jar"
+        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.18.1-uber.jar"
                                            sb/extras-directory)
         lsp-yaml-print-width sb/fill-column)
 
@@ -3364,19 +3363,17 @@ This location is used for temporary installations and files.")
   ;; We have `flycheck' error summary listed on the modeline, but `lsp' may report additional errors
   ;; (lsp-modeline-diagnostics-mode -1)
 
-  (add-to-list 'lsp-file-watch-ignored-directories "/\\.git\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "/\\.cache\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "/\\.clangd\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "/\\.log\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "/node_modules\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "/build\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "/__pycache__\\'")
-
-  ;; Disable fuzzy matching, TODO: What is the utility of this?
-  ;; (advice-add #'lsp-completion--regex-fuz :override #'identity)
+  (dolist (ignore-dirs '("/build\\'"
+                         "/\\.metadata\\'"
+                         "/\\.recommenders\\'"
+                         "/\\.clangd\\'"
+                         "/\\.cache\\'"
+                         "/__pycache__\\'"
+                         "/\\.log\\'"
+                         ))
+    (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
   :bind-keymap ("C-c l" . lsp-command-map)
-
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
   ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
@@ -3388,6 +3385,7 @@ This location is used for temporary installations and files.")
    ("G" . nil)
    ("a" . nil)
    ("F" . nil)
+   ("L" . lsp)
    ("q" . lsp-disconnect)
    ("Q" . lsp-workspace-shutdown)
    ("H" . lsp-describe-session)
@@ -3459,7 +3457,7 @@ This location is used for temporary installations and files.")
         ("E" . lsp-treemacs-errors-list)))
 
 (use-package lsp-ivy
-  :after lsp-mode
+  :after (lsp-mode ivy)
   :demand t
   :bind
   (:map lsp-command-map
@@ -3469,8 +3467,6 @@ This location is used for temporary installations and files.")
 (use-package dap-mode
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
 
-;; Call this in c-mode-common-hook:
-;; (define-key (current-local-map) "}" (lambda () (interactive) (c-electric-brace 1)))
 (use-package cc-mode
   :ensure nil
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
@@ -3580,7 +3576,6 @@ This location is used for temporary installations and files.")
   :commands pip-requirements-mode)
 
 (use-package pyvenv
-  ;; :diminish
   :commands (pyvenv-mode pyvenv-tracking-mode)
   :hook (python-mode . pyvenv-mode)
   :config
@@ -3601,7 +3596,7 @@ This location is used for temporary installations and files.")
                    (add-hook 'before-save-hook #'py-isort-before-save)))
   :config (setq py-isort-options '("-l 100")))
 
-;; `pyright --createstub pandas'
+;; "pyright --createstub pandas"
 (use-package lsp-pyright
   :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
@@ -3717,7 +3712,7 @@ This location is used for temporary installations and files.")
   :config
   (setq lsp-java-inhibit-message t
         ;; Requires Java 11+, Java 11 is the LTS
-        lsp-java-java-path "/usr/lib/jvm/java-13-openjdk-amd64/bin/java"
+        lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java"
         lsp-java-save-actions-organize-imports t
         lsp-java-format-settings-profile "Swarnendu"
         lsp-java-format-settings-url (expand-file-name
@@ -4003,7 +3998,7 @@ This location is used for temporary installations and files.")
    (make-lsp-client
     :new-connection (lsp-tramp-connection
                      '("html-languageserver" "--stdio"))
-    :major-modes '(html-mode web-mode mhtml-mode sgml-mode)
+    :major-modes '(html-mode web-mode mhtml-mode)
     :remote? t
     :server-id 'htmlls-remote)))
 
@@ -4546,9 +4541,10 @@ Ignore if no file is found."
   :diminish tree-sitter-mode
   :init
   (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
-                               css-mode-hook html-mode-hook java-mode-hook js-mode-hook
-                               js2-mode-hook json-mode-hook jsonc-mode-hook php-mode-hook
-                               python-mode-hook typescript-mode-hook))
+                               css-mode-hook html-mode-hook
+                               java-mode-hook json-mode-hook
+                               jsonc-mode-hook php-mode-hook
+                               python-mode-hook))
     (add-hook hook (lambda ()
                      (require 'tree-sitter)
                      (require 'tree-sitter-langs)
