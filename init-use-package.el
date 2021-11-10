@@ -1092,6 +1092,8 @@ This location is used for temporary installations and files.")
         ;; Prevents Treemacs from being selected with `other-window' if non-nil, but it hurts easy
         ;; navigability. Use `treemacs-select-window'.
         treemacs-is-never-other-window t
+        treemacs-project-follow-cleanup t
+        treemacs-missing-project-action 'remove
         treemacs-recenter-after-file-follow 'on-distance
         treemacs-recenter-after-tag-follow 'on-distance
         treemacs-silent-refresh t ; Silence all refresh messages including file watches
@@ -1169,16 +1171,23 @@ This location is used for temporary installations and files.")
 
   ;; Ignore files
 
-  ;; (defun sb/treemacs-ignore-files (filename absolute-path)
-  ;;   (or (string-equal filename "foo")
-  ;;       (string-prefix-p "/x/y/z/" absolute-path)))
-
-  ;; (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-files)
+  (defun sb/treemacs-ignore-files (filename absolute-path)
+    (or
+     (-contains? '("__pycache__" "node_modules" "package-lock.json") filename)
+	 (s-ends-with? ".pyc" filename)
+	 (s-ends-with? ".elc" filename)
+	 (s-ends-with? ".o" filename)
+	 (s-ends-with? ".so" filename)
+	 (s-ends-with? ".dll" filename)
+     ))
+  (add-to-list 'treemacs-ignored-file-predicates #'sb/treemacs-ignore-files)
 
   :bind*
   (;; The keybinding interferes with `dired-jump' and imenu `C-c C-j'
-   ("C-j" . treemacs)
-   ("M-0" . treemacs-select-window)))
+   ("C-j"     . treemacs)
+   ("C-c t d" . treemacs-add-and-display-current-project)
+   ("C-c t e" . treemacs-display-current-project-exclusively)
+   ("M-0"     . treemacs-select-window)))
 
 ;; Starts Treemacs automatically with Emacsclient
 ;; https://github.com/Alexander-Miller/treemacs/issues/624
@@ -2141,7 +2150,6 @@ This location is used for temporary installations and files.")
 
   ;; (add-hook 'projectile-after-switch-project-hook
   ;;           (lambda ()
-  ;;             (interactive)
   ;;             (treemacs-add-and-display-current-project)
   ;;             (treemacs-display-current-project-exclusively)
   ;;             (other-window 1)))
@@ -2309,7 +2317,7 @@ This location is used for temporary installations and files.")
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
-        flycheck-checker-error-threshold  500
+        flycheck-checker-error-threshold  1500
         flycheck-idle-buffer-switch-delay 5 ; Increase the time (s) to allow for quick transitions
         flycheck-idle-change-delay        5 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path     'inherit
@@ -3221,7 +3229,7 @@ This location is used for temporary installations and files.")
 
 (declare-function ht-merge "ht")
 
-;; TODO: Registering `lsp-format-buffer' makes sense only if the server is active. We may not always
+;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always
 ;; want to format unrelated files and buffers (e.g., commented YAML files in out-of-project
 ;; locations).
 (use-package lsp-mode
@@ -3455,8 +3463,11 @@ This location is used for temporary installations and files.")
   :config (lsp-treemacs-sync-mode 1)
   :bind
   (:map lsp-command-map
-        ("T" . lsp-treemacs-sync-mode)
-        ("H" . lsp-treemacs-call-hierarchy)
+        ("S" . lsp-treemacs-symbols)
+        ("F" . lsp-treemacs-references)
+        ("Y" . lsp-treemacs-sync-mode)
+        ("C" . lsp-treemacs-call-hierarchy)
+        ("T" . lsp-treemacs-type-hierarchy)
         ("E" . lsp-treemacs-errors-list)))
 
 (use-package lsp-ivy
@@ -3937,16 +3948,20 @@ This location is used for temporary installations and files.")
   (setq ediff-split-window-function #'split-window-horizontally)
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
+;; TODO: Disable `ltex-ls' and `grammarly-ls'
 (use-package yaml-mode
   :defines lsp-ltex-enabled
   :commands yaml-mode
   :mode
-  ((".clang-format" . yaml-mode)
+  (("\\.yml\\'"     . yaml-mode)
+   ("\\.yaml\\'"    . yaml-mode)
+   (".clang-format" . yaml-mode)
    (".clang-tidy"   . yaml-mode))
   :hook
   (yaml-mode . (lambda ()
                  ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking
-                 (setq-local lsp-ltex-enabled nil)
+                 ;; (setq-local lsp-ltex-enabled nil)
+                 (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
                  (spell-fu-mode -1)
                  (flyspell-mode -1)
                  (lsp-deferred)))
@@ -3978,12 +3993,8 @@ This location is used for temporary installations and files.")
    ("\\.djhtml\\'"     . web-mode)
    ("\\.phtml\\'"      . web-mode)
    ("\\.hb\\.html\\'"  . web-mode)
-   ("\\.tpl\\.php\\'"  . web-mode)
    ("\\.[agj]sp\\'"    . web-mode)
-   ("\\.as[cp]x\\'"    . web-mode)
-   ("\\.erb\\'"        . web-mode)
-   ("\\.mustache\\'"   . web-mode)
-   ("\\.handlebars\\'" . web-mode))
+   ("\\.as[cp]x\\'"    . web-mode))
   :hook (web-mode . lsp-deferred)
   :config
   (setq web-mode-enable-auto-closing              t
@@ -4177,10 +4188,9 @@ This location is used for temporary installations and files.")
 (use-package lsp-ltex
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :hook
-  ;; TODO: Is specifying `gfm-mode' needed?
-  ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
-                                                                         (require 'lsp-ltex)
-                                                                         (lsp-deferred)))
+  ((text-mode markdown-mode org-mode latex-mode LaTeX-mode) . (lambda ()
+                                                                (require 'lsp-ltex)
+                                                                (lsp-deferred)))
   :init
   (setq lsp-ltex-check-frequency "save"
         lsp-ltex-version "14.1.0"
@@ -4457,7 +4467,6 @@ Ignore if no file is found."
 ;;   (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
 ;;                                                sb/user-tmp)))
 
-;; The Melpa package does not include support for `jsonc-mode'. A pull request is pending.
 (use-package json-mode
   :ensure t
   :ensure json-reformat
@@ -4474,8 +4483,6 @@ Ignore if no file is found."
                               (setq js-indent-level 2)
                               (lsp-deferred)))
   :config
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (json-jsonlint))))))
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4588,7 +4595,7 @@ Ignore if no file is found."
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
   :config
   ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
-  (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
+  (add-hook 'compilation-filter-hook #'sanityinc/colourise-compilation-buffer))
 
 (use-package info-colors
   :commands info-colors-fontify-node
@@ -4603,11 +4610,11 @@ Ignore if no file is found."
 ;; https://emacs.stackexchange.com/questions/64038/how-to-use-multiple-backends-in-priority-for-company-mode
 
 ;; Try completion backends in order till there is a non-empty completion list
-;; (setq company-backends '(company-xxx company-yyy company-zzz))
+;; `(setq company-backends '(company-xxx company-yyy company-zzz))'
 ;; Merge completions of all the backends
-;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+;; `(setq company-backends '((company-xxx company-yyy company-zzz)))'
 ;; Merge completions of all the backends, give priority to `company-xxx'
-;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
+;; `(setq company-backends '((company-xxx :separate company-yyy company-zzz)))'
 ;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
 ;; what `prefix' returns.
 
@@ -4616,8 +4623,8 @@ Ignore if no file is found."
 ;; that come from different backends are sorted separately in the combined list.
 
 ;; LATER: I do not understand the difference between the following two, and the explanation.
-;; (add-to-list 'company-backends '(company-capf company-dabbrev))
-;; (add-to-list 'company-backends '(company-capf :with company-dabbrev))
+;; `(add-to-list 'company-backends '(company-capf company-dabbrev))'
+;; `(add-to-list 'company-backends '(company-capf :with company-dabbrev))'
 
 (progn
   (defun sb/company-text-mode ()
