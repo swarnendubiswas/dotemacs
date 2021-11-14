@@ -27,12 +27,14 @@
 
 ;; https://www.masteringemacs.org/article/mastering-key-bindings-emacs
 
+(add-to-list 'term-file-aliases '("alacritty" . "xterm"))
+
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
  ("C-c z"     . repeat)
  ("C-z"       . undo)
- ("<f11>"     . delete-other-windows)
+ ;; ("<f11>"     . delete-other-windows)
  ("C-x k"     . kill-this-buffer)
  ("M-<left>"  . previous-buffer)
  ("M-<right>" . next-buffer)

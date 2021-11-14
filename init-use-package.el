@@ -830,7 +830,7 @@ This location is used for temporary installations and files.")
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :height 170)
+  (set-face-attribute 'default nil :height 150)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
@@ -1119,32 +1119,32 @@ This location is used for temporary installations and files.")
 
     ;; https://github.com/Alexander-Miller/treemacs/issues/735
     (treemacs-create-theme "Default-Tighter"
-                           :extends "Default"
-                           :config
-                           (let ((icons (treemacs-theme->gui-icons theme)))
-                             (maphash (lambda
-                                        (ext icon)
-                                        (puthash ext
-                                                 (concat
-                                                  (substring icon 0 1)
-                                                  (propertize " " 'display
-                                                              '(space . (:width 0.5))))
-                                                 icons))
-                                      icons)))
+      :extends "Default"
+      :config
+      (let ((icons (treemacs-theme->gui-icons theme)))
+        (maphash (lambda
+                   (ext icon)
+                   (puthash ext
+                            (concat
+                             (substring icon 0 1)
+                             (propertize " " 'display
+                                         '(space . (:width 0.5))))
+                            icons))
+                 icons)))
 
     (treemacs-create-theme "all-the-icons-tighter"
-                           :extends "all-the-icons"
-                           :config
-                           (let ((icons (treemacs-theme->gui-icons theme)))
-                             (maphash (lambda
-                                        (ext icon)
-                                        (puthash ext
-                                                 (concat
-                                                  (substring icon 0 1)
-                                                  (propertize " " 'display
-                                                              '(space . (:width 0.5))))
-                                                 icons))
-                                      icons)))
+      :extends "all-the-icons"
+      :config
+      (let ((icons (treemacs-theme->gui-icons theme)))
+        (maphash (lambda
+                   (ext icon)
+                   (puthash ext
+                            (concat
+                             (substring icon 0 1)
+                             (propertize " " 'display
+                                         '(space . (:width 0.5))))
+                            icons))
+                 icons)))
 
     (treemacs-load-theme "all-the-icons"))
 
@@ -1549,6 +1549,7 @@ This location is used for temporary installations and files.")
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode prog-mode) . yas-global-mode)
+  :diminish
   :config
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
         yas-verbosity 0)
@@ -1740,11 +1741,11 @@ This location is used for temporary installations and files.")
   (defvar ivy-re-builders-alist)
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
 
-  (setq completion-styles '(orderless initials basic partial-completion emacs22)
-        orderless-component-separator 'orderless-escapable-split-on-space
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion))
-    				                    (minibuffer (initials))))
+  ;; (setq completion-styles '(orderless initials basic partial-completion emacs22)
+  ;;       orderless-component-separator 'orderless-escapable-split-on-space
+  ;;       completion-category-defaults nil
+  ;;       completion-category-overrides '((file (styles partial-completion))
+  ;;   				                    (minibuffer (initials))))
 
   ;; (declare-function sb/just-one-face "init-use-package")
 
@@ -3421,8 +3422,8 @@ This location is used for temporary installations and files.")
   :demand t
   :config
   (setq lsp-ui-doc-enable nil ; Enable on-hover dialogs
-        lsp-ui-doc-max-width 80
-        lsp-ui-doc-max-height 10
+        ;; lsp-ui-doc-max-width 100
+        ;; lsp-ui-doc-max-height 10
         lsp-ui-doc-include-signature t
         lsp-ui-imenu-auto-refresh 'after-save
         lsp-ui-imenu-window-width 16
@@ -3516,12 +3517,14 @@ This location is used for temporary installations and files.")
         ("C-c c e" . c-end-of-defun)
         ("M-q"     . c-fill-paragraph)))
 
+;; FIXME: The package is not loading.
 (use-package modern-cpp-font-lock
-  :after c++-mode
-  :demand t
+  ;; :after c++-mode
+  ;; :demand t
   :commands modern-c++-font-lock-mode
-  ;; :diminish modern-c++-font-lock-mode
-  :config (modern-c++-font-lock-mode 1))
+  :diminish modern-c++-font-lock-mode
+  :hook (c++-mode . (lambda ()
+                      (modern-c++-font-lock-mode 1))))
 
 (use-package cuda-mode
   :commands cuda-mode
@@ -3633,9 +3636,9 @@ This location is used for temporary installations and files.")
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (ht-merge (lsp-configuration-section "pyright")
-                                                     (lsp-configuration-section "python")))))
+                        (lsp--set-configuration
+                         (ht-merge (lsp-configuration-section "pyright")
+                                   (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -3797,11 +3800,12 @@ This location is used for temporary installations and files.")
 (use-package transient
   :commands transient-bind-q-to-quit
   :defines transient-display-buffer-action
-  :config
-  (setq transient-display-buffer-action '(display-buffer-below-selected))
+  ;; :config
+  ;; (setq transient-display-buffer-action '(display-buffer-below-selected))
 
   ;; Allow using `q' to quit out of popups, in addition to `C-g'
-  (transient-bind-q-to-quit))
+  ;; (transient-bind-q-to-quit)
+  )
 
 (use-package with-editor
   ;; :diminish with-editor-mode
@@ -3836,9 +3840,9 @@ This location is used for temporary installations and files.")
     :ensure nil
     :demand t
     :config
-    (setq magit-diff-refine-hunk        t
-          magit-diff-highlight-trailing nil
-          magit-diff-paint-whitespace   nil)))
+    (setq ;; magit-diff-refine-hunk  t
+     magit-diff-highlight-trailing nil
+     magit-diff-paint-whitespace   nil)))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
@@ -3940,28 +3944,27 @@ This location is used for temporary installations and files.")
   :commands (ediff-setup-windows-plain ediff-set-diff-options)
   :config
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
-  ;; Split windows horizontally in ediff (instead of vertically)
-  (setq ediff-split-window-function #'split-window-horizontally)
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain
+        ;; Split windows horizontally in ediff (instead of vertically)
+        ediff-split-window-function #'split-window-horizontally)
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
-;; TODO: Disable `ltex-ls' and `grammarly-ls'
+;; TODO: The hook is not invoked. Disable `ltex-ls' and `grammarly-ls'
 (use-package yaml-mode
   :defines lsp-ltex-enabled
   :commands yaml-mode
-  :mode
-  (("\\.yml\\'"     . yaml-mode)
-   ("\\.yaml\\'"    . yaml-mode)
-   (".clang-format" . yaml-mode)
-   (".clang-tidy"   . yaml-mode))
+  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
   :hook
   (yaml-mode . (lambda ()
-                 ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking
-                 ;; (setq-local lsp-ltex-enabled nil)
-                 (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
-                 (spell-fu-mode -1)
-                 (flyspell-mode -1)
-                 (lsp-deferred)))
+                 (message "printed")
+                 ;; ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking
+                 ;; (make-local-variable 'lsp-disabled-clients)
+                 ;; ;; (setq-local lsp-ltex-enabled nil)
+                 ;; (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                 ;; (spell-fu-mode -1)
+                 ;; (flyspell-mode -1)
+                 ;; (lsp-deferred)
+                 ))
   :config
   (lsp-register-client
    (make-lsp-client
@@ -4039,8 +4042,10 @@ This location is used for temporary installations and files.")
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode . (lambda ()
+                 (message "xml mode hooks")
                  (spell-fu-mode -1)
-                 (setq-local lsp-ltex-enabled nil)
+                 (flyspell-mode -1)
+                 ;; (setq-local lsp-ltex-enabled nil)
                  (lsp-deferred)))
   :config
   (fset 'xml-mode 'nxml-mode)
