@@ -100,7 +100,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -1111,6 +1111,7 @@ This location is used for temporary installations and files.")
   (treemacs-follow-mode 1)
   (treemacs-git-mode 'deferred)
   (treemacs-fringe-indicator-mode 'always) ; Always show the file indicator
+  (treemacs-project-follow-mode 1)
 
   (when (display-graphic-p)
     (use-package treemacs-all-the-icons
@@ -1346,6 +1347,8 @@ This location is used for temporary installations and files.")
         ("C-x C-q" . wgrep-exit))
   :config (setq wgrep-auto-save-buffer t))
 
+;; Use `S' to change the search term, `D' to change the search directory, `g' to rerun the search,
+;; `o' to view the result in another window.
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
@@ -1460,11 +1463,6 @@ This location is used for temporary installations and files.")
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
-  :preface
-  (defun sb/quit-company-save-buffer ()
-    "Quit company popup and save the buffer."
-    (company-abort)
-    (save-buffer))
   :hook (after-init . global-company-mode)
   :diminish ; We have `company-posframe' completion kind indicator enabled
   :config
@@ -1501,7 +1499,6 @@ This location is used for temporary installations and files.")
         ;; Insert the common part of all candidates, or select the next one
         ("<tab>"    . company-complete-common-or-cycle)
         ;; ("C-M-/" . company-other-backend) ; Is bound to `dabbrev-completion'
-        ("C-s"      . sb/quit-company-save-buffer)
         ("<escape>" . company-abort)))
 
 ;; Silence "Starting 'look' process..." message
@@ -3307,7 +3304,7 @@ This location is used for temporary installations and files.")
         ;; lsp-eldoc-enable-hover nil
         lsp-enable-dap-auto-configure nil
         lsp-enable-on-type-formatting nil
-        lsp-semantic-tokens-enable t
+        ;; lsp-semantic-tokens-enable t
         ;; lsp-enable-snippet t ; Autocomplete parentheses
         lsp-headerline-breadcrumb-enable nil ; Breadcrumb is not useful for all modes
         lsp-headerline-breadcrumb-enable-diagnostics nil
@@ -3410,7 +3407,7 @@ This location is used for temporary installations and files.")
    ("r" . lsp-rename)
    ("h" . lsp-symbol-highlight)
    ("f" . lsp-format-buffer)
-   ("l" . lsp-execute-code-action)
+   ("x" . lsp-execute-code-action)
    ("c" . lsp-imenu-create-categorised-index)
    ("u" . lsp-imenu-create-uncategorised-index)
    ("a" . lsp-workspace-folders-add)
@@ -4776,8 +4773,9 @@ Ignore if no file is found."
     (setq company-backends '((company-capf :with company-yasnippet)
                              (company-files :with company-yasnippet)
                              (company-dabbrev-code :with company-yasnippet)
-                             company-dabbrev
-                             company-ispell)))
+                             (:separate
+                              company-dabbrev
+                              company-ispell))))
 
   (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
 

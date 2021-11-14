@@ -365,9 +365,7 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 Use the steps mentioned in the following links.
 
-- <https://pisquare.osisoft.com/s/Blog-Detail/a8r1I000000GvXBQA0/console-things-getting-24bit-color-working-in-terminals>
 - <https://github.com/syl20bnr/spacemacs/wiki/Terminal>
-- <https://titanwolf.org/Network/Articles/Article?AID=58f275e6-08c4-43e5-b561-89dc3c343e6c>
 
 ```Bash
 export LC_ALL=en_US.UTF-8
