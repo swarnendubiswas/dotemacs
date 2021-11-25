@@ -14,6 +14,37 @@
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
+(defconst sb/emacs-4MB    (*       4 1024 1024))
+(defconst sb/emacs-8MB    (*       8 1000 1024))
+(defconst sb/emacs-64MB   (*      64 1024 1024))
+(defconst sb/emacs-128MB  (*     128 1024 1024))
+(defconst sb/emacs-256MB  (*     256 1024 1024))
+(defconst sb/emacs-512MB  (*     512 1024 1024))
+(defconst sb/emacs-8GB    (*  8 1024 1024 1024))
+(defconst sb/emacs-16GB   (* 16 1024 1024 1024))
+
+;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
+;; decrease this. If you experience stuttering, increase this.
+(defun sb/defer-garbage-collection ()
+  "Defer garbage collection."
+  (setq gc-cons-percentage 0.1
+        gc-cons-threshold sb/emacs-16GB))
+
+;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
+;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
+;; permanently.
+(defun sb/restore-garbage-collection ()
+  "Restore garbage collection."
+  (setq gc-cons-percentage 0.1
+        ;; https://github.com/emacs-lsp/lsp-mode#performance
+        gc-cons-threshold sb/emacs-8MB))
+
+;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
+;; customizations
+(add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
+(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
+(add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
+
 (require 'package)
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'
@@ -25,13 +56,12 @@
   (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
+(add-to-list 'load-path (concat user-emacs-directory "modules"))
+
 ;; Initialise the package management system. Another option is to construct the `load-path'
 ;; manually.
 ;; (add-to-list 'load-path sb/extras-directory)
 ;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
-
-(add-to-list 'load-path (concat user-emacs-directory "modules"))
-
 (package-initialize)
 
 (unless (package-installed-p 'no-littering)

@@ -29,11 +29,18 @@
 
 (add-to-list 'term-file-aliases '("alacritty" . "xterm"))
 
+(declare-function sb/comment-line "defuns")
+(declare-function sb/save-all-buffers "defuns")
+(declare-function sb/previous-buffer "defuns")
+(declare-function sb/next-buffer "defuns")
+(declare-function sb/switch-to-scratch "defuns")
+
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
  ("C-c z"     . repeat)
  ("C-z"       . undo)
+ ;; Conflicts with Gnome window manager keybindings
  ;; ("<f11>"     . delete-other-windows)
  ("C-x k"     . kill-this-buffer)
  ("M-<left>"  . previous-buffer)
@@ -85,12 +92,12 @@
         which-key-sort-order 'which-key-key-order-alpha))
 
 (use-package which-key-posframe
-  :disabled t
   :commands which-key-posframe-mode
   :hook (which-key-mode . which-key-posframe-mode)
   :config
   ;; The posframe has a low contrast
   ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
+  ;; Positioning the frame at the top obstructs the view to a lesser degree
   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
 
 ;; Hydras

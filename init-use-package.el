@@ -25,11 +25,12 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'sb/default
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
+           (const :tag "doom-one-light"  doom-one-light)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
            (const :tag "monokai"         monokai)
@@ -39,6 +40,7 @@
            (const :tag "none"            none))
   :group 'sb/emacs)
 
+;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
   'modus-operandi
   "Specify which Emacs theme to use."
@@ -131,36 +133,6 @@ This location is used for temporary installations and files.")
            (const :tag "none"    none))
   :group 'sb/emacs)
 
-
-(defconst sb/emacs-4MB   (*   4 1000 1000))
-(defconst sb/emacs-8MB   (*   8 1000 1000))
-(defconst sb/emacs-64MB  (*  64 1000 1000))
-(defconst sb/emacs-128MB (* 128 1000 1000))
-(defconst sb/emacs-256MB (* 256 1000 1000))
-(defconst sb/emacs-512MB (* 512 1000 1000))
-
-;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
-;; decrease this. If you experience stuttering, increase this.
-(defun sb/defer-garbage-collection ()
-  "Defer garbage collection."
-  (setq gc-cons-percentage 0.1
-        gc-cons-threshold sb/emacs-256MB))
-
-;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
-;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
-;; permanently.
-(defun sb/restore-garbage-collection ()
-  "Restore garbage collection."
-  (setq gc-cons-percentage 0.1
-        ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/emacs-8MB))
-
-;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
-;; customizations
-(add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
-(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-(add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -173,16 +145,17 @@ This location is used for temporary installations and files.")
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
 
-(setq use-package-enable-imenu-support t)
+(setq use-package-enable-imenu-support t
+      ;; Avoid manual modifications whenever I modify package installations
+      use-package-always-ensure        t)
 
 (when (bound-and-true-p sb/debug-init-file)
   (setq debug-on-error                 t
-        debug-on-event 'sigusr2
-        garbage-collection-messages t
-        use-package-always-ensure      t
+        debug-on-event                 'sigusr2
+        garbage-collection-messages    t
         use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-        use-package-expand-minimally   nil
-        use-package-verbose            t)
+        use-package-verbose            t
+        use-package-expand-minimally   nil)
   (debug-on-entry 'projectile-remove-known-project))
 
 ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
@@ -191,13 +164,11 @@ This location is used for temporary installations and files.")
 ;; of loading the package.
 ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 (unless (bound-and-true-p sb/debug-init-file)
-  (setq use-package-always-defer t
-        ;; Avoid manual modifications whenever I modify package installations
-        use-package-always-ensure t
-        use-package-compute-statistics nil
+  (setq use-package-always-defer       t
         ;; Avoid printing errors and warnings since the configuration is known to work
-        use-package-expand-minimally t
-        use-package-verbose nil))
+        use-package-expand-minimally   t
+        use-package-compute-statistics nil
+        use-package-verbose            nil))
 
 (eval-when-compile
   (require 'use-package))
@@ -219,7 +190,10 @@ This location is used for temporary installations and files.")
 (use-package diminish)
 
 (use-package s
-  :commands s-starts-with?)
+  :commands s-starts-with? s-ends-with?)
+
+(use-package dash
+  :commands -contains?)
 
 ;; TODO: Learn how to use hydras better
 (use-package hydra
@@ -297,7 +271,7 @@ This location is used for temporary installations and files.")
    (paradox-enable)))
 
 ;; Get PATH with `(getenv "PATH")'. Set PATH with
-;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'
+;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'.
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
@@ -307,7 +281,7 @@ This location is used for temporary installations and files.")
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
-                                         "LANG" "LC_CTYPE"))
+                                         "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
   (exec-path-from-shell-initialize))
 
 ;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
@@ -430,13 +404,13 @@ This location is used for temporary installations and files.")
   (add-to-list 'completion-ignored-extensions exts))
 
 ;; Activate utf-8
-;; (setq locale-coding-system 'utf-8)
-;; (prefer-coding-system 'utf-8)
-;; (set-default-coding-systems 'utf-8)
-;; (set-keyboard-coding-system 'utf-8)
-;; (set-language-environment 'utf-8)
-;; (set-selection-coding-system 'utf-8)
-;; (set-terminal-coding-system 'utf-8)
+(setq locale-coding-system   'utf-8)
+(prefer-coding-system        'utf-8)
+(set-default-coding-systems  'utf-8)
+(set-keyboard-coding-system  'utf-8)
+(set-language-environment    'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-terminal-coding-system  'utf-8)
 
 ;; Scroll settings from Doom Emacs
 (setq scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
@@ -483,7 +457,7 @@ This location is used for temporary installations and files.")
 (use-package savehist ; Save minibuffer history across sessions
   :ensure nil
   :commands savehist-mode
-  :init (run-with-idle-timer 3 nil #'savehist-mode)
+  :init (run-with-idle-timer 2 nil #'savehist-mode)
   :config
   (setq savehist-additional-variables '(extended-command-history
                                         kill-ring
@@ -620,7 +594,7 @@ This location is used for temporary installations and files.")
 (use-package so-long
   :ensure nil
   :commands global-so-long-mode
-  :init (run-with-idle-timer 3 nil #'global-so-long-mode)
+  :init (run-with-idle-timer 2 nil #'global-so-long-mode)
   :config (setq so-long-threshold 500))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
@@ -670,7 +644,18 @@ This location is used for temporary installations and files.")
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (load-theme 'doom-molokai t)
-  (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
+  ;; (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
+  :config
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification
+  (doom-themes-org-config))
+
+(use-package doom-themes
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'doom-one-light))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-one-light)))
+  :commands (doom-themes-org-config doom-themes-treemacs-config)
+  :init
+  (load-theme 'doom-one-light t)
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -682,7 +667,7 @@ This location is used for temporary installations and files.")
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (load-theme 'doom-gruvbox t)
-  (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
+  ;; (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -713,9 +698,10 @@ This location is used for temporary installations and files.")
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
 
-  (load-theme 'modus-operandi t))
+  (modus-themes-load-themes)
+  :config
+  (modus-themes-load-operandi))
 
-;; A dark theme looks good on the TUI
 (use-package modus-vivendi-theme
   :ensure moody
   :ensure modus-themes
@@ -735,7 +721,9 @@ This location is used for temporary installations and files.")
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
 
-  (load-theme 'modus-vivendi t))
+  (modus-themes-load-themes)
+  :config
+  (modus-themes-load-vivendi))
 
 (when (and (eq sb/gui-theme 'sb/default)
            (display-graphic-p))
@@ -941,7 +929,9 @@ This location is used for temporary installations and files.")
    ("M-<up>"   . sb/dired-jump-to-top)
    ("M-<down>" . sb/dired-jump-to-bottom)
    ("i"        . find-file))
-  :hook (dired-mode . auto-revert-mode) ; Auto refresh dired when files change
+  :hook
+  ;; Auto refresh dired when files change
+  (dired-mode . auto-revert-mode)
   :config
   (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
         ;; Guess a default target directory. When there are two dired buffers, Emacs will select
@@ -1086,6 +1076,16 @@ This location is used for temporary installations and files.")
         (when (featurep 'auto-dim-other-buffers)
           (adob--rescan-windows)))))
 
+  (defun sb/treemacs-ignore-files (filename absolute-path)
+    "Ignore files in the Treemacs explorer"
+    (or
+     (-contains? '("__pycache__" "node_modules" "package-lock.json") filename)
+	 (s-ends-with? ".pyc" filename)
+	 (s-ends-with? ".elc" filename)
+	 (s-ends-with? ".o" filename)
+	 (s-ends-with? ".so" filename)
+	 (s-ends-with? ".dll" filename)
+     ))
   :config
   (setq treemacs-follow-after-init t
         treemacs-indentation 1
@@ -1170,41 +1170,13 @@ This location is used for temporary installations and files.")
   (when (display-graphic-p)
     (treemacs-resize-icons 16))
 
-  ;; Ignore files
-
-  (defun sb/treemacs-ignore-files (filename absolute-path)
-    (or
-     (-contains? '("__pycache__" "node_modules" "package-lock.json") filename)
-	 (s-ends-with? ".pyc" filename)
-	 (s-ends-with? ".elc" filename)
-	 (s-ends-with? ".o" filename)
-	 (s-ends-with? ".so" filename)
-	 (s-ends-with? ".dll" filename)
-     ))
   (add-to-list 'treemacs-ignored-file-predicates #'sb/treemacs-ignore-files)
-
   :bind*
   (;; The keybinding interferes with `dired-jump' and imenu `C-c C-j'
    ("C-j"     . treemacs)
    ("C-c t d" . treemacs-add-and-display-current-project)
    ("C-c t e" . treemacs-display-current-project-exclusively)
    ("M-0"     . treemacs-select-window)))
-
-;; Starts Treemacs automatically with Emacsclient
-;; https://github.com/Alexander-Miller/treemacs/issues/624
-
-;; (add-hook 'after-make-frame-functions
-;;           (lambda (frame)
-;;             (run-with-timer
-;;              1 nil
-;;              (lambda ()
-;;                (with-selected-frame frame
-;;                  (save-selected-window
-;;                    (treemacs-select-window)))))))
-
-;; (add-hook 'emacs-startup-hook (lambda()
-;;                                 (treemacs-display-current-project-exclusively)
-;;                                 (other-window 1)))
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
 (use-package treemacs-projectile
@@ -1303,7 +1275,8 @@ This location is used for temporary installations and files.")
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
   :after isearch
-  :commands (isearch-symbol-at-point
+  :commands (isearch-forward-symbol ; `M-s _'
+             isearch-symbol-at-point
              isearch-forward-symbol-at-point ; `M-s .'
              isearch-backward-symbol-at-point))
 
@@ -1426,6 +1399,7 @@ This location is used for temporary installations and files.")
 (use-package init-open-recentf
   :after recentf
   :demand t
+  :disabled t
   :config (init-open-recentf))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
@@ -1498,7 +1472,7 @@ This location is used for temporary installations and files.")
         ("C-p"      . company-select-previous)
         ;; Insert the common part of all candidates, or select the next one
         ("<tab>"    . company-complete-common-or-cycle)
-        ;; ("C-M-/" . company-other-backend) ; Is bound to `dabbrev-completion'
+        ("C-M-/" . company-other-backend) ; Was bound to `dabbrev-completion'
         ("<escape>" . company-abort)))
 
 ;; Silence "Starting 'look' process..." message
@@ -1549,7 +1523,7 @@ This location is used for temporary installations and files.")
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode prog-mode) . yas-global-mode)
-  :diminish
+  :diminish yas-minor-mode
   :config
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
         yas-verbosity 0)
@@ -1739,7 +1713,8 @@ This location is used for temporary installations and files.")
   :functions sb/just-one-face
   :config
   (defvar ivy-re-builders-alist)
-  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))
+        completion-styles '(orderless))
 
   ;; (setq completion-styles '(orderless initials basic partial-completion emacs22)
   ;;       orderless-component-separator 'orderless-escapable-split-on-space
@@ -1779,7 +1754,7 @@ This location is used for temporary installations and files.")
 (use-package flyspell
   :ensure nil
   :if (symbol-value 'sb/IS-LINUX)
-  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next)
+  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :diminish
   :preface
   ;; Move point to previous error
@@ -1854,12 +1829,6 @@ This location is used for temporary installations and files.")
   :bind
   (:map flyspell-mode-map
         ("C-;" . flyspell-correct-wrapper)))
-
-(use-package flyspell-correct-ivy
-  :ensure flyspell-correct
-  :ensure t
-  :disabled t
-  :after flyspell-correct)
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
@@ -2971,7 +2940,7 @@ This location is used for temporary installations and files.")
 ;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
 ;; also get run for all modes derived from a basic mode such as `text-mode'.
 
-;; Enabling `autfill-mode' makes it difficult to include long instructions verbatim, since they get
+;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
@@ -3060,6 +3029,9 @@ This location is used for temporary installations and files.")
   :commands autodisass-llvm-bitcode
   :mode "\\.bc\\'")
 
+;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
+;; more shortcuts.
+;; https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
   :commands (markdown-mode gfm-mode)
   :mode
@@ -3099,17 +3071,6 @@ This location is used for temporary installations and files.")
   (pandoc-load-default-settings)
   ;; (unbind-key "C-c /" pandoc-mode-map) ; Binds `C-c /' to `pandoc-main-hydra/body'
   )
-
-;; Preview with `grip-mode' is better than `markdown-live-preview-mode' but there is a limit on the
-;; number of API requests to GitHub without authentication
-(use-package grip-mode
-  :if (executable-find "grip")
-  :after (:any markdown-mode org-mode)
-  :config
-  (setq grip-preview-use-webkit nil) ; Do not use the embedded webkit for preview
-  :bind
-  (:map markdown-mode-command-map
-        ("C-g" . grip-mode)))
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
@@ -3225,6 +3186,32 @@ This location is used for temporary installations and files.")
                                      (flycheck-add-next-checker 'emacs-lisp
                                                                 'emacs-lisp-checkdoc 'append)))))
 
+(use-package yaml-mode
+  :defines lsp-ltex-enabled lsp-disabled-clients
+  :commands yaml-mode
+  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
+  :hook
+  (yaml-mode . (lambda ()
+                 ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
+                 (make-local-variable 'lsp-disabled-clients)
+                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                 (spell-fu-mode -1)
+                 (flyspell-mode -1)
+                 (lsp-deferred)))
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("yaml-language-server" "--stdio"))
+    :major-modes '(yaml-mode)
+    :remote? t
+    :server-id 'yamlls-remote)))
+
+(use-package yaml-imenu
+  :after yaml-mode
+  :demand t
+  :config (yaml-imenu-enable))
+
 (declare-function ht-merge "ht")
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always
@@ -3326,6 +3313,8 @@ This location is used for temporary installations and files.")
         ;; Disable showing function documentation with `eldoc'
         ;; lsp-signature-render-documentation nil
         ;; lsp-signature-function 'lsp-signature-posframe
+        ;; Avoid annoying questions. We expect a server restart to succeed more often than not.
+        lsp-restart 'auto-restart
         lsp-xml-logs-client nil
         lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.18.1-uber.jar"
                                            sb/extras-directory)
@@ -3807,10 +3796,6 @@ This location is used for temporary installations and files.")
   ;; (transient-bind-q-to-quit)
   )
 
-(use-package with-editor
-  ;; :diminish with-editor-mode
-  )
-
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1
   :bind
@@ -3949,36 +3934,6 @@ This location is used for temporary installations and files.")
         ediff-split-window-function #'split-window-horizontally)
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
-;; TODO: The hook is not invoked. Disable `ltex-ls' and `grammarly-ls'
-(use-package yaml-mode
-  :defines lsp-ltex-enabled
-  :commands yaml-mode
-  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
-  :hook
-  (yaml-mode . (lambda ()
-                 (message "printed")
-                 ;; ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking
-                 ;; (make-local-variable 'lsp-disabled-clients)
-                 ;; ;; (setq-local lsp-ltex-enabled nil)
-                 ;; (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                 ;; (spell-fu-mode -1)
-                 ;; (flyspell-mode -1)
-                 ;; (lsp-deferred)
-                 ))
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("yaml-language-server" "--stdio"))
-    :major-modes '(yaml-mode)
-    :remote? t
-    :server-id 'yamlls-remote)))
-
-(use-package yaml-imenu
-  :after yaml-mode
-  :demand t
-  :config (yaml-imenu-enable))
-
 (use-package bat-mode
   :ensure nil
   :commands bat-mode
@@ -3988,13 +3943,7 @@ This location is used for temporary installations and files.")
 
 (use-package web-mode
   :commands web-mode
-  :mode
-  (("\\.html?\\'"      . web-mode)
-   ("\\.djhtml\\'"     . web-mode)
-   ("\\.phtml\\'"      . web-mode)
-   ("\\.hb\\.html\\'"  . web-mode)
-   ("\\.[agj]sp\\'"    . web-mode)
-   ("\\.as[cp]x\\'"    . web-mode))
+  :mode "\\.html?\\'"
   :hook (web-mode . lsp-deferred)
   :config
   (setq web-mode-enable-auto-closing              t
@@ -4026,26 +3975,17 @@ This location is used for temporary installations and files.")
   :commands rainbow-mode
   :hook ((css-mode html-mode web-mode) . rainbow-mode))
 
-(use-package php-mode
-  :hook (php-mode . lsp-deferred)
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "intelephense")
-    :major-modes '(php-mode)
-    :remote? t
-    :server-id 'intelephense-remote)))
-
 (use-package nxml-mode
   :ensure nil
   :commands nxml-mode
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode . (lambda ()
-                 (message "xml mode hooks")
+                 ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+                 (make-local-variable 'lsp-disabled-clients)
+                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                  (spell-fu-mode -1)
                  (flyspell-mode -1)
-                 ;; (setq-local lsp-ltex-enabled nil)
                  (lsp-deferred)))
   :config
   (fset 'xml-mode 'nxml-mode)
@@ -4097,55 +4037,59 @@ This location is used for temporary installations and files.")
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
-;; org -> grammarly -> languagetool
-(add-hook 'org-mode-hook
-          (lambda ()
-            (flycheck-select-checker 'org-lint)
-            (when (featurep 'flycheck-grammarly)
-              (flycheck-add-next-checker 'org-lint 'grammarly))
-            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-              (flycheck-add-next-checker 'grammarly 'languagetool))
-            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-              (flycheck-add-next-checker 'org-lint 'languagetool))))
+;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
+;; support. We only need to enable `flycheck-grammarly' support for the *scratch* buffer which is in
+;; `text-mode'.
 
-;; We prefer not to use `textlint' and `proselint', `proselint' is not maintained.
-;; grammarly -> languagetool
+;; org -> grammarly -> languagetool
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (flycheck-select-checker 'org-lint)
+;;             (when (featurep 'flycheck-grammarly)
+;;               (flycheck-add-next-checker 'org-lint 'grammarly))
+;;             (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
+
+;; We prefer not to use `textlint' and `proselint', `proselint' is not maintained. We only limit to
+;; *scratch* buffer since we can use `grammarly' and `ltex' for directories.
 (add-hook 'text-mode-hook
           (lambda ()
-            (when (featurep 'flycheck-grammarly)
+            (when (and (featurep 'flycheck-grammarly) (string= (buffer-name) "*scratch*"))
               (flycheck-select-checker 'grammarly))
-            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-              (flycheck-add-next-checker 'grammarly 'languagetool))
-            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-              (flycheck-select-checker 'languagetool))))
+            ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+            ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
+            ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+            ;;   (flycheck-select-checker 'languagetool))
+            ))
 
 ;; `markdown-mode' is derived from `text-mode'
 ;; markdown-markdownlint-cli -> grammarly -> languagetool
-(add-hook 'markdown-mode-hook
-          (lambda()
-            (flycheck-select-checker 'markdown-markdownlint-cli)
-            (when (featurep 'flycheck-grammarly)
-              ;; (make-local-variable 'flycheck-error-list-minimum-level)
-              ;; (setq flycheck-error-list-minimum-level 'warning
-              ;;       flycheck-navigation-minimum-level 'warning)
-              ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
-            (when (featurep 'flycheck-grammarly)
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
-            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-              (flycheck-add-next-checker 'grammarly 'languagetool))
-            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-              (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))))
+;; (add-hook 'markdown-mode-hook
+;;           (lambda()
+;;             (flycheck-select-checker 'markdown-markdownlint-cli)
+;;             (when (featurep 'flycheck-grammarly)
+;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
+;;               ;; (setq flycheck-error-list-minimum-level 'warning
+;;               ;;       flycheck-navigation-minimum-level 'warning)
+;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
+;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
+;;             ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))
+;;             ))
 
-(dolist (hook '(LaTex-mode-hook latex-mode-hook))
-  (add-hook hook (lambda ()
-                   (flycheck-select-checker 'tex-chktex)
-                   (when (featurep 'flycheck-grammarly)
-                     (flycheck-add-next-checker 'tex-chktex 'grammarly))
-                   (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-                     (flycheck-add-next-checker 'grammarly 'languagetool))
-                   (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-                     (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
+;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+;;   (add-hook hook (lambda ()
+;;                    (flycheck-select-checker 'tex-chktex)
+;;                    (when (featurep 'flycheck-grammarly)
+;;                      (flycheck-add-next-checker 'tex-chktex 'grammarly))
+;;                    (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
+;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
@@ -4156,14 +4100,14 @@ This location is used for temporary installations and files.")
   :ensure t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :hook
-  ((text-mode markdown-mode org-mode gfm-mode latex-mode LaTeX-mode) . (lambda ()
-                                                                         (require 'lsp-grammarly)
-                                                                         (lsp-deferred)))
+  ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
+                                                     (require 'lsp-grammarly)
+                                                     (lsp-deferred)))
   :config
-  (setq lsp-grammarly-active-modes '(text-mode latex-mode
-                                               LaTeX-mode org-mode markdown-mode gfm-mode)
-        lsp-grammarly-user-words '(
-                                   ))
+  ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
+  ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
+  ;;       lsp-grammarly-user-words '(
+  ;;                                  ))
 
   ;; (defvar lsp-grammarly-active-modes)
 
@@ -4190,14 +4134,14 @@ This location is used for temporary installations and files.")
 (use-package lsp-ltex
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :hook
-  ((text-mode markdown-mode org-mode latex-mode LaTeX-mode) . (lambda ()
-                                                                (require 'lsp-ltex)
-                                                                (lsp-deferred)))
+  ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
+                                                     (require 'lsp-ltex)
+                                                     (lsp-deferred)))
   :init
   (setq lsp-ltex-check-frequency "save"
-        lsp-ltex-version "14.1.0"
+        ;; lsp-ltex-version "14.1.0"
         ;; lsp-ltex-dictionary ("microbenchmarks")
-        lsp-ltex-java-path "/usr/lib/jvm/java-13-openjdk-amd64")
+        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64")
   :config
   ;; (defvar lsp-ltex-active-modes)
 
@@ -4227,18 +4171,20 @@ This location is used for temporary installations and files.")
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'.
 (use-package lsp-latex
+  :disabled t ; Server performance is very poor, so I continue to prefer `auctex'
   :hook
-  ((latex-mode LaTeX-mode) . (lambda()
-                               (require 'lsp-latex)
-                               (lsp-deferred)))
+  (latex-mode . (lambda()
+                  (require 'lsp-latex)
+                  (lsp-deferred)))
   :config
-  (setq lsp-latex-bibtex-formatter "latexindent"
-        lsp-latex-latex-formatter "latexindent"
+  (setq lsp-latex-bibtex-formatter             "latexindent"
+        lsp-latex-latex-formatter              "latexindent"
         lsp-latex-bibtex-formatter-line-length sb/fill-column
-        lsp-latex-chktex-on-open-and-save t
-        lsp-latex-build-is-continuous t
+        lsp-latex-chktex-on-open-and-save      t
+        lsp-latex-build-is-continuous          t
+        lsp-latex-build-on-save                t
         ;; Delay time in milliseconds before reporting diagnostics
-        lsp-latex-diagnostics-delay 2000)
+        lsp-latex-diagnostics-delay            2000)
 
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc")
@@ -4250,9 +4196,9 @@ This location is used for temporary installations and files.")
     :remote? t
     :server-id 'texlab-remote)))
 
-;; (use-package tex-site
-;;   :ensure nil
-;;   :commands tex-site)
+(use-package tex-site
+  :ensure nil
+  :commands tex-site)
 
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
@@ -4330,11 +4276,6 @@ This location is used for temporary installations and files.")
   (setq bibtex-align-at-equal-sign     t
         bibtex-maintain-sorted-entries t))
 
-(use-package bibtex-utils
-  :after bibtex
-  :disabled t
-  :demand t)
-
 (use-package ivy-bibtex
   :bind ("C-c x b" . ivy-bibtex)
   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
@@ -4348,10 +4289,12 @@ This location is used for temporary installations and files.")
         bibtex-completion-cite-prompt-for-optional-arguments nil
         bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
+;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 (use-package reftex
   :ensure nil
-  :commands (reftex-get-bibfile-list bibtex-parse-keys reftex-mode
+  :commands (reftex-get-bibfile-list bibtex-parse-keys
+                                     reftex-mode reftex-toc-rescan
                                      reftex-default-bibliography)
   ;; :diminish
   :hook ((LaTeX-mode latex-mode) . reftex-mode)
@@ -4413,27 +4356,25 @@ Ignore if no file is found."
 
   (sb/reftex-try-add-all-bibitems-from-bibtex)
 
-  ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-  ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+  (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
 
-  )
-
-(use-package bib-cite
-  :ensure nil
-  :disabled t
-  :diminish bib-cite-minor-mode
-  :commands bib-cite-minor-mode
-  :hook ((LaTeX-mode latex-mode) . bib-cite-minor-mode )
-  :config (setq bib-cite-use-reftex-view-crossref t)
-  :bind (:map bib-cite-minor-mode-map
-              ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-              ("C-c l a" . bib-apropos)
-              ("C-c l b" . bib-make-bibliography)
-              ("C-c l d" . bib-display)
-              ("C-c l t" . bib-etags)
-              ("C-c l f" . bib-find)
-              ("C-c l n" . bib-find-next)
-              ("C-c l h" . bib-highlight-mouse)))
+;; (use-package bib-cite
+;;   :ensure nil
+;;   :disabled t
+;;   :diminish bib-cite-minor-mode
+;;   :commands bib-cite-minor-mode
+;;   :hook ((LaTeX-mode latex-mode) . bib-cite-minor-mode )
+;;   :config (setq bib-cite-use-reftex-view-crossref t)
+;;   :bind (:map bib-cite-minor-mode-map
+;;               ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+;;               ("C-c l a" . bib-apropos)
+;;               ("C-c l b" . bib-make-bibliography)
+;;               ("C-c l d" . bib-display)
+;;               ("C-c l t" . bib-etags)
+;;               ("C-c l f" . bib-find)
+;;               ("C-c l n" . bib-find-next)
+;;               ("C-c l h" . bib-highlight-mouse)))
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el")
@@ -4462,12 +4403,11 @@ Ignore if no file is found."
   (defvar LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
 
-;; (use-package math-preview
-;;   :disabled t
-;;   :commands (math-preview-all math-preview-at-point math-preview-region)
-;;   :config
-;;   (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-;;                                                sb/user-tmp)))
+(use-package math-preview
+  :commands (math-preview-all math-preview-at-point math-preview-region)
+  :config
+  (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+                                               sb/user-tmp)))
 
 (use-package json-mode
   :ensure t
@@ -4497,9 +4437,9 @@ Ignore if no file is found."
   :after (:any json-mode jsonc-mode)
   :demand t)
 
-(use-package json-snatcher
-  :after (:any json-mode jsonc-mode)
-  :demand t)
+;; (use-package json-snatcher
+;;   :after (:any json-mode jsonc-mode)
+;;   :demand t)
 
 (use-package bazel
   :commands (bazel-mode bazelrc-mode)
@@ -4545,24 +4485,26 @@ Ignore if no file is found."
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
   :init (run-with-idle-timer 2 nil #'sb/enable-format-all))
 
+;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
-  :disabled t
   :ensure tree-sitter-langs
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
   :diminish tree-sitter-mode
-  :init
-  (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
-                               css-mode-hook html-mode-hook
-                               java-mode-hook json-mode-hook
-                               jsonc-mode-hook php-mode-hook
-                               python-mode-hook))
-    (add-hook hook (lambda ()
-                     (require 'tree-sitter)
-                     (require 'tree-sitter-langs)
-                     (require 'tree-sitter-hl)
-
-                     (global-tree-sitter-mode 1))))
+  :preface
+  (defun sb/enable-tree-sitter ()
+    "Delay enabling tree-sitter to avoid slowing down Emacs startup."
+    (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
+                                 css-mode-hook html-mode-hook
+                                 java-mode-hook json-mode-hook
+                                 jsonc-mode-hook php-mode-hook
+                                 python-mode-hook))
+      (add-hook hook (lambda ()
+                       (require 'tree-sitter)
+                       (require 'tree-sitter-langs)
+                       (require 'tree-sitter-hl)
+                       (global-tree-sitter-mode 1)))))
+  :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
   :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
@@ -4744,7 +4686,6 @@ Ignore if no file is found."
 
   (add-hook 'sh-mode-hook #'sb/company-sh-mode))
 
-
 (progn
   (use-package company-shell
     :commands company-fish-shell)
@@ -4784,7 +4725,6 @@ Ignore if no file is found."
 
   (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
 
-
 (progn
   (defun sb/company-python-mode ()
     "Add backends for Python completion in company mode."
@@ -4801,62 +4741,60 @@ Ignore if no file is found."
 
   (add-hook 'python-mode-hook #'sb/company-python-mode))
 
-
 (progn
   (defun sb/company-latex-mode ()
     "Add backends for latex completion in company mode."
-    (use-package company-auctex
-      :demand t
-      :commands (company-auctex-init company-auctex-labels
-                                     company-auctex-bibs company-auctex-macros
-                                     company-auctex-symbols company-auctex-environments)
-      :config (company-auctex-init))
-    (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
-      :demand t)
-    (use-package company-math
-      :demand t
-      :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-    (use-package company-reftex
-      :demand t
-      :commands (company-reftex-labels company-reftex-citations))
-    (use-package company-bibtex
-      :disabled t
-      :demand t
-      :commands company-bibtex)
+    ;;     ;; (use-package company-auctex
+    ;;     ;;   :demand t
+    ;;     ;;   :commands (company-auctex-init company-auctex-labels
+    ;;     ;;                                  company-auctex-bibs company-auctex-macros
+    ;;     ;;                                  company-auctex-symbols company-auctex-environments)
+    ;;     ;;   :config (company-auctex-init))
+    ;;     ;; (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
+    ;;     ;;   :demand t)
+    ;;     ;; (use-package company-math
+    ;;     ;;   :demand t
+    ;;     ;;   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+    ;;     ;; (use-package company-reftex
+    ;;     ;;   :demand t
+    ;;     ;;   :commands (company-reftex-labels company-reftex-citations))
+    ;;     ;; (use-package company-bibtex
+    ;;     ;;   :disabled t
+    ;;     ;;   :demand t
+    ;;     ;;   :commands company-bibtex)
 
-    (setq-local company-minimum-prefix-length 3)
-    (make-local-variable 'company-backends)
+    ;;     (setq-local company-minimum-prefix-length 2)
+    ;;     (make-local-variable 'company-backends)
 
-    ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-    ;; labels and citations
+    ;;     ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+    ;;     ;; labels and citations
+
+    ;;     ;; (setq company-backends '((:separate
+    ;;     ;;                           company-capf
+    ;;     ;;                           company-files
+    ;;     ;;                           company-reftex-citations
+    ;;     ;;                           company-reftex-labels
+    ;;     ;;                           company-auctex-environments
+    ;;     ;;                           company-auctex-macros
+    ;;     ;;                           company-latex-commands
+    ;;     ;;                           company-math-symbols-latex
+    ;;     ;;                           company-math-symbols-unicode
+
+    ;;     ;;                           ;; company-auctex-symbols
+    ;;     ;;                           ;; company-auctex-bibs
+    ;;     ;;                           ;; company-auctex-labels
+    ;;     ;;                           ;; company-bibtex
+    ;;     ;;                           ;; company-capf
+    ;;     ;;                           )
+    ;;     ;;                          company-dabbrev
+    ;;     ;;                          company-ispell))
 
     (setq company-backends '((:separate
                               company-capf
                               company-files
-                              company-reftex-citations
-                              company-reftex-labels
-                              company-auctex-environments
-                              company-auctex-macros
-                              company-latex-commands
-                              company-math-symbols-latex
-                              company-math-symbols-unicode
-
-                              ;; company-auctex-symbols
-                              ;; company-auctex-bibs
-                              ;; company-auctex-labels
-                              ;; company-bibtex
-                              ;; company-capf
-                              )
-                             company-dabbrev
-                             company-ispell))
-
-    ;; (setq company-backends '((:separate
-    ;;                           company-capf
-    ;;                           ;; company-latex-commands
-    ;;                           company-files
-    ;;                           company-yasnippet
-    ;;                           company-dabbrev
-    ;;                           company-ispell)))
+                              company-yasnippet
+                              company-dabbrev
+                              company-ispell)))
     )
 
   (dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))

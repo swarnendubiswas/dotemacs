@@ -1445,12 +1445,15 @@
 
 (define-abbrev-table 'markdown-mode-abbrev-table
   '(
+    ("arbitary" "arbitrary" nil :count 0)
     ("chaning" "changing" nil :count 0)
     ("conrol" "control" nil :count 0)
     ("currenly" "currently" nil :count 0)
     ("distintc" "distinct" nil :count 0)
+    ("funution" "function" nil :count 0)
     ("gettign" "getting" nil :count 0)
     ("idicates" "indicates" nil :count 0)
+    ("intergers" "integers" nil :count 0)
     ("jin" "join" nil :count 0)
     ("migratnig" "migrating" nil :count 0)
     ("occuring" "occurring" nil :count 0)
