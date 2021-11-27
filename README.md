@@ -1,8 +1,8 @@
 # GNU Emacs
 
-This repository lists my preferred customizations for GNU Emacs, which is my primary editor. The setup should work on a GNU/Linux platform.
+This repository lists my preferred customizations for GNU Emacs, which is my primary editor. Most of the included customizations are from the internet. The setup should work on a GNU/Linux platform.
 
-Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+Suggestions and pull requests are welcome.
 
 ## Installation
 
@@ -14,7 +14,12 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ### Dependencies
 
-You can use the following instructions to install third-party applications. Add LLVM 10 sources based on your distribution.
+Use the following instructions to install third-party applications. Add LLVM 13 sources based on your distribution.
+
+```shell
+wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
+sudo dpkg -i fd_8.2.1_amd64.deb
+```
 
 #### Ubuntu 18.04 Packages
 
@@ -30,8 +35,6 @@ sudo dpkg -i fd_8.2.1_amd64.deb
 ```Bash
 export LLVM_VERSION="-13"
 sudo apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev
-wget https://github.com/sharkdp/fd/releases/download/v8.2.1/fd_8.2.1_amd64.deb
-sudo dpkg -i fd_8.2.1_amd64.deb
 ```
 
 #### Snap Packages
@@ -65,12 +68,9 @@ sudo cpanm Perl::LanguageServer
 ```shell
 cd $HOME/tmp; cd;
 npm init --yes;
-npm install --save-dev npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli  markdownlint-cli2 yaml-language-server vscode-json-languageserver intelephense write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php
+npm install --save-dev npm less jsonlint bash-language-server vscode-html-languageserver-bin typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver intelephense write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php
+npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 ```
-
-`npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev`
-
-Install `textlint` separately so that the installation is shared by other editors.
 
 #### Update helper packages
 
@@ -90,7 +90,9 @@ echo "export NODE_PATH=/usr/local/lib/node_modules" >> $HOME/.bashrc
 
 #### Universal Ctags
 
-The setup supports using both Universal Ctags (or `ctags`) and GNU Global (or `gtags`).
+The setup supports using Universal Ctags.
+
+Install using Snap: `sudo snap install universal-ctags`.
 
 ```shell
 git clone git@github.com:universal-ctags/ctags.git universal-ctags
@@ -101,9 +103,9 @@ cd universal-ctags
 #### GNU Global
 
 ```shell
-wget http://tamacom.com/global/global-6.6.4.tar.gz
-tar -xzvf global-6.6.4.tar.gz
-cd global-6.6.4
+wget http://tamacom.com/global/global-6.6.7.tar.gz
+tar -xzvf global-6.6.7.tar.gz
+cd global-6.6.7
 ./configure --with-universal-ctags=/usr/local/bin/ctags; make; sudo make install;
 echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >> $HOME/.bashrc
 echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
@@ -139,26 +141,24 @@ I plan to automate the complete setup sometime in the future.
 
 ## Directory structure
 
-- `extras` -- third-party packages (may not be available from the package archives)
-- `reference-cards` -- documentation and help files
-- `snippets` -- custom snippets
+- `modules` - setup modules split across files
+- `extras` - third-party packages (may not be available from the package archives)
+- `dir-locals-examples` - examples to show how to use directory-local variables
+- `projectile-examples` - projectile configuration files
+- `snippets` - custom snippets
+- `reference-cards` - documentation and help files
 
-## Tweaking the default settings
+The following are a few customization options defined in `init.el` that you could use to tweak the default setup. Please check `init.el` for more options.
 
-The following are customization options defined in `init.el` that you could use to tweak the default setup. Check the file for more options.
-
-- `dotemacs-theme` -- Set the desired theme from a bunch of themes
+- `dotemacs-gui-theme` -- Set the desired GUI theme from a bunch of themes
+- `dotemacs-tui-theme` -- Set the desired TUI theme from a bunch of themes
 - `dotemacs-modeline-theme` -- Set the desired modeline theme
-- `dotemacs-window-split` -- Specify the direction in which the windows should be split
 - `dotemacs-fill-column` -- Column beyond which lines should not extend
 - `dotemacs-delete-trailing-whitespace-p` -- Control whether trailing whitespace should be deleted or not
-- `dotemacs-tags-scheme` -- Choose whether to use Gtags or Ctags (we use `lsp-mode` for supported languages)
-
-Please check `init.el` for other options.
 
 ## Browsing Source Code
 
-Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by the `lsp` mode or you cannot create a compilation database.
+Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by the `lsp` mode, or you cannot create a compilation database.
 
 ### GNU Global
 
@@ -247,17 +247,13 @@ ctags -eR --languages=Python
 
 GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
 
-- <https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support>
-- <https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub>
-- <https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html>
+- [Compiling GNU Global with universal-ctags support](https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support)
+- [Tags for Emacs: Relationship between etags, ebrowse, cscope, GNU Global and exuberant ctags](https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub)
+- [GTags for Python in Emacs](https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html)
 
 ## Server Support
 
-Enable server support either through `init.el` or as a `systemd` service.
-
-### systemd service
-
-Create a file `$HOME/.config/systemd/user/emacs.service` with the following content.
+Enable server support either through `init.el` or as a `systemd` service. Create a file `$HOME/.config/systemd/user/emacs.service` with the following content.
 
 ```config
 [Unit]
@@ -296,12 +292,12 @@ StartupWMClass=Emacs
 Keywords=Text;Editor;
 ```
 
-- <https://tychoish.com/post/running-emacs/>
+- [Running Emacs](https://tychoish.com/post/running-emacs/)
 
 ## Build GNU Emacs from source
 
 ```shell
-sudo apt install -y texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin
+sudo apt install -y texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev
 git clone git://git.sv.gnu.org/emacs.git
 ./configure --without-makeinfo --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 make -j2
@@ -322,7 +318,7 @@ make -j2 NATIVE_FULL_AOT=1
 sudo make install
 ```
 
-Try the [following](https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html) if the build fails: `make bootstrap` or `rm lisp/loaddefs.el; make;`
+Try the [following](https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html) if the build fails: `make bootstrap` or `rm lisp/loaddefs.el; make;`.
 
 Evaluate the following to test that both fast JSON and native compilation are working.
 
@@ -341,11 +337,14 @@ Evaluate the following to test fast JSON is working.
 (message "Native JSON is *not* available"))
 ```
 
-Set `(setq comp-deferred-compilation t)` if not set. This is now the default.
+Set `(setq native-comp-deferred-compilation t)` if not set. This is now the default.
 
-Run the following to native-compile all Elisp files under a directory.
+Run the following to native compile all Elisp files under a directory.
 
 `(native-compile-async "/home/swarnendu/.emacs.d/elpa" 'recursively)`
+
+- [Native compilation and "pure" GTK in Emacs](http://www.cesarolea.com/posts/emacs-native-compile/)
+- [My Emacs Flatpak](https://github.com/fejfighter/pgtk-emacs-flatpak)
 
 ## Setup Emacs NG
 
@@ -359,13 +358,13 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 ## Profile startup time
 
-`emacs -Q -l /home/swarnendu/github/dotemacs-28/extras/profile-dotemacs.el -f profile-dotemacs`
+`emacs -Q -l /home/swarnendu/github/dotemacs/extras/profile-dotemacs.el -f profile-dotemacs`
 
 ## Emacs in a Terminal
 
-Use the steps mentioned in the following links.
+Use the steps mentioned in the following link.
 
-- <https://github.com/syl20bnr/spacemacs/wiki/Terminal>
+- [Spacemacs Terminal](https://github.com/syl20bnr/spacemacs/wiki/Terminal)
 
 ```Bash
 export LC_ALL=en_US.UTF-8
