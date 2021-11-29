@@ -304,7 +304,7 @@ make -j2
 sudo make install
 ```
 
-## Setup GCCEmacs
+## GCCEmacs
 
 ```shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
@@ -337,8 +337,6 @@ Evaluate the following to test fast JSON is working.
 (message "Native JSON is *not* available"))
 ```
 
-Set `(setq native-comp-deferred-compilation t)` if not set. This is now the default.
-
 Run the following to native compile all Elisp files under a directory.
 
 `(native-compile-async "/home/swarnendu/.emacs.d/elpa" 'recursively)`
@@ -346,7 +344,7 @@ Run the following to native compile all Elisp files under a directory.
 - [Native compilation and "pure" GTK in Emacs](http://www.cesarolea.com/posts/emacs-native-compile/)
 - [My Emacs Flatpak](https://github.com/fejfighter/pgtk-emacs-flatpak)
 
-## Setup Emacs NG
+## Emacs NG
 
 Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
@@ -362,9 +360,7 @@ Test Emacs NG: `(featurep 'emacs-ng)` should return `t`
 
 ## Emacs in a Terminal
 
-Use the steps mentioned in the following link.
-
-- [Spacemacs Terminal](https://github.com/syl20bnr/spacemacs/wiki/Terminal)
+Use the steps mentioned in the link [Spacemacs Terminal](https://github.com/syl20bnr/spacemacs/wiki/Terminal), including enabling support for 24bit colors in the terminal.
 
 ```Bash
 export LC_ALL=en_US.UTF-8

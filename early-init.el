@@ -31,7 +31,7 @@
         gc-cons-threshold sb/emacs-16GB))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
-;; large pause times whenever GC eventually happens. But lsp suggests increasing the limit
+;; large pause times whenever GC eventually happens. But `lsp-mode' suggests increasing the limit
 ;; permanently.
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
@@ -40,7 +40,7 @@
         gc-cons-threshold sb/emacs-8MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
-;; customizations
+;; customizations.
 (add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
@@ -82,8 +82,9 @@
   ;;         (no-littering-expand-var-file-name "eln-cache"))
   (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
 
-(when (boundp 'package-native-compile)
-  (setq package-native-compile t))
+(when sb/EMACS28+
+  (setq package-native-compile t
+        native-comp-always-compile t))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
 ;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html

@@ -1627,7 +1627,7 @@ This location is used for temporary installations and files.")
    ("C-c s r"                        . counsel-rg)
    ("C-c C-m"                        . counsel-mark-ring)
    ;; Enabling preview can make switching over remote buffers slow
-   ("S-<f3>"                        . counsel-switch-buffer)
+   ("S-<f3>"                         . counsel-switch-buffer)
    ("<f4>"                           . counsel-grep-or-swiper))
   :bind* ("C-c C-j"                  . counsel-imenu)
   :diminish
@@ -1959,6 +1959,12 @@ This location is used for temporary installations and files.")
 (use-package smartparens
   :commands (sp-pair sp-local-pair)
   :diminish
+  :preface
+  ;; https://web-mode.org/
+  (defun sp-web-mode-is-code-context (id action context)
+    (and (eq action 'insert)
+         (not (or (get-text-property (point) 'part-side)
+                  (get-text-property (point) 'block-side)))))
   :hook
   ((after-init . (lambda ()
                    (require 'smartparens-config)
@@ -1969,6 +1975,8 @@ This location is used for temporary installations and files.")
         sp-autoskip-closing-pair 'always)
 
   (smartparens-strict-mode -1)
+
+  (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
 
   (sp-local-pair 'markdown-mode "<" ">")
 
@@ -2250,7 +2258,8 @@ This location is used for temporary installations and files.")
   ;; Increase the width to see the major mode clearly
   (ivy-rich-modify-columns 'ivy-switch-buffer
                            '((ivy-rich-switch-buffer-size (:align right))
-                             (ivy-rich-switch-buffer-major-mode (:width 20 :face error))))
+                             (ivy-rich-switch-buffer-major-mode (:width 20 :face error))
+                             (ivy-rich-switch-buffer-project (:width 0.25 :face success))))
 
   (ivy-rich-set-columns 'counsel-recentf
                         '((file-name-nondirectory (:width 0.24))
@@ -2546,7 +2555,6 @@ This location is used for temporary installations and files.")
                                      vc-ignore-dir-regexp tramp-file-name-regexp))
 
   (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-  (setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
 
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
@@ -3947,7 +3955,7 @@ This location is used for temporary installations and files.")
   :hook (web-mode . lsp-deferred)
   :config
   (setq web-mode-enable-auto-closing              t
-        web-mode-enable-auto-pairing              t
+        web-mode-enable-auto-pairing              nil ; Prefer `smartparens'
         web-mode-enable-auto-quoting              t
         web-mode-enable-block-face                t
         web-mode-enable-css-colorization          t
@@ -4004,10 +4012,10 @@ This location is used for temporary installations and files.")
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account.
 (use-package flycheck-grammarly
-  :ensure websocket
-  :ensure grammarly
-  :ensure keytar
-  :ensure t
+  ;; :ensure websocket
+  ;; :ensure grammarly
+  ;; :ensure keytar
+  ;; :ensure t
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
@@ -4169,32 +4177,34 @@ This location is used for temporary installations and files.")
   )
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
-;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'.
-(use-package lsp-latex
-  :disabled t ; Server performance is very poor, so I continue to prefer `auctex'
-  :hook
-  (latex-mode . (lambda()
-                  (require 'lsp-latex)
-                  (lsp-deferred)))
-  :config
-  (setq lsp-latex-bibtex-formatter             "latexindent"
-        lsp-latex-latex-formatter              "latexindent"
-        lsp-latex-bibtex-formatter-line-length sb/fill-column
-        lsp-latex-chktex-on-open-and-save      t
-        lsp-latex-build-is-continuous          t
-        lsp-latex-build-on-save                t
-        ;; Delay time in milliseconds before reporting diagnostics
-        lsp-latex-diagnostics-delay            2000)
+;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
+;; performance is very poor, so I continue to prefer `auctex'.
 
-  (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc")
+;; (use-package lsp-latex
+;;   :disabled t
+;;   :hook
+;;   (latex-mode . (lambda()
+;;                   (require 'lsp-latex)
+;;                   (lsp-deferred)))
+;;   :config
+;;   (setq lsp-latex-bibtex-formatter             "latexindent"
+;;         lsp-latex-latex-formatter              "latexindent"
+;;         lsp-latex-bibtex-formatter-line-length sb/fill-column
+;;         lsp-latex-chktex-on-open-and-save      t
+;;         lsp-latex-build-is-continuous          t
+;;         lsp-latex-build-on-save                t
+;;         ;; Delay time in milliseconds before reporting diagnostics
+;;         lsp-latex-diagnostics-delay            2000)
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "texlab")
-    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-    :remote? t
-    :server-id 'texlab-remote)))
+;;   (add-to-list 'lsp-latex-build-args "-c")
+;;   (add-to-list 'lsp-latex-build-args "-pvc")
+
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-tramp-connection "texlab")
+;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+;;     :remote? t
+;;     :server-id 'texlab-remote)))
 
 (use-package tex-site
   :ensure nil
@@ -4207,23 +4217,30 @@ This location is used for temporary installations and files.")
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defines (tex-fontify-script font-latex-fontify-script
                                font-latex-fontify-sectioning
-                               TeX-syntactic-comment TeX-save-query
-                               LaTeX-item-indent LaTeX-syntactic-comments
+                               TeX-syntactic-comment
+                               TeX-save-query LaTeX-item-indent
+                               LaTeX-syntactic-comments
                                LaTeX-fill-break-at-separators)
   :functions TeX-active-process
-  :commands (TeX-active-process TeX-save-document tex-site LaTeX-mode LaTeX-math-mode TeX-PDF-mode
-                                TeX-source-correlate-mode TeX-active-process
+  :commands (TeX-active-process TeX-save-document tex-site
+                                LaTeX-mode LaTeX-math-mode
+                                TeX-PDF-mode
+                                TeX-source-correlate-mode
+                                TeX-active-process
                                 TeX-command-menu
                                 TeX-revert-document-buffer)
   :hook
   (((latex-mode LaTeX-mode) . LaTeX-math-mode)
    ((latex-mode LaTeX-mode) . TeX-PDF-mode) ; Use `pdflatex'
-   ((latex-mode LaTeX-mode) . TeX-source-correlate-mode))
+   ((latex-mode LaTeX-mode) . TeX-source-correlate-mode)
+   (LaTeX-mode . turn-on-auto-fill))
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
         TeX-auto-untabify t ; Remove all tabs before saving
         TeX-clean-confirm nil
-        TeX-electric-sub-and-superscript t ; Automatically insert braces in math mode
+        ;; Automatically insert braces after typing ^ and _ in math mode
+        TeX-electric-sub-and-superscript t
+        TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
         TeX-parse-self t ; Parse documents
         TeX-quote-after-quote nil ; Allow original LaTeX quotes
         TeX-save-query nil ; Save buffers automatically when compiling
@@ -4254,18 +4271,8 @@ This location is used for temporary installations and files.")
   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   ;; (unbind-key "C-c ;" LaTeX-mode-map)
-  )
-
-;; We can disable this once `lsp-latex-build' works well
-(use-package auctex-latexmk
-  :after tex-mode
-  :demand t
-  :commands (auctex-latexmk-setup auctex-latexmk)
-  :config
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t ; Pass the `-pdf' flag when `TeX-PDF-mode' is active
-        TeX-command-default "LatexMk")
-
-  (auctex-latexmk-setup))
+  :bind
+  ("C-c x q" . TeX-insert-quote))
 
 (use-package bibtex
   :ensure nil
@@ -4294,7 +4301,9 @@ This location is used for temporary installations and files.")
 (use-package reftex
   :ensure nil
   :commands (reftex-get-bibfile-list bibtex-parse-keys
-                                     reftex-mode reftex-toc-rescan
+                                     reftex-mode
+                                     reftex-toc-rescan
+                                     reftex-toc-Rescan
                                      reftex-default-bibliography)
   ;; :diminish
   :hook ((LaTeX-mode latex-mode) . reftex-mode)
@@ -4317,8 +4326,8 @@ This location is used for temporary installations and files.")
 
   (defun sb/find-bibliography-file ()
     "Try to find a bibliography file using RefTeX.
-      Returns a string with text properties (as expected by read-file-name) or empty string if no
-      file can be found"
+      Returns a string with text properties (as expected by read-file-name) or
+empty string if no file can be found"
     (interactive)
     (let ((bibfile-list nil))
       (condition-case nil
@@ -4341,7 +4350,6 @@ Ignore if no file is found."
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list)))))
-  ;; :init (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
   :config
   (setq reftex-enable-partial-scans t
         reftex-highlight-selection 'both
@@ -4349,15 +4357,12 @@ Ignore if no file is found."
         reftex-save-parse-info t
         reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
         reftex-use-multiple-selection-buffers t
-        ;; Make the toc displayed on the left
-        reftex-toc-split-windows-horizontally t
-        ;; Adjust the fraction
-        reftex-toc-split-windows-fraction 0.3)
+        ;; Make the toc display with a vertical split, since it is easy to read long lines
+        reftex-toc-split-windows-horizontally nil)
 
   (sb/reftex-try-add-all-bibitems-from-bibtex)
-
-  (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-  (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+  ;; Rescan the entire document, not only the current file (`reftex-toc-rescan')
+  (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan))
 
 ;; (use-package bib-cite
 ;;   :ensure nil
@@ -4375,6 +4380,17 @@ Ignore if no file is found."
 ;;               ("C-c l f" . bib-find)
 ;;               ("C-c l n" . bib-find-next)
 ;;               ("C-c l h" . bib-highlight-mouse)))
+
+;; We can disable this once `lsp-latex-build' works well
+(use-package auctex-latexmk
+  :after tex-mode
+  :demand t
+  :commands (auctex-latexmk-setup auctex-latexmk)
+  :config
+  ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+  (auctex-latexmk-setup)
+  (setq TeX-command-default "LatexMk"))
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el")
@@ -4822,6 +4838,21 @@ Ignore if no file is found."
   :init
   (unless (server-running-p)
     (server-start)))
+
+;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+(setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
+
+(use-package vterm
+  :config
+  (setq vterm-always-compile-module t
+        vterm-max-scrollback 5000)
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+              (buffer-face-mode t))))
+
+(use-package vterm-toggle
+  :commands vterm-toggle)
 
 (require 'defuns)
 (require 'test-functions)

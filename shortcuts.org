@@ -172,20 +172,40 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
 - ~C-c @ C-p~ - Move to previous heading (at any level) (~outline-previous-visible-heading~)
 - ~C-c @ C-f~ - Move Forward to next heading at the same level (~outline-forward-same-level~)
 - ~C-c @ C-b~ - Move Backward to previous heading at the same level (~outline-backward-same-level~)
-- ~C-c C-e~ - Make LaTeX environment (~\begin{...}-\end{...}~ pair) (~LaTeX-environment~)
+- ~C-c C-s~ - Insert sectioning command (~LaTeX-section~)  
+- ~C-c C-e~ - Make LaTeX environment (~\begin{...}-\end{...}~ pair) (~LaTeX-environment~). Change the current environment with ~C-u C-c C-e~.
 - ~C-c ]~ - Close LaTeX environment (~LaTeX-close-environment~)
 - ~C-c C-o C-f~ - Toggle folding mode (~TeX-fold-mode~)
 - ~C-c C-f C-e~ - Insert formatted text (~TeX-font~)
-
-  - ~C-e~ - Insert emphasized text ()
-  - ~C-b~ - Insert bold text ()
-  - ~C-i~ - Insert italicized text ()
-  - ~C-r~ - Insert roman text ()
-  - ~C-t~ - Insert typewriter text ()
-  - ~C-s~ - Insert slanted text ()
-
-- ~C-c _~ - Set master file (``)
+- ~C-c C-f C-b~ - Insert bold text ()
+- ~C-c C-f C-m~ - Insert medium text ()
+- ~C-c C-f C-i~ - Insert italicized text ()
+- ~C-c C-f C-e~ - Insert emphasized text ()
+- ~C-c C-f C-s~ - Insert slanted text ()
+- ~C-c C-f C-r~ - Insert roman text ()
+- ~C-c C-f C-t~ - Insert typewriter text ()
+- ~C-c C-f C-f~ - Insert serif text ()
+- ~C-c C-f C-c~ - Insert small caps text ()
+- ~C-c C-f C-l~ - Insert lower case text ()
+- ~C-c C-f C-w~ - Insert swash text ()
+- ~C-c C-f C-d~ - Delete the innermost font specification containing the point ()
+- ~C-c _~ - Set master file (~~)
 - ~C-c ^~ - Switch to master file (~TeX-home-buffer~)
+- ~C-M-a~ - Move point to the "\begin" of the current environment (~LaTeX-find-matching-begin~)  
+- ~C-M-e~ - Move point to the "\end" of the current environment (~LaTeX-find-matching-end~)
+- ~M-j~ - Close the current item, move to the next line and insert an appropriate "\item" for the current environment (~LaTeX-insert-item~)
+- ~C-c ~~ - Toggle LaTeX Math mode (~LaTeX-math-mode~)
+- ~C-c .~ - Set mark to the end of the current environment and point to the matching beginning (~LaTeX-mark-environment~)
+- ~C-c *~ - Set mark at end of current logical section, and point at top (~LaTeX-mark-section~)
+- ~C-c ;~ - Add or remove "%" from the beginning of each line in the current region (~TeX-comment-or-uncomment-region~)
+- ~C-c %~ - Add or remove "%" from the beginning of each line in the current paragraph (~TeX-comment-or-uncomment-paragraph~)
+- ~C-c C-q C-p~ - Fill and indent the current paragraph (~LaTeX-fill-paragraph~)
+- ~C-c C-q C-e~ - Fill and indent the current environment (~LaTeX-fill-environment~)
+- ~C-c C-q C-s~ - Fill and indent the current logical sectional unit (~LaTeX-fill-section~)
+- ~C-c C-q C-r~ - Fill and indent the current region (~LaTeX-fill-region~)
+- 
+  
+  
 
 *** Reftex
 
@@ -238,6 +258,12 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c C-n~ - Jump to opening/closing blocks/tags (~web-mode-navigate~)
 - ~C-c C-f~ - Fold code for code blocks (~web-mode-fold-or-unfold~)
 - ~C-c C-i~ - Indent entire buffer (~web-mode-buffer-indent~)
+- ~M-;~ - Comment or uncomment line(s), block or region at POS (~web-mode-comment-or-uncomment~)
+- ~C-c C-m~ - Mark and expand (~web-mode-mark-and-expand~)
+- ~C-c C-w~ - Toggle whitespaces (~web-mode-whitespaces-show~)
+- ~C-c C-i~ - Indent entire buffer (~web-mode-buffer-indent~)
+- ~~C-c C-d d~ - Show tag mismatch (~~)
+
 
 ** Tags
 
