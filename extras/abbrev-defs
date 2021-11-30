@@ -1509,6 +1509,7 @@
     ("durig" "during" nil :count 0)
     ("explainiation" "explanation" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)
+    ("genomic" "genomics" nil :count 0)
     ("hueristically" "heuristically" nil :count 0)
     ("informatino" "information" nil :count 0)
     ("inititation" "initiation" nil :count 0)

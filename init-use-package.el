@@ -357,6 +357,7 @@ This location is used for temporary installations and files.")
       select-enable-clipboard t
       sentence-end-double-space nil
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
+      sort-fold-case nil ; Do not ignore case when sorting
       standard-indent 2
       ;; suggest-key-bindings t
       ;; switch-to-buffer-preserve-window-point t
@@ -1168,6 +1169,7 @@ This location is used for temporary installations and files.")
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
+  :commands (org-indent-mode org-indent-item org-outdent-item)
   :hook (org-mode . visual-line-mode)
   :config
   (setq org-fontify-done-headline nil
@@ -1180,7 +1182,9 @@ This location is used for temporary installations and files.")
         org-src-preserve-indentation t
         org-src-tabs-acts-natively t
         org-src-window-setup 'current-window
-        org-startup-indented t
+        ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance feels
+        ;; better with the mode disabled.
+        org-startup-indented nil
         org-startup-truncated nil
         org-startup-folded 'showeverything
         org-startup-with-inline-images t
@@ -1202,20 +1206,11 @@ This location is used for temporary installations and files.")
         ("M-<right>" . nil)
         ("M-<up>"    . nil)
         ("M-<down>"  . nil)
-        ("C-'"       . nil)))
-
-;; There is a lot of visible distortion with `org-indent-mode' enabled.
-(use-package org-indent
-  :ensure nil
-  :commands (org-indent-mode org-indent-item org-outdent-item)
-  :disabled t
-  :hook (org-mode . org-indent-mode)
-  :bind
-  (:map org-mode-map
+        ("C-'"       . nil)
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)))
 
-;; The style depends on the theme. We have disabled the package to be more consistent.
+;; We have disabled the package to get consistent styles across themes.
 (use-package org-bullets
   :disabled t
   :commands org-bullets-mode
@@ -1224,6 +1219,7 @@ This location is used for temporary installations and files.")
 ;; Make invisible parts of Org elements appear visible
 (use-package org-appear
   :commands org-appear-mode
+  :disabled t
   :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autosubmarkers t
@@ -1231,8 +1227,8 @@ This location is used for temporary installations and files.")
         org-appear-autolinks      t))
 
 (use-package ox-gfm
-  :demand t
-  :after org)
+  :after org
+  :demand t)
 
 ;; TODO: Use `C-c o' as the binding for `org-mode-map'
 
@@ -2388,14 +2384,17 @@ This location is used for temporary installations and files.")
   ;;             ))
   )
 
+;; Showing error messages  in the echo area are less intrusive.
 (or
  (use-package flycheck-popup-tip ; Show error messages in popups
    :unless (display-graphic-p)
+   :disabled t
    :hook (flycheck-mode . flycheck-popup-tip-mode))
 
  ;; Does not display popup under TTY, check possible workarounds at
  ;; https://github.com/flycheck/flycheck-popup-tip
  (use-package flycheck-pos-tip
+   :disabled t
    :commands flycheck-pos-tip-mode
    :if (display-graphic-p)
    :hook (flycheck-mode . flycheck-pos-tip-mode))

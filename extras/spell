@@ -1,4 +1,4 @@
-personal_ws-1.1 en 293 
+personal_ws-1.1 en 298 
 Agrawal
 Amey
 Anupam
@@ -143,10 +143,13 @@ downsampling
 ebooks
 enqueue
 explainability
+extensibility
 formatter
 freezed
 functionalities
+granularities
 hardcoded
+hatchling
 incrementing
 indices
 infeasibility
@@ -166,6 +169,7 @@ livelocks
 liveness
 locksteps
 lookahead
+lookaside
 metadata
 microarchitectural
 microbenchmark
@@ -184,6 +188,7 @@ multicore
 multilayer
 multithreaded
 multithreading
+neuromorphic
 nonblocking
 nondeterminism
 nonpreemptive

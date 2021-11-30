@@ -6,8 +6,8 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
 ** Emacs Window
 
-- ~C-x C-+~  — Increase font size by one step (~text-scale-adjust~)
-- ~C-x C--~  — Decrease font size by one step (~text-scale-adjust~)
+- ~C-x C-+~  - Increase font size by one step (~text-scale-adjust~)
+- ~C-x C--~  - Decrease font size by one step (~text-scale-adjust~)
 - ~Ctrl-x +~ - Make all visible windows approximately equal height (~balance-windows~)
 
 ** Text Manipulation
@@ -205,8 +205,6 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
 - ~C-c C-q C-r~ - Fill and indent the current region (~LaTeX-fill-region~)
 -
 
-
-
 *** Reftex
 
 - ~C-c (~ - Create a label (~reftex-label~)
@@ -264,10 +262,7 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c C-i~ - Indent entire buffer (~web-mode-buffer-indent~)
 - ~~C-c C-d d~ - Show tag mismatch (~~)
 
-
-** Tags
-
-*** XRef
+** XRef
 
 - ~M-.~ - Jump to tag underneath cursor (~xref-find-definitions~)
 - ~M-*~ - Pop back to where you previously invoked ~M-.~ (~xref-pop-marker-stacker~)
@@ -293,28 +288,26 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c <~ - Indent left (~python-indent-shift-left~)
 - ~C-c >~ - Indent right (~python-indent-shift-right~)
 - - Navigate to the previous function (~python-nav-backward-defun~)
-- - Navigate to the previous function (~python-nav-forward-defun~)
+- - Navigate to the next function (~python-nav-forward-defun~)
 - ~M-]~ - Jump to the forward block (~python-nav-forward-block~)
 - ~M-[~ - Jump to the backward block (~python-nav-backward-block~)
 
 ** C/C++ with LSP
 
-- ~M-.~ - Jump to tag underneath cursor ()
-- ~M-,~ - Pop stack location ()
 
 ** Flycheck
 
-Within the error list the following key bindings are available:
+The following key bindings are available in ~flycheck-error-list-mode~.
 
-- ~RET~ - Go to the current error in the source buffer (``)
-- ~n~ - Jump to the next error (``)
-- ~p~ - Jump to the previous error (``)
-- ~e~ - Explain the error (``)
-- ~f~ - Filter the error list by level (``)
-- ~F~ - Remove the filter (``)
-- ~S~ - Sort the error list by the column at point (``)
-- ~g~ - Check the source buffer and update the error list (``)
-- ~q~ - Quit the error list and hide its window (``)
+- ~RET~ - Go to the current error in the source buffer (~~)
+- ~n~ - Jump to the next error (~~)
+- ~p~ - Jump to the previous error (~~)
+- ~e~ - Explain the error (~~)
+- ~f~ - Filter the error list by level (~~)
+- ~F~ - Remove the filter (~~)
+- ~S~ - Sort the error list by the column at point (~~)
+- ~g~ - Check the source buffer and update the error list (~~)
+- ~q~ - Quit the error list and hide its window (~~)
 
 ** LSP
 
