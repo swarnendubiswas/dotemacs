@@ -131,10 +131,6 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
-(push '(tool-bar-lines . 0)   default-frame-alist)
-(push '(menu-bar-lines . 0)   default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
-
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 
@@ -144,7 +140,7 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Maximize Emacs on startup, append to the hook instead of prepending, this means it will run after
-;; other hooks that might fiddle with the frame size
+;; other hooks that might fiddle with the frame size.
 ;; (add-hook 'emacs-startup-hook #'toggle-frame-maximized t)
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))

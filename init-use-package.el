@@ -25,12 +25,13 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'sb/default
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
            (const :tag "doom-one-light"  doom-one-light)
+           (const :tag "doom-nord"       doom-nord)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
            (const :tag "monokai"         monokai)
@@ -64,7 +65,7 @@
            (const :tag "doom-modeline"   doom-modeline)
            (const :tag "awesome-tray"    awesome-tray)
            (const :tag "moody"           moody)
-           (const :tag "default"         default))
+           (const :tag "none"            none))
   :group 'sb/emacs)
 
 (defcustom sb/window-split
@@ -639,34 +640,27 @@ This location is used for temporary installations and files.")
   :init (load-theme 'zenburn t))
 
 (use-package doom-themes
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'doom-molokai))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-molokai)))
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'doom-molokai)
+                   (eq sb/gui-theme 'doom-one-light)
+                   (eq sb/gui-theme 'doom-nord)
+                   (eq sb/gui-theme 'doom-gruvbox)))
+          (and (not (display-graphic-p))
+               (or (eq sb/tui-theme 'doom-molokai)
+                   (eq sb/tui-theme 'doom-one-light)
+                   (eq sb/tui-theme 'doom-nord)
+                   (eq sb/tui-theme 'doom-gruvbox))))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
-  (load-theme 'doom-molokai t)
-  ;; (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
-  :config
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification
-  (doom-themes-org-config))
-
-(use-package doom-themes
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'doom-one-light))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-one-light)))
-  :commands (doom-themes-org-config doom-themes-treemacs-config)
-  :init
-  (load-theme 'doom-one-light t)
-  :config
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification
-  (doom-themes-org-config))
-
-(use-package doom-themes
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'doom-gruvbox))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'doom-gruvbox)))
-  :commands (doom-themes-org-config doom-themes-treemacs-config)
-  :init
-  (load-theme 'doom-gruvbox t)
+  (cond
+   ((or (eq sb/gui-theme 'doom-molokai)
+        (eq sb/tui-theme 'doom-molokai))   (load-theme 'doom-molokai t))
+   ((or (eq sb/gui-theme 'doom-one-light)
+        (eq sb/tui-theme 'doom-one-light)) (load-theme 'doom-one-light t))
+   ((or (eq sb/gui-theme 'doom-nord)
+        (eq sb/tui-theme 'doom-nord))      (load-theme 'doom-nord t))
+   ((or (eq sb/gui-theme 'doom-gruvbox)
+        (eq sb/tui-theme 'doom-gruvbox))   (load-theme 'doom-gruvbox t)))
   ;; (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
   :config
   (doom-themes-treemacs-config)
@@ -678,19 +672,20 @@ This location is used for temporary installations and files.")
           (and (not (display-graphic-p)) (eq sb/tui-theme 'monokai)))
   :init (load-theme 'monokai t))
 
-(use-package modus-operandi-theme
+(use-package modus-themes
   :ensure moody
-  :ensure modus-themes
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'modus-operandi))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'modus-operandi)))
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'modus-operandi)
+                   (eq sb/gui-theme 'modus-vivendi)))
+          (and (not (display-graphic-p))
+               (or (eq sb/tui-theme 'modus-operandi)
+                   (eq sb/tui-theme 'modus-vivendi))))
   :init
-  ;; (setq modus-themes-completions 'opinionated
-  ;;       modus-themes-fringes 'subtle
-  ;;       modus-themes-hl-line '(underline accented)
-  ;;       modus-themes-scale-headings nil
-  ;;       modus-themes-prompts 'intense-accented
-  ;;       modus-themes-variable-pitch-headings nil
-  ;;       modus-themes-org-blocks 'tinted-background)
+  (setq modus-themes-completions 'opinionated
+        modus-themes-fringes 'intense
+        modus-themes-hl-line '(accented)
+        modus-themes-prompts '(intense)
+        modus-themes-org-blocks 'tinted-background)
 
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -700,30 +695,11 @@ This location is used for temporary installations and files.")
 
   (modus-themes-load-themes)
   :config
-  (modus-themes-load-operandi))
-
-(use-package modus-vivendi-theme
-  :ensure moody
-  :ensure modus-themes
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'modus-vivendi))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'modus-vivendi)))
-  :init
-  ;; (setq modus-themes-completions 'opinionated
-  ;;       modus-themes-fringes 'subtle
-  ;;       modus-themes-intense-hl-line t
-  ;;       modus-themes-scale-headings nil
-  ;;       modus-themes-prompts 'intense-accented
-  ;;       modus-themes-variable-pitch-headings nil)
-
-  (when (eq sb/modeline-theme 'default)
-    (setq modus-themes-mode-line 'accented-3d))
-
-  (when (eq sb/modeline-theme 'moody)
-    (setq modus-themes-mode-line 'borderless-moody))
-
-  (modus-themes-load-themes)
-  :config
-  (modus-themes-load-vivendi))
+  (cond
+   ((or (eq sb/gui-theme 'modus-operandi)
+        (eq sb/tui-theme 'modus-operandi)) (modus-themes-load-operandi))
+   ((or (eq sb/gui-theme 'modus-vivendi)
+        (eq sb/tui-theme 'modus-vivendi)) (modus-themes-load-vivendi))))
 
 (when (and (eq sb/gui-theme 'sb/default)
            (display-graphic-p))
@@ -1194,10 +1170,10 @@ This location is used for temporary installations and files.")
             org-src-tabs-acts-natively)
   :hook (org-mode . visual-line-mode)
   :config
-  (setq org-fontify-done-headline      nil
+  (setq org-fontify-done-headline nil
         org-fontify-whole-heading-line nil
-        ;; org-hide-emphasis-markers      t
-        ;; org-hide-leading-stars         t
+        ;; org-hide-emphasis-markers t
+        ;; org-hide-leading-stars t
         ;; org-hide-leading-stars-before-indent-mode t
         ;; Code block fontification using the major-mode of the code
         org-src-fontify-natively t
@@ -1228,16 +1204,20 @@ This location is used for temporary installations and files.")
         ("M-<down>"  . nil)
         ("C-'"       . nil)))
 
+;; There is a lot of visible distortion with `org-indent-mode' enabled.
 (use-package org-indent
   :ensure nil
   :commands (org-indent-mode org-indent-item org-outdent-item)
+  :disabled t
   :hook (org-mode . org-indent-mode)
   :bind
   (:map org-mode-map
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)))
 
+;; The style depends on the theme. We have disabled the package to be more consistent.
 (use-package org-bullets
+  :disabled t
   :commands org-bullets-mode
   :hook (org-mode . org-bullets-mode))
 
@@ -4147,7 +4127,6 @@ This location is used for temporary installations and files.")
                                                      (lsp-deferred)))
   :init
   (setq lsp-ltex-check-frequency "save"
-        ;; lsp-ltex-version "14.1.0"
         ;; lsp-ltex-dictionary ("microbenchmarks")
         lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64")
   :config
@@ -4760,57 +4739,58 @@ Ignore if no file is found."
 (progn
   (defun sb/company-latex-mode ()
     "Add backends for latex completion in company mode."
-    ;;     ;; (use-package company-auctex
-    ;;     ;;   :demand t
-    ;;     ;;   :commands (company-auctex-init company-auctex-labels
-    ;;     ;;                                  company-auctex-bibs company-auctex-macros
-    ;;     ;;                                  company-auctex-symbols company-auctex-environments)
-    ;;     ;;   :config (company-auctex-init))
-    ;;     ;; (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
-    ;;     ;;   :demand t)
-    ;;     ;; (use-package company-math
-    ;;     ;;   :demand t
-    ;;     ;;   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-    ;;     ;; (use-package company-reftex
-    ;;     ;;   :demand t
-    ;;     ;;   :commands (company-reftex-labels company-reftex-citations))
-    ;;     ;; (use-package company-bibtex
-    ;;     ;;   :disabled t
-    ;;     ;;   :demand t
-    ;;     ;;   :commands company-bibtex)
+    (use-package company-auctex
+      :demand t
+      :commands (company-auctex-init company-auctex-labels
+                                     company-auctex-bibs company-auctex-macros
+                                     company-auctex-symbols company-auctex-environments)
+      :config (company-auctex-init))
+    (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
+      :demand t)
+    (use-package company-math
+      :demand t
+      :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+    (use-package company-reftex
+      :demand t
+      :commands (company-reftex-labels company-reftex-citations))
+    (use-package company-bibtex
+      :disabled t
+      :demand t
+      :commands company-bibtex)
 
-    ;;     (setq-local company-minimum-prefix-length 2)
-    ;;     (make-local-variable 'company-backends)
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
 
-    ;;     ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-    ;;     ;; labels and citations
-
-    ;;     ;; (setq company-backends '((:separate
-    ;;     ;;                           company-capf
-    ;;     ;;                           company-files
-    ;;     ;;                           company-reftex-citations
-    ;;     ;;                           company-reftex-labels
-    ;;     ;;                           company-auctex-environments
-    ;;     ;;                           company-auctex-macros
-    ;;     ;;                           company-latex-commands
-    ;;     ;;                           company-math-symbols-latex
-    ;;     ;;                           company-math-symbols-unicode
-
-    ;;     ;;                           ;; company-auctex-symbols
-    ;;     ;;                           ;; company-auctex-bibs
-    ;;     ;;                           ;; company-auctex-labels
-    ;;     ;;                           ;; company-bibtex
-    ;;     ;;                           ;; company-capf
-    ;;     ;;                           )
-    ;;     ;;                          company-dabbrev
-    ;;     ;;                          company-ispell))
+    ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+    ;; labels and citations
 
     (setq company-backends '((:separate
                               company-capf
                               company-files
-                              company-yasnippet
-                              company-dabbrev
-                              company-ispell)))
+                              company-reftex-citations
+                              company-reftex-labels
+                              company-auctex-environments
+                              company-auctex-macros
+                              company-latex-commands
+                              company-math-symbols-latex
+                              company-math-symbols-unicode
+
+                              ;; company-auctex-symbols
+                              ;; company-auctex-bibs
+                              ;; company-auctex-labels
+                              ;; company-bibtex
+                              ;; company-capf
+                              )
+                             company-dabbrev
+                             company-ispell))
+
+    ;; The following block is used with LSP.
+    ;; (setq company-backends '((:separate
+    ;;                           company-capf
+    ;;                           company-files
+    ;;                           company-yasnippet
+    ;;                           company-dabbrev
+    ;;                           company-ispell)))
     )
 
   (dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))
