@@ -293,6 +293,7 @@ This location is used for temporary installations and files.")
 (defvar bookmark-save-flag)
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
+(defvar sort-fold-case)
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
@@ -325,6 +326,7 @@ This location is used for temporary installations and files.")
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes
       echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
+      ;; Keeping track of the minibuffer nesting is difficult, so it is better to keep it disabled
       ;; enable-recursive-minibuffers t
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
       ;; variables, but I edit files over Tramp a lot, so I am unsure.
@@ -470,9 +472,9 @@ This location is used for temporary installations and files.")
   :ensure nil
   :init
   (setq uniquify-after-kill-buffer-p t
-        uniquify-buffer-name-style 'forward
-        uniquify-ignore-buffers-re "^\\*"
-        uniquify-separator "/"
+        uniquify-buffer-name-style   'forward
+        uniquify-ignore-buffers-re   "^\\*"
+        uniquify-separator           "/"
         uniquify-strip-common-suffix t))
 
 ;; Replace `dabbrev-exp' with `hippie-expand'. Use `C-M-/' for `dabbrev-completion' which finds all
@@ -571,7 +573,8 @@ This location is used for temporary installations and files.")
   (diminish 'visual-line-mode))
 
 ;; Default is 8 pixels, we have increased it to look good on TUI
-(fringe-mode '(10 . 10))
+(unless (display-graphic-p)
+  (fringe-mode '(10 . 10)))
 
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
