@@ -37,7 +37,7 @@
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
-           (const :tag "customized"      sb/default) ; Customizations over the default theme
+           (const :tag "customized"      sb/customized) ; Customizations over the default theme
            (const :tag "none"            none))
   :group 'sb/emacs)
 
@@ -53,7 +53,7 @@
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
-           (const :tag "customized"      sb/default) ; Customizations over the default theme
+           (const :tag "customized"      sb/customized) ; Customizations over the default theme
            (const :tag "none"            none))
   :group 'sb/emacs)
 
@@ -64,6 +64,7 @@
            (const :tag "powerline"       powerline)
            (const :tag "doom-modeline"   doom-modeline)
            (const :tag "awesome-tray"    awesome-tray)
+           (const :tag "spaceline"       spaceline)
            (const :tag "moody"           moody)
            (const :tag "none"            none))
   :group 'sb/emacs)
@@ -547,6 +548,7 @@ This location is used for temporary installations and files.")
 
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
 (dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
+                ;; size-indication-mode
                 tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
@@ -705,7 +707,7 @@ This location is used for temporary installations and files.")
    ((or (eq sb/gui-theme 'modus-vivendi)
         (eq sb/tui-theme 'modus-vivendi)) (modus-themes-load-vivendi))))
 
-(when (and (eq sb/gui-theme 'sb/default)
+(when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
   (progn
     ;; (setq frame-background-mode 'light)
@@ -750,6 +752,44 @@ This location is used for temporary installations and files.")
         doom-modeline-buffer-file-name-style 'file-name)
   (doom-modeline-mode 1))
 
+(use-package spaceline
+  :ensure t
+  :defines (spaceline-hud-p spaceline-selection-info-p
+                            spaceline-version-control-p spaceline-input-method-p
+                            spaceline-persp-name-p
+                            spaceline-buffer-encoding-abbrev-p
+                            spaceline-buffer-encoding-p
+                            spaceline-buffer-size-p)
+  :if (eq sb/modeline-theme 'spaceline)
+  :init
+  (require 'spaceline-config)
+  (setq spaceline-hud-p nil
+        spaceline-selection-info-p nil
+        spaceline-version-control-p t
+        spaceline-input-method-p nil
+        spaceline-buffer-size-p nil
+        ;; Line ending convention used in the current buffer (unix, dos or mac)
+        spaceline-buffer-encoding-abbrev-p nil
+        ;; Line ending convention used in the current buffer (unix, dos or mac) without abbreviation
+        spaceline-buffer-encoding-p nil
+        spaceline-persp-name-p nil)
+  ;; (set-face-attribute 'powerline-inactive1 nil
+  ;;                     :background "gray40"
+  ;;                     :foreground "white"
+  ;;                     :weight 'light)
+  ;; (set-face-attribute 'powerline-inactive2 nil
+  ;;                     :background "grey50"
+  ;;                     :foreground "white")
+  ;; (when (eq dotemacs-theme 'leuven)
+  ;;   (set-face-attribute 'powerline-active1 nil
+  ;;                       :background "gray22"
+  ;;                       :foreground "white"
+  ;;                       :weight 'light)
+  ;;   (set-face-attribute 'mode-line-inactive nil
+  ;;                       :background "grey88"
+  ;;                       :foreground "black"))
+  (spaceline-emacs-theme))
+
 (use-package awesome-tray ; Minimal modeline information
   :ensure nil
   :commands awesome-tray-mode
@@ -780,8 +820,11 @@ This location is used for temporary installations and files.")
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 
+;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
+;; line.
 (use-package auto-dim-other-buffers
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
+  :disabled t
   :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
@@ -863,7 +906,11 @@ This location is used for temporary installations and files.")
   :ensure nil
   :config
   (defalias 'list-buffers 'ibuffer)
-  (setq ibuffer-display-summary nil)
+  (setq ibuffer-display-summary nil
+        ;; ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
+        ;; ibuffer-expert t
+        ;; ibuffer-use-header-line t
+        )
   :bind ("C-x C-b" . ibuffer))
 
 (use-package ibuf-ext
@@ -932,6 +979,7 @@ This location is used for temporary installations and files.")
   :hook (dired-mode . dired-omit-mode)
   :config
   (setq dired-cleanup-buffers-too t
+        ;; dired-bind-jump t
         ;; Do not show messages when omitting files
         dired-omit-verbose nil)
 
@@ -1081,9 +1129,9 @@ This location is used for temporary installations and files.")
         ;; Hide the mode-line in the Treemacs buffer
         treemacs-user-mode-line-format 'none)
 
-  (if (display-graphic-p)
-      (setq treemacs-indentation-string (propertize "⫶" 'face 'font-lock-comment-face))
-    (setq treemacs-indentation-string (propertize "|" 'face 'font-lock-comment-face)))
+  ;; (if (display-graphic-p)
+  ;;     (setq treemacs-indentation-string (propertize "⫶" 'face 'font-lock-comment-face))
+  ;;   (setq treemacs-indentation-string (propertize "|" 'face 'font-lock-comment-face)))
 
   (treemacs-filewatch-mode 1)
   ;; `treemacs-tag-follow-mode' disables `treemacs-follow-mode', focuses the tag, but following tags
@@ -1091,7 +1139,8 @@ This location is used for temporary installations and files.")
   (treemacs-follow-mode 1)
   (treemacs-git-mode 'deferred)
   (treemacs-fringe-indicator-mode 'always) ; Always show the file indicator
-  (treemacs-project-follow-mode 1)
+  (treemacs-indent-guide-mode 1)
+  ;; (treemacs-project-follow-mode 1) ; Ignores workspace features
 
   (when (display-graphic-p)
     (use-package treemacs-all-the-icons
@@ -1126,25 +1175,26 @@ This location is used for temporary installations and files.")
                             icons))
                  icons)))
 
-    (treemacs-load-theme "all-the-icons"))
+    ;; (treemacs-load-theme "all-the-icons")
+    )
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
-  (set-face-attribute 'treemacs-directory-face nil :height 0.7)
-  (set-face-attribute 'treemacs-file-face nil :height 0.7)
-  (set-face-attribute 'treemacs-root-face nil :height 0.7)
-  (set-face-attribute 'treemacs-tags-face nil :height 0.7)
-  (set-face-attribute 'treemacs-git-ignored-face nil :height 0.7)
-  (set-face-attribute 'treemacs-git-untracked-face nil :height 0.7)
+  (set-face-attribute 'treemacs-directory-face           nil :height 0.7)
+  (set-face-attribute 'treemacs-file-face                nil :height 0.7)
+  (set-face-attribute 'treemacs-root-face                nil :height 0.7)
+  (set-face-attribute 'treemacs-tags-face                nil :height 0.7)
+  (set-face-attribute 'treemacs-git-ignored-face         nil :height 0.7)
+  (set-face-attribute 'treemacs-git-untracked-face       nil :height 0.7)
 
   (when (or (eq sb/gui-theme 'modus-operandi)
             (eq sb/gui-theme 'modus-vivendi)
             (eq sb/gui-theme 'doom-gruvbox))
-    (set-face-attribute 'treemacs-git-modified-face nil :height 0.7)
+    (set-face-attribute 'treemacs-git-modified-face   nil :height 0.7)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
 
-  (when (or (eq sb/gui-theme 'sb/default)
+  (when (or (eq sb/gui-theme 'sb/customized)
             (eq sb/gui-theme 'none))
-    (set-face-attribute 'treemacs-git-modified-face nil :height 0.8)
+    (set-face-attribute 'treemacs-git-modified-face   nil :height 0.8)
     (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0))
 
   (when (display-graphic-p)
@@ -2023,6 +2073,7 @@ This location is used for temporary installations and files.")
         projectile-mode-line-prefix "PRJ"
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
+        ;; The contents of ".projectile" are ignored when using the alien project indexing method
         projectile-indexing-method 'alien
         ;; No sorting should be faster, note that files are not sorted if
         ;; `projectile-indexing-method' is set to 'alien'.
@@ -2525,7 +2576,7 @@ This location is used for temporary installations and files.")
 ;; `R'.
 (use-package tramp
   :config
-  (setq tramp-default-user "swarnendu"
+  (setq tramp-default-user user-login-name
         ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
         ;; files which is faster than SSH.
         ;; tramp-default-method "ssh"
@@ -2745,6 +2796,10 @@ This location is used for temporary installations and files.")
   :bind
   (("C-="   . er/expand-region)
    ("C-M-=" . er/contract-region)))
+
+(use-package expand-line
+  :ensure t
+  :bind ("M-i" . turn-on-expand-line-mode))
 
 ;; Restore point to the initial location with `C-g' after marking a region
 (use-package smart-mark
