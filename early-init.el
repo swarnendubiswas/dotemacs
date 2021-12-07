@@ -56,8 +56,6 @@
   (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
-(add-to-list 'load-path (concat user-emacs-directory "modules"))
-
 ;; Initialise the package management system. Another option is to construct the `load-path'
 ;; manually.
 ;; (add-to-list 'load-path sb/extras-directory)

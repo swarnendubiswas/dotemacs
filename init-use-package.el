@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -58,7 +58,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'none
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -221,22 +221,6 @@ This location is used for temporary installations and files.")
 
 (when (file-exists-p sb/private-file)
   (load sb/private-file 'noerror))
-
-;; Using quelpa is convenient but slow
-(when nil
-  (progn
-    (unless (package-installed-p 'quelpa)
-      (package-refresh-contents)
-      (package-install 'quelpa))
-    (defvar quelpa-update-melpa-p)
-    (defvar quelpa-upgrade-interval)
-    (defvar quelpa-self-upgrade-p)
-    (setq quelpa-self-upgrade-p   nil
-          quelpa-update-melpa-p   nil
-          quelpa-upgrade-interval 30))
-
-  (use-package quelpa-use-package
-    :demand t))
 
 (use-package warnings
   :init
@@ -795,7 +779,6 @@ This location is used for temporary installations and files.")
   :commands awesome-tray-mode
   :if (eq sb/modeline-theme 'awesome-tray)
   :load-path "extras"
-  ;; :quelpa ((awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
   :hook (after-init . awesome-tray-mode)
   :config
   (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
@@ -1009,8 +992,6 @@ This location is used for temporary installations and files.")
 ;; Do not create multiple dired buffers
 (use-package dired+
   :load-path "extras"
-  ;; :quelpa ((dired+ :fetcher github :repo "emacsmirror/dired-plus"
-  ;;                  :files (dired+.el)))
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
   :config
@@ -1467,7 +1448,7 @@ This location is used for temporary installations and files.")
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
   :hook (after-init . global-company-mode)
-  :diminish ; We have `company-posframe' completion kind indicator enabled
+  ;; :diminish ;; The `company-posframe' completion kind indicator is not great
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -1521,7 +1502,7 @@ This location is used for temporary installations and files.")
   :diminish
   :config
   (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
-        company-posframe-show-indicator t ; Hide the backends
+        company-posframe-show-indicator nil ; Hide the backends, the display is not great
         company-posframe-quickhelp-delay nil) ; Disable showing the help frame
   (company-posframe-mode 1))
 
@@ -2539,8 +2520,6 @@ This location is used for temporary installations and files.")
   :load-path "extras"
   :commands number-separator-mode
   :disabled t
-  ;; :quelpa ((number-separator :fetcher github :repo "legalnonsense/number-separator.el"
-  ;;                            :files ("number-separator.el")))
   :diminish
   :config
   (setq number-separator ","
@@ -2923,6 +2902,12 @@ This location is used for temporary installations and files.")
    ;; TODO: Reuse the keybinding
    ("M-g l" . avy-goto-line)))
 
+(use-package ace-jump-buffer
+  :bind ("C-b" . ace-jump-buffer)
+  :config
+  (setq ajb-max-window-height 30
+        ajb-sort-function 'bs--sort-by-name))
+
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
 (use-package ivy-avy
   :after (ivy avy)
@@ -2976,9 +2961,6 @@ This location is used for temporary installations and files.")
   :if (bound-and-true-p sb/debug-init-file)
   :load-path "extras"
   :disabled t
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file"
-  ;; :quelpa ((explain-pause-mode :fetcher github :repo "lastquestion/explain-pause-mode"))
   :commands (explain-pause-mode explain-pause-top)
   :diminish)
 
@@ -3050,22 +3032,12 @@ This location is used for temporary installations and files.")
 (use-package llvm-mode
   :ensure nil
   :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file [3 times]"
-  ;; This will clone the llvm project
-  ;; :quelpa ((llvm-mode :fetcher github :repo "llvm/llvm-project"
-  ;;                     :files ("llvm/utils/emacs/llvm-mode.el")))
   :commands llvm-mode
   :mode "\\.ll\\'")
 
 (use-package tablegen-mode
   :ensure nil
   :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to ‘package-initialize’ in init file [3 times]"
-  ;; This will clone the llvm project
-  ;; :quelpa ((tablegen-mode :fetcher github :repo "llvm/llvm-project"
-  ;;                         :files ("llvm/utils/emacs/tablegen-mode.el")))
   :commands tablegen-mode
   :disabled t
   :mode "\\.td\\'")
@@ -4436,9 +4408,29 @@ Ignore if no file is found."
   (interactive)
   (require 'tex)
   (require 'tex-buf)
-  (let ((process (TeX-active-process))) (if process (delete-process process)))
-  (let ((TeX-save-query nil)) (TeX-save-document ""))
+  ;; Kill any active compilation process
+  (let ((process (TeX-active-process)))
+    (if process (delete-process process)))
+  (let ((TeX-save-query nil))
+    (TeX-save-document ""))
   (TeX-command-menu "LaTeXMk"))
+
+(defun sb/latex-compile-open-pdf ()
+  "Save the current buffer, run LaTeXMk, and switch to the PDF after a successful compilation."
+  (interactive)
+  (let ((TeX-save-query nil)
+        (process (TeX-active-process))
+        (TeX-process-asynchronous nil)
+        (master-file (TeX-master-file)))
+    (if process (delete-process process))
+    (TeX-save-document "")
+    (TeX-run-TeX "latexmk" "latexmk -pdf" master-file)
+    (if (plist-get TeX-error-report-switches (intern master-file))
+        (TeX-next-error t)
+      (progn
+        (minibuffer-message "LaTeXMk done")
+        (find-file (concat (file-name-directory (concat master-file ".tex"))
+                           (concat master-file ".pdf")))))))
 
 ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
 ;;   (add-hook hook
@@ -4449,11 +4441,11 @@ Ignore if no file is found."
 
 (with-eval-after-load "tex-mode"
   (defvar latex-mode-map)
-  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk latex-mode-map))
+  (bind-key "C-x C-s" #'sb/latex-compile-open-pdf latex-mode-map))
 
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
-  (bind-key "C-x C-s" #'sb/save-buffer-and-run-latexmk LaTeX-mode-map))
+  (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
 (use-package math-preview
   :commands (math-preview-all math-preview-at-point math-preview-region)
@@ -4506,11 +4498,6 @@ Ignore if no file is found."
   :ensure nil
   :commands mlir-mode
   :load-path "extras"
-  ;; Generates the following warning with `quelpa'
-  ;; "Warning (package): Unnecessary call to `package-initialize' in init file [3 times]"
-  ;; This will clone the llvm project
-  ;; :quelpa ((mlir-mode :fetcher github :repo "llvm/llvm-project"
-  ;;                     :files ("mlir/utils/emacs/mlir-mode.el")))
   :mode "\\.mlir\\'")
 
 (use-package clang-format
@@ -4571,7 +4558,7 @@ Ignore if no file is found."
   :commands (global-fasd-mode fasd-find-file)
   :init (run-with-idle-timer 3 nil #'global-fasd-mode)
   :config (setq fasd-enable-initial-prompt nil)
-  :bind ("C-c /" . fasd-find-file))
+  :bind* ("C-c /" . fasd-find-file))
 
 (use-package dotenv-mode
   :mode "\\.env\\'")
@@ -4877,7 +4864,7 @@ Ignore if no file is found."
     (server-start)))
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-(setenv "SHELL" "/bin/bash") ; Recommended to connect with bash
+(setenv "SHELL" shell-file-name) ; Recommended to connect with bash
 
 (use-package vterm
   :config
@@ -4891,9 +4878,525 @@ Ignore if no file is found."
 (use-package vterm-toggle
   :commands vterm-toggle)
 
-(require 'defuns)
-(require 'test-functions)
-(require 'keybindings)
+;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
+(defun sb/save-all-buffers ()
+  "Save all modified buffers without prompting."
+  (interactive)
+  (save-some-buffers t))
+
+;; http://endlessparentheses.com/implementing-comment-line.html
+(defun sb/comment-line (n)
+  "Comment or uncomment current line and leave point after it.
+With positive prefix, apply to N lines including current one.
+With negative prefix, apply to -N lines above.
+If region is active, apply to active region instead."
+  (interactive "p")
+  (if (use-region-p)
+      (comment-or-uncomment-region
+       (region-beginning) (region-end))
+    (let ((range
+           (list (line-beginning-position)
+                 (goto-char (line-end-position n)))))
+      (comment-or-uncomment-region
+       (apply #'min range)
+       (apply #'max range)))
+    (forward-line 1)
+    (back-to-indentation)))
+
+;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
+(defun sb/toggle-line-spacing ()
+  "Toggle line spacing.  Increase the line spacing to help readability.
+Increase line spacing by two line height."
+  (interactive)
+  (if (eq line-spacing nil)
+      (setq line-spacing 2)
+    (setq line-spacing nil))
+  (redraw-frame (selected-frame)))
+
+(defun sb/byte-compile-current-file ()
+  "Byte compile the current file."
+  (interactive)
+  (byte-compile-file buffer-file-name))
+
+;; http://emacsredux.com/blog/2013/06/25/boost-performance-by-leveraging-byte-compilation/
+(defun sb/byte-compile-init-dir ()
+  "Byte-compile all elisp files in the user init directory."
+  (interactive)
+  (byte-recompile-directory user-emacs-directory 0))
+
+;; https://github.com/thomasf/dotfiles-thomasf-emacs/blob/e14a7e857a89b7488ba5bdae54877abdc77fa9e6/emacs.d/init.el
+(defun sb/switch-to-minibuffer ()
+  "Switch to minibuffer window."
+  (interactive)
+  (if (active-minibuffer-window)
+      (select-window (active-minibuffer-window))
+    (error "Minibuffer is not active")))
+
+(defun sb/switch-to-scratch ()
+  "Switch to the *scratch* buffer."
+  (interactive)
+  (switch-to-buffer "*scratch*"))
+
+;; https://www.emacswiki.org/emacs/InsertDate
+(defun sb/insert-date (arg)
+  "Insert today's date.  With prefix argument ARG, use a different format."
+  (interactive "P")
+  (insert (if arg
+              (format-time-string "%d.%m.%Y")
+            (format-time-string "%\"Mmmm\" %d, %Y"))))
+
+;; http://zck.me/emacs-move-file
+(defun sb/move-file (new-location)
+  "Write this file to NEW-LOCATION, and delete the old one."
+  (interactive (list (if buffer-file-name
+                         (read-file-name "Move file to: ")
+                       (read-file-name "Move file to: "
+                                       default-directory
+                                       (expand-file-name (file-name-nondirectory (buffer-name))
+                                                         default-directory)))))
+  (when (file-exists-p new-location)
+    (delete-file new-location))
+  (let ((old-location (buffer-file-name)))
+    (write-file new-location t)
+    (when (and old-location
+               (file-exists-p new-location)
+               (not (string-equal old-location new-location)))
+      (delete-file old-location))))
+
+;; https://www.emacswiki.org/emacs/BuildTags
+(defun sb/create-ctags (dir-name)
+  "Create tags file with ctags in DIR-NAME."
+  (interactive "DDirectory: ")
+  (shell-command
+   (format "%s -f TAGS -eR %s" sb/ctags-path (directory-file-name dir-name))))
+
+;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
+(defun sb/counsel-all-files-recursively (dir-name)
+  "List all files recursively in DIR-NAME."
+  (interactive "DDirectory: ")
+  (let* ((cands (split-string
+                 (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
+    (ivy-read "File: " cands
+              :action #'find-file
+              :caller 'sb/counsel-all-files-recursively)))
+
+;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
+;; You need to check for either major modes or buffer names, since a few major modes are commonly
+;; used.
+(defcustom sb/skippable-buffers
+  '(
+    "TAGS" "*Messages*" "*Backtrace*" "*scratch*"
+    ;; "*company-documentation*" ; Major mode is `python-mode'
+    ;; "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*" "*Compile-Log* *lsp-log*"
+    ;; "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*" "*perl-language-server*"
+    ;; "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*"
+    ;; "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*"
+    ;; "*clangd::stderr*" "*shfmt errors*"
+    )
+  "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
+  :type  '(repeat string)
+  :group 'sb/emacs)
+
+;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
+(defun sb/get-buffer-major-mode (buffer-or-string)
+  "Return the major mode associated with BUFFER-OR-STRING."
+  (with-current-buffer buffer-or-string
+    major-mode))
+
+(defcustom sb/skippable-modes '(dired-mode fundamental-mode
+                                           helpful-mode
+                                           special-mode
+                                           paradox-menu-mode
+                                           lsp-log-io-mode
+                                           help-mode
+                                           magit-status-mode
+                                           magit-process-mode
+                                           magit-diff-mode
+                                           tags-table-mode
+                                           compilation-mode
+                                           flycheck-verify-mode
+                                           ibuffer-mode)
+  "List of major modes to skip over when calling `change-buffer'."
+  :type  '(repeat string)
+  :group 'sb/emacs)
+
+(defun sb/change-buffer (change-buffer)
+  "Call CHANGE-BUFFER.
+Keep trying until current buffer is not in `sb/skippable-buffers'
+or the major mode is not in `sb/skippable-modes'."
+  (let ((initial (current-buffer)))
+    (funcall change-buffer)
+    (let ((first-change (current-buffer)))
+      (catch 'loop
+        (while (or (member (buffer-name) sb/skippable-buffers)
+                   (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
+          (funcall change-buffer)
+          (when (eq (current-buffer) first-change)
+            (switch-to-buffer initial)
+            (throw 'loop t)))))))
+
+(defun sb/next-buffer ()
+  "Variant of `next-buffer' that skips `sb/skippable-buffers'."
+  (interactive)
+  (sb/change-buffer 'next-buffer))
+
+(defun sb/previous-buffer ()
+  "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
+  (interactive)
+  (sb/change-buffer 'previous-buffer))
+
+;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
+(defun sb/reinstall-package (package)
+  "Reinstall PACKAGE without restarting Emacs."
+  (interactive)
+  (unload-feature package)
+  (package-reinstall package)
+  (require package))
+
+;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
+(defun sb/get-derived-modes (mode)
+  "Return a list of the ancestor modes that MODE is derived from."
+  (let ((modes ())
+        (parent nil))
+    (while (setq parent (get mode 'derived-mode-parent))
+      (push parent modes)
+      (setq mode parent))
+    (setq modes (nreverse modes))))
+
+(defun sb/goto-line-with-feedback ()
+  "Show line numbers temporarily, while prompting for the line number input."
+  (interactive)
+  (unwind-protect
+      (progn
+        (linum-mode 1)
+        (forward-line (read-number "Goto line: ")))
+    (linum-mode -1)))
+
+(defun sb/open-local-file-projectile (directory)
+  "Open projectile file within DIRECTORY.
+Specify by the keyword projectile-default-file define in `dir-locals-file'"
+  (let ((default-file
+          (f-join directory
+                  (nth 1
+                       (car (-tree-map (lambda (node)
+                                         (when (eq (car node)
+                                                   'dotemacs-projectile-default-file)
+                                           (format "%s" (cdr node))))
+                                       (dir-locals-get-class-variables (dir-locals-read-from-dir
+                                                                        directory))))))))
+    (if (f-exists? default-file)
+        (counsel-find-file default-file)
+      (message "The file %s doesn't exist in the select project" default-file))))
+
+(defun sb/open-project-default-file1 (filepath)
+  "Open projectile file with FILEPATH.
+Specify by the keyword projectile-default-file define in `dir-locals-file'."
+  (let ((liststring (with-temp-buffer
+                      (insert-file-contents filepath)
+                      (split-string (buffer-string) "\n"))))
+    (mapcar (lambda (str)
+              (when (cl-search "dotemacs-projectile-default-file" str)
+                (let ((x (substring str (+
+                                         13 (length "dotemacs-projectile-default-file")) (length
+                                         str))))
+                  (let ((default-file (expand-file-name (substring
+                                                         x 1 -2) (projectile-project-root))))
+                    (when (f-exists? default-file)
+                      (let ((new-buffer (get-buffer-create default-file)))
+                        (switch-to-buffer new-buffer)
+                        (insert-file-contents default-file)))))))
+            liststring)))
+;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
+
+(defun sb/open-project-default-file2 ()
+  "Open projectile file with FILEPATH.
+Specify by the keyword projectile-default-file define in `dir-locals-file'."
+  (interactive)
+  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
+                                                 (projectile-project-root)))))
+    (mapcar (lambda (node)
+              (when (eq (car node) nil)
+                (let ((nillist (cdr node)))
+                  (mapcar (lambda (elem)
+                            (when (eq (car elem) 'dotemacs-projectile-default-file)
+                              (let ((default-file (expand-file-name (cdr elem)
+                                                                    (projectile-project-root))))
+                                (when (f-exists? default-file)
+                                  ;; (let ((new-buffer (get-buffer-create default-file)))
+                                  ;;   (switch-to-buffer new-buffer)
+                                  ;;   (insert-file-contents default-file))
+                                  (find-file default-file)))))
+                          nillist))))
+            mylist)))
+
+;; (sb/open-project-default-file2)
+
+;; (with-eval-after-load "counsel-projectile"
+;;   (add-to-list 'counsel-projectile-action '("d"
+;;     sb/open-project-default-file2 "open default file") t))
+
+(add-to-list 'term-file-aliases '("alacritty" . "xterm"))
+
+(declare-function sb/comment-line "defuns")
+(declare-function sb/save-all-buffers "defuns")
+(declare-function sb/previous-buffer "defuns")
+(declare-function sb/next-buffer "defuns")
+(declare-function sb/switch-to-scratch "defuns")
+
+(bind-keys
+ ("RET"       . newline-and-indent)
+ ("C-l"       . goto-line)
+ ("C-c z"     . repeat)
+ ("C-z"       . undo)
+ ;; Conflicts with Gnome window manager keybindings
+ ;; ("<f11>"     . delete-other-windows)
+ ("C-x k"     . kill-this-buffer)
+ ("M-<left>"  . previous-buffer)
+ ("C-S-<tab>" . previous-buffer)
+ ("M-<right>" . next-buffer)
+ ("C-<tab>"   . next-buffer)
+ ("C-c d f"   . auto-fill-mode)
+ ("M-c"       . capitalize-dwim)
+ ("M-u"       . upcase-dwim)
+ ("M-l"       . downcase-dwim)
+ ("<f7>"      . previous-error)
+ ("<f8>"      . next-error)
+ ;; The default keybinding `C-S-backspace' does not work with TUI
+ ("M-k"       . kill-whole-line))
+
+;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
+;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
+(bind-keys*
+ ("C-c n" . comment-region)
+ ("C-c m" . uncomment-region)
+ ("C-c ;" . sb/comment-line)
+ ("C-c b" . comment-box)
+ ("C-s"   . save-buffer)
+ ("C-S-s" . sb/save-all-buffers))
+
+(unbind-key "C-]") ; Bound to `abort-recursive-edit'
+
+(unbind-key "C-x s") ; Bound to `save-some-buffers'
+(bind-key   "C-x s" #'sb/switch-to-scratch)
+(bind-key   "C-x j" #'sb/counsel-all-files-recursively)
+
+(global-set-key [remap next-buffer]     #'sb/next-buffer)
+(global-set-key [remap previous-buffer] #'sb/previous-buffer)
+
+(use-package default-text-scale
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
+
+(use-package free-keys
+  :commands free-keys)
+
+(use-package which-key ; Show help popups for prefix keys
+  :diminish
+  :commands (which-key-mode which-key-setup-side-window-right-bottom)
+  :init (run-with-idle-timer 3 nil #'which-key-mode)
+  :config
+  (which-key-setup-side-window-right-bottom)
+  ;; Allow C-h to trigger which-key before it is done automatically
+  (setq which-key-show-early-on-C-h t
+        which-key-sort-order 'which-key-key-order-alpha))
+
+(use-package which-key-posframe
+  :commands which-key-posframe-mode
+  :hook (which-key-mode . which-key-posframe-mode)
+  :config
+  ;; The posframe has a low contrast
+  ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
+  ;; Positioning the frame at the top obstructs the view to a lesser degree
+  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
+
+;; Hydras
+
+(declare-function spell-fu-goto-next-error "spell-fu")
+(declare-function spell-fu-goto-previous-error "spell-fu")
+
+;; `:exit t' will quit the hydra
+(defhydra sb/hydra-spelling (:color blue)
+  "
+  ^
+  ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
+  ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
+  _q_ quit            _<_ previous        _c_ correction        _n_ next error
+  ^^                  _>_ next            _d_ dictionary        _p_ previous error
+  ^^                  _f_ check           _m_ mode              _a_ add word
+  ^^                  ^^                  ^^                    ^^
+  "
+  ("q" nil "quit")
+  ("<" flyspell-correct-previous :color pink)
+  (">" flyspell-correct-next :color pink)
+  ("c" ispell)
+  ("d" ispell-change-dictionary)
+  ("f" flyspell-buffer)
+  ("m" flyspell-mode)
+  ("n" spell-fu-goto-next-error)
+  ("p" spell-fu-goto-previous-error)
+  ("a" spell-fu-word-add))
+
+(defhydra sb/hydra-text-scale-zoom ()
+  "Zoom the text"
+  ("i" default-text-scale-increase "in")
+  ("o" default-text-scale-decrease "out")
+  ("q" nil "quit"))
+
+(defhydra sb/hydra-error (global-map "C-c h e")
+  "goto-error"
+  ("h" first-error "first")
+  ("j" next-error "next")
+  ("k" previous-error "prev")
+  ("v" recenter-top-bottom "recenter")
+  ("q" nil "quit"))
+
+;; https://github.com/abo-abo/hydra/wiki/avy
+(defhydra sb/hydra-avy (:exit t :hint nil)
+  "
+ Line^^       Region^^        Goto
+----------------------------------------------------------
+ [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
+ [_m_] move   [_M_] move      [_w_] word        [_W_] any word
+ [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
+  ("c" avy-goto-char-timer)
+  ("C" avy-goto-char)
+  ("w" avy-goto-word-1)
+  ("W" avy-goto-word-0)
+  ("l" avy-goto-line)
+  ("L" avy-goto-end-of-line)
+  ("m" avy-move-line)
+  ("M" avy-move-region)
+  ("k" avy-kill-whole-line)
+  ("K" avy-kill-region)
+  ("y" avy-copy-line)
+  ("Y" avy-copy-region))
+
+(defhydra sb/hydra-projectile (:color teal :hint nil)
+  "
+     PROJECTILE: %(projectile-project-root)
+
+     Find File            Search/Tags          Buffers                Cache
+------------------------------------------------------------------------------------------
+_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
+ _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
+ _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
+  _r_: recent file                                               ^^^^_z_: cache current
+  _d_: dir
+"
+  ("b"   projectile-switch-to-buffer)
+  ("c"   projectile-invalidate-cache)
+  ("d"   projectile-find-dir)
+  ("s-f" projectile-find-file)
+  ("ff"  projectile-find-file-dwim)
+  ("fd"  projectile-find-file-in-directory)
+  ("i"   projectile-ibuffer)
+  ("K"   projectile-kill-buffers)
+  ("s-k" projectile-kill-buffers)
+  ("m"   projectile-multi-occur)
+  ("o"   projectile-multi-occur)
+  ("s-p" projectile-switch-project "switch project")
+  ("p"   projectile-switch-project)
+  ("s"   projectile-switch-project)
+  ("r"   projectile-recentf)
+  ("x"   projectile-remove-known-project)
+  ("X"   projectile-cleanup-known-projects)
+  ("z"   projectile-cache-current-file)
+  ("a"   projectile-ag)
+  ("g"   projectile-find-tag)
+  ("q"   nil "cancel" :color blue))
+
+
+(declare-function flycheck-verify-setup "flycheck")
+(declare-function flycheck-previous-error "flycheck")
+(declare-function flycheck-next-error "flycheck")
+(declare-function flycheck-list-errors "flycheck")
+(declare-function flycheck-select-checker "flycheck")
+(declare-function flycheck-describe-checker "flycheck")
+(declare-function flycheck-disable-checker "flycheck")
+(declare-function flycheck-buffer "flycheck")
+
+(defhydra sb/hydra-flycheck (:color blue)
+  "
+  ^
+  ^Flycheck^          ^Errors^            ^Checker^
+  ^────────^──────────^──────^────────────^───────^─────
+  _q_ quit            _<_ previous        _?_ describe
+  _M_ manual          _>_ next            _d_ disable
+  _v_ verify setup    _f_ check           _m_ mode
+  ^^                  _l_ list            _s_ select
+  ^^                  ^^                  ^^
+  "
+  ("q" nil)
+  ("<" flycheck-previous-error :color pink)
+  (">" flycheck-next-error :color pink)
+  ("?" flycheck-describe-checker)
+  ("M" flycheck-manual)
+  ("d" flycheck-disable-checker)
+  ("f" flycheck-buffer)
+  ("l" flycheck-list-errors)
+  ("m" flycheck-mode)
+  ("s" flycheck-select-checker)
+  ("v" flycheck-verify-setup))
+
+(defvar python-mode-map)
+
+(with-eval-after-load "python"
+  (defhydra sb/hydra-python-indent (python-mode-map "C-c")
+    "Adjust Python indentation."
+    (">" python-indent-shift-right "right")
+    ("<" python-indent-shift-left "left")))
+
+(defhydra sb/smerge-hydra
+  (:color pink :hint nil :post (smerge-auto-leave))
+  "
+^Move^       ^Keep^               ^Diff^                 ^Other^
+^^-----------^^-------------------^^---------------------^^-------
+_n_ext       _b_ase               _<_: upper/base        _C_ombine
+_p_rev       _u_pper              _=_: upper/lower       _r_esolve
+^^           _l_ower              _>_: base/lower        _k_ill current
+^^           _a_ll                _R_efine
+^^           _RET_: current       _E_diff
+"
+  ("n" smerge-next)
+  ("p" smerge-prev)
+  ("b" smerge-keep-base)
+  ("u" smerge-keep-upper)
+  ("l" smerge-keep-lower)
+  ("a" smerge-keep-all)
+  ("RET" smerge-keep-current)
+  ("\C-m" smerge-keep-current)
+  ("<" smerge-diff-base-upper)
+  ("=" smerge-diff-upper-lower)
+  (">" smerge-diff-base-lower)
+  ("R" smerge-refine)
+  ("E" smerge-ediff)
+  ("C" smerge-combine-with-next)
+  ("r" smerge-resolve)
+  ("k" smerge-kill-current)
+  ("q" nil "cancel" :color blue))
+
+(defhydra multiple-cursors-hydra (:hint nil)
+  "
+   ^Up^            ^Down^        ^Other^
+----------------------------------------------
+[_p_]   Next    [_n_]   Next    [_l_] Edit lines
+[_P_]   Skip    [_N_]   Skip    [_a_] Mark all
+[_M-p_] Unmark  [_M-n_] Unmark  [_r_] Mark by regexp
+^ ^             ^ ^             [_q_] Quit
+"
+  ("l" mc/edit-lines :exit t)
+  ("a" mc/mark-all-like-this :exit t)
+  ("n" mc/mark-next-like-this)
+  ("N" mc/skip-to-next-like-this)
+  ("M-n" mc/unmark-next-like-this)
+  ("p" mc/mark-previous-like-this)
+  ("P" mc/skip-to-previous-like-this)
+  ("M-p" mc/unmark-previous-like-this)
+  ("r" mc/mark-all-in-region-regexp :exit t)
+  ("q" nil))
+
+(global-set-key (kbd "C-c m") #'multiple-cursors-hydra/body)
 
 ;; Mark safe variables
 
