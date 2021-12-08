@@ -812,7 +812,6 @@ This location is used for temporary installations and files.")
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
-;; (set-frame-font "Roboto Mono")
 
 ;; https://github.com/wandersoncferreira/dotfiles
 ;; (when (member "Monaco" (font-family-list))
@@ -933,12 +932,11 @@ This location is used for temporary installations and files.")
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
   :bind
-  (("C-x C-j"  . dired-jump)
-   :map dired-mode-map
-   ("M-<home>" . sb/dired-go-home)
-   ("M-<up>"   . sb/dired-jump-to-top)
-   ("M-<down>" . sb/dired-jump-to-bottom)
-   ("i"        . find-file))
+  (:map dired-mode-map
+        ("M-<home>" . sb/dired-go-home)
+        ("M-<up>"   . sb/dired-jump-to-top)
+        ("M-<down>" . sb/dired-jump-to-bottom)
+        ("i"        . find-file))
   :hook
   ;; Auto refresh dired when files change
   (dired-mode . auto-revert-mode)
@@ -960,9 +958,10 @@ This location is used for temporary installations and files.")
   :defines dired-cleanup-buffers-too
   :commands (dired-omit-mode)
   :hook (dired-mode . dired-omit-mode)
+  :bind ("C-x C-j"  . dired-jump)
   :config
   (setq dired-cleanup-buffers-too t
-        ;; dired-bind-jump t
+        dired-bind-jump t
         ;; Do not show messages when omitting files
         dired-omit-verbose nil)
 
