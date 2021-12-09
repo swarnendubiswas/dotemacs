@@ -25,7 +25,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'none
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -43,7 +43,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-operandi
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -58,7 +58,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'none
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -685,11 +685,15 @@ This location is used for temporary installations and files.")
 
   (modus-themes-load-themes)
   :config
-  (cond
-   ((or (eq sb/gui-theme 'modus-operandi)
-        (eq sb/tui-theme 'modus-operandi)) (modus-themes-load-operandi))
-   ((or (eq sb/gui-theme 'modus-vivendi)
-        (eq sb/tui-theme 'modus-vivendi)) (modus-themes-load-vivendi))))
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'modus-operandi) (modus-themes-load-operandi))
+     ((eq sb/gui-theme 'modus-vivendi) (modus-themes-load-vivendi))))
+
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'modus-operandi) (modus-themes-load-operandi))
+     ((eq sb/gui-theme 'modus-vivendi) (modus-themes-load-vivendi)))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -1034,24 +1038,21 @@ This location is used for temporary installations and files.")
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
-  :commands (treemacs-current-workspace treemacs--find-current-user-project
-                                        treemacs-do-add-project-to-workspace
-                                        treemacs-add-project-to-workspace
-                                        treemacs-git-mode
-                                        treemacs-follow-mode
-                                        treemacs-fringe-indicator-mode
-                                        treemacs-filewatch-mode
-                                        treemacs-goto-file-node
-                                        treemacs--propagate-new-icons
-                                        treemacs-scope->current-scope
-                                        treemacs--restore-eldoc-after-log
-                                        treemacs-load-theme
-                                        treemacs-find-file-node
-                                        treemacs-resize-icons
-                                        treemacs-select-window
-                                        treemacs-add-and-display-current-project
-                                        treemacs-display-current-project-exclusively
-                                        projectile-project-p)
+  :commands (treemacs-current-workspace
+             treemacs--find-current-user-project
+             treemacs-do-add-project-to-workspace
+             treemacs-add-project-to-workspace treemacs-git-mode
+             treemacs-follow-mode treemacs-fringe-indicator-mode
+             treemacs-filewatch-mode treemacs-goto-file-node
+             treemacs--propagate-new-icons
+             treemacs-scope->current-scope
+             treemacs--restore-eldoc-after-log
+             treemacs-load-theme treemacs-find-file-node
+             treemacs-indent-guide-mode treemacs-resize-icons
+             treemacs-select-window
+             treemacs-add-and-display-current-project
+             treemacs-display-current-project-exclusively
+             projectile-project-p)
   :preface
   ;; The problem is there is no toggle support.
   (defun sb/setup-treemacs-quick ()
@@ -5211,11 +5212,17 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 
 ;; Hydras
 
-(declare-function spell-fu-goto-next-error "spell-fu")
-(declare-function spell-fu-goto-previous-error "spell-fu")
+;; https://github.com/abo-abo/hydra
+;; `:exit nil' means the hydra state will continue, `:exit t' will quit the hydra. `:color red'
+;; means continue the hydra on a valid key but stop when a foreign key has been pressed. `:color
+;; blue' means exit.
 
-;; `:exit t' will quit the hydra
-(defhydra sb/hydra-spelling (:color blue)
+(setq lv-use-separator t)
+
+;; (declare-function spell-fu-goto-next-error "spell-fu")
+;; (declare-function spell-fu-goto-previous-error "spell-fu")
+
+(defhydra sb/hydra-spelling (:color amaranth)
   "
   ^
   ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
@@ -5225,25 +5232,25 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   ^^                  _f_ check           _m_ mode              _a_ add word
   ^^                  ^^                  ^^                    ^^
   "
-  ("q" nil "quit")
-  ("<" flyspell-correct-previous :color pink)
-  (">" flyspell-correct-next :color pink)
+  ("<" flyspell-correct-previous)
+  (">" flyspell-correct-next)
   ("c" ispell)
   ("d" ispell-change-dictionary)
   ("f" flyspell-buffer)
   ("m" flyspell-mode)
   ("n" spell-fu-goto-next-error)
   ("p" spell-fu-goto-previous-error)
-  ("a" spell-fu-word-add))
+  ("a" spell-fu-word-add)
+  ("q" nil "quit"))
 
-(defhydra sb/hydra-text-scale-zoom ()
+(defhydra sb/hydra-text-scale-zoom (:color amaranth)
   "Zoom the text"
   ("i" default-text-scale-increase "in")
   ("o" default-text-scale-decrease "out")
   ("q" nil "quit"))
 
-(defhydra sb/hydra-error (global-map "C-c h e")
-  "goto-error"
+(defhydra sb/hydra-error (:color amaranth)
+  "Navigate errors"
   ("h" first-error "first")
   ("j" next-error "next")
   ("k" previous-error "prev")
@@ -5251,10 +5258,10 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   ("q" nil "quit"))
 
 ;; https://github.com/abo-abo/hydra/wiki/avy
-(defhydra sb/hydra-avy (:exit t :hint nil)
+(defhydra sb/hydra-avy (:color red)
   "
- Line^^       Region^^        Goto
-----------------------------------------------------------
+  Line^^       Region^^        Goto
+----------------------------------q------------------------
  [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
  [_m_] move   [_M_] move      [_w_] word        [_W_] any word
  [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
@@ -5271,7 +5278,7 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   ("y" avy-copy-line)
   ("Y" avy-copy-region))
 
-(defhydra sb/hydra-projectile (:color teal :hint nil)
+(defhydra sb/hydra-projectile (:color teal :hint nil global-map "C-c p")
   "
      PROJECTILE: %(projectile-project-root)
 
@@ -5303,17 +5310,21 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   ("z"   projectile-cache-current-file)
   ("a"   projectile-ag)
   ("g"   projectile-find-tag)
-  ("q"   nil "cancel" :color blue))
+  ("q"   nil "cancel"))
 
+(defhydra sb/hydra-move-text ()
+  "Move text"
+  ("u" move-text-up "up")
+  ("d" move-text-down "down"))
 
-(declare-function flycheck-verify-setup "flycheck")
-(declare-function flycheck-previous-error "flycheck")
-(declare-function flycheck-next-error "flycheck")
-(declare-function flycheck-list-errors "flycheck")
-(declare-function flycheck-select-checker "flycheck")
-(declare-function flycheck-describe-checker "flycheck")
-(declare-function flycheck-disable-checker "flycheck")
-(declare-function flycheck-buffer "flycheck")
+;; (declare-function flycheck-verify-setup "flycheck")
+;; (declare-function flycheck-previous-error "flycheck")
+;; (declare-function flycheck-next-error "flycheck")
+;; (declare-function flycheck-list-errors "flycheck")
+;; (declare-function flycheck-select-checker "flycheck")
+;; (declare-function flycheck-describe-checker "flycheck")
+;; (declare-function flycheck-disable-checker "flycheck")
+;; (declare-function flycheck-buffer "flycheck")
 
 (defhydra sb/hydra-flycheck (:color blue)
   "
@@ -5344,7 +5355,9 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
   (defhydra sb/hydra-python-indent (python-mode-map "C-c")
     "Adjust Python indentation."
     (">" python-indent-shift-right "right")
-    ("<" python-indent-shift-left "left")))
+    ("<" python-indent-shift-left "left"))
+
+  (bind-key "C-c" #'sb/hydra-python-indent/body))
 
 (defhydra sb/smerge-hydra
   (:color pink :hint nil :post (smerge-auto-leave))
@@ -5375,7 +5388,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   ("k" smerge-kill-current)
   ("q" nil "cancel" :color blue))
 
-(defhydra multiple-cursors-hydra (:hint nil)
+(defhydra sb/hydra-multiple-cursors (:hint nil)
   "
    ^Up^            ^Down^        ^Other^
 ----------------------------------------------
@@ -5395,7 +5408,133 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   ("r" mc/mark-all-in-region-regexp :exit t)
   ("q" nil))
 
-(global-set-key (kbd "C-c m") #'multiple-cursors-hydra/body)
+(defhydra sb/hydra-smartparens (:hint nil)
+  "
+ Moving^^^^                       Slurp & Barf^^   Wrapping^^            Sexp juggling^^^^               Destructive
+------------------------------------------------------------------------------------------------------------------------
+ [_a_] beginning  [_n_] down      [_h_] bw slurp   [_R_]   rewrap        [_S_] split   [_t_] transpose   [_c_] change inner  [_w_] copy
+ [_e_] end        [_N_] bw down   [_H_] bw barf    [_u_]   unwrap        [_s_] splice  [_A_] absorb      [_C_] change outer
+ [_f_] forward    [_p_] up        [_l_] slurp      [_U_]   bw unwrap     [_r_] raise   [_E_] emit        [_k_] kill          [_g_] quit
+ [_b_] backward   [_P_] bw up     [_L_] barf       [_(__{__[_] wrap (){}[]   [_j_] join    [_o_] convolute   [_K_] bw kill       [_q_] quit"
+  ;; Moving
+  ("a" sp-beginning-of-sexp)
+  ("e" sp-end-of-sexp)
+  ("f" sp-forward-sexp)
+  ("b" sp-backward-sexp)
+  ("n" sp-down-sexp)
+  ("N" sp-backward-down-sexp)
+  ("p" sp-up-sexp)
+  ("P" sp-backward-up-sexp)
+
+  ;; Slurping & barfing
+  ("h" sp-backward-slurp-sexp)
+  ("H" sp-backward-barf-sexp)
+  ("l" sp-forward-slurp-sexp)
+  ("L" sp-forward-barf-sexp)
+
+  ;; Wrapping
+  ("R" sp-rewrap-sexp)
+  ("u" sp-unwrap-sexp)
+  ("U" sp-backward-unwrap-sexp)
+  ("(" sp-wrap-round)
+  ("{" sp-wrap-curly)
+  ("[" sp-wrap-square)
+
+  ;; Sexp juggling
+  ("S" sp-split-sexp)
+  ("s" sp-splice-sexp)
+  ("r" sp-raise-sexp)
+  ("j" sp-join-sexp)
+  ("t" sp-transpose-sexp)
+  ("A" sp-absorb-sexp)
+  ("E" sp-emit-sexp)
+  ("o" sp-convolute-sexp)
+
+  ;; Destructive editing
+  ("c" sp-change-inner :exit t)
+  ("C" sp-change-enclosing :exit t)
+  ("k" sp-kill-sexp)
+  ("K" sp-backward-kill-sexp)
+  ("w" sp-copy-sexp)
+
+  ("q" nil)
+  ("g" nil))
+
+(defhydra sb/hydra-lsp (:exit t :hint nil)
+  "
+ Buffer^^               Server^^                   Symbol
+-------------------------------------------------------------------------------------
+ [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+ [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+ [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
+  ("d" lsp-find-declaration)
+  ("D" lsp-ui-peek-find-definitions)
+  ("R" lsp-ui-peek-find-references)
+  ("i" lsp-ui-peek-find-implementation)
+  ("t" lsp-find-type-definition)
+  ("s" lsp-signature-help)
+  ("o" lsp-describe-thing-at-point)
+  ("r" lsp-rename)
+
+  ("f" lsp-format-buffer)
+  ("m" lsp-ui-imenu)
+  ("x" lsp-execute-code-action)
+
+  ("M-s" lsp-describe-session)
+  ("M-r" lsp-restart-workspace)
+  ("S" lsp-shutdown-workspace))
+
+(defhydra sb/hydra-markdown-mode (:hint nil)
+  "
+Formatting        C-c C-s    _s_: bold          _e_: italic     _b_: blockquote   _p_: pre-formatted    _c_: code
+
+Headings          C-c C-t    _h_: automatic     _1_: h1         _2_: h2           _3_: h3               _4_: h4
+
+Lists             C-c C-x    _m_: insert item
+
+Demote/Promote    C-c C-x    _l_: promote       _r_: demote     _u_: move up      _d_: move down
+
+Links, footnotes  C-c C-a    _L_: link          _U_: uri        _F_: footnote     _W_: wiki-link      _R_: reference
+
+"
+
+  ("s" markdown-insert-bold)
+  ("e" markdown-insert-italic)
+  ("b" markdown-insert-blockquote :color blue)
+  ("p" markdown-insert-pre :color blue)
+  ("c" markdown-insert-code)
+
+  ("h" markdown-insert-header-dwim)
+  ("1" markdown-insert-header-atx-1)
+  ("2" markdown-insert-header-atx-2)
+  ("3" markdown-insert-header-atx-3)
+  ("4" markdown-insert-header-atx-4)
+
+  ("m" markdown-insert-list-item)
+
+  ("l" markdown-promote)
+  ("r" markdown-demote)
+  ("d" markdown-move-down)
+  ("u" markdown-move-up)
+
+  ("L" markdown-insert-link :color blue)
+  ("U" markdown-insert-uri :color blue)
+  ("F" markdown-insert-footnote :color blue)
+  ("W" markdown-insert-wiki-link :color blue)
+  ("R" markdown-insert-reference-link-dwim :color blue))
+
+(bind-key "C-c h a" #'sb/hydra-avy/body)
+(bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
+(bind-key "C-c h e" #'sb/hydra-error/body)
+(bind-key "C-c h f" #'sb/hydra-flycheck/body)
+(bind-key "C-c h g" #'sb/smerge-hydra/body)
+(bind-key "C-c h j" #'sb/hydra-projectile/body)
+(bind-key "C-c h l" #'sb/hydra-lsp/body)
+(bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
+(bind-key "C-c h p" #'sb/hydra-smartparens/body)
+(bind-key "C-c h s" #'sb/hydra-spelling/body)
+(bind-key "C-c h t" #'sb/hydra-move-text/body)
+(bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
 
 ;; Mark safe variables
 

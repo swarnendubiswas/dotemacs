@@ -6,11 +6,11 @@
 ;; Maintainer: Drew Adams (concat "drew.adams" "@" "oracle" ".com")
 ;; Copyright (C) 1999-2021, Drew Adams, all rights reserved.
 ;; Created: Fri Mar 19 15:58:58 1999
-;; Version: 2021.06.21
+;; Version: 2021.10.03
 ;; Package-Requires: ()
-;; Last-Updated: Thu Sep 23 14:48:00 2021 (-0700)
+;; Last-Updated: Tue Nov 30 14:07:33 2021 (-0800)
 ;;           By: dradams
-;;     Update #: 13033
+;;     Update #: 13044
 ;; URL: https://www.emacswiki.org/emacs/download/dired%2b.el
 ;; Doc URL: https://www.emacswiki.org/emacs/DiredPlus
 ;; Keywords: unix, mouse, directories, diredp, dired
@@ -648,6 +648,7 @@
 ;;    `diredp-prompt-for-bookmark-prefix-flag',
 ;;    `diredp-recent-files-quit-kills-flag',
 ;;    `diredp-switches-in-mode-line',
+;;    `diredp-toggle-dot+dot-dot-flag',
 ;;    `diredp-visit-ignore-extensions', `diredp-visit-ignore-regexps',
 ;;    `diredp-w32-local-drives', `diredp-wrap-around-flag'.
 ;;
@@ -879,6 +880,12 @@
 ;;
 ;;; Change Log:
 ;;
+;; 2021/11/30 dadams
+;;     diredp-do-apply/eval-marked-recursive:
+;;       Typo in body: current-prefix-arg -> arg.  Corrected first argument to diredp-get-files.
+;; 2021/10/03 dadams
+;;     Added: diredp-toggle-dot+dot-dot-flag.
+;;     dired-toggle-marks: Added optional arg FLIP.  Respect diredp-toggle-dot+dot-dot-flag.
 ;; 2021/09/23 dadams
 ;;     diredp-menu-bar-multiple-menu: Removed items that are anyway on Apply (Map) submenu.
 ;; 2021/07/22 dadams
@@ -2701,6 +2708,11 @@ Possible values:
           (const    :tag "Show full switches"                    as-is)
           (integer  :tag "Show first N chars of switches" :value 10)
           (function :tag "Format with function"           :value identity)))
+
+;;;###autoload
+(defcustom diredp-toggle-dot+dot-dot-flag t
+  "Non-nil means `dired-toggle-marks' acts also on `.' and `..'."
+  :type 'boolean :group 'Dired-Plus)
 
 ;;;###autoload
 (defcustom diredp-visit-ignore-extensions '("elc")
@@ -7782,7 +7794,7 @@ When called from Lisp:
                                     (and (boundp 'function-name-history)  'function-name-history))))
            current-prefix-arg
            diredp-list-file-attributes)))
-  (let ((use-no-args-p  (and (consp current-prefix-arg)  (< (car current-prefix-arg) 16))))
+  (let ((use-no-args-p  (and (consp arg)  (< (car arg) 16))))
     (if use-no-args-p
         (when (functionp fun/sexp)
           (unless (or (not (fboundp 'func-arity)) ; Emacs < 26
@@ -7792,7 +7804,7 @@ When called from Lisp:
                   (let ((max  (cdr (func-arity fun/sexp))))
                     (or (eq max 'many)  (> max 0))))
         (error "Function `%s' cannot accept any args" fun/sexp))) ; Function to apply to file name.
-    (let* ((files     (diredp-get-files arg nil nil nil nil details)) ; @@@@ is ARG correct here? Copied from 
+    (let* ((files     (diredp-get-files (and (not use-no-args-p)  arg) nil nil nil nil details))
            (fbufs     (delq nil (mapcar #'find-buffer-visiting files)))
            (mod-bufs  (diredp-remove-if-not #'buffer-modified-p fbufs))
            (new-bufs  ())
@@ -12124,23 +12136,30 @@ Non-file lines are skipped."
 
 ;; REPLACE ORIGINAL in `dired.el':
 ;;
-;; Toggle also `.' and `..'.  See bug #48883.
+;; Toggle also `.' and `..', according to option `diredp-toggle-dot+dot-dot-flag'.
+;; See also Emacs bug #48883.
 ;;
-(defun dired-toggle-marks ()
+(defun dired-toggle-marks (&optional flip)
   "Toggle marks: marked files become unmarked, and vice versa.
 Marks (such as `C' and `D') other than `*' are not affected.
-Hidden subdirs are also not affected."
-  (interactive)
+Hidden subdirs are also not affected.
+
+Whether `.' and `..' are toggled is controlled by option
+`diredp-toggle-dot+dot-dot-flag'.  A prefix arg acts as if the option
+had the opposite value."
+  (interactive "P")
   (save-excursion
     (goto-char (point-min))
-    (let ((inhibit-read-only  t))
+    (let ((inhibit-read-only     t))
       (while (not (eobp))
         (or (dired-between-files)
-            ;; Use subst instead of insdel because it does not move the gap and thus should be faster and because
-            ;; other characters are left alone automatically
-            (apply 'subst-char-in-region (point) (1+ (point)) (if (eq ?\   (following-char)) ; SPC
-                                                                  (list ?\   dired-marker-char)
-                                                                (list dired-marker-char ?\  ))))
+            (and (if flip diredp-toggle-dot+dot-dot-flag (not diredp-toggle-dot+dot-dot-flag))
+                 (member (dired-get-filename t t) '("." "..")))
+            (apply 'subst-char-in-region (point)
+                   (1+ (point))
+                   (if (eq ?\   (following-char))
+                       (list ?\   dired-marker-char)
+                     (list dired-marker-char ?\  ))))
         (forward-line 1)))))
 
 
