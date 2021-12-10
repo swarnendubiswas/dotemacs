@@ -1724,22 +1724,13 @@ This location is used for temporary installations and files.")
   :config
   (defvar ivy-re-builders-alist)
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))
-        completion-styles '(orderless))
+        completion-styles '(orderless)
+        ;; completion-styles '(orderless initials basic partial-completion emacs22)
+        orderless-matching-styles '(orderless-regexp))
 
-  ;; (setq completion-styles '(orderless initials basic partial-completion emacs22)
-  ;;       orderless-component-separator 'orderless-escapable-split-on-space
-  ;;       completion-category-defaults nil
-  ;;       completion-category-overrides '((file (styles partial-completion))
-  ;;   				                    (minibuffer (initials))))
-
-  ;; (declare-function sb/just-one-face "init-use-package")
-
-  ;; (defun sb/just-one-face (fn &rest args)
-  ;;   (let ((orderless-match-faces [completions-common-part]))
-  ;;     (apply fn args)))
-
-  ;; (advice-add 'company-capf--candidates :around #'just-one-face)
-
+  ;;  completion-category-defaults nil
+  ;;  completion-category-overrides '((file (styles partial-completion))
+  ;;                                  (minibuffer (initials))))
   )
 
 (use-package ispell
@@ -5224,38 +5215,38 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 
 (defhydra sb/hydra-spelling (:color amaranth)
   "
-  ^
-  ^Spelling^          ^Errors^            ^Checker^             ^Spell fu^
-  ^────────^──────────^──────^────────────^───────^─────────────^────────^────────
-  _q_ quit            _<_ previous        _c_ correction        _n_ next error
-  ^^                  _>_ next            _d_ dictionary        _p_ previous error
-  ^^                  _f_ check           _m_ mode              _a_ add word
-  ^^                  ^^                  ^^                    ^^
+  ^Spell Check^          ^Errors^            ^Spell fu^
+  ^────────^──────────^──────^────────────^───────^─────────────^
+  _c_ ispell            _<_ previous         _p_ previous error
+  _f_ flyspell          _>_ next             _n_ next error
+  _q_ quit              ^^                   _a_ add word
   "
+  ("c" ispell)
+  ("f" flyspell-buffer)
+
   ("<" flyspell-correct-previous)
   (">" flyspell-correct-next)
-  ("c" ispell)
-  ("d" ispell-change-dictionary)
-  ("f" flyspell-buffer)
-  ("m" flyspell-mode)
+
   ("n" spell-fu-goto-next-error)
   ("p" spell-fu-goto-previous-error)
   ("a" spell-fu-word-add)
+
   ("q" nil "quit"))
 
 (defhydra sb/hydra-text-scale-zoom (:color amaranth)
   "Zoom the text"
   ("i" default-text-scale-increase "in")
   ("o" default-text-scale-decrease "out")
+
   ("q" nil "quit"))
 
-(defhydra sb/hydra-error (:color amaranth)
-  "Navigate errors"
-  ("h" first-error "first")
-  ("j" next-error "next")
-  ("k" previous-error "prev")
-  ("v" recenter-top-bottom "recenter")
-  ("q" nil "quit"))
+;; (defhydra sb/hydra-error (:color amaranth)
+;;   "Navigate errors"
+;;   ("h" first-error "first")
+;;   ("j" next-error "next")
+;;   ("k" previous-error "prev")
+;;   ("v" recenter-top-bottom "recenter")
+;;   ("q" nil "quit"))
 
 ;; https://github.com/abo-abo/hydra/wiki/avy
 (defhydra sb/hydra-avy (:color red)
@@ -5265,51 +5256,56 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
  [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
  [_m_] move   [_M_] move      [_w_] word        [_W_] any word
  [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
-  ("c" avy-goto-char-timer)
-  ("C" avy-goto-char)
-  ("w" avy-goto-word-1)
-  ("W" avy-goto-word-0)
-  ("l" avy-goto-line)
-  ("L" avy-goto-end-of-line)
-  ("m" avy-move-line)
-  ("M" avy-move-region)
-  ("k" avy-kill-whole-line)
-  ("K" avy-kill-region)
+
   ("y" avy-copy-line)
-  ("Y" avy-copy-region))
+  ("m" avy-move-line)
+  ("k" avy-kill-whole-line)
+
+  ("Y" avy-copy-region)
+  ("M" avy-move-region)
+  ("K" avy-kill-region)
+
+  ("c" avy-goto-char-timer)
+  ("w" avy-goto-word-1)
+  ("l" avy-goto-line)
+
+  ("C" avy-goto-char)
+  ("W" avy-goto-word-0)
+  ("L" avy-goto-end-of-line))
 
 (defhydra sb/hydra-projectile (:color teal :hint nil global-map "C-c p")
   "
      PROJECTILE: %(projectile-project-root)
 
-     Find File            Search/Tags          Buffers                Cache
-------------------------------------------------------------------------------------------
-_s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache clear
- _ff_: file dwim       _g_: find tags      _b_: switch to buffer  _x_: remove known project
- _fd_: file curr dir   _o_: multi-occur     _s-k_: Kill all buffers  _X_: cleanup non-existing
-  _r_: recent file                                               ^^^^_z_: cache current
-  _d_: dir
+  Project                    Find File             Buffers                  Misc
+-----------------------------------------------------------------------------------------------------------
+  _p_: switch project        _f_: find file        _i_: ibuffer           _c_: invalidate cache
+  _s_: switch project        _F_: find file dwim   _b_: switch to buffer  _z_: cache current
+  _a_: add known project     _d_: find directory   _r_: recent file       _g_: find tag
+  _x_: remove known project  _D_: find file cwd    _k_: kill all buffers  _o_: multi-occur
+  _X_: clean known project   ^^                    ^^                     _m_: compile
 "
-  ("b"   projectile-switch-to-buffer)
-  ("c"   projectile-invalidate-cache)
-  ("d"   projectile-find-dir)
-  ("s-f" projectile-find-file)
-  ("ff"  projectile-find-file-dwim)
-  ("fd"  projectile-find-file-in-directory)
-  ("i"   projectile-ibuffer)
-  ("K"   projectile-kill-buffers)
-  ("s-k" projectile-kill-buffers)
-  ("m"   projectile-multi-occur)
-  ("o"   projectile-multi-occur)
-  ("s-p" projectile-switch-project "switch project")
   ("p"   projectile-switch-project)
   ("s"   projectile-switch-project)
-  ("r"   projectile-recentf)
+  ("a"   projectile-add-known-project)
   ("x"   projectile-remove-known-project)
   ("X"   projectile-cleanup-known-projects)
+
+  ("f"   projectile-find-file)
+  ("F"   projectile-find-file-dwim)
+  ("d"   projectile-find-dir)
+  ("D"   projectile-find-file-in-directory)
+
+  ("i"   projectile-ibuffer)
+  ("b"   projectile-switch-to-buffer)
+  ("r"   projectile-recentf)
+  ("k"   projectile-kill-buffers)
+
+  ("c"   projectile-invalidate-cache)
   ("z"   projectile-cache-current-file)
-  ("a"   projectile-ag)
   ("g"   projectile-find-tag)
+  ("o"   projectile-multi-occur)
+  ("m"   projectile-compile)
   ("q"   nil "cancel"))
 
 (defhydra sb/hydra-move-text ()
@@ -5328,15 +5324,15 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 
 (defhydra sb/hydra-flycheck (:color blue)
   "
-  ^
-  ^Flycheck^          ^Errors^            ^Checker^
-  ^────────^──────────^──────^────────────^───────^─────
-  _q_ quit            _<_ previous        _?_ describe
-  _M_ manual          _>_ next            _d_ disable
-  _v_ verify setup    _f_ check           _m_ mode
-  ^^                  _l_ list            _s_ select
-  ^^                  ^^                  ^^
-  "
+                                              ^
+                                              ^Flycheck^          ^Errors^            ^Checker^
+                                              ^────────^──────────^──────^────────────^───────^─────
+                                              _q_ quit            _<_ previous        _?_ describe
+                                              _M_ manual          _>_ next            _d_ disable
+                                              _v_ verify setup    _f_ check           _m_ mode
+                                              ^^                  _l_ list            _s_ select
+                                              ^^                  ^^                  ^^
+                                              "
   ("q" nil)
   ("<" flycheck-previous-error :color pink)
   (">" flycheck-next-error :color pink)
@@ -5362,14 +5358,14 @@ _s-f_: file            _a_: ag                _i_: Ibuffer           _c_: cache 
 (defhydra sb/smerge-hydra
   (:color pink :hint nil :post (smerge-auto-leave))
   "
-^Move^       ^Keep^               ^Diff^                 ^Other^
-^^-----------^^-------------------^^---------------------^^-------
-_n_ext       _b_ase               _<_: upper/base        _C_ombine
-_p_rev       _u_pper              _=_: upper/lower       _r_esolve
-^^           _l_ower              _>_: base/lower        _k_ill current
-^^           _a_ll                _R_efine
-^^           _RET_: current       _E_diff
-"
+                                              ^Move^       ^Keep^               ^Diff^                 ^Other^
+                                              ^^-----------^^-------------------^^---------------------^^-------
+                                              _n_ext       _b_ase               _<_: upper/base        _C_ombine
+                                              _p_rev       _u_pper              _=_: upper/lower       _r_esolve
+                                              ^^           _l_ower              _>_: base/lower        _k_ill current
+                                              ^^           _a_ll                _R_efine
+                                              ^^           _RET_: current       _E_diff
+                                              "
   ("n" smerge-next)
   ("p" smerge-prev)
   ("b" smerge-keep-base)
@@ -5390,13 +5386,13 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (defhydra sb/hydra-multiple-cursors (:hint nil)
   "
-   ^Up^            ^Down^        ^Other^
-----------------------------------------------
-[_p_]   Next    [_n_]   Next    [_l_] Edit lines
-[_P_]   Skip    [_N_]   Skip    [_a_] Mark all
-[_M-p_] Unmark  [_M-n_] Unmark  [_r_] Mark by regexp
-^ ^             ^ ^             [_q_] Quit
-"
+                                              ^Up^            ^Down^        ^Other^
+                                              ----------------------------------------------
+                                              [_p_]   Next    [_n_]   Next    [_l_] Edit lines
+                                              [_P_]   Skip    [_N_]   Skip    [_a_] Mark all
+                                              [_M-p_] Unmark  [_M-n_] Unmark  [_r_] Mark by regexp
+                                              ^ ^             ^ ^             [_q_] Quit
+                                              "
   ("l" mc/edit-lines :exit t)
   ("a" mc/mark-all-like-this :exit t)
   ("n" mc/mark-next-like-this)
@@ -5410,12 +5406,12 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (defhydra sb/hydra-smartparens (:hint nil)
   "
- Moving^^^^                       Slurp & Barf^^   Wrapping^^            Sexp juggling^^^^               Destructive
-------------------------------------------------------------------------------------------------------------------------
- [_a_] beginning  [_n_] down      [_h_] bw slurp   [_R_]   rewrap        [_S_] split   [_t_] transpose   [_c_] change inner  [_w_] copy
- [_e_] end        [_N_] bw down   [_H_] bw barf    [_u_]   unwrap        [_s_] splice  [_A_] absorb      [_C_] change outer
- [_f_] forward    [_p_] up        [_l_] slurp      [_U_]   bw unwrap     [_r_] raise   [_E_] emit        [_k_] kill          [_g_] quit
- [_b_] backward   [_P_] bw up     [_L_] barf       [_(__{__[_] wrap (){}[]   [_j_] join    [_o_] convolute   [_K_] bw kill       [_q_] quit"
+                                              Moving^^^^                       Slurp & Barf^^   Wrapping^^            Sexp juggling^^^^               Destructive
+                                              ------------------------------------------------------------------------------------------------------------------------
+                                              [_a_] beginning  [_n_] down      [_h_] bw slurp   [_R_]   rewrap        [_S_] split   [_t_] transpose   [_c_] change inner  [_w_] copy
+                                              [_e_] end        [_N_] bw down   [_H_] bw barf    [_u_]   unwrap        [_s_] splice  [_A_] absorb      [_C_] change outer
+                                              [_f_] forward    [_p_] up        [_l_] slurp      [_U_]   bw unwrap     [_r_] raise   [_E_] emit        [_k_] kill          [_g_] quit
+                                              [_b_] backward   [_P_] bw up     [_L_] barf       [_(__{__[_] wrap (){}[]   [_j_] join    [_o_] convolute   [_K_] bw kill       [_q_] quit"
   ;; Moving
   ("a" sp-beginning-of-sexp)
   ("e" sp-end-of-sexp)
@@ -5462,11 +5458,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (defhydra sb/hydra-lsp (:exit t :hint nil)
   "
- Buffer^^               Server^^                   Symbol
--------------------------------------------------------------------------------------
- [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
- [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
- [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
+  Buffer^^               Server^^                   Symbol
+  -------------------------------------------------------------------------------------
+  [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+  [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+  [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
   ("d" lsp-find-declaration)
   ("D" lsp-ui-peek-find-definitions)
   ("R" lsp-ui-peek-find-references)
@@ -5486,17 +5482,17 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (defhydra sb/hydra-markdown-mode (:hint nil)
   "
-Formatting        C-c C-s    _s_: bold          _e_: italic     _b_: blockquote   _p_: pre-formatted    _c_: code
+  Formatting        C-c C-s    _s_: bold          _e_: italic     _b_: blockquote   _p_: pre-formatted    _c_: code
 
-Headings          C-c C-t    _h_: automatic     _1_: h1         _2_: h2           _3_: h3               _4_: h4
+  Headings          C-c C-t    _h_: automatic     _1_: h1         _2_: h2           _3_: h3               _4_: h4
 
-Lists             C-c C-x    _m_: insert item
+  Lists             C-c C-x    _m_: insert item
 
-Demote/Promote    C-c C-x    _l_: promote       _r_: demote     _u_: move up      _d_: move down
+  Demote/Promote    C-c C-x    _l_: promote       _r_: demote     _u_: move up      _d_: move down
 
-Links, footnotes  C-c C-a    _L_: link          _U_: uri        _F_: footnote     _W_: wiki-link      _R_: reference
+  Links, footnotes  C-c C-a    _L_: link          _U_: uri        _F_: footnote     _W_: wiki-link      _R_: reference
 
-"
+  "
 
   ("s" markdown-insert-bold)
   ("e" markdown-insert-italic)

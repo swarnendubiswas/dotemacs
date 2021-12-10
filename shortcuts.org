@@ -8,7 +8,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
 - ~C-x C-+~  - Increase font size by one step (~text-scale-adjust~)
 - ~C-x C--~  - Decrease font size by one step (~text-scale-adjust~)
-- ~Ctrl-x +~ - Make all visible windows approximately equal height (~balance-windows~)
+- ~C-x +~    - Make all visible windows approximately equal height (~balance-windows~)
 
 ** Text Manipulation
 
