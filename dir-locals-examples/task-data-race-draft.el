@@ -27,7 +27,8 @@
 
  (latex-mode . (
                 ;; (flycheck-checker . tex-chktex)
-                (TeX-master . (expand-file-name "paper.tex" (projectile-project-root)))
+                ;; (TeX-master . (expand-file-name "paper.tex" (projectile-project-root)))
+                (TeX-master . "paper.tex")
 
                 (eval . (progn
                           (let (

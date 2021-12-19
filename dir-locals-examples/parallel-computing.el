@@ -1,7 +1,7 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.o$\\|.out$\\|.pyc$\\|.toc$\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace")
-         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "build"))
+         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.o$\\|.out$\\|.pyc$\\|tramp\\|.metadata\\|.clangd\\|.recommenders\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace\\|^build")
+         (lsp-file-watch-ignored-directories . ("/\\.git$" "/\\.clangd$" "/build$"))
          ))
 
  (java-mode . (
@@ -11,6 +11,7 @@
  (c++-mode . (
               (flycheck-gcc-language-standard   . "c++11")
               (flycheck-clang-language-standard . "c++11")
+              (flycheck-clang-tidy-build-path   . ".")
               (flycheck-gcc-openmp . t)
               (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
 
@@ -24,17 +25,17 @@
                                          "-I/usr/include/linux"
                                          "-I/usr/include/boost"
                                          (concat "-I" "/usr/lib/llvm-12/include")
-                                         (concat "-I" (expand-file-name "." (projectile-project-root)))
+                                         (concat "-I" ".")
                                          ))
                             (include-path (list
                                            "/usr/include"
                                            "/usr/include/linux"
                                            "/usr/include/boost"
                                            "/usr/lib/llvm-12/include"
-                                           (expand-file-name "." (projectile-project-root))
+                                           "."
                                            ))
                             (clangd-args (list
-                                          "-j=2"
+                                          "-j=4"
                                           "--background-index"
                                           "--clang-tidy"
                                           "--fallback-style=LLVM"
@@ -46,14 +47,13 @@
                                           "--pretty"
                                           ))
                             )
-                        (setq-local company-clang-arguments        clang-args
-                                    flycheck-clang-args            clang-args
-                                    flycheck-gcc-args              clang-args
-                                    lsp-clients-clangd-args        clangd-args
-                                    flycheck-gcc-include-path      include-path
-                                    flycheck-clang-include-path    include-path
+                        (setq-local company-clang-arguments clang-args
+                                    flycheck-clang-args clang-args
+                                    flycheck-gcc-args clang-args
+                                    flycheck-gcc-include-path include-path
+                                    flycheck-clang-include-path include-path
                                     flycheck-cppcheck-include-path include-path
-                                    )
+                                    lsp-clients-clangd-args clangd-args)
                         ))
               ))
 
