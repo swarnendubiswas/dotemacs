@@ -397,6 +397,7 @@ This location is used for temporary installations and files.")
 
 ;; Activate utf-8
 (setq locale-coding-system   'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
 (prefer-coding-system        'utf-8)
 (set-default-coding-systems  'utf-8)
 (set-keyboard-coding-system  'utf-8)
@@ -1126,41 +1127,34 @@ This location is used for temporary installations and files.")
   (treemacs-indent-guide-mode 1)
   ;; (treemacs-project-follow-mode 1) ; Ignores workspace features
 
-  (when (display-graphic-p)
-    (use-package treemacs-all-the-icons
-      :demand t)
+  ;; https://github.com/Alexander-Miller/treemacs/issues/735
+  ;; (treemacs-create-theme "Default-Tighter"
+  ;;   :extends "Default"
+  ;;   :config
+  ;;   (let ((icons (treemacs-theme->gui-icons theme)))
+  ;;     (maphash (lambda
+  ;;                (ext icon)
+  ;;                (puthash ext
+  ;;                         (concat
+  ;;                          (substring icon 0 1)
+  ;;                          (propertize " " 'display
+  ;;                                      '(space . (:width 0.5))))
+  ;;                         icons))
+  ;;              icons)))
 
-    ;; https://github.com/Alexander-Miller/treemacs/issues/735
-    (treemacs-create-theme "Default-Tighter"
-      :extends "Default"
-      :config
-      (let ((icons (treemacs-theme->gui-icons theme)))
-        (maphash (lambda
-                   (ext icon)
-                   (puthash ext
-                            (concat
-                             (substring icon 0 1)
-                             (propertize " " 'display
-                                         '(space . (:width 0.5))))
-                            icons))
-                 icons)))
-
-    (treemacs-create-theme "all-the-icons-tighter"
-      :extends "all-the-icons"
-      :config
-      (let ((icons (treemacs-theme->gui-icons theme)))
-        (maphash (lambda
-                   (ext icon)
-                   (puthash ext
-                            (concat
-                             (substring icon 0 1)
-                             (propertize " " 'display
-                                         '(space . (:width 0.5))))
-                            icons))
-                 icons)))
-
-    ;; (treemacs-load-theme "all-the-icons")
-    )
+  ;; (treemacs-create-theme "all-the-icons-tighter"
+  ;;   :extends "all-the-icons"
+  ;;   :config
+  ;;   (let ((icons (treemacs-theme->gui-icons theme)))
+  ;;     (maphash (lambda
+  ;;                (ext icon)
+  ;;                (puthash ext
+  ;;                         (concat
+  ;;                          (substring icon 0 1)
+  ;;                          (propertize " " 'display
+  ;;                                      '(space . (:width 0.5))))
+  ;;                         icons))
+  ;;              icons)))
 
   (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
   (set-face-attribute 'treemacs-directory-face           nil :height 0.7)
@@ -1191,6 +1185,12 @@ This location is used for temporary installations and files.")
    ("C-c t d" . treemacs-add-and-display-current-project)
    ("C-c t e" . treemacs-display-current-project-exclusively)
    ("M-0"     . treemacs-select-window)))
+
+(use-package treemacs-all-the-icons
+  :if (display-graphic-p)
+  :after treemacs
+  :demand t
+  :config (treemacs-load-theme "all-the-icons"))
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
 (use-package treemacs-projectile
@@ -2715,7 +2715,7 @@ This location is used for temporary installations and files.")
 (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
   :commands vlf
   :defines vlf-application
-  :config
+  :init
   (setq vlf-application 'dont-ask)
   (require 'vlf-setup))
 
@@ -2792,6 +2792,7 @@ This location is used for temporary installations and files.")
 (add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -2830,7 +2831,7 @@ This location is used for temporary installations and files.")
 
 (use-package undo-tree
   :defines undo-tree-map
-  :commands (global-undo-tree-mode)
+  :commands (global-undo-tree-mode undo-tree-redo)
   :diminish
   :config
   (setq undo-tree-auto-save-history              t
@@ -2839,7 +2840,9 @@ This location is used for temporary installations and files.")
         undo-tree-visualizer-timestamps          t)
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
-  :bind ("C-x u" . undo-tree-visualize))
+  :bind
+  (("C-z"   . undo-tree-undo)
+   ("C-x u" . undo-tree-visualize)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
@@ -4531,7 +4534,9 @@ Ignore if no file is found."
 
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)
-  :demand t)
+  :demand t
+  :config (setq json-reformat:indent-width 2
+                js-indent-level 2))
 
 ;; (use-package json-snatcher
 ;;   :after (:any json-mode jsonc-mode)
@@ -4591,9 +4596,7 @@ Ignore if no file is found."
                                  jsonc-mode-hook php-mode-hook
                                  python-mode-hook))
       (add-hook hook (lambda ()
-                       (require 'tree-sitter)
                        (require 'tree-sitter-langs)
-                       (require 'tree-sitter-hl)
                        (global-tree-sitter-mode 1)))))
   :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
   :config
