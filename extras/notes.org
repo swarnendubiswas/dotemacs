@@ -10,7 +10,7 @@
 #+LATEX_HEADER: \usepackage{palatino}
 #+LATEX_HEADER: \usepackage[letterpaper]{geometry}
 
-* Notes about Emacs 
+* Notes about Emacs
 
 Emacs searches for the init files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
@@ -72,7 +72,7 @@ The equivalent version with ~with-eval-after-load~ would be:
   (setq bar 17))
 #+END_SRC
 
-*** Enable major mode per-project via directory-local variables 
+*** Enable major mode per-project via directory-local variables
 
 [[https://www.reddit.com/r/emacs/comments/o2zeek/how_do_you_enable_prettiermode_and_other/][Reddit post]]
 
@@ -91,8 +91,8 @@ The equivalent version with ~with-eval-after-load~ would be:
 (defun sb/prettier-mode-maybe ()
   "Enable `prettier-mode' according to the `sb/prettier-p' directory-local variable."
   (add-hook 'hack-local-variables-hook
-            (lambda () 
-              (when sb/prettier-p 
+            (lambda ()
+              (when sb/prettier-p
                  (prettier-mode)))
             nil t))
 #+END_SRC
