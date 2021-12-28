@@ -16,10 +16,15 @@
 
 (defconst sb/emacs-4MB    (*       4 1024 1024))
 (defconst sb/emacs-8MB    (*       8 1000 1024))
+(defconst sb/emacs-16MB   (*      16 1000 1024))
+(defconst sb/emacs-32MB   (*      32 1000 1024))
 (defconst sb/emacs-64MB   (*      64 1024 1024))
 (defconst sb/emacs-128MB  (*     128 1024 1024))
 (defconst sb/emacs-256MB  (*     256 1024 1024))
 (defconst sb/emacs-512MB  (*     512 1024 1024))
+(defconst sb/emacs-1GB    (*  1 1024 1024 1024))
+(defconst sb/emacs-2GB    (*  2 1024 1024 1024))
+(defconst sb/emacs-4GB    (*  4 1024 1024 1024))
 (defconst sb/emacs-8GB    (*  8 1024 1024 1024))
 (defconst sb/emacs-16GB   (* 16 1024 1024 1024))
 
@@ -27,7 +32,7 @@
 ;; decrease this. If you experience stuttering, increase this.
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
-  (setq gc-cons-percentage 0.1
+  (setq gc-cons-percentage 0.5
         gc-cons-threshold sb/emacs-16GB))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
@@ -35,9 +40,9 @@
 ;; permanently.
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
-  (setq gc-cons-percentage 0.1
+  (setq gc-cons-percentage 0.3
         ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/emacs-8MB))
+        gc-cons-threshold sb/emacs-16MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
 ;; customizations.
@@ -79,6 +84,9 @@
   ;; (setcar native-comp-eln-load-path
   ;;         (no-littering-expand-var-file-name "eln-cache"))
   (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
 
 (when sb/EMACS28+
   (setq package-native-compile t

@@ -43,7 +43,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -267,7 +267,7 @@ This location is used for temporary installations and files.")
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
   ;; "-i" is expensive but Tramp is unable to find executables without the option
-  (setq exec-path-from-shell-arguments '("-l" "-i")
+  (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
                                          "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
@@ -818,6 +818,21 @@ This location is used for temporary installations and files.")
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
   :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode))
 
+;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
+(defun sb/font-available-p (font-name)
+  "Find font specified by FONT-NAME."
+  (find-font (font-spec :name font-name)))
+
+;; (cond
+;;  ((sb/font-available-p "Cascadia Code")
+;;   (set-frame-font "Cascadia Code-14"))
+;;  ((sb/font-available-p "Menlo")
+;;   (set-frame-font "Menlo-14"))
+;;  ((sb/font-available-p "Inconsolata")
+;;   (set-frame-font "Inconsolata-14"))
+;;  ((sb/font-available-p "DejaVu Sans Mono")
+;;   (set-frame-font "DejaVu Sans Mono-14")))
+
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 
@@ -831,12 +846,12 @@ This location is used for temporary installations and files.")
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :height 150)
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 130)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil :height 140)
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -2337,6 +2352,10 @@ This location is used for temporary installations and files.")
         ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
         ;; derived from `text-mode'. `chktex' errors are often not very helpful.
         flycheck-global-modes '(not csv-mode))
+
+  ;; We prefer not to use `textlint' and `proselint', `proselint' is not maintained.
+  (dolist (checkers '(proselint textlint tex-chktex))
+    (delq checkers flycheck-checkers))
 
   (when (eq sb/modeline-theme 'doom-modeline)
     (setq flycheck-mode-line nil))
@@ -4071,20 +4090,13 @@ This location is used for temporary installations and files.")
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
-;; account.
+;; account. We only need this package for checking text in *scratch* buffer.
 (use-package flycheck-grammarly
-  ;; :ensure websocket
-  ;; :ensure grammarly
-  ;; :ensure keytar
-  ;; :ensure t
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
   :config
   (setq flycheck-grammarly-check-time 3
-        ;; LATER: Can we combine the delete operations?
-        flycheck-checkers (delete 'proselint flycheck-checkers)
-        ;; flycheck-checkers (delete 'textlint flycheck-checkers)
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
@@ -4121,8 +4133,7 @@ This location is used for temporary installations and files.")
 ;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
 ;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
 
-;; We prefer not to use `textlint' and `proselint', `proselint' is not maintained. We only limit to
-;; *scratch* buffer since we can use `grammarly' and `ltex' for directories.
+;; We only limit to *scratch* buffer since we can use `grammarly' and `ltex' for directories.
 (add-hook 'text-mode-hook
           (lambda ()
             (when (and (featurep 'flycheck-grammarly) (string= (buffer-name) "*scratch*"))
@@ -4281,7 +4292,7 @@ This location is used for temporary installations and files.")
                                TeX-save-query LaTeX-item-indent
                                LaTeX-syntactic-comments
                                LaTeX-fill-break-at-separators)
-  :functions (TeX-active-process TeX-run-TeX)
+  :functions (TeX-active-process)
   :commands (TeX-active-process TeX-save-document tex-site
                                 LaTeX-mode LaTeX-math-mode
                                 TeX-PDF-mode
@@ -4290,7 +4301,6 @@ This location is used for temporary installations and files.")
                                 TeX-command-menu
                                 TeX-revert-document-buffer
                                 TeX-master-file
-                                TeX-run-TeX
                                 TeX-next-error)
   :hook
   (((latex-mode LaTeX-mode) . LaTeX-math-mode)
@@ -4469,6 +4479,8 @@ Ignore if no file is found."
   (let ((TeX-save-query nil))
     (TeX-save-document ""))
   (TeX-command-menu "LaTeXMk"))
+
+(declare-function TeX-run-TeX "tex")
 
 (defun sb/latex-compile-open-pdf ()
   "Save the current buffer, run LaTeXMk, and switch to the PDF after a successful compilation."
@@ -5531,10 +5543,11 @@ _v_ verify setup    _f_ check           _m_ mode
 (defhydra sb/hydra-lsp (:exit t :hint nil)
   "
   Buffer^^               Server^^                   Symbol
-  -------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------
   [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
   [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
   [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
+
   ("d" lsp-find-declaration)
   ("D" lsp-ui-peek-find-definitions)
   ("R" lsp-ui-peek-find-references)
