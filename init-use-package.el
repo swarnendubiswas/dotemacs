@@ -7,9 +7,6 @@
 
 ;;; Code:
 
-;; TODO:
-;; Fix ordering of company completions, prefix match seems to be good
-
 (defvar no-littering-etc-directory)
 (defvar no-littering-var-directory)
 
@@ -200,7 +197,6 @@ This location is used for temporary installations and files.")
 (use-package dash
   :commands (-contains? -tree-map))
 
-;; TODO: Learn how to use hydras better
 (use-package hydra
   :commands (hydra-default-pre hydra-keyboard-quit defhydra
                                hydra-show-hint hydra-set-transient-map
@@ -213,8 +209,6 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (setq custom-file sb/custom-file)
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror))
 
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
@@ -222,8 +216,11 @@ This location is used for temporary installations and files.")
   :type  'string
   :group 'sb/emacs)
 
-(when (file-exists-p sb/private-file)
-  (load sb/private-file 'noerror))
+(let ((gc-cons-threshold most-positive-fixnum))
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror))
+  (when (file-exists-p sb/private-file)
+    (load sb/private-file 'noerror)))
 
 (use-package warnings
   :init
@@ -846,7 +843,7 @@ This location is used for temporary installations and files.")
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 130)
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
@@ -2918,7 +2915,7 @@ This location is used for temporary installations and files.")
 (use-package ace-window
   :bind ([remap other-window] . ace-window))
 
-(use-package windmove ; `Shift + direction' arrows
+(use-package windmove ; "Shift + direction" arrows
   :ensure nil
   :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
@@ -2959,7 +2956,7 @@ This location is used for temporary installations and files.")
 
 ;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
 (use-package ivy-avy
-  :after (ivy avy)
+  :after ivy
   :bind
   (:map ivy-minibuffer-map
         ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
@@ -4224,28 +4221,25 @@ This location is used for temporary installations and files.")
   :config
   ;; (defvar lsp-ltex-active-modes)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-stdio-connection
-  ;;                    #'lsp-ltex--server-command
-  ;;                    (lambda () (f-exists? (lsp-ltex--extension-root))))
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-  ;;   :priority -2
-  ;;   :add-on? t
-  ;;   :remote? t
-  ;;   :server-id 'ltex-ls-remote
-  ;;   :download-server-fn
-  ;;   (lambda (_client _callback error-callback _update?)
-  ;;     (lsp-package-ensure
-  ;;      'ltex-ls
-  ;;      (lambda ()
-  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-  ;;                                     "-C" dest)
-  ;;            (error "Error during the unzip process: tar"))))
-  ;;      error-callback))))
-
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+    :priority -2
+    :add-on? t
+    :remote? t
+    :server-id 'ltex-ls-remote
+    :download-server-fn
+    (lambda (_client _callback error-callback _update?)
+      (lsp-package-ensure
+       'ltex-ls
+       (lambda ()
+         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+                                      "-C" dest)
+             (error "Error during the unzip process: tar"))))
+       error-callback)))))
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server

@@ -28,21 +28,29 @@
 (defconst sb/emacs-8GB    (*  8 1024 1024 1024))
 (defconst sb/emacs-16GB   (* 16 1024 1024 1024))
 
+;; https://github.com/kiwanami/emacs-epc/issues/35
+;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
+                                  cl-functions interactive-only))
+
+;; Defer GC during startup
+(setq garbage-collection-messages nil
+      gc-cons-percentage 0.3 ; Portion of heap used for allocation
+      gc-cons-threshold most-positive-fixnum)
+
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."
-  (setq gc-cons-percentage 0.5
-        gc-cons-threshold sb/emacs-16GB))
+  (setq gc-cons-threshold sb/emacs-1GB))
 
 ;; Ideally, we would have reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But `lsp-mode' suggests increasing the limit
 ;; permanently.
+;; https://github.com/emacs-lsp/lsp-mode#performance
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
-  (setq gc-cons-percentage 0.3
-        ;; https://github.com/emacs-lsp/lsp-mode#performance
-        gc-cons-threshold sb/emacs-16MB))
+  (setq gc-cons-threshold sb/emacs-64MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
 ;; customizations.
@@ -50,7 +58,7 @@
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
 
-(require 'package)
+;; (require 'package)
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'
 (setq package-enable-at-startup nil
@@ -62,9 +70,7 @@
   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
 ;; Initialise the package management system. Another option is to construct the `load-path'
-;; manually.
-;; (add-to-list 'load-path sb/extras-directory)
-;; (add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))
+;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
 (package-initialize)
 
 (unless (package-installed-p 'no-littering)
@@ -73,16 +79,11 @@
 
 (require 'no-littering)
 
-;; (customize-set-variable 'package-quickstart t)
-
 (setq package-quickstart t ; Populate one big autoloads file
       package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
 
 ;; Emacs 28+.
-;; FIXME: How to prevent Emacs from using `("eln-cache" user-emacs-directory)'?
 (when (boundp 'native-comp-eln-load-path)
-  ;; (setcar native-comp-eln-load-path
-  ;;         (no-littering-expand-var-file-name "eln-cache"))
   (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
 
 (defvar package-native-compile)
@@ -92,20 +93,11 @@
   (setq package-native-compile t
         native-comp-always-compile t))
 
-;; https://github.com/kiwanami/emacs-epc/issues/35
-;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
-(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
-                                  cl-functions interactive-only))
-
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following
 ;; (require 'loadhist)
 ;; (file-dependents (feature-file 'cl))
 
-;; Defer GC during startup
-(setq garbage-collection-messages nil
-      gc-cons-percentage 0.6 ; Portion of heap used for allocation
-      gc-cons-threshold most-positive-fixnum)
 
 ;; The run-time load order is: (1) file described by `site-run-file', if non-nil, (2)
 ;; `user-init-file', and (3) `default.el'.
