@@ -5,7 +5,7 @@
 
 ;;; Commentary:
 
-;; Only for use with Emacs 27 or higher. This is run before package and UI initialization.
+;; This file is supported from Emacs 27+, and is run before package and UI initialization.
 
 ;;; Code:
 
@@ -13,6 +13,11 @@
 (defconst sb/EMACS28+   (> emacs-major-version 27))
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+
+;; https://github.com/kiwanami/emacs-epc/issues/35
+;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
+                                  cl-functions interactive-only))
 
 (defconst sb/emacs-4MB    (*       4 1024 1024))
 (defconst sb/emacs-8MB    (*       8 1000 1024))
@@ -27,11 +32,6 @@
 (defconst sb/emacs-4GB    (*  4 1024 1024 1024))
 (defconst sb/emacs-8GB    (*  8 1024 1024 1024))
 (defconst sb/emacs-16GB   (* 16 1024 1024 1024))
-
-;; https://github.com/kiwanami/emacs-epc/issues/35
-;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
-(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
-                                  cl-functions interactive-only))
 
 ;; Defer GC during startup
 (setq garbage-collection-messages nil
@@ -74,7 +74,8 @@
 (package-initialize)
 
 (unless (package-installed-p 'no-littering)
-  (package-refresh-contents nil)
+  (unless package-archive-contents
+    (package-refresh-contents nil))
   (package-install 'no-littering))
 
 (require 'no-littering)
@@ -97,7 +98,6 @@
 ;; Get a list of loaded packages that depend on `cl' by calling the following
 ;; (require 'loadhist)
 ;; (file-dependents (feature-file 'cl))
-
 
 ;; The run-time load order is: (1) file described by `site-run-file', if non-nil, (2)
 ;; `user-init-file', and (3) `default.el'.

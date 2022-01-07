@@ -372,6 +372,13 @@ Use ~magit-status~ to display information about the current Git repository, and 
 
 ** Use Cases
 
+*** Byte recompile the ~elpa~ directory
+
+#+BEGIN_SRC emacs-lisp
+find ~/.emacs.d/elpa -name "*.elc" -delete
+(byte-recompile-directory (expand-file-name "~/.emacs.d/elpa/") 0)
+#+END_SRC
+
 *** Delete blank lines
 
 - Mark buffer (~C-x h~) or region

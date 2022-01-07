@@ -294,7 +294,7 @@ Keywords=Text;Editor;
 
 - [Running Emacs](https://tychoish.com/post/running-emacs/)
 
-## Build GNU Emacs from source
+## Build GNU Emacs 28 from source
 
 ```shell
 sudo apt install -y texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont  xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev

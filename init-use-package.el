@@ -133,7 +133,8 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
+  (unless package-archive-contents
+    (package-refresh-contents))
   (package-install 'use-package))
 
 ;; Configure `use-package' before loading
@@ -189,7 +190,7 @@ This location is used for temporary installations and files.")
 (use-package diminish)
 
 (use-package f
-  :commands (f-exists? f-join))
+  :commands (f-exists? f-join f-dirname))
 
 (use-package s
   :commands s-starts-with? s-ends-with?)
@@ -843,7 +844,7 @@ This location is used for temporary installations and files.")
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
 
@@ -1068,7 +1069,7 @@ This location is used for temporary installations and files.")
              treemacs-select-window
              treemacs-add-and-display-current-project
              treemacs-display-current-project-exclusively
-             projectile-project-p)
+             projectile-project-p treemacs--select-workspace-by-name)
   :preface
   ;; The problem is there is no toggle support.
   (defun sb/setup-treemacs-quick ()
@@ -3400,6 +3401,8 @@ This location is used for temporary installations and files.")
         ;; lsp-signature-function 'lsp-signature-posframe
         ;; Avoid annoying questions. We expect a server restart to succeed more often than not.
         lsp-restart 'auto-restart
+        ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+        lsp-use-plists t
         lsp-xml-logs-client nil
         lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.18.1-uber.jar"
                                            sb/extras-directory)
@@ -3553,6 +3556,9 @@ This location is used for temporary installations and files.")
 (use-package dap-mode
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
 
+(use-package docstr
+  :hook ((c++-mode python-mode java-mode) . docstr-mode))
+
 (use-package cc-mode
   :ensure nil
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
@@ -3612,7 +3618,13 @@ This location is used for temporary installations and files.")
 
 (use-package cmake-mode
   :commands cmake-mode
-  :hook (cmake-mode . lsp-deferred)
+  :hook
+  (cmake-mode . (lambda ()
+                  (make-local-variable 'lsp-disabled-clients)
+                  (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                  (spell-fu-mode -1)
+                  (flyspell-mode -1)
+                  (lsp-deferred)))
   :config
   (lsp-register-client
    (make-lsp-client
@@ -4210,6 +4222,7 @@ This location is used for temporary installations and files.")
 
 (use-package lsp-ltex
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
+  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
                                                      (require 'lsp-ltex)
