@@ -150,11 +150,11 @@ I plan to automate the complete setup sometime in the future.
 
 The following are a few customization options defined in `init.el` that you could use to tweak the default setup. Please check `init.el` for more options.
 
-- `dotemacs-gui-theme` -- Set the desired GUI theme from a bunch of themes
-- `dotemacs-tui-theme` -- Set the desired TUI theme from a bunch of themes
-- `dotemacs-modeline-theme` -- Set the desired modeline theme
-- `dotemacs-fill-column` -- Column beyond which lines should not extend
-- `dotemacs-delete-trailing-whitespace-p` -- Control whether trailing whitespace should be deleted or not
+- `sb/gui-theme` -- Set the desired GUI theme from a bunch of themes
+- `sb/tui-theme` -- Set the desired TUI theme from a bunch of themes
+- `sb/modeline-theme` -- Set the desired modeline theme
+- `sb/fill-column` -- Column beyond which lines should not extend
+- `sb/delete-trailing-whitespace-p` -- Control whether trailing whitespace should be deleted or not
 
 ## Browsing Source Code
 

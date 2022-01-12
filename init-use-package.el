@@ -686,17 +686,15 @@ This location is used for temporary installations and files.")
   (when (eq sb/modeline-theme 'moody)
     (setq modus-themes-mode-line 'borderless-moody))
 
-  (modus-themes-load-themes)
-  :config
   (when (display-graphic-p)
     (cond
-     ((eq sb/gui-theme 'modus-operandi) (modus-themes-load-operandi))
-     ((eq sb/gui-theme 'modus-vivendi) (modus-themes-load-vivendi))))
+     ((eq sb/gui-theme 'modus-operandi) (load-theme 'modus-operandi t))
+     ((eq sb/gui-theme 'modus-vivendi) (load-theme 'modus-vivendi t))))
 
   (unless (display-graphic-p)
     (cond
-     ((eq sb/gui-theme 'modus-operandi) (modus-themes-load-operandi))
-     ((eq sb/gui-theme 'modus-vivendi) (modus-themes-load-vivendi)))))
+     ((eq sb/gui-theme 'modus-operandi) (load-theme 'modus-operandi t))
+     ((eq sb/gui-theme 'modus-vivendi) (load-theme 'modus-vivendi t)))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -844,6 +842,11 @@ This location is used for temporary installations and files.")
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "inspiron-7572")
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+  (set-face-attribute 'mode-line nil :height 120)
+  (set-face-attribute 'mode-line-inactive nil :height 120))
+
+(when (string= (system-name) "dell-7506")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
@@ -3402,10 +3405,8 @@ This location is used for temporary installations and files.")
         ;; Avoid annoying questions. We expect a server restart to succeed more often than not.
         lsp-restart 'auto-restart
         ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-        lsp-use-plists t
+        lsp-use-plists nil
         lsp-xml-logs-client nil
-        lsp-xml-jar-file (expand-file-name "org.eclipse.lemminx-0.18.1-uber.jar"
-                                           sb/extras-directory)
         lsp-yaml-print-width sb/fill-column)
 
   (defvar lsp-pylsp-configuration-sources)
@@ -4230,8 +4231,16 @@ This location is used for temporary installations and files.")
   :init
   (setq lsp-ltex-check-frequency "save"
         ;; lsp-ltex-dictionary ("microbenchmarks")
-        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64")
+        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
+        lsp-ltex-version "15.2.0")
   :config
+  ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
+  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
+  (setq lsp-ltex-disabled-rules
+        #s(hash-table size 30 data
+                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
+			          ))
+
   ;; (defvar lsp-ltex-active-modes)
 
   (lsp-register-client
