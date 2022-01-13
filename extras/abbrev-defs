@@ -54,6 +54,7 @@
     ("icludes" "includes" nil :count 0)
     ("initialise" "Initialize" nil :count 0)
     ("requiest" "request" nil :count 0)
+    ("reuqires" "requires" nil :count 0)
     ("sepcial" "special" nil :count 0)
    ))
 
@@ -1535,3 +1536,4 @@
     ("vidoes" "videos" nil :count 0)
     ("willign" "willing" nil :count 0)
    ))
+

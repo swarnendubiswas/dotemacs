@@ -424,7 +424,8 @@ This location is used for temporary installations and files.")
   :ensure nil
   :commands global-auto-revert-mode
   :diminish auto-revert-mode
-  :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
+  ;; :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
+  :hook (after-init-hook . global-auto-revert-mode)
   :config
   (setq auto-revert-interval 10 ; Faster (seconds) would mean less likely to use stale data
         ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
@@ -448,7 +449,8 @@ This location is used for temporary installations and files.")
 (use-package savehist ; Save minibuffer history across sessions
   :ensure nil
   :commands savehist-mode
-  :init (run-with-idle-timer 2 nil #'savehist-mode)
+  ;; :init (run-with-idle-timer 2 nil #'savehist-mode)
+  :hook (after-init-hook . savehist-mode)
   :config
   (setq savehist-additional-variables '(extended-command-history
                                         kill-ring
@@ -587,7 +589,8 @@ This location is used for temporary installations and files.")
 (use-package so-long
   :ensure nil
   :commands global-so-long-mode
-  :init (run-with-idle-timer 2 nil #'global-so-long-mode)
+  ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
+  :hook (after-init . global-so-long-mode)
   :config (setq so-long-threshold 500))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
@@ -812,7 +815,8 @@ This location is used for temporary installations and files.")
 ;; line.
 (use-package auto-dim-other-buffers
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
-  :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode))
+  :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
+  :hook (after-init . auto-dim-other-buffers-mode))
 
 ;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
 (defun sb/font-available-p (font-name)
@@ -906,7 +910,8 @@ This location is used for temporary installations and files.")
 (use-package beacon
   :commands beacon-mode
   :diminish
-  :init (run-with-idle-timer 3 nil #'beacon-mode))
+  ;; :init (run-with-idle-timer 3 nil #'beacon-mode)
+  :hook (after-init . beacon-mode))
 
 (use-package ibuffer
   :ensure nil
@@ -1467,17 +1472,19 @@ This location is used for temporary installations and files.")
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
   :hook (after-init . global-company-mode)
-  ;; :diminish ;; The `company-posframe' completion kind indicator is not great
+  ;; The `company-posframe' completion kind indicator is not great, but we are now using
+  ;; `company-fuzzy'.
+  :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
         company-dabbrev-other-buffers t ; Search in other buffers with the same major mode
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 2 ; Small words can be faster to type
+        company-minimum-prefix-length 3 ; Small words can be faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
-        company-show-quick-access nil ; Speed up completion
+        company-show-quick-access t ; Speed up completion
         ;; Align additional metadata, like type signatures, to the right-hand side
         company-tooltip-align-annotations t
         ;; Disable insertion of arguments
@@ -1533,28 +1540,28 @@ This location is used for temporary installations and files.")
 (use-package company-quickhelp
   :after company
   :commands company-quickhelp-mode
-  :init (run-with-idle-timer 3 nil #'company-quickhelp-mode))
+  ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
+  :hook (after-init . company-quickhelp-mode))
+
+(use-package company-statistics
+  :after company
+  :demand t
+  :commands company-statistics-mode
+  :config (company-statistics-mode 1))
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
   :ensure flx
   :ensure t
   :after company
-  :diminish
+  :diminish company-fuzzy-mode
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
-  :hook (prog-mode . company-fuzzy-mode)
+  :demand t
   :config
   (setq company-fuzzy-sorting-backend 'flx
         company-fuzzy-show-annotation nil ; The right-hand side gets cut off
         ;; We should not need this because the `flx' sorting accounts for the prefix
         company-fuzzy-prefix-on-top t))
-
-;; We are currently trying out `company-prescient'
-(use-package company-statistics
-  :after company
-  :demand t
-  :commands company-statistics-mode
-  :config (company-statistics-mode 1))
 
 (use-package yasnippet
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
@@ -1649,7 +1656,8 @@ This location is used for temporary installations and files.")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
   :bind
-  (([remap execute-extended-command] . counsel-M-x)
+  (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
+   ([remap execute-extended-command] . counsel-M-x)
    ([remap completion-at-point]      . counsel-company)
    ("C-M-i"                          . counsel-company)
    ([remap find-file]                . counsel-find-file)
@@ -1722,11 +1730,13 @@ This location is used for temporary installations and files.")
   :demand t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
+;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
   :commands prescient-persist-mode
   :hook (after-init . prescient-persist-mode)
   :config (setq prescient-sort-full-matches-first t))
 
+;; We are using `company-fuzzy' for sorting completion candidates
 (use-package company-prescient
   :after company
   :demand t
@@ -1956,7 +1966,8 @@ This location is used for temporary installations and files.")
 
 (use-package paren
   :ensure nil
-  :init (run-with-idle-timer 2 nil #'show-paren-mode)
+  ;; :init (run-with-idle-timer 2 nil #'show-paren-mode)
+  :hook (after-init . show-paren-mode)
   :config
   (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
         show-paren-when-point-inside-paren t
@@ -1967,7 +1978,8 @@ This location is used for temporary installations and files.")
   :ensure nil
   :commands (electric-pair-mode)
   :disabled t
-  :init (run-with-idle-timer 2 nil #'electric-pair-mode)
+  ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)
+  :hook (after-init . electric-pair-mode)
   :config
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
@@ -2189,9 +2201,10 @@ This location is used for temporary installations and files.")
   ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
 
   :bind-keymap ("C-c p" . projectile-command-map)
-  :init
+  ;; :init
   ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
-  (run-with-idle-timer 2 nil #'projectile-mode)
+  ;; (run-with-idle-timer 2 nil #'projectile-mode)
+  :hook (after-init . projectile-mode)
   :bind
   ;; Set these in case `counsel-projectile' is disabled
   (("<f5>" . projectile-switch-project)
@@ -2538,7 +2551,8 @@ This location is used for temporary installations and files.")
 
 (use-package hl-todo
   :commands global-hl-todo-mode
-  :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
+  ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
+  :hook (after-init . global-hl-todo-mode)
   :config
   (setq hl-todo-highlight-punctuation ":"
         hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
@@ -2557,7 +2571,8 @@ This location is used for temporary installations and files.")
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :diminish
   :commands (global-page-break-lines-mode page-break-lines-mode)
-  :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode))
+  ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
+  :hook (after-init . global-page-break-lines-mode))
 
 (use-package number-separator
   :ensure nil
@@ -2830,13 +2845,15 @@ This location is used for temporary installations and files.")
 
 ;; Restore point to the initial location with `C-g' after marking a region
 (use-package smart-mark
-  :init (run-with-idle-timer 3 nil #'smart-mark-mode))
+  ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
+  :hook (after-init . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
   :diminish (whole-line-or-region-local-mode)
-  :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode))
+  ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
+  :hook (after-init . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
   :bind ("C-x C-\\" . goto-last-change))
@@ -2844,7 +2861,8 @@ This location is used for temporary installations and files.")
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys `M-<' and `M->' keys again.
 (use-package beginend
-  :init (run-with-idle-timer 3 nil #'beginend-global-mode)
+  ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
+  :hook (after-init . beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
@@ -2875,7 +2893,8 @@ This location is used for temporary installations and files.")
 
 (use-package immortal-scratch
   :commands immortal-scratch-mode
-  :init (run-with-idle-timer 2 nil #'immortal-scratch-mode))
+  ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
+  :hook (after-init . immortal-scratch-mode))
 
 ;; I use the *scratch* buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
@@ -2934,8 +2953,9 @@ This location is used for temporary installations and files.")
   :defines (super-save-remote-files super-save-triggers)
   :commands super-save-mode
   :disabled t
-  ;; :diminish
-  :init (run-with-idle-timer 3 nil #'super-save-mode)
+  :diminish
+  ;; :init (run-with-idle-timer 3 nil #'super-save-mode)
+  :hook (after-init . super-save-mode)
   :config
   (setq super-save-remote-files nil) ; Ignore remote files, can cause Emacs to hang
   (add-to-list 'super-save-triggers 'ace-window))
@@ -2990,7 +3010,8 @@ This location is used for temporary installations and files.")
   (setq bm-restore-repository-on-load t)
   ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
   ;; usability
-  (run-with-idle-timer 2 nil #'sb/bm-setup)
+  ;; (run-with-idle-timer 2 nil #'sb/bm-setup)
+  :hook (after-init . sb/bm-setup)
   :config (setq-default bm-buffer-persistence t)
   :bind
   (("C-<f1>" . bm-toggle)
@@ -3046,7 +3067,9 @@ This location is used for temporary installations and files.")
                                pdf-annot-add-text-annotation)
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
-  :init (run-with-idle-timer 3 nil #'require 'pdf-tools nil t) ; Expensive to load
+  ;; :init (run-with-idle-timer 3 nil #'require 'pdf-tools nil t) ; Expensive to load
+  :hook (after-init . (lambda ()
+                        (require 'pdf-tools nil t)))
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
@@ -4201,23 +4224,23 @@ This location is used for temporary installations and files.")
 
   ;; (defvar lsp-grammarly-active-modes)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-stdio-connection #'lsp-grammarly--server-command)
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-  ;;   :priority -1
-  ;;   :remote? t
-  ;;   :add-on? t
-  ;;   :server-id 'grammarly-ls-remote
-  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
-  ;;   :after-open-fn #'lsp-grammarly--init
-  ;;   :async-request-handlers
-  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
-  ;;       ("$/getToken" #'lsp-grammarly--get-token)
-  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
-  ;;       ("$/showError" #'lsp-grammarly--show-error)
-  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+    :priority -1
+    :remote? t
+    :add-on? t
+    :server-id 'grammarly-ls-remote
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'grammarly-ls callback error-callback))
+    :after-open-fn #'lsp-grammarly--init
+    :async-request-handlers
+    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+        ("$/getToken" #'lsp-grammarly--get-token)
+        ("$/storeToken" #'lsp-grammarly--store-token)
+        ("$/showError" #'lsp-grammarly--show-error)
+        ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
 
   )
 
@@ -4238,8 +4261,7 @@ This location is used for temporary installations and files.")
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
   (setq lsp-ltex-disabled-rules
         #s(hash-table size 30 data
-                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
-			          ))
+                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
 
   ;; (defvar lsp-ltex-active-modes)
 
@@ -4261,7 +4283,9 @@ This location is used for temporary installations and files.")
            (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
                                       "-C" dest)
              (error "Error during the unzip process: tar"))))
-       error-callback)))))
+       error-callback))))
+
+  )
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
@@ -4607,7 +4631,8 @@ Ignore if no file is found."
     (dolist (hook '(bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
-  :init (run-with-idle-timer 2 nil #'sb/enable-format-all))
+  ;; :init (run-with-idle-timer 2 nil #'sb/enable-format-all)
+  :hook (after-init . sb/enable-format-all))
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
@@ -4626,7 +4651,8 @@ Ignore if no file is found."
       (add-hook hook (lambda ()
                        (require 'tree-sitter-langs)
                        (global-tree-sitter-mode 1)))))
-  :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
+  ;; :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
+  :hook (after-init . sb/enable-tree-sitter)
   :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
@@ -4639,7 +4665,7 @@ Ignore if no file is found."
   :defines fasd-enable-initial-prompt
   :if (executable-find "fasd")
   :commands (global-fasd-mode fasd-find-file)
-  :init (run-with-idle-timer 3 nil #'global-fasd-mode)
+  ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
   :config (setq fasd-enable-initial-prompt nil)
   :bind* ("C-c /" . fasd-find-file))
 
@@ -4699,54 +4725,57 @@ Ignore if no file is found."
     (defvar company-backends)
 
     ;; Slightly larger value to have more precise matches and so that the popup does not block
-    (setq-local company-minimum-prefix-length 2
+    (setq-local company-minimum-prefix-length 3
                 company-transformers '(delete-dups))
     (set (make-local-variable 'company-backends)
          '(company-files
-           ;; Give priority to dabbrev completions over ispell. Delete duplicates with a special
-           ;; company transformer
-           (:separate
-            company-dabbrev
-            company-ispell)
-           )))
+           company-dabbrev
+           company-ispell)
+         ))
 
   (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
-    (add-hook hook #'sb/company-text-mode)))
+    (add-hook hook (lambda ()
+                     (sb/company-text-mode)
+                     (company-fuzzy-mode 1)))))
 
-;; (progn
-;;   (defun sb/company-xml-mode ()
-;;     "Add backends for completion with company."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
+(progn
+  (defun sb/company-xml-mode ()
+    "Add backends for completion with company."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '(company-capf
-;;                              company-files
-;;                              company-yasnippet
-;;                              company-dabbrev-code
-;;                              company-dabbrev)))
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)))
 
-;;   (dolist (hook '(nxml-mode-hook))
-;;     (add-hook hook (lambda ()
-;;                      (sb/company-xml-mode)))))
+  (dolist (hook '(nxml-mode-hook))
+    (add-hook hook (lambda ()
+                     (sb/company-xml-mode)
+                     (company-fuzzy-mode 1)))))
 
-;; (progn
-;;   (defun sb/company-prog-mode ()
-;;     "Add backends for program completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
+(progn
+  (defun sb/company-prog-mode ()
+    "Add backends for program completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
 
-;;     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-;;     (setq company-backends '((company-capf :with company-yasnippet)
-;;                              (company-files :with company-yasnippet)
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              company-dabbrev)))
+    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-files
+                             company-dabbrev-code
+                             company-dabbrev)))
 
-;;   (add-hook 'prog-mode-hook #'sb/company-prog-mode))
+  (add-hook 'prog-mode-hook (lambda ()
+                              (sb/company-prog-mode)
+                              (company-fuzzy-mode 1))))
 
 ;; (progn
 ;;   (defun sb/company-java-mode ()
@@ -4781,51 +4810,50 @@ Ignore if no file is found."
 
 ;;   (add-hook 'c-mode-common-hook #'sb/company-c-mode))
 
-;; (progn
-;;   (use-package company-shell
-;;     :defines company-shell-delete-duplictes
-;;     :commands (company-shell company-shell-env)
-;;     :config (setq company-shell-delete-duplictes t))
+(progn
+  (use-package company-shell
+    :defines company-shell-delete-duplictes
+    :commands (company-shell company-shell-env company-fish-shell)
+    :config (setq company-shell-delete-duplictes t))
 
-;;   (defun sb/company-sh-mode ()
-;;     "Add backends for shell script completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
+  (defun sb/company-sh-mode ()
+    "Add backends for shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '((:separate
-;;                               company-capf
-;;                               company-shell
-;;                               company-shell-env
-;;                               company-fish-shell
-;;                               company-dabbrev-code)
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev)))
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
 
-;;   (add-hook 'sh-mode-hook #'sb/company-sh-mode))
+  (add-hook 'sh-mode-hook (lambda ()
+                            (sb/company-sh-mode)
+                            (company-fuzzy-mode 1)))
 
-;; (progn
-;;   (use-package company-shell
-;;     :commands company-fish-shell)
+  (defun sb/company-fish-mode ()
+    "Add backends for fish shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
 
-;;   (defun sb/company-fish-mode ()
-;;     "Add backends for fish shell script completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-fish-shell
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
 
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '((:separate
-;;                               company-capf
-;;                               company-fish-shell
-;;                               company-dabbrev-code)
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev)))
-
-;;   (add-hook 'fish-mode-hook #'sb/company-fish-mode))
+  (add-hook 'fish-mode-hook (lambda ()
+                              (sb/company-fish-mode)
+                              (company-fuzzy-mode 1))))
 
 ;; (progn
 ;;   (defun sb/company-elisp-mode ()
@@ -4835,12 +4863,12 @@ Ignore if no file is found."
 
 ;;     (setq-local company-minimum-prefix-length 2)
 ;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '((company-capf :with company-yasnippet)
-;;                              (company-files :with company-yasnippet)
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              (:separate
-;;                               company-dabbrev
-;;                               company-ispell))))
+;;     (setq company-backends '(company-capf
+;;                              company-yasnippet
+;;                              company-files
+;;                              company-dabbrev-code
+;;                              company-dabbrev
+;;                              company-ispell)))
 
 ;;   (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
 
@@ -4853,9 +4881,10 @@ Ignore if no file is found."
 ;;     (setq-local company-minimum-prefix-length 2)
 ;;     (make-local-variable 'company-backends)
 ;;     ;; `company-dabbrev-code' is useful for variable names
-;;     (setq company-backends '((company-capf :with company-yasnippet)
-;;                              (company-files :with company-yasnippet)
-;;                              (company-dabbrev-code :with company-yasnippet)
+;;     (setq company-backends '(company-capf
+;;                              company-yasnippet
+;;                              company-files
+;;                              company-dabbrev-code
 ;;                              company-dabbrev)))
 
 ;;   (add-hook 'python-mode-hook #'sb/company-python-mode))
@@ -4878,7 +4907,6 @@ Ignore if no file is found."
       :demand t
       :commands (company-reftex-labels company-reftex-citations))
     (use-package company-bibtex
-      :disabled t
       :demand t
       :commands company-bibtex)
 
@@ -4888,51 +4916,42 @@ Ignore if no file is found."
     ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
     ;; labels and citations
 
-    (setq company-backends '((:separate
-                              company-capf
-                              company-files
-                              company-reftex-citations
-                              company-reftex-labels
-                              company-auctex-environments
-                              company-auctex-macros
-                              company-latex-commands
-                              company-math-symbols-latex
-                              company-math-symbols-unicode
-
-                              ;; company-auctex-symbols
-                              ;; company-auctex-bibs
-                              ;; company-auctex-labels
-                              ;; company-bibtex
-                              ;; company-capf
-                              )
+    (setq company-backends '(company-capf
+                             company-files
+                             company-reftex-citations
+                             company-reftex-labels
+                             company-auctex-environments
+                             company-auctex-macros
+                             company-latex-commands
+                             company-math-symbols-latex
+                             company-math-symbols-unicode
+                             company-auctex-symbols
+                             company-auctex-bibs
+                             company-auctex-labels
+                             company-bibtex
                              company-dabbrev
-                             company-ispell))
-
-    ;; The following block is used with LSP.
-    ;; (setq company-backends '((:separate
-    ;;                           company-capf
-    ;;                           company-files
-    ;;                           company-yasnippet
-    ;;                           company-dabbrev
-    ;;                           company-ispell)))
-    )
+                             company-ispell)))
 
   (dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))
-    (add-hook hook #'sb/company-latex-mode)))
+    (add-hook hook (lambda ()
+                     (sb/company-latex-mode)
+                     (company-fuzzy-mode 1)))))
 
-;; (progn
-;;   (defun sb/company-web-mode ()
-;;     "Add backends for web completion in company mode."
+(progn
+  (defun sb/company-web-mode ()
+    "Add backends for web completion in company mode."
 
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '(company-capf
-;;                              company-files
-;;                              company-yasnippet
-;;                              company-dabbrev
-;;                              company-ispell)))
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev
+                             company-ispell)))
 
-;;   (dolist (hook '(web-mode-hook))
-;;     (add-hook hook #'sb/company-web-mode)))
+  (dolist (hook '(web-mode-hook))
+    (add-hook hook (lambda ()
+                     (sb/company-web-mode)
+                     (company-fuzzy-mode 1)))))
 
 ;; Use `emacsclient -c -nw' to start a new frame.
 (use-package server
@@ -4946,11 +4965,15 @@ Ignore if no file is found."
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
 (setenv "SHELL" shell-file-name) ; Recommended to connect with bash
 
+;; `vterm' provides better performance than `eshell', `shell', and `(ansi-)term'. The advantage of
+;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
+;; Check https://github.com/akermu/emacs-libvterm.
 (use-package vterm
   :config
   (setq vterm-always-compile-module t
         vterm-max-scrollback 5000
         vterm-term-environment-variable "xterm-24bit")
+
   (add-hook 'vterm-mode-hook
             (lambda ()
               (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
@@ -5138,6 +5161,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
 (defun sb/get-derived-modes (mode)
   "Return a list of the ancestor modes that MODE is derived from."
+  (interactive)
   (let ((modes ())
         (parent nil))
     (while (setq parent (get mode 'derived-mode-parent))
@@ -5219,12 +5243,6 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 
 (add-to-list 'term-file-aliases '("alacritty" . "xterm"))
 
-(declare-function sb/comment-line "defuns")
-(declare-function sb/save-all-buffers "defuns")
-(declare-function sb/previous-buffer "defuns")
-(declare-function sb/next-buffer "defuns")
-(declare-function sb/switch-to-scratch "defuns")
-
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
@@ -5276,10 +5294,12 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 (use-package which-key ; Show help popups for prefix keys
   :diminish
   :commands (which-key-mode which-key-setup-side-window-right-bottom)
-  :init (run-with-idle-timer 3 nil #'which-key-mode)
+  ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
+  :hook (after-init . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
-  ;; Allow C-h to trigger which-key before it is done automatically
+
+  ;; Allow "C-h" to trigger `which-key' before it is done automatically
   (setq which-key-show-early-on-C-h t
         which-key-sort-order 'which-key-key-order-alpha))
 
@@ -5287,8 +5307,12 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   :commands which-key-posframe-mode
   :hook (which-key-mode . which-key-posframe-mode)
   :config
-  ;; The posframe has a low contrast
+  ;; Modify the posframe background if it has a low contrast
   ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
+
+  ;; Thicker border makes the posframe easier to distinguish
+  (setq which-key-posframe-border-width 4)
+
   ;; Positioning the frame at the top obstructs the view to a lesser degree
   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
 
@@ -5635,23 +5659,23 @@ _v_ verify setup    _f_ check           _m_ mode
 
 ;; Mark safe variables
 
-(put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
-(put 'company-bibtex-bibliography             'safe-local-variable #'listp)
-(put 'company-clang-arguments                 'safe-local-variable #'listp)
-(put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
-(put 'flycheck-checker                        'safe-local-variable #'listp)
-(put 'flycheck-clang-include-path             'safe-local-variable #'listp)
-(put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
-(put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
-(put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
-(put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
-(put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
-(put 'projectile-enable-caching               'safe-local-variable #'stringp)
-(put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
-(put 'projectile-project-root                 'safe-local-variable #'stringp)
-(put 'pyvenv-activate                         'safe-local-variable #'stringp)
-(put 'reftex-default-bibliography             'safe-local-variable #'listp)
-(put 'tags-table-list                         'safe-local-variable #'listp)
+;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
+;; (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
+;; (put 'company-clang-arguments                 'safe-local-variable #'listp)
+;; (put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
+;; (put 'flycheck-checker                        'safe-local-variable #'listp)
+;; (put 'flycheck-clang-include-path             'safe-local-variable #'listp)
+;; (put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
+;; (put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
+;; (put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
+;; (put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
+;; (put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
+;; (put 'projectile-enable-caching               'safe-local-variable #'stringp)
+;; (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
+;; (put 'projectile-project-root                 'safe-local-variable #'stringp)
+;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
+;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
+;; (put 'tags-table-list                         'safe-local-variable #'listp)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
