@@ -40,13 +40,15 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-operandi
+  'doom-nord
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
+           (const :tag "doom-one-light"  doom-one-light)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
+           (const :tag "doom-nord"       doom-nord)
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
@@ -320,6 +322,9 @@ This location is used for temporary installations and files.")
       ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
       ;; information
       eval-expression-print-length 500
+      ;; Accelerate scrolling operations when non-nil. Only those portions of the buffer which are
+      ;; actually going to be displayed get fontified.
+      fast-but-imprecise-scrolling t
       ;; Disable the warning "X and Y are the same file" in case of symlinks
       find-file-suppress-same-file-warnings t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
@@ -394,14 +399,14 @@ This location is used for temporary installations and files.")
   (add-to-list 'completion-ignored-extensions exts))
 
 ;; Activate utf-8
-(setq locale-coding-system   'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
-(prefer-coding-system        'utf-8)
-(set-default-coding-systems  'utf-8)
-(set-keyboard-coding-system  'utf-8)
-(set-language-environment    'utf-8)
-(set-selection-coding-system 'utf-8)
-(set-terminal-coding-system  'utf-8)
+(set-language-environment    "UTF-8")
+;; (setq locale-coding-system   'utf-8)
+;; (setq-default buffer-file-coding-system 'utf-8)
+;; (prefer-coding-system        'utf-8)
+;; (set-default-coding-systems  'utf-8)
+;; (set-keyboard-coding-system  'utf-8)
+;; (set-selection-coding-system 'utf-8)
+;; (set-terminal-coding-system  'utf-8)
 
 ;; Scroll settings from Doom Emacs
 (setq scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
@@ -521,6 +526,9 @@ This location is used for temporary installations and files.")
     (apply save-fn '(t)))
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
+
+(use-package ffap
+  :commands (ffip ffap))
 
 (use-package abbrev
   :ensure nil
@@ -1295,7 +1303,10 @@ This location is used for temporary installations and files.")
 (use-package isearch
   :ensure nil
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
-  :config (setq search-highlight t) ; Highlight incremental search
+  :config
+  (setq search-highlight       t ; Highlight incremental search
+        isearch-lazy-highlight t
+        isearch-lazy-count     t)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
@@ -1554,14 +1565,14 @@ This location is used for temporary installations and files.")
   :ensure flx
   :ensure t
   :after company
-  :diminish company-fuzzy-mode
+  :diminish (company-fuzzy-mode global-company-fuzzy-mode)
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
   :config
   (setq company-fuzzy-sorting-backend 'flx
         company-fuzzy-show-annotation nil ; The right-hand side gets cut off
         ;; We should not need this because the `flx' sorting accounts for the prefix
-        company-fuzzy-prefix-on-top t))
+        company-fuzzy-prefix-on-top nil))
 
 (use-package yasnippet
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
@@ -4074,9 +4085,12 @@ This location is used for temporary installations and files.")
         web-mode-enable-css-colorization          t
         web-mode-enable-current-element-highlight t ; Highlight the element under the cursor
         web-mode-enable-current-column-highlight  t
-        web-mode-css-indent-offset                2
-        web-mode-code-indent-offset               2
-        web-mode-style-padding                    2)
+        web-mode-markup-indent-offset             2 ; HTML
+        web-mode-css-indent-offset                2 ; CSS
+        web-mode-code-indent-offset               2 ; Script
+        web-mode-style-padding                    2 ; For `<style>' tag
+        ;; For `<script>' tag
+        web-mode-script-padding                   2)
 
   (lsp-register-client
    (make-lsp-client
@@ -4212,6 +4226,10 @@ This location is used for temporary installations and files.")
   :ensure keytar
   :ensure t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
+  :commands (lsp-grammarly--server-command lsp-grammarly--init
+                                           lsp-grammarly--get-credentials lsp-grammarly--get-token
+                                           lsp-grammarly--store-token lsp-grammarly--show-error
+                                           lsp-grammarly--update-document-state)
   :hook
   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
                                                      (require 'lsp-grammarly)
@@ -4730,13 +4748,14 @@ Ignore if no file is found."
     (set (make-local-variable 'company-backends)
          '(company-files
            company-dabbrev
-           company-ispell)
-         ))
+           company-ispell
+           company-abbrev)))
 
   (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook hook (lambda ()
                      (sb/company-text-mode)
-                     (company-fuzzy-mode 1)))))
+                     (company-fuzzy-mode 1)
+                     (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-xml-mode ()
@@ -4755,7 +4774,8 @@ Ignore if no file is found."
   (dolist (hook '(nxml-mode-hook))
     (add-hook hook (lambda ()
                      (sb/company-xml-mode)
-                     (company-fuzzy-mode 1)))))
+                     (company-fuzzy-mode 1)
+                     (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-prog-mode ()
@@ -4763,7 +4783,7 @@ Ignore if no file is found."
     (defvar company-minimum-prefix-length)
     (defvar company-backends)
 
-    (setq-local company-minimum-prefix-length 2)
+    (setq-local company-minimum-prefix-length 3)
     (make-local-variable 'company-backends)
 
     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
@@ -4775,7 +4795,8 @@ Ignore if no file is found."
 
   (add-hook 'prog-mode-hook (lambda ()
                               (sb/company-prog-mode)
-                              (company-fuzzy-mode 1))))
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
 
 ;; (progn
 ;;   (defun sb/company-java-mode ()
@@ -4783,7 +4804,7 @@ Ignore if no file is found."
 ;;     (defvar company-minimum-prefix-length)
 ;;     (defvar company-backends)
 
-;;     (setq-local company-minimum-prefix-length 2)
+;;     (setq-local company-minimum-prefix-length 3)
 ;;     (make-local-variable 'company-backends)
 ;;     (setq company-backends '((company-capf :with company-yasnippet)
 ;;                              (company-files : with company-yasnippet)
@@ -4811,13 +4832,13 @@ Ignore if no file is found."
 ;;   (add-hook 'c-mode-common-hook #'sb/company-c-mode))
 
 (progn
-  (use-package company-shell
-    :defines company-shell-delete-duplictes
-    :commands (company-shell company-shell-env company-fish-shell)
-    :config (setq company-shell-delete-duplictes t))
-
   (defun sb/company-sh-mode ()
     "Add backends for shell script completion in company mode."
+    (use-package company-shell
+      :defines company-shell-delete-duplictes
+      :commands (company-shell company-shell-env company-fish-shell)
+      :config (setq company-shell-delete-duplictes t))
+
     (defvar company-minimum-prefix-length)
     (defvar company-backends)
 
@@ -4833,10 +4854,16 @@ Ignore if no file is found."
 
   (add-hook 'sh-mode-hook (lambda ()
                             (sb/company-sh-mode)
-                            (company-fuzzy-mode 1)))
+                            (company-fuzzy-mode 1)
+                            (diminish 'company-fuzzy-mode)))
 
   (defun sb/company-fish-mode ()
     "Add backends for fish shell script completion in company mode."
+    (use-package company-shell
+      :defines company-shell-delete-duplictes
+      :commands (company-shell company-shell-env company-fish-shell)
+      :config (setq company-shell-delete-duplictes t))
+
     (defvar company-minimum-prefix-length)
     (defvar company-backends)
 
@@ -4853,7 +4880,8 @@ Ignore if no file is found."
 
   (add-hook 'fish-mode-hook (lambda ()
                               (sb/company-fish-mode)
-                              (company-fuzzy-mode 1))))
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
 
 ;; (progn
 ;;   (defun sb/company-elisp-mode ()
@@ -4878,7 +4906,7 @@ Ignore if no file is found."
 ;;     (defvar company-minimum-prefix-length)
 ;;     (defvar company-backends)
 
-;;     (setq-local company-minimum-prefix-length 2)
+;;     (setq-local company-minimum-prefix-length 3)
 ;;     (make-local-variable 'company-backends)
 ;;     ;; `company-dabbrev-code' is useful for variable names
 ;;     (setq company-backends '(company-capf
@@ -4898,19 +4926,23 @@ Ignore if no file is found."
                                      company-auctex-bibs company-auctex-macros
                                      company-auctex-symbols company-auctex-environments)
       :config (company-auctex-init))
+
     (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
       :demand t)
+
     (use-package company-math
       :demand t
       :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+
     (use-package company-reftex
       :demand t
       :commands (company-reftex-labels company-reftex-citations))
+
     (use-package company-bibtex
       :demand t
       :commands company-bibtex)
 
-    (setq-local company-minimum-prefix-length 2)
+    (setq-local company-minimum-prefix-length 3)
     (make-local-variable 'company-backends)
 
     ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
@@ -4935,7 +4967,8 @@ Ignore if no file is found."
   (dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))
     (add-hook hook (lambda ()
                      (sb/company-latex-mode)
-                     (company-fuzzy-mode 1)))))
+                     (company-fuzzy-mode 1)
+                     (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-web-mode ()
@@ -4951,9 +4984,10 @@ Ignore if no file is found."
   (dolist (hook '(web-mode-hook))
     (add-hook hook (lambda ()
                      (sb/company-web-mode)
-                     (company-fuzzy-mode 1)))))
+                     (company-fuzzy-mode 1)
+                     (diminish 'company-fuzzy-mode)))))
 
-;; Use `emacsclient -c -nw' to start a new frame.
+;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
   :disabled t
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
