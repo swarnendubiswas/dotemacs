@@ -57,7 +57,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'mini
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -65,6 +65,7 @@
            (const :tag "awesome-tray"    awesome-tray)
            (const :tag "spaceline"       spaceline)
            (const :tag "moody"           moody)
+           (const :tag "mini-modeline"   mini)
            (const :tag "none"            none))
   :group 'sb/emacs)
 
@@ -819,6 +820,21 @@ This location is used for temporary installations and files.")
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 
+(use-package mini-modeline
+  :diminish
+  :if (eq sb/modeline-theme 'mini)
+  :hook (after-init . mini-modeline-mode)
+  :config
+  (setq mini-modeline-r-format '("%e" mode-line-front-space
+                                 mode-line-client
+                                 mode-line-modified
+                                 mode-line-remote
+                                 mode-line-frame-identification
+                                 mode-line-buffer-identification
+                                 mode-line-position
+                                 (:eval (string-trim (format-mode-line mode-line-modes)))
+                                 mode-line-misc-info)))
+
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
 (use-package auto-dim-other-buffers
@@ -862,6 +878,11 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
   (set-face-attribute 'mode-line nil :height 120)
   (set-face-attribute 'mode-line-inactive nil :height 120))
+
+(when (string= (system-name) "swarnendu-Dell-XPS-L502X")
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
@@ -3291,8 +3312,9 @@ This location is used for temporary installations and files.")
             ;; Highlight and allow to open http link at point in programming buffers.
             ;; `goto-address-prog-mode' only highlights links in strings and comments.
             (goto-address-prog-mode 1)
-            ;; Native from Emacs 27+
-            (display-fill-column-indicator-mode 1)))
+            ;; Native from Emacs 27+. Disable in TUI since the line characters also get copied.
+            (when (display-graphic-p)
+              (display-fill-column-indicator-mode 1))))
 
 (use-package elisp-mode
   :ensure nil
@@ -4242,23 +4264,23 @@ This location is used for temporary installations and files.")
 
   ;; (defvar lsp-grammarly-active-modes)
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-    :priority -1
-    :remote? t
-    :add-on? t
-    :server-id 'grammarly-ls-remote
-    :download-server-fn (lambda (_client callback error-callback _update?)
-                          (lsp-package-ensure 'grammarly-ls callback error-callback))
-    :after-open-fn #'lsp-grammarly--init
-    :async-request-handlers
-    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
-        ("$/getToken" #'lsp-grammarly--get-token)
-        ("$/storeToken" #'lsp-grammarly--store-token)
-        ("$/showError" #'lsp-grammarly--show-error)
-        ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+  ;;   :priority -1
+  ;;   :remote? t
+  ;;   :add-on? t
+  ;;   :server-id 'grammarly-ls-remote
+  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
+  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
+  ;;   :after-open-fn #'lsp-grammarly--init
+  ;;   :async-request-handlers
+  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+  ;;       ("$/getToken" #'lsp-grammarly--get-token)
+  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
+  ;;       ("$/showError" #'lsp-grammarly--show-error)
+  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
 
   )
 
@@ -4283,25 +4305,25 @@ This location is used for temporary installations and files.")
 
   ;; (defvar lsp-ltex-active-modes)
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-    :priority -2
-    :add-on? t
-    :remote? t
-    :server-id 'ltex-ls-remote
-    :download-server-fn
-    (lambda (_client _callback error-callback _update?)
-      (lsp-package-ensure
-       'ltex-ls
-       (lambda ()
-         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-                                      "-C" dest)
-             (error "Error during the unzip process: tar"))))
-       error-callback))))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-tramp-connection
+  ;;                    "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+  ;;   :priority -2
+  ;;   :add-on? t
+  ;;   :remote? t
+  ;;   :server-id 'ltex-ls-remote
+  ;;   :download-server-fn
+  ;;   (lambda (_client _callback error-callback _update?)
+  ;;     (lsp-package-ensure
+  ;;      'ltex-ls
+  ;;      (lambda ()
+  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+  ;;                                     "-C" dest)
+  ;;            (error "Error during the unzip process: tar"))))
+  ;;      error-callback))))
 
   )
 
