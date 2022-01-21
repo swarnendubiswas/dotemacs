@@ -40,7 +40,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'doom-nord
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -705,8 +705,8 @@ This location is used for temporary installations and files.")
 
   (unless (display-graphic-p)
     (cond
-     ((eq sb/gui-theme 'modus-operandi) (load-theme 'modus-operandi t))
-     ((eq sb/gui-theme 'modus-vivendi) (load-theme 'modus-vivendi t)))))
+     ((eq sb/tui-theme 'modus-operandi) (load-theme 'modus-operandi t))
+     ((eq sb/tui-theme 'modus-vivendi) (load-theme 'modus-vivendi t)))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -774,6 +774,7 @@ This location is used for temporary installations and files.")
         ;; Line ending convention used in the current buffer (unix, dos or mac) without abbreviation
         spaceline-buffer-encoding-p nil
         spaceline-persp-name-p nil)
+
   ;; (set-face-attribute 'powerline-inactive1 nil
   ;;                     :background "gray40"
   ;;                     :foreground "white"
@@ -789,6 +790,7 @@ This location is used for temporary installations and files.")
   ;;   (set-face-attribute 'mode-line-inactive nil
   ;;                       :background "grey88"
   ;;                       :foreground "black"))
+
   (spaceline-emacs-theme))
 
 (use-package awesome-tray ; Minimal modeline information
@@ -839,7 +841,7 @@ This location is used for temporary installations and files.")
 ;; line.
 (use-package auto-dim-other-buffers
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
-  :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
+  ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
   :hook (after-init . auto-dim-other-buffers-mode))
 
 ;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
@@ -3355,6 +3357,8 @@ This location is used for temporary installations and files.")
   :config (yaml-imenu-enable))
 
 (declare-function ht-merge "ht")
+
+;; TODO: Disable `flycheck-mode-line' per-buffer when `lsp-modeline-diagnostics-mode' is active.
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always
 ;; want to format unrelated files and buffers (e.g., commented YAML files in out-of-project
