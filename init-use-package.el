@@ -551,6 +551,7 @@ This location is used for temporary installations and files.")
     (funcall mode -1)))
 
 (use-package hl-line
+  :if (display-graphic-p)
   :hook (after-init . global-hl-line-mode))
 
 ;; Enable the following modes
@@ -1010,7 +1011,10 @@ This location is used for temporary installations and files.")
         dired-recursive-copies 'always ; Single prompt for all n directories
         dired-recursive-deletes 'always ; Single prompt for all n directories
         ;; Do not ask whether to kill buffers visiting deleted files
-        dired-clean-confirm-killing-deleted-buffers nil))
+        dired-clean-confirm-killing-deleted-buffers nil)
+
+  (when (boundp dired-kill-when-opening-new-dired-buffer)
+    (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
   :ensure nil
@@ -1049,6 +1053,7 @@ This location is used for temporary installations and files.")
 
 ;; Do not create multiple dired buffers
 (use-package dired+
+  :if (= emacs-major-version 27)
   :load-path "extras"
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
@@ -1992,6 +1997,7 @@ This location is used for temporary installations and files.")
 (use-package aggressive-indent
   :commands aggressive-indent-mode
   :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
+  :diminish
   :config
   (setq aggressive-indent-comments-too t
         ;; Never use `electric-indent-mode'
@@ -2355,8 +2361,8 @@ This location is used for temporary installations and files.")
   ;; Increase the width to see the major mode clearly
   (ivy-rich-modify-columns 'ivy-switch-buffer
                            '((ivy-rich-switch-buffer-size (:align right))
-                             (ivy-rich-switch-buffer-major-mode (:width 20 :face error))
-                             (ivy-rich-switch-buffer-project (:width 0.25 :face success))))
+                             (ivy-rich-switch-buffer-major-mode (:width 18 :face error))
+                             (ivy-rich-switch-buffer-project (:width 0.30 :face success))))
 
   (ivy-rich-set-columns 'counsel-recentf
                         '((file-name-nondirectory (:width 0.24))
@@ -3283,14 +3289,13 @@ This location is used for temporary installations and files.")
   :config
   (setq css-indent-offset 2)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("css-languageserver" "--stdio"))
-  ;;   :major-modes '(css-mode)
-  ;;   :remote? t
-  ;;   :server-id 'cssls-remote))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+    :major-modes '(css-mode)
+    :remote? t
+    :server-id 'cssls-remote)))
 
 (use-package css-eldoc
   :disabled t ;; We use LSP
@@ -3347,15 +3352,14 @@ This location is used for temporary installations and files.")
                  (spell-fu-mode -1)
                  (flyspell-mode -1)
                  (lsp-deferred)))
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("yaml-language-server" "--stdio"))
-  ;;   :major-modes '(yaml-mode)
-  ;;   :remote? t
-  ;;   :server-id 'yamlls-remote))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("yaml-language-server" "--stdio"))
+    :major-modes '(yaml-mode)
+    :remote? t
+    :server-id 'yamlls-remote)))
 
 (use-package yaml-imenu
   :after yaml-mode
@@ -3653,12 +3657,12 @@ This location is used for temporary installations and files.")
 
   (unbind-key "C-M-a" c-mode-map)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "clangd")
-  ;;   :major-modes '(c-mode c++-mode)
-  ;;   :remote? t
-  ;;   :server-id 'clangd-remote))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "clangd")
+    :major-modes '(c-mode c++-mode)
+    :remote? t
+    :server-id 'clangd-remote))
   :bind
   (:map c-mode-base-map
         ("C-c c a" . c-beginning-of-defun)
@@ -3693,14 +3697,13 @@ This location is used for temporary installations and files.")
                   (spell-fu-mode -1)
                   (flyspell-mode -1)
                   (lsp-deferred)))
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "cmake-language-server")
-  ;;   :major-modes '(cmake-mode)
-  ;;   :remote? t
-  ;;   :server-id 'cmakels-remote))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "cmake-language-server")
+    :major-modes '(cmake-mode)
+    :remote? t
+    :server-id 'cmakels-remote)))
 
 (use-package cmake-font-lock
   :commands cmake-font-lock-activate
@@ -3775,33 +3778,32 @@ This location is used for temporary installations and files.")
   :config
   (setq lsp-pyright-python-executable-cmd "python3")
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    (lambda ()
-  ;;                      (cons "pyright-langserver"
-  ;;                            lsp-pyright-langserver-command-args)))
-  ;;   :major-modes '(python-mode)
-  ;;   :remote? t
-  ;;   :server-id 'pyright-remote
-  ;;   :multi-root lsp-pyright-multi-root
-  ;;   :priority 3
-  ;;   :initialization-options (lambda ()
-  ;;                             (ht-merge (lsp-configuration-section "pyright")
-  ;;                                       (lsp-configuration-section "python")))
-  ;;   :initialized-fn (lambda (workspace)
-  ;;                     (with-lsp-workspace workspace
-  ;;                       (lsp--set-configuration
-  ;;                        (ht-merge (lsp-configuration-section "pyright")
-  ;;                                  (lsp-configuration-section "python")))))
-  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                         (lsp-package-ensure 'pyright callback error-callback))
-  ;;   :notification-handlers
-  ;;   (lsp-ht
-  ;;    ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
-  ;;    ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-  ;;    ("pyright/endProgress"    'lsp-pyright--end-progress-callback))))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (cons "pyright-langserver"
+                             lsp-pyright-langserver-command-args)))
+    :major-modes '(python-mode)
+    :remote? t
+    :server-id 'pyright-remote
+    :multi-root lsp-pyright-multi-root
+    :priority 3
+    :initialization-options (lambda ()
+                              (ht-merge (lsp-configuration-section "pyright")
+                                        (lsp-configuration-section "python")))
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                        (lsp--set-configuration
+                         (ht-merge (lsp-configuration-section "pyright")
+                                   (lsp-configuration-section "python")))))
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'pyright callback error-callback))
+    :notification-handlers
+    (lsp-ht
+     ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
+     ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+     ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
 (use-package lsp-jedi
   :defines lsp-jedi-diagnostics-enable
@@ -3812,13 +3814,12 @@ This location is used for temporary installations and files.")
   :config
   (setq lsp-jedi-diagnostics-enable t)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "jedi-language-server")
-  ;;   :major-modes '(python-mode)
-  ;;   :remote? t
-  ;;   :server-id 'jedils-remote))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "jedi-language-server")
+    :major-modes '(python-mode)
+    :remote? t
+    :server-id 'jedils-remote)))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
@@ -3836,25 +3837,24 @@ This location is used for temporary installations and files.")
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    (lambda ()
-  ;;                      (list lsp-perl-language-server-path
-  ;;                            "-MPerl::LanguageServer" "-e"
-  ;;                            "Perl::LanguageServer::run" "--"
-  ;;                            (format "--port %d --version %s"
-  ;;                                    lsp-perl-language-server-port
-  ;;                                    lsp-perl-language-server-client-version))))
-  ;;   :major-modes '(perl-mode cperl-mode)
-  ;;   :remote? t
-  ;;   :initialized-fn (lambda (workspace)
-  ;;                     (with-lsp-workspace workspace
-  ;;                       (lsp--set-configuration
-  ;;                        (lsp-configuration-section "perl"))))
-  ;;   :priority -1
-  ;;   :server-id 'perlls-remote))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (list lsp-perl-language-server-path
+                             "-MPerl::LanguageServer" "-e"
+                             "Perl::LanguageServer::run" "--"
+                             (format "--port %d --version %s"
+                                     lsp-perl-language-server-port
+                                     lsp-perl-language-server-client-version))))
+    :major-modes '(perl-mode cperl-mode)
+    :remote? t
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
+    :priority -1
+    :server-id 'perlls-remote)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -3921,14 +3921,13 @@ This location is used for temporary installations and files.")
         ;; Indent comments as a regular line
         sh-indent-comment t)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("bash-language-server" "start"))
-  ;;   :major-modes '(sh-mode)
-  ;;   :remote? t
-  ;;   :server-id 'bashls-remote))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("bash-language-server" "start"))
+    :major-modes '(sh-mode)
+    :remote? t
+    :server-id 'bashls-remote)))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -4130,14 +4129,13 @@ This location is used for temporary installations and files.")
         ;; For `<script>' tag
         web-mode-script-padding                   2)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("html-languageserver" "--stdio"))
-  ;;   :major-modes '(html-mode web-mode mhtml-mode)
-  ;;   :remote? t
-  ;;   :server-id 'htmlls-remote))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("html-languageserver" "--stdio"))
+    :major-modes '(html-mode web-mode mhtml-mode)
+    :remote? t
+    :server-id 'htmlls-remote)))
 
 (use-package emmet-mode
   :defines emmet-move-cursor-between-quote
@@ -4166,14 +4164,13 @@ This location is used for temporary installations and files.")
   (setq nxml-auto-insert-xml-declaration-flag t
         nxml-slash-auto-complete-flag t)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("java" "-jar" lsp-xml-jar-file))
-  ;;   :major-modes '(xml-mode nxml-mode)
-  ;;   :remote? t
-  ;;   :server-id 'xmlls-remote))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("java" "-jar" lsp-xml-jar-file))
+    :major-modes '(xml-mode nxml-mode)
+    :remote? t
+    :server-id 'xmlls-remote)))
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
@@ -4274,31 +4271,31 @@ This location is used for temporary installations and files.")
   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
                                                      (require 'lsp-grammarly)
                                                      (lsp-deferred)))
-  ;; :config
+  :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
   ;;       lsp-grammarly-user-words '(
   ;;                                  ))
 
-  ;; (defvar lsp-grammarly-active-modes)
+  (defvar lsp-grammarly-active-modes)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-  ;;   :priority -1
-  ;;   :remote? t
-  ;;   :add-on? t
-  ;;   :server-id 'grammarly-ls-remote
-  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
-  ;;   :after-open-fn #'lsp-grammarly--init
-  ;;   :async-request-handlers
-  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
-  ;;       ("$/getToken" #'lsp-grammarly--get-token)
-  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
-  ;;       ("$/showError" #'lsp-grammarly--show-error)
-  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+    :priority -1
+    :remote? t
+    :add-on? t
+    :server-id 'grammarly-ls-remote
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'grammarly-ls callback error-callback))
+    :after-open-fn #'lsp-grammarly--init
+    :async-request-handlers
+    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+        ("$/getToken" #'lsp-grammarly--get-token)
+        ("$/storeToken" #'lsp-grammarly--store-token)
+        ("$/showError" #'lsp-grammarly--show-error)
+        ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
 
   )
 
@@ -4319,30 +4316,30 @@ This location is used for temporary installations and files.")
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
   (setq lsp-ltex-disabled-rules
         #s(hash-table size 30 data
-                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
+                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
+                      ("en-US" ["WHITESPACE_RULE"])))
 
-  ;; (defvar lsp-ltex-active-modes)
+  (defvar lsp-ltex-active-modes)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-  ;;   :priority -2
-  ;;   :add-on? t
-  ;;   :remote? t
-  ;;   :server-id 'ltex-ls-remote
-  ;;   :download-server-fn
-  ;;   (lambda (_client _callback error-callback _update?)
-  ;;     (lsp-package-ensure
-  ;;      'ltex-ls
-  ;;      (lambda ()
-  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-  ;;                                     "-C" dest)
-  ;;            (error "Error during the unzip process: tar"))))
-  ;;      error-callback))))
-
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+    :priority -2
+    :add-on? t
+    :remote? t
+    :server-id 'ltex-ls-remote
+    :download-server-fn
+    (lambda (_client _callback error-callback _update?)
+      (lsp-package-ensure
+       'ltex-ls
+       (lambda ()
+         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+                                      "-C" dest)
+             (error "Error during the unzip process: tar"))))
+       error-callback))))
   )
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
@@ -4625,6 +4622,7 @@ Ignore if no file is found."
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
+   ("pyrightconfig.json"          . jsonc-mode)
    (".*/vscode/settings.json$"    . jsonc-mode)
    (".*/\\.vscode/settings.json$" . jsonc-mode)
    ("User/settings.json$"         . jsonc-mode))
@@ -4633,15 +4631,14 @@ Ignore if no file is found."
                               (make-local-variable 'js-indent-level)
                               (setq js-indent-level 2)
                               (lsp-deferred)))
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("vscode-json-languageserver" "--stdio"))
-  ;;   :major-modes '(json-mode jsonc-mode)
-  ;;   :remote? t
-  ;;   :server-id 'jsonls-remote))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("vscode-json-languageserver" "--stdio"))
+    :major-modes '(json-mode jsonc-mode)
+    :remote? t
+    :server-id 'jsonls-remote)))
 
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)
@@ -4684,6 +4681,7 @@ Ignore if no file is found."
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
   :commands (format-all-ensure-formatter format-all-buffer)
+  :diminish
   :preface
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
@@ -4691,7 +4689,10 @@ Ignore if no file is found."
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
   ;; :init (run-with-idle-timer 2 nil #'sb/enable-format-all)
-  :hook (after-init . sb/enable-format-all))
+  :diminish
+  :hook
+  ((format-all-mode . format-all-ensure-formatter)
+   ((bazel-mode LaTeX-mode web-mode markdown-mode) . format-all-mode)))
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
@@ -4987,7 +4988,7 @@ Ignore if no file is found."
     (make-local-variable 'company-backends)
 
     ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-    ;; labels and citations
+    ;; labels and citations.
 
     (setq company-backends '(company-capf
                              company-files

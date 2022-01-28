@@ -1,6 +1,6 @@
 * Useful Keyboard Shortcuts
 
-This file lists useful keyboard shortcuts and describes how to deal with common use cases. Most keybindings are from a default installation of GNU Emacs, so the keybindings listed here should also be available in the reference cards. I am maintaining this for my ease of reference.
+This file lists keyboard shortcuts and describes how to deal with frequent use cases. I am maintaining this for ease of reference, although most keybindings are from a default installation of GNU Emacs.
 
 Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings defined using ~bind-key~. Use ~C-h m (describe-mode)~ to view documentation for the current major mode, including a list of its key bindings.
 
@@ -397,10 +397,8 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 - Use ~C-x C-s~ to commit ~wgrep~
 - Use ~C-x s !~ to save the changed files
 
-- References
-
-  - [[http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open]]
-  - [[https://emacsbliss.com/post/emacs-search-replace/]]
+- [[http://stackoverflow.com/questions/270930/using-emacs-to-recursively-find-and-replace-in-text-files-not-already-open]]
+- [[https://emacsbliss.com/post/emacs-search-replace/]]
 
 *** Search for the symbol at point
 
@@ -432,3 +430,7 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 
 - ~C-x j~ - List all files in given directory (~sb/counsel-all-files-recursively~)
 - ~C-x f~ - Jump to a file below the current directory (~counsel-file-jump~)
+
+*** Combining ~find~ and ~grep~
+
+The use case is to search all files in a file hierarchy for some regular expression with a ~find~/~grep~ pipeline. For example, to search the ~lisp~ directory and all of its subdirectories for file containing the ~mapcar~ function, one could use ~find ~/lisp -name "*.lisp" -exec grep -H mapcar {} \;~. In GNU Emacs, we can use ~find-grep-dired~.

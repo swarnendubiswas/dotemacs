@@ -124,10 +124,11 @@
 ;; deprecated.
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
-(when (fboundp 'menu-bar-mode)
-  (menu-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
+;; The menu bar is useful to identify different capabilities available and the shortcuts.
+;; (when (fboundp 'menu-bar-mode)
+;;   (menu-bar-mode -1))
 
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/

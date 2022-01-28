@@ -309,6 +309,7 @@
     ("comited" "committed" nil :count 0)
     ("comittee" "committee" nil :count 0)
     ("commadn" "command" nil :count 0)
+    ("commidity" "commodity" nil :count 0)
     ("comming" "coming" nil :count 0)
     ("commited" "committed" nil :count 0)
     ("commitee" "committee" nil :count 0)
