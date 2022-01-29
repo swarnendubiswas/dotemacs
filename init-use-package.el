@@ -57,7 +57,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'mini
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -214,6 +214,7 @@ This location is used for temporary installations and files.")
 
 (setq custom-file sb/custom-file)
 
+;; NOTE: Make a symlink to "private.el" under say "$HOME/.emacs.d/etc"
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
@@ -551,6 +552,7 @@ This location is used for temporary installations and files.")
     (funcall mode -1)))
 
 (use-package hl-line
+  :commands hl-line-highlight
   :if (display-graphic-p)
   :hook (after-init . global-hl-line-mode))
 
@@ -679,6 +681,12 @@ This location is used for temporary installations and files.")
 
 (use-package modus-themes
   :ensure moody
+  :defines (modus-themes-completions modus-themes-fringes
+                                     modus-themes-prompts
+                                     modus-themes-lang-checkers
+                                     modus-themes-hl-line
+                                     modus-themes-org-blocks
+                                     modus-themes-mode-line)
   :if (or (and (display-graphic-p)
                (or (eq sb/gui-theme 'modus-operandi)
                    (eq sb/gui-theme 'modus-vivendi)))
@@ -1024,9 +1032,11 @@ This location is used for temporary installations and files.")
   :bind ("C-x C-j"  . dired-jump)
   :config
   (setq dired-cleanup-buffers-too t
-        dired-bind-jump t
         ;; Do not show messages when omitting files
         dired-omit-verbose nil)
+
+  (when (boundp 'dired-bind-jump) ;; Obsolete from Emacs 28+
+    (setq dired-bind-jump t))
 
   ;; (setq dired-omit-files
   ;;       (concat dired-omit-files
@@ -2142,7 +2152,7 @@ This location is used for temporary installations and files.")
   :config
   (setq projectile-enable-caching nil ; Caching will not watch for file system changes
         projectile-file-exists-remote-cache-expire nil
-        projectile-mode-line-prefix "PRJ"
+        projectile-mode-line-prefix "" ; Save modeline space
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
         ;; The contents of ".projectile" are ignored when using the alien project indexing method
@@ -2164,9 +2174,10 @@ This location is used for temporary installations and files.")
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
-      (format " [%s: %s]"
-              projectile-mode-line-prefix
-              (or project-name "-"))))
+      ;; (format " [%s: %s]"
+      ;;         projectile-mode-line-prefix
+      ;;         (or project-name "-"))
+      (format " [%s]" (or project-name "-"))))
 
   (setq projectile-project-root-files '("build.gradle"
                                         "setup.py"
@@ -3248,8 +3259,15 @@ This location is used for temporary installations and files.")
 
 ;; Align fields with `C-c C-a'
 (use-package csv-mode
+  :defines lsp-disabled-clients
   :commands csv-mode
-  :config (setq csv-separators '("," ";" "|" " ")))
+  :hook
+  (csv-mode . (lambda ()
+                (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                (spell-fu-mode -1)
+                (flyspell-mode -1)))
+  :config
+  (setq csv-separators '("," ";" "|" " ")))
 
 (use-package highlight-doxygen
   :commands highlight-doxygen-global-mode
@@ -3295,7 +3313,7 @@ This location is used for temporary installations and files.")
                      '("css-languageserver" "--stdio"))
     :major-modes '(css-mode)
     :remote? t
-    :server-id 'cssls-remote)))
+    :server-id 'cssls-r)))
 
 (use-package css-eldoc
   :disabled t ;; We use LSP
@@ -3359,7 +3377,7 @@ This location is used for temporary installations and files.")
                      '("yaml-language-server" "--stdio"))
     :major-modes '(yaml-mode)
     :remote? t
-    :server-id 'yamlls-remote)))
+    :server-id 'yamlls-r)))
 
 (use-package yaml-imenu
   :after yaml-mode
@@ -3375,7 +3393,7 @@ This location is used for temporary installations and files.")
 ;; locations).
 (use-package lsp-mode
   :ensure spinner
-  :diminish "LSP"
+  ;; :diminish "LSP"
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -3662,7 +3680,7 @@ This location is used for temporary installations and files.")
     :new-connection (lsp-tramp-connection "clangd")
     :major-modes '(c-mode c++-mode)
     :remote? t
-    :server-id 'clangd-remote))
+    :server-id 'clangd-r))
   :bind
   (:map c-mode-base-map
         ("C-c c a" . c-beginning-of-defun)
@@ -3703,7 +3721,7 @@ This location is used for temporary installations and files.")
     :new-connection (lsp-tramp-connection "cmake-language-server")
     :major-modes '(cmake-mode)
     :remote? t
-    :server-id 'cmakels-remote)))
+    :server-id 'cmakels-r)))
 
 (use-package cmake-font-lock
   :commands cmake-font-lock-activate
@@ -3786,7 +3804,7 @@ This location is used for temporary installations and files.")
                              lsp-pyright-langserver-command-args)))
     :major-modes '(python-mode)
     :remote? t
-    :server-id 'pyright-remote
+    :server-id 'pyright-r
     :multi-root lsp-pyright-multi-root
     :priority 3
     :initialization-options (lambda ()
@@ -3819,7 +3837,7 @@ This location is used for temporary installations and files.")
     :new-connection (lsp-tramp-connection "jedi-language-server")
     :major-modes '(python-mode)
     :remote? t
-    :server-id 'jedils-remote)))
+    :server-id 'jedils-r)))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
@@ -3854,7 +3872,7 @@ This location is used for temporary installations and files.")
                         (lsp--set-configuration
                          (lsp-configuration-section "perl"))))
     :priority -1
-    :server-id 'perlls-remote)))
+    :server-id 'perlls-r)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -3927,7 +3945,7 @@ This location is used for temporary installations and files.")
                      '("bash-language-server" "start"))
     :major-modes '(sh-mode)
     :remote? t
-    :server-id 'bashls-remote)))
+    :server-id 'bashls-r)))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -4135,7 +4153,7 @@ This location is used for temporary installations and files.")
                      '("html-languageserver" "--stdio"))
     :major-modes '(html-mode web-mode mhtml-mode)
     :remote? t
-    :server-id 'htmlls-remote)))
+    :server-id 'htmlls-r)))
 
 (use-package emmet-mode
   :defines emmet-move-cursor-between-quote
@@ -4170,7 +4188,7 @@ This location is used for temporary installations and files.")
                      '("java" "-jar" lsp-xml-jar-file))
     :major-modes '(xml-mode nxml-mode)
     :remote? t
-    :server-id 'xmlls-remote)))
+    :server-id 'xmlls-r)))
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
@@ -4286,7 +4304,7 @@ This location is used for temporary installations and files.")
     :priority -1
     :remote? t
     :add-on? t
-    :server-id 'grammarly-ls-remote
+    :server-id 'grammarly-r
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'grammarly-ls callback error-callback))
     :after-open-fn #'lsp-grammarly--init
@@ -4329,7 +4347,7 @@ This location is used for temporary installations and files.")
     :priority -2
     :add-on? t
     :remote? t
-    :server-id 'ltex-ls-remote
+    :server-id 'ltex-r
     :download-server-fn
     (lambda (_client _callback error-callback _update?)
       (lsp-package-ensure
@@ -4370,7 +4388,7 @@ This location is used for temporary installations and files.")
 ;;     :new-connection (lsp-tramp-connection "texlab")
 ;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
 ;;     :remote? t
-;;     :server-id 'texlab-remote)))
+;;     :server-id 'texlab-r)))
 
 (use-package tex-site
   :ensure nil
@@ -4578,7 +4596,8 @@ Ignore if no file is found."
 (declare-function TeX-run-TeX "tex")
 
 (defun sb/latex-compile-open-pdf ()
-  "Save the current buffer, run LaTeXMk, and switch to the PDF after a successful compilation."
+  "Save the current buffer, run LaTeXMk, and switch to the PDF
+after a successful compilation."
   (interactive)
   (let ((TeX-save-query nil)
         (process (TeX-active-process))
@@ -4638,7 +4657,7 @@ Ignore if no file is found."
                      '("vscode-json-languageserver" "--stdio"))
     :major-modes '(json-mode jsonc-mode)
     :remote? t
-    :server-id 'jsonls-remote)))
+    :server-id 'jsonls-r)))
 
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)

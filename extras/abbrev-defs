@@ -752,6 +752,7 @@
     ("inital" "initial" nil :count 2)
     ("initalization" "initialization" nil :count 0)
     ("insignts" "insights" nil :count 0)
+    ("insititute" "institute" nil :count 0)
     ("instaleld" "installed" nil :count 0)
     ("insted" "instead" nil :count 1)
     ("insturance" "insurance" nil :count 1)
