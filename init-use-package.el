@@ -2409,7 +2409,7 @@ This location is used for temporary installations and files.")
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
         flycheck-checker-error-threshold 1500
         flycheck-idle-buffer-switch-delay 10 ; Increase the time (s) to allow for quick transitions
-        flycheck-idle-change-delay 10 ; Increase the time (s) to allow for edits
+        flycheck-idle-change-delay 15 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
         ;; Show error messages only if the error list is not already visible
         ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
@@ -3230,6 +3230,7 @@ This location is used for temporary installations and files.")
 ;; Convert `markdown' to `org': `pandoc -f markdown -t org -o output-file.org input-file.md'
 (use-package pandoc-mode
   :commands (pandoc-load-default-settings pandoc-mode)
+  :diminish
   :hook (markdown-mode . pandoc-mode)
   :config
   (pandoc-load-default-settings)
@@ -4275,8 +4276,8 @@ This location is used for temporary installations and files.")
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
-;; failures, then try logging out of Grammarly and logging in again. But it does not solve the issue
-;; for me, so I have disabled the package and I am again trying `flycheck-grammarly'.
+;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
+;; keytar-install".
 (use-package lsp-grammarly
   :ensure keytar
   :ensure t
@@ -4313,9 +4314,7 @@ This location is used for temporary installations and files.")
         ("$/getToken" #'lsp-grammarly--get-token)
         ("$/storeToken" #'lsp-grammarly--store-token)
         ("$/showError" #'lsp-grammarly--show-error)
-        ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
-
-  )
+        ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
 (use-package lsp-ltex
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
@@ -4985,8 +4984,7 @@ after a successful compilation."
       :demand t
       :commands (company-auctex-init company-auctex-labels
                                      company-auctex-bibs company-auctex-macros
-                                     company-auctex-symbols company-auctex-environments)
-      :config (company-auctex-init))
+                                     company-auctex-symbols company-auctex-environments))
 
     (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
       :demand t)
@@ -4995,7 +4993,7 @@ after a successful compilation."
       :demand t
       :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
-    (use-package company-reftex
+    (use-package company-reftex ; Reftex must be enabled to work
       :demand t
       :commands (company-reftex-labels company-reftex-citations))
 
@@ -5025,7 +5023,7 @@ after a successful compilation."
                              company-dabbrev
                              company-ispell)))
 
-  (dolist (hook '(latex-mode-hook LaTeX-mode-hook TeX-mode-hook tex-mode-hook))
+  (dolist (hook '(latex-mode-hook))
     (add-hook hook (lambda ()
                      (sb/company-latex-mode)
                      (company-fuzzy-mode 1)

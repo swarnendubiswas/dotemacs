@@ -340,4 +340,5 @@ This may lead to failures when accessing remote systems. In such cases, we can f
 ## TODO
 
 - Improve return key in ivy minibuffer map in TUI
-- Fix "C-`" vterm keybinding in TUI
+- Fix "C-\`" vterm keybinding in TUI
+- Format-all is not working automatically with `.md` files
