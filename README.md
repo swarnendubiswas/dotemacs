@@ -342,3 +342,4 @@ This may lead to failures when accessing remote systems. In such cases, we can f
 - Improve return key in ivy minibuffer map in TUI
 - Fix "C-\`" vterm keybinding in TUI
 - Format-all is not working automatically with `.md` files
+- Company fuzzy is not working with LaTeX files

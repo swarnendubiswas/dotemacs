@@ -696,7 +696,7 @@ This location is used for temporary installations and files.")
   :init
   (setq modus-themes-completions 'opinionated
         modus-themes-fringes 'intense
-        modus-themes-hl-line '(accented)
+        modus-themes-hl-line '(intense)
         modus-themes-prompts '(intense)
         modus-themes-lang-checkers '(background faint)
         modus-themes-org-blocks 'tinted-background)
@@ -1077,7 +1077,7 @@ This location is used for temporary installations and files.")
 ;; `r' is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
-  :after dired+
+  :after dired
   :defines dired-efap-initial-filename-selection
   :config (setq dired-efap-initial-filename-selection nil)
   :bind*
@@ -3447,7 +3447,8 @@ This location is used for temporary installations and files.")
                                                                :weight bold :height 0.9))))
   :config
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
-  ;; "compile_commands.json" reside
+  ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
+  ;; and parent paths of each source file.
   (setq lsp-clients-clangd-args '("-j=4"
                                   "--all-scopes-completion"
                                   "--background-index"
@@ -3456,14 +3457,12 @@ This location is used for temporary installations and files.")
                                   "--cross-file-rename"
                                   "--fallback-style=LLVM"
                                   "--header-insertion=never"
-                                  "--header-insertion-decorators"
                                   "--log=error"
-                                  "--malloc-trim"
+                                  "--malloc-trim" ;; Release memory periodically
                                   ;; Increases memory usage but can improve performance
                                   "--pch-storage=memory"
                                   "--pretty")
-        ;; lsp-clients-clangd-executable "clangd"
-        ;; Enable integration of custom backends other than `capf' with `company'
+        ;; Enable integration of custom backends other than `company-capf'
         lsp-completion-provider :none
         lsp-completion-show-detail nil ; Disable completion metadata since they can be very long
         ;; lsp-completion-show-kind nil
@@ -3480,11 +3479,11 @@ This location is used for temporary installations and files.")
         lsp-imenu-sort-methods '(position)
         ;; lsp-keep-workspace-alive nil
         lsp-log-io nil ; Increases memory usage because of JSON parsing if enabled
-        ;; We already have `flycheck' error summary listed on the modeline, but the `lsp' server may
-        ;; report additional errors. However, the modeline can get too congested.
+        ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
+        ;; additional errors. The problem is that the modeline can get too congested.
         lsp-modeline-diagnostics-enable nil
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
-        ;; lsp-modeline-workspace-status-enable nil
+        lsp-modeline-workspace-status-enable nil
         ;; Sudden changes in the height of the echo area causes the cursor to lose position,
         ;; manually request via `lsp-signature-activate'
         ;; lsp-signature-auto-activate nil
@@ -3596,8 +3595,10 @@ This location is used for temporary installations and files.")
         lsp-ui-imenu-auto-refresh 'after-save
         lsp-ui-imenu-window-width 16
         lsp-ui-sideline-enable t ; Enable/disable whole sideline
-        lsp-ui-sideline-show-diagnostics t ; Show/hide diagnostics when typing
-        lsp-ui-modeline-code-actions-enable t)
+        ;; Showing code actions in the sideline enables understanding when to invoke them
+        lsp-ui-sideline-show-code-actions t
+        ;; Show/hide diagnostics when typing because they can be intrusive
+        lsp-ui-sideline-show-diagnostics nil)
 
   (when (not (display-graphic-p))
     (setq lsp-ui-doc-enable nil
