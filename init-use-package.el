@@ -104,7 +104,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -1303,6 +1303,9 @@ This location is used for temporary installations and files.")
         org-pretty-entities-include-sub-superscripts t
         ;; Automatically sorted and renumbered whenever I insert a new one
         org-footnote-auto-adjust t)
+
+  (with-eval-after-load "org-indent"
+    (diminish 'org-indent-mode))
   :bind
   (:map org-mode-map
         ("M-<left>"  . nil)
@@ -2372,8 +2375,8 @@ This location is used for temporary installations and files.")
   ;; Increase the width to see the major mode clearly
   (ivy-rich-modify-columns 'ivy-switch-buffer
                            '((ivy-rich-switch-buffer-size (:align right))
-                             (ivy-rich-switch-buffer-major-mode (:width 18 :face error))
-                             (ivy-rich-switch-buffer-project (:width 0.30 :face success))))
+                             (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
+                             (ivy-rich-switch-buffer-project (:width 0.24 :face success))))
 
   (ivy-rich-set-columns 'counsel-recentf
                         '((file-name-nondirectory (:width 0.24))
@@ -3116,6 +3119,7 @@ This location is used for temporary installations and files.")
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
+  :if (display-graphic-p)
   :defines pdf-annot-activate-created-annotations
   :commands (pdf-tools-install pdf-loader-install pdf-view-mode
                                pdf-annot-delete pdf-annot-add-highlight-markup-annotation

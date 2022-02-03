@@ -12,9 +12,9 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
 ** Text Manipulation
 
-- ~M-l~     - Convert following word to lower case (~downcase-word~)
+- ~M-l~     - Convert the following word to lower case (~downcase-word~)
 - ~M-c~     - Capitalize the following word (~capitalize-word~)
-- ~M-u~     - Convert following word to upper case (~upcase-word~)
+- ~M-u~     - Convert the following word to upper case (~upcase-word~)
 - ~C-t~     - Transpose two characters (~transpose-chars~)
 - ~M-t~     - Transpose words (~transpose-words~ or ~subword-transpose~)
 - ~C-x r t~ - Prepend the selected region with characters (~string-rectangle~)

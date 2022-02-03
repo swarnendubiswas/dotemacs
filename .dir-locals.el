@@ -62,7 +62,8 @@
          ))
 
  (sh-mode . (
-             (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+             ;; Bash language server does not format files
+             ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
              ))
 
  (json-mode . (

@@ -12,13 +12,13 @@
 
 * Notes about Emacs
 
-Emacs searches for the init files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
+Emacs searches for the initiation files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
 To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
 ~M-:~ to evaluate an Emacs Lisp expression and print the result. Only an interactive function can be
 invoked with ~M-x~ or a key binding.
 
-The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~, since they cause eager loading and
+The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~ since they cause eager loading and
 are expensive. A cheaper alternative is to use ~autoload~.
 
 * Notes about Elisp
@@ -72,7 +72,7 @@ The equivalent version with ~with-eval-after-load~ would be:
   (setq bar 17))
 #+END_SRC
 
-*** Enable major mode per-project via directory-local variables
+*** Enable major mode per project via directory-local variables
 
 [[https://www.reddit.com/r/emacs/comments/o2zeek/how_do_you_enable_prettiermode_and_other/][Reddit post]]
 
