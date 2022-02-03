@@ -10,49 +10,56 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+USER="/home/swarnendu"
+
 DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
 DIST_VERSION="${DISTRO}_${VERSION}"
 
-# Add necessary repositories
-case "$DIST_VERSION" in
-    Ubuntu_18.04)
-        add-apt-repository ppa:ubuntu-toolchain-r/test
-        ;;
-    Ubuntu_20.04) ;;
-
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
-esac
+# TODO: Avoid much of the installation exercise if packages and Emacs are already set up.
 
 # Install important packages
 
 case "$DIST_VERSION" in
-    Ubuntu_18.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
-        ;;
-    Ubuntu_20.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
-        ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+Ubuntu_18.04)
+    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
+    ;;
+Ubuntu_20.04)
+    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
+    ;;
+*)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
+
+# Add necessary repositories
+case "$DIST_VERSION" in
+Ubuntu_18.04)
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    ;;
+Ubuntu_20.04)
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    ;;
+*)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
+esac
+
+apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
 
 # Install LLVM
 
 LLVM_VERSION="-13"
 
 case "$DIST_VERSION" in
-    Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
-    Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal$LLVM_VERSION   main" ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
+Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal$LLVM_VERSION   main" ;;
+*)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
 
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
@@ -62,16 +69,18 @@ apt install -y clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$
 
 # Download GNU Emacs source
 
-cd "$HOME"
+cd "$USER"
 EMACS_VERSION="28.0.91"
 EMACS_NAME="emacs-${EMACS_VERSION}"
+rm "${EMACS_NAME}".tar.xz* || true
 wget https://alpha.gnu.org/gnu/emacs/pretest/${EMACS_NAME}.tar.xz
 tar xf "${EMACS_NAME}.tar.xz"
-EMACS_SOURCE="$HOME/$EMACS_NAME"
+EMACS_SOURCE="$USER/$EMACS_NAME"
 
 # Build the source
 
 cd "$EMACS_SOURCE"
+export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
 ./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 make -j2 NATIVE_FULL_AOT=1
@@ -81,12 +90,12 @@ make install
 
 # Checkout configurations
 
-GITHUB="$HOME/github"
+GITHUB="$USER/github"
 DOTEMACS="$GITHUB/dotemacs"
 DOTFILES="$GITHUB/dotfiles"
-EMACSD="$HOME/.emacs.d"
+EMACSD="$USER/.emacs.d"
 
-cd "$HOME"
+cd "$USER"
 
 if [ ! -d "$GITHUB" ]; then
     mkdir -p github
@@ -100,7 +109,7 @@ if [ -d "$DOTEMACS" ]; then
     git pull
 else
     echo "Cloning dotemacs repository from Github..."
-    git clone https://github.com/swarnendubiswas/dotemacs.git
+    git clone git@github.com:swarnendubiswas/dotemacs.git
 fi
 echo "...Done"
 
@@ -110,11 +119,13 @@ if [ -d "$DOTFILES" ]; then
     git pull
 else
     echo "Cloning dotfiles repository from Github..."
-    git clone https://github.com/swarnendubiswas/dotfiles.git
+    git clone git@github.com:swarnendubiswas/dotfiles.git
 fi
 echo "...Done"
 
-cd "$HOME"
+# Link .emacs.d
+
+cd "$USER"
 
 if [ -d "$EMACSD" ]; then
     if [ ! -L "$EMACSD" ]; then
@@ -125,9 +136,20 @@ fi
 # Install Python packages
 python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 
+# Install Nodejs
+
+NODEJS_VER="17"
+
+# curl -sL https://deb.nodesource.com/setup_{$NODEJS_VER}.x -o nodesource_setup.sh
+# bash nodesource_setup.sh
+# apt install nodejs
+
+curl -fsSL https://deb.nodesource.com/setup_{$NODEJS_VER}.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
 # Setup Node packages
 
-TMP_HOME="$HOME/tmp"
+TMP_HOME="$USER/tmp"
 
 NPM_HOME="$TMP_HOME"
 mkdir -p "$NPM_HOME"
@@ -152,11 +174,13 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 # Install Texlab
 # cargo install --git https://github.com/latex-lsp/texlab.git
 
+cpanm Perl::LanguageServer
+
 # Update configurations of helper utilities
 
 # HOME Directory
 
-cd "$HOME"
+cd "$USER"
 
 if [ ! -L ".markdownxlint.json" ]; then
     echo "Creating symlink for .markdownlint.json..."
@@ -169,11 +193,11 @@ echo "...Done"
 
 # CONFIG Directory
 
-CONFIG_DIR="$HOME/.config"
+CONFIG_DIR="$USER/.config"
 if [ ! -d "$CONFIG_DIR" ]; then
     mkdir -p "$CONFIG_DIR"
 fi
-cd "$HOME/.config"
+cd "$USER/.config"
 
 if [ ! -L "pylintrc" ]; then
     echo "Creating symlink for pylintrc..."
@@ -213,14 +237,14 @@ echo "...Done"
 # Shellcheck
 SHELLCHECK_VER="0.8.0"
 
-cd "$HOME"
+cd "$USER"
 wget https://github.com/koalaman/shellcheck/releases/download/v"{$SHELLCHECK_VER}/shellcheck-v{$SHELLCHECK_VER}".linux.x86_64.tar.xz
 tar xz shellcheck-v"{SHELLCHECK_VER}".linux.x86_64.tar.xz
 
 # shfmt
 SHFMT_VER="3.4.2"
 
-cd "$HOME"
+cd "$USER"
 wget https://github.com/mvdan/sh/releases/download/v"{$SHFMT_VER}/shfmt_v{$SHFMT_VER}"_linux_amd64
 
 # Ripgrep
