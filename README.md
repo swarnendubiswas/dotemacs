@@ -343,3 +343,17 @@ This may lead to failures when accessing remote systems. In such cases, we can f
 - Fix "C-\`" vterm keybinding in TUI
 - Format-all is not working automatically with `.md` files
 - Company fuzzy is not working with LaTeX files
+
+## Use `conda`
+
+```shell
+conda create --prefix /home/hangingpawns/emacs_lsp
+
+conda activate /home/hangingpawns/emacs_lsp
+
+conda install clang clangd libclang bear
+
+export PATH=/home/hangingpawns/emacs_lsp/bin (or wherever the bin is)
+
+Do the same with ld_library_path
+```
