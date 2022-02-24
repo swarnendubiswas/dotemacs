@@ -1,5 +1,6 @@
-personal_ws-1.1 en 306 
+personal_ws-1.1 en 329 
 Agrawal
+Alacritty
 Amey
 Anupam
 Aravalli
@@ -15,22 +16,27 @@ Biswas
 CSE
 CUDA
 Chatterjee
+Chaudhuri
 Convolution
 Convolutional
 Covid
 Dagstuhl
 Deba
 Debadatta
+Deepak
 Dhandhania
 Durgapur
 FIXME
 GPGPU
 GPUs
+GeForce
 Hamim
 Hemant
+Hrugved
 IIT
 IITK
 Imon
+Jayesh
 Jikes
 KMeans
 Kalyanpur
@@ -39,16 +45,21 @@ Kharagpur
 KinectFusion
 Kolkata
 LLVM
+MESI
+MPK
 MTech
 Mainak
 Maiti
 Malakar
+Manish
 Migrator
 Mishra
 Mittal
 Modi
 Modularity
 Mondal
+Nagendra
+Naiza
 Naman
 Nath
 Nitin
@@ -58,6 +69,7 @@ Parallelize
 Parth
 Pingala
 Prafulla
+Prathyusha
 Preeti
 Prepend
 Pretrained
@@ -68,6 +80,7 @@ Quantized
 README
 Rajasthan
 Rajat
+Rajesh
 Refactor
 SIMD
 Sagnik
@@ -82,6 +95,7 @@ Saxena
 Sharma
 Sharwari
 Shivam
+Shreyansh
 Simula
 Sinha
 Srivastava
@@ -91,6 +105,7 @@ Surender
 Swaprava
 Swarnendu
 TODO
+Therac
 Tilottama
 Umang
 Uncomment
@@ -136,6 +151,7 @@ customizations
 cybersecurity
 cyclomatic
 dataset
+datasets
 deallocation
 declaratively
 decrementing
@@ -145,6 +161,7 @@ deoptimized
 dependences
 deregister
 deterministically
+dialogs
 dimensionality
 disjunctions
 downsampling
@@ -152,9 +169,12 @@ ebooks
 enqueue
 explainability
 extensibility
+fontification
+fontified
 formatter
 freezed
 functionalities
+geforce
 granularities
 hardcoded
 hatchling
@@ -180,6 +200,7 @@ lookahead
 lookaside
 metadata
 microarchitectural
+microarchitecture
 microbenchmark
 microbenchmarks
 microcontroller
@@ -225,6 +246,7 @@ precimonious
 preemptions
 prefetch
 prefetched
+prefetcher
 prefetching
 preprocessing
 preprocessor
@@ -269,6 +291,7 @@ suboptimal
 summarization
 superset
 swarnendu
+threadsanitizer
 toolchain
 tradeoff
 tradeoffs

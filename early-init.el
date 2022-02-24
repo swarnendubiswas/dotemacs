@@ -5,19 +5,19 @@
 
 ;;; Commentary:
 
-;; Only for use with Emacs 27 or higher. This is run before package and UI initialization.
+;; This file is supported from Emacs 27+, and is run before package and UI initialization.
 
 ;;; Code:
-
-;; Defer GC during startup
-(setq garbage-collection-messages nil
-      gc-cons-percentage 0.3 ; Portion of heap used for allocation
-      gc-cons-threshold most-positive-fixnum)
 
 (defconst sb/EMACS27+   (> emacs-major-version 26))
 (defconst sb/EMACS28+   (> emacs-major-version 27))
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+
+;; https://github.com/kiwanami/emacs-epc/issues/35
+;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
+                                  cl-functions interactive-only))
 
 (defconst sb/emacs-4MB    (*       4 1024 1024))
 (defconst sb/emacs-8MB    (*       8 1000 1024))
@@ -32,6 +32,11 @@
 (defconst sb/emacs-4GB    (*  4 1024 1024 1024))
 (defconst sb/emacs-8GB    (*  8 1024 1024 1024))
 (defconst sb/emacs-16GB   (* 16 1024 1024 1024))
+
+;; Defer GC during startup
+(setq garbage-collection-messages nil
+      gc-cons-percentage 0.3 ; Portion of heap used for allocation
+      gc-cons-threshold most-positive-fixnum)
 
 ;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
@@ -53,10 +58,41 @@
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
 
-;; https://github.com/kiwanami/emacs-epc/issues/35
-;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
-(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
-                                  cl-functions interactive-only))
+;; (require 'package)
+
+;; Avoid loading packages twice, this is set during `(package-initialize)'
+(setq package-enable-at-startup nil
+      package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
+(with-eval-after-load 'package
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+
+;; Initialise the package management system. Another option is to construct the `load-path'
+;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+(package-initialize)
+
+(unless (package-installed-p 'no-littering)
+  (unless package-archive-contents
+    (package-refresh-contents nil))
+  (package-install 'no-littering))
+
+(require 'no-littering)
+
+(setq package-quickstart t ; Populate one big autoloads file
+      package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
+
+;; Emacs 28+.
+(when (boundp 'native-comp-eln-load-path)
+  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
+
+(when sb/EMACS28+
+  (setq package-native-compile t
+        native-comp-always-compile t))
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following
@@ -88,10 +124,11 @@
 ;; deprecated.
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
-(when (fboundp 'menu-bar-mode)
-  (menu-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
+;; The menu bar is useful to identify different capabilities available and the shortcuts.
+;; (when (fboundp 'menu-bar-mode)
+;;   (menu-bar-mode -1))
 
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
