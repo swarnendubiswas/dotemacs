@@ -17,8 +17,8 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 Use the following instructions to install third-party applications. Add recent LLVM sources based on your distribution.
 
 ```shell
-wget https://github.com/sharkdp/fd/releases/download/v8.3.1/fd_8.3.1_amd64.deb
-sudo dpkg -i fd_8.3.1_amd64.deb
+wget https://github.com/sharkdp/fd/releases/download/v8.3.2/fd_8.3.2_amd64.deb
+sudo dpkg -i fd_8.3.2_amd64.deb
 ```
 
 The following is for Ubuntu 18.04.
@@ -113,13 +113,13 @@ ln -nsf $HOME/github/dotfiles/dotconfig/yapf $HOME/.config/yapf
 Add the following PPA for Ubuntu 18.04.
 
 ```shell
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 ```
 
 Add the following PPA for Ubuntu 20.04.
 
 ```shell
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 ```
 
 Install `gcc-10` packages with required support for `libgccjit`: `sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev`.
@@ -295,7 +295,22 @@ WantedBy=default.target
 
 ## Desktop Entry
 
-Create a `emacsclient.desktop` file in `$HOME/.local/share/applications/` with the following content.
+Create `emacs.desktop` and `emacsclient.desktop` files in `$HOME/.local/share/applications/` with the following content.
+
+``` config
+[Desktop Entry]
+Name=GNU Emacs
+GenericName=Text Editor
+Comment=Edit text
+MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
+Exec=/home/swarnendu/software/emacs-28.0.91/src/emacs
+Icon=/home/swarnendu/software/emacs-28.0.91/etc/images/icons/hicolor/scalable/apps/emacs.svg
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;Utility;
+StartupWMClass=Emacs
+Keywords=Text;Editor;
+```
 
 ```config
 [Desktop Entry]
