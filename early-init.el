@@ -61,38 +61,38 @@
 ;; (require 'package)
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'
-(setq package-enable-at-startup nil
-      package-user-dir (expand-file-name "elpa" user-emacs-directory))
+;; (setq package-enable-at-startup nil
+;;       package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
-(with-eval-after-load 'package
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
-  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+;; (with-eval-after-load 'package
+;;   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+;;   (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+;;   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
 ;; Initialise the package management system. Another option is to construct the `load-path'
 ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-(package-initialize)
+;; (package-initialize)
 
-(unless (package-installed-p 'no-littering)
-  (unless package-archive-contents
-    (package-refresh-contents nil))
-  (package-install 'no-littering))
+;; (unless (package-installed-p 'no-littering)
+;;   (unless package-archive-contents
+;;     (package-refresh-contents nil))
+;;   (package-install 'no-littering))
 
-(require 'no-littering)
+;; (require 'no-littering)
 
-(setq package-quickstart t ; Populate one big autoloads file
-      package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
+;; (setq package-quickstart t ; Populate one big autoloads file
+;;       package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
 
-;; Emacs 28+.
-(when (boundp 'native-comp-eln-load-path)
-  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+;; ;; Emacs 28+.
+;; (when (boundp 'native-comp-eln-load-path)
+;;   (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
 
-(defvar package-native-compile)
-(defvar native-comp-always-compile)
+;; (defvar package-native-compile)
+;; (defvar native-comp-always-compile)
 
-(when sb/EMACS28+
-  (setq package-native-compile t
-        native-comp-always-compile t))
+;; (when sb/EMACS28+
+;;   (setq package-native-compile t
+;;         native-comp-always-compile t))
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following
@@ -142,10 +142,10 @@
 ;; other hooks that might fiddle with the frame size.
 ;; (add-hook 'emacs-startup-hook #'toggle-frame-maximized t)
 
-(let ((file-name-handler-alist-orig file-name-handler-alist))
-  (setq file-name-handler-alist nil)
-  (add-hook 'after-init-hook (lambda ()
-                               (setq file-name-handler-alist file-name-handler-alist-orig))))
+;; (let ((file-name-handler-alist-orig file-name-handler-alist))
+;;   (setq file-name-handler-alist nil)
+;;   (add-hook 'after-init-hook (lambda ()
+;;                                (setq file-name-handler-alist file-name-handler-alist-orig))))
 
 (provide 'early-init)
 
