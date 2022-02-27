@@ -7,15 +7,6 @@
 
 ;;; Code:
 
-(with-eval-after-load 'package
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
-  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
-
-;; Initialise the package management system. Another option is to construct the `load-path'
-;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-(package-initialize)
-
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
@@ -110,7 +101,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -141,6 +132,34 @@ This location is used for temporary installations and files.")
            (const :tag "none"    none))
   :group 'sb/emacs)
 
+(defconst sb/EMACS27+   (> emacs-major-version 26))
+(defconst sb/EMACS28+   (> emacs-major-version 27))
+(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
+(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+
+;; Avoid loading packages twice, this is set during `(package-initialize)'
+(setq package-enable-at-startup nil)
+
+(with-eval-after-load 'package
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+
+;; Initialise the package management system. Another option is to construct the `load-path'
+;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+(package-initialize)
+
+;; Emacs 28+.
+(when (boundp 'native-comp-eln-load-path)
+  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
+
+(when sb/EMACS28+
+  (setq package-native-compile t
+        native-comp-always-compile t))
+
 (unless (package-installed-p 'use-package)
   (unless package-archive-contents
     (package-refresh-contents))
@@ -155,32 +174,30 @@ This location is used for temporary installations and files.")
 (defvar use-package-verbose)
 
 (eval-and-compile
-(setq use-package-enable-imenu-support t
-      ;; Avoid manual modifications whenever I modify package installations
-      use-package-always-ensure        t))
+  (setq use-package-enable-imenu-support t
+        ;; Avoid manual modifications whenever I modify package installations
+        use-package-always-ensure        t)
 
-(eval-and-compile
-(when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error                 t
-        debug-on-event                 'sigusr2
-        garbage-collection-messages    t
-        use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-        use-package-verbose            t
-        use-package-expand-minimally   nil)
-  (debug-on-entry 'projectile-remove-known-project)))
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq debug-on-error                 t
+          debug-on-event                 'sigusr2
+          garbage-collection-messages    t
+          use-package-compute-statistics t ; Use `M-x use-package-report' to see results
+          use-package-verbose            t
+          use-package-expand-minimally   nil)
+    (debug-on-entry 'projectile-remove-known-project))
 
-;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
-;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
-;; using `:after' and always deferring loading, because then we will need to specifiy alternate ways
-;; of loading the package.
-;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
-(eval-and-compile
-(unless (bound-and-true-p sb/debug-init-file)
-  (setq use-package-always-defer       t
-        ;; Avoid printing errors and warnings since the configuration is known to work
-        use-package-expand-minimally   t
-        use-package-compute-statistics nil
-        use-package-verbose            nil)))
+  ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
+  ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
+  ;; using `:after' and always deferring loading, because then we will need to specifiy alternate ways
+  ;; of loading the package.
+  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
+  (unless (bound-and-true-p sb/debug-init-file)
+    (setq use-package-always-defer       t
+          ;; Avoid printing errors and warnings since the configuration is known to work
+          use-package-expand-minimally   t
+          use-package-compute-statistics nil
+          use-package-verbose            nil)))
 
 (eval-when-compile
   (require 'use-package))
@@ -218,6 +235,9 @@ This location is used for temporary installations and files.")
 (use-package no-littering
   :demand t)
 
+(setq package-quickstart t ; Populate one big autoloads file
+      package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
+
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
   "File to write Emacs customizations."
@@ -235,9 +255,9 @@ This location is used for temporary installations and files.")
 
 (let ((gc-cons-threshold most-positive-fixnum))
   (when (file-exists-p custom-file)
-    (load custom-file 'noerror))
+    (load custom-file 'noerror 'nomessage))
   (when (file-exists-p sb/private-file)
-    (load sb/private-file 'noerror)))
+    (load sb/private-file 'noerror 'nomessage)))
 
 (use-package warnings
   :init
@@ -345,6 +365,7 @@ This location is used for temporary installations and files.")
       frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
+      history-length 50 ; Reduce the state that is to be read
       indicate-buffer-boundaries nil
       kill-do-not-save-duplicates t
       kill-whole-line t
@@ -707,11 +728,11 @@ This location is used for temporary installations and files.")
                    (eq sb/tui-theme 'modus-vivendi))))
   :init
   (setq ;;modus-themes-completions 'opinionated
-        modus-themes-fringes 'intense
-        modus-themes-hl-line '(intense)
-        modus-themes-prompts '(intense)
-        modus-themes-lang-checkers '(background faint)
-        modus-themes-org-blocks 'tinted-background)
+   modus-themes-fringes 'intense
+   modus-themes-hl-line '(intense)
+   modus-themes-prompts '(intense)
+   modus-themes-lang-checkers '(background faint)
+   modus-themes-org-blocks 'tinted-background)
 
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -5795,64 +5816,4 @@ _v_ verify setup    _f_ check           _m_ mode
             (message "Emacs is ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
 
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(use-package doom-modeline modus-themes))
- '(safe-local-variable-values
-   '((eval add-hook 'lsp-managed-mode-hook
-	   (lambda nil
-	     (when
-		 (derived-mode-p 'markdown-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers markdown-markdownlint-cli)))))
-	     (when
-		 (derived-mode-p 'gfm-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers markdown-markdownlint-cli)))))
-	     (when
-		 (derived-mode-p 'sh-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers sh-shellcheck)))))
-	     (when
-		 (derived-mode-p 'yaml-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers yaml-yamllint)))))
-	     (when
-		 (derived-mode-p 'json-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers json-jsonlint)))))
-	     (when
-		 (derived-mode-p 'python-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers python-pylint)))))
-	     (when
-		 (derived-mode-p 'c++-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers c/c++-cppcheck)))))
-	     (when
-		 (derived-mode-p 'html-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers html-tidy)))))
-	     (when
-		 (derived-mode-p 'xml-mode)
-	       (setq sb/flycheck-local-checkers
-		     '((lsp
-			(next-checkers xml-xmllint))))))))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;;; init-use-package.el ends here

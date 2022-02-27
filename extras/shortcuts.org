@@ -55,9 +55,14 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~M-e~   - Move forward to the end of the sentence (~forward-sentence~)
 - ~M-{~   - Move back to the previous paragraph beginning (~backward-paragraph~)
 - ~M-}~   - Move forward to the next paragraph end (~markdown-forward-paragraph~)
-- ~C-up~  - Move forward to end of paragraph paragraph (~forward-paragraph~)
+- ~C-up~  - Move forward to end of paragraph (~forward-paragraph~)
 - ~C-down~ - Move backward to start of paragraph (~backward-paragraph~)
 - ~M-r~ - Without a prefix argument, position the cursor at the center of the window (~move-to-window-line-top-bottom~)
+
+** Miscellaneous
+
+- ~M-n~ - Puts next element of the minibuffer history in the minibuffer (~next-history-element~)
+- ~M-p~ - Puts previous element of the minibuffer history in the minibuffer (~previous-history-element~)
 
 ** Dired
 

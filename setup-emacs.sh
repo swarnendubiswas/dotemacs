@@ -82,7 +82,8 @@ EMACS_SOURCE="$USER/$EMACS_NAME"
 cd "$EMACS_SOURCE"
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
-./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+# We do not need POP3 support
+./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 make -j2 NATIVE_FULL_AOT=1
 make install
 
@@ -242,10 +243,11 @@ wget https://github.com/koalaman/shellcheck/releases/download/v"{$SHELLCHECK_VER
 tar xz shellcheck-v"{SHELLCHECK_VER}".linux.x86_64.tar.xz
 
 # shfmt
-SHFMT_VER="3.4.2"
+SHFMT_VER="3.4.3"
 
 cd "$USER"
 wget https://github.com/mvdan/sh/releases/download/v"{$SHFMT_VER}/shfmt_v{$SHFMT_VER}"_linux_amd64
+mv shfmt_v{$SHFMT_VER}"_linux_amd64 $HOME/.local/bin/shfmt
 
 # Ripgrep
 
@@ -258,7 +260,7 @@ dpkg -i ripgrep_"{$RG_VER}"_amd64.deb
 
 apt install libpcre3-dev
 git clone git@github.com:danmar/cppcheck.git
-git checkout 2.6
+git checkout 2.7
 mkdir -p build
 cd build
 cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
@@ -278,10 +280,12 @@ make install
 
 # Alacritty
 
-ALACRITTY_VER="0.10.0"
+# ALACRITTY_VER="0.10.0"
+# cd "$GITHUB"
+# wget https://github.com/alacritty/alacritty/archive/refs/tags/v"{$ALACRITTY_VER}".tar.gz
+# tar xz alacritty-"{$ALACRITTY_VER}".tar.gz
+# cd alacritty-"{$ALACRITTY_VER}"
+# cargo build --release
 
-cd "$GITHUB"
-wget https://github.com/alacritty/alacritty/archive/refs/tags/v"{$ALACRITTY_VER}".tar.gz
-tar xz alacritty-"{$ALACRITTY_VER}".tar.gz
-cd alacritty-"{$ALACRITTY_VER}"
-cargo build --release
+sudo add-apt-repository ppa:aslatter/ppa -y
+apt install alacritty
