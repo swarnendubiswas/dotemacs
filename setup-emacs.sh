@@ -172,7 +172,8 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 # composer require felixfbecker/language-server
 # composer update
 
-# Install Texlab
+# Install Texlab. The language server seems feature-incomplete and slow, so I still prefer AuCTeX.
+
 # cargo install --git https://github.com/latex-lsp/texlab.git
 
 cpanm Perl::LanguageServer
@@ -247,7 +248,7 @@ SHFMT_VER="3.4.3"
 
 cd "$USER"
 wget https://github.com/mvdan/sh/releases/download/v"{$SHFMT_VER}/shfmt_v{$SHFMT_VER}"_linux_amd64
-mv shfmt_v{$SHFMT_VER}"_linux_amd64 $HOME/.local/bin/shfmt
+mv shfmt_v"{$SHFMT_VER}"_linux_amd64 $HOME/.local/bin/shfmt
 
 # Ripgrep
 
@@ -269,6 +270,8 @@ make install
 
 # Build Universal Ctags
 
+# Installing snaps seems to hurt Ubuntu performance.
+
 cd "$GITHUB"
 git clone https://github.com/universal-ctags/ctags.git
 cd ctags
@@ -287,5 +290,5 @@ make install
 # cd alacritty-"{$ALACRITTY_VER}"
 # cargo build --release
 
-sudo add-apt-repository ppa:aslatter/ppa -y
+add-apt-repository ppa:aslatter/ppa -y
 apt install alacritty

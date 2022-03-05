@@ -19,7 +19,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'doom-nord
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -67,7 +67,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/window-split
-  'horizontal
+  'vertical
   "Specify the direction in which the windows should be split.
 This depends on the orientation of the display."
   :type  '(radio
@@ -149,10 +149,6 @@ This location is used for temporary installations and files.")
 ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
 (package-initialize)
 
-;; Emacs 28+.
-(when (boundp 'native-comp-eln-load-path)
-  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
-
 (defvar package-native-compile)
 (defvar native-comp-always-compile)
 
@@ -161,8 +157,7 @@ This location is used for temporary installations and files.")
         native-comp-always-compile t))
 
 (unless (package-installed-p 'use-package)
-  (unless package-archive-contents
-    (package-refresh-contents))
+  (package-refresh-contents)
   (package-install 'use-package))
 
 ;; Configure `use-package' before loading
@@ -189,8 +184,8 @@ This location is used for temporary installations and files.")
 
   ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
   ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
-  ;; using `:after' and always deferring loading, because then we will need to specifiy alternate ways
-  ;; of loading the package.
+  ;; using `:after' and always deferring loading, because then we will need to specifiy alternate
+  ;; ways of loading the package.
   ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
   (unless (bound-and-true-p sb/debug-init-file)
     (setq use-package-always-defer       t
@@ -238,6 +233,10 @@ This location is used for temporary installations and files.")
 (setq package-quickstart t ; Populate one big autoloads file
       package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
 
+;; Emacs 28+.
+(when (boundp 'native-comp-eln-load-path)
+  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
   "File to write Emacs customizations."
@@ -261,7 +260,7 @@ This location is used for temporary installations and files.")
 
 (use-package warnings
   :init
-  ;; This is not a great idea, but I expect most warnings will arise from third-party packages
+  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
   (setq warning-minimum-level :emergency))
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
@@ -562,25 +561,21 @@ This location is used for temporary installations and files.")
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-(use-package ffap
-  :commands (ffip ffap))
+(use-package ffap ;; Find FILENAME, guessing a default from text around point.
+  :commands ffap)
 
+;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
   :ensure nil
-  :commands abbrev-mode
   :diminish
-  :hook
-  ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
-  (after-init . abbrev-mode)
+  :hook (after-init . abbrev-mode)
   :config
   ;; The "abbrev-defs" file is under version control
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently))
 
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
-(dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
-                ;; size-indication-mode
-                tooltip-mode))
+(dolist (mode '(tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
 
@@ -591,10 +586,12 @@ This location is used for temporary installations and files.")
 
 ;; Enable the following modes
 (dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
+                blink-cursor-mode
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
-                ;; Soft wraps, wrap lines without the ugly continuation marks
-                global-visual-line-mode))
+                ;; Use soft wraps, wrap lines without the ugly continuation marks
+                global-visual-line-mode
+                size-indication-mode))
   (when (fboundp mode)
     (funcall mode 1)))
 
@@ -626,17 +623,13 @@ This location is used for temporary installations and files.")
   :diminish hs-minor-mode
   :hook (prog-mode . hs-minor-mode)
   :config
-  (setq hs-isearch-open t)
-  ;; (hs-hide-initial-comment-block)
-  )
+  (setq hs-isearch-open t))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
 (use-package so-long
   :ensure nil
-  :commands global-so-long-mode
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
-  :hook (after-init . global-so-long-mode)
-  :config (setq so-long-threshold 500))
+  :hook (after-init . global-so-long-mode))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
@@ -1953,7 +1946,8 @@ This location is used for temporary installations and files.")
    ("C-c f b" . flyspell-buffer)
    :map flyspell-mode-map
    ("C-;"     . nil)
-   ("C-,"     . sb/flyspell-goto-previous-error)))
+   ;; ("C-,"     . sb/flyspell-goto-previous-error)
+   ))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
 (use-package flyspell-popup
@@ -2153,6 +2147,7 @@ This location is used for temporary installations and files.")
 ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
 ;; yet.
 (use-package project
+  :ensure nil
   :commands (project-switch-project project-current
                                     project-find-file project-execute-extended-command
                                     project-known-project-roots
@@ -2200,9 +2195,6 @@ This location is used for temporary installations and files.")
         projectile-sort-order 'recently-active
         projectile-verbose nil)
 
-  ;; See Git status after switching to a project
-  ;; (setq projectile-switch-project-action #'magit-status)
-
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and (symbol-value 'sb/IS-WINDOWS)
              (executable-find "tr"))
@@ -2247,10 +2239,6 @@ This location is used for temporary installations and files.")
                  (expand-file-name sb/user-home) ; Do not consider $HOME as a project
                  "~/" ; Do not consider $HOME as a project
                  (expand-file-name "/tmp")
-                 (expand-file-name "bitbucket/.metadata"       sb/user-home)
-                 (expand-file-name "github/.metadata"          sb/user-home)
-                 (expand-file-name "iitk-workspace/.metadata"  sb/user-home)
-                 (expand-file-name "plass-workspace/.metadata" sb/user-home)
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
 
@@ -3964,7 +3952,9 @@ This location is used for temporary installations and files.")
 
 (use-package image-mode
   :ensure nil
+  :if (display-graphic-p)
   :mode "\\.svg$"
+  ;; TODO: This does not work.
   :hook (image-mode . show-image-dimensions-in-mode-line))
 
 (use-package sh-script ; Shell script mode
@@ -3995,6 +3985,13 @@ This location is used for temporary installations and files.")
   :hook
   (fish-mode . (lambda ()
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
+
+(use-package company-shell
+  :after (:any sh-mode fish-mode)
+  :demand t
+  :defines company-shell-delete-duplictes
+  :commands (company-shell company-shell-env company-fish-shell)
+  :config (setq company-shell-delete-duplictes t))
 
 (use-package shfmt
   :hook (sh-mode . shfmt-on-save-mode)
@@ -4356,78 +4353,78 @@ This location is used for temporary installations and files.")
         ("$/showError" #'lsp-grammarly--show-error)
         ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
-(use-package lsp-ltex
-  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
-  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
-  :hook
-  ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-                                                     (require 'lsp-ltex)
-                                                     (lsp-deferred)))
-  :init
-  (setq lsp-ltex-check-frequency "save"
-        ;; lsp-ltex-dictionary ("microbenchmarks")
-        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
-        lsp-ltex-version "15.2.0")
-  :config
-  ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
-  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
-  (setq lsp-ltex-disabled-rules
-        #s(hash-table size 30 data
-                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
-                      ("en-US" ["WHITESPACE_RULE"])))
+;; (use-package lsp-ltex
+;;   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
+;;   :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
+;;   :hook
+;;   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
+;;                                                      (require 'lsp-ltex)
+;;                                                      (lsp-deferred)))
+;;   :init
+;;   (setq lsp-ltex-check-frequency "save"
+;;         ;; lsp-ltex-dictionary ("microbenchmarks")
+;;         lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
+;;         lsp-ltex-version "15.2.0")
+;;   :config
+;;   ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
+;;   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
+;;   (setq lsp-ltex-disabled-rules
+;;         #s(hash-table size 30 data
+;;                       ("en-US" ["MORFOLOGIK_RULE_EN_US"])
+;;                       ("en-US" ["WHITESPACE_RULE"])))
 
-  (defvar lsp-ltex-active-modes)
+;;   (defvar lsp-ltex-active-modes)
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-    :priority -2
-    :add-on? t
-    :remote? t
-    :server-id 'ltex-r
-    :download-server-fn
-    (lambda (_client _callback error-callback _update?)
-      (lsp-package-ensure
-       'ltex-ls
-       (lambda ()
-         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-                                      "-C" dest)
-             (error "Error during the unzip process: tar"))))
-       error-callback))))
-  )
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-tramp-connection
+;;                      "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+;;     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+;;     :priority -2
+;;     :add-on? t
+;;     :remote? t
+;;     :server-id 'ltex-r
+;;     :download-server-fn
+;;     (lambda (_client _callback error-callback _update?)
+;;       (lsp-package-ensure
+;;        'ltex-ls
+;;        (lambda ()
+;;          (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+;;            (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+;;                                       "-C" dest)
+;;              (error "Error during the unzip process: tar"))))
+;;        error-callback))))
+;;   )
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 
-;; (use-package lsp-latex
-;;   :disabled t
-;;   :hook
-;;   (latex-mode . (lambda()
-;;                   (require 'lsp-latex)
-;;                   (lsp-deferred)))
-;;   :config
-;;   (setq lsp-latex-bibtex-formatter             "latexindent"
-;;         lsp-latex-latex-formatter              "latexindent"
-;;         lsp-latex-bibtex-formatter-line-length sb/fill-column
-;;         lsp-latex-chktex-on-open-and-save      t
-;;         lsp-latex-build-is-continuous          t
-;;         lsp-latex-build-on-save                t
-;;         ;; Delay time in milliseconds before reporting diagnostics
-;;         lsp-latex-diagnostics-delay            2000)
+(use-package lsp-latex
+  :disabled t
+  :hook
+  (latex-mode . (lambda()
+                  (require 'lsp-latex)
+                  (lsp-deferred)))
+  :config
+  (setq lsp-latex-bibtex-formatter             "latexindent"
+        lsp-latex-latex-formatter              "latexindent"
+        lsp-latex-bibtex-formatter-line-length sb/fill-column
+        lsp-latex-chktex-on-open-and-save      t
+        lsp-latex-build-is-continuous          t
+        lsp-latex-build-on-save                t
+        ;; Delay time in milliseconds before reporting diagnostics
+        lsp-latex-diagnostics-delay            2000)
 
-;;   (add-to-list 'lsp-latex-build-args "-c")
-;;   (add-to-list 'lsp-latex-build-args "-pvc")
+  (add-to-list 'lsp-latex-build-args "-c")
+  (add-to-list 'lsp-latex-build-args "-pvc")
 
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection (lsp-tramp-connection "texlab")
-;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-;;     :remote? t
-;;     :server-id 'texlab-r)))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "texlab")
+    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+    :remote? t
+    :server-id 'texlab-r)))
 
 (use-package tex-site
   :ensure nil
@@ -4617,6 +4614,32 @@ Ignore if no file is found."
   (auctex-latexmk-setup)
   (setq TeX-command-default "LatexMk"))
 
+(use-package company-auctex
+  :after tex-mode
+  :demand t
+  :commands (company-auctex-init company-auctex-labels
+                                 company-auctex-bibs company-auctex-macros
+                                 company-auctex-symbols company-auctex-environments))
+
+(use-package math-symbols
+  :after tex-mode
+  :demand t) ; Required by `ac-math' and `company-math'
+
+(use-package company-math
+  :after tex-mode
+  :demand t
+  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+
+(use-package company-reftex ; Reftex must be enabled to work
+  :after tex-mode
+  :demand t
+  :commands (company-reftex-labels company-reftex-citations))
+
+(use-package company-bibtex
+  :after tex-mode
+  :demand t
+  :commands company-bibtex)
+
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el")
 
@@ -4781,9 +4804,10 @@ after a successful compilation."
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
   :defines fasd-enable-initial-prompt
-  :if (executable-find "fasd")
   :commands (global-fasd-mode fasd-find-file)
+  :if (executable-find "fasd")
   ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
+  :hook (after-init . global-fasd-mode)
   :config (setq fasd-enable-initial-prompt nil)
   :bind* ("C-c /" . fasd-find-file))
 
@@ -4934,11 +4958,6 @@ after a successful compilation."
 (progn
   (defun sb/company-sh-mode ()
     "Add backends for shell script completion in company mode."
-    (use-package company-shell
-      :defines company-shell-delete-duplictes
-      :commands (company-shell company-shell-env company-fish-shell)
-      :config (setq company-shell-delete-duplictes t))
-
     (defvar company-minimum-prefix-length)
     (defvar company-backends)
 
@@ -4959,11 +4978,6 @@ after a successful compilation."
 
   (defun sb/company-fish-mode ()
     "Add backends for fish shell script completion in company mode."
-    (use-package company-shell
-      :defines company-shell-delete-duplictes
-      :commands (company-shell company-shell-env company-fish-shell)
-      :config (setq company-shell-delete-duplictes t))
-
     (defvar company-minimum-prefix-length)
     (defvar company-backends)
 
@@ -5020,26 +5034,6 @@ after a successful compilation."
 (progn
   (defun sb/company-latex-mode ()
     "Add backends for latex completion in company mode."
-    (use-package company-auctex
-      :demand t
-      :commands (company-auctex-init company-auctex-labels
-                                     company-auctex-bibs company-auctex-macros
-                                     company-auctex-symbols company-auctex-environments))
-
-    (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
-      :demand t)
-
-    (use-package company-math
-      :demand t
-      :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-
-    (use-package company-reftex ; Reftex must be enabled to work
-      :demand t
-      :commands (company-reftex-labels company-reftex-citations))
-
-    (use-package company-bibtex
-      :demand t
-      :commands company-bibtex)
 
     (setq-local company-minimum-prefix-length 3)
     (make-local-variable 'company-backends)
@@ -5096,7 +5090,7 @@ after a successful compilation."
     (server-start)))
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-(setenv "SHELL" shell-file-name) ; Recommended to connect with bash
+(setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
 
 ;; `vterm' provides better performance than `eshell', `shell', and `(ansi-)term'. The advantage of
 ;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
