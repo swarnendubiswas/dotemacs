@@ -22,30 +22,30 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 # Install important packages
 
 case "${DIST_VERSION}" in
-Ubuntu_18.04)
-    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
-    ;;
-Ubuntu_20.04)
-    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
-    ;;
-*)
-    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-    exit 2
-    ;;
+    Ubuntu_18.04)
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
+        ;;
+    Ubuntu_20.04)
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
+        ;;
+    *)
+        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+        exit 2
+        ;;
 esac
 
 # Add necessary repositories
 case "${DIST_VERSION}" in
-Ubuntu_18.04)
-    add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    ;;
-Ubuntu_20.04)
-    add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    ;;
-*)
-    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-    exit 2
-    ;;
+    Ubuntu_18.04)
+        add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        ;;
+    Ubuntu_20.04)
+        add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        ;;
+    *)
+        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+        exit 2
+        ;;
 esac
 
 apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
@@ -55,12 +55,12 @@ apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-
 LLVM_VERSION="-13"
 
 case "${DIST_VERSION}" in
-Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
-Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
-*)
-    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-    exit 2
-    ;;
+    Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
+    Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
+    *)
+        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+        exit 2
+        ;;
 esac
 
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
@@ -75,28 +75,29 @@ EMACS_VERSION="28.0.91"
 cd "${USER_HOME}"
 EMACS_NAME="emacs-${EMACS_VERSION}"
 EMACS_FILENAME="${EMACS_NAME}.tar.xz"
-# if [ ! -f "$EMACS_FILENAME" ]; then
-#     wget https://alpha.gnu.org/gnu/emacs/pretest/"${EMACS_FILENAME}"
-# fi
-# tar xf "${EMACS_NAME}.tar.xz"
-rm "${EMACS_NAME}".tar.xz* || true
+if [ ! -f "${EMACS_FILENAME}" ]; then
+    wget https://alpha.gnu.org/gnu/emacs/pretest/"${EMACS_FILENAME}"
+fi
+tar xf "${EMACS_FILENAME}"
+rm "${EMACS_FILENAME}*" || true
 
 EMACS_SOURCE="${USER_HOME}/${EMACS_NAME}"
-chown -R $USER:$USER "${EMACS_SOURCE}"
+chown -R "$USER:$USER ${EMACS_SOURCE}"
 
 # Build the source
 
-cd "$EMACS_SOURCE"
+cd "{$EMACS_SOURCE}"
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
 # We do not need POP3 support
-./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
+# prefix=/usr/local
 make -j4 NATIVE_FULL_AOT=1
 # make install
 
 cd "${USER_HOME}"
 rm "${EMACS_FILENAME}" || true
-rm -rf "${EMACS_SOURCE"
+rm -rf "${EMACS_SOURCE}"
 
 # Setup Emacs at the correct path
 
@@ -107,7 +108,7 @@ DOTEMACS="$GITHUB/dotemacs"
 DOTFILES="$GITHUB/dotfiles"
 EMACSD="${USER_HOME}/.emacs.d"
 
-cd "${USER_HOME}"
+cd "$USER_HOME"
 
 if [ ! -d "$GITHUB" ]; then
     mkdir -p "$GITHUB"
@@ -159,7 +160,7 @@ NODEJS_VER="17"
 # bash nodesource_setup.sh
 # apt install nodejs
 
-curl -fsSL https://deb.nodesource.com/setup_{$NODEJS_VER}.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
 apt install -y nodejs
 
 # Setup Node packages
@@ -289,7 +290,7 @@ cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
 cmake --build .
 make install
 cd ../..
-rm -rf cppcheck 
+rm -rf cppcheck
 
 # Build Universal Ctags
 
@@ -317,7 +318,7 @@ make install
 add-apt-repository ppa:aslatter/ppa -y
 apt install alacritty
 
-# Setup 24bit terminal support 
+# Setup 24bit terminal support
 /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
 
 # Remove junk
