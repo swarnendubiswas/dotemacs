@@ -10,7 +10,8 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-USER="/home/swarnendu"
+USER="swarnendu"
+USER_HOME="/home/$USER"
 
 DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
@@ -20,7 +21,7 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 
 # Install important packages
 
-case "$DIST_VERSION" in
+case "${DIST_VERSION}" in
 Ubuntu_18.04)
     apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
     ;;
@@ -34,7 +35,7 @@ Ubuntu_20.04)
 esac
 
 # Add necessary repositories
-case "$DIST_VERSION" in
+case "${DIST_VERSION}" in
 Ubuntu_18.04)
     add-apt-repository ppa:ubuntu-toolchain-r/test -y
     ;;
@@ -53,9 +54,9 @@ apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-
 
 LLVM_VERSION="-13"
 
-case "$DIST_VERSION" in
-Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION  main" ;;
-Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal$LLVM_VERSION   main" ;;
+case "${DIST_VERSION}" in
+Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
+Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
 *)
     echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
     exit 2
@@ -65,17 +66,23 @@ esac
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 add-apt-repository "${REPO_NAME}"
 
-apt install -y clang$LLVM_VERSION clangd$LLVM_VERSION clang-{format,tidy,tools}$LLVM_VERSION clang$LLVM_VERSION-doc clang$LLVM_VERSION-examples llvm$LLVM_VERSION lld$LLVM_VERSION lldb$LLVM_VERSION llvm$LLVM_VERSION-runtime
+apt install -y clang${LLVM_VERSION} clangd${LLVM_VERSION} clang-{format,tidy,tools}${LLVM_VERSION} clang${LLVM_VERSION}-doc clang${LLVM_VERSION}-examples llvm${LLVM_VERSION} lld${LLVM_VERSION} lldb${LLVM_VERSION} llvm${LLVM_VERSION}-runtime
 
 # Download GNU Emacs source
 
-cd "$USER"
 EMACS_VERSION="28.0.91"
+
+cd "${USER_HOME}"
 EMACS_NAME="emacs-${EMACS_VERSION}"
+EMACS_FILENAME="${EMACS_NAME}.tar.xz"
+# if [ ! -f "$EMACS_FILENAME" ]; then
+#     wget https://alpha.gnu.org/gnu/emacs/pretest/"${EMACS_FILENAME}"
+# fi
+# tar xf "${EMACS_NAME}.tar.xz"
 rm "${EMACS_NAME}".tar.xz* || true
-wget https://alpha.gnu.org/gnu/emacs/pretest/${EMACS_NAME}.tar.xz
-tar xf "${EMACS_NAME}.tar.xz"
-EMACS_SOURCE="$USER/$EMACS_NAME"
+
+EMACS_SOURCE="${USER_HOME}/${EMACS_NAME}"
+chown -R $USER:$USER "${EMACS_SOURCE}"
 
 # Build the source
 
@@ -84,22 +91,27 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
 # We do not need POP3 support
 ./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
-make -j2 NATIVE_FULL_AOT=1
-make install
+make -j4 NATIVE_FULL_AOT=1
+# make install
+
+cd "${USER_HOME}"
+rm "${EMACS_FILENAME}" || true
+rm -rf "${EMACS_SOURCE"
 
 # Setup Emacs at the correct path
 
 # Checkout configurations
 
-GITHUB="$USER/github"
+GITHUB="${USER_HOME}/github"
 DOTEMACS="$GITHUB/dotemacs"
 DOTFILES="$GITHUB/dotfiles"
-EMACSD="$USER/.emacs.d"
+EMACSD="${USER_HOME}/.emacs.d"
 
-cd "$USER"
+cd "${USER_HOME}"
 
 if [ ! -d "$GITHUB" ]; then
-    mkdir -p github
+    mkdir -p "$GITHUB"
+    chown -R $USER:$USER "$GITHUB"
 fi
 
 cd "$GITHUB"
@@ -113,6 +125,7 @@ else
     git clone git@github.com:swarnendubiswas/dotemacs.git
 fi
 echo "...Done"
+chown -R $USER:$USER "$DOTEMACS"
 
 if [ -d "$DOTFILES" ]; then
     cd "$DOTFILES"
@@ -123,10 +136,11 @@ else
     git clone git@github.com:swarnendubiswas/dotfiles.git
 fi
 echo "...Done"
+chown -R $USER:$USER "$DOTFILES"
 
 # Link .emacs.d
 
-cd "$USER"
+cd "${USER_HOME}"
 
 if [ -d "$EMACSD" ]; then
     if [ ! -L "$EMACSD" ]; then
@@ -135,7 +149,7 @@ if [ -d "$EMACSD" ]; then
 fi
 
 # Install Python packages
-python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
+sudo -H python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
 
 # Install Nodejs
 
@@ -145,12 +159,12 @@ NODEJS_VER="17"
 # bash nodesource_setup.sh
 # apt install nodejs
 
-curl -fsSL https://deb.nodesource.com/setup_{$NODEJS_VER}.x | sudo -E bash -
-sudo apt-get install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_{$NODEJS_VER}.x | bash -
+apt install -y nodejs
 
 # Setup Node packages
 
-TMP_HOME="$USER/tmp"
+TMP_HOME="$USER_HOME/tmp"
 
 NPM_HOME="$TMP_HOME"
 mkdir -p "$NPM_HOME"
@@ -176,15 +190,14 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
 # cargo install --git https://github.com/latex-lsp/texlab.git
 
-cpanm Perl::LanguageServer
+# cpanm Perl::LanguageServer
 
 # Update configurations of helper utilities
 
 # HOME Directory
+cd "$USER_HOME"
 
-cd "$USER"
-
-if [ ! -L ".markdownxlint.json" ]; then
+if [ ! -L ".markdownlint.json" ]; then
     echo "Creating symlink for .markdownlint.json..."
     ln -s "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
 else
@@ -195,11 +208,12 @@ echo "...Done"
 
 # CONFIG Directory
 
-CONFIG_DIR="$USER/.config"
+CONFIG_DIR="$USER_HOME/.config"
 if [ ! -d "$CONFIG_DIR" ]; then
     mkdir -p "$CONFIG_DIR"
+    chown -R $USER:$USER "$CONFIG_DIR"
 fi
-cd "$USER/.config"
+cd "$CONFIG_DIR"
 
 if [ ! -L "pylintrc" ]; then
     echo "Creating symlink for pylintrc..."
@@ -239,34 +253,43 @@ echo "...Done"
 # Shellcheck
 SHELLCHECK_VER="0.8.0"
 
-cd "$USER"
-wget https://github.com/koalaman/shellcheck/releases/download/v"{$SHELLCHECK_VER}/shellcheck-v{$SHELLCHECK_VER}".linux.x86_64.tar.xz
-tar xz shellcheck-v"{SHELLCHECK_VER}".linux.x86_64.tar.xz
+SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
+
+cd "${USER_HOME}"
+wget https://github.com/koalaman/shellcheck/releases/download/v"${SHELLCHECK_VER}/${SHELLCHECK_FILENAME}.tar.xz"
+tar xf "${SHELLCHECK_FILENAME}.tar.xz"
+cd "shellcheck-v${SHELLCHECK_VER}"
+mv shellcheck "${USER_HOME}/.local/bin"
+rm -rf "${SHELLCHECK_FILENAME}.tar.xz*"
 
 # shfmt
 SHFMT_VER="3.4.3"
 
-cd "$USER"
-wget https://github.com/mvdan/sh/releases/download/v"{$SHFMT_VER}/shfmt_v{$SHFMT_VER}"_linux_amd64
-mv shfmt_v"{$SHFMT_VER}"_linux_amd64 $HOME/.local/bin/shfmt
+cd "${USER_HOME}"
+wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
+mv shfmt_v"${SHFMT_VER}"_linux_amd64 ${USER_HOME}/.local/bin/shfmt
 
 # Ripgrep
 
 RG_VER="13.0.0"
 
-wget https://github.com/BurntSushi/ripgrep/releases/download/"{$RG_VER}/ripgrep_{$RG_VER}"_amd64.deb
-dpkg -i ripgrep_"{$RG_VER}"_amd64.deb
+wget https://github.com/BurntSushi/ripgrep/releases/download/"${RG_VER}/ripgrep_${RG_VER}"_amd64.deb
+dpkg -i ripgrep_"${RG_VER}"_amd64.deb
+rm -rf ripgrep_"${RG_VER}"_amd64.deb*
 
 # Build CPPCheck
 
 apt install libpcre3-dev
 git clone git@github.com:danmar/cppcheck.git
+cd cppcheck
 git checkout 2.7
 mkdir -p build
 cd build
 cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
 cmake --build .
 make install
+cd ../..
+rm -rf cppcheck 
 
 # Build Universal Ctags
 
@@ -274,6 +297,7 @@ make install
 
 cd "$GITHUB"
 git clone https://github.com/universal-ctags/ctags.git
+chown -R $USER:$USER ctags
 cd ctags
 ./autogen.sh
 # "--prefix=/where/you/want" defaults to "/usr/local"
@@ -292,3 +316,13 @@ make install
 
 add-apt-repository ppa:aslatter/ppa -y
 apt install alacritty
+
+# Setup 24bit terminal support 
+/usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
+
+# Remove junk
+cd "$USER_HOME"
+apt autoremove
+apt autoclean
+
+set +eux
