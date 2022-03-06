@@ -22,30 +22,30 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 # Install important packages
 
 case "${DIST_VERSION}" in
-    Ubuntu_18.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
-        ;;
-    Ubuntu_20.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
-        ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+Ubuntu_18.04)
+    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
+    ;;
+Ubuntu_20.04)
+    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
+    ;;
+*)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
 
 # Add necessary repositories
 case "${DIST_VERSION}" in
-    Ubuntu_18.04)
-        add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        ;;
-    Ubuntu_20.04)
-        add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+Ubuntu_18.04)
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    ;;
+Ubuntu_20.04)
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    ;;
+*)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
 
 apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
@@ -55,12 +55,12 @@ apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-
 LLVM_VERSION="-13"
 
 case "${DIST_VERSION}" in
-    Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
-    Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
-    *)
-        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-        exit 2
-        ;;
+Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
+Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
+*)
+    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+    exit 2
+    ;;
 esac
 
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
@@ -93,13 +93,13 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 # prefix=/usr/local
 make -j4 NATIVE_FULL_AOT=1
-# make install
 
 cd "${USER_HOME}"
 rm "${EMACS_FILENAME}" || true
-rm -rf "${EMACS_SOURCE}"
 
 # Setup Emacs at the correct path
+echo "export EMACS_PATH=${EMACS_SOURCE}/src" >>"$USER_HOME/.bashrc"
+echo "PATH=${EMACS_PATH}:$PATH" >>"$USER_HOME/.bashrc"
 
 # Checkout configurations
 
@@ -119,25 +119,25 @@ cd "$GITHUB"
 
 if [ -d "$DOTEMACS" ]; then
     cd "$DOTEMACS"
-    echo "Pulling dotemacs repository from Github..."
+    echo "Pulling dotemacs repository from GitHub..."
     git pull
 else
-    echo "Cloning dotemacs repository from Github..."
+    echo "Cloning dotemacs repository from GitHub..."
     git clone git@github.com:swarnendubiswas/dotemacs.git
 fi
 echo "...Done"
-chown -R $USER:$USER "$DOTEMACS"
+chown -R $USER:$USER $DOTEMACS
 
 if [ -d "$DOTFILES" ]; then
     cd "$DOTFILES"
-    echo "Pulling dotfiles repository from Github..."
+    echo "Pulling dotfiles repository from GitHub..."
     git pull
 else
-    echo "Cloning dotfiles repository from Github..."
+    echo "Cloning dotfiles repository from GitHub..."
     git clone git@github.com:swarnendubiswas/dotfiles.git
 fi
 echo "...Done"
-chown -R $USER:$USER "$DOTFILES"
+chown -R $USER:$USER $DOTFILES
 
 # Link .emacs.d
 
@@ -297,9 +297,21 @@ rm -rf cppcheck
 # Installing snaps seems to hurt Ubuntu performance.
 
 cd "$GITHUB"
-git clone https://github.com/universal-ctags/ctags.git
-chown -R $USER:$USER ctags
-cd ctags
+
+CTAGS_DIR="$GITHUB/ctags"
+
+if [ -d "${CTAGS_DIR}" ]; then
+    cd "${CTAGS_DIR}"
+    echo "Pulling ctags reposiory from GitHub..."
+    git pull
+else
+    echo "Cloning ctags repository from GitHub..."
+    git clone https://github.com/universal-ctags/ctags.git
+fi
+echo "...Done"
+chown -R $USER:$USER "${CTAGS_DIR}"
+
+cd "${CTAGS_DIR}"
 ./autogen.sh
 # "--prefix=/where/you/want" defaults to "/usr/local"
 ./configure
