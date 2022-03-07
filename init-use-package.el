@@ -3954,6 +3954,9 @@ This location is used for temporary installations and files.")
   :ensure nil
   :if (display-graphic-p)
   :mode "\\.svg$"
+  :custom
+  ;;  Enable converting external formats (ie. webp) to internal ones.
+  (image-use-external-converter t)
   ;; TODO: This does not work.
   :hook (image-mode . show-image-dimensions-in-mode-line))
 
@@ -4325,8 +4328,9 @@ This location is used for temporary installations and files.")
                                            lsp-grammarly--update-document-state)
   :hook
   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-                                                     (require 'lsp-grammarly)
-                                                     (lsp-deferred)))
+                                                     (unless (eq major-mode 'csv-mode)
+                                                       (require 'lsp-grammarly)
+                                                       (lsp-deferred))))
   :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
@@ -4353,48 +4357,49 @@ This location is used for temporary installations and files.")
         ("$/showError" #'lsp-grammarly--show-error)
         ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
-;; (use-package lsp-ltex
-;;   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
-;;   :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
-;;   :hook
-;;   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-;;                                                      (require 'lsp-ltex)
-;;                                                      (lsp-deferred)))
-;;   :init
-;;   (setq lsp-ltex-check-frequency "save"
-;;         ;; lsp-ltex-dictionary ("microbenchmarks")
-;;         lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
-;;         lsp-ltex-version "15.2.0")
-;;   :config
-;;   ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
-;;   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
-;;   (setq lsp-ltex-disabled-rules
-;;         #s(hash-table size 30 data
-;;                       ("en-US" ["MORFOLOGIK_RULE_EN_US"])
-;;                       ("en-US" ["WHITESPACE_RULE"])))
+(use-package lsp-ltex
+  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
+  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
+  :hook
+  ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
+                                                     (unless (eq major-mode 'csv-mode)
+                                                       (require 'lsp-ltex)
+                                                       (lsp-deferred))))
+  :init
+  (setq lsp-ltex-check-frequency "save"
+        ;; lsp-ltex-dictionary ("microbenchmarks")
+        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
+        lsp-ltex-version "15.2.0")
+  :config
+  ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
+  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
+  (setq lsp-ltex-disabled-rules
+        #s(hash-table size 30 data
+                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
+                      ("en-US" ["WHITESPACE_RULE"])))
 
-;;   (defvar lsp-ltex-active-modes)
+  (defvar lsp-ltex-active-modes)
 
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection (lsp-tramp-connection
-;;                      "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
-;;     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-;;     :priority -2
-;;     :add-on? t
-;;     :remote? t
-;;     :server-id 'ltex-r
-;;     :download-server-fn
-;;     (lambda (_client _callback error-callback _update?)
-;;       (lsp-package-ensure
-;;        'ltex-ls
-;;        (lambda ()
-;;          (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-;;            (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-;;                                       "-C" dest)
-;;              (error "Error during the unzip process: tar"))))
-;;        error-callback))))
-;;   )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+    :priority -2
+    :add-on? t
+    :remote? t
+    :server-id 'ltex-r
+    :download-server-fn
+    (lambda (_client _callback error-callback _update?)
+      (lsp-package-ensure
+       'ltex-ls
+       (lambda ()
+         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+                                      "-C" dest)
+             (error "Error during the unzip process: tar"))))
+       error-callback))))
+  )
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
@@ -4861,27 +4866,6 @@ after a successful compilation."
 ;; `(add-to-list 'company-backends '(company-capf :with company-dabbrev))'
 
 (progn
-  (defun sb/company-text-mode ()
-    "Add backends for text completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    ;; Slightly larger value to have more precise matches and so that the popup does not block
-    (setq-local company-minimum-prefix-length 3
-                company-transformers '(delete-dups))
-    (set (make-local-variable 'company-backends)
-         '(company-files
-           company-dabbrev
-           company-ispell
-           company-abbrev)))
-
-  (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
-    (add-hook hook (lambda ()
-                     (sb/company-text-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
-
-(progn
   (defun sb/company-xml-mode ()
     "Add backends for completion with company."
     (defvar company-minimum-prefix-length)
@@ -4900,136 +4884,6 @@ after a successful compilation."
                      (sb/company-xml-mode)
                      (company-fuzzy-mode 1)
                      (diminish 'company-fuzzy-mode)))))
-
-(progn
-  (defun sb/company-prog-mode ()
-    "Add backends for program completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 3)
-    (make-local-variable 'company-backends)
-
-    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-    (setq company-backends '(company-capf
-                             company-yasnippet
-                             company-files
-                             company-dabbrev-code
-                             company-dabbrev)))
-
-  (add-hook 'prog-mode-hook (lambda ()
-                              (sb/company-prog-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
-
-;; (progn
-;;   (defun sb/company-java-mode ()
-;;     "Add backends for Java completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 3)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '((company-capf :with company-yasnippet)
-;;                              (company-files : with company-yasnippet)
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              company-dabbrev)))
-
-;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
-
-;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;; `company-clang' is slow
-;; (progn
-;;   (defun sb/company-c-mode ()
-;;     "Add backends for C/C++ completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '(company-capf
-;;                              company-files
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              (company-dabbrev
-;;                               company-ispell))))
-
-;;   (add-hook 'c-mode-common-hook #'sb/company-c-mode))
-
-(progn
-  (defun sb/company-sh-mode ()
-    "Add backends for shell script completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-shell
-                             company-shell-env
-                             company-dabbrev-code
-                             company-yasnippet
-                             company-files
-                             company-dabbrev)))
-
-  (add-hook 'sh-mode-hook (lambda ()
-                            (sb/company-sh-mode)
-                            (company-fuzzy-mode 1)
-                            (diminish 'company-fuzzy-mode)))
-
-  (defun sb/company-fish-mode ()
-    "Add backends for fish shell script completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-shell
-                             company-shell-env
-                             company-fish-shell
-                             company-dabbrev-code
-                             company-yasnippet
-                             company-files
-                             company-dabbrev)))
-
-  (add-hook 'fish-mode-hook (lambda ()
-                              (sb/company-fish-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
-
-;; (progn
-;;   (defun sb/company-elisp-mode ()
-;;     "Set up company for elisp mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '(company-capf
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev-code
-;;                              company-dabbrev
-;;                              company-ispell)))
-
-;;   (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
-
-;; (progn
-;;   (defun sb/company-python-mode ()
-;;     "Add backends for Python completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 3)
-;;     (make-local-variable 'company-backends)
-;;     ;; `company-dabbrev-code' is useful for variable names
-;;     (setq company-backends '(company-capf
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev-code
-;;                              company-dabbrev)))
-
-;;   (add-hook 'python-mode-hook #'sb/company-python-mode))
 
 (progn
   (defun sb/company-latex-mode ()
@@ -5079,6 +4933,157 @@ after a successful compilation."
                      (sb/company-web-mode)
                      (company-fuzzy-mode 1)
                      (diminish 'company-fuzzy-mode)))))
+
+(progn
+  (defun sb/company-text-mode ()
+    "Add backends for text completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    ;; Slightly larger value to have more precise matches and so that the popup does not block
+    (setq-local company-minimum-prefix-length 3
+                company-transformers '(delete-dups))
+    (set (make-local-variable 'company-backends)
+         '(company-files
+           company-dabbrev
+           company-ispell
+           company-abbrev)))
+
+  (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
+    (add-hook hook (lambda ()
+                     (sb/company-text-mode)
+                     (company-fuzzy-mode 1)
+                     (diminish 'company-fuzzy-mode)))))
+
+;; (progn
+;;   (defun sb/company-java-mode ()
+;;     "Add backends for Java completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 3)
+;;     (make-local-variable 'company-backends)
+;;     (setq company-backends '((company-capf :with company-yasnippet)
+;;                              (company-files : with company-yasnippet)
+;;                              (company-dabbrev-code :with company-yasnippet)
+;;                              company-dabbrev)))
+
+;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
+
+;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; `company-clang' is slow
+(progn
+  (defun sb/company-c-mode ()
+    "Add backends for C/C++ completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-dabbrev-code
+                             company-files
+                             company-yasnippet
+                             company-dabbrev
+                             company-ispell)))
+
+  (add-hook 'c-mode-common-hook #'sb/company-c-mode))
+
+(progn
+  (defun sb/company-sh-mode ()
+    "Add backends for shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'sh-mode-hook (lambda ()
+                            (sb/company-sh-mode)
+                            (company-fuzzy-mode 1)
+                            (diminish 'company-fuzzy-mode)))
+
+  (defun sb/company-fish-mode ()
+    "Add backends for fish shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-fish-shell
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'fish-mode-hook (lambda ()
+                              (sb/company-fish-mode)
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
+
+(progn
+  (defun sb/company-elisp-mode ()
+    "Set up company for elisp mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-files
+                             company-dabbrev-code
+                             company-dabbrev)))
+
+  (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
+
+(progn
+  (defun sb/company-python-mode ()
+    "Add backends for Python completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    ;; `company-dabbrev-code' is useful for variable names
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'python-mode-hook #'sb/company-python-mode))
+
+(progn
+  (defun sb/company-prog-mode ()
+    "Add backends for program completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-files
+                             company-dabbrev-code
+                             company-dabbrev)))
+
+  (add-hook 'prog-mode-hook (lambda ()
+                              (sb/company-prog-mode)
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
