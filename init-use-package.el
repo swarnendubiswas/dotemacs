@@ -128,10 +128,10 @@ This location is used for temporary installations and files.")
   :type  '(radio
            (const :tag "pylsp"   pylsp)
            (const :tag "pyright" pyright)
-           (const :tag "jedi"    jedi)
            (const :tag "none"    none))
   :group 'sb/emacs)
 
+(defconst sb/EMACS27    (= emacs-major-version 27))
 (defconst sb/EMACS27+   (> emacs-major-version 26))
 (defconst sb/EMACS28+   (> emacs-major-version 27))
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
@@ -198,6 +198,8 @@ This location is used for temporary installations and files.")
   (require 'use-package))
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
+;; We do not need `:commands' with `:hook' or `:bind'.
+
 ;; Hooks in the `:hook' section run in reverse order. Example:
 ;; (use-package package-name
 ;;   :hook
@@ -245,7 +247,7 @@ This location is used for temporary installations and files.")
 
 (setq custom-file sb/custom-file)
 
-;; NOTE: Make a symlink to "private.el" under say "$HOME/.emacs.d/etc"
+;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc"
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
@@ -273,24 +275,23 @@ This location is used for temporary installations and files.")
 
 ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
 ;; is `paradox-upgrade-packages' in a single command.
-(or
- (use-package package
-   :if sb/EMACS27+
-   :bind
-   (("C-c d p" . package-quickstart-refresh)
-    ("C-c d l" . package-list-packages)))
+(use-package package
+  :if sb/EMACS27+
+  :bind
+  (("C-c d p" . package-quickstart-refresh)
+   ("C-c d l" . package-list-packages)))
 
- (use-package paradox
-   :disabled t
-   :commands (paradox-enable)
-   :bind
-   (("C-c d l" . paradox-list-packages)
-    ("C-c d u" . paradox-upgrade-packages))
-   :config
-   (setq paradox-display-star-count nil
-         paradox-execute-asynchronously t
-         paradox-github-token t)
-   (paradox-enable)))
+(use-package paradox
+  :disabled t ; This package is no longer maintained.
+  :commands (paradox-enable)
+  :bind
+  (("C-c d l" . paradox-list-packages)
+   ("C-c d u" . paradox-upgrade-packages))
+  :config
+  (setq paradox-display-star-count nil
+        paradox-execute-asynchronously t
+        paradox-github-token t)
+  (paradox-enable))
 
 ;; Get PATH with `(getenv "PATH")'. Set PATH with
 ;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'.
@@ -299,7 +300,7 @@ This location is used for temporary installations and files.")
   :commands exec-path-from-shell-initialize
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
-  ;; "-i" is expensive but Tramp is unable to find executables without the option
+  ;; "-i" is expensive but Tramp may be unable to find executables without the option
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
@@ -386,12 +387,14 @@ This location is used for temporary installations and files.")
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       sort-fold-case nil ; Do not ignore case when sorting
       standard-indent 2
-      ;; suggest-key-bindings t
+      suggest-key-bindings t
       ;; switch-to-buffer-preserve-window-point t
       use-dialog-box nil ; Do not use dialog boxes with mouse commands
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
-      vc-handled-backends '(Git) ; Disabling vc improves performance, alternate option '(Git)
+      ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
+      ;; information on the modeline
+      vc-handled-backends '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
@@ -478,12 +481,11 @@ This location is used for temporary installations and files.")
 ;; Revert all (e.g., PDF) files without asking
 (setq revert-without-query '("\\.*"))
 
+;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
+;; timer.
 (use-package saveplace ; Remember cursor position in files
   :ensure nil
-  :hook
-  ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
-  ;; timer.
-  (after-init . save-place-mode))
+  :hook (after-init . save-place-mode))
 
 (use-package savehist ; Save minibuffer history across sessions
   :ensure nil
@@ -525,28 +527,26 @@ This location is used for temporary installations and files.")
 
 (use-package subword
   :ensure nil
-  :commands subword-mode
   :diminish
   :hook (prog-mode . subword-mode))
 
+;; Show dividers on the right of each window, more prominent than the default
 (use-package frame
   :ensure nil
-  :config
-  ;; Show dividers on the right of each window, more prominent than the default
-  (window-divider-mode))
+  :hook (after-init . window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
-(when (eq sb/window-split 'horizontal)
+(when (eq sb/window-split 'vertical)
   (setq split-width-threshold nil
         split-height-threshold 0))
 
 ;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right')
-(when (eq sb/window-split 'vertical)
+(when (eq sb/window-split 'horizontal)
   (setq split-height-threshold nil
         split-width-threshold 0))
 
-;; Make use of wider screens
+;; Make use of wider screens, start with a window split
 (when nil
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
@@ -622,8 +622,7 @@ This location is used for temporary installations and files.")
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
   :hook (prog-mode . hs-minor-mode)
-  :config
-  (setq hs-isearch-open t))
+  :config (setq hs-isearch-open t))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
 (use-package so-long
@@ -720,12 +719,11 @@ This location is used for temporary installations and files.")
                (or (eq sb/tui-theme 'modus-operandi)
                    (eq sb/tui-theme 'modus-vivendi))))
   :init
-  (setq ;;modus-themes-completions 'opinionated
-   modus-themes-fringes 'intense
-   modus-themes-hl-line '(intense)
-   modus-themes-prompts '(intense)
-   modus-themes-lang-checkers '(background faint)
-   modus-themes-org-blocks 'tinted-background)
+  (setq modus-themes-fringes 'intense
+        modus-themes-hl-line '(intense)
+        modus-themes-prompts '(intense)
+        modus-themes-lang-checkers '(background faint)
+        modus-themes-org-blocks 'tinted-background)
 
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -772,8 +770,8 @@ This location is used for temporary installations and files.")
 
   (powerline-default-theme))
 
+;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
 (use-package doom-modeline
-  ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
   :ensure all-the-icons
   :ensure doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
@@ -858,7 +856,7 @@ This location is used for temporary installations and files.")
   (moody-replace-vc-mode))
 
 (use-package mini-modeline
-  :diminish
+  :diminish mini-modeline-mode
   :if (eq sb/modeline-theme 'mini)
   :hook (after-init . mini-modeline-mode)
   :config
@@ -867,7 +865,8 @@ This location is used for temporary installations and files.")
                                  mode-line-modified
                                  mode-line-remote
                                  " " mode-line-buffer-identification " "
-                                 mode-line-position
+                                 ;; mode-line-position
+                                 ;; mode-line-percent-position
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
                                  mode-line-misc-info)))
 
@@ -955,6 +954,11 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
+(when (string= (system-name) "garwhal")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
@@ -975,7 +979,6 @@ This location is used for temporary installations and files.")
 (use-package beacon
   :commands beacon-mode
   :diminish
-  ;; :init (run-with-idle-timer 3 nil #'beacon-mode)
   :hook (after-init . beacon-mode))
 
 (use-package ibuffer
@@ -983,10 +986,8 @@ This location is used for temporary installations and files.")
   :config
   (defalias 'list-buffers 'ibuffer)
   (setq ibuffer-display-summary nil
-        ;; ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
-        ;; ibuffer-expert t
-        ;; ibuffer-use-header-line t
-        )
+        ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode, recency
+        ibuffer-use-header-line t)
   :bind ("C-x C-b" . ibuffer))
 
 (use-package ibuf-ext
@@ -1061,7 +1062,8 @@ This location is used for temporary installations and files.")
         ;; Do not show messages when omitting files
         dired-omit-verbose nil)
 
-  (when (boundp 'dired-bind-jump) ;; Obsolete from Emacs 28+
+  ;; Obsolete from Emacs 28+
+  (unless sb/EMACS28+
     (setq dired-bind-jump t))
 
   ;; (setq dired-omit-files
@@ -1089,7 +1091,7 @@ This location is used for temporary installations and files.")
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :if (= emacs-major-version 27)
+  :if sb/EMACS27
   :load-path "extras"
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
@@ -1255,12 +1257,8 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'treemacs-tags-face                nil :height 0.7)
   (set-face-attribute 'treemacs-git-ignored-face         nil :height 0.7)
   (set-face-attribute 'treemacs-git-untracked-face       nil :height 0.7)
-
-  (when (or (eq sb/gui-theme 'modus-operandi)
-            (eq sb/gui-theme 'modus-vivendi)
-            (eq sb/gui-theme 'doom-gruvbox))
-    (set-face-attribute 'treemacs-git-modified-face   nil :height 0.7)
-    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
+  (set-face-attribute 'treemacs-git-modified-face        nil :height 0.7)
+  (set-face-attribute 'treemacs-git-unmodified-face      nil :height 0.7)
 
   (when (or (eq sb/gui-theme 'sb/customized)
             (eq sb/gui-theme 'none))
@@ -1438,19 +1436,6 @@ This location is used for temporary installations and files.")
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
-;; (use-package ctrlf
-;;   :disabled t
-;;   :commands (ctrlf-mode ctrlf-local-mode)
-;;   :config
-;;   (ctrlf-mode 1)
-;;   (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
-;;                                            (ctrlf-local-mode -1)))
-;;   :bind
-;;   (("C-f"   . ctrlf-forward-literal)
-;;    ("C-r"   . ctrlf-backward-literal)
-;;    ("C-M-s" . ctrlf-forward-regexp)
-;;    ("C-M-r" . ctrlf-backward-regexp)))
-
 (progn
   (defvar reb-re-syntax)
 
@@ -1553,7 +1538,7 @@ This location is used for temporary installations and files.")
   :hook (after-init . global-company-mode)
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
-  :diminish
+  ;; :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -3139,6 +3124,22 @@ This location is used for temporary installations and files.")
 (use-package define-word
   :commands (define-word define-word-at-point))
 
+;; https://languagetool.org/download/LanguageTool-stable.zip
+(use-package langtool
+  :commands (langtool-check
+             langtool-check-done
+             langtool-show-message-at-point
+             langtool-correct-buffer)
+  :init (setq langtool-default-language "en-US")
+  :config
+  (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        languagetool-console-command (no-littering-expand-etc-file-name
+                                      "languagetool-commandline.jar")
+        languagetool-server-command (no-littering-expand-etc-file-name
+                                     "languagetool-server.jar")
+        langtool-language-tool-jar (no-littering-expand-etc-file-name
+                                    "languagetool-commandline.jar")))
+
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
@@ -3852,22 +3853,6 @@ This location is used for temporary installations and files.")
      ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
      ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
-(use-package lsp-jedi
-  :defines lsp-jedi-diagnostics-enable
-  :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-jedi)))
-  :config
-  (setq lsp-jedi-diagnostics-enable t)
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "jedi-language-server")
-    :major-modes '(python-mode)
-    :remote? t
-    :server-id 'jedils-r)))
-
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
@@ -4245,16 +4230,12 @@ This location is used for temporary installations and files.")
 
   (add-to-list 'flycheck-checkers 'grammarly t))
 
-;; https://languagetool.org/download/
+;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
-  :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
-  :demand t
-  :disabled t
-  :config
-  (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
-                                               "languagetool-commandline.jar")
-        flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
+  :hook (text-mode . flycheck-languagetool-setup)
+  :init
+  (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool-server.jar")
         flycheck-checkers (delete 'languagetool flycheck-checkers)
         flycheck-languagetool-check-time 3)
@@ -4873,6 +4854,7 @@ after a successful compilation."
 
     (setq-local company-minimum-prefix-length 3)
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-files
                              company-yasnippet
@@ -4922,6 +4904,7 @@ after a successful compilation."
     "Add backends for web completion in company mode."
 
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-files
                              company-yasnippet
@@ -4972,22 +4955,25 @@ after a successful compilation."
 
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
 ;; `company-clang' is slow
-(progn
-  (defun sb/company-c-mode ()
-    "Add backends for C/C++ completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
+;; (progn
+;;   (defun sb/company-c-mode ()
+;;     "Add backends for C/C++ completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
 
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-dabbrev-code
-                             company-files
-                             company-yasnippet
-                             company-dabbrev
-                             company-ispell)))
+;;     (setq-local company-minimum-prefix-length 2)
+;;     (make-local-variable 'company-backends)
 
-  (add-hook 'c-mode-common-hook #'sb/company-c-mode))
+;;     (setq company-backends '(company-capf
+;;                              company-dabbrev-code
+;;                              company-files
+;;                              company-yasnippet
+;;                              company-dabbrev)))
+
+;;   (add-hook 'c-mode-common-hook (lambda ()
+;;                                   (sb/company-c-mode)
+;;                                   (company-fuzzy-mode 1)
+;;                                   (diminish 'company-fuzzy-mode))))
 
 (progn
   (defun sb/company-sh-mode ()
@@ -4997,6 +4983,7 @@ after a successful compilation."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-shell
                              company-shell-env
@@ -5017,6 +5004,7 @@ after a successful compilation."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-shell
                              company-shell-env
@@ -5039,13 +5027,17 @@ after a successful compilation."
 
     (setq-local company-minimum-prefix-length 2)
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-yasnippet
                              company-files
                              company-dabbrev-code
                              company-dabbrev)))
 
-  (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
+  (add-hook 'emacs-lisp-mode-hook (lambda ()
+                                    (sb/company-elisp-mode)
+                                    (company-fuzzy-mode 1)
+                                    (diminish 'company-fuzzy-mode))))
 
 (progn
   (defun sb/company-python-mode ()
@@ -5059,31 +5051,35 @@ after a successful compilation."
     ;; `company-dabbrev-code' is useful for variable names
     (setq company-backends '(company-capf
                              company-yasnippet
-                             company-files
-                             company-dabbrev)))
-
-  (add-hook 'python-mode-hook #'sb/company-python-mode))
-
-(progn
-  (defun sb/company-prog-mode ()
-    "Add backends for program completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-
-    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-    (setq company-backends '(company-capf
-                             company-yasnippet
-                             company-files
                              company-dabbrev-code
+                             company-files
                              company-dabbrev)))
 
-  (add-hook 'prog-mode-hook (lambda ()
-                              (sb/company-prog-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
+  (add-hook 'python-mode-hook (lambda ()
+                                (sb/company-python-mode)
+                                (company-fuzzy-mode 1)
+                                (diminish 'company-fuzzy-mode))))
+
+;; (progn
+;;   (defun sb/company-prog-mode ()
+;;     "Add backends for program completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 2)
+;;     (make-local-variable 'company-backends)
+
+;;     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+;;     (setq company-backends '(company-capf
+;;                              company-yasnippet
+;;                              company-files
+;;                              company-dabbrev-code
+;;                              company-dabbrev)))
+
+;;   (add-hook 'prog-mode-hook (lambda ()
+;;                               (sb/company-prog-mode)
+;;                               (company-fuzzy-mode 1)
+;;                               (diminish 'company-fuzzy-mode))))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
