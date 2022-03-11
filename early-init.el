@@ -9,10 +9,10 @@
 
 ;;; Code:
 
-(defconst sb/EMACS27+   (> emacs-major-version 26))
-(defconst sb/EMACS28+   (> emacs-major-version 27))
-(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
-(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+;; https://github.com/kiwanami/emacs-epc/issues/35
+;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
+(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
+                                  cl-functions interactive-only))
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
 ;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
@@ -57,42 +57,6 @@
 (add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
-
-;; (require 'package)
-
-;; Avoid loading packages twice, this is set during `(package-initialize)'
-(setq package-enable-at-startup nil
-      package-user-dir (expand-file-name "elpa" user-emacs-directory))
-
-(with-eval-after-load 'package
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
-  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
-
-;; Initialise the package management system. Another option is to construct the `load-path'
-;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-(package-initialize)
-
-(unless (package-installed-p 'no-littering)
-  (unless package-archive-contents
-    (package-refresh-contents nil))
-  (package-install 'no-littering))
-
-(require 'no-littering)
-
-(setq package-quickstart t ; Populate one big autoloads file
-      package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
-
-;; Emacs 28+.
-(when (boundp 'native-comp-eln-load-path)
-  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
-
-(defvar package-native-compile)
-(defvar native-comp-always-compile)
-
-(when sb/EMACS28+
-  (setq package-native-compile t
-        native-comp-always-compile t))
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following

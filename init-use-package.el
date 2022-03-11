@@ -7,9 +7,6 @@
 
 ;;; Code:
 
-(defvar no-littering-etc-directory)
-(defvar no-littering-var-directory)
-
 (defgroup sb/emacs
   nil
   "Personal configuration for dotemacs."
@@ -22,7 +19,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'doom-nord
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -70,7 +67,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/window-split
-  'horizontal
+  'vertical
   "Specify the direction in which the windows should be split.
 This depends on the orientation of the display."
   :type  '(radio
@@ -131,9 +128,33 @@ This location is used for temporary installations and files.")
   :type  '(radio
            (const :tag "pylsp"   pylsp)
            (const :tag "pyright" pyright)
-           (const :tag "jedi"    jedi)
            (const :tag "none"    none))
   :group 'sb/emacs)
+
+(defconst sb/EMACS27    (= emacs-major-version 27))
+(defconst sb/EMACS27+   (> emacs-major-version 26))
+(defconst sb/EMACS28+   (> emacs-major-version 27))
+(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
+(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+
+;; Avoid loading packages twice, this is set during `(package-initialize)'
+(setq package-enable-at-startup nil)
+
+(with-eval-after-load 'package
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+  (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+
+;; Initialise the package management system. Another option is to construct the `load-path'
+;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+(package-initialize)
+
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
+
+(when sb/EMACS28+
+  (setq package-native-compile t
+        native-comp-always-compile t))
 
 (unless (package-installed-p 'use-package)
   (unless package-archive-contents
@@ -148,35 +169,38 @@ This location is used for temporary installations and files.")
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
 
-(setq use-package-enable-imenu-support t
-      ;; Avoid manual modifications whenever I modify package installations
-      use-package-always-ensure        t)
+(eval-and-compile
+  (setq use-package-enable-imenu-support t
+        ;; Avoid manual modifications whenever I modify package installations
+        use-package-always-ensure        t)
 
-(when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error                 t
-        debug-on-event                 'sigusr2
-        garbage-collection-messages    t
-        use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-        use-package-verbose            t
-        use-package-expand-minimally   nil)
-  (debug-on-entry 'projectile-remove-known-project))
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq debug-on-error                 t
+          debug-on-event                 'sigusr2
+          garbage-collection-messages    t
+          use-package-compute-statistics t ; Use `M-x use-package-report' to see results
+          use-package-verbose            t
+          use-package-expand-minimally   nil)
+    (debug-on-entry 'projectile-remove-known-project))
 
-;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
-;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
-;; using `:after' and always deferring loading, because then we will need to specifiy alternate ways
-;; of loading the package.
-;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
-(unless (bound-and-true-p sb/debug-init-file)
-  (setq use-package-always-defer       t
-        ;; Avoid printing errors and warnings since the configuration is known to work
-        use-package-expand-minimally   t
-        use-package-compute-statistics nil
-        use-package-verbose            nil))
+  ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
+  ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
+  ;; using `:after' and always deferring loading, because then we will need to specifiy alternate
+  ;; ways of loading the package.
+  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
+  (unless (bound-and-true-p sb/debug-init-file)
+    (setq use-package-always-defer       t
+          ;; Avoid printing errors and warnings since the configuration is known to work
+          use-package-expand-minimally   t
+          use-package-compute-statistics nil
+          use-package-verbose            nil)))
 
 (eval-when-compile
   (require 'use-package))
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
+;; We do not need `:commands' with `:hook' or `:bind'.
+
 ;; Hooks in the `:hook' section run in reverse order. Example:
 ;; (use-package package-name
 ;;   :hook
@@ -206,6 +230,16 @@ This location is used for temporary installations and files.")
                                hydra-show-hint hydra-set-transient-map
                                hydra--call-interactively-remap-maybe))
 
+(use-package no-littering
+  :demand t)
+
+(setq package-quickstart t ; Populate one big autoloads file
+      package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
+
+;; Emacs 28+.
+(when (boundp 'native-comp-eln-load-path)
+  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
   "File to write Emacs customizations."
@@ -214,7 +248,7 @@ This location is used for temporary installations and files.")
 
 (setq custom-file sb/custom-file)
 
-;; NOTE: Make a symlink to "private.el" under say "$HOME/.emacs.d/etc"
+;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc"
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
@@ -223,13 +257,13 @@ This location is used for temporary installations and files.")
 
 (let ((gc-cons-threshold most-positive-fixnum))
   (when (file-exists-p custom-file)
-    (load custom-file 'noerror))
+    (load custom-file 'noerror 'nomessage))
   (when (file-exists-p sb/private-file)
-    (load sb/private-file 'noerror)))
+    (load sb/private-file 'noerror 'nomessage)))
 
 (use-package warnings
   :init
-  ;; This is not a great idea, but I expect most warnings will arise from third-party packages
+  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
   (setq warning-minimum-level :emergency))
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
@@ -242,24 +276,23 @@ This location is used for temporary installations and files.")
 
 ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
 ;; is `paradox-upgrade-packages' in a single command.
-(or
- (use-package package
-   :if sb/EMACS27+
-   :bind
-   (("C-c d p" . package-quickstart-refresh)
-    ("C-c d l" . package-list-packages)))
+(use-package package
+  :if sb/EMACS27+
+  :bind
+  (("C-c d p" . package-quickstart-refresh)
+   ("C-c d l" . package-list-packages)))
 
- (use-package paradox
-   :disabled t
-   :commands (paradox-enable)
-   :bind
-   (("C-c d l" . paradox-list-packages)
-    ("C-c d u" . paradox-upgrade-packages))
-   :config
-   (setq paradox-display-star-count nil
-         paradox-execute-asynchronously t
-         paradox-github-token t)
-   (paradox-enable)))
+(use-package paradox
+  :disabled t ; This package is no longer maintained.
+  :commands (paradox-enable)
+  :bind
+  (("C-c d l" . paradox-list-packages)
+   ("C-c d u" . paradox-upgrade-packages))
+  :config
+  (setq paradox-display-star-count nil
+        paradox-execute-asynchronously t
+        paradox-github-token t)
+  (paradox-enable))
 
 ;; Get PATH with `(getenv "PATH")'. Set PATH with
 ;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'.
@@ -268,7 +301,7 @@ This location is used for temporary installations and files.")
   :commands exec-path-from-shell-initialize
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
-  ;; "-i" is expensive but Tramp is unable to find executables without the option
+  ;; "-i" is expensive but Tramp may be unable to find executables without the option
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
@@ -333,6 +366,7 @@ This location is used for temporary installations and files.")
       frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
+      history-length 50 ; Reduce the state that is to be read
       indicate-buffer-boundaries nil
       kill-do-not-save-duplicates t
       kill-whole-line t
@@ -354,12 +388,14 @@ This location is used for temporary installations and files.")
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       sort-fold-case nil ; Do not ignore case when sorting
       standard-indent 2
-      ;; suggest-key-bindings t
+      suggest-key-bindings t
       ;; switch-to-buffer-preserve-window-point t
       use-dialog-box nil ; Do not use dialog boxes with mouse commands
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
-      vc-handled-backends '(Git) ; Disabling vc improves performance, alternate option '(Git)
+      ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
+      ;; information on the modeline
+      vc-handled-backends '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
@@ -446,12 +482,11 @@ This location is used for temporary installations and files.")
 ;; Revert all (e.g., PDF) files without asking
 (setq revert-without-query '("\\.*"))
 
+;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
+;; timer.
 (use-package saveplace ; Remember cursor position in files
   :ensure nil
-  :hook
-  ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
-  ;; timer.
-  (after-init . save-place-mode))
+  :hook (after-init . save-place-mode))
 
 (use-package savehist ; Save minibuffer history across sessions
   :ensure nil
@@ -493,28 +528,26 @@ This location is used for temporary installations and files.")
 
 (use-package subword
   :ensure nil
-  :commands subword-mode
   :diminish
   :hook (prog-mode . subword-mode))
 
+;; Show dividers on the right of each window, more prominent than the default
 (use-package frame
   :ensure nil
-  :config
-  ;; Show dividers on the right of each window, more prominent than the default
-  (window-divider-mode))
+  :hook (after-init . window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
-(when (eq sb/window-split 'horizontal)
+(when (eq sb/window-split 'vertical)
   (setq split-width-threshold nil
         split-height-threshold 0))
 
 ;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right')
-(when (eq sb/window-split 'vertical)
+(when (eq sb/window-split 'horizontal)
   (setq split-height-threshold nil
         split-width-threshold 0))
 
-;; Make use of wider screens
+;; Make use of wider screens, start with a window split
 (when nil
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
@@ -529,25 +562,21 @@ This location is used for temporary installations and files.")
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-(use-package ffap
-  :commands (ffip ffap))
+(use-package ffap ;; Find FILENAME, guessing a default from text around point.
+  :commands ffap)
 
+;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
   :ensure nil
-  :commands abbrev-mode
   :diminish
-  :hook
-  ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
-  (after-init . abbrev-mode)
+  :hook (after-init . abbrev-mode)
   :config
   ;; The "abbrev-defs" file is under version control
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
         save-abbrevs 'silently))
 
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
-(dolist (mode '(blink-cursor-mode ; Blinking cursor is distracting
-                ;; size-indication-mode
-                tooltip-mode))
+(dolist (mode '(tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
 
@@ -558,10 +587,12 @@ This location is used for temporary installations and files.")
 
 ;; Enable the following modes
 (dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
+                blink-cursor-mode
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
-                ;; Soft wraps, wrap lines without the ugly continuation marks
-                global-visual-line-mode))
+                ;; Use soft wraps, wrap lines without the ugly continuation marks
+                global-visual-line-mode
+                size-indication-mode))
   (when (fboundp mode)
     (funcall mode 1)))
 
@@ -592,18 +623,13 @@ This location is used for temporary installations and files.")
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
   :hook (prog-mode . hs-minor-mode)
-  :config
-  (setq hs-isearch-open t)
-  ;; (hs-hide-initial-comment-block)
-  )
+  :config (setq hs-isearch-open t))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
 (use-package so-long
   :ensure nil
-  :commands global-so-long-mode
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
-  :hook (after-init . global-so-long-mode)
-  :config (setq so-long-threshold 500))
+  :hook (after-init . global-so-long-mode))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
@@ -694,8 +720,7 @@ This location is used for temporary installations and files.")
                (or (eq sb/tui-theme 'modus-operandi)
                    (eq sb/tui-theme 'modus-vivendi))))
   :init
-  (setq modus-themes-completions 'opinionated
-        modus-themes-fringes 'intense
+  (setq modus-themes-fringes 'intense
         modus-themes-hl-line '(intense)
         modus-themes-prompts '(intense)
         modus-themes-lang-checkers '(background faint)
@@ -746,8 +771,8 @@ This location is used for temporary installations and files.")
 
   (powerline-default-theme))
 
+;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
 (use-package doom-modeline
-  ;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
   :ensure all-the-icons
   :ensure doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
@@ -832,7 +857,7 @@ This location is used for temporary installations and files.")
   (moody-replace-vc-mode))
 
 (use-package mini-modeline
-  :diminish
+  :diminish mini-modeline-mode
   :if (eq sb/modeline-theme 'mini)
   :hook (after-init . mini-modeline-mode)
   :config
@@ -841,7 +866,8 @@ This location is used for temporary installations and files.")
                                  mode-line-modified
                                  mode-line-remote
                                  " " mode-line-buffer-identification " "
-                                 mode-line-position
+                                 ;; mode-line-position
+                                 ;; mode-line-percent-position
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
                                  mode-line-misc-info)))
 
@@ -929,6 +955,11 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
+(when (string= (system-name) "garwhal")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
@@ -949,7 +980,6 @@ This location is used for temporary installations and files.")
 (use-package beacon
   :commands beacon-mode
   :diminish
-  ;; :init (run-with-idle-timer 3 nil #'beacon-mode)
   :hook (after-init . beacon-mode))
 
 (use-package ibuffer
@@ -957,10 +987,8 @@ This location is used for temporary installations and files.")
   :config
   (defalias 'list-buffers 'ibuffer)
   (setq ibuffer-display-summary nil
-        ;; ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode
-        ;; ibuffer-expert t
-        ;; ibuffer-use-header-line t
-        )
+        ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode, recency
+        ibuffer-use-header-line t)
   :bind ("C-x C-b" . ibuffer))
 
 (use-package ibuf-ext
@@ -1035,7 +1063,8 @@ This location is used for temporary installations and files.")
         ;; Do not show messages when omitting files
         dired-omit-verbose nil)
 
-  (when (boundp 'dired-bind-jump) ;; Obsolete from Emacs 28+
+  ;; Obsolete from Emacs 28+
+  (unless sb/EMACS28+
     (setq dired-bind-jump t))
 
   ;; (setq dired-omit-files
@@ -1063,7 +1092,7 @@ This location is used for temporary installations and files.")
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :if (= emacs-major-version 27)
+  :if sb/EMACS27
   :load-path "extras"
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
@@ -1229,12 +1258,8 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'treemacs-tags-face                nil :height 0.7)
   (set-face-attribute 'treemacs-git-ignored-face         nil :height 0.7)
   (set-face-attribute 'treemacs-git-untracked-face       nil :height 0.7)
-
-  (when (or (eq sb/gui-theme 'modus-operandi)
-            (eq sb/gui-theme 'modus-vivendi)
-            (eq sb/gui-theme 'doom-gruvbox))
-    (set-face-attribute 'treemacs-git-modified-face   nil :height 0.7)
-    (set-face-attribute 'treemacs-git-unmodified-face nil :height 0.7))
+  (set-face-attribute 'treemacs-git-modified-face        nil :height 0.7)
+  (set-face-attribute 'treemacs-git-unmodified-face      nil :height 0.7)
 
   (when (or (eq sb/gui-theme 'sb/customized)
             (eq sb/gui-theme 'none))
@@ -1265,6 +1290,8 @@ This location is used for temporary installations and files.")
   :demand t)
 
 (use-package treemacs-magit
+  :ensure magit
+  :ensure t
   :after (treemacs magit)
   :demand t)
 
@@ -1339,7 +1366,7 @@ This location is used for temporary installations and files.")
 ;; TODO: Use `C-c o' as the binding for `org-mode-map'
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
-;; `isearch' candidates
+;; `isearch' candidates.
 (use-package isearch
   :ensure nil
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
@@ -1409,19 +1436,6 @@ This location is used for temporary installations and files.")
 ;; `o' to view the result in another window.
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
-
-;; (use-package ctrlf
-;;   :disabled t
-;;   :commands (ctrlf-mode ctrlf-local-mode)
-;;   :config
-;;   (ctrlf-mode 1)
-;;   (add-hook 'pdf-isearch-minor-mode-hook (lambda ()
-;;                                            (ctrlf-local-mode -1)))
-;;   :bind
-;;   (("C-f"   . ctrlf-forward-literal)
-;;    ("C-r"   . ctrlf-backward-literal)
-;;    ("C-M-s" . ctrlf-forward-regexp)
-;;    ("C-M-r" . ctrlf-backward-regexp)))
 
 (progn
   (defvar reb-re-syntax)
@@ -1525,7 +1539,7 @@ This location is used for temporary installations and files.")
   :hook (after-init . global-company-mode)
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
-  :diminish
+  ;; :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -1918,7 +1932,8 @@ This location is used for temporary installations and files.")
    ("C-c f b" . flyspell-buffer)
    :map flyspell-mode-map
    ("C-;"     . nil)
-   ("C-,"     . sb/flyspell-goto-previous-error)))
+   ;; ("C-,"     . sb/flyspell-goto-previous-error)
+   ))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
 (use-package flyspell-popup
@@ -2118,6 +2133,7 @@ This location is used for temporary installations and files.")
 ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
 ;; yet.
 (use-package project
+  :ensure nil
   :commands (project-switch-project project-current
                                     project-find-file project-execute-extended-command
                                     project-known-project-roots
@@ -2165,9 +2181,6 @@ This location is used for temporary installations and files.")
         projectile-sort-order 'recently-active
         projectile-verbose nil)
 
-  ;; See Git status after switching to a project
-  ;; (setq projectile-switch-project-action #'magit-status)
-
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and (symbol-value 'sb/IS-WINDOWS)
              (executable-find "tr"))
@@ -2212,10 +2225,6 @@ This location is used for temporary installations and files.")
                  (expand-file-name sb/user-home) ; Do not consider $HOME as a project
                  "~/" ; Do not consider $HOME as a project
                  (expand-file-name "/tmp")
-                 (expand-file-name "bitbucket/.metadata"       sb/user-home)
-                 (expand-file-name "github/.metadata"          sb/user-home)
-                 (expand-file-name "iitk-workspace/.metadata"  sb/user-home)
-                 (expand-file-name "plass-workspace/.metadata" sb/user-home)
                  ))
     (add-to-list 'projectile-ignored-projects prjs))
 
@@ -3116,6 +3125,22 @@ This location is used for temporary installations and files.")
 (use-package define-word
   :commands (define-word define-word-at-point))
 
+;; https://languagetool.org/download/LanguageTool-stable.zip
+(use-package langtool
+  :commands (langtool-check
+             langtool-check-done
+             langtool-show-message-at-point
+             langtool-correct-buffer)
+  :init (setq langtool-default-language "en-US")
+  :config
+  (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        languagetool-console-command (no-littering-expand-etc-file-name
+                                      "languagetool-commandline.jar")
+        languagetool-server-command (no-littering-expand-etc-file-name
+                                     "languagetool-server.jar")
+        langtool-language-tool-jar (no-littering-expand-etc-file-name
+                                    "languagetool-commandline.jar")))
+
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
@@ -3829,22 +3854,6 @@ This location is used for temporary installations and files.")
      ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
      ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
-(use-package lsp-jedi
-  :defines lsp-jedi-diagnostics-enable
-  :if (and (eq sb/python-langserver 'jedi) (executable-find "jedi-language-server"))
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-jedi)))
-  :config
-  (setq lsp-jedi-diagnostics-enable t)
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "jedi-language-server")
-    :major-modes '(python-mode)
-    :remote? t
-    :server-id 'jedils-r)))
-
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
@@ -3929,7 +3938,12 @@ This location is used for temporary installations and files.")
 
 (use-package image-mode
   :ensure nil
+  :if (display-graphic-p)
   :mode "\\.svg$"
+  :custom
+  ;;  Enable converting external formats (ie. webp) to internal ones.
+  (image-use-external-converter t)
+  ;; TODO: This does not work.
   :hook (image-mode . show-image-dimensions-in-mode-line))
 
 (use-package sh-script ; Shell script mode
@@ -3960,6 +3974,13 @@ This location is used for temporary installations and files.")
   :hook
   (fish-mode . (lambda ()
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
+
+(use-package company-shell
+  :after (:any sh-mode fish-mode)
+  :demand t
+  :defines company-shell-delete-duplictes
+  :commands (company-shell company-shell-env company-fish-shell)
+  :config (setq company-shell-delete-duplictes t))
 
 (use-package shfmt
   :hook (sh-mode . shfmt-on-save-mode)
@@ -4210,16 +4231,12 @@ This location is used for temporary installations and files.")
 
   (add-to-list 'flycheck-checkers 'grammarly t))
 
-;; https://languagetool.org/download/
+;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
-  :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
-  :demand t
-  :disabled t
-  :config
-  (setq flycheck-languagetool-commandline-jar (no-littering-expand-etc-file-name
-                                               "languagetool-commandline.jar")
-        flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
+  :hook (text-mode . flycheck-languagetool-setup)
+  :init
+  (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool-server.jar")
         flycheck-checkers (delete 'languagetool flycheck-checkers)
         flycheck-languagetool-check-time 3)
@@ -4293,8 +4310,9 @@ This location is used for temporary installations and files.")
                                            lsp-grammarly--update-document-state)
   :hook
   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-                                                     (require 'lsp-grammarly)
-                                                     (lsp-deferred)))
+                                                     (unless (eq major-mode 'csv-mode)
+                                                       (require 'lsp-grammarly)
+                                                       (lsp-deferred))))
   :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
@@ -4326,8 +4344,9 @@ This location is used for temporary installations and files.")
   :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
   ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-                                                     (require 'lsp-ltex)
-                                                     (lsp-deferred)))
+                                                     (unless (eq major-mode 'csv-mode)
+                                                       (require 'lsp-ltex)
+                                                       (lsp-deferred))))
   :init
   (setq lsp-ltex-check-frequency "save"
         ;; lsp-ltex-dictionary ("microbenchmarks")
@@ -4368,31 +4387,31 @@ This location is used for temporary installations and files.")
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 
-;; (use-package lsp-latex
-;;   :disabled t
-;;   :hook
-;;   (latex-mode . (lambda()
-;;                   (require 'lsp-latex)
-;;                   (lsp-deferred)))
-;;   :config
-;;   (setq lsp-latex-bibtex-formatter             "latexindent"
-;;         lsp-latex-latex-formatter              "latexindent"
-;;         lsp-latex-bibtex-formatter-line-length sb/fill-column
-;;         lsp-latex-chktex-on-open-and-save      t
-;;         lsp-latex-build-is-continuous          t
-;;         lsp-latex-build-on-save                t
-;;         ;; Delay time in milliseconds before reporting diagnostics
-;;         lsp-latex-diagnostics-delay            2000)
+(use-package lsp-latex
+  :disabled t
+  :hook
+  (latex-mode . (lambda()
+                  (require 'lsp-latex)
+                  (lsp-deferred)))
+  :config
+  (setq lsp-latex-bibtex-formatter             "latexindent"
+        lsp-latex-latex-formatter              "latexindent"
+        lsp-latex-bibtex-formatter-line-length sb/fill-column
+        lsp-latex-chktex-on-open-and-save      t
+        lsp-latex-build-is-continuous          t
+        lsp-latex-build-on-save                t
+        ;; Delay time in milliseconds before reporting diagnostics
+        lsp-latex-diagnostics-delay            2000)
 
-;;   (add-to-list 'lsp-latex-build-args "-c")
-;;   (add-to-list 'lsp-latex-build-args "-pvc")
+  (add-to-list 'lsp-latex-build-args "-c")
+  (add-to-list 'lsp-latex-build-args "-pvc")
 
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection (lsp-tramp-connection "texlab")
-;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-;;     :remote? t
-;;     :server-id 'texlab-r)))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "texlab")
+    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+    :remote? t
+    :server-id 'texlab-r)))
 
 (use-package tex-site
   :ensure nil
@@ -4582,6 +4601,32 @@ Ignore if no file is found."
   (auctex-latexmk-setup)
   (setq TeX-command-default "LatexMk"))
 
+(use-package company-auctex
+  :after tex-mode
+  :demand t
+  :commands (company-auctex-init company-auctex-labels
+                                 company-auctex-bibs company-auctex-macros
+                                 company-auctex-symbols company-auctex-environments))
+
+(use-package math-symbols
+  :after tex-mode
+  :demand t) ; Required by `ac-math' and `company-math'
+
+(use-package company-math
+  :after tex-mode
+  :demand t
+  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+
+(use-package company-reftex ; Reftex must be enabled to work
+  :after tex-mode
+  :demand t
+  :commands (company-reftex-labels company-reftex-citations))
+
+(use-package company-bibtex
+  :after tex-mode
+  :demand t
+  :commands company-bibtex)
+
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el")
 
@@ -4746,9 +4791,10 @@ after a successful compilation."
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
   :defines fasd-enable-initial-prompt
-  :if (executable-find "fasd")
   :commands (global-fasd-mode fasd-find-file)
+  :if (executable-find "fasd")
   ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
+  :hook (after-init . global-fasd-mode)
   :config (setq fasd-enable-initial-prompt nil)
   :bind* ("C-c /" . fasd-find-file))
 
@@ -4802,27 +4848,6 @@ after a successful compilation."
 ;; `(add-to-list 'company-backends '(company-capf :with company-dabbrev))'
 
 (progn
-  (defun sb/company-text-mode ()
-    "Add backends for text completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    ;; Slightly larger value to have more precise matches and so that the popup does not block
-    (setq-local company-minimum-prefix-length 3
-                company-transformers '(delete-dups))
-    (set (make-local-variable 'company-backends)
-         '(company-files
-           company-dabbrev
-           company-ispell
-           company-abbrev)))
-
-  (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
-    (add-hook hook (lambda ()
-                     (sb/company-text-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
-
-(progn
   (defun sb/company-xml-mode ()
     "Add backends for completion with company."
     (defvar company-minimum-prefix-length)
@@ -4830,6 +4855,7 @@ after a successful compilation."
 
     (setq-local company-minimum-prefix-length 3)
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-files
                              company-yasnippet
@@ -4843,168 +4869,8 @@ after a successful compilation."
                      (diminish 'company-fuzzy-mode)))))
 
 (progn
-  (defun sb/company-prog-mode ()
-    "Add backends for program completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 3)
-    (make-local-variable 'company-backends)
-
-    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-    (setq company-backends '(company-capf
-                             company-yasnippet
-                             company-files
-                             company-dabbrev-code
-                             company-dabbrev)))
-
-  (add-hook 'prog-mode-hook (lambda ()
-                              (sb/company-prog-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
-
-;; (progn
-;;   (defun sb/company-java-mode ()
-;;     "Add backends for Java completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 3)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '((company-capf :with company-yasnippet)
-;;                              (company-files : with company-yasnippet)
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              company-dabbrev)))
-
-;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
-
-;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;; `company-clang' is slow
-;; (progn
-;;   (defun sb/company-c-mode ()
-;;     "Add backends for C/C++ completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '(company-capf
-;;                              company-files
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              (company-dabbrev
-;;                               company-ispell))))
-
-;;   (add-hook 'c-mode-common-hook #'sb/company-c-mode))
-
-(progn
-  (defun sb/company-sh-mode ()
-    "Add backends for shell script completion in company mode."
-    (use-package company-shell
-      :defines company-shell-delete-duplictes
-      :commands (company-shell company-shell-env company-fish-shell)
-      :config (setq company-shell-delete-duplictes t))
-
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-shell
-                             company-shell-env
-                             company-dabbrev-code
-                             company-yasnippet
-                             company-files
-                             company-dabbrev)))
-
-  (add-hook 'sh-mode-hook (lambda ()
-                            (sb/company-sh-mode)
-                            (company-fuzzy-mode 1)
-                            (diminish 'company-fuzzy-mode)))
-
-  (defun sb/company-fish-mode ()
-    "Add backends for fish shell script completion in company mode."
-    (use-package company-shell
-      :defines company-shell-delete-duplictes
-      :commands (company-shell company-shell-env company-fish-shell)
-      :config (setq company-shell-delete-duplictes t))
-
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-    (setq company-backends '(company-capf
-                             company-shell
-                             company-shell-env
-                             company-fish-shell
-                             company-dabbrev-code
-                             company-yasnippet
-                             company-files
-                             company-dabbrev)))
-
-  (add-hook 'fish-mode-hook (lambda ()
-                              (sb/company-fish-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
-
-;; (progn
-;;   (defun sb/company-elisp-mode ()
-;;     "Set up company for elisp mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-;;     (setq company-backends '(company-capf
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev-code
-;;                              company-dabbrev
-;;                              company-ispell)))
-
-;;   (add-hook 'emacs-lisp-mode-hook #'sb/company-elisp-mode))
-
-;; (progn
-;;   (defun sb/company-python-mode ()
-;;     "Add backends for Python completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 3)
-;;     (make-local-variable 'company-backends)
-;;     ;; `company-dabbrev-code' is useful for variable names
-;;     (setq company-backends '(company-capf
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev-code
-;;                              company-dabbrev)))
-
-;;   (add-hook 'python-mode-hook #'sb/company-python-mode))
-
-(progn
   (defun sb/company-latex-mode ()
     "Add backends for latex completion in company mode."
-    (use-package company-auctex
-      :demand t
-      :commands (company-auctex-init company-auctex-labels
-                                     company-auctex-bibs company-auctex-macros
-                                     company-auctex-symbols company-auctex-environments))
-
-    (use-package math-symbol-lists ; Required by `ac-math' and `company-math'
-      :demand t)
-
-    (use-package company-math
-      :demand t
-      :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-
-    (use-package company-reftex ; Reftex must be enabled to work
-      :demand t
-      :commands (company-reftex-labels company-reftex-citations))
-
-    (use-package company-bibtex
-      :demand t
-      :commands company-bibtex)
 
     (setq-local company-minimum-prefix-length 3)
     (make-local-variable 'company-backends)
@@ -5039,6 +4905,7 @@ after a successful compilation."
     "Add backends for web completion in company mode."
 
     (make-local-variable 'company-backends)
+
     (setq company-backends '(company-capf
                              company-files
                              company-yasnippet
@@ -5051,6 +4918,170 @@ after a successful compilation."
                      (company-fuzzy-mode 1)
                      (diminish 'company-fuzzy-mode)))))
 
+(progn
+  (defun sb/company-text-mode ()
+    "Add backends for text completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    ;; Slightly larger value to have more precise matches and so that the popup does not block
+    (setq-local company-minimum-prefix-length 3
+                company-transformers '(delete-dups))
+    (set (make-local-variable 'company-backends)
+         '(company-files
+           company-dabbrev
+           company-ispell
+           company-abbrev)))
+
+  (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
+    (add-hook hook (lambda ()
+                     (sb/company-text-mode)
+                     (company-fuzzy-mode 1)
+                     (diminish 'company-fuzzy-mode)))))
+
+;; (progn
+;;   (defun sb/company-java-mode ()
+;;     "Add backends for Java completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 3)
+;;     (make-local-variable 'company-backends)
+;;     (setq company-backends '((company-capf :with company-yasnippet)
+;;                              (company-files : with company-yasnippet)
+;;                              (company-dabbrev-code :with company-yasnippet)
+;;                              company-dabbrev)))
+
+;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
+
+;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; `company-clang' is slow
+;; (progn
+;;   (defun sb/company-c-mode ()
+;;     "Add backends for C/C++ completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 2)
+;;     (make-local-variable 'company-backends)
+
+;;     (setq company-backends '(company-capf
+;;                              company-dabbrev-code
+;;                              company-files
+;;                              company-yasnippet
+;;                              company-dabbrev)))
+
+;;   (add-hook 'c-mode-common-hook (lambda ()
+;;                                   (sb/company-c-mode)
+;;                                   (company-fuzzy-mode 1)
+;;                                   (diminish 'company-fuzzy-mode))))
+
+(progn
+  (defun sb/company-sh-mode ()
+    "Add backends for shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'sh-mode-hook (lambda ()
+                            (sb/company-sh-mode)
+                            (company-fuzzy-mode 1)
+                            (diminish 'company-fuzzy-mode)))
+
+  (defun sb/company-fish-mode ()
+    "Add backends for fish shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-fish-shell
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'fish-mode-hook (lambda ()
+                              (sb/company-fish-mode)
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
+
+(progn
+  (defun sb/company-elisp-mode ()
+    "Set up company for elisp mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-files
+                             company-dabbrev-code
+                             company-dabbrev)))
+
+  (add-hook 'emacs-lisp-mode-hook (lambda ()
+                                    (sb/company-elisp-mode)
+                                    (company-fuzzy-mode 1)
+                                    (diminish 'company-fuzzy-mode))))
+
+(progn
+  (defun sb/company-python-mode ()
+    "Add backends for Python completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
+
+    ;; `company-dabbrev-code' is useful for variable names
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'python-mode-hook (lambda ()
+                                (sb/company-python-mode)
+                                (company-fuzzy-mode 1)
+                                (diminish 'company-fuzzy-mode))))
+
+;; (progn
+;;   (defun sb/company-prog-mode ()
+;;     "Add backends for program completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 2)
+;;     (make-local-variable 'company-backends)
+
+;;     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+;;     (setq company-backends '(company-capf
+;;                              company-yasnippet
+;;                              company-files
+;;                              company-dabbrev-code
+;;                              company-dabbrev)))
+
+;;   (add-hook 'prog-mode-hook (lambda ()
+;;                               (sb/company-prog-mode)
+;;                               (company-fuzzy-mode 1)
+;;                               (diminish 'company-fuzzy-mode))))
+
 ;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
   :disabled t
@@ -5061,7 +5092,7 @@ after a successful compilation."
     (server-start)))
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-(setenv "SHELL" shell-file-name) ; Recommended to connect with bash
+(setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
 
 ;; `vterm' provides better performance than `eshell', `shell', and `(ansi-)term'. The advantage of
 ;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
