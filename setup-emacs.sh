@@ -3,7 +3,7 @@
 # Helper script to install GNU Emacs if not already present. It also sets up packages related to my
 # setup.
 
-set -eux
+# set -eux
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root!"
@@ -22,30 +22,30 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 # Install important packages
 
 case "${DIST_VERSION}" in
-Ubuntu_18.04)
-    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libgccjit-8-dev bear
-    ;;
-Ubuntu_20.04)
-    apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip cppcheck composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline libncurses5-dev fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo htop x11-utils unifont ttf-ancient-fonts xfonts-terminus ttf-anonymous-pro libperl-dev libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxml2-dev libxt-dev aspell libxml2-utils chktex libjansson-dev libyaml-dev libxml2-dev autojump htop x11-utils unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev automake autoconf libgtk2.0-dev librsvg2-dev libmagickwand-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
-    ;;
-*)
-    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-    exit 2
-    ;;
+    Ubuntu_18.04)
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump x11-utils libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
+        ;;
+    Ubuntu_20.04)
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear
+        ;;
+    *)
+        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+        exit 2
+        ;;
 esac
 
 # Add necessary repositories
 case "${DIST_VERSION}" in
-Ubuntu_18.04)
-    add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    ;;
-Ubuntu_20.04)
-    add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    ;;
-*)
-    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-    exit 2
-    ;;
+    Ubuntu_18.04)
+        add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        ;;
+    Ubuntu_20.04)
+        add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        ;;
+    *)
+        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+        exit 2
+        ;;
 esac
 
 apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
@@ -55,12 +55,12 @@ apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-
 LLVM_VERSION="-13"
 
 case "${DIST_VERSION}" in
-Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
-Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
-*)
-    echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
-    exit 2
-    ;;
+    Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
+    Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
+    *)
+        echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+        exit 2
+        ;;
 esac
 
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
@@ -79,14 +79,14 @@ if [ ! -f "${EMACS_FILENAME}" ]; then
     wget https://alpha.gnu.org/gnu/emacs/pretest/"${EMACS_FILENAME}"
 fi
 tar xf "${EMACS_FILENAME}"
-rm "${EMACS_FILENAME}*" || true
+rm "${EMACS_FILENAME}"* || true
 
 EMACS_SOURCE="${USER_HOME}/${EMACS_NAME}"
-chown -R "$USER:$USER ${EMACS_SOURCE}"
+chown -R $USER:$USER "${EMACS_SOURCE}"
 
 # Build the source
 
-cd "{$EMACS_SOURCE}"
+cd "${EMACS_SOURCE}"
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
 # We do not need POP3 support
@@ -117,27 +117,27 @@ fi
 
 cd "$GITHUB"
 
-if [ -d "$DOTEMACS" ]; then
-    cd "$DOTEMACS"
-    echo "Pulling dotemacs repository from GitHub..."
-    git pull
-else
-    echo "Cloning dotemacs repository from GitHub..."
-    git clone git@github.com:swarnendubiswas/dotemacs.git
-fi
-echo "...Done"
-chown -R $USER:$USER $DOTEMACS
+# if [ -d "$DOTEMACS" ]; then
+#     cd "$DOTEMACS"
+#     echo "Pulling dotemacs repository from GitHub..."
+#     git pull
+# else
+#     echo "Cloning dotemacs repository from GitHub..."
+#     git clone git@github.com:swarnendubiswas/dotemacs.git
+# fi
+# echo "...Done"
+# chown -R $USER:$USER $DOTEMACS
 
-if [ -d "$DOTFILES" ]; then
-    cd "$DOTFILES"
-    echo "Pulling dotfiles repository from GitHub..."
-    git pull
-else
-    echo "Cloning dotfiles repository from GitHub..."
-    git clone git@github.com:swarnendubiswas/dotfiles.git
-fi
-echo "...Done"
-chown -R $USER:$USER $DOTFILES
+# if [ -d "$DOTFILES" ]; then
+#     cd "$DOTFILES"
+#     echo "Pulling dotfiles repository from GitHub..."
+#     git pull
+# else
+#     echo "Cloning dotfiles repository from GitHub..."
+#     git clone git@github.com:swarnendubiswas/dotfiles.git
+# fi
+# echo "...Done"
+# chown -R $USER:$USER $DOTFILES
 
 # Link .emacs.d
 
@@ -150,7 +150,7 @@ if [ -d "$EMACSD" ]; then
 fi
 
 # Install Python packages
-sudo -H python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pyls-isort pydocstyle setuptools configparser backports-functools_lru_cache yamllint cmake-language-server --user
+sudo -H python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server --user
 
 # Install Nodejs
 
@@ -322,9 +322,9 @@ make install
 
 # ALACRITTY_VER="0.10.0"
 # cd "$GITHUB"
-# wget https://github.com/alacritty/alacritty/archive/refs/tags/v"{$ALACRITTY_VER}".tar.gz
-# tar xz alacritty-"{$ALACRITTY_VER}".tar.gz
-# cd alacritty-"{$ALACRITTY_VER}"
+# wget https://github.com/alacritty/alacritty/archive/refs/tags/v"${ALACRITTY_VER}".tar.gz
+# tar xz alacritty-"${ALACRITTY_VER}".tar.gz
+# cd alacritty-"${ALACRITTY_VER}"
 # cargo build --release
 
 add-apt-repository ppa:aslatter/ppa -y
@@ -338,4 +338,4 @@ cd "$USER_HOME"
 apt autoremove
 apt autoclean
 
-set +eux
+# set +eux
