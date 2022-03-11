@@ -72,7 +72,7 @@ apt install -y clang${LLVM_VERSION} clangd${LLVM_VERSION} clang-{format,tidy,too
 
 EMACS_VERSION="28.0.91"
 
-cd "${USER_HOME}"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 EMACS_NAME="emacs-${EMACS_VERSION}"
 EMACS_FILENAME="${EMACS_NAME}.tar.xz"
 if [ ! -f "${EMACS_FILENAME}" ]; then
@@ -86,7 +86,7 @@ chown -R $USER:$USER "${EMACS_SOURCE}"
 
 # Build the source
 
-cd "${EMACS_SOURCE}"
+cd "${EMACS_SOURCE}" || echo "Failed: cd ${EMACS_SOURCE}"
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./autogen.sh
 # We do not need POP3 support
@@ -94,7 +94,7 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 # prefix=/usr/local
 make -j4 NATIVE_FULL_AOT=1
 
-cd "${USER_HOME}"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 rm "${EMACS_FILENAME}" || true
 
 # Setup Emacs at the correct path
@@ -108,14 +108,14 @@ DOTEMACS="$GITHUB/dotemacs"
 DOTFILES="$GITHUB/dotfiles"
 EMACSD="${USER_HOME}/.emacs.d"
 
-cd "$USER_HOME"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
 if [ ! -d "$GITHUB" ]; then
     mkdir -p "$GITHUB"
     chown -R $USER:$USER "$GITHUB"
 fi
 
-cd "$GITHUB"
+cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 
 # if [ -d "$DOTEMACS" ]; then
 #     cd "$DOTEMACS"
@@ -141,7 +141,7 @@ cd "$GITHUB"
 
 # Link .emacs.d
 
-cd "${USER_HOME}"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
 if [ -d "$EMACSD" ]; then
     if [ ! -L "$EMACSD" ]; then
@@ -168,8 +168,8 @@ apt install -y nodejs
 TMP_HOME="$USER_HOME/tmp"
 
 NPM_HOME="$TMP_HOME"
-mkdir -p "$NPM_HOME"
-cd "$NPM_HOME"
+mkdir -p "${NPM_HOME}"
+cd "${NPM_HOME}" || echo "Failed: cd ${NPM_HOME}"
 
 npm init --yes
 npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver intelephense write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php stylelint
@@ -196,7 +196,7 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 # Update configurations of helper utilities
 
 # HOME Directory
-cd "$USER_HOME"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
 if [ ! -L ".markdownlint.json" ]; then
     echo "Creating symlink for .markdownlint.json..."
@@ -209,12 +209,12 @@ echo "...Done"
 
 # CONFIG Directory
 
-CONFIG_DIR="$USER_HOME/.config"
-if [ ! -d "$CONFIG_DIR" ]; then
-    mkdir -p "$CONFIG_DIR"
-    chown -R $USER:$USER "$CONFIG_DIR"
+CONFIG_DIR="${USER_HOME}/.config"
+if [ ! -d "${CONFIG_DIR}" ]; then
+    mkdir -p "${CONFIG_DIR}"
+    chown -R $USER:$USER "${CONFIG_DIR}"
 fi
-cd "$CONFIG_DIR"
+cd "${CONFIG_DIR}" || echo "Failed: cd ${CONFIG_DIR}"
 
 if [ ! -L "pylintrc" ]; then
     echo "Creating symlink for pylintrc..."
@@ -227,7 +227,7 @@ echo "...Done"
 
 if [ -d "yapf" ]; then
     if [ ! -L "yapf" ]; then
-        echo "$CONFIG_DIR/yapf present and is not a symlink!"
+        echo "${CONFIG_DIR}/yapf present and is not a symlink!"
     else
         echo "Overwriting symlink for yapf..."
         ln -nsf "$DOTFILES/python/yapf" .
@@ -240,7 +240,7 @@ echo "...Done"
 
 if [ -d "yamllint" ]; then
     if [ ! -L "yamllint" ]; then
-        echo "$CONFIG_DIR/yamllint present and is not a symlink!"
+        echo "${CONFIG_DIR}/yamllint present and is not a symlink!"
     else
         echo "Overwriting symlink for yamllint..."
         ln -nsf "$DOTFILES/yamllint" .
@@ -256,17 +256,17 @@ SHELLCHECK_VER="0.8.0"
 
 SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
 
-cd "${USER_HOME}"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 wget https://github.com/koalaman/shellcheck/releases/download/v"${SHELLCHECK_VER}/${SHELLCHECK_FILENAME}.tar.xz"
 tar xf "${SHELLCHECK_FILENAME}.tar.xz"
-cd "shellcheck-v${SHELLCHECK_VER}"
+cd "shellcheck-v${SHELLCHECK_VER}" || echo "Failed: cd shellcheck-v${SHELLCHECK_VER}"
 mv shellcheck "${USER_HOME}/.local/bin"
 rm -rf "${SHELLCHECK_FILENAME}.tar.xz*"
 
 # shfmt
 SHFMT_VER="3.4.3"
 
-cd "${USER_HOME}"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
 mv shfmt_v"${SHFMT_VER}"_linux_amd64 ${USER_HOME}/.local/bin/shfmt
 
@@ -282,10 +282,10 @@ rm -rf ripgrep_"${RG_VER}"_amd64.deb*
 
 apt install libpcre3-dev
 git clone git@github.com:danmar/cppcheck.git
-cd cppcheck
+cd cppcheck || echo "Failed: cd cppcheck"
 git checkout 2.7
 mkdir -p build
-cd build
+cd build || echo "Failed: cd build"
 cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
 cmake --build .
 make install
@@ -296,12 +296,12 @@ rm -rf cppcheck
 
 # Installing snaps seems to hurt Ubuntu performance.
 
-cd "$GITHUB"
+cd "$GITHUB" || echo "Failed: cd $GITHUB"
 
 CTAGS_DIR="$GITHUB/ctags"
 
 if [ -d "${CTAGS_DIR}" ]; then
-    cd "${CTAGS_DIR}"
+    cd "${CTAGS_DIR}" || echo "Failed: cd ${CTAGS_DIR}"
     echo "Pulling ctags reposiory from GitHub..."
     git pull
 else
@@ -311,7 +311,7 @@ fi
 echo "...Done"
 chown -R $USER:$USER "${CTAGS_DIR}"
 
-cd "${CTAGS_DIR}"
+cd "${CTAGS_DIR}" || echo "Failed: cd ${CTAGS_DIR}"
 ./autogen.sh
 # "--prefix=/where/you/want" defaults to "/usr/local"
 ./configure
@@ -334,7 +334,7 @@ apt install alacritty
 /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
 
 # Remove junk
-cd "$USER_HOME"
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 apt autoremove
 apt autoclean
 

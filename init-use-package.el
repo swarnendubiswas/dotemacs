@@ -1365,7 +1365,7 @@ This location is used for temporary installations and files.")
 ;; TODO: Use `C-c o' as the binding for `org-mode-map'
 
 ;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
-;; `isearch' candidates
+;; `isearch' candidates.
 (use-package isearch
   :ensure nil
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
