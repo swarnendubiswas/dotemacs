@@ -14,11 +14,6 @@
 (setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
                                   cl-functions interactive-only))
 
-;; https://github.com/kiwanami/emacs-epc/issues/35
-;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
-(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
-                                  cl-functions interactive-only))
-
 (defconst sb/emacs-4MB    (*       4 1024 1024))
 (defconst sb/emacs-8MB    (*       8 1000 1024))
 (defconst sb/emacs-16MB   (*      16 1000 1024))

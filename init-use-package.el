@@ -101,7 +101,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -152,9 +152,9 @@ This location is used for temporary installations and files.")
 (defvar package-native-compile)
 (defvar native-comp-always-compile)
 
+;; Enable ahead-of-time compilation when installing a package
 (when sb/EMACS28+
-  (setq package-native-compile t
-        native-comp-always-compile t))
+  (setq package-native-compile nil))
 
 (unless (package-installed-p 'use-package)
   (unless package-archive-contents
@@ -326,8 +326,7 @@ This location is used for temporary installations and files.")
       auto-save-default nil ; Disable `auto-save-mode', prefer `auto-save-visited-mode' instead
       auto-save-no-message t ; Allow for debugging frequent autosave triggers if `nil'
       auto-save-interval 0 ; Disable autosaving based on number of characters typed
-      ;; Save buffer after idling for some time, the default of 5s is too frequent
-      ;; `auto-save-visited-mode'
+      ;; Save buffer after idling for some time, the default of 5s may be too frequent
       auto-save-visited-interval 30
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
@@ -470,7 +469,7 @@ This location is used for temporary installations and files.")
   ;; :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
   :hook (after-init-hook . global-auto-revert-mode)
   :config
-  (setq auto-revert-interval 10 ; Faster (seconds) would mean less likely to use stale data
+  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
         ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
         ;; use Emacs, but enabling auto-revert is always safe.
         auto-revert-remote-files t
@@ -562,7 +561,7 @@ This location is used for temporary installations and files.")
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-(use-package ffap ;; Find FILENAME, guessing a default from text around point.
+(use-package ffap ; Find FILENAME, guessing a default from text around point.
   :commands ffap)
 
 ;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
@@ -4896,9 +4895,7 @@ after a successful compilation."
 
   (dolist (hook '(latex-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-latex-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
+                     (sb/company-latex-mode)))))
 
 (progn
   (defun sb/company-web-mode ()
@@ -4927,6 +4924,7 @@ after a successful compilation."
     ;; Slightly larger value to have more precise matches and so that the popup does not block
     (setq-local company-minimum-prefix-length 3
                 company-transformers '(delete-dups))
+
     (set (make-local-variable 'company-backends)
          '(company-files
            company-dabbrev
@@ -4935,9 +4933,10 @@ after a successful compilation."
 
   (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook hook (lambda ()
-                     (sb/company-text-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
+                     (when (not (derived-mode-p 'latex-mode))
+                       (sb/company-text-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
 
 ;; (progn
 ;;   (defun sb/company-java-mode ()
