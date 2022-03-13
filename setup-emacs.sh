@@ -23,10 +23,10 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 
 case "${DIST_VERSION}" in
     Ubuntu_18.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump x11-utils libmagickwand-dev cpanminus texinfo libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxpm-dev libxrandr-dev libxt-dev libxtst-dev libxv-dev
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev
         ;;
     Ubuntu_20.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxpm-dev libxrandr-dev libxt-dev libxtst-dev libxv-dev
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev
         ;;
     *)
         echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
@@ -118,27 +118,27 @@ fi
 
 cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 
-# if [ -d "$DOTEMACS" ]; then
-#     cd "$DOTEMACS"
-#     echo "Pulling dotemacs repository from GitHub..."
-#     git pull
-# else
-#     echo "Cloning dotemacs repository from GitHub..."
-#     git clone git@github.com:swarnendubiswas/dotemacs.git
-# fi
-# echo "...Done"
-# chown -R $USER:$USER $DOTEMACS
+if [ -d "$DOTEMACS" ]; then
+    cd "$DOTEMACS"
+    echo "Pulling dotemacs repository from GitHub..."
+    sudo -u swarnendu git pull
+else
+    echo "Cloning dotemacs repository from GitHub..."
+    sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotemacs.git
+fi
+echo "...Done"
+chown -R $USER:$USER $DOTEMACS
 
-# if [ -d "$DOTFILES" ]; then
-#     cd "$DOTFILES"
-#     echo "Pulling dotfiles repository from GitHub..."
-#     git pull
-# else
-#     echo "Cloning dotfiles repository from GitHub..."
-#     git clone git@github.com:swarnendubiswas/dotfiles.git
-# fi
-# echo "...Done"
-# chown -R $USER:$USER $DOTFILES
+if [ -d "$DOTFILES" ]; then
+    cd "$DOTFILES"
+    echo "Pulling dotfiles repository from GitHub..."
+    sudo -u swarnendu git pull
+else
+    echo "Cloning dotfiles repository from GitHub..."
+    sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotfiles.git
+fi
+echo "...Done"
+chown -R $USER:$USER $DOTFILES
 
 # Link .emacs.d
 
@@ -151,15 +151,11 @@ if [ -d "$EMACSD" ]; then
 fi
 
 # Install Python packages
-sudo -H python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server --user
+sudo -u swarnendu python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server --user
 
 # Install Nodejs
 
 NODEJS_VER="17"
-
-# curl -sL https://deb.nodesource.com/setup_{$NODEJS_VER}.x -o nodesource_setup.sh
-# bash nodesource_setup.sh
-# apt install nodejs
 
 curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
 apt install -y nodejs
@@ -188,11 +184,17 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 # composer require felixfbecker/language-server
 # composer update
 
+# cpanm Perl::LanguageServer
+
 # Install Texlab. The language server seems feature-incomplete and slow, so I still prefer AuCTeX.
 
-# cargo install --git https://github.com/latex-lsp/texlab.git
+TEXLAB_VER="3.3.2"
 
-# cpanm Perl::LanguageServer
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
+wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
+tar xf texlab-x86_64-linux.tar.gz
+mv texlab "${USER_HOME}/.local/bin"
+rm texlab-x86_64-linux.tar.gz
 
 # Update configurations of helper utilities
 
@@ -210,10 +212,10 @@ echo "...Done"
 
 if [ -f ".prettierrc" ]; then
     echo "Overwriting symlink for .prettierrc..."
-    ln -nsf $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc
+    ln -nsf "$DOTFILES/dotprettierrc" "$HOME/.prettierrc"
 else
     echo "Creating symlink for .prettierrc..."
-    ln -s $HOME/github/dotfiles/dotprettierrc $HOME/.prettierrc
+    ln -s "$DOTFILES/dotprettierrc" "$HOME/.prettierrc"
 fi
 echo "...Done"
 
@@ -291,7 +293,14 @@ rm -rf ripgrep_"${RG_VER}"_amd64.deb*
 # Build CPPCheck
 
 apt install libpcre3-dev
-git clone git@github.com:danmar/cppcheck.git
+if [ ! -d cppcheck ]; then
+    sudo -u swarnendu git clone git@github.com:danmar/cppcheck.git
+else
+    cd cppcheck || echo "Failed: cd cppcheck"
+    sudo -u swarnendu git pull
+    cd ..
+fi
+
 cd cppcheck || echo "Failed: cd cppcheck"
 git checkout 2.7
 mkdir -p build
@@ -302,21 +311,18 @@ make install
 cd ../..
 rm -rf cppcheck
 
-# Build Universal Ctags
-
-# Installing snaps seems to hurt Ubuntu performance.
+# Build Universal Ctags, installing snaps seems to hurt Ubuntu performance.
 
 cd "$GITHUB" || echo "Failed: cd $GITHUB"
-
 CTAGS_DIR="$GITHUB/ctags"
 
 if [ -d "${CTAGS_DIR}" ]; then
     cd "${CTAGS_DIR}" || echo "Failed: cd ${CTAGS_DIR}"
     echo "Pulling ctags reposiory from GitHub..."
-    git pull
+    sudo -u swarnendu git pull
 else
     echo "Cloning ctags repository from GitHub..."
-    git clone https://github.com/universal-ctags/ctags.git
+    sudo -u swarnendu git clone https://github.com/universal-ctags/ctags.git
 fi
 echo "...Done"
 chown -R $USER:$USER "${CTAGS_DIR}"
@@ -342,6 +348,22 @@ apt install alacritty
 
 # Setup 24bit terminal support
 /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
+
+# Build bear
+if [ ! -d bear ]; then
+    sudo -u swarnendu git clone git@github.com:rizsotto/Bear.git bear
+else
+    cd bear || echo "Failed: cd bear"
+    sudo -u swarnendu git pull
+    cd ..
+fi
+
+cd bear || echo "Failed: cd bear"
+cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
+make all
+make install
+cd ../..
+rm -rf bear
 
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"

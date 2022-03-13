@@ -79,8 +79,8 @@
       initial-major-mode 'text-mode
       initial-scratch-message nil)
 
-;; Disable UI elements early before being initialized. Use `display-graphic-p', `window-system' is
-;; deprecated.
+;; Disable UI elements early before being initialized. Use `display-graphic-p' since `window-system'
+;; is deprecated.
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'scroll-bar-mode)

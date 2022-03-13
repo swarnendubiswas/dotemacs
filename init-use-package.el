@@ -435,15 +435,15 @@ This location is used for temporary installations and files.")
                 ".toc"))
   (add-to-list 'completion-ignored-extensions exts))
 
-;; Activate utf-8
+;; Activate utf-8, these are needed (may not be all) for icons to work well in TUI
 (set-language-environment    "UTF-8")
-;; (setq locale-coding-system   'utf-8)
-;; (setq-default buffer-file-coding-system 'utf-8)
-;; (prefer-coding-system        'utf-8)
-;; (set-default-coding-systems  'utf-8)
-;; (set-keyboard-coding-system  'utf-8)
-;; (set-selection-coding-system 'utf-8)
-;; (set-terminal-coding-system  'utf-8)
+(setq locale-coding-system   'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+(prefer-coding-system        'utf-8)
+(set-default-coding-systems  'utf-8)
+(set-keyboard-coding-system  'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-terminal-coding-system  'utf-8)
 
 ;; Scroll settings from Doom Emacs
 (setq scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
