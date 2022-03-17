@@ -123,7 +123,7 @@ This location is used for temporary installations and files.")
 
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `py-lsp' is slow
 (defcustom sb/python-langserver
-  'pyright
+  'pylsp
   "Choose the Python Language Server implementation."
   :type  '(radio
            (const :tag "pylsp"   pylsp)
@@ -136,8 +136,6 @@ This location is used for temporary installations and files.")
 (defconst sb/EMACS28+   (> emacs-major-version 27))
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
-
-(require 'package)
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
@@ -161,7 +159,6 @@ This location is used for temporary installations and files.")
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
 
-(eval-and-compile
   (setq use-package-enable-imenu-support t
         ;; Avoid manual modifications whenever I modify package installations
         use-package-always-ensure        t)
@@ -185,7 +182,7 @@ This location is used for temporary installations and files.")
           ;; Avoid printing errors and warnings since the configuration is known to work
           use-package-expand-minimally   t
           use-package-compute-statistics nil
-          use-package-verbose            nil)))
+          use-package-verbose            nil))
 
 (eval-when-compile
   (require 'use-package))
@@ -995,7 +992,7 @@ This location is used for temporary installations and files.")
         ;; Do not ask whether to kill buffers visiting deleted files
         dired-clean-confirm-killing-deleted-buffers nil)
 
-  (when (boundp dired-kill-when-opening-new-dired-buffer)
+  (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
@@ -3154,8 +3151,8 @@ This location is used for temporary installations and files.")
 
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
-         (setq lsp-enable-snippet t))
-                                        
+           (setq lsp-enable-snippet t))
+
   (defvar lsp-pylsp-configuration-sources)
   (defvar lsp-pylsp-plugins-autopep8-enable)
   (defvar lsp-pylsp-plugins-mccabe-enabled)

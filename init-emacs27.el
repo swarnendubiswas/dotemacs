@@ -123,7 +123,7 @@ This location is used for temporary installations and files.")
 
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `py-lsp' is slow
 (defcustom sb/python-langserver
-  'pyright
+  'pylsp
   "Choose the Python Language Server implementation."
   :type  '(radio
            (const :tag "pylsp"   pylsp)
@@ -905,9 +905,9 @@ This location is used for temporary installations and files.")
 ;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
-  (set-face-attribute 'mode-line nil :height 120)
-  (set-face-attribute 'mode-line-inactive nil :height 120))
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
 
 (when (string= (system-name) "dell-7506")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
@@ -1048,7 +1048,7 @@ This location is used for temporary installations and files.")
         ;; Do not ask whether to kill buffers visiting deleted files
         dired-clean-confirm-killing-deleted-buffers nil)
 
-  (when (boundp dired-kill-when-opening-new-dired-buffer)
+  (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
@@ -2129,31 +2129,31 @@ This location is used for temporary installations and files.")
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
-;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; yet.
-(use-package project
-  :ensure nil
-  :commands (project-switch-project project-current
-                                    project-find-file project-execute-extended-command
-                                    project-known-project-roots
-                                    project-remove-known-project
-                                    project-remember-project
-                                    project-kill-buffers
-                                    project-switch-to-buffer
-                                    project-search
-                                    project-compile)
-  :bind
-  (:map project-prefix-map
-        ("f" . project-find-file)
-        ("F" . project-or-external-find-file)
-        ("b" . project-switch-to-buffer)
-        ("d" . project-dired)
-        ("v" . project-vc-dir)
-        ("c" . project-compile)
-        ("k" . project-kill-buffers)
-        ("p" . project-switch-project)
-        ("g" . project-find-regexp)
-        ("r" . project-query-replace-regexp)))
+;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; ;; yet.
+;; (use-package project
+;;   :ensure nil
+;;   :commands (project-switch-project project-current
+;;                                     project-find-file project-execute-extended-command
+;;                                     project-known-project-roots
+;;                                     project-remove-known-project
+;;                                     project-remember-project
+;;                                     project-kill-buffers
+;;                                     project-switch-to-buffer
+;;                                     project-search
+;;                                     project-compile)
+;;   :bind
+;;   (:map project-prefix-map
+;;         ("f" . project-find-file)
+;;         ("F" . project-or-external-find-file)
+;;         ("b" . project-switch-to-buffer)
+;;         ("d" . project-dired)
+;;         ("v" . project-vc-dir)
+;;         ("c" . project-compile)
+;;         ("k" . project-kill-buffers)
+;;         ("p" . project-switch-project)
+;;         ("g" . project-find-regexp)
+;;         ("r" . project-query-replace-regexp)))
 
 (use-package projectile
   :commands (projectile-project-p projectile-project-name
