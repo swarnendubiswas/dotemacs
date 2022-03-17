@@ -40,7 +40,7 @@ sudo snap install shfmt
 sudo snap install ripgrep --classic
 sudo snap install shellcheck --edge
 
-python3 -m pip install --upgrade pip Sphinx pygments yapf jedi pylint importmagic setuptools configparser yamllint cmake-language-server grip data-science-types cpplint --user
+python3 -m pip install --upgrade pip Sphinx pygments yapf jedi pylint importmagic setuptools yamllint cmake-language-server grip data-science-types cpplint --user
 
 sudo gem install scss_lint
 
