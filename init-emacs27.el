@@ -19,7 +19,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-nord
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -471,7 +471,7 @@ This location is used for temporary installations and files.")
   :config
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
         ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
-        ;; use Emacs, but enabling auto-revert is always safe.
+        ;; use Emacs. Enabling auto-revert is always safe.
         auto-revert-remote-files t
         auto-revert-verbose nil
         ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
@@ -507,7 +507,7 @@ This location is used for temporary installations and files.")
         uniquify-separator           "/"
         uniquify-strip-common-suffix t))
 
-;; Replace `dabbrev-exp' with `hippie-expand'. Use `C-M-/' for `dabbrev-completion' which finds all
+;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
 ;; expansions in the current buffer and presents suggestions for completion.
 (use-package hippie-exp
   :ensure nil
@@ -536,17 +536,17 @@ This location is used for temporary installations and files.")
   :hook (after-init-hook . window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
-;; the other
+;; the other.
 (when (eq sb/window-split 'vertical)
   (setq split-width-threshold nil
         split-height-threshold 0))
 
-;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right')
+;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right').
 (when (eq sb/window-split 'horizontal)
   (setq split-height-threshold nil
         split-width-threshold 0))
 
-;; Make use of wider screens, start with a window split
+;; Start with a window split to make use of wider screens
 (when nil
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
@@ -564,7 +564,7 @@ This location is used for temporary installations and files.")
 (use-package ffap ; Find FILENAME, guessing a default from text around point.
   :commands ffap)
 
-;; We open the `*scratch*' buffer in `text-mode', so enabling `abbrev-mode' early is useful
+;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
   :ensure nil
   :diminish
@@ -578,11 +578,6 @@ This location is used for temporary installations and files.")
 (dolist (mode '(tooltip-mode))
   (when (fboundp mode)
     (funcall mode -1)))
-
-(use-package hl-line
-  :commands hl-line-highlight
-  :if (display-graphic-p)
-  :hook (after-init-hook . global-hl-line-mode))
 
 ;; Enable the following modes
 (dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
@@ -604,14 +599,20 @@ This location is used for temporary installations and files.")
 (with-eval-after-load "simple"
   (diminish 'visual-line-mode))
 
-;; Default is 8 pixels, we have increased it to look good on TUI
+;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
 (unless (display-graphic-p)
   (fringe-mode '(10 . 10)))
 
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
 
+(use-package hl-line
+  :commands hl-line-highlight
+  :if (display-graphic-p)
+  :hook (after-init-hook . global-hl-line-mode))
+
 (use-package outline ; Edit outlines
+  :disabled t
   :hook (prog-mode-hook . outline-minor-mode)
   :diminish outline-minor-mode)
 
@@ -624,7 +625,7 @@ This location is used for temporary installations and files.")
   :hook (prog-mode-hook . hs-minor-mode)
   :config (setq hs-isearch-open t))
 
-;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
+;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
   :ensure nil
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
@@ -693,7 +694,6 @@ This location is used for temporary installations and files.")
         (eq sb/tui-theme 'doom-nord))      (load-theme 'doom-nord t))
    ((or (eq sb/gui-theme 'doom-gruvbox)
         (eq sb/tui-theme 'doom-gruvbox))   (load-theme 'doom-gruvbox t)))
-  ;; (set-face-attribute 'font-lock-comment-face nil :foreground "#999999")
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -706,6 +706,7 @@ This location is used for temporary installations and files.")
 
 (use-package modus-themes
   :ensure moody
+  :ensure t
   :defines (modus-themes-completions modus-themes-fringes
                                      modus-themes-prompts
                                      modus-themes-lang-checkers
@@ -751,7 +752,8 @@ This location is used for temporary installations and files.")
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
 
-;; The Python virtualenv information is not shown on the modeline
+;; The Python virtualenv information is not shown on the modeline. The package is not being actively
+;; maintained.
 (use-package powerline
   :if (eq sb/modeline-theme 'powerline)
   :commands powerline-default-theme
@@ -770,20 +772,23 @@ This location is used for temporary installations and files.")
 
   (powerline-default-theme))
 
-;; Requires the fonts included with `all-the-icons', run `M-x all-the-icons-install-fonts'
 (use-package doom-modeline
   :ensure all-the-icons
   :ensure doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
   :commands doom-modeline-mode
   :init
+  ;; Requires the fonts included with `all-the-icons', run "M-x all-the-icons-install-fonts".
+  (unless (sb/font-installed-p "all-the-icons")
+    (all-the-icons-install-fonts t))
+
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format nil
         doom-modeline-indent-info nil
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
         ;; Reduce space on the modeline
-        doom-modeline-buffer-file-name-style 'file-name)
+        doom-modeline-buffer-file-name-style 'truncate-with-project)
   (doom-modeline-mode 1))
 
 (use-package spaceline
@@ -870,7 +875,7 @@ This location is used for temporary installations and files.")
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
                                  mode-line-misc-info)))
 
-(use-package minions
+(use-package minions ; Display a minor-mode menu in the mode line
   :hook (after-init-hook . minions-mode))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
@@ -878,7 +883,7 @@ This location is used for temporary installations and files.")
 (use-package auto-dim-other-buffers
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
   ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
-  :hook (after-init . auto-dim-other-buffers-mode))
+  :hook (after-init-hook . auto-dim-other-buffers-mode))
 
 ;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
 (defun sb/font-available-p (font-name)
@@ -898,17 +903,14 @@ This location is used for temporary installations and files.")
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 
-;; https://github.com/wandersoncferreira/dotfiles
-;; (when (member "Monaco" (font-family-list))
-;;   (set-face-attribute 'default nil :font "Monaco" :height 120)
-;;   (setq default-frame-alist '((font . "Monaco-12"))))
-
-;; https://github.com/larstvei/dot-emacs
-;; (cond ((member "Inconsolata" (font-family-list))
-;;        (set-face-attribute 'default nil :font "Inconsolata-18")))
+(cond ((member "Inconsolata" (font-family-list))
+       (set-face-attribute 'default nil :font "Inconsolata-18"))
+      ((member "Monaco" (font-family-list))
+       (set-face-attribute 'default nil :font "Monaco" :height 120)
+       (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -972,24 +974,24 @@ This location is used for temporary installations and files.")
   (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
-;; useful information
+;; useful information.
 (when nil
-  (progn
-    (add-hook 'emacs-startup-hook (lambda ()
-                                    (setq resize-mini-windows nil)))
-    ))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq resize-mini-windows nil)))
+  )
 
 (use-package beacon
   :commands beacon-mode
   :diminish
-  :hook (after-init . beacon-mode))
+  :hook (after-init-hook . beacon-mode))
 
 (use-package ibuffer
   :ensure nil
   :config
   (defalias 'list-buffers 'ibuffer)
   (setq ibuffer-display-summary nil
-        ibuffer-default-sorting-mode 'alphabetic ; Options: major-mode, recency
+        ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
         ibuffer-use-header-line t)
   :bind ("C-x C-b" . ibuffer))
 
@@ -1037,13 +1039,13 @@ This location is used for temporary installations and files.")
         ("i"        . find-file))
   :hook
   ;; Auto refresh dired when files change
-  (dired-mode . auto-revert-mode)
+  (dired-mode-hook . auto-revert-mode)
   :config
   (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
         ;; Guess a default target directory. When there are two dired buffers, Emacs will select
         ;; another buffer as the target (e.g., target for copying files).
         dired-dwim-target t
-        ;; Check `ls' for additional options
+        ;; Check "ls" for additional options
         dired-listing-switches "-ABhl --si --group-directories-first"
         dired-ls-F-marks-symlinks t ; -F marks links with @
         dired-recursive-copies 'always ; Single prompt for all n directories
@@ -1080,7 +1082,7 @@ This location is used for temporary installations and files.")
   ;;               "\\|\\(?:\\.js\\)?\\.meta\\'"
   ;;               "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
-  ;; `:diminish dired-omit-mode' does not work
+  ;; ":diminish dired-omit-mode" does not work
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Remove 'Omit' from the modeline."
@@ -1094,7 +1096,6 @@ This location is used for temporary installations and files.")
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :if sb/EMACS27
   :load-path "extras"
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
@@ -1102,11 +1103,12 @@ This location is used for temporary installations and files.")
   (setq diredp-hide-details-initially-flag nil
         diredp-hide-details-propagate-flag nil)
   :hook
-  (dired-mode . (lambda ()
-                  (diredp-toggle-find-file-reuse-dir 1))))
+  (dired-mode-hook . (lambda ()
+                       (when sb/EMACS27
+                         (diredp-toggle-find-file-reuse-dir 1)))))
 
-;; `r' is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
-;; we load after `dired+' and not `dired', even with `bind-keys*'.
+;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
+;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
   :after dired
   :defines dired-efap-initial-filename-selection
@@ -1130,12 +1132,7 @@ This location is used for temporary installations and files.")
   :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
   :if (display-graphic-p)
-  :hook (dired-mode-hook . all-the-icons-dired-mode)
-  :config
-  ;; Icons are not aligned after renaming a file.
-  ;; https://github.com/jtbm37/all-the-icons-dired/issues/34
-  (advice-add 'dired-add-entry :around #'all-the-icons-dired--refresh-advice)
-  (advice-add 'dired-remove-entry :around #'all-the-icons-dired--refresh-advice))
+  :hook (dired-mode-hook . all-the-icons-dired-mode))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
@@ -1306,16 +1303,16 @@ This location is used for temporary installations and files.")
   :config
   (setq org-fontify-done-headline nil
         org-fontify-whole-heading-line nil
-        ;; org-hide-emphasis-markers t
-        ;; org-hide-leading-stars t
-        ;; org-hide-leading-stars-before-indent-mode t
+        org-hide-emphasis-markers t
+        org-hide-leading-stars t
+        org-hide-leading-stars-before-indent-mode t
         ;; Code block fontification using the major-mode of the code
         org-src-fontify-natively t
         org-src-preserve-indentation t
         org-src-tabs-acts-natively t
         org-src-window-setup 'current-window
-        ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance feels
-        ;; better with the mode disabled.
+        ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
+        ;; feels better with the mode disabled.
         org-startup-indented nil
         org-startup-truncated nil
         org-startup-folded 'showeverything
@@ -1345,14 +1342,13 @@ This location is used for temporary installations and files.")
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)))
 
-;; We have disabled the package to get consistent styles across themes.
+;; Disabled the package to get consistent styles across themes.
 (use-package org-bullets
   :disabled t
   :commands org-bullets-mode
   :hook (org-mode-hook . org-bullets-mode))
 
-;; Make invisible parts of Org elements appear visible
-(use-package org-appear
+(use-package org-appear ; Make invisible parts of Org elements appear visible
   :commands org-appear-mode
   :disabled t
   :hook (org-mode-hook . org-appear-mode)
@@ -1365,9 +1361,9 @@ This location is used for temporary installations and files.")
   :after org
   :demand t)
 
-;; TODO: Use `C-c o' as the binding for `org-mode-map'
+;; TODO: Use "C-c o" as the binding for `org-mode-map'
 
-;; Use `C-'' in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
+;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; `isearch' candidates.
 (use-package isearch
   :ensure nil
@@ -1379,19 +1375,18 @@ This location is used for temporary installations and files.")
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
-   ("C-M-f"   . nil) ;; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
+   ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
    ("C-f"     . isearch-forward-regexp)
    :map isearch-mode-map
    ("C-s"     . nil)
    ("C-f"     . isearch-repeat-forward)
    ("C-c C-o" . isearch-occur)))
 
-;; Auto populate `isearch' with the symbol at point
-(use-package isearch-symbol-at-point
+(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
-  :commands (isearch-forward-symbol ; `M-s _'
+  :commands (isearch-forward-symbol ; "M-s _"
              isearch-symbol-at-point
-             isearch-forward-symbol-at-point ; `M-s .'
+             isearch-forward-symbol-at-point ; "M-s ."
              isearch-backward-symbol-at-point))
 
 (use-package anzu
@@ -1422,20 +1417,19 @@ This location is used for temporary installations and files.")
     (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
       (add-to-list 'grep-find-ignored-directories dirs))))
 
-;; When the *grep* buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
+;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
 (use-package wgrep ; Writable grep
   :bind
-  ;; These keybindings are also defined in `wgrep-mode-map'
-  (:map grep-mode-map
+  (:map grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
         ("C-x C-p" . wgrep-change-to-wgrep-mode)
         ("C-x C-s" . wgrep-finish-edit)
         ("C-x C-k" . wgrep-abort-changes)
         ("C-x C-q" . wgrep-exit))
   :config (setq wgrep-auto-save-buffer t))
 
-;; Use `S' to change the search term, `D' to change the search directory, `g' to rerun the search,
-;; `o' to view the result in another window.
+;; Use "S" to change the search term, "D" to change the search directory, "g" to rerun the search,
+;; and "o" to view the result in another window.
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
@@ -1456,7 +1450,7 @@ This location is used for temporary installations and files.")
                           recentf-cleanup)
   :config
   (setq recentf-auto-cleanup 'never ; Do not stat remote files
-        ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
+        ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
         recentf-exclude '("[/\\]elpa/"
                           "[/\\]\\.git/"
                           ".*\\.gz\\'"
@@ -1479,7 +1473,7 @@ This location is used for temporary installations and files.")
         ;; Larger values help in lookup but takes more time to check if the files exist
         recentf-max-saved-items 100
         ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
-        ;; `abbreviate-file-name' abbreviates home directory to "~/" in the file list.
+        ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
         recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
   ;; Use the true file name and not the symlink name
@@ -1496,7 +1490,6 @@ This location is used for temporary installations and files.")
   (run-with-idle-timer 60 t #'recentf-cleanup)
   :hook (after-init-hook . recentf-mode))
 
-;; Load immediately after start since I use it often
 (use-package init-open-recentf
   :after recentf
   :demand t
@@ -1524,8 +1517,8 @@ This location is used for temporary installations and files.")
   :ensure company
   :commands company-capf)
 
-;; Use "M-x company-diag" or the modeline status to see the backend used. Try `M-x
-;; company-complete-common' when there are no completions. Use `C-M-i' for `complete-symbol' with
+;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
+;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
   :commands (company-abort company-files company-yasnippet
@@ -1541,7 +1534,7 @@ This location is used for temporary installations and files.")
   :hook (after-init-hook . global-company-mode)
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
-  ;; :diminish
+  :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -1567,12 +1560,10 @@ This location is used for temporary installations and files.")
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
-  ;; (push (apply-partially #'cl-remove-if
-  ;;                        (lambda (c)
-  ;;                          (string-match-p "\\`[0-9]+\\'" c)))
-  ;;       company-transformers)
-
-  (remove-hook 'kill-emacs-hook #'company-clang-set-prefix)
+  (push (apply-partially #'cl-remove-if
+                         (lambda (c)
+                           (string-match-p "\\`[0-9]+\\'" c)))
+        company-transformers)
   :bind
   (:map company-active-map
         ("C-n"      . company-select-next)
@@ -1829,14 +1820,13 @@ This location is used for temporary installations and files.")
   :config
   ;; (defvar ivy-re-builders-alist)
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))
-        completion-styles '(orderless)
         ;; completion-styles '(orderless initials basic partial-completion emacs22)
-        orderless-matching-styles '(orderless-regexp))
-
-  ;;  completion-category-defaults nil
-  ;;  completion-category-overrides '((file (styles partial-completion))
-  ;;                                  (minibuffer (initials))))
-  )
+        completion-styles '(orderless)
+        orderless-matching-styles '(orderless-regexp)
+        ;;  completion-category-defaults nil
+        ;;  completion-category-overrides '((file (styles partial-completion))
+        ;;                                  (minibuffer (initials))))
+        ))
 
 (use-package ispell
   :ensure nil
