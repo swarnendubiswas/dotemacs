@@ -923,7 +923,7 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -5815,7 +5815,9 @@ _v_ verify setup    _f_ check           _m_ mode
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (message "Emacs is ready in %s with %d garbage collections."
-                     (emacs-init-time) gcs-done)))
+            (let ((packages  (length package-activated-list))
+                  (gc-time   (float-time gc-elapsed)))
+              (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
+                       (emacs-init-time) packages gc-time gcs-done))))
 
 ;;; init-emacs27.el ends here

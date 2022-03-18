@@ -103,8 +103,9 @@
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)
-  (add-hook 'after-init-hook (lambda ()
-                               (setq file-name-handler-alist file-name-handler-alist-orig))))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq file-name-handler-alist file-name-handler-alist-orig))))
 
 (provide 'early-init)
 

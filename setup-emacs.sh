@@ -23,10 +23,10 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 
 case "${DIST_VERSION}" in
     Ubuntu_18.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl
         ;;
     Ubuntu_20.04)
-        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev
+        apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev gnutls-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl
         ;;
     *)
         echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
@@ -173,6 +173,9 @@ npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html
 
 npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
+# TODO: Add the following to $HOME/.bashrc
+# echo "export NODE_PATH=$HOME/tmp/node_modules" >> $HOME/.bashrc
+
 # Gem modules
 
 # gem install scss_lint
@@ -233,7 +236,7 @@ if [ ! -L "pylintrc" ]; then
     ln -s "$DOTFILES/python/pylintrc" .
 else
     echo "Overwriting symlink for pylintrc..."
-    ln -nsf "$DOTFILES/python/pylintrc" .
+    ln -s "$DOTFILES/python/pylintrc" .
 fi
 echo "...Done"
 
@@ -246,7 +249,7 @@ if [ -d "yapf" ]; then
     fi
 else
     echo "Creating symlink for yapf..."
-    ln -nsf "$DOTFILES/python/yapf" .
+    ln -s "$DOTFILES/python/yapf" .
 fi
 echo "...Done"
 
@@ -259,7 +262,7 @@ if [ -d "yamllint" ]; then
     fi
 else
     echo "Creating symlink for yapf..."
-    ln -nsf "$DOTFILES/yamllint" .
+    ln -s "$DOTFILES/yamllint" .
 fi
 echo "...Done"
 
@@ -334,6 +337,14 @@ cd "${CTAGS_DIR}" || echo "Failed: cd ${CTAGS_DIR}"
 make
 make install
 
+# GNU Global
+# wget http://tamacom.com/global/global-6.6.7.tar.gz
+# tar -xzvf global-6.6.7.tar.gz
+# cd global-6.6.7
+# ./configure --with-universal-ctags=/usr/local/bin/ctags; make; sudo make install;
+# echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >> $HOME/.bashrc
+# echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
+
 # Alacritty
 
 # ALACRITTY_VER="0.10.0"
@@ -359,6 +370,7 @@ else
 fi
 
 cd bear || echo "Failed: cd bear"
+mkdir -p build && cd build || echo "Failed: cd bear/build"
 cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
 make all
 make install
