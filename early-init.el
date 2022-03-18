@@ -106,8 +106,6 @@
   (add-hook 'after-init-hook (lambda ()
                                (setq file-name-handler-alist file-name-handler-alist-orig))))
 
-(setq native-comp-deferred-compilation nil)
-
 (provide 'early-init)
 
 ;;; early-init.el ends here

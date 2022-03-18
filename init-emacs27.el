@@ -157,7 +157,7 @@ This location is used for temporary installations and files.")
   (setq package-native-compile nil))
 
 (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
+  (package-refresh-contents)
   (package-install 'use-package))
 
 ;; Configure `use-package' before loading
@@ -167,47 +167,48 @@ This location is used for temporary installations and files.")
 (defvar use-package-enable-imenu-support)
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
+(defvar use-package-hook-name-suffix)
 
 (setq use-package-enable-imenu-support t
       ;; Avoid manual modifications whenever I modify package installations
-      use-package-always-ensure        t)
-(setq use-package-hook-name-suffix nil)
-
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq debug-on-error                 t
-          debug-on-event                 'sigusr2
-          garbage-collection-messages    t
-          use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-          use-package-verbose            t
-          use-package-expand-minimally   nil)
-    (debug-on-entry 'projectile-remove-known-project))
-
-  ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
-  ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
-  ;; using `:after' and always deferring loading, because then we will need to specifiy alternate
-  ;; ways of loading the package.
-  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
-  (unless (bound-and-true-p sb/debug-init-file)
-    (setq use-package-always-defer       t
-          ;; Avoid printing errors and warnings since the configuration is known to work
-          use-package-expand-minimally   t
-          use-package-compute-statistics nil
-          use-package-verbose            nil))
-
-(eval-when-compile
-  (require 'use-package))
+      use-package-always-ensure        t
+      use-package-hook-name-suffix     nil)
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
-;; We do not need `:commands' with `:hook' or `:bind'.
+;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
+;; implies always load features lazily unless told otherwise. This implies we should use
+;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
+;; careful about using `:after' and always deferring loading, because then we will need to specifiy
+;; alternate ways of loading the package.
+;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 
 ;; Hooks in the `:hook' section run in reverse order. Example:
 ;; (use-package package-name
 ;;   :hook
-;;   (x-mode . last)
-;;   (x-mode . second)
-;;   (x-mode . first))
+;;   ((x-mode-hook . last)
+;;    (x-mode-hook . second)
+;;    (x-mode-hook . first)))
 
-;; `C-h b' lists all the bindings available in a buffer. `C-h m' shows the keybindings for the major
+(when (bound-and-true-p sb/debug-init-file)
+  (setq debug-on-error                 t
+        debug-on-event                 'sigusr2
+        garbage-collection-messages    t
+        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+        use-package-verbose            t
+        use-package-expand-minimally   nil)
+  (debug-on-entry 'projectile-remove-known-project))
+
+(unless (bound-and-true-p sb/debug-init-file)
+  (setq use-package-always-defer       t
+        ;; Avoid printing errors and warnings since the configuration is known to work
+        use-package-expand-minimally   t
+        use-package-compute-statistics nil
+        use-package-verbose            nil))
+
+(eval-when-compile
+  (require 'use-package))
+
+;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
 (use-package bind-key
   :functions bind-key--remove
@@ -235,9 +236,8 @@ This location is used for temporary installations and files.")
 (setq package-quickstart t ; Populate one big autoloads file
       package-quickstart-file (no-littering-expand-var-file-name "package-quickstart.el"))
 
-;; Emacs 28+.
-(when (boundp 'native-comp-eln-load-path)
-  (add-to-list 'native-comp-eln-load-path (no-littering-expand-var-file-name "eln-cache")))
+(when (boundp 'native-comp-deferred-compilation)
+  (setq native-comp-deferred-compilation nil))
 
 (defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
@@ -247,7 +247,7 @@ This location is used for temporary installations and files.")
 
 (setq custom-file sb/custom-file)
 
-;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc"
+;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
@@ -274,7 +274,7 @@ This location is used for temporary installations and files.")
     (setq gcmh-verbose t)))
 
 ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
-;; is `paradox-upgrade-packages' in a single command.
+;; is `paradox-upgrade-packages' as a single command.
 (use-package package
   :if sb/EMACS27+
   :bind
@@ -293,8 +293,8 @@ This location is used for temporary installations and files.")
         paradox-github-token t)
   (paradox-enable))
 
-;; Get PATH with `(getenv "PATH")'. Set PATH with
-;; `(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))'.
+;; Get PATH with "(getenv "PATH")". Set PATH with
+;; "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
@@ -307,10 +307,11 @@ This location is used for temporary installations and files.")
                                          "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
   (exec-path-from-shell-initialize))
 
+;; These are alternative ways.
+
 ;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
 ;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
 
-;; Silence "assignment to free variable" warning
 (defvar apropos-do-all)
 (defvar bookmark-save-flag)
 (defvar compilation-always-kill)
@@ -321,11 +322,13 @@ This location is used for temporary installations and files.")
       apropos-do-all t ; Make `apropos' search more extensively
       auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
       ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
-      ;; file and runs all save-related hooks
-      auto-save-default nil ; Disable `auto-save-mode', prefer `auto-save-visited-mode' instead
-      auto-save-no-message t ; Allow for debugging frequent autosave triggers if `nil'
+      ;; file and runs all save-related hooks. We disable `auto-save-mode' and prefer
+      ;; `auto-save-visited-mode' instead.
+      auto-save-default nil
+      auto-save-no-message t ; Allows for debugging frequent autosave triggers if `nil'
       auto-save-interval 0 ; Disable autosaving based on number of characters typed
-      ;; Save buffer after idling for some time, the default of 5s may be too frequent
+      ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
+      ;; it runs all the save-related hooks.
       auto-save-visited-interval 30
       backup-inhibited t ; Disable backup for a per-file basis
       blink-matching-paren t ; Distracting
@@ -335,7 +338,7 @@ This location is used for temporary installations and files.")
       compilation-always-kill t ; Kill a compilation process before starting a new one
       compilation-ask-about-save nil ; Save all modified buffers without asking
       ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
-      ;; error
+      ;; error.
       compilation-scroll-output 'first-error
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
@@ -344,13 +347,13 @@ This location is used for temporary installations and files.")
       create-lockfiles nil
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
-      delete-by-moving-to-trash t ; Use system trash to deal with mistakes
-      echo-keystrokes 0.2 ; Show current key-sequence in minibuffer
+      delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
+      echo-keystrokes 1 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       ;; Keeping track of the minibuffer nesting is difficult, so it is better to keep it disabled
       ;; enable-recursive-minibuffers t
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
-      ;; variables, but I edit files over Tramp a lot, so I am unsure.
+      ;; variables, but I edit files over Tramp a lot.
       enable-remote-dir-locals t
       ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
       ;; information
@@ -367,27 +370,26 @@ This location is used for temporary installations and files.")
       history-length 50 ; Reduce the state that is to be read
       indicate-buffer-boundaries nil
       kill-do-not-save-duplicates t
-      kill-whole-line t
+      kill-whole-line t ;; TODO: What is the utility of this variable?
       make-backup-files nil ; Stop making backup `~' files
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
-      ;; pop-up-frames nil ; Avoid making separate frames
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
-      ;; Ignore case when reading a file name completion
-      read-file-name-completion-ignore-case t
-      read-process-output-max (* 5 1024 1024) ; 5 MB
+      read-file-name-completion-ignore-case t ; Ignore case when reading a file name
+      read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound
       save-interprogram-paste-before-kill t
       save-silently t ; Error messages will still be printed
-      ;; Enable use of system clipboard across Emacs and other applications, does not work on TUI
+      ;; Enable use of system clipboard across Emacs and other applications, does not work on the
+      ;; TUI
       select-enable-clipboard t
       sentence-end-double-space nil
       shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
       sort-fold-case nil ; Do not ignore case when sorting
       standard-indent 2
       suggest-key-bindings t
-      ;; switch-to-buffer-preserve-window-point t
+      switch-to-buffer-preserve-window-point t
       use-dialog-box nil ; Do not use dialog boxes with mouse commands
       use-file-dialog nil
       vc-follow-symlinks t ; No need to ask
@@ -397,8 +399,7 @@ This location is used for temporary installations and files.")
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
-      ;; Always trigger an immediate resize of the child frame
-      x-gtk-resize-child-frames 'resize-mode
+      x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
       ;; Underline looks a bit better when drawn lower
       x-underline-at-descent-line t)
 
@@ -457,9 +458,6 @@ This location is used for temporary installations and files.")
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
-
-(use-package minions
-  :hook (after-init-hook . minions-mode))
 
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
@@ -871,6 +869,9 @@ This location is used for temporary installations and files.")
                                  ;; mode-line-percent-position
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
                                  mode-line-misc-info)))
+
+(use-package minions
+  :hook (after-init-hook . minions-mode))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
@@ -1925,8 +1926,8 @@ This location is used for temporary installations and files.")
    (prog-mode . flyspell-prog-mode)
    ;; `find-file-hook' will not work for buffers with no associated files
    (after-init-hook . (lambda ()
-                   (when (string= (buffer-name) "*scratch*")
-                     (flyspell-mode 1))))
+                        (when (string= (buffer-name) "*scratch*")
+                          (flyspell-mode 1))))
    (text-mode . flyspell-mode))
   :bind
   (("C-c f f" . flyspell-mode)
@@ -2096,9 +2097,9 @@ This location is used for temporary installations and files.")
                   (get-text-property (point) 'block-side)))))
   :hook
   ((after-init-hook . (lambda ()
-                   (require 'smartparens-config)
-                   (smartparens-global-mode 1)
-                   (show-smartparens-global-mode 1))))
+                        (require 'smartparens-config)
+                        (smartparens-global-mode 1)
+                        (show-smartparens-global-mode 1))))
   :config
   (setq sp-show-pair-from-inside t
         sp-autoskip-closing-pair 'always)
@@ -2676,6 +2677,7 @@ This location is used for temporary installations and files.")
 ;; or `bookmark-bmenu-list' (C-x r l). Rename the bookmarked location in `bookmark-bmenu-mode' with
 ;; `R'.
 (use-package tramp
+  :defines tramp-ssh-controlmaster-options
   :config
   (setq tramp-default-user user-login-name
         ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
@@ -3128,6 +3130,7 @@ This location is used for temporary installations and files.")
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package langtool
+  :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
   :commands (langtool-check
              langtool-check-done
              langtool-show-message-at-point
@@ -3154,7 +3157,7 @@ This location is used for temporary installations and files.")
   :magic ("%PDF" . pdf-view-mode)
   ;; :init (run-with-idle-timer 3 nil #'require 'pdf-tools nil t) ; Expensive to load
   :hook (after-init-hook . (lambda ()
-                        (require 'pdf-tools nil t)))
+                             (require 'pdf-tools nil t)))
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
@@ -3528,7 +3531,7 @@ This location is used for temporary installations and files.")
 
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
-           (setq lsp-enable-snippet t))
+    (setq lsp-enable-snippet t))
 
   (defvar lsp-pylsp-configuration-sources)
   (defvar lsp-pylsp-plugins-autopep8-enable)
@@ -3729,7 +3732,7 @@ This location is used for temporary installations and files.")
   :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode-hook . (lambda ()
-                      (modern-c++-font-lock-mode 1))))
+                           (modern-c++-font-lock-mode 1))))
 
 (use-package cuda-mode
   :commands cuda-mode
@@ -3745,11 +3748,11 @@ This location is used for temporary installations and files.")
   :commands cmake-mode
   :hook
   (cmake-mode-hook . (lambda ()
-                  (make-local-variable 'lsp-disabled-clients)
-                  (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                  (spell-fu-mode -1)
-                  (flyspell-mode -1)
-                  (lsp-deferred)))
+                       (make-local-variable 'lsp-disabled-clients)
+                       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                       (spell-fu-mode -1)
+                       (flyspell-mode -1)
+                       (lsp-deferred)))
   :config
   (lsp-register-client
    (make-lsp-client
@@ -3847,9 +3850,9 @@ This location is used for temporary installations and files.")
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (ht-merge (lsp-configuration-section "pyright")
-                                   (lsp-configuration-section "python")))))
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -3888,8 +3891,8 @@ This location is used for temporary installations and files.")
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-r)))
 
@@ -4202,12 +4205,12 @@ This location is used for temporary installations and files.")
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode-hook . (lambda ()
-                 ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
-                 (make-local-variable 'lsp-disabled-clients)
-                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                 (spell-fu-mode -1)
-                 (flyspell-mode -1)
-                 (lsp-deferred)))
+                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+                      (make-local-variable 'lsp-disabled-clients)
+                      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                      (spell-fu-mode -1)
+                      (flyspell-mode -1)
+                      (lsp-deferred)))
   :config
   (fset 'xml-mode 'nxml-mode)
   (setq nxml-auto-insert-xml-declaration-flag t
@@ -4649,8 +4652,7 @@ Ignore if no file is found."
 (declare-function TeX-run-TeX "tex")
 
 (defun sb/latex-compile-open-pdf ()
-  "Save the current buffer, run LaTeXMk, and switch to the PDF
-after a successful compilation."
+  "Save the current buffer, run LaTeXMk, and switch to the PDF after a successful compilation."
   (interactive)
   (let ((TeX-save-query nil)
         (process (TeX-active-process))
@@ -5816,4 +5818,4 @@ _v_ verify setup    _f_ check           _m_ mode
             (message "Emacs is ready in %s with %d garbage collections."
                      (emacs-init-time) gcs-done)))
 
-;;; init-use-package.el ends here
+;;; init-emacs27.el ends here

@@ -137,6 +137,8 @@ This location is used for temporary installations and files.")
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
+(require 'package)
+
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
   (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
