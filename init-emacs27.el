@@ -157,8 +157,7 @@ This location is used for temporary installations and files.")
   (setq package-native-compile nil))
 
 (unless (package-installed-p 'use-package)
-  (unless package-archive-contents
-    (package-refresh-contents))
+    (package-refresh-contents)
   (package-install 'use-package))
 
 ;; Configure `use-package' before loading
@@ -169,10 +168,10 @@ This location is used for temporary installations and files.")
 (defvar use-package-expand-minimally)
 (defvar use-package-verbose)
 
-(eval-and-compile
-  (setq use-package-enable-imenu-support t
-        ;; Avoid manual modifications whenever I modify package installations
-        use-package-always-ensure        t)
+(setq use-package-enable-imenu-support t
+      ;; Avoid manual modifications whenever I modify package installations
+      use-package-always-ensure        t)
+(setq use-package-hook-name-suffix nil)
 
   (when (bound-and-true-p sb/debug-init-file)
     (setq debug-on-error                 t
@@ -193,7 +192,7 @@ This location is used for temporary installations and files.")
           ;; Avoid printing errors and warnings since the configuration is known to work
           use-package-expand-minimally   t
           use-package-compute-statistics nil
-          use-package-verbose            nil)))
+          use-package-verbose            nil))
 
 (eval-when-compile
   (require 'use-package))
@@ -269,7 +268,7 @@ This location is used for temporary installations and files.")
 (use-package gcmh ; Allow GC to happen after a period of idle time
   :diminish
   :commands (gcmh-mode gcmh-idle-garbage-collect)
-  :hook (after-init . gcmh-mode)
+  :hook (after-init-hook . gcmh-mode)
   :config
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
@@ -459,6 +458,9 @@ This location is used for temporary installations and files.")
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
 
+(use-package minions
+  :hook (after-init-hook . minions-mode))
+
 (fset 'display-startup-echo-area-message #'ignore)
 (fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
 
@@ -485,7 +487,7 @@ This location is used for temporary installations and files.")
 ;; timer.
 (use-package saveplace ; Remember cursor position in files
   :ensure nil
-  :hook (after-init . save-place-mode))
+  :hook (after-init-hook . save-place-mode))
 
 (use-package savehist ; Save minibuffer history across sessions
   :ensure nil
@@ -528,12 +530,12 @@ This location is used for temporary installations and files.")
 (use-package subword
   :ensure nil
   :diminish
-  :hook (prog-mode . subword-mode))
+  :hook (prog-mode-hook . subword-mode))
 
 ;; Show dividers on the right of each window, more prominent than the default
 (use-package frame
   :ensure nil
-  :hook (after-init . window-divider-mode))
+  :hook (after-init-hook . window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other
@@ -568,7 +570,7 @@ This location is used for temporary installations and files.")
 (use-package abbrev
   :ensure nil
   :diminish
-  :hook (after-init . abbrev-mode)
+  :hook (after-init-hook . abbrev-mode)
   :config
   ;; The "abbrev-defs" file is under version control
   (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
@@ -582,7 +584,7 @@ This location is used for temporary installations and files.")
 (use-package hl-line
   :commands hl-line-highlight
   :if (display-graphic-p)
-  :hook (after-init . global-hl-line-mode))
+  :hook (after-init-hook . global-hl-line-mode))
 
 ;; Enable the following modes
 (dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
@@ -612,7 +614,7 @@ This location is used for temporary installations and files.")
 ;; (set-default 'cursor-type '(bar . 4))
 
 (use-package outline ; Edit outlines
-  :hook (prog-mode . outline-minor-mode)
+  :hook (prog-mode-hook . outline-minor-mode)
   :diminish outline-minor-mode)
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
@@ -621,14 +623,14 @@ This location is used for temporary installations and files.")
   :ensure nil
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
-  :hook (prog-mode . hs-minor-mode)
+  :hook (prog-mode-hook . hs-minor-mode)
   :config (setq hs-isearch-open t))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with `C-c C-c'
 (use-package so-long
   :ensure nil
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
-  :hook (after-init . global-so-long-mode))
+  :hook (after-init-hook . global-so-long-mode))
 
 ;; Install fonts with `M-x all-the-icons-install-fonts'
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
@@ -831,7 +833,7 @@ This location is used for temporary installations and files.")
   :commands awesome-tray-mode
   :if (eq sb/modeline-theme 'awesome-tray)
   :load-path "extras"
-  :hook (after-init . awesome-tray-mode)
+  :hook (after-init-hook . awesome-tray-mode)
   :config
   (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
         awesome-tray-git-update-duration 30 ; seconds
@@ -858,7 +860,7 @@ This location is used for temporary installations and files.")
 (use-package mini-modeline
   :diminish mini-modeline-mode
   :if (eq sb/modeline-theme 'mini)
-  :hook (after-init . mini-modeline-mode)
+  :hook (after-init-hook . mini-modeline-mode)
   :config
   (setq mini-modeline-r-format '("%e" mode-line-front-space
                                  mode-line-client
@@ -996,16 +998,16 @@ This location is used for temporary installations and files.")
   :config
   ;; Do not show filter groups if there are no buffers in that group
   (setq ibuffer-show-empty-filter-groups nil)
-  :hook (ibuffer . ibuffer-auto-mode))
+  :hook (ibuffer-hook . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :commands ibuffer-projectile-set-filter-groups
-  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+  :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
   :commands all-the-icons-ibuffer-mode
-  :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
+  :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
   :config (setq all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package dired
@@ -1055,7 +1057,7 @@ This location is used for temporary installations and files.")
   :ensure nil
   :defines dired-cleanup-buffers-too
   :commands (dired-omit-mode)
-  :hook (dired-mode . dired-omit-mode)
+  :hook (dired-mode-hook . dired-omit-mode)
   :bind ("C-x C-j"  . dired-jump)
   :config
   (setq dired-cleanup-buffers-too t
@@ -1121,13 +1123,13 @@ This location is used for temporary installations and files.")
 (use-package dired-async
   :ensure async
   :diminish
-  :hook (dired-mode . dired-async-mode))
+  :hook (dired-mode-hook . dired-async-mode))
 
 (use-package all-the-icons-dired
   :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
   :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode)
+  :hook (dired-mode-hook . all-the-icons-dired-mode)
   :config
   ;; Icons are not aligned after renaming a file.
   ;; https://github.com/jtbm37/all-the-icons-dired/issues/34
@@ -1299,7 +1301,7 @@ This location is used for temporary installations and files.")
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
   :commands (org-indent-mode org-indent-item org-outdent-item)
-  :hook (org-mode . visual-line-mode)
+  :hook (org-mode-hook . visual-line-mode)
   :config
   (setq org-fontify-done-headline nil
         org-fontify-whole-heading-line nil
@@ -1346,13 +1348,13 @@ This location is used for temporary installations and files.")
 (use-package org-bullets
   :disabled t
   :commands org-bullets-mode
-  :hook (org-mode . org-bullets-mode))
+  :hook (org-mode-hook . org-bullets-mode))
 
 ;; Make invisible parts of Org elements appear visible
 (use-package org-appear
   :commands org-appear-mode
   :disabled t
-  :hook (org-mode . org-appear-mode)
+  :hook (org-mode-hook . org-appear-mode)
   :config
   (setq org-appear-autosubmarkers t
         org-appear-autoentities   t
@@ -1491,7 +1493,7 @@ This location is used for temporary installations and files.")
   ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
   ;; timers.
   (run-with-idle-timer 60 t #'recentf-cleanup)
-  :hook (after-init . recentf-mode))
+  :hook (after-init-hook . recentf-mode))
 
 ;; Load immediately after start since I use it often
 (use-package init-open-recentf
@@ -1535,7 +1537,7 @@ This location is used for temporary installations and files.")
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
-  :hook (after-init . global-company-mode)
+  :hook (after-init-hook . global-company-mode)
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
   ;; :diminish
@@ -1605,7 +1607,7 @@ This location is used for temporary installations and files.")
   :after company
   :commands company-quickhelp-mode
   ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
-  :hook (after-init . company-quickhelp-mode))
+  :hook (after-init-hook . company-quickhelp-mode))
 
 (use-package company-statistics
   :after company
@@ -1630,7 +1632,7 @@ This location is used for temporary installations and files.")
 (use-package yasnippet
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((text-mode prog-mode) . yas-global-mode)
+  :hook ((text-mode-hook prog-mode-hook) . yas-global-mode)
   :diminish yas-minor-mode
   :config
   (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
@@ -1652,7 +1654,7 @@ This location is used for temporary installations and files.")
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
   :commands amx-mode
-  :hook (after-init . amx-mode)
+  :hook (after-init-hook . amx-mode)
   :config
   ;; Update the command list every n minutes
   (setq amx-auto-update-interval 10))
@@ -1667,7 +1669,7 @@ This location is used for temporary installations and files.")
   This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
-  :hook (after-init . ivy-mode)
+  :hook (after-init-hook . ivy-mode)
   :config
   (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
         ivy-extra-directories nil ; Hide . and ..
@@ -1740,7 +1742,7 @@ This location is used for temporary installations and files.")
    ("<f4>"                           . counsel-grep-or-swiper))
   :bind* ("C-c C-j"                  . counsel-imenu)
   :diminish
-  :hook (ivy-mode . counsel-mode)
+  :hook (ivy-mode-hook . counsel-mode)
   :config
   (setq counsel-describe-function-function #'helpful-callable
         counsel-describe-variable-function #'helpful-variable
@@ -1797,7 +1799,7 @@ This location is used for temporary installations and files.")
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
   :commands prescient-persist-mode
-  :hook (after-init . prescient-persist-mode)
+  :hook (after-init-hook . prescient-persist-mode)
   :config (setq prescient-sort-full-matches-first t))
 
 ;; We are using `company-fuzzy' for sorting completion candidates
@@ -1922,7 +1924,7 @@ This location is used for temporary installations and files.")
    ;; language-specific words
    (prog-mode . flyspell-prog-mode)
    ;; `find-file-hook' will not work for buffers with no associated files
-   (after-init . (lambda ()
+   (after-init-hook . (lambda ()
                    (when (string= (buffer-name) "*scratch*")
                      (flyspell-mode 1))))
    (text-mode . flyspell-mode))
@@ -2018,12 +2020,12 @@ This location is used for temporary installations and files.")
 (use-package highlight-indentation
   :commands highlight-indentation-mode
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-  :hook ((yaml-mode python-mode) . highlight-indentation-mode))
+  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
   :commands aggressive-indent-mode
-  :hook ((lisp-mode emacs-lisp-mode lisp-interaction-mode) . aggressive-indent-mode)
+  :hook ((lisp-mode-hook emacs-lisp-mode-hook lisp-interaction-mode-hook) . aggressive-indent-mode)
   :diminish
   :config
   (setq aggressive-indent-comments-too t
@@ -2033,7 +2035,7 @@ This location is used for temporary installations and files.")
 (use-package paren
   :ensure nil
   ;; :init (run-with-idle-timer 2 nil #'show-paren-mode)
-  :hook (after-init . show-paren-mode)
+  :hook (after-init-hook . show-paren-mode)
   :config
   (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
         show-paren-when-point-inside-paren t
@@ -2045,7 +2047,7 @@ This location is used for temporary installations and files.")
   :commands (electric-pair-mode)
   :disabled t
   ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)
-  :hook (after-init . electric-pair-mode)
+  :hook (after-init-hook . electric-pair-mode)
   :config
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
@@ -2093,7 +2095,7 @@ This location is used for temporary installations and files.")
          (not (or (get-text-property (point) 'part-side)
                   (get-text-property (point) 'block-side)))))
   :hook
-  ((after-init . (lambda ()
+  ((after-init-hook . (lambda ()
                    (require 'smartparens-config)
                    (smartparens-global-mode 1)
                    (show-smartparens-global-mode 1))))
@@ -2129,31 +2131,31 @@ This location is used for temporary installations and files.")
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
-;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; ;; yet.
-;; (use-package project
-;;   :ensure nil
-;;   :commands (project-switch-project project-current
-;;                                     project-find-file project-execute-extended-command
-;;                                     project-known-project-roots
-;;                                     project-remove-known-project
-;;                                     project-remember-project
-;;                                     project-kill-buffers
-;;                                     project-switch-to-buffer
-;;                                     project-search
-;;                                     project-compile)
-;;   :bind
-;;   (:map project-prefix-map
-;;         ("f" . project-find-file)
-;;         ("F" . project-or-external-find-file)
-;;         ("b" . project-switch-to-buffer)
-;;         ("d" . project-dired)
-;;         ("v" . project-vc-dir)
-;;         ("c" . project-compile)
-;;         ("k" . project-kill-buffers)
-;;         ("p" . project-switch-project)
-;;         ("g" . project-find-regexp)
-;;         ("r" . project-query-replace-regexp)))
+;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; yet.
+(use-package project
+  :ensure nil
+  :commands (project-switch-project project-current
+                                    project-find-file project-execute-extended-command
+                                    project-known-project-roots
+                                    project-remove-known-project
+                                    project-remember-project
+                                    project-kill-buffers
+                                    project-switch-to-buffer
+                                    project-search
+                                    project-compile)
+  :bind
+  (:map project-prefix-map
+        ("f" . project-find-file)
+        ("F" . project-or-external-find-file)
+        ("b" . project-switch-to-buffer)
+        ("d" . project-dired)
+        ("v" . project-vc-dir)
+        ("c" . project-compile)
+        ("k" . project-kill-buffers)
+        ("p" . project-switch-project)
+        ("g" . project-find-regexp)
+        ("r" . project-query-replace-regexp)))
 
 (use-package projectile
   :commands (projectile-project-p projectile-project-name
@@ -2265,7 +2267,7 @@ This location is used for temporary installations and files.")
   ;; :init
   ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
   ;; (run-with-idle-timer 2 nil #'projectile-mode)
-  :hook (after-init . projectile-mode)
+  :hook (after-init-hook . projectile-mode)
   :bind
   ;; Set these in case `counsel-projectile' is disabled
   (("<f5>" . projectile-switch-project)
@@ -2334,7 +2336,7 @@ This location is used for temporary installations and files.")
   :ensure ivy-rich
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
-  :hook (ivy-mode . all-the-icons-ivy-rich-mode)
+  :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
   :config (setq all-the-icons-ivy-rich-icon-size 0.9))
 
 (use-package ivy-rich
@@ -2413,7 +2415,7 @@ This location is used for temporary installations and files.")
                                        flycheck-manual
                                        flycheck-display-error-messages-unless-error-list
                                        flycheck-sexp-to-string)
-  :hook (after-init . global-flycheck-mode)
+  :hook (after-init-hook . global-flycheck-mode)
   :config
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
@@ -2542,7 +2544,7 @@ This location is used for temporary installations and files.")
  (use-package flycheck-popup-tip ; Show error messages in popups
    :unless (display-graphic-p)
    :disabled t
-   :hook (flycheck-mode . flycheck-popup-tip-mode))
+   :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
 
  ;; Does not display popup under TTY, check possible workarounds at
  ;; https://github.com/flycheck/flycheck-popup-tip
@@ -2550,14 +2552,14 @@ This location is used for temporary installations and files.")
    :disabled t
    :commands flycheck-pos-tip-mode
    :if (display-graphic-p)
-   :hook (flycheck-mode . flycheck-pos-tip-mode))
+   :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
 
  ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
  (use-package flycheck-posframe
    :disabled t
    :if (display-graphic-p)
    :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
-   :hook (flycheck-mode . flycheck-posframe-mode)
+   :hook (flycheck-mode-hook . flycheck-posframe-mode)
    :config
    (setq flycheck-posframe-position 'point-bottom-left-corner
          flycheck-posframe-border-width 1)
@@ -2570,7 +2572,7 @@ This location is used for temporary installations and files.")
                              whitespace-buffer whitespace-cleanup
                              whitespace-turn-off)
   ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :hook (markdown-mode . whitespace-mode)
+  :hook (markdown-mode-hook . whitespace-mode)
   :config
   (setq show-trailing-whitespace t
         whitespace-line-column sb/fill-column
@@ -2596,13 +2598,13 @@ This location is used for temporary installations and files.")
 (use-package ws-butler
   :commands ws-butler-mode
   :diminish
-  :hook (prog-mode . ws-butler-mode))
+  :hook (prog-mode-hook . ws-butler-mode))
 
 ;; Highlight symbol under point
 (use-package symbol-overlay
   :diminish
   :commands (symbol-overlay-mode)
-  :hook (prog-mode . symbol-overlay-mode)
+  :hook (prog-mode-hook . symbol-overlay-mode)
   :bind
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next))
@@ -2613,7 +2615,7 @@ This location is used for temporary installations and files.")
 (use-package hl-todo
   :commands global-hl-todo-mode
   ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
-  :hook (after-init . global-hl-todo-mode)
+  :hook (after-init-hook . global-hl-todo-mode)
   :config
   (setq hl-todo-highlight-punctuation ":"
         hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
@@ -2627,13 +2629,13 @@ This location is used for temporary installations and files.")
 
 (use-package highlight-numbers
   :commands highlight-numbers-mode
-  :hook ((prog-mode yaml-mode conf-mode css-mode html-mode) . highlight-numbers-mode))
+  :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook css-mode-hook html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :diminish
   :commands (global-page-break-lines-mode page-break-lines-mode)
   ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
-  :hook (after-init . global-page-break-lines-mode))
+  :hook (after-init-hook . global-page-break-lines-mode))
 
 (use-package number-separator
   :ensure nil
@@ -2649,7 +2651,7 @@ This location is used for temporary installations and files.")
 
 (use-package highlight-escape-sequences
   :commands hes-mode
-  :hook (prog-mode . hes-mode))
+  :hook (prog-mode-hook . hes-mode))
 
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
@@ -2827,7 +2829,7 @@ This location is used for temporary installations and files.")
   :hook
   ((minibuffer-setup . (lambda ()
                          (hungry-delete-mode -1)))
-   (after-init . global-hungry-delete-mode)))
+   (after-init-hook . global-hungry-delete-mode)))
 
 (use-package move-text ; Move lines with `M-<up>' and `M-<down>'
   :commands (move-text-up move-text-down move-text-default-bindings)
@@ -2850,7 +2852,7 @@ This location is used for temporary installations and files.")
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :commands popwin-mode
-  :hook (after-init . popwin-mode)
+  :hook (after-init-hook . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
 
@@ -2912,14 +2914,14 @@ This location is used for temporary installations and files.")
 ;; Restore point to the initial location with `C-g' after marking a region
 (use-package smart-mark
   ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
-  :hook (after-init . smart-mark-mode))
+  :hook (after-init-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
   :diminish (whole-line-or-region-local-mode)
   ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
-  :hook (after-init . whole-line-or-region-global-mode))
+  :hook (after-init-hook . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
   :bind ("C-x C-\\" . goto-last-change))
@@ -2928,7 +2930,7 @@ This location is used for temporary installations and files.")
 ;; pressing the keys `M-<' and `M->' keys again.
 (use-package beginend
   ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
-  :hook (after-init . beginend-global-mode)
+  :hook (after-init-hook . beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
@@ -2955,17 +2957,17 @@ This location is used for temporary installations and files.")
 (use-package session
   :disabled t
   :commands (session-initialize)
-  :hook (after-init . session-initialize))
+  :hook (after-init-hook . session-initialize))
 
 (use-package immortal-scratch
   :commands immortal-scratch-mode
   ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
-  :hook (after-init . immortal-scratch-mode))
+  :hook (after-init-hook . immortal-scratch-mode))
 
 ;; I use the *scratch* buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
   :commands persistent-scratch-setup-default
-  :hook (after-init . persistent-scratch-setup-default)
+  :hook (after-init-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
@@ -2981,7 +2983,7 @@ This location is used for temporary installations and files.")
   :disabled t
   :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode
-  :hook (after-init . global-disable-mouse-mode))
+  :hook (after-init-hook . global-disable-mouse-mode))
 
 ;; Move the cursor from the line of view
 (use-package avoid
@@ -2995,11 +2997,11 @@ This location is used for temporary installations and files.")
 
 (use-package rainbow-delimiters
   :commands rainbow-delimiters-mode
-  :hook ((prog-mode latex-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
+  :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
 (use-package ssh-config-mode
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode turn-on-font-lock)
-  :hook (ssh-config-mode . turn-on-font-lock))
+  :hook (ssh-config-mode-hook . turn-on-font-lock))
 
 (use-package ace-window
   :bind ([remap other-window] . ace-window))
@@ -3021,7 +3023,7 @@ This location is used for temporary installations and files.")
   :disabled t
   :diminish
   ;; :init (run-with-idle-timer 3 nil #'super-save-mode)
-  :hook (after-init . super-save-mode)
+  :hook (after-init-hook . super-save-mode)
   :config
   (setq super-save-remote-files nil) ; Ignore remote files, can cause Emacs to hang
   (add-to-list 'super-save-triggers 'ace-window))
@@ -3077,7 +3079,7 @@ This location is used for temporary installations and files.")
   ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
   ;; usability
   ;; (run-with-idle-timer 2 nil #'sb/bm-setup)
-  :hook (after-init . sb/bm-setup)
+  :hook (after-init-hook . sb/bm-setup)
   :config (setq-default bm-buffer-persistence t)
   :bind
   (("C-<f1>" . bm-toggle)
@@ -3115,7 +3117,7 @@ This location is used for temporary installations and files.")
   :disabled t
   :commands writegood-mode
   :diminish
-  :hook (text-mode . writegood-mode))
+  :hook (text-mode-hook . writegood-mode))
 
 (use-package wc-mode
   :commands wc-mode)
@@ -3151,7 +3153,7 @@ This location is used for temporary installations and files.")
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
   ;; :init (run-with-idle-timer 3 nil #'require 'pdf-tools nil t) ; Expensive to load
-  :hook (after-init . (lambda ()
+  :hook (after-init-hook . (lambda ()
                         (require 'pdf-tools nil t)))
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
@@ -3259,7 +3261,7 @@ This location is used for temporary installations and files.")
 (use-package pandoc-mode
   :commands (pandoc-load-default-settings pandoc-mode)
   :diminish
-  :hook (markdown-mode . pandoc-mode)
+  :hook (markdown-mode-hook . pandoc-mode)
   :config
   (pandoc-load-default-settings)
   ;; (unbind-key "C-c /" pandoc-mode-map) ; Binds `C-c /' to `pandoc-main-hydra/body'
@@ -3316,7 +3318,7 @@ This location is used for temporary installations and files.")
   :if (symbol-value 'sb/IS-LINUX)
   :commands turn-on-eldoc-mode
   :diminish
-  :hook (prog-mode . turn-on-eldoc-mode)
+  :hook (prog-mode-hook . turn-on-eldoc-mode)
   ;; :config
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
   ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
@@ -3327,12 +3329,12 @@ This location is used for temporary installations and files.")
 
 (use-package c-eldoc
   :disabled t ;; We use LSP
-  :hook (c-mode-common . c-turn-on-eldoc-mode))
+  :hook (c-mode-common-hook . c-turn-on-eldoc-mode))
 
 (use-package css-mode
   :commands css-mode
   :defines sb/flycheck-local-checkers
-  :hook (css-mode . lsp-deferred)
+  :hook (css-mode-hook . lsp-deferred)
   :config
   (setq css-indent-offset 2)
 
@@ -3354,7 +3356,7 @@ This location is used for temporary installations and files.")
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
   :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
-  :hook (eldoc-mode . eldoc-box-hover-mode)
+  :hook (eldoc-mode-hook . eldoc-box-hover-mode)
   :config
   (setq eldoc-box-clear-with-C-g t
         eldoc-box-fringe-use-same-bg nil)
@@ -3464,8 +3466,8 @@ This location is used for temporary installations and files.")
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
   :hook
-  ((lsp-mode . lsp-enable-which-key-integration)
-   (lsp-mode . lsp-lens-mode))
+  ((lsp-mode-hook . lsp-enable-which-key-integration)
+   (lsp-mode-hook . lsp-lens-mode))
   :custom-face
   ;; Reduce the height
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
@@ -3498,7 +3500,6 @@ This location is used for temporary installations and files.")
         lsp-enable-dap-auto-configure nil
         lsp-enable-on-type-formatting nil
         ;; lsp-semantic-tokens-enable t
-        ;; lsp-enable-snippet t ; Autocomplete parentheses
         lsp-headerline-breadcrumb-enable nil ; Breadcrumb is not useful for all modes
         lsp-headerline-breadcrumb-enable-diagnostics nil
         lsp-html-format-wrap-line-length sb/fill-column
@@ -3524,6 +3525,10 @@ This location is used for temporary installations and files.")
         lsp-use-plists nil
         lsp-xml-logs-client nil
         lsp-yaml-print-width sb/fill-column)
+
+  ;; Autocomplete parentheses
+  (when (featurep 'yasnippet)
+           (setq lsp-enable-snippet t))
 
   (defvar lsp-pylsp-configuration-sources)
   (defvar lsp-pylsp-plugins-autopep8-enable)
@@ -3677,7 +3682,7 @@ This location is used for temporary installations and files.")
 
 (use-package docstr
   :diminish
-  :hook ((c++-mode python-mode java-mode) . docstr-mode))
+  :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
 (use-package cc-mode
   :ensure nil
@@ -3686,7 +3691,7 @@ This location is used for temporary installations and files.")
   :mode
   (("\\.h\\'" . c++-mode)
    ("\\.c\\'" . c++-mode))
-  :hook (c++-mode . lsp-deferred)
+  :hook (c++-mode-hook . lsp-deferred)
   :config
   (setq c-set-style "cc-mode"
         c-basic-offset 2)
@@ -3723,7 +3728,7 @@ This location is used for temporary installations and files.")
   ;; :demand t
   :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
-  :hook (c++-mode . (lambda ()
+  :hook (c++-mode-hook . (lambda ()
                       (modern-c++-font-lock-mode 1))))
 
 (use-package cuda-mode
@@ -3739,7 +3744,7 @@ This location is used for temporary installations and files.")
 (use-package cmake-mode
   :commands cmake-mode
   :hook
-  (cmake-mode . (lambda ()
+  (cmake-mode-hook . (lambda ()
                   (make-local-variable 'lsp-disabled-clients)
                   (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                   (spell-fu-mode -1)
@@ -3755,11 +3760,11 @@ This location is used for temporary installations and files.")
 
 (use-package cmake-font-lock
   :commands cmake-font-lock-activate
-  :hook (cmake-mode . cmake-font-lock-activate))
+  :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 (use-package python
   :ensure nil
-  :hook (python-mode . lsp-deferred)
+  :hook (python-mode-hook . lsp-deferred)
   :bind
   (:map python-mode-map
         ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
@@ -3797,7 +3802,7 @@ This location is used for temporary installations and files.")
 
 (use-package pyvenv
   :commands (pyvenv-mode pyvenv-tracking-mode)
-  :hook (python-mode . pyvenv-mode)
+  :hook (python-mode-hook . pyvenv-mode)
   :config
   (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:"
                                                               pyvenv-virtual-env-name "] "))
@@ -3859,12 +3864,12 @@ This location is used for temporary installations and files.")
   ;; :diminish yapf-mode
   :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
   :commands yapf-mode
-  :hook (python-mode . yapf-mode))
+  :hook (python-mode-hook . yapf-mode))
 
 (use-package cperl-mode
   :ensure nil
   :mode ("latexmkrc\\'")
-  :hook (cperl-mode . lsp-deferred)
+  :hook (cperl-mode-hook . lsp-deferred)
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
@@ -3943,14 +3948,14 @@ This location is used for temporary installations and files.")
   ;;  Enable converting external formats (ie. webp) to internal ones.
   (image-use-external-converter t)
   ;; TODO: This does not work.
-  :hook (image-mode . show-image-dimensions-in-mode-line))
+  :hook (image-mode-hook . show-image-dimensions-in-mode-line))
 
 (use-package sh-script ; Shell script mode
   :ensure nil
   :mode
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
-  :hook (sh-mode . lsp-deferred)
+  :hook (sh-mode-hook . lsp-deferred)
   :config
   ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
   (setq sh-basic-offset 2
@@ -3982,7 +3987,7 @@ This location is used for temporary installations and files.")
   :config (setq company-shell-delete-duplictes t))
 
 (use-package shfmt
-  :hook (sh-mode . shfmt-on-save-mode)
+  :hook (sh-mode-hook . shfmt-on-save-mode)
   :config
   (setq shfmt-arguments '("-i" "4" "-p" "-ci")))
 
@@ -3990,7 +3995,7 @@ This location is used for temporary installations and files.")
 ;; if they contain a valid shebang line
 (use-package executable
   :commands (executable-make-buffer-file-executable-if-script-p)
-  :hook (after-save . executable-make-buffer-file-executable-if-script-p))
+  :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
 (use-package vc
@@ -4053,7 +4058,7 @@ This location is used for temporary installations and files.")
   :bind
   (("C-x p" . git-gutter:previous-hunk)
    ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init . global-git-gutter-mode)
+  :hook (after-init-hook . global-git-gutter-mode)
   :config
   (setq git-gutter:added-sign      " "
         git-gutter:deleted-sign    " "
@@ -4075,15 +4080,15 @@ This location is used for temporary installations and files.")
   (unless (display-graphic-p)
     (diff-hl-margin-mode 1))
   :hook
-  ((magit-post-refresh . diff-hl-magit-post-refresh)
-   (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-   (dired-mode         . diff-hl-dired-mode-unless-remote)
-   (diff-hl-mode       . diff-hl-flydiff-mode)
-   (after-init         . global-diff-hl-mode)))
+  ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
+   (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
+   (dired-mode-hook         . diff-hl-dired-mode-unless-remote)
+   (diff-hl-mode-hook       . diff-hl-flydiff-mode)
+   (after-init-hook        . global-diff-hl-mode)))
 
 (use-package git-commit
   :commands git-commit-turn-on-flyspell
-  :hook (git-commit-setup . git-commit-turn-on-flyspell)
+  :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
   :config
   (setq git-commit-summary-max-length 50
         git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
@@ -4157,7 +4162,7 @@ This location is used for temporary installations and files.")
 (use-package web-mode
   :commands web-mode
   :mode "\\.html?\\'"
-  :hook (web-mode . lsp-deferred)
+  :hook (web-mode-hook . lsp-deferred)
   :config
   (setq web-mode-enable-auto-closing              t
         web-mode-enable-auto-pairing              nil ; Prefer `smartparens'
@@ -4184,19 +4189,19 @@ This location is used for temporary installations and files.")
 (use-package emmet-mode
   :defines emmet-move-cursor-between-quote
   :commands emmet-mode
-  :hook ((web-mode css-mode html-mode) . emmet-mode)
+  :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :config (setq emmet-move-cursor-between-quote t))
 
 (use-package rainbow-mode
   :commands rainbow-mode
-  :hook ((css-mode html-mode web-mode) . rainbow-mode))
+  :hook ((css-mode-hook html-mode-hook web-mode-hook) . rainbow-mode))
 
 (use-package nxml-mode
   :ensure nil
   :commands nxml-mode
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
-  (nxml-mode . (lambda ()
+  (nxml-mode-hook . (lambda ()
                  ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
                  (make-local-variable 'lsp-disabled-clients)
                  (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
@@ -4233,7 +4238,7 @@ This location is used for temporary installations and files.")
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
-  :hook (text-mode . flycheck-languagetool-setup)
+  :hook (text-mode-hook . flycheck-languagetool-setup)
   :init
   (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool-server.jar")
@@ -4514,7 +4519,7 @@ This location is used for temporary installations and files.")
                                      reftex-toc-Rescan
                                      reftex-default-bibliography)
   ;; :diminish
-  :hook ((LaTeX-mode latex-mode) . reftex-mode)
+  :hook ((LaTeX-mode-hook latex-mode-hook) . reftex-mode)
   :bind
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)
@@ -4577,7 +4582,7 @@ Ignore if no file is found."
 ;;   :disabled t
 ;;   :diminish bib-cite-minor-mode
 ;;   :commands bib-cite-minor-mode
-;;   :hook ((LaTeX-mode latex-mode) . bib-cite-minor-mode )
+;;   :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
 ;;   :config (setq bib-cite-use-reftex-view-crossref t)
 ;;   :bind (:map bib-cite-minor-mode-map
 ;;               ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
@@ -4719,12 +4724,12 @@ after a successful compilation."
 
 (use-package bazel
   :commands (bazel-mode bazelrc-mode)
-  :hook (bazel-mode . flycheck-mode))
+  :hook (bazel-mode-hook . flycheck-mode))
 
 (use-package protobuf-mode
   :commands protobuf-mode
   :mode "\\.proto$"
-  :hook (protobuf-mode . flycheck-mode))
+  :hook (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
   :ensure nil
@@ -4741,7 +4746,7 @@ after a successful compilation."
   :ensure clang-format
   :ensure t
   :defines clang-format+-always-enable
-  :hook (mlir-mode . clang-format+-mode)
+  :hook (mlir-mode-hook . clang-format+-mode)
   :config (setq clang-format+-always-enable t))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
@@ -4779,7 +4784,7 @@ after a successful compilation."
                        (require 'tree-sitter-langs)
                        (global-tree-sitter-mode 1)))))
   ;; :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
-  :hook (after-init . sb/enable-tree-sitter)
+  :hook (after-init-hook . sb/enable-tree-sitter)
   :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
@@ -4793,7 +4798,7 @@ after a successful compilation."
   :commands (global-fasd-mode fasd-find-file)
   :if (executable-find "fasd")
   ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
-  :hook (after-init . global-fasd-mode)
+  :hook (after-init-hook . global-fasd-mode)
   :config (setq fasd-enable-initial-prompt nil)
   :bind* ("C-c /" . fasd-find-file))
 
@@ -4819,7 +4824,7 @@ after a successful compilation."
 
 (use-package info-colors
   :commands info-colors-fontify-node
-  :hook (Info-selection . info-colors-fontify-node))
+  :hook (Info-selection-hook . info-colors-fontify-node))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
@@ -5423,7 +5428,7 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   :diminish
   :commands (which-key-mode which-key-setup-side-window-right-bottom)
   ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
-  :hook (after-init . which-key-mode)
+  :hook (after-init-hook . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
 
@@ -5433,7 +5438,7 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 
 (use-package which-key-posframe
   :commands which-key-posframe-mode
-  :hook (which-key-mode . which-key-posframe-mode)
+  :hook (which-key-mode-hook . which-key-posframe-mode)
   :config
   ;; Modify the posframe background if it has a low contrast
   ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
