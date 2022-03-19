@@ -1845,11 +1845,11 @@ This location is used for temporary installations and files.")
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_EXAMPLE" . "#\\+END_EXAMPLE"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
-  ;; Verbatim regions in org mode should not be ispelled:
+  ;; Verbatim regions in org mode should not be ispelled
   (add-to-list 'ispell-skip-region-alist '("=" "="))
-  ;; Properties block in org do not need to be ispelled
+  ;; Properties block in org mode do not need to be ispelled
   (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
-  ;; Footnoes in org that have http links that are line breaked should not be ispelled:
+  ;; Footnotes in org that have http links that are line breaked should not be ispelled
   (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
 
   (add-to-list 'ispell-skip-region-alist '("`" "`"))
@@ -1878,13 +1878,13 @@ This location is used for temporary installations and files.")
                  (eq pos flyspell-old-pos-error))
             (progn
               (if (= flyspell-old-pos-error min)
-                  ;; goto beginning of buffer
+                  ;; Goto beginning of buffer
                   (progn
                     (message "Restarting from end of buffer")
                     (goto-char (point-max)))
                 (backward-word 1))
               (setq pos (point))))
-        ;; seek the next error
+        ;; Seek the next error
         (while (and (> pos min)
                     (let ((ovs (overlays-at pos))
                           (r '()))
@@ -1895,14 +1895,14 @@ This location is used for temporary installations and files.")
                       (not r)))
           (backward-word 1)
           (setq pos (point)))
-        ;; save the current location for next invocation
+        ;; Save the current location for the next invocation
         (setq arg (1- arg))
         (setq flyspell-old-pos-error pos)
         (setq flyspell-old-buffer-error (current-buffer))
         (goto-char pos)
         (if (= pos min)
             (progn
-              (message "No more misspelled word!")
+              (message "No more misspelled words!")
               (setq arg 0))
           (forward-word)))))
   :config
@@ -1910,27 +1910,29 @@ This location is used for temporary installations and files.")
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
   :hook
-  (;; (before-save . flyspell-buffer) ; Saving files will be slow
+  (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
    ;; language-specific words
-   (prog-mode . flyspell-prog-mode)
+   (prog-mode-hook . flyspell-prog-mode)
    ;; `find-file-hook' will not work for buffers with no associated files
    (after-init-hook . (lambda ()
                         (when (string= (buffer-name) "*scratch*")
                           (flyspell-mode 1))))
-   (text-mode . flyspell-mode))
+   (text-mode-hook . flyspell-mode))
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
    :map flyspell-mode-map
    ("C-;"     . nil)
-   ;; ("C-,"     . sb/flyspell-goto-previous-error)
-   ))
+   ("C-,"     . sb/flyspell-goto-previous-error)))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
 (use-package flyspell-popup
+  :after flyspell
   :disabled t
-  :bind ("C-;" . flyspell-popup-correct)
+  :bind
+  (:map flyspell-mode-map
+        ("C-;" . flyspell-popup-correct))
   :config (setq flyspell-popup-correct-delay 0.1))
 
 (use-package flyspell-correct
@@ -1944,8 +1946,7 @@ This location is used for temporary installations and files.")
 (use-package spell-fu
   :defines spell-fu-directory
   :commands spell-fu-mode
-  :config
-  (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+  :config (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
   :init
   (add-hook 'text-mode-hook
             (lambda ()
@@ -2116,7 +2117,7 @@ This location is used for temporary installations and files.")
    ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
    ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
    ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
-   ;; TODO: The keybindings are not properly supported yet in terminal Emacs
+   ;; TODO: The following two keybindings are not properly supported yet in terminal Emacs.
    ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
    ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
    ;; "(foo bar)" -> "foo bar"
@@ -2166,10 +2167,10 @@ This location is used for temporary installations and files.")
         projectile-mode-line-prefix "" ; Save modeline space
         ;; Use only in desired directories, too much noise otherwise
         projectile-require-project-root t
-        ;; The contents of ".projectile" are ignored when using the alien project indexing method
+        ;; The contents of ".projectile" are ignored when using the `alien' project indexing method
         projectile-indexing-method 'alien
         ;; No sorting should be faster, note that files are not sorted if
-        ;; `projectile-indexing-method' is set to 'alien'.
+        ;; `projectile-indexing-method' is set to `alien'.
         projectile-sort-order 'recently-active
         projectile-verbose nil)
 
@@ -2201,7 +2202,7 @@ This location is used for temporary installations and files.")
                                         "configure.in"))
 
   ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
-  ;; projects is disabled for faster startup
+  ;; projects is disabled for faster startup.
   (setq projectile-auto-discover nil
         projectile-project-search-path (list
                                         (concat `,(getenv "HOME") "/bitbucket")
@@ -2255,9 +2256,8 @@ This location is used for temporary installations and files.")
   ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
 
   :bind-keymap ("C-c p" . projectile-command-map)
-  ;; :init
-  ;; Use idle timer in case we open a project file without enabling projectile via bind-keys
-  ;; (run-with-idle-timer 2 nil #'projectile-mode)
+  ;; :init (run-with-idle-timer 2 nil #'projectile-mode)
+  ;; We can open a project file without enabling projectile via bind-keys
   :hook (after-init-hook . projectile-mode)
   :bind
   ;; Set these in case `counsel-projectile' is disabled
@@ -2323,8 +2323,8 @@ This location is used for temporary installations and files.")
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
-  :ensure t
   :ensure ivy-rich
+  :ensure t
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
@@ -2418,10 +2418,10 @@ This location is used for temporary installations and files.")
         ;; Show error messages only if the error list is not already visible
         ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
-        ;; derived from `text-mode'. `chktex' errors are often not very helpful.
+        ;; derived from `text-mode'.
         flycheck-global-modes '(not csv-mode))
 
-  ;; We prefer not to use `textlint' and `proselint', `proselint' is not maintained.
+  ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))
 
@@ -2498,7 +2498,7 @@ This location is used for temporary installations and files.")
   ;; Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
 
-  (declare-function sb/flycheck-may-check-automatically "init-use-package.el")
+  (declare-function sb/flycheck-may-check-automatically "init-emacs27.el")
 
   (defvar sb/excluded-directory-regexps
     '(".git/" "elpa/" ".cache" ".clangd"))
@@ -2530,32 +2530,31 @@ This location is used for temporary installations and files.")
   ;;             ))
   )
 
-;; Showing error messages  in the echo area are less intrusive.
-(or
- (use-package flycheck-popup-tip ; Show error messages in popups
-   :unless (display-graphic-p)
-   :disabled t
-   :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
+;; Showing error messages in the echo area is less intrusive.
+(use-package flycheck-popup-tip ; Show error messages in popups
+  :unless (display-graphic-p)
+  :disabled t
+  :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
 
- ;; Does not display popup under TTY, check possible workarounds at
- ;; https://github.com/flycheck/flycheck-popup-tip
- (use-package flycheck-pos-tip
-   :disabled t
-   :commands flycheck-pos-tip-mode
-   :if (display-graphic-p)
-   :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
+;; Does not display popup under TTY, check possible workarounds at
+;; https://github.com/flycheck/flycheck-popup-tip
+(use-package flycheck-pos-tip
+  :disabled t
+  :commands flycheck-pos-tip-mode
+  :if (display-graphic-p)
+  :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
 
- ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
- (use-package flycheck-posframe
-   :disabled t
-   :if (display-graphic-p)
-   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
-   :hook (flycheck-mode-hook . flycheck-posframe-mode)
-   :config
-   (setq flycheck-posframe-position 'point-bottom-left-corner
-         flycheck-posframe-border-width 1)
+;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
+(use-package flycheck-posframe
+  :disabled t
+  :if (display-graphic-p)
+  :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
+  :hook (flycheck-mode-hook . flycheck-posframe-mode)
+  :config
+  (setq flycheck-posframe-position 'point-bottom-left-corner
+        flycheck-posframe-border-width 1)
 
-   (flycheck-posframe-configure-pretty-defaults)))
+  (flycheck-posframe-configure-pretty-defaults))
 
 (use-package whitespace
   :disabled t
@@ -2571,7 +2570,7 @@ This location is used for temporary installations and files.")
 
 ;; This is different from `whitespace-cleanup-mode' since this is unconditional
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
-  (setq delete-trailing-lines t) ; `M-x delete-trailing-whitespace' deletes trailing lines
+  (setq delete-trailing-lines t) ; "M-x delete-trailing-whitespace" deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
@@ -2620,7 +2619,8 @@ This location is used for temporary installations and files.")
 
 (use-package highlight-numbers
   :commands highlight-numbers-mode
-  :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook css-mode-hook html-mode-hook) . highlight-numbers-mode))
+  :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook
+                         css-mode-hook html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :diminish
@@ -2656,16 +2656,15 @@ This location is used for temporary installations and files.")
 ;; "user@host#port".
 ;; Edit local file with sudo: "C-x C-f /sudo::/etc/hosts".
 ;; Open a remote file with ssh + sudo: "C-x C-f /ssh:host|sudo:root:/etc/passwd".
-;; Multihop syntax: C-x C-f /ssh:bird@bastion|ssh:you@remotehost:/path
+;; Multihop syntax: "C-x C-f /ssh:bird@bastion|ssh:you@remotehost:/path"
 ;; Multihop with sudo: "C-x C-f /ssh:you@remotehost|sudo:remotehost:/path/to/file"
 ;; Multihop with sudo with custom user: "C-x C-f
 ;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 
-;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/
-;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
-;; bookmark with `bookmark-set' (C-x r m). To revisit that bookmark, use `bookmark-jump' (C-x r b)
-;; or `bookmark-bmenu-list' (C-x r l). Rename the bookmarked location in `bookmark-bmenu-mode' with
-;; `R'.
+;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/ Use bookmarks to speed up remote file
+;; access: upon visiting a location with TRAMP, save it as a bookmark with `bookmark-set' ("C-x r
+;; m"). To revisit that bookmark, use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r
+;; l"). Rename the bookmarked location in `bookmark-bmenu-mode' with `R'.
 (use-package tramp
   :defines tramp-ssh-controlmaster-options
   :config
@@ -2673,7 +2672,7 @@ This location is used for temporary installations and files.")
         ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
         ;; files which is faster than SSH.
         ;; tramp-default-method "ssh"
-        ;; tramp-default-remote-shell "/bin/bash"
+        tramp-default-remote-shell "/usr/bin/bash"
         remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
         ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
         ;; settings
@@ -2713,9 +2712,9 @@ This location is used for temporary installations and files.")
 
 ;; TODO: SSH into Gcloud
 ;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
-;; Make sure you've set your default project with:
-;; gcloud config set project <project-name>
-;; C-x C-f /gcssh:compute-instance:/path/to/filename.clj
+;; Make sure you have set your default project with:
+;; "gcloud config set project <project-name>"
+;; "C-x C-f /gcssh:compute-instance:/path/to/filename.clj"
 
 ;; LATER: Can we shorten long Tramp file names? This does not work with Tramp.
 ;; (add-to-list 'directory-abbrev-alist
@@ -2732,7 +2731,7 @@ This location is used for temporary installations and files.")
         ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful
         ;; with mouse support enabled
         imenu-use-popup-menu nil
-        ;; `nil' implies no sorting, and will list by position in the buffer
+        ;; `nil' implies no sorting and will list by position in the buffer
         imenu-sort-function nil))
 
 (defvar tags-revert-without-query)
@@ -2819,11 +2818,11 @@ This location is used for temporary installations and files.")
   :commands (hungry-delete-mode global-hungry-delete-mode)
   :diminish
   :hook
-  ((minibuffer-setup . (lambda ()
-                         (hungry-delete-mode -1)))
+  ((minibuffer-setup-hook . (lambda ()
+                              (hungry-delete-mode -1)))
    (after-init-hook . global-hungry-delete-mode)))
 
-(use-package move-text ; Move lines with `M-<up>' and `M-<down>'
+(use-package move-text ; Move lines with "M-<up>" and "M-<down>"
   :commands (move-text-up move-text-down move-text-default-bindings)
   :init (move-text-default-bindings))
 
@@ -2903,7 +2902,7 @@ This location is used for temporary installations and files.")
   :diminish
   :bind ("M-i" . turn-on-expand-line-mode))
 
-;; Restore point to the initial location with `C-g' after marking a region
+;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
   :hook (after-init-hook . smart-mark-mode))
@@ -2919,7 +2918,7 @@ This location is used for temporary installations and files.")
   :bind ("C-x C-\\" . goto-last-change))
 
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
-;; pressing the keys `M-<' and `M->' keys again.
+;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
   ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
   :hook (after-init-hook . beginend-global-mode)
@@ -2956,7 +2955,7 @@ This location is used for temporary installations and files.")
   ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
   :hook (after-init-hook . immortal-scratch-mode))
 
-;; I use the *scratch* buffer for taking notes, this package helps to make the data persist
+;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
   :commands persistent-scratch-setup-default
   :hook (after-init-hook . persistent-scratch-setup-default)
@@ -3038,12 +3037,13 @@ This location is used for temporary installations and files.")
   (setq ajb-max-window-height 30
         ajb-sort-function 'bs--sort-by-name))
 
-;; This package adds a `C-'' binding to Ivy minibuffer that uses Avy
+;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
 (use-package ivy-avy
   :after ivy
   :bind
   (:map ivy-minibuffer-map
         ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
+        ;; TODO: Reuse the keybinding
         ("M-g l" . ivy-avy)))
 
 (use-package bookmark
@@ -3106,7 +3106,6 @@ This location is used for temporary installations and files.")
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-  :disabled t
   :commands writegood-mode
   :diminish
   :hook (text-mode-hook . writegood-mode))
@@ -3164,7 +3163,7 @@ This location is used for temporary installations and files.")
         ("d"   . pdf-annot-delete)
         ("h"   . pdf-annot-add-highlight-markup-annotation)
         ("t"   . pdf-annot-add-text-annotation)
-        ("M" . pdf-view-midnight-minor-mode)))
+        ("M"   . pdf-view-midnight-minor-mode)))
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
 (use-package saveplace-pdf-view
@@ -3239,9 +3238,7 @@ This location is used for temporary installations and files.")
         markdown-list-indent-width 2
         markdown-split-window-direction 'horizontal
         ;; markdown-make-gfm-checkboxes-buttons nil
-        markdown-hide-urls t)
-
-  (unbind-key "C-c C-j"))
+        markdown-hide-urls t))
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
@@ -3250,15 +3247,12 @@ This location is used for temporary installations and files.")
                                       markdown-toc-generate-or-refresh-toc))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
-;; Convert `markdown' to `org': `pandoc -f markdown -t org -o output-file.org input-file.md'
+;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
   :commands (pandoc-load-default-settings pandoc-mode)
   :diminish
   :hook (markdown-mode-hook . pandoc-mode)
-  :config
-  (pandoc-load-default-settings)
-  ;; (unbind-key "C-c /" pandoc-mode-map) ; Binds `C-c /' to `pandoc-main-hydra/body'
-  )
+  :config (pandoc-load-default-settings))
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
@@ -3274,14 +3268,14 @@ This location is used for temporary installations and files.")
   :commands prettier-mode
   :hook
   ;; Should work with `gfm-mode', `css-mode', and `html-mode' as they are derived modes
-  ((markdown-mode web-mode json-mode jsonc-mode js2-mode)
+  ((markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook)
    . (lambda ()
        (when (and buffer-file-name ; Returns `nil' if not visiting a file
                   (not (file-remote-p buffer-file-name)))
          (prettier-mode 1))))
   :config (setq prettier-lighter nil))
 
-;; Align fields with `C-c C-a'
+;; Align fields with "C-c C-a"
 (use-package csv-mode
   :defines lsp-disabled-clients
   :commands csv-mode
@@ -3303,8 +3297,10 @@ This location is used for temporary installations and files.")
   (("\\Makefile\\'"       . makefile-mode)
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :config (add-hook 'makefile-mode-hook (lambda()
-                                          (setq-local indent-tabs-mode t))))
+  :config
+  (add-hook 'makefile-mode-hook
+            (lambda()
+              (setq-local indent-tabs-mode t))))
 
 (use-package eldoc
   :ensure nil
@@ -3320,10 +3316,6 @@ This location is used for temporary installations and files.")
   ;; (setq eldoc-echo-area-use-multiline-p nil)
   )
 
-(use-package c-eldoc
-  :disabled t ;; We use LSP
-  :hook (c-mode-common-hook . c-turn-on-eldoc-mode))
-
 (use-package css-mode
   :commands css-mode
   :defines sb/flycheck-local-checkers
@@ -3338,13 +3330,6 @@ This location is used for temporary installations and files.")
     :major-modes '(css-mode)
     :remote? t
     :server-id 'cssls-r)))
-
-(use-package css-eldoc
-  :disabled t ;; We use LSP
-  :after css-mode
-  :demand t
-  :commands css-eldoc-enable
-  :config (css-eldoc-enable))
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
@@ -3363,10 +3348,10 @@ This location is used for temporary installations and files.")
 
 (add-hook 'prog-mode-hook
           (lambda ()
-            ;; Highlight and allow to open http link at point in programming buffers.
-            ;; `goto-address-prog-mode' only highlights links in strings and comments.
+            ;; Highlight and allow to open http links in strings and comments in programming
+            ;; buffers.
             (goto-address-prog-mode 1)
-            ;; Native from Emacs 27+. Disable in TUI since the line characters also get copied.
+            ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
             (when (display-graphic-p)
               (display-fill-column-indicator-mode 1))))
 
@@ -3376,24 +3361,26 @@ This location is used for temporary installations and files.")
   (("\\.el\\'"  . emacs-lisp-mode)
    ("\\.elc\\'" . elisp-byte-code-mode))
   :hook
-  ((lisp-mode emacs-lisp-mode) . (lambda ()
-                                   (when buffer-file-name
-                                     (add-hook 'after-save-hook #'check-parens nil t)
-                                     (flycheck-add-next-checker 'emacs-lisp
-                                                                'emacs-lisp-checkdoc 'append)))))
+  ((lisp-mode emacs-lisp-mode) .
+   (lambda ()
+     (when buffer-file-name
+       (add-hook 'after-save-hook #'check-parens nil t)
+       (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
 
 (use-package yaml-mode
   :defines lsp-ltex-enabled lsp-disabled-clients
   :commands yaml-mode
   :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
   :hook
-  (yaml-mode . (lambda ()
-                 ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
-                 (make-local-variable 'lsp-disabled-clients)
-                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                 (spell-fu-mode -1)
-                 (flyspell-mode -1)
-                 (lsp-deferred)))
+  (yaml-mode-hook .
+                  (lambda ()
+                    ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
+                    ;; checking.
+                    (make-local-variable 'lsp-disabled-clients)
+                    (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                    (spell-fu-mode -1)
+                    (flyspell-mode -1)
+                    (lsp-deferred)))
   :config
   (lsp-register-client
    (make-lsp-client
@@ -3410,11 +3397,8 @@ This location is used for temporary installations and files.")
 
 (declare-function ht-merge "ht")
 
-;; TODO: Disable `flycheck-mode-line' per-buffer when `lsp-modeline-diagnostics-mode' is active.
-
-;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always
-;; want to format unrelated files and buffers (e.g., commented YAML files in out-of-project
-;; locations).
+;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
+;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :ensure spinner
   ;; :diminish "LSP"
@@ -3536,6 +3520,7 @@ This location is used for temporary installations and files.")
   (defvar lsp-pylsp-plugins-pylint-enabled)
   (defvar lsp-pylsp-plugins-yapf-enabled)
   (defvar lsp-pyright-langserver-command-args)
+  (defvar lsp-pylsp-plugins-preload-modules)
 
   (when (eq sb/python-langserver 'pylsp)
     (setq lsp-pylsp-configuration-sources []
@@ -3543,8 +3528,8 @@ This location is used for temporary installations and files.")
           ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
           ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
           lsp-pylsp-plugins-mccabe-enabled nil
-          ;; Set this per-project
-          ;; lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics"]
+          ;; We can also set this per-project
+          lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
           lsp-pylsp-plugins-pycodestyle-enabled nil
           lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
           lsp-pylsp-plugins-pydocstyle-convention "pep257"
@@ -3559,17 +3544,13 @@ This location is used for temporary installations and files.")
           lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
           lsp-pylsp-plugins-yapf-enabled t))
 
-  ;; We have `flycheck' error summary listed on the modeline, but `lsp' may report additional errors
-  ;; (lsp-modeline-diagnostics-mode -1)
-
   (dolist (ignore-dirs '("/build\\'"
                          "/\\.metadata\\'"
                          "/\\.recommenders\\'"
                          "/\\.clangd\\'"
                          "/\\.cache\\'"
                          "/__pycache__\\'"
-                         "/\\.log\\'"
-                         ))
+                         "/\\.log\\'"))
     (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
   (with-eval-after-load "lsp-lens"
@@ -3578,7 +3559,7 @@ This location is used for temporary installations and files.")
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
   ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
-  (("M-."     . lsp-find-definition)
+  (("M-." . lsp-find-definition)
    :map lsp-command-map
    ("=" . nil)
    ("w" . nil)
@@ -3615,8 +3596,6 @@ This location is used for temporary installations and files.")
   :demand t
   :config
   (setq lsp-ui-doc-enable t ; Enable/disable on-hover dialogs
-        ;; lsp-ui-doc-max-width 100
-        ;; lsp-ui-doc-max-height 10
         lsp-ui-doc-include-signature t
         lsp-ui-imenu-auto-refresh 'after-save
         lsp-ui-imenu-window-width 16
@@ -3631,17 +3610,6 @@ This location is used for temporary installations and files.")
           lsp-ui-peek-enable nil))
 
   (lsp-ui-mode 1)
-
-  ;; ;; https://github.com/emacs-lsp/lsp-ui/issues/578
-  ;; (add-hook 'minibuffer-setup-hook
-  ;;           (lambda ()
-  ;;             (lsp-ui-doc--hide-frame)))
-
-  ;; (add-hook 'lsp-managed-mode-hook
-  ;;           (lambda ()
-  ;;             ;; (eldoc-box-hover-mode -1)
-  ;;             ;; (eldoc-box-hover-at-point-mode -1)
-  ;;             (eldoc-mode -1)))
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -3715,14 +3683,10 @@ This location is used for temporary installations and files.")
         ("C-c c e" . c-end-of-defun)
         ("M-q"     . c-fill-paragraph)))
 
-;; FIXME: The package is not loading.
 (use-package modern-cpp-font-lock
-  ;; :after c++-mode
-  ;; :demand t
   :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
-  :hook (c++-mode-hook . (lambda ()
-                           (modern-c++-font-lock-mode 1))))
+  :hook (c++-mode-hook . modern-c++-font-lock-mode))
 
 (use-package cuda-mode
   :commands cuda-mode
@@ -3787,7 +3751,7 @@ This location is used for temporary installations and files.")
   :after python-mode
   :demand t
   :commands (python-docstring-mode python-docstring-install)
-  ;; :diminish
+  :diminish
   :config (python-docstring-install))
 
 (use-package pip-requirements
@@ -3799,19 +3763,20 @@ This location is used for temporary installations and files.")
   :config
   (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:"
                                                               pyvenv-virtual-env-name "] "))
-        pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python"))))
-        pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
+        pyvenv-post-activate-hooks (list
+                                    (lambda ()
+                                      (setq python-shell-interpreter
+                                            (concat pyvenv-virtual-env "bin/python"))))
+        pyvenv-post-deactivate-hooks (list
+                                      (lambda ()
+                                        (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :commands py-isort-before-save
   :hook
-  (python-mode . (lambda ()
-                   (add-hook 'before-save-hook #'py-isort-before-save)))
+  (python-mode-hook . (lambda ()
+                        (add-hook 'before-save-hook #'py-isort-before-save)))
   :config (setq py-isort-options '("-l 100")))
 
 ;; "pyright --createstub pandas"
@@ -3819,8 +3784,8 @@ This location is used for temporary installations and files.")
   :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-pyright)))
+  (python-mode-hook . (lambda ()
+                        (require 'lsp-pyright)))
   :config
   (setq lsp-pyright-python-executable-cmd "python3")
 
@@ -3854,7 +3819,7 @@ This location is used for temporary installations and files.")
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
-  ;; :diminish yapf-mode
+  :diminish yapf-mode
   :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
   :commands yapf-mode
   :hook (python-mode-hook . yapf-mode))
@@ -3907,10 +3872,10 @@ This location is used for temporary installations and files.")
                                        lsp-java-extract-method
                                        lsp-java-add-import)
   :hook
-  (java-mode . (lambda ()
-                 (setq-default c-basic-offset 4
-                               c-set-style "java")
-                 (lsp-deferred)))
+  (java-mode-hook . (lambda ()
+                      (setq-default c-basic-offset 4
+                                    c-set-style "java")
+                      (lsp-deferred)))
   :config
   (setq lsp-java-inhibit-message t
         ;; Requires Java 11+, Java 11 is the LTS
@@ -3924,8 +3889,7 @@ This location is used for temporary installations and files.")
 (use-package ant
   :commands (ant ant-clean ant-compile ant-test))
 
-;; Can disassemble `.class' files from within jars
-(use-package autodisass-java-bytecode
+(use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
   :commands autodisass-java-bytecode
   :mode "\\.class\\'")
 
@@ -3936,12 +3900,20 @@ This location is used for temporary installations and files.")
 (use-package image-mode
   :ensure nil
   :if (display-graphic-p)
+  :commands image-get-display-property
   :mode "\\.svg$"
+  :preface
+  ;; http://emacs.stackexchange.com/a/7693/289
+  (defun sb/show-image-dimensions-in-mode-line ()
+    (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
+           (width (car image-dimensions))
+           (height (cdr image-dimensions)))
+      (setq mode-line-buffer-identification
+            (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
   :custom
-  ;;  Enable converting external formats (ie. webp) to internal ones.
+  ;;  Enable converting external formats (i.e., webp) to internal ones.
   (image-use-external-converter t)
-  ;; TODO: This does not work.
-  :hook (image-mode-hook . show-image-dimensions-in-mode-line))
+  :hook (image-mode-hook . sb/show-image-dimensions-in-mode-line))
 
 (use-package sh-script ; Shell script mode
   :ensure nil
@@ -3950,7 +3922,6 @@ This location is used for temporary installations and files.")
    ("\\bashrc\\'" . sh-mode))
   :hook (sh-mode-hook . lsp-deferred)
   :config
-  ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
   (setq sh-basic-offset 2
         sh-indent-after-continuation 'always
         ;; Indent comments as a regular line
@@ -3997,16 +3968,6 @@ This location is used for temporary installations and files.")
       (add-hook 'find-file-hook #'vc-refresh-state)
     (remove-hook 'find-file-hook #'vc-refresh-state)))
 
-(use-package transient
-  :commands transient-bind-q-to-quit
-  :defines transient-display-buffer-action
-  ;; :config
-  ;; (setq transient-display-buffer-action '(display-buffer-below-selected))
-
-  ;; Allow using `q' to quit out of popups, in addition to `C-g'
-  ;; (transient-bind-q-to-quit)
-  )
-
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1
   :bind
@@ -4036,9 +3997,9 @@ This location is used for temporary installations and files.")
     :ensure nil
     :demand t
     :config
-    (setq ;; magit-diff-refine-hunk  t
-     magit-diff-highlight-trailing nil
-     magit-diff-paint-whitespace   nil)))
+    (setq magit-diff-refine-hunk  t
+          magit-diff-highlight-trailing nil
+          magit-diff-paint-whitespace   nil)))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
@@ -4077,7 +4038,7 @@ This location is used for temporary installations and files.")
    (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
    (dired-mode-hook         . diff-hl-dired-mode-unless-remote)
    (diff-hl-mode-hook       . diff-hl-flydiff-mode)
-   (after-init-hook        . global-diff-hl-mode)))
+   (after-init-hook         . global-diff-hl-mode)))
 
 (use-package git-commit
   :commands git-commit-turn-on-flyspell
@@ -4216,7 +4177,7 @@ This location is used for temporary installations and files.")
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
-;; account. We only need this package for checking text in *scratch* buffer.
+;; account. We only need this package for checking text in "*scratch*" buffer.
 (use-package flycheck-grammarly
   :after flycheck
   :defines flycheck-grammarly-check-time
@@ -4241,8 +4202,8 @@ This location is used for temporary installations and files.")
   (add-to-list 'flycheck-checkers 'languagetool t))
 
 ;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
-;; support. We only need to enable `flycheck-grammarly' support for the *scratch* buffer which is in
-;; `text-mode'.
+;; support. We only need to enable `flycheck-grammarly' support for the "*scratch*" buffer which is
+;; in `text-mode'.
 
 ;; org -> grammarly -> languagetool
 ;; (add-hook 'org-mode-hook
@@ -4255,7 +4216,7 @@ This location is used for temporary installations and files.")
 ;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
 ;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
 
-;; We only limit to *scratch* buffer since we can use `grammarly' and `ltex' for directories.
+;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
 (add-hook 'text-mode-hook
           (lambda ()
             (when (and (featurep 'flycheck-grammarly) (string= (buffer-name) "*scratch*"))
@@ -4306,10 +4267,11 @@ This location is used for temporary installations and files.")
                                            lsp-grammarly--store-token lsp-grammarly--show-error
                                            lsp-grammarly--update-document-state)
   :hook
-  ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-                                                     (unless (eq major-mode 'csv-mode)
-                                                       (require 'lsp-grammarly)
-                                                       (lsp-deferred))))
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
+   (lambda ()
+     (unless (eq major-mode 'csv-mode)
+       (require 'lsp-grammarly)
+       (lsp-deferred))))
   :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
@@ -4340,10 +4302,11 @@ This location is used for temporary installations and files.")
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
-  ((text-mode markdown-mode org-mode latex-mode) . (lambda ()
-                                                     (unless (eq major-mode 'csv-mode)
-                                                       (require 'lsp-ltex)
-                                                       (lsp-deferred))))
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
+   (lambda ()
+     (unless (eq major-mode 'csv-mode)
+       (require 'lsp-ltex)
+       (lsp-deferred))))
   :init
   (setq lsp-ltex-check-frequency "save"
         ;; lsp-ltex-dictionary ("microbenchmarks")
@@ -4377,19 +4340,24 @@ This location is used for temporary installations and files.")
            (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
                                       "-C" dest)
              (error "Error during the unzip process: tar"))))
-       error-callback))))
-  )
+       error-callback)))))
 
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 
 (use-package lsp-latex
-  :disabled t
+  :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
+                                       lsp-latex-bibtex-formatter-line-length
+                                       lsp-latex-chktex-on-open-and-save
+                                       lsp-latex-build-on-save
+                                       lsp-latex-build-is-continuous
+                                       lsp-latex-build-args
+                                       lsp-latex-diagnostics-delay)
   :hook
-  (latex-mode . (lambda()
-                  (require 'lsp-latex)
-                  (lsp-deferred)))
+  (latex-mode-hook . (lambda()
+                       (require 'lsp-latex)
+                       (lsp-deferred)))
   :config
   (setq lsp-latex-bibtex-formatter             "latexindent"
         lsp-latex-latex-formatter              "latexindent"
@@ -4436,10 +4404,10 @@ This location is used for temporary installations and files.")
                                 TeX-master-file
                                 TeX-next-error)
   :hook
-  (((latex-mode LaTeX-mode) . LaTeX-math-mode)
-   ((latex-mode LaTeX-mode) . TeX-PDF-mode) ; Use `pdflatex'
-   ((latex-mode LaTeX-mode) . TeX-source-correlate-mode)
-   (LaTeX-mode . turn-on-auto-fill))
+  (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
+   ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
+   ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
+   (LaTeX-mode-hook . turn-on-auto-fill))
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
         TeX-auto-untabify t ; Remove all tabs before saving
@@ -4472,19 +4440,14 @@ This location is used for temporary installations and files.")
 
   ;; Enable rainbow mode after applying styles to the buffer
   (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
-
-  ;; Disable "LaTeX-insert-item" in favor of imenu
-  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
-  ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  ;; (unbind-key "C-c ;" LaTeX-mode-map)
   :bind
   ("C-c x q" . TeX-insert-quote))
 
 (use-package bibtex
   :ensure nil
   :hook
-  ((bibtex-mode . turn-on-auto-revert-mode)
-   (bibtex-mode . lsp-deferred))
+  ((bibtex-mode-hook . turn-on-auto-revert-mode)
+   (bibtex-mode-hook . lsp-deferred))
   :config
   (setq bibtex-align-at-equal-sign     t
         bibtex-maintain-sorted-entries t))
@@ -4511,7 +4474,7 @@ This location is used for temporary installations and files.")
                                      reftex-toc-rescan
                                      reftex-toc-Rescan
                                      reftex-default-bibliography)
-  ;; :diminish
+  :diminish
   :hook ((LaTeX-mode-hook latex-mode-hook) . reftex-mode)
   :bind
   (("C-c ["   . reftex-citation)
@@ -4570,22 +4533,22 @@ Ignore if no file is found."
   ;; Rescan the entire document, not only the current file (`reftex-toc-rescan')
   (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan))
 
-;; (use-package bib-cite
-;;   :ensure nil
-;;   :disabled t
-;;   :diminish bib-cite-minor-mode
-;;   :commands bib-cite-minor-mode
-;;   :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
-;;   :config (setq bib-cite-use-reftex-view-crossref t)
-;;   :bind (:map bib-cite-minor-mode-map
-;;               ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-;;               ("C-c l a" . bib-apropos)
-;;               ("C-c l b" . bib-make-bibliography)
-;;               ("C-c l d" . bib-display)
-;;               ("C-c l t" . bib-etags)
-;;               ("C-c l f" . bib-find)
-;;               ("C-c l n" . bib-find-next)
-;;               ("C-c l h" . bib-highlight-mouse)))
+(use-package bib-cite
+  :ensure nil
+  :disabled t
+  :diminish bib-cite-minor-mode
+  :commands bib-cite-minor-mode
+  :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
+  :config (setq bib-cite-use-reftex-view-crossref t)
+  :bind (:map bib-cite-minor-mode-map
+              ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+              ("C-c l a" . bib-apropos)
+              ("C-c l b" . bib-make-bibliography)
+              ("C-c l d" . bib-display)
+              ("C-c l t" . bib-etags)
+              ("C-c l f" . bib-find)
+              ("C-c l n" . bib-find-next)
+              ("C-c l h" . bib-highlight-mouse)))
 
 ;; We can disable this once `lsp-latex-build' works well
 (use-package auctex-latexmk
@@ -4691,10 +4654,10 @@ Ignore if no file is found."
    (".*/\\.vscode/settings.json$" . jsonc-mode)
    ("User/settings.json$"         . jsonc-mode))
   :hook
-  ((json-mode jsonc-mode) . (lambda ()
-                              (make-local-variable 'js-indent-level)
-                              (setq js-indent-level 2)
-                              (lsp-deferred)))
+  ((json-mode-hook jsonc-mode-hook) . (lambda ()
+                                        (make-local-variable 'js-indent-level)
+                                        (setq js-indent-level 2)
+                                        (lsp-deferred)))
   :config
   (lsp-register-client
    (make-lsp-client
@@ -4709,10 +4672,6 @@ Ignore if no file is found."
   :demand t
   :config (setq json-reformat:indent-width 2
                 js-indent-level 2))
-
-;; (use-package json-snatcher
-;;   :after (:any json-mode jsonc-mode)
-;;   :demand t)
 
 (use-package bazel
   :commands (bazel-mode bazelrc-mode)
@@ -4755,8 +4714,8 @@ Ignore if no file is found."
   ;; :init (run-with-idle-timer 2 nil #'sb/enable-format-all)
   :diminish
   :hook
-  ((format-all-mode . format-all-ensure-formatter)
-   ((bazel-mode LaTeX-mode web-mode markdown-mode) . format-all-mode)))
+  ((format-all-mode-hook . format-all-ensure-formatter)
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode)))
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
