@@ -1,4 +1,4 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-emacs27.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
 ;;; no-byte-compile: nil; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -2047,7 +2047,7 @@ This location is used for temporary installations and files.")
   (defvar electric-pair-text-pairs)
   (defvar electric-pair-preserve-balance)
 
-  (declare-function sb/add-markdown-pairs "init-use-package")
+  (declare-function sb/add-markdown-pairs "init-emacs27")
 
   (defun sb/add-markdown-pairs ()
     "Add custom pairs to `markdown-mode'."
