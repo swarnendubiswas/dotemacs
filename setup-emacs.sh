@@ -3,7 +3,7 @@
 # Helper script to install GNU Emacs if not already present. It also sets up packages related to my
 # setup.
 
-# set -eux
+set -eux
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root!"
@@ -99,7 +99,7 @@ rm "${EMACS_FILENAME}" || true
 
 # Setup Emacs at the correct path
 echo "export EMACS_PATH=${EMACS_SOURCE}/src" >>"$USER_HOME/.bashrc"
-echo "PATH=${EMACS_PATH}:$PATH" >>"$USER_HOME/.bashrc"
+echo "PATH=\${EMACS_PATH}:$PATH" >>"$USER_HOME/.bashrc"
 
 # Checkout configurations
 
@@ -357,6 +357,21 @@ make install
 add-apt-repository ppa:aslatter/ppa -y
 apt install alacritty
 
+cd "${CONFIG_DIR}" || echo "Failed: cd ${CONFIG_DIR}"
+
+if [ -d "alacritty" ]; then
+    if [ ! -L "alacritty" ]; then
+        echo "${CONFIG_DIR}/yamllint present and is not a symlink!"
+    else
+        echo "Overwriting symlink for yamllint..."
+        ln -nsf "$DOTFILES/alacritty" .
+    fi
+else
+    echo "Creating symlink for yapf..."
+    ln -s "$DOTFILES/alacritty" .
+fi
+echo "...Done"
+
 # Setup 24bit terminal support
 /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
 
@@ -382,4 +397,4 @@ cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 apt autoremove
 apt autoclean
 
-# set +eux
+set +eux

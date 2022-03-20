@@ -372,6 +372,7 @@ This location is used for temporary installations and files.")
       kill-do-not-save-duplicates t
       kill-whole-line t ;; TODO: What is the utility of this variable?
       make-backup-files nil ; Stop making backup `~' files
+      message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
@@ -631,7 +632,7 @@ This location is used for temporary installations and files.")
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
   :hook (after-init-hook . global-so-long-mode))
 
-;; Install fonts with `M-x all-the-icons-install-fonts'
+;; Install fonts with "M-x all-the-icons-install-fonts"
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
 (use-package all-the-icons
   :if (display-graphic-p)
@@ -779,7 +780,7 @@ This location is used for temporary installations and files.")
   :commands doom-modeline-mode
   :init
   ;; Requires the fonts included with `all-the-icons', run "M-x all-the-icons-install-fonts".
-  (unless (sb/font-installed-p "all-the-icons")
+  (when (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
     (all-the-icons-install-fonts t))
 
   (setq doom-modeline-buffer-encoding nil
@@ -788,7 +789,8 @@ This location is used for temporary installations and files.")
         doom-modeline-lsp nil
         doom-modeline-minor-modes t
         ;; Reduce space on the modeline
-        doom-modeline-buffer-file-name-style 'truncate-with-project)
+        doom-modeline-buffer-file-name-style 'truncate-with-project
+        doom-modeline-unicode-fallback t)
   (doom-modeline-mode 1))
 
 (use-package spaceline
@@ -910,7 +912,7 @@ This location is used for temporary installations and files.")
        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -2125,29 +2127,29 @@ This location is used for temporary installations and files.")
 
 ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
 ;; yet.
-(use-package project
-  :ensure nil
-  :commands (project-switch-project project-current
-                                    project-find-file project-execute-extended-command
-                                    project-known-project-roots
-                                    project-remove-known-project
-                                    project-remember-project
-                                    project-kill-buffers
-                                    project-switch-to-buffer
-                                    project-search
-                                    project-compile)
-  :bind
-  (:map project-prefix-map
-        ("f" . project-find-file)
-        ("F" . project-or-external-find-file)
-        ("b" . project-switch-to-buffer)
-        ("d" . project-dired)
-        ("v" . project-vc-dir)
-        ("c" . project-compile)
-        ("k" . project-kill-buffers)
-        ("p" . project-switch-project)
-        ("g" . project-find-regexp)
-        ("r" . project-query-replace-regexp)))
+;; (use-package project
+;;   :ensure nil
+;;   :commands (project-switch-project project-current
+;;                                     project-find-file project-execute-extended-command
+;;                                     project-known-project-roots
+;;                                     project-remove-known-project
+;;                                     project-remember-project
+;;                                     project-kill-buffers
+;;                                     project-switch-to-buffer
+;;                                     project-search
+;;                                     project-compile)
+;;   :bind
+;;   (:map project-prefix-map
+;;         ("f" . project-find-file)
+;;         ("F" . project-or-external-find-file)
+;;         ("b" . project-switch-to-buffer)
+;;         ("d" . project-dired)
+;;         ("v" . project-vc-dir)
+;;         ("c" . project-compile)
+;;         ("k" . project-kill-buffers)
+;;         ("p" . project-switch-project)
+;;         ("g" . project-find-regexp)
+;;         ("r" . project-query-replace-regexp)))
 
 (use-package projectile
   :commands (projectile-project-p projectile-project-name
@@ -2566,7 +2568,15 @@ This location is used for temporary installations and files.")
   :config
   (setq show-trailing-whitespace t
         whitespace-line-column sb/fill-column
-        whitespace-style '(face lines-tail trailing)))
+        whitespace-style '(face ; Visualize using faces
+                           lines-tail
+                           trailing ; Trailing whitespace
+                           ;; tab-mark ; Mark any tabs
+                           ;; empty ; Empty lines at beginning or end of buffer
+                           ;; lines ; Lines that extend beyond `whitespace-line-column'
+                           ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
+                           ;; space-before-tab space-after-tab ; Mixture of space and tab on the same line
+                           )))
 
 ;; This is different from `whitespace-cleanup-mode' since this is unconditional
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
@@ -2853,8 +2863,8 @@ This location is used for temporary installations and files.")
   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
   (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
   (push '("*Selection Ring:")                  popwin:special-display-config)
-  (push '("*Flycheck errors*"   :noselect nil) popwin:special-display-config)
   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+  (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
   (push '("*xref*"              :noselect nil) popwin:special-display-config)
@@ -2938,7 +2948,9 @@ This location is used for temporary installations and files.")
   (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
   :bind
-  (("C-z"   . undo-tree-undo)
+  (([remap undo] . undo-tree-undo)
+   ([remap redo] . undo-tree-redo)
+   ("C-z"   . undo-tree-undo)
    ("C-x u" . undo-tree-visualize)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -3300,7 +3312,8 @@ This location is used for temporary installations and files.")
   :config
   (add-hook 'makefile-mode-hook
             (lambda()
-              (setq-local indent-tabs-mode t))))
+              (setq-local indent-tabs-mode t)))
+  (use-package makefile-executor))
 
 (use-package eldoc
   :ensure nil
@@ -3639,7 +3652,10 @@ This location is used for temporary installations and files.")
         ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
-  :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
+  :commands (dap-debug dap-hydra dap-mode dap-ui-mode)
+  :hook
+  ((lsp-mode-hook . dap-mode)
+   (lsp-mode-hook . dap-ui-mode)))
 
 (use-package docstr
   :diminish
@@ -3699,7 +3715,9 @@ This location is used for temporary installations and files.")
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
+  :if (executable-find "cmake")
   :commands cmake-mode
+  :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
   (cmake-mode-hook . (lambda ()
                        (make-local-variable 'lsp-disabled-clients)
@@ -3722,6 +3740,7 @@ This location is used for temporary installations and files.")
 (use-package python
   :ensure nil
   :hook (python-mode-hook . lsp-deferred)
+  :mode ("SCon\(struct\|script\)$" . python-mode)
   :bind
   (:map python-mode-map
         ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
@@ -3743,9 +3762,10 @@ This location is used for temporary installations and files.")
 
   ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
 
-  (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
-                                  ("SConscript\\'" . python-mode))
-                                auto-mode-alist)))
+  ;; (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
+  ;;                                 ("SConscript\\'" . python-mode))
+  ;;                               auto-mode-alist))
+  )
 
 (use-package python-docstring
   :after python-mode
@@ -3805,9 +3825,9 @@ This location is used for temporary installations and files.")
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (ht-merge (lsp-configuration-section "pyright")
-                                                     (lsp-configuration-section "python")))))
+                        (lsp--set-configuration
+                         (ht-merge (lsp-configuration-section "pyright")
+                                   (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -3846,8 +3866,8 @@ This location is used for temporary installations and files.")
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-r)))
 
@@ -4364,7 +4384,6 @@ This location is used for temporary installations and files.")
         lsp-latex-bibtex-formatter-line-length sb/fill-column
         lsp-latex-chktex-on-open-and-save      t
         lsp-latex-build-is-continuous          t
-        lsp-latex-build-on-save                t
         ;; Delay time in milliseconds before reporting diagnostics
         lsp-latex-diagnostics-delay            2000)
 
@@ -4523,11 +4542,22 @@ Ignore if no file is found."
   (setq reftex-enable-partial-scans t
         reftex-highlight-selection 'both
         reftex-plug-into-AUCTeX t
+        ;; Save parse info to avoid reparsing every time a file is visited
         reftex-save-parse-info t
         reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-        reftex-use-multiple-selection-buffers t
         ;; Make the toc display with a vertical split, since it is easy to read long lines
-        reftex-toc-split-windows-horizontally nil)
+        reftex-toc-split-windows-horizontally nil
+        ;; Try to guess the label type before prompting
+        reftex-guess-label-type t
+        ;; Use nice fonts for toc
+        reftex-use-fonts t
+        ;; Revisit files if necessary when browsing toc
+        reftex-revisit-to-follow t
+        ;; Center on the section currently being edited.
+        reftex-auto-recenter-toc t
+        ;; Cache selection buffers for faster access.
+        reftex-use-multiple-selection-buffers t)
+
 
   (sb/reftex-try-add-all-bibitems-from-bibtex)
   ;; Rescan the entire document, not only the current file (`reftex-toc-rescan')
@@ -4674,6 +4704,7 @@ Ignore if no file is found."
                 js-indent-level 2))
 
 (use-package bazel
+  :if (executable-find "bazel")
   :commands (bazel-mode bazelrc-mode)
   :hook (bazel-mode-hook . flycheck-mode))
 
@@ -4689,6 +4720,7 @@ Ignore if no file is found."
   :mode "\\.mlir\\'")
 
 (use-package clang-format
+  :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
   :config (setq clang-format-style "file"))
@@ -5262,70 +5294,69 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
-(defun sb/open-local-file-projectile (directory)
-  "Open projectile file within DIRECTORY.
-Specify by the keyword projectile-default-file define in `dir-locals-file'"
-  (let ((default-file
-          (f-join directory
-                  (nth 1
-                       (car (-tree-map (lambda (node)
-                                         (when (eq (car node)
-                                                   'dotemacs-projectile-default-file)
-                                           (format "%s" (cdr node))))
-                                       (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                                        directory))))))))
-    (if (f-exists? default-file)
-        (counsel-find-file default-file)
-      (message "The file %s doesn't exist in the select project" default-file))))
+;; (defun sb/open-local-file-projectile (directory)
+;;   "Open projectile file within DIRECTORY.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'"
+;;   (let ((default-file
+;;           (f-join directory
+;;                   (nth 1
+;;                        (car (-tree-map (lambda (node)
+;;                                          (when (eq (car node)
+;;                                                    'dotemacs-projectile-default-file)
+;;                                            (format "%s" (cdr node))))
+;;                                        (dir-locals-get-class-variables (dir-locals-read-from-dir
+;;                                                                         directory))))))))
+;;     (if (f-exists? default-file)
+;;         (counsel-find-file default-file)
+;;       (message "The file %s doesn't exist in the select project" default-file))))
 
-(defun sb/open-project-default-file1 (filepath)
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (let ((liststring (with-temp-buffer
-                      (insert-file-contents filepath)
-                      (split-string (buffer-string) "\n"))))
-    (mapcar (lambda (str)
-              (when (cl-search "dotemacs-projectile-default-file" str)
-                (let ((x (substring str (+
-                                         13 (length "dotemacs-projectile-default-file")) (length
-                                         str))))
-                  (let ((default-file (expand-file-name (substring
-                                                         x 1 -2) (projectile-project-root))))
-                    (when (f-exists? default-file)
-                      (let ((new-buffer (get-buffer-create default-file)))
-                        (switch-to-buffer new-buffer)
-                        (insert-file-contents default-file)))))))
-            liststring)))
+;; (defun sb/open-project-default-file1 (filepath)
+;;   "Open projectile file with FILEPATH.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'."
+;;   (let ((liststring (with-temp-buffer
+;;                       (insert-file-contents filepath)
+;;                       (split-string (buffer-string) "\n"))))
+;;     (mapcar (lambda (str)
+;;               (when (cl-search "dotemacs-projectile-default-file" str)
+;;                 (let ((x (substring str (+
+;;                                          13 (length "dotemacs-projectile-default-file")) (length
+;;                                          str))))
+;;                   (let ((default-file (expand-file-name (substring
+;;                                                          x 1 -2) (projectile-project-root))))
+;;                     (when (f-exists? default-file)
+;;                       (let ((new-buffer (get-buffer-create default-file)))
+;;                         (switch-to-buffer new-buffer)
+;;                         (insert-file-contents default-file)))))))
+;;             liststring)))
+
 ;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
 
-(defun sb/open-project-default-file2 ()
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (interactive)
-  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                 (projectile-project-root)))))
-    (mapcar (lambda (node)
-              (when (eq (car node) nil)
-                (let ((nillist (cdr node)))
-                  (mapcar (lambda (elem)
-                            (when (eq (car elem) 'dotemacs-projectile-default-file)
-                              (let ((default-file (expand-file-name (cdr elem)
-                                                                    (projectile-project-root))))
-                                (when (f-exists? default-file)
-                                  ;; (let ((new-buffer (get-buffer-create default-file)))
-                                  ;;   (switch-to-buffer new-buffer)
-                                  ;;   (insert-file-contents default-file))
-                                  (find-file default-file)))))
-                          nillist))))
-            mylist)))
+;; (defun sb/open-project-default-file2 ()
+;;   "Open projectile file with FILEPATH.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'."
+;;   (interactive)
+;;   (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
+;;                                                  (projectile-project-root)))))
+;;     (mapcar (lambda (node)
+;;               (when (eq (car node) nil)
+;;                 (let ((nillist (cdr node)))
+;;                   (mapcar (lambda (elem)
+;;                             (when (eq (car elem) 'dotemacs-projectile-default-file)
+;;                               (let ((default-file (expand-file-name (cdr elem)
+;;                                                                     (projectile-project-root))))
+;;                                 (when (f-exists? default-file)
+;;                                   ;; (let ((new-buffer (get-buffer-create default-file)))
+;;                                   ;;   (switch-to-buffer new-buffer)
+;;                                   ;;   (insert-file-contents default-file))
+;;                                   (find-file default-file)))))
+;;                           nillist))))
+;;             mylist)))
 
 ;; (sb/open-project-default-file2)
 
 ;; (with-eval-after-load "counsel-projectile"
 ;;   (add-to-list 'counsel-projectile-action '("d"
 ;;     sb/open-project-default-file2 "open default file") t))
-
-(add-to-list 'term-file-aliases '("alacritty" . "xterm"))
 
 (bind-keys
  ("RET"       . newline-and-indent)
@@ -5345,10 +5376,10 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
  ("M-l"       . downcase-dwim)
  ("<f7>"      . previous-error)
  ("<f8>"      . next-error)
- ;; The default keybinding `C-S-backspace' does not work with TUI
+ ;; The default keybinding "C-S-backspace" does not work with the TUI.
  ("M-k"       . kill-whole-line))
 
-;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
+;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
 (bind-keys*
  ("C-c n" . comment-region)
