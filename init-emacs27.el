@@ -2125,13 +2125,8 @@ This location is used for temporary installations and files.")
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
-<<<<<<< Updated upstream
-;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; yet.
-=======
 ;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
 ;; ;; yet.
->>>>>>> Stashed changes
 ;; (use-package project
 ;;   :ensure nil
 ;;   :commands (project-switch-project project-current
