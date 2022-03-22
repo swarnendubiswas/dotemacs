@@ -37,12 +37,12 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
-           (const :tag "doom-one-light"  doom-one-light)
+           (const :tag "doom-one"        doom-one)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
            (const :tag "doom-nord"       doom-nord)
@@ -683,7 +683,7 @@ This location is used for temporary installations and files.")
                    (eq sb/gui-theme 'doom-gruvbox)))
           (and (not (display-graphic-p))
                (or (eq sb/tui-theme 'doom-molokai)
-                   (eq sb/tui-theme 'doom-one-light)
+                   (eq sb/tui-theme 'doom-one)
                    (eq sb/tui-theme 'doom-nord)
                    (eq sb/tui-theme 'doom-gruvbox))))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
@@ -691,8 +691,8 @@ This location is used for temporary installations and files.")
   (cond
    ((or (eq sb/gui-theme 'doom-molokai)
         (eq sb/tui-theme 'doom-molokai))   (load-theme 'doom-molokai t))
-   ((or (eq sb/gui-theme 'doom-one-light)
-        (eq sb/tui-theme 'doom-one-light)) (load-theme 'doom-one-light t))
+   ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+   ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one-light t))
    ((or (eq sb/gui-theme 'doom-nord)
         (eq sb/tui-theme 'doom-nord))      (load-theme 'doom-nord t))
    ((or (eq sb/gui-theme 'doom-gruvbox)
@@ -2127,8 +2127,8 @@ This location is used for temporary installations and files.")
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
-;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; yet.
+;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; ;; yet.
 ;; (use-package project
 ;;   :ensure nil
 ;;   :commands (project-switch-project project-current
