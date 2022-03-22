@@ -524,7 +524,9 @@ This location is used for temporary installations and files.")
                                            try-complete-lisp-symbol-partially
                                            try-complete-lisp-symbol)
         hippie-expand-verbose nil)
-  :bind ("M-/" . hippie-expand))
+  :bind
+  (("M-/"   . hippie-expand)
+   ("C-M-/" . dabbrev-completion)))
 
 (use-package subword
   :ensure nil
@@ -2019,7 +2021,7 @@ This location is used for temporary installations and files.")
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
   :commands aggressive-indent-mode
-  :hook ((lisp-mode-hook emacs-lisp-mode-hook lisp-interaction-mode-hook) . aggressive-indent-mode)
+  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
   :diminish
   :config
   (setq aggressive-indent-comments-too t
@@ -2978,12 +2980,12 @@ This location is used for temporary installations and files.")
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
-   ("C-c d s" . crux-sudo-edit)))
+   ("C-c d s" . crux-sudo-edit)
+   ("C-a"     . crux-move-beginning-of-line)))
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
   :if (display-mouse-p)
-  :disabled t
   :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode
   :hook (after-init-hook . global-disable-mouse-mode))
@@ -3515,6 +3517,9 @@ This location is used for temporary installations and files.")
         lsp-use-plists nil
         lsp-xml-logs-client nil
         lsp-yaml-print-width sb/fill-column)
+
+  (when (display-graphic-p)
+    (setq lsp-modeline-code-actions-enable t))
 
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
@@ -4648,8 +4653,9 @@ Ignore if no file is found."
         (TeX-next-error t)
       (progn
         (minibuffer-message "LaTeXMk done")
-        (find-file (concat (file-name-directory (concat master-file ".tex"))
-                           (concat master-file ".pdf")))))))
+        (when (display-graphic-p)
+          (find-file (concat (file-name-directory (concat master-file ".tex"))
+                             (concat master-file ".pdf"))))))))
 
 ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
 ;;   (add-hook hook
@@ -5405,6 +5411,13 @@ or the major mode is not in `sb/skippable-modes'."
 
 (use-package free-keys
   :commands free-keys)
+
+(use-package keyfreq
+  :hook
+  (after-init-hook . (lambda ()
+                       (keyfreq-mode 1)
+                       (keyfreq-autosave-mode 1))))
+
 
 (use-package which-key ; Show help popups for prefix keys
   :diminish
