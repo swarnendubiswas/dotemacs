@@ -348,7 +348,7 @@ This location is used for temporary installations and files.")
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
-      echo-keystrokes 1 ; Show current key-sequence in minibuffer
+      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       ;; Keeping track of the minibuffer nesting is difficult, so it is better to keep it disabled
       ;; enable-recursive-minibuffers t
@@ -602,9 +602,9 @@ This location is used for temporary installations and files.")
 (with-eval-after-load "simple"
   (diminish 'visual-line-mode))
 
-;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
-(unless (display-graphic-p)
-  (fringe-mode '(10 . 10)))
+;; Default is 8 pixels, we can increase it to make the fringe more prominent if required
+;; (unless (display-graphic-p)
+;;   (fringe-mode '(10 . 10)))
 
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
@@ -692,7 +692,7 @@ This location is used for temporary installations and files.")
    ((or (eq sb/gui-theme 'doom-molokai)
         (eq sb/tui-theme 'doom-molokai))   (load-theme 'doom-molokai t))
    ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
-   ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one-light t))
+   ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
    ((or (eq sb/gui-theme 'doom-nord)
         (eq sb/tui-theme 'doom-nord))      (load-theme 'doom-nord t))
    ((or (eq sb/gui-theme 'doom-gruvbox)
@@ -885,6 +885,7 @@ This location is used for temporary installations and files.")
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
 (use-package auto-dim-other-buffers
+  :disabled t
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
   ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
   :hook (after-init-hook . auto-dim-other-buffers-mode))
@@ -2947,8 +2948,8 @@ This location is used for temporary installations and files.")
         undo-tree-visualizer-diff                t
         undo-tree-visualizer-relative-timestamps t
         undo-tree-visualizer-timestamps          t)
-  (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
+  :hook (find-file-hook . undo-tree-mode)
   :bind
   (([remap undo] . undo-tree-undo)
    ([remap redo] . undo-tree-redo)
@@ -3120,7 +3121,8 @@ This location is used for temporary installations and files.")
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-  :commands writegood-mode
+  :disabled t
+  :commands (writegood-mode writegood-passive-voice-turn-off)
   :diminish
   :hook (text-mode-hook . writegood-mode))
 
