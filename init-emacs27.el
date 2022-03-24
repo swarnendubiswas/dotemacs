@@ -1155,7 +1155,8 @@ This location is used for temporary installations and files.")
              treemacs-select-window
              treemacs-add-and-display-current-project
              treemacs-display-current-project-exclusively
-             projectile-project-p treemacs--select-workspace-by-name)
+             projectile-project-p treemacs--select-workspace-by-name
+             adob--rescan-windows)
   :preface
   ;; The problem is there is no toggle support.
   (defun sb/setup-treemacs-quick ()
@@ -2761,7 +2762,7 @@ This location is used for temporary installations and files.")
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
    ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-pop-marker-stack)
+   ("M-,"   . xref-go-back)
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
