@@ -3521,8 +3521,9 @@ This location is used for temporary installations and files.")
         lsp-xml-logs-client nil
         lsp-yaml-print-width sb/fill-column)
 
-  (when (display-graphic-p)
-    (setq lsp-modeline-code-actions-enable t))
+  (if (display-graphic-p)
+      (setq lsp-modeline-code-actions-enable t)
+    (setq lsp-modeline-code-actions-enable nil))
 
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
