@@ -1521,6 +1521,7 @@
     ("informatino" "information" nil :count 0)
     ("inititation" "initiation" nil :count 0)
     ("meagre" "meager" nil :count 0)
+    ("paediatrician" "pediatrician" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("profilign" "Profiling" nil :count 0)
     ("prototye" "prototype" nil :count 0)

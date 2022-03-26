@@ -131,6 +131,22 @@ This location is used for temporary installations and files.")
            (const :tag "none"    none))
   :group 'sb/emacs)
 
+(defcustom sb/minibuffer-completion
+  'vertico
+  "Choose the framework to use for narrowing and selection."
+  :type '(radio
+          (const :tag "vertico" vertico)
+          (const :tag "ivy" ivy))
+  :group 'dotemacs)
+
+(defcustom sb/capf
+  'corfu
+  "Choose the framework to use for completion at point."
+  :type '(radio
+          (const :tag "corfu" corfu)
+          (const :tag "company" company))
+  :group 'dotemacs)
+
 (defconst sb/EMACS27    (= emacs-major-version 27))
 (defconst sb/EMACS27+   (> emacs-major-version 26))
 (defconst sb/EMACS28+   (> emacs-major-version 27))
@@ -340,6 +356,7 @@ This location is used for temporary installations and files.")
       ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
       ;; error.
       compilation-scroll-output 'first-error
+      completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
@@ -1407,6 +1424,7 @@ This location is used for temporary installations and files.")
    ([remap query-replace-regexp] . anzu-query-replace-regexp)))
 
 (use-package swiper
+  :if (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch)
   :config (setq swiper-action-recenter t))
 
@@ -1527,6 +1545,7 @@ This location is used for temporary installations and files.")
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
+  :if (eq sb/capf 'company)
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -1646,6 +1665,7 @@ This location is used for temporary installations and files.")
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
+  :after ivy
   :bind ("C-M-y" . ivy-yasnippet))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
@@ -1653,6 +1673,10 @@ This location is used for temporary installations and files.")
 (use-package amx
   :commands amx-mode
   :hook (after-init-hook . amx-mode)
+  :bind
+  ;; We need this if we use `vertico' and `consult'
+  (("M-x"  . execute-extended-command)
+   ("<f1>" . execute-extended-command))
   :config
   ;; Update the command list every n minutes
   (setq amx-auto-update-interval 10))
@@ -1660,6 +1684,7 @@ This location is used for temporary installations and files.")
 (use-package ivy
   :functions ivy-format-function-line
   :commands (ivy-read ivy-mode)
+  :if (eq sb/minibuffer-completion 'ivy)
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
@@ -1706,6 +1731,7 @@ This location is used for temporary installations and files.")
 (use-package counsel
   :ensure t
   :ensure amx ; `counsel' makes use of `amx' if installed
+  :if (eq sb/minibuffer-completion 'ivy)
   :commands counsel-mode
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
@@ -1819,7 +1845,7 @@ This location is used for temporary installations and files.")
   :config (all-the-icons-ivy-setup))
 
 (use-package orderless
-  :after ivy
+  :after (:any ivy vertico)
   :demand t
   :defines orderless-component-separator
   :functions sb/just-one-face
@@ -1829,9 +1855,10 @@ This location is used for temporary installations and files.")
         ;; completion-styles '(orderless initials basic partial-completion emacs22)
         completion-styles '(orderless)
         orderless-matching-styles '(orderless-regexp)
-        ;;  completion-category-defaults nil
-        ;;  completion-category-overrides '((file (styles partial-completion))
-        ;;                                  (minibuffer (initials))))
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic-remote orderless partial-completion))
+                                        ;; (minibuffer (initials))))
+                                        )
         ))
 
 (use-package ispell
@@ -2275,6 +2302,7 @@ This location is used for temporary installations and files.")
 ;; I am unsure how does this package advances `projectile' in terms of usability.
 (use-package counsel-projectile
   :disabled t
+  :if (eq sb/minibuffer-completion 'ivy)
   :defines counsel-projectile-default-file
   :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
   :preface
@@ -2390,7 +2418,7 @@ This location is used for temporary installations and files.")
                           (ivy-rich-candidate (:width 0.75)))))
 
 (use-package counsel-fd
-  :if (executable-find "fd")
+  :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
    ;; Jump to a file below the current directory
@@ -2722,6 +2750,7 @@ This location is used for temporary installations and files.")
 ;;   (bind-key "C-c d t" #'sb/ivy-tramp))
 
 (use-package counsel-tramp
+  :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c d t" . counsel-tramp))
 
 ;; TODO: SSH into Gcloud
@@ -2778,7 +2807,7 @@ This location is used for temporary installations and files.")
 (use-package counsel-etags
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
-  :if (symbol-value 'sb/IS-LINUX)
+  :if (and (symbol-value 'sb/IS-LINUX) (eq sb/minibuffer-completion 'ivy) (executable-find "ctags"))
   :bind
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -4481,6 +4510,7 @@ This location is used for temporary installations and files.")
         bibtex-maintain-sorted-entries t))
 
 (use-package ivy-bibtex
+  :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c x b" . ivy-bibtex)
   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
@@ -4508,8 +4538,7 @@ This location is used for temporary installations and files.")
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)
    ("C-c ("   . reftex-label)
-   ("C-c ="   . reftex-toc)
-   ("C-c C-j" . reftex-toc))
+   ("C-c ="   . reftex-toc))
   :preface
   (defun sb/get-bibtex-keys (file)
     (with-current-buffer (find-file-noselect file)
@@ -5808,6 +5837,178 @@ _v_ verify setup    _f_ check           _m_ mode
 ;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
 ;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
 ;; (put 'tags-table-list                         'safe-local-variable #'listp)
+
+;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
+(use-package vertico
+  :if (eq sb/minibuffer-completion 'vertico)
+  :defines read-extended-command-predicate
+  :hook (after-init-hook . vertico-mode)
+  :custom
+  (vertico-cycle t)
+  (vertico-resize nil)
+  (vertico-count 15)
+  :config
+  ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
+  ;; hidden in normal buffers.
+  (when sb/EMACS28+
+    (setq read-extended-command-predicate #'command-completion-default-include-p))
+  :bind
+  (("<f2>" .  find-file)
+   :map vertico-map
+   ("<escape>" . minibuffer-keyboard-quit)))
+
+(use-package consult
+  :bind
+  (("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+   ("C-x b" . consult-buffer)
+   ([switch-to-buffer] . consult-buffer)
+   ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+   ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
+   ("<f3>" . consult-buffer)
+   ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
+   ("C-x p b" . consult-project-buffer)
+   ([remap project-switch-to-buffer] . consult-project-buffer)
+   ;; Other custom bindings
+   ("M-y" . consult-yank-pop)
+   ([remap yank-pop] . consult-yank-pop)
+   ([remap apropos] . consult-apropos)            ;; orig. apropos-command
+   ;; M-g bindings (goto-map)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+   ([remap goto-line] . consult-goto-line)           ;; orig. goto-line
+   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("C-c C-j" . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
+   ;; M-s bindings (search-map)
+   ("M-s d" . consult-find)
+   ("M-s D" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("M-s l" . consult-line)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-multi-occur)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
+   ("<f9>" . consult-recent-file)
+   ([remap multi-occur] . consult-multi-occur)
+   ;; Isearch integration
+   ("M-s e" . consult-isearch-history)
+
+   :map isearch-mode-map
+   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+   )
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :init
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+  :config
+  (setq completion-in-region-function (lambda (&rest args)
+                                        (apply #'consult-completion-in-region)
+                                        args))
+  )
+
+(use-package consult-projectile
+  :after (consult projectile))
+
+(use-package consult-lsp
+  :after (consult lsp))
+
+(use-package consult-flycheck
+  :after (consult flycheck))
+
+(use-package consult-flyspell
+  :after (consult flyspell))
+
+(use-package consult-dir
+  :bind
+  (([remap list-directory] . consult-dir)
+   :map vertico-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file)))
+
+(use-package consult-project-extra)
+
+;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
+(use-package corfu
+  :if (eq sb/capf 'corfu)
+  :hook (after-init-hook . corfu-global-mode)
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-auto-delay 0.1)
+  (corfu-auto-prefix 2)
+  (corfu-min-width 40)
+  (corfu-max-width corfu-min-width)
+  (corfu-count 15)
+
+  :bind
+  (("C-n" . corfu-next)
+   ("C-p" . corfu-previous)
+   ("<escape>" . corfu-quit)
+   ("<return>" . corfu-insert)))
+
+(use-package corfu-doc
+  :hook (corfu-mode-hook . corfu-doc-mode))
+
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :commands kind-icon-margin-formatter
+  :custom
+  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;; https://kristofferbalintona.me/posts/cape/
+(use-package cape
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  )
+
+(use-package marginalia
+  :hook (after-init-hook . marginalia-mode)
+  :custom
+  (marginalia-align 'right))
+
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
+  :init (all-the-icons-completion-mode))
+
+(use-package embark
+  :bind
+  ([remap describe-bindings] . embark-bindings))
+
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
