@@ -19,12 +19,13 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
            (const :tag "doom-one-light"  doom-one-light)
+           (const :tag "doom-one"        doom-one)
            (const :tag "doom-nord"       doom-nord)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
@@ -693,27 +694,26 @@ This location is used for temporary installations and files.")
   :init (load-theme 'zenburn t))
 
 (use-package doom-themes
-  :if (or (and (display-graphic-p)
-               (or (eq sb/gui-theme 'doom-molokai)
-                   (eq sb/gui-theme 'doom-one-light)
-                   (eq sb/gui-theme 'doom-nord)
-                   (eq sb/gui-theme 'doom-gruvbox)))
-          (and (not (display-graphic-p))
-               (or (eq sb/tui-theme 'doom-molokai)
-                   (eq sb/tui-theme 'doom-one)
-                   (eq sb/tui-theme 'doom-nord)
-                   (eq sb/tui-theme 'doom-gruvbox))))
+  :if (or (eq sb/gui-theme 'doom-molokai)
+          (eq sb/gui-theme 'doom-one-light)
+          (eq sb/gui-theme 'doom-one)
+          (eq sb/gui-theme 'doom-nord)
+          (eq sb/gui-theme 'doom-gruvbox))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
-  (cond
-   ((or (eq sb/gui-theme 'doom-molokai)
-        (eq sb/tui-theme 'doom-molokai))   (load-theme 'doom-molokai t))
-   ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
-   ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
-   ((or (eq sb/gui-theme 'doom-nord)
-        (eq sb/tui-theme 'doom-nord))      (load-theme 'doom-nord t))
-   ((or (eq sb/gui-theme 'doom-gruvbox)
-        (eq sb/tui-theme 'doom-gruvbox))   (load-theme 'doom-gruvbox t)))
+  (if (display-graphic-p)
+      (cond
+       ((eq sb/gui-theme 'doom-molokai) (load-theme 'doom-molokai t))
+       ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+       ((eq sb/gui-theme 'doom-one) (load-theme 'doom-one t))
+       ((eq sb/gui-theme 'doom-nord) (load-theme 'doom-nord t))
+       ((eq sb/gui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))
+    (cond
+     ((eq sb/tui-theme 'doom-molokai)   (load-theme 'doom-molokai t))
+     ((eq sb/tui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+     ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
+     ((eq sb/tui-theme 'doom-nord)      (load-theme 'doom-nord t))
+     ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t))))
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -805,7 +805,7 @@ This location is used for temporary installations and files.")
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format nil
         doom-modeline-indent-info nil
-        doom-modeline-lsp nil
+        doom-modeline-lsp t
         doom-modeline-minor-modes t
         ;; Reduce space on the modeline
         doom-modeline-buffer-file-name-style 'truncate-with-project
@@ -896,7 +896,10 @@ This location is used for temporary installations and files.")
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
                                  mode-line-misc-info)))
 
-(use-package minions ; Display a minor-mode menu in the mode line
+;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
+;; takes up lot of horizontal space.
+(use-package minions
+  :if (not (bound-and-true-p doom-modeline-lsp))
   :hook (after-init-hook . minions-mode))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
@@ -1853,7 +1856,7 @@ This location is used for temporary installations and files.")
   ;; (defvar ivy-re-builders-alist)
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))
         ;; completion-styles '(orderless initials basic partial-completion emacs22)
-        completion-styles '(orderless)
+        completion-styles '(orderless partial-completion)
         orderless-matching-styles '(orderless-regexp)
         completion-category-defaults nil
         completion-category-overrides '((file (styles basic-remote orderless partial-completion))
@@ -3284,7 +3287,10 @@ This location is used for temporary installations and files.")
         markdown-list-indent-width 2
         markdown-split-window-direction 'horizontal
         ;; markdown-make-gfm-checkboxes-buttons nil
-        markdown-hide-urls t))
+        markdown-hide-urls t)
+  :bind
+  (:map markdown-mode-map
+        ("C-c C-j" . nil)))
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
@@ -3489,8 +3495,14 @@ This location is used for temporary installations and files.")
                                     lsp-completion--regex-fuz
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
+  :preface
+  ;; https://github.com/minad/corfu/wiki
+  (defun sb/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(flex)))
   :hook
-  ((lsp-mode-hook . lsp-enable-which-key-integration)
+  ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
+   (lsp-mode-hook . lsp-enable-which-key-integration)
    (lsp-mode-hook . lsp-lens-mode))
   :custom-face
   ;; Reduce the height
@@ -5842,11 +5854,13 @@ _v_ verify setup    _f_ check           _m_ mode
 (use-package vertico
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
+  :commands command-completion-default-include-p
   :hook (after-init-hook . vertico-mode)
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
   (vertico-count 15)
+  (vertico-scroll-margin 4)
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
@@ -5858,20 +5872,22 @@ _v_ verify setup    _f_ check           _m_ mode
    ("<escape>" . minibuffer-keyboard-quit)))
 
 (use-package consult
+  :custom
+  (consult-line-start-from-top t "Start search from the beginning")
   :bind
-  (("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+  (("C-x M-:" . consult-complex-command)
+   ([remap repeat-complex-command] . consult-complex-command)
    ("C-x b" . consult-buffer)
+   ("<f3>" . consult-buffer)
    ([switch-to-buffer] . consult-buffer)
    ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
    ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
-   ("<f3>" . consult-buffer)
    ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
    ("C-x p b" . consult-project-buffer)
    ([remap project-switch-to-buffer] . consult-project-buffer)
-   ;; Other custom bindings
    ("M-y" . consult-yank-pop)
    ([remap yank-pop] . consult-yank-pop)
-   ([remap apropos] . consult-apropos)            ;; orig. apropos-command
+   ([remap apropos-command] . consult-apropos)
    ;; M-g bindings (goto-map)
    ("M-g e" . consult-compile-error)
    ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
@@ -5888,7 +5904,7 @@ _v_ verify setup    _f_ check           _m_ mode
    ("M-s g" . consult-grep)
    ("M-s G" . consult-git-grep)
    ("M-s r" . consult-ripgrep)
-   ("M-s l" . consult-line)
+   ("<f4>" . consult-line)
    ("M-s L" . consult-line-multi)
    ("M-s m" . consult-multi-occur)
    ("M-s k" . consult-keep-lines)
@@ -5897,35 +5913,42 @@ _v_ verify setup    _f_ check           _m_ mode
    ([remap multi-occur] . consult-multi-occur)
    ;; Isearch integration
    ("M-s e" . consult-isearch-history)
-
    :map isearch-mode-map
    ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
    ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
    ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
    ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
    )
-
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
-  :init
+  :hook (completion-list-mode-hook . consult-preview-at-point-mode)
+  :config
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
-  :config
-  (setq completion-in-region-function (lambda (&rest args)
-                                        (apply #'consult-completion-in-region)
-                                        args))
-  )
+  (setq consult-project-function #'projectile-project-root)
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+
+  ;; Disable live preview
+  (consult-customize
+   consult-recent-file consult-buffer
+   :preview-key nil))
 
 (use-package consult-projectile
   :after (consult projectile))
 
 (use-package consult-lsp
-  :after (consult lsp))
+  :after (consult lsp)
+  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :config (consult-lsp-marginalia-mode 1))
 
 (use-package consult-flycheck
   :after (consult flycheck))
@@ -5936,11 +5959,14 @@ _v_ verify setup    _f_ check           _m_ mode
 (use-package consult-dir
   :bind
   (([remap list-directory] . consult-dir)
-   :map vertico-map
+   ("C-x C-d" . consult-dir)
+   :map minibuffer-local-completion-map
    ("C-x C-d" . consult-dir)
    ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-project-extra)
+
+(use-package consult-yasnippet)
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
@@ -5951,15 +5977,16 @@ _v_ verify setup    _f_ check           _m_ mode
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1)
   (corfu-auto-prefix 2)
-  (corfu-min-width 40)
+  (corfu-min-width 60)
   (corfu-max-width corfu-min-width)
   (corfu-count 15)
-
-  :bind
-  (("C-n" . corfu-next)
-   ("C-p" . corfu-previous)
-   ("<escape>" . corfu-quit)
-   ("<return>" . corfu-insert)))
+  (corfu-preselect-first t)
+  ;; :bind
+  ;; (("C-n" . corfu-next)
+  ;;  ("C-p" . corfu-previous)
+  ;;  ("<escape>" . corfu-quit)
+  ;;  ("<return>" . corfu-insert))
+  )
 
 (use-package corfu-doc
   :hook (corfu-mode-hook . corfu-doc-mode))
@@ -5978,17 +6005,25 @@ _v_ verify setup    _f_ check           _m_ mode
   :init
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-tex)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;; Complete programming language keyword
   (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
-  (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; Complete unicode char from TeX command, e.g. \hbar.
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; Complete abbreviation at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; Complete word from dictionary at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
+  ;; Complete with Dabbrev at point.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;; Complete word at point with Ispell.
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
   )
 
 (use-package marginalia
+  :after vertico
   :hook (after-init-hook . marginalia-mode)
   :custom
   (marginalia-align 'right))
@@ -5998,9 +6033,16 @@ _v_ verify setup    _f_ check           _m_ mode
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode))
 
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 (use-package embark
+  :after vertico
+  :init
+  ;; Replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
   :bind
-  ([remap describe-bindings] . embark-bindings))
+  (([remap describe-bindings] . embark-bindings)
+   :map vertico-map
+   ("C-l" . embark-act)))
 
 (use-package embark-consult
   :ensure t
