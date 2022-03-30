@@ -3454,7 +3454,7 @@ This location is used for temporary installations and files.")
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :ensure spinner
-  ;; :diminish "LSP"
+  :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -4023,6 +4023,7 @@ This location is used for temporary installations and files.")
 (use-package shfmt
   :hook (sh-mode-hook . shfmt-on-save-mode)
   :config
+  ;; p: posix, ci: indent case labels, i: indent with spaces
   (setq shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
@@ -5471,6 +5472,8 @@ or the major mode is not in `sb/skippable-modes'."
   :hook (after-init-hook . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
+  ;; Apply suggested settings for minibuffer. Do not use this if we use paging across keys.
+  ;; (which-key-setup-minibuffer)
 
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
   (setq which-key-show-early-on-C-h t
