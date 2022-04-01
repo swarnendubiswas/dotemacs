@@ -474,6 +474,7 @@ This location is used for temporary installations and files.")
       scroll-preserve-screen-position t
       ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
       auto-window-vscroll nil
+      mouse-wheel-follow-mouse 't ; Scroll window under mouse
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
@@ -607,7 +608,8 @@ This location is used for temporary installations and files.")
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 ;; Use soft wraps, wrap lines without the ugly continuation marks
                 global-visual-line-mode
-                size-indication-mode))
+                size-indication-mode
+                global-display-line-numbers-mode))
   (when (fboundp mode)
     (funcall mode 1)))
 
@@ -900,7 +902,7 @@ This location is used for temporary installations and files.")
 ;; takes up lot of horizontal space.
 (use-package minions
   :if (not (bound-and-true-p doom-modeline-lsp))
-  :hook (after-init-hook . minions-mode))
+  :hook (doom-modeline-mode-hook . minions-mode))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
@@ -935,7 +937,7 @@ This location is used for temporary installations and files.")
        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 140)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -988,6 +990,16 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'default nil :height 160)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(set-face-attribute 'fixed-pitch nil
+                    :font "JetBrains Mono"
+                    :weight 'light
+                    :height 140)
+
+(set-face-attribute 'variable-pitch nil
+                    :font "Iosevka Aile"
+                    :height 140
+                    :weight 'light)
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -1157,7 +1169,10 @@ This location is used for temporary installations and files.")
   :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
   :if (display-graphic-p)
-  :hook (dired-mode-hook . all-the-icons-dired-mode))
+  :hook
+  (dired-mode-hook . (lambda ()
+                       (unless (file-remote-p default-directory)
+                         all-the-icons-dired-mode))))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
@@ -1381,11 +1396,13 @@ This location is used for temporary installations and files.")
   :config
   (setq org-appear-autosubmarkers t
         org-appear-autoentities   t
-        org-appear-autolinks      t))
+        org-appear-autolinks      t
+        org-appear-autoemphasis  t))
 
 (use-package ox-gfm
   :after org
-  :demand t)
+  :demand t
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
 ;; TODO: Use "C-c o" as the binding for `org-mode-map'
 
@@ -1548,7 +1565,7 @@ This location is used for temporary installations and files.")
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
-  :if (eq sb/capf 'company)
+  :if (and (eq sb/capf 'company) (not (display-graphic-p)))
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -1612,6 +1629,7 @@ This location is used for temporary installations and files.")
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
+  :if (eq sb/capf 'company)
   :after company
   :demand t
   :commands company-posframe-mode
@@ -1624,12 +1642,14 @@ This location is used for temporary installations and files.")
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
+  :if (eq sb/capf 'company)
   :after company
   :commands company-quickhelp-mode
   ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
   :hook (after-init-hook . company-quickhelp-mode))
 
 (use-package company-statistics
+  :if (eq sb/capf 'company)
   :after company
   :demand t
   :commands company-statistics-mode
@@ -1637,6 +1657,7 @@ This location is used for temporary installations and files.")
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
+  :if (eq sb/capf 'company)
   :ensure flx
   :ensure t
   :after company
@@ -1709,7 +1730,9 @@ This location is used for temporary installations and files.")
         ;;                         (counsel-find-file . ivy--regex-fuzzy)
         ;;                         (t                 . ivy--regex-ignore-order))
         ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
-        ivy-wrap t)
+        ivy-wrap t
+        ;; Do not start searches with ^
+        ivy-initial-inputs-alist nil)
 
   (dolist (buffer
            '("TAGS" "magit-process" "*emacs*" "*xref*"
@@ -1853,10 +1876,11 @@ This location is used for temporary installations and files.")
   :defines orderless-component-separator
   :functions sb/just-one-face
   :config
-  ;; (defvar ivy-re-builders-alist)
-  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))
-        ;; completion-styles '(orderless initials basic partial-completion emacs22)
-        completion-styles '(orderless partial-completion)
+  (with-eval-after-load "ivy"
+    ;; (defvar ivy-re-builders-alist)
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+
+  (setq completion-styles '(orderless partial-completion) ; initials, basic, emacs22
         orderless-matching-styles '(orderless-regexp)
         completion-category-defaults nil
         completion-category-overrides '((file (styles basic-remote orderless partial-completion))
@@ -3532,7 +3556,7 @@ This location is used for temporary installations and files.")
         lsp-completion-provider :none
         lsp-completion-show-detail nil ; Disable completion metadata since they can be very long
         ;; lsp-completion-show-kind nil
-        ;; lsp-eldoc-enable-hover nil
+        lsp-eldoc-enable-hover nil
         lsp-enable-dap-auto-configure nil
         lsp-enable-on-type-formatting nil
         ;; lsp-semantic-tokens-enable t
@@ -3857,7 +3881,8 @@ This location is used for temporary installations and files.")
   (python-mode-hook . (lambda ()
                         (require 'lsp-pyright)))
   :config
-  (setq lsp-pyright-python-executable-cmd "python3")
+  (setq lsp-pyright-python-executable-cmd "python3"
+        lsp-pyright-typechecking-mode "basic")
 
   (lsp-register-client
    (make-lsp-client
@@ -4757,8 +4782,12 @@ Ignore if no file is found."
 
 (use-package bazel
   :if (executable-find "bazel")
-  :commands (bazel-mode bazelrc-mode)
-  :hook (bazel-mode-hook . flycheck-mode))
+  :commands (bazel-mode bazelrc-mode bazel-buildifier)
+  :hook (bazel-mode-hook . flycheck-mode)
+  :config
+  (add-hook 'bazel-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'bazel-buildifier nil t))))
 
 (use-package protobuf-mode
   :commands protobuf-mode
@@ -5475,9 +5504,11 @@ or the major mode is not in `sb/skippable-modes'."
   ;; Apply suggested settings for minibuffer. Do not use this if we use paging across keys.
   ;; (which-key-setup-minibuffer)
 
+  :custom
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
-  (setq which-key-show-early-on-C-h t
-        which-key-sort-order 'which-key-key-order-alpha))
+  (which-key-show-early-on-C-h t)
+  (which-key-sort-order 'which-key-key-order-alpha)
+  (which-key-idle-delay 0.3))
 
 (use-package which-key-posframe
   :commands which-key-posframe-mode
@@ -5872,7 +5903,47 @@ _v_ verify setup    _f_ check           _m_ mode
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
-   ("<escape>" . minibuffer-keyboard-quit)))
+   ("<escape>" . minibuffer-keyboard-quit)
+   ("?" . minibuffer-completion-help)
+   ("M-RET" . minibuffer-force-complete-and-exit)
+   ("M-TAB" . minibuffer-complete)))
+
+;; More convenient directory navigation commands
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :load-path "extras"
+  :bind
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
+
+(use-package vertico-repeat
+  :after vertico
+  :ensure nil
+  :load-path "extras"
+  :hook (minibuffer-setup-hook . vertico-repeat-save)
+  :bind
+  (("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)))
+
+(use-package vertico-indexed
+  :after vertico
+  :ensure nil
+  :load-path "extras"
+  :commands vertico-indexed-mode
+  :init (vertico-indexed-mode 1))
+
+(use-package vertico-quick
+  :after vertico
+  :ensure nil
+  :bind
+  (:map vertico-map
+        ("C-c q" . vertico-quick-insert)
+        ("C-'" . vertico-quick-exit)))
 
 (use-package consult
   :custom
@@ -5902,8 +5973,8 @@ _v_ verify setup    _f_ check           _m_ mode
    ("C-c C-j" . consult-imenu)
    ("M-g I" . consult-imenu-multi)
    ;; M-s bindings (search-map)
-   ("M-s d" . consult-find)
-   ("M-s D" . consult-locate)
+   ("M-s f" . consult-find)
+   ("M-s l" . consult-locate)
    ("M-s g" . consult-grep)
    ("M-s G" . consult-git-grep)
    ("M-s r" . consult-ripgrep)
@@ -5933,12 +6004,9 @@ _v_ verify setup    _f_ check           _m_ mode
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
   (setq consult-project-function #'projectile-project-root)
-  (setq completion-in-region-function
-        (lambda (&rest args)
-          (apply (if vertico-mode
-                     #'consult-completion-in-region
-                   #'completion--in-region)
-                 args)))
+
+  (unless (display-graphic-p)
+    (setq completion-in-region-function #'consult-completion-in-region))
 
   ;; Disable live preview
   (consult-customize
@@ -5946,7 +6014,8 @@ _v_ verify setup    _f_ check           _m_ mode
    :preview-key nil))
 
 (use-package consult-projectile
-  :after (consult projectile))
+  :after (consult projectile)
+  :bind ("<f6>" . consult-projectile))
 
 (use-package consult-lsp
   :after (consult lsp)
@@ -5954,7 +6023,10 @@ _v_ verify setup    _f_ check           _m_ mode
   :config (consult-lsp-marginalia-mode 1))
 
 (use-package consult-flycheck
-  :after (consult flycheck))
+  :after (consult flycheck)
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
 
 (use-package consult-flyspell
   :after (consult flyspell))
@@ -5973,23 +6045,21 @@ _v_ verify setup    _f_ check           _m_ mode
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
-  :if (eq sb/capf 'corfu)
+  :if (and (eq sb/capf 'corfu) (display-graphic-p))
   :hook (after-init-hook . corfu-global-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0.1)
+  (corfu-auto-delay 0)
   (corfu-auto-prefix 2)
   (corfu-min-width 60)
   (corfu-max-width corfu-min-width)
   (corfu-count 15)
   (corfu-preselect-first t)
-  ;; :bind
-  ;; (("C-n" . corfu-next)
-  ;;  ("C-p" . corfu-previous)
-  ;;  ("<escape>" . corfu-quit)
-  ;;  ("<return>" . corfu-insert))
-  )
+  :bind
+  (:map corfu-map
+        ([tab] . corfu-next)
+        ([backtab] . corfu-previous)))
 
 (use-package corfu-doc
   :hook (corfu-mode-hook . corfu-doc-mode))
@@ -5997,6 +6067,7 @@ _v_ verify setup    _f_ check           _m_ mode
 (use-package kind-icon
   :ensure t
   :after corfu
+  :demand t
   :commands kind-icon-margin-formatter
   :custom
   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
@@ -6023,13 +6094,12 @@ _v_ verify setup    _f_ check           _m_ mode
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   ;; Complete word at point with Ispell.
   (add-to-list 'completion-at-point-functions #'cape-ispell)
-  )
+  :custom
+  (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
 
 (use-package marginalia
   :after vertico
-  :hook (after-init-hook . marginalia-mode)
-  :custom
-  (marginalia-align 'right))
+  :init (marginalia-mode 1))
 
 (use-package all-the-icons-completion
   :after (marginalia all-the-icons)
@@ -6054,6 +6124,21 @@ _v_ verify setup    _f_ check           _m_ mode
   ;; if you want to have consult previews as you move around an
   ;; auto-updating embark collect buffer
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
+
+(use-package centaur-tabs
+  :commands centaur-tabs-group-by-projectile-project
+  :hook (emacs-startup-hook . centaur-tabs-mode)
+  :init
+  (setq centaur-tabs-set-icons t
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-modified-marker "*"
+        centaur-tabs-cycle-scope 'tabs
+        centaur-tabs-set-close-button nil
+        centaur-tabs-show-new-tab-button nil
+        centaur-tabs-enable-ido-completion nil)
+  :config
+  (centaur-tabs-mode t)
+  (centaur-tabs-group-by-projectile-project))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
