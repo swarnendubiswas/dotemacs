@@ -19,7 +19,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-one
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -38,7 +38,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'doom-one
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -133,7 +133,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (defcustom sb/minibuffer-completion
-  'vertico
+  'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)
@@ -141,8 +141,9 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/capf
-  'corfu
-  "Choose the framework to use for completion at point."
+  'company
+  "Choose the framework to use for completion at point.
+Corfu does not support TUI, so we have to fallback on company. Therefore, this selection variable is not used now."
   :type '(radio
           (const :tag "corfu" corfu)
           (const :tag "company" company))
@@ -187,7 +188,7 @@ This location is used for temporary installations and files.")
 (defvar use-package-hook-name-suffix)
 
 (setq use-package-enable-imenu-support t
-      ;; Avoid manual modifications whenever I modify package installations
+      ;; Avoid manual installations whenever I modify package installations
       use-package-always-ensure        t
       use-package-hook-name-suffix     nil)
 
@@ -608,10 +609,13 @@ This location is used for temporary installations and files.")
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 ;; Use soft wraps, wrap lines without the ugly continuation marks
                 global-visual-line-mode
-                size-indication-mode
-                global-display-line-numbers-mode))
+                size-indication-mode))
   (when (fboundp mode)
     (funcall mode 1)))
+
+;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
+(when (display-graphic-p)
+  (global-display-line-numbers-mode 1))
 
 (when (bound-and-true-p enable-recursive-minibuffers)
   (minibuffer-depth-indicate-mode 1))
@@ -622,9 +626,9 @@ This location is used for temporary installations and files.")
 (with-eval-after-load "simple"
   (diminish 'visual-line-mode))
 
-;; Default is 8 pixels, we can increase it to make the fringe more prominent if required
-;; (unless (display-graphic-p)
-;;   (fringe-mode '(10 . 10)))
+;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
+(unless (display-graphic-p)
+  (fringe-mode '(10 . 10)))
 
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
@@ -1559,13 +1563,14 @@ This location is used for temporary installations and files.")
 ;; function company-capf"
 (use-package company-capf
   :ensure company
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands company-capf)
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
-  :if (and (eq sb/capf 'company) (not (display-graphic-p)))
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -1629,7 +1634,7 @@ This location is used for temporary installations and files.")
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
-  :if (eq sb/capf 'company)
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
   :commands company-posframe-mode
@@ -1642,14 +1647,14 @@ This location is used for temporary installations and files.")
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
-  :if (eq sb/capf 'company)
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :commands company-quickhelp-mode
   ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
   :hook (after-init-hook . company-quickhelp-mode))
 
 (use-package company-statistics
-  :if (eq sb/capf 'company)
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
   :commands company-statistics-mode
@@ -1657,18 +1662,18 @@ This location is used for temporary installations and files.")
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
-  :if (eq sb/capf 'company)
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :ensure flx
   :ensure t
   :after company
   :diminish (company-fuzzy-mode global-company-fuzzy-mode)
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
-  :config
-  (setq company-fuzzy-sorting-backend 'flx
-        company-fuzzy-show-annotation nil ; The right-hand side gets cut off
-        ;; We should not need this because the `flx' sorting accounts for the prefix
-        company-fuzzy-prefix-on-top nil))
+  :custom
+  (company-fuzzy-sorting-backend 'flx)
+  (company-fuzzy-show-annotation nil "The right-hand side gets cut off")
+  ;; We should not need this because the `flx' sorting accounts for the prefix
+  (company-fuzzy-prefix-on-top t))
 
 (use-package yasnippet
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
@@ -1701,9 +1706,8 @@ This location is used for temporary installations and files.")
   ;; We need this if we use `vertico' and `consult'
   (("M-x"  . execute-extended-command)
    ("<f1>" . execute-extended-command))
-  :config
-  ;; Update the command list every n minutes
-  (setq amx-auto-update-interval 10))
+  :custom
+  (amx-auto-update-interval 10 "Update the command list every n minutes"))
 
 (use-package ivy
   :functions ivy-format-function-line
@@ -1721,6 +1725,7 @@ This location is used for temporary installations and files.")
   (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
         ivy-extra-directories nil ; Hide . and ..
         ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+        ivy-height 12
         ;; Make the height of the minibuffer proportionate to the screen
         ;; ivy-height-alist '((t
         ;;                      lambda (_caller)
@@ -1850,7 +1855,7 @@ This location is used for temporary installations and files.")
 (use-package prescient
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
-  :config (setq prescient-sort-full-matches-first t))
+  :custom (prescient-sort-full-matches-first t))
 
 ;; We are using `company-fuzzy' for sorting completion candidates
 (use-package company-prescient
@@ -4039,6 +4044,7 @@ This location is used for temporary installations and files.")
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package company-shell
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
@@ -4357,6 +4363,7 @@ This location is used for temporary installations and files.")
 (use-package lsp-grammarly
   :ensure keytar
   :ensure t
+  :disabled t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands (lsp-grammarly--server-command lsp-grammarly--init
                                            lsp-grammarly--get-credentials lsp-grammarly--get-token
@@ -4668,6 +4675,7 @@ Ignore if no file is found."
   (setq TeX-command-default "LatexMk"))
 
 (use-package company-auctex
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t
   :commands (company-auctex-init company-auctex-labels
@@ -4675,21 +4683,25 @@ Ignore if no file is found."
                                  company-auctex-symbols company-auctex-environments))
 
 (use-package math-symbols
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t) ; Required by `ac-math' and `company-math'
 
 (use-package company-math
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
 (use-package company-reftex ; Reftex must be enabled to work
   :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 
 (use-package company-bibtex
   :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands company-bibtex)
 
@@ -4932,9 +4944,10 @@ Ignore if no file is found."
 
   (dolist (hook '(nxml-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-xml-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-xml-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
 
 (progn
   (defun sb/company-latex-mode ()
@@ -4964,7 +4977,8 @@ Ignore if no file is found."
 
   (dolist (hook '(latex-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-latex-mode)))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-latex-mode))))))
 
 (progn
   (defun sb/company-web-mode ()
@@ -4980,9 +4994,10 @@ Ignore if no file is found."
 
   (dolist (hook '(web-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-web-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-web-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
 
 (progn
   (defun sb/company-text-mode ()
@@ -5002,10 +5017,11 @@ Ignore if no file is found."
 
   (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook hook (lambda ()
-                     (when (not (derived-mode-p 'latex-mode))
-                       (sb/company-text-mode)
-                       (company-fuzzy-mode 1)
-                       (diminish 'company-fuzzy-mode))))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (unless (derived-mode-p 'latex-mode)
+                         (sb/company-text-mode)
+                         (company-fuzzy-mode 1)
+                         (diminish 'company-fuzzy-mode)))))))
 
 ;; (progn
 ;;   (defun sb/company-java-mode ()
@@ -5062,9 +5078,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'sh-mode-hook (lambda ()
-                            (sb/company-sh-mode)
-                            (company-fuzzy-mode 1)
-                            (diminish 'company-fuzzy-mode)))
+                            (unless (display-graphic-p)
+                              (sb/company-sh-mode)
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
 
   (defun sb/company-fish-mode ()
     "Add backends for fish shell script completion in company mode."
@@ -5084,9 +5101,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'fish-mode-hook (lambda ()
-                              (sb/company-fish-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
+                              (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                (sb/company-fish-mode)
+                                (company-fuzzy-mode 1)
+                                (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-elisp-mode ()
@@ -5104,9 +5122,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'emacs-lisp-mode-hook (lambda ()
-                                    (sb/company-elisp-mode)
-                                    (company-fuzzy-mode 1)
-                                    (diminish 'company-fuzzy-mode))))
+                                    (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                      (sb/company-elisp-mode)
+                                      (company-fuzzy-mode 1)
+                                      (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-python-mode ()
@@ -5125,9 +5144,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'python-mode-hook (lambda ()
-                                (sb/company-python-mode)
-                                (company-fuzzy-mode 1)
-                                (diminish 'company-fuzzy-mode))))
+                                (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                  (sb/company-python-mode)
+                                  (company-fuzzy-mode 1)
+                                  (diminish 'company-fuzzy-mode)))))
 
 ;; (progn
 ;;   (defun sb/company-prog-mode ()
@@ -5476,8 +5496,9 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 (bind-key   "C-x j" #'sb/counsel-all-files-recursively)
 
-(global-set-key [remap next-buffer]     #'sb/next-buffer)
-(global-set-key [remap previous-buffer] #'sb/previous-buffer)
+(unless (featurep 'centaur-tabs)
+  (global-set-key [remap next-buffer]     #'sb/next-buffer)
+  (global-set-key [remap previous-buffer] #'sb/previous-buffer))
 
 (use-package default-text-scale
   :bind
@@ -5893,7 +5914,7 @@ _v_ verify setup    _f_ check           _m_ mode
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
-  (vertico-count 15)
+  (vertico-count 12)
   (vertico-scroll-margin 4)
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
@@ -5946,6 +5967,7 @@ _v_ verify setup    _f_ check           _m_ mode
         ("C-'" . vertico-quick-exit)))
 
 (use-package consult
+  :commands consult--customize-put
   :custom
   (consult-line-start-from-top t "Start search from the beginning")
   :bind
@@ -6045,7 +6067,13 @@ _v_ verify setup    _f_ check           _m_ mode
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
-  :if (and (eq sb/capf 'corfu) (display-graphic-p))
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :preface
+  (defun sb/corfu-move-to-minibuffer ()
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
   :hook (after-init-hook . corfu-global-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
@@ -6059,7 +6087,8 @@ _v_ verify setup    _f_ check           _m_ mode
   :bind
   (:map corfu-map
         ([tab] . corfu-next)
-        ([backtab] . corfu-previous)))
+        ([backtab] . corfu-previous)
+        ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (use-package corfu-doc
   :hook (corfu-mode-hook . corfu-doc-mode))
@@ -6090,10 +6119,10 @@ _v_ verify setup    _f_ check           _m_ mode
   ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
-  ;; Complete with Dabbrev at point.
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   ;; Complete word at point with Ispell.
   (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; Complete with Dabbrev at point.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   :custom
   (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
 
@@ -6138,7 +6167,10 @@ _v_ verify setup    _f_ check           _m_ mode
         centaur-tabs-enable-ido-completion nil)
   :config
   (centaur-tabs-mode t)
-  (centaur-tabs-group-by-projectile-project))
+  (centaur-tabs-group-by-projectile-project)
+  :bind
+  (("M-<right>" . centaur-tabs-forward-tab)
+   ("M-<left>" . centaur-tabs-backward-tab)))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook

@@ -25,6 +25,7 @@
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
            (const :tag "doom-one-light"  doom-one-light)
+           (const :tag "doom-one"        doom-one)
            (const :tag "doom-nord"       doom-nord)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
@@ -37,12 +38,12 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
-           (const :tag "doom-one-light"  doom-one-light)
+           (const :tag "doom-one"        doom-one)
            (const :tag "doom-molokai"    doom-molokai)
            (const :tag "doom-gruvbox"    doom-gruvbox)
            (const :tag "doom-nord"       doom-nord)
@@ -131,6 +132,23 @@ This location is used for temporary installations and files.")
            (const :tag "none"    none))
   :group 'sb/emacs)
 
+(defcustom sb/minibuffer-completion
+  'ivy
+  "Choose the framework to use for narrowing and selection."
+  :type '(radio
+          (const :tag "vertico" vertico)
+          (const :tag "ivy" ivy))
+  :group 'dotemacs)
+
+(defcustom sb/capf
+  'company
+  "Choose the framework to use for completion at point.
+Corfu does not support TUI, so we have to fallback on company. Therefore, this selection variable is not used now."
+  :type '(radio
+          (const :tag "corfu" corfu)
+          (const :tag "company" company))
+  :group 'dotemacs)
+
 (defconst sb/EMACS27    (= emacs-major-version 27))
 (defconst sb/EMACS27+   (> emacs-major-version 26))
 (defconst sb/EMACS28+   (> emacs-major-version 27))
@@ -198,11 +216,11 @@ This location is used for temporary installations and files.")
 ;; Hooks in the `:hook' section run in reverse order. Example:
 ;; (use-package package-name
 ;;   :hook
-;;   (x-mode . last)
-;;   (x-mode . second)
-;;   (x-mode . first))
+;;   ((x-mode-hook . last)
+;;    (x-mode-hook . second)
+;;    (x-mode-hook . first)))
 
-;; `C-h b' lists all the bindings available in a buffer. `C-h m' shows the keybindings for the major
+;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
 (use-package bind-key
   :functions bind-key--remove
@@ -330,6 +348,7 @@ This location is used for temporary installations and files.")
       ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
       ;; error.
       compilation-scroll-output 'first-error
+      completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
@@ -338,7 +357,7 @@ This location is used for temporary installations and files.")
       cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
-      echo-keystrokes 1 ; Show current key-sequence in minibuffer
+      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
       ;; Keeping track of the minibuffer nesting is difficult, so it is better to keep it disabled
       ;; enable-recursive-minibuffers t
@@ -362,6 +381,7 @@ This location is used for temporary installations and files.")
       kill-do-not-save-duplicates t
       kill-whole-line t ;; TODO: What is the utility of this variable?
       make-backup-files nil ; Stop making backup `~' files
+      message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
@@ -445,6 +465,7 @@ This location is used for temporary installations and files.")
       scroll-preserve-screen-position t
       ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
       auto-window-vscroll nil
+      mouse-wheel-follow-mouse 't ; Scroll window under mouse
       mouse-wheel-scroll-amount '(5 ((shift) . 2))
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
@@ -513,7 +534,9 @@ This location is used for temporary installations and files.")
                                            try-complete-lisp-symbol-partially
                                            try-complete-lisp-symbol)
         hippie-expand-verbose nil)
-  :bind ("M-/" . hippie-expand))
+  :bind
+  (("M-/"   . hippie-expand)
+   ("C-M-/" . dabbrev-completion)))
 
 (use-package subword
   :ensure nil
@@ -580,6 +603,10 @@ This location is used for temporary installations and files.")
   (when (fboundp mode)
     (funcall mode 1)))
 
+;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
+(when (display-graphic-p)
+  (global-display-line-numbers-mode 1))
+
 (when (bound-and-true-p enable-recursive-minibuffers)
   (minibuffer-depth-indicate-mode 1))
 
@@ -621,7 +648,7 @@ This location is used for temporary installations and files.")
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
   :hook (after-init-hook . global-so-long-mode))
 
-;; Install fonts with `M-x all-the-icons-install-fonts'
+;; Install fonts with "M-x all-the-icons-install-fonts"
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
 (use-package all-the-icons
   :if (display-graphic-p)
@@ -663,27 +690,26 @@ This location is used for temporary installations and files.")
   :init (load-theme 'zenburn t))
 
 (use-package doom-themes
-  :if (or (and (display-graphic-p)
-               (or (eq sb/gui-theme 'doom-molokai)
-                   (eq sb/gui-theme 'doom-one-light)
-                   (eq sb/gui-theme 'doom-nord)
-                   (eq sb/gui-theme 'doom-gruvbox)))
-          (and (not (display-graphic-p))
-               (or (eq sb/tui-theme 'doom-molokai)
-                   (eq sb/tui-theme 'doom-one-light)
-                   (eq sb/tui-theme 'doom-nord)
-                   (eq sb/tui-theme 'doom-gruvbox))))
+  :if (or (eq sb/gui-theme 'doom-molokai)
+          (eq sb/gui-theme 'doom-one-light)
+          (eq sb/gui-theme 'doom-one)
+          (eq sb/gui-theme 'doom-nord)
+          (eq sb/gui-theme 'doom-gruvbox))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
-  (cond
-   ((or (eq sb/gui-theme 'doom-molokai)
-        (eq sb/tui-theme 'doom-molokai))   (load-theme 'doom-molokai t))
-   ((or (eq sb/gui-theme 'doom-one-light)
-        (eq sb/tui-theme 'doom-one-light)) (load-theme 'doom-one-light t))
-   ((or (eq sb/gui-theme 'doom-nord)
-        (eq sb/tui-theme 'doom-nord))      (load-theme 'doom-nord t))
-   ((or (eq sb/gui-theme 'doom-gruvbox)
-        (eq sb/tui-theme 'doom-gruvbox))   (load-theme 'doom-gruvbox t)))
+  (if (display-graphic-p)
+      (cond
+       ((eq sb/gui-theme 'doom-molokai) (load-theme 'doom-molokai t))
+       ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+       ((eq sb/gui-theme 'doom-one) (load-theme 'doom-one t))
+       ((eq sb/gui-theme 'doom-nord) (load-theme 'doom-nord t))
+       ((eq sb/gui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))
+    (cond
+     ((eq sb/tui-theme 'doom-molokai)   (load-theme 'doom-molokai t))
+     ((eq sb/tui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+     ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
+     ((eq sb/tui-theme 'doom-nord)      (load-theme 'doom-nord t))
+     ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t))))
   :config
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification
@@ -769,16 +795,17 @@ This location is used for temporary installations and files.")
   :commands doom-modeline-mode
   :init
   ;; Requires the fonts included with `all-the-icons', run "M-x all-the-icons-install-fonts".
-  (unless (sb/font-installed-p "all-the-icons")
+  (when (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
     (all-the-icons-install-fonts t))
 
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format nil
         doom-modeline-indent-info nil
-        doom-modeline-lsp nil
+        doom-modeline-lsp t
         doom-modeline-minor-modes t
         ;; Reduce space on the modeline
-        doom-modeline-buffer-file-name-style 'truncate-with-project)
+        doom-modeline-buffer-file-name-style 'truncate-with-project
+        doom-modeline-unicode-fallback t)
   (doom-modeline-mode 1))
 
 (use-package spaceline
@@ -865,12 +892,16 @@ This location is used for temporary installations and files.")
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
                                  mode-line-misc-info)))
 
-(use-package minions ; Display a minor-mode menu in the mode line
-  :hook (after-init-hook . minions-mode))
+;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
+;; takes up lot of horizontal space.
+(use-package minions
+  :if (not (bound-and-true-p doom-modeline-lsp))
+  :hook (doom-modeline-mode-hook . minions-mode))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
 (use-package auto-dim-other-buffers
+  :disabled t
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
   ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
   :hook (after-init-hook . auto-dim-other-buffers-mode))
@@ -953,6 +984,16 @@ This location is used for temporary installations and files.")
   (set-face-attribute 'default nil :height 160)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(set-face-attribute 'fixed-pitch nil
+                    :font "JetBrains Mono"
+                    :weight 'light
+                    :height 140)
+
+(set-face-attribute 'variable-pitch nil
+                    :font "Iosevka Aile"
+                    :height 140
+                    :weight 'light)
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -1122,7 +1163,10 @@ This location is used for temporary installations and files.")
   :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
   :if (display-graphic-p)
-  :hook (dired-mode-hook . all-the-icons-dired-mode))
+  :hook
+  (dired-mode-hook . (lambda ()
+                       (unless (file-remote-p default-directory)
+                         all-the-icons-dired-mode))))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
@@ -1140,7 +1184,8 @@ This location is used for temporary installations and files.")
              treemacs-select-window
              treemacs-add-and-display-current-project
              treemacs-display-current-project-exclusively
-             projectile-project-p treemacs--select-workspace-by-name)
+             projectile-project-p treemacs--select-workspace-by-name
+             adob--rescan-windows)
   :preface
   ;; The problem is there is no toggle support.
   (defun sb/setup-treemacs-quick ()
@@ -1345,11 +1390,13 @@ This location is used for temporary installations and files.")
   :config
   (setq org-appear-autosubmarkers t
         org-appear-autoentities   t
-        org-appear-autolinks      t))
+        org-appear-autolinks      t
+        org-appear-autoemphasis  t))
 
 (use-package ox-gfm
   :after org
-  :demand t)
+  :demand t
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
 ;; TODO: Use "C-c o" as the binding for `org-mode-map'
 
@@ -1391,6 +1438,7 @@ This location is used for temporary installations and files.")
    ([remap query-replace-regexp] . anzu-query-replace-regexp)))
 
 (use-package swiper
+  :if (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch)
   :config (setq swiper-action-recenter t))
 
@@ -1505,12 +1553,14 @@ This location is used for temporary installations and files.")
 ;; function company-capf"
 (use-package company-capf
   :ensure company
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands company-capf)
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -1574,6 +1624,7 @@ This location is used for temporary installations and files.")
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
   :commands company-posframe-mode
@@ -1586,12 +1637,14 @@ This location is used for temporary installations and files.")
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :commands company-quickhelp-mode
   ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
   :hook (after-init-hook . company-quickhelp-mode))
 
 (use-package company-statistics
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
   :commands company-statistics-mode
@@ -1599,6 +1652,7 @@ This location is used for temporary installations and files.")
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :ensure flx
   :ensure t
   :after company
@@ -1609,7 +1663,7 @@ This location is used for temporary installations and files.")
   (setq company-fuzzy-sorting-backend 'flx
         company-fuzzy-show-annotation nil ; The right-hand side gets cut off
         ;; We should not need this because the `flx' sorting accounts for the prefix
-        company-fuzzy-prefix-on-top nil))
+        company-fuzzy-prefix-on-top t))
 
 (use-package yasnippet
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
@@ -1630,6 +1684,7 @@ This location is used for temporary installations and files.")
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
+  :after ivy
   :bind ("C-M-y" . ivy-yasnippet))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
@@ -1637,13 +1692,17 @@ This location is used for temporary installations and files.")
 (use-package amx
   :commands amx-mode
   :hook (after-init-hook . amx-mode)
-  :config
-  ;; Update the command list every n minutes
-  (setq amx-auto-update-interval 10))
+  :bind
+  ;; We need this if we use `vertico' and `consult'
+  (("M-x"  . execute-extended-command)
+   ("<f1>" . execute-extended-command))
+  :custom
+  (amx-auto-update-interval 10 "Update the command list every n minutes"))
 
 (use-package ivy
   :functions ivy-format-function-line
   :commands (ivy-read ivy-mode)
+  :if (eq sb/minibuffer-completion 'ivy)
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
@@ -1656,6 +1715,7 @@ This location is used for temporary installations and files.")
   (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
         ivy-extra-directories nil ; Hide . and ..
         ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+        ivy-height 12
         ;; Make the height of the minibuffer proportionate to the screen
         ;; ivy-height-alist '((t
         ;;                      lambda (_caller)
@@ -1665,7 +1725,9 @@ This location is used for temporary installations and files.")
         ;;                         (counsel-find-file . ivy--regex-fuzzy)
         ;;                         (t                 . ivy--regex-ignore-order))
         ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
-        ivy-wrap t)
+        ivy-wrap t
+        ;; Do not start searches with ^
+        ivy-initial-inputs-alist nil)
 
   (dolist (buffer
            '("TAGS" "magit-process" "*emacs*" "*xref*"
@@ -1690,6 +1752,7 @@ This location is used for temporary installations and files.")
 (use-package counsel
   :ensure t
   :ensure amx ; `counsel' makes use of `amx' if installed
+  :if (eq sb/minibuffer-completion 'ivy)
   :commands counsel-mode
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
@@ -1803,19 +1866,21 @@ This location is used for temporary installations and files.")
   :config (all-the-icons-ivy-setup))
 
 (use-package orderless
-  :after ivy
+  :after (:any ivy vertico)
   :demand t
   :defines orderless-component-separator
   :functions sb/just-one-face
   :config
-  ;; (defvar ivy-re-builders-alist)
-  (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))
-        ;; completion-styles '(orderless initials basic partial-completion emacs22)
-        completion-styles '(orderless)
+  (with-eval-after-load "ivy"
+    ;; (defvar ivy-re-builders-alist)
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+
+  (setq completion-styles '(orderless partial-completion) ; initials, basic, emacs22
         orderless-matching-styles '(orderless-regexp)
-        ;;  completion-category-defaults nil
-        ;;  completion-category-overrides '((file (styles partial-completion))
-        ;;                                  (minibuffer (initials))))
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic-remote orderless partial-completion))
+                                        ;; (minibuffer (initials))))
+                                        )
         ))
 
 (use-package ispell
@@ -2007,7 +2072,7 @@ This location is used for temporary installations and files.")
 ;; Claims to be better than `electric-indent-mode'
 (use-package aggressive-indent
   :commands aggressive-indent-mode
-  :hook ((lisp-mode-hook emacs-lisp-mode-hook lisp-interaction-mode-hook) . aggressive-indent-mode)
+  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
   :diminish
   :config
   (setq aggressive-indent-comments-too t
@@ -2113,31 +2178,31 @@ This location is used for temporary installations and files.")
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
-;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; yet.
-(use-package project
-  :ensure nil
-  :commands (project-switch-project project-current
-                                    project-find-file project-execute-extended-command
-                                    project-known-project-roots
-                                    project-remove-known-project
-                                    project-remember-project
-                                    project-kill-buffers
-                                    project-switch-to-buffer
-                                    project-search
-                                    project-compile)
-  :bind
-  (:map project-prefix-map
-        ("f" . project-find-file)
-        ("F" . project-or-external-find-file)
-        ("b" . project-switch-to-buffer)
-        ("d" . project-dired)
-        ("v" . project-vc-dir)
-        ("c" . project-compile)
-        ("k" . project-kill-buffers)
-        ("p" . project-switch-project)
-        ("g" . project-find-regexp)
-        ("r" . project-query-replace-regexp)))
+;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; ;; yet.
+;; (use-package project
+;;   :ensure nil
+;;   :commands (project-switch-project project-current
+;;                                     project-find-file project-execute-extended-command
+;;                                     project-known-project-roots
+;;                                     project-remove-known-project
+;;                                     project-remember-project
+;;                                     project-kill-buffers
+;;                                     project-switch-to-buffer
+;;                                     project-search
+;;                                     project-compile)
+;;   :bind
+;;   (:map project-prefix-map
+;;         ("f" . project-find-file)
+;;         ("F" . project-or-external-find-file)
+;;         ("b" . project-switch-to-buffer)
+;;         ("d" . project-dired)
+;;         ("v" . project-vc-dir)
+;;         ("c" . project-compile)
+;;         ("k" . project-kill-buffers)
+;;         ("p" . project-switch-project)
+;;         ("g" . project-find-regexp)
+;;         ("r" . project-query-replace-regexp)))
 
 (use-package projectile
   :commands (projectile-project-p projectile-project-name
@@ -2259,6 +2324,7 @@ This location is used for temporary installations and files.")
 ;; I am unsure how does this package advances `projectile' in terms of usability.
 (use-package counsel-projectile
   :disabled t
+  :if (eq sb/minibuffer-completion 'ivy)
   :defines counsel-projectile-default-file
   :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
   :preface
@@ -2374,7 +2440,7 @@ This location is used for temporary installations and files.")
                           (ivy-rich-candidate (:width 0.75)))))
 
 (use-package counsel-fd
-  :if (executable-find "fd")
+  :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
    ;; Jump to a file below the current directory
@@ -2556,7 +2622,15 @@ This location is used for temporary installations and files.")
   :config
   (setq show-trailing-whitespace t
         whitespace-line-column sb/fill-column
-        whitespace-style '(face lines-tail trailing)))
+        whitespace-style '(face ; Visualize using faces
+                           lines-tail
+                           trailing ; Trailing whitespace
+                           ;; tab-mark ; Mark any tabs
+                           ;; empty ; Empty lines at beginning or end of buffer
+                           ;; lines ; Lines that extend beyond `whitespace-line-column'
+                           ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
+                           ;; space-before-tab space-after-tab ; Mixture of space and tab on the same line
+                           )))
 
 ;; This is different from `whitespace-cleanup-mode' since this is unconditional
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
@@ -2698,6 +2772,7 @@ This location is used for temporary installations and files.")
 ;;   (bind-key "C-c d t" #'sb/ivy-tramp))
 
 (use-package counsel-tramp
+  :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c d t" . counsel-tramp))
 
 ;; TODO: SSH into Gcloud
@@ -2738,7 +2813,7 @@ This location is used for temporary installations and files.")
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
    ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-pop-marker-stack)
+   ("M-,"   . xref-go-back)
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
@@ -2754,7 +2829,7 @@ This location is used for temporary installations and files.")
 (use-package counsel-etags
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
-  :if (symbol-value 'sb/IS-LINUX)
+  :if (and (symbol-value 'sb/IS-LINUX) (eq sb/minibuffer-completion 'ivy) (executable-find "ctags"))
   :bind
   (("M-]"     . counsel-etags-find-tag-at-point)
    ("C-c g s" . counsel-etags-find-symbol-at-point)
@@ -2843,8 +2918,8 @@ This location is used for temporary installations and files.")
   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
   (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
   (push '("*Selection Ring:")                  popwin:special-display-config)
-  (push '("*Flycheck errors*"   :noselect nil) popwin:special-display-config)
   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+  (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
   (push '("*xref*"              :noselect nil) popwin:special-display-config)
@@ -2925,10 +3000,12 @@ This location is used for temporary installations and files.")
         undo-tree-visualizer-diff                t
         undo-tree-visualizer-relative-timestamps t
         undo-tree-visualizer-timestamps          t)
-  (global-undo-tree-mode 1)
   (unbind-key "C-/" undo-tree-map)
+  :hook (find-file-hook . undo-tree-mode)
   :bind
-  (("C-z"   . undo-tree-undo)
+  (([remap undo] . undo-tree-undo)
+   ([remap redo] . undo-tree-redo)
+   ("C-z"   . undo-tree-undo)
    ("C-x u" . undo-tree-visualize)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
@@ -2956,12 +3033,12 @@ This location is used for temporary installations and files.")
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
-   ("C-c d s" . crux-sudo-edit)))
+   ("C-c d s" . crux-sudo-edit)
+   ("C-a"     . crux-move-beginning-of-line)))
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
   :if (display-mouse-p)
-  :disabled t
   :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode
   :hook (after-init-hook . global-disable-mouse-mode))
@@ -3096,7 +3173,8 @@ This location is used for temporary installations and files.")
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-  :commands writegood-mode
+  :disabled t
+  :commands (writegood-mode writegood-passive-voice-turn-off)
   :diminish
   :hook (text-mode-hook . writegood-mode))
 
@@ -3228,7 +3306,10 @@ This location is used for temporary installations and files.")
         markdown-list-indent-width 2
         markdown-split-window-direction 'horizontal
         ;; markdown-make-gfm-checkboxes-buttons nil
-        markdown-hide-urls t))
+        markdown-hide-urls t)
+  :bind
+  (:map markdown-mode-map
+        ("C-c C-j" . nil)))
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
@@ -3290,7 +3371,8 @@ This location is used for temporary installations and files.")
   :config
   (add-hook 'makefile-mode-hook
             (lambda()
-              (setq-local indent-tabs-mode t))))
+              (setq-local indent-tabs-mode t)))
+  (use-package makefile-executor))
 
 (use-package eldoc
   :ensure nil
@@ -3391,7 +3473,7 @@ This location is used for temporary installations and files.")
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :ensure spinner
-  ;; :diminish "LSP"
+  :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -3432,8 +3514,14 @@ This location is used for temporary installations and files.")
                                     lsp-completion--regex-fuz
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
+  :preface
+  ;; https://github.com/minad/corfu/wiki
+  (defun sb/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(flex)))
   :hook
-  ((lsp-mode-hook . lsp-enable-which-key-integration)
+  ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
+   (lsp-mode-hook . lsp-enable-which-key-integration)
    (lsp-mode-hook . lsp-lens-mode))
   :custom-face
   ;; Reduce the height
@@ -3463,7 +3551,7 @@ This location is used for temporary installations and files.")
         lsp-completion-provider :none
         lsp-completion-show-detail nil ; Disable completion metadata since they can be very long
         ;; lsp-completion-show-kind nil
-        ;; lsp-eldoc-enable-hover nil
+        lsp-eldoc-enable-hover nil
         lsp-enable-dap-auto-configure nil
         lsp-enable-on-type-formatting nil
         ;; lsp-semantic-tokens-enable t
@@ -3492,6 +3580,10 @@ This location is used for temporary installations and files.")
         lsp-use-plists nil
         lsp-xml-logs-client nil
         lsp-yaml-print-width sb/fill-column)
+
+  (if (display-graphic-p)
+      (setq lsp-modeline-code-actions-enable t)
+    (setq lsp-modeline-code-actions-enable nil))
 
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
@@ -3629,7 +3721,10 @@ This location is used for temporary installations and files.")
         ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
-  :commands (dap-debug dap-hydra dap-mode dap-ui-mode))
+  :commands (dap-debug dap-hydra dap-mode dap-ui-mode)
+  :hook
+  ((lsp-mode-hook . dap-mode)
+   (lsp-mode-hook . dap-ui-mode)))
 
 (use-package docstr
   :diminish
@@ -3689,7 +3784,9 @@ This location is used for temporary installations and files.")
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
+  :if (executable-find "cmake")
   :commands cmake-mode
+  :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
   (cmake-mode-hook . (lambda ()
                        (make-local-variable 'lsp-disabled-clients)
@@ -3712,6 +3809,7 @@ This location is used for temporary installations and files.")
 (use-package python
   :ensure nil
   :hook (python-mode-hook . lsp-deferred)
+  :mode ("SCon\(struct\|script\)$" . python-mode)
   :bind
   (:map python-mode-map
         ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
@@ -3733,9 +3831,10 @@ This location is used for temporary installations and files.")
 
   ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
 
-  (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
-                                  ("SConscript\\'" . python-mode))
-                                auto-mode-alist)))
+  ;; (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
+  ;;                                 ("SConscript\\'" . python-mode))
+  ;;                               auto-mode-alist))
+  )
 
 (use-package python-docstring
   :after python-mode
@@ -3777,7 +3876,8 @@ This location is used for temporary installations and files.")
   (python-mode-hook . (lambda ()
                         (require 'lsp-pyright)))
   :config
-  (setq lsp-pyright-python-executable-cmd "python3")
+  (setq lsp-pyright-python-executable-cmd "python3"
+        lsp-pyright-typechecking-mode "basic")
 
   (lsp-register-client
    (make-lsp-client
@@ -3795,9 +3895,9 @@ This location is used for temporary installations and files.")
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (ht-merge (lsp-configuration-section "pyright")
-                                                     (lsp-configuration-section "python")))))
+                        (lsp--set-configuration
+                         (ht-merge (lsp-configuration-section "pyright")
+                                   (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -3836,8 +3936,8 @@ This location is used for temporary installations and files.")
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (lsp-configuration-section "perl"))))
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-r)))
 
@@ -3934,6 +4034,7 @@ This location is used for temporary installations and files.")
                  (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package company-shell
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
@@ -3943,6 +4044,7 @@ This location is used for temporary installations and files.")
 (use-package shfmt
   :hook (sh-mode-hook . shfmt-on-save-mode)
   :config
+  ;; p: posix, ci: indent case labels, i: indent with spaces
   (setq shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
@@ -4251,6 +4353,7 @@ This location is used for temporary installations and files.")
 (use-package lsp-grammarly
   :ensure keytar
   :ensure t
+  :disabled t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands (lsp-grammarly--server-command lsp-grammarly--init
                                            lsp-grammarly--get-credentials lsp-grammarly--get-token
@@ -4354,7 +4457,6 @@ This location is used for temporary installations and files.")
         lsp-latex-bibtex-formatter-line-length sb/fill-column
         lsp-latex-chktex-on-open-and-save      t
         lsp-latex-build-is-continuous          t
-        lsp-latex-build-on-save                t
         ;; Delay time in milliseconds before reporting diagnostics
         lsp-latex-diagnostics-delay            2000)
 
@@ -4443,6 +4545,7 @@ This location is used for temporary installations and files.")
         bibtex-maintain-sorted-entries t))
 
 (use-package ivy-bibtex
+  :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c x b" . ivy-bibtex)
   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
@@ -4470,8 +4573,7 @@ This location is used for temporary installations and files.")
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)
    ("C-c ("   . reftex-label)
-   ("C-c ="   . reftex-toc)
-   ("C-c C-j" . reftex-toc))
+   ("C-c ="   . reftex-toc))
   :preface
   (defun sb/get-bibtex-keys (file)
     (with-current-buffer (find-file-noselect file)
@@ -4513,11 +4615,22 @@ Ignore if no file is found."
   (setq reftex-enable-partial-scans t
         reftex-highlight-selection 'both
         reftex-plug-into-AUCTeX t
+        ;; Save parse info to avoid reparsing every time a file is visited
         reftex-save-parse-info t
         reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-        reftex-use-multiple-selection-buffers t
         ;; Make the toc display with a vertical split, since it is easy to read long lines
-        reftex-toc-split-windows-horizontally nil)
+        reftex-toc-split-windows-horizontally nil
+        ;; Try to guess the label type before prompting
+        reftex-guess-label-type t
+        ;; Use nice fonts for toc
+        reftex-use-fonts t
+        ;; Revisit files if necessary when browsing toc
+        reftex-revisit-to-follow t
+        ;; Center on the section currently being edited.
+        reftex-auto-recenter-toc t
+        ;; Cache selection buffers for faster access.
+        reftex-use-multiple-selection-buffers t)
+
 
   (sb/reftex-try-add-all-bibitems-from-bibtex)
   ;; Rescan the entire document, not only the current file (`reftex-toc-rescan')
@@ -4552,6 +4665,7 @@ Ignore if no file is found."
   (setq TeX-command-default "LatexMk"))
 
 (use-package company-auctex
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t
   :commands (company-auctex-init company-auctex-labels
@@ -4559,21 +4673,25 @@ Ignore if no file is found."
                                  company-auctex-symbols company-auctex-environments))
 
 (use-package math-symbols
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t) ; Required by `ac-math' and `company-math'
 
 (use-package company-math
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
 (use-package company-reftex ; Reftex must be enabled to work
   :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 
 (use-package company-bibtex
   :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands company-bibtex)
 
@@ -4608,8 +4726,9 @@ Ignore if no file is found."
         (TeX-next-error t)
       (progn
         (minibuffer-message "LaTeXMk done")
-        (find-file (concat (file-name-directory (concat master-file ".tex"))
-                           (concat master-file ".pdf")))))))
+        (when (display-graphic-p)
+          (find-file (concat (file-name-directory (concat master-file ".tex"))
+                             (concat master-file ".pdf"))))))))
 
 ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
 ;;   (add-hook hook
@@ -4664,8 +4783,13 @@ Ignore if no file is found."
                 js-indent-level 2))
 
 (use-package bazel
-  :commands (bazel-mode bazelrc-mode)
-  :hook (bazel-mode-hook . flycheck-mode))
+  :if (executable-find "bazel")
+  :commands (bazel-mode bazelrc-mode bazel-buildifier)
+  :hook (bazel-mode-hook . flycheck-mode)
+  :config
+  (add-hook 'bazel-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'bazel-buildifier nil t))))
 
 (use-package protobuf-mode
   :commands protobuf-mode
@@ -4679,6 +4803,7 @@ Ignore if no file is found."
   :mode "\\.mlir\\'")
 
 (use-package clang-format
+  :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
   :config (setq clang-format-style "file"))
@@ -4809,9 +4934,10 @@ Ignore if no file is found."
 
   (dolist (hook '(nxml-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-xml-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-xml-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
 
 (progn
   (defun sb/company-latex-mode ()
@@ -4841,7 +4967,8 @@ Ignore if no file is found."
 
   (dolist (hook '(latex-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-latex-mode)))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-latex-mode))))))
 
 (progn
   (defun sb/company-web-mode ()
@@ -4857,9 +4984,10 @@ Ignore if no file is found."
 
   (dolist (hook '(web-mode-hook))
     (add-hook hook (lambda ()
-                     (sb/company-web-mode)
-                     (company-fuzzy-mode 1)
-                     (diminish 'company-fuzzy-mode)))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-web-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
 
 (progn
   (defun sb/company-text-mode ()
@@ -4879,10 +5007,11 @@ Ignore if no file is found."
 
   (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook hook (lambda ()
-                     (when (not (derived-mode-p 'latex-mode))
-                       (sb/company-text-mode)
-                       (company-fuzzy-mode 1)
-                       (diminish 'company-fuzzy-mode))))))
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (unless (derived-mode-p 'latex-mode)
+                         (sb/company-text-mode)
+                         (company-fuzzy-mode 1)
+                         (diminish 'company-fuzzy-mode)))))))
 
 ;; (progn
 ;;   (defun sb/company-java-mode ()
@@ -4939,9 +5068,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'sh-mode-hook (lambda ()
-                            (sb/company-sh-mode)
-                            (company-fuzzy-mode 1)
-                            (diminish 'company-fuzzy-mode)))
+                            (unless (display-graphic-p)
+                              (sb/company-sh-mode)
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
 
   (defun sb/company-fish-mode ()
     "Add backends for fish shell script completion in company mode."
@@ -4961,9 +5091,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'fish-mode-hook (lambda ()
-                              (sb/company-fish-mode)
-                              (company-fuzzy-mode 1)
-                              (diminish 'company-fuzzy-mode))))
+                              (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                (sb/company-fish-mode)
+                                (company-fuzzy-mode 1)
+                                (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-elisp-mode ()
@@ -4981,9 +5112,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'emacs-lisp-mode-hook (lambda ()
-                                    (sb/company-elisp-mode)
-                                    (company-fuzzy-mode 1)
-                                    (diminish 'company-fuzzy-mode))))
+                                    (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                      (sb/company-elisp-mode)
+                                      (company-fuzzy-mode 1)
+                                      (diminish 'company-fuzzy-mode)))))
 
 (progn
   (defun sb/company-python-mode ()
@@ -5002,9 +5134,10 @@ Ignore if no file is found."
                              company-dabbrev)))
 
   (add-hook 'python-mode-hook (lambda ()
-                                (sb/company-python-mode)
-                                (company-fuzzy-mode 1)
-                                (diminish 'company-fuzzy-mode))))
+                                (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                  (sb/company-python-mode)
+                                  (company-fuzzy-mode 1)
+                                  (diminish 'company-fuzzy-mode)))))
 
 ;; (progn
 ;;   (defun sb/company-prog-mode ()
@@ -5252,70 +5385,69 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
-(defun sb/open-local-file-projectile (directory)
-  "Open projectile file within DIRECTORY.
-Specify by the keyword projectile-default-file define in `dir-locals-file'"
-  (let ((default-file
-          (f-join directory
-                  (nth 1
-                       (car (-tree-map (lambda (node)
-                                         (when (eq (car node)
-                                                   'dotemacs-projectile-default-file)
-                                           (format "%s" (cdr node))))
-                                       (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                                        directory))))))))
-    (if (f-exists? default-file)
-        (counsel-find-file default-file)
-      (message "The file %s doesn't exist in the select project" default-file))))
+;; (defun sb/open-local-file-projectile (directory)
+;;   "Open projectile file within DIRECTORY.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'"
+;;   (let ((default-file
+;;           (f-join directory
+;;                   (nth 1
+;;                        (car (-tree-map (lambda (node)
+;;                                          (when (eq (car node)
+;;                                                    'dotemacs-projectile-default-file)
+;;                                            (format "%s" (cdr node))))
+;;                                        (dir-locals-get-class-variables (dir-locals-read-from-dir
+;;                                                                         directory))))))))
+;;     (if (f-exists? default-file)
+;;         (counsel-find-file default-file)
+;;       (message "The file %s doesn't exist in the select project" default-file))))
 
-(defun sb/open-project-default-file1 (filepath)
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (let ((liststring (with-temp-buffer
-                      (insert-file-contents filepath)
-                      (split-string (buffer-string) "\n"))))
-    (mapcar (lambda (str)
-              (when (cl-search "dotemacs-projectile-default-file" str)
-                (let ((x (substring str (+
-                                         13 (length "dotemacs-projectile-default-file")) (length
-                                         str))))
-                  (let ((default-file (expand-file-name (substring
-                                                         x 1 -2) (projectile-project-root))))
-                    (when (f-exists? default-file)
-                      (let ((new-buffer (get-buffer-create default-file)))
-                        (switch-to-buffer new-buffer)
-                        (insert-file-contents default-file)))))))
-            liststring)))
+;; (defun sb/open-project-default-file1 (filepath)
+;;   "Open projectile file with FILEPATH.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'."
+;;   (let ((liststring (with-temp-buffer
+;;                       (insert-file-contents filepath)
+;;                       (split-string (buffer-string) "\n"))))
+;;     (mapcar (lambda (str)
+;;               (when (cl-search "dotemacs-projectile-default-file" str)
+;;                 (let ((x (substring str (+
+;;                                          13 (length "dotemacs-projectile-default-file")) (length
+;;                                          str))))
+;;                   (let ((default-file (expand-file-name (substring
+;;                                                          x 1 -2) (projectile-project-root))))
+;;                     (when (f-exists? default-file)
+;;                       (let ((new-buffer (get-buffer-create default-file)))
+;;                         (switch-to-buffer new-buffer)
+;;                         (insert-file-contents default-file)))))))
+;;             liststring)))
+
 ;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
 
-(defun sb/open-project-default-file2 ()
-  "Open projectile file with FILEPATH.
-Specify by the keyword projectile-default-file define in `dir-locals-file'."
-  (interactive)
-  (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
-                                                 (projectile-project-root)))))
-    (mapcar (lambda (node)
-              (when (eq (car node) nil)
-                (let ((nillist (cdr node)))
-                  (mapcar (lambda (elem)
-                            (when (eq (car elem) 'dotemacs-projectile-default-file)
-                              (let ((default-file (expand-file-name (cdr elem)
-                                                                    (projectile-project-root))))
-                                (when (f-exists? default-file)
-                                  ;; (let ((new-buffer (get-buffer-create default-file)))
-                                  ;;   (switch-to-buffer new-buffer)
-                                  ;;   (insert-file-contents default-file))
-                                  (find-file default-file)))))
-                          nillist))))
-            mylist)))
+;; (defun sb/open-project-default-file2 ()
+;;   "Open projectile file with FILEPATH.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'."
+;;   (interactive)
+;;   (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
+;;                                                  (projectile-project-root)))))
+;;     (mapcar (lambda (node)
+;;               (when (eq (car node) nil)
+;;                 (let ((nillist (cdr node)))
+;;                   (mapcar (lambda (elem)
+;;                             (when (eq (car elem) 'dotemacs-projectile-default-file)
+;;                               (let ((default-file (expand-file-name (cdr elem)
+;;                                                                     (projectile-project-root))))
+;;                                 (when (f-exists? default-file)
+;;                                   ;; (let ((new-buffer (get-buffer-create default-file)))
+;;                                   ;;   (switch-to-buffer new-buffer)
+;;                                   ;;   (insert-file-contents default-file))
+;;                                   (find-file default-file)))))
+;;                           nillist))))
+;;             mylist)))
 
 ;; (sb/open-project-default-file2)
 
 ;; (with-eval-after-load "counsel-projectile"
 ;;   (add-to-list 'counsel-projectile-action '("d"
 ;;     sb/open-project-default-file2 "open default file") t))
-
-(add-to-list 'term-file-aliases '("alacritty" . "xterm"))
 
 (bind-keys
  ("RET"       . newline-and-indent)
@@ -5335,10 +5467,10 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
  ("M-l"       . downcase-dwim)
  ("<f7>"      . previous-error)
  ("<f8>"      . next-error)
- ;; The default keybinding `C-S-backspace' does not work with TUI
+ ;; The default keybinding "C-S-backspace" does not work with the TUI.
  ("M-k"       . kill-whole-line))
 
-;; In a line with comments, `C-u M-;' removes the comments altogether. That means deleting the
+;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
 (bind-keys*
  ("C-c n" . comment-region)
@@ -5354,8 +5486,9 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 (bind-key   "C-x j" #'sb/counsel-all-files-recursively)
 
-(global-set-key [remap next-buffer]     #'sb/next-buffer)
-(global-set-key [remap previous-buffer] #'sb/previous-buffer)
+(unless (featurep 'centaur-tabs)
+  (global-set-key [remap next-buffer]     #'sb/next-buffer)
+  (global-set-key [remap previous-buffer] #'sb/previous-buffer))
 
 (use-package default-text-scale
   :bind
@@ -5365,6 +5498,13 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
 (use-package free-keys
   :commands free-keys)
 
+(use-package keyfreq
+  :hook
+  (after-init-hook . (lambda ()
+                       (keyfreq-mode 1)
+                       (keyfreq-autosave-mode 1))))
+
+
 (use-package which-key ; Show help popups for prefix keys
   :diminish
   :commands (which-key-mode which-key-setup-side-window-right-bottom)
@@ -5372,10 +5512,14 @@ Specify by the keyword projectile-default-file define in `dir-locals-file'."
   :hook (after-init-hook . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
+  ;; Apply suggested settings for minibuffer. Do not use this if we use paging across keys.
+  ;; (which-key-setup-minibuffer)
 
+  :custom
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
-  (setq which-key-show-early-on-C-h t
-        which-key-sort-order 'which-key-key-order-alpha))
+  (which-key-show-early-on-C-h t)
+  (which-key-sort-order 'which-key-key-order-alpha)
+  (which-key-idle-delay 0.3))
 
 (use-package which-key-posframe
   :commands which-key-posframe-mode
@@ -5750,6 +5894,273 @@ _v_ verify setup    _f_ check           _m_ mode
 ;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
 ;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
 ;; (put 'tags-table-list                         'safe-local-variable #'listp)
+
+;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
+(use-package vertico
+  :if (eq sb/minibuffer-completion 'vertico)
+  :defines read-extended-command-predicate
+  :commands command-completion-default-include-p
+  :hook (after-init-hook . vertico-mode)
+  :custom
+  (vertico-cycle t)
+  (vertico-resize nil)
+  (vertico-count 12)
+  (vertico-scroll-margin 4)
+  :config
+  ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
+  ;; hidden in normal buffers.
+  (when sb/EMACS28+
+    (setq read-extended-command-predicate #'command-completion-default-include-p))
+  :bind
+  (("<f2>" .  find-file)
+   :map vertico-map
+   ("<escape>" . minibuffer-keyboard-quit)
+   ("?" . minibuffer-completion-help)
+   ("M-RET" . minibuffer-force-complete-and-exit)
+   ("M-TAB" . minibuffer-complete)))
+
+;; More convenient directory navigation commands
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  :load-path "extras"
+  :bind
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
+
+(use-package vertico-repeat
+  :after vertico
+  :ensure nil
+  :load-path "extras"
+  :hook (minibuffer-setup-hook . vertico-repeat-save)
+  :bind
+  (("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)))
+
+(use-package vertico-indexed
+  :after vertico
+  :ensure nil
+  :load-path "extras"
+  :commands vertico-indexed-mode
+  :init (vertico-indexed-mode 1))
+
+(use-package vertico-quick
+  :after vertico
+  :ensure nil
+  :bind
+  (:map vertico-map
+        ("C-c q" . vertico-quick-insert)
+        ("C-'" . vertico-quick-exit)))
+
+(use-package consult
+  :commands consult--customize-put
+  :custom
+  (consult-line-start-from-top t "Start search from the beginning")
+  :bind
+  (("C-x M-:" . consult-complex-command)
+   ([remap repeat-complex-command] . consult-complex-command)
+   ("C-x b" . consult-buffer)
+   ("<f3>" . consult-buffer)
+   ([switch-to-buffer] . consult-buffer)
+   ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+   ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
+   ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
+   ("C-x p b" . consult-project-buffer)
+   ([remap project-switch-to-buffer] . consult-project-buffer)
+   ("M-y" . consult-yank-pop)
+   ([remap yank-pop] . consult-yank-pop)
+   ([remap apropos-command] . consult-apropos)
+   ;; M-g bindings (goto-map)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+   ([remap goto-line] . consult-goto-line)           ;; orig. goto-line
+   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("C-c C-j" . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
+   ;; M-s bindings (search-map)
+   ("M-s f" . consult-find)
+   ("M-s l" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("<f4>" . consult-line)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-multi-occur)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
+   ("<f9>" . consult-recent-file)
+   ([remap multi-occur] . consult-multi-occur)
+   ;; Isearch integration
+   ("M-s e" . consult-isearch-history)
+   :map isearch-mode-map
+   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+   )
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode-hook . consult-preview-at-point-mode)
+  :config
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+  (setq consult-project-function #'projectile-project-root)
+
+  (unless (display-graphic-p)
+    (setq completion-in-region-function #'consult-completion-in-region))
+
+  ;; Disable live preview
+  (consult-customize
+   consult-recent-file consult-buffer
+   :preview-key nil))
+
+(use-package consult-projectile
+  :after (consult projectile)
+  :bind ("<f6>" . consult-projectile))
+
+(use-package consult-lsp
+  :after (consult lsp)
+  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :config (consult-lsp-marginalia-mode 1))
+
+(use-package consult-flycheck
+  :after (consult flycheck)
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
+
+(use-package consult-flyspell
+  :after (consult flyspell))
+
+(use-package consult-dir
+  :bind
+  (([remap list-directory] . consult-dir)
+   ("C-x C-d" . consult-dir)
+   :map minibuffer-local-completion-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file)))
+
+(use-package consult-project-extra)
+
+(use-package consult-yasnippet)
+
+;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
+(use-package corfu
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :preface
+  (defun sb/corfu-move-to-minibuffer ()
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+  :hook (after-init-hook . corfu-global-mode)
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-auto-delay 0)
+  (corfu-auto-prefix 2)
+  (corfu-min-width 60)
+  (corfu-max-width corfu-min-width)
+  (corfu-count 15)
+  (corfu-preselect-first t)
+  :bind
+  (:map corfu-map
+        ([tab] . corfu-next)
+        ([backtab] . corfu-previous)
+        ("M-m" . sb/corfu-move-to-minibuffer)))
+
+(use-package corfu-doc
+  :hook (corfu-mode-hook . corfu-doc-mode))
+
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :demand t
+  :commands kind-icon-margin-formatter
+  :custom
+  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;; https://kristofferbalintona.me/posts/cape/
+(use-package cape
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;; Complete programming language keyword
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; Complete unicode char from TeX command, e.g. \hbar.
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; Complete abbreviation at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; Complete word from dictionary at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; Complete current line from other lines in buffer.
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
+  ;; Complete word at point with Ispell.
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; Complete with Dabbrev at point.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  :custom
+  (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
+
+(use-package marginalia
+  :after vertico
+  :init (marginalia-mode 1))
+
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
+  :init (all-the-icons-completion-mode))
+
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/
+(use-package embark
+  :after vertico
+  :init
+  ;; Replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :bind
+  (([remap describe-bindings] . embark-bindings)
+   :map vertico-map
+   ("C-l" . embark-act)))
+
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
+
+(use-package centaur-tabs
+  :commands centaur-tabs-group-by-projectile-project
+  :hook (emacs-startup-hook . centaur-tabs-mode)
+  :init
+  (setq centaur-tabs-set-icons t
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-modified-marker "*"
+        centaur-tabs-cycle-scope 'tabs
+        centaur-tabs-set-close-button nil
+        centaur-tabs-show-new-tab-button nil
+        centaur-tabs-enable-ido-completion nil)
+  :config
+  (centaur-tabs-mode t)
+  (centaur-tabs-group-by-projectile-project)
+  :bind
+  (("M-<right>" . centaur-tabs-forward-tab)
+   ("M-<left>" . centaur-tabs-backward-tab)))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
