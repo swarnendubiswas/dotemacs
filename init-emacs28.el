@@ -19,7 +19,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -38,7 +38,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -133,7 +133,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (defcustom sb/minibuffer-completion
-  'ivy
+  'vertico
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)
@@ -141,7 +141,7 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point.
 Corfu does not support TUI, so we have to fallback on company. Therefore, this selection variable is not used now."
   :type '(radio
@@ -155,7 +155,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
-(require 'package)
+;; Avoid loading packages twice, this is set during `(package-initialize)'
+(setq package-enable-at-startup nil)
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
@@ -164,9 +165,14 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 
 ;; Initialise the package management system. Another option is to construct the `load-path'
 ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-  ;; Avoid loading packages twice, this is set during `(package-initialize)'
-  (setq package-enable-at-startup nil)
-  (package-initialize)
+(package-initialize)
+
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
+
+;; Enable ahead-of-time compilation when installing a package
+(when sb/EMACS28+
+  (setq package-native-compile nil))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -182,36 +188,17 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (defvar use-package-hook-name-suffix)
 
 (setq use-package-enable-imenu-support t
-      ;; Avoid manual modifications whenever I modify package installations
-      use-package-always-ensure        t)
-(setq use-package-hook-name-suffix nil)
-
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq debug-on-error                 t
-          debug-on-event                 'sigusr2
-          garbage-collection-messages    t
-          use-package-compute-statistics t ; Use `M-x use-package-report' to see results
-          use-package-verbose            t
-          use-package-expand-minimally   nil)
-    (debug-on-entry 'projectile-remove-known-project))
-
-  ;; Always load features lazily unless told otherwise. This implies we should use `after-init' hook
-  ;; or `:init' instead of `:config', since otherwise packages may not be loaded. Be careful about
-  ;; using `:after' and always deferring loading, because then we will need to specifiy alternate
-  ;; ways of loading the package.
-  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
-  (unless (bound-and-true-p sb/debug-init-file)
-    (setq use-package-always-defer       t
-          ;; Avoid printing errors and warnings since the configuration is known to work
-          use-package-expand-minimally   t
-          use-package-compute-statistics nil
-          use-package-verbose            nil))
-
-(eval-when-compile
-  (require 'use-package))
+      ;; Avoid manual installations whenever I modify package installations
+      use-package-always-ensure        t
+      use-package-hook-name-suffix     nil)
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
-;; We do not need `:commands' with `:hook' or `:bind'.
+;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
+;; implies always load features lazily unless told otherwise. This implies we should use
+;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
+;; careful about using `:after' and always deferring loading, because then we will need to specifiy
+;; alternate ways of loading the package.
+;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 
 ;; Hooks in the `:hook' section run in reverse order. Example:
 ;; (use-package package-name
@@ -219,6 +206,25 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 ;;   ((x-mode-hook . last)
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
+
+(when (bound-and-true-p sb/debug-init-file)
+  (setq debug-on-error                 t
+        debug-on-event                 'sigusr2
+        garbage-collection-messages    t
+        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+        use-package-verbose            t
+        use-package-expand-minimally   nil)
+  (debug-on-entry 'projectile-remove-known-project))
+
+(unless (bound-and-true-p sb/debug-init-file)
+  (setq use-package-always-defer       t
+        ;; Avoid printing errors and warnings since the configuration is known to work
+        use-package-expand-minimally   t
+        use-package-compute-statistics nil
+        use-package-verbose            nil))
+
+(eval-when-compile
+  (require 'use-package))
 
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
@@ -257,7 +263,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :type  'string
   :group 'sb/emacs)
 
-;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc"
+(setq custom-file sb/custom-file)
+
+;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
 (defcustom sb/private-file
   (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
@@ -265,6 +273,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :group 'sb/emacs)
 
 (let ((gc-cons-threshold most-positive-fixnum))
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror 'nomessage))
   (when (file-exists-p sb/private-file)
     (load sb/private-file 'noerror 'nomessage)))
 
@@ -350,6 +360,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       compilation-scroll-output 'first-error
       completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing
+      completions-detailed t
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
@@ -374,6 +385,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       find-file-suppress-same-file-warnings t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
+      help-enable-symbol-autoload t
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       history-length 50 ; Reduce the state that is to be read
@@ -384,8 +396,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
+      next-error-message-highlight t
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name
+      read-minibuffer-restore-windows t
       read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound
@@ -471,7 +485,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       mouse-wheel-progressive-speed nil)
 
 (fset 'display-startup-echo-area-message #'ignore)
-(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
+
+(if (boundp 'use-short-answers)
+    (setq use-short-answers t)
+  ;; Type "y"/"n" instead of "yes"/"no"
+  (fset 'yes-or-no-p 'y-or-n-p))
 
 (use-package autorevert ; Auto-refresh all buffers
   :ensure nil
@@ -503,11 +521,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands savehist-mode
   ;; :init (run-with-idle-timer 2 nil #'savehist-mode)
   :hook (after-init-hook . savehist-mode)
-  :config
-  (setq savehist-additional-variables '(extended-command-history
-                                        kill-ring
-                                        regexp-search-ring
-                                        search-ring)))
+  :custom
+  (savehist-additional-variables '(extended-command-history
+                                   kill-ring
+                                   regexp-search-ring
+                                   search-ring)))
 
 (use-package uniquify
   :ensure nil
@@ -522,18 +540,18 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 ;; expansions in the current buffer and presents suggestions for completion.
 (use-package hippie-exp
   :ensure nil
-  :config
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                           try-expand-dabbrev-all-buffers
-                                           try-expand-dabbrev-from-kill
-                                           try-complete-file-name-partially
-                                           try-complete-file-name
-                                           try-expand-all-abbrevs
-                                           try-expand-list
-                                           try-expand-line
-                                           try-complete-lisp-symbol-partially
-                                           try-complete-lisp-symbol)
-        hippie-expand-verbose nil)
+  :custom
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-complete-file-name
+                                      try-expand-all-abbrevs
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
+  (hippie-expand-verbose nil)
   :bind
   (("M-/"   . hippie-expand)
    ("C-M-/" . dabbrev-completion)))
@@ -582,10 +600,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :ensure nil
   :diminish
   :hook (after-init-hook . abbrev-mode)
-  :config
+  :custom
   ;; The "abbrev-defs" file is under version control
-  (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
-        save-abbrevs 'silently))
+  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
+  (save-abbrevs 'silently))
 
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
 (dolist (mode '(tooltip-mode))
@@ -637,10 +655,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 (use-package hideshow
   :ensure nil
+  :disabled t
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
   :hook (prog-mode-hook . hs-minor-mode)
-  :config (setq hs-isearch-open t))
+  :custom (hs-isearch-open t))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
@@ -665,18 +684,16 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (setq all-the-icons-scale-factor 0.9
         all-the-icons-color-icons nil))
 
-;; Set `sb/gui-theme' to `none' if you use this package
+;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
 (use-package circadian
-  :disabled t
   :commands circadian-setup
-  :if (display-graphic-p)
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
-        circadian-themes '((:sunrise . doom-gruvbox)
-                           (:sunset  . doom-gruvbox)))
+        circadian-themes '((:sunrise . modus-operandi)
+                           (:sunset  . modus-vivendi)))
   (circadian-setup))
 
 (use-package leuven-theme
@@ -736,12 +753,6 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                (or (eq sb/tui-theme 'modus-operandi)
                    (eq sb/tui-theme 'modus-vivendi))))
   :init
-  (setq modus-themes-fringes 'intense
-        modus-themes-hl-line '(intense)
-        modus-themes-prompts '(intense)
-        modus-themes-lang-checkers '(background faint)
-        modus-themes-org-blocks 'tinted-background)
-
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
 
@@ -790,7 +801,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 
 (use-package doom-modeline
   :ensure all-the-icons
-  :ensure doom-modeline
+  :ensure t
   :if (eq sb/modeline-theme 'doom-modeline)
   :commands doom-modeline-mode
   :init
@@ -931,7 +942,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -1166,7 +1177,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   (dired-mode-hook . (lambda ()
                        (unless (file-remote-p default-directory)
-                         all-the-icons-dired-mode))))
+                         (all-the-icons-dired-mode 1)))))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
@@ -1659,11 +1670,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :diminish (company-fuzzy-mode global-company-fuzzy-mode)
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
-  :config
-  (setq company-fuzzy-sorting-backend 'flx
-        company-fuzzy-show-annotation nil ; The right-hand side gets cut off
-        ;; We should not need this because the `flx' sorting accounts for the prefix
-        company-fuzzy-prefix-on-top t))
+  :custom
+  (company-fuzzy-sorting-backend 'flx)
+  (company-fuzzy-show-annotation nil "The right-hand side gets cut off")
+  ;; We should not need this because the `flx' sorting accounts for the prefix
+  (company-fuzzy-prefix-on-top t))
 
 (use-package yasnippet
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
@@ -1695,7 +1706,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :bind
   ;; We need this if we use `vertico' and `consult'
   (("M-x"  . execute-extended-command)
-   ("<f1>" . execute-extended-command))
+   ("<f1>" . execute-extended-command-for-buffer))
   :custom
   (amx-auto-update-interval 10 "Update the command list every n minutes"))
 
@@ -1845,7 +1856,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package prescient
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
-  :config (setq prescient-sort-full-matches-first t))
+  :custom (prescient-sort-full-matches-first t))
 
 ;; We are using `company-fuzzy' for sorting completion candidates
 (use-package company-prescient
@@ -2384,7 +2395,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
-  :config (setq all-the-icons-ivy-rich-icon-size 0.9))
+  :custom (all-the-icons-ivy-rich-icon-size 0.9))
 
 (use-package ivy-rich
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
@@ -2606,10 +2617,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :if (display-graphic-p)
   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
   :hook (flycheck-mode-hook . flycheck-posframe-mode)
+  :custom
+  (flycheck-posframe-position 'point-bottom-left-corner)
+  (flycheck-posframe-border-width 1)
   :config
-  (setq flycheck-posframe-position 'point-bottom-left-corner
-        flycheck-posframe-border-width 1)
-
   (flycheck-posframe-configure-pretty-defaults))
 
 (use-package whitespace
@@ -2646,7 +2657,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
   :config
   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
-  (setq whitespace-cleanup-mode-preserve-point t))
+  :custom
+  (whitespace-cleanup-mode-preserve-point t))
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
@@ -2662,9 +2674,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :bind
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next))
-  :config
+  :custom
   ;; Delay highlighting to allow for transient cursor placements
-  (setq symbol-overlay-idle-time 2))
+  (symbol-overlay-idle-time 2))
 
 (use-package hl-todo
   :commands global-hl-todo-mode
@@ -2698,11 +2710,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands number-separator-mode
   :disabled t
   :diminish
-  :config
-  (setq number-separator ","
-        number-separator-interval 3
-        number-separator-ignore-threshold 4
-        number-separator-decimal-char "."))
+  :custom
+  (number-separator ",")
+  (number-separator-interval 3)
+  (number-separator-ignore-threshold 4)
+  (number-separator-decimal-char "."))
 
 (use-package highlight-escape-sequences
   :commands hes-mode
@@ -2790,14 +2802,14 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package imenu
   :ensure nil
   :after (:any markdown-mode yaml-mode prog-mode)
-  :config
-  (setq imenu-auto-rescan t
-        imenu-max-items 1000
-        ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful
-        ;; with mouse support enabled
-        imenu-use-popup-menu nil
-        ;; `nil' implies no sorting and will list by position in the buffer
-        imenu-sort-function nil))
+  :custom
+  (imenu-auto-rescan t)
+  (imenu-max-items 1000)
+  ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
+  ;; mouse support enabled
+  (imenu-use-popup-menu nil)
+  ;; `nil' implies no sorting and will list by position in the buffer
+  (imenu-sort-function nil))
 
 (defvar tags-revert-without-query)
 
@@ -2813,7 +2825,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
    ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-go-back)
+   ("M-,"   . xref-pop-marker-stack)
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
@@ -2822,9 +2834,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package ivy-xref
   :after (ivy xref)
   :demand t
-  :config
-  (setq xref-show-definitions-function #'ivy-xref-show-defs
-        xref-show-xrefs-function       #'ivy-xref-show-xrefs))
+  :custom
+  (xref-show-definitions-function #'ivy-xref-show-defs)
+  (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
@@ -3352,6 +3364,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands csv-mode
   :hook
   (csv-mode . (lambda ()
+                (make-local-variable 'lsp-disabled-clients)
                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                 (spell-fu-mode -1)
                 (flyspell-mode -1)))
@@ -4209,21 +4222,20 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands web-mode
   :mode "\\.html?\\'"
   :hook (web-mode-hook . lsp-deferred)
+  :custom
+  (web-mode-enable-auto-closing              t)
+  (web-mode-enable-auto-pairing              nil "Prefer `smartparens'")
+  (web-mode-enable-auto-quoting              t)
+  (web-mode-enable-block-face                t)
+  (web-mode-enable-css-colorization          t)
+  (web-mode-enable-current-element-highlight t "Highlight the element under the cursor")
+  (web-mode-enable-current-column-highlight  t)
+  (web-mode-markup-indent-offset             2) ; HTML
+  (web-mode-css-indent-offset                2) ; CSS
+  (web-mode-code-indent-offset               2) ; Script
+  (web-mode-style-padding                    2) ; For `<style>' tag
+  (web-mode-script-padding                   2) ; For `<script>' tag
   :config
-  (setq web-mode-enable-auto-closing              t
-        web-mode-enable-auto-pairing              nil ; Prefer `smartparens'
-        web-mode-enable-auto-quoting              t
-        web-mode-enable-block-face                t
-        web-mode-enable-css-colorization          t
-        web-mode-enable-current-element-highlight t ; Highlight the element under the cursor
-        web-mode-enable-current-column-highlight  t
-        web-mode-markup-indent-offset             2 ; HTML
-        web-mode-css-indent-offset                2 ; CSS
-        web-mode-code-indent-offset               2 ; Script
-        web-mode-style-padding                    2 ; For `<style>' tag
-        ;; For `<script>' tag
-        web-mode-script-padding                   2)
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4236,7 +4248,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :defines emmet-move-cursor-between-quote
   :commands emmet-mode
   :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
-  :config (setq emmet-move-cursor-between-quote t))
+  :custom (emmet-move-cursor-between-quote t))
 
 (use-package rainbow-mode
   :commands rainbow-mode
@@ -4248,16 +4260,18 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode-hook . (lambda ()
-                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
+                      ;; checking.
                       (make-local-variable 'lsp-disabled-clients)
                       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                       (spell-fu-mode -1)
                       (flyspell-mode -1)
                       (lsp-deferred)))
+  :custom
+  (nxml-auto-insert-xml-declaration-flag t)
+  (nxml-slash-auto-complete-flag t)
   :config
   (fset 'xml-mode 'nxml-mode)
-  (setq nxml-auto-insert-xml-declaration-flag t
-        nxml-slash-auto-complete-flag t)
 
   (lsp-register-client
    (make-lsp-client
@@ -4362,9 +4376,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
    (lambda ()
-     (unless (eq major-mode 'csv-mode)
-       (require 'lsp-grammarly)
-       (lsp-deferred))))
+     (require 'lsp-grammarly)
+     (lsp-deferred)))
   :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
@@ -4397,9 +4410,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
    (lambda ()
-     (unless (eq major-mode 'csv-mode)
-       (require 'lsp-ltex)
-       (lsp-deferred))))
+     (require 'lsp-ltex)
+     (lsp-deferred)))
   :init
   (setq lsp-ltex-check-frequency "save"
         ;; lsp-ltex-dictionary ("microbenchmarks")
@@ -4451,15 +4463,15 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (latex-mode-hook . (lambda()
                        (require 'lsp-latex)
                        (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter             "latexindent")
+  (lsp-latex-latex-formatter              "latexindent")
+  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+  (lsp-latex-chktex-on-open-and-save      t)
+  (lsp-latex-build-is-continuous          t)
+  ;; Delay time in milliseconds before reporting diagnostics
+  (lsp-latex-diagnostics-delay            2000)
   :config
-  (setq lsp-latex-bibtex-formatter             "latexindent"
-        lsp-latex-latex-formatter              "latexindent"
-        lsp-latex-bibtex-formatter-line-length sb/fill-column
-        lsp-latex-chktex-on-open-and-save      t
-        lsp-latex-build-is-continuous          t
-        ;; Delay time in milliseconds before reporting diagnostics
-        lsp-latex-diagnostics-delay            2000)
-
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc")
 
@@ -4540,23 +4552,23 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
    (bibtex-mode-hook . lsp-deferred))
-  :config
-  (setq bibtex-align-at-equal-sign     t
-        bibtex-maintain-sorted-entries t))
+  :custom
+  (bibtex-align-at-equal-sign     t)
+  (bibtex-maintain-sorted-entries t))
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c x b" . ivy-bibtex)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package bibtex-completion
   :ensure nil
   :after ivy-bibtex
   :demand t
-  :config
-  (setq bibtex-completion-cite-default-as-initial-input t
-        bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
+  :custom
+  (bibtex-completion-cite-default-as-initial-input t)
+  (bibtex-completion-cite-prompt-for-optional-arguments nil)
+  (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -4568,7 +4580,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                                      reftex-toc-Rescan
                                      reftex-default-bibliography)
   :diminish
-  :hook ((LaTeX-mode-hook latex-mode-hook) . reftex-mode)
+  :hook
+  (;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
+   ;; consistent but this is expensive. We can use an idle timer.
+   (reftex-toc-mode-hook . reftex-toc-Rescan)
+   ((LaTeX-mode-hook latex-mode-hook) . reftex-mode))
   :bind
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)
@@ -4611,30 +4627,21 @@ Ignore if no file is found."
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+  :custom
+  (reftex-enable-partial-scans t)
+  (reftex-highlight-selection 'both)
+  (reftex-plug-into-AUCTeX t)
+  (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
+  (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
+  ;; Make the toc display with a vertical split, since it is easy to read long lines
+  (reftex-toc-split-windows-horizontally nil)
+  (reftex-guess-label-type t "Try to guess the label type before prompting")
+  (reftex-use-fonts t "Use nice fonts for toc")
+  (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
+  (reftex-auto-recenter-toc t "Center on the section currently being edited")
+  (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
   :config
-  (setq reftex-enable-partial-scans t
-        reftex-highlight-selection 'both
-        reftex-plug-into-AUCTeX t
-        ;; Save parse info to avoid reparsing every time a file is visited
-        reftex-save-parse-info t
-        reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-        ;; Make the toc display with a vertical split, since it is easy to read long lines
-        reftex-toc-split-windows-horizontally nil
-        ;; Try to guess the label type before prompting
-        reftex-guess-label-type t
-        ;; Use nice fonts for toc
-        reftex-use-fonts t
-        ;; Revisit files if necessary when browsing toc
-        reftex-revisit-to-follow t
-        ;; Center on the section currently being edited.
-        reftex-auto-recenter-toc t
-        ;; Cache selection buffers for faster access.
-        reftex-use-multiple-selection-buffers t)
-
-
-  (sb/reftex-try-add-all-bibitems-from-bibtex)
-  ;; Rescan the entire document, not only the current file (`reftex-toc-rescan')
-  (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan))
+  (sb/reftex-try-add-all-bibitems-from-bibtex))
 
 (use-package bib-cite
   :ensure nil
@@ -4642,7 +4649,7 @@ Ignore if no file is found."
   :diminish bib-cite-minor-mode
   :commands bib-cite-minor-mode
   :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
-  :config (setq bib-cite-use-reftex-view-crossref t)
+  :custom (bib-cite-use-reftex-view-crossref t)
   :bind (:map bib-cite-minor-mode-map
               ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
               ("C-c l a" . bib-apropos)
@@ -4658,11 +4665,11 @@ Ignore if no file is found."
   :after tex-mode
   :demand t
   :commands (auctex-latexmk-setup auctex-latexmk)
+  :custom
+  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  (TeX-command-default "LatexMk")
   :config
-  ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-  (auctex-latexmk-setup)
-  (setq TeX-command-default "LatexMk"))
+  (auctex-latexmk-setup))
 
 (use-package company-auctex
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
@@ -4746,15 +4753,16 @@ Ignore if no file is found."
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
 (use-package math-preview
+  :disabled t
   :commands (math-preview-all math-preview-at-point math-preview-region)
-  :config
-  (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                               sb/user-tmp)))
+  :custom
+  (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+                                          sb/user-tmp)))
 
 (use-package json-mode
-  :ensure t
   :ensure json-reformat
   :ensure json-snatcher
+  :ensure t
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
@@ -4779,17 +4787,17 @@ Ignore if no file is found."
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)
   :demand t
-  :config (setq json-reformat:indent-width 2
-                js-indent-level 2))
+  :custom
+  (json-reformat:indent-width 2)
+  (js-indent-level 2))
 
 (use-package bazel
   :if (executable-find "bazel")
   :commands (bazel-mode bazelrc-mode bazel-buildifier)
-  :hook (bazel-mode-hook . flycheck-mode)
-  :config
-  (add-hook 'bazel-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook #'bazel-buildifier nil t))))
+  :hook
+  ((bazel-mode-hook . (lambda ()
+                        (add-hook 'before-save-hook #'bazel-buildifier nil t)))
+   (bazel-mode-hook . flycheck-mode)))
 
 (use-package protobuf-mode
   :commands protobuf-mode
@@ -4806,14 +4814,14 @@ Ignore if no file is found."
   :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
-  :config (setq clang-format-style "file"))
+  :custom (clang-format-style "file"))
 
 (use-package clang-format+
   :ensure clang-format
   :ensure t
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
-  :config (setq clang-format+-always-enable t))
+  :custom (clang-format+-always-enable t))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
@@ -5960,6 +5968,10 @@ _v_ verify setup    _f_ check           _m_ mode
   :commands consult--customize-put
   :custom
   (consult-line-start-from-top t "Start search from the beginning")
+  ;; Use Consult to select xref locations with preview
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
+  (consult-project-function #'projectile-project-root)
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
@@ -6011,12 +6023,6 @@ _v_ verify setup    _f_ check           _m_ mode
   :config
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-  (setq consult-project-function #'projectile-project-root)
-
   (unless (display-graphic-p)
     (setq completion-in-region-function #'consult-completion-in-region))
 
@@ -6027,7 +6033,10 @@ _v_ verify setup    _f_ check           _m_ mode
 
 (use-package consult-projectile
   :after (consult projectile)
-  :bind ("<f6>" . consult-projectile))
+  :commands consult-projectile-recentf
+  :bind
+  (("<f5>" . consult-projectile-switch-project)
+   ("<f6>" . consult-projectile)))
 
 (use-package consult-lsp
   :after (consult lsp)
@@ -6041,7 +6050,8 @@ _v_ verify setup    _f_ check           _m_ mode
         ("!" . consult-flycheck)))
 
 (use-package consult-flyspell
-  :after (consult flyspell))
+  :after (consult flyspell)
+  :commands consult-flyspell)
 
 (use-package consult-dir
   :bind
@@ -6053,7 +6063,8 @@ _v_ verify setup    _f_ check           _m_ mode
 
 (use-package consult-project-extra)
 
-(use-package consult-yasnippet)
+(use-package consult-yasnippet
+  :bind ("C-M-y" . consult-yasnippet))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
@@ -6089,7 +6100,8 @@ _v_ verify setup    _f_ check           _m_ mode
   :demand t
   :commands kind-icon-margin-formatter
   :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  (kind-icon-face 'corfu-default)
+  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
@@ -6105,7 +6117,7 @@ _v_ verify setup    _f_ check           _m_ mode
   ;; Complete abbreviation at point.
   ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
   ;; Complete word from dictionary at point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
   ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
@@ -6120,7 +6132,12 @@ _v_ verify setup    _f_ check           _m_ mode
   :after vertico
   :init (marginalia-mode 1))
 
+;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
+;; which is better.
 (use-package all-the-icons-completion
+  :ensure all-the-icons
+  :ensure t
+  :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode))
@@ -6140,15 +6157,13 @@ _v_ verify setup    _f_ check           _m_ mode
   :ensure t
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 (use-package centaur-tabs
   :commands centaur-tabs-group-by-projectile-project
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :init
-  (setq centaur-tabs-set-icons t
+  (setq centaur-tabs-set-icons nil ; The icons often do not blend well with the theme
         centaur-tabs-set-modified-marker t
         centaur-tabs-modified-marker "*"
         centaur-tabs-cycle-scope 'tabs
@@ -6156,7 +6171,6 @@ _v_ verify setup    _f_ check           _m_ mode
         centaur-tabs-show-new-tab-button nil
         centaur-tabs-enable-ido-completion nil)
   :config
-  (centaur-tabs-mode t)
   (centaur-tabs-group-by-projectile-project)
   :bind
   (("M-<right>" . centaur-tabs-forward-tab)

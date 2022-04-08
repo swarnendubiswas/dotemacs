@@ -19,7 +19,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -38,7 +38,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-operandi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -133,7 +133,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (defcustom sb/minibuffer-completion
-  'ivy
+  'vertico
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)
@@ -141,7 +141,7 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point.
 Corfu does not support TUI, so we have to fallback on company. Therefore, this selection variable is not used now."
   :type '(radio
@@ -360,6 +360,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       compilation-scroll-output 'first-error
       completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing
+      completions-detailed t
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
@@ -384,6 +385,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       find-file-suppress-same-file-warnings t
       find-file-visit-truename t ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
+      help-enable-symbol-autoload t
       help-window-select t ; Makes it easy to close the window
       history-delete-duplicates t
       history-length 50 ; Reduce the state that is to be read
@@ -394,8 +396,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
+      next-error-message-highlight t
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name
+      read-minibuffer-restore-windows t
       read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound
@@ -481,7 +485,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       mouse-wheel-progressive-speed nil)
 
 (fset 'display-startup-echo-area-message #'ignore)
-(fset 'yes-or-no-p 'y-or-n-p) ; Type "y"/"n" instead of "yes"/"no"
+
+(if (boundp 'use-short-answers)
+    (setq use-short-answers t)
+  ;; Type "y"/"n" instead of "yes"/"no"
+  (fset 'yes-or-no-p 'y-or-n-p))
 
 (use-package autorevert ; Auto-refresh all buffers
   :ensure nil
@@ -513,11 +521,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands savehist-mode
   ;; :init (run-with-idle-timer 2 nil #'savehist-mode)
   :hook (after-init-hook . savehist-mode)
-  :config
-  (setq savehist-additional-variables '(extended-command-history
-                                        kill-ring
-                                        regexp-search-ring
-                                        search-ring)))
+  :custom
+  (savehist-additional-variables '(extended-command-history
+                                   kill-ring
+                                   regexp-search-ring
+                                   search-ring)))
 
 (use-package uniquify
   :ensure nil
@@ -532,18 +540,18 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 ;; expansions in the current buffer and presents suggestions for completion.
 (use-package hippie-exp
   :ensure nil
-  :config
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                           try-expand-dabbrev-all-buffers
-                                           try-expand-dabbrev-from-kill
-                                           try-complete-file-name-partially
-                                           try-complete-file-name
-                                           try-expand-all-abbrevs
-                                           try-expand-list
-                                           try-expand-line
-                                           try-complete-lisp-symbol-partially
-                                           try-complete-lisp-symbol)
-        hippie-expand-verbose nil)
+  :custom
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-complete-file-name
+                                      try-expand-all-abbrevs
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
+  (hippie-expand-verbose nil)
   :bind
   (("M-/"   . hippie-expand)
    ("C-M-/" . dabbrev-completion)))
@@ -592,10 +600,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :ensure nil
   :diminish
   :hook (after-init-hook . abbrev-mode)
-  :config
+  :custom
   ;; The "abbrev-defs" file is under version control
-  (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
-        save-abbrevs 'silently))
+  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
+  (save-abbrevs 'silently))
 
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
 (dolist (mode '(tooltip-mode))
@@ -647,10 +655,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 (use-package hideshow
   :ensure nil
+  :disabled t
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
   :hook (prog-mode-hook . hs-minor-mode)
-  :config (setq hs-isearch-open t))
+  :custom (hs-isearch-open t))
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
@@ -675,18 +684,16 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (setq all-the-icons-scale-factor 0.9
         all-the-icons-color-icons nil))
 
-;; Set `sb/gui-theme' to `none' if you use this package
+;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
 (use-package circadian
-  :disabled t
   :commands circadian-setup
-  :if (display-graphic-p)
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
-        circadian-themes '((:sunrise . doom-gruvbox)
-                           (:sunset  . doom-gruvbox)))
+        circadian-themes '((:sunrise . modus-operandi)
+                           (:sunset  . modus-vivendi)))
   (circadian-setup))
 
 (use-package leuven-theme
@@ -746,12 +753,6 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                (or (eq sb/tui-theme 'modus-operandi)
                    (eq sb/tui-theme 'modus-vivendi))))
   :init
-  (setq modus-themes-fringes 'intense
-        modus-themes-hl-line '(intense)
-        modus-themes-prompts '(intense)
-        modus-themes-lang-checkers '(background faint)
-        modus-themes-org-blocks 'tinted-background)
-
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
 
@@ -800,7 +801,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 
 (use-package doom-modeline
   :ensure all-the-icons
-  :ensure doom-modeline
+  :ensure t
   :if (eq sb/modeline-theme 'doom-modeline)
   :commands doom-modeline-mode
   :init
@@ -941,7 +942,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -1176,7 +1177,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   (dired-mode-hook . (lambda ()
                        (unless (file-remote-p default-directory)
-                         all-the-icons-dired-mode))))
+                         (all-the-icons-dired-mode 1)))))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode
@@ -1705,7 +1706,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :bind
   ;; We need this if we use `vertico' and `consult'
   (("M-x"  . execute-extended-command)
-   ("<f1>" . execute-extended-command))
+   ("<f1>" . execute-extended-command-for-buffer))
   :custom
   (amx-auto-update-interval 10 "Update the command list every n minutes"))
 
@@ -2394,7 +2395,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
-  :config (setq all-the-icons-ivy-rich-icon-size 0.9))
+  :custom (all-the-icons-ivy-rich-icon-size 0.9))
 
 (use-package ivy-rich
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
@@ -2616,10 +2617,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :if (display-graphic-p)
   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
   :hook (flycheck-mode-hook . flycheck-posframe-mode)
+  :custom
+  (flycheck-posframe-position 'point-bottom-left-corner)
+  (flycheck-posframe-border-width 1)
   :config
-  (setq flycheck-posframe-position 'point-bottom-left-corner
-        flycheck-posframe-border-width 1)
-
   (flycheck-posframe-configure-pretty-defaults))
 
 (use-package whitespace
@@ -2656,7 +2657,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
   :config
   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
-  (setq whitespace-cleanup-mode-preserve-point t))
+  :custom
+  (whitespace-cleanup-mode-preserve-point t))
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
@@ -2672,9 +2674,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :bind
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next))
-  :config
+  :custom
   ;; Delay highlighting to allow for transient cursor placements
-  (setq symbol-overlay-idle-time 2))
+  (symbol-overlay-idle-time 2))
 
 (use-package hl-todo
   :commands global-hl-todo-mode
@@ -2708,11 +2710,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands number-separator-mode
   :disabled t
   :diminish
-  :config
-  (setq number-separator ","
-        number-separator-interval 3
-        number-separator-ignore-threshold 4
-        number-separator-decimal-char "."))
+  :custom
+  (number-separator ",")
+  (number-separator-interval 3)
+  (number-separator-ignore-threshold 4)
+  (number-separator-decimal-char "."))
 
 (use-package highlight-escape-sequences
   :commands hes-mode
@@ -2800,14 +2802,14 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package imenu
   :ensure nil
   :after (:any markdown-mode yaml-mode prog-mode)
-  :config
-  (setq imenu-auto-rescan t
-        imenu-max-items 1000
-        ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful
-        ;; with mouse support enabled
-        imenu-use-popup-menu nil
-        ;; `nil' implies no sorting and will list by position in the buffer
-        imenu-sort-function nil))
+  :custom
+  (imenu-auto-rescan t)
+  (imenu-max-items 1000)
+  ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
+  ;; mouse support enabled
+  (imenu-use-popup-menu nil)
+  ;; `nil' implies no sorting and will list by position in the buffer
+  (imenu-sort-function nil))
 
 (defvar tags-revert-without-query)
 
@@ -2823,7 +2825,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
    ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-go-back)
+   ("M-,"   . xref-pop-marker-stack)
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
@@ -2832,9 +2834,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package ivy-xref
   :after (ivy xref)
   :demand t
-  :config
-  (setq xref-show-definitions-function #'ivy-xref-show-defs
-        xref-show-xrefs-function       #'ivy-xref-show-xrefs))
+  :custom
+  (xref-show-definitions-function #'ivy-xref-show-defs)
+  (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
@@ -6099,7 +6101,8 @@ _v_ verify setup    _f_ check           _m_ mode
   :demand t
   :commands kind-icon-margin-formatter
   :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  (kind-icon-face 'corfu-default)
+  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
@@ -6130,7 +6133,11 @@ _v_ verify setup    _f_ check           _m_ mode
   :after vertico
   :init (marginalia-mode 1))
 
+;; We prefer to use "kind-icon" package for icons
 (use-package all-the-icons-completion
+  :ensure all-the-icons
+  :ensure t
+  :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode))
@@ -6150,15 +6157,13 @@ _v_ verify setup    _f_ check           _m_ mode
   :ensure t
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 (use-package centaur-tabs
   :commands centaur-tabs-group-by-projectile-project
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :init
-  (setq centaur-tabs-set-icons t
+  (setq centaur-tabs-set-icons nil ; The icons often do not blend well with the theme
         centaur-tabs-set-modified-marker t
         centaur-tabs-modified-marker "*"
         centaur-tabs-cycle-scope 'tabs
