@@ -38,7 +38,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'none
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -143,7 +143,7 @@ This location is used for temporary installations and files.")
 (defcustom sb/capf
   'corfu
   "Choose the framework to use for completion at point.
-Corfu does not support TUI, so we have to fallback on company. Therefore, this selection variable is not used now."
+Corfu does not support TUI, so we have to fallback on company."
   :type '(radio
           (const :tag "corfu" corfu)
           (const :tag "company" company))
@@ -335,6 +335,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (defvar compilation-always-kill)
 (defvar compilation-scroll-output)
 (defvar sort-fold-case)
+(defvar help-enable-symbol-autoload)
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
@@ -370,8 +371,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
       echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
-      ;; Keeping track of the minibuffer nesting is difficult, so it is better to keep it disabled
-      ;; enable-recursive-minibuffers t
+      enable-recursive-minibuffers t ; Keeping track of the minibuffer nesting is difficult
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
       ;; variables, but I edit files over Tramp a lot.
       enable-remote-dir-locals t
@@ -687,6 +687,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 ;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
 (use-package circadian
   :commands circadian-setup
+  :if (display-graphic-p)
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
@@ -1141,9 +1142,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :load-path "extras"
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
-  :config
-  (setq diredp-hide-details-initially-flag nil
-        diredp-hide-details-propagate-flag nil)
+  :custom
+  (diredp-hide-details-initially-flag nil)
+  (diredp-hide-details-propagate-flag nil)
   :hook
   (dired-mode-hook . (lambda ()
                        (when sb/EMACS27
@@ -1154,7 +1155,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package dired-efap
   :after dired
   :defines dired-efap-initial-filename-selection
-  :config (setq dired-efap-initial-filename-selection nil)
+  :custom (dired-efap-initial-filename-selection nil)
   :bind*
   (:map dired-mode-map
         ("r" . dired-efap)))
@@ -1416,10 +1417,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package isearch
   :ensure nil
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
-  :config
-  (setq search-highlight       t ; Highlight incremental search
-        isearch-lazy-highlight t
-        isearch-lazy-count     t)
+  :custom
+  (search-highlight t "Highlight incremental search")
+  (isearch-lazy-highlight t)
+  (isearch-lazy-count t)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
@@ -1451,7 +1452,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package swiper
   :if (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch)
-  :config (setq swiper-action-recenter t))
+  :custom (swiper-action-recenter t))
 
 (progn
   (with-eval-after-load "grep"
@@ -1475,7 +1476,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
         ("C-x C-s" . wgrep-finish-edit)
         ("C-x C-k" . wgrep-abort-changes)
         ("C-x C-q" . wgrep-exit))
-  :config (setq wgrep-auto-save-buffer t))
+  :custom (wgrep-auto-save-buffer t))
 
 ;; Use "S" to change the search term, "D" to change the search directory, "g" to rerun the search,
 ;; and "o" to view the result in another window.
@@ -1681,9 +1682,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode-hook prog-mode-hook) . yas-global-mode)
   :diminish yas-minor-mode
+  :custom
+  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  (yas-verbosity 0)
   :config
-  (setq yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory))
-        yas-verbosity 0)
   (with-eval-after-load "hippie-expand"
     (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
   (unbind-key "<tab>" yas-minor-mode-map))
@@ -2321,16 +2323,18 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 
   ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
 
+  ;; Set these in case `counsel-projectile' is disabled. For `vertico', we use `consult-projectile'.
+  (when (eq sb/minibuffer-completion 'ivy)
+    (bind-key "<f5>" #'projectile-switch-project)
+    (bind-key "<f6>" #'projectile-find-file))
+
   :bind-keymap ("C-c p" . projectile-command-map)
   ;; :init (run-with-idle-timer 2 nil #'projectile-mode)
   ;; We can open a project file without enabling projectile via bind-keys
   :hook (after-init-hook . projectile-mode)
   :bind
-  ;; Set these in case `counsel-projectile' is disabled
-  (("<f5>" . projectile-switch-project)
-   ("<f6>" . projectile-find-file)
-   :map projectile-command-map
-   ("A"    . projectile-add-known-project)))
+  (:map projectile-command-map
+        ("A"    . projectile-add-known-project)))
 
 ;; I am unsure how does this package advances `projectile' in terms of usability.
 (use-package counsel-projectile
@@ -3308,17 +3312,17 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
-  :config
-  (setq markdown-command
-        "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments"
-        markdown-enable-math t ; Syntax highlight for LaTeX fragments
-        markdown-enable-wiki-links t
-        markdown-fontify-code-blocks-natively t
-        markdown-indent-on-enter 'indent-and-new-item
-        markdown-list-indent-width 2
-        markdown-split-window-direction 'horizontal
-        ;; markdown-make-gfm-checkboxes-buttons nil
-        markdown-hide-urls t)
+  :custom
+  (markdown-command
+   "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
+  (markdown-enable-math t "Syntax highlight for LaTeX fragments")
+  (markdown-enable-wiki-links t)
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-indent-on-enter 'indent-and-new-item)
+  (markdown-list-indent-width 2)
+  (markdown-split-window-direction 'horizontal)
+  ;; (markdown-make-gfm-checkboxes-buttons nil)
+  (markdown-hide-urls t)
   :bind
   (:map markdown-mode-map
         ("C-c C-j" . nil)))
@@ -3368,8 +3372,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                 (spell-fu-mode -1)
                 (flyspell-mode -1)))
-  :config
-  (setq csv-separators '("," ";" "|" " ")))
+  :custom
+  (csv-separators '("," ";" "|" " ")))
 
 (use-package highlight-doxygen
   :commands highlight-doxygen-global-mode
@@ -3382,9 +3386,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode))
   :config
-  (add-hook 'makefile-mode-hook
-            (lambda()
-              (setq-local indent-tabs-mode t)))
+  (add-hook 'makefile-mode-hook (lambda()
+                                  (setq-local indent-tabs-mode t)))
   (use-package makefile-executor))
 
 (use-package eldoc
@@ -3405,9 +3408,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands css-mode
   :defines sb/flycheck-local-checkers
   :hook (css-mode-hook . lsp-deferred)
+  :custom
+  (css-indent-offset 2)
   :config
-  (setq css-indent-offset 2)
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -3420,9 +3423,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package eldoc-box
   :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
-  :config
-  (setq eldoc-box-clear-with-C-g t
-        eldoc-box-fringe-use-same-bg nil)
+  :custom
+  (eldoc-box-clear-with-C-g t)
+  (eldoc-box-fringe-use-same-bg nil)
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package ini-mode
@@ -3689,17 +3692,17 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                              lsp-ui-peek-find-implementation lsp-ui-imenu)
   :after lsp-mode
   :demand t
+  :custom
+  (lsp-ui-doc-enable t "Enable/disable on-hover dialogs")
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-imenu-auto-refresh 'after-save)
+  (lsp-ui-imenu-window-width 16)
+  (lsp-ui-sideline-enable t "Enable/disable whole sideline")
+  ;; Showing code actions in the sideline enables understanding when to invoke them
+  (lsp-ui-sideline-show-code-actions t)
+  ;; Show/hide diagnostics when typing because they can be intrusive
+  (lsp-ui-sideline-show-diagnostics nil)
   :config
-  (setq lsp-ui-doc-enable t ; Enable/disable on-hover dialogs
-        lsp-ui-doc-include-signature t
-        lsp-ui-imenu-auto-refresh 'after-save
-        lsp-ui-imenu-window-width 16
-        lsp-ui-sideline-enable t ; Enable/disable whole sideline
-        ;; Showing code actions in the sideline enables understanding when to invoke them
-        lsp-ui-sideline-show-code-actions t
-        ;; Show/hide diagnostics when typing because they can be intrusive
-        lsp-ui-sideline-show-diagnostics nil)
-
   (when (not (display-graphic-p))
     (setq lsp-ui-doc-enable nil
           lsp-ui-peek-enable nil))
@@ -3751,10 +3754,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (("\\.h\\'" . c++-mode)
    ("\\.c\\'" . c++-mode))
   :hook (c++-mode-hook . lsp-deferred)
+  :custom
+  (c-set-style "cc-mode")
+  (c-basic-offset 2)
   :config
-  (setq c-set-style "cc-mode"
-        c-basic-offset 2)
-
   (defvar c-electric-indent)
 
   ;; Disable electric indentation and on-type formatting
@@ -3831,16 +3834,16 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
         ("M-}"   . python-nav-forward-block)
         ("C-c <" . python-indent-shift-left)
         ("C-c >" . python-indent-shift-right))
+  :custom
+  (python-shell-completion-native-enable nil "Disable readline based native completion")
+  (python-fill-docstring-style 'django)
+  (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
+  (python-indent-guess-indent-offset nil)
+  (python-indent-offset 4)
+  (python-shell-exec-path "python3")
+  (python-shell-interpreter "python3")
   :config
   (setenv "PYTHONPATH" "python3")
-
-  (setq python-shell-completion-native-enable nil ; Disable readline based native completion
-        python-fill-docstring-style 'django
-        python-indent-guess-indent-offset-verbose nil ; Remove guess indent python message
-        python-indent-guess-indent-offset nil
-        python-indent-offset 4
-        python-shell-exec-path "python3"
-        python-shell-interpreter "python3")
 
   ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
 
@@ -3862,16 +3865,16 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package pyvenv
   :commands (pyvenv-mode pyvenv-tracking-mode)
   :hook (python-mode-hook . pyvenv-mode)
-  :config
-  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:"
-                                                              pyvenv-virtual-env-name "] "))
-        pyvenv-post-activate-hooks (list
-                                    (lambda ()
-                                      (setq python-shell-interpreter
-                                            (concat pyvenv-virtual-env "bin/python"))))
-        pyvenv-post-deactivate-hooks (list
-                                      (lambda ()
-                                        (setq python-shell-interpreter "python3")))))
+  :custom
+  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:"
+                                                         pyvenv-virtual-env-name "] ")))
+  (pyvenv-post-activate-hooks (list
+                               (lambda ()
+                                 (setq python-shell-interpreter
+                                       (concat pyvenv-virtual-env "bin/python")))))
+  (pyvenv-post-deactivate-hooks (list
+                                 (lambda ()
+                                   (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
@@ -3879,7 +3882,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
-  :config (setq py-isort-options '("-l 100")))
+  :custom
+  (py-isort-options '("-l 100")))
 
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
@@ -3888,10 +3892,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   (python-mode-hook . (lambda ()
                         (require 'lsp-pyright)))
+  :custom
+  (lsp-pyright-python-executable-cmd "python3")
+  (lsp-pyright-typechecking-mode "basic")
   :config
-  (setq lsp-pyright-python-executable-cmd "python3"
-        lsp-pyright-typechecking-mode "basic")
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -3979,15 +3983,15 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                       (setq-default c-basic-offset 4
                                     c-set-style "java")
                       (lsp-deferred)))
-  :config
-  (setq lsp-java-inhibit-message t
-        ;; Requires Java 11+, Java 11 is the LTS
-        lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java"
-        lsp-java-save-actions-organize-imports t
-        lsp-java-format-settings-profile "Swarnendu"
-        lsp-java-format-settings-url (expand-file-name
-                                      "github/dotfiles/java/eclipse-format-swarnendu.xml"
-                                      sb/user-home)))
+  :custom
+  (lsp-java-inhibit-message t)
+  ;; Requires Java 11+, Java 11 is the LTS
+  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java")
+  (lsp-java-save-actions-organize-imports t)
+  (lsp-java-format-settings-profile "Swarnendu")
+  (lsp-java-format-settings-url (expand-file-name
+                                 "github/dotfiles/java/eclipse-format-swarnendu.xml"
+                                 sb/user-home)))
 
 (use-package ant
   :commands (ant ant-clean ant-compile ant-test))
@@ -4024,12 +4028,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
   :hook (sh-mode-hook . lsp-deferred)
+  :custom
+  (sh-basic-offset 2)
+  (sh-indent-after-continuation 'always)
+  (sh-indent-comment t "Indent comments as a regular line")
   :config
-  (setq sh-basic-offset 2
-        sh-indent-after-continuation 'always
-        ;; Indent comments as a regular line
-        sh-indent-comment t)
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4043,8 +4046,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :interpreter "fish"
   :commands (fish-mode fish_indent-before-save)
   :hook
-  (fish-mode . (lambda ()
-                 (add-hook 'before-save-hook #'fish_indent-before-save))))
+  (fish-mode-hook . (lambda ()
+                      (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package company-shell
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
@@ -4052,13 +4055,13 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :demand t
   :defines company-shell-delete-duplictes
   :commands (company-shell company-shell-env company-fish-shell)
-  :config (setq company-shell-delete-duplictes t))
+  :custom (company-shell-delete-duplictes t))
 
 (use-package shfmt
   :hook (sh-mode-hook . shfmt-on-save-mode)
-  :config
-  ;; p: posix, ci: indent case labels, i: indent with spaces
-  (setq shfmt-arguments '("-i" "4" "-p" "-ci")))
+  :custom
+  ;; p: Posix, ci: indent case labels, i: indent with spaces
+  (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line
@@ -4079,18 +4082,18 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (("C-x g"   . magit-status)
    ("C-c M-g" . magit-file-dispatch)
    ("C-x M-g" . magit-dispatch))
-  :config
+  :custom
   ;; Open the status buffer in a full frame
-  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
-        ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
-        magit-no-message '("Turning on magit-auto-revert-mode...")
-        ;; https://irreal.org/blog/?p=8877
-        magit-section-initial-visibility-alist '((stashes   . show)
-                                                 (untracked . show)
-                                                 (unpushed  . show)
-                                                 (unpulled  . show)))
-
-  ;; These give a performance boost to magit
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
+  (magit-no-message '("Turning on magit-auto-revert-mode..."))
+  ;; https://irreal.org/blog/?p=8877
+  (magit-section-initial-visibility-alist '((stashes   . show)
+                                            (untracked . show)
+                                            (unpushed  . show)
+                                            (unpulled  . show)))
+  ;; :config
+  ;; These give a performance boost to Magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
@@ -4101,10 +4104,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (use-package magit-diff
     :ensure nil
     :demand t
-    :config
-    (setq magit-diff-refine-hunk  t
-          magit-diff-highlight-trailing nil
-          magit-diff-paint-whitespace   nil)))
+    :custom
+    (magit-diff-refine-hunk  t)
+    (magit-diff-highlight-trailing nil)
+    (magit-diff-paint-whitespace   nil)))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
@@ -4118,12 +4121,12 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (("C-x p" . git-gutter:previous-hunk)
    ("C-x n" . git-gutter:next-hunk))
   :hook (after-init-hook . global-git-gutter-mode)
+  :custom
+  (git-gutter:added-sign " ")
+  (git-gutter:deleted-sign " ")
+  (git-gutter:modified-sign " ")
+  (git-gutter:update-interval 1)
   :config
-  (setq git-gutter:added-sign      " "
-        git-gutter:deleted-sign    " "
-        git-gutter:modified-sign   " "
-        git-gutter:update-interval 1)
-
   ;; https://github.com/syl20bnr/spacemacs/issues/10555
   ;; https://github.com/syohex/emacs-git-gutter/issues/24
   (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
@@ -4133,9 +4136,10 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :if (boundp 'vc-handled-backends)
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh
                                        diff-hl-dired-mode-unless-remote global-diff-hl-mode)
+  :custom
+  (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
-  (setq diff-hl-draw-borders nil) ; Highlight without a border looks nicer
-  ;; Display margin since the fringe is unavailable in tty
+  ;; Display margin since the fringe is unavailable in TTY
   (unless (display-graphic-p)
     (diff-hl-margin-mode 1))
   :hook
@@ -4148,9 +4152,9 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
 (use-package git-commit
   :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
-  :config
-  (setq git-commit-summary-max-length 50
-        git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
+  :custom
+  (git-commit-summary-max-length 50)
+  (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
@@ -4204,11 +4208,12 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :demand t
   :defines ediff-window-setup-function
   :commands (ediff-setup-windows-plain ediff-set-diff-options)
-  :config
+  :custom
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-  (setq ediff-window-setup-function #'ediff-setup-windows-plain
-        ;; Split windows horizontally in ediff (instead of vertically)
-        ediff-split-window-function #'split-window-horizontally)
+  (ediff-window-setup-function #'ediff-setup-windows-plain)
+  ;; Split windows horizontally in ediff (instead of vertically)
+  (ediff-split-window-function #'split-window-horizontally)
+  :config
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 (use-package bat-mode
@@ -4482,10 +4487,6 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
     :remote? t
     :server-id 'texlab-r)))
 
-(use-package tex-site
-  :ensure nil
-  :commands tex-site)
-
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
 (use-package tex
@@ -4709,7 +4710,7 @@ Ignore if no file is found."
   "Save the current buffer and run LaTeXMk also."
   (interactive)
   (require 'tex)
-  (require 'tex-buf)
+  ;; (require 'tex-buf)
   ;; Kill any active compilation process
   (let ((process (TeX-active-process)))
     (if process (delete-process process)))
@@ -6023,6 +6024,8 @@ _v_ verify setup    _f_ check           _m_ mode
   :config
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; TODO: Is this what is causing issues with latex?
   (unless (display-graphic-p)
     (setq completion-in-region-function #'consult-completion-in-region))
 
@@ -6032,7 +6035,7 @@ _v_ verify setup    _f_ check           _m_ mode
    :preview-key nil))
 
 (use-package consult-projectile
-  :after (consult projectile)
+  :if (eq sb/minibuffer-completion 'vertico)
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
@@ -6092,6 +6095,7 @@ _v_ verify setup    _f_ check           _m_ mode
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (use-package corfu-doc
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :hook (corfu-mode-hook . corfu-doc-mode))
 
 (use-package kind-icon
