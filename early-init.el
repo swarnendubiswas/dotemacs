@@ -90,8 +90,8 @@
 ;;   (menu-bar-mode -1))
 
 ;; Set frame transparency
-(set-frame-parameter (selected-frame) 'alpha '(98 . 98))
-(add-to-list 'default-frame-alist '(alpha . (98 . 98)))
+(set-frame-parameter (selected-frame) 'alpha '(99 . 99))
+(add-to-list 'default-frame-alist '(alpha . (99 . 99)))
 
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
