@@ -6144,7 +6144,7 @@ _v_ verify setup    _f_ check           _m_ mode
   ;; Complete abbreviation at point.
   ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
   ;; Complete word from dictionary at point.
-  (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
   ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol

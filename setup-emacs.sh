@@ -48,7 +48,7 @@ case "${DIST_VERSION}" in
         ;;
 esac
 
-apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-9 g++-9
+apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-10-multilib g++-10-multilib gcc-9 g++-9
 
 # Install LLVM
 

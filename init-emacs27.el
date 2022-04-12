@@ -143,7 +143,7 @@ This location is used for temporary installations and files.")
 (defcustom sb/capf
   'corfu
   "Choose the framework to use for completion at point.
-Corfu does not support TUI, so we have to fallback on company. Therefore, this selection variable is not used now."
+Corfu does not support TUI, so we have to fallback on company."
   :type '(radio
           (const :tag "corfu" corfu)
           (const :tag "company" company))
@@ -3364,6 +3364,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands csv-mode
   :hook
   (csv-mode . (lambda ()
+                (make-local-variable 'lsp-disabled-clients)
                 (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                 (spell-fu-mode -1)
                 (flyspell-mode -1)))
@@ -3878,7 +3879,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
-  :config (setq py-isort-options '("-l 100")))
+  :custom
+  (py-isort-options '("-l 100")))
 
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
@@ -4221,21 +4223,20 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :commands web-mode
   :mode "\\.html?\\'"
   :hook (web-mode-hook . lsp-deferred)
+  :custom
+  (web-mode-enable-auto-closing              t)
+  (web-mode-enable-auto-pairing              nil "Prefer `smartparens'")
+  (web-mode-enable-auto-quoting              t)
+  (web-mode-enable-block-face                t)
+  (web-mode-enable-css-colorization          t)
+  (web-mode-enable-current-element-highlight t "Highlight the element under the cursor")
+  (web-mode-enable-current-column-highlight  t)
+  (web-mode-markup-indent-offset             2) ; HTML
+  (web-mode-css-indent-offset                2) ; CSS
+  (web-mode-code-indent-offset               2) ; Script
+  (web-mode-style-padding                    2) ; For `<style>' tag
+  (web-mode-script-padding                   2) ; For `<script>' tag
   :config
-  (setq web-mode-enable-auto-closing              t
-        web-mode-enable-auto-pairing              nil ; Prefer `smartparens'
-        web-mode-enable-auto-quoting              t
-        web-mode-enable-block-face                t
-        web-mode-enable-css-colorization          t
-        web-mode-enable-current-element-highlight t ; Highlight the element under the cursor
-        web-mode-enable-current-column-highlight  t
-        web-mode-markup-indent-offset             2 ; HTML
-        web-mode-css-indent-offset                2 ; CSS
-        web-mode-code-indent-offset               2 ; Script
-        web-mode-style-padding                    2 ; For `<style>' tag
-        ;; For `<script>' tag
-        web-mode-script-padding                   2)
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
@@ -4248,7 +4249,7 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :defines emmet-move-cursor-between-quote
   :commands emmet-mode
   :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
-  :config (setq emmet-move-cursor-between-quote t))
+  :custom (emmet-move-cursor-between-quote t))
 
 (use-package rainbow-mode
   :commands rainbow-mode
@@ -4260,16 +4261,18 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode-hook . (lambda ()
-                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
+                      ;; checking.
                       (make-local-variable 'lsp-disabled-clients)
                       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                       (spell-fu-mode -1)
                       (flyspell-mode -1)
                       (lsp-deferred)))
+  :custom
+  (nxml-auto-insert-xml-declaration-flag t)
+  (nxml-slash-auto-complete-flag t)
   :config
   (fset 'xml-mode 'nxml-mode)
-  (setq nxml-auto-insert-xml-declaration-flag t
-        nxml-slash-auto-complete-flag t)
 
   (lsp-register-client
    (make-lsp-client
@@ -4374,9 +4377,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
    (lambda ()
-     (unless (eq major-mode 'csv-mode)
-       (require 'lsp-grammarly)
-       (lsp-deferred))))
+     (require 'lsp-grammarly)
+     (lsp-deferred)))
   :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
@@ -4409,9 +4411,8 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
    (lambda ()
-     (unless (eq major-mode 'csv-mode)
-       (require 'lsp-ltex)
-       (lsp-deferred))))
+     (require 'lsp-ltex)
+     (lsp-deferred)))
   :init
   (setq lsp-ltex-check-frequency "save"
         ;; lsp-ltex-dictionary ("microbenchmarks")
@@ -4463,15 +4464,15 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   (latex-mode-hook . (lambda()
                        (require 'lsp-latex)
                        (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter             "latexindent")
+  (lsp-latex-latex-formatter              "latexindent")
+  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+  (lsp-latex-chktex-on-open-and-save      t)
+  (lsp-latex-build-is-continuous          t)
+  ;; Delay time in milliseconds before reporting diagnostics
+  (lsp-latex-diagnostics-delay            2000)
   :config
-  (setq lsp-latex-bibtex-formatter             "latexindent"
-        lsp-latex-latex-formatter              "latexindent"
-        lsp-latex-bibtex-formatter-line-length sb/fill-column
-        lsp-latex-chktex-on-open-and-save      t
-        lsp-latex-build-is-continuous          t
-        ;; Delay time in milliseconds before reporting diagnostics
-        lsp-latex-diagnostics-delay            2000)
-
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc")
 
@@ -4552,23 +4553,23 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
    (bibtex-mode-hook . lsp-deferred))
-  :config
-  (setq bibtex-align-at-equal-sign     t
-        bibtex-maintain-sorted-entries t))
+  :custom
+  (bibtex-align-at-equal-sign     t)
+  (bibtex-maintain-sorted-entries t))
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c x b" . ivy-bibtex)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
+  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package bibtex-completion
   :ensure nil
   :after ivy-bibtex
   :demand t
-  :config
-  (setq bibtex-completion-cite-default-as-initial-input t
-        bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
+  :custom
+  (bibtex-completion-cite-default-as-initial-input t)
+  (bibtex-completion-cite-prompt-for-optional-arguments nil)
+  (bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -4580,7 +4581,11 @@ Corfu does not support TUI, so we have to fallback on company. Therefore, this s
                                      reftex-toc-Rescan
                                      reftex-default-bibliography)
   :diminish
-  :hook ((LaTeX-mode-hook latex-mode-hook) . reftex-mode)
+  :hook
+  (;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
+   ;; consistent but this is expensive. We can use an idle timer.
+   (reftex-toc-mode-hook . reftex-toc-Rescan)
+   ((LaTeX-mode-hook latex-mode-hook) . reftex-mode))
   :bind
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)
@@ -4623,30 +4628,21 @@ Ignore if no file is found."
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+  :custom
+  (reftex-enable-partial-scans t)
+  (reftex-highlight-selection 'both)
+  (reftex-plug-into-AUCTeX t)
+  (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
+  (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
+  ;; Make the toc display with a vertical split, since it is easy to read long lines
+  (reftex-toc-split-windows-horizontally nil)
+  (reftex-guess-label-type t "Try to guess the label type before prompting")
+  (reftex-use-fonts t "Use nice fonts for toc")
+  (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
+  (reftex-auto-recenter-toc t "Center on the section currently being edited")
+  (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
   :config
-  (setq reftex-enable-partial-scans t
-        reftex-highlight-selection 'both
-        reftex-plug-into-AUCTeX t
-        ;; Save parse info to avoid reparsing every time a file is visited
-        reftex-save-parse-info t
-        reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-        ;; Make the toc display with a vertical split, since it is easy to read long lines
-        reftex-toc-split-windows-horizontally nil
-        ;; Try to guess the label type before prompting
-        reftex-guess-label-type t
-        ;; Use nice fonts for toc
-        reftex-use-fonts t
-        ;; Revisit files if necessary when browsing toc
-        reftex-revisit-to-follow t
-        ;; Center on the section currently being edited.
-        reftex-auto-recenter-toc t
-        ;; Cache selection buffers for faster access.
-        reftex-use-multiple-selection-buffers t)
-
-
-  (sb/reftex-try-add-all-bibitems-from-bibtex)
-  ;; Rescan the entire document, not only the current file (`reftex-toc-rescan')
-  (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan))
+  (sb/reftex-try-add-all-bibitems-from-bibtex))
 
 (use-package bib-cite
   :ensure nil
@@ -4654,7 +4650,7 @@ Ignore if no file is found."
   :diminish bib-cite-minor-mode
   :commands bib-cite-minor-mode
   :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
-  :config (setq bib-cite-use-reftex-view-crossref t)
+  :custom (bib-cite-use-reftex-view-crossref t)
   :bind (:map bib-cite-minor-mode-map
               ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
               ("C-c l a" . bib-apropos)
@@ -4670,11 +4666,11 @@ Ignore if no file is found."
   :after tex-mode
   :demand t
   :commands (auctex-latexmk-setup auctex-latexmk)
+  :custom
+  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  (TeX-command-default "LatexMk")
   :config
-  ;; Pass the `-pdf' flag when `TeX-PDF-mode' is active
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-  (auctex-latexmk-setup)
-  (setq TeX-command-default "LatexMk"))
+  (auctex-latexmk-setup))
 
 (use-package company-auctex
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
@@ -4758,15 +4754,16 @@ Ignore if no file is found."
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
 (use-package math-preview
+  :disabled t
   :commands (math-preview-all math-preview-at-point math-preview-region)
-  :config
-  (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                               sb/user-tmp)))
+  :custom
+  (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+                                          sb/user-tmp)))
 
 (use-package json-mode
-  :ensure t
   :ensure json-reformat
   :ensure json-snatcher
+  :ensure t
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
@@ -4791,17 +4788,17 @@ Ignore if no file is found."
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)
   :demand t
-  :config (setq json-reformat:indent-width 2
-                js-indent-level 2))
+  :custom
+  (json-reformat:indent-width 2)
+  (js-indent-level 2))
 
 (use-package bazel
   :if (executable-find "bazel")
   :commands (bazel-mode bazelrc-mode bazel-buildifier)
-  :hook (bazel-mode-hook . flycheck-mode)
-  :config
-  (add-hook 'bazel-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook #'bazel-buildifier nil t))))
+  :hook
+  ((bazel-mode-hook . (lambda ()
+                        (add-hook 'before-save-hook #'bazel-buildifier nil t)))
+   (bazel-mode-hook . flycheck-mode)))
 
 (use-package protobuf-mode
   :commands protobuf-mode
@@ -4818,14 +4815,14 @@ Ignore if no file is found."
   :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
-  :config (setq clang-format-style "file"))
+  :custom (clang-format-style "file"))
 
 (use-package clang-format+
   :ensure clang-format
   :ensure t
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
-  :config (setq clang-format+-always-enable t))
+  :custom (clang-format+-always-enable t))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
@@ -5972,6 +5969,10 @@ _v_ verify setup    _f_ check           _m_ mode
   :commands consult--customize-put
   :custom
   (consult-line-start-from-top t "Start search from the beginning")
+  ;; Use Consult to select xref locations with preview
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
+  (consult-project-function #'projectile-project-root)
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
@@ -6023,12 +6024,6 @@ _v_ verify setup    _f_ check           _m_ mode
   :config
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-  (setq consult-project-function #'projectile-project-root)
-
   (unless (display-graphic-p)
     (setq completion-in-region-function #'consult-completion-in-region))
 
@@ -6039,7 +6034,10 @@ _v_ verify setup    _f_ check           _m_ mode
 
 (use-package consult-projectile
   :after (consult projectile)
-  :bind ("<f6>" . consult-projectile))
+  :commands consult-projectile-recentf
+  :bind
+  (("<f5>" . consult-projectile-switch-project)
+   ("<f6>" . consult-projectile)))
 
 (use-package consult-lsp
   :after (consult lsp)
@@ -6053,7 +6051,8 @@ _v_ verify setup    _f_ check           _m_ mode
         ("!" . consult-flycheck)))
 
 (use-package consult-flyspell
-  :after (consult flyspell))
+  :after (consult flyspell)
+  :commands consult-flyspell)
 
 (use-package consult-dir
   :bind
@@ -6065,7 +6064,8 @@ _v_ verify setup    _f_ check           _m_ mode
 
 (use-package consult-project-extra)
 
-(use-package consult-yasnippet)
+(use-package consult-yasnippet
+  :bind ("C-M-y" . consult-yasnippet))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
@@ -6093,6 +6093,7 @@ _v_ verify setup    _f_ check           _m_ mode
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (use-package corfu-doc
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :hook (corfu-mode-hook . corfu-doc-mode))
 
 (use-package kind-icon
@@ -6118,7 +6119,7 @@ _v_ verify setup    _f_ check           _m_ mode
   ;; Complete abbreviation at point.
   ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
   ;; Complete word from dictionary at point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
   ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
@@ -6133,7 +6134,8 @@ _v_ verify setup    _f_ check           _m_ mode
   :after vertico
   :init (marginalia-mode 1))
 
-;; We prefer to use "kind-icon" package for icons
+;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
+;; which is better.
 (use-package all-the-icons-completion
   :ensure all-the-icons
   :ensure t
@@ -6171,7 +6173,6 @@ _v_ verify setup    _f_ check           _m_ mode
         centaur-tabs-show-new-tab-button nil
         centaur-tabs-enable-ido-completion nil)
   :config
-  (centaur-tabs-mode t)
   (centaur-tabs-group-by-projectile-project)
   :bind
   (("M-<right>" . centaur-tabs-forward-tab)
