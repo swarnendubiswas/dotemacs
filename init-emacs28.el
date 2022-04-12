@@ -1590,7 +1590,9 @@ Corfu does not support TUI, so we have to fallback on company."
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
-        company-dabbrev-other-buffers t ; Search in other buffers with the same major mode
+        ;; Search in other buffers with the same major mode. This can cause
+        ;; performance overhead if there are lots of open buffers.
+        company-dabbrev-other-buffers nil
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
         company-minimum-prefix-length 3 ; Small words can be faster to type
@@ -1604,7 +1606,11 @@ Corfu does not support TUI, so we have to fallback on company."
         ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
         ;; strings
         ;; https://github.com/company-mode/company-mode/discussions/1211
-        company-search-regexp-function 'company-search-words-in-any-order-regexp)
+        company-search-regexp-function 'company-search-words-in-any-order-regexp
+        company-frontends '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+                            ;; show selected candidate docs in echo area
+                            company-echo-metadata-frontend)
+        company-backends '(company-capf))
 
   ;; We set `company-backends' as a local variable, so it is not important to delete backends
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake company-clang))
@@ -1740,7 +1746,13 @@ Corfu does not support TUI, so we have to fallback on company."
         ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
         ivy-wrap t
         ;; Do not start searches with ^
-        ivy-initial-inputs-alist nil)
+        ivy-initial-inputs-alist nil
+        ;; don't show recent files in switch-buffer
+        ivy-use-virtual-buffers nil
+        ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
+        ;; is way too big (30,000). Turn it down so big repos affect project
+        ;; navigation less.
+        ivy-sort-max-size 7500)
 
   (dolist (buffer
            '("TAGS" "magit-process" "*emacs*" "*xref*"
@@ -3569,7 +3581,9 @@ Corfu does not support TUI, so we have to fallback on company."
         ;; lsp-completion-show-kind nil
         lsp-eldoc-enable-hover nil
         lsp-enable-dap-auto-configure nil
-        lsp-enable-on-type-formatting nil
+        lsp-enable-on-type-formatting nil ; Reduce unexpected modifications to code
+        lsp-enable-folding nil
+        lsp-enable-text-document-color nil
         ;; lsp-semantic-tokens-enable t
         lsp-headerline-breadcrumb-enable nil ; Breadcrumb is not useful for all modes
         lsp-headerline-breadcrumb-enable-diagnostics nil
@@ -3700,8 +3714,12 @@ Corfu does not support TUI, so we have to fallback on company."
   (lsp-ui-sideline-enable t "Enable/disable whole sideline")
   ;; Showing code actions in the sideline enables understanding when to invoke them
   (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-hover nil)
   ;; Show/hide diagnostics when typing because they can be intrusive
   (lsp-ui-sideline-show-diagnostics nil)
+  (lsp-ui-doc-max-height 8)
+  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   :config
   (when (not (display-graphic-p))
     (setq lsp-ui-doc-enable nil
@@ -5973,12 +5991,13 @@ _v_ verify setup    _f_ check           _m_ mode
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
   (consult-project-function #'projectile-project-root)
+  (consult-line-numbers-widen t)
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
    ("C-x b" . consult-buffer)
    ("<f3>" . consult-buffer)
-   ([switch-to-buffer] . consult-buffer)
+   ([remap switch-to-buffer] . consult-buffer)
    ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
    ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
    ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
@@ -5986,7 +6005,7 @@ _v_ verify setup    _f_ check           _m_ mode
    ([remap project-switch-to-buffer] . consult-project-buffer)
    ("M-y" . consult-yank-pop)
    ([remap yank-pop] . consult-yank-pop)
-   ([remap apropos-command] . consult-apropos)
+   ([remap apropos] . consult-apropos)
    ;; M-g bindings (goto-map)
    ("M-g e" . consult-compile-error)
    ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
@@ -5996,9 +6015,12 @@ _v_ verify setup    _f_ check           _m_ mode
    ("M-g m" . consult-mark)
    ("M-g k" . consult-global-mark)
    ("C-c C-j" . consult-imenu)
+   ([remap imenu] . consult-imenu)
    ("M-g I" . consult-imenu-multi)
+   ([remap load-theme] . consult-theme)
    ;; M-s bindings (search-map)
    ("M-s f" . consult-find)
+   ([remap locate] . consult-locate)
    ("M-s l" . consult-locate)
    ("M-s g" . consult-grep)
    ("M-s G" . consult-git-grep)
@@ -6009,6 +6031,7 @@ _v_ verify setup    _f_ check           _m_ mode
    ("M-s k" . consult-keep-lines)
    ("M-s u" . consult-focus-lines)
    ("<f9>" . consult-recent-file)
+   ([remap recentf-open-files] . consult-recent-file)
    ([remap multi-occur] . consult-multi-occur)
    ;; Isearch integration
    ("M-s e" . consult-isearch-history)
@@ -6151,11 +6174,13 @@ _v_ verify setup    _f_ check           _m_ mode
   :after vertico
   :init
   ;; Replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
+  (setq prefix-help-command #'embark-prefix-help-command
+        which-key-use-C-h-commands nil)
   :bind
   (([remap describe-bindings] . embark-bindings)
    :map vertico-map
-   ("C-l" . embark-act)))
+   ("C-l" . embark-act)
+   ("C-c C-l" . embark-export)))
 
 (use-package embark-consult
   :ensure t
