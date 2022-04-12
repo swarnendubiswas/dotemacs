@@ -1,0 +1,27 @@
+I have built Emacs 28 from source on and installed globally on two systems, Ubuntu 18.04 and 20.04. The steps to build are as follows.
+
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-10-multilib g++-10-multilib
+
+export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+
+git clone git://git.savannah.gnu.org/emacs.git
+cd emacs
+git checkout emacs-28.1
+
+make distclean
+./autogen.sh
+./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
+make -j"$(nproc)" NATIVE_FULL_AOT=1
+sudo make install
+
+which emacs
+/usr/local/bin/emacs
+
+These steps succeed on both the systems, and I can launch Emacs. I am now using my own minimal configuration (`early-init.el` and `init.el`) to customize Emacs. The configuration is as follows.
+
+Emacs launches correctly on the Ubuntu 20.04 system, while I get the following error on the 18.04 system.
+
+Error (use-package): doom-themes/:config: Cannot open load file: No such file or directory, ../../../../.emacs.d/elpa/doom-themes-20220222.2326/doom-themes-ext-treemacs Disable showing Disable logging
+Error (use-package): doom-modeline/:init: Cannot open load file: No such file or directory, ../../../../.emacs.d/elpa/all-the-icons-20220325.1238/all-the-icons Disable showing Disable logging
+Error (use-package): anzu/:init: Cannot open load file: No such file or directory, ../../../../.emacs.d/elpa/anzu-20211002.2255/anzu Disable showing Disable logging
