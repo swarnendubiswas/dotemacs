@@ -38,8 +38,7 @@
   :ensure t
   :commands doom-modeline-mode
   :init
-  (when (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
-    (all-the-icons-install-fonts t))
+  (all-the-icons-install-fonts t)
   (doom-modeline-mode 1))
 
 (use-package beacon
@@ -73,7 +72,6 @@
   (([remap query-replace]        . anzu-query-replace)
    ([remap query-replace-regexp] . anzu-query-replace-regexp)))
 
-
 (use-package amx
   :commands amx-mode
   :hook (after-init-hook . amx-mode)
@@ -94,7 +92,6 @@
                                         ;; (minibuffer (initials))))
                                         )))
 
-
 (use-package format-all
   :commands (format-all-ensure-formatter format-all-buffer)
   :diminish
@@ -111,7 +108,8 @@
 
 (use-package vertico
   :commands command-completion-default-include-p
-  :hook (after-init-hook . vertico-mode))
+  :hook (after-init-hook . vertico-mode)
+  :custom
   (vertico-resize nil)
   (vertico-count 12)
   (vertico-scroll-margin 4)
@@ -127,7 +125,8 @@
    ("M-TAB" . minibuffer-complete)))
 
 (use-package consult
-  :commands consult--customize-put)
+  :commands consult--customize-put
+  :custom
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
   (consult-line-numbers-widen t)
@@ -167,7 +166,8 @@
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
-  :hook (after-init-hook . corfu-global-mode))
+  :hook (after-init-hook . corfu-global-mode)
+  :custom
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0)
   (corfu-auto-prefix 2)
@@ -215,3 +215,65 @@
    ("M-<left>" . centaur-tabs-backward-tab)))
 
 ;;; init-emacs28.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(centaur-tabs marginalia cape corfu-doc vertico use-package orderless no-littering format-all doom-themes doom-modeline diminish corfu consult beacon anzu amx all-the-icons-ibuffer all-the-icons-dired))
+ '(safe-local-variable-values
+   '((dired-omit-files . "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'")
+     (eval add-hook 'lsp-managed-mode-hook
+	   (lambda nil
+	     (when
+		 (derived-mode-p 'markdown-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers markdown-markdownlint-cli)))))
+	     (when
+		 (derived-mode-p 'gfm-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers markdown-markdownlint-cli)))))
+	     (when
+		 (derived-mode-p 'sh-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers sh-shellcheck)))))
+	     (when
+		 (derived-mode-p 'yaml-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers yaml-yamllint)))))
+	     (when
+		 (derived-mode-p 'json-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers json-jsonlint)))))
+	     (when
+		 (derived-mode-p 'python-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers python-pylint)))))
+	     (when
+		 (derived-mode-p 'c++-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers c/c++-cppcheck)))))
+	     (when
+		 (derived-mode-p 'html-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers html-tidy)))))
+	     (when
+		 (derived-mode-p 'xml-mode)
+	       (setq sb/flycheck-local-checkers
+		     '((lsp
+			(next-checkers xml-xmllint))))))))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
