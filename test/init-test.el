@@ -21,8 +21,6 @@
       use-package-always-ensure        t
       use-package-hook-name-suffix   nil)
 
-(use-package bind-key)
-(use-package diminish)
 (use-package no-littering :demand t)
 
 (setq package-quickstart t ; Populate one big autoloads file

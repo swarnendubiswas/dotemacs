@@ -1,0 +1,28 @@
+I have built Emacs 28 from source on an Ubuntu 20.04. The steps I followed are as follows.
+
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-10-multilib g++-10-multilib
+
+export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+
+git clone git://git.savannah.gnu.org/emacs.git
+cd emacs
+git checkout emacs-28.1
+
+make distclean
+./autogen.sh
+./configure --with-native-compilation --with-json --without-sound --without-pop CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
+make -j"$(nproc)" NATIVE_FULL_AOT=1
+sudo make install
+
+which emacs
+/usr/local/bin/emacs
+
+I can now launch Emacs with /usr/local/bin/emacs and with $EMACS_ROOT/src/emacs.
+
+I am using my own minimal configuration (`early-init.el` and `init.el`) to customize Emacs. The configurations files are as follows.
+
+Emacs launches correctly with `./src/emacs` but fails with the globally-installed `/usr/local/bin/emacs`, with the following error.
+
+Error (use-package): doom-themes/:config: Cannot open load file: No such file or directory, ../../../../.emacs.d/elpa/doom-themes-20220222.2326/doom-themes-ext-treemacs Disable showing Disable logging
+Error (use-package): doom-modeline/:init: Cannot open load file: No such file or directory, ../../../../.emacs.d/elpa/doom-modeline-20220412.853/doom-modeline Disable showing Disable logging
