@@ -45,398 +45,6 @@
   (setq use-package-expand-minimally t))
 (straight-use-package 'use-package)
 
-(use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
-  :straight t
-  :defer t
-  :init
-  (setq exec-path-from-shell-arguments nil
-        exec-path-from-shell-variables '("PATH" "MANPATH"
-                                         "GNUPGHOME" "SSH_AUTH_SOCK"))
-  (exec-path-from-shell-initialize))
-
-(use-package no-littering :straight t :defer t)
-
-(set-language-environment 'utf-8)
-(set-default-coding-systems 'utf-8)
-
-(setq initial-scratch-message nil   ;; "make scratch buffer empty"
-      inhibit-startup-message t)    ;; "disable splash screen"
-
-;; use spaces instead of tabs
-(setq-default indent-tabs-mode nil)
-
-;; widen `fill-column'
-(setq-default fill-column 80)
-
-;; no beep and visual blinking
-(setq ring-bell-function 'ignore
-      visible-bell nil)
-
-(setq frame-resize-pixelwise t)
-
-;; highlight current line
-(global-hl-line-mode 1)
-;; no blink
-(blink-cursor-mode 0)
-;; prettify symbols
-(global-prettify-symbols-mode 1)
-
-;; Single space between sentences is more widespread than double
-(setq sentence-end-double-space nil)
-
-;; smooth scrolling
-(setq scroll-conservatively 101
-      scroll-margin 2)
-
-;; draw underline lower
-(setq x-underline-at-descent-line t)
-
-;; enable flymake-mode in prog-mode
-(add-hook 'prog-mode-hook #'flymake-mode)
-;; Highlight and allow to open http link at point in programming buffers
-;; goto-address-prog-mode only highlights links in strings and comments
-(add-hook 'prog-mode-hook #'goto-address-prog-mode)
-;; Highlight and follow bug references in comments and strings
-(add-hook 'prog-mode-hook #'bug-reference-prog-mode)
-;; enable subword-mode in prog-mode
-(add-hook 'prog-mode-hook #'subword-mode)
-
-;; scroll compilation to first error or end
-(setq compilation-scroll-output 'first-error)
-
-;; Don't try to ping things that look like domain names
-(setq ffap-machine-p-known 'reject)
-
-;; Use system trash for file deletion.
-(setq delete-by-moving-to-trash t)
-
-;; autosave each change
-(setq bookmark-save-flag 1)
-
-;; don't set a fringe mark at bookmarked lines
-(setq bookmark-set-fringe-mark nil)
-
-;; keep focus while navigating help buffers
-(setq help-window-select t)
-
-;; When emacs asks for "yes" or "no", let "y" or "n" suffice
-;; (fset 'yes-or-no-p 'y-or-n-p)
-(setq use-short-answers t)
-
-;; don't load outdated compiled files.
-(setq load-prefer-newer t)
-
-;; don't save duplicates in kill-ring
-(setq kill-do-not-save-duplicates t)
-
-(defun server-remove-kill-buffer-hook ()
-  "Remove prompt if the file is opened in other clients."
-  (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function))
-(add-hook 'server-visit-hook #'server-remove-kill-buffer-hook)
-
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-(use-package autorevert
-  :hook (after-init . global-auto-revert-mode)
-  :config
-  (setq global-auto-revert-non-file-buffers t))
-
-(use-package desktop
-  :commands restart-emacs-without-desktop
-  :init (desktop-save-mode)
-  :config
-  ;; inhibit no-loaded prompt
-  (setq desktop-file-modtime (file-attribute-modification-time
-                              (file-attributes
-                               (desktop-full-file-name)))
-        desktop-lazy-verbose nil
-        desktop-load-locked-desktop t
-        desktop-restore-eager 1
-        desktop-save t)
-
-  (dolist (param '(foreground-color background-color font cursor-color mouse-color))
-    (push `(,param . :never) frameset-filter-alist))
-
-  (defun restart-emacs-without-desktop (&optional args)
-    "Restart emacs without desktop."
-    (interactive)
-    (restart-emacs (cons "--no-desktop" args)))
-
-  (defun desktop-read@override (desktop-read)
-    "Inhibit `desktop-read' message"
-    (let ((inhibit-message t))
-      (funcall desktop-read)))
-  (advice-add 'desktop-read :around #'desktop-read@override))
-
-(use-package dired
-  :defer t
-  :config
-  (setq dired-auto-revert-buffer t
-        dired-create-destination-dirs 'ask
-        dired-dwim-target t
-        dired-listing-switches "-aBhl --group-directories-first"
-        dired-vc-rename-file t))
-
-(use-package doc-view
-  :defer t
-  :config
-  (setq doc-view-resolution 400))
-
-(use-package elec-pair
-  :hook (after-init . electric-pair-mode))
-
-(use-package ediff
-  :hook ((ediff-quit . winner-undo)
-         (ediff-prepare-buffer . outline-show-all))
-  :config
-  (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
-                ediff-split-window-function 'split-window-horizontally
-                ediff-merge-split-window-function 'split-window-horizontally))
-
-(use-package files
-  :hook ((before-save . delete-trailing-whitespace)
-         (after-save . executable-make-buffer-file-executable-if-script-p))
-  :init
-  (setq make-backup-files nil        ;; don't create backup~ files
-        revert-without-query '(".*") ;; disable revert query
-        enable-remote-dir-locals t)
-  :config
-  ;; Prompt to open file literally if large file.
-  (defun check-large-file ()
-    "Check when opening large files - literal file open."
-    (let* ((filename (buffer-file-name))
-           (size (nth 7 (file-attributes filename))))
-      (when (and
-             (not (memq major-mode
-                        '(archive-mode doc-view-mode doc-view-mode-maybe
-                                       ebrowse-tree-mode emacs-lisp-mode
-                                       fundamental-mode git-commit-mode
-                                       image-mode jka-compr pdf-view-mode
-                                       tags-table-mode tar-mode)))
-             size (> size (* 1024 1024 1))
-             (y-or-n-p (format (concat "%s is a large file, open literally to "
-                                       "avoid performance issues?")
-                               filename)))
-        (setq buffer-read-only t)
-        (buffer-disable-undo)
-        (fundamental-mode))))
-  (add-hook 'find-file-hook #'check-large-file)
-
-  (defun system-move-file-to-trash (filename)
-    (process-file-shell-command
-     (format "trash %S" (file-local-name filename))))
-
-  (defun make-directory-maybe ()
-    "Create parent directory if not exists while visiting file."
-    (let ((dir (file-name-directory buffer-file-name)))
-      (unless (file-exists-p dir)
-        (if (y-or-n-p (format "Directory %s does not exist,do you want you create it? " dir))
-            (make-directory dir t)
-          (keyboard-quit)))))
-  (add-to-list 'find-file-not-found-functions 'make-directory-maybe nil #'eq))
-
-(use-package newcomment
-  :commands comment-or-uncomment
-  :config
-  (defun comment-or-uncomment (n)
-    (interactive "*p")
-    (if (or (region-active-p)
-            (save-excursion
-              (beginning-of-line)
-              (looking-at "\\s-*$")))
-        (call-interactively 'comment-dwim)
-      (comment-or-uncomment-region
-       (line-beginning-position) (line-end-position n)))))
-
-(use-package project
-  :defer t
-  :config
-  (setq project-current-inhibit-prompt t
-        project-vc-merge-submodules nil
-        project-switch-commands '((project-find-file "Find file")
-                                  (project-find-regexp "Find regexp")
-                                  (project-find-dir "Find directory")
-                                  (project-vc-dir "VC-Dir"))
-        project-switch-use-entire-map t)
-
-  (defun project-vc-dir ()
-    "Run VC-Dir in the current project's root."
-    (interactive)
-    (let ((project-root (project-root (project-current t))))
-      (if (file-exists-p (expand-file-name ".git" project-root))
-          (cond ((fboundp 'magit-status-internal)
-                 (magit-status-internal project-root))
-                ((fboundp 'magit-status)
-                 (with-no-warnings (magit-status project-root)))
-                (t
-                 (vc-dir project-root)))
-        (vc-dir project-root)))))
-
-(use-package recentf
-  :hook (after-init . recentf-mode)
-  :config
-  (setq recentf-auto-cleanup 'never
-        recentf-filename-handlers '(abbreviate-file-name)
-        recentf-max-saved-items 100
-        recentf-initialize-file-name-history nil)
-
-  (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight"))))
-
-(use-package savehist
-  :hook (after-init . savehist-mode)
-  :config
-  (setq enable-recursive-minibuffers t ; allow commands in minibuffers
-        history-length 100
-        savehist-autosave-interval nil
-        savehist-additional-variables '(evil-jumps-history
-                                        mark-ring global-mark-ring
-                                        search-ring regexp-search-ring
-                                        extended-command-history))
-
-  (add-hook 'savehist-save-hook
-            (defun savehist-unpropertize-variables-h ()
-              "Remove text properties from `kill-ring' to reduce savehist cache size."
-              (setq kill-ring
-                    (mapcar #'substring-no-properties
-                            (cl-remove-if-not #'stringp kill-ring))
-                    register-alist
-                    (cl-loop for (reg . item) in register-alist
-                             if (stringp item)
-                             collect (cons reg (substring-no-properties item))
-                             else collect (cons reg item)))))
-
-  (add-hook 'savehist-save-hook
-            (defun savehist-remove-unprintable-registers-h ()
-              "Remove unwriteable registers (e.g. containing window configurations).
-Otherwise, `savehist' would discard `register-alist' entirely if we don't omit
-the unwritable tidbits."
-              ;; Save new value in the temp buffer savehist is running
-              ;; `savehist-save-hook' in. We don't want to actually remove the
-              ;; unserializable registers in the current session!
-              (setq-local register-alist
-                          (cl-remove-if-not #'savehist-printable register-alist)))))
-
-(use-package saveplace
-  :hook (after-init . save-place-mode))
-
-(use-package simple
-  :config
-  (setq column-number-mode t
-        delete-trailing-lines nil
-        eval-expression-print-length nil
-        eval-expression-print-level nil
-        ;; save clipboard contents into kill-ring before replace them
-        save-interprogram-paste-before-kill t))
-
-(use-package tab-bar
-  :hook (after-init . tab-bar-mode)
-  :config
-  (setq tab-bar-show nil
-        tab-bar-close-button-show nil
-        tab-bar-new-button-show nil
-        tab-bar-tab-hints t
-        tab-bar-new-tab-choice "*scratch*"
-        tab-bar-select-tab-modifiers '(hyper)))
-
-(use-package tramp
-  :defer t
-  :config
-  (setq remote-file-name-inhibit-cache 60
-        tramp-verbose 1
-        vc-handled-backends '(SVN Git))
-
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
-
-(use-package xref
-  :defer t
-  :config
-  (setq xref-prompt-for-identifier '(not xref-find-definitions
-                                         xref-find-definitions-other-window
-                                         xref-find-definitions-other-frame
-                                         xref-find-references))
-
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read
-        xref-show-xrefs-function       #'xref-show-definitions-completing-read))
-
-(use-package whitespace
-  :hook ((prog-mode . show-trailing-whitespace)
-         (diff-mode . whitespace-mode))
-  :config
-  (defun show-trailing-whitespace ()
-    (set-face-attribute 'trailing-whitespace nil :background
-                        (face-attribute 'font-lock-comment-face
-                                        :foreground))
-    (setq show-trailing-whitespace t)))
-
-(use-package winner
-  :commands (winner-undo winner-redo)
-  :hook (after-init . winner-mode)
-  :init
-  (setq winner-dont-bind-my-keys t)
-  :config
-  (setq winner-boring-buffers-regexp "\\*.*\\*"))
-
-
-(setq-default custom-file (no-littering-expand-var-file-name "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
-
-(defvar after-load-theme-hook nil
-  "Hook run after a color theme is loaded using `load-theme'.")
-
-(defun load-theme@after (&rest _)
-  "Run `after-load-theme-hook'."
-  (run-hooks 'after-load-theme-hook))
-(advice-add 'load-theme :after #'load-theme@after)
-
-(add-hook 'after-load-theme-hook
-          (defun bolder-faces ()
-            (set-face-attribute 'font-lock-function-name-face nil :weight 'semi-bold)
-            (set-face-attribute 'font-lock-keyword-face nil :weight 'semi-bold)))
-
-(use-package doom-themes
-  :straight t
-  :defer t
-  :custom-face
-  ;; fix doom-theme diff-hl face
-  (diff-hl-change ((t (:background nil))))
-  (diff-hl-delete ((t (:background nil))))
-  (diff-hl-insert ((t (:background nil)))))
-
-(use-package berrys-theme
-  :straight t
-  :defer t
-  :custom-face
-  (fringe ((t nil))))
-
-(use-package flucui-themes :straight t :defer t)
-
-(use-package humanoid-themes
-  :straight t
-  :defer t
-  :config
-  (setq humanoid-themes-org-height nil
-        humanoid-themes-org-bold nil))
-
-(use-package kaolin-themes
-  :straight t
-  :defer t
-  :config
-  (setq kaolin-themes-org-scale-headings nil
-        kaolin-themes-modeline-border nil))
-
-(use-package lab-themes
-  :straight t
-  :defer t
-  :custom-face
-  (font-lock-keyword-face ((t (:slant normal))))
-  (font-lock-constant-face ((t (:slant normal)))))
-
-
 
 (defgroup sb/emacs
   nil
@@ -586,7 +194,1438 @@ Corfu does not support TUI, so we have to fallback on company."
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
 
+;; Enable ahead-of-time compilation when installing a package
+(when sb/EMACS28+
+  (setq package-native-compile nil))
+
+;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
+;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
+;; implies always load features lazily unless told otherwise. This implies we should use
+;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
+;; careful about using `:after' and always deferring loading, because then we will need to specifiy
+;; alternate ways of loading the package.
+;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
+
+;; Hooks in the `:hook' section run in reverse order. Example:
+;; (use-package package-name
+;;   :hook
+;;   ((x-mode-hook . last)
+;;    (x-mode-hook . second)
+;;    (x-mode-hook . first)))
+
+;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
+;; and the minor modes.
+(use-package bind-key
+  :straight t
+  :functions bind-key--remove
+  :bind ("C-c d k" . describe-personal-keybindings))
+
+(use-package diminish
+  :straight t)
+
+(use-package f
+  :straight t
+  :commands (f-exists? f-join f-dirname))
+
+(use-package s
+  :straight t
+  :commands s-starts-with? s-ends-with?)
+
+(use-package dash
+  :straight t
+  :commands (-contains? -tree-map))
+
+(use-package hydra
+  :straight t
+  :commands (hydra-default-pre hydra-keyboard-quit defhydra
+                               hydra-show-hint hydra-set-transient-map
+                               hydra--call-interactively-remap-maybe))
+
+(use-package no-littering
+  :straight t
+  :demand t)
+
+(use-package warnings
+  :straight nil
+  :init
+  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
+  (setq warning-minimum-level :emergency))
+
+(use-package gcmh ; Allow GC to happen after a period of idle time
+  :straight t
+  :diminish
+  :commands (gcmh-mode gcmh-idle-garbage-collect)
+  :hook (after-init-hook . gcmh-mode)
+  :config
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq gcmh-verbose t)))
+
+(use-package paradox
+  :straight t
+  :disabled t ; This package is no longer maintained.
+  :commands (paradox-enable)
+  :bind
+  (("C-c d l" . paradox-list-packages)
+   ("C-c d u" . paradox-upgrade-packages))
+  :config
+  (setq paradox-display-star-count nil
+        paradox-execute-asynchronously t
+        paradox-github-token t)
+  (paradox-enable))
+
+;; Get PATH with "(getenv "PATH")". Set PATH with
+;; "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
+(use-package exec-path-from-shell
+  :straight t
+  :defines exec-path-from-shell-check-startup-files
+  :commands exec-path-from-shell-initialize
+  :if (or (daemonp) (memq window-system '(x ns)))
+  :init
+  ;; "-i" is expensive but Tramp may be unable to find executables without the option
+  (setq exec-path-from-shell-arguments '("-l")
+        exec-path-from-shell-check-startup-files nil
+        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
+                                         "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
+  (exec-path-from-shell-initialize))
+
+;; These are alternative ways.
+
+;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
+;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
+
+(defvar apropos-do-all)
+(defvar bookmark-save-flag)
+(defvar compilation-always-kill)
+(defvar compilation-scroll-output)
+(defvar sort-fold-case)
+(defvar help-enable-symbol-autoload)
+
+(setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
+      apropos-do-all t ; Make `apropos' search more extensively
+      auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
+      ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
+      ;; file and runs all save-related hooks. We disable `auto-save-mode' and prefer
+      ;; `auto-save-visited-mode' instead.
+      auto-save-default nil
+      auto-save-no-message t ; Allows for debugging frequent autosave triggers if `nil'
+      auto-save-interval 0 ; Disable autosaving based on number of characters typed
+      ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
+      ;; it runs all the save-related hooks.
+      auto-save-visited-interval 30
+      backup-inhibited t ; Disable backup for a per-file basis
+      blink-matching-paren t ; Distracting
+      bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
+      case-fold-search t ; Searches and matches should ignore case
+      comment-auto-fill-only-comments t
+      compilation-always-kill t ; Kill a compilation process before starting a new one
+      compilation-ask-about-save nil ; Save all modified buffers without asking
+      ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
+      ;; error.
+      compilation-scroll-output 'first-error
+      completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
+      completion-ignore-case t ; Ignore case when completing
+      completions-detailed t
+      confirm-kill-emacs nil
+      confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
+      confirm-nonexistent-file-or-buffer t
+      create-lockfiles nil
+      cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+      custom-safe-themes t
+      delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
+      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      ;; enable-local-variables :all ; Avoid "defvar" warnings
+      enable-recursive-minibuffers t ; Keeping track of the minibuffer nesting is difficult
+      ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
+      ;; variables, but I edit files over Tramp a lot.
+      enable-remote-dir-locals t
+      ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
+      ;; information
+      eval-expression-print-length 500
+      ;; Accelerate scrolling operations when non-nil. Only those portions of the buffer which are
+      ;; actually going to be displayed get fontified.
+      fast-but-imprecise-scrolling t
+      ;; Disable the warning "X and Y are the same file" in case of symlinks
+      find-file-suppress-same-file-warnings t
+      find-file-visit-truename t ; Show true name, useful in case of symlinks
+      frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
+      help-enable-symbol-autoload t
+      help-window-select t ; Makes it easy to close the window
+      history-delete-duplicates t
+      history-length 50 ; Reduce the state that is to be read
+      indicate-buffer-boundaries nil
+      kill-do-not-save-duplicates t
+      kill-whole-line t ;; TODO: What is the utility of this variable?
+      make-backup-files nil ; Stop making backup `~' files
+      message-log-max 5000
+      ;; mouse-drag-copy-region nil ; Mouse is disabled
+      ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
+      next-error-message-highlight t
+      read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
+      read-file-name-completion-ignore-case t ; Ignore case when reading a file name
+      read-minibuffer-restore-windows t
+      read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
+      require-final-newline t ; Always end a file with a newline
+      ring-bell-function 'ignore ; Disable beeping sound
+      save-interprogram-paste-before-kill t
+      save-silently t ; Error messages will still be printed
+      ;; Enable use of system clipboard across Emacs and other applications, does not work on the
+      ;; TUI
+      select-enable-clipboard t
+      sentence-end-double-space nil
+      shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
+      sort-fold-case nil ; Do not ignore case when sorting
+      standard-indent 2
+      suggest-key-bindings t
+      switch-to-buffer-preserve-window-point t
+      use-dialog-box nil ; Do not use dialog boxes with mouse commands
+      use-file-dialog nil
+      vc-follow-symlinks t ; No need to ask
+      ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
+      ;; information on the modeline
+      vc-handled-backends '(Git)
+      view-read-only t ; View mode for read-only buffers
+      visible-bell nil
+      x-gtk-use-system-tooltips nil ; Do not use system tooltips
+      x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
+      ;; Underline looks a bit better when drawn lower
+      x-underline-at-descent-line t)
+
+;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
+;; buffer-local variable's default value.
+(setq-default fill-column sb/fill-column
+              ;; electric-indent-inhibit nil
+              indent-tabs-mode nil ; Spaces instead of tabs
+              indicate-empty-lines nil
+              major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
+              ;; TAB first tries to indent the current line, and if the line was already indented,
+              ;; then try to complete the thing at point.
+              tab-always-indent 'complete
+              tab-width 4
+              truncate-lines nil)
+
+;; https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
+(setq-default bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
+              bidi-paragraph-direction 'left-to-right)
+
+(dolist (exts '(".aux"
+                ".class"
+                ".dll"
+                ".elc"
+                ".exe"
+                ".fls"
+                ".lof"
+                ".o"
+                ".pyc"
+                ".rel"
+                ".rip"
+                ".so"
+                ".toc"))
+  (add-to-list 'completion-ignored-extensions exts))
+
+;; Activate utf-8, these are needed (may not be all) for icons to work well in TUI
+(set-language-environment    "UTF-8")
+(setq locale-coding-system   'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+(prefer-coding-system        'utf-8)
+(set-default-coding-systems  'utf-8)
+(set-keyboard-coding-system  'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-terminal-coding-system  'utf-8)
+
+;; Scroll settings from Doom Emacs
+(setq scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
+      ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N
+      ;; lines past window edges, where N is the setting of `scroll-conservatively'. This is
+      ;; especially slow in larger files during large-scale scrolling commands. If kept over 100,
+      ;; the window is never automatically recentered.
+      scroll-conservatively 101
+      scroll-preserve-screen-position t
+      ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
+      auto-window-vscroll nil
+      mouse-wheel-follow-mouse 't ; Scroll window under mouse
+      mouse-wheel-scroll-amount '(5 ((shift) . 2))
+      ;; Do not accelerate scrolling
+      mouse-wheel-progressive-speed nil)
+
+(fset 'display-startup-echo-area-message #'ignore)
+
+(if (boundp 'use-short-answers)
+    (setq use-short-answers t)
+  ;; Type "y"/"n" instead of "yes"/"no"
+  (fset 'yes-or-no-p 'y-or-n-p))
+
+(use-package autorevert ; Auto-refresh all buffers
+  :straight nil
+  :commands global-auto-revert-mode
+  :diminish auto-revert-mode
+  ;; :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
+  :hook (after-init-hook . global-auto-revert-mode)
+  :config
+  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+        ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
+        ;; use Emacs. Enabling auto-revert is always safe.
+        auto-revert-remote-files t
+        auto-revert-verbose nil
+        ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
+        ;; contents of the directory changes
+        global-auto-revert-non-file-buffers t))
+
+;; Revert all (e.g., PDF) files without asking
+(setq revert-without-query '("\\.*"))
+
+;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
+;; timer.
+(use-package saveplace ; Remember cursor position in files
+  :straight nil
+  :hook (after-init-hook . save-place-mode))
+
+(use-package savehist ; Save minibuffer history across sessions
+  :straight nil
+  :commands savehist-mode
+  ;; :init (run-with-idle-timer 2 nil #'savehist-mode)
+  :hook (after-init-hook . savehist-mode)
+  :custom
+  (savehist-additional-variables '(extended-command-history
+                                   kill-ring
+                                   regexp-search-ring
+                                   search-ring)))
+
+(use-package uniquify
+  :straight nil
+  :init
+  (setq uniquify-after-kill-buffer-p t
+        uniquify-buffer-name-style   'forward
+        uniquify-ignore-buffers-re   "^\\*"
+        uniquify-separator           "/"
+        uniquify-strip-common-suffix t))
+
+;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
+;; expansions in the current buffer and presents suggestions for completion.
+(use-package hippie-exp
+  :straight nil
+  :custom
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-complete-file-name
+                                      try-expand-all-abbrevs
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
+  (hippie-expand-verbose nil)
+  :bind
+  (("M-/"   . hippie-expand)
+   ("C-M-/" . dabbrev-completion)))
+
+(use-package subword
+  :straight nil
+  :diminish
+  :hook (prog-mode-hook . subword-mode))
+
+;; Show dividers on the right of each window, more prominent than the default
+(use-package frame
+  :straight nil
+  :hook (after-init-hook . window-divider-mode))
+
+;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
+;; the other.
+(when (eq sb/window-split 'vertical)
+  (setq split-width-threshold nil
+        split-height-threshold 0))
+
+;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right').
+(when (eq sb/window-split 'horizontal)
+  (setq split-height-threshold nil
+        split-width-threshold 0))
+
+;; Start with a window split to make use of wider screens
+(when nil
+  (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+    (split-window-right)))
+
+;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
+(progn
+  (defun sb/auto-save-wrapper (save-fn &rest args)
+    "Hide 'Auto-saving...done' messages by calling the method.
+  SAVE-FN with non-nil ARGS."
+    (ignore args)
+    (apply save-fn '(t)))
+
+  (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
+
+(use-package ffap ; Find FILENAME, guessing a default from text around point.
+  :commands ffap
+  :straight t)
+
+;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
+(use-package abbrev
+  :straight nil
+  :diminish
+  :hook (after-init-hook . abbrev-mode)
+  :custom
+  ;; The "abbrev-defs" file is under version control
+  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
+  (save-abbrevs 'silently))
+
+
+;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
+(dolist (mode '(tooltip-mode))
+  (when (fboundp mode)
+    (funcall mode -1)))
+
+;; Enable the following modes
+(dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
+                blink-cursor-mode
+                column-number-mode
+                delete-selection-mode ; Typing with the mark active will overwrite the marked region
+                ;; Use soft wraps, wrap lines without the ugly continuation marks
+                global-visual-line-mode
+                size-indication-mode))
+  (when (fboundp mode)
+    (funcall mode 1)))
+
+;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
+(when (display-graphic-p)
+  (global-display-line-numbers-mode 1))
+
+(when (bound-and-true-p enable-recursive-minibuffers)
+  (minibuffer-depth-indicate-mode 1))
+
+;; Not a library/file, so `eval-after-load' does not work
+(diminish 'auto-fill-function)
+
+(with-eval-after-load "simple"
+  (diminish 'visual-line-mode))
+
+;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
+(unless (display-graphic-p)
+  (fringe-mode '(10 . 10)))
+
+;; Make the cursor a thin horizontal bar, not a block
+;; (set-default 'cursor-type '(bar . 4))
+
+(use-package hl-line
+  :straight t
+  :commands hl-line-highlight
+  :if (display-graphic-p)
+  :hook (after-init-hook . global-hl-line-mode))
+
+(use-package outline ; Edit outlines
+  :straight t
+  :disabled t
+  :hook (prog-mode-hook . outline-minor-mode)
+  :diminish outline-minor-mode)
+
+;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
+;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
+(use-package hideshow
+  :straight nil
+  :disabled t
+  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+  :diminish hs-minor-mode
+  :hook (prog-mode-hook . hs-minor-mode)
+  :custom (hs-isearch-open t))
+
+;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
+(use-package so-long
+  :straight nil
+  ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
+  :hook (after-init-hook . global-so-long-mode))
+
+;; Install fonts with "M-x all-the-icons-install-fonts"
+;; https://github.com/domtronn/all-the-icons.el/issues/120
+(use-package all-the-icons
+  :straight t
+  :if (display-graphic-p)
+  :commands all-the-icons-install-fonts
+  :preface
+  (defun sb/font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (if (find-font (font-spec :name font-name))
+        t
+      nil))
+  :init
+  (unless (sb/font-installed-p "all-the-icons")
+    (all-the-icons-install-fonts t))
+  (setq all-the-icons-scale-factor 0.9
+        all-the-icons-color-icons nil))
+
+;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
+(use-package circadian
+  :straight t
+  :commands circadian-setup
+  :if (display-graphic-p)
+  :init
+  (require 'solar)
+  (setq calendar-latitude 26.50
+        calendar-location-name "Kanpur, UP, India"
+        calendar-longitude 80.23
+        circadian-themes '((:sunrise . modus-operandi)
+                           (:sunset  . modus-vivendi)))
+  (circadian-setup))
+
+(use-package leuven-theme
+  :straight t
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'leuven))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'leuven)))
+  :init (load-theme 'leuven t))
+
+(use-package zenburn-theme
+  :straight t
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'zenburn))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'zenburn)))
+  :init (load-theme 'zenburn t))
+
+(use-package doom-themes
+  :straight t
+  :if (or (eq sb/gui-theme 'doom-molokai)
+          (eq sb/gui-theme 'doom-one-light)
+          (eq sb/gui-theme 'doom-one)
+          (eq sb/gui-theme 'doom-nord)
+          (eq sb/gui-theme 'doom-gruvbox))
+  :commands (doom-themes-org-config doom-themes-treemacs-config)
+  :init
+  (if (display-graphic-p)
+      (cond
+       ((eq sb/gui-theme 'doom-molokai) (load-theme 'doom-molokai t))
+       ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+       ((eq sb/gui-theme 'doom-one) (load-theme 'doom-one t))
+       ((eq sb/gui-theme 'doom-nord) (load-theme 'doom-nord t))
+       ((eq sb/gui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))
+    (cond
+     ((eq sb/tui-theme 'doom-molokai)   (load-theme 'doom-molokai t))
+     ((eq sb/tui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+     ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
+     ((eq sb/tui-theme 'doom-nord)      (load-theme 'doom-nord t))
+     ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t))))
+  :config
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification
+  (doom-themes-org-config))
+
+(use-package monokai-theme
+  :straight t
+  :if (or (and (display-graphic-p) (eq sb/gui-theme 'monokai))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'monokai)))
+  :init (load-theme 'monokai t))
+
+(use-package modus-themes
+  :straight moody
+  :straight t
+  :defines (modus-themes-completions modus-themes-fringes
+                                     modus-themes-prompts
+                                     modus-themes-lang-checkers
+                                     modus-themes-hl-line
+                                     modus-themes-org-blocks
+                                     modus-themes-mode-line)
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'modus-operandi)
+                   (eq sb/gui-theme 'modus-vivendi)))
+          (and (not (display-graphic-p))
+               (or (eq sb/tui-theme 'modus-operandi)
+                   (eq sb/tui-theme 'modus-vivendi))))
+  :init
+  (when (eq sb/modeline-theme 'default)
+    (setq modus-themes-mode-line 'accented-3d))
+
+  (when (eq sb/modeline-theme 'moody)
+    (setq modus-themes-mode-line 'borderless-moody))
+
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'modus-operandi) (load-theme 'modus-operandi t))
+     ((eq sb/gui-theme 'modus-vivendi) (load-theme 'modus-vivendi t))))
+
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/tui-theme 'modus-operandi) (load-theme 'modus-operandi t))
+     ((eq sb/tui-theme 'modus-vivendi) (load-theme 'modus-vivendi t)))))
+
+(when (and (eq sb/gui-theme 'sb/customized)
+           (display-graphic-p))
+  (progn
+    ;; (setq frame-background-mode 'light)
+    ;; (set-background-color "#ffffff")
+    (set-foreground-color "#333333")
+    (with-eval-after-load "hl-line"
+      (set-face-attribute 'hl-line nil :background "light yellow"))
+    (set-face-attribute 'region nil :background "gainsboro")))
+
+
+;; The Python virtualenv information is not shown on the modeline. The package is not being actively
+;; maintained.
+(use-package powerline
+  :straight t
+  :if (eq sb/modeline-theme 'powerline)
+  :commands powerline-default-theme
+  :init
+  (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
+        ;; powerline-default-separator 'box
+        powerline-display-buffer-size nil
+        powerline-display-mule-info nil ; File encoding information is not useful
+        powerline-gui-use-vcs-glyph t
+        powerline-height 20)
+
+  (when (eq sb/gui-theme 'leuven)
+    (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
+    (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
+                        :foreground "black" :background "gray88"))
+
+  (powerline-default-theme))
+
+(use-package doom-modeline
+  :straight all-the-icons
+  :straight t
+  :if (eq sb/modeline-theme 'doom-modeline)
+  :commands doom-modeline-mode
+  :init
+  ;; Requires the fonts included with `all-the-icons', run "M-x all-the-icons-install-fonts".
+  (when (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
+    (all-the-icons-install-fonts t))
+
+  (setq doom-modeline-buffer-encoding nil
+        doom-modeline-checker-simple-format nil
+        doom-modeline-indent-info nil
+        doom-modeline-lsp t
+        doom-modeline-minor-modes t
+        ;; Reduce space on the modeline
+        doom-modeline-buffer-file-name-style 'truncate-with-project
+        doom-modeline-unicode-fallback t)
+  (doom-modeline-mode 1))
+
+(use-package spaceline
+  :straight t
+  :defines (spaceline-hud-p spaceline-selection-info-p
+                            spaceline-version-control-p spaceline-input-method-p
+                            spaceline-persp-name-p
+                            spaceline-buffer-encoding-abbrev-p
+                            spaceline-buffer-encoding-p
+                            spaceline-buffer-size-p)
+  :if (eq sb/modeline-theme 'spaceline)
+  :init
+  (require 'spaceline-config)
+  (setq spaceline-hud-p nil
+        spaceline-selection-info-p nil
+        spaceline-version-control-p t
+        spaceline-input-method-p nil
+        spaceline-buffer-size-p nil
+        ;; Line ending convention used in the current buffer (unix, dos or mac)
+        spaceline-buffer-encoding-abbrev-p nil
+        ;; Line ending convention used in the current buffer (unix, dos or mac) without abbreviation
+        spaceline-buffer-encoding-p nil
+        spaceline-persp-name-p nil)
+
+  ;; (set-face-attribute 'powerline-inactive1 nil
+  ;;                     :background "gray40"
+  ;;                     :foreground "white"
+  ;;                     :weight 'light)
+  ;; (set-face-attribute 'powerline-inactive2 nil
+  ;;                     :background "grey50"
+  ;;                     :foreground "white")
+  ;; (when (eq dotemacs-theme 'leuven)
+  ;;   (set-face-attribute 'powerline-active1 nil
+  ;;                       :background "gray22"
+  ;;                       :foreground "white"
+  ;;                       :weight 'light)
+  ;;   (set-face-attribute 'mode-line-inactive nil
+  ;;                       :background "grey88"
+  ;;                       :foreground "black"))
+
+  (spaceline-emacs-theme))
+
+(use-package awesome-tray ; Minimal modeline information
+  :straight nil
+  :commands awesome-tray-mode
+  :if (eq sb/modeline-theme 'awesome-tray)
+  :load-path "extras"
+  :hook (after-init-hook . awesome-tray-mode)
+  :config
+  (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
+        awesome-tray-git-update-duration 30 ; seconds
+        awesome-tray-file-path-full-dirname-levels 1)
+  :custom-face
+  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
+  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
+  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
+  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+
+(use-package moody
+  :straight t
+  :if (eq sb/modeline-theme 'moody)
+  :commands (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
+  :init
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
+(use-package mini-modeline
+  :straight t
+  :diminish mini-modeline-mode
+  :if (eq sb/modeline-theme 'mini)
+  :hook (after-init-hook . mini-modeline-mode)
+  :config
+  (setq mini-modeline-r-format '("%e" mode-line-front-space
+                                 mode-line-client
+                                 mode-line-modified
+                                 mode-line-remote
+                                 " " mode-line-buffer-identification " "
+                                 ;; mode-line-position
+                                 ;; mode-line-percent-position
+                                 (:eval (string-trim (format-mode-line mode-line-modes)))
+                                 mode-line-misc-info)))
+
+;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
+;; takes up lot of horizontal space.
+(use-package minions
+  :straight t
+  :if (not (bound-and-true-p doom-modeline-lsp))
+  :hook (doom-modeline-mode-hook . minions-mode))
+
+;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
+;; line.
+(use-package auto-dim-other-buffers
+  :disabled t
+  :straight t
+  :commands (adob--rescan-windows auto-dim-other-buffers-mode)
+  ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
+  :hook (after-init-hook . auto-dim-other-buffers-mode))
+
+;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
+(defun sb/font-available-p (font-name)
+  "Find font specified by FONT-NAME."
+  (find-font (font-spec :name font-name)))
+
+;; (cond
+;;  ((sb/font-available-p "Cascadia Code")
+;;   (set-frame-font "Cascadia Code-14"))
+;;  ((sb/font-available-p "Menlo")
+;;   (set-frame-font "Menlo-14"))
+;;  ((sb/font-available-p "Inconsolata")
+;;   (set-frame-font "Inconsolata-14"))
+;;  ((sb/font-available-p "DejaVu Sans Mono")
+;;   (set-frame-font "DejaVu Sans Mono-14")))
+
+;; Value is in 1/10pt, so 100 will give you 10pt
+;; (set-frame-font "DejaVu Sans Mono" nil t)
+
+(cond ((member "Inconsolata" (font-family-list))
+       (set-face-attribute 'default nil :font "Inconsolata-18"))
+      ((member "Monaco" (font-family-list))
+       (set-face-attribute 'default nil :font "Monaco" :height 120)
+       (setq default-frame-alist '((font . "Monaco-12")))))
+
+(when (string= (system-name) "inspiron-7572")
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "dell-7506")
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+  (set-face-attribute 'mode-line nil :height 120)
+  (set-face-attribute 'mode-line-inactive nil :height 120))
+
+(when (string= (system-name) "swarnendu-Dell-XPS-L502X")
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "vindhya")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "himalaya")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "aravalli")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "satpura")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "nilgiri")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "sivalik")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(when (string= (system-name) "garwhal")
+  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'mode-line nil :height 110)
+  (set-face-attribute 'mode-line-inactive nil :height 110))
+
+(set-face-attribute 'fixed-pitch nil
+                    :font "JetBrains Mono"
+                    :weight 'light
+                    :height 140)
+
+(set-face-attribute 'variable-pitch nil
+                    :font "Iosevka Aile"
+                    :height 140
+                    :weight 'light)
+
+;; Decrease minibuffer font
+;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
+(progn
+  (defun sb/minibuffer-font-setup ()
+    "Customize minibuffer font."
+    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
+
+  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
+
+;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
+;; useful information.
+(when nil
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq resize-mini-windows nil)))
+  )
+
+(use-package beacon
+  :straight t
+  :commands beacon-mode
+  :diminish
+  :hook (after-init-hook . beacon-mode))
+
+(use-package ibuffer
+  :straight nil
+  :config
+  (defalias 'list-buffers 'ibuffer)
+  (setq ibuffer-display-summary nil
+        ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
+        ibuffer-use-header-line t)
+  :bind ("C-x C-b" . ibuffer))
+
+(use-package ibuf-ext
+  :straight nil
+  :commands ibuffer-auto-mode
+  :config
+  ;; Do not show filter groups if there are no buffers in that group
+  (setq ibuffer-show-empty-filter-groups nil)
+  :hook (ibuffer-hook . ibuffer-auto-mode))
+
+(use-package ibuffer-projectile ; Group buffers by projectile project
+  :straight t
+  :commands ibuffer-projectile-set-filter-groups
+  :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
+
+(use-package all-the-icons-ibuffer
+  :straight t
+  :if (display-graphic-p)
+  :commands all-the-icons-ibuffer-mode
+  :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
+  :config (setq all-the-icons-ibuffer-icon-size 0.8))
+
+(use-package dired
+  :straight nil
+  :commands (dired-next-line dired-jump)
+  :defines dired-clean-confirm-killing-deleted-buffers
+  :preface
+  (defun sb/dired-go-home ()
+    (interactive)
+    (dired sb/user-home))
+
+  (defun sb/dired-jump-to-top ()
+    (interactive)
+    (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
+    (dired-next-line 2))
+
+  (defun sb/dired-jump-to-bottom ()
+    (interactive)
+    (goto-char (point-max)) ; Faster than `(end-of-buffer)'
+    (dired-next-line -1))
+  :bind
+  (:map dired-mode-map
+        ("M-<home>" . sb/dired-go-home)
+        ("M-<up>"   . sb/dired-jump-to-top)
+        ("M-<down>" . sb/dired-jump-to-bottom)
+        ("i"        . find-file))
+  :hook
+  ;; Auto refresh dired when files change
+  (dired-mode-hook . auto-revert-mode)
+  :config
+  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
+        ;; Guess a default target directory. When there are two dired buffers, Emacs will select
+        ;; another buffer as the target (e.g., target for copying files).
+        dired-dwim-target t
+        ;; Check "ls" for additional options
+        dired-listing-switches "-ABhl --si --group-directories-first"
+        dired-ls-F-marks-symlinks t ; -F marks links with @
+        dired-recursive-copies 'always ; Single prompt for all n directories
+        dired-recursive-deletes 'always ; Single prompt for all n directories
+        ;; Do not ask whether to kill buffers visiting deleted files
+        dired-clean-confirm-killing-deleted-buffers nil)
+
+  (when (boundp 'dired-kill-when-opening-new-dired-buffer)
+    (setq dired-kill-when-opening-new-dired-buffer t)))
+
+(use-package dired-x
+  :straight nil
+  :defines dired-cleanup-buffers-too
+  :commands (dired-omit-mode)
+  :hook (dired-mode-hook . dired-omit-mode)
+  :bind ("C-x C-j"  . dired-jump)
+  :config
+  (setq dired-cleanup-buffers-too t
+        ;; Do not show messages when omitting files
+        dired-omit-verbose nil)
+
+  ;; Obsolete from Emacs 28+
+  (unless sb/EMACS28+
+    (setq dired-bind-jump t))
+
+  ;; (setq dired-omit-files
+  ;;       (concat dired-omit-files
+  ;;               "\\|^.DS_Store\\'"
+  ;;               "\\|^.project\\(?:ile\\)?\\'"
+  ;;               "\\|^.\\(svn\\|git\\)\\'"
+  ;;               "\\|^.ccls-cache\\'"
+  ;;               ;; FIXME: Fix the regexp
+  ;;               ;; "\\|__pycache__"
+  ;;               "\\|\\(?:\\.js\\)?\\.meta\\'"
+  ;;               "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+
+  ;; ":diminish dired-omit-mode" does not work
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Remove 'Omit' from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map))
+
+(use-package dired-narrow ; Narrow `dired' to match filter
+  :straight t
+  :after dired
+  :bind
+  (:map dired-mode-map
+        ("/" . dired-narrow)))
+
+;; Do not create multiple dired buffers
+(use-package dired+
+  :straight nil
+  :load-path "extras"
+  :commands diredp-toggle-find-file-reuse-dir
+  :init (setq diredp-bind-problematic-terminal-keys nil)
+  :custom
+  (diredp-hide-details-initially-flag nil)
+  (diredp-hide-details-propagate-flag nil)
+  :hook
+  (dired-mode-hook . (lambda ()
+                       (when sb/EMACS27
+                         (diredp-toggle-find-file-reuse-dir 1)))))
+
+;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
+;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
+(use-package dired-efap
+  :straight t
+  :after dired
+  :defines dired-efap-initial-filename-selection
+  :custom (dired-efap-initial-filename-selection nil)
+  :bind*
+  (:map dired-mode-map
+        ("r" . dired-efap)))
+
+;; Asynchronously byte compile packages installed with `package.el'
+(use-package async
+  :straight t
+  :functions async-bytecomp-package-mode
+  :commands async-bytecomp-package-mode
+  :init (async-bytecomp-package-mode 1))
+
+(use-package dired-async
+  :diminish
+  :hook (dired-mode-hook . dired-async-mode))
+
+(use-package all-the-icons-dired
+  :straight t
+  :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
+  :diminish
+  :if (display-graphic-p)
+  :hook
+  (dired-mode-hook . (lambda ()
+                       (unless (file-remote-p default-directory)
+                         (all-the-icons-dired-mode 1)))))
+
+(use-package treemacs
+  :straight t
+  :functions treemacs-tag-follow-mode
+  :commands (treemacs-current-workspace
+             treemacs--find-current-user-project
+             treemacs-do-add-project-to-workspace
+             treemacs-add-project-to-workspace treemacs-git-mode
+             treemacs-follow-mode treemacs-fringe-indicator-mode
+             treemacs-filewatch-mode treemacs-goto-file-node
+             treemacs--propagate-new-icons
+             treemacs-scope->current-scope
+             treemacs--restore-eldoc-after-log
+             treemacs-load-theme treemacs-find-file-node
+             treemacs-indent-guide-mode treemacs-resize-icons
+             treemacs-select-window
+             treemacs-add-and-display-current-project
+             treemacs-display-current-project-exclusively
+             projectile-project-p treemacs--select-workspace-by-name
+             adob--rescan-windows)
+  :preface
+  ;; The problem is there is no toggle support.
+  (defun sb/setup-treemacs-quick ()
+    "Setup treemacs."
+    (interactive)
+    (when (projectile-project-p)
+      (treemacs-display-current-project-exclusively)
+      (other-window 1)))
+
+  (defun sb/setup-treemacs-detailed (args)
+    "Setup treemacs."
+    (let* ((root (treemacs--find-current-user-project))
+           (path (treemacs-canonical-path root))
+           (name (treemacs--filename path)))
+      (unless (treemacs-current-workspace)
+        (treemacs--find-workspace))
+      (if (treemacs-workspace->is-empty?)
+          (progn
+            (treemacs-do-add-project-to-workspace path name)
+            (treemacs-select-window)
+            (treemacs-pulse-on-success)
+            (other-window 1)
+            (when (featurep 'auto-dim-other-buffers)
+              (adob--rescan-windows)))
+        (treemacs-select-window)
+        (if (treemacs-is-path path :in-workspace)
+            (treemacs-goto-file-node path)
+          (treemacs-add-project-to-workspace path name))
+        (other-window 1)
+        (when (featurep 'auto-dim-other-buffers)
+          (adob--rescan-windows)))))
+
+  (defun sb/treemacs-ignore-files (filename absolute-path)
+    "Ignore files in the Treemacs explorer"
+    (or
+     (-contains? '("__pycache__" "node_modules" "package-lock.json") filename)
+	 (s-ends-with? ".pyc" filename)
+	 (s-ends-with? ".elc" filename)
+	 (s-ends-with? ".o" filename)
+	 (s-ends-with? ".so" filename)
+	 (s-ends-with? ".dll" filename)
+     ))
+  :config
+  (setq treemacs-follow-after-init t
+        treemacs-indentation 1
+        ;; Prevents Treemacs from being selected with `other-window' if non-nil, but it hurts easy
+        ;; navigability. Use `treemacs-select-window'.
+        treemacs-is-never-other-window t
+        treemacs-project-follow-cleanup t
+        treemacs-missing-project-action 'remove
+        treemacs-recenter-after-file-follow 'on-distance
+        treemacs-recenter-after-tag-follow 'on-distance
+        treemacs-silent-refresh t ; Silence all refresh messages including file watches
+        treemacs-width 20
+        ;; Hide the mode-line in the Treemacs buffer
+        treemacs-user-mode-line-format 'none)
+
+  ;; (if (display-graphic-p)
+  ;;     (setq treemacs-indentation-string (propertize "⫶" 'face 'font-lock-comment-face))
+  ;;   (setq treemacs-indentation-string (propertize "|" 'face 'font-lock-comment-face)))
+
+  (treemacs-filewatch-mode 1)
+  ;; `treemacs-tag-follow-mode' disables `treemacs-follow-mode', focuses the tag, but following tags
+  ;; in noisy
+  (treemacs-follow-mode 1)
+  (treemacs-git-mode 'deferred)
+  (treemacs-fringe-indicator-mode 'always) ; Always show the file indicator
+  (treemacs-indent-guide-mode 1)
+  ;; (treemacs-project-follow-mode 1) ; Ignores workspace features
+
+  ;; https://github.com/Alexander-Miller/treemacs/issues/735
+  ;; (treemacs-create-theme "Default-Tighter"
+  ;;   :extends "Default"
+  ;;   :config
+  ;;   (let ((icons (treemacs-theme->gui-icons theme)))
+  ;;     (maphash (lambda
+  ;;                (ext icon)
+  ;;                (puthash ext
+  ;;                         (concat
+  ;;                          (substring icon 0 1)
+  ;;                          (propertize " " 'display
+  ;;                                      '(space . (:width 0.5))))
+  ;;                         icons))
+  ;;              icons)))
+
+  ;; (treemacs-create-theme "all-the-icons-tighter"
+  ;;   :extends "all-the-icons"
+  ;;   :config
+  ;;   (let ((icons (treemacs-theme->gui-icons theme)))
+  ;;     (maphash (lambda
+  ;;                (ext icon)
+  ;;                (puthash ext
+  ;;                         (concat
+  ;;                          (substring icon 0 1)
+  ;;                          (propertize " " 'display
+  ;;                                      '(space . (:width 0.5))))
+  ;;                         icons))
+  ;;              icons)))
+
+  (set-face-attribute 'treemacs-directory-collapsed-face nil :height 0.8)
+  (set-face-attribute 'treemacs-directory-face           nil :height 0.7)
+  (set-face-attribute 'treemacs-file-face                nil :height 0.7)
+  (set-face-attribute 'treemacs-root-face                nil :height 0.7)
+  (set-face-attribute 'treemacs-tags-face                nil :height 0.7)
+  (set-face-attribute 'treemacs-git-ignored-face         nil :height 0.7)
+  (set-face-attribute 'treemacs-git-untracked-face       nil :height 0.7)
+  (set-face-attribute 'treemacs-git-modified-face        nil :height 0.7)
+  (set-face-attribute 'treemacs-git-unmodified-face      nil :height 0.7)
+
+  (when (or (eq sb/gui-theme 'sb/customized)
+            (eq sb/gui-theme 'none))
+    (set-face-attribute 'treemacs-git-modified-face   nil :height 0.8)
+    (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0))
+
+  (when (display-graphic-p)
+    (treemacs-resize-icons 16))
+
+  (add-to-list 'treemacs-ignored-file-predicates #'sb/treemacs-ignore-files)
+  :bind*
+  (;; The keybinding interferes with `dired-jump' and imenu `C-c C-j'
+   ("C-j"     . treemacs)
+   ("C-c t d" . treemacs-add-and-display-current-project)
+   ("C-c t e" . treemacs-display-current-project-exclusively)
+   ("M-0"     . treemacs-select-window)))
+
+(use-package treemacs-all-the-icons
+  :straight t
+  :if (display-graphic-p)
+  :after treemacs
+  :demand t
+  :config (treemacs-load-theme "all-the-icons"))
+
+;; Allows to quickly add projectile projects to the treemacs workspace
+(use-package treemacs-projectile
+  :straight t
+  :after (treemacs projectile)
+  :commands treemacs-projectile
+  :demand t)
+
+(use-package treemacs-magit
+  :straight t
+  :ensure magit
+  :after (treemacs magit)
+  :demand t)
+
+(use-package org
+  :straight nil
+  :defines (org-hide-leading-stars-before-indent-mode
+            org-src-strip-leading-and-trailing-blank-lines
+            org-src-tabs-acts-natively)
+  :commands (org-indent-mode org-indent-item org-outdent-item)
+  :hook (org-mode-hook . visual-line-mode)
+  :config
+  (setq org-fontify-done-headline nil
+        org-fontify-whole-heading-line nil
+        org-hide-emphasis-markers t
+        org-hide-leading-stars t
+        org-hide-leading-stars-before-indent-mode t
+        ;; Code block fontification using the major-mode of the code
+        org-src-fontify-natively t
+        org-src-preserve-indentation t
+        org-src-tabs-acts-natively t
+        org-src-window-setup 'current-window
+        ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
+        ;; feels better with the mode disabled.
+        org-startup-indented nil
+        org-startup-truncated nil
+        org-startup-folded 'showeverything
+        org-startup-with-inline-images t
+        org-support-shift-select t
+        ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
+        ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
+        ;; blocks commands and their related keys.
+        org-use-speed-commands t
+        org-src-strip-leading-and-trailing-blank-lines t
+        ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
+        org-pretty-entities t
+        ;; Render subscripts and superscripts in org buffers
+        org-pretty-entities-include-sub-superscripts t
+        ;; Automatically sorted and renumbered whenever I insert a new one
+        org-footnote-auto-adjust t)
+
+  (with-eval-after-load "org-indent"
+    (diminish 'org-indent-mode))
+  :bind
+  (:map org-mode-map
+        ("M-<left>"  . nil)
+        ("M-<right>" . nil)
+        ("M-<up>"    . nil)
+        ("M-<down>"  . nil)
+        ("C-'"       . nil)
+        ("<tab>"     . org-indent-item)
+        ("<backtab>" . org-outdent-item)))
+
+;; Disabled the package to get consistent styles across themes.
+(use-package org-bullets
+  :disabled t
+  :straight t
+  :commands org-bullets-mode
+  :hook (org-mode-hook . org-bullets-mode))
+
+
+(use-package org-appear ; Make invisible parts of Org elements appear visible
+  :straight t
+  :commands org-appear-mode
+  :disabled t
+  :hook (org-mode-hook . org-appear-mode)
+  :config
+  (setq org-appear-autosubmarkers t
+        org-appear-autoentities   t
+        org-appear-autolinks      t
+        org-appear-autoemphasis  t))
+
+(use-package ox-gfm
+  :straight t
+  :after org
+  :demand t
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
+
+;; TODO: Use "C-c o" as the binding for `org-mode-map'
+
+;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
+;; `isearch' candidates.
+(use-package isearch
+  :straight nil
+  :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
+  :custom
+  (search-highlight t "Highlight incremental search")
+  (isearch-lazy-highlight t)
+  (isearch-lazy-count t)
+  :bind
+  ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
+  (("C-s"     . nil)
+   ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
+   ("C-f"     . isearch-forward-regexp)
+   :map isearch-mode-map
+   ("C-s"     . nil)
+   ("C-f"     . isearch-repeat-forward)
+   ("C-c C-o" . isearch-occur)))
+
+(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
+  :straight t
+  :after isearch
+  :commands (isearch-forward-symbol ; "M-s _"
+             isearch-symbol-at-point
+             isearch-forward-symbol-at-point ; "M-s ."
+             isearch-backward-symbol-at-point))
+
+(use-package anzu
+  :straight t
+  :diminish anzu-mode
+  :commands global-anzu-mode
+  :init
+  (setq anzu-search-threshold     10000
+        anzu-minimum-input-length 2)
+  (global-anzu-mode 1)
+  :bind
+  (([remap query-replace]        . anzu-query-replace)
+   ([remap query-replace-regexp] . anzu-query-replace-regexp)))
+
+(use-package swiper
+  :straight t
+  :if (eq sb/minibuffer-completion 'ivy)
+  :commands (swiper swiper-isearch)
+  :custom (swiper-action-recenter t))
+
+(progn
+  (with-eval-after-load "grep"
+    (defvar grep-highlight-matches)
+    (defvar grep-scroll-output)
+    (defvar grep-find-ignored-directories)
+
+    (setq grep-command           "grep -irHn "
+          grep-highlight-matches t
+          grep-scroll-output     t)
+
+    (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
+      (add-to-list 'grep-find-ignored-directories dirs))))
+
+;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
+;; minutes.
+(use-package wgrep ; Writable grep
+  :straight t
+  :bind
+  (:map grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
+        ("C-x C-p" . wgrep-change-to-wgrep-mode)
+        ("C-x C-s" . wgrep-finish-edit)
+        ("C-x C-k" . wgrep-abort-changes)
+        ("C-x C-q" . wgrep-exit))
+  :custom (wgrep-auto-save-buffer t))
+
+;; Use "S" to change the search term, "D" to change the search directory, "g" to rerun the search,
+;; and "o" to view the result in another window.
+(use-package deadgrep
+  :straight t
+  :bind ("C-c s d" . deadgrep))
+
+(progn
+  (defvar reb-re-syntax)
+
+  (setq reb-re-syntax 'string))
+
+(use-package visual-regexp
+  :straight t
+  :commands (vr/replace vr/query-replace vr/mark)
+  :bind ([remap query-replace] . vr/query-replace))
+
+(use-package recentf
+  :straight nil
+  :commands (recentf-mode recentf-add-file recentf-save-file
+                          recentf-save-list
+                          recentf-apply-filename-handlers
+                          recentf-cleanup)
+  :config
+  (setq recentf-auto-cleanup 'never ; Do not stat remote files
+        ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
+        recentf-exclude '("[/\\]elpa/"
+                          "[/\\]\\.git/"
+                          ".*\\.gz\\'"
+                          ".*\\.xz\\'"
+                          ".*\\.zip\\'"
+                          ".*-autoloads.el\\'"
+                          "[/\\]archive-contents\\'"
+                          "[/\\]\\.loaddefs\\.el\\'"
+                          "[/\\]tmp/.*"
+                          ".*/recentf\\'"
+                          ".*/recentf-save.el\\'"
+                          "~$"
+                          "/.autosaves/"
+                          ".*/TAGS\\'"
+                          "*.cache"
+                          ".*/treemacs/persist.org")
+        ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+        ;; Keep remote file without testing if they still exist
+        recentf-keep '(file-remote-p file-readable-p)
+        ;; Larger values help in lookup but takes more time to check if the files exist
+        recentf-max-saved-items 100
+        ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
+        ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
+        recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
+
+  ;; Use the true file name and not the symlink name
+  (dolist (exclude `(,(file-truename no-littering-etc-directory)
+                     ,(file-truename no-littering-var-directory)))
+    (add-to-list 'recentf-exclude exclude))
+
+  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
+  ;; after idling for 30 seconds.
+  (run-with-idle-timer 30 t #'recentf-save-list)
+
+  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
+  ;; timers.
+  (run-with-idle-timer 60 t #'recentf-cleanup)
+  :hook (after-init-hook . recentf-mode))
+
+(use-package init-open-recentf
+  :after recentf
+  :straight t
+  :demand t
+  :disabled t
+  :config (init-open-recentf))
+
+(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
+  "Hide messages appearing in ORIG-FUN, forward ARGS."
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
+
+;; Hide the "Wrote to recentf" message
+(advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
+;; Hide the "Cleaning up the recentf list...done" message
+(advice-add 'recentf-cleanup   :around #'sb/inhibit-message-call-orig-fun)
+
+;; Hide the "Wrote ..." message
+(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+
+;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
+;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
+;; regex search.
+(use-package company
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :commands (company-abort company-files company-yasnippet
+                           company-ispell company-dabbrev
+                           company-capf company-dabbrev-code
+                           company-clang-set-prefix
+                           global-company-mode)
+  :defines (company-dabbrev-downcase company-dabbrev-ignore-case
+                                     company-dabbrev-other-buffers
+                                     company-ispell-available
+                                     company-ispell-dictionary
+                                     company-clang-insert-arguments)
+  :hook (after-init-hook . global-company-mode)
+  ;; The `company-posframe' completion kind indicator is not great, but we are now using
+  ;; `company-fuzzy'.
+  :diminish
+  :config
+  (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
+        company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
+        ;; Search in other buffers with the same major mode. This can cause
+        ;; performance overhead if there are lots of open buffers.
+        company-dabbrev-other-buffers nil
+        company-ispell-available t
+        company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
+        company-minimum-prefix-length 3 ; Small words can be faster to type
+        company-require-match nil ; Allow input string that do not match candidates
+        company-selection-wrap-around t
+        company-show-quick-access t ; Speed up completion
+        ;; Align additional metadata, like type signatures, to the right-hand side
+        company-tooltip-align-annotations t
+        ;; Disable insertion of arguments
+        company-clang-insert-arguments nil
+        ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
+        ;; strings
+        ;; https://github.com/company-mode/company-mode/discussions/1211
+        company-search-regexp-function 'company-search-words-in-any-order-regexp
+        company-frontends '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+                            ;; show selected candidate docs in echo area
+                            company-echo-metadata-frontend)
+        company-backends '(company-capf))
+
+  ;; We set `company-backends' as a local variable, so it is not important to delete backends
+  ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake company-clang))
+  ;;   (delq backends company-backends))
+
+  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
+  ;; https://github.com/company-mode/company-mode/issues/358
+  (push (apply-partially #'cl-remove-if
+                         (lambda (c)
+                           (string-match-p "\\`[0-9]+\\'" c)))
+        company-transformers)
+  :bind
+  (:map company-active-map
+        ("C-n"      . company-select-next)
+        ("C-p"      . company-select-previous)
+        ;; Insert the common part of all candidates, or select the next one
+        ("<tab>"    . company-complete-common-or-cycle)
+        ("C-M-/"    . company-other-backend) ; Was bound to `dabbrev-completion'
+        ("<escape>" . company-abort)))
 
 
 ;; Silence "Starting 'look' process..." message
@@ -614,7 +1653,7 @@ Corfu does not support TUI, so we have to fallback on company."
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
-:straight t
+  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :commands company-quickhelp-mode
@@ -622,7 +1661,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :hook (after-init-hook . company-quickhelp-mode))
 
 (use-package company-statistics
-:straight t
+  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
@@ -659,14 +1698,14 @@ Corfu does not support TUI, so we have to fallback on company."
   (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package yasnippet-snippets
-:straight t
+  :straight t
   :after yasnippet
   :demand t
   :commands yasnippet-snippets-initialize
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
-:straight t
+  :straight t
   :after ivy
   :bind ("C-M-y" . ivy-yasnippet))
 
@@ -828,14 +1867,14 @@ Corfu does not support TUI, so we have to fallback on company."
         counsel-yank-pop-separator "\n------------------------------------------\n"))
 
 (use-package ivy-hydra ; Additional keybindings for `ivy'
-:straight t
+  :straight t
   :after (ivy hydra)
   :demand t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
-:straight t
+  :straight t
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t))
@@ -979,7 +2018,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
 (use-package flyspell-popup
-:straight t
+  :straight t
   :after flyspell
   :disabled t
   :bind
@@ -1392,7 +2431,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :custom (all-the-icons-ivy-rich-icon-size 0.9))
 
 (use-package ivy-rich
-:straight t
+  :straight t
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
   :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
   :preface
@@ -1731,7 +2770,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
-:straight t
+  :straight t
   :bind
   (("C-<"     . mc/mark-previous-like-this)
    ("C->"     . mc/mark-next-like-this)
@@ -1832,7 +2871,7 @@ Corfu does not support TUI, so we have to fallback on company."
       tags-revert-without-query t)
 
 (use-package xref
-:straight t
+  :straight t
   :commands xref-etags-mode
   :bind
   (("M-'"   . xref-find-definitions)
@@ -1845,7 +2884,7 @@ Corfu does not support TUI, so we have to fallback on company."
    ("r"     . xref-query-replace-in-results)))
 
 (use-package ivy-xref
-:straight t
+  :straight t
   :after (ivy xref)
   :demand t
   :custom
@@ -1853,7 +2892,7 @@ Corfu does not support TUI, so we have to fallback on company."
   (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
-:straight t
+  :straight t
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
   :if (and (symbol-value 'sb/IS-LINUX) (eq sb/minibuffer-completion 'ivy) (executable-find "ctags"))
@@ -1877,7 +2916,7 @@ Corfu does not support TUI, so we have to fallback on company."
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package dumb-jump
-:straight t
+  :straight t
   :after xref
   :demand t
   :commands dumb-jump-xref-activate
@@ -1889,7 +2928,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
-:straight t
+  :straight t
   :bind
   (("C-h v" . helpful-variable)
    ("C-h k" . helpful-key)
@@ -1901,7 +2940,7 @@ Corfu does not support TUI, so we have to fallback on company."
    ("q"     . helpful-kill-buffers)))
 
 (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-:straight t
+  :straight t
   :commands vlf
   :defines vlf-application
   :init
@@ -1910,7 +2949,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
-:straight t
+  :straight t
   :commands (hungry-delete-mode global-hungry-delete-mode)
   :diminish
   :hook
@@ -1919,30 +2958,30 @@ Corfu does not support TUI, so we have to fallback on company."
    (after-init-hook . global-hungry-delete-mode)))
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
-:straight t
+  :straight t
   :commands (move-text-up move-text-down move-text-default-bindings)
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
-:straight t
+  :straight t
   :bind* ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
-:straight t
+  :straight t
   :bind
   (("C-h C-m" . discover-my-major)
    ("C-h M-m" . discover-my-mode)))
 
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
-:straight t
+  :straight t
   :commands manage-minor-mode)
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-:straight nil
+  :straight nil
   :commands popwin-mode
   :hook (after-init-hook . popwin-mode)
   :config
@@ -1996,38 +3035,38 @@ Corfu does not support TUI, so we have to fallback on company."
 ;;                    (cons #'display-buffer-no-window nil)))
 
 (use-package expand-region ; Expand region by semantic units
-:straight t
+  :straight t
   :bind
   (("C-="   . er/expand-region)
    ("C-M-=" . er/contract-region)))
 
 (use-package expand-line
-:straight t
+  :straight t
   :diminish
   :bind ("M-i" . turn-on-expand-line-mode))
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
-:straight t
+  :straight t
   ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
   :hook (after-init-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-:straight t
+  :straight t
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
   :diminish (whole-line-or-region-local-mode)
   ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
   :hook (after-init-hook . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
-:straight t
+  :straight t
   :bind ("C-x C-\\" . goto-last-change))
 
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
-:straight t
+  :straight t
   ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
   :hook (after-init-hook . beginend-global-mode)
   :config
@@ -2035,7 +3074,7 @@ Corfu does not support TUI, so we have to fallback on company."
     (diminish mode)))
 
 (use-package undo-tree
-:straight t
+  :straight t
   :defines undo-tree-map
   :commands (global-undo-tree-mode undo-tree-redo)
   :diminish
@@ -2053,32 +3092,32 @@ Corfu does not support TUI, so we have to fallback on company."
    ("C-x u" . undo-tree-visualize)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
-:straight t
+  :straight t
   :bind* ("C-." . iedit-mode))
 
 ;; Avoid the "Overwrite old session file (not loaded)?" warning by loading the `session' package
 (use-package session
-:straight t
+  :straight t
   :disabled t
   :commands (session-initialize)
   :hook (after-init-hook . session-initialize))
 
 (use-package immortal-scratch
-:straight t
+  :straight t
   :commands immortal-scratch-mode
   ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
   :hook (after-init-hook . immortal-scratch-mode))
 
 ;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
-:straight t
+  :straight t
   :commands persistent-scratch-setup-default
   :hook (after-init-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package crux
-:straight t
+  :straight t
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
@@ -2087,7 +3126,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
-:straight t
+  :straight t
   :if (display-mouse-p)
   :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode
@@ -2101,21 +3140,21 @@ Corfu does not support TUI, so we have to fallback on company."
   :init (mouse-avoidance-mode 'banish))
 
 (use-package apt-sources-list
-:straight t
+  :straight t
   :commands apt-sources-list-mode)
 
 (use-package rainbow-delimiters
-:straight t
+  :straight t
   :commands rainbow-delimiters-mode
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
 (use-package ssh-config-mode
-:straight t
+  :straight t
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode turn-on-font-lock)
   :hook (ssh-config-mode-hook . turn-on-font-lock))
 
 (use-package ace-window
-:straight t
+  :straight t
   :bind ([remap other-window] . ace-window))
 
 (use-package windmove ; "Shift + direction" arrows
@@ -2130,7 +3169,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
 ;; given that we have `auto-save-visited-mode' enabled.
 (use-package super-save
-:straight t
+  :straight t
   :defines (super-save-remote-files super-save-triggers)
   :commands super-save-mode
   :disabled t
@@ -2144,7 +3183,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
-:straight t
+  :straight t
   :commands avy-setup-default
   :bind
   (("M-b"   . avy-goto-word-1)
@@ -2155,7 +3194,7 @@ Corfu does not support TUI, so we have to fallback on company."
    ("M-g l" . avy-goto-line)))
 
 (use-package ace-jump-buffer
-:straight t
+  :straight t
   :bind ("C-b" . ace-jump-buffer)
   :config
   (setq ajb-max-window-height 30
@@ -2163,7 +3202,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
 (use-package ivy-avy
-:straight t
+  :straight t
   :after ivy
   :bind
   (:map ivy-minibuffer-map
@@ -2175,7 +3214,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :straight nil)
 
 (use-package bm
-:straight t
+  :straight t
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
                                 bm-repository-load bm-buffer-save bm-buffer-restore)
   :preface
@@ -2205,18 +3244,18 @@ Corfu does not support TUI, so we have to fallback on company."
    ("C-<f3>" . bm-previous)))
 
 (use-package esup
-:straight t
+  :straight t
   :commands esup
   :if (bound-and-true-p sb/debug-init-file))
 
 (use-package bug-hunter
-:straight t
+  :straight t
   :disabled t
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
 
 (use-package explain-pause-mode
-:straight nil
+  :straight nil
   :if (bound-and-true-p sb/debug-init-file)
   :load-path "extras"
   :disabled t
@@ -2234,25 +3273,25 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-:straight t
+  :straight t
   :disabled t
   :commands (writegood-mode writegood-passive-voice-turn-off)
   :diminish
   :hook (text-mode-hook . writegood-mode))
 
 (use-package wc-mode
-:straight t
+  :straight t
   :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
-:straight t
+  :straight t
   :commands (define-word define-word-at-point))
 
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package langtool
-:straight t
+  :straight t
   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
   :commands (langtool-check
              langtool-check-done
@@ -2271,7 +3310,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
-:straight t
+  :straight t
   :if (display-graphic-p)
   :defines pdf-annot-activate-created-annotations
   :commands (pdf-tools-install pdf-loader-install pdf-view-mode
@@ -2302,12 +3341,12 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
 (use-package saveplace-pdf-view
-:straight t
+  :straight t
   :after (pdf-tools saveplace)
   :demand t)
 
 (use-package logview
-:straight t
+  :straight t
   :commands logview-mode)
 
 (use-package antlr-mode
@@ -2315,7 +3354,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :mode "\\.g4\\'")
 
 (use-package bison-mode
-:straight t
+  :straight t
   :mode ("\\.bison\\'"))
 
 (use-package llvm-mode
@@ -2332,7 +3371,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
-:straight t
+  :straight t
   :commands autodisass-llvm-bitcode
   :mode "\\.bc\\'")
 
@@ -2385,7 +3424,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-:straight t
+  :straight t
   :after markdown-mode
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
                                       markdown-toc-generate-or-refresh-toc))
@@ -2393,7 +3432,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 ;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
-:straight t
+  :straight t
   :commands (pandoc-load-default-settings pandoc-mode)
   :diminish
   :hook (markdown-mode-hook . pandoc-mode)
@@ -2401,7 +3440,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
-:straight t
+  :straight t
   :disabled t
   :commands markdown-preview-mode)
 
@@ -2467,7 +3506,7 @@ Corfu does not support TUI, so we have to fallback on company."
   )
 
 (use-package css-mode
-:straight t
+  :straight t
   :commands css-mode
   :defines sb/flycheck-local-checkers
   :hook (css-mode-hook . lsp-deferred)
@@ -2484,7 +3523,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
-:straight t
+  :straight t
   :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
   :custom
@@ -2493,7 +3532,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package ini-mode
-:straight nil
+  :straight nil
   :commands ini-mode)
 
 ;;;###autoload
@@ -2521,7 +3560,7 @@ Corfu does not support TUI, so we have to fallback on company."
        (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
 
 (use-package yaml-mode
-:straight t
+  :straight t
   :defines lsp-ltex-enabled lsp-disabled-clients
   :commands yaml-mode
   :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
@@ -2687,26 +3726,26 @@ Corfu does not support TUI, so we have to fallback on company."
   (defvar lsp-pyright-langserver-command-args)
   (defvar lsp-pylsp-plugins-preload-modules)
 
-      (setq lsp-pylsp-configuration-sources []
-          lsp-pylsp-plugins-autopep8-enable nil
-          ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
-          ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
-          lsp-pylsp-plugins-mccabe-enabled nil
-          ;; We can also set this per-project
-          lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
-          lsp-pylsp-plugins-pycodestyle-enabled nil
-          lsp-pylsp-plugins-pycodestyle-max-line-length 100
-          lsp-pylsp-plugins-pydocstyle-convention "pep257"
-          lsp-pylsp-plugins-pydocstyle-enabled nil
-          lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-          lsp-pylsp-plugins-pyflakes-enabled nil
-          lsp-pylsp-plugins-pylint-args (vconcat
-                                         (list "-j 2"
-                                               (concat "--rcfile="
-                                                       (expand-file-name ".config/pylintrc"
-                                                                         sb/user-home))))
-          lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
-          lsp-pylsp-plugins-yapf-enabled t)
+  (setq lsp-pylsp-configuration-sources []
+        lsp-pylsp-plugins-autopep8-enable nil
+        ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
+        ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
+        lsp-pylsp-plugins-mccabe-enabled nil
+        ;; We can also set this per-project
+        lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
+        lsp-pylsp-plugins-pycodestyle-enabled nil
+        lsp-pylsp-plugins-pycodestyle-max-line-length 100
+        lsp-pylsp-plugins-pydocstyle-convention "pep257"
+        lsp-pylsp-plugins-pydocstyle-enabled nil
+        lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+        lsp-pylsp-plugins-pyflakes-enabled nil
+        lsp-pylsp-plugins-pylint-args (vconcat
+                                       (list "-j 2"
+                                             (concat "--rcfile="
+                                                     (expand-file-name ".config/pylintrc"
+                                                                       sb/user-home))))
+        lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
+        lsp-pylsp-plugins-yapf-enabled t)
 
   (dolist (ignore-dirs '("/build\\'"
                          "/\\.metadata\\'"
@@ -2788,7 +3827,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Sync workspace folders and treemacs projects
 (use-package lsp-treemacs
-:straight t
+  :straight t
   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
   :config (lsp-treemacs-sync-mode 1)
   :bind
@@ -2801,7 +3840,7 @@ Corfu does not support TUI, so we have to fallback on company."
         ("E" . lsp-treemacs-errors-list)))
 
 (use-package lsp-ivy
-:straight t
+  :straight t
   :after (lsp-mode ivy)
   :demand t
   :bind
@@ -2810,14 +3849,14 @@ Corfu does not support TUI, so we have to fallback on company."
         ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
-:straight t
+  :straight t
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode)
   :hook
   ((lsp-mode-hook . dap-mode)
    (lsp-mode-hook . dap-ui-mode)))
 
 (use-package docstr
-:straight t
+  :straight t
   :diminish
   :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
@@ -2860,25 +3899,25 @@ Corfu does not support TUI, so we have to fallback on company."
         ("M-q"     . c-fill-paragraph)))
 
 (use-package modern-cpp-font-lock
-:straight t
+  :straight t
   :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode-hook . modern-c++-font-lock-mode))
 
 (use-package cuda-mode
-:straight t
+  :straight t
   :commands cuda-mode
   :mode
   (("\\.cu\\'"  . c++-mode)
    ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
-:straight t
+  :straight t
   :commands opencl-mode
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
-:straight t
+  :straight t
   :if (executable-find "cmake")
   :commands cmake-mode
   :mode "\(CMakeLists\.txt|\.cmake\)$"
@@ -2898,7 +3937,7 @@ Corfu does not support TUI, so we have to fallback on company."
     :server-id 'cmakels-r)))
 
 (use-package cmake-font-lock
-:straight t
+  :straight t
   :commands cmake-font-lock-activate
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
@@ -2933,7 +3972,7 @@ Corfu does not support TUI, so we have to fallback on company."
   )
 
 (use-package python-docstring
-:straight t
+  :straight t
   :after python-mode
   :demand t
   :commands (python-docstring-mode python-docstring-install)
@@ -2941,11 +3980,11 @@ Corfu does not support TUI, so we have to fallback on company."
   :config (python-docstring-install))
 
 (use-package pip-requirements
-:straight t
+  :straight t
   :commands pip-requirements-mode)
 
 (use-package pyvenv
-:straight t
+  :straight t
   :commands (pyvenv-mode pyvenv-tracking-mode)
   :hook (python-mode-hook . pyvenv-mode)
   :custom
@@ -2960,7 +3999,7 @@ Corfu does not support TUI, so we have to fallback on company."
                                    (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
-:straight t
+  :straight t
   :commands py-isort-before-save
   :hook
   (python-mode-hook . (lambda ()
@@ -2970,7 +4009,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
-:straight t
+  :straight t
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode-hook . (lambda ()
@@ -3009,7 +4048,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
-:straight t
+  :straight t
   :diminish yapf-mode
   :commands yapf-mode
   :hook (python-mode-hook . yapf-mode))
@@ -3043,7 +4082,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
-:straight t
+  :straight t
   :commands (lsp-java-organize-imports lsp-java-build-project
                                        lsp-java-update-project-configuration
                                        lsp-java-actionable-notifications
@@ -3078,16 +4117,16 @@ Corfu does not support TUI, so we have to fallback on company."
                                  sb/user-home)))
 
 (use-package ant
-:straight t
+  :straight t
   :commands (ant ant-clean ant-compile ant-test))
 
 (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
-:straight t
+  :straight t
   :commands autodisass-java-bytecode
   :mode "\\.class\\'")
 
 (use-package groovy-mode ; Syntax highlighting for Gradle files
-:straight t
+  :straight t
   :commands groovy-mode
   :mode "\\.gradle\\'")
 
@@ -3129,7 +4168,7 @@ Corfu does not support TUI, so we have to fallback on company."
     :server-id 'bashls-r)))
 
 (use-package fish-mode
-:straight t
+  :straight t
   :mode "\\.fish\\'"
   :interpreter "fish"
   :commands (fish-mode fish_indent-before-save)
@@ -3138,7 +4177,7 @@ Corfu does not support TUI, so we have to fallback on company."
                       (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package company-shell
-:straight t
+  :straight t
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
@@ -3146,7 +4185,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :custom (company-shell-delete-duplictes t))
 
 (use-package shfmt
-:straight t
+  :straight t
   :hook (sh-mode-hook . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
@@ -3161,14 +4200,14 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
 (use-package vc
-:straight nil
+  :straight nil
   :init
   (if (boundp 'vc-handled-backends)
       (add-hook 'find-file-hook #'vc-refresh-state)
     (remove-hook 'find-file-hook #'vc-refresh-state)))
 
 (use-package magit
-:straight t
+  :straight t
   :commands magit-display-buffer-fullframe-status-v1
   :bind
   (("C-x g"   . magit-status)
@@ -3206,7 +4245,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
 (use-package git-gutter
-:straight t
+  :straight t
   :if (unless (boundp 'vc-handled-backends))
   :disabled t
   :commands global-git-gutter-mode
@@ -3227,7 +4266,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
-:straight t
+  :straight t
   :if (boundp 'vc-handled-backends)
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh
                                        diff-hl-dired-mode-unless-remote global-diff-hl-mode)
@@ -3245,7 +4284,7 @@ Corfu does not support TUI, so we have to fallback on company."
    (after-init-hook         . global-diff-hl-mode)))
 
 (use-package git-commit
-:straight t
+  :straight t
   :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
   :custom
@@ -3320,7 +4359,7 @@ Corfu does not support TUI, so we have to fallback on company."
    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
-:straight nil
+  :straight nil
   :commands web-mode
   :mode "\\.html?\\'"
   :hook (web-mode-hook . lsp-deferred)
@@ -3347,14 +4386,14 @@ Corfu does not support TUI, so we have to fallback on company."
     :server-id 'htmlls-r)))
 
 (use-package emmet-mode
-:straight t
+  :straight t
   :defines emmet-move-cursor-between-quote
   :commands emmet-mode
   :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package rainbow-mode
-:straight t
+  :straight t
   :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook) . rainbow-mode))
 
@@ -3389,7 +4428,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
 (use-package flycheck-grammarly
-:straight t
+  :straight t
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
@@ -3403,7 +4442,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
-:straight t
+  :straight t
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :hook (text-mode-hook . flycheck-languagetool-setup)
   :init
@@ -3470,7 +4509,7 @@ Corfu does not support TUI, so we have to fallback on company."
         ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
 (use-package lsp-ltex
-:straight t
+  :straight t
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
@@ -3518,7 +4557,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 (use-package lsp-latex
-:straight t
+  :straight t
   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
                                        lsp-latex-bibtex-formatter-line-length
                                        lsp-latex-chktex-on-open-and-save
@@ -3708,21 +4747,21 @@ Ignore if no file is found."
 
 (use-package bib-cite
   :straight nil(use-package bib-cite
-  :ensure nil
-  :disabled t
-  :diminish bib-cite-minor-mode
-  :commands bib-cite-minor-mode
-  :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
-  :custom (bib-cite-use-reftex-view-crossref t)
-  :bind (:map bib-cite-minor-mode-map
-              ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-              ("C-c l a" . bib-apropos)
-              ("C-c l b" . bib-make-bibliography)
-              ("C-c l d" . bib-display)
-              ("C-c l t" . bib-etags)
-              ("C-c l f" . bib-find)
-              ("C-c l n" . bib-find-next)
-              ("C-c l h" . bib-highlight-mouse)))
+                 :ensure nil
+                 :disabled t
+                 :diminish bib-cite-minor-mode
+                 :commands bib-cite-minor-mode
+                 :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
+                 :custom (bib-cite-use-reftex-view-crossref t)
+                 :bind (:map bib-cite-minor-mode-map
+                             ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+                             ("C-c l a" . bib-apropos)
+                             ("C-c l b" . bib-make-bibliography)
+                             ("C-c l d" . bib-display)
+                             ("C-c l t" . bib-etags)
+                             ("C-c l f" . bib-find)
+                             ("C-c l n" . bib-find-next)
+                             ("C-c l h" . bib-highlight-mouse)))
   :disabled t
   :diminish bib-cite-minor-mode
   :commands bib-cite-minor-mode
@@ -3759,25 +4798,25 @@ Ignore if no file is found."
                                  company-auctex-symbols company-auctex-environments))
 
 (use-package math-symbols
-:straight t
+  :straight t
   :after tex-mode
   :demand t) ; Required by `ac-math' and `company-math'
 
 (use-package company-math
-:straight t
+  :straight t
   :after tex-mode
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
 (use-package company-reftex ; Reftex must be enabled to work
-:straight t
+  :straight t
   :after tex-mode
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 
 
 (use-package company-bibtex
-:straight t
+  :straight t
   :after tex-mode
   :demand t
   :commands company-bibtex)
@@ -3827,7 +4866,7 @@ Ignore if no file is found."
 
 
 (use-package math-preview
-:straight nil
+  :straight nil
   :disabled t
   :commands (math-preview-all math-preview-at-point math-preview-region)
   :custom
@@ -3858,7 +4897,7 @@ Ignore if no file is found."
     :server-id 'jsonls-r)))
 
 (use-package json-reformat
-:straight t
+  :straight t
   :after (:any json-mode jsonc-mode)
   :demand t
   :custom
@@ -3866,7 +4905,7 @@ Ignore if no file is found."
   (js-indent-level 2))
 
 (use-package bazel
-:straight t
+  :straight t
   :if (executable-find "bazel")
   :commands (bazel-mode bazelrc-mode bazel-buildifier)
   :hook
@@ -3875,34 +4914,34 @@ Ignore if no file is found."
    (bazel-mode-hook . flycheck-mode)))
 
 (use-package protobuf-mode
-:straight t
+  :straight t
   :commands protobuf-mode
   :mode "\\.proto$"
   :hook (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
-:straight nil
+  :straight nil
   :ensure nil
   :commands mlir-mode
   :load-path "extras"
   :mode "\\.mlir\\'")
 
 (use-package clang-format
-:straight t
+  :straight t
   :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
   :custom (clang-format-style "file"))
 
 (use-package clang-format+
-:straight t
+  :straight t
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
   :custom (clang-format+-always-enable t))
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
-:straight t
+  :straight t
   :commands (format-all-ensure-formatter format-all-buffer)
   :diminish
   :preface
@@ -3942,13 +4981,13 @@ Ignore if no file is found."
 
 
 (use-package editorconfig
-:straight t
+  :straight t
   :if (executable-find "editorconfig")
   :commands editorconfig-mode)
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
-:straight t
+  :straight t
   :defines fasd-enable-initial-prompt
   :commands (global-fasd-mode fasd-find-file)
   :if (executable-find "fasd")
@@ -3958,13 +4997,13 @@ Ignore if no file is found."
   :bind* ("C-c /" . fasd-find-file))
 
 (use-package dotenv-mode
-:straight t
+  :straight t
   :mode "\\.env\\'")
 
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (use-package ansi-color
-:straight nil
+  :straight nil
   :commands ansi-color-apply-on-region
   :preface
   (defun sb/colorize-compilation-buffer ()
@@ -3981,11 +5020,11 @@ Ignore if no file is found."
   (add-hook 'compilation-filter-hook #'sanityinc/colourise-compilation-buffer))
 
 (use-package info-colors
-:straight nil
+  :straight nil
   :commands info-colors-fontify-node
   :hook (Info-selection-hook . info-colors-fontify-node))
 
-; Use "emacsclient -c -nw" to start a new frame.
+                                        ; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
   :straight nil
   :disabled t
@@ -4002,7 +5041,7 @@ Ignore if no file is found."
 ;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
 ;; Check https://github.com/akermu/emacs-libvterm.
 (use-package vterm
-:straight t
+  :straight t
   :config
   (setq vterm-always-compile-module t
         vterm-max-scrollback 5000
@@ -4014,7 +5053,7 @@ Ignore if no file is found."
               (buffer-face-mode t))))
 
 (use-package vterm-toggle
-:straight t
+  :straight t
   :commands vterm-toggle
   :bind ("C-`" . vterm-toggle))
 
@@ -4257,24 +5296,24 @@ or the major mode is not in `sb/skippable-modes'."
 
 
 (use-package default-text-scale
-:straight t
+  :straight t
   :bind
   (("C-M-+" . default-text-scale-increase)
    ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
-:straight t
+  :straight t
   :commands free-keys)
 
 (use-package keyfreq
-:straight t
+  :straight t
   :hook
   (after-init-hook . (lambda ()
                        (keyfreq-mode 1)
                        (keyfreq-autosave-mode 1))))
 
 (use-package which-key ; Show help popups for prefix keys
-:straight t
+  :straight t
   :diminish
   :commands (which-key-mode which-key-setup-side-window-right-bottom)
   ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
@@ -4291,7 +5330,7 @@ or the major mode is not in `sb/skippable-modes'."
   (which-key-idle-delay 0.3))
 
 (use-package which-key-posframe
-:straight t
+  :straight t
   :commands which-key-posframe-mode
   :hook (which-key-mode-hook . which-key-posframe-mode)
   :config
@@ -4338,7 +5377,7 @@ or the major mode is not in `sb/skippable-modes'."
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
-    (setq read-extended-command-predicate #'command-completion-default-include-p)
+  (setq read-extended-command-predicate #'command-completion-default-include-p)
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
@@ -4386,7 +5425,7 @@ or the major mode is not in `sb/skippable-modes'."
         ("C-'" . vertico-quick-exit)))
 
 (use-package consult
-:straight t
+  :straight t
   :commands consult--customize-put
   :custom
   (consult-line-start-from-top t "Start search from the beginning")
@@ -4461,32 +5500,32 @@ or the major mode is not in `sb/skippable-modes'."
    :preview-key nil))
 
 (use-package consult-projectile
-:straight t
+  :straight t
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
    ("<f6>" . consult-projectile)))
 
 (use-package consult-lsp
-:straight t
+  :straight t
   :after (consult lsp)
   :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
   :config (consult-lsp-marginalia-mode 1))
 
 (use-package consult-flycheck
-:straight t
+  :straight t
   :after (consult flycheck)
   :bind
   (:map flycheck-command-map
         ("!" . consult-flycheck)))
 
 (use-package consult-flyspell
-:straight t
+  :straight t
   :after (consult flyspell)
   :commands consult-flyspell)
 
 (use-package consult-dir
-:straight t
+  :straight t
   :bind
   (([remap list-directory] . consult-dir)
    ("C-x C-d" . consult-dir)
@@ -4495,15 +5534,15 @@ or the major mode is not in `sb/skippable-modes'."
    ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-project-extra
-:straight t)
+  :straight t)
 
 (use-package consult-yasnippet
-:straight t
+  :straight t
   :bind ("C-M-y" . consult-yasnippet))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
-:straight t
+  :straight t
   :preface
   (defun sb/corfu-move-to-minibuffer ()
     (interactive)
@@ -4542,7 +5581,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
-:straight t
+  :straight t
   :init
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
   (add-to-list 'completion-at-point-functions #'cape-file)
@@ -4618,3 +5657,64 @@ or the major mode is not in `sb/skippable-modes'."
    ("M-<left>" . centaur-tabs-backward-tab)))
 
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values
+   '((eval add-hook 'lsp-managed-mode-hook
+           (lambda nil
+             (when
+                 (derived-mode-p 'markdown-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers markdown-markdownlint-cli)))))
+             (when
+                 (derived-mode-p 'gfm-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers markdown-markdownlint-cli)))))
+             (when
+                 (derived-mode-p 'sh-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers sh-shellcheck)))))
+             (when
+                 (derived-mode-p 'yaml-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers yaml-yamllint)))))
+             (when
+                 (derived-mode-p 'json-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers json-jsonlint)))))
+             (when
+                 (derived-mode-p 'python-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers python-pylint)))))
+             (when
+                 (derived-mode-p 'c++-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers c/c++-cppcheck)))))
+             (when
+                 (derived-mode-p 'html-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers html-tidy)))))
+             (when
+                 (derived-mode-p 'xml-mode)
+               (setq sb/flycheck-local-checkers
+                     '((lsp
+                        (next-checkers xml-xmllint))))))))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
+ '(lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face :weight bold :height 0.9))))
+ '(lsp-headerline-breadcrumb-symbols-face ((t (:inherit font-lock-doc-face :weight bold :height 0.9)))))
