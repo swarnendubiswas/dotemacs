@@ -587,6 +587,1046 @@ Corfu does not support TUI, so we have to fallback on company."
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
 
+;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
+;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
+(use-package amx
+  :straight t
+  :commands amx-mode
+  :hook (after-init-hook . amx-mode)
+  :bind
+  ;; We need this if we use `vertico' and `consult'
+  (("M-x"  . execute-extended-command)
+   ("<f1>" . execute-extended-command-for-buffer))
+  :custom
+  (amx-auto-update-interval 10 "Update the command list every n minutes"))
+
+(use-package ivy
+  :straight t
+  :functions ivy-format-function-line
+  :commands (ivy-read ivy-mode)
+  :if (eq sb/minibuffer-completion 'ivy)
+  :preface
+  ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
+  (defun sb/ignore-dired-buffers (str)
+    "Return non-nil if STR names a Dired buffer.
+  This function is intended for use with `ivy-ignore-buffers'."
+    (let ((buf (get-buffer str)))
+      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
+  :hook (after-init-hook . ivy-mode)
+  :config
+  (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
+        ivy-extra-directories nil ; Hide . and ..
+        ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+        ivy-height 12
+        ;; Make the height of the minibuffer proportionate to the screen
+        ;; ivy-height-alist '((t
+        ;;                      lambda (_caller)
+        ;;                      (/ (frame-height) 2)))
+        ;; We update `ivy-re-builders-alist' after loading `orderless'
+        ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
+        ;;                         (counsel-find-file . ivy--regex-fuzzy)
+        ;;                         (t                 . ivy--regex-ignore-order))
+        ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
+        ivy-wrap t
+        ;; Do not start searches with ^
+        ivy-initial-inputs-alist nil
+        ;; don't show recent files in switch-buffer
+        ivy-use-virtual-buffers nil
+        ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
+        ;; is way too big (30,000). Turn it down so big repos affect project
+        ;; navigation less.
+        ivy-sort-max-size 7500)
+
+  (dolist (buffer
+           '("TAGS" "magit-process" "*emacs*" "*xref*"
+             ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
+             ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+             ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
+             ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
+             ))
+    (add-to-list 'ivy-ignore-buffers buffer))
+
+  ;; Ignore `dired' buffers from `ivy-switch-buffer'
+  ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
+  :diminish
+  :bind
+  (("C-c r"    . ivy-resume)
+   ("<f3>"     . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("<return>" . ivy-alt-done) ; Continue completion
+   ("<left>"   . ivy-previous-line)
+   ("<right>"  . ivy-next-line)))
+
+(use-package counsel
+  :straight t
+  :straight amx ;; `counsel' makes use of `amx' if installed
+  :if (eq sb/minibuffer-completion 'ivy)
+  :commands counsel-mode
+  :preface
+  ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
+  (defun sb/counsel-goto-recent-directory ()
+    "Open recent directories with `dired'."
+    (interactive)
+    (unless recentf-mode (recentf-mode 1))
+    (let ((collection
+           (delete-dups
+            (append (mapcar 'file-name-directory recentf-list)
+                    (if (executable-find "fasd")
+                        (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
+      (ivy-read "Directories:" collection :action 'dired)))
+  :bind
+  (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
+   ([remap execute-extended-command] . counsel-M-x)
+   ([remap completion-at-point]      . counsel-company)
+   ("C-M-i"                          . counsel-company)
+   ([remap find-file]                . counsel-find-file)
+   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
+   ;; ([remap flycheck-list-errors]  . counsel-flycheck)
+   ("<f1>"                           . counsel-M-x)
+   ("<f2>"                           . counsel-find-file)
+   ("C-c s g"                        . counsel-git-grep)
+   ("C-<f9>"                         . sb/counsel-goto-recent-directory)
+   ("C-c d m"                        . counsel-minor)
+   ("<f9>"                           . counsel-recentf)
+   ("C-c s r"                        . counsel-rg)
+   ("C-c C-m"                        . counsel-mark-ring)
+   ;; Enabling preview can make switching over remote buffers slow
+   ("S-<f3>"                         . counsel-switch-buffer)
+   ("<f4>"                           . counsel-grep-or-swiper))
+  :bind* ("C-c C-j"                  . counsel-imenu)
+  :diminish
+  :hook (ivy-mode-hook . counsel-mode)
+  :config
+  (setq counsel-describe-function-function #'helpful-callable
+        counsel-describe-variable-function #'helpful-variable
+        counsel-find-file-at-point t
+        counsel-find-file-ignore-regexp (concat
+                                         "\\(?:\\`[#.]\\)"
+                                         "\\|\\(?:\\`.+?[#~]\\'\\)"
+                                         "\\|.cb$"
+                                         "\\|.cb2$"
+                                         "\\|.class$"
+                                         "\\|.djvu$"
+                                         "\\|.doc$"
+                                         "\\|.docx$"
+                                         "\\|.elc$"
+                                         "\\|.fdb_latexmk$"
+                                         "\\|.fls$"
+                                         "\\|.lof$"
+                                         "\\|.lot$"
+                                         "\\|.o$"
+                                         "\\|.ppt$"
+                                         "\\|.pptx$"
+                                         "\\|.pyc$"
+                                         "\\|.rel$"
+                                         "\\|.rip$"
+                                         "\\|.so$"
+                                         "\\|.synctex$"
+                                         "\\|.synctex.gz$"
+                                         "\\|.toc$"
+                                         "\\|.xls$"
+                                         "\\|.xlsx$"
+                                         "\\|tags"
+                                         "\\|TAGS"
+                                         "\\|GPATH"
+                                         "\\|GRTAGS"
+                                         "\\|GTAGS"
+                                         "\\|tramp"
+                                         "\\|.clangd"
+                                         "\\|.cache"
+                                         "\\|.metadata"
+                                         "\\|.recommenders"
+                                         "\\|typings"
+                                         "\\|__pycache__")
+        counsel-mode-override-describe-bindings t
+        counsel-preselect-current-file t
+        counsel-switch-buffer-preview-virtual-buffers nil ; Removes recent files and bookmarks
+        counsel-yank-pop-preselect-last t
+        counsel-yank-pop-separator "\n------------------------------------------\n"))
+
+(use-package ivy-hydra ; Additional keybindings for `ivy'
+:straight t
+  :after (ivy hydra)
+  :demand t
+  :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
+
+;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
+(use-package prescient
+:straight t
+  :commands prescient-persist-mode
+  :hook (after-init-hook . prescient-persist-mode)
+  :custom (prescient-sort-full-matches-first t))
+
+;; We are using `company-fuzzy' for sorting completion candidates
+(use-package company-prescient
+  :straight t
+  :after company
+  :demand t
+  :commands company-prescient-mode
+  :disabled t
+  :config
+  ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
+  ;; `:separate' keyword in `company'.
+  ;; (setq company-prescient-sort-length-enable nil)
+  (company-prescient-mode 1))
+
+(use-package all-the-icons-ivy
+  :straight t
+  :after ivy
+  :demand t
+  :commands all-the-icons-ivy-setup
+  :config (all-the-icons-ivy-setup))
+
+(use-package orderless
+  :straight t
+  :after (:any ivy vertico)
+  :demand t
+  :defines orderless-component-separator
+  :functions sb/just-one-face
+  :config
+  (with-eval-after-load "ivy"
+    ;; (defvar ivy-re-builders-alist)
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+
+  (setq completion-styles '(orderless partial-completion) ; initials, basic, emacs22
+        orderless-matching-styles '(orderless-regexp)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic-remote orderless partial-completion))
+                                        ;; (minibuffer (initials))))
+                                        )
+        ))
+
+(use-package ispell
+  :straight nil
+  :if (symbol-value 'sb/IS-LINUX)
+  :config
+  (setq ispell-dictionary "en_US"
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
+        ispell-local-dictionary "en_US"
+        ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory)
+        ;; Save a new word to personal dictionary without asking
+        ispell-silently-savep t)
+
+  ;; Skip regions in Org-mode
+  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_EXAMPLE" . "#\\+END_EXAMPLE"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+  (add-to-list 'ispell-skip-region-alist '("~" "~"))
+  ;; Verbatim regions in org mode should not be ispelled
+  (add-to-list 'ispell-skip-region-alist '("=" "="))
+  ;; Properties block in org mode do not need to be ispelled
+  (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
+  ;; Footnotes in org that have http links that are line breaked should not be ispelled
+  (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
+
+  (add-to-list 'ispell-skip-region-alist '("`" "`"))
+
+  ;; Skip some math environments
+  (add-to-list 'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
+  (add-to-list 'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
+  (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}")))
+
+(use-package flyspell
+  :straight nil
+  :if (symbol-value 'sb/IS-LINUX)
+  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
+  :diminish
+  :preface
+  ;; Move point to previous error
+  ;; http://emacs.stackexchange.com/a/14912/2017
+  ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
+  (defun sb/flyspell-goto-previous-error (arg)
+    "Go to arg previous spelling error."
+    (interactive "p")
+    (while (not (= 0 arg))
+      (let ((pos (point))
+            (min (point-min)))
+        (if (and (eq (current-buffer) flyspell-old-buffer-error)
+                 (eq pos flyspell-old-pos-error))
+            (progn
+              (if (= flyspell-old-pos-error min)
+                  ;; Goto beginning of buffer
+                  (progn
+                    (message "Restarting from end of buffer")
+                    (goto-char (point-max)))
+                (backward-word 1))
+              (setq pos (point))))
+        ;; Seek the next error
+        (while (and (> pos min)
+                    (let ((ovs (overlays-at pos))
+                          (r '()))
+                      (while (and (not r) (consp ovs))
+                        (if (flyspell-overlay-p (car ovs))
+                            (setq r t)
+                          (setq ovs (cdr ovs))))
+                      (not r)))
+          (backward-word 1)
+          (setq pos (point)))
+        ;; Save the current location for the next invocation
+        (setq arg (1- arg))
+        (setq flyspell-old-pos-error pos)
+        (setq flyspell-old-buffer-error (current-buffer))
+        (goto-char pos)
+        (if (= pos min)
+            (progn
+              (message "No more misspelled words!")
+              (setq arg 0))
+          (forward-word)))))
+  :config
+  (setq flyspell-abbrev-p           t ; Add corrections to abbreviation table
+        flyspell-issue-message-flag nil
+        flyspell-issue-welcome-flag nil)
+  :hook
+  (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
+   ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
+   ;; language-specific words
+   (prog-mode-hook . flyspell-prog-mode)
+   ;; `find-file-hook' will not work for buffers with no associated files
+   (after-init-hook . (lambda ()
+                        (when (string= (buffer-name) "*scratch*")
+                          (flyspell-mode 1))))
+   (text-mode-hook . flyspell-mode))
+  :bind
+  (("C-c f f" . flyspell-mode)
+   ("C-c f b" . flyspell-buffer)
+   :map flyspell-mode-map
+   ("C-;"     . nil)
+   ("C-,"     . sb/flyspell-goto-previous-error)))
+
+;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
+(use-package flyspell-popup
+:straight t
+  :after flyspell
+  :disabled t
+  :bind
+  (:map flyspell-mode-map
+        ("C-;" . flyspell-popup-correct))
+  :config (setq flyspell-popup-correct-delay 0.1))
+
+(use-package flyspell-correct
+  :straight t
+  :after flyspell
+  :bind
+  (:map flyspell-mode-map
+        ("C-;" . flyspell-correct-wrapper)))
+
+;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
+;; Running `flyspell-buffer' on an entire buffer can be slow.
+(use-package spell-fu
+  :straight t
+  :defines spell-fu-directory
+  :commands spell-fu-mode
+  :config (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+  :init
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (setq spell-fu-faces-exclude '(hl-line
+                                             ;; `nxml-mode' is derived from `text-mode'
+                                             nxml-attribute-local-name))
+              (spell-fu-mode)))
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (setq spell-fu-faces-exclude '(org-block
+                                             org-block-begin-line
+                                             org-block-end-line
+                                             org-code
+                                             org-date
+                                             org-formula
+                                             org-latex-and-related
+                                             org-link
+                                             org-meta-line
+                                             org-property-value
+                                             org-ref-cite-face
+                                             org-special-keyword
+                                             org-tag
+                                             org-todo
+                                             org-todo-keyword-done
+                                             org-todo-keyword-habt
+                                             org-todo-keyword-kill
+                                             org-todo-keyword-outd
+                                             org-todo-keyword-todo
+                                             org-todo-keyword-wait
+                                             org-verbatim
+                                             hl-line))
+              (spell-fu-mode)))
+
+  (add-hook 'markdown-mode-hook
+            (lambda ()
+              (setq spell-fu-faces-exclude '(markdown-blockquote-face
+                                             markdown-code-face
+                                             markdown-html-attr-name-face
+                                             markdown-html-attr-value-face
+                                             markdown-html-tag-name-face
+                                             markdown-inline-code-face
+                                             markdown-link-face
+                                             markdown-markup-face
+                                             markdown-plain-url-face
+                                             markdown-reference-face
+                                             markdown-url-face
+                                             hl-line
+                                             pandoc-citation-key-face))
+              (spell-fu-mode)))
+
+  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+    (add-hook hook (lambda ()
+                     (setq spell-fu-faces-exclude '(font-latex-math-face
+                                                    font-latex-sedate-face
+                                                    hl-line))
+                     (spell-fu-mode))))
+  :bind
+  (("C-c f n" . spell-fu-goto-next-error)
+   ("C-c f p" . spell-fu-goto-previous-error)
+   ("C-c f a" . spell-fu-word-add)))
+
+(use-package highlight-indentation
+  :straight t
+  :commands highlight-indentation-mode
+  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
+
+;; Claims to be better than `electric-indent-mode'
+(use-package aggressive-indent
+  :straight t
+  :commands aggressive-indent-mode
+  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
+  :diminish
+  :config
+  (setq aggressive-indent-comments-too t
+        ;; Never use `electric-indent-mode'
+        aggressive-indent-dont-electric-modes t))
+
+(use-package paren
+  :straight nil
+  ;; :init (run-with-idle-timer 2 nil #'show-paren-mode)
+  :hook (after-init-hook . show-paren-mode)
+  :config
+  (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
+        show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t))
+
+;; Enable autopairing
+(use-package elec-pair
+  :straight nil
+  :commands (electric-pair-mode)
+  :disabled t
+  ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)
+  :hook (after-init-hook . electric-pair-mode)
+  :config
+  ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+  (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+  (defvar electric-pair-pairs)
+  (defvar electric-pair-text-pairs)
+  (defvar electric-pair-preserve-balance)
+
+  (declare-function sb/add-markdown-pairs "init-emacs28")
+
+  (defun sb/add-markdown-pairs ()
+    "Add custom pairs to `markdown-mode'."
+    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
+
+  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+
+  ;; Avoid balancing parentheses since they can be both irritating and slow
+  (setq electric-pair-preserve-balance nil)
+
+  ;; Disable pairs when entering minibuffer
+  (add-hook 'minibuffer-setup-hook (lambda ()
+                                     (electric-pair-mode -1)))
+  ;; Re-enable pairs when existing minibuffer
+  (add-hook 'minibuffer-exit-hook (lambda ()
+                                    (electric-pair-mode 1))))
+
+;; `sp-cheat-sheet' will show you all the commands available, with examples. Seems to have
+;; performance issue with `latex-mode', `markdown-mode', and large JSON files.
+;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
+(use-package smartparens
+  :straight t
+  :commands (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
+                     sp-transpose-sexp sp-absort-sexp sp-copy-sexp
+                     sp-backward-kill-sexp sp-kill-sexp sp-change-inner
+                     sp-change-enclosing sp-convolute-sexp sp-emit-sexp
+                     sp-backward-down-sexp sp-backward-up-sexp
+                     sp-backward-slurp-sexp sp-backward-barf-sexp
+                     sp-forward-barf-sexp sp-forward-slurp-sexp sp-rewrap-sexp
+                     sp-unwrap-sexp sp-backward-unwrap-sexp sp-wrap-round
+                     sp-wrap-curly sp-wrap-square sp-split-sexp)
+  :diminish
+  :preface
+  ;; https://web-mode.org/
+  (defun sp-web-mode-is-code-context (id action context)
+    (and (eq action 'insert)
+         (not (or (get-text-property (point) 'part-side)
+                  (get-text-property (point) 'block-side)))))
+  :hook
+  ((after-init-hook . (lambda ()
+                        (require 'smartparens-config)
+                        (smartparens-global-mode 1)
+                        (show-smartparens-global-mode 1))))
+  :config
+  (setq sp-show-pair-from-inside t
+        sp-autoskip-closing-pair 'always)
+
+  (smartparens-strict-mode -1)
+
+  (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
+
+  (sp-local-pair 'markdown-mode "<" ">")
+
+  ;; Do not insert a parenthesis pair when the point is at the beginning of a word
+  (sp-pair "("  nil :unless '(sp-point-before-word-p))
+  (sp-pair "["  nil :unless '(sp-point-before-word-p))
+  (sp-pair "{"  nil :unless '(sp-point-before-word-p))
+  (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
+
+  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
+  :bind
+  (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+   ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+   ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+   ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
+   ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
+   ;; TODO: The following two keybindings are not properly supported yet in terminal Emacs.
+   ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
+   ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
+   ;; "(foo bar)" -> "foo bar"
+   ("C-M-k" . sp-splice-sexp)))
+
+;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; ;; yet.
+;; (use-package project
+;;   :straight t
+;;   :commands (project-switch-project project-current
+;;                                     project-find-file project-execute-extended-command
+;;                                     project-known-project-roots
+;;                                     project-remove-known-project
+;;                                     project-remember-project
+;;                                     project-kill-buffers
+;;                                     project-switch-to-buffer
+;;                                     project-search
+;;                                     project-compile)
+;;   :bind
+;;   (:map project-prefix-map
+;;         ("f" . project-find-file)
+;;         ("F" . project-or-external-find-file)
+;;         ("b" . project-switch-to-buffer)
+;;         ("d" . project-dired)
+;;         ("v" . project-vc-dir)
+;;         ("c" . project-compile)
+;;         ("k" . project-kill-buffers)
+;;         ("p" . project-switch-project)
+;;         ("g" . project-find-regexp)
+;;         ("r" . project-query-replace-regexp)))
+
+(use-package projectile
+  :straight t
+  :commands (projectile-project-p projectile-project-name
+                                  projectile-expand-root
+                                  projectile-project-root
+                                  projectile-mode
+                                  projectile-compile
+                                  projectile-compile-project)
+  :preface
+  (defun sb/close-treemacs-with-projectile (orig-fun &rest args)
+    (let ((res (apply orig-fun args)))
+      (treemacs)
+      res))
+  :config
+  (setq projectile-enable-caching nil ; Caching will not watch for file system changes
+        projectile-file-exists-remote-cache-expire nil
+        projectile-mode-line-prefix "" ; Save modeline space
+        ;; Use only in desired directories, too much noise otherwise
+        projectile-require-project-root t
+        ;; The contents of ".projectile" are ignored when using the `alien' project indexing method
+        projectile-indexing-method 'alien
+        ;; No sorting should be faster, note that files are not sorted if
+        ;; `projectile-indexing-method' is set to `alien'.
+        projectile-sort-order 'recently-active
+        projectile-verbose nil)
+
+  ;; https://github.com/MatthewZMD/.emacs.d
+  (when (and (symbol-value 'sb/IS-WINDOWS)
+             (executable-find "tr"))
+    (setq projectile-indexing-method 'alien))
+
+  ;; Disable computing the project type that is shown on the modeline
+  (defun projectile-default-mode-line ()
+    "Report project name and type in the modeline."
+    (let ((project-name (projectile-project-name)))
+      ;; (format " [%s: %s]"
+      ;;         projectile-mode-line-prefix
+      ;;         (or project-name "-"))
+      (format " [%s]" (or project-name "-"))))
+
+  (setq projectile-project-root-files '("build.gradle"
+                                        "setup.py"
+                                        "requirements.txt"
+                                        "package.json"
+                                        "composer.json"
+                                        "CMakeLists.txt"
+                                        "Makefile"
+                                        "WORKSPACE"
+                                        "meson.build"
+                                        "SConstruct"
+                                        "configure.ac"
+                                        "configure.in"))
+
+  ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
+  ;; projects is disabled for faster startup.
+  (setq projectile-auto-discover nil
+        projectile-project-search-path (list
+                                        (concat `,(getenv "HOME") "/bitbucket")
+                                        (expand-file-name "github"            sb/user-home)
+                                        (expand-file-name "iitk-workspace"    sb/user-home)
+                                        (expand-file-name "iitkgp-workspace"  sb/user-home)
+                                        (expand-file-name "iss-workspace"     sb/user-home)
+                                        (expand-file-name "plass-workspace"   sb/user-home)
+                                        (expand-file-name "prospar-workspace" sb/user-home)
+                                        ))
+
+  (dolist (prjs (list
+                 (expand-file-name sb/user-home) ; Do not consider $HOME as a project
+                 "~/" ; Do not consider $HOME as a project
+                 (expand-file-name "/tmp")
+                 ))
+    (add-to-list 'projectile-ignored-projects prjs))
+
+  ;; Filtering works with `alien' indexing
+  (dolist (dirs
+           '(".cache" ".clangd" ".dropbox" ".git" ".hg" ".metadata" ".nx" ".recommenders" ".svn"
+             ".vscode" "__pycache__" "auto" "elpa" "node_modules"))
+    (add-to-list 'projectile-globally-ignored-directories dirs))
+
+  (dolist (items
+           '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"))
+    (add-to-list 'projectile-globally-ignored-files items))
+
+  (dolist (exts
+           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" ".elc" ".o" ".odt" ".ppt"
+             ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" ".xls" ".xlsx" "~$"))
+    (add-to-list 'projectile-globally-ignored-file-suffixes exts))
+
+  (projectile-mode 1)
+
+  ;; https://github.com/Alexander-Miller/treemacs/issues/660
+  ;; TODO: These do not achieve what I want.
+
+  ;; (add-hook 'projectile-after-switch-project-hook
+  ;;           (lambda ()
+  ;;             (treemacs-add-and-display-current-project)
+  ;;             (treemacs-display-current-project-exclusively)
+  ;;             (other-window 1)))
+
+  ;; (add-hook 'projectile-after-switch-project-hook
+  ;;           (lambda ()
+  ;;             (treemacs)
+  ;;             (treemacs-display-current-project-exclusively)
+  ;;             (other-window 1)))
+
+  ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
+
+  ;; Set these in case `counsel-projectile' is disabled. For `vertico', we use `consult-projectile'.
+  (when (eq sb/minibuffer-completion 'ivy)
+    (bind-key "<f5>" #'projectile-switch-project)
+    (bind-key "<f6>" #'projectile-find-file))
+
+  :bind-keymap ("C-c p" . projectile-command-map)
+  ;; :init (run-with-idle-timer 2 nil #'projectile-mode)
+  ;; We can open a project file without enabling projectile via bind-keys
+  :hook (after-init-hook . projectile-mode)
+  :bind
+  (:map projectile-command-map
+        ("A"    . projectile-add-known-project)))
+
+;; I am unsure how does this package advances `projectile' in terms of usability.
+(use-package counsel-projectile
+  :straight t
+  :disabled t
+  :if (eq sb/minibuffer-completion 'ivy)
+  :defines counsel-projectile-default-file
+  :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
+  :preface
+  (defun sb/counsel-projectile-switch-project-magit (project)
+    "Open Magit for the PROJECT."
+    (let ((projectile-switch-project-action 'magit-status))
+      (counsel-projectile-switch-project-by-name project)))
+
+  ;; Set a default landing file: https://github.com/ericdanan/counsel-projectile/issues/172
+  (defun sb/counsel-projectile-open-default-file ()
+    "Open the current project's default file.
+        This file is specified in `counsel-projectile-default-file'."
+    (interactive)
+    (let ((file counsel-projectile-default-file))
+      (if (and file
+               (setq file (projectile-expand-root file))
+               (file-exists-p file))
+          (find-file file)
+        (message "File %s doesn't exist." file))))
+
+  ;; Set `counsel-projectile-switch-project-action' to the following action
+  (defun sb/counsel-projectile-switch-project-action-default-file (project)
+    "Open PROJECT's default file.
+        This file is specified in `counsel-projectile-default-file'."
+    (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
+      (counsel-projectile-switch-project-by-name project)))
+  :config
+  ;; Setting these to `t' can be slow for large projects
+  (setq counsel-projectile-remove-current-buffer t
+        counsel-projectile-sort-directories nil
+        counsel-projectile-find-file-more-chars 0
+        counsel-projectile-sort-buffers nil
+        counsel-projectile-sort-projects nil
+        counsel-projectile-sort-files nil)
+
+  (counsel-projectile-mode 1)
+
+  ;; (counsel-projectile-modify-action
+  ;;  'counsel-projectile-switch-project-action
+  ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
+  :bind
+  ;; The `counsel' actions seem to be slower than base `projectile'
+  (("<f5>" . counsel-projectile-switch-project)
+   ("<f6>" . counsel-projectile-find-file)
+   ;; ("<f7>" . counsel-projectile-rg)
+   ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
+   ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
+   ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
+   ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
+   ))
+
+;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
+;; seem an overkill, and it hides long file names.
+(use-package all-the-icons-ivy-rich
+  :straight t
+  :commands all-the-icons-ivy-rich-mode
+  :if (display-graphic-p)
+  :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
+  :custom (all-the-icons-ivy-rich-icon-size 0.9))
+
+(use-package ivy-rich
+:straight t
+  :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
+  :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
+  :preface
+  ;; Adapted from
+  ;; https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
+  (defun sb/ivy-rich-file-size (candidate)
+    "Displays the file size of the candidate for ivy-rich."
+    (let ((candidate (expand-file-name candidate ivy--directory)))
+      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
+          ""
+        (let ((size (file-attribute-size (file-attributes candidate))))
+          (cond
+           ((> size 1000000) (format "%.1fM " (/ size 1000000.0)))
+           ((> size 1000) (format "%.1fk " (/ size 1000.0)))
+           (t (format "%d " size)))))))
+
+  (defun sb/ivy-rich-file-user (candidate)
+    "Displays the file user of the candidate for ivy-rich."
+    (let ((candidate (expand-file-name candidate ivy--directory)))
+      (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
+          ""
+        (let* ((user-id (file-attribute-user-id (file-attributes candidate)))
+               (user-name (user-login-name user-id)))
+          (format "%s" user-name)))))
+  :init (ivy-rich-mode 1)
+  :config
+  (setq ivy-rich-parse-remote-buffer nil)
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+
+  (if (display-graphic-p)
+      (ivy-rich-set-columns 'counsel-find-file
+                            '((all-the-icons-ivy-rich-file-icon)
+                              (ivy-rich-candidate    (:width 0.70))
+                              (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
+                              (sb/ivy-rich-file-size (:width 10 :align right
+                                                             :face font-lock-doc-face))))
+    (ivy-rich-set-columns 'counsel-find-file
+                          '((ivy-rich-candidate    (:width 0.70))
+                            (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
+                            (sb/ivy-rich-file-size (:width 10 :align right
+                                                           :face font-lock-doc-face)))))
+
+  ;; Increase the width to see the major mode clearly
+  (ivy-rich-modify-columns 'ivy-switch-buffer
+                           '((ivy-rich-switch-buffer-size (:align right))
+                             (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
+                             (ivy-rich-switch-buffer-project (:width 0.24 :face success))))
+
+  (ivy-rich-set-columns 'counsel-recentf
+                        '((file-name-nondirectory (:width 0.24))
+                          (ivy-rich-candidate (:width 0.75)))))
+
+(use-package counsel-fd
+  :straight t
+  :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
+  :bind
+  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
+   ;; Jump to a file below the current directory
+   ("C-x f" . counsel-fd-file-jump)))
+
+(use-package flycheck
+  :straight t
+  :commands (flycheck-add-next-checker flycheck-next-checker
+                                       flycheck-mode
+                                       global-flycheck-mode
+                                       flycheck-previous-error
+                                       flycheck-describe-checker
+                                       flycheck-buffer
+                                       flycheck-list-errors
+                                       flycheck-select-checker
+                                       flycheck-verify-setup
+                                       flycheck-next-error
+                                       flycheck-disable-checker
+                                       flycheck-add-mode
+                                       flycheck-manual
+                                       flycheck-display-error-messages-unless-error-list
+                                       flycheck-sexp-to-string)
+  :hook (after-init-hook . global-flycheck-mode)
+  :config
+  ;; Remove newline checks, since they would trigger an immediate check when we want the
+  ;; `flycheck-idle-change-delay' to be in effect while editing.
+  (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
+        flycheck-checker-error-threshold 1500
+        flycheck-idle-buffer-switch-delay 10 ; Increase the time (s) to allow for quick transitions
+        flycheck-idle-change-delay 15 ; Increase the time (s) to allow for edits
+        flycheck-emacs-lisp-load-path 'inherit
+        ;; Show error messages only if the error list is not already visible
+        ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
+        ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
+        ;; derived from `text-mode'.
+        flycheck-global-modes '(not csv-mode))
+
+  ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
+  (dolist (checkers '(proselint textlint tex-chktex))
+    (delq checkers flycheck-checkers))
+
+  (when (eq sb/modeline-theme 'doom-modeline)
+    (setq flycheck-mode-line nil))
+
+  (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
+                                                                            sb/user-home)
+                flycheck-chktexrc "chktexrc"
+                flycheck-pylintrc '("setup.cfg" "pylintrc")
+                flycheck-python-pylint-executable "python3"
+                flycheck-shellcheck-follow-sources nil
+                flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
+                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                                                               sb/textlint-home))
+
+  (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
+  (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
+
+  ;; Add support for `org-lint' as a checker
+  (defconst flycheck-org-lint-form
+    (flycheck-prepare-emacs-lisp-form
+      (require 'org)
+      (require 'org-attach)
+      (let ((source (car command-line-args-left))
+            (process-default-directory default-directory))
+        (with-temp-buffer
+          (insert-file-contents source 'visit)
+          (setq buffer-file-name source)
+          (setq default-directory process-default-directory)
+          (delay-mode-hooks (org-mode))
+          (setq delayed-mode-hooks nil)
+          (dolist (err (org-lint))
+            (let ((inf (cl-second err)))
+              (princ (elt inf 0))
+              (princ ": ")
+              (princ (elt inf 2))
+              (terpri)))))))
+
+  (defconst flycheck-org-lint-variables
+    '(org-directory
+      org-id-locations
+      org-id-locations-file
+      org-attach-id-dir
+      org-attach-use-inheritance
+      org-attach-id-to-path-function-list)
+    "Variables inherited by the `org-lint' subprocess.")
+
+  (defun flycheck-org-lint-variables-form ()
+    (require 'org-attach)  ; Needed to make variables available
+    `(progn
+       ,@(seq-map (lambda (opt) `(setq-default ,opt ',(symbol-value opt)))
+                  (seq-filter #'boundp flycheck-org-lint-variables))))
+
+  (flycheck-define-checker org-lint
+    "Org buffer checker using `org-lint'."
+    :command ("emacs" (eval flycheck-emacs-args)
+              "--eval" (eval (concat "(add-to-list 'load-path \""
+                                     (file-name-directory (locate-library "org"))
+                                     "\")"))
+              "--eval" (eval (flycheck-sexp-to-string
+                              (flycheck-org-lint-variables-form)))
+              "--eval" (eval flycheck-org-lint-form)
+              "--" source)
+    :error-patterns
+    ((error line-start line ": " (message) line-end))
+    :modes (org-mode))
+
+  (add-to-list 'flycheck-checkers 'org-lint t)
+
+  ;; https://github.com/flycheck/flycheck/issues/1833
+  (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
+
+  ;; Exclude directories and files from being checked
+  ;; https://github.com/flycheck/flycheck/issues/1745
+
+  (declare-function sb/flycheck-may-check-automatically "init-emacs28.el")
+
+  (defvar sb/excluded-directory-regexps
+    '(".git/" "elpa/" ".cache" ".clangd"))
+
+  (defun sb/flycheck-may-check-automatically (&rest _conditions)
+    (or (null buffer-file-name)
+        (let ((bufname (file-truename buffer-file-name)))
+          (not (seq-some (lambda (re) (string-match-p re bufname))
+                         sb/excluded-directory-regexps)))))
+
+  (advice-add 'flycheck-may-check-automatically
+              :after-while #'sb/flycheck-may-check-automatically)
+
+  ;; Chain flycheck checkers with lsp, we can also use per-project directory local variables
+  ;; https://github.com/flycheck/flycheck/issues/1762
+
+  (defvar-local sb/flycheck-local-checkers nil)
+
+  (defun sb/flycheck-checker-get (fn checker property)
+    (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
+        (funcall fn checker property)))
+
+  (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
+
+  ;; (add-hook 'lsp-managed-mode-hook
+  ;;           (lambda ()
+  ;;             (when (derived-mode-p 'python-mode)
+  ;;               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint)))))))
+  ;;             ))
+  )
+
+;; Showing error messages in the echo area is less intrusive.
+(use-package flycheck-popup-tip ; Show error messages in popups
+  :straight t
+  :unless (display-graphic-p)
+  :disabled t
+  :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
+
+;; Does not display popup under TTY, check possible workarounds at
+;; https://github.com/flycheck/flycheck-popup-tip
+(use-package flycheck-pos-tip
+  :disabled t
+  :straight t
+  :commands flycheck-pos-tip-mode
+  :if (display-graphic-p)
+  :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
+
+;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
+(use-package flycheck-posframe
+  :disabled t
+  :straight t
+  :if (display-graphic-p)
+  :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
+  :hook (flycheck-mode-hook . flycheck-posframe-mode)
+  :custom
+  (flycheck-posframe-position 'point-bottom-left-corner)
+  (flycheck-posframe-border-width 1)
+  :config
+  (flycheck-posframe-configure-pretty-defaults))
+
+(use-package whitespace
+  :straight nil
+  :disabled t
+  :commands (whitespace-mode global-whitespace-mode
+                             whitespace-buffer whitespace-cleanup
+                             whitespace-turn-off)
+  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+  :hook (markdown-mode-hook . whitespace-mode)
+  :config
+  (setq show-trailing-whitespace t
+        whitespace-line-column sb/fill-column
+        whitespace-style '(face ; Visualize using faces
+                           lines-tail
+                           trailing ; Trailing whitespace
+                           ;; tab-mark ; Mark any tabs
+                           ;; empty ; Empty lines at beginning or end of buffer
+                           ;; lines ; Lines that extend beyond `whitespace-line-column'
+                           ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
+                           ;; space-before-tab space-after-tab ; Mixture of space and tab on the same line
+                           )))
+
+;; This is different from `whitespace-cleanup-mode' since this is unconditional
+(when (bound-and-true-p sb/delete-trailing-whitespace-p)
+  (setq delete-trailing-lines t) ; "M-x delete-trailing-whitespace" deletes trailing lines
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
+
+;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
+;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
+;; to `t' in the `.dir-locals.el' file.
+(use-package whitespace-cleanup-mode
+  :straight t
+  :disabled t
+  :diminish
+  :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
+  :config
+  (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+  :custom
+  (whitespace-cleanup-mode-preserve-point t))
+
+;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+(use-package ws-butler
+  :straight t
+  :commands ws-butler-mode
+  :diminish
+  :hook (prog-mode-hook . ws-butler-mode))
+
+;; Highlight symbol under point
+(use-package symbol-overlay
+  :straight t
+  :diminish
+  :commands (symbol-overlay-mode)
+  :hook (prog-mode-hook . symbol-overlay-mode)
+  :bind
+  (("M-p" . symbol-overlay-jump-prev)
+   ("M-n" . symbol-overlay-jump-next))
+  :custom
+  ;; Delay highlighting to allow for transient cursor placements
+  (symbol-overlay-idle-time 2))
+
+(use-package hl-todo
+  :straight t
+  :commands global-hl-todo-mode
+  ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
+  :hook (after-init-hook . global-hl-todo-mode)
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
+                                        ("ISSUE"    . "#ff8c00")
+                                        ("DEBUG"    . "#ff8c00")
+                                        ("TEST"     . "tomato")
+                                        ("WARNING"  . "#cc0000")
+                                        ("BEWARE"   . "#aa0000")
+                                        ("REFACTOR" . "#cc9393"))
+                                      hl-todo-keyword-faces)))
+
+(use-package highlight-numbers
+  :straight t
+  :commands highlight-numbers-mode
+  :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook
+                         css-mode-hook html-mode-hook) . highlight-numbers-mode))
+
+(use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
+  :straight t
+  :diminish
+  :commands (global-page-break-lines-mode page-break-lines-mode)
+  ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
+  :hook (after-init-hook . global-page-break-lines-mode))
 
 (use-package number-separator
   :straight nil
