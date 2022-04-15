@@ -1,50 +1,11 @@
-;;; init.el --- Tianshu Wang Personal Emacs Configuration. -*- lexical-binding: t; -*-
+;;; init-emacs28.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
 
 ;;; Commentary:
 
 ;;; Code:
-
-;;; Load path
-;; optimize: force "lisp"" and "site-lisp" at the head to reduce the startup time.
-
-(dolist (dir '("site-lisp" "lisp"))
-  (push (expand-file-name dir user-emacs-directory) load-path))
-
-(setq package-archives '(("melpa"        . "https://melpa.org/packages/")
-                         ("gnu"          . "https://elpa.gnu.org/packages/")
-                         ("nongnu"       . "https://elpa.nongnu.org/nongnu/")))
-
-;; bootstrap `straight.el'
-(defvar bootstrap-version)
-(setq straight-check-for-modifications '(find-when-checking)
-      straight-host-usernames '((github . "tshu-w"))
-      straight-vc-git-default-clone-depth 1
-      straight-build-dir (format "build/%d%s%d"
-                                 emacs-major-version
-                                 version-separator
-                                 emacs-minor-version))
-
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(if init-file-debug
-    (setq use-package-verbose t
-          use-package-minimum-reported-time 0
-          use-package-compute-statistics t
-          use-package-inject-hooks t
-          debug-on-error t)
-  (setq use-package-expand-minimally t))
-(straight-use-package 'use-package)
-
 
 (defgroup sb/emacs
   nil
@@ -188,18 +149,34 @@ Corfu does not support TUI, so we have to fallback on company."
           (const :tag "company" company))
   :group 'dotemacs)
 
-(defconst sb/EMACS27    (= emacs-major-version 27))
-(defconst sb/EMACS27+   (> emacs-major-version 26))
-(defconst sb/EMACS28+   (> emacs-major-version 27))
-(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
-(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+;; Bootstrap `straight.el'
+(defvar bootstrap-version)
+(setq straight-check-for-modifications '(find-when-checking)
+      straight-host-usernames '((github . "swarnendubiswas"))
+      straight-vc-git-default-clone-depth 1
+      straight-build-dir (format "build/%d%s%d"
+                                 emacs-major-version
+                                 version-separator
+                                 emacs-minor-version))
 
-(defvar package-native-compile)
-(defvar native-comp-always-compile)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; Enable ahead-of-time compilation when installing a package
-(when sb/EMACS28+
-  (setq package-native-compile nil))
+(straight-use-package 'use-package)
+
+(setq use-package-enable-imenu-support t
+      ;; Avoid manual installations whenever I modify package installations
+      use-package-always-ensure        nil
+      use-package-hook-name-suffix     nil)
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
@@ -215,6 +192,22 @@ Corfu does not support TUI, so we have to fallback on company."
 ;;   ((x-mode-hook . last)
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
+
+(when (bound-and-true-p sb/debug-init-file)
+  (setq debug-on-error                 t
+        debug-on-event                 'sigusr2
+        garbage-collection-messages    t
+        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+        use-package-verbose            t
+        use-package-expand-minimally   nil)
+  (debug-on-entry 'projectile-remove-known-project))
+
+(unless (bound-and-true-p sb/debug-init-file)
+  (setq use-package-always-defer       t
+        ;; Avoid printing errors and warnings since the configuration is known to work
+        use-package-expand-minimally   t
+        use-package-compute-statistics nil
+        use-package-verbose            nil))
 
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
@@ -238,15 +231,30 @@ Corfu does not support TUI, so we have to fallback on company."
   :straight t
   :commands (-contains? -tree-map))
 
-(use-package hydra
-  :straight t
-  :commands (hydra-default-pre hydra-keyboard-quit defhydra
-                               hydra-show-hint hydra-set-transient-map
-                               hydra--call-interactively-remap-maybe))
-
 (use-package no-littering
   :straight t
   :demand t)
+
+(defcustom sb/custom-file
+  (no-littering-expand-etc-file-name "custom.el")
+  "File to write Emacs customizations."
+  :type  'string
+  :group 'sb/emacs)
+
+(setq custom-file sb/custom-file)
+
+;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
+(defcustom sb/private-file
+  (no-littering-expand-etc-file-name "private.el")
+  "File to include private information."
+  :type  'string
+  :group 'sb/emacs)
+
+(let ((gc-cons-threshold most-positive-fixnum))
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror 'nomessage))
+  (when (file-exists-p sb/private-file)
+    (load sb/private-file 'noerror 'nomessage)))
 
 (use-package warnings
   :straight nil
@@ -263,18 +271,13 @@ Corfu does not support TUI, so we have to fallback on company."
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
 
-(use-package paradox
-  :straight t
-  :disabled t ; This package is no longer maintained.
-  :commands (paradox-enable)
+;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
+;; is `paradox-upgrade-packages' as a single command.
+(use-package package
+  :if sb/EMACS27+
   :bind
-  (("C-c d l" . paradox-list-packages)
-   ("C-c d u" . paradox-upgrade-packages))
-  :config
-  (setq paradox-display-star-count nil
-        paradox-execute-asynchronously t
-        paradox-github-token t)
-  (paradox-enable))
+  (("C-c d p" . package-quickstart-refresh)
+   ("C-c d l" . package-list-packages)))
 
 ;; Get PATH with "(getenv "PATH")". Set PATH with
 ;; "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
@@ -572,7 +575,6 @@ Corfu does not support TUI, so we have to fallback on company."
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
   (save-abbrevs 'silently))
 
-
 ;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
 (dolist (mode '(tooltip-mode))
   (when (fboundp mode)
@@ -755,7 +757,6 @@ Corfu does not support TUI, so we have to fallback on company."
     (with-eval-after-load "hl-line"
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
-
 
 ;; The Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
@@ -1096,8 +1097,8 @@ Corfu does not support TUI, so we have to fallback on company."
         dired-omit-verbose nil)
 
   ;; Obsolete from Emacs 28+
-  (unless sb/EMACS28+
-    (setq dired-bind-jump t))
+  ;; (unless sb/EMACS28+
+  ;;   (setq dired-bind-jump t))
 
   ;; (setq dired-omit-files
   ;;       (concat dired-omit-files
@@ -1156,6 +1157,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :init (async-bytecomp-package-mode 1))
 
 (use-package dired-async
+  :straight async
   :diminish
   :hook (dired-mode-hook . dired-async-mode))
 
@@ -1329,7 +1331,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 (use-package treemacs-magit
   :straight t
-  :ensure magit
+  :straight magit
   :after (treemacs magit)
   :demand t)
 
@@ -1388,7 +1390,6 @@ Corfu does not support TUI, so we have to fallback on company."
   :straight t
   :commands org-bullets-mode
   :hook (org-mode-hook . org-bullets-mode))
-
 
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight t
@@ -1496,7 +1497,6 @@ Corfu does not support TUI, so we have to fallback on company."
   :bind ([remap query-replace] . vr/query-replace))
 
 (use-package recentf
-  :straight nil
   :commands (recentf-mode recentf-add-file recentf-save-file
                           recentf-save-list
                           recentf-apply-filename-handlers
@@ -1626,7 +1626,6 @@ Corfu does not support TUI, so we have to fallback on company."
         ("<tab>"    . company-complete-common-or-cycle)
         ("C-M-/"    . company-other-backend) ; Was bound to `dabbrev-completion'
         ("<escape>" . company-abort)))
-
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -1781,7 +1780,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 (use-package counsel
   :straight t
-  :straight amx ;; `counsel' makes use of `amx' if installed
+  :straight amx ; `counsel' makes use of `amx' if installed
   :if (eq sb/minibuffer-completion 'ivy)
   :commands counsel-mode
   :preface
@@ -1865,6 +1864,12 @@ Corfu does not support TUI, so we have to fallback on company."
         counsel-switch-buffer-preview-virtual-buffers nil ; Removes recent files and bookmarks
         counsel-yank-pop-preselect-last t
         counsel-yank-pop-separator "\n------------------------------------------\n"))
+
+(use-package hydra
+  :straight t
+  :commands (hydra-default-pre hydra-keyboard-quit defhydra
+                               hydra-show-hint hydra-set-transient-map
+                               hydra--call-interactively-remap-maybe))
 
 (use-package ivy-hydra ; Additional keybindings for `ivy'
   :straight t
@@ -2425,6 +2430,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
   :straight t
+  :straight ivy-rich
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
@@ -2837,7 +2843,6 @@ Corfu does not support TUI, so we have to fallback on company."
   :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c d t" . counsel-tramp))
 
-
 ;; TODO: SSH into Gcloud
 ;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
 ;; Make sure you have set your default project with:
@@ -2981,7 +2986,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-  :straight nil
+  :straight t
   :commands popwin-mode
   :hook (after-init-hook . popwin-mode)
   :config
@@ -3027,7 +3032,6 @@ Corfu does not support TUI, so we have to fallback on company."
 (add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
-
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist
@@ -3287,7 +3291,6 @@ Corfu does not support TUI, so we have to fallback on company."
 (use-package define-word
   :straight t
   :commands (define-word define-word-at-point))
-
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package langtool
@@ -3589,10 +3592,13 @@ Corfu does not support TUI, so we have to fallback on company."
   :demand t
   :config (yaml-imenu-enable))
 
+(declare-function ht-merge "ht")
+
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :straight t
+  :straight spinner
   :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -3679,7 +3685,7 @@ Corfu does not support TUI, so we have to fallback on company."
         ;; lsp-semantic-tokens-enable t
         lsp-headerline-breadcrumb-enable nil ; Breadcrumb is not useful for all modes
         lsp-headerline-breadcrumb-enable-diagnostics nil
-        lsp-html-format-wrap-line-length 100
+        lsp-html-format-wrap-line-length sb/fill-column
         lsp-html-format-end-with-newline t
         lsp-html-format-indent-inner-html t
         lsp-imenu-sort-methods '(position)
@@ -3701,7 +3707,7 @@ Corfu does not support TUI, so we have to fallback on company."
         ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
         lsp-use-plists nil
         lsp-xml-logs-client nil
-        lsp-yaml-print-width 100)
+        lsp-yaml-print-width sb/fill-column)
 
   (if (display-graphic-p)
       (setq lsp-modeline-code-actions-enable t)
@@ -3726,26 +3732,27 @@ Corfu does not support TUI, so we have to fallback on company."
   (defvar lsp-pyright-langserver-command-args)
   (defvar lsp-pylsp-plugins-preload-modules)
 
-  (setq lsp-pylsp-configuration-sources []
-        lsp-pylsp-plugins-autopep8-enable nil
-        ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
-        ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
-        lsp-pylsp-plugins-mccabe-enabled nil
-        ;; We can also set this per-project
-        lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
-        lsp-pylsp-plugins-pycodestyle-enabled nil
-        lsp-pylsp-plugins-pycodestyle-max-line-length 100
-        lsp-pylsp-plugins-pydocstyle-convention "pep257"
-        lsp-pylsp-plugins-pydocstyle-enabled nil
-        lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-        lsp-pylsp-plugins-pyflakes-enabled nil
-        lsp-pylsp-plugins-pylint-args (vconcat
-                                       (list "-j 2"
-                                             (concat "--rcfile="
-                                                     (expand-file-name ".config/pylintrc"
-                                                                       sb/user-home))))
-        lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
-        lsp-pylsp-plugins-yapf-enabled t)
+  (when (eq sb/python-langserver 'pylsp)
+    (setq lsp-pylsp-configuration-sources []
+          lsp-pylsp-plugins-autopep8-enable nil
+          ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
+          ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
+          lsp-pylsp-plugins-mccabe-enabled nil
+          ;; We can also set this per-project
+          lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
+          lsp-pylsp-plugins-pycodestyle-enabled nil
+          lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
+          lsp-pylsp-plugins-pydocstyle-convention "pep257"
+          lsp-pylsp-plugins-pydocstyle-enabled nil
+          lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+          lsp-pylsp-plugins-pyflakes-enabled nil
+          lsp-pylsp-plugins-pylint-args (vconcat
+                                         (list "-j 2"
+                                               (concat "--rcfile="
+                                                       (expand-file-name ".config/pylintrc"
+                                                                         sb/user-home))))
+          lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
+          lsp-pylsp-plugins-yapf-enabled t))
 
   (dolist (ignore-dirs '("/build\\'"
                          "/\\.metadata\\'"
@@ -4000,6 +4007,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 (use-package py-isort
   :straight t
+  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :commands py-isort-before-save
   :hook
   (python-mode-hook . (lambda ()
@@ -4010,6 +4018,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
   :straight t
+:if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode-hook . (lambda ()
@@ -4050,6 +4059,7 @@ Corfu does not support TUI, so we have to fallback on company."
 (use-package yapfify
   :straight t
   :diminish yapf-mode
+  :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
   :commands yapf-mode
   :hook (python-mode-hook . yapf-mode))
 
@@ -4178,6 +4188,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 (use-package company-shell
   :straight t
+:if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
@@ -4433,12 +4444,11 @@ Corfu does not support TUI, so we have to fallback on company."
   :defines flycheck-grammarly-check-time
   :demand t
   :config
-  ;; (setq flycheck-grammarly-check-time 3
-  ;;       ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-  ;;       flycheck-checkers (delete 'grammarly flycheck-checkers))
+  (setq flycheck-grammarly-check-time 3
+        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+        flycheck-checkers (delete 'grammarly flycheck-checkers))
 
-  ;; (add-to-list 'flycheck-checkers 'grammarly t)
-  )
+  (add-to-list 'flycheck-checkers 'grammarly t))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
@@ -4448,11 +4458,25 @@ Corfu does not support TUI, so we have to fallback on company."
   :init
   (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool-server.jar")
-        ;; flycheck-checkers (delete 'languagetool flycheck-checkers)
+        flycheck-checkers (delete 'languagetool flycheck-checkers)
         flycheck-languagetool-check-time 3)
 
-  ;; (add-to-list 'flycheck-checkers 'languagetool t)
-  )
+  (add-to-list 'flycheck-checkers 'languagetool t))
+
+;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
+;; support. We only need to enable `flycheck-grammarly' support for the "*scratch*" buffer which is
+;; in `text-mode'.
+
+;; org -> grammarly -> languagetool
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (flycheck-select-checker 'org-lint)
+;;             (when (featurep 'flycheck-grammarly)
+;;               (flycheck-add-next-checker 'org-lint 'grammarly))
+;;             (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
 
 ;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
 (add-hook 'text-mode-hook
@@ -4465,12 +4489,40 @@ Corfu does not support TUI, so we have to fallback on company."
             ;;   (flycheck-select-checker 'languagetool))
             ))
 
+;; `markdown-mode' is derived from `text-mode'
+;; markdown-markdownlint-cli -> grammarly -> languagetool
+;; (add-hook 'markdown-mode-hook
+;;           (lambda()
+;;             (flycheck-select-checker 'markdown-markdownlint-cli)
+;;             (when (featurep 'flycheck-grammarly)
+;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
+;;               ;; (setq flycheck-error-list-minimum-level 'warning
+;;               ;;       flycheck-navigation-minimum-level 'warning)
+;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
+;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
+;;             ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))
+;;             ))
+
+;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+;;   (add-hook hook (lambda ()
+;;                    (flycheck-select-checker 'tex-chktex)
+;;                    (when (featurep 'flycheck-grammarly)
+;;                      (flycheck-add-next-checker 'tex-chktex 'grammarly))
+;;                    (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
+;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
+
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
 ;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
 ;; keytar-install".
 (use-package lsp-grammarly
   :straight t
+  :straight keytar
   :disabled t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands (lsp-grammarly--server-command lsp-grammarly--init
@@ -4552,10 +4604,10 @@ Corfu does not support TUI, so we have to fallback on company."
              (error "Error during the unzip process: tar"))))
        error-callback)))))
 
-
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
+
 (use-package lsp-latex
   :straight t
   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
@@ -4572,7 +4624,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :custom
   (lsp-latex-bibtex-formatter             "latexindent")
   (lsp-latex-latex-formatter              "latexindent")
-  (lsp-latex-bibtex-formatter-line-length 100)
+  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
   (lsp-latex-chktex-on-open-and-save      t)
   (lsp-latex-build-is-continuous          t)
   ;; Delay time in milliseconds before reporting diagnostics
@@ -4590,7 +4642,7 @@ Corfu does not support TUI, so we have to fallback on company."
 
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
-(use-package tex-site
+(use-package tex
   :straight auctex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defines (tex-fontify-script font-latex-fontify-script
@@ -4648,6 +4700,7 @@ Corfu does not support TUI, so we have to fallback on company."
   (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
   :bind
   ("C-c x q" . TeX-insert-quote))
+
 (use-package bibtex
   :straight nil
   :hook
@@ -4658,7 +4711,7 @@ Corfu does not support TUI, so we have to fallback on company."
   (bibtex-maintain-sorted-entries t))
 
 (use-package ivy-bibtex
-  :straight t
+  :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c x b" . ivy-bibtex)
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
@@ -4744,24 +4797,8 @@ Ignore if no file is found."
   :config
   (sb/reftex-try-add-all-bibitems-from-bibtex))
 
-
 (use-package bib-cite
-  :straight nil(use-package bib-cite
-                 :ensure nil
-                 :disabled t
-                 :diminish bib-cite-minor-mode
-                 :commands bib-cite-minor-mode
-                 :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
-                 :custom (bib-cite-use-reftex-view-crossref t)
-                 :bind (:map bib-cite-minor-mode-map
-                             ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-                             ("C-c l a" . bib-apropos)
-                             ("C-c l b" . bib-make-bibliography)
-                             ("C-c l d" . bib-display)
-                             ("C-c l t" . bib-etags)
-                             ("C-c l f" . bib-find)
-                             ("C-c l n" . bib-find-next)
-                             ("C-c l h" . bib-highlight-mouse)))
+  :straight nil
   :disabled t
   :diminish bib-cite-minor-mode
   :commands bib-cite-minor-mode
@@ -4791,6 +4828,7 @@ Ignore if no file is found."
 
 (use-package company-auctex
   :straight t
+:if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t
   :commands (company-auctex-init company-auctex-labels
@@ -4799,6 +4837,7 @@ Ignore if no file is found."
 
 (use-package math-symbols
   :straight t
+:if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t) ; Required by `ac-math' and `company-math'
 
@@ -4811,13 +4850,14 @@ Ignore if no file is found."
 (use-package company-reftex ; Reftex must be enabled to work
   :straight t
   :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
-
 
 (use-package company-bibtex
   :straight t
   :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands company-bibtex)
 
@@ -4856,6 +4896,13 @@ Ignore if no file is found."
           (find-file (concat (file-name-directory (concat master-file ".tex"))
                              (concat master-file ".pdf"))))))))
 
+;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (add-hook 'after-save-hook
+;;                         (lambda ()
+;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
+
 (with-eval-after-load "tex-mode"
   (defvar latex-mode-map)
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf latex-mode-map))
@@ -4863,7 +4910,6 @@ Ignore if no file is found."
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
-
 
 (use-package math-preview
   :straight nil
@@ -4874,6 +4920,8 @@ Ignore if no file is found."
                                           sb/user-tmp)))
 
 (use-package json-mode
+  :straight json-reformat
+  :straight json-snatcher
   :straight t
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
@@ -4935,9 +4983,11 @@ Ignore if no file is found."
 
 (use-package clang-format+
   :straight t
+  :straight clang-format
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
   :custom (clang-format+-always-enable t))
+
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
@@ -4958,7 +5008,7 @@ Ignore if no file is found."
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
-  ;; :ensure tree-sitter-langs
+  :straight tree-sitter-langs
   :straight t
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
@@ -4979,7 +5029,6 @@ Ignore if no file is found."
   :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
-
 (use-package editorconfig
   :straight t
   :if (executable-find "editorconfig")
@@ -4999,7 +5048,6 @@ Ignore if no file is found."
 (use-package dotenv-mode
   :straight t
   :mode "\\.env\\'")
-
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (use-package ansi-color
@@ -5024,7 +5072,275 @@ Ignore if no file is found."
   :commands info-colors-fontify-node
   :hook (Info-selection-hook . info-colors-fontify-node))
 
-                                        ; Use "emacsclient -c -nw" to start a new frame.
+;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
+;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
+;; context (major mode, inside strings or comments). That is why it is better to put it at the end.
+
+;; https://tychoish.com/post/better-company/
+;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
+;; https://emacs.stackexchange.com/questions/64038/how-to-use-multiple-backends-in-priority-for-company-mode
+
+;; Try completion backends in order till there is a non-empty completion list
+;; `(setq company-backends '(company-xxx company-yyy company-zzz))'
+;; Merge completions of all the backends
+;; `(setq company-backends '((company-xxx company-yyy company-zzz)))'
+;; Merge completions of all the backends, give priority to `company-xxx'
+;; `(setq company-backends '((company-xxx :separate company-yyy company-zzz)))'
+;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
+;; what `prefix' returns.
+
+;; If the group contains keyword `:with', the backends listed after this keyword are ignored for
+;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
+;; that come from different backends are sorted separately in the combined list.
+
+;; LATER: I do not understand the difference between the following two, and the explanation.
+;; `(add-to-list 'company-backends '(company-capf company-dabbrev))'
+;; `(add-to-list 'company-backends '(company-capf :with company-dabbrev))'
+
+(progn
+  (defun sb/company-xml-mode ()
+    "Add backends for completion with company."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)))
+
+  (dolist (hook '(nxml-mode-hook))
+    (add-hook hook (lambda ()
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-xml-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
+
+(progn
+  (defun sb/company-latex-mode ()
+    "Add backends for latex completion in company mode."
+
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
+
+    ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+    ;; labels and citations.
+
+    (setq company-backends '(company-capf
+                             company-files
+                             company-reftex-citations
+                             company-reftex-labels
+                             company-auctex-environments
+                             company-auctex-macros
+                             company-latex-commands
+                             company-math-symbols-latex
+                             company-math-symbols-unicode
+                             company-auctex-symbols
+                             company-auctex-bibs
+                             company-auctex-labels
+                             company-bibtex
+                             company-dabbrev
+                             company-ispell)))
+
+  (dolist (hook '(latex-mode-hook))
+    (add-hook hook (lambda ()
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-latex-mode))))))
+
+(progn
+  (defun sb/company-web-mode ()
+    "Add backends for web completion in company mode."
+
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-files
+                             company-yasnippet
+                             company-dabbrev
+                             company-ispell)))
+
+  (dolist (hook '(web-mode-hook))
+    (add-hook hook (lambda ()
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (sb/company-web-mode)
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode))))))
+
+(progn
+  (defun sb/company-text-mode ()
+    "Add backends for text completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    ;; Slightly larger value to have more precise matches and so that the popup does not block
+    (setq-local company-minimum-prefix-length 3
+                company-transformers '(delete-dups))
+
+    (set (make-local-variable 'company-backends)
+         '(company-files
+           company-dabbrev
+           company-ispell
+           company-abbrev)))
+
+  (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
+    (add-hook hook (lambda ()
+                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                       (unless (derived-mode-p 'latex-mode)
+                         (sb/company-text-mode)
+                         (company-fuzzy-mode 1)
+                         (diminish 'company-fuzzy-mode)))))))
+
+;; (progn
+;;   (defun sb/company-java-mode ()
+;;     "Add backends for Java completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 3)
+;;     (make-local-variable 'company-backends)
+;;     (setq company-backends '((company-capf :with company-yasnippet)
+;;                              (company-files : with company-yasnippet)
+;;                              (company-dabbrev-code :with company-yasnippet)
+;;                              company-dabbrev)))
+
+;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
+
+;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; `company-clang' is slow
+;; (progn
+;;   (defun sb/company-c-mode ()
+;;     "Add backends for C/C++ completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 2)
+;;     (make-local-variable 'company-backends)
+
+;;     (setq company-backends '(company-capf
+;;                              company-dabbrev-code
+;;                              company-files
+;;                              company-yasnippet
+;;                              company-dabbrev)))
+
+;;   (add-hook 'c-mode-common-hook (lambda ()
+;;                                   (sb/company-c-mode)
+;;                                   (company-fuzzy-mode 1)
+;;                                   (diminish 'company-fuzzy-mode))))
+
+(progn
+  (defun sb/company-sh-mode ()
+    "Add backends for shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'sh-mode-hook (lambda ()
+                            (unless (display-graphic-p)
+                              (sb/company-sh-mode)
+                              (company-fuzzy-mode 1)
+                              (diminish 'company-fuzzy-mode))))
+
+  (defun sb/company-fish-mode ()
+    "Add backends for fish shell script completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-shell
+                             company-shell-env
+                             company-fish-shell
+                             company-dabbrev-code
+                             company-yasnippet
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'fish-mode-hook (lambda ()
+                              (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                (sb/company-fish-mode)
+                                (company-fuzzy-mode 1)
+                                (diminish 'company-fuzzy-mode)))))
+
+(progn
+  (defun sb/company-elisp-mode ()
+    "Set up company for elisp mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-files
+                             company-dabbrev-code
+                             company-dabbrev)))
+
+  (add-hook 'emacs-lisp-mode-hook (lambda ()
+                                    (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                      (sb/company-elisp-mode)
+                                      (company-fuzzy-mode 1)
+                                      (diminish 'company-fuzzy-mode)))))
+
+(progn
+  (defun sb/company-python-mode ()
+    "Add backends for Python completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 3)
+    (make-local-variable 'company-backends)
+
+    ;; `company-dabbrev-code' is useful for variable names
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'python-mode-hook (lambda ()
+                                (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                                  (sb/company-python-mode)
+                                  (company-fuzzy-mode 1)
+                                  (diminish 'company-fuzzy-mode)))))
+
+;; (progn
+;;   (defun sb/company-prog-mode ()
+;;     "Add backends for program completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 2)
+;;     (make-local-variable 'company-backends)
+
+;;     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+;;     (setq company-backends '(company-capf
+;;                              company-yasnippet
+;;                              company-files
+;;                              company-dabbrev-code
+;;                              company-dabbrev)))
+
+;;   (add-hook 'prog-mode-hook (lambda ()
+;;                               (sb/company-prog-mode)
+;;                               (company-fuzzy-mode 1)
+;;                               (diminish 'company-fuzzy-mode))))
+
+;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
   :straight nil
   :disabled t
@@ -5056,7 +5372,6 @@ Ignore if no file is found."
   :straight t
   :commands vterm-toggle
   :bind ("C-`" . vterm-toggle))
-
 
 ;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
 (defun sb/save-all-buffers ()
@@ -5253,6 +5568,70 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
+;; (defun sb/open-local-file-projectile (directory)
+;;   "Open projectile file within DIRECTORY.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'"
+;;   (let ((default-file
+;;           (f-join directory
+;;                   (nth 1
+;;                        (car (-tree-map (lambda (node)
+;;                                          (when (eq (car node)
+;;                                                    'dotemacs-projectile-default-file)
+;;                                            (format "%s" (cdr node))))
+;;                                        (dir-locals-get-class-variables (dir-locals-read-from-dir
+;;                                                                         directory))))))))
+;;     (if (f-exists? default-file)
+;;         (counsel-find-file default-file)
+;;       (message "The file %s doesn't exist in the select project" default-file))))
+
+;; (defun sb/open-project-default-file1 (filepath)
+;;   "Open projectile file with FILEPATH.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'."
+;;   (let ((liststring (with-temp-buffer
+;;                       (insert-file-contents filepath)
+;;                       (split-string (buffer-string) "\n"))))
+;;     (mapcar (lambda (str)
+;;               (when (cl-search "dotemacs-projectile-default-file" str)
+;;                 (let ((x (substring str (+
+;;                                          13 (length "dotemacs-projectile-default-file")) (length
+;;                                          str))))
+;;                   (let ((default-file (expand-file-name (substring
+;;                                                          x 1 -2) (projectile-project-root))))
+;;                     (when (f-exists? default-file)
+;;                       (let ((new-buffer (get-buffer-create default-file)))
+;;                         (switch-to-buffer new-buffer)
+;;                         (insert-file-contents default-file)))))))
+;;             liststring)))
+
+;; (sb/open-project-default-file1 "/home/swarnendu/.emacs.d/.dir-locals.el")
+
+;; (defun sb/open-project-default-file2 ()
+;;   "Open projectile file with FILEPATH.
+;; Specify by the keyword projectile-default-file define in `dir-locals-file'."
+;;   (interactive)
+;;   (let ((mylist (dir-locals-get-class-variables (dir-locals-read-from-dir
+;;                                                  (projectile-project-root)))))
+;;     (mapcar (lambda (node)
+;;               (when (eq (car node) nil)
+;;                 (let ((nillist (cdr node)))
+;;                   (mapcar (lambda (elem)
+;;                             (when (eq (car elem) 'dotemacs-projectile-default-file)
+;;                               (let ((default-file (expand-file-name (cdr elem)
+;;                                                                     (projectile-project-root))))
+;;                                 (when (f-exists? default-file)
+;;                                   ;; (let ((new-buffer (get-buffer-create default-file)))
+;;                                   ;;   (switch-to-buffer new-buffer)
+;;                                   ;;   (insert-file-contents default-file))
+;;                                   (find-file default-file)))))
+;;                           nillist))))
+;;             mylist)))
+
+;; (sb/open-project-default-file2)
+
+;; (with-eval-after-load "counsel-projectile"
+;;   (add-to-list 'counsel-projectile-action '("d"
+;;     sb/open-project-default-file2 "open default file") t))
+
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
@@ -5293,7 +5672,6 @@ or the major mode is not in `sb/skippable-modes'."
 (unless (featurep 'centaur-tabs)
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
   (global-set-key [remap previous-buffer] #'sb/previous-buffer))
-
 
 (use-package default-text-scale
   :straight t
@@ -5343,6 +5721,347 @@ or the major mode is not in `sb/skippable-modes'."
   ;; Positioning the frame at the top obstructs the view to a lesser degree
   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
 
+;; Hydras
+
+;; https://github.com/abo-abo/hydra
+;; `:exit nil' means the hydra state will continue, `:exit t' will quit the hydra. `:color red'
+;; means continue the hydra on a valid key but stop when a foreign key has been pressed. `:color
+;; blue' means exit.
+
+(setq lv-use-separator t)
+
+;; (declare-function spell-fu-goto-next-error "spell-fu")
+;; (declare-function spell-fu-goto-previous-error "spell-fu")
+
+(defhydra sb/hydra-spelling (:color amaranth)
+  "
+  ^Spell Check^          ^Errors^            ^Spell fu^
+  ^────────^──────────^──────^────────────^───────^─────────────^
+  _c_ ispell            _<_ previous         _p_ previous error
+  _f_ flyspell          _>_ next             _n_ next error
+  _q_ quit              ^^                   _a_ add word
+  "
+  ("c" ispell)
+  ("f" flyspell-buffer)
+
+  ("<" flyspell-correct-previous)
+  (">" flyspell-correct-next)
+
+  ("n" spell-fu-goto-next-error)
+  ("p" spell-fu-goto-previous-error)
+  ("a" spell-fu-word-add)
+
+  ("q" nil "quit"))
+
+(defhydra sb/hydra-text-scale-zoom (:color amaranth)
+  "Zoom the text"
+  ("i" default-text-scale-increase "in")
+  ("o" default-text-scale-decrease "out")
+
+  ("q" nil "quit"))
+
+;; (defhydra sb/hydra-error (:color amaranth)
+;;   "Navigate errors"
+;;   ("h" first-error "first")
+;;   ("j" next-error "next")
+;;   ("k" previous-error "prev")
+;;   ("v" recenter-top-bottom "recenter")
+;;   ("q" nil "quit"))
+
+;; https://github.com/abo-abo/hydra/wiki/avy
+(defhydra sb/hydra-avy (:color red)
+  "
+  Line^^       Region^^        Goto
+----------------------------------q------------------------
+ [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
+ [_m_] move   [_M_] move      [_w_] word        [_W_] any word
+ [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
+
+  ("y" avy-copy-line)
+  ("m" avy-move-line)
+  ("k" avy-kill-whole-line)
+
+  ("Y" avy-copy-region)
+  ("M" avy-move-region)
+  ("K" avy-kill-region)
+
+  ("c" avy-goto-char-timer)
+  ("w" avy-goto-word-1)
+  ("l" avy-goto-line)
+
+  ("C" avy-goto-char)
+  ("W" avy-goto-word-0)
+  ("L" avy-goto-end-of-line))
+
+(defhydra sb/hydra-projectile (:color teal :hint nil global-map "C-c p")
+  "
+     PROJECTILE: %(projectile-project-root)
+
+  Project                    Find File             Buffers                  Misc
+-----------------------------------------------------------------------------------------------------------
+  _p_: switch project        _f_: find file        _i_: ibuffer           _c_: invalidate cache
+  _s_: switch project        _F_: find file dwim   _b_: switch to buffer  _z_: cache current
+  _a_: add known project     _d_: find directory   _r_: recent file       _g_: find tag
+  _x_: remove known project  _D_: find file cwd    _k_: kill all buffers  _o_: multi-occur
+  _X_: clean known project   ^^                    ^^                     _m_: compile
+"
+  ("p"   projectile-switch-project)
+  ("s"   projectile-switch-project)
+  ("a"   projectile-add-known-project)
+  ("x"   projectile-remove-known-project)
+  ("X"   projectile-cleanup-known-projects)
+
+  ("f"   projectile-find-file)
+  ("F"   projectile-find-file-dwim)
+  ("d"   projectile-find-dir)
+  ("D"   projectile-find-file-in-directory)
+
+  ("i"   projectile-ibuffer)
+  ("b"   projectile-switch-to-buffer)
+  ("r"   projectile-recentf)
+  ("k"   projectile-kill-buffers)
+
+  ("c"   projectile-invalidate-cache)
+  ("z"   projectile-cache-current-file)
+  ("g"   projectile-find-tag)
+  ("o"   projectile-multi-occur)
+  ("m"   projectile-compile)
+  ("q"   nil "cancel"))
+
+(defhydra sb/hydra-move-text ()
+  "Move text"
+  ("u" move-text-up "up")
+  ("d" move-text-down "down")
+  ("q"   nil "cancel"))
+
+;; (declare-function flycheck-verify-setup "flycheck")
+;; (declare-function flycheck-previous-error "flycheck")
+;; (declare-function flycheck-next-error "flycheck")
+;; (declare-function flycheck-list-errors "flycheck")
+;; (declare-function flycheck-select-checker "flycheck")
+;; (declare-function flycheck-describe-checker "flycheck")
+;; (declare-function flycheck-disable-checker "flycheck")
+;; (declare-function flycheck-buffer "flycheck")
+
+(defhydra sb/hydra-flycheck (:color blue)
+  "
+^
+^Flycheck^          ^Errors^            ^Checker^
+^────────^──────────^──────^────────────^───────^─────
+_q_ quit            _<_ previous        _?_ describe
+_M_ manual          _>_ next            _d_ disable
+_v_ verify setup    _f_ check           _m_ mode
+^^                  _l_ list            _s_ select
+^^                  ^^                  ^^
+
+
+                                              ^
+                                              ^Flycheck^          ^Errors^            ^Checker^
+                                              ^────────^──────────^──────^────────────^───────^─────
+                                              _q_ quit            _<_ previous        _?_ describe
+                                              _M_ manual          _>_ next            _d_ disable
+                                              _v_ verify setup    _f_ check           _m_ mode
+                                              ^^                  _l_ list            _s_ select
+                                              ^^                  ^^                  ^^
+                                              "
+  ("q" nil)
+  ("<" flycheck-previous-error :color pink)
+  (">" flycheck-next-error :color pink)
+  ("?" flycheck-describe-checker)
+  ("M" flycheck-manual)
+  ("d" flycheck-disable-checker)
+  ("f" flycheck-buffer)
+  ("l" flycheck-list-errors)
+  ("m" flycheck-mode)
+  ("s" flycheck-select-checker)
+  ("v" flycheck-verify-setup))
+
+(defhydra sb/hydra-python-indent ()
+  "Adjust Python indentation."
+  (">" python-indent-shift-right "right")
+  ("<" python-indent-shift-left "left"))
+
+(with-eval-after-load "python-mode"
+  (bind-key "C-c" #'sb/hydra-python-indent/body python-mode-map))
+
+(defhydra sb/smerge-hydra
+  (:color pink :hint nil :post (smerge-auto-leave))
+  "
+                                              ^Move^       ^Keep^               ^Diff^                 ^Other^
+                                              ^^-----------^^-------------------^^---------------------^^-------
+                                              _n_ext       _b_ase               _<_: upper/base        _C_ombine
+                                              _p_rev       _u_pper              _=_: upper/lower       _r_esolve
+                                              ^^           _l_ower              _>_: base/lower        _k_ill current
+                                              ^^           _a_ll                _R_efine
+                                              ^^           _RET_: current       _E_diff
+                                              "
+  ("n" smerge-next)
+  ("p" smerge-prev)
+  ("b" smerge-keep-base)
+  ("u" smerge-keep-upper)
+  ("l" smerge-keep-lower)
+  ("a" smerge-keep-all)
+  ("RET" smerge-keep-current)
+  ("\C-m" smerge-keep-current)
+  ("<" smerge-diff-base-upper)
+  ("=" smerge-diff-upper-lower)
+  (">" smerge-diff-base-lower)
+  ("R" smerge-refine)
+  ("E" smerge-ediff)
+  ("C" smerge-combine-with-next)
+  ("r" smerge-resolve)
+  ("k" smerge-kill-current)
+  ("q" nil "cancel" :color blue))
+
+(defhydra sb/hydra-multiple-cursors (:hint nil)
+  "
+                                              ^Up^            ^Down^        ^Other^
+                                              ----------------------------------------------
+                                              [_p_]   Next    [_n_]   Next    [_l_] Edit lines
+                                              [_P_]   Skip    [_N_]   Skip    [_a_] Mark all
+                                              [_M-p_] Unmark  [_M-n_] Unmark  [_r_] Mark by regexp
+                                              ^ ^             ^ ^             [_q_] Quit
+                                              "
+  ("l" mc/edit-lines :exit t)
+  ("a" mc/mark-all-like-this :exit t)
+  ("n" mc/mark-next-like-this)
+  ("N" mc/skip-to-next-like-this)
+  ("M-n" mc/unmark-next-like-this)
+  ("p" mc/mark-previous-like-this)
+  ("P" mc/skip-to-previous-like-this)
+  ("M-p" mc/unmark-previous-like-this)
+  ("r" mc/mark-all-in-region-regexp :exit t)
+  ("q" nil))
+
+(defhydra sb/hydra-smartparens (:hint nil)
+  "
+                                              Moving^^^^                       Slurp & Barf^^   Wrapping^^            Sexp juggling^^^^               Destructive
+                                              ------------------------------------------------------------------------------------------------------------------------
+                                              [_a_] beginning  [_n_] down      [_h_] bw slurp   [_R_]   rewrap        [_S_] split   [_t_] transpose   [_c_] change inner  [_w_] copy
+                                              [_e_] end        [_N_] bw down   [_H_] bw barf    [_u_]   unwrap        [_s_] splice  [_A_] absorb      [_C_] change outer
+                                              [_f_] forward    [_p_] up        [_l_] slurp      [_U_]   bw unwrap     [_r_] raise   [_E_] emit        [_k_] kill          [_g_] quit
+                                              [_b_] backward   [_P_] bw up     [_L_] barf       [_(__{__[_] wrap (){}[]   [_j_] join    [_o_] convolute   [_K_] bw kill       [_q_] quit"
+  ;; Moving
+  ("a" sp-beginning-of-sexp)
+  ("e" sp-end-of-sexp)
+  ("f" sp-forward-sexp)
+  ("b" sp-backward-sexp)
+  ("n" sp-down-sexp)
+  ("N" sp-backward-down-sexp)
+  ("p" sp-up-sexp)
+  ("P" sp-backward-up-sexp)
+
+  ;; Slurping & barfing
+  ("h" sp-backward-slurp-sexp)
+  ("H" sp-backward-barf-sexp)
+  ("l" sp-forward-slurp-sexp)
+  ("L" sp-forward-barf-sexp)
+
+  ;; Wrapping
+  ("R" sp-rewrap-sexp)
+  ("u" sp-unwrap-sexp)
+  ("U" sp-backward-unwrap-sexp)
+  ("(" sp-wrap-round)
+  ("{" sp-wrap-curly)
+  ("[" sp-wrap-square)
+
+  ;; Sexp juggling
+  ("S" sp-split-sexp)
+  ("s" sp-splice-sexp)
+  ("r" sp-raise-sexp)
+  ("j" sp-join-sexp)
+  ("t" sp-transpose-sexp)
+  ("A" sp-absorb-sexp)
+  ("E" sp-emit-sexp)
+  ("o" sp-convolute-sexp)
+
+  ;; Destructive editing
+  ("c" sp-change-inner :exit t)
+  ("C" sp-change-enclosing :exit t)
+  ("k" sp-kill-sexp)
+  ("K" sp-backward-kill-sexp)
+  ("w" sp-copy-sexp)
+
+  ("q" nil)
+  ("g" nil))
+
+(defhydra sb/hydra-lsp (:exit t :hint nil)
+  "
+  Buffer^^               Server^^                   Symbol
+  -----------------------------------------------------------------------------------------------------------
+  [_f_] format           [_M-r_] restart            [_d_] declaration  [_i_] implementation  [_o_] documentation
+  [_m_] imenu            [_S_]   shutdown           [_D_] definition   [_t_] type            [_r_] rename
+  [_x_] execute action   [_M-s_] describe session   [_R_] references   [_s_] signature"
+
+  ("d" lsp-find-declaration)
+  ("D" lsp-ui-peek-find-definitions)
+  ("R" lsp-ui-peek-find-references)
+  ("i" lsp-ui-peek-find-implementation)
+  ("t" lsp-find-type-definition)
+  ("s" lsp-signature-help)
+  ("o" lsp-describe-thing-at-point)
+  ("r" lsp-rename)
+
+  ("f" lsp-format-buffer)
+  ("m" lsp-ui-imenu)
+  ("x" lsp-execute-code-action)
+
+  ("M-s" lsp-describe-session)
+  ("M-r" lsp-workspace-restart)
+  ("S" lsp-workspace-shutdown))
+
+(defhydra sb/hydra-markdown-mode (:hint nil)
+  "
+  Formatting        C-c C-s    _s_: bold          _e_: italic     _b_: blockquote   _p_: pre-formatted    _c_: code
+
+  Headings          C-c C-t    _h_: automatic     _1_: h1         _2_: h2           _3_: h3               _4_: h4
+
+  Lists             C-c C-x    _m_: insert item
+
+  Demote/Promote    C-c C-x    _l_: promote       _r_: demote     _u_: move up      _d_: move down
+
+  Links, footnotes  C-c C-a    _L_: link          _U_: uri        _F_: footnote     _W_: wiki-link      _R_: reference
+
+  "
+
+  ("s" markdown-insert-bold)
+  ("e" markdown-insert-italic)
+  ("b" markdown-insert-blockquote :color blue)
+  ("p" markdown-insert-pre :color blue)
+  ("c" markdown-insert-code)
+
+  ("h" markdown-insert-header-dwim)
+  ("1" markdown-insert-header-atx-1)
+  ("2" markdown-insert-header-atx-2)
+  ("3" markdown-insert-header-atx-3)
+  ("4" markdown-insert-header-atx-4)
+
+  ("m" markdown-insert-list-item)
+
+  ("l" markdown-promote)
+  ("r" markdown-demote)
+  ("d" markdown-move-down)
+  ("u" markdown-move-up)
+
+  ("L" markdown-insert-link :color blue)
+  ("U" markdown-insert-uri :color blue)
+  ("F" markdown-insert-footnote :color blue)
+  ("W" markdown-insert-wiki-link :color blue)
+  ("R" markdown-insert-reference-link-dwim :color blue))
+
+(bind-key "C-c h a" #'sb/hydra-avy/body)
+(bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
+;; (bind-key "C-c h e" #'sb/hydra-error/body)
+(bind-key "C-c h f" #'sb/hydra-flycheck/body)
+(bind-key "C-c h g" #'sb/smerge-hydra/body)
+(bind-key "C-c h j" #'sb/hydra-projectile/body)
+(bind-key "C-c h l" #'sb/hydra-lsp/body)
+(bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
+(bind-key "C-c h p" #'sb/hydra-smartparens/body)
+(bind-key "C-c h s" #'sb/hydra-spelling/body)
+(bind-key "C-c h t" #'sb/hydra-move-text/body)
+(bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
+
 ;; Mark safe variables
 
 ;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
@@ -5366,6 +6085,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
   :straight t
+  :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands command-completion-default-include-p
   :hook (after-init-hook . vertico-mode)
@@ -5377,7 +6097,8 @@ or the major mode is not in `sb/skippable-modes'."
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
-  (setq read-extended-command-predicate #'command-completion-default-include-p)
+  (when sb/EMACS28+
+    (setq read-extended-command-predicate #'command-completion-default-include-p))
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
@@ -5398,7 +6119,6 @@ or the major mode is not in `sb/skippable-modes'."
         ("M-DEL" . vertico-directory-delete-word))
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
-
 
 (use-package vertico-repeat
   :after vertico
@@ -5501,6 +6221,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 (use-package consult-projectile
   :straight t
+:if (eq sb/minibuffer-completion 'vertico)
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
@@ -5543,6 +6264,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
   :straight t
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :preface
   (defun sb/corfu-move-to-minibuffer ()
     (interactive)
@@ -5565,8 +6287,10 @@ or the major mode is not in `sb/skippable-modes'."
         ([backtab] . corfu-previous)
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
-(use-package corfu-doc
-  :hook (corfu-mode-hook . corfu-doc-mode))
+;; (use-package corfu-doc
+;;   :straight t
+;;   :if (and (display-graphic-p) (eq sb/capf 'corfu))
+;;   :hook (corfu-mode-hook . corfu-doc-mode))
 
 (use-package kind-icon
   :straight t
@@ -5612,6 +6336,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; which is better.
 (use-package all-the-icons-completion
   :straight t
+:straight all-the-icons
   :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
@@ -5637,7 +6362,6 @@ or the major mode is not in `sb/skippable-modes'."
   :demand t ; only necessary if you have the hook below
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
-
 (use-package centaur-tabs
   :straight t
   :commands centaur-tabs-group-by-projectile-project
@@ -5656,65 +6380,14 @@ or the major mode is not in `sb/skippable-modes'."
   (("M-<right>" . centaur-tabs-forward-tab)
    ("M-<left>" . centaur-tabs-backward-tab)))
 
-;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(safe-local-variable-values
-   '((eval add-hook 'lsp-managed-mode-hook
-           (lambda nil
-             (when
-                 (derived-mode-p 'markdown-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers markdown-markdownlint-cli)))))
-             (when
-                 (derived-mode-p 'gfm-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers markdown-markdownlint-cli)))))
-             (when
-                 (derived-mode-p 'sh-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers sh-shellcheck)))))
-             (when
-                 (derived-mode-p 'yaml-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers yaml-yamllint)))))
-             (when
-                 (derived-mode-p 'json-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers json-jsonlint)))))
-             (when
-                 (derived-mode-p 'python-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers python-pylint)))))
-             (when
-                 (derived-mode-p 'c++-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers c/c++-cppcheck)))))
-             (when
-                 (derived-mode-p 'html-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers html-tidy)))))
-             (when
-                 (derived-mode-p 'xml-mode)
-               (setq sb/flycheck-local-checkers
-                     '((lsp
-                        (next-checkers xml-xmllint))))))))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
- '(lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face :weight bold :height 0.9))))
- '(lsp-headerline-breadcrumb-symbols-face ((t (:inherit font-lock-doc-face :weight bold :height 0.9)))))
+;; https://blog.d46.us/advanced-emacs-startup/
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (let (;;(packages  (length package-activated-list))
+                  (gc-time   (float-time gc-elapsed)))
+              ;; (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
+              ;;          (emacs-init-time) packages gc-time gcs-done)
+              (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
+                       (emacs-init-time) gc-time gcs-done))))
+
+;;; init-emacs28.el ends here

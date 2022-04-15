@@ -5531,7 +5531,6 @@ or the major mode is not in `sb/skippable-modes'."
                        (keyfreq-mode 1)
                        (keyfreq-autosave-mode 1))))
 
-
 (use-package which-key ; Show help popups for prefix keys
   :diminish
   :commands (which-key-mode which-key-setup-side-window-right-bottom)
