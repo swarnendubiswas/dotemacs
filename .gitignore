@@ -47,3 +47,5 @@ private.el
 tramp
 /checks.json
 init.el
+
+straight

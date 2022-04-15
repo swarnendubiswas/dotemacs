@@ -52,51 +52,16 @@
   :init
   (setq exec-path-from-shell-arguments nil
         exec-path-from-shell-variables '("PATH" "MANPATH"
-                                         "GNUPGHOME" "SSH_AUTH_SOCK"
-                                         "WAKATIME_HOME"))
+                                         "GNUPGHOME" "SSH_AUTH_SOCK"))
   (exec-path-from-shell-initialize))
 
 (use-package no-littering :straight t :defer t)
-
-(use-package restart-emacs
-  :straight t
-  :commands restart-emacs-debug-init
-  :config
-  (defun restart-emacs-debug-init (&optional args)
-    "Restart emacs and enable debug-init."
-    (interactive)
-    (restart-emacs (cons "--debug-init" args))))
-
 
 (set-language-environment 'utf-8)
 (set-default-coding-systems 'utf-8)
 
 (setq user-full-name "Tianshu Wang"
       user-mail-address "wang@tianshu.me")
-
-(defvar default-font "Source Code Pro")
-(defvar font-size 14)
-(defvar unicode-font "Noto Sans CJK SC")
-(defvar unicode-scale (/ 16.0 14))
-(defvar emoji-font "Noto Color Emoji")
-(defvar symbol-font "Noto Sans Symbols")
-
-(set-face-attribute 'default nil :font (font-spec :family default-font :size font-size))
-(add-hook 'after-init-hook
-          (defun setup-font ()
-            (dolist (charset '(kana han cjk-misc bopomofo))
-              (set-fontset-font t charset unicode-font))
-            (add-to-list 'face-font-rescale-alist `(,unicode-font . ,unicode-scale))
-
-            (set-fontset-font t 'emoji emoji-font nil 'prepend)
-            (set-fontset-font t 'symbol symbol-font nil 'prepend)))
-
-(when (memq window-system '(mac ns))
-  (setq ns-pop-up-frames nil)
-
-  (setq unicode-font "PingFang SC"
-        emoji-font "Apple Color Emoji"
-        symbol-font "Apple Symbols"))
 
 (setq initial-scratch-message nil   ;; "make scratch buffer empty"
       inhibit-startup-message t)    ;; "disable splash screen"
@@ -1079,208 +1044,365 @@ reuse it's window, otherwise create new one."
           special-mode
           flymake-diagnostics-buffer-mode)))
 
-(use-package reformatter :straight t :defer t)
+(use-package default-text-scale
+:straight t
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
 
-(use-package undohist
-  :straight t
-  :hook (after-init . undohist-initialize)
+(use-package free-keys
+:straight t
+  :commands free-keys)
+
+(use-package keyfreq
+:straight t
+  :hook
+  (after-init-hook . (lambda ()
+                       (keyfreq-mode 1)
+                       (keyfreq-autosave-mode 1))))
+
+(use-package which-key ; Show help popups for prefix keys
+:straight t
+  :diminish
+  :commands (which-key-mode which-key-setup-side-window-right-bottom)
+  ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
+  :hook (after-init-hook . which-key-mode)
   :config
-  (setq undohist-ignored-files '("EDITMSG"))
+  (which-key-setup-side-window-right-bottom)
+  ;; Apply suggested settings for minibuffer. Do not use this if we use paging across keys.
+  ;; (which-key-setup-minibuffer)
 
-  (defun undohist-recover-safe@around (fun)
-    (cl-letf (((symbol-function 'yes-or-no-p) (lambda (p) nil)))
-      (funcall fun)))
-  (advice-add #'undohist-recover-safe :around #'undohist-recover-safe@around))
+  :custom
+  ;; Allow "C-h" to trigger `which-key' before it is done automatically
+  (which-key-show-early-on-C-h t)
+  (which-key-sort-order 'which-key-key-order-alpha)
+  (which-key-idle-delay 0.3))
 
-(use-package winum
-  :straight t
-  :hook (after-init . winum-mode)
+(use-package which-key-posframe
+:straight t
+  :commands which-key-posframe-mode
+  :hook (which-key-mode-hook . which-key-posframe-mode)
   :config
-  (setq winum-auto-assign-0-to-minibuffer t
-        winum-auto-setup-mode-line t
-        winum-scope 'frame-local)
+  ;; Modify the posframe background if it has a low contrast
+  ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
 
-  (defun move-buffer-to-window (windownum follow-focus-p)
-    "Moves a buffer to a window. follow-focus-p controls
-whether focus moves to new window (with buffer), or stays on current"
+  ;; Thicker border makes the posframe easier to distinguish
+  (setq which-key-posframe-border-width 4)
+
+  ;; Positioning the frame at the top obstructs the view to a lesser degree
+  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
+
+;; Mark safe variables
+
+;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
+;; (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
+;; (put 'company-clang-arguments                 'safe-local-variable #'listp)
+;; (put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
+;; (put 'flycheck-checker                        'safe-local-variable #'listp)
+;; (put 'flycheck-clang-include-path             'safe-local-variable #'listp)
+;; (put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
+;; (put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
+;; (put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
+;; (put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
+;; (put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
+;; (put 'projectile-enable-caching               'safe-local-variable #'stringp)
+;; (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
+;; (put 'projectile-project-root                 'safe-local-variable #'stringp)
+;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
+;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
+;; (put 'tags-table-list                         'safe-local-variable #'listp)
+
+;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
+(use-package vertico
+  :straight t
+  :defines read-extended-command-predicate
+  :commands command-completion-default-include-p
+  :hook (after-init-hook . vertico-mode)
+  :custom
+  (vertico-cycle t)
+  (vertico-resize nil)
+  (vertico-count 12)
+  (vertico-scroll-margin 4)
+  :config
+  ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
+  ;; hidden in normal buffers.
+    (setq read-extended-command-predicate #'command-completion-default-include-p)
+  :bind
+  (("<f2>" .  find-file)
+   :map vertico-map
+   ("<escape>" . minibuffer-keyboard-quit)
+   ("?" . minibuffer-completion-help)
+   ("M-RET" . minibuffer-force-complete-and-exit)
+   ("M-TAB" . minibuffer-complete)))
+
+;; More convenient directory navigation commands
+(use-package vertico-directory
+  :after vertico
+  :straight nil
+  :load-path "extras"
+  :bind
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
+
+
+(use-package vertico-repeat
+  :after vertico
+  :straight nil
+  :load-path "extras"
+  :hook (minibuffer-setup-hook . vertico-repeat-save)
+  :bind
+  (("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)))
+
+(use-package vertico-indexed
+  :after vertico
+  :straight nil
+  :load-path "extras"
+  :commands vertico-indexed-mode
+  :init (vertico-indexed-mode 1))
+
+(use-package vertico-quick
+  :after vertico
+  :straight nil
+  :bind
+  (:map vertico-map
+        ("C-c q" . vertico-quick-insert)
+        ("C-'" . vertico-quick-exit)))
+
+(use-package consult
+:straight t
+  :commands consult--customize-put
+  :custom
+  (consult-line-start-from-top t "Start search from the beginning")
+  ;; Use Consult to select xref locations with preview
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
+  (consult-project-function #'projectile-project-root)
+  (consult-line-numbers-widen t)
+  :bind
+  (("C-x M-:" . consult-complex-command)
+   ([remap repeat-complex-command] . consult-complex-command)
+   ("C-x b" . consult-buffer)
+   ("<f3>" . consult-buffer)
+   ([remap switch-to-buffer] . consult-buffer)
+   ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+   ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
+   ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
+   ("C-x p b" . consult-project-buffer)
+   ([remap project-switch-to-buffer] . consult-project-buffer)
+   ("M-y" . consult-yank-pop)
+   ([remap yank-pop] . consult-yank-pop)
+   ([remap apropos] . consult-apropos)
+   ;; M-g bindings (goto-map)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+   ([remap goto-line] . consult-goto-line)           ;; orig. goto-line
+   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("C-c C-j" . consult-imenu)
+   ([remap imenu] . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
+   ([remap load-theme] . consult-theme)
+   ;; M-s bindings (search-map)
+   ("M-s f" . consult-find)
+   ([remap locate] . consult-locate)
+   ("M-s l" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("<f4>" . consult-line)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-multi-occur)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
+   ("<f9>" . consult-recent-file)
+   ([remap recentf-open-files] . consult-recent-file)
+   ([remap multi-occur] . consult-multi-occur)
+   ;; Isearch integration
+   ("M-s e" . consult-isearch-history)
+   :map isearch-mode-map
+   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+   )
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode-hook . consult-preview-at-point-mode)
+  :config
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; TODO: Is this what is causing issues with latex?
+  (unless (display-graphic-p)
+    (setq completion-in-region-function #'consult-completion-in-region))
+
+  ;; Disable live preview
+  (consult-customize
+   consult-recent-file consult-buffer
+   :preview-key nil))
+
+(use-package consult-projectile
+:straight t
+  :commands consult-projectile-recentf
+  :bind
+  (("<f5>" . consult-projectile-switch-project)
+   ("<f6>" . consult-projectile)))
+
+(use-package consult-lsp
+:straight t
+  :after (consult lsp)
+  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :config (consult-lsp-marginalia-mode 1))
+
+(use-package consult-flycheck
+:straight t
+  :after (consult flycheck)
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
+
+(use-package consult-flyspell
+:straight t
+  :after (consult flyspell)
+  :commands consult-flyspell)
+
+(use-package consult-dir
+:straight t
+  :bind
+  (([remap list-directory] . consult-dir)
+   ("C-x C-d" . consult-dir)
+   :map minibuffer-local-completion-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file)))
+
+(use-package consult-project-extra
+:straight t)
+
+(use-package consult-yasnippet
+:straight t
+  :bind ("C-M-y" . consult-yasnippet))
+
+;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
+(use-package corfu
+:straight t
+  :preface
+  (defun sb/corfu-move-to-minibuffer ()
     (interactive)
-    (let ((b (current-buffer))
-          (w1 (selected-window))
-          (w2 (winum-get-window-by-number windownum)))
-      (unless (eq w1 w2)
-        (set-window-buffer w2 b)
-        (switch-to-prev-buffer)
-        (unrecord-window-buffer w1 b)))
-    (when follow-focus-p (select-window (winum-get-window-by-number windownum))))
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+  :hook (after-init-hook . corfu-global-mode)
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-auto-delay 0)
+  (corfu-auto-prefix 2)
+  (corfu-min-width 60)
+  (corfu-max-width corfu-min-width)
+  (corfu-count 15)
+  (corfu-preselect-first t)
+  :bind
+  (:map corfu-map
+        ([tab] . corfu-next)
+        ([backtab] . corfu-previous)
+        ("M-m" . sb/corfu-move-to-minibuffer)))
 
-  (defun swap-buffers-to-window (windownum follow-focus-p)
-    "Swaps visible buffers between active window and selected window.
-follow-focus-p controls whether focus moves to new window (with buffer), or
-stays on current"
-    (interactive)
-    (let* ((b1 (current-buffer))
-           (w1 (selected-window))
-           (w2 (winum-get-window-by-number windownum))
-           (b2 (window-buffer w2)))
-      (unless (eq w1 w2)
-        (set-window-buffer w1 b2)
-        (set-window-buffer w2 b1)
-        (unrecord-window-buffer w1 b1)
-        (unrecord-window-buffer w2 b2)))
-    (when follow-focus-p (winum-select-window-by-number windownum)))
+(use-package corfu-doc
+  :hook (corfu-mode-hook . corfu-doc-mode))
 
-  (dotimes (i 9)
-    (let ((n (+ i 1)))
-      (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
-               ,(format "Move buffer to the window with number %i." n)
-               (interactive "P")
-               (if arg
-                   (move-buffer-to-window ,n t)
-                 (swap-buffers-to-window ,n t)))))))
-
-(use-package wakatime-mode
+(use-package kind-icon
   :straight t
-  :hook (prog-mode . wakatime-mode)
+  :after corfu
+  :demand t
+  :commands kind-icon-margin-formatter
+  :custom
+  (kind-icon-face 'corfu-default)
+  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
   :config
-  (setq wakatime-cli-path "wakatime-cli")
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-  (defun wakatime-dashboard ()
-    (interactive)
-    (browse-url "https://wakatime.com/dashboard")))
+;; https://kristofferbalintona.me/posts/cape/
+(use-package cape
+:straight t
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;; Complete programming language keyword
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; Complete unicode char from TeX command, e.g. \hbar.
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; Complete abbreviation at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; Complete word from dictionary at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; Complete current line from other lines in buffer.
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
+  ;; Complete word at point with Ispell.
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; Complete with Dabbrev at point.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  :custom
+  (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
 
-
-(use-package tex
-  :straight auctex
-  :defer t
-  :mode ("\\.[tT]e[xX]\\'" . TeX-tex-mode)
-  :config
-  (setq TeX-auto-save t
-        TeX-command-default "LatexMk"
-        TeX-master t
-        TeX-parse-self t
-        TeX-save-query nil
-        TeX-source-correlate-start-server t
-        TeX-view-program-list '(("Preview.app" "open -a Preview.app %o")
-                                ("Skim" "open -a Skim.app %o")
-                                ("displayline" "displayline -b %n %o %b")
-                                ("open" "open %o"))
-        TeX-view-program-selection '((output-dvi "open")
-                                     (output-pdf "displayline")
-                                     (output-html "open"))
-        ;; Don't insert line-break at inline math
-        LaTeX-fill-break-at-separators nil)
-
-  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-  (add-hook 'LaTeX-mode-hook 'TeX-fold-mode)
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-
-  (defun TeX-build ()
-    (interactive)
-    (TeX-save-document (TeX-master-file))
-    (TeX-command TeX-command-default 'TeX-master-file -1))
-
-  ;; Rebindings for TeX-font
-  (defun font-bold () (interactive) (TeX-font nil ?\C-b))
-  (defun font-medium () (interactive) (TeX-font nil ?\C-m))
-  (defun font-code () (interactive) (TeX-font nil ?\C-t))
-  (defun font-emphasis () (interactive) (TeX-font nil ?\C-e))
-  (defun font-italic () (interactive) (TeX-font nil ?\C-i))
-  (defun font-clear () (interactive) (TeX-font nil ?\C-d))
-  (defun font-calligraphic () (interactive) (TeX-font nil ?\C-a))
-  (defun font-small-caps () (interactive) (TeX-font nil ?\C-c))
-  (defun font-sans-serif () (interactive) (TeX-font nil ?\C-f))
-  (defun font-normal () (interactive) (TeX-font nil ?\C-n))
-  (defun font-serif () (interactive) (TeX-font nil ?\C-r))
-  (defun font-oblique () (interactive) (TeX-font nil ?\C-s))
-  (defun font-upright () (interactive) (TeX-font nil ?\C-u))
-)
-
-(use-package reftex
-  :hook (TeX-mode . reftex-mode)
-  :config
-  (setq reftex-default-bibliography '("~/Documents/Bibliography/references.bib")
-        reftex-plug-into-AUCTeX '(nil nil t t t)
-        reftex-use-fonts t))
-
-(use-package auctex-latexmk
+(use-package marginalia
   :straight t
-  :after tex
-  :config
-  (auctex-latexmk-setup)
-  (setq-default TeX-command-default "LatexMk")
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t))
+  :after vertico
+  :init (marginalia-mode 1))
 
-(use-package aas
+;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
+;; which is better.
+(use-package all-the-icons-completion
   :straight t
-  :hook ((TeX-mode org-mode) . aas-activate-for-major-mode))
+  :disabled t
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
+  :init (all-the-icons-completion-mode))
 
-(use-package laas
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/
+(use-package embark
+  :after vertico
   :straight t
-  :hook (TeX-mode . laas-mode))
+  :init
+  ;; Replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command
+        which-key-use-C-h-commands nil)
+  :bind
+  (([remap describe-bindings] . embark-bindings)
+   :map vertico-map
+   ("C-l" . embark-act)
+   ("C-c C-l" . embark-export)))
 
-(use-package bibtex
-  :defer t
-  :config
-  (setq bibtex-file-path "~/Documents/Bibliography/"
-        bibtex-files '("references.bib")
-        bibtex-notes-path "~/Documents/Org/notes/refs/"
-
-        bibtex-align-at-equal-sign t
-        bibtex-autokey-titleword-separator "-"
-        bibtex-autokey-year-title-separator "-"
-        bibtex-autokey-name-year-separator "-"
-        bibtex-dialect 'biblatex))
-
-(use-package python
-  :hook ((python-mode . eglot-ensure)
-         (python-mode . tree-sitter-hl-mode))
-  :config
-  (setq python-indent-def-block-scale 1
-        python-indent-guess-indent-offset-verbose nil)
-
-  (add-hook 'python-mode-hook
-            (defun init-python-mode ()
-              "Stuff to do when opening `python-mode' files."
-              (set (make-local-variable 'comment-inline-offset) 2)
-              (setq fill-column 88
-                    tab-width 4))))
-
-
-(use-package eval-sexp-fu
+(use-package embark-consult
   :straight t
-  :hook (emacs-lisp-mode . eval-sexp-fu-flash-mode))
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
-(defun display-startup-echo-area-message ()
-  "Display startup message."
-  (message (concat "Startup time: " (emacs-init-time))))
 
-(use-package dockerfile-mode :straight t :defer t)
-
-(use-package js
-  :mode ("\\.json\\'" . json-mode)
-  :config
-  (defvar json-mode-map
-    (make-sparse-keymap)
-    "Keymap for `json-mode'.")
-
-  (define-derived-mode json-mode js-mode "JSON"
-    (make-local-variable 'js-indent-level)
-    (setq js-indent-level 2)))
-
-(use-package jsonnet-mode
+(use-package centaur-tabs
   :straight t
-  :defer t)
-
-(use-package web-mode :straight t :defer t)
-
-(use-package yaml-mode :straight t :defer t)
-
-(use-package markdown-mode
-  :straight t
-  :defer t
+  :commands centaur-tabs-group-by-projectile-project
+  :hook (emacs-startup-hook . centaur-tabs-mode)
+  :init
+  (setq centaur-tabs-set-icons nil ; The icons often do not blend well with the theme
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-modified-marker "*"
+        centaur-tabs-cycle-scope 'tabs
+        centaur-tabs-set-close-button nil
+        centaur-tabs-show-new-tab-button nil
+        centaur-tabs-enable-ido-completion nil)
   :config
-  (setq markdown-fontify-code-blocks-natively t))
+  (centaur-tabs-group-by-projectile-project)
+  :bind
+  (("M-<right>" . centaur-tabs-forward-tab)
+   ("M-<left>" . centaur-tabs-backward-tab)))
 
 ;;; init.el ends here
