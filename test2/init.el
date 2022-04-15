@@ -587,6 +587,89 @@ Corfu does not support TUI, so we have to fallback on company."
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
 
+
+
+;; Silence "Starting 'look' process..." message
+(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+
+;; Hide the "Starting new Ispell process" message
+(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
+
+;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
+;; However, the width of the frame popup is often not enough and the right side gets cut off.
+;; https://github.com/company-mode/company-mode/issues/1010
+(use-package company-posframe
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after company
+  :demand t
+  :commands company-posframe-mode
+  :diminish
+  :config
+  (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
+        company-posframe-show-indicator nil ; Hide the backends, the display is not great
+        ;; Disable showing the help frame
+        company-posframe-quickhelp-delay nil)
+  (company-posframe-mode 1))
+
+(use-package company-quickhelp
+:straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after company
+  :commands company-quickhelp-mode
+  ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
+  :hook (after-init-hook . company-quickhelp-mode))
+
+(use-package company-statistics
+:straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after company
+  :demand t
+  :commands company-statistics-mode
+  :config (company-statistics-mode 1))
+
+;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
+(use-package company-fuzzy
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :straight flx
+  :after company
+  :diminish (company-fuzzy-mode global-company-fuzzy-mode)
+  :commands (global-company-fuzzy-mode company-fuzzy-mode)
+  :demand t
+  :custom
+  (company-fuzzy-sorting-backend 'flx)
+  (company-fuzzy-show-annotation nil "The right-hand side gets cut off")
+  ;; We should not need this because the `flx' sorting accounts for the prefix
+  (company-fuzzy-prefix-on-top t))
+
+(use-package yasnippet
+  :straight t
+  :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  :hook ((text-mode-hook prog-mode-hook) . yas-global-mode)
+  :diminish yas-minor-mode
+  :custom
+  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  (yas-verbosity 0)
+  :config
+  (with-eval-after-load "hippie-expand"
+    (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
+  (unbind-key "<tab>" yas-minor-mode-map))
+
+(use-package yasnippet-snippets
+:straight t
+  :after yasnippet
+  :demand t
+  :commands yasnippet-snippets-initialize
+  :config (yasnippet-snippets-initialize))
+
+(use-package ivy-yasnippet
+:straight t
+  :after ivy
+  :bind ("C-M-y" . ivy-yasnippet))
+
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
