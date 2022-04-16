@@ -210,7 +210,20 @@
         uniquify-separator           "/"
         uniquify-strip-common-suffix t))
 
+;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
+(use-package abbrev
+  :straight nil
+  :diminish
+  :hook (after-init-hook . abbrev-mode)
+  :custom
+  ;; The "abbrev-defs" file is under version control
+  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
+  (save-abbrevs 'silently))
 
-
+;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
+(use-package so-long
+  :straight nil
+  ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
+  :hook (after-init-hook . global-so-long-mode))
 
 (provide 'init-core)

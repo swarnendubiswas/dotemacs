@@ -402,6 +402,29 @@
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
 
+;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
+(when (display-graphic-p)
+  (global-display-line-numbers-mode 1))
+
+;; Not a library/file, so `eval-after-load' does not work
+(diminish 'auto-fill-function)
+
+(with-eval-after-load "simple"
+  (diminish 'visual-line-mode))
+
+;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
+(unless (display-graphic-p)
+  (fringe-mode '(10 . 10)))
+
+;; Make the cursor a thin horizontal bar, not a block
+;; (set-default 'cursor-type '(bar . 4))
+
+(use-package hl-line
+  :straight t
+  :commands hl-line-highlight
+  :if (display-graphic-p)
+  :hook (after-init-hook . global-hl-line-mode))
+
 
 (provide 'init-ui)
 ;;; core-config.el ends here
