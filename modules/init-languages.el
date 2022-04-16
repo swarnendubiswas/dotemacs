@@ -61,4 +61,21 @@
   (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
+;; (use-package highlight-indentation
+;;   :straight t
+;;   :commands highlight-indentation-mode
+;;   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+;;   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
+
+;; Claims to be better than `electric-indent-mode'
+(use-package aggressive-indent
+  :straight t
+  :commands aggressive-indent-mode
+  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
+  :diminish
+  :config
+  (setq aggressive-indent-comments-too t
+        ;; Never use `electric-indent-mode'
+        aggressive-indent-dont-electric-modes t))
+
 (provide 'init-languages)
