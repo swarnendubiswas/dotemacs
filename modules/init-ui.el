@@ -271,7 +271,7 @@
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
         circadian-themes '((:sunrise . modus-operandi)
-                           (:sunset  . modus-vivendi)))
+                           (:sunset  . doom-one)))
   (circadian-setup))
 
 ;; (cond

@@ -78,4 +78,17 @@
         ;; Never use `electric-indent-mode'
         aggressive-indent-dont-electric-modes t))
 
+;; ;; Highlight symbol under point
+;; (use-package symbol-overlay
+;;   :straight t
+;;   :diminish
+;;   :commands (symbol-overlay-mode)
+;;   :hook (prog-mode-hook . symbol-overlay-mode)
+;;   :bind
+;;   (("M-p" . symbol-overlay-jump-prev)
+;;    ("M-n" . symbol-overlay-jump-next))
+;;   :custom
+;;   ;; Delay highlighting to allow for transient cursor placements
+;;   (symbol-overlay-idle-time 2))
+
 (provide 'init-languages)

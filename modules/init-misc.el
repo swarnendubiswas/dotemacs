@@ -111,4 +111,33 @@
   :commands (session-initialize)
   :hook (after-init-hook . session-initialize))
 
+(use-package hl-todo
+  :straight t
+  :commands global-hl-todo-mode
+  ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
+  :hook (after-init-hook . global-hl-todo-mode)
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
+                                        ("ISSUE"    . "#ff8c00")
+                                        ("DEBUG"    . "#ff8c00")
+                                        ("TEST"     . "tomato")
+                                        ("WARNING"  . "#cc0000")
+                                        ("BEWARE"   . "#aa0000")
+                                        ("REFACTOR" . "#cc9393"))
+                                      hl-todo-keyword-faces)))
+
+(use-package highlight-numbers
+  :straight t
+  :commands highlight-numbers-mode
+  :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook
+                         css-mode-hook html-mode-hook) . highlight-numbers-mode))
+
+;; (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
+;;   :straight t
+;;   :diminish
+;;   :commands (global-page-break-lines-mode page-break-lines-mode)
+;;   ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
+;;   :hook (after-init-hook . global-page-break-lines-mode))
+
 (provide 'init-misc)
