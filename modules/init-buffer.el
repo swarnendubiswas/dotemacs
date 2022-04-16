@@ -27,4 +27,35 @@
   :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
   :config (setq all-the-icons-ibuffer-icon-size 0.8))
 
+(use-package counsel-fd
+  :straight t
+  :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
+  :bind
+  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
+   ;; Jump to a file below the current directory
+   ("C-x f" . counsel-fd-file-jump)))
+
+(use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+  :straight t
+  :commands vlf
+  :defines vlf-application
+  :init
+  (setq vlf-application 'dont-ask)
+  (require 'vlf-setup))
+
+(use-package immortal-scratch
+  :straight t
+  :commands immortal-scratch-mode
+  ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
+  :hook (after-init-hook . immortal-scratch-mode))
+
+;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
+(use-package persistent-scratch
+  :straight t
+  :commands persistent-scratch-setup-default
+  :hook (after-init-hook . persistent-scratch-setup-default)
+  :config
+  (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
+
+
 (provide 'init-buffer)

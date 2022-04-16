@@ -2034,13 +2034,7 @@ Corfu does not support TUI, so we have to fallback on company."
                         '((file-name-nondirectory (:width 0.24))
                           (ivy-rich-candidate (:width 0.75)))))
 
-(use-package counsel-fd
-  :straight t
-  :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
-  :bind
-  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
-   ;; Jump to a file below the current directory
-   ("C-x f" . counsel-fd-file-jump)))
+
 
 (use-package flycheck
   :straight t
@@ -2432,102 +2426,11 @@ Corfu does not support TUI, so we have to fallback on company."
    ("<tab>" . xref-quit-and-goto-xref)
    ("r"     . xref-query-replace-in-results)))
 
-(use-package ivy-xref
-  :straight t
-  :after (ivy xref)
-  :demand t
-  :custom
-  (xref-show-definitions-function #'ivy-xref-show-defs)
-  (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
-(use-package counsel-etags
-  :straight t
-  :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
-  :commands counsel-etags-virtual-update-tags
-  :if (and (symbol-value 'sb/IS-LINUX) (eq sb/minibuffer-completion 'ivy) (executable-find "ctags"))
-  :bind
-  (("M-]"     . counsel-etags-find-tag-at-point)
-   ("C-c g s" . counsel-etags-find-symbol-at-point)
-   ("C-c g f" . counsel-etags-find-tag)
-   ("C-c g l" . counsel-etags-list-tag)
-   ("C-c g c" . counsel-etags-scan-code))
-  :config
-  (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local)))
 
-  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd" ".cache"))
-    (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
 
-  (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
-    (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
-
-(use-package dumb-jump
-  :straight t
-  :after xref
-  :demand t
-  :commands dumb-jump-xref-activate
-  :config
-  (setq dumb-jump-quiet t)
-
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-
-;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
-;; functions only, so we use `helpful-callable' as a drop-in replacement.
-(use-package helpful
-  :straight t
-  :bind
-  (("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h f" . helpful-callable)
-   ("C-h c" . helpful-command)
-   ("C-h p" . helpful-at-point)
-   ("C-h o" . helpful-symbol)
-   :map helpful-mode-map
-   ("q"     . helpful-kill-buffers)))
-
-(use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-  :straight t
-  :commands vlf
-  :defines vlf-application
-  :init
-  (setq vlf-application 'dont-ask)
-  (require 'vlf-setup))
-
-;; Erase all consecutive white space characters in a given direction
-(use-package hungry-delete
-  :straight t
-  :commands (hungry-delete-mode global-hungry-delete-mode)
-  :diminish
-  :hook
-  ((minibuffer-setup-hook . (lambda ()
-                              (hungry-delete-mode -1)))
-   (after-init-hook . global-hungry-delete-mode)))
-
-(use-package move-text ; Move lines with "M-<up>" and "M-<down>"
-  :straight t
-  :commands (move-text-up move-text-down move-text-default-bindings)
-  :init (move-text-default-bindings))
-
-(use-package duplicate-thing
-  :straight t
-  :bind* ("C-c C-d" . duplicate-thing))
-
-;; Discover key bindings and their meaning for the current Emacs major mode
-(use-package discover-my-major
-  :straight t
-  :bind
-  (("C-h C-m" . discover-my-major)
-   ("C-h M-m" . discover-my-mode)))
-
-;; Manage minor-mode on the dedicated interface buffer
-(use-package manage-minor-mode
-  :straight t
-  :commands manage-minor-mode)
-
-;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
+  ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :straight t
@@ -2582,87 +2485,9 @@ Corfu does not support TUI, so we have to fallback on company."
 ;;              (cons "\\*Async Shell Command\\*.*"
 ;;                    (cons #'display-buffer-no-window nil)))
 
-(use-package expand-region ; Expand region by semantic units
-  :straight t
-  :bind
-  (("C-="   . er/expand-region)
-   ("C-M-=" . er/contract-region)))
 
-(use-package expand-line
-  :straight t
-  :diminish
-  :bind ("M-i" . turn-on-expand-line-mode))
 
-;; Restore point to the initial location with "C-g" after marking a region
-(use-package smart-mark
-  :straight t
-  ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
-  :hook (after-init-hook . smart-mark-mode))
 
-;; Operate on the current line if no region is active
-(use-package whole-line-or-region
-  :straight t
-  :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
-  :diminish (whole-line-or-region-local-mode)
-  ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
-  :hook (after-init-hook . whole-line-or-region-global-mode))
-
-(use-package goto-last-change
-  :straight t
-  :bind ("C-x C-\\" . goto-last-change))
-
-;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
-;; pressing the keys "M-<" and "M->" keys again.
-(use-package beginend
-  :straight t
-  ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
-  :hook (after-init-hook . beginend-global-mode)
-  :config
-  (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
-    (diminish mode)))
-
-(use-package undo-tree
-  :straight t
-  :defines undo-tree-map
-  :commands (global-undo-tree-mode undo-tree-redo)
-  :diminish
-  :config
-  (setq undo-tree-auto-save-history              t
-        undo-tree-visualizer-diff                t
-        undo-tree-visualizer-relative-timestamps t
-        undo-tree-visualizer-timestamps          t)
-  (unbind-key "C-/" undo-tree-map)
-  :hook (find-file-hook . undo-tree-mode)
-  :bind
-  (([remap undo] . undo-tree-undo)
-   ([remap redo] . undo-tree-redo)
-   ("C-z"   . undo-tree-undo)
-   ("C-x u" . undo-tree-visualize)))
-
-(use-package iedit ; Edit multiple regions in the same way simultaneously
-  :straight t
-  :bind* ("C-." . iedit-mode))
-
-;; Avoid the "Overwrite old session file (not loaded)?" warning by loading the `session' package
-(use-package session
-  :straight t
-  :disabled t
-  :commands (session-initialize)
-  :hook (after-init-hook . session-initialize))
-
-(use-package immortal-scratch
-  :straight t
-  :commands immortal-scratch-mode
-  ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
-  :hook (after-init-hook . immortal-scratch-mode))
-
-;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
-(use-package persistent-scratch
-  :straight t
-  :commands persistent-scratch-setup-default
-  :hook (after-init-hook . persistent-scratch-setup-default)
-  :config
-  (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package crux
   :straight t

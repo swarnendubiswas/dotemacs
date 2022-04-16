@@ -19,5 +19,46 @@
   :hook (prog-mode-hook . hs-minor-mode)
   :custom (hs-isearch-open t))
 
+(use-package dumb-jump
+  :straight t
+  :after xref
+  :demand t
+  :commands dumb-jump-xref-activate
+  :config
+  (setq dumb-jump-quiet t)
+
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+(use-package ivy-xref
+  :straight t
+  :after (ivy xref)
+  :demand t
+  :custom
+  (xref-show-definitions-function #'ivy-xref-show-defs)
+  (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
+
+(use-package counsel-etags
+  :straight t
+  :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
+  :commands counsel-etags-virtual-update-tags
+  :if (and (symbol-value 'sb/IS-LINUX) (eq sb/minibuffer-completion 'ivy) (executable-find "ctags"))
+  :bind
+  (("M-]"     . counsel-etags-find-tag-at-point)
+   ("C-c g s" . counsel-etags-find-symbol-at-point)
+   ("C-c g f" . counsel-etags-find-tag)
+   ("C-c g l" . counsel-etags-list-tag)
+   ("C-c g c" . counsel-etags-scan-code))
+  :config
+  (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
+
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local)))
+
+  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd" ".cache"))
+    (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
+
+  (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
+    (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (provide 'init-languages)

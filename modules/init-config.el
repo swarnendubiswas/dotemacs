@@ -140,4 +140,10 @@ Corfu does not support TUI, so we have to fallback on company."
           (const :tag "company" company))
   :group 'dotemacs)
 
+(defconst sb/EMACS27    (= emacs-major-version 27))
+(defconst sb/EMACS27+   (> emacs-major-version 26))
+(defconst sb/EMACS28+   (> emacs-major-version 27))
+(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
+(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+
 (provide 'init-config)
