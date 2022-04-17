@@ -1,3 +1,12 @@
+;;; init-packages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; Bootstrap `straight.el'
 
 (setf straight-profiles `((nil . "straight.lockfile.el")))
@@ -141,3 +150,5 @@
   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)
+
+;;; init-packages.el ends here

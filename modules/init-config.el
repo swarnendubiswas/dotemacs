@@ -1,7 +1,11 @@
-(defgroup sb/emacs
-  nil
-  "Personal configuration for dotemacs."
-  :group 'local)
+;;; init-config.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
 
 (defcustom sb/extras-directory
   (expand-file-name "extras" user-emacs-directory)
@@ -85,7 +89,8 @@ Sometimes we do not want to unnecessarily add differences due to
   :type  'boolean
   :group 'sb/emacs)
 
-;; Use the snap installation of universal-ctags
+;; We can use the snap installation of "universal-ctags", but snap packages have poor performance.
+;; Another alternative is to build and install "ctags" locally.
 (defcustom sb/ctags-path
   "/snap/bin/ctags"
   "Absolute path to Universal Ctags executable."
@@ -143,7 +148,10 @@ Corfu does not support TUI, so we have to fallback on company."
 (defconst sb/EMACS27    (= emacs-major-version 27))
 (defconst sb/EMACS27+   (> emacs-major-version 26))
 (defconst sb/EMACS28+   (> emacs-major-version 27))
+
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
 (provide 'init-config)
+
+;;; init-config.el ends here

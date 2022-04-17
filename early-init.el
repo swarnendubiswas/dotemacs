@@ -60,9 +60,9 @@
 
 ;; The run-time load order is: (1) file described by `site-run-file', if non-nil, (2)
 ;; `user-init-file', and (3) `default.el'.
-;; (setq site-run-file nil ; Disable site-wide run-time initialization
-;;       ;; Disable loading of `default.el' at startup
-;;       inhibit-default-init t)
+(setq site-run-file nil ; Disable site-wide run-time initialization
+      ;; Disable loading of `default.el' at startup
+      inhibit-default-init t)
 
 ;; Do not resize the frame at this early stage. Resizing the Emacs frame can be a terribly expensive
 ;; part of changing the font. By inhibiting this, we easily halve startup times with fonts that are
@@ -114,15 +114,15 @@
 ;; Disable `package.el' in favor of `straight.el'
 (setq package-enable-at-startup nil)
 
-(when (featurep 'native-compile)
-  ;; Silence compiler warnings as they can be pretty disruptive
-  (setq native-comp-async-report-warnings-errors nil)
+;; (when (featurep 'native-compile)
+;;   ;; Silence compiler warnings as they can be pretty disruptive
+;;   (setq native-comp-async-report-warnings-errors nil)
 
-  ;; Set the right directory to store the native compilation cache
-  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
+;;   ;; Set the right directory to store the native compilation cache
+;;   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
 
-(defvar package-native-compile)
-(defvar native-comp-always-compile)
+;; (defvar package-native-compile)
+;; (defvar native-comp-always-compile)
 
 ;; ;; Enable ahead-of-time compilation when installing a package
 ;; (when sb/EMACS28+
