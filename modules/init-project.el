@@ -204,5 +204,22 @@
    ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
    ))
 
+(use-package consult-projectile
+  :straight t
+:if (eq sb/minibuffer-completion 'vertico)
+  :commands consult-projectile-recentf
+  :bind
+  (("<f5>" . consult-projectile-switch-project)
+   ("<f6>" . consult-projectile)))
+
+(use-package consult-project-extra
+  :straight t)
+
+;; Allows to quickly add projectile projects to the treemacs workspace
+(use-package treemacs-projectile
+  :straight t
+  :after (treemacs projectile)
+  :commands treemacs-projectile
+  :demand t)
 
 (provide 'init-project)

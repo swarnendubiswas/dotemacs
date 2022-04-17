@@ -260,19 +260,19 @@
   ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
   :hook (after-init-hook . auto-dim-other-buffers-mode))
 
-;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
-(use-package circadian
-  :straight t
-  :commands circadian-setup
-  :if (display-graphic-p)
-  :init
-  (require 'solar)
-  (setq calendar-latitude 26.50
-        calendar-location-name "Kanpur, UP, India"
-        calendar-longitude 80.23
-        circadian-themes '((:sunrise . modus-operandi)
-                           (:sunset  . doom-one)))
-  (circadian-setup))
+;; ;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
+;; (use-package circadian
+;;   :straight t
+;;   :commands circadian-setup
+;;   :if (display-graphic-p)
+;;   :init
+;;   (require 'solar)
+;;   (setq calendar-latitude 26.50
+;;         calendar-location-name "Kanpur, UP, India"
+;;         calendar-longitude 80.23
+;;         circadian-themes '((:sunrise . modus-operandi)
+;;                            (:sunset  . doom-one)))
+;;   (circadian-setup))
 
 ;; (cond
 ;;  ((sb/font-available-p "Cascadia Code")

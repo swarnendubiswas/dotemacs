@@ -10,13 +10,14 @@
 
 ;;; Code:
 
-(setq package-archives '(("melpa"        . "https://melpa.org/packages/")
-                         ("gnu"          . "https://elpa.gnu.org/packages/")
-                         ("nongnu"       . "https://elpa.nongnu.org/nongnu/")))
+;; (setq package-archives '(("melpa"        . "https://melpa.org/packages/")
+;;                          ("gnu"          . "https://elpa.gnu.org/packages/")
+;;                          ("nongnu"       . "https://elpa.nongnu.org/nongnu/")))
 
 ;; bootstrap `straight.el'
 (defvar bootstrap-version)
-(setq straight-check-for-modifications '(find-when-checking)
+(setq
+straight-check-for-modifications '(find-when-checking)
       straight-host-usernames '((github . "tshu-w"))
       straight-vc-git-default-clone-depth 1
       straight-build-dir (format "build/%d%s%d"
@@ -57,15 +58,6 @@
   (exec-path-from-shell-initialize))
 
 (use-package no-littering :straight t :defer t)
-
-(use-package restart-emacs
-  :straight t
-  :commands restart-emacs-debug-init
-  :config
-  (defun restart-emacs-debug-init (&optional args)
-    "Restart emacs and enable debug-init."
-    (interactive)
-    (restart-emacs (cons "--debug-init" args))))
 
 (provide 'core-packages)
 ;;; core-packages.el ends here

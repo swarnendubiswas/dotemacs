@@ -57,5 +57,13 @@
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
+(use-package consult-dir
+  :straight t
+  :bind
+  (([remap list-directory] . consult-dir)
+   ("C-x C-d" . consult-dir)
+   :map minibuffer-local-completion-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file)))
 
 (provide 'init-buffer)

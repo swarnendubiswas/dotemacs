@@ -182,4 +182,9 @@
    ("C-c f p" . spell-fu-goto-previous-error)
    ("C-c f a" . spell-fu-word-add)))
 
+(use-package consult-flyspell
+  :straight t
+  :after (consult flyspell)
+  :commands consult-flyspell)
+
 (provide 'init-spell)
