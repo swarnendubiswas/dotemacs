@@ -1,11 +1,24 @@
-(use-package gcmh ; Allow GC to happen after a period of idle time
-  :straight t
-  :diminish
-  :commands (gcmh-mode gcmh-idle-garbage-collect)
-  :hook (after-init-hook . gcmh-mode)
-  :config
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose t)))
+;; Bootstrap `straight.el'
+(defvar bootstrap-version)
+(setq straight-build-dir (format "build/%d%s%d"
+                                 emacs-major-version
+                                 version-separator
+                                 emacs-minor-version))
+
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
@@ -22,26 +35,34 @@
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
 
-(when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error                 t
-        debug-on-event                 'sigusr2
-        garbage-collection-messages    t
-        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-        use-package-verbose            t
-        use-package-expand-minimally   nil)
-  (debug-on-entry 'projectile-remove-known-project))
+;; (when (bound-and-true-p sb/debug-init-file)
+;;   (setq debug-on-error                 t
+;;         debug-on-event                 'sigusr2
+;;         garbage-collection-messages    t
+;;         use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+;;         use-package-verbose            t
+;;         use-package-expand-minimally   nil)
+;;   (debug-on-entry 'projectile-remove-known-project))
 
-(unless (bound-and-true-p sb/debug-init-file)
-  (setq use-package-always-defer       t
-        ;; Avoid printing errors and warnings since the configuration is known to work
-        use-package-expand-minimally   t
-        use-package-compute-statistics nil
-        use-package-verbose            nil))
+;; (unless (bound-and-true-p sb/debug-init-file)
+;;   (setq ;; use-package-always-defer       t
+;;         ;; Avoid printing errors and warnings since the configuration is known to work
+;;         ;; use-package-expand-minimally   t
+;;         use-package-compute-statistics nil
+;;         use-package-verbose            nil))
 
-(setq use-package-enable-imenu-support t
-      ;; Avoid manual installations whenever I modify package installations
-      use-package-always-ensure        nil
-      use-package-hook-name-suffix     nil)
+;; (setq use-package-enable-imenu-support t
+;;       ;; Avoid manual installations whenever I modify package installations
+;;       use-package-hook-name-suffix     nil)
+
+(use-package gcmh ; Allow GC to happen after a period of idle time
+  :straight t
+  :diminish
+  :commands (gcmh-mode gcmh-idle-garbage-collect)
+  :hook (after-init-hook . gcmh-mode)
+  :config
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq gcmh-verbose t)))
 
 ;; ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
 ;; ;; is `paradox-upgrade-packages' as a single command.
@@ -50,13 +71,6 @@
 ;;   :bind
 ;;   (("C-c d p" . package-quickstart-refresh)
 ;;    ("C-c d l" . package-list-packages)))
-
-
-
-;; These are alternative ways.
-
-;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
-;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
 
 (use-package f
   :straight t
@@ -73,6 +87,19 @@
 (use-package no-littering
   :straight t
   :demand t)
+
+  (defcustom sb/custom-file
+  (no-littering-expand-etc-file-name "custom.el")
+  "File to write Emacs customizations."
+  :type  'string
+  :group 'sb/emacs)
+
+;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
+(defcustom sb/private-file
+  (no-littering-expand-etc-file-name "private.el")
+  "File to include private information."
+  :type  'string
+  :group 'sb/emacs)
 
 ;; ;; Asynchronously byte compile packages installed with `package.el'
 ;; (use-package async
@@ -93,6 +120,9 @@
 
 ;; Get PATH with "(getenv "PATH")". Set PATH with
 ;; "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
+;; These are alternative ways.
+;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
+;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
 (use-package exec-path-from-shell
   :straight t
   :defines exec-path-from-shell-check-startup-files

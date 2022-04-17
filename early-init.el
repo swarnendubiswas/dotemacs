@@ -21,6 +21,20 @@
 
 ;;; Code:
 
+(defconst sb/emacs-4MB    (*       4 1024 1024))
+(defconst sb/emacs-8MB    (*       8 1000 1024))
+(defconst sb/emacs-16MB   (*      16 1000 1024))
+(defconst sb/emacs-32MB   (*      32 1000 1024))
+(defconst sb/emacs-64MB   (*      64 1024 1024))
+(defconst sb/emacs-128MB  (*     128 1024 1024))
+(defconst sb/emacs-256MB  (*     256 1024 1024))
+(defconst sb/emacs-512MB  (*     512 1024 1024))
+(defconst sb/emacs-1GB    (*  1 1024 1024 1024))
+(defconst sb/emacs-2GB    (*  2 1024 1024 1024))
+(defconst sb/emacs-4GB    (*  4 1024 1024 1024))
+(defconst sb/emacs-8GB    (*  8 1024 1024 1024))
+(defconst sb/emacs-16GB   (* 16 1024 1024 1024))
+
 ;; Defer garbage collection further back in the startup process
 (setq gc-cons-threshold most-positive-fixnum gc-cons-percentage 0.6)
 (add-hook 'emacs-startup-hook

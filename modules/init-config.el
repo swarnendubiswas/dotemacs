@@ -146,17 +146,4 @@ Corfu does not support TUI, so we have to fallback on company."
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
 
-(defcustom sb/custom-file
-  (no-littering-expand-etc-file-name "custom.el")
-  "File to write Emacs customizations."
-  :type  'string
-  :group 'sb/emacs)
-
-;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
-(defcustom sb/private-file
-  (no-littering-expand-etc-file-name "private.el")
-  "File to include private information."
-  :type  'string
-  :group 'sb/emacs)
-
 (provide 'init-config)

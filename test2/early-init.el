@@ -116,12 +116,12 @@
 ;; Disable `package.el' in favor of `straight.el'
 (setq package-enable-at-startup nil)
 
-(when (featurep 'native-compile)
-  ;; Silence compiler warnings as they can be pretty disruptive
-  (setq native-comp-async-report-warnings-errors nil))
+;; (when (featurep 'native-compile)
+;;   ;; Silence compiler warnings as they can be pretty disruptive
+;;   (setq native-comp-async-report-warnings-errors nil))
 
-(defvar package-native-compile)
-(defvar native-comp-always-compile)
+;; (defvar package-native-compile)
+;; (defvar native-comp-always-compile)
 
 ;; Enable ahead-of-time compilation when installing a package
 ;; (when sb/EMACS28+

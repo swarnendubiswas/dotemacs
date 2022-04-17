@@ -322,6 +322,8 @@
                      ,(file-truename no-littering-var-directory)))
     (add-to-list 'recentf-exclude exclude))
 
+  (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight")))
+
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
   ;; after idling for 30 seconds.
   (run-with-idle-timer 30 t #'recentf-save-list)
