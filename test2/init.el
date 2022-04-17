@@ -1576,12 +1576,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :custom
   (whitespace-cleanup-mode-preserve-point t))
 
-;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :straight t
-  :commands ws-butler-mode
-  :diminish
-  :hook (prog-mode-hook . ws-butler-mode))
+
 
 
 
@@ -1597,66 +1592,6 @@ Corfu does not support TUI, so we have to fallback on company."
   (number-separator-interval 3)
   (number-separator-ignore-threshold 4)
   (number-separator-decimal-char "."))
-
-(use-package highlight-escape-sequences
-  :straight t
-  :commands hes-mode
-  :hook (prog-mode-hook . hes-mode))
-
-;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
-;; an active region that spans multiple lines.
-(use-package multiple-cursors
-  :straight t
-  :bind
-  (("C-<"     . mc/mark-previous-like-this)
-   ("C->"     . mc/mark-next-like-this)
-   ("C-c C-<" . mc/mark-all-like-this)))
-
-;; Edit remote file: "/method:user@host#port:filename". Shortcut "/ssh::" will connect to default
-;; "user@host#port".
-;; Edit local file with sudo: "C-x C-f /sudo::/etc/hosts".
-;; Open a remote file with ssh + sudo: "C-x C-f /ssh:host|sudo:root:/etc/passwd".
-;; Multihop syntax: "C-x C-f /ssh:bird@bastion|ssh:you@remotehost:/path"
-;; Multihop with sudo: "C-x C-f /ssh:you@remotehost|sudo:remotehost:/path/to/file"
-;; Multihop with sudo with custom user: "C-x C-f
-;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
-
-;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/ Use bookmarks to speed up remote file
-;; access: upon visiting a location with TRAMP, save it as a bookmark with `bookmark-set' ("C-x r
-;; m"). To revisit that bookmark, use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r
-;; l"). Rename the bookmarked location in `bookmark-bmenu-mode' with `R'.
-(use-package tramp
-  :straight nil
-  :defines tramp-ssh-controlmaster-options
-  :config
-  (setq tramp-default-user user-login-name
-        ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
-        ;; files which is faster than SSH.
-        ;; tramp-default-method "ssh"
-        tramp-default-remote-shell "/usr/bin/bash"
-        remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
-        ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
-        ;; settings
-        ;; https://emacs.stackexchange.com/questions/22306/working-with-tramp-mode-on-slow-connection-emacs-does-network-trip-when-i-start
-        ;; https://puppet.com/blog/speed-up-ssh-by-reusing-connections
-        tramp-ssh-controlmaster-options ""
-        tramp-verbose 1
-        ;; Disable version control for remote files to improve performance
-        vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
-                                     vc-ignore-dir-regexp tramp-file-name-regexp))
-
-  (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-
-  ;; Disable backup
-  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
-
-  ;; Include this directory in $PATH on remote
-  (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-
-  ;; https://www.gnu.org/software/tramp/
-  (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
-  :bind ("C-S-q" . tramp-cleanup-all-buffers))
 
 ;; (declare-function sb/sshlist "private")
 
@@ -1685,44 +1620,7 @@ Corfu does not support TUI, so we have to fallback on company."
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
 
-(use-package imenu
-  :straight nil
-  :after (:any markdown-mode yaml-mode prog-mode)
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-items 1000)
-  ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
-  ;; mouse support enabled
-  (imenu-use-popup-menu nil)
-  ;; `nil' implies no sorting and will list by position in the buffer
-  (imenu-sort-function nil))
-
-(defvar tags-revert-without-query)
-
-(setq large-file-warning-threshold (* 500 1024 1024) ; MB
-      tags-add-tables nil
-      tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
-      ;; Do not ask before rereading the `TAGS' files if they have changed
-      tags-revert-without-query t)
-
-(use-package xref
-  :straight t
-  :commands xref-etags-mode
-  :bind
-  (("M-'"   . xref-find-definitions)
-   ("M-?"   . xref-find-references)
-   ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-pop-marker-stack)
-   :map xref--xref-buffer-mode-map
-   ("C-o"   . xref-show-location-at-point)
-   ("<tab>" . xref-quit-and-goto-xref)
-   ("r"     . xref-query-replace-in-results)))
-
-
-
-
-
-  ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
+;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
   :straight t
@@ -2013,100 +1911,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :straight t
   :commands logview-mode)
 
-(use-package antlr-mode
-  :straight nil
-  :mode "\\.g4\\'")
 
-(use-package bison-mode
-  :straight t
-  :mode ("\\.bison\\'"))
-
-(use-package llvm-mode
-  :straight nil
-  :load-path "extras"
-  :commands llvm-mode
-  :mode "\\.ll\\'")
-
-(use-package tablegen-mode
-  :straight nil
-  :load-path "extras"
-  :commands tablegen-mode
-  :disabled t
-  :mode "\\.td\\'")
-
-(use-package autodisass-llvm-bitcode
-  :straight t
-  :commands autodisass-llvm-bitcode
-  :mode "\\.bc\\'")
-
-;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
-;; more shortcuts.
-;; https://jblevins.org/projects/markdown-mode/
-(use-package markdown-mode
-  :straight t
-  :commands (markdown-mode gfm-mode markdown-insert-bold
-                           markdown-insert-italic
-                           markdown-insert-blockquote
-                           markdown-insert-pre
-                           markdown-insert-code markdown-move-up
-                           markdown-insert-link
-                           markdown-insert-wiki-link
-                           markdown-demote
-                           markdown-move-down
-                           markdown-insert-header-dwim
-                           markdown-insert-reference-link-dwim
-                           markdown-insert-header-atx-1
-                           markdown-insert-header-atx-2
-                           markdown-insert-header-atx-3
-                           markdown-insert-header-atx-4
-                           markdown-promote
-                           markdown-insert-list-item
-                           markdown-insert-uri
-                           markdown-insert-footnote)
-  :mode
-  ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'"       . markdown-mode)
-   ("\\.markdown\\'" . markdown-mode)
-   ("README\\.md\\'" . gfm-mode))
-  ;; :init
-  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
-  ;; (setq-default markdown-hide-markup t)
-  :custom
-  (markdown-command
-   "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
-  (markdown-enable-math t "Syntax highlight for LaTeX fragments")
-  (markdown-enable-wiki-links t)
-  (markdown-fontify-code-blocks-natively t)
-  (markdown-indent-on-enter 'indent-and-new-item)
-  (markdown-list-indent-width 2)
-  (markdown-split-window-direction 'horizontal)
-  ;; (markdown-make-gfm-checkboxes-buttons nil)
-  (markdown-hide-urls t)
-  :bind
-  (:map markdown-mode-map
-        ("C-c C-j" . nil)))
-
-;; Generate TOC with `markdown-toc-generate-toc'
-(use-package markdown-toc
-  :straight t
-  :after markdown-mode
-  :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
-                                      markdown-toc-generate-or-refresh-toc))
-
-;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
-;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
-(use-package pandoc-mode
-  :straight t
-  :commands (pandoc-load-default-settings pandoc-mode)
-  :diminish
-  :hook (markdown-mode-hook . pandoc-mode)
-  :config (pandoc-load-default-settings))
-
-;; Open preview of markdown file in a browser
-(use-package markdown-preview-mode
-  :straight t
-  :disabled t
-  :commands markdown-preview-mode)
 
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
@@ -2125,35 +1930,14 @@ Corfu does not support TUI, so we have to fallback on company."
          (prettier-mode 1))))
   :config (setq prettier-lighter nil))
 
-;; Align fields with "C-c C-a"
-(use-package csv-mode
-  :straight t
-  :defines lsp-disabled-clients
-  :commands csv-mode
-  :hook
-  (csv-mode . (lambda ()
-                (make-local-variable 'lsp-disabled-clients)
-                (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                (spell-fu-mode -1)
-                (flyspell-mode -1)))
-  :custom
-  (csv-separators '("," ";" "|" " ")))
+
 
 (use-package highlight-doxygen
   :straight t
   :commands highlight-doxygen-global-mode
   :init (highlight-doxygen-global-mode))
 
-(use-package make-mode
-  :straight nil
-  :mode
-  (("\\Makefile\\'"       . makefile-mode)
-   ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-   ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :config
-  (add-hook 'makefile-mode-hook (lambda()
-                                  (setq-local indent-tabs-mode t)))
-  (use-package makefile-executor))
+
 
 (use-package eldoc
   :straight nil
@@ -2169,21 +1953,7 @@ Corfu does not support TUI, so we have to fallback on company."
   ;; (setq eldoc-echo-area-use-multiline-p nil)
   )
 
-(use-package css-mode
-  :straight t
-  :commands css-mode
-  :defines sb/flycheck-local-checkers
-  :hook (css-mode-hook . lsp-deferred)
-  :custom
-  (css-indent-offset 2)
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("css-languageserver" "--stdio"))
-    :major-modes '(css-mode)
-    :remote? t
-    :server-id 'cssls-r)))
+
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
@@ -2195,63 +1965,6 @@ Corfu does not support TUI, so we have to fallback on company."
   (eldoc-box-fringe-use-same-bg nil)
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
-(use-package ini-mode
-  :straight nil
-  :commands ini-mode)
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
-
-(add-hook 'prog-mode-hook
-          (lambda ()
-            ;; Highlight and allow to open http links in strings and comments in programming
-            ;; buffers.
-            (goto-address-prog-mode 1)
-            ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-            (when (display-graphic-p)
-              (display-fill-column-indicator-mode 1))))
-
-(use-package elisp-mode
-  :straight nil
-  :mode
-  (("\\.el\\'"  . emacs-lisp-mode)
-   ("\\.elc\\'" . elisp-byte-code-mode))
-  :hook
-  ((lisp-mode emacs-lisp-mode) .
-   (lambda ()
-     (when buffer-file-name
-       (add-hook 'after-save-hook #'check-parens nil t)
-       (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
-
-(use-package yaml-mode
-  :straight t
-  :defines lsp-ltex-enabled lsp-disabled-clients
-  :commands yaml-mode
-  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
-  :hook
-  (yaml-mode-hook .
-                  (lambda ()
-                    ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
-                    ;; checking.
-                    (make-local-variable 'lsp-disabled-clients)
-                    (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                    (spell-fu-mode -1)
-                    (flyspell-mode -1)
-                    (lsp-deferred)))
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("yaml-language-server" "--stdio"))
-    :major-modes '(yaml-mode)
-    :remote? t
-    :server-id 'yamlls-r)))
-
-(use-package yaml-imenu
-  :straight t
-  :after yaml-mode
-  :demand t
-  :config (yaml-imenu-enable))
 
 (declare-function ht-merge "ht")
 

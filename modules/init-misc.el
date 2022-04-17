@@ -140,4 +140,13 @@
 ;;   ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
 ;;   :hook (after-init-hook . global-page-break-lines-mode))
 
+;; ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
+;; ;; an active region that spans multiple lines.
+;; (use-package multiple-cursors
+;;   :straight t
+;;   :bind
+;;   (("C-<"     . mc/mark-previous-like-this)
+;;    ("C->"     . mc/mark-next-like-this)
+;;    ("C-c C-<" . mc/mark-all-like-this)))
+
 (provide 'init-misc)
