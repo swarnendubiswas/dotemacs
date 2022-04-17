@@ -1,3 +1,10 @@
+;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
+;; also get run for all modes derived from a basic mode such as `text-mode'.
+
+;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
+;; wrapped around automatically.
+;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+
 (use-package flycheck
   :straight t
   :commands (flycheck-add-next-checker flycheck-next-checker
@@ -202,5 +209,198 @@
   :bind
   (:map flycheck-command-map
         ("!" . consult-flycheck)))
+
+;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
+;; background process but does not support Tramp and supports fewer formatters.
+(use-package format-all
+  :straight t
+  :commands (format-all-ensure-formatter format-all-buffer)
+  :diminish
+  :preface
+  (defun sb/enable-format-all ()
+    "Delay enabling format-all to avoid slowing down Emacs startup."
+    (dolist (hook '(bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook))
+      (add-hook hook #'format-all-mode))
+    (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
+  ;; :init (run-with-idle-timer 2 nil #'sb/enable-format-all)
+  :diminish
+  :hook
+  ((format-all-mode-hook . format-all-ensure-formatter)
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode)))
+
+(use-package editorconfig
+  :straight t
+  :if (executable-find "editorconfig")
+  :commands editorconfig-mode)
+
+;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
+;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
+;; account. We only need this package for checking text in "*scratch*" buffer.
+(use-package flycheck-grammarly
+  :straight t
+  :after flycheck
+  :defines flycheck-grammarly-check-time
+  :demand t
+  :config
+  (setq flycheck-grammarly-check-time 3
+        ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+        flycheck-checkers (delete 'grammarly flycheck-checkers))
+
+  (add-to-list 'flycheck-checkers 'grammarly t))
+
+;; https://languagetool.org/download/LanguageTool-stable.zip
+(use-package flycheck-languagetool
+  :straight t
+  :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
+  :hook (text-mode-hook . flycheck-languagetool-setup)
+  :init
+  (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
+                                          "languagetool-server.jar")
+        flycheck-checkers (delete 'languagetool flycheck-checkers)
+        flycheck-languagetool-check-time 3)
+
+  (add-to-list 'flycheck-checkers 'languagetool t))
+
+;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
+;; support. We only need to enable `flycheck-grammarly' support for the "*scratch*" buffer which is
+;; in `text-mode'.
+
+;; org -> grammarly -> languagetool
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (flycheck-select-checker 'org-lint)
+;;             (when (featurep 'flycheck-grammarly)
+;;               (flycheck-add-next-checker 'org-lint 'grammarly))
+;;             (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
+
+;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
+(add-hook 'text-mode-hook
+          (lambda ()
+            (when (and (featurep 'flycheck-grammarly) (string= (buffer-name) "*scratch*"))
+              (flycheck-select-checker 'grammarly))
+            ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+            ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
+            ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+            ;;   (flycheck-select-checker 'languagetool))
+            ))
+
+;; `markdown-mode' is derived from `text-mode'
+;; markdown-markdownlint-cli -> grammarly -> languagetool
+;; (add-hook 'markdown-mode-hook
+;;           (lambda()
+;;             (flycheck-select-checker 'markdown-markdownlint-cli)
+;;             (when (featurep 'flycheck-grammarly)
+;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
+;;               ;; (setq flycheck-error-list-minimum-level 'warning
+;;               ;;       flycheck-navigation-minimum-level 'warning)
+;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
+;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
+;;             ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))
+;;             ))
+
+;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+;;   (add-hook hook (lambda ()
+;;                    (flycheck-select-checker 'tex-chktex)
+;;                    (when (featurep 'flycheck-grammarly)
+;;                      (flycheck-add-next-checker 'tex-chktex 'grammarly))
+;;                    (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
+;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
+
+;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
+;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
+;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
+;; keytar-install".
+(use-package lsp-grammarly
+  :straight t
+  :straight keytar
+  :disabled t
+  :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
+  :commands (lsp-grammarly--server-command lsp-grammarly--init
+                                           lsp-grammarly--get-credentials lsp-grammarly--get-token
+                                           lsp-grammarly--store-token lsp-grammarly--show-error
+                                           lsp-grammarly--update-document-state)
+  :hook
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
+   (lambda ()
+     (require 'lsp-grammarly)
+     (lsp-deferred)))
+  :config
+  ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
+  ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
+  ;;       lsp-grammarly-user-words '(
+  ;;                                  ))
+
+  (defvar lsp-grammarly-active-modes)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+    :priority -1
+    :remote? t
+    :add-on? t
+    :server-id 'grammarly-r
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'grammarly-ls callback error-callback))
+    :after-open-fn #'lsp-grammarly--init
+    :async-request-handlers
+    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+        ("$/getToken" #'lsp-grammarly--get-token)
+        ("$/storeToken" #'lsp-grammarly--store-token)
+        ("$/showError" #'lsp-grammarly--show-error)
+        ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
+
+(use-package lsp-ltex
+  :straight t
+  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
+  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
+  :hook
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
+   (lambda ()
+     (require 'lsp-ltex)
+     (lsp-deferred)))
+  :init
+  (setq lsp-ltex-check-frequency "save"
+        ;; lsp-ltex-dictionary ("microbenchmarks")
+        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
+        lsp-ltex-version "15.2.0")
+  :config
+  ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
+  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
+  (setq lsp-ltex-disabled-rules
+        #s(hash-table size 30 data
+                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
+                      ("en-US" ["WHITESPACE_RULE"])))
+
+  (defvar lsp-ltex-active-modes)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+    :priority -2
+    :add-on? t
+    :remote? t
+    :server-id 'ltex-r
+    :download-server-fn
+    (lambda (_client _callback error-callback _update?)
+      (lsp-package-ensure
+       'ltex-ls
+       (lambda ()
+         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+                                      "-C" dest)
+             (error "Error during the unzip process: tar"))))
+       error-callback)))))
+
 
 (provide 'init-checkers)

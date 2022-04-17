@@ -338,4 +338,85 @@
   :disabled t
   :config (init-open-recentf))
 
+(use-package whitespace
+  :straight nil
+  :disabled t
+  :commands (whitespace-mode global-whitespace-mode
+                             whitespace-buffer whitespace-cleanup
+                             whitespace-turn-off)
+  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
+  :hook (markdown-mode-hook . whitespace-mode)
+  :config
+  (setq show-trailing-whitespace t
+        whitespace-line-column sb/fill-column
+        whitespace-style '(face ; Visualize using faces
+                           lines-tail
+                           trailing ; Trailing whitespace
+                           ;; tab-mark ; Mark any tabs
+                           ;; empty ; Empty lines at beginning or end of buffer
+                           ;; lines ; Lines that extend beyond `whitespace-line-column'
+                           ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
+                           ;; space-before-tab space-after-tab ; Mixture of space and tab on the same line
+                           )))
+
+(use-package image-mode
+  :straight nil
+  :if (display-graphic-p)
+  :commands image-get-display-property
+  :mode "\\.svg$"
+  :preface
+  ;; http://emacs.stackexchange.com/a/7693/289
+  (defun sb/show-image-dimensions-in-mode-line ()
+    (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
+           (width (car image-dimensions))
+           (height (cdr image-dimensions)))
+      (setq mode-line-buffer-identification
+            (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
+  :custom
+  ;;  Enable converting external formats (i.e., webp) to internal ones.
+  (image-use-external-converter t)
+  :hook (image-mode-hook . sb/show-image-dimensions-in-mode-line))
+
+;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
+(progn
+  (defun sb/auto-save-wrapper (save-fn &rest args)
+    "Hide 'Auto-saving...done' messages by calling the method.
+  SAVE-FN with non-nil ARGS."
+    (ignore args)
+    (apply save-fn '(t)))
+
+  (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
+
+;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
+(dolist (mode '(tooltip-mode))
+  (when (fboundp mode)
+    (funcall mode -1)))
+
+;; Enable the following modes
+(dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
+                blink-cursor-mode
+                column-number-mode
+                delete-selection-mode ; Typing with the mark active will overwrite the marked region
+                ;; Use soft wraps, wrap lines without the ugly continuation marks
+                global-visual-line-mode
+                size-indication-mode))
+  (when (fboundp mode)
+    (funcall mode 1)))
+
+;; Use "emacsclient -c -nw" to start a new frame.
+(use-package server
+  :straight nil
+  :disabled t
+  :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
+  :commands server-running-p
+  :init
+  (unless (server-running-p)
+    (server-start)))
+
+(use-package warnings
+  :straight nil
+  :init
+  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
+  (setq warning-minimum-level :emergency))
+
 (provide 'init-core)

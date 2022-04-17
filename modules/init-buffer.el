@@ -66,4 +66,15 @@
    ("C-x C-d" . consult-dir)
    ("C-x C-j" . consult-dir-jump-file)))
 
+;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
+(use-package fasd
+  :straight t
+  :defines fasd-enable-initial-prompt
+  :commands (global-fasd-mode fasd-find-file)
+  :if (executable-find "fasd")
+  ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
+  :hook (after-init-hook . global-fasd-mode)
+  :config (setq fasd-enable-initial-prompt nil)
+  :bind* ("C-c /" . fasd-find-file))
+
 (provide 'init-buffer)

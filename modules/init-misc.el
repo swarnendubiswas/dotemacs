@@ -200,4 +200,271 @@
 ;;   :straight t
 ;;   :commands (define-word define-word-at-point))
 
+(use-package number-separator
+  :straight nil
+  :load-path "extras"
+  :commands number-separator-mode
+  :disabled t
+  :diminish
+  :custom
+  (number-separator ",")
+  (number-separator-interval 3)
+  (number-separator-ignore-threshold 4)
+  (number-separator-decimal-char "."))
+
+(use-package eldoc
+  :straight nil
+  :if (symbol-value 'sb/IS-LINUX)
+  :commands turn-on-eldoc-mode
+  :diminish
+  :hook (prog-mode-hook . turn-on-eldoc-mode)
+  ;; :config
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
+  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
+  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
+  ;; useful information.
+  ;; (setq eldoc-echo-area-use-multiline-p nil)
+  )
+
+
+
+;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
+(use-package eldoc-box
+  :straight t
+  :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+  :hook (eldoc-mode-hook . eldoc-box-hover-mode)
+  :custom
+  (eldoc-box-clear-with-C-g t)
+  (eldoc-box-fringe-use-same-bg nil)
+  :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+
+(use-package esup
+  :straight t
+  :commands esup
+  :if (bound-and-true-p sb/debug-init-file))
+
+(use-package bug-hunter
+  :straight t
+  :disabled t
+  :if (bound-and-true-p sb/debug-init-file)
+  :commands (bug-hunter-init-file bug-hunter-file))
+
+(use-package explain-pause-mode
+  :straight nil
+  :if (bound-and-true-p sb/debug-init-file)
+  :load-path "extras"
+  :disabled t
+  :commands (explain-pause-mode explain-pause-top)
+  :diminish)
+
+(use-package ace-window
+  :straight t
+  :bind ([remap other-window] . ace-window))
+
+(use-package windmove ; "Shift + direction" arrows
+  :straight nil
+  :commands windmove-default-keybindings
+  :init (windmove-default-keybindings)
+  :config
+  ;; Wrap around at edges
+  (setq windmove-wrap-around t))
+
+;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
+;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
+;; given that we have `auto-save-visited-mode' enabled.
+(use-package super-save
+  :straight t
+  :defines (super-save-remote-files super-save-triggers)
+  :commands super-save-mode
+  :disabled t
+  :diminish
+  ;; :init (run-with-idle-timer 3 nil #'super-save-mode)
+  :hook (after-init-hook . super-save-mode)
+  :config
+  (setq super-save-remote-files nil) ; Ignore remote files, can cause Emacs to hang
+  (add-to-list 'super-save-triggers 'ace-window))
+
+;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
+;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
+(use-package amx
+  :straight t
+  :commands amx-mode
+  :hook (after-init-hook . amx-mode)
+  :bind
+  ;; We need this if we use `vertico' and `consult'
+  (("M-x"  . execute-extended-command)
+   ("<f1>" . execute-extended-command-for-buffer))
+  :custom
+  (amx-auto-update-interval 10 "Update the command list every n minutes"))
+
+;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
+;; https://github.com/dakrone/eos/blob/master/eos-core.org
+(use-package popwin
+  :straight t
+  :commands popwin-mode
+  :hook (after-init-hook . popwin-mode)
+  :config
+  (defvar popwin:special-display-config-backup popwin:special-display-config)
+
+  (push '("*Help*"              :noselect t)   popwin:special-display-config)
+  (push '(compilation-mode      :noselect t)   popwin:special-display-config)
+  (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
+  (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
+  (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
+  (push '("*Selection Ring:")                  popwin:special-display-config)
+  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+  (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
+  (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
+  (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
+  (push '("*xref*"              :noselect nil) popwin:special-display-config)
+  (push '(helpful-mode          :noselect t)   popwin:special-display-config)
+  (push "*Shell Command Output*"               popwin:special-display-config)
+  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+  (add-to-list 'popwin:special-display-config '("*Apropos*"))
+  (add-to-list 'popwin:special-display-config '("*Warnings*"))
+  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+  (add-to-list 'popwin:special-display-config '("*lsp session*")))
+
+;; Learn about display actions, see [[info:elisp#Display Action Functions]]
+;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
+(add-to-list 'display-buffer-alist '("*Faces*"                  display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck checkers*"      display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Flycheck errors*"        display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Help*"                   display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*deadgrep*"            display-buffer-same-window))
+;; Open shell in same window.
+(add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
+(add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
+
+;; ;; Do not popup the *Async Shell Command* buffer
+;; (add-to-list 'display-buffer-alist
+;;              (cons "\\*Async Shell Command\\*.*"
+;;                    (cons #'display-buffer-no-window nil)))
+
+
+;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
+;; select one of the currently visible `isearch' candidates using `avy'.
+(use-package avy
+  :straight t
+  :commands avy-setup-default
+  :bind
+  (("M-b"   . avy-goto-word-1)
+   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
+   ("M-g c" . avy-goto-char-timer) ; TODO: Reuse the keybinding
+   ("C-/"   . avy-goto-line) ; Does not work with TUI, but works with Alacritty
+   ;; TODO: Reuse the keybinding
+   ("M-g l" . avy-goto-line)))
+
+(use-package ace-jump-buffer
+  :straight t
+  :bind ("C-b" . ace-jump-buffer)
+  :config
+  (setq ajb-max-window-height 30
+        ajb-sort-function 'bs--sort-by-name))
+
+;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
+(use-package ivy-avy
+  :straight t
+  :after ivy
+  :bind
+  (:map ivy-minibuffer-map
+        ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
+        ;; TODO: Reuse the keybinding
+        ("M-g l" . ivy-avy)))
+
+(use-package bookmark
+  :straight nil)
+
+(use-package bm
+  :straight t
+  :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
+                                bm-repository-load bm-buffer-save bm-buffer-restore)
+  :preface
+  (defun sb/bm-setup ()
+    "Wrapper function to help call with a timer."
+    ;; `kill-buffer-hook' is not called when Emacs is killed
+    (add-hook 'kill-emacs-hook (lambda ()
+                                 (bm-buffer-save-all)
+                                 (bm-repository-save)))
+    (add-hook 'after-save-hook        #'bm-buffer-save)
+    (add-hook 'kill-buffer-hook       #'bm-buffer-save)
+    (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+    (add-hook 'after-revert-hook      #'bm-buffer-restore)
+    (add-hook 'find-file-hook         #'bm-buffer-restore)
+    (add-hook 'after-init-hook        #'bm-repository-load))
+  :init
+  ;; Must be set before `bm' is loaded
+  (setq bm-restore-repository-on-load t)
+  ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
+  ;; usability
+  ;; (run-with-idle-timer 2 nil #'sb/bm-setup)
+  :hook (after-init-hook . sb/bm-setup)
+  :config (setq-default bm-buffer-persistence t)
+  :bind
+  (("C-<f1>" . bm-toggle)
+   ("C-<f2>" . bm-next)
+   ("C-<f3>" . bm-previous)))
+
+
+
+(use-package crux
+  :straight t
+  :bind
+  (("C-c d i" . crux-ispell-word-then-abbrev)
+   ("<f12>"   . crux-kill-other-buffers)
+   ("C-c d s" . crux-sudo-edit)
+   ("C-a"     . crux-move-beginning-of-line)))
+
+;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+(setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
+
+;; `vterm' provides better performance than `eshell', `shell', and `(ansi-)term'. The advantage of
+;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
+;; Check https://github.com/akermu/emacs-libvterm.
+(use-package vterm
+  :straight t
+  :config
+  (setq vterm-always-compile-module t
+        vterm-max-scrollback 5000
+        vterm-term-environment-variable "xterm-24bit")
+
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+              (buffer-face-mode t))))
+
+(use-package vterm-toggle
+  :straight t
+  :commands vterm-toggle
+  :bind ("C-`" . vterm-toggle))
+
+;; This is different from `whitespace-cleanup-mode' since this is unconditional
+(when (bound-and-true-p sb/delete-trailing-whitespace-p)
+  (setq delete-trailing-lines t) ; "M-x delete-trailing-whitespace" deletes trailing lines
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
+
+;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
+;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
+;; to `t' in the `.dir-locals.el' file.
+(use-package whitespace-cleanup-mode
+  :straight t
+  :disabled t
+  :diminish
+  :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
+  :config
+  (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+  :custom
+  (whitespace-cleanup-mode-preserve-point t))
+
 (provide 'init-misc)

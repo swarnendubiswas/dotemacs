@@ -564,5 +564,20 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
+;; This package disables the mouse completely which is an extreme.
+(use-package disable-mouse
+  :straight t
+  :if (display-mouse-p)
+  :commands global-disable-mouse-mode
+  :diminish disable-mouse-global-mode
+  :hook (after-init-hook . global-disable-mouse-mode))
+
+;; Move the cursor from the line of view
+(use-package avoid
+  :straight nil
+  :commands mouse-avoidance-mode
+  :if (display-mouse-p)
+  :init (mouse-avoidance-mode 'banish))
+
 (provide 'init-ui)
 ;;; core-config.el ends here
