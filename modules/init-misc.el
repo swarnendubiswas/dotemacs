@@ -24,6 +24,7 @@
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
   :straight t
+  :if sb/EMACS27
   :commands (hungry-delete-mode global-hungry-delete-mode)
   :diminish
   :hook
@@ -66,12 +67,14 @@
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :straight t
+  :if sb/EMACS27
   ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
   :hook (after-init-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
   :straight t
+  :if sb/EMACS27
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
   :diminish (whole-line-or-region-local-mode)
   ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
@@ -85,6 +88,7 @@
 ;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
   :straight t
+  :if sb/EMACS27
   ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
   :hook (after-init-hook . beginend-global-mode)
   :config
@@ -122,6 +126,7 @@
 
 (use-package hl-todo
   :straight t
+  :if sb/EMACS27
   :commands global-hl-todo-mode
   ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
   :hook (after-init-hook . global-hl-todo-mode)
@@ -144,6 +149,7 @@
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :straight t
+  :if sb/EMACS27
   :diminish
   :commands (global-page-break-lines-mode page-break-lines-mode)
   ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
@@ -295,6 +301,7 @@
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
   :straight t
+  :if sb/EMACS27
   :commands amx-mode
   :hook (after-init-hook . amx-mode)
   :bind

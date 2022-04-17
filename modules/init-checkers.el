@@ -60,7 +60,7 @@
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))
 
-  (when (eq sb/modeline-theme 'doom-modeline)
+  (when (or (eq sb/modeline-theme 'doom-modeline) (eq sb/modeline-theme 'spaceline))
     (setq flycheck-mode-line nil))
 
   (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"

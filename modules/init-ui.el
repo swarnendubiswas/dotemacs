@@ -516,6 +516,7 @@
 
 (use-package centaur-tabs
   :straight t
+  :if sb/EMACS27
   :commands centaur-tabs-group-by-projectile-project
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :init

@@ -31,7 +31,7 @@
 
 (use-package all-the-icons-ibuffer
   :straight t
-  :if (display-graphic-p)
+  :if (and (display-graphic-p) sb/EMACS27)
   :commands all-the-icons-ibuffer-mode
   :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
   :config (setq all-the-icons-ibuffer-icon-size 0.8))
