@@ -17,8 +17,8 @@
 ;; bootstrap `straight.el'
 (defvar bootstrap-version)
 (setq
-straight-check-for-modifications nil
-      straight-vc-git-default-clone-depth '(1 single-branch)
+;; straight-check-for-modifications nil
+      ;; straight-vc-git-default-clone-depth '(1 single-branch)
       straight-build-dir (format "build/%d%s%d"
                                  emacs-major-version
                                  version-separator

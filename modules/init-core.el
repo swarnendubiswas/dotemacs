@@ -419,4 +419,17 @@
   ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
   (setq warning-minimum-level :emergency))
 
+(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
+  "Hide messages appearing in ORIG-FUN, forward ARGS."
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
+
+;; Hide the "Wrote to recentf" message
+(advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
+;; Hide the "Cleaning up the recentf list...done" message
+(advice-add 'recentf-cleanup   :around #'sb/inhibit-message-call-orig-fun)
+
+;; Hide the "Wrote ..." message
+(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+
 (provide 'init-core)

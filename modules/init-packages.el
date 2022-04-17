@@ -38,6 +38,48 @@
         use-package-compute-statistics nil
         use-package-verbose            nil))
 
+(setq use-package-enable-imenu-support t
+      ;; Avoid manual installations whenever I modify package installations
+      use-package-always-ensure        nil
+      use-package-hook-name-suffix     nil)
+
+;; ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
+;; ;; is `paradox-upgrade-packages' as a single command.
+;; (use-package package
+;;   :if sb/EMACS27+
+;;   :bind
+;;   (("C-c d p" . package-quickstart-refresh)
+;;    ("C-c d l" . package-list-packages)))
+
+
+
+;; These are alternative ways.
+
+;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
+;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
+
+(use-package f
+  :straight t
+  :commands (f-exists? f-join f-dirname))
+
+(use-package s
+  :straight t
+  :commands s-starts-with? s-ends-with?)
+
+(use-package dash
+  :straight t
+  :commands (-contains? -tree-map))
+
+(use-package no-littering
+  :straight t
+  :demand t)
+
+;; ;; Asynchronously byte compile packages installed with `package.el'
+;; (use-package async
+;;   :straight t
+;;   :functions async-bytecomp-package-mode
+;;   :commands async-bytecomp-package-mode
+;;   :init (async-bytecomp-package-mode 1))
 
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
