@@ -1,4 +1,7 @@
 ;; Bootstrap `straight.el'
+
+(setf straight-profiles `((nil . "straight.lockfile.el")))
+
 (defvar bootstrap-version)
 (setq straight-build-dir (format "build/%d%s%d"
                                  emacs-major-version
@@ -18,7 +21,8 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+(setq straight-use-package-by-default t
+      straight-disable-native-compile nil)
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
@@ -51,9 +55,9 @@
 ;;         use-package-compute-statistics nil
 ;;         use-package-verbose            nil))
 
-;; (setq use-package-enable-imenu-support t
-;;       ;; Avoid manual installations whenever I modify package installations
-;;       use-package-hook-name-suffix     nil)
+(setq use-package-enable-imenu-support t
+      ;; Avoid manual installations whenever I modify package installations
+      use-package-hook-name-suffix     nil)
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
   :straight t
@@ -88,7 +92,7 @@
   :straight t
   :demand t)
 
-  (defcustom sb/custom-file
+(defcustom sb/custom-file
   (no-littering-expand-etc-file-name "custom.el")
   "File to write Emacs customizations."
   :type  'string

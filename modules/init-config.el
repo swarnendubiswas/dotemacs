@@ -10,7 +10,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'none
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)

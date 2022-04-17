@@ -535,12 +535,10 @@
         ([backtab] . corfu-previous)
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
-;; (use-package corfu-doc
-;;   :straight t
-;;   :if (and (display-graphic-p) (eq sb/capf 'corfu))
-;;   :hook (corfu-mode-hook . corfu-doc-mode))
-
-
+(use-package corfu-doc
+  :straight t
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :hook (corfu-mode-hook . corfu-doc-mode))
 
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape

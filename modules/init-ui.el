@@ -7,11 +7,11 @@
 
 ;;; Code:
 
-  (defun sb/font-installed-p (font-name)
-    "Check if font with FONT-NAME is available."
-    (if (find-font (font-spec :name font-name))
-        t
-      nil))
+(defun sb/font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (if (find-font (font-spec :name font-name))
+      t
+    nil))
 
 ;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
 (defun sb/font-available-p (font-name)
@@ -63,11 +63,7 @@
      ((eq sb/tui-theme 'doom-one-light) (load-theme 'doom-one-light t))
      ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
      ((eq sb/tui-theme 'doom-nord)      (load-theme 'doom-nord t))
-     ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t))))
-  :config
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification
-  (doom-themes-org-config))
+     ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t)))))
 
 (use-package monokai-theme
   :straight t
@@ -539,7 +535,7 @@
         centaur-tabs-enable-ido-completion nil)
   :config
   (centaur-tabs-group-by-projectile-project)
-  :bind
+  :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
    ("M-<left>" . centaur-tabs-backward-tab)))
 
@@ -547,7 +543,7 @@
 ;; which is better.
 (use-package all-the-icons-completion
   :straight t
-:straight all-the-icons
+  :straight all-the-icons
   :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)

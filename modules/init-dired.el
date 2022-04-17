@@ -266,9 +266,9 @@
   :demand t
   :config (treemacs-load-theme "all-the-icons"))
 
-;; (use-package dired-async
-;;   :straight async
-;;   :diminish
-;;   :hook (dired-mode-hook . dired-async-mode))
+(use-package dired-async
+  :straight async
+  :diminish
+  :hook (dired-mode-hook . dired-async-mode))
 
 (provide 'init-dired)

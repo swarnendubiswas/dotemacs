@@ -175,23 +175,23 @@
   :config
   (flycheck-posframe-configure-pretty-defaults))
 
-;; ;; https://languagetool.org/download/LanguageTool-stable.zip
-;; (use-package langtool
-;;   :straight t
-;;   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
-;;   :commands (langtool-check
-;;              langtool-check-done
-;;              langtool-show-message-at-point
-;;              langtool-correct-buffer)
-;;   :init (setq langtool-default-language "en-US")
-;;   :config
-;;   (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-;;         languagetool-console-command (no-littering-expand-etc-file-name
-;;                                       "languagetool-commandline.jar")
-;;         languagetool-server-command (no-littering-expand-etc-file-name
-;;                                      "languagetool-server.jar")
-;;         langtool-language-tool-jar (no-littering-expand-etc-file-name
-;;                                     "languagetool-commandline.jar")))
+;; https://languagetool.org/download/LanguageTool-stable.zip
+(use-package langtool
+  :straight t
+  :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
+  :commands (langtool-check
+             langtool-check-done
+             langtool-show-message-at-point
+             langtool-correct-buffer)
+  :init (setq langtool-default-language "en-US")
+  :config
+  (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        languagetool-console-command (no-littering-expand-etc-file-name
+                                      "languagetool-commandline.jar")
+        languagetool-server-command (no-littering-expand-etc-file-name
+                                     "languagetool-server.jar")
+        langtool-language-tool-jar (no-littering-expand-etc-file-name
+                                    "languagetool-commandline.jar")))
 
 ;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood. I
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
@@ -251,6 +251,7 @@
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
   :straight t
+  :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :hook (text-mode-hook . flycheck-languagetool-setup)
   :init
