@@ -284,4 +284,58 @@
   ;; `nil' implies no sorting and will list by position in the buffer
   (imenu-sort-function nil))
 
+(use-package recentf
+  :commands (recentf-mode recentf-add-file recentf-save-file
+                          recentf-save-list
+                          recentf-apply-filename-handlers
+                          recentf-cleanup)
+  :config
+  (setq recentf-auto-cleanup 'never ; Do not stat remote files
+        ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
+        recentf-exclude '("[/\\]elpa/"
+                          "[/\\]\\.git/"
+                          ".*\\.gz\\'"
+                          ".*\\.xz\\'"
+                          ".*\\.zip\\'"
+                          ".*-autoloads.el\\'"
+                          "[/\\]archive-contents\\'"
+                          "[/\\]\\.loaddefs\\.el\\'"
+                          "[/\\]tmp/.*"
+                          ".*/recentf\\'"
+                          ".*/recentf-save.el\\'"
+                          "~$"
+                          "/.autosaves/"
+                          ".*/TAGS\\'"
+                          "*.cache"
+                          ".*/treemacs/persist.org")
+        ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+        ;; Keep remote file without testing if they still exist
+        recentf-keep '(file-remote-p file-readable-p)
+        ;; Larger values help in lookup but takes more time to check if the files exist
+        recentf-max-saved-items 100
+        ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
+        ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
+        recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
+
+  ;; Use the true file name and not the symlink name
+  (dolist (exclude `(,(file-truename no-littering-etc-directory)
+                     ,(file-truename no-littering-var-directory)))
+    (add-to-list 'recentf-exclude exclude))
+
+  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
+  ;; after idling for 30 seconds.
+  (run-with-idle-timer 30 t #'recentf-save-list)
+
+  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
+  ;; timers.
+  (run-with-idle-timer 60 t #'recentf-cleanup)
+  :hook (after-init-hook . recentf-mode))
+
+(use-package init-open-recentf
+  :after recentf
+  :straight t
+  :demand t
+  :disabled t
+  :config (init-open-recentf))
+
 (provide 'init-core)

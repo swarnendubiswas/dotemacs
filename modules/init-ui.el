@@ -525,5 +525,44 @@
    ;; "(foo bar)" -> "foo bar"
    ("C-M-k" . sp-splice-sexp)))
 
+(use-package centaur-tabs
+  :straight t
+  :commands centaur-tabs-group-by-projectile-project
+  :hook (emacs-startup-hook . centaur-tabs-mode)
+  :init
+  (setq centaur-tabs-set-icons nil ; The icons often do not blend well with the theme
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-modified-marker "*"
+        centaur-tabs-cycle-scope 'tabs
+        centaur-tabs-set-close-button nil
+        centaur-tabs-show-new-tab-button nil
+        centaur-tabs-enable-ido-completion nil)
+  :config
+  (centaur-tabs-group-by-projectile-project)
+  :bind
+  (("M-<right>" . centaur-tabs-forward-tab)
+   ("M-<left>" . centaur-tabs-backward-tab)))
+
+;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
+;; which is better.
+(use-package all-the-icons-completion
+  :straight t
+:straight all-the-icons
+  :disabled t
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
+  :init (all-the-icons-completion-mode))
+
+(use-package kind-icon
+  :straight t
+  :after corfu
+  :demand t
+  :commands kind-icon-margin-formatter
+  :custom
+  (kind-icon-face 'corfu-default)
+  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 (provide 'init-ui)
 ;;; core-config.el ends here

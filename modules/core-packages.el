@@ -17,9 +17,8 @@
 ;; bootstrap `straight.el'
 (defvar bootstrap-version)
 (setq
-straight-check-for-modifications '(find-when-checking)
-      straight-host-usernames '((github . "tshu-w"))
-      straight-vc-git-default-clone-depth 1
+straight-check-for-modifications nil
+      straight-vc-git-default-clone-depth '(1 single-branch)
       straight-build-dir (format "build/%d%s%d"
                                  emacs-major-version
                                  version-separator

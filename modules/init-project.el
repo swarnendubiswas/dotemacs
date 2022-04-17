@@ -205,7 +205,8 @@
    ))
 
 (use-package consult-projectile
-  :straight t
+  :straight (consult-projectile :type git :host gitlab :repo
+                                  "OlMon/consult-projectile" :branch "master")
 :if (eq sb/minibuffer-completion 'vertico)
   :commands consult-projectile-recentf
   :bind
