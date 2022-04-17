@@ -102,7 +102,7 @@
   :demand t)
 
 (defcustom sb/custom-file
-  (no-littering-expand-etc-file-name "custom.el")
+  (no-littering-expand-var-file-name "custom.el")
   "File to write Emacs customizations."
   :type  'string
   :group 'sb/emacs)
@@ -131,11 +131,12 @@
 (use-package diminish
   :straight t)
 
-;; Get PATH with "(getenv "PATH")". Set PATH with
-;; "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
-;; These are alternative ways.
-;; (setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))
-;; (add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))
+;; Get PATH with "(getenv "PATH")".
+;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
+
+;; These are alternative ways to manipulate the `exec-path'.
+;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))"
+;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))"
 (use-package exec-path-from-shell
   :straight t
   :defines exec-path-from-shell-check-startup-files

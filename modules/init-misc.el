@@ -1,3 +1,12 @@
+;;; init-misc.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
@@ -82,7 +91,7 @@
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
 
-    (use-package undo-tree
+(use-package undo-tree
   :straight t
   :defines undo-tree-map
   :commands (global-undo-tree-mode undo-tree-redo)
@@ -226,8 +235,6 @@
   ;; (setq eldoc-echo-area-use-multiline-p nil)
   )
 
-
-
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
   :straight t
@@ -297,62 +304,6 @@
   :custom
   (amx-auto-update-interval 10 "Update the command list every n minutes"))
 
-;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
-;; https://github.com/dakrone/eos/blob/master/eos-core.org
-(use-package popwin
-  :straight t
-  :commands popwin-mode
-  :hook (after-init-hook . popwin-mode)
-  :config
-  (defvar popwin:special-display-config-backup popwin:special-display-config)
-
-  (push '("*Help*"              :noselect t)   popwin:special-display-config)
-  (push '(compilation-mode      :noselect t)   popwin:special-display-config)
-  (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
-  (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
-  (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
-  (push '("*Selection Ring:")                  popwin:special-display-config)
-  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
-  (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
-  (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
-  (push '("*xref*"              :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode          :noselect t)   popwin:special-display-config)
-  (push "*Shell Command Output*"               popwin:special-display-config)
-  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-  (add-to-list 'popwin:special-display-config '("*lsp session*")))
-
-;; Learn about display actions, see [[info:elisp#Display Action Functions]]
-;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-(add-to-list 'display-buffer-alist '("*Faces*"                  display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck checkers*"      display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck errors*"        display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Help*"                   display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*deadgrep*"            display-buffer-same-window))
-;; Open shell in same window.
-(add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
-
-;; ;; Do not popup the *Async Shell Command* buffer
-;; (add-to-list 'display-buffer-alist
-;;              (cons "\\*Async Shell Command\\*.*"
-;;                    (cons #'display-buffer-no-window nil)))
-
-
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
@@ -415,8 +366,6 @@
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)
    ("C-<f3>" . bm-previous)))
-
-
 
 (use-package crux
   :straight t
@@ -504,5 +453,6 @@
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
 
-
 (provide 'init-misc)
+
+;;; init-misc.el ends here

@@ -1,3 +1,12 @@
+;;; init-functions.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -194,3 +203,5 @@ or the major mode is not in `sb/skippable-modes'."
     (linum-mode -1)))
 
 (provide 'init-functions)
+
+;;; init-functions.el ends here

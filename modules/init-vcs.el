@@ -1,10 +1,21 @@
+;;; init-vcs.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
+(setq vc-follow-symlinks t ; No need to ask
+      ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
+      ;; information on the modeline
+      vc-handled-backends '(Git))
+
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-(use-package vc
-  :straight nil
-  :init
-  (if (boundp 'vc-handled-backends)
-      (add-hook 'find-file-hook #'vc-refresh-state)
-    (remove-hook 'find-file-hook #'vc-refresh-state)))
+(if (boundp 'vc-handled-backends)
+    (add-hook 'find-file-hook #'vc-refresh-state)
+  (remove-hook 'find-file-hook #'vc-refresh-state))
 
 (use-package magit
   :straight t
@@ -152,9 +163,12 @@
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 (use-package treemacs-magit
-  :straight t
   :straight magit
+  :straight treemacs
+  :straight t
   :after (treemacs magit)
   :demand t)
 
 (provide 'init-vcs)
+
+;;; init-vcs.el ends here

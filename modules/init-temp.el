@@ -1,3 +1,12 @@
+;;; init-temp.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; (defun sb/open-local-file-projectile (directory)
 ;;   "Open projectile file within DIRECTORY.
 ;; Specify by the keyword projectile-default-file define in `dir-locals-file'"
@@ -64,29 +73,25 @@
 
 ;; Mark safe variables
 
-;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
-;; (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
-;; (put 'company-clang-arguments                 'safe-local-variable #'listp)
-;; (put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
-;; (put 'flycheck-checker                        'safe-local-variable #'listp)
-;; (put 'flycheck-clang-include-path             'safe-local-variable #'listp)
-;; (put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
-;; (put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
-;; (put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
-;; (put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
-;; (put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
-;; (put 'projectile-enable-caching               'safe-local-variable #'stringp)
-;; (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
-;; (put 'projectile-project-root                 'safe-local-variable #'stringp)
-;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
-;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
-;; (put 'tags-table-list                         'safe-local-variable #'listp)
-
-
+(put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
+(put 'company-bibtex-bibliography             'safe-local-variable #'listp)
+(put 'company-clang-arguments                 'safe-local-variable #'listp)
+(put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
+(put 'flycheck-checker                        'safe-local-variable #'listp)
+(put 'flycheck-clang-include-path             'safe-local-variable #'listp)
+(put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
+(put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
+(put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
+(put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
+(put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
+(put 'projectile-enable-caching               'safe-local-variable #'stringp)
+(put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
+(put 'projectile-project-root                 'safe-local-variable #'stringp)
+(put 'pyvenv-activate                         'safe-local-variable #'stringp)
+(put 'reftex-default-bibliography             'safe-local-variable #'listp)
+(put 'tags-table-list                         'safe-local-variable #'listp)
 
 (setq custom-file sb/custom-file)
-
-
 
 (let ((gc-cons-threshold most-positive-fixnum))
   (when (file-exists-p custom-file)
@@ -94,5 +99,6 @@
   (when (file-exists-p sb/private-file)
     (load sb/private-file 'noerror 'nomessage)))
 
-
 (provide 'init-temp)
+
+;;; init-temp.el ends here

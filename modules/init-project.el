@@ -1,32 +1,41 @@
+;;; init-project.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package ffap ; Find FILENAME, guessing a default from text around point.
   :commands ffap
   :straight t)
 
-;; ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; ;; yet.
-;; (use-package project
-;;   :straight t
-;;   :commands (project-switch-project project-current
-;;                                     project-find-file project-execute-extended-command
-;;                                     project-known-project-roots
-;;                                     project-remove-known-project
-;;                                     project-remember-project
-;;                                     project-kill-buffers
-;;                                     project-switch-to-buffer
-;;                                     project-search
-;;                                     project-compile)
-;;   :bind
-;;   (:map project-prefix-map
-;;         ("f" . project-find-file)
-;;         ("F" . project-or-external-find-file)
-;;         ("b" . project-switch-to-buffer)
-;;         ("d" . project-dired)
-;;         ("v" . project-vc-dir)
-;;         ("c" . project-compile)
-;;         ("k" . project-kill-buffers)
-;;         ("p" . project-switch-project)
-;;         ("g" . project-find-regexp)
-;;         ("r" . project-query-replace-regexp)))
+;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
+;; yet.
+(use-package project
+  :straight t
+  :commands (project-switch-project project-current
+                                    project-find-file project-execute-extended-command
+                                    project-known-project-roots
+                                    project-remove-known-project
+                                    project-remember-project
+                                    project-kill-buffers
+                                    project-switch-to-buffer
+                                    project-search
+                                    project-compile)
+  :bind
+  (:map project-prefix-map
+        ("f" . project-find-file)
+        ("F" . project-or-external-find-file)
+        ("b" . project-switch-to-buffer)
+        ("d" . project-dired)
+        ("v" . project-vc-dir)
+        ("c" . project-compile)
+        ("k" . project-kill-buffers)
+        ("p" . project-switch-project)
+        ("g" . project-find-regexp)
+        ("r" . project-query-replace-regexp)))
 
 (use-package projectile
   :straight t
@@ -206,8 +215,8 @@
 
 (use-package consult-projectile
   :straight (consult-projectile :type git :host gitlab :repo
-                                  "OlMon/consult-projectile" :branch "master")
-:if (eq sb/minibuffer-completion 'vertico)
+                                "OlMon/consult-projectile" :branch "master")
+  :if (eq sb/minibuffer-completion 'vertico)
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
@@ -224,3 +233,5 @@
   :demand t)
 
 (provide 'init-project)
+
+;;; init-project.el ends here

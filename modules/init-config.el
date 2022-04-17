@@ -50,7 +50,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'awesome-tray
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -145,12 +145,17 @@ Corfu does not support TUI, so we have to fallback on company."
           (const :tag "company" company))
   :group 'dotemacs)
 
-(defconst sb/EMACS27    (= emacs-major-version 27))
-(defconst sb/EMACS27+   (> emacs-major-version 26))
-(defconst sb/EMACS28+   (> emacs-major-version 27))
+(defconst sb/EMACS27    (= emacs-major-version 27)
+  "Non-nil if Emacs version is 27.")
+(defconst sb/EMACS27+   (> emacs-major-version 26)
+  "Non-nil if Emacs version is 27 and above.")
+(defconst sb/EMACS28+   (> emacs-major-version 27)
+  "Non-nil if Emacs version is 28 and above.")
 
-(defconst sb/IS-LINUX   (eq system-type 'gnu/linux))
-(defconst sb/IS-WINDOWS (eq system-type 'windows-nt))
+(defconst sb/IS-LINUX   (eq system-type 'gnu/linux)
+  "Non-nil if the OS is GNU/Linux.")
+(defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
+  "Non-nil if the OS is Windows.")
 
 (provide 'init-config)
 

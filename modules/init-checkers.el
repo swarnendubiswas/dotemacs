@@ -1,9 +1,28 @@
+;;; init-checkers.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
 ;; also get run for all modes derived from a basic mode such as `text-mode'.
 
 ;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+
+;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood. I
+;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
+;; style.
+(use-package writegood-mode
+  :straight t
+  :disabled t
+  :commands (writegood-mode writegood-passive-voice-turn-off)
+  :diminish
+  :hook (text-mode-hook . writegood-mode))
 
 (use-package flycheck
   :straight t
@@ -193,23 +212,6 @@
         langtool-language-tool-jar (no-littering-expand-etc-file-name
                                     "languagetool-commandline.jar")))
 
-;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood. I
-;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
-;; style.
-(use-package writegood-mode
-  :straight t
-  :disabled t
-  :commands (writegood-mode writegood-passive-voice-turn-off)
-  :diminish
-  :hook (text-mode-hook . writegood-mode))
-
-(use-package consult-flycheck
-  :straight t
-  :after (consult flycheck)
-  :bind
-  (:map flycheck-command-map
-        ("!" . consult-flycheck)))
-
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
@@ -320,8 +322,8 @@
 ;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
 ;; keytar-install".
 (use-package lsp-grammarly
-  :straight t
   :straight keytar
+  :straight t
   :disabled t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands (lsp-grammarly--server-command lsp-grammarly--init
@@ -403,5 +405,13 @@
              (error "Error during the unzip process: tar"))))
        error-callback)))))
 
+(use-package consult-flycheck
+  :straight t
+  :after (consult flycheck)
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
 
 (provide 'init-checkers)
+
+;;; init-checkers.el ends here

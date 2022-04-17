@@ -1,3 +1,12 @@
+;;; init-dired.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package dired
   :straight nil
   :commands (dired-next-line dired-jump)
@@ -187,7 +196,7 @@
         treemacs-recenter-after-file-follow 'on-distance
         treemacs-recenter-after-tag-follow 'on-distance
         treemacs-silent-refresh t ; Silence all refresh messages including file watches
-        treemacs-width 20
+        treemacs-width 24
         ;; Hide the mode-line in the Treemacs buffer
         treemacs-user-mode-line-format 'none)
 
@@ -272,3 +281,5 @@
   :hook (dired-mode-hook . dired-async-mode))
 
 (provide 'init-dired)
+
+;;; init-dired.el ends here

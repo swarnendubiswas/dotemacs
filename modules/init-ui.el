@@ -1,4 +1,4 @@
-;;; init-emacs28.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-ui.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
 ;;; no-byte-compile: nil; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -7,6 +7,10 @@
 
 ;;; Code:
 
+(defvar sb/modeline-theme)
+
+;; Install fonts with "M-x all-the-icons-install-fonts"
+;; https://github.com/domtronn/all-the-icons.el/issues/120
 (defun sb/font-installed-p (font-name)
   "Check if font with FONT-NAME is available."
   (if (find-font (font-spec :name font-name))
@@ -18,8 +22,6 @@
   "Find font specified by FONT-NAME."
   (find-font (font-spec :name font-name)))
 
-;; Install fonts with "M-x all-the-icons-install-fonts"
-;; https://github.com/domtronn/all-the-icons.el/issues/120
 (use-package all-the-icons
   :straight t
   :if (display-graphic-p)
@@ -195,10 +197,9 @@
   (spaceline-emacs-theme))
 
 (use-package awesome-tray ; Minimal modeline information
-  :straight nil
+  :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
   :commands awesome-tray-mode
   :if (eq sb/modeline-theme 'awesome-tray)
-  :load-path "extras"
   :hook (after-init-hook . awesome-tray-mode)
   :config
   (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
@@ -256,19 +257,19 @@
   ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
   :hook (after-init-hook . auto-dim-other-buffers-mode))
 
-;; ;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
-;; (use-package circadian
-;;   :straight t
-;;   :commands circadian-setup
-;;   :if (display-graphic-p)
-;;   :init
-;;   (require 'solar)
-;;   (setq calendar-latitude 26.50
-;;         calendar-location-name "Kanpur, UP, India"
-;;         calendar-longitude 80.23
-;;         circadian-themes '((:sunrise . modus-operandi)
-;;                            (:sunset  . doom-one)))
-;;   (circadian-setup))
+;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
+(use-package circadian
+  :straight t
+  :commands circadian-setup
+  :if (and sb/EMACS27 (display-graphic-p))
+  :init
+  (require 'solar)
+  (setq calendar-latitude 26.50
+        calendar-location-name "Kanpur, UP, India"
+        calendar-longitude 80.23
+        circadian-themes '((:sunrise . modus-operandi)
+                           (:sunset  . doom-one)))
+  (circadian-setup))
 
 ;; (cond
 ;;  ((sb/font-available-p "Cascadia Code")
@@ -344,15 +345,8 @@
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
-(set-face-attribute 'fixed-pitch nil
-                    :font "JetBrains Mono"
-                    :weight 'light
-                    :height 140)
-
-(set-face-attribute 'variable-pitch nil
-                    :font "Iosevka Aile"
-                    :height 140
-                    :weight 'light)
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
+(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -368,8 +362,7 @@
 (when nil
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (setq resize-mini-windows nil)))
-  )
+              (setq resize-mini-windows nil))))
 
 (use-package beacon
   :straight t
@@ -568,12 +561,12 @@
   :diminish disable-mouse-global-mode
   :hook (after-init-hook . global-disable-mouse-mode))
 
-;; Move the cursor from the line of view
-(use-package avoid
+(use-package avoid ; Move the cursor from the line of view
   :straight nil
   :commands mouse-avoidance-mode
   :if (display-mouse-p)
   :init (mouse-avoidance-mode 'banish))
 
 (provide 'init-ui)
-;;; core-config.el ends here
+
+;;; init-ui.el ends here

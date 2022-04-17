@@ -1,3 +1,12 @@
+;;; init-search.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; `isearch' candidates.
 (use-package isearch
@@ -17,25 +26,25 @@
    ("C-f"     . isearch-repeat-forward)
    ("C-c C-o" . isearch-occur)))
 
-;; (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
-;;   :straight t
-;;   :after isearch
-;;   :commands (isearch-forward-symbol ; "M-s _"
-;;              isearch-symbol-at-point
-;;              isearch-forward-symbol-at-point ; "M-s ."
-;;              isearch-backward-symbol-at-point))
+(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
+  :straight t
+  :after isearch
+  :commands (isearch-forward-symbol ; "M-s _"
+             isearch-symbol-at-point
+             isearch-forward-symbol-at-point ; "M-s ."
+             isearch-backward-symbol-at-point))
 
-;; (use-package anzu
-;;   :straight t
-;;   :diminish anzu-mode
-;;   :commands global-anzu-mode
-;;   :init
-;;   (setq anzu-search-threshold     10000
-;;         anzu-minimum-input-length 2)
-;;   (global-anzu-mode 1)
-;;   :bind
-;;   (([remap query-replace]        . anzu-query-replace)
-;;    ([remap query-replace-regexp] . anzu-query-replace-regexp)))
+(use-package anzu
+  :straight t
+  :diminish anzu-mode
+  :commands global-anzu-mode
+  :init
+  (setq anzu-search-threshold     10000
+        anzu-minimum-input-length 2)
+  (global-anzu-mode 1)
+  :bind
+  (([remap query-replace]        . anzu-query-replace)
+   ([remap query-replace-regexp] . anzu-query-replace-regexp)))
 
 (use-package swiper
   :straight t
@@ -75,3 +84,5 @@
   :bind ("C-c s d" . deadgrep))
 
 (provide 'init-search)
+
+;;; init-search.el ends here

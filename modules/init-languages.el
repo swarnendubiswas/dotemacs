@@ -1,3 +1,12 @@
+;;; init-languages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
+;;; coding:utf-8; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package subword
   :straight nil
   :diminish
@@ -742,7 +751,7 @@
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
   :straight t
-:if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
+  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode-hook . (lambda ()
@@ -1145,3 +1154,5 @@
   :hook (ssh-config-mode-hook . turn-on-font-lock))
 
 (provide 'init-languages)
+
+;;; init-languages.el ends here

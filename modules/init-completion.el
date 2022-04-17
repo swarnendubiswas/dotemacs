@@ -1,30 +1,181 @@
-(when (bound-and-true-p enable-recursive-minibuffers)
-  (minibuffer-depth-indicate-mode 1))
+;;; init-completion.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
 
-(use-package orderless
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
+;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
+;; expansions in the current buffer and presents suggestions for completion.
+(use-package hippie-exp
+  :straight nil
+  :custom
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-complete-file-name
+                                      try-expand-all-abbrevs
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
+  (hippie-expand-verbose nil)
+  :bind
+  (("M-/"   . hippie-expand)
+   ("C-M-/" . dabbrev-completion)))
+
+(use-package ivy
   :straight t
-  :after (:any ivy vertico)
-  :demand t
-  :defines orderless-component-separator
-  :functions sb/just-one-face
+  :functions ivy-format-function-line
+  :commands (ivy-read ivy-mode)
+  :if (eq sb/minibuffer-completion 'ivy)
+  :preface
+  ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
+  (defun sb/ignore-dired-buffers (str)
+    "Return non-nil if STR names a Dired buffer.
+  This function is intended for use with `ivy-ignore-buffers'."
+    (let ((buf (get-buffer str)))
+      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
+  :hook (after-init-hook . ivy-mode)
   :config
-  (with-eval-after-load "ivy"
-    ;; (defvar ivy-re-builders-alist)
-    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+  (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
+        ivy-extra-directories nil ; Hide . and ..
+        ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
+        ivy-height 12
+        ;; Make the height of the minibuffer proportionate to the screen
+        ;; ivy-height-alist '((t
+        ;;                      lambda (_caller)
+        ;;                      (/ (frame-height) 2)))
+        ;; We update `ivy-re-builders-alist' after loading `orderless'
+        ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
+        ;;                         (counsel-find-file . ivy--regex-fuzzy)
+        ;;                         (t                 . ivy--regex-ignore-order))
+        ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
+        ivy-wrap t
+        ;; Do not start searches with ^
+        ivy-initial-inputs-alist nil
+        ;; don't show recent files in switch-buffer
+        ivy-use-virtual-buffers nil
+        ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
+        ;; is way too big (30,000). Turn it down so big repos affect project
+        ;; navigation less.
+        ivy-sort-max-size 7500)
 
-  (setq completion-styles '(orderless partial-completion) ; initials, basic, emacs22
-        orderless-matching-styles '(orderless-regexp)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles basic-remote orderless partial-completion))
-                                        ;; (minibuffer (initials))))
-                                        )
-        ))
+  (dolist (buffer
+           '("TAGS" "magit-process" "*emacs*" "*xref*"
+             ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
+             ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+             ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
+             ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
+             ))
+    (add-to-list 'ivy-ignore-buffers buffer))
+
+  ;; Ignore `dired' buffers from `ivy-switch-buffer'
+  ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
+  :diminish
+  :bind
+  (("C-c r"    . ivy-resume)
+   ("<f3>"     . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("<return>" . ivy-alt-done) ; Continue completion
+   ("<left>"   . ivy-previous-line)
+   ("<right>"  . ivy-next-line)))
+
+(use-package counsel
+  :straight t
+  :straight amx ; `counsel' makes use of `amx' if installed
+  :if (eq sb/minibuffer-completion 'ivy)
+  :commands counsel-mode
+  :preface
+  ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
+  (defun sb/counsel-goto-recent-directory ()
+    "Open recent directories with `dired'."
+    (interactive)
+    (unless recentf-mode (recentf-mode 1))
+    (let ((collection
+           (delete-dups
+            (append (mapcar 'file-name-directory recentf-list)
+                    (if (executable-find "fasd")
+                        (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
+      (ivy-read "Directories:" collection :action 'dired)))
+  :bind
+  (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
+   ([remap execute-extended-command] . counsel-M-x)
+   ([remap completion-at-point]      . counsel-company)
+   ("C-M-i"                          . counsel-company)
+   ([remap find-file]                . counsel-find-file)
+   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
+   ;; ([remap flycheck-list-errors]  . counsel-flycheck)
+   ("<f1>"                           . counsel-M-x)
+   ("<f2>"                           . counsel-find-file)
+   ("C-c s g"                        . counsel-git-grep)
+   ("C-<f9>"                         . sb/counsel-goto-recent-directory)
+   ("C-c d m"                        . counsel-minor)
+   ("<f9>"                           . counsel-recentf)
+   ("C-c s r"                        . counsel-rg)
+   ("C-c C-m"                        . counsel-mark-ring)
+   ;; Enabling preview can make switching over remote buffers slow
+   ("S-<f3>"                         . counsel-switch-buffer)
+   ("<f4>"                           . counsel-grep-or-swiper))
+  :bind* ("C-c C-j"                  . counsel-imenu)
+  :diminish
+  :hook (ivy-mode-hook . counsel-mode)
+  :config
+  (setq counsel-describe-function-function #'helpful-callable
+        counsel-describe-variable-function #'helpful-variable
+        counsel-find-file-at-point t
+        counsel-find-file-ignore-regexp (concat
+                                         "\\(?:\\`[#.]\\)"
+                                         "\\|\\(?:\\`.+?[#~]\\'\\)"
+                                         "\\|.cb$"
+                                         "\\|.cb2$"
+                                         "\\|.class$"
+                                         "\\|.djvu$"
+                                         "\\|.doc$"
+                                         "\\|.docx$"
+                                         "\\|.elc$"
+                                         "\\|.fdb_latexmk$"
+                                         "\\|.fls$"
+                                         "\\|.lof$"
+                                         "\\|.lot$"
+                                         "\\|.o$"
+                                         "\\|.ppt$"
+                                         "\\|.pptx$"
+                                         "\\|.pyc$"
+                                         "\\|.rel$"
+                                         "\\|.rip$"
+                                         "\\|.so$"
+                                         "\\|.synctex$"
+                                         "\\|.synctex.gz$"
+                                         "\\|.toc$"
+                                         "\\|.xls$"
+                                         "\\|.xlsx$"
+                                         "\\|tags"
+                                         "\\|TAGS"
+                                         "\\|GPATH"
+                                         "\\|GRTAGS"
+                                         "\\|GTAGS"
+                                         "\\|tramp"
+                                         "\\|.clangd"
+                                         "\\|.cache"
+                                         "\\|.metadata"
+                                         "\\|.recommenders"
+                                         "\\|typings"
+                                         "\\|__pycache__")
+        counsel-mode-override-describe-bindings t
+        counsel-preselect-current-file t
+        counsel-switch-buffer-preview-virtual-buffers nil ; Removes recent files and bookmarks
+        counsel-yank-pop-preselect-last t
+        counsel-yank-pop-separator "\n------------------------------------------\n"))
 
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
-  :straight t
   :straight ivy-rich
+  :straight t
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
@@ -83,6 +234,13 @@
   (ivy-rich-set-columns 'counsel-recentf
                         '((file-name-nondirectory (:width 0.24))
                           (ivy-rich-candidate (:width 0.75)))))
+
+(use-package all-the-icons-ivy
+  :straight t
+  :after ivy
+  :demand t
+  :commands all-the-icons-ivy-setup
+  :config (all-the-icons-ivy-setup))
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
@@ -220,6 +378,86 @@
   (consult-customize
    consult-recent-file consult-buffer
    :preview-key nil))
+
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/
+(use-package embark
+  :after vertico
+  :straight t
+  :init
+  ;; Replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command
+        which-key-use-C-h-commands nil)
+  :bind
+  (([remap describe-bindings] . embark-bindings)
+   :map vertico-map
+   ("C-l" . embark-act)
+   ("C-c C-l" . embark-export)))
+
+(use-package embark-consult
+  :straight t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
+
+;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
+(use-package corfu
+  :straight t
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :preface
+  (defun sb/corfu-move-to-minibuffer ()
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+  :hook (after-init-hook . corfu-global-mode)
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-auto-delay 0)
+  (corfu-auto-prefix 2)
+  (corfu-min-width 60)
+  (corfu-max-width corfu-min-width)
+  (corfu-count 15)
+  (corfu-preselect-first t)
+  :bind
+  (:map corfu-map
+        ([tab] . corfu-next)
+        ([backtab] . corfu-previous)
+        ("M-m" . sb/corfu-move-to-minibuffer)))
+
+(use-package corfu-doc
+  :straight t
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :hook (corfu-mode-hook . corfu-doc-mode))
+
+;; https://kristofferbalintona.me/posts/cape/
+(use-package cape
+  :straight t
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;; Complete programming language keyword
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; Complete unicode char from TeX command, e.g. \hbar.
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; Complete abbreviation at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; Complete word from dictionary at point.
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  ;; Complete current line from other lines in buffer.
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
+  ;; Complete word at point with Ispell.
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; Complete with Dabbrev at point.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  :custom
+  (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
+
+(use-package marginalia
+  :straight t
+  :after vertico
+  :init (marginalia-mode 1))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
@@ -489,118 +727,14 @@
 ;;                               (company-fuzzy-mode 1)
 ;;                               (diminish 'company-fuzzy-mode))))
 
-;; https://karthinks.com/software/fifteen-ways-to-use-embark/
-(use-package embark
-  :after vertico
-  :straight t
-  :init
-  ;; Replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command
-        which-key-use-C-h-commands nil)
-  :bind
-  (([remap describe-bindings] . embark-bindings)
-   :map vertico-map
-   ("C-l" . embark-act)
-   ("C-c C-l" . embark-export)))
-
-(use-package embark-consult
-  :straight t
-  :after (embark consult)
-  :demand t ; only necessary if you have the hook below
-  :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
-
-;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
-(use-package corfu
-  :straight t
-  :if (and (display-graphic-p) (eq sb/capf 'corfu))
-  :preface
-  (defun sb/corfu-move-to-minibuffer ()
-    (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
-  :hook (after-init-hook . corfu-global-mode)
-  :custom
-  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
-  (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0)
-  (corfu-auto-prefix 2)
-  (corfu-min-width 60)
-  (corfu-max-width corfu-min-width)
-  (corfu-count 15)
-  (corfu-preselect-first t)
-  :bind
-  (:map corfu-map
-        ([tab] . corfu-next)
-        ([backtab] . corfu-previous)
-        ("M-m" . sb/corfu-move-to-minibuffer)))
-
-(use-package corfu-doc
-  :straight t
-  :if (and (display-graphic-p) (eq sb/capf 'corfu))
-  :hook (corfu-mode-hook . corfu-doc-mode))
-
-;; https://kristofferbalintona.me/posts/cape/
-(use-package cape
-  :straight t
-  :init
-  ;; Add `completion-at-point-functions', used by `completion-at-point'.
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  ;; Complete programming language keyword
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;; Complete unicode char from TeX command, e.g. \hbar.
-  (add-to-list 'completion-at-point-functions #'cape-tex)
-  ;; Complete abbreviation at point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;; Complete word from dictionary at point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
-  ;; Complete current line from other lines in buffer.
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
-  ;; Complete word at point with Ispell.
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
-  ;; Complete with Dabbrev at point.
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  :custom
-  (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
-
-(use-package marginalia
-  :straight t
-  :after vertico
-  :init (marginalia-mode 1))
-
-(use-package consult-yasnippet
-  :straight t
-  :bind ("C-M-y" . consult-yasnippet))
-
 (use-package company-shell
   :straight t
-:if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
   :commands (company-shell company-shell-env company-fish-shell)
   :custom (company-shell-delete-duplictes t))
-
-;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
-;; expansions in the current buffer and presents suggestions for completion.
-(use-package hippie-exp
-  :straight nil
-  :custom
-  (hippie-expand-try-functions-list '(try-expand-dabbrev
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev-from-kill
-                                      try-complete-file-name-partially
-                                      try-complete-file-name
-                                      try-expand-all-abbrevs
-                                      try-expand-list
-                                      try-expand-line
-                                      try-complete-lisp-symbol-partially
-                                      try-complete-lisp-symbol))
-  (hippie-expand-verbose nil)
-  :bind
-  (("M-/"   . hippie-expand)
-   ("C-M-/" . dabbrev-completion)))
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
@@ -668,7 +802,6 @@
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
-
 ;; Hide the "Starting new Ispell process" message
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -721,6 +854,23 @@
   ;; We should not need this because the `flx' sorting accounts for the prefix
   (company-fuzzy-prefix-on-top t))
 
+(use-package orderless
+  :straight t
+  :after (:any ivy vertico)
+  :demand t
+  :defines orderless-component-separator
+  :config
+  (with-eval-after-load "ivy"
+    ;; (defvar ivy-re-builders-alist)
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+
+  (setq completion-styles '(orderless partial-completion) ; initials, basic, emacs22
+        orderless-matching-styles '(orderless-regexp)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic-remote orderless partial-completion))
+                                        ;; (minibuffer (initials))))
+                                        )))
+
 (use-package yasnippet
   :straight t
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
@@ -747,156 +897,9 @@
   :after ivy
   :bind ("C-M-y" . ivy-yasnippet))
 
-(use-package ivy
+(use-package consult-yasnippet
   :straight t
-  :functions ivy-format-function-line
-  :commands (ivy-read ivy-mode)
-  :if (eq sb/minibuffer-completion 'ivy)
-  :preface
-  ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
-  (defun sb/ignore-dired-buffers (str)
-    "Return non-nil if STR names a Dired buffer.
-  This function is intended for use with `ivy-ignore-buffers'."
-    (let ((buf (get-buffer str)))
-      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
-  :hook (after-init-hook . ivy-mode)
-  :config
-  (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
-        ivy-extra-directories nil ; Hide . and ..
-        ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
-        ivy-height 12
-        ;; Make the height of the minibuffer proportionate to the screen
-        ;; ivy-height-alist '((t
-        ;;                      lambda (_caller)
-        ;;                      (/ (frame-height) 2)))
-        ;; We update `ivy-re-builders-alist' after loading `orderless'
-        ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
-        ;;                         (counsel-find-file . ivy--regex-fuzzy)
-        ;;                         (t                 . ivy--regex-ignore-order))
-        ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
-        ivy-wrap t
-        ;; Do not start searches with ^
-        ivy-initial-inputs-alist nil
-        ;; don't show recent files in switch-buffer
-        ivy-use-virtual-buffers nil
-        ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
-        ;; is way too big (30,000). Turn it down so big repos affect project
-        ;; navigation less.
-        ivy-sort-max-size 7500)
-
-  (dolist (buffer
-           '("TAGS" "magit-process" "*emacs*" "*xref*"
-             ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
-             ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
-             ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
-             ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
-             ))
-    (add-to-list 'ivy-ignore-buffers buffer))
-
-  ;; Ignore `dired' buffers from `ivy-switch-buffer'
-  ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
-  :diminish
-  :bind
-  (("C-c r"    . ivy-resume)
-   ("<f3>"     . ivy-switch-buffer)
-   :map ivy-minibuffer-map
-   ("<return>" . ivy-alt-done) ; Continue completion
-   ("<left>"   . ivy-previous-line)
-   ("<right>"  . ivy-next-line)))
-
-(use-package counsel
-  :straight t
-  :straight amx ; `counsel' makes use of `amx' if installed
-  :if (eq sb/minibuffer-completion 'ivy)
-  :commands counsel-mode
-  :preface
-  ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
-  (defun sb/counsel-goto-recent-directory ()
-    "Open recent directories with `dired'."
-    (interactive)
-    (unless recentf-mode (recentf-mode 1))
-    (let ((collection
-           (delete-dups
-            (append (mapcar 'file-name-directory recentf-list)
-                    (if (executable-find "fasd")
-                        (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
-      (ivy-read "Directories:" collection :action 'dired)))
-  :bind
-  (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
-   ([remap execute-extended-command] . counsel-M-x)
-   ([remap completion-at-point]      . counsel-company)
-   ("C-M-i"                          . counsel-company)
-   ([remap find-file]                . counsel-find-file)
-   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
-   ;; ([remap flycheck-list-errors]  . counsel-flycheck)
-   ("<f1>"                           . counsel-M-x)
-   ("<f2>"                           . counsel-find-file)
-   ("C-c s g"                        . counsel-git-grep)
-   ("C-<f9>"                         . sb/counsel-goto-recent-directory)
-   ("C-c d m"                        . counsel-minor)
-   ("<f9>"                           . counsel-recentf)
-   ("C-c s r"                        . counsel-rg)
-   ("C-c C-m"                        . counsel-mark-ring)
-   ;; Enabling preview can make switching over remote buffers slow
-   ("S-<f3>"                         . counsel-switch-buffer)
-   ("<f4>"                           . counsel-grep-or-swiper))
-  :bind* ("C-c C-j"                  . counsel-imenu)
-  :diminish
-  :hook (ivy-mode-hook . counsel-mode)
-  :config
-  (setq counsel-describe-function-function #'helpful-callable
-        counsel-describe-variable-function #'helpful-variable
-        counsel-find-file-at-point t
-        counsel-find-file-ignore-regexp (concat
-                                         "\\(?:\\`[#.]\\)"
-                                         "\\|\\(?:\\`.+?[#~]\\'\\)"
-                                         "\\|.cb$"
-                                         "\\|.cb2$"
-                                         "\\|.class$"
-                                         "\\|.djvu$"
-                                         "\\|.doc$"
-                                         "\\|.docx$"
-                                         "\\|.elc$"
-                                         "\\|.fdb_latexmk$"
-                                         "\\|.fls$"
-                                         "\\|.lof$"
-                                         "\\|.lot$"
-                                         "\\|.o$"
-                                         "\\|.ppt$"
-                                         "\\|.pptx$"
-                                         "\\|.pyc$"
-                                         "\\|.rel$"
-                                         "\\|.rip$"
-                                         "\\|.so$"
-                                         "\\|.synctex$"
-                                         "\\|.synctex.gz$"
-                                         "\\|.toc$"
-                                         "\\|.xls$"
-                                         "\\|.xlsx$"
-                                         "\\|tags"
-                                         "\\|TAGS"
-                                         "\\|GPATH"
-                                         "\\|GRTAGS"
-                                         "\\|GTAGS"
-                                         "\\|tramp"
-                                         "\\|.clangd"
-                                         "\\|.cache"
-                                         "\\|.metadata"
-                                         "\\|.recommenders"
-                                         "\\|typings"
-                                         "\\|__pycache__")
-        counsel-mode-override-describe-bindings t
-        counsel-preselect-current-file t
-        counsel-switch-buffer-preview-virtual-buffers nil ; Removes recent files and bookmarks
-        counsel-yank-pop-preselect-last t
-        counsel-yank-pop-separator "\n------------------------------------------\n"))
-
-(use-package all-the-icons-ivy
-  :straight t
-  :after ivy
-  :demand t
-  :commands all-the-icons-ivy-setup
-  :config (all-the-icons-ivy-setup))
+  :bind ("C-M-y" . consult-yasnippet))
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
@@ -919,3 +922,5 @@
   (company-prescient-mode 1))
 
 (provide 'init-completion)
+
+;;; init-completion.el ends here

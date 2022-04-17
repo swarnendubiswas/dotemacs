@@ -1,3 +1,12 @@
+;;; init-org.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package org
   :straight nil
   :defines (org-hide-leading-stars-before-indent-mode
@@ -49,7 +58,6 @@
 
 ;; Disabled the package to get consistent styles across themes.
 (use-package org-bullets
-  :disabled t
   :straight t
   :commands org-bullets-mode
   :hook (org-mode-hook . org-bullets-mode))
@@ -57,13 +65,12 @@
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight t
   :commands org-appear-mode
-  :disabled t
   :hook (org-mode-hook . org-appear-mode)
-  :config
-  (setq org-appear-autosubmarkers t
-        org-appear-autoentities   t
-        org-appear-autolinks      t
-        org-appear-autoemphasis  t))
+  :custom
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities   t)
+  (org-appear-autolinks      t)
+  (org-appear-autoemphasis   t))
 
 (use-package ox-gfm
   :straight t
@@ -74,3 +81,5 @@
 ;; TODO: Use "C-c o" as the binding for `org-mode-map'
 
 (provide 'init-org)
+
+;;; init-org.el ends here

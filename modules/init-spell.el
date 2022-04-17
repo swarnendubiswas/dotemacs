@@ -1,14 +1,22 @@
+;;; init-spell.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package ispell
   :straight nil
   :if (symbol-value 'sb/IS-LINUX)
+  :custom
+  (ispell-dictionary "en_US")
+  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
+  (ispell-local-dictionary "en_US")
+  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   :config
-  (setq ispell-dictionary "en_US"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
-        ispell-local-dictionary "en_US"
-        ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory)
-        ;; Save a new word to personal dictionary without asking
-        ispell-silently-savep t)
-
   ;; Skip regions in Org-mode
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
@@ -21,7 +29,6 @@
   (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
   ;; Footnotes in org that have http links that are line breaked should not be ispelled
   (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
-
   (add-to-list 'ispell-skip-region-alist '("`" "`"))
 
   ;; Skip some math environments
@@ -119,7 +126,8 @@
   :straight t
   :defines spell-fu-directory
   :commands spell-fu-mode
-  :config (setq spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+  :custom
+  (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
   :init
   (add-hook 'text-mode-hook
             (lambda ()
@@ -188,3 +196,5 @@
   :commands consult-flyspell)
 
 (provide 'init-spell)
+
+;;; init-spell.el ends here

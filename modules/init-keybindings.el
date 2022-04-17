@@ -1,3 +1,12 @@
+;;; init-keybindings.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
@@ -441,3 +450,5 @@ _v_ verify setup    _f_ check           _m_ mode
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (provide 'init-keybindings)
+
+;;; init-keybindings.el ends here

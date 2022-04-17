@@ -1,8 +1,11 @@
-(use-package warnings
-  :straight nil
-  :init
-  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
-  (setq warning-minimum-level :emergency))
+;;; init-core.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
 
 (defvar apropos-do-all)
 (defvar bookmark-save-flag)
@@ -10,6 +13,14 @@
 (defvar compilation-scroll-output)
 (defvar sort-fold-case)
 (defvar help-enable-symbol-autoload)
+(defvar sb/fill-column)
+(defvar sb/EMACS28+)
+
+(use-package warnings
+  :straight nil
+  :init
+  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
+  (setq warning-minimum-level :emergency))
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
@@ -35,7 +46,6 @@
       compilation-scroll-output 'first-error
       completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing
-      completions-detailed t
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
@@ -70,10 +80,8 @@
       message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
-      next-error-message-highlight t
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name
-      read-minibuffer-restore-windows t
       read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound
@@ -90,16 +98,17 @@
       switch-to-buffer-preserve-window-point t
       use-dialog-box nil ; Do not use dialog boxes with mouse commands
       use-file-dialog nil
-      vc-follow-symlinks t ; No need to ask
-      ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
-      ;; information on the modeline
-      vc-handled-backends '(Git)
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
       ;; Underline looks a bit better when drawn lower
       x-underline-at-descent-line t)
+
+(when sb/EMACS28+
+  (setq completions-detailed t
+        next-error-message-highlight t
+        read-minibuffer-restore-windows t))
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
@@ -164,6 +173,9 @@
     (setq use-short-answers t)
   ;; Type "y"/"n" instead of "yes"/"no"
   (fset 'yes-or-no-p 'y-or-n-p))
+
+(when (bound-and-true-p enable-recursive-minibuffers)
+  (minibuffer-depth-indicate-mode 1))
 
 (use-package autorevert ; Auto-refresh all buffers
   :straight nil
@@ -357,8 +369,9 @@
                            ;; tab-mark ; Mark any tabs
                            ;; empty ; Empty lines at beginning or end of buffer
                            ;; lines ; Lines that extend beyond `whitespace-line-column'
-                           ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
-                           ;; space-before-tab space-after-tab ; Mixture of space and tab on the same line
+                           ;; indentation ; Wrong indentation (tab when spaces and vice versa)
+                           ;; space-before-tab ; Mixture of space and tab on the same line
+                           ;; space-after-tab ; Mixture of space and tab on the same line
                            )))
 
 (use-package image-mode
@@ -415,12 +428,6 @@
   (unless (server-running-p)
     (server-start)))
 
-(use-package warnings
-  :straight nil
-  :init
-  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
-  (setq warning-minimum-level :emergency))
-
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."
   (let ((inhibit-message t))
@@ -430,8 +437,9 @@
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
 ;; Hide the "Cleaning up the recentf list...done" message
 (advice-add 'recentf-cleanup   :around #'sb/inhibit-message-call-orig-fun)
-
 ;; Hide the "Wrote ..." message
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
 (provide 'init-core)
+
+;;; init-core.el ends here
