@@ -403,7 +403,8 @@
   (diminish 'visual-line-mode))
 
 ;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
-(unless (display-graphic-p)
+(if (display-graphic-p)
+    (fringe-mode '(10 . 0))
   (fringe-mode '(10 . 10)))
 
 ;; Make the cursor a thin horizontal bar, not a block

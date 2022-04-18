@@ -7,6 +7,18 @@
 
 ;;; Code:
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
+
+(add-hook 'prog-mode-hook
+          (lambda ()
+            ;; Highlight and allow to open http links in strings and comments in programming
+            ;; buffers.
+            (goto-address-prog-mode 1)
+            ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
+            (when (display-graphic-p)
+              (display-fill-column-indicator-mode 1))))
+
 (use-package subword
   :straight nil
   :diminish
@@ -26,7 +38,29 @@
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
   :hook (prog-mode-hook . hs-minor-mode)
-  :custom (hs-isearch-open t))
+  :custom
+  (hs-isearch-open t "Open all folds while searching."))
+
+(defvar tags-revert-without-query)
+
+(setq large-file-warning-threshold (* 500 1024 1024) ; MB
+      tags-add-tables nil
+      tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
+      ;; Do not ask before rereading the `TAGS' files if they have changed
+      tags-revert-without-query t)
+
+(use-package xref
+  :straight t
+  :commands xref-etags-mode
+  :bind
+  (("M-'"   . xref-find-definitions)
+   ("M-?"   . xref-find-references)
+   ("C-M-." . xref-find-apropos)
+   ("M-,"   . xref-pop-marker-stack)
+   :map xref--xref-buffer-mode-map
+   ("C-o"   . xref-show-location-at-point)
+   ("<tab>" . xref-quit-and-goto-xref)
+   ("r"     . xref-query-replace-in-results)))
 
 (use-package dumb-jump
   :straight t
@@ -70,14 +104,13 @@
   (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
-;; (use-package highlight-indentation
-;;   :straight t
-;;   :commands highlight-indentation-mode
-;;   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
-;;   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
+(use-package highlight-indentation
+  :straight t
+  :commands highlight-indentation-mode
+  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
-;; Claims to be better than `electric-indent-mode'
-(use-package aggressive-indent
+(use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
   :straight t
   :commands aggressive-indent-mode
   :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
@@ -87,18 +120,17 @@
         ;; Never use `electric-indent-mode'
         aggressive-indent-dont-electric-modes t))
 
-;; ;; Highlight symbol under point
-;; (use-package symbol-overlay
-;;   :straight t
-;;   :diminish
-;;   :commands (symbol-overlay-mode)
-;;   :hook (prog-mode-hook . symbol-overlay-mode)
-;;   :bind
-;;   (("M-p" . symbol-overlay-jump-prev)
-;;    ("M-n" . symbol-overlay-jump-next))
-;;   :custom
-;;   ;; Delay highlighting to allow for transient cursor placements
-;;   (symbol-overlay-idle-time 2))
+(use-package symbol-overlay ; Highlight symbol under point
+  :straight t
+  :diminish
+  :commands (symbol-overlay-mode)
+  :hook (prog-mode-hook . symbol-overlay-mode)
+  :bind
+  (("M-p" . symbol-overlay-jump-prev)
+   ("M-n" . symbol-overlay-jump-next))
+  :custom
+  ;; Delay highlighting to allow for transient cursor placements
+  (symbol-overlay-idle-time 2))
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
@@ -112,42 +144,9 @@
   :commands hes-mode
   :hook (prog-mode-hook . hes-mode))
 
-(defvar tags-revert-without-query)
-
-(setq large-file-warning-threshold (* 500 1024 1024) ; MB
-      tags-add-tables nil
-      tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
-      ;; Do not ask before rereading the `TAGS' files if they have changed
-      tags-revert-without-query t)
-
-(use-package xref
-  :straight t
-  :commands xref-etags-mode
-  :bind
-  (("M-'"   . xref-find-definitions)
-   ("M-?"   . xref-find-references)
-   ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-pop-marker-stack)
-   :map xref--xref-buffer-mode-map
-   ("C-o"   . xref-show-location-at-point)
-   ("<tab>" . xref-quit-and-goto-xref)
-   ("r"     . xref-query-replace-in-results)))
-
 (use-package ini-mode
   :straight nil
   :commands ini-mode)
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
-
-(add-hook 'prog-mode-hook
-          (lambda ()
-            ;; Highlight and allow to open http links in strings and comments in programming
-            ;; buffers.
-            (goto-address-prog-mode 1)
-            ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-            (when (display-graphic-p)
-              (display-fill-column-indicator-mode 1))))
 
 (use-package elisp-mode
   :straight nil
@@ -253,10 +252,10 @@
   :disabled t
   :mode "\\.td\\'")
 
-;; (use-package autodisass-llvm-bitcode
-;;   :straight t
-;;   :commands autodisass-llvm-bitcode
-;;   :mode "\\.bc\\'")
+(use-package autodisass-llvm-bitcode
+  :straight t
+  :commands autodisass-llvm-bitcode
+  :mode "\\.bc\\'")
 
 ;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
 ;; more shortcuts.
@@ -330,8 +329,8 @@
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
-  :straight t
   :straight spinner
+  :straight t
   :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -1113,11 +1112,6 @@
   :commands (executable-make-buffer-file-executable-if-script-p)
   :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
-(use-package rainbow-mode
-  :straight t
-  :commands rainbow-mode
-  :hook ((css-mode-hook html-mode-hook web-mode-hook) . rainbow-mode))
-
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
 ;; https://github.com/jscheid/prettier.el/issues/84
@@ -1135,8 +1129,6 @@
          (prettier-mode 1))))
   :config (setq prettier-lighter nil))
 
-
-
 (use-package highlight-doxygen
   :straight t
   :commands highlight-doxygen-global-mode
@@ -1145,8 +1137,6 @@
 (use-package apt-sources-list
   :straight t
   :commands apt-sources-list-mode)
-
-
 
 (use-package ssh-config-mode
   :straight t

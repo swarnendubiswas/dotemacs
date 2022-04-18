@@ -12,8 +12,7 @@
   "Personal configuration for dotemacs."
   :group 'local)
 
-;;; Load path
-;; optimize: force "lisp"" and "site-lisp" at the head to reduce the startup time.
+;; Add "modules" at the head of `load-path' to reduce startup time
 (dolist (dir '("modules"))
   (push (expand-file-name dir user-emacs-directory) load-path))
 

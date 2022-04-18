@@ -86,8 +86,8 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 ;; The menu bar is useful to identify different capabilities available and the shortcuts.
-;; (when (fboundp 'menu-bar-mode)
-;;   (menu-bar-mode -1))
+(when (and (fboundp 'menu-bar-mode) (not (display-graphic-p)))
+  (menu-bar-mode -1))
 
 ;; Set frame transparency
 (set-frame-parameter (selected-frame) 'alpha '(99 . 99))

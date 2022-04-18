@@ -16,12 +16,6 @@
 (defvar sb/fill-column)
 (defvar sb/EMACS28+)
 
-(use-package warnings
-  :straight nil
-  :init
-  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
-  (setq warning-minimum-level :emergency))
-
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
       auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
@@ -75,7 +69,7 @@
       history-length 50 ; Reduce the state that is to be read
       indicate-buffer-boundaries nil
       kill-do-not-save-duplicates t
-      kill-whole-line t ;; TODO: What is the utility of this variable?
+      kill-whole-line t ; TODO: What is the utility of this variable?
       make-backup-files nil ; Stop making backup `~' files
       message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
@@ -100,6 +94,8 @@
       use-file-dialog nil
       view-read-only t ; View mode for read-only buffers
       visible-bell nil
+      ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
+      warning-minimum-level :emergency
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
       ;; Underline looks a bit better when drawn lower
@@ -177,6 +173,22 @@
 (when (bound-and-true-p enable-recursive-minibuffers)
   (minibuffer-depth-indicate-mode 1))
 
+;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
+(dolist (mode '(tooltip-mode))
+  (when (fboundp mode)
+    (funcall mode -1)))
+
+;; Enable the following modes
+(dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
+                blink-cursor-mode
+                column-number-mode
+                delete-selection-mode ; Typing with the mark active will overwrite the marked region
+                ;; Use soft wraps, wrap lines without the ugly continuation marks
+                global-visual-line-mode
+                size-indication-mode))
+  (when (fboundp mode)
+    (funcall mode 1)))
+
 (use-package autorevert ; Auto-refresh all buffers
   :straight nil
   :commands global-auto-revert-mode
@@ -247,10 +259,11 @@
 ;; Multihop with sudo with custom user: "C-x C-f
 ;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 
-;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/ Use bookmarks to speed up remote file
-;; access: upon visiting a location with TRAMP, save it as a bookmark with `bookmark-set' ("C-x r
-;; m"). To revisit that bookmark, use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r
-;; l"). Rename the bookmarked location in `bookmark-bmenu-mode' with `R'.
+;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
+;; bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump' ("C-x r
+;; b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in `bookmark-bmenu-mode'
+;; with `R'.
+;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/
 (use-package tramp
   :straight nil
   :defines tramp-ssh-controlmaster-options
@@ -392,32 +405,6 @@
   (image-use-external-converter t)
   :hook (image-mode-hook . sb/show-image-dimensions-in-mode-line))
 
-;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
-(progn
-  (defun sb/auto-save-wrapper (save-fn &rest args)
-    "Hide 'Auto-saving...done' messages by calling the method.
-  SAVE-FN with non-nil ARGS."
-    (ignore args)
-    (apply save-fn '(t)))
-
-  (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
-
-;; Disable the unhelpful modes, ignore disabling for modes I am not bothered with
-(dolist (mode '(tooltip-mode))
-  (when (fboundp mode)
-    (funcall mode -1)))
-
-;; Enable the following modes
-(dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
-                blink-cursor-mode
-                column-number-mode
-                delete-selection-mode ; Typing with the mark active will overwrite the marked region
-                ;; Use soft wraps, wrap lines without the ugly continuation marks
-                global-visual-line-mode
-                size-indication-mode))
-  (when (fboundp mode)
-    (funcall mode 1)))
-
 ;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
   :straight nil
@@ -439,6 +426,16 @@
 (advice-add 'recentf-cleanup   :around #'sb/inhibit-message-call-orig-fun)
 ;; Hide the "Wrote ..." message
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+
+;; http://emacs.stackexchange.com/questions/12556/disabling-the-auto-saving-done-message
+(progn
+  (defun sb/auto-save-wrapper (save-fn &rest args)
+    "Hide 'Auto-saving...done' messages by calling the method.
+  SAVE-FN with non-nil ARGS."
+    (ignore args)
+    (apply save-fn '(t)))
+
+  (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
 (provide 'init-core)
 

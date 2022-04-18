@@ -7,6 +7,10 @@
 
 ;;; Code:
 
+(use-package help-fns+
+  :straight t
+  :demand t)
+
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
@@ -459,6 +463,11 @@
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
+
+(use-package rainbow-mode
+  :straight t
+  :commands rainbow-mode
+  :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
 
 (provide 'init-misc)
 

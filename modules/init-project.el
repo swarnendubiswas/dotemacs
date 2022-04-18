@@ -121,8 +121,9 @@
     (add-to-list 'projectile-globally-ignored-files items))
 
   (dolist (exts
-           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" ".elc" ".o" ".odt" ".ppt"
-             ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" ".xls" ".xlsx" "~$"))
+           '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" "egg-info" ".elc" ".o" ".odt"
+             ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"
+             ))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
   (projectile-mode 1)
