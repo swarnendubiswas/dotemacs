@@ -128,3 +128,5 @@ https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variabl
 - https://github.com/tecosaur/emacs-config
 - https://github.com/wdenton/.emacs.d
 - https://github.com/tshu-w/.emacs.d
+- https://github.com/croqaz/dotfiles/blob/main/emacs/Emacs.org
+- https://github.com/mattduck/dotfiles

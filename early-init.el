@@ -81,12 +81,14 @@
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p' since `window-system'
 ;; is deprecated.
-(when (fboundp 'tool-bar-mode)
+(when (fboundp 'tool-bar-mode) ; (when (featurep 'tool-bar)
   (tool-bar-mode -1))
-(when (fboundp 'scroll-bar-mode)
+(when (fboundp 'scroll-bar-mode) ; (when (featurep 'scroll-bar)
   (scroll-bar-mode -1))
+
 ;; The menu bar is useful to identify different capabilities available and the shortcuts.
-(when (and (fboundp 'menu-bar-mode) (not (display-graphic-p)))
+(when (and (fboundp 'menu-bar-mode) ; (when (featurep 'menu-bar)
+           (not (display-graphic-p)))
   (menu-bar-mode -1))
 
 ;; Set frame transparency
@@ -114,19 +116,19 @@
 ;; Disable `package.el' in favor of `straight.el'
 (setq package-enable-at-startup nil)
 
-;; (when (featurep 'native-compile)
-;;   ;; Silence compiler warnings as they can be pretty disruptive
-;;   (setq native-comp-async-report-warnings-errors nil)
+(when (featurep 'native-compile)
+  ;; Silence compiler warnings as they can be pretty disruptive
+  (setq native-comp-async-report-warnings-errors nil)
 
-;;   ;; Set the right directory to store the native compilation cache
-;;   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
+  ;; Set the right directory to store the native compilation cache
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
 
-;; (defvar package-native-compile)
-;; (defvar native-comp-always-compile)
+(defvar package-native-compile)
+(defvar native-comp-always-compile)
 
-;; ;; Enable ahead-of-time compilation when installing a package
-;; (when sb/EMACS28+
-;;   (setq package-native-compile nil))
+;; Enable ahead-of-time compilation when installing a package
+(when sb/EMACS28+
+  (setq package-native-compile nil))
 
 (provide 'early-init)
 
