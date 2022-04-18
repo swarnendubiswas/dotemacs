@@ -34,7 +34,7 @@
                                             (untracked . show)
                                             (unpushed  . show)
                                             (unpulled  . show)))
-  ;; :config
+  :config
   ;; These give a performance boost to Magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)

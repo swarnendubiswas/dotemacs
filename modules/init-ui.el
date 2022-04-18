@@ -29,8 +29,9 @@
   :init
   (unless (sb/font-installed-p "all-the-icons")
     (all-the-icons-install-fonts t))
-  (setq all-the-icons-scale-factor 0.9
-        all-the-icons-color-icons nil))
+  :custom
+  (all-the-icons-scale-factor 0.9)
+  (all-the-icons-color-icons nil))
 
 (use-package leuven-theme
   :straight t
@@ -531,7 +532,7 @@
   (centaur-tabs-group-by-projectile-project)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
-   ("M-<left>" . centaur-tabs-backward-tab)))
+   ("M-<left>"  . centaur-tabs-backward-tab)))
 
 ;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
 ;; which is better.

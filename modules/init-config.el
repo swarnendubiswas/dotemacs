@@ -50,7 +50,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'spaceline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)

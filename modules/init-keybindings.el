@@ -1,5 +1,5 @@
-;;; init-keybindings.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
-;;; no-byte-compile: nil; fill-column: 100 -*-
+;;; init-keybindings.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
+;;; coding:utf-8; no-byte-compile: nil; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -12,8 +12,7 @@
  ("C-l"       . goto-line)
  ("C-c z"     . repeat)
  ("C-z"       . undo)
- ;; Conflicts with Gnome window manager keybindings
- ;; ("<f11>"     . delete-other-windows)
+ ;; ("<f11>"     . delete-other-windows) ; Conflicts with Gnome window manager keybindings
  ("C-x k"     . kill-this-buffer)
  ("M-<left>"  . previous-buffer)
  ("C-S-<tab>" . previous-buffer)
@@ -34,7 +33,9 @@
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)
  ("C-c ;" . sb/comment-line)
- ("C-c b" . comment-box)
+ ("C-c b" . comment-box))
+
+(bind-keys*
  ("C-s"   . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
 
@@ -42,6 +43,7 @@
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
+
 (bind-key   "C-x j" #'sb/counsel-all-files-recursively)
 
 (unless (featurep 'centaur-tabs)
@@ -73,9 +75,6 @@
   :hook (after-init-hook . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
-  ;; Apply suggested settings for minibuffer. Do not use this if we use paging across keys.
-  ;; (which-key-setup-minibuffer)
-
   :custom
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
   (which-key-show-early-on-C-h t)
@@ -89,21 +88,31 @@
   :config
   ;; Modify the posframe background if it has a low contrast
   ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
-
+  :custom
   ;; Thicker border makes the posframe easier to distinguish
-  (setq which-key-posframe-border-width 4)
-
+  (which-key-posframe-border-width 4)
   ;; Positioning the frame at the top obstructs the view to a lesser degree
-  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
+  (which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
 
-;; Hydras
+;; Hydras, https://github.com/abo-abo/hydra
 
-;; https://github.com/abo-abo/hydra
-;; `:exit nil' means the hydra state will continue, `:exit t' will quit the hydra. `:color red'
-;; means continue the hydra on a valid key but stop when a foreign key has been pressed. `:color
-;; blue' means exit.
+;; ":exit nil" means the hydra state will continue, ":exit t" will quit the hydra. ":color red"
+;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
+;; blue" means exit.
 
 (setq lv-use-separator t)
+
+(use-package hydra
+  :straight t
+  :commands (hydra-default-pre hydra-keyboard-quit defhydra
+                               hydra-show-hint hydra-set-transient-map
+                               hydra--call-interactively-remap-maybe))
+
+(use-package ivy-hydra ; Additional keybindings for `ivy'
+  :straight t
+  :after (ivy hydra)
+  :demand t
+  :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 ;; (declare-function spell-fu-goto-next-error "spell-fu")
 ;; (declare-function spell-fu-goto-previous-error "spell-fu")
@@ -436,18 +445,6 @@ _v_ verify setup    _f_ check           _m_ mode
 (bind-key "C-c h s" #'sb/hydra-spelling/body)
 (bind-key "C-c h t" #'sb/hydra-move-text/body)
 (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
-
-(use-package hydra
-  :straight t
-  :commands (hydra-default-pre hydra-keyboard-quit defhydra
-                               hydra-show-hint hydra-set-transient-map
-                               hydra--call-interactively-remap-maybe))
-
-(use-package ivy-hydra ; Additional keybindings for `ivy'
-  :straight t
-  :after (ivy hydra)
-  :demand t
-  :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (provide 'init-keybindings)
 
