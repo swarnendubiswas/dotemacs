@@ -141,7 +141,7 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/capf
-  'corfu
+  'company
   "Choose the framework to use for completion at point.
 Corfu does not support TUI, so we have to fallback on company."
   :type '(radio
@@ -3126,7 +3126,9 @@ Corfu does not support TUI, so we have to fallback on company."
    ("M-g c" . avy-goto-char-timer) ; TODO: Reuse the keybinding
    ("C-/"   . avy-goto-line) ; Does not work with TUI, but works with Alacritty
    ;; TODO: Reuse the keybinding
-   ("M-g l" . avy-goto-line)))
+   ("M-g l" . avy-goto-line)
+   :map isearch-mode-map
+   ("C-'" . avy-isearch)))
 
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
@@ -3932,9 +3934,9 @@ Corfu does not support TUI, so we have to fallback on company."
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (ht-merge (lsp-configuration-section "pyright")
-                                   (lsp-configuration-section "python")))))
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
@@ -3973,8 +3975,8 @@ Corfu does not support TUI, so we have to fallback on company."
     :remote? t
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (lsp-configuration-section "perl"))))
+                                          (lsp--set-configuration
+                                           (lsp-configuration-section "perl"))))
     :priority -1
     :server-id 'perlls-r)))
 

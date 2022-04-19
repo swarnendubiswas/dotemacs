@@ -373,7 +373,7 @@
 
 ;; Show dividers on the right of each window, more prominent than the default
 (use-package frame
-  :straight nil
+  :straight (:type built-in)
   :hook (after-init-hook . window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above

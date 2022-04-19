@@ -10,7 +10,7 @@
 ;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
 ;; expansions in the current buffer and presents suggestions for completion.
 (use-package hippie-exp
-  :straight nil
+  :straight (:type built-in)
   :custom
   (hippie-expand-try-functions-list '(try-expand-dabbrev
                                       try-expand-dabbrev-all-buffers

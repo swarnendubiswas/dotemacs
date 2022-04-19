@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package ibuffer
-  :straight nil
+  :straight (:type built-in)
   :config
   (defalias 'list-buffers 'ibuffer)
   (setq ibuffer-display-summary nil
@@ -17,7 +17,7 @@
   :bind ("C-x C-b" . ibuffer))
 
 (use-package ibuf-ext
-  :straight nil
+  :straight (:type built-in)
   :commands ibuffer-auto-mode
   :config
   ;; Do not show filter groups if there are no buffers in that group

@@ -190,7 +190,7 @@
     (funcall mode 1)))
 
 (use-package autorevert ; Auto-refresh all buffers
-  :straight nil
+  :straight (:type built-in)
   :commands global-auto-revert-mode
   :diminish auto-revert-mode
   ;; :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
@@ -211,11 +211,11 @@
 ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
 ;; timer.
 (use-package saveplace ; Remember cursor position in files
-  :straight nil
+  :straight (:type built-in)
   :hook (after-init-hook . save-place-mode))
 
 (use-package savehist ; Save minibuffer history across sessions
-  :straight nil
+  :straight (:type built-in)
   :commands savehist-mode
   ;; :init (run-with-idle-timer 2 nil #'savehist-mode)
   :hook (after-init-hook . savehist-mode)
@@ -226,7 +226,7 @@
                                    search-ring)))
 
 (use-package uniquify
-  :straight nil
+  :straight (:type built-in)
   :init
   (setq uniquify-after-kill-buffer-p t
         uniquify-buffer-name-style   'forward
@@ -236,7 +236,7 @@
 
 ;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
-  :straight nil
+  :straight (:type built-in)
   :diminish
   :hook (after-init-hook . abbrev-mode)
   :custom
@@ -246,7 +246,7 @@
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
-  :straight nil
+  :straight (:type built-in)
   ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
   :hook (after-init-hook . global-so-long-mode))
 
@@ -265,7 +265,7 @@
 ;; with `R'.
 ;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/
 (use-package tramp
-  :straight nil
+  :straight (:type built-in)
   :defines tramp-ssh-controlmaster-options
   :config
   (setq tramp-default-user user-login-name
