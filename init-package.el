@@ -385,7 +385,7 @@ Corfu does not support TUI, so we have to fallback on company."
       find-file-suppress-same-file-warnings t
       ;; ISSUE: There is a known bug with Emacs upstream.
       ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52292
-      ;; find-file-visit-truename t ; Show true name, useful in case of symlinks
+      find-file-visit-truename nil ; Show true name, useful in case of symlinks
       frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
       help-enable-symbol-autoload t
       help-window-select t ; Makes it easy to close the window
