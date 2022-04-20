@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-one
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -28,12 +28,13 @@
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
+           ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -46,11 +47,12 @@
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
+           ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'telephone-line
+  'airline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -61,6 +63,7 @@
            (const :tag "mini-modeline"   mini)
            (const :tag "airline"         airline)
            (const :tag "telephone-line"  telephone)
+           ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
 
@@ -92,9 +95,9 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 ;; We can use the snap installation of "universal-ctags", but snap packages have poor performance.
-;; Another alternative is to build and install "ctags" locally.
+;; A better alternative is to build and install "ctags" locally.
 (defcustom sb/ctags-path
-  "/snap/bin/ctags"
+  "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
   :type  'string
   :group 'sb/emacs)

@@ -85,8 +85,8 @@
    ("<right>"  . ivy-next-line)))
 
 (use-package counsel
-  :straight t
   :straight amx ; `counsel' makes use of `amx' if installed
+  :straight t
   :if (eq sb/minibuffer-completion 'ivy)
   :commands counsel-mode
   :preface
@@ -447,6 +447,27 @@
   :custom
   (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
 
+;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
+;; which is better.
+(use-package all-the-icons-completion
+  :straight t
+  :straight all-the-icons
+  :disabled t
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
+  :init (all-the-icons-completion-mode))
+
+(use-package kind-icon
+  :straight (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
+  :after corfu
+  :demand t
+  :commands kind-icon-margin-formatter
+  :custom
+  (kind-icon-face 'corfu-default)
+  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
 (use-package marginalia
   :straight t
   :after vertico
@@ -486,7 +507,7 @@
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
         ;; Search in other buffers with the same major mode. This can cause
         ;; performance overhead if there are lots of open buffers.
-        company-dabbrev-other-buffers nil
+        company-dabbrev-other-buffers t
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
         company-minimum-prefix-length 3 ; Small words can be faster to type
@@ -587,6 +608,41 @@
   :defines company-shell-delete-duplictes
   :commands (company-shell company-shell-env company-fish-shell)
   :custom (company-shell-delete-duplictes t))
+
+(use-package company-auctex
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after tex-mode
+  :demand t
+  :commands (company-auctex-init company-auctex-labels
+                                 company-auctex-bibs company-auctex-macros
+                                 company-auctex-symbols company-auctex-environments))
+
+(use-package math-symbols
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after tex-mode
+  :demand t) ; Required by `ac-math' and `company-math'
+
+(use-package company-math
+  :straight t
+  :after tex-mode
+  :demand t
+  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+
+(use-package company-reftex ; Reftex must be enabled to work
+  :straight t
+  :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :demand t
+  :commands (company-reftex-labels company-reftex-citations))
+
+(use-package company-bibtex
+  :straight t
+  :after tex-mode
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :demand t
+  :commands company-bibtex)
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any

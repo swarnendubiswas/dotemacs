@@ -62,8 +62,8 @@
         dired-omit-verbose nil)
 
   ;; Obsolete from Emacs 28+
-  ;; (unless sb/EMACS28+
-  ;;   (setq dired-bind-jump t))
+  (unless sb/EMACS28+
+    (setq dired-bind-jump t))
 
   ;; (setq dired-omit-files
   ;;       (concat dired-omit-files
@@ -91,8 +91,7 @@
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :straight nil
-  :load-path "extras"
+  :straight  (dired+ :type git :host github :repo "emacsmirror/dired-plus")
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
   :custom

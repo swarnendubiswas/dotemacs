@@ -26,6 +26,7 @@
 (require 'init-project)
 (require 'init-spell)
 (require 'init-search)
+(require 'init-parens)
 (require 'init-misc)
 (require 'init-checkers)
 (require 'init-languages)

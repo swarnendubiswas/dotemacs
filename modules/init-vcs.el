@@ -78,7 +78,7 @@
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
   :straight t
-  :if (and (boundp 'vc-handled-backends) sb/EMACS27)
+  :if (boundp 'vc-handled-backends)
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh
                                        diff-hl-dired-mode-unless-remote global-diff-hl-mode)
   :custom

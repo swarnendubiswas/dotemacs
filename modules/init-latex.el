@@ -220,41 +220,6 @@ Ignore if no file is found."
   :config
   (auctex-latexmk-setup))
 
-(use-package company-auctex
-  :straight t
-:if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :after tex-mode
-  :demand t
-  :commands (company-auctex-init company-auctex-labels
-                                 company-auctex-bibs company-auctex-macros
-                                 company-auctex-symbols company-auctex-environments))
-
-(use-package math-symbols
-  :straight t
-:if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :after tex-mode
-  :demand t) ; Required by `ac-math' and `company-math'
-
-(use-package company-math
-  :straight t
-  :after tex-mode
-  :demand t
-  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-
-(use-package company-reftex ; Reftex must be enabled to work
-  :straight t
-  :after tex-mode
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :demand t
-  :commands (company-reftex-labels company-reftex-citations))
-
-(use-package company-bibtex
-  :straight t
-  :after tex-mode
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :demand t
-  :commands company-bibtex)
-
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el")
 

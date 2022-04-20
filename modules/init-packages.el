@@ -32,7 +32,9 @@
 
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t
-      straight-disable-native-compile nil)
+      straight-disable-native-compile nil
+      ;; There is no need to download the whole Git history, and a single branch often suffices
+      straight-vc-git-default-clone-depth '(1 single-branch))
 
 ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
 ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
@@ -128,12 +130,12 @@
   :type  'string
   :group 'sb/emacs)
 
-;; ;; Asynchronously byte compile packages installed with `package.el'
-;; (use-package async
-;;   :straight t
-;;   :functions async-bytecomp-package-mode
-;;   :commands async-bytecomp-package-mode
-;;   :init (async-bytecomp-package-mode 1))
+;; Asynchronously byte compile packages installed with `package.el'
+(use-package async
+  :straight t
+  :functions async-bytecomp-package-mode
+  :commands async-bytecomp-package-mode
+  :init (async-bytecomp-package-mode 1))
 
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
