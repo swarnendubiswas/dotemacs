@@ -50,7 +50,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'telephone-line
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -59,6 +59,8 @@
            (const :tag "spaceline"       spaceline)
            (const :tag "moody"           moody)
            (const :tag "mini-modeline"   mini)
+           (const :tag "airline"         airline)
+           (const :tag "telephone-line"  telephone)
            (const :tag "none"            none))
   :group 'sb/emacs)
 
@@ -129,7 +131,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (defcustom sb/minibuffer-completion
-  'vertico
+  'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)

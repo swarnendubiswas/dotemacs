@@ -34,6 +34,11 @@
 (setq straight-use-package-by-default t
       straight-disable-native-compile nil)
 
+;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
+;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
+;; persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
+;; packages to their locked versions, making the config totally reproducible across environments.
+
 ;; Freeze package versions with `straight-freeze-versions' which will write the versions in a
 ;; lockfile. All package versions can be restored to the versions specified in the lockfile with
 ;; `straight-thaw-versions'.

@@ -225,22 +225,15 @@
                             (sb/ivy-rich-file-size (:width 10 :align right
                                                            :face font-lock-doc-face)))))
 
-  ;; Increase the width to see the major mode clearly
-  (ivy-rich-modify-columns 'ivy-switch-buffer
-                           '((ivy-rich-switch-buffer-size (:align right))
-                             (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
-                             (ivy-rich-switch-buffer-project (:width 0.24 :face success))))
+  ;; ;; Increase the width to see the major mode clearly
+  ;; (ivy-rich-modify-columns 'ivy-switch-buffer
+  ;;                          '((ivy-rich-switch-buffer-size (:align right))
+  ;;                            (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
+  ;;                            (ivy-rich-switch-buffer-project (:width 0.24 :face success))))
 
   (ivy-rich-set-columns 'counsel-recentf
                         '((file-name-nondirectory (:width 0.24))
                           (ivy-rich-candidate (:width 0.75)))))
-
-(use-package all-the-icons-ivy
-  :straight t
-  :after ivy
-  :demand t
-  :commands all-the-icons-ivy-setup
-  :config (all-the-icons-ivy-setup))
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
@@ -458,6 +451,142 @@
   :straight t
   :after vertico
   :init (marginalia-mode 1))
+
+;; The module does not specify an `autoload'. So we get the following error without the following
+;; declaration.
+;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
+;; function company-capf"
+(use-package company-capf
+  :straight company
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :commands company-capf)
+
+;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
+;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
+;; regex search.
+(use-package company
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :commands (company-abort company-files company-yasnippet
+                           company-ispell company-dabbrev
+                           company-capf company-dabbrev-code
+                           company-clang-set-prefix
+                           global-company-mode)
+  :defines (company-dabbrev-downcase company-dabbrev-ignore-case
+                                     company-dabbrev-other-buffers
+                                     company-ispell-available
+                                     company-ispell-dictionary
+                                     company-clang-insert-arguments)
+  :hook (after-init-hook . global-company-mode)
+  ;; The `company-posframe' completion kind indicator is not great, but we are now using
+  ;; `company-fuzzy'.
+  :diminish
+  :config
+  (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
+        company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
+        ;; Search in other buffers with the same major mode. This can cause
+        ;; performance overhead if there are lots of open buffers.
+        company-dabbrev-other-buffers nil
+        company-ispell-available t
+        company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
+        company-minimum-prefix-length 3 ; Small words can be faster to type
+        company-require-match nil ; Allow input string that do not match candidates
+        company-selection-wrap-around t
+        company-show-quick-access t ; Speed up completion
+        ;; Align additional metadata, like type signatures, to the right-hand side
+        company-tooltip-align-annotations t
+        ;; Disable insertion of arguments
+        company-clang-insert-arguments nil
+        ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
+        ;; strings
+        ;; https://github.com/company-mode/company-mode/discussions/1211
+        company-search-regexp-function 'company-search-words-in-any-order-regexp
+        company-frontends '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+                            ;; show selected candidate docs in echo area
+                            company-echo-metadata-frontend)
+        company-backends '(company-capf))
+
+  ;; We set `company-backends' as a local variable, so it is not important to delete backends
+  ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake company-clang))
+  ;;   (delq backends company-backends))
+
+  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
+  ;; https://github.com/company-mode/company-mode/issues/358
+  (push (apply-partially #'cl-remove-if
+                         (lambda (c)
+                           (string-match-p "\\`[0-9]+\\'" c)))
+        company-transformers)
+  :bind
+  (:map company-active-map
+        ("C-n"      . company-select-next)
+        ("C-p"      . company-select-previous)
+        ;; Insert the common part of all candidates, or select the next one
+        ("<tab>"    . company-complete-common-or-cycle)
+        ("C-M-/"    . company-other-backend) ; Was bound to `dabbrev-completion'
+        ("<escape>" . company-abort)))
+
+;; Silence "Starting 'look' process..." message
+(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+;; Hide the "Starting new Ispell process" message
+(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
+
+;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
+;; However, the width of the frame popup is often not enough and the right side gets cut off.
+;; https://github.com/company-mode/company-mode/issues/1010
+(use-package company-posframe
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after company
+  :demand t
+  :commands company-posframe-mode
+  :diminish
+  :config
+  (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
+        company-posframe-show-indicator nil ; Hide the backends, the display is not great
+        ;; Disable showing the help frame
+        company-posframe-quickhelp-delay nil)
+  (company-posframe-mode 1))
+
+(use-package company-quickhelp
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after company
+  :commands company-quickhelp-mode
+  ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
+  :hook (after-init-hook . company-quickhelp-mode))
+
+(use-package company-statistics
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after company
+  :demand t
+  :commands company-statistics-mode
+  :config (company-statistics-mode 1))
+
+;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
+(use-package company-fuzzy
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :straight flx
+  :after company
+  :diminish (company-fuzzy-mode global-company-fuzzy-mode)
+  :commands (global-company-fuzzy-mode company-fuzzy-mode)
+  :demand t
+  :custom
+  (company-fuzzy-sorting-backend 'flx)
+  (company-fuzzy-show-annotation nil "The right-hand side gets cut off")
+  ;; We should not need this because the `flx' sorting accounts for the prefix
+  (company-fuzzy-prefix-on-top t))
+
+(use-package company-shell
+  :straight t
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :after (:any sh-mode fish-mode)
+  :demand t
+  :defines company-shell-delete-duplictes
+  :commands (company-shell company-shell-env company-fish-shell)
+  :custom (company-shell-delete-duplictes t))
 
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
@@ -726,133 +855,6 @@
 ;;                               (sb/company-prog-mode)
 ;;                               (company-fuzzy-mode 1)
 ;;                               (diminish 'company-fuzzy-mode))))
-
-(use-package company-shell
-  :straight t
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :after (:any sh-mode fish-mode)
-  :demand t
-  :defines company-shell-delete-duplictes
-  :commands (company-shell company-shell-env company-fish-shell)
-  :custom (company-shell-delete-duplictes t))
-
-;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
-;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
-;; regex search.
-(use-package company
-  :straight t
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :commands (company-abort company-files company-yasnippet
-                           company-ispell company-dabbrev
-                           company-capf company-dabbrev-code
-                           company-clang-set-prefix
-                           global-company-mode)
-  :defines (company-dabbrev-downcase company-dabbrev-ignore-case
-                                     company-dabbrev-other-buffers
-                                     company-ispell-available
-                                     company-ispell-dictionary
-                                     company-clang-insert-arguments)
-  :hook (after-init-hook . global-company-mode)
-  ;; The `company-posframe' completion kind indicator is not great, but we are now using
-  ;; `company-fuzzy'.
-  :diminish
-  :config
-  (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
-        company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
-        ;; Search in other buffers with the same major mode. This can cause
-        ;; performance overhead if there are lots of open buffers.
-        company-dabbrev-other-buffers nil
-        company-ispell-available t
-        company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 3 ; Small words can be faster to type
-        company-require-match nil ; Allow input string that do not match candidates
-        company-selection-wrap-around t
-        company-show-quick-access t ; Speed up completion
-        ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t
-        ;; Disable insertion of arguments
-        company-clang-insert-arguments nil
-        ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
-        ;; strings
-        ;; https://github.com/company-mode/company-mode/discussions/1211
-        company-search-regexp-function 'company-search-words-in-any-order-regexp
-        company-frontends '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
-                            ;; show selected candidate docs in echo area
-                            company-echo-metadata-frontend)
-        company-backends '(company-capf))
-
-  ;; We set `company-backends' as a local variable, so it is not important to delete backends
-  ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake company-clang))
-  ;;   (delq backends company-backends))
-
-  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
-  ;; https://github.com/company-mode/company-mode/issues/358
-  (push (apply-partially #'cl-remove-if
-                         (lambda (c)
-                           (string-match-p "\\`[0-9]+\\'" c)))
-        company-transformers)
-  :bind
-  (:map company-active-map
-        ("C-n"      . company-select-next)
-        ("C-p"      . company-select-previous)
-        ;; Insert the common part of all candidates, or select the next one
-        ("<tab>"    . company-complete-common-or-cycle)
-        ("C-M-/"    . company-other-backend) ; Was bound to `dabbrev-completion'
-        ("<escape>" . company-abort)))
-
-;; Silence "Starting 'look' process..." message
-(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
-;; Hide the "Starting new Ispell process" message
-(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
-
-;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
-;; However, the width of the frame popup is often not enough and the right side gets cut off.
-;; https://github.com/company-mode/company-mode/issues/1010
-(use-package company-posframe
-  :straight t
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :after company
-  :demand t
-  :commands company-posframe-mode
-  :diminish
-  :config
-  (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
-        company-posframe-show-indicator nil ; Hide the backends, the display is not great
-        ;; Disable showing the help frame
-        company-posframe-quickhelp-delay nil)
-  (company-posframe-mode 1))
-
-(use-package company-quickhelp
-  :straight t
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :after company
-  :commands company-quickhelp-mode
-  ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
-  :hook (after-init-hook . company-quickhelp-mode))
-
-(use-package company-statistics
-  :straight t
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :after company
-  :demand t
-  :commands company-statistics-mode
-  :config (company-statistics-mode 1))
-
-;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
-(use-package company-fuzzy
-  :straight t
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :straight flx
-  :after company
-  :diminish (company-fuzzy-mode global-company-fuzzy-mode)
-  :commands (global-company-fuzzy-mode company-fuzzy-mode)
-  :demand t
-  :custom
-  (company-fuzzy-sorting-backend 'flx)
-  (company-fuzzy-show-annotation nil "The right-hand side gets cut off")
-  ;; We should not need this because the `flx' sorting accounts for the prefix
-  (company-fuzzy-prefix-on-top t))
 
 (use-package orderless
   :straight t

@@ -33,6 +33,13 @@
   (all-the-icons-scale-factor 0.9)
   (all-the-icons-color-icons nil))
 
+(use-package all-the-icons-ivy
+  :straight t
+  :after ivy
+  :demand t
+  :commands all-the-icons-ivy-setup
+  :config (all-the-icons-ivy-setup))
+
 (use-package leuven-theme
   :straight t
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'leuven))
@@ -248,6 +255,16 @@
   :straight t
   :if (not (bound-and-true-p doom-modeline-lsp))
   :hook (doom-modeline-mode-hook . minions-mode))
+
+(use-package telephone-line
+  :straight t
+  :if (eq sb/modeline-theme 'telephone-line)
+  :init (telephone-line-mode 1))
+
+(use-package airline-themes
+  :straight t
+  :if (eq sb/modeline-theme 'airline)
+  :init (load-theme 'airline-light t))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
@@ -546,7 +563,7 @@
   :init (all-the-icons-completion-mode))
 
 (use-package kind-icon
-  :straigh (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
+  :straight (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
