@@ -344,11 +344,16 @@
         ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
         recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
+
+  ;; (setq recentf-exclude `(,(expand-file-name "straight/build/" user-emacs-directory)
+  ;;                         ,(expand-file-name "eln-cache/" user-emacs-directory)
+  ;;                         ,(expand-file-name "etc/" user-emacs-directory)
+  ;;                         ,(expand-file-name "var/" user-emacs-directory)))
+
   ;; Use the true file name and not the symlink name
   (dolist (exclude `(,(file-truename no-littering-etc-directory)
                      ,(file-truename no-littering-var-directory)))
     (add-to-list 'recentf-exclude exclude))
-
   (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight")))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
@@ -414,7 +419,8 @@
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
   :commands server-running-p
   :init
-  (unless (server-running-p)
+  (unless (and (fboundp 'server-running-p)
+               (server-running-p))
     (server-start)))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)

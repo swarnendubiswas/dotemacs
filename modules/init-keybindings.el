@@ -433,6 +433,35 @@ _v_ verify setup    _f_ check           _m_ mode
   ("W" markdown-insert-wiki-link :color blue)
   ("R" markdown-insert-reference-link-dwim :color blue))
 
+(defhydra sb/hydra-straight (:hint nil)
+  "
+    _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
+    _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
+    ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
+    _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
+    _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
+  ("c" straight-check-all)
+  ("C" straight-check-package)
+  ("r" straight-rebuild-all)
+  ("R" straight-rebuild-package)
+  ("f" straight-fetch-all)
+  ("F" straight-fetch-package)
+  ("p" straight-pull-all)
+  ("P" straight-pull-package)
+  ("m" straight-merge-all)
+  ("M" straight-merge-package)
+  ("n" straight-normalize-all)
+  ("N" straight-normalize-package)
+  ("u" straight-push-all)
+  ("U" straight-push-package)
+  ("v" straight-freeze-versions)
+  ("V" straight-thaw-versions)
+  ("w" straight-watcher-start)
+  ("W" straight-watcher-quit)
+  ("g" straight-get-recipe)
+  ("e" straight-prune-build)
+  ("q" nil))
+
 (bind-key "C-c h a" #'sb/hydra-avy/body)
 (bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
 ;; (bind-key "C-c h e" #'sb/hydra-error/body)
@@ -445,6 +474,7 @@ _v_ verify setup    _f_ check           _m_ mode
 (bind-key "C-c h s" #'sb/hydra-spelling/body)
 (bind-key "C-c h t" #'sb/hydra-move-text/body)
 (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
+(bind-key "C-c h i" #'sb/hydra-straight/body)
 
 (provide 'init-keybindings)
 

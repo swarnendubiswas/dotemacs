@@ -15,7 +15,8 @@
 (setq straight-build-dir (format "build/%d%s%d"
                                  emacs-major-version
                                  version-separator
-                                 emacs-minor-version))
+                                 emacs-minor-version)
+      straight-check-for-modifications nil)
 
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -33,6 +34,14 @@
 (setq straight-use-package-by-default t
       straight-disable-native-compile nil)
 
+;; Freeze package versions with `straight-freeze-versions' which will write the versions in a
+;; lockfile. All package versions can be restored to the versions specified in the lockfile with
+;; `straight-thaw-versions'.
+;;;; Create a version file if it does not yet exist
+(when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
+                                            straight-base-dir)))
+  (straight-freeze-versions))
+
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
 ;; implies always load features lazily unless told otherwise. This implies we should use
@@ -48,21 +57,21 @@
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
 
-;; (when (bound-and-true-p sb/debug-init-file)
-;;   (setq debug-on-error                 t
-;;         debug-on-event                 'sigusr2
-;;         garbage-collection-messages    t
-;;         use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-;;         use-package-verbose            t
-;;         use-package-expand-minimally   nil)
-;;   (debug-on-entry 'projectile-remove-known-project))
+(when (bound-and-true-p sb/debug-init-file)
+  (setq debug-on-error                 t
+        debug-on-event                 'sigusr2
+        garbage-collection-messages    t
+        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+        use-package-verbose            t
+        use-package-expand-minimally   nil)
+  (debug-on-entry 'projectile-remove-known-project))
 
-;; (unless (bound-and-true-p sb/debug-init-file)
-;;   (setq ;; use-package-always-defer       t
-;;         ;; Avoid printing errors and warnings since the configuration is known to work
-;;         ;; use-package-expand-minimally   t
-;;         use-package-compute-statistics nil
-;;         use-package-verbose            nil))
+(unless (bound-and-true-p sb/debug-init-file)
+  (setq use-package-always-defer       t
+        ;; Avoid printing errors and warnings since the configuration is known to work
+        use-package-expand-minimally   t
+        use-package-compute-statistics nil
+        use-package-verbose            nil))
 
 (setq use-package-enable-imenu-support t
       ;; Avoid manual installations whenever I modify package installations

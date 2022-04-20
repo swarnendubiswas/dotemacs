@@ -63,7 +63,7 @@
   :hook (org-mode-hook . org-bullets-mode))
 
 (use-package org-appear ; Make invisible parts of Org elements appear visible
-  :straight t
+  :straight (org-appear :type git :host github :repo "awth13/org-appear")
   :commands org-appear-mode
   :hook (org-mode-hook . org-appear-mode)
   :custom

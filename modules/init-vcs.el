@@ -104,7 +104,7 @@
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
-  :straight nil
+  :straight (:type built-in)
   :after hydra
   :commands (smerge-next smerge-prev smerge-auto-leave
                          smerge-keep-base smerge-keep-upper

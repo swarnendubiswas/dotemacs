@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package dired
-  :straight nil
+  :straight (:type built-in)
   :commands (dired-next-line dired-jump)
   :defines dired-clean-confirm-killing-deleted-buffers
   :preface

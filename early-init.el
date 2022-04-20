@@ -11,8 +11,10 @@
 
 ;; https://github.com/kiwanami/emacs-epc/issues/35
 ;; http://tsengf.blogspot.com/2011/06/disable-byte-compile-warning-in-emacs.html
-(setq byte-compile-warnings '(not nresolved free-vars callargs redefine obsolete noruntime
-                                  cl-functions interactive-only))
+(setq byte-compile-warnings '(not unresolved free-vars callargs
+                                  redefine obsolete noruntime
+                                  lexical make-local cl-functions
+                                  interactive-only))
 
 (defconst sb/emacs-4MB    (*       4 1024 1024))
 (defconst sb/emacs-8MB    (*       8 1000 1024))
@@ -114,7 +116,8 @@
               (setq file-name-handler-alist file-name-handler-alist-orig))))
 
 ;; Disable `package.el' in favor of `straight.el'
-(setq package-enable-at-startup nil)
+(setq package-enable-at-startup nil
+      package-quickstart nil)
 
 ;; (when (featurep 'native-compile)
 ;;   (defvar package-native-compile)

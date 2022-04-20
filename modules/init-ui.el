@@ -546,7 +546,7 @@
   :init (all-the-icons-completion-mode))
 
 (use-package kind-icon
-  :straight t
+  :straigh (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
