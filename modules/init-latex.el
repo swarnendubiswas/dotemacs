@@ -1,3 +1,12 @@
+;;; init-latex.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
+;;; coding:utf-8; no-byte-compile: nil; fill-column: 100 -*-
+
+;; Swarnendu Biswas
+
+;;; Commentary:
+
+;;; Code:
+
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
@@ -271,11 +280,13 @@ Ignore if no file is found."
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
 (use-package math-preview
-  :straight nil
-  :disabled t
-  :commands (math-preview-all math-preview-at-point math-preview-region)
-  :custom
-  (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                          sb/user-tmp)))
+:straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
+:disabled t
+:commands (math-preview-all math-preview-at-point math-preview-region)
+:custom
+(math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+                                        sb/user-tmp)))
 
 (provide 'init-latex)
+
+;;; init-latex.el ends here

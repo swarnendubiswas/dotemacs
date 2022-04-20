@@ -32,6 +32,7 @@
 (require 'init-languages)
 (require 'init-vcs)
 (require 'init-org)
+(require 'init-latex)
 (require 'init-functions)
 (require 'init-temp)
 (require 'init-keybindings)

@@ -394,7 +394,7 @@
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
-  :straight (corfu :type git :host github :repo "minad/corfu")
+  :straight t
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :preface
   (defun sb/corfu-move-to-minibuffer ()
@@ -458,7 +458,7 @@
   :init (all-the-icons-completion-mode))
 
 (use-package kind-icon
-  :straight (kind-icon :type git :host github :repo "jdtsmith/kind-icon")
+  :straight t
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
