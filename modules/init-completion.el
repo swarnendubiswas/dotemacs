@@ -179,7 +179,48 @@
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
-  :custom (all-the-icons-ivy-rich-icon-size 0.9))
+  :custom (all-the-icons-ivy-rich-icon-size 0.9)
+  :config
+  (plist-put all-the-icons-ivy-rich-display-transformers-list
+             'counsel-recentf
+             '(:columns
+               ((all-the-icons-ivy-rich-file-icon)
+                (all-the-icons-ivy-rich-file-name (:width 0.5))
+                (all-the-icons-ivy-rich-file-id (:width 15
+                                                        :face all-the-icons-ivy-rich-file-owner-face
+                                                        :align right)))
+               :delimiter "\t"))
+
+  (plist-put all-the-icons-ivy-rich-display-transformers-list
+             'counsel-find-file
+             '(:columns
+               ((all-the-icons-ivy-rich-file-icon)
+                (all-the-icons-ivy-rich-file-name (:width 0.4))
+                (all-the-icons-ivy-rich-file-id (:width 15
+                                                        :face all-the-icons-ivy-rich-file-owner-face
+                                                        :align right)))
+               :delimiter "\t"))
+
+  (plist-put
+   all-the-icons-ivy-rich-display-transformers-list
+   'ivy-switch-buffer
+   '(:columns
+     ((all-the-icons-ivy-rich-buffer-icon)
+      (ivy-rich-candidate (:width 30))
+      (ivy-rich-switch-buffer-indicators (:width 4
+                                                 :face all-the-icons-ivy-rich-indicator-face
+                                                 :align right))
+      (all-the-icons-ivy-rich-switch-buffer-major-mode
+       (:width 18 :face all-the-icons-ivy-rich-major-mode-face))
+      (ivy-rich-switch-buffer-project (:width 0.12 :face all-the-icons-ivy-rich-project-face))
+      (ivy-rich-switch-buffer-path (:width
+                                    (lambda (x)
+                                      (ivy-rich-switch-buffer-shorten-path
+                                       x
+                                       (ivy-rich-minibuffer-width 0.3)))
+                                    :face all-the-icons-ivy-rich-path-face)))
+     :predicate (lambda (cand) (get-buffer cand))
+     :delimiter "\t")))
 
 (use-package ivy-rich
   :straight t
@@ -212,18 +253,18 @@
   (setq ivy-rich-parse-remote-buffer nil)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 
-  (if (display-graphic-p)
-      (ivy-rich-set-columns 'counsel-find-file
-                            '((all-the-icons-ivy-rich-file-icon)
-                              (ivy-rich-candidate    (:width 0.70))
-                              (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
-                              (sb/ivy-rich-file-size (:width 10 :align right
-                                                             :face font-lock-doc-face))))
-    (ivy-rich-set-columns 'counsel-find-file
-                          '((ivy-rich-candidate    (:width 0.70))
-                            (sb/ivy-rich-file-user (:width 15 :face font-lock-doc-face))
-                            (sb/ivy-rich-file-size (:width 10 :align right
-                                                           :face font-lock-doc-face)))))
+  (ivy-rich-project-root-cache-mode 1)
+
+  ;; (if (display-graphic-p)
+  ;;     (ivy-rich-set-columns 'counsel-find-file
+  ;;                           '((all-the-icons-ivy-rich-file-icon)
+  ;;                             (ivy-rich-candidate    (:width 0.70))
+  ;;                             (sb/ivy-rich-file-size (:width 10 :align right
+  ;;                                                            :face font-lock-doc-face))))
+  ;;   (ivy-rich-set-columns 'counsel-find-file
+  ;;                         '((ivy-rich-candidate    (:width 0.70))
+  ;;                           (sb/ivy-rich-file-size (:width 10 :align right
+  ;;                                                          :face font-lock-doc-face)))))
 
   ;; ;; Increase the width to see the major mode clearly
   ;; (ivy-rich-modify-columns 'ivy-switch-buffer
@@ -231,9 +272,10 @@
   ;;                            (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
   ;;                            (ivy-rich-switch-buffer-project (:width 0.24 :face success))))
 
-  (ivy-rich-set-columns 'counsel-recentf
-                        '((file-name-nondirectory (:width 0.24))
-                          (ivy-rich-candidate (:width 0.75)))))
+  ;; (ivy-rich-set-columns 'counsel-recentf
+  ;;                       '((file-name-nondirectory (:width 0.24))
+  ;;                         (ivy-rich-candidate (:width 0.75))))
+  )
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
@@ -299,6 +341,7 @@
 
 (use-package consult
   :straight t
+  :if (eq sb/minibuffer-completion 'vertico)
   :commands consult--customize-put
   :custom
   (consult-line-start-from-top t "Start search from the beginning")

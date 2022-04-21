@@ -52,18 +52,17 @@
   :commands (swiper swiper-isearch)
   :custom (swiper-action-recenter t))
 
-(progn
-  (with-eval-after-load "grep"
-    (defvar grep-highlight-matches)
-    (defvar grep-scroll-output)
-    (defvar grep-find-ignored-directories)
+(with-eval-after-load "grep"
+  (defvar grep-highlight-matches)
+  (defvar grep-scroll-output)
+  (defvar grep-find-ignored-directories)
 
-    (setq grep-command           "grep -irHn "
-          grep-highlight-matches t
-          grep-scroll-output     t)
+  (setq grep-command           "grep -irHn "
+        grep-highlight-matches t
+        grep-scroll-output     t)
 
-    (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
-      (add-to-list 'grep-find-ignored-directories dirs))))
+  (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
+    (add-to-list 'grep-find-ignored-directories dirs)))
 
 ;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
@@ -78,7 +77,8 @@
   :custom (wgrep-auto-save-buffer t))
 
 ;; Use "S" to change the search term, "D" to change the search directory, "g" to rerun the search,
-;; and "o" to view the result in another window.
+;; "o" to view the result in another window, "n" and "p" to move between results buttons, "M-n" and
+;; "M-p" to move between file headers, and "C-c C-k" to stop a running search.
 (use-package deadgrep
   :straight t
   :bind ("C-c s d" . deadgrep))

@@ -151,8 +151,8 @@
 ;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
 
 ;; These are alternative ways to manipulate the `exec-path'.
-;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp)))"
-;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp))"
+;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
+;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 (use-package exec-path-from-shell
   :straight t
   :defines exec-path-from-shell-check-startup-files

@@ -482,7 +482,7 @@
                                          (list "-j 2"
                                                (concat "--rcfile="
                                                        (expand-file-name ".config/pylintrc"
-                                                                         sb/user-home))))
+                                                                         sb/user-home-directory))))
           lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
           lsp-pylsp-plugins-yapf-enabled t))
 
@@ -856,7 +856,7 @@
   (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url (expand-file-name
                                  "github/dotfiles/java/eclipse-format-swarnendu.xml"
-                                 sb/user-home)))
+                                 sb/user-home-directory)))
 
 (use-package ant
   :straight t

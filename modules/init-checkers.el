@@ -64,14 +64,14 @@
     (setq flycheck-mode-line nil))
 
   (setq-default flycheck-markdown-markdownlint-cli-config (expand-file-name ".markdownlint.json"
-                                                                            sb/user-home)
+                                                                            sb/user-home-directory)
                 flycheck-chktexrc "chktexrc"
                 flycheck-pylintrc '("setup.cfg" "pylintrc")
                 flycheck-python-pylint-executable "python3"
                 flycheck-shellcheck-follow-sources nil
-                flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-home)
+                flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-directory)
                 flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                               sb/textlint-home))
+                                                               sb/textlint-directory))
 
   (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
   (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))

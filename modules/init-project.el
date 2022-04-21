@@ -95,16 +95,16 @@
   (setq projectile-auto-discover nil
         projectile-project-search-path (list
                                         (concat `,(getenv "HOME") "/bitbucket")
-                                        (expand-file-name "github"            sb/user-home)
-                                        (expand-file-name "iitk-workspace"    sb/user-home)
-                                        (expand-file-name "iitkgp-workspace"  sb/user-home)
-                                        (expand-file-name "iss-workspace"     sb/user-home)
-                                        (expand-file-name "plass-workspace"   sb/user-home)
-                                        (expand-file-name "prospar-workspace" sb/user-home)
+                                        (expand-file-name "github"            sb/user-home-directory)
+                                        (expand-file-name "iitk-workspace"    sb/user-home-directory)
+                                        (expand-file-name "iitkgp-workspace"  sb/user-home-directory)
+                                        (expand-file-name "iss-workspace"     sb/user-home-directory)
+                                        (expand-file-name "plass-workspace"   sb/user-home-directory)
+                                        (expand-file-name "prospar-workspace" sb/user-home-directory)
                                         ))
 
   (dolist (prjs (list
-                 (expand-file-name sb/user-home) ; Do not consider $HOME as a project
+                 (expand-file-name sb/user-home-directory) ; Do not consider $HOME as a project
                  "~/" ; Do not consider $HOME as a project
                  (expand-file-name "/tmp")
                  ))

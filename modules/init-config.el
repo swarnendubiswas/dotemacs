@@ -52,7 +52,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'airline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -108,17 +108,35 @@ Sometimes we do not want to unnecessarily add differences due to
   :type  'boolean
   :group 'sb/emacs)
 
-(defconst sb/user-home
+(defconst sb/user-home-directory
   (getenv "HOME")
   "User HOME directory.")
 
-(defconst sb/user-tmp
-  (expand-file-name "tmp" sb/user-home)
+(defconst sb/user-config-directory
+  (path-join (getenv-or "XDG_CONFIG_HOME"
+                        (path-join sb/user-home-directory ".config"))
+             "emacs")
+  "Path to user's local cache store.")
+
+(defconst sb/user-data-directory
+  (path-join (getenv-or "XDG_DATA_HOME"
+                        (path-join sb/user-local-directory "share"))
+             "emacs")
+  "Path to user's local data store.")
+
+(defconst sb/user-cache-directory
+  (path-join (getenv-or "XDG_CACHE_HOME"
+                        (path-join sb/user-home-directory ".cache"))
+             "emacs")
+  "Path to user's local cache store.")
+
+(defconst sb/user-tmp-directory
+  (expand-file-name "tmp" sb/user-home-directory)
   "User temp directory.
 This location is used for temporary installations and files.")
 
-(defcustom sb/textlint-home
-  (expand-file-name "textlint-workspace" sb/user-tmp)
+(defcustom sb/textlint-directory
+  (expand-file-name "textlint-workspace" sb/user-tmp-directory)
   "Absolute path to textlint workspace."
   :type  'string
   :group 'sb/emacs)

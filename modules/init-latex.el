@@ -285,7 +285,7 @@ Ignore if no file is found."
 :commands (math-preview-all math-preview-at-point math-preview-region)
 :custom
 (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                        sb/user-tmp)))
+                                        sb/user-tmp-directory)))
 
 (provide 'init-latex)
 
