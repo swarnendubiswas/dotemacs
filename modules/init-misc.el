@@ -214,8 +214,7 @@
   :commands (define-word define-word-at-point))
 
 (use-package number-separator
-  :straight nil
-  :load-path "extras"
+  :straight (number-separator :type git :host github :repo "legalnonsense/number-separator.el")
   :commands number-separator-mode
   :disabled t
   :diminish
@@ -261,7 +260,7 @@
   :commands (bug-hunter-init-file bug-hunter-file))
 
 (use-package explain-pause-mode
-  :straight nil
+  :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
   :if (bound-and-true-p sb/debug-init-file)
   :load-path "extras"
   :disabled t

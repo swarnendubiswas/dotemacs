@@ -113,21 +113,13 @@ Sometimes we do not want to unnecessarily add differences due to
   "User HOME directory.")
 
 (defconst sb/user-config-directory
-  (path-join (getenv-or "XDG_CONFIG_HOME"
-                        (path-join sb/user-home-directory ".config"))
-             "emacs")
-  "Path to user's local cache store.")
-
-(defconst sb/user-data-directory
-  (path-join (getenv-or "XDG_DATA_HOME"
-                        (path-join sb/user-local-directory "share"))
-             "emacs")
-  "Path to user's local data store.")
+  (or (getenv "XDG_CONFIG_HOME")
+      (expand-file-name ".config" sb/user-home-directory))
+  "Path to user's local config store.")
 
 (defconst sb/user-cache-directory
-  (path-join (getenv-or "XDG_CACHE_HOME"
-                        (path-join sb/user-home-directory ".cache"))
-             "emacs")
+  (or (getenv "XDG_CACHE_HOME")
+      (expand-file-name ".cache" sb/user-home-directory))
   "Path to user's local cache store.")
 
 (defconst sb/user-tmp-directory

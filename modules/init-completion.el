@@ -279,7 +279,16 @@
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
-  :straight t
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes
+                     (vertico-buffer
+                      vertico-directory
+                      vertico-flat
+                      vertico-indexed
+                      vertico-mouse
+                      vertico-quick
+                      vertico-repeat
+                      vertico-reverse))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands command-completion-default-include-p
@@ -294,6 +303,33 @@
   ;; hidden in normal buffers.
   (when sb/EMACS28+
     (setq read-extended-command-predicate #'command-completion-default-include-p))
+
+  ;; More convenient directory navigation commands
+  (use-package vertico-directory
+    :after vertico
+    :bind
+    (:map vertico-map
+          ("RET" . vertico-directory-enter)
+          ("DEL" . vertico-directory-delete-char)
+          ("M-DEL" . vertico-directory-delete-word))
+    ;; Tidy shadowed file names
+    :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
+
+  (use-package vertico-repeat
+    :hook (minibuffer-setup-hook . vertico-repeat-save)
+    :bind
+    (("C-c r" . vertico-repeat-last)
+     ("M-r" . vertico-repeat-select)))
+
+  (use-package vertico-indexed
+    :commands vertico-indexed-mode
+    :init (vertico-indexed-mode 1))
+
+  (use-package vertico-quick
+    :bind
+    (:map vertico-map
+          ("C-c q" . vertico-quick-insert)
+          ("C-'" . vertico-quick-exit)))
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
@@ -301,43 +337,6 @@
    ("?" . minibuffer-completion-help)
    ("M-RET" . minibuffer-force-complete-and-exit)
    ("M-TAB" . minibuffer-complete)))
-
-;; More convenient directory navigation commands
-(use-package vertico-directory
-  :after vertico
-  :straight nil
-  :load-path "extras"
-  :bind
-  (:map vertico-map
-        ("RET" . vertico-directory-enter)
-        ("DEL" . vertico-directory-delete-char)
-        ("M-DEL" . vertico-directory-delete-word))
-  ;; Tidy shadowed file names
-  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy))
-
-(use-package vertico-repeat
-  :after vertico
-  :straight nil
-  :load-path "extras"
-  :hook (minibuffer-setup-hook . vertico-repeat-save)
-  :bind
-  (("C-c r" . vertico-repeat-last)
-   ("M-r" . vertico-repeat-select)))
-
-(use-package vertico-indexed
-  :after vertico
-  :straight nil
-  :load-path "extras"
-  :commands vertico-indexed-mode
-  :init (vertico-indexed-mode 1))
-
-(use-package vertico-quick
-  :after vertico
-  :straight nil
-  :bind
-  (:map vertico-map
-        ("C-c q" . vertico-quick-insert)
-        ("C-'" . vertico-quick-exit)))
 
 (use-package consult
   :straight t
@@ -437,7 +436,10 @@
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
-  :straight t
+  :straight (corfu :includes (corfu-indexed
+                              corfu-quick
+                              corfu-history)
+                   :files (:defaults "extensions/corfu-*.el"))
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :preface
   (defun sb/corfu-move-to-minibuffer ()
@@ -455,6 +457,15 @@
   (corfu-max-width corfu-min-width)
   (corfu-count 15)
   (corfu-preselect-first t)
+  :config
+  (use-package corfu-quick
+    :bind
+    (:map corfu-map
+          ("C-q" . corfu-quick-insert)))
+  (use-package corfu-indexed
+    :init (corfu-indexed-mode 1))
+  (use-package corfu-history
+    :init (corfu-history-mode 1))
   :bind
   (:map corfu-map
         ([tab] . corfu-next)
