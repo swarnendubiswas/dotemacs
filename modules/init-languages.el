@@ -240,7 +240,10 @@
   :mode ("\\.bison\\'"))
 
 (use-package llvm-mode
-  :straight nil
+  :straight t
+  ;; :straight (llvm-mode :type git :host github
+  ;;                      :repo "llvm/llvm-project"
+  ;;                      :files "llvm/utils/emacs/llvm-mode.el")
   :load-path "extras"
   :commands llvm-mode
   :mode "\\.ll\\'")

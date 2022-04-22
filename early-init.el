@@ -35,7 +35,7 @@
       gc-cons-percentage 0.3 ; Portion of heap used for allocation
       gc-cons-threshold most-positive-fixnum)
 
-;; GC may happen after this many bytes are allocated since last GC If you experience freezing,
+;; GC may happen after this many bytes are allocated since last GC. If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
 (defun sb/defer-garbage-collection ()
   "Defer garbage collection."

@@ -217,6 +217,7 @@ Ignore if no file is found."
               ("C-c l n" . bib-find-next)
               ("C-c l h" . bib-highlight-mouse)))
 
+;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 ;; We can disable this once `lsp-latex-build' works well
 (use-package auctex-latexmk
   :after tex-mode

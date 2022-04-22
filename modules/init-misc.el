@@ -262,7 +262,6 @@
 (use-package explain-pause-mode
   :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
   :if (bound-and-true-p sb/debug-init-file)
-  :load-path "extras"
   :disabled t
   :commands (explain-pause-mode explain-pause-top)
   :diminish)
@@ -275,9 +274,8 @@
   :straight nil
   :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
-  :config
-  ;; Wrap around at edges
-  (setq windmove-wrap-around t))
+  :custom
+  (windmove-wrap-around t "Wrap around at edges"))
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this

@@ -15,7 +15,7 @@
  ;; ("<f11>"     . delete-other-windows) ; Conflicts with Gnome window manager keybindings
  ("C-x k"     . kill-this-buffer)
  ("M-<left>"  . previous-buffer)
- ("C-S-<tab>" . previous-buffer)
+ ("C-S-<iso-lefttab>" . previous-buffer)
  ("M-<right>" . next-buffer)
  ("C-<tab>"   . next-buffer)
  ("C-c d f"   . auto-fill-mode)
@@ -44,7 +44,8 @@
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 
-(bind-key   "C-x j" #'sb/counsel-all-files-recursively)
+(when (eq sb/minibuffer-completion 'ivy)
+  (bind-key   "C-x j" #'sb/counsel-all-files-recursively))
 
 (unless (featurep 'centaur-tabs)
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
@@ -83,6 +84,7 @@
 
 (use-package which-key-posframe
   :straight t
+  :disabled t
   :commands which-key-posframe-mode
   :hook (which-key-mode-hook . which-key-posframe-mode)
   :config
@@ -229,16 +231,6 @@
 
 (defhydra sb/hydra-flycheck (:color blue)
   "
-^
-^Flycheck^          ^Errors^            ^Checker^
-^────────^──────────^──────^────────────^───────^─────
-_q_ quit            _<_ previous        _?_ describe
-_M_ manual          _>_ next            _d_ disable
-_v_ verify setup    _f_ check           _m_ mode
-^^                  _l_ list            _s_ select
-^^                  ^^                  ^^
-
-
                                               ^
                                               ^Flycheck^          ^Errors^            ^Checker^
                                               ^────────^──────────^──────^────────────^───────^─────
