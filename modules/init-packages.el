@@ -85,7 +85,6 @@
       use-package-hook-name-suffix     nil)
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
-  :straight t
   :diminish
   :commands (gcmh-mode gcmh-idle-garbage-collect)
   :hook (after-init-hook . gcmh-mode)
@@ -102,19 +101,15 @@
 ;;    ("C-c d l" . package-list-packages)))
 
 (use-package f
-  :straight t
   :commands (f-exists? f-join f-dirname))
 
 (use-package s
-  :straight t
   :commands s-starts-with? s-ends-with?)
 
 (use-package dash
-  :straight t
   :commands (-contains? -tree-map))
 
 (use-package no-littering
-  :straight t
   :demand t)
 
 (defcustom sb/custom-file
@@ -140,12 +135,10 @@
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
 (use-package bind-key
-  :straight t
   :functions bind-key--remove
   :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package diminish
-  :straight t)
+(use-package diminish)
 
 ;; Get PATH with "(getenv "PATH")".
 ;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
@@ -154,7 +147,6 @@
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 (use-package exec-path-from-shell
-  :straight t
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
   :if (or (daemonp) (memq window-system '(x ns)))

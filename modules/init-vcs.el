@@ -18,7 +18,6 @@
   (remove-hook 'find-file-hook #'vc-refresh-state))
 
 (use-package magit
-  :straight t
   :commands magit-display-buffer-fullframe-status-v1
   :bind
   (("C-x g"   . magit-status)
@@ -52,11 +51,9 @@
     (magit-diff-paint-whitespace   nil)))
 
 (use-package git-modes
-  :straight t
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
 (use-package git-gutter
-  :straight t
   :if (unless (boundp 'vc-handled-backends))
   :disabled t
   :commands global-git-gutter-mode
@@ -77,7 +74,6 @@
 
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
-  :straight t
   :if (boundp 'vc-handled-backends)
   :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh
                                        diff-hl-dired-mode-unless-remote global-diff-hl-mode)
@@ -95,7 +91,6 @@
    (after-init-hook         . global-diff-hl-mode)))
 
 (use-package git-commit
-  :straight t
   :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
   :custom
@@ -163,9 +158,6 @@
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 (use-package treemacs-magit
-  :straight magit
-  :straight treemacs
-  :straight t
   :after (treemacs magit)
   :demand t)
 

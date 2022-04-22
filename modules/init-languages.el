@@ -25,7 +25,7 @@
   :hook (prog-mode-hook . subword-mode))
 
 (use-package outline ; Edit outlines
-  :straight t
+  :straight nil
   :disabled t
   :hook (prog-mode-hook . outline-minor-mode)
   :diminish outline-minor-mode)
@@ -50,7 +50,6 @@
       tags-revert-without-query t)
 
 (use-package xref
-  :straight t
   :commands xref-etags-mode
   :bind
   (("M-'"   . xref-find-definitions)
@@ -63,7 +62,6 @@
    ("r"     . xref-query-replace-in-results)))
 
 (use-package dumb-jump
-  :straight t
   :after xref
   :demand t
   :commands dumb-jump-xref-activate
@@ -73,7 +71,6 @@
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package ivy-xref
-  :straight t
   :after (ivy xref)
   :demand t
   :custom
@@ -81,7 +78,6 @@
   (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 (use-package counsel-etags
-  :straight t
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
   :if (and (symbol-value 'sb/IS-LINUX) (eq sb/minibuffer-completion 'ivy) (executable-find "ctags"))
@@ -105,23 +101,20 @@
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package highlight-indentation
-  :straight t
   :commands highlight-indentation-mode
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
 (use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
-  :straight t
   :commands aggressive-indent-mode
   :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
   :diminish
-  :config
-  (setq aggressive-indent-comments-too t
-        ;; Never use `electric-indent-mode'
-        aggressive-indent-dont-electric-modes t))
+  :custom
+  (aggressive-indent-comments-too t)
+  ;; Never use `electric-indent-mode'
+  (aggressive-indent-dont-electric-modes t))
 
 (use-package symbol-overlay ; Highlight symbol under point
-  :straight t
   :diminish
   :commands (symbol-overlay-mode)
   :hook (prog-mode-hook . symbol-overlay-mode)
@@ -134,13 +127,11 @@
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
-  :straight t
   :commands ws-butler-mode
   :diminish
   :hook (prog-mode-hook . ws-butler-mode))
 
 (use-package highlight-escape-sequences
-  :straight t
   :commands hes-mode
   :hook (prog-mode-hook . hes-mode))
 
@@ -161,7 +152,6 @@
        (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
 
 (use-package yaml-mode
-  :straight t
   :defines lsp-ltex-enabled lsp-disabled-clients
   :commands yaml-mode
   :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
@@ -185,13 +175,11 @@
     :server-id 'yamlls-r)))
 
 (use-package yaml-imenu
-  :straight t
   :after yaml-mode
   :demand t
   :config (yaml-imenu-enable))
 
 (use-package css-mode
-  :straight t
   :commands css-mode
   :defines sb/flycheck-local-checkers
   :hook (css-mode-hook . lsp-deferred)
@@ -219,7 +207,6 @@
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
-  :straight t
   :defines lsp-disabled-clients
   :commands csv-mode
   :hook
@@ -236,11 +223,10 @@
   :mode "\\.g4\\'")
 
 (use-package bison-mode
-  :straight t
   :mode ("\\.bison\\'"))
 
 (use-package llvm-mode
-  :straight t
+  :straight nil
   ;; :straight (llvm-mode :type git :host github
   ;;                      :repo "llvm/llvm-project"
   ;;                      :files "llvm/utils/emacs/llvm-mode.el")
@@ -252,11 +238,9 @@
   :straight nil
   :load-path "extras"
   :commands tablegen-mode
-  :disabled t
   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
-  :straight t
   :commands autodisass-llvm-bitcode
   :mode "\\.bc\\'")
 
@@ -264,7 +248,6 @@
 ;; more shortcuts.
 ;; https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  :straight t
   :commands (markdown-mode gfm-mode markdown-insert-bold
                            markdown-insert-italic
                            markdown-insert-blockquote
@@ -309,7 +292,6 @@
 
 ;; ;; Generate TOC with `markdown-toc-generate-toc'
 ;; (use-package markdown-toc
-;;   :straight t
 ;;   :after markdown-mode
 ;;   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
 ;;                                       markdown-toc-generate-or-refresh-toc))
@@ -317,7 +299,6 @@
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 ;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
-  :straight t
   :commands (pandoc-load-default-settings pandoc-mode)
   :diminish
   :hook (markdown-mode-hook . pandoc-mode)
@@ -325,7 +306,6 @@
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
-  :straight t
   :disabled t
   :commands markdown-preview-mode)
 
@@ -333,7 +313,6 @@
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :straight spinner
-  :straight t
   :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -534,7 +513,6 @@
    ("b" . lsp-workspace-blacklist-remove)))
 
 (use-package lsp-ui
-  :straight t
   :defines lsp-ui-modeline-code-actions-enable
   :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-doc--hide-frame
                              lsp-ui-peek-find-implementation lsp-ui-imenu)
@@ -569,7 +547,6 @@
 
 ;; Sync workspace folders and treemacs projects
 (use-package lsp-treemacs
-  :straight t
   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
   :config (lsp-treemacs-sync-mode 1)
   :bind
@@ -582,7 +559,6 @@
         ("E" . lsp-treemacs-errors-list)))
 
 (use-package lsp-ivy
-  :straight t
   :after (lsp-mode ivy)
   :demand t
   :bind
@@ -591,14 +567,12 @@
         ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
-  :straight t
   :commands (dap-debug dap-hydra dap-mode dap-ui-mode)
   :hook
   ((lsp-mode-hook . dap-mode)
    (lsp-mode-hook . dap-ui-mode)))
 
 (use-package docstr
-  :straight t
   :diminish
   :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
@@ -641,25 +615,21 @@
         ("M-q"     . c-fill-paragraph)))
 
 (use-package modern-cpp-font-lock
-  :straight t
   :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode-hook . modern-c++-font-lock-mode))
 
 (use-package cuda-mode
-  :straight t
   :commands cuda-mode
   :mode
   (("\\.cu\\'"  . c++-mode)
    ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
-  :straight t
   :commands opencl-mode
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
-  :straight t
   :if (executable-find "cmake")
   :commands cmake-mode
   :mode "\(CMakeLists\.txt|\.cmake\)$"
@@ -679,7 +649,6 @@
     :server-id 'cmakels-r)))
 
 (use-package cmake-font-lock
-  :straight t
   :commands cmake-font-lock-activate
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
@@ -714,7 +683,6 @@
   )
 
 (use-package python-docstring
-  :straight t
   :after python-mode
   :demand t
   :commands (python-docstring-mode python-docstring-install)
@@ -722,11 +690,9 @@
   :config (python-docstring-install))
 
 (use-package pip-requirements
-  :straight t
   :commands pip-requirements-mode)
 
 (use-package pyvenv
-  :straight t
   :commands (pyvenv-mode pyvenv-tracking-mode)
   :hook (python-mode-hook . pyvenv-mode)
   :custom
@@ -741,7 +707,6 @@
                                    (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
-  :straight t
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :commands py-isort-before-save
   :hook
@@ -752,7 +717,6 @@
 
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
-  :straight t
   :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
@@ -792,7 +756,6 @@
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used.
 (use-package yapfify
-  :straight t
   :diminish yapf-mode
   :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
   :commands yapf-mode
@@ -827,7 +790,6 @@
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
-  :straight t
   :commands (lsp-java-organize-imports lsp-java-build-project
                                        lsp-java-update-project-configuration
                                        lsp-java-actionable-notifications
@@ -862,16 +824,13 @@
                                  sb/user-home-directory)))
 
 (use-package ant
-  :straight t
   :commands (ant ant-clean ant-compile ant-test))
 
 (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
-  :straight t
   :commands autodisass-java-bytecode
   :mode "\\.class\\'")
 
 (use-package groovy-mode ; Syntax highlighting for Gradle files
-  :straight t
   :commands groovy-mode
   :mode "\\.gradle\\'")
 
@@ -895,7 +854,6 @@
     :server-id 'bashls-r)))
 
 (use-package fish-mode
-  :straight t
   :mode "\\.fish\\'"
   :interpreter "fish"
   :commands (fish-mode fish_indent-before-save)
@@ -904,7 +862,6 @@
                       (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package shfmt
-  :straight t
   :hook (sh-mode-hook . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
@@ -918,7 +875,6 @@
    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
-  :straight nil
   :commands web-mode
   :mode "\\.html?\\'"
   :hook (web-mode-hook . lsp-deferred)
@@ -945,7 +901,6 @@
     :server-id 'htmlls-r)))
 
 (use-package emmet-mode
-  :straight t
   :defines emmet-move-cursor-between-quote
   :commands emmet-mode
   :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
@@ -979,9 +934,6 @@
     :server-id 'xmlls-r)))
 
 (use-package json-mode
-  :straight json-reformat
-  :straight json-snatcher
-  :straight t
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
@@ -1004,7 +956,6 @@
     :server-id 'jsonls-r)))
 
 (use-package json-reformat
-  :straight t
   :after (:any json-mode jsonc-mode)
   :demand t
   :custom
@@ -1012,7 +963,6 @@
   (js-indent-level 2))
 
 (use-package bazel
-  :straight t
   :if (executable-find "bazel")
   :commands (bazel-mode bazelrc-mode bazel-buildifier)
   :hook
@@ -1021,36 +971,29 @@
    (bazel-mode-hook . flycheck-mode)))
 
 (use-package protobuf-mode
-  :straight t
   :commands protobuf-mode
   :mode "\\.proto$"
   :hook (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
   :straight nil
-  :ensure nil
   :commands mlir-mode
   :load-path "extras"
   :mode "\\.mlir\\'")
 
 (use-package clang-format
-  :straight t
   :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
   :custom (clang-format-style "file"))
 
 (use-package clang-format+
-  :straight t
-  :straight clang-format
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
   :custom (clang-format+-always-enable t))
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
-  :straight tree-sitter-langs
-  :straight t
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
   :diminish tree-sitter-mode
@@ -1071,7 +1014,6 @@
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (use-package dotenv-mode
-  :straight t
   :mode "\\.env\\'")
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
@@ -1098,13 +1040,11 @@
   :hook (Info-selection-hook . info-colors-fontify-node))
 
 (use-package consult-lsp
-  :straight t
   :after (consult lsp)
   :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
   :config (consult-lsp-marginalia-mode 1))
 
 (use-package rainbow-delimiters
-  :straight t
   :commands rainbow-delimiters-mode
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
@@ -1120,7 +1060,6 @@
 ;; https://github.com/jscheid/prettier.el/issues/84
 (use-package prettier
   :if (executable-find "prettier")
-  :straight t
   :disabled t
   :commands prettier-mode
   :hook
@@ -1133,16 +1072,13 @@
   :config (setq prettier-lighter nil))
 
 (use-package highlight-doxygen
-  :straight t
   :commands highlight-doxygen-global-mode
   :init (highlight-doxygen-global-mode))
 
 (use-package apt-sources-list
-  :straight t
   :commands apt-sources-list-mode)
 
 (use-package ssh-config-mode
-  :straight t
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode turn-on-font-lock)
   :hook (ssh-config-mode-hook . turn-on-font-lock))
 

@@ -12,7 +12,6 @@
 ;; performance is very poor, so I continue to prefer `auctex'.
 
 (use-package lsp-latex
-  :straight t
   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
                                        lsp-latex-bibtex-formatter-line-length
                                        lsp-latex-chktex-on-open-and-save
@@ -221,7 +220,6 @@ Ignore if no file is found."
 ;; We can disable this once `lsp-latex-build' works well
 (use-package auctex-latexmk
   :after tex-mode
-  :straight t
   :demand t
   :commands (auctex-latexmk-setup auctex-latexmk)
   :custom

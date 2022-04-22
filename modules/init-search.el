@@ -27,7 +27,6 @@
    ("C-c C-o" . isearch-occur)))
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
-  :straight t
   :after isearch
   :commands (isearch-forward-symbol ; "M-s _"
              isearch-symbol-at-point
@@ -35,7 +34,6 @@
              isearch-backward-symbol-at-point))
 
 (use-package anzu
-  :straight t
   :diminish anzu-mode
   :commands global-anzu-mode
   :init
@@ -47,7 +45,6 @@
    ([remap query-replace-regexp] . anzu-query-replace-regexp)))
 
 (use-package swiper
-  :straight t
   :if (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch)
   :custom (swiper-action-recenter t))
@@ -67,7 +64,6 @@
 ;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
 (use-package wgrep ; Writable grep
-  :straight t
   :bind
   (:map grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
         ("C-x C-p" . wgrep-change-to-wgrep-mode)
@@ -80,7 +76,6 @@
 ;; "o" to view the result in another window, "n" and "p" to move between results buttons, "M-n" and
 ;; "M-p" to move between file headers, and "C-c C-k" to stop a running search.
 (use-package deadgrep
-  :straight t
   :bind ("C-c s d" . deadgrep))
 
 (provide 'init-search)

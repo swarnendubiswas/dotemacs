@@ -8,13 +8,11 @@
 ;;; Code:
 
 (use-package ffap ; Find FILENAME, guessing a default from text around point.
-  :commands ffap
-  :straight t)
+  :commands ffap)
 
 ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
 ;; yet.
 (use-package project
-  :straight t
   :commands (project-switch-project project-current
                                     project-find-file project-execute-extended-command
                                     project-known-project-roots
@@ -38,7 +36,6 @@
         ("r" . project-query-replace-regexp)))
 
 (use-package projectile
-  :straight t
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
@@ -160,7 +157,6 @@
 
 ;; I am unsure how does this package advances `projectile' in terms of usability.
 (use-package counsel-projectile
-  :straight t
   :disabled t
   :if (eq sb/minibuffer-completion 'ivy)
   :defines counsel-projectile-default-file
@@ -223,12 +219,10 @@
   (("<f5>" . consult-projectile-switch-project)
    ("<f6>" . consult-projectile)))
 
-(use-package consult-project-extra
-  :straight t)
+(use-package consult-project-extra)
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
 (use-package treemacs-projectile
-  :straight t
   :after (treemacs projectile)
   :commands treemacs-projectile
   :demand t)

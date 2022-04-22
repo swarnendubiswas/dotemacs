@@ -53,7 +53,6 @@
 ;; performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
 (use-package smartparens
-  :straight t
   :commands (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
                      sp-transpose-sexp sp-absort-sexp sp-copy-sexp
                      sp-backward-kill-sexp sp-kill-sexp sp-change-inner

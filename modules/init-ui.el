@@ -23,7 +23,6 @@
   (find-font (font-spec :name font-name)))
 
 (use-package all-the-icons
-  :straight t
   :if (display-graphic-p)
   :commands all-the-icons-install-fonts
   :init
@@ -34,26 +33,22 @@
   (all-the-icons-color-icons nil))
 
 (use-package all-the-icons-ivy
-  :straight t
   :after ivy
   :demand t
   :commands all-the-icons-ivy-setup
   :config (all-the-icons-ivy-setup))
 
 (use-package leuven-theme
-  :straight t
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'leuven))
           (and (not (display-graphic-p)) (eq sb/tui-theme 'leuven)))
   :init (load-theme 'leuven t))
 
 (use-package zenburn-theme
-  :straight t
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'zenburn))
           (and (not (display-graphic-p)) (eq sb/tui-theme 'zenburn)))
   :init (load-theme 'zenburn t))
 
 (use-package doom-themes
-  :straight t
   :if (or (eq sb/gui-theme 'doom-molokai)
           (eq sb/gui-theme 'doom-one-light)
           (eq sb/gui-theme 'doom-one)
@@ -76,14 +71,11 @@
      ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t)))))
 
 (use-package monokai-theme
-  :straight t
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'monokai))
           (and (not (display-graphic-p)) (eq sb/tui-theme 'monokai)))
   :init (load-theme 'monokai t))
 
 (use-package modus-themes
-  :straight moody
-  :straight t
   :defines (modus-themes-completions modus-themes-fringes
                                      modus-themes-prompts
                                      modus-themes-lang-checkers
@@ -125,7 +117,6 @@
 
 ;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
 (use-package circadian
-  :straight t
   :commands circadian-setup
   :init
   (require 'solar)
@@ -133,13 +124,12 @@
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
         circadian-themes '((:sunrise . modus-vivendi)
-                           (:sunset  . doom-one)))
+                           (:sunset  . modus-vivendi)))
   (circadian-setup))
 
 ;; The Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
 (use-package powerline
-  :straight t
   :if (eq sb/modeline-theme 'powerline)
   :commands powerline-default-theme
   :init
@@ -158,8 +148,6 @@
   (powerline-default-theme))
 
 (use-package doom-modeline
-  :straight all-the-icons
-  :straight t
   :if (eq sb/modeline-theme 'doom-modeline)
   :commands doom-modeline-mode
   :init
@@ -178,7 +166,6 @@
   (doom-modeline-mode 1))
 
 (use-package spaceline
-  :straight t
   :defines (spaceline-hud-p spaceline-selection-info-p
                             spaceline-version-control-p spaceline-input-method-p
                             spaceline-persp-name-p
@@ -239,7 +226,6 @@
   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (use-package moody
-  :straight t
   :if (eq sb/modeline-theme 'moody)
   :commands (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
   :init
@@ -247,7 +233,6 @@
   (moody-replace-vc-mode))
 
 (use-package mini-modeline
-  :straight t
   :diminish mini-modeline-mode
   :if (eq sb/modeline-theme 'mini)
   :hook (after-init-hook . mini-modeline-mode)
@@ -265,18 +250,15 @@
 ;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
 ;; takes up lot of horizontal space.
 (use-package minions
-  :straight t
   :if (not (bound-and-true-p doom-modeline-lsp))
   :hook (doom-modeline-mode-hook . minions-mode))
 
 (use-package telephone-line
-  :straight t
   :if (eq sb/modeline-theme 'telephone-line)
   :init (telephone-line-mode 1))
 
 ;; https://github.com/AnthonyDiGirolamo/airline-themes/issues/28
 (use-package airline-themes
-  :straight t
   :if (eq sb/modeline-theme 'airline)
   :demand t
   :config (load-theme 'airline-doom-one t)
@@ -286,8 +268,6 @@
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
 (use-package auto-dim-other-buffers
-  :disabled t
-  :straight t
   :commands (adob--rescan-windows auto-dim-other-buffers-mode)
   ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
   :hook (after-init-hook . auto-dim-other-buffers-mode))
@@ -386,7 +366,6 @@
               (setq resize-mini-windows nil))))
 
 (use-package beacon
-  :straight t
   :commands beacon-mode
   :diminish
   :hook (after-init-hook . beacon-mode))
@@ -431,13 +410,11 @@
 ;; (set-default 'cursor-type '(bar . 4))
 
 (use-package hl-line
-  :straight t
   :commands hl-line-highlight
   :if (display-graphic-p)
   :hook (after-init-hook . global-hl-line-mode))
 
 (use-package centaur-tabs
-  :straight t
   :commands centaur-tabs-group-by-projectile-project
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :init
@@ -456,7 +433,6 @@
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
-  :straight t
   :if (display-mouse-p)
   :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode

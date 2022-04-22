@@ -58,7 +58,6 @@
 
 ;; Disabled the package to get consistent styles across themes.
 (use-package org-bullets
-  :straight t
   :commands org-bullets-mode
   :hook (org-mode-hook . org-bullets-mode))
 
@@ -73,7 +72,6 @@
   (org-appear-autoemphasis   t))
 
 (use-package ox-gfm
-  :straight t
   :after org
   :demand t
   :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))

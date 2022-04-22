@@ -105,7 +105,6 @@
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
 (use-package flyspell-popup
-  :straight t
   :after flyspell
   :disabled t
   :bind
@@ -114,7 +113,6 @@
   :config (setq flyspell-popup-correct-delay 0.1))
 
 (use-package flyspell-correct
-  :straight t
   :after flyspell
   :bind
   (:map flyspell-mode-map
@@ -123,7 +121,6 @@
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
-  :straight t
   :defines spell-fu-directory
   :commands spell-fu-mode
   :custom
@@ -191,7 +188,6 @@
    ("C-c f a" . spell-fu-word-add)))
 
 (use-package consult-flyspell
-  :straight t
   :after (consult flyspell)
   :commands consult-flyspell)
 

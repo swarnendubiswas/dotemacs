@@ -28,7 +28,6 @@
    ("C-M-/" . dabbrev-completion)))
 
 (use-package ivy
-  :straight t
   :functions ivy-format-function-line
   :commands (ivy-read ivy-mode)
   :if (eq sb/minibuffer-completion 'ivy)
@@ -85,8 +84,6 @@
    ("<right>"  . ivy-next-line)))
 
 (use-package counsel
-  :straight amx ; `counsel' makes use of `amx' if installed
-  :straight t
   :if (eq sb/minibuffer-completion 'ivy)
   :commands counsel-mode
   :preface
@@ -174,8 +171,6 @@
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
-  :straight ivy-rich
-  :straight t
   :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
@@ -234,7 +229,6 @@
      :delimiter "\t")))
 
 (use-package ivy-rich
-  :straight t
   :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
   :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
   :preface
@@ -350,7 +344,6 @@
    ("M-TAB" . minibuffer-complete)))
 
 (use-package consult
-  :straight t
   :if (eq sb/minibuffer-completion 'vertico)
   :commands consult--customize-put
   :custom
@@ -428,7 +421,6 @@
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 (use-package embark
   :after vertico
-  :straight t
   :init
   ;; Replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command
@@ -440,7 +432,6 @@
    ("C-c C-l" . embark-export)))
 
 (use-package embark-consult
-  :straight t
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
@@ -484,13 +475,11 @@
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (use-package corfu-doc
-  :straight t
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :hook (corfu-mode-hook . corfu-doc-mode))
 
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
-  :straight t
   :init
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
   (add-to-list 'completion-at-point-functions #'cape-file)
@@ -515,15 +504,12 @@
 ;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
 ;; which is better.
 (use-package all-the-icons-completion
-  :straight t
-  :straight all-the-icons
   :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode))
 
 (use-package kind-icon
-  :straight t
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
@@ -534,7 +520,6 @@
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package marginalia
-  :straight t
   :after vertico
   :init (marginalia-mode 1))
 
@@ -551,7 +536,6 @@
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
@@ -621,7 +605,6 @@
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
@@ -635,7 +618,6 @@
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :commands company-quickhelp-mode
@@ -643,7 +625,6 @@
   :hook (after-init-hook . company-quickhelp-mode))
 
 (use-package company-statistics
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :demand t
@@ -652,9 +633,7 @@
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :straight flx
   :after company
   :diminish (company-fuzzy-mode global-company-fuzzy-mode)
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
@@ -666,7 +645,6 @@
   (company-fuzzy-prefix-on-top t))
 
 (use-package company-shell
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after (:any sh-mode fish-mode)
   :demand t
@@ -675,7 +653,6 @@
   :custom (company-shell-delete-duplictes t))
 
 (use-package company-auctex
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t
@@ -684,26 +661,22 @@
                                  company-auctex-symbols company-auctex-environments))
 
 (use-package math-symbols
-  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after tex-mode
   :demand t) ; Required by `ac-math' and `company-math'
 
 (use-package company-math
-  :straight t
   :after tex-mode
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
 (use-package company-reftex ; Reftex must be enabled to work
-  :straight t
   :after tex-mode
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 
 (use-package company-bibtex
-  :straight t
   :after tex-mode
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :demand t
@@ -978,7 +951,6 @@
 ;;                               (diminish 'company-fuzzy-mode))))
 
 (use-package orderless
-  :straight t
   :after (:any ivy vertico)
   :demand t
   :defines orderless-component-separator
@@ -995,7 +967,6 @@
                                         )))
 
 (use-package yasnippet
-  :straight t
   :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((text-mode-hook prog-mode-hook) . yas-global-mode)
@@ -1009,31 +980,26 @@
   (unbind-key "<tab>" yas-minor-mode-map))
 
 (use-package yasnippet-snippets
-  :straight t
   :after yasnippet
   :demand t
   :commands yasnippet-snippets-initialize
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
-  :straight t
   :after ivy
   :bind ("C-M-y" . ivy-yasnippet))
 
 (use-package consult-yasnippet
-  :straight t
   :bind ("C-M-y" . consult-yasnippet))
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
-  :straight t
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t))
 
 ;; We are using `company-fuzzy' for sorting completion candidates
 (use-package company-prescient
-  :straight t
   :after company
   :demand t
   :commands company-prescient-mode

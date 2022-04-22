@@ -8,13 +8,11 @@
 ;;; Code:
 
 (use-package help-fns+
-  :straight t
   :demand t)
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
-  :straight t
   :bind
   (("C-h v" . helpful-variable)
    ("C-h k" . helpful-key)
@@ -27,7 +25,6 @@
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
-  :straight t
   :commands (hungry-delete-mode global-hungry-delete-mode)
   :diminish
   :hook
@@ -36,59 +33,49 @@
    (after-init-hook . global-hungry-delete-mode)))
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
-  :straight t
   :commands (move-text-up move-text-down move-text-default-bindings)
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
-  :straight t
   :bind* ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
-  :straight t
   :bind
   (("C-h C-m" . discover-my-major)
    ("C-h M-m" . discover-my-mode)))
 
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
-  :straight t
   :commands manage-minor-mode)
 
 (use-package expand-region ; Expand region by semantic units
-  :straight t
   :bind
   (("C-="   . er/expand-region)
    ("C-M-=" . er/contract-region)))
 
 (use-package expand-line
-  :straight t
   :diminish
   :bind ("M-i" . turn-on-expand-line-mode))
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
-  :straight t
   ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
   :hook (after-init-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :straight t
   :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
   :diminish (whole-line-or-region-local-mode)
   ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
   :hook (after-init-hook . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
-  :straight t
   :bind ("C-x C-\\" . goto-last-change))
 
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
-  :straight t
   ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
   :hook (after-init-hook . beginend-global-mode)
   :config
@@ -96,7 +83,6 @@
     (diminish mode)))
 
 (use-package undo-tree
-  :straight t
   :defines undo-tree-map
   :commands (global-undo-tree-mode undo-tree-redo)
   :diminish
@@ -114,18 +100,15 @@
    ("C-x u" . undo-tree-visualize)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
-  :straight t
   :bind* ("C-." . iedit-mode))
 
 ;; Avoid the "Overwrite old session file (not loaded)?" warning by loading the `session' package
 (use-package session
-  :straight t
   :disabled t
   :commands (session-initialize)
   :hook (after-init-hook . session-initialize))
 
 (use-package hl-todo
-  :straight t
   :commands global-hl-todo-mode
   ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
   :hook (after-init-hook . global-hl-todo-mode)
@@ -141,13 +124,11 @@
                                       hl-todo-keyword-faces)))
 
 (use-package highlight-numbers
-  :straight t
   :commands highlight-numbers-mode
   :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook
                          css-mode-hook html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
-  :straight t
   :diminish
   :commands (global-page-break-lines-mode page-break-lines-mode)
   ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
@@ -156,7 +137,6 @@
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
-  :straight t
   :bind
   (("C-<"     . mc/mark-previous-like-this)
    ("C->"     . mc/mark-next-like-this)
@@ -165,7 +145,6 @@
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
-  :straight t
   :if (display-graphic-p)
   :defines pdf-annot-activate-created-annotations
   :commands (pdf-tools-install pdf-loader-install pdf-view-mode
@@ -196,21 +175,17 @@
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
 (use-package saveplace-pdf-view
-  :straight t
   :after (pdf-tools saveplace)
   :demand t)
 
 (use-package logview
-  :straight t
   :commands logview-mode)
 
 (use-package wc-mode
-  :straight t
   :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
-  :straight t
   :commands (define-word define-word-at-point))
 
 (use-package number-separator
@@ -240,7 +215,6 @@
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
-  :straight t
   :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
   :custom
@@ -249,12 +223,10 @@
   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package esup
-  :straight t
   :commands esup
   :if (bound-and-true-p sb/debug-init-file))
 
 (use-package bug-hunter
-  :straight t
   :disabled t
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
@@ -267,7 +239,6 @@
   :diminish)
 
 (use-package ace-window
-  :straight t
   :bind ([remap other-window] . ace-window))
 
 (use-package windmove ; "Shift + direction" arrows
@@ -281,7 +252,6 @@
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
 ;; given that we have `auto-save-visited-mode' enabled.
 (use-package super-save
-  :straight t
   :defines (super-save-remote-files super-save-triggers)
   :commands super-save-mode
   :disabled t
@@ -295,7 +265,6 @@
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
-  :straight t
   :commands amx-mode
   :hook (after-init-hook . amx-mode)
   :bind
@@ -308,7 +277,6 @@
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
-  :straight t
   :commands avy-setup-default
   :bind
   (("M-b"   . avy-goto-word-1)
@@ -319,7 +287,6 @@
    ("M-g l" . avy-goto-line)))
 
 (use-package ace-jump-buffer
-  :straight t
   :bind ("C-b" . ace-jump-buffer)
   :config
   (setq ajb-max-window-height 30
@@ -327,7 +294,6 @@
 
 ;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
 (use-package ivy-avy
-  :straight t
   :after ivy
   :bind
   (:map ivy-minibuffer-map
@@ -339,7 +305,6 @@
   :straight nil)
 
 (use-package bm
-  :straight t
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
                                 bm-repository-load bm-buffer-save bm-buffer-restore)
   :preface
@@ -369,7 +334,6 @@
    ("C-<f3>" . bm-previous)))
 
 (use-package crux
-  :straight t
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
@@ -383,7 +347,6 @@
 ;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
 ;; Check https://github.com/akermu/emacs-libvterm.
 (use-package vterm
-  :straight t
   :config
   (setq vterm-always-compile-module t
         vterm-max-scrollback 5000
@@ -395,7 +358,6 @@
               (buffer-face-mode t))))
 
 (use-package vterm-toggle
-  :straight t
   :commands vterm-toggle
   :bind ("C-`" . vterm-toggle))
 
@@ -408,7 +370,6 @@
 ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
 ;; to `t' in the `.dir-locals.el' file.
 (use-package whitespace-cleanup-mode
-  :straight t
   :disabled t
   :diminish
   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
@@ -423,7 +384,6 @@
   (setq reb-re-syntax 'string))
 
 (use-package visual-regexp
-  :straight t
   :commands (vr/replace vr/query-replace vr/mark)
   :bind ([remap query-replace] . vr/query-replace))
 
@@ -438,7 +398,6 @@
 ;;   (bind-key "C-c d t" #'sb/ivy-tramp))
 
 (use-package counsel-tramp
-  :straight t
   :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c d t" . counsel-tramp))
 
@@ -455,9 +414,14 @@
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
 
 (use-package rainbow-mode
-  :straight t
   :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
+
+(use-package init-open-recentf
+  :after recentf
+  :demand t
+  :disabled t
+  :config (init-open-recentf))
 
 (provide 'init-misc)
 

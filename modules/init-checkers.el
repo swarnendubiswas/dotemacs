@@ -18,14 +18,12 @@
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-  :straight t
   :disabled t
   :commands (writegood-mode writegood-passive-voice-turn-off)
   :diminish
   :hook (text-mode-hook . writegood-mode))
 
 (use-package flycheck
-  :straight t
   :commands (flycheck-add-next-checker flycheck-next-checker
                                        flycheck-mode
                                        global-flycheck-mode
@@ -167,7 +165,6 @@
 
 ;; Showing error messages in the echo area is less intrusive.
 (use-package flycheck-popup-tip ; Show error messages in popups
-  :straight t
   :unless (display-graphic-p)
   :disabled t
   :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
@@ -176,7 +173,6 @@
 ;; https://github.com/flycheck/flycheck-popup-tip
 (use-package flycheck-pos-tip
   :disabled t
-  :straight t
   :commands flycheck-pos-tip-mode
   :if (display-graphic-p)
   :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
@@ -184,7 +180,6 @@
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 (use-package flycheck-posframe
   :disabled t
-  :straight t
   :if (display-graphic-p)
   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
   :hook (flycheck-mode-hook . flycheck-posframe-mode)
@@ -196,7 +191,6 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package langtool
-  :straight t
   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
   :commands (langtool-check
              langtool-check-done
@@ -215,7 +209,6 @@
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
-  :straight t
   :commands (format-all-ensure-formatter format-all-buffer)
   :diminish
   :preface
@@ -231,7 +224,6 @@
    ((bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode)))
 
 (use-package editorconfig
-  :straight t
   :if (executable-find "editorconfig")
   :commands editorconfig-mode)
 
@@ -239,7 +231,6 @@
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
 (use-package flycheck-grammarly
-  :straight t
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
@@ -252,7 +243,6 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool
-  :straight t
   :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :hook (text-mode-hook . flycheck-languagetool-setup)
@@ -322,8 +312,6 @@
 ;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
 ;; keytar-install".
 (use-package lsp-grammarly
-  :straight keytar
-  :straight t
   :disabled t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands (lsp-grammarly--server-command lsp-grammarly--init
@@ -362,7 +350,6 @@
         ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
 (use-package lsp-ltex
-  :straight t
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
@@ -406,7 +393,6 @@
        error-callback)))))
 
 (use-package consult-flycheck
-  :straight t
   :after (consult flycheck)
   :bind
   (:map flycheck-command-map

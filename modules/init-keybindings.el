@@ -52,24 +52,20 @@
   (global-set-key [remap previous-buffer] #'sb/previous-buffer))
 
 (use-package default-text-scale
-  :straight t
   :bind
   (("C-M-+" . default-text-scale-increase)
    ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
-  :straight t
   :commands free-keys)
 
 (use-package keyfreq
-  :straight t
   :hook
   (after-init-hook . (lambda ()
                        (keyfreq-mode 1)
                        (keyfreq-autosave-mode 1))))
 
 (use-package which-key ; Show help popups for prefix keys
-  :straight t
   :diminish
   :commands (which-key-mode which-key-setup-side-window-right-bottom)
   ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
@@ -83,7 +79,6 @@
   (which-key-idle-delay 0.3))
 
 (use-package which-key-posframe
-  :straight t
   :disabled t
   :commands which-key-posframe-mode
   :hook (which-key-mode-hook . which-key-posframe-mode)
@@ -105,13 +100,11 @@
 (setq lv-use-separator t)
 
 (use-package hydra
-  :straight t
   :commands (hydra-default-pre hydra-keyboard-quit defhydra
                                hydra-show-hint hydra-set-transient-map
                                hydra--call-interactively-remap-maybe))
 
 (use-package ivy-hydra ; Additional keybindings for `ivy'
-  :straight t
   :after (ivy hydra)
   :demand t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))

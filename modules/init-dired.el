@@ -83,7 +83,6 @@
     (diminish 'dired-omit-mode) dired-mode-map))
 
 (use-package dired-narrow ; Narrow `dired' to match filter
-  :straight t
   :after dired
   :bind
   (:map dired-mode-map
@@ -105,7 +104,6 @@
 ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
-  :straight t
   :after dired
   :defines dired-efap-initial-filename-selection
   :custom (dired-efap-initial-filename-selection nil)
@@ -114,7 +112,6 @@
         ("r" . dired-efap)))
 
 (use-package all-the-icons-dired
-  :straight t
   :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
   :if (display-graphic-p)
@@ -124,7 +121,6 @@
                          (all-the-icons-dired-mode 1)))))
 
 (use-package treemacs
-  :straight t
   :functions treemacs-tag-follow-mode
   :commands (treemacs-current-workspace
              treemacs--find-current-user-project
@@ -268,7 +264,6 @@
    ("M-0"     . treemacs-select-window)))
 
 (use-package treemacs-all-the-icons
-  :straight t
   :if (display-graphic-p)
   :after treemacs
   :demand t

@@ -365,13 +365,6 @@
   (run-with-idle-timer 60 t #'recentf-cleanup)
   :hook (after-init-hook . recentf-mode))
 
-(use-package init-open-recentf
-  :after recentf
-  :straight t
-  :demand t
-  :disabled t
-  :config (init-open-recentf))
-
 (use-package whitespace
   :straight nil
   :disabled t
