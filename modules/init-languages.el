@@ -656,6 +656,8 @@
   :straight nil
   :hook (python-mode-hook . lsp-deferred)
   :mode ("SCon\(struct\|script\)$" . python-mode)
+  :mode ("[./]flake8\\'" . conf-mode)
+  :mode ("/Pipfile\\'" . conf-mode)
   :bind
   (:map python-mode-map
         ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
@@ -708,7 +710,7 @@
 
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  :commands py-isort-before-save
+  :commands (py-isort-before-save py-isort-buffer py-isort-region)
   :hook
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
@@ -994,6 +996,7 @@
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
+  :straight tree-sitter-langs
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
   :diminish tree-sitter-mode

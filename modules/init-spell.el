@@ -82,10 +82,10 @@
               (message "No more misspelled words!")
               (setq arg 0))
           (forward-word)))))
-  :config
-  (setq flyspell-abbrev-p           t ; Add corrections to abbreviation table
-        flyspell-issue-message-flag nil
-        flyspell-issue-welcome-flag nil)
+  :custom
+  (flyspell-abbrev-p t "Add corrections to abbreviation table")
+  (flyspell-issue-message-flag nil)
+  (flyspell-issue-welcome-flag nil)
   :hook
   (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
@@ -123,6 +123,7 @@
 (use-package spell-fu
   :defines spell-fu-directory
   :commands spell-fu-mode
+  :if (executable-find "aspell")
   :custom
   (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
   :init
@@ -138,8 +139,11 @@
               (setq spell-fu-faces-exclude '(org-block
                                              org-block-begin-line
                                              org-block-end-line
+                                             org-cite
+                                             org-cite-key
                                              org-code
                                              org-date
+                                             org-footnote
                                              org-formula
                                              org-latex-and-related
                                              org-link
@@ -180,6 +184,9 @@
     (add-hook hook (lambda ()
                      (setq spell-fu-faces-exclude '(font-latex-math-face
                                                     font-latex-sedate-face
+                                                    font-lock-function-name-face
+                                                    font-lock-keyword-face
+                                                    font-lock-variable-name-face
                                                     hl-line))
                      (spell-fu-mode))))
   :bind

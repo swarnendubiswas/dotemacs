@@ -46,7 +46,7 @@
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
         flycheck-checker-error-threshold 1500
         flycheck-idle-buffer-switch-delay 10 ; Increase the time (s) to allow for quick transitions
-        flycheck-idle-change-delay 15 ; Increase the time (s) to allow for edits
+        flycheck-idle-change-delay 10 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
         ;; Show error messages only if the error list is not already visible
         ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list

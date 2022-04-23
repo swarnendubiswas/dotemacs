@@ -44,6 +44,8 @@
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 
+(bind-key "[escape]" #'keyboard-quit popup-menu-keymap)
+
 (when (eq sb/minibuffer-completion 'ivy)
   (bind-key   "C-x j" #'sb/counsel-all-files-recursively))
 
@@ -74,7 +76,7 @@
   (which-key-setup-side-window-right-bottom)
   :custom
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
-  (which-key-show-early-on-C-h t)
+  (which-key-show-early-on-C-h nil)
   (which-key-sort-order 'which-key-key-order-alpha)
   (which-key-idle-delay 0.3))
 

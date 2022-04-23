@@ -205,13 +205,19 @@
   :commands turn-on-eldoc-mode
   :diminish
   :hook (prog-mode-hook . turn-on-eldoc-mode)
-  ;; :config
+  :config
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
   ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
   ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
   ;; useful information.
   ;; (setq eldoc-echo-area-use-multiline-p nil)
-  )
+
+  ;; Allow eldoc to trigger after completions
+  (when (sb/capf 'company)
+    (eldoc-add-command 'company-complete-selection
+                       'company-complete-common
+                       'company-capf
+                       'company-abort)))
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box

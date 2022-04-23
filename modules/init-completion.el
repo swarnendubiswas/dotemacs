@@ -559,7 +559,7 @@
         company-dabbrev-other-buffers t
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 3 ; Small words can be faster to type
+        company-minimum-prefix-length 2 ; Small words can be faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
         company-show-quick-access t ; Speed up completion
@@ -633,6 +633,8 @@
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
+  :straight flx
+  :straight t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :diminish (company-fuzzy-mode global-company-fuzzy-mode)
